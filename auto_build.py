@@ -141,9 +141,10 @@ def get_pitcher_info(pname, l14_pitch):
     pk = pname.lower()
     pd = PITCHER_CAREER_DB.get(pk, {})
     pf = pitcher_factor(pname, l14_pitch)
-    xfip = pd.get("xfip", 4.0) or 4.0
-    era  = pd.get("era",  4.5) or 4.5
-    k9   = pd.get("k9",   8.0) or 8.0
+    # DB uses xf3 (3yr xFIP), xf6 (6yr xFIP), h3 (K%), e3 (BB%)
+    xfip = pd.get("xf3") or pd.get("xf6") or pd.get("xfip") or 4.0
+    era  = pd.get("era") or round(xfip * 1.05, 2)
+    k9   = round((pd.get("h3") or pd.get("h6") or 0.22) * 27, 1)
     hr9  = round(xfip * 0.12, 3)
     hand = pd.get("hand", "R") or "R"
     return {"pf": pf, "xfip": xfip, "era": era, "k9": k9, "hr9": hr9, "hand": hand}
