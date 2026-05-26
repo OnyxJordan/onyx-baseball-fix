@@ -104,8 +104,12 @@ def sc_score(d: dict) -> float:
 def pitcher_factor(pitcher_name: str, l14_pitchers: dict = None) -> float:
     pk = pitcher_name.lower()
     pd = PITCHER_CAREER_DB.get(pk, {})
-    base_xfip = pd.get("xf3") or pd.get("xf6") or pd.get("xfip") or 4.0
-    base_pf = max(0.60, min(1.50, base_xfip / 4.0))
+    # Use pre-computed pf if available, else derive from xFIP
+    if pd.get("pf"):
+        base_pf = max(0.60, min(1.50, float(pd["pf"])))
+    else:
+        base_xfip = pd.get("xf3") or pd.get("xf6") or 4.0
+        base_pf = max(0.60, min(1.50, base_xfip / 4.0))
 
     # Blend in L14 if available (max 30% weight if 10+ BF)
     if l14_pitchers and pk in l14_pitchers:
