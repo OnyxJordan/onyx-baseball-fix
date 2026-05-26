@@ -155,6 +155,9 @@ def build():
     lineups   = json.loads((DATA / "lineups.json").read_text())
     odds_path = DATA / "odds.json"
     odds_map  = json.loads(odds_path.read_text()) if odds_path.exists() else {}
+    sal_path  = DATA / "salaries.json"
+    sal_map   = json.loads(sal_path.read_text()) if sal_path.exists() else {}
+    print(f"  Salaries: {len(sal_map)} players loaded" if sal_map else "  Salaries: not found")
     weather   = json.loads((DATA / "weather.json").read_text())
     l14_hit   = json.loads((DATA / "statcast_l14.json").read_text())
     l14_pitch = json.loads((DATA / "pitchers_l14.json").read_text())
