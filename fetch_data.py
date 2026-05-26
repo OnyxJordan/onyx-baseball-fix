@@ -1,15 +1,14 @@
 """
-fetch_data.py — Onyx Baseball daily data fetcher v5
-Odds: parsed from odds_input.html (uploaded manually each morning)
+fetch_data.py — Onyx Baseball daily data fetcher v6
+Odds: reads data/odds.json directly (uploaded manually each morning)
 Lineups: MLB Stats API with roster fallback
 Weather: Open-Meteo (free, no key)
 Statcast: Baseball Savant
 """
 
-import os, json, time, requests, csv, io, datetime, re
+import os, json, time, requests, csv, io, datetime
 from pathlib import Path
 from collections import defaultdict
-from html.parser import HTMLParser
 
 OUT = Path("data")
 OUT.mkdir(exist_ok=True)
@@ -67,82 +66,23 @@ def mlb_get(path, params=None):
 def player_name_key(name):
     return name.lower().strip()
 
-# ── 1. ODDS from uploaded HTML ────────────────────────────────────────────────
-class TextExtractor(HTMLParser):
-    def __init__(self):
-        super().__init__()
-        self.text = []; self.skip = False
-    def handle_starttag(self, tag, attrs):
-        if tag in ('script','style'): self.skip = True
-    def handle_endtag(self, tag):
-        if tag in ('script','style'): self.skip = False
-    def handle_data(self, data):
-        if not self.skip:
-            d = data.strip()
-            if d: self.text.append(d)
-
-def fetch_odds():
-    print("Parsing HR odds from odds_input.html...")
-    odds_path = Path("odds_input.html")
-    if not odds_path.exists():
-        print("  No odds_input.html found — running without odds")
-        with open(OUT/"odds.json","w") as f: json.dump({},f)
+# ── 1. ODDS — read from data/odds.json (uploaded daily) ──────────────────────
+def load_odds():
+    odds_path = OUT / "odds.json"
+    if odds_path.exists():
+        with open(odds_path) as f:
+            odds = json.load(f)
+        print(f"  Odds: loaded {len(odds)} players from data/odds.json")
+        return odds
+    else:
+        print("  Odds: data/odds.json not found — running without odds")
         return {}
-
-    with open(odds_path) as f:
-        html = f.read()
-
-    p = TextExtractor()
-    p.feed(html)
-    lines = p.text
-
-    odds_map = {}
-    SKIP = {'HR:','1+','2+','Home Runs','Total Bases','Hits','Hits + Runs + RBIs',
-            'RBIs','Extra Base Hits','Combined Hits','Live Batter Props',
-            'Grand Slam Payout','Quick Hits','Batter Props','Game Lines',
-            'Today','MLB','POPULAR','Sign In','Sign Up'}
-
-    i = 0
-    while i < len(lines):
-        line = lines[i].strip()
-        # Skip obvious non-player lines
-        if (not line or line in SKIP or
-            re.match(r'^[\d\s\+\-\.\(\)]+$', line) or
-            len(line) < 4 or len(line) > 40 or
-            len(line.split()) < 2 or len(line.split()) > 4):
-            i += 1; continue
-
-        # Look ahead for odds in next 6 tokens
-        for j in range(i+1, min(i+7, len(lines))):
-            odds_str = lines[j].strip()
-            if re.match(r'^\+\d{2,4}$', odds_str):
-                try:
-                    odds_val = int(odds_str)
-                    if 100 <= odds_val <= 5000:
-                        odds_map[line.lower()] = odds_val
-                except: pass
-                break
-            # Stop if we hit another potential player name
-            if (len(odds_str.split()) >= 2 and
-                not re.match(r'^[\d\+\-\.]+$', odds_str) and
-                j > i+1):
-                break
-        i += 1
-
-    print(f"  Parsed {len(odds_map)} player odds from HTML")
-    if odds_map:
-        sample = sorted(odds_map.items(), key=lambda x: x[1])[:5]
-        for name, o in sample:
-            print(f"    {name}: +{o}")
-
-    with open(OUT/"odds.json","w") as f: json.dump(odds_map,f,indent=2)
-    return odds_map
 
 # ── 2. SCHEDULE ───────────────────────────────────────────────────────────────
 def fetch_schedule():
     today = datetime.date.today().strftime("%Y-%m-%d")
     data = mlb_get("/schedule", {
-        "sportId":1,"date":today,
+        "sportId":1, "date":today,
         "hydrate":"lineups,probablePitcher,team,linescore",
     })
     games = [g for de in data.get("dates",[]) for g in de.get("games",[])
@@ -290,15 +230,18 @@ def fetch_weather(games):
             r.raise_for_status()
             h = r.json().get("hourly",{})
             idx = min(game_hour,23)
-            weather[team] = {"park":park_name,
-                "temp":h.get("temperature_2m",[72]*24)[idx],
-                "precip_pct":h.get("precipitation_probability",[0]*24)[idx],
-                "wind_mph":h.get("wind_speed_10m",[5]*24)[idx],
-                "wind_dir":deg_to_compass(h.get("wind_direction_10m",[180]*24)[idx]),
-                "roof":roof}
+            weather[team] = {
+                "park":park_name,
+                "temp":       h.get("temperature_2m",[72]*24)[idx],
+                "precip_pct": h.get("precipitation_probability",[0]*24)[idx],
+                "wind_mph":   h.get("wind_speed_10m",[5]*24)[idx],
+                "wind_dir":   deg_to_compass(h.get("wind_direction_10m",[180]*24)[idx]),
+                "roof":       roof,
+            }
         except Exception as e:
             print(f"  Weather error {team}: {e}")
-            weather[team] = {"park":park_name,"temp":72,"precip_pct":0,"wind_mph":5,"wind_dir":"N","roof":roof}
+            weather[team] = {"park":park_name,"temp":72,"precip_pct":0,
+                             "wind_mph":5,"wind_dir":"N","roof":roof}
         time.sleep(0.15)
     print(f"  Weather: {len(weather)} stadiums")
     with open(OUT/"weather.json","w") as f: json.dump(weather,f,indent=2)
@@ -384,7 +327,7 @@ def fetch_pitcher_statcast():
 # ── MAIN ───────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     print("=== Onyx Baseball — Fetching data ===\n")
-    fetch_odds()          # parse from odds_input.html if present
+    load_odds()           # just reads data/odds.json — no API call
     games = fetch_lineups()
     fetch_weather(games)
     fetch_statcast()
