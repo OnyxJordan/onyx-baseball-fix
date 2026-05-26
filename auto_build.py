@@ -132,7 +132,8 @@ def build():
     print("=== Onyx Auto-Build ===\n")
 
     lineups   = json.loads((DATA / "lineups.json").read_text())
-    odds_map  = json.loads((DATA / "odds.json").read_text())
+  odds_path = DATA / "odds.json"
+odds_map  = json.loads(odds_path.read_text()) if odds_path.exists() else {}
     weather   = json.loads((DATA / "weather.json").read_text())
     l14_hit   = json.loads((DATA / "statcast_l14.json").read_text())
     l14_pitch = json.loads((DATA / "pitchers_l14.json").read_text())
