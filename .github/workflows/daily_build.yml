@@ -1,0 +1,38 @@
+name: Daily Onyx Build
+
+on:
+  schedule:
+    - cron: '30 15 * * *'  # 11:30 AM ET (15:30 UTC)
+  workflow_dispatch:         # manual trigger from Actions tab
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Fetch daily data
+        env:
+          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
+        run: python3 fetch_data.py
+
+      - name: Build index.html
+        run: python3 auto_build.py
+
+      - name: Commit and push updated index.html
+        run: |
+          git config user.name "Onyx Bot"
+          git config user.email "bot@onyxbaseball.io"
+          git add index.html
+          git diff --staged --quiet || git commit -m "Auto-build: $(date +'%B %-d, %Y')"
+          git push
