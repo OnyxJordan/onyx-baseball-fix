@@ -1,20 +1,9 @@
 """
-fetch_data.py — Onyx Baseball daily data fetcher v2
-Pulls: MLB lineups (confirmed OR projected from rosters), HR odds, weather, Statcast L14
-
-Strategy for lineups:
-  1. Try confirmed lineups from MLB Stats API (available ~1hr before first pitch)
-  2. Fall back to recent game batting orders per player (last 7 days)
-  3. Fall back to team roster with position-based default batting orders
-
-This guarantees the site always populates even at 11:30 AM when lineups aren't out yet.
-
-Usage:  python3 fetch_data.py
-Output: data/lineups.json, data/odds.json, data/weather.json,
-        data/statcast_l14.json, data/pitchers_l14.json
+fetch_data.py — Onyx Baseball daily data fetcher v3
+Fixes: odds market key, recent batting orders, weather timeout
 """
 
-import os, json, time, requests, csv, io, datetime, math
+import os, json, time, requests, csv, io, datetime
 from pathlib import Path
 from collections import defaultdict
 
@@ -23,7 +12,6 @@ OUT.mkdir(exist_ok=True)
 
 ODDS_API_KEY = os.environ.get("ODDS_API_KEY", "")
 
-# Stadium GPS + park names keyed by MLB team abbreviation
 STADIUMS = {
     "PIT": ("PNC Park",                40.4469, -80.0057, False),
     "TOR": ("Rogers Centre",           43.6414, -79.3894, True),
@@ -57,7 +45,6 @@ STADIUMS = {
     "LAA": ("Angel Stadium",           33.8003,-117.8827, False),
 }
 
-# MLB team ID → abbreviation (for Stats API responses)
 TEAM_ID_TO_ABBR = {
     109:"ARI",110:"BAL",111:"BOS",112:"CHC",113:"CIN",114:"CLE",115:"COL",
     116:"DET",117:"HOU",118:"KC",119:"LAD",120:"WAS",121:"NYM",133:"OAK",
@@ -66,12 +53,10 @@ TEAM_ID_TO_ABBR = {
     158:"MIL",108:"LAA",
 }
 
-# Default batting order by position (if all else fails)
 POS_DEFAULT_ORDER = {
-    "CF":2,"SS":2,"2B":2,"3B":3,"1B":4,"LF":4,"RF":5,"DH":4,"C":7,"OF":5,"P":9
+    "CF":2,"SS":2,"2B":3,"3B":4,"1B":4,"LF":5,"RF":5,"DH":4,"C":7,"OF":5,"P":9
 }
 
-# ── HELPERS ────────────────────────────────────────────────────────────────────
 def mlb_get(path, params=None):
     url = f"https://statsapi.mlb.com/api/v1{path}"
     r = requests.get(url, params=params, timeout=20)
@@ -81,155 +66,111 @@ def mlb_get(path, params=None):
 def player_name_key(name):
     return name.lower().strip()
 
-# ── 1. TODAYS SCHEDULE ────────────────────────────────────────────────────────
+# ── 1. SCHEDULE ───────────────────────────────────────────────────────────────
 def fetch_schedule():
     today = datetime.date.today().strftime("%Y-%m-%d")
     data = mlb_get("/schedule", {
-        "sportId": 1,
-        "date": today,
-        "hydrate": "lineups,probablePitcher,team,linescore,weather",
+        "sportId": 1, "date": today,
+        "hydrate": "lineups,probablePitcher,team,linescore",
     })
-    games = []
-    for date_entry in data.get("dates", []):
-        for g in date_entry.get("games", []):
-            status = g.get("status", {}).get("abstractGameState", "")
-            if status == "Final":
-                continue
-            games.append(g)
+    games = [g for de in data.get("dates",[]) for g in de.get("games",[])
+             if g.get("status",{}).get("abstractGameState") != "Final"]
     print(f"  Schedule: {len(games)} games today")
     return games
 
-# ── 2. RECENT BATTING ORDERS (last 7 days, per team) ─────────────────────────
+# ── 2. RECENT BATTING ORDERS ──────────────────────────────────────────────────
 def fetch_recent_batting_orders():
-    """Returns {team_abbr: {player_name_key: avg_batting_order}}"""
     today = datetime.date.today()
-    start = (today - datetime.timedelta(days=7)).strftime("%Y-%m-%d")
-    end   = today.strftime("%Y-%m-%d")
-
-    print("  Fetching recent batting orders (last 7 days)...")
-    data = mlb_get("/schedule", {
-        "sportId": 1,
-        "startDate": start,
-        "endDate": end,
-        "hydrate": "lineups,team",
-        "gameType": "R",
-    })
+    # Try last 14 days to get more data
+    start = (today - datetime.timedelta(days=14)).strftime("%Y-%m-%d")
+    end   = (today - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
+    print(f"  Fetching recent batting orders ({start} to {end})...")
+    try:
+        data = mlb_get("/schedule", {
+            "sportId":1, "startDate":start, "endDate":end,
+            "hydrate":"lineups,team", "gameType":"R",
+        })
+    except Exception as e:
+        print(f"  Recent orders error: {e}")
+        return {}
 
     team_orders = defaultdict(lambda: defaultdict(list))
-
-    for date_entry in data.get("dates", []):
-        for g in date_entry.get("games", []):
-            lineups = g.get("lineups", {})
-            if not lineups:
-                continue
+    for de in data.get("dates",[]):
+        for g in de.get("games",[]):
+            lineups = g.get("lineups",{})
+            if not lineups: continue
             away_id = g["teams"]["away"]["team"]["id"]
             home_id = g["teams"]["home"]["team"]["id"]
-            away_abbr = TEAM_ID_TO_ABBR.get(away_id, "")
-            home_abbr = TEAM_ID_TO_ABBR.get(home_id, "")
+            away_abbr = TEAM_ID_TO_ABBR.get(away_id,"")
+            home_abbr = TEAM_ID_TO_ABBR.get(home_id,"")
+            for p in lineups.get("awayPlayers",[]):
+                name = player_name_key(p.get("fullName",""))
+                bo = p.get("battingOrder",0)//100
+                if name and 1<=bo<=9: team_orders[away_abbr][name].append(bo)
+            for p in lineups.get("homePlayers",[]):
+                name = player_name_key(p.get("fullName",""))
+                bo = p.get("battingOrder",0)//100
+                if name and 1<=bo<=9: team_orders[home_abbr][name].append(bo)
 
-            for player in lineups.get("awayPlayers", []):
-                name = player_name_key(player.get("fullName", ""))
-                bo = player.get("battingOrder", 0) // 100
-                if name and 1 <= bo <= 9:
-                    team_orders[away_abbr][name].append(bo)
-
-            for player in lineups.get("homePlayers", []):
-                name = player_name_key(player.get("fullName", ""))
-                bo = player.get("battingOrder", 0) // 100
-                if name and 1 <= bo <= 9:
-                    team_orders[home_abbr][name].append(bo)
-
-    # Average the batting orders
-    avg_orders = {}
-    for team, players in team_orders.items():
-        avg_orders[team] = {name: round(sum(orders)/len(orders)) for name, orders in players.items()}
-
-    print(f"  Recent batting orders: {sum(len(v) for v in avg_orders.values())} player-entries across {len(avg_orders)} teams")
+    avg_orders = {team: {name: round(sum(o)/len(o)) for name,o in players.items()}
+                  for team,players in team_orders.items()}
+    total = sum(len(v) for v in avg_orders.values())
+    print(f"  Recent batting orders: {total} entries across {len(avg_orders)} teams")
     return avg_orders
 
-# ── 3. TEAM ROSTERS (fallback) ─────────────────────────────────────────────────
+# ── 3. ROSTER FALLBACK ────────────────────────────────────────────────────────
 def fetch_roster(team_id):
-    """Get active 40-man roster for a team."""
     try:
-        data = mlb_get(f"/teams/{team_id}/roster", {"rosterType": "active"})
-        return [
-            {
-                "name": p["person"]["fullName"],
-                "pos": p.get("position", {}).get("abbreviation", "OF"),
-            }
-            for p in data.get("roster", [])
-            if p.get("position", {}).get("abbreviation", "P") != "P"  # exclude pitchers from lineup
-        ]
-    except Exception as e:
-        print(f"    Roster fetch error for team {team_id}: {e}")
+        data = mlb_get(f"/teams/{team_id}/roster", {"rosterType":"active"})
+        return [{"name":p["person"]["fullName"],"pos":p.get("position",{}).get("abbreviation","OF")}
+                for p in data.get("roster",[])
+                if p.get("position",{}).get("abbreviation","P") not in ("P","SP","RP")]
+    except:
         return []
 
-# ── 4. BUILD LINEUP (confirmed → recent orders → roster) ─────────────────────
-def build_lineup(game, recent_orders, away_or_home):
-    """
-    Returns list of {name, pos, batting_order} for one side of a game.
-    Priority: confirmed lineup → recent batting order history → roster fallback.
-    """
-    team_data = game["teams"][away_or_home]
+# ── 4. BUILD LINEUP ────────────────────────────────────────────────────────────
+def build_lineup(game, recent_orders, side):
+    team_data = game["teams"][side]
     team_id   = team_data["team"]["id"]
-    team_abbr = TEAM_ID_TO_ABBR.get(team_id, "")
-
-    # Try confirmed lineup first
-    lineups = game.get("lineups", {})
-    key = "awayPlayers" if away_or_home == "away" else "homePlayers"
-    confirmed = lineups.get(key, [])
+    team_abbr = TEAM_ID_TO_ABBR.get(team_id,"")
+    key = "awayPlayers" if side=="away" else "homePlayers"
+    confirmed = game.get("lineups",{}).get(key,[])
 
     if confirmed:
         result = []
         for p in confirmed:
-            name = p.get("fullName", "")
-            pos  = p.get("position", {}).get("abbreviation", "OF")
-            bo   = p.get("battingOrder", 500) // 100
-            if not name or pos == "P": continue
-            result.append({"name": name, "pos": pos, "batting_order": max(1, min(9, bo))})
+            name = p.get("fullName","")
+            pos  = p.get("position",{}).get("abbreviation","OF")
+            bo   = p.get("battingOrder",500)//100
+            if not name or pos=="P": continue
+            result.append({"name":name,"pos":pos,"batting_order":max(1,min(9,bo))})
         if result:
-            return result, team_abbr, True  # confirmed=True
+            return result, team_abbr, True
 
-    # Fall back: use roster + recent batting orders
+    # Roster fallback
     roster = fetch_roster(team_id)
-    team_recent = recent_orders.get(team_abbr, {})
-
+    team_recent = recent_orders.get(team_abbr,{})
     players = []
     for p in roster:
-        name = p["name"]
-        pos  = p["pos"]
-        nk   = player_name_key(name)
-        # Look up recent batting order, fall back to position default
-        bo = team_recent.get(nk) or POS_DEFAULT_ORDER.get(pos, 6)
-        players.append({"name": name, "pos": pos, "batting_order": bo, "_nk": nk})
+        nk = player_name_key(p["name"])
+        bo = team_recent.get(nk) or POS_DEFAULT_ORDER.get(p["pos"],6)
+        players.append({"name":p["name"],"pos":p["pos"],"batting_order":bo})
 
-    # Sort by batting order, deduplicate by closest to typical order
     players.sort(key=lambda x: x["batting_order"])
-
-    # Take top 9 (excluding pure pitchers already filtered)
-    # Prefer players with recent batting order data
     has_recent = [p for p in players if player_name_key(p["name"]) in team_recent]
     no_recent  = [p for p in players if player_name_key(p["name"]) not in team_recent]
+    lineup = (has_recent + no_recent)[:9]
+    for i,p in enumerate(lineup):
+        p["batting_order"] = i+1
+    return lineup, team_abbr, False
 
-    lineup = has_recent[:9]
-    if len(lineup) < 9:
-        lineup += no_recent[:9 - len(lineup)]
-
-    # Re-assign batting orders 1-9 cleanly
-    lineup = lineup[:9]
-    for i, p in enumerate(lineup):
-        p["batting_order"] = i + 1
-        p.pop("_nk", None)
-
-    return lineup, team_abbr, False  # confirmed=False (projected)
-
-# ── 5. MAIN LINEUP FETCH ──────────────────────────────────────────────────────
+# ── 5. FETCH LINEUPS ──────────────────────────────────────────────────────────
 def fetch_lineups():
     print("Fetching lineups...")
-    games_raw  = fetch_schedule()
+    games_raw     = fetch_schedule()
     recent_orders = fetch_recent_batting_orders()
-
     games = {}
+
     for g in games_raw:
         away_id   = g["teams"]["away"]["team"]["id"]
         home_id   = g["teams"]["home"]["team"]["id"]
@@ -237,274 +178,261 @@ def fetch_lineups():
         home_abbr = TEAM_ID_TO_ABBR.get(home_id, str(home_id))
         game_key  = f"{away_abbr}_{home_abbr}"
 
-        away_pitcher = g["teams"]["away"].get("probablePitcher", {}).get("fullName", "TBD")
-        home_pitcher = g["teams"]["home"].get("probablePitcher", {}).get("fullName", "TBD")
-
-        away_lineup, _, away_confirmed = build_lineup(g, recent_orders, "away")
-        home_lineup, _, home_confirmed = build_lineup(g, recent_orders, "home")
-
-        game_time = g.get("gameDate", "")
-        status    = g.get("status", {}).get("detailedState", "")
+        away_pitcher = g["teams"]["away"].get("probablePitcher",{}).get("fullName","TBD")
+        home_pitcher = g["teams"]["home"].get("probablePitcher",{}).get("fullName","TBD")
+        away_lineup, _, away_conf = build_lineup(g, recent_orders, "away")
+        home_lineup, _, home_conf = build_lineup(g, recent_orders, "home")
 
         games[game_key] = {
-            "game_key":       game_key,
-            "game_id":        g["gamePk"],
-            "game_time":      game_time,
-            "away_team":      away_abbr,
-            "home_team":      home_abbr,
-            "away_pitcher":   away_pitcher,
-            "home_pitcher":   home_pitcher,
-            "away_lineup":    away_lineup,
-            "home_lineup":    home_lineup,
-            "away_confirmed": away_confirmed,
-            "home_confirmed": home_confirmed,
-            "status":         status,
+            "game_key":game_key,"game_id":g["gamePk"],
+            "game_time":g.get("gameDate",""),
+            "away_team":away_abbr,"home_team":home_abbr,
+            "away_pitcher":away_pitcher,"home_pitcher":home_pitcher,
+            "away_lineup":away_lineup,"home_lineup":home_lineup,
+            "away_confirmed":away_conf,"home_confirmed":home_conf,
+            "status":g.get("status",{}).get("detailedState",""),
         }
-        conf = "✓" if (away_confirmed and home_confirmed) else "~projected"
-        print(f"  {game_key:12s}  {away_pitcher:20s} vs {home_pitcher:20s}  [{conf}]")
+        conf = "✓" if (away_conf and home_conf) else "~projected"
+        print(f"  {game_key:12s}  {away_pitcher:22s} vs {home_pitcher:22s}  [{conf}]")
 
-    print(f"\n  Total: {len(games)} games, "
-          f"{sum(1 for g in games.values() if g['away_confirmed'] and g['home_confirmed'])} fully confirmed")
-
-    with open(OUT / "lineups.json", "w") as f:
-        json.dump(games, f, indent=2)
+    fully = sum(1 for g in games.values() if g["away_confirmed"] and g["home_confirmed"])
+    print(f"\n  Total: {len(games)} games, {fully} fully confirmed")
+    with open(OUT/"lineups.json","w") as f: json.dump(games,f,indent=2)
     return games
 
 # ── 6. HR ODDS ────────────────────────────────────────────────────────────────
 def fetch_odds():
     print("Fetching HR odds from The Odds API...")
     if not ODDS_API_KEY:
-        print("  WARNING: ODDS_API_KEY not set.")
-        with open(OUT / "odds.json", "w") as f:
-            json.dump({}, f)
+        print("  WARNING: No ODDS_API_KEY")
+        with open(OUT/"odds.json","w") as f: json.dump({},f)
         return {}
 
     today_str = datetime.date.today().isoformat()
     odds_map  = {}
 
+    # Try multiple market keys — API has changed these over time
+    MARKET_KEYS = ["batter_home_runs", "player_home_runs", "batter_hr"]
+
     try:
-        events_url = "https://api.the-odds-api.com/v4/sports/baseball_mlb/events"
-        r = requests.get(events_url, params={"apiKey": ODDS_API_KEY, "dateFormat": "iso"}, timeout=15)
+        r = requests.get("https://api.the-odds-api.com/v4/sports/baseball_mlb/events",
+            params={"apiKey":ODDS_API_KEY,"dateFormat":"iso"}, timeout=15)
         r.raise_for_status()
         events = r.json()
+        print(f"  Events found: {len(events)}")
     except Exception as e:
         print(f"  Events error: {e}")
-        with open(OUT / "odds.json", "w") as f:
-            json.dump({}, f)
+        with open(OUT/"odds.json","w") as f: json.dump({},f)
         return {}
 
-    for event in events:
-        if event.get("commence_time", "")[:10] != today_str:
-            continue
-        event_id = event["id"]
+    # Find which market key works using first event
+    working_market = None
+    today_events = [e for e in events if e.get("commence_time","")[:10] == today_str]
+    print(f"  Today's events: {len(today_events)}")
+
+    if today_events:
+        test_id = today_events[0]["id"]
+        for mkey in MARKET_KEYS:
+            try:
+                r2 = requests.get(
+                    f"https://api.the-odds-api.com/v4/sports/baseball_mlb/events/{test_id}/odds",
+                    params={"apiKey":ODDS_API_KEY,"regions":"us","markets":mkey,
+                            "bookmakers":"draftkings","oddsFormat":"american"}, timeout=15)
+                r2.raise_for_status()
+                data = r2.json()
+                for bm in data.get("bookmakers",[]):
+                    for market in bm.get("markets",[]):
+                        if market.get("outcomes"):
+                            working_market = mkey
+                            print(f"  Working market key: {mkey}")
+                            break
+                if working_market: break
+            except Exception as e:
+                print(f"  Market key {mkey} error: {e}")
+            time.sleep(0.2)
+
+    if not working_market:
+        # Last resort: try the player_props endpoint
+        print("  Trying player_props endpoint...")
+        try:
+            r3 = requests.get(
+                "https://api.the-odds-api.com/v4/sports/baseball_mlb/odds",
+                params={"apiKey":ODDS_API_KEY,"regions":"us",
+                        "markets":"batter_home_runs","bookmakers":"draftkings",
+                        "oddsFormat":"american","dateFormat":"iso"}, timeout=15)
+            r3.raise_for_status()
+            bulk = r3.json()
+            for game in bulk:
+                if game.get("commence_time","")[:10] != today_str: continue
+                for bm in game.get("bookmakers",[]):
+                    for market in bm.get("markets",[]):
+                        for outcome in market.get("outcomes",[]):
+                            if outcome.get("name")=="Over" and outcome.get("point",0)<1.5:
+                                player = (outcome.get("description","") or outcome.get("name","")).lower().strip()
+                                if player:
+                                    odds_map[player] = outcome["price"]
+            print(f"  Bulk odds: {len(odds_map)} players")
+        except Exception as e:
+            print(f"  Bulk odds error: {e}")
+        with open(OUT/"odds.json","w") as f: json.dump(odds_map,f,indent=2)
+        return odds_map
+
+    # Fetch per-event with working market key
+    for event in today_events:
         try:
             r2 = requests.get(
-                f"https://api.the-odds-api.com/v4/sports/baseball_mlb/events/{event_id}/odds",
-                params={
-                    "apiKey":      ODDS_API_KEY,
-                    "regions":     "us",
-                    "markets":     "batter_home_runs",
-                    "bookmakers":  "draftkings",
-                    "oddsFormat":  "american",
-                },
-                timeout=15,
-            )
+                f"https://api.the-odds-api.com/v4/sports/baseball_mlb/events/{event['id']}/odds",
+                params={"apiKey":ODDS_API_KEY,"regions":"us","markets":working_market,
+                        "bookmakers":"draftkings","oddsFormat":"american"}, timeout=15)
             r2.raise_for_status()
-            prop_data = r2.json()
+            data = r2.json()
+            for bm in data.get("bookmakers",[]):
+                if bm["key"] != "draftkings": continue
+                for market in bm.get("markets",[]):
+                    for outcome in market.get("outcomes",[]):
+                        if outcome.get("name")=="Over" and outcome.get("point",0.5)<1.5:
+                            player = (outcome.get("description","") or "").lower().strip()
+                            if player:
+                                odds_map[player] = outcome["price"]
         except Exception as e:
-            print(f"  Props error: {e}")
-            continue
-
-        for bm in prop_data.get("bookmakers", []):
-            if bm["key"] != "draftkings":
-                continue
-            for market in bm.get("markets", []):
-                if market["key"] != "batter_home_runs":
-                    continue
-                for outcome in market.get("outcomes", []):
-                    if outcome["name"] == "Over" and outcome.get("point", 0) < 1.5:
-                        player = outcome["description"].lower().strip()
-                        odds_map[player] = outcome["price"]
+            print(f"  Props error {event.get('id','')}: {e}")
         time.sleep(0.25)
 
     print(f"  Odds: {len(odds_map)} players")
-    with open(OUT / "odds.json", "w") as f:
-        json.dump(odds_map, f, indent=2)
+    with open(OUT/"odds.json","w") as f: json.dump(odds_map,f,indent=2)
     return odds_map
 
 # ── 7. WEATHER ────────────────────────────────────────────────────────────────
 def deg_to_compass(deg):
-    dirs = ["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"]
-    return dirs[round(deg / 22.5) % 16]
+    dirs=["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"]
+    return dirs[round(deg/22.5)%16]
 
 def fetch_weather(games):
     print("Fetching weather from Open-Meteo...")
     weather = {}
     home_teams = {g["home_team"] for g in games.values()}
 
-    # Try to pick the right hour index based on game time
     for team in home_teams:
-        if team not in STADIUMS:
-            continue
+        if team not in STADIUMS: continue
         park_name, lat, lon, roof = STADIUMS[team]
 
-        # Find earliest game for this home team to pick weather hour
-        game_hour = 14  # default 2pm local
+        game_hour = 14
         for g in games.values():
-            if g["home_team"] == team and g.get("game_time"):
+            if g["home_team"]==team and g.get("game_time"):
                 try:
                     dt = datetime.datetime.fromisoformat(g["game_time"].replace("Z","+00:00"))
                     eastern = dt.astimezone(datetime.timezone(datetime.timedelta(hours=-4)))
-                    game_hour = eastern.hour
-                    break
+                    game_hour = eastern.hour; break
                 except: pass
 
         try:
             r = requests.get("https://api.open-meteo.com/v1/forecast", params={
-                "latitude":         lat,
-                "longitude":        lon,
-                "hourly":           "temperature_2m,precipitation_probability,wind_speed_10m,wind_direction_10m",
-                "temperature_unit": "fahrenheit",
-                "wind_speed_unit":  "mph",
-                "forecast_days":    1,
-                "timezone":         "America/New_York",
-            }, timeout=10)
+                "latitude":lat,"longitude":lon,
+                "hourly":"temperature_2m,precipitation_probability,wind_speed_10m,wind_direction_10m",
+                "temperature_unit":"fahrenheit","wind_speed_unit":"mph",
+                "forecast_days":1,"timezone":"America/New_York",
+            }, timeout=20)
             r.raise_for_status()
-            h = r.json().get("hourly", {})
-            idx = min(game_hour, 23)
+            h = r.json().get("hourly",{})
+            idx = min(game_hour,23)
             weather[team] = {
-                "park":       park_name,
-                "temp":       h.get("temperature_2m",       [72]*24)[idx],
-                "precip_pct": h.get("precipitation_probability", [0]*24)[idx],
-                "wind_mph":   h.get("wind_speed_10m",       [5]*24)[idx],
-                "wind_dir":   deg_to_compass(h.get("wind_direction_10m", [180]*24)[idx]),
+                "park":park_name,
+                "temp":       h.get("temperature_2m",[72]*24)[idx],
+                "precip_pct": h.get("precipitation_probability",[0]*24)[idx],
+                "wind_mph":   h.get("wind_speed_10m",[5]*24)[idx],
+                "wind_dir":   deg_to_compass(h.get("wind_direction_10m",[180]*24)[idx]),
                 "roof":       roof,
             }
         except Exception as e:
             print(f"  Weather error {team}: {e}")
-            weather[team] = {"park": park_name, "temp":72,"precip_pct":0,"wind_mph":5,"wind_dir":"N","roof":roof}
-        time.sleep(0.1)
+            weather[team] = {"park":park_name,"temp":72,"precip_pct":0,
+                             "wind_mph":5,"wind_dir":"N","roof":roof}
+        time.sleep(0.15)
 
     print(f"  Weather: {len(weather)} stadiums")
-    with open(OUT / "weather.json", "w") as f:
-        json.dump(weather, f, indent=2)
+    with open(OUT/"weather.json","w") as f: json.dump(weather,f,indent=2)
     return weather
 
 # ── 8. STATCAST L14 ───────────────────────────────────────────────────────────
 def fetch_statcast():
     print("Fetching Statcast L14 hitter data...")
     today = datetime.date.today()
-    start = (today - datetime.timedelta(days=14)).strftime("%Y-%m-%d")
+    start = (today-datetime.timedelta(days=14)).strftime("%Y-%m-%d")
     end   = today.strftime("%Y-%m-%d")
-
-    url = (
-        "https://baseballsavant.mlb.com/statcast_search/csv"
-        f"?all=true&player_type=batter&hfGT=R%7C&hfSea=2026%7C"
-        f"&game_date_gt={start}&game_date_lt={end}"
-        f"&min_abs=5&group_by=name&sort_col=pitches&sort_order=desc&type=details&"
-    )
-
+    url = (f"https://baseballsavant.mlb.com/statcast_search/csv"
+           f"?all=true&player_type=batter&hfGT=R%7C&hfSea=2026%7C"
+           f"&game_date_gt={start}&game_date_lt={end}"
+           f"&min_abs=5&group_by=name&sort_col=pitches&sort_order=desc&type=details&")
     statcast = {}
     try:
-        r = requests.get(url, timeout=45)
+        r = requests.get(url, timeout=60)
         r.raise_for_status()
         reader = csv.DictReader(io.StringIO(r.text))
-        agg = defaultdict(lambda: {"pa":0,"hr":0,"ev_sum":0,"ev_n":0,"barrels":0,"hard_hits":0,"hits":0})
-
+        agg = defaultdict(lambda:{"pa":0,"hr":0,"ev_sum":0,"ev_n":0,"barrels":0,"hard_hits":0,"hits":0})
         for row in reader:
             raw = (row.get("player_name","") or "").strip()
             if not raw: continue
-            # Savant format: "Last, First"
             if "," in raw:
-                last, first = raw.split(",", 1)
+                last,first = raw.split(",",1)
                 name = f"{first.strip()} {last.strip()}".lower()
-            else:
-                name = raw.lower()
-
+            else: name = raw.lower()
             events = row.get("events","") or ""
-            ev_s   = row.get("launch_speed","") or ""
-            la_s   = row.get("launch_angle","") or ""
-
+            ev_s = row.get("launch_speed","") or ""
+            la_s = row.get("launch_angle","") or ""
             agg[name]["pa"] += 1
-            if events == "home_run": agg[name]["hr"] += 1
-            if events in ("single","double","triple","home_run"): agg[name]["hits"] += 1
+            if events=="home_run": agg[name]["hr"]+=1
+            if events in ("single","double","triple","home_run"): agg[name]["hits"]+=1
             try:
-                ev = float(ev_s)
-                agg[name]["ev_sum"] += ev
-                agg[name]["ev_n"]   += 1
-                if ev >= 95: agg[name]["hard_hits"] += 1
-                la = float(la_s)
-                if ev >= 98 and 26 <= la <= 30: agg[name]["barrels"] += 1
+                ev=float(ev_s); agg[name]["ev_sum"]+=ev; agg[name]["ev_n"]+=1
+                if ev>=95: agg[name]["hard_hits"]+=1
+                if ev>=98 and 26<=float(la_s)<=30: agg[name]["barrels"]+=1
             except: pass
-
-        for name, d in agg.items():
-            pa = max(d["pa"], 1)
-            statcast[name] = {
-                "l14_pa":       d["pa"],
-                "l14_hr":       d["hr"],
-                "l14_rate":     round(d["hr"] / pa, 4),
-                "l14_avg_ev":   round(d["ev_sum"] / d["ev_n"], 1) if d["ev_n"] else 90.0,
-                "l14_barrel_pct": round(d["barrels"] / pa, 4),
-                "l14_hh_pct":   round(d["hard_hits"] / pa, 4),
-                "l14_hit_rate": round(d["hits"] / pa, 4),
-            }
-    except Exception as e:
-        print(f"  Statcast hitter error: {e}")
-
+        for name,d in agg.items():
+            pa=max(d["pa"],1)
+            statcast[name]={"l14_pa":d["pa"],"l14_hr":d["hr"],"l14_rate":round(d["hr"]/pa,4),
+                "l14_avg_ev":round(d["ev_sum"]/d["ev_n"],1) if d["ev_n"] else 90.0,
+                "l14_barrel_pct":round(d["barrels"]/pa,4),"l14_hh_pct":round(d["hard_hits"]/pa,4),
+                "l14_hit_rate":round(d["hits"]/pa,4)}
+    except Exception as e: print(f"  Statcast error: {e}")
     print(f"  Statcast hitters: {len(statcast)}")
-    with open(OUT / "statcast_l14.json", "w") as f:
-        json.dump(statcast, f, indent=2)
+    with open(OUT/"statcast_l14.json","w") as f: json.dump(statcast,f,indent=2)
     return statcast
 
 # ── 9. PITCHER L14 ────────────────────────────────────────────────────────────
 def fetch_pitcher_statcast():
     print("Fetching Statcast L14 pitcher data...")
     today = datetime.date.today()
-    start = (today - datetime.timedelta(days=14)).strftime("%Y-%m-%d")
+    start = (today-datetime.timedelta(days=14)).strftime("%Y-%m-%d")
     end   = today.strftime("%Y-%m-%d")
-
-    url = (
-        "https://baseballsavant.mlb.com/statcast_search/csv"
-        f"?all=true&player_type=pitcher&hfGT=R%7C&hfSea=2026%7C"
-        f"&game_date_gt={start}&game_date_lt={end}"
-        f"&min_abs=10&group_by=name&sort_col=pitches&sort_order=desc&type=details&"
-    )
-
+    url = (f"https://baseballsavant.mlb.com/statcast_search/csv"
+           f"?all=true&player_type=pitcher&hfGT=R%7C&hfSea=2026%7C"
+           f"&game_date_gt={start}&game_date_lt={end}"
+           f"&min_abs=10&group_by=name&sort_col=pitches&sort_order=desc&type=details&")
     pitchers = {}
     try:
-        r = requests.get(url, timeout=45)
+        r = requests.get(url, timeout=60)
         r.raise_for_status()
         reader = csv.DictReader(io.StringIO(r.text))
-        agg = defaultdict(lambda: {"bf":0,"hr":0,"k":0,"bb":0})
-
+        agg = defaultdict(lambda:{"bf":0,"hr":0,"k":0,"bb":0})
         for row in reader:
             raw = (row.get("player_name","") or "").strip()
             if not raw: continue
             if "," in raw:
-                last, first = raw.split(",", 1)
+                last,first = raw.split(",",1)
                 name = f"{first.strip()} {last.strip()}".lower()
-            else:
-                name = raw.lower()
+            else: name = raw.lower()
             events = row.get("events","") or ""
-            agg[name]["bf"] += 1
-            if events == "home_run": agg[name]["hr"] += 1
-            if events in ("strikeout","strikeout_double_play"): agg[name]["k"] += 1
-            if events == "walk": agg[name]["bb"] += 1
-
-        for name, d in agg.items():
-            bf = max(d["bf"], 1)
-            pitchers[name] = {
-                "l14_bf":      d["bf"],
-                "l14_hr_rate": round(d["hr"] / bf, 4),
-                "l14_k_rate":  round(d["k"]  / bf, 4),
-                "l14_bb_rate": round(d["bb"] / bf, 4),
-            }
-    except Exception as e:
-        print(f"  Statcast pitcher error: {e}")
-
+            agg[name]["bf"]+=1
+            if events=="home_run": agg[name]["hr"]+=1
+            if events in ("strikeout","strikeout_double_play"): agg[name]["k"]+=1
+            if events=="walk": agg[name]["bb"]+=1
+        for name,d in agg.items():
+            bf=max(d["bf"],1)
+            pitchers[name]={"l14_bf":d["bf"],"l14_hr_rate":round(d["hr"]/bf,4),
+                "l14_k_rate":round(d["k"]/bf,4),"l14_bb_rate":round(d["bb"]/bf,4)}
+    except Exception as e: print(f"  Pitcher error: {e}")
     print(f"  Statcast pitchers: {len(pitchers)}")
-    with open(OUT / "pitchers_l14.json", "w") as f:
-        json.dump(pitchers, f, indent=2)
+    with open(OUT/"pitchers_l14.json","w") as f: json.dump(pitchers,f,indent=2)
     return pitchers
 
 # ── MAIN ───────────────────────────────────────────────────────────────────────
