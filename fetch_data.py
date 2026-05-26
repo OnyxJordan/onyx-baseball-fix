@@ -1,6 +1,6 @@
 """
-fetch_data.py — Onyx Baseball daily data fetcher v3
-Fixes: odds market key, recent batting orders, weather timeout
+fetch_data.py — Onyx Baseball daily data fetcher v4
+Odds: scrapes DraftKings sportsbook API directly (no key needed)
 """
 
 import os, json, time, requests, csv, io, datetime
@@ -9,8 +9,6 @@ from collections import defaultdict
 
 OUT = Path("data")
 OUT.mkdir(exist_ok=True)
-
-ODDS_API_KEY = os.environ.get("ODDS_API_KEY", "")
 
 STADIUMS = {
     "PIT": ("PNC Park",                40.4469, -80.0057, False),
@@ -57,9 +55,15 @@ POS_DEFAULT_ORDER = {
     "CF":2,"SS":2,"2B":3,"3B":4,"1B":4,"LF":5,"RF":5,"DH":4,"C":7,"OF":5,"P":9
 }
 
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+    "Accept": "application/json",
+    "Accept-Language": "en-US,en;q=0.9",
+    "Referer": "https://sportsbook.draftkings.com/",
+}
+
 def mlb_get(path, params=None):
-    url = f"https://statsapi.mlb.com/api/v1{path}"
-    r = requests.get(url, params=params, timeout=20)
+    r = requests.get(f"https://statsapi.mlb.com/api/v1{path}", params=params, timeout=20)
     r.raise_for_status()
     return r.json()
 
@@ -70,8 +74,8 @@ def player_name_key(name):
 def fetch_schedule():
     today = datetime.date.today().strftime("%Y-%m-%d")
     data = mlb_get("/schedule", {
-        "sportId": 1, "date": today,
-        "hydrate": "lineups,probablePitcher,team,linescore",
+        "sportId":1, "date":today,
+        "hydrate":"lineups,probablePitcher,team,linescore",
     })
     games = [g for de in data.get("dates",[]) for g in de.get("games",[])
              if g.get("status",{}).get("abstractGameState") != "Final"]
@@ -81,14 +85,13 @@ def fetch_schedule():
 # ── 2. RECENT BATTING ORDERS ──────────────────────────────────────────────────
 def fetch_recent_batting_orders():
     today = datetime.date.today()
-    # Try last 14 days to get more data
     start = (today - datetime.timedelta(days=14)).strftime("%Y-%m-%d")
     end   = (today - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
-    print(f"  Fetching recent batting orders ({start} to {end})...")
+    print(f"  Fetching recent batting orders...")
     try:
         data = mlb_get("/schedule", {
-            "sportId":1, "startDate":start, "endDate":end,
-            "hydrate":"lineups,team", "gameType":"R",
+            "sportId":1,"startDate":start,"endDate":end,
+            "hydrate":"lineups,team","gameType":"R",
         })
     except Exception as e:
         print(f"  Recent orders error: {e}")
@@ -112,7 +115,7 @@ def fetch_recent_batting_orders():
                 bo = p.get("battingOrder",0)//100
                 if name and 1<=bo<=9: team_orders[home_abbr][name].append(bo)
 
-    avg_orders = {team: {name: round(sum(o)/len(o)) for name,o in players.items()}
+    avg_orders = {team:{name:round(sum(o)/len(o)) for name,o in players.items()}
                   for team,players in team_orders.items()}
     total = sum(len(v) for v in avg_orders.values())
     print(f"  Recent batting orders: {total} entries across {len(avg_orders)} teams")
@@ -147,7 +150,6 @@ def build_lineup(game, recent_orders, side):
         if result:
             return result, team_abbr, True
 
-    # Roster fallback
     roster = fetch_roster(team_id)
     team_recent = recent_orders.get(team_abbr,{})
     players = []
@@ -200,105 +202,140 @@ def fetch_lineups():
     with open(OUT/"lineups.json","w") as f: json.dump(games,f,indent=2)
     return games
 
-# ── 6. HR ODDS ────────────────────────────────────────────────────────────────
+# ── 6. DK ODDS (direct scrape, no key needed) ─────────────────────────────────
 def fetch_odds():
-    print("Fetching HR odds from The Odds API...")
-    if not ODDS_API_KEY:
-        print("  WARNING: No ODDS_API_KEY")
-        with open(OUT/"odds.json","w") as f: json.dump({},f)
-        return {}
+    print("Fetching HR odds from DraftKings...")
+    odds_map = {}
 
-    today_str = datetime.date.today().isoformat()
-    odds_map  = {}
+    # DK's public API for MLB batter props
+    # subcategory 1093 = Home Runs, category 1000 = MLB
+    urls = [
+        # Primary: batter props subcategory
+        "https://sportsbook.draftkings.com/sites/US-SB/api/v5/eventgroups/84240/categories/1000/subcategories/1093",
+        # Fallback: broader MLB props
+        "https://sportsbook.draftkings.com/sites/US-SB/api/v5/eventgroups/84240/categories/1000/subcategories/1094",
+    ]
 
-    # Try multiple market keys — API has changed these over time
-    MARKET_KEYS = ["batter_home_runs", "player_home_runs", "batter_hr"]
-
-    try:
-        r = requests.get("https://api.the-odds-api.com/v4/sports/baseball_mlb/events",
-            params={"apiKey":ODDS_API_KEY,"dateFormat":"iso"}, timeout=15)
-        r.raise_for_status()
-        events = r.json()
-        print(f"  Events found: {len(events)}")
-    except Exception as e:
-        print(f"  Events error: {e}")
-        with open(OUT/"odds.json","w") as f: json.dump({},f)
-        return {}
-
-    # Find which market key works using first event
-    working_market = None
-    today_events = [e for e in events if e.get("commence_time","")[:10] == today_str]
-    print(f"  Today's events: {len(today_events)}")
-
-    if today_events:
-        test_id = today_events[0]["id"]
-        for mkey in MARKET_KEYS:
-            try:
-                r2 = requests.get(
-                    f"https://api.the-odds-api.com/v4/sports/baseball_mlb/events/{test_id}/odds",
-                    params={"apiKey":ODDS_API_KEY,"regions":"us","markets":mkey,
-                            "bookmakers":"draftkings","oddsFormat":"american"}, timeout=15)
-                r2.raise_for_status()
-                data = r2.json()
-                for bm in data.get("bookmakers",[]):
-                    for market in bm.get("markets",[]):
-                        if market.get("outcomes"):
-                            working_market = mkey
-                            print(f"  Working market key: {mkey}")
-                            break
-                if working_market: break
-            except Exception as e:
-                print(f"  Market key {mkey} error: {e}")
-            time.sleep(0.2)
-
-    if not working_market:
-        # Last resort: try the player_props endpoint
-        print("  Trying player_props endpoint...")
+    for url in urls:
         try:
-            r3 = requests.get(
-                "https://api.the-odds-api.com/v4/sports/baseball_mlb/odds",
-                params={"apiKey":ODDS_API_KEY,"regions":"us",
-                        "markets":"batter_home_runs","bookmakers":"draftkings",
-                        "oddsFormat":"american","dateFormat":"iso"}, timeout=15)
-            r3.raise_for_status()
-            bulk = r3.json()
-            for game in bulk:
-                if game.get("commence_time","")[:10] != today_str: continue
-                for bm in game.get("bookmakers",[]):
-                    for market in bm.get("markets",[]):
-                        for outcome in market.get("outcomes",[]):
-                            if outcome.get("name")=="Over" and outcome.get("point",0)<1.5:
-                                player = (outcome.get("description","") or outcome.get("name","")).lower().strip()
-                                if player:
-                                    odds_map[player] = outcome["price"]
-            print(f"  Bulk odds: {len(odds_map)} players")
-        except Exception as e:
-            print(f"  Bulk odds error: {e}")
-        with open(OUT/"odds.json","w") as f: json.dump(odds_map,f,indent=2)
-        return odds_map
+            r = requests.get(url, headers=HEADERS, timeout=20)
+            r.raise_for_status()
+            data = r.json()
 
-    # Fetch per-event with working market key
-    for event in today_events:
+            # Navigate DK response structure
+            event_group = data.get("eventGroup", {})
+            offer_categories = event_group.get("offerCategories", [])
+
+            for cat in offer_categories:
+                for subcat in cat.get("offerSubcategoryDescriptors", []):
+                    for offer_subcat in subcat.get("offerSubcategory", {}).get("offers", []):
+                        for offer in offer_subcat:
+                            label = offer.get("label", "").lower()
+                            if "home run" not in label and "hr" not in label:
+                                continue
+                            for outcome in offer.get("outcomes", []):
+                                player = outcome.get("participant", "").lower().strip()
+                                line   = outcome.get("line", 0)
+                                odds   = outcome.get("oddsAmerican")
+                                # We want the Over 0.5 HR line
+                                if player and odds and line is not None and float(line) < 1.0:
+                                    try:
+                                        odds_map[player] = int(odds)
+                                    except:
+                                        pass
+
+            if odds_map:
+                print(f"  DK odds (subcategory): {len(odds_map)} players")
+                break
+
+        except Exception as e:
+            print(f"  DK URL error: {e}")
+            continue
+
+    # Fallback 2: DK's newer API format
+    if not odds_map:
+        print("  Trying DK newer API format...")
         try:
-            r2 = requests.get(
-                f"https://api.the-odds-api.com/v4/sports/baseball_mlb/events/{event['id']}/odds",
-                params={"apiKey":ODDS_API_KEY,"regions":"us","markets":working_market,
-                        "bookmakers":"draftkings","oddsFormat":"american"}, timeout=15)
-            r2.raise_for_status()
-            data = r2.json()
-            for bm in data.get("bookmakers",[]):
-                if bm["key"] != "draftkings": continue
-                for market in bm.get("markets",[]):
-                    for outcome in market.get("outcomes",[]):
-                        if outcome.get("name")=="Over" and outcome.get("point",0.5)<1.5:
-                            player = (outcome.get("description","") or "").lower().strip()
-                            if player:
-                                odds_map[player] = outcome["price"]
-        except Exception as e:
-            print(f"  Props error {event.get('id','')}: {e}")
-        time.sleep(0.25)
+            r = requests.get(
+                "https://sportsbook-nash.draftkings.com/api/sportscontent/dkusnj/v1/leagues/84240/categories/1000/subcategories/1093",
+                headers=HEADERS, timeout=20)
+            r.raise_for_status()
+            data = r.json()
 
-    print(f"  Odds: {len(odds_map)} players")
+            for event in data.get("events", []):
+                for market in event.get("markets", []):
+                    market_name = market.get("marketName","").lower()
+                    if "home run" not in market_name:
+                        continue
+                    for selection in market.get("selections", []):
+                        player = selection.get("selectionName","").lower().strip()
+                        odds   = selection.get("displayOdds",{}).get("american","")
+                        if player and odds:
+                            try:
+                                odds_map[player] = int(odds.replace("+",""))
+                            except:
+                                pass
+
+            print(f"  DK newer API: {len(odds_map)} players")
+
+        except Exception as e:
+            print(f"  DK newer API error: {e}")
+
+    # Fallback 3: DK's event-level props API
+    if not odds_map:
+        print("  Trying DK event props API...")
+        try:
+            # Get today's MLB events from DK
+            r = requests.get(
+                "https://sportsbook.draftkings.com/sites/US-SB/api/v5/eventgroups/84240",
+                headers=HEADERS, timeout=20)
+            r.raise_for_status()
+            eg_data = r.json()
+
+            events = eg_data.get("eventGroup",{}).get("events",[])
+            today_str = datetime.date.today().strftime("%Y-%m-%d")
+            today_event_ids = []
+
+            for ev in events:
+                ev_time = ev.get("startDate","")
+                if today_str in ev_time:
+                    today_event_ids.append(ev.get("eventId"))
+
+            print(f"  DK events today: {len(today_event_ids)}")
+
+            for eid in today_event_ids[:16]:
+                try:
+                    r2 = requests.get(
+                        f"https://sportsbook.draftkings.com/sites/US-SB/api/v5/events/{eid}/categories/1000/subcategories/1093",
+                        headers=HEADERS, timeout=15)
+                    r2.raise_for_status()
+                    ev_data = r2.json()
+
+                    for cat in ev_data.get("eventCategories",[]):
+                        for subcat in cat.get("componentizedOffers",[]):
+                            for col in subcat.get("columnHeaders",[]):
+                                pass
+                            for offer_row in subcat.get("offers",[]):
+                                for offer in offer_row:
+                                    for outcome in offer.get("outcomes",[]):
+                                        player = outcome.get("participant","").lower().strip()
+                                        odds_str = outcome.get("oddsAmerican","")
+                                        if player and odds_str:
+                                            try:
+                                                odds_map[player] = int(odds_str)
+                                            except: pass
+                except Exception as e2:
+                    pass
+                time.sleep(0.2)
+
+            print(f"  DK event props: {len(odds_map)} players")
+
+        except Exception as e:
+            print(f"  DK event props error: {e}")
+
+    if not odds_map:
+        print("  WARNING: Could not fetch DK odds. Site will run without market calibration.")
+
     with open(OUT/"odds.json","w") as f: json.dump(odds_map,f,indent=2)
     return odds_map
 
@@ -315,7 +352,6 @@ def fetch_weather(games):
     for team in home_teams:
         if team not in STADIUMS: continue
         park_name, lat, lon, roof = STADIUMS[team]
-
         game_hour = 14
         for g in games.values():
             if g["home_team"]==team and g.get("game_time"):
@@ -324,14 +360,13 @@ def fetch_weather(games):
                     eastern = dt.astimezone(datetime.timezone(datetime.timedelta(hours=-4)))
                     game_hour = eastern.hour; break
                 except: pass
-
         try:
             r = requests.get("https://api.open-meteo.com/v1/forecast", params={
                 "latitude":lat,"longitude":lon,
                 "hourly":"temperature_2m,precipitation_probability,wind_speed_10m,wind_direction_10m",
                 "temperature_unit":"fahrenheit","wind_speed_unit":"mph",
                 "forecast_days":1,"timezone":"America/New_York",
-            }, timeout=20)
+            }, timeout=25)
             r.raise_for_status()
             h = r.json().get("hourly",{})
             idx = min(game_hour,23)
@@ -373,13 +408,12 @@ def fetch_statcast():
             raw = (row.get("player_name","") or "").strip()
             if not raw: continue
             if "," in raw:
-                last,first = raw.split(",",1)
-                name = f"{first.strip()} {last.strip()}".lower()
-            else: name = raw.lower()
-            events = row.get("events","") or ""
-            ev_s = row.get("launch_speed","") or ""
-            la_s = row.get("launch_angle","") or ""
-            agg[name]["pa"] += 1
+                last,first = raw.split(",",1); name=f"{first.strip()} {last.strip()}".lower()
+            else: name=raw.lower()
+            events=row.get("events","") or ""
+            ev_s=row.get("launch_speed","") or ""
+            la_s=row.get("launch_angle","") or ""
+            agg[name]["pa"]+=1
             if events=="home_run": agg[name]["hr"]+=1
             if events in ("single","double","triple","home_run"): agg[name]["hits"]+=1
             try:
@@ -415,13 +449,12 @@ def fetch_pitcher_statcast():
         reader = csv.DictReader(io.StringIO(r.text))
         agg = defaultdict(lambda:{"bf":0,"hr":0,"k":0,"bb":0})
         for row in reader:
-            raw = (row.get("player_name","") or "").strip()
+            raw=(row.get("player_name","") or "").strip()
             if not raw: continue
             if "," in raw:
-                last,first = raw.split(",",1)
-                name = f"{first.strip()} {last.strip()}".lower()
-            else: name = raw.lower()
-            events = row.get("events","") or ""
+                last,first=raw.split(",",1); name=f"{first.strip()} {last.strip()}".lower()
+            else: name=raw.lower()
+            events=row.get("events","") or ""
             agg[name]["bf"]+=1
             if events=="home_run": agg[name]["hr"]+=1
             if events in ("strikeout","strikeout_double_play"): agg[name]["k"]+=1
