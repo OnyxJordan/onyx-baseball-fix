@@ -417,6 +417,8 @@ def build():
 
     # Merge picks_input.json into PICKS history
     picks_input_path = DATA / "picks_input.json"
+    picks_str = extract_obj(html, "PICKS")
+    dfs_record_str = extract_obj(html, "DFS_RECORD")
     if picks_input_path.exists():
         new_picks = json.loads(picks_input_path.read_text())
         existing_picks = json.loads(picks_str) if picks_str != "[]" else []
@@ -437,9 +439,7 @@ def build():
         picks_str = json.dumps(existing_picks)
         print(f"  Picks: merged {added} new picks from picks_input.json")
 
-    # Preserve PICKS and DFS_RECORD from shell
-    picks_str      = extract_obj(html, "PICKS")
-    dfs_record_str = extract_obj(html, "DFS_RECORD")
+    # PICKS and DFS_RECORD already extracted above
 
     for var, val in [
         ("RESULTS",       json.dumps(RESULTS)),
