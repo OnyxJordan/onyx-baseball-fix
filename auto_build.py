@@ -155,6 +155,11 @@ def build():
     print("=== Onyx Auto-Build v3 ===\n")
 
     lineups   = json.loads((DATA / "lineups.json").read_text())
+    # Load game lines (moneylines, O/U) if available
+    gl_path = DATA / "game_lines.json"
+    game_lines = json.loads(gl_path.read_text()) if gl_path.exists() else {}
+    print(f"  Game lines: {len(game_lines)} games" if game_lines else "  Game lines: not found")
+
     odds_path = DATA / "odds.json"
     odds_map  = json.loads(odds_path.read_text()) if odds_path.exists() else {}
     sal_path  = DATA / "salaries.json"
@@ -401,10 +406,36 @@ def build():
             "home_exp_hr":    home_exp_hr,
             "n_away":         len(away_results),
             "n_home":         len(home_results),
+            # Game lines from game_lines.json
+            "ou":             game_lines.get(game_key, {}).get("ou"),
+            "away_ml":        game_lines.get(game_key, {}).get("away_ml", ""),
+            "home_ml":        game_lines.get(game_key, {}).get("home_ml", ""),
         })
 
     RESULTS = apply_game_diversity(RESULTS)
     ALL_GAME_KEYS = list(lineups.keys())
+
+    # Merge picks_input.json into PICKS history
+    picks_input_path = DATA / "picks_input.json"
+    if picks_input_path.exists():
+        new_picks = json.loads(picks_input_path.read_text())
+        existing_picks = json.loads(picks_str) if picks_str != "[]" else []
+        # Add new picks that aren't already tracked (match by date+player)
+        existing_keys = {(p["date"],p["player"]) for p in existing_picks}
+        added = 0
+        for p in new_picks:
+            key = (p.get("date",""), p.get("player",""))
+            if key not in existing_keys:
+                existing_picks.insert(0, p)  # newest first
+                added += 1
+            else:
+                # Update hit result if now known
+                for ep in existing_picks:
+                    if ep["date"]==p["date"] and ep["player"]==p["player"]:
+                        if p.get("hit") is not None:
+                            ep["hit"] = p["hit"]
+        picks_str = json.dumps(existing_picks)
+        print(f"  Picks: merged {added} new picks from picks_input.json")
 
     # Preserve PICKS and DFS_RECORD from shell
     picks_str      = extract_obj(html, "PICKS")
