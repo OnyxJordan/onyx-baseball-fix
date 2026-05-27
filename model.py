@@ -101,15 +101,23 @@ def sc_score(d: dict) -> float:
     pa_conf = min(pa / 400, 1.0)
     return pa_conf * sc_raw + (1 - pa_conf) * 0.90
 
-def pitcher_factor(pitcher_name: str, l14_pitchers: dict = None) -> float:
+def pitcher_factor(pitcher_name: str, l14_pitchers: dict = None, is_home_pitcher: bool = False) -> float:
+    """
+    is_home_pitcher: True if this pitcher is pitching at HOME (i.e. batters face him at his home park).
+    pfh = factor when pitching at home, pfa = factor when pitching away.
+    """
     pk = pitcher_name.lower()
     pd = PITCHER_CAREER_DB.get(pk, {})
-    # Use pre-computed pf if available, else derive from xFIP
-    if pd.get("pf"):
-        base_pf = max(0.60, min(1.50, float(pd["pf"])))
+    # Use home/away split if available, else global pf, else derive from xFIP
+    if is_home_pitcher and pd.get("pfh"):
+        base_pf = max(0.50, min(1.80, float(pd["pfh"])))
+    elif not is_home_pitcher and pd.get("pfa"):
+        base_pf = max(0.50, min(1.80, float(pd["pfa"])))
+    elif pd.get("pf"):
+        base_pf = max(0.50, min(1.80, float(pd["pf"])))
     else:
         base_xfip = pd.get("xf3") or pd.get("xf6") or 4.0
-        base_pf = max(0.60, min(1.50, base_xfip / 4.0))
+        base_pf = max(0.50, min(1.80, base_xfip / 4.0))
 
     # Blend in L14 if available (max 30% weight if 10+ BF)
     if l14_pitchers and pk in l14_pitchers:
@@ -176,10 +184,19 @@ def project_player(
     pos_avg     = POS_HR_AVG.get(pos, 0.038)
     c_adj = (career_rate * pa_3yr + REG_K * pos_avg) / (pa_3yr + REG_K)
 
-    # Home/away split
-    split = d.get("ch" if is_home else "ca", career_rate) or career_rate
-    split_adj = max(0.85, min(1.15, split / career_rate)) if (pa_3yr >= 200 and career_rate > 0) else 1.0
-    base = c_adj * split_adj
+    # Home/away split — actual split rate drives the base
+    # ch = career HR/PA at home, ca = career HR/PA away
+    split_rate = d.get("ch" if is_home else "ca", career_rate) or career_rate
+    split_pa   = max(pa_3yr / 2, 1)  # approximate split PA
+
+    if split_pa >= 50 and career_rate > 0:
+        # Bayesian-regress the split toward position average (not career overall)
+        # Lower REG_K = more weight to actual split data
+        SPLIT_REG_K = 75
+        pos_avg = POS_HR_AVG.get(pos, 0.038)
+        base = (split_rate * split_pa + pos_avg * SPLIT_REG_K) / (split_pa + SPLIT_REG_K)
+    else:
+        base = c_adj  # not enough data, use Bayesian career rate
 
     # 2. L14 form adjustment
     if l14 and l14.get("l14_pa", 0) >= 20:
@@ -191,7 +208,8 @@ def project_player(
     sc = sc_score(d)
 
     # 4. Pitcher factor
-    pf = pitcher_factor(opp_pitcher, l14_pitchers)
+    # is_home_pitcher = True when pitcher pitches at home (batter is away team)
+    pf = pitcher_factor(opp_pitcher, l14_pitchers, is_home_pitcher=not is_home)
 
     # 5. Park + weather environment
     env = wind_env(park, wind_dir, wind_mph, temp, roof)
