@@ -219,15 +219,23 @@ def project_player(
     due_mult = due_meter(d, sc, l14)
 
     # 7. Raw probability
-    raw_prob = max(1.0, min(35.0, base * sc * 4.3 * 100 * pf * env * park_f * due_mult))
+    raw_prob = max(1.0, min(30.0, base * sc * 3.5 * 100 * pf * env * park_f * due_mult))
 
     # 8. Market calibration
+    # Market is well-calibrated for HR props — give it more weight
+    # Model runs ~1.4x above market; use market as anchor, model for edge detection
     if dk_odds is not None:
         mkt_prob = implied_prob(dk_odds) * 100
-        w = 0.80 if dk_odds <= 350 else 0.70 if dk_odds <= 500 else 0.60 if dk_odds <= 750 else 0.50
+        # Higher market weight = final prob closer to true probability
+        # Model still contributes for edge detection but doesn't inflate absolute prob
+        if dk_odds <= 250:   w = 0.35  # heavy favorites — trust market most
+        elif dk_odds <= 400: w = 0.45  # core range
+        elif dk_odds <= 600: w = 0.50  # mid range
+        elif dk_odds <= 900: w = 0.45  # longer shots
+        else:                w = 0.35  # big longshots — market knows
         final_prob = w * raw_prob + (1 - w) * mkt_prob
     else:
-        final_prob = raw_prob * 0.88
+        final_prob = raw_prob * 0.75   # no odds = bigger haircut
         mkt_prob = final_prob
 
     edge = final_prob - (implied_prob(dk_odds) * 100 if dk_odds else final_prob)
