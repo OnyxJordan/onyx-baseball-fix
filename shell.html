@@ -1729,8 +1729,8 @@ function initLUGameGrid() {
   const grid = document.getElementById('lu-game-grid');
   if (!grid) return;
   grid.innerHTML = ALL_GAME_KEYS.map(g => {
-    const s = SUMMARIES.find(x => x.game === g) || {};
-    const lbl = g.replace(/ \(\d+:\d+ [AP]M ET\)/,'');
+    const s = SUMMARIES.find(x => x.game_key === g) || {};
+    const lbl = (s.away && s.home) ? (s.away + ' @ ' + s.home) : g;
     const t   = (s.time||'').replace(' ET','');
     return '<button class="lu-game-btn active" data-game="'+g+'" onclick="toggleLUGame(\''+g+'\',this)">'
       +'<div style="font-size:11px;font-weight:700;color:var(--text)">'+lbl+'</div>'
@@ -1768,9 +1768,9 @@ function optimizeLineup(){
   const stackCount=parseInt(document.getElementById('lu-stack-count')?.value||'3');
   const statusEl=document.getElementById('lu-status');
   if(statusEl)statusEl.textContent='Optimizing…';
-  const bPool=RESULTS.filter(r=>enabledGames.has(r.game)&&(r[sk]||0)>0&&(r[pk]||0)>0&&!excludedPlayers.has(r.matched_name||r.name));
+  const bPool=RESULTS.filter(r=>enabledGames.has(r.game_key)&&(r[sk]||0)>0&&(r[pk]||0)>0&&!excludedPlayers.has(r.matched_name||r.name));
   const pPool=PITCHERS
-    .filter(p=>(p[sk]||0)>0&&SUMMARIES.some(s=>(s.away===p.team||s.home===p.team)&&enabledGames.has(s.game)))
+    .filter(p=>(p[sk]||0)>0&&SUMMARIES.some(s=>(s.away===p.team||s.home===p.team)&&enabledGames.has(s.game_key)))
     .map(p=>({...p,_isPitcher:true,dk_pos:'P',fd_pos:'P',matched_name:p.name,batting_order:0,[pk]:p[pk]||(luMode==='dk'?6.0:7.5)}));
   const allPlayers=[...bPool,...pPool];
   const DK_SLOTS=['P','P','C','1B','2B','3B','SS','OF','OF','OF'];
