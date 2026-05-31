@@ -16,6 +16,33 @@ BASE  = Path(__file__).parent
 SHELL = BASE / "shell.html"
 OUT   = BASE / "index.html"
 
+import unicodedata
+
+def _norm_name(s):
+    """Lowercase, strip accents/punctuation and Jr/Sr/II/III suffixes for fuzzy salary matching."""
+    s = unicodedata.normalize("NFKD", s).encode("ascii", "ignore").decode()
+    s = s.lower().strip()
+    s = re.sub(r"[.'`-]", " ", s)
+    s = re.sub(r"\b(jr|sr|ii|iii|iv)\b", "", s)
+    return re.sub(r"\s+", " ", s).strip()
+
+def lookup_salary(sal_map, name):
+    """Find a player's {dk,fd} salary tolerant of name-format differences. Returns {} if no match."""
+    if not name:
+        return {}
+    if name.lower() in sal_map:
+        return sal_map[name.lower()]
+    target = _norm_name(name)
+    # build a normalized index once, cached on the function
+    idx = getattr(lookup_salary, "_idx_cache", None)
+    cache_key = id(sal_map)
+    if not idx or idx.get("_key") != cache_key:
+        idx = {"_key": cache_key}
+        for k, v in sal_map.items():
+            idx[_norm_name(k)] = v
+        lookup_salary._idx_cache = idx
+    return idx.get(target, {})
+
 TEAM_PARK = {
     "PIT": ("PNC Park",                False),
     "TOR": ("Rogers Centre",           True),
@@ -211,6 +238,11 @@ def build():
         ]:
             if pname and pname != "TBD" and pname not in seen_pitchers:
                 seen_pitchers.add(pname)
+                psal     = lookup_salary(sal_map, pname)
+                p_dk_sal = psal.get("dk") or 7000
+                p_fd_sal = psal.get("fd") or 8000
+                p_dk_proj = round(pi["k9"] * 0.8 + (5.0 - pi["xfip"]) * 2.5 + 12, 2)
+                p_fd_proj = round(pi["k9"] * 1.2 + (5.0 - pi["xfip"]) * 3.0 + 15, 2)
                 PITCHERS.append({
                     "name":     pname,
                     "hand":     pi["hand"],
@@ -228,12 +260,12 @@ def build():
                     "k9_blend": pi["k9"],
                     "k9_adj":   pi["k9"],
                     "p_factor": pi["pf"],
-                    "dk_salary": 7000,
-                    "fd_salary": 8000,
-                    "dk_proj":  round(pi["k9"] * 0.8 + (5.0 - pi["xfip"]) * 2.5 + 12, 2),
-                    "fd_proj":  round(pi["k9"] * 1.2 + (5.0 - pi["xfip"]) * 3.0 + 15, 2),
-                    "dk_value": 0,
-                    "fd_value": 0,
+                    "dk_salary": p_dk_sal,
+                    "fd_salary": p_fd_sal,
+                    "dk_proj":  p_dk_proj,
+                    "fd_proj":  p_fd_proj,
+                    "dk_value": round(p_dk_proj / (p_dk_sal / 1000), 2),
+                    "fd_value": round(p_fd_proj / (p_fd_sal / 1000), 2),
                 })
 
         # Build RESULTS for each player
@@ -251,6 +283,10 @@ def build():
             bo   = player.get("batting_order", 5)
 
             dk_odds = odds_map.get(name.lower())
+
+            bsal       = lookup_salary(sal_map, name)
+            bat_dk_sal = bsal.get("dk") or 3000
+            bat_fd_sal = bsal.get("fd") or 3000
 
             proj = project_player(
                 name=name, pos=pos, batting_order=bo, is_home=is_home,
@@ -342,10 +378,10 @@ def build():
                 # DFS projections — exact field names
                 "dk_proj":           proj["dk_pts"],
                 "fd_proj":           proj["fd_pts"],
-                "dk_salary":         3000,
-                "fd_salary":         3000,
-                "dk_value":          round(proj["dk_pts"] / 3.0, 2),
-                "fd_value":          round(proj["fd_pts"] / 3.0, 2),
+                "dk_salary":         bat_dk_sal,
+                "fd_salary":         bat_fd_sal,
+                "dk_value":          round(proj["dk_pts"] / (bat_dk_sal / 1000), 2),
+                "fd_value":          round(proj["fd_pts"] / (bat_fd_sal / 1000), 2),
                 # Internal key for diversity calc
                 "game_key":          game_key,
                 # Odds / edge — exact field names
@@ -371,17 +407,19 @@ def build():
         away_exp_hr = round(sum(r["hr_prob"]/100 for r in away_results), 2)
         home_exp_hr = round(sum(r["hr_prob"]/100 for r in home_results), 2)
 
+        gl = game_lines.get(game_key, {})
         SUMMARIES.append({
             "game":           game_label,
+            "game_key":       game_key,
             "label":          game_label,
             "time":           time_str,
             "away":           away_team,
             "home":           home_team,
             "venue":          park,
-            "ou":             None,
+            "ou":             gl.get("ou"),
             "roof":           roof,
-            "away_ml":        "",
-            "home_ml":        "",
+            "away_ml":        gl.get("away_ml", ""),
+            "home_ml":        gl.get("home_ml", ""),
             "temp":           temp,
             "wind_spd":       wind_mph_val,
             "wind_dir":       wind_dir,
