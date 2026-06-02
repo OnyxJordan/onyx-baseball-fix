@@ -1,47 +1,21 @@
 """
-auto_build.py — Onyx Baseball daily build v3
-RESULTS/SUMMARIES/PITCHERS schemas match shell.html JS exactly.
+auto_build.py — Onyx Baseball daily build v2
+
+Reads data/ JSON files → runs model → injects into shell.html → writes index.html
+RESULTS schema matches original HTML exactly so all tabs/UI work correctly.
 """
 
-import json, re, datetime, math
+import json, re, unicodedata, datetime
 from pathlib import Path
 from model import (
     project_player, apply_game_diversity,
-    PARK_HR_FACTOR, PITCHER_CAREER_DB, CAREER_DB,
-    pitcher_factor, sc_score, implied_prob, wind_env
+    PARK_HR_FACTOR, PITCHER_CAREER_DB, pitcher_factor
 )
 
 DATA  = Path("data")
 BASE  = Path(__file__).parent
 SHELL = BASE / "shell.html"
 OUT   = BASE / "index.html"
-
-import unicodedata
-
-def _norm_name(s):
-    """Lowercase, strip accents/punctuation and Jr/Sr/II/III suffixes for fuzzy salary matching."""
-    s = unicodedata.normalize("NFKD", s).encode("ascii", "ignore").decode()
-    s = s.lower().strip()
-    s = re.sub(r"[.'`-]", " ", s)
-    s = re.sub(r"\b(jr|sr|ii|iii|iv)\b", "", s)
-    return re.sub(r"\s+", " ", s).strip()
-
-def lookup_salary(sal_map, name):
-    """Find a player's {dk,fd} salary tolerant of name-format differences. Returns {} if no match."""
-    if not name:
-        return {}
-    if name.lower() in sal_map:
-        return sal_map[name.lower()]
-    target = _norm_name(name)
-    # build a normalized index once, cached on the function
-    idx = getattr(lookup_salary, "_idx_cache", None)
-    cache_key = id(sal_map)
-    if not idx or idx.get("_key") != cache_key:
-        idx = {"_key": cache_key}
-        for k, v in sal_map.items():
-            idx[_norm_name(k)] = v
-        lookup_salary._idx_cache = idx
-    return idx.get(target, {})
 
 TEAM_PARK = {
     "PIT": ("PNC Park",                False),
@@ -93,37 +67,119 @@ PARK_IN = {
     "Oracle Park":              ["W","NW","WNW","SW"],
 }
 
-# ── HELPERS ────────────────────────────────────────────────────────────────────
+# ── SALARY HELPERS ─────────────────────────────────────────────────────────────
+def _norm_name(s):
+    """Lowercase, strip accents/punctuation and Jr/Sr/II/III suffixes."""
+    s = unicodedata.normalize("NFKD", s).encode("ascii", "ignore").decode()
+    s = s.lower().strip()
+    s = re.sub(r"[.'`\-]", " ", s)
+    s = re.sub(r"\b(jr|sr|ii|iii|iv)\b", "", s)
+    return re.sub(r"\s+", " ", s).strip()
+
+def lookup_salary(sal_map, name):
+    """Return {dk, fd} salary dict for a player, tolerant of name-format differences."""
+    if not name:
+        return {}
+    nk = name.lower()
+    if nk in sal_map:
+        return sal_map[nk]
+    target = _norm_name(name)
+    # Build normalised index once per sal_map instance
+    cache_key = id(sal_map)
+    idx = getattr(lookup_salary, "_cache", None)
+    if idx is None or idx.get("_key") != cache_key:
+        idx = {"_key": cache_key}
+        for k, v in sal_map.items():
+            idx[_norm_name(k)] = v
+        lookup_salary._cache = idx
+    return idx.get(target, {})
+
+def load_salaries():
+    """Load salaries.json → {player_name_lower: {dk, fd}}"""
+    path = DATA / "salaries.json"
+    if not path.exists():
+        print("  WARNING: salaries.json not found — using default salaries")
+        return {}
+    raw = json.loads(path.read_text())
+    # Support both {name: {dk,fd}} and [{name,dk_salary,fd_salary}] shapes
+    sal_map = {}
+    if isinstance(raw, list):
+        for entry in raw:
+            n = entry.get("name", "")
+            if n:
+                sal_map[n.lower()] = {
+                    "dk": entry.get("dk_salary") or entry.get("dk") or 3000,
+                    "fd": entry.get("fd_salary") or entry.get("fd") or 3000,
+                }
+    else:
+        for k, v in raw.items():
+            sal_map[k.lower()] = v if isinstance(v, dict) else {"dk": v, "fd": v}
+    print(f"  Salaries: {len(sal_map)} players loaded")
+    return sal_map
+
+def load_game_lines():
+    """Load game_lines.json → {game_key: {ou, away_ml, home_ml}}"""
+    path = DATA / "game_lines.json"
+    if not path.exists():
+        print("  WARNING: game_lines.json not found — moneylines/totals will be empty")
+        return {}
+    gl = json.loads(path.read_text())
+    print(f"  Game lines: {len(gl)} games loaded")
+    return gl
+
+# ── HTML INJECTION HELPERS ────────────────────────────────────────────────────
 def bracket_replace(html, varname, new_json_str):
     idx = html.find(f"const {varname} = ")
-    if idx < 0: return html, False
+    if idx < 0:
+        return html, False
     start = idx + len(f"const {varname} = ")
-    ch = html[start]; end_ch = "]" if ch == "[" else "}"
-    depth = 0; i = start
+    ch = html[start]
+    end_ch = "]" if ch == "[" else "}"
+    depth = 0
+    i = start
     while i < len(html):
-        if html[i] == ch:    depth += 1
+        if html[i] == ch:
+            depth += 1
         elif html[i] == end_ch:
             depth -= 1
             if depth == 0:
                 ei = i + 1
-                if ei < len(html) and html[ei] == ";": ei += 1
+                if ei < len(html) and html[ei] == ";":
+                    ei += 1
                 return html[:idx] + f"const {varname} = {new_json_str};" + html[ei:], True
         i += 1
     return html, False
 
 def extract_obj(html, varname):
     idx = html.find(f"const {varname} = ")
-    if idx < 0: return "[]"
+    if idx < 0:
+        return "[]"
     start = idx + len(f"const {varname} = ")
-    ch = html[start]; end_ch = "]" if ch=="[" else "}"
-    depth=0; i=start
+    ch = html[start]
+    end_ch = "]" if ch == "[" else "}"
+    depth = 0
+    i = start
     while i < len(html):
-        if html[i]==ch: depth+=1
-        elif html[i]==end_ch:
-            depth-=1
-            if depth==0: return html[start:i+1]
-        i+=1
+        if html[i] == ch:
+            depth += 1
+        elif html[i] == end_ch:
+            depth -= 1
+            if depth == 0:
+                return html[start:i+1]
+        i += 1
     return "[]"
+
+# ── WEATHER / WIND HELPERS ────────────────────────────────────────────────────
+def weather_flag(precip_pct):
+    if precip_pct >= 70: return "ppd_risk"
+    if precip_pct >= 40: return "delay_risk"
+    if precip_pct >= 20: return "shower_risk"
+    return "clear"
+
+def wind_label(wind_dir, wind_mph, park, wind_factor):
+    arrow = "↗" if wind_factor > 1.02 else "↘" if wind_factor < 0.98 else "→"
+    direction = "OUT" if wind_factor > 1.02 else "IN" if wind_factor < 0.98 else "NEUTRAL"
+    return f"{wind_dir} {int(wind_mph)}mph {arrow} {direction}"
 
 def calc_wind_factor(park, wind_dir, wind_mph, temp, roof):
     if roof:
@@ -136,168 +192,103 @@ def calc_wind_factor(park, wind_dir, wind_mph, temp, roof):
     factor += max(0, (temp - 72) * 0.002)
     return round(max(0.85, min(1.15, factor)), 4)
 
-def wind_alignment(park, wind_dir, wind_mph, roof):
-    if roof: return 0.0
-    if park in PARK_OUT and wind_dir in PARK_OUT[park]:
-        return round(min(wind_mph / 15, 1.0), 2)
-    if park in PARK_IN and wind_dir in PARK_IN.get(park, []):
-        return round(-min(wind_mph / 15, 1.0), 2)
-    return 0.0
-
-def wind_label(wind_dir, wind_mph, wf, roof):
-    if roof: return "DOME"
-    arrow = "↗" if wf > 1.02 else "↘" if wf < 0.98 else "→"
-    direction = "OUT" if wf > 1.02 else "IN" if wf < 0.98 else "NEUTRAL"
-    return f"{wind_dir} {int(wind_mph)}mph {arrow} {direction}"
-
-def weather_flag(precip_pct):
-    if precip_pct >= 70: return "ppd_risk"
-    if precip_pct >= 40: return "delay_risk"
-    if precip_pct >= 20: return "shower_risk"
-    return "clear"
-
 def format_game_time(game_time_iso):
     try:
-        dt = datetime.datetime.fromisoformat(game_time_iso.replace("Z","+00:00"))
+        dt = datetime.datetime.fromisoformat(game_time_iso.replace("Z", "+00:00"))
         eastern = dt.astimezone(datetime.timezone(datetime.timedelta(hours=-4)))
-        return eastern.strftime("%-I:%M %p")
+        return eastern.strftime("%-I:%M %p ET")
     except:
-        return "TBD"
+        return ""
 
-def get_pitcher_info(pname, l14_pitch):
-    pk = pname.lower()
-    pd = PITCHER_CAREER_DB.get(pk, {})
-    # pf = pre-computed pitcher factor, xf3 = xFIP 3yr, e3 = ERA 3yr, h3 = HR/9 3yr
-    pf   = pd.get("pf") or pitcher_factor(pname, l14_pitch)
-    xfip = pd.get("xf3") or pd.get("xf6") or 4.0
-    era  = pd.get("e3")  or pd.get("e6")  or round(xfip * 1.05, 2)
-    hr9  = pd.get("h3")  or pd.get("h6")  or round(xfip * 0.11, 3)
-    # k9: estimate from xFIP (no direct field) - good pitchers have lower xFIP
-    k9   = round(max(4.0, 12.0 - xfip * 1.5), 1)
-    hand = pd.get("hand", "R") or "R"
-    return {"pf": float(pf), "xfip": float(xfip), "era": float(era), "k9": float(k9), "hr9": float(hr9), "hand": hand}
-
-# ── MAIN BUILD ─────────────────────────────────────────────────────────────────
+# ── MAIN BUILD ────────────────────────────────────────────────────────────────
 def build():
-    print("=== Onyx Auto-Build v3 ===\n")
+    print("=== Onyx Auto-Build ===\n")
 
-    lineups   = json.loads((DATA / "lineups.json").read_text())
-    # Load game lines (moneylines, O/U) if available
-    gl_path = DATA / "game_lines.json"
-    game_lines = json.loads(gl_path.read_text()) if gl_path.exists() else {}
-    print(f"  Game lines: {len(game_lines)} games" if game_lines else "  Game lines: not found")
-
-    odds_path = DATA / "odds.json"
-    odds_map  = json.loads(odds_path.read_text()) if odds_path.exists() else {}
-    sal_path  = DATA / "salaries.json"
-    sal_map   = json.loads(sal_path.read_text()) if sal_path.exists() else {}
-    print(f"  Salaries: {len(sal_map)} players loaded" if sal_map else "  Salaries: not found")
-    weather   = json.loads((DATA / "weather.json").read_text())
-    l14_hit   = json.loads((DATA / "statcast_l14.json").read_text())
-    l14_pitch = json.loads((DATA / "pitchers_l14.json").read_text())
+    lineups    = json.loads((DATA / "lineups.json").read_text())
+    odds_map   = json.loads((DATA / "odds.json").read_text())
+    weather    = json.loads((DATA / "weather.json").read_text())
+    l14_hit    = json.loads((DATA / "statcast_l14.json").read_text())
+    l14_pitch  = json.loads((DATA / "pitchers_l14.json").read_text())
+    sal_map    = load_salaries()
+    game_lines = load_game_lines()
 
     with open(SHELL) as f:
         html = f.read()
 
     today = datetime.date.today()
 
-    RESULTS  = []
-    SUMMARIES = []
-    PITCHERS  = []
-    seen_pitchers = set()
+    RESULTS = []
 
     for game_key, game in lineups.items():
-        home_team    = game["home_team"]
-        away_team    = game["away_team"]
-        park, roof   = TEAM_PARK.get(home_team, ("Unknown Park", False))
-        park_f       = PARK_HR_FACTOR.get(park, 1.00)
+        home_team = game["home_team"]
+        away_team = game["away_team"]
+        park, roof = TEAM_PARK.get(home_team, ("Unknown Park", False))
+        park_f = PARK_HR_FACTOR.get(park, 1.00)
 
-        w            = weather.get(home_team, {})
-        temp         = w.get("temp", 72)
-        wind_mph_val = w.get("wind_mph", 5)
-        wind_dir     = w.get("wind_dir", "N")
-        precip_pct   = w.get("precip_pct", 0)
+        w          = weather.get(home_team, {})
+        temp       = w.get("temp", 72)
+        wind_mph   = w.get("wind_mph", 5)
+        wind_dir   = w.get("wind_dir", "N")
+        precip_pct = w.get("precip_pct", 0)
+        wflag      = weather_flag(precip_pct)
+        wf         = calc_wind_factor(park, wind_dir, wind_mph, temp, roof)
+        wlabel     = wind_label(wind_dir, wind_mph, park, wf)
 
-        wf           = calc_wind_factor(park, wind_dir, wind_mph_val, temp, roof)
-        wa           = wind_alignment(park, wind_dir, wind_mph_val, roof)
-        wlabel       = wind_label(wind_dir, wind_mph_val, wf, roof)
-        wflag        = weather_flag(precip_pct)
-
-        time_str     = format_game_time(game.get("game_time",""))
-        game_label   = f"{away_team} @ {home_team} ({time_str})"
+        game_time  = game.get("game_time", "")
+        time_str   = format_game_time(game_time)
+        game_label = f"{away_team} @ {home_team} ({time_str})"
 
         home_pitcher = game.get("home_pitcher", "TBD")
         away_pitcher = game.get("away_pitcher", "TBD")
-        home_pi      = get_pitcher_info(home_pitcher, l14_pitch)
-        away_pi      = get_pitcher_info(away_pitcher, l14_pitch)
 
-        # Build PITCHERS entries
-        for pname, pi, role, team, opp in [
-            (home_pitcher, home_pi, "home", home_team, away_team),
-            (away_pitcher, away_pi, "away", away_team, home_team),
-        ]:
-            if pname and pname != "TBD" and pname not in seen_pitchers:
-                seen_pitchers.add(pname)
-                psal     = lookup_salary(sal_map, pname)
-                p_dk_sal = psal.get("dk") or 7000
-                p_fd_sal = psal.get("fd") or 8000
-                p_dk_proj = round(pi["k9"] * 0.8 + (5.0 - pi["xfip"]) * 2.5 + 12, 2)
-                p_fd_proj = round(pi["k9"] * 1.2 + (5.0 - pi["xfip"]) * 3.0 + 15, 2)
-                PITCHERS.append({
-                    "name":     pname,
-                    "hand":     pi["hand"],
-                    "team":     team,
-                    "opp":      opp,
-                    "role":     role,
-                    "location": role,
-                    "game":     game_label,
-                    "time":     time_str,
-                    "venue":    park,
-                    "hr9":      pi["hr9"],
-                    "era26":    pi["era"],
-                    "xfip":     pi["xfip"],
-                    "ip":       5.5,
-                    "k9_blend": pi["k9"],
-                    "k9_adj":   pi["k9"],
-                    "p_factor": pi["pf"],
-                    "dk_salary": p_dk_sal,
-                    "fd_salary": p_fd_sal,
-                    "dk_proj":  p_dk_proj,
-                    "fd_proj":  p_fd_proj,
-                    "dk_value": round(p_dk_proj / (p_dk_sal / 1000), 2),
-                    "fd_value": round(p_fd_proj / (p_fd_sal / 1000), 2),
-                })
+        # Pitcher stats for display
+        def get_pitcher_stats(pname):
+            pk = pname.lower()
+            pd = PITCHER_CAREER_DB.get(pk, {})
+            pf = pitcher_factor(pname, l14_pitch)
+            era  = pd.get("e3", 4.50) or 4.50
+            xfip = pd.get("xf3", 4.00) or 4.00
+            hr9  = round(pd.get("h3", xfip * 0.12) or xfip * 0.12, 3)
+            return pf, era, xfip, hr9
 
-        # Build RESULTS for each player
-        home_results = []
-        away_results = []
+        home_pf, home_era, home_xfip, home_hr9 = get_pitcher_stats(home_pitcher)
+        away_pf, away_era, away_xfip, away_hr9 = get_pitcher_stats(away_pitcher)
 
         all_players = (
-            [(p, True,  home_team, away_team, away_pitcher, away_pi) for p in game["home_lineup"]] +
-            [(p, False, away_team, home_team, home_pitcher, home_pi) for p in game["away_lineup"]]
+            [(p, True)  for p in game["home_lineup"]] +
+            [(p, False) for p in game["away_lineup"]]
         )
 
-        for player, is_home, team, opp, opp_pname, opp_pi in all_players:
+        for player, is_home in all_players:
             name = player["name"]
             pos  = player.get("pos", "OF")
             bo   = player.get("batting_order", 5)
+            team = home_team if is_home else away_team
+            opp  = away_team if is_home else home_team
+            opp_pitcher = away_pitcher if is_home else home_pitcher
+            opp_pf, opp_era, opp_xfip, opp_hr9 = (
+                (away_pf, away_era, away_xfip, away_hr9) if is_home
+                else (home_pf, home_era, home_xfip, home_hr9)
+            )
 
             dk_odds = odds_map.get(name.lower())
 
+            # ── Salary lookup (replaces hardcoded $3000/$7000/$8000) ──────────
             bsal       = lookup_salary(sal_map, name)
-            bat_dk_sal = bsal.get("dk") or 3000
-            bat_fd_sal = bsal.get("fd") or 3000
+            bat_dk_sal = int(bsal.get("dk") or 3000)
+            bat_fd_sal = int(bsal.get("fd") or 3000)
 
             proj = project_player(
                 name=name, pos=pos, batting_order=bo, is_home=is_home,
-                opp_pitcher=opp_pname, park=park, park_factor=park_f,
-                wind_dir=wind_dir, wind_mph=wind_mph_val, temp=temp, roof=roof,
-                dk_odds=dk_odds, dk_salary=3000, fd_salary=3000,
+                opp_pitcher=opp_pitcher, park=park, park_factor=park_f,
+                wind_dir=wind_dir, wind_mph=wind_mph, temp=temp, roof=roof,
+                dk_odds=dk_odds, dk_salary=bat_dk_sal, fd_salary=bat_fd_sal,
                 l14_statcast=l14_hit, l14_pitchers=l14_pitch,
                 game_key=game_key, game_label=game_label, team=team,
                 weather_flag=wflag,
             )
 
+            from model import CAREER_DB, sc_score, implied_prob
             d   = CAREER_DB.get(name.lower(), {})
             l14 = l14_hit.get(name.lower(), {})
 
@@ -307,24 +298,25 @@ def build():
             l14_hr  = l14.get("l14_hr", 0)
             sc      = proj["sc_score"]
 
+            # Due meter label
             if l14_pa >= 20:
                 expected  = career_rate * l14_pa
                 due_score = (expected - l14_hr) * sc
                 if due_score > 1.2:    due_label = "OVERDUE"
                 elif due_score > 0.6:  due_label = "DUE"
                 elif due_score > 0.15: due_label = "COOL"
-                elif due_score >-0.15: due_label = "NORMAL"
-                elif due_score >-0.6:  due_label = "WARM"
-                elif due_score >-1.2:  due_label = "HOT"
+                elif due_score > -0.15:due_label = "NORMAL"
+                elif due_score > -0.6: due_label = "WARM"
+                elif due_score > -1.2: due_label = "HOT"
                 else:                  due_label = "FIRE"
                 due_detail = f"{int(l14_hr)}HR/{int(l14_pa)}PA"
             else:
-                due_score = 0.0; due_label = "NORMAL"; due_detail = "—"
+                due_score = 0; due_label = "NORMAL"; due_detail = "—"
 
-            implied_mkt = round(implied_prob(dk_odds) * 100, 2) if dk_odds else 0.0
+            implied = round(implied_prob(dk_odds) * 100, 2) if dk_odds else 0
 
             r = {
-                # Identity — exact field names the JS reads
+                # Identity
                 "batter_name":       name,
                 "matched_name":      name,
                 "batting_order":     bo,
@@ -340,34 +332,38 @@ def build():
                 # Game
                 "game":              game_label,
                 "time":              time_str,
+                "game_key":          game_key,
+                "game_label":        game_label,
+                "weather_flag":      wflag,
+                # Park / weather
                 "venue":             park,
-                # Weather — exact field names
                 "weather_label":     wlabel,
                 "wind_from":         wind_dir,
                 "wind_factor":       wf,
-                "wind_alignment":    wa,
                 "park_hr":           park_f,
-                "env_factor":        wf,
-                # Pitcher — exact field names
-                "opp_pitcher":       opp_pname,
-                "opp_pitcher_hand":  opp_pi["hand"],
-                "opp_pitcher_hr9":   opp_pi["hr9"],
-                "opp_pitcher_era":   opp_pi["era"],
-                "p_factor":          opp_pi["pf"],
-                # Career / Statcast — exact field names
+                "env_factor":        proj["env"],
+                "temp":              temp,
+                "wind_mph":          wind_mph,
+                # Pitcher
+                "opp_pitcher":       opp_pitcher,
+                "opp_pitcher_hand":  "R",
+                "opp_pitcher_hr9":   opp_hr9,
+                "opp_pitcher_era":   opp_era,
+                "p_factor":          opp_pf,
+                # Career / Statcast
                 "career_hr_pa":      round(career_rate, 5),
                 "split_hr_pa":       round(split_rate, 5),
                 "l14_hr":            l14_hr,
                 "l14_pa":            l14_pa,
                 "l14_xwoba":         round(l14.get("l14_hit_rate", 0.30), 4),
-                "ev90_26":           d.get("e3", 95.0),
+                "ev90_26":           d.get("e3", 95),
                 "barrel_26":         d.get("b3", 0.08),
                 "hh_pct":            d.get("h3", 0.40),
                 "iso_ctx":           d.get("i3", 0.165),
                 "sc_score":          sc,
                 "barrel_pct":        d.get("b3", 0.08),
-                "ev90":              d.get("e3", 95.0),
-                # Model outputs — exact field names
+                "ev90":              d.get("e3", 95),
+                # Model outputs
                 "hr_per_pa":         round(proj["hr_prob"] / 100 / 4.3, 5),
                 "hr_pg":             round(proj["hr_prob"] / 100, 4),
                 "hr_prob":           proj["hr_prob"],
@@ -375,109 +371,101 @@ def build():
                 "due_adj":           proj["due_mult"],
                 "due_label":         due_label,
                 "due_detail":        due_detail,
-                # DFS projections — exact field names
+                # Projections
                 "dk_proj":           proj["dk_pts"],
                 "fd_proj":           proj["fd_pts"],
-                "dk_salary":         bat_dk_sal,
-                "fd_salary":         bat_fd_sal,
-                "dk_value":          round(proj["dk_pts"] / (bat_dk_sal / 1000), 2),
-                "fd_value":          round(proj["fd_pts"] / (bat_fd_sal / 1000), 2),
-                # Internal key for diversity calc
-                "game_key":          game_key,
-                # Odds / edge — exact field names
+                "dk_salary":         proj["dk_salary"],
+                "fd_salary":         proj["fd_salary"],
+                "dk_value":          round(proj["dk_pts"] / max(proj["dk_salary"], 1000) * 1000, 2),
+                "fd_value":          round(proj["fd_pts"] / max(proj["fd_salary"], 1000) * 1000, 2),
+                # Odds / edge
                 "dk_hr_odds":        dk_odds,
-                "dk_hr_implied":     implied_mkt,
+                "dk_hr_implied":     implied,
                 "hr_edge":           proj["hr_edge"],
                 "composite":         proj["composite"],
+                "wind_alignment":    round(wf - 1.0, 4),
+                # Confirmed flag
+                "lineup_confirmed":  game.get("home_confirmed" if is_home else "away_confirmed", False),
             }
             RESULTS.append(r)
-            if is_home:
-                home_results.append(r)
-            else:
-                away_results.append(r)
-
-        # Build SUMMARIES entry with exact field names JS expects
-        def top_for_team(players):
-            valid = [p for p in players if p["hr_prob"] > 0]
-            valid.sort(key=lambda x: -x["hr_prob"])
-            return valid[0] if valid else None
-
-        away_top_r  = top_for_team(away_results)
-        home_top_r  = top_for_team(home_results)
-        away_exp_hr = round(sum(r["hr_prob"]/100 for r in away_results), 2)
-        home_exp_hr = round(sum(r["hr_prob"]/100 for r in home_results), 2)
-
-        gl = game_lines.get(game_key, {})
-        SUMMARIES.append({
-            "game":           game_label,
-            "game_key":       game_key,
-            "label":          game_label,
-            "time":           time_str,
-            "away":           away_team,
-            "home":           home_team,
-            "venue":          park,
-            "ou":             gl.get("ou"),
-            "roof":           roof,
-            "away_ml":        gl.get("away_ml", ""),
-            "home_ml":        gl.get("home_ml", ""),
-            "temp":           temp,
-            "wind_spd":       wind_mph_val,
-            "wind_dir":       wind_dir,
-            "wind_factor":    wf,
-            "env_factor":     wf,
-            "wind_alignment": wa,
-            "weather_label":  wlabel,
-            "wind_from":      wind_dir,
-            # Pitcher fields — JS reads awayP/homeP (confusingly: awayP = pitcher the away team faces = HOME pitcher)
-            "awayP":          home_pitcher,   # pitcher facing away batters
-            "awayHand":       home_pi["hand"],
-            "awayP_hr9":      home_pi["hr9"],
-            "homeP":          away_pitcher,   # pitcher facing home batters
-            "homeHand":       away_pi["hand"],
-            "homeP_hr9":      away_pi["hr9"],
-            # Top plays
-            "away_top":       away_top_r["batter_name"] if away_top_r else "",
-            "away_top_prob":  away_top_r["hr_prob"] if away_top_r else 0,
-            "home_top":       home_top_r["batter_name"] if home_top_r else "",
-            "home_top_prob":  home_top_r["hr_prob"] if home_top_r else 0,
-            "away_exp_hr":    away_exp_hr,
-            "home_exp_hr":    home_exp_hr,
-            "n_away":         len(away_results),
-            "n_home":         len(home_results),
-            # Game lines from game_lines.json
-            "ou":             game_lines.get(game_key, {}).get("ou"),
-            "away_ml":        game_lines.get(game_key, {}).get("away_ml", ""),
-            "home_ml":        game_lines.get(game_key, {}).get("home_ml", ""),
-        })
 
     RESULTS = apply_game_diversity(RESULTS)
-    ALL_GAME_KEYS = list(lineups.keys())
+    print(f"Model ran: {len(RESULTS)} players across {len(lineups)} games")
 
-    # Merge picks_input.json into PICKS history
-    picks_input_path = DATA / "picks_input.json"
-    picks_str = extract_obj(html, "PICKS")
+    # ── SUMMARIES (with game_key + moneylines/total from game_lines.json) ─────
+    game_map = {}
+    for r in RESULTS:
+        gk = r["game_key"]
+        if gk not in game_map:
+            game_map[gk] = []
+        game_map[gk].append(r)
+
+    SUMMARIES = []
+    for gk, players in game_map.items():
+        top = sorted(players, key=lambda x: -x["composite"])[:3]
+        home_team = lineups[gk]["home_team"]
+        park, roof = TEAM_PARK.get(home_team, ("Unknown", False))
+        w  = weather.get(home_team, {})
+        gl = game_lines.get(gk, {})
+        SUMMARIES.append({
+            "game_key":    gk,
+            "game":        players[0]["game"],
+            "label":       players[0]["game"],
+            "away":        lineups[gk]["away_team"],
+            "home":        home_team,
+            "time":        players[0]["time"],
+            "park":        park,
+            "park_factor": PARK_HR_FACTOR.get(park, 1.0),
+            "weather_flag":players[0]["weather_flag"],
+            "temp":        w.get("temp", 72),
+            "wind_mph":    w.get("wind_mph", 5),
+            "wind_dir":    w.get("wind_dir", "N"),
+            "ou":          gl.get("ou"),
+            "away_ml":     gl.get("away_ml", ""),
+            "home_ml":     gl.get("home_ml", ""),
+            "top_plays":   [
+                {
+                    "name":      p["batter_name"],
+                    "prob":      p["hr_prob"],
+                    "edge":      p["hr_edge"],
+                    "composite": p["composite"],
+                }
+                for p in top
+            ],
+        })
+
+    # ── PITCHERS ──────────────────────────────────────────────────────────────
+    seen = set()
+    PITCHERS = []
+    for gk, game in lineups.items():
+        for pname in [game.get("home_pitcher", ""), game.get("away_pitcher", "")]:
+            if not pname or pname == "TBD" or pname in seen:
+                continue
+            seen.add(pname)
+            pk = pname.lower()
+            pd = PITCHER_CAREER_DB.get(pk, {})
+            # Pitcher salary lookup
+            psal       = lookup_salary(sal_map, pname)
+            pit_dk_sal = int(psal.get("dk") or 7500)
+            pit_fd_sal = int(psal.get("fd") or 8000)
+            PITCHERS.append({
+                "name":      pname,
+                "game_key":  gk,
+                "xfip":      pd.get("xf3", 4.0),
+                "era":       pd.get("e3", 4.0),
+                "hr9":       pd.get("h3", 1.0),
+                "pfh":       pd.get("pfh", 1.0),
+                "pfa":       pd.get("pfa", 1.0),
+                "p_factor":  pitcher_factor(pname, l14_pitch),
+                "dk_salary": pit_dk_sal,
+                "fd_salary": pit_fd_sal,
+            })
+
+    ALL_GAME_KEYS = list(game_map.keys())
+
+    # ── Inject into shell.html ────────────────────────────────────────────────
+    picks_str      = extract_obj(html, "PICKS")
     dfs_record_str = extract_obj(html, "DFS_RECORD")
-    if picks_input_path.exists():
-        new_picks = json.loads(picks_input_path.read_text())
-        existing_picks = json.loads(picks_str) if picks_str != "[]" else []
-        # Add new picks that aren't already tracked (match by date+player)
-        existing_keys = {(p["date"],p["player"]) for p in existing_picks}
-        added = 0
-        for p in new_picks:
-            key = (p.get("date",""), p.get("player",""))
-            if key not in existing_keys:
-                existing_picks.insert(0, p)  # newest first
-                added += 1
-            else:
-                # Update hit result if now known
-                for ep in existing_picks:
-                    if ep["date"]==p["date"] and ep["player"]==p["player"]:
-                        if p.get("hit") is not None:
-                            ep["hit"] = p["hit"]
-        picks_str = json.dumps(existing_picks)
-        print(f"  Picks: merged {added} new picks from picks_input.json")
-
-    # PICKS and DFS_RECORD already extracted above
 
     for var, val in [
         ("RESULTS",       json.dumps(RESULTS)),
@@ -490,22 +478,30 @@ def build():
         html, ok = bracket_replace(html, var, val)
         print(f"  {var}: {'✓' if ok else 'FAILED'}")
 
-    # Update date labels
-    html = re.sub(r"(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d+, \d{4}",
-                  today.strftime("%b %-d, %Y"), html)
-    html = re.sub(r"Top Edge Plays — \w+ \d+",
-                  f"Top Edge Plays — {today.strftime('%b %-d')}", html)
-    html = re.sub(r"<title>Onyx Baseball · \w+ \d+</title>",
-                  f"<title>Onyx Baseball · {today.strftime('%b %-d')}</title>", html)
+    # Update date header
+    html = re.sub(
+        r"(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d+, \d{4}",
+        today.strftime("%b %-d, %Y"), html)
+    html = re.sub(
+        r"Top Edge Plays — (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d+",
+        f"Top Edge Plays — {today.strftime('%b %-d')}", html)
+    html = re.sub(
+        r"<title>Onyx Baseball · (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d+</title>",
+        f"<title>Onyx Baseball · {today.strftime('%b %-d')}</title>", html)
 
     with open(OUT, "w") as f:
         f.write(html)
 
     top5 = sorted([r for r in RESULTS if r.get("dk_hr_odds")], key=lambda x: -x["composite"])[:5]
-    print(f"\n✅ {len(RESULTS)} players, {len(SUMMARIES)} games, {len(PITCHERS)} pitchers → index.html")
+    confirmed = sum(1 for r in RESULTS if r.get("lineup_confirmed"))
+    print(f"\n✅ index.html written — {len(RESULTS)} players, {confirmed} in confirmed lineups")
     print("\nTop 5 edge plays:")
     for p in top5:
-        print(f"  {p['batter_name']:25s} prob={p['hr_prob']}% edge={p['hr_edge']}% odds=+{p['dk_hr_odds']}")
+        conf = "✓" if p.get("lineup_confirmed") else "~"
+        sal  = f"DK${p['dk_salary']:,}"
+        val  = f"{p['dk_value']:.2f}x"
+        print(f"  {conf} {p['batter_name']:25s} prob={p['hr_prob']}% edge={p['hr_edge']}% "
+              f"odds=+{p['dk_hr_odds']} comp={p['composite']:.3f} {sal} val={val}")
 
 if __name__ == "__main__":
     build()
