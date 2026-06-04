@@ -1,63 +1,41 @@
 name: Daily Onyx Build
-
 on:
   schedule:
     # 11:30 AM ET = 15:30 UTC (EDT, Apr–Nov)
     - cron: "30 15 * * *"
   workflow_dispatch:  # allow manual trigger from Actions tab
-
 permissions:
   contents: write
   pages: write
   id-token: write
-
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-
       - name: Install dependencies
         run: pip install requests
-
       - name: Fetch daily data
         env:
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
         run: python3 fetch_data.py
-
-        - name: Ensure data files exist
-        run: |
-          mkdir -p data
-          [ -f data/lineups.json ]   || echo '{}' > data/lineups.json
-          [ -f data/odds.json ]      || echo '{}' > data/odds.json
-          [ -f data/weather.json ]   || echo '{}' > data/weather.json
-          [ -f data/statcast_l14.json ]  || echo '{}' > data/statcast_l14.json
-          [ -f data/pitchers_l14.json ]  || echo '{}' > data/pitchers_l14.json
-          [ -f data/salaries.json ]  || echo '{}' > data/salaries.json
-          [ -f data/game_lines.json ] || echo '[]' > data/game_lines.json
-
       - name: Build index.html
         run: python3 auto_build.py
-
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: .
-
   deploy:
     needs: build
     runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
