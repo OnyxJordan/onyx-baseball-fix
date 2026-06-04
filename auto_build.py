@@ -1,5 +1,5 @@
 """
-auto_build.py — Onyx Baseball daily build v2
+auto_build.py — Onyx Baseball daily build v3
 
 Reads data/ JSON files → runs model → injects into shell.html → writes index.html
 RESULTS schema matches original HTML exactly so all tabs/UI work correctly.
@@ -69,7 +69,6 @@ PARK_IN = {
 
 # ── SALARY HELPERS ─────────────────────────────────────────────────────────────
 def _norm_name(s):
-    """Lowercase, strip accents/punctuation and Jr/Sr/II/III suffixes."""
     s = unicodedata.normalize("NFKD", s).encode("ascii", "ignore").decode()
     s = s.lower().strip()
     s = re.sub(r"[.'`\-]", " ", s)
@@ -77,14 +76,12 @@ def _norm_name(s):
     return re.sub(r"\s+", " ", s).strip()
 
 def lookup_salary(sal_map, name):
-    """Return {dk, fd} salary dict for a player, tolerant of name-format differences."""
     if not name:
         return {}
     nk = name.lower()
     if nk in sal_map:
         return sal_map[nk]
     target = _norm_name(name)
-    # Build normalised index once per sal_map instance
     cache_key = id(sal_map)
     idx = getattr(lookup_salary, "_cache", None)
     if idx is None or idx.get("_key") != cache_key:
@@ -95,13 +92,11 @@ def lookup_salary(sal_map, name):
     return idx.get(target, {})
 
 def load_salaries():
-    """Load salaries.json → {player_name_lower: {dk, fd}}"""
     path = DATA / "salaries.json"
     if not path.exists():
         print("  WARNING: salaries.json not found — using default salaries")
         return {}
     raw = json.loads(path.read_text())
-    # Support both {name: {dk,fd}} and [{name,dk_salary,fd_salary}] shapes
     sal_map = {}
     if isinstance(raw, list):
         for entry in raw:
@@ -118,12 +113,23 @@ def load_salaries():
     return sal_map
 
 def load_game_lines():
-    """Load game_lines.json → {game_key: {ou, away_ml, home_ml}}"""
+    """Load game_lines.json → {game_key: {...}}
+    FIX v3: normalize '@' → '_' so keys match lineups.json format (e.g. SD_PHI).
+    Supports both list and dict shapes.
+    """
     path = DATA / "game_lines.json"
     if not path.exists():
         print("  WARNING: game_lines.json not found — moneylines/totals will be empty")
         return {}
-    gl = json.loads(path.read_text())
+    raw = json.loads(path.read_text())
+
+    gl = {}
+    items = raw if isinstance(raw, list) else [dict(v, game_key=k) for k, v in raw.items()]
+    for entry in items:
+        key = entry.get("game_key", "")
+        key = key.replace("@", "_")   # "SD@PHI" → "SD_PHI"
+        gl[key] = entry
+
     print(f"  Game lines: {len(gl)} games loaded")
     return gl
 
@@ -241,7 +247,6 @@ def build():
         home_pitcher = game.get("home_pitcher", "TBD")
         away_pitcher = game.get("away_pitcher", "TBD")
 
-        # Pitcher stats for display
         def get_pitcher_stats(pname):
             pk = pname.lower()
             pd = PITCHER_CAREER_DB.get(pk, {})
@@ -273,7 +278,6 @@ def build():
 
             dk_odds = odds_map.get(name.lower())
 
-            # ── Salary lookup (replaces hardcoded $3000/$7000/$8000) ──────────
             bsal       = lookup_salary(sal_map, name)
             bat_dk_sal = int(bsal.get("dk") or 3000)
             bat_fd_sal = int(bsal.get("fd") or 3000)
@@ -298,17 +302,16 @@ def build():
             l14_hr  = l14.get("l14_hr", 0)
             sc      = proj["sc_score"]
 
-            # Due meter label
             if l14_pa >= 20:
                 expected  = career_rate * l14_pa
                 due_score = (expected - l14_hr) * sc
-                if due_score > 1.2:    due_label = "OVERDUE"
-                elif due_score > 0.6:  due_label = "DUE"
-                elif due_score > 0.15: due_label = "COOL"
-                elif due_score > -0.15:due_label = "NORMAL"
-                elif due_score > -0.6: due_label = "WARM"
-                elif due_score > -1.2: due_label = "HOT"
-                else:                  due_label = "FIRE"
+                if due_score > 1.2:     due_label = "OVERDUE"
+                elif due_score > 0.6:   due_label = "DUE"
+                elif due_score > 0.15:  due_label = "COOL"
+                elif due_score > -0.15: due_label = "NORMAL"
+                elif due_score > -0.6:  due_label = "WARM"
+                elif due_score > -1.2:  due_label = "HOT"
+                else:                   due_label = "FIRE"
                 due_detail = f"{int(l14_hr)}HR/{int(l14_pa)}PA"
             else:
                 due_score = 0; due_label = "NORMAL"; due_detail = "—"
@@ -344,8 +347,10 @@ def build():
                 "env_factor":        proj["env"],
                 "temp":              temp,
                 "wind_mph":          wind_mph,
-                # Pitcher
+                # Pitcher — FIX v3: include pitcher names for game page display
                 "opp_pitcher":       opp_pitcher,
+                "home_pitcher":      home_pitcher,
+                "away_pitcher":      away_pitcher,
                 "opp_pitcher_hand":  "R",
                 "opp_pitcher_hr9":   opp_hr9,
                 "opp_pitcher_era":   opp_era,
@@ -392,7 +397,7 @@ def build():
     RESULTS = apply_game_diversity(RESULTS)
     print(f"Model ran: {len(RESULTS)} players across {len(lineups)} games")
 
-    # ── SUMMARIES (with game_key + moneylines/total from game_lines.json) ─────
+    # ── SUMMARIES ─────────────────────────────────────────────────────────────
     game_map = {}
     for r in RESULTS:
         gk = r["game_key"]
@@ -408,22 +413,24 @@ def build():
         w  = weather.get(home_team, {})
         gl = game_lines.get(gk, {})
         SUMMARIES.append({
-            "game_key":    gk,
-            "game":        players[0]["game"],
-            "label":       players[0]["game"],
-            "away":        lineups[gk]["away_team"],
-            "home":        home_team,
-            "time":        players[0]["time"],
-            "park":        park,
-            "park_factor": PARK_HR_FACTOR.get(park, 1.0),
-            "weather_flag":players[0]["weather_flag"],
-            "temp":        w.get("temp", 72),
-            "wind_mph":    w.get("wind_mph", 5),
-            "wind_dir":    w.get("wind_dir", "N"),
-            "ou":          gl.get("ou"),
-            "away_ml":     gl.get("away_ml", ""),
-            "home_ml":     gl.get("home_ml", ""),
-            "top_plays":   [
+            "game_key":     gk,
+            "game":         players[0]["game"],
+            "label":        players[0]["game"],
+            "away":         lineups[gk]["away_team"],
+            "home":         home_team,
+            "away_pitcher": lineups[gk].get("away_pitcher", "TBD"),   # FIX v3
+            "home_pitcher": lineups[gk].get("home_pitcher", "TBD"),   # FIX v3
+            "time":         players[0]["time"],
+            "park":         park,
+            "park_factor":  PARK_HR_FACTOR.get(park, 1.0),
+            "weather_flag": players[0]["weather_flag"],
+            "temp":         w.get("temp", 72),
+            "wind_mph":     w.get("wind_mph", 5),
+            "wind_dir":     w.get("wind_dir", "N"),
+            "ou":           gl.get("ou"),
+            "away_ml":      gl.get("away_ml", ""),
+            "home_ml":      gl.get("home_ml", ""),
+            "top_plays": [
                 {
                     "name":      p["batter_name"],
                     "prob":      p["hr_prob"],
@@ -444,7 +451,6 @@ def build():
             seen.add(pname)
             pk = pname.lower()
             pd = PITCHER_CAREER_DB.get(pk, {})
-            # Pitcher salary lookup
             psal       = lookup_salary(sal_map, pname)
             pit_dk_sal = int(psal.get("dk") or 7500)
             pit_fd_sal = int(psal.get("fd") or 8000)
