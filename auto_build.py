@@ -115,13 +115,23 @@ def load_salaries():
     print(f"  Salaries: {len(sal_map)} players loaded")
     return sal_map
 
+
 def load_game_lines():
-    """Load game_lines.json → {game_key: {ou, away_ml, home_ml}}"""
+    """Load game_lines.json → {game_key: {ou, away_ml, home_ml}}
+    Supports both list [{game_key, ...}] and dict {game_key: {...}} formats.
+    Normalizes '@' to '_' to match lineups.json keys.
+    """
     path = DATA / "game_lines.json"
     if not path.exists():
         print("  WARNING: game_lines.json not found — moneylines/totals will be empty")
         return {}
-    gl = json.loads(path.read_text())
+    raw = json.loads(path.read_text())
+    gl = {}
+    items = raw if isinstance(raw, list) else [dict(v, game_key=k) for k, v in raw.items()]
+    for entry in items:
+        key = entry.get("game_key", "").replace("@", "_")
+        if key:
+            gl[key] = entry
     print(f"  Game lines: {len(gl)} games loaded")
     return gl
 
