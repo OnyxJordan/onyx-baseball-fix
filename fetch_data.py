@@ -57,7 +57,143 @@ TEAM_ID_TO_ABBR = {
 POS_DEFAULT_ORDER = {
     "CF":2,"SS":2,"2B":3,"3B":4,"1B":4,"LF":5,"RF":5,"DH":4,"C":7,"OF":5,"P":9
 }
+# Add this set near the top of fetch_data.py (after POS_DEFAULT_ORDER)
+PA_EVENTS = {
+    "home_run","single","double","triple","field_out","strikeout",
+    "walk","hit_by_pitch","grounded_into_double_play","fielders_choice",
+    "fielders_choice_out","force_out","sac_fly","sac_bunt",
+    "double_play","triple_play","strikeout_double_play","sac_fly_double_play",
+    "other_out","field_error","catcher_interf","intent_walk",
+}
 
+# ── 8. STATCAST L14 — replace existing fetch_statcast() ──────────────────────
+def fetch_statcast():
+    print("Fetching Statcast L14 hitter data...")
+    today = datetime.date.today()
+    start = (today - datetime.timedelta(days=14)).strftime("%Y-%m-%d")
+    end   = today.strftime("%Y-%m-%d")
+    url = (
+        f"https://baseballsavant.mlb.com/statcast_search/csv"
+        f"?all=true&player_type=batter&hfGT=R%7C&hfSea=2026%7C"
+        f"&game_date_gt={start}&game_date_lt={end}"
+        f"&min_abs=5&group_by=name&sort_col=pitches&sort_order=desc&type=details&"
+    )
+    statcast = {}
+    try:
+        r = requests.get(url, timeout=60)
+        r.raise_for_status()
+        reader = csv.DictReader(io.StringIO(r.text))
+        agg = defaultdict(lambda: {
+            "pa":0,"hr":0,"ev_sum":0,"ev_n":0,"barrels":0,"hard_hits":0,"hits":0
+        })
+        for row in reader:
+            raw = (row.get("player_name","") or "").strip()
+            if not raw: continue
+            if "," in raw:
+                last, first = raw.split(",", 1)
+                name = f"{first.strip()} {last.strip()}".lower()
+            else:
+                name = raw.lower()
+
+            events = row.get("events","") or ""
+            ev_s   = row.get("launch_speed","") or ""
+            la_s   = row.get("launch_angle","") or ""
+
+            # Only count terminal PA-ending events
+            if events in PA_EVENTS:
+                agg[name]["pa"] += 1
+                if events == "home_run":
+                    agg[name]["hr"] += 1
+                if events in ("single","double","triple","home_run"):
+                    agg[name]["hits"] += 1
+
+            # Batted ball metrics on any pitch with launch data
+            try:
+                ev = float(ev_s)
+                la = float(la_s)
+                agg[name]["ev_sum"] += ev
+                agg[name]["ev_n"]   += 1
+                if ev >= 95:
+                    agg[name]["hard_hits"] += 1
+                if ev >= 98 and 26 <= la <= 30:
+                    agg[name]["barrels"] += 1
+            except:
+                pass
+
+        for name, d in agg.items():
+            pa = max(d["pa"], 1)
+            statcast[name] = {
+                "l14_pa":         d["pa"],
+                "l14_hr":         d["hr"],
+                "l14_rate":       round(d["hr"] / pa, 4),
+                "l14_avg_ev":     round(d["ev_sum"] / d["ev_n"], 1) if d["ev_n"] else 90.0,
+                "l14_barrel_pct": round(d["barrels"] / pa, 4),
+                "l14_hh_pct":     round(d["hard_hits"] / pa, 4),
+                "l14_hit_rate":   round(d["hits"] / pa, 4),
+            }
+    except Exception as e:
+        print(f"  Statcast error: {e}")
+
+    print(f"  Statcast hitters: {len(statcast)}")
+    with open(OUT / "statcast_l14.json", "w") as f:
+        json.dump(statcast, f, indent=2)
+    return statcast
+
+
+# ── 9. PITCHER L14 — replace existing fetch_pitcher_statcast() ───────────────
+def fetch_pitcher_statcast():
+    print("Fetching Statcast L14 pitcher data...")
+    today = datetime.date.today()
+    start = (today - datetime.timedelta(days=14)).strftime("%Y-%m-%d")
+    end   = today.strftime("%Y-%m-%d")
+    url = (
+        f"https://baseballsavant.mlb.com/statcast_search/csv"
+        f"?all=true&player_type=pitcher&hfGT=R%7C&hfSea=2026%7C"
+        f"&game_date_gt={start}&game_date_lt={end}"
+        f"&min_abs=10&group_by=name&sort_col=pitches&sort_order=desc&type=details&"
+    )
+    pitchers = {}
+    try:
+        r = requests.get(url, timeout=60)
+        r.raise_for_status()
+        reader = csv.DictReader(io.StringIO(r.text))
+        agg = defaultdict(lambda: {"bf":0,"hr":0,"k":0,"bb":0})
+        for row in reader:
+            raw = (row.get("player_name","") or "").strip()
+            if not raw: continue
+            if "," in raw:
+                last, first = raw.split(",", 1)
+                name = f"{first.strip()} {last.strip()}".lower()
+            else:
+                name = raw.lower()
+
+            events = row.get("events","") or ""
+
+            if events in PA_EVENTS:
+                agg[name]["bf"] += 1
+                if events == "home_run":
+                    agg[name]["hr"] += 1
+                if events in ("strikeout","strikeout_double_play"):
+                    agg[name]["k"] += 1
+                if events in ("walk","intent_walk"):
+                    agg[name]["bb"] += 1
+
+        for name, d in agg.items():
+            bf = max(d["bf"], 1)
+            pitchers[name] = {
+                "l14_bf":      d["bf"],
+                "l14_hr_rate": round(d["hr"] / bf, 4),
+                "l14_k_rate":  round(d["k"]  / bf, 4),
+                "l14_bb_rate": round(d["bb"] / bf, 4),
+            }
+    except Exception as e:
+        print(f"  Pitcher error: {e}")
+
+    print(f"  Statcast pitchers: {len(pitchers)}")
+    with open(OUT / "pitchers_l14.json", "w") as f:
+        json.dump(pitchers, f, indent=2)
+    return pitchers
+    
 def mlb_get(path, params=None):
     r = requests.get(f"https://statsapi.mlb.com/api/v1{path}", params=params, timeout=20)
     r.raise_for_status()
