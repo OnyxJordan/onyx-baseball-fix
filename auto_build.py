@@ -1,5 +1,5 @@
 """
-auto_build.py — Onyx Baseball daily build v3
+auto_build.py — Onyx Baseball daily build v2
 
 Reads data/ JSON files → runs model → injects into shell.html → writes index.html
 RESULTS schema matches original HTML exactly so all tabs/UI work correctly.
@@ -69,6 +69,7 @@ PARK_IN = {
 
 # ── SALARY HELPERS ─────────────────────────────────────────────────────────────
 def _norm_name(s):
+    """Lowercase, strip accents/punctuation and Jr/Sr/II/III suffixes."""
     s = unicodedata.normalize("NFKD", s).encode("ascii", "ignore").decode()
     s = s.lower().strip()
     s = re.sub(r"[.'`\-]", " ", s)
@@ -76,6 +77,7 @@ def _norm_name(s):
     return re.sub(r"\s+", " ", s).strip()
 
 def lookup_salary(sal_map, name):
+    """Return {dk, fd} salary dict for a player, tolerant of name-format differences."""
     if not name:
         return {}
     nk = name.lower()
@@ -92,6 +94,7 @@ def lookup_salary(sal_map, name):
     return idx.get(target, {})
 
 def load_salaries():
+    """Load salaries.json → {player_name_lower: {dk, fd}}"""
     path = DATA / "salaries.json"
     if not path.exists():
         print("  WARNING: salaries.json not found — using default salaries")
@@ -113,23 +116,12 @@ def load_salaries():
     return sal_map
 
 def load_game_lines():
-    """Load game_lines.json → {game_key: {...}}
-    FIX v3: normalize '@' → '_' so keys match lineups.json format (e.g. SD_PHI).
-    Supports both list and dict shapes.
-    """
+    """Load game_lines.json → {game_key: {ou, away_ml, home_ml}}"""
     path = DATA / "game_lines.json"
     if not path.exists():
         print("  WARNING: game_lines.json not found — moneylines/totals will be empty")
         return {}
-    raw = json.loads(path.read_text())
-
-    gl = {}
-    items = raw if isinstance(raw, list) else [dict(v, game_key=k) for k, v in raw.items()]
-    for entry in items:
-        key = entry.get("game_key", "")
-        key = key.replace("@", "_")   # "SD@PHI" → "SD_PHI"
-        gl[key] = entry
-
+    gl = json.loads(path.read_text())
     print(f"  Game lines: {len(gl)} games loaded")
     return gl
 
@@ -305,13 +297,13 @@ def build():
             if l14_pa >= 20:
                 expected  = career_rate * l14_pa
                 due_score = (expected - l14_hr) * sc
-                if due_score > 1.2:     due_label = "OVERDUE"
-                elif due_score > 0.6:   due_label = "DUE"
-                elif due_score > 0.15:  due_label = "COOL"
-                elif due_score > -0.15: due_label = "NORMAL"
-                elif due_score > -0.6:  due_label = "WARM"
-                elif due_score > -1.2:  due_label = "HOT"
-                else:                   due_label = "FIRE"
+                if due_score > 1.2:    due_label = "OVERDUE"
+                elif due_score > 0.6:  due_label = "DUE"
+                elif due_score > 0.15: due_label = "COOL"
+                elif due_score > -0.15:due_label = "NORMAL"
+                elif due_score > -0.6: due_label = "WARM"
+                elif due_score > -1.2: due_label = "HOT"
+                else:                  due_label = "FIRE"
                 due_detail = f"{int(l14_hr)}HR/{int(l14_pa)}PA"
             else:
                 due_score = 0; due_label = "NORMAL"; due_detail = "—"
@@ -319,7 +311,6 @@ def build():
             implied = round(implied_prob(dk_odds) * 100, 2) if dk_odds else 0
 
             r = {
-                # Identity
                 "batter_name":       name,
                 "matched_name":      name,
                 "batting_order":     bo,
@@ -332,13 +323,11 @@ def build():
                 "opp":               opp,
                 "away":              away_team,
                 "home":              home_team,
-                # Game
                 "game":              game_label,
                 "time":              time_str,
                 "game_key":          game_key,
                 "game_label":        game_label,
                 "weather_flag":      wflag,
-                # Park / weather
                 "venue":             park,
                 "weather_label":     wlabel,
                 "wind_from":         wind_dir,
@@ -347,15 +336,11 @@ def build():
                 "env_factor":        proj["env"],
                 "temp":              temp,
                 "wind_mph":          wind_mph,
-                # Pitcher — FIX v3: include pitcher names for game page display
                 "opp_pitcher":       opp_pitcher,
-                "home_pitcher":      home_pitcher,
-                "away_pitcher":      away_pitcher,
                 "opp_pitcher_hand":  "R",
                 "opp_pitcher_hr9":   opp_hr9,
                 "opp_pitcher_era":   opp_era,
                 "p_factor":          opp_pf,
-                # Career / Statcast
                 "career_hr_pa":      round(career_rate, 5),
                 "split_hr_pa":       round(split_rate, 5),
                 "l14_hr":            l14_hr,
@@ -368,7 +353,6 @@ def build():
                 "sc_score":          sc,
                 "barrel_pct":        d.get("b3", 0.08),
                 "ev90":              d.get("e3", 95),
-                # Model outputs
                 "hr_per_pa":         round(proj["hr_prob"] / 100 / 4.3, 5),
                 "hr_pg":             round(proj["hr_prob"] / 100, 4),
                 "hr_prob":           proj["hr_prob"],
@@ -376,20 +360,17 @@ def build():
                 "due_adj":           proj["due_mult"],
                 "due_label":         due_label,
                 "due_detail":        due_detail,
-                # Projections
                 "dk_proj":           proj["dk_pts"],
                 "fd_proj":           proj["fd_pts"],
                 "dk_salary":         proj["dk_salary"],
                 "fd_salary":         proj["fd_salary"],
                 "dk_value":          round(proj["dk_pts"] / max(proj["dk_salary"], 1000) * 1000, 2),
                 "fd_value":          round(proj["fd_pts"] / max(proj["fd_salary"], 1000) * 1000, 2),
-                # Odds / edge
                 "dk_hr_odds":        dk_odds,
                 "dk_hr_implied":     implied,
                 "hr_edge":           proj["hr_edge"],
                 "composite":         proj["composite"],
                 "wind_alignment":    round(wf - 1.0, 4),
-                # Confirmed flag
                 "lineup_confirmed":  game.get("home_confirmed" if is_home else "away_confirmed", False),
             }
             RESULTS.append(r)
@@ -397,7 +378,6 @@ def build():
     RESULTS = apply_game_diversity(RESULTS)
     print(f"Model ran: {len(RESULTS)} players across {len(lineups)} games")
 
-    # ── SUMMARIES ─────────────────────────────────────────────────────────────
     game_map = {}
     for r in RESULTS:
         gk = r["game_key"]
@@ -413,24 +393,22 @@ def build():
         w  = weather.get(home_team, {})
         gl = game_lines.get(gk, {})
         SUMMARIES.append({
-            "game_key":     gk,
-            "game":         players[0]["game"],
-            "label":        players[0]["game"],
-            "away":         lineups[gk]["away_team"],
-            "home":         home_team,
-            "away_pitcher": lineups[gk].get("away_pitcher", "TBD"),   # FIX v3
-            "home_pitcher": lineups[gk].get("home_pitcher", "TBD"),   # FIX v3
-            "time":         players[0]["time"],
-            "park":         park,
-            "park_factor":  PARK_HR_FACTOR.get(park, 1.0),
-            "weather_flag": players[0]["weather_flag"],
-            "temp":         w.get("temp", 72),
-            "wind_mph":     w.get("wind_mph", 5),
-            "wind_dir":     w.get("wind_dir", "N"),
-            "ou":           gl.get("ou"),
-            "away_ml":      gl.get("away_ml", ""),
-            "home_ml":      gl.get("home_ml", ""),
-            "top_plays": [
+            "game_key":    gk,
+            "game":        players[0]["game"],
+            "label":       players[0]["game"],
+            "away":        lineups[gk]["away_team"],
+            "home":        home_team,
+            "time":        players[0]["time"],
+            "park":        park,
+            "park_factor": PARK_HR_FACTOR.get(park, 1.0),
+            "weather_flag":players[0]["weather_flag"],
+            "temp":        w.get("temp", 72),
+            "wind_mph":    w.get("wind_mph", 5),
+            "wind_dir":    w.get("wind_dir", "N"),
+            "ou":          gl.get("ou"),
+            "away_ml":     gl.get("away_ml", ""),
+            "home_ml":     gl.get("home_ml", ""),
+            "top_plays":   [
                 {
                     "name":      p["batter_name"],
                     "prob":      p["hr_prob"],
@@ -441,7 +419,6 @@ def build():
             ],
         })
 
-    # ── PITCHERS ──────────────────────────────────────────────────────────────
     seen = set()
     PITCHERS = []
     for gk, game in lineups.items():
@@ -469,7 +446,6 @@ def build():
 
     ALL_GAME_KEYS = list(game_map.keys())
 
-    # ── Inject into shell.html ────────────────────────────────────────────────
     picks_str      = extract_obj(html, "PICKS")
     dfs_record_str = extract_obj(html, "DFS_RECORD")
 
@@ -484,7 +460,6 @@ def build():
         html, ok = bracket_replace(html, var, val)
         print(f"  {var}: {'✓' if ok else 'FAILED'}")
 
-    # Update date header
     html = re.sub(
         r"(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d+, \d{4}",
         today.strftime("%b %-d, %Y"), html)
