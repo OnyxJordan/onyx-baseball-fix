@@ -32,6 +32,17 @@ jobs:
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
         run: python3 fetch_data.py
 
+        - name: Ensure data files exist
+        run: |
+          mkdir -p data
+          [ -f data/lineups.json ]   || echo '{}' > data/lineups.json
+          [ -f data/odds.json ]      || echo '{}' > data/odds.json
+          [ -f data/weather.json ]   || echo '{}' > data/weather.json
+          [ -f data/statcast_l14.json ]  || echo '{}' > data/statcast_l14.json
+          [ -f data/pitchers_l14.json ]  || echo '{}' > data/pitchers_l14.json
+          [ -f data/salaries.json ]  || echo '{}' > data/salaries.json
+          [ -f data/game_lines.json ] || echo '[]' > data/game_lines.json
+
       - name: Build index.html
         run: python3 auto_build.py
 
