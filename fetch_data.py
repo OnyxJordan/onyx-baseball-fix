@@ -190,4 +190,146 @@ def fetch_lineups():
             "game_time":g.get("gameDate",""),
             "away_team":away_abbr,"home_team":home_abbr,
             "away_pitcher":away_pitcher,"home_pitcher":home_pitcher,
-            "away_lineup
+            "away_lineup":away_lineup,"home_lineup":home_lineup,
+            "away_confirmed":away_conf,"home_confirmed":home_conf,
+            "status":g.get("status",{}).get("detailedState",""),
+        }
+        conf = "✓" if (away_conf and home_conf) else "~projected"
+        print(f"  {game_key:12s}  {away_pitcher:22s} vs {home_pitcher:22s}  [{conf}]")
+    fully = sum(1 for g in games.values() if g["away_confirmed"] and g["home_confirmed"])
+    print(f"\n  Total: {len(games)} games, {fully} fully confirmed")
+    with open(OUT/"lineups.json","w") as f: json.dump(games,f,indent=2)
+    return games
+
+# ── 7. WEATHER ────────────────────────────────────────────────────────────────
+def deg_to_compass(deg):
+    dirs=["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"]
+    return dirs[round(deg/22.5)%16]
+
+def fetch_weather(games):
+    print("Fetching weather from Open-Meteo...")
+    weather = {}
+    for team in {g["home_team"] for g in games.values()}:
+        if team not in STADIUMS: continue
+        park_name, lat, lon, roof = STADIUMS[team]
+        game_hour = 14
+        for g in games.values():
+            if g["home_team"]==team and g.get("game_time"):
+                try:
+                    dt = datetime.datetime.fromisoformat(g["game_time"].replace("Z","+00:00"))
+                    eastern = dt.astimezone(datetime.timezone(datetime.timedelta(hours=-4)))
+                    game_hour = eastern.hour; break
+                except: pass
+        try:
+            r = requests.get("https://api.open-meteo.com/v1/forecast", params={
+                "latitude":lat,"longitude":lon,
+                "hourly":"temperature_2m,precipitation_probability,wind_speed_10m,wind_direction_10m",
+                "temperature_unit":"fahrenheit","wind_speed_unit":"mph",
+                "forecast_days":1,"timezone":"America/New_York",
+            }, timeout=25)
+            r.raise_for_status()
+            h = r.json().get("hourly",{})
+            idx = min(game_hour,23)
+            weather[team] = {
+                "park":park_name,
+                "temp":       h.get("temperature_2m",[72]*24)[idx],
+                "precip_pct": h.get("precipitation_probability",[0]*24)[idx],
+                "wind_mph":   h.get("wind_speed_10m",[5]*24)[idx],
+                "wind_dir":   deg_to_compass(h.get("wind_direction_10m",[180]*24)[idx]),
+                "roof":       roof,
+            }
+        except Exception as e:
+            print(f"  Weather error {team}: {e}")
+            weather[team] = {"park":park_name,"temp":72,"precip_pct":0,
+                             "wind_mph":5,"wind_dir":"N","roof":roof}
+        time.sleep(0.15)
+    print(f"  Weather: {len(weather)} stadiums")
+    with open(OUT/"weather.json","w") as f: json.dump(weather,f,indent=2)
+    return weather
+
+# ── 8. STATCAST L14 ───────────────────────────────────────────────────────────
+def fetch_statcast():
+    print("Fetching Statcast L14 hitter data...")
+    today = datetime.date.today()
+    start = (today-datetime.timedelta(days=14)).strftime("%Y-%m-%d")
+    end   = today.strftime("%Y-%m-%d")
+    url = (f"https://baseballsavant.mlb.com/statcast_search/csv"
+           f"?all=true&player_type=batter&hfGT=R%7C&hfSea=2026%7C"
+           f"&game_date_gt={start}&game_date_lt={end}"
+           f"&min_abs=5&group_by=name&sort_col=pitches&sort_order=desc&type=details&")
+    statcast = {}
+    try:
+        r = requests.get(url, timeout=60); r.raise_for_status()
+        reader = csv.DictReader(io.StringIO(r.text))
+        agg = defaultdict(lambda:{"pa":0,"hr":0,"ev_sum":0,"ev_n":0,"barrels":0,"hard_hits":0,"hits":0})
+        for row in reader:
+            raw=(row.get("player_name","") or "").strip()
+            if not raw: continue
+            if "," in raw:
+                last,first=raw.split(",",1); name=f"{first.strip()} {last.strip()}".lower()
+            else: name=raw.lower()
+            events=row.get("events","") or ""
+            ev_s=row.get("launch_speed","") or ""; la_s=row.get("launch_angle","") or ""
+            agg[name]["pa"]+=1
+            if events=="home_run": agg[name]["hr"]+=1
+            if events in ("single","double","triple","home_run"): agg[name]["hits"]+=1
+            try:
+                ev=float(ev_s); agg[name]["ev_sum"]+=ev; agg[name]["ev_n"]+=1
+                if ev>=95: agg[name]["hard_hits"]+=1
+                if ev>=98 and 26<=float(la_s)<=30: agg[name]["barrels"]+=1
+            except: pass
+        for name,d in agg.items():
+            pa=max(d["pa"],1)
+            statcast[name]={"l14_pa":d["pa"],"l14_hr":d["hr"],"l14_rate":round(d["hr"]/pa,4),
+                "l14_avg_ev":round(d["ev_sum"]/d["ev_n"],1) if d["ev_n"] else 90.0,
+                "l14_barrel_pct":round(d["barrels"]/pa,4),"l14_hh_pct":round(d["hard_hits"]/pa,4),
+                "l14_hit_rate":round(d["hits"]/pa,4)}
+    except Exception as e: print(f"  Statcast error: {e}")
+    print(f"  Statcast hitters: {len(statcast)}")
+    with open(OUT/"statcast_l14.json","w") as f: json.dump(statcast,f,indent=2)
+    return statcast
+
+# ── 9. PITCHER L14 ────────────────────────────────────────────────────────────
+def fetch_pitcher_statcast():
+    print("Fetching Statcast L14 pitcher data...")
+    today = datetime.date.today()
+    start = (today-datetime.timedelta(days=14)).strftime("%Y-%m-%d")
+    end   = today.strftime("%Y-%m-%d")
+    url = (f"https://baseballsavant.mlb.com/statcast_search/csv"
+           f"?all=true&player_type=pitcher&hfGT=R%7C&hfSea=2026%7C"
+           f"&game_date_gt={start}&game_date_lt={end}"
+           f"&min_abs=10&group_by=name&sort_col=pitches&sort_order=desc&type=details&")
+    pitchers = {}
+    try:
+        r = requests.get(url, timeout=60); r.raise_for_status()
+        reader = csv.DictReader(io.StringIO(r.text))
+        agg = defaultdict(lambda:{"bf":0,"hr":0,"k":0,"bb":0})
+        for row in reader:
+            raw=(row.get("player_name","") or "").strip()
+            if not raw: continue
+            if "," in raw:
+                last,first=raw.split(",",1); name=f"{first.strip()} {last.strip()}".lower()
+            else: name=raw.lower()
+            events=row.get("events","") or ""
+            agg[name]["bf"]+=1
+            if events=="home_run": agg[name]["hr"]+=1
+            if events in ("strikeout","strikeout_double_play"): agg[name]["k"]+=1
+            if events=="walk": agg[name]["bb"]+=1
+        for name,d in agg.items():
+            bf=max(d["bf"],1)
+            pitchers[name]={"l14_bf":d["bf"],"l14_hr_rate":round(d["hr"]/bf,4),
+                "l14_k_rate":round(d["k"]/bf,4),"l14_bb_rate":round(d["bb"]/bf,4)}
+    except Exception as e: print(f"  Pitcher error: {e}")
+    print(f"  Statcast pitchers: {len(pitchers)}")
+    with open(OUT/"pitchers_l14.json","w") as f: json.dump(pitchers,f,indent=2)
+    return pitchers
+
+# ── MAIN ───────────────────────────────────────────────────────────────────────
+if __name__ == "__main__":
+    print("=== Onyx Baseball — Fetching data ===\n")
+    load_odds()
+    games = fetch_lineups()
+    fetch_weather(games)
+    fetch_statcast()
+    fetch_pitcher_statcast()
+    print("\n=== Done. Ready for auto_build.py ===")
