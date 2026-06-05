@@ -66,122 +66,6 @@ PA_EVENTS = {
     "other_out","field_error","catcher_interf","intent_walk",
 }
 
-# ── 8. STATCAST L14 — reads data/fangraphs_l14.csv (uploaded daily) ──────────
-def fetch_statcast():
-    print("Fetching L14 hitter data from FanGraphs CSV...")
-    fg_path = OUT / "fangraphs_l14.csv"
-    statcast = {}
-
-    if not fg_path.exists():
-        print("  WARNING: fangraphs_l14.csv not found — L14 data will be empty")
-        with open(OUT / "statcast_l14.json", "w") as f:
-            json.dump({}, f)
-        return {}
-
-    try:
-        with open(fg_path, encoding="utf-8-sig") as f:
-            reader = csv.DictReader(f)
-            for row in reader:
-                raw = (row.get("Name") or row.get("NameASCII") or "").strip()
-                if not raw:
-                    continue
-                name = raw.lower()
-
-                pa  = int(row.get("PA")  or 0)
-                hr  = int(row.get("HR")  or 0)
-                iso = float(row.get("ISO") or 0)
-                bb_pct = float((row.get("BB%") or "0").replace("%","")) / 100
-                k_pct  = float((row.get("K%")  or "0").replace("%","")) / 100
-                xwoba  = float(row.get("xwOBA") or row.get("wOBA") or 0.320)
-                woba   = float(row.get("wOBA")  or 0.320)
-
-                if pa < 1:
-                    continue
-
-                statcast[name] = {
-                    "l14_pa":         pa,
-                    "l14_hr":         hr,
-                    "l14_rate":       round(hr / pa, 4),
-                    "l14_avg_ev":     90.0,       # not in FG export — use default
-                    "l14_barrel_pct": round(iso * 0.18, 4),  # rough proxy
-                    "l14_hh_pct":     round(iso * 0.45, 4),  # rough proxy
-                    "l14_hit_rate":   round(woba / 1.25, 4), # rough proxy for hit rate
-                    "l14_xwoba":      xwoba,
-                    "l14_iso":        iso,
-                    "l14_bb_pct":     bb_pct,
-                    "l14_k_pct":      k_pct,
-                }
-
-    except Exception as e:
-        print(f"  FanGraphs parse error: {e}")
-        with open(OUT / "statcast_l14.json", "w") as f:
-            json.dump({}, f)
-        return {}
-
-    print(f"  L14 hitters: {len(statcast)} players loaded from FanGraphs")
-    with open(OUT / "statcast_l14.json", "w") as f:
-        json.dump(statcast, f, indent=2)
-    return statcast
-
-
-# ── 9. PITCHER L14 — reads data/fangraphs_pitchers_l14.csv (uploaded daily) ──
-def fetch_pitcher_statcast():
-    print("Fetching L14 pitcher data from FanGraphs CSV...")
-    fg_path = OUT / "fangraphs_pitchers_l14.csv"
-    pitchers = {}
-
-    if not fg_path.exists():
-        print("  WARNING: fangraphs_pitchers_l14.csv not found — pitcher L14 will be empty")
-        with open(OUT / "pitchers_l14.json", "w") as f:
-            json.dump({}, f)
-        return {}
-
-    try:
-        with open(fg_path, encoding="utf-8-sig") as f:
-            reader = csv.DictReader(f)
-            for row in reader:
-                raw = (row.get("Name") or row.get("NameASCII") or "").strip()
-                if not raw:
-                    continue
-                name = raw.lower()
-
-                ip   = float(row.get("IP")   or 0)
-                hr9  = float(row.get("HR/9") or 0)
-                k9   = float(row.get("K/9")  or 0)
-                bb9  = float(row.get("BB/9") or 0)
-                xfip = float(row.get("xFIP") or 4.0)
-                era  = float(row.get("ERA")  or 4.0)
-
-                if ip < 1:
-                    continue
-
-                # Convert rate stats to per-BF approximations
-                # ~4.3 PA per inning is standard
-                bf = round(ip * 4.3)
-                hr_rate = round(hr9 / 27, 4)   # HR/9 → HR per BF (27 outs/9 inn)
-                k_rate  = round(k9  / 27, 4)
-                bb_rate = round(bb9 / 27, 4)
-
-                pitchers[name] = {
-                    "l14_bf":      bf,
-                    "l14_hr_rate": hr_rate,
-                    "l14_k_rate":  k_rate,
-                    "l14_bb_rate": bb_rate,
-                    "l14_xfip":    xfip,
-                    "l14_era":     era,
-                }
-
-    except Exception as e:
-        print(f"  FanGraphs pitcher parse error: {e}")
-        with open(OUT / "pitchers_l14.json", "w") as f:
-            json.dump({}, f)
-        return {}
-
-    print(f"  L14 pitchers: {len(pitchers)} players loaded from FanGraphs")
-    with open(OUT / "pitchers_l14.json", "w") as f:
-        json.dump(pitchers, f, indent=2)
-    return pitchers
-
 # ── 2. SCHEDULE ───────────────────────────────────────────────────────────────
 def fetch_schedule():
     today = datetime.date.today().strftime("%Y-%m-%d")
@@ -431,7 +315,6 @@ def fetch_pitcher_statcast():
 # ── MAIN ───────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     print("=== Onyx Baseball — Fetching data ===\n")
-    load_odds()
     games = fetch_lineups()
     fetch_weather(games)
     fetch_statcast()
