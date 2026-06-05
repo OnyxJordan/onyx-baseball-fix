@@ -2,7 +2,7 @@
 fetch_data.py — Onyx Baseball daily data fetcher v6
 Odds:    reads data/odds.json directly (uploaded manually each morning)
 Lineups: MLB Stats API with roster fallback
-Weather: Open-Meteo (free, no key)
+Weather: manual data/weather.json wins; falls back to Open-Meteo if missing
 Statcast: reads data/fangraphs_l14.csv + data/fangraphs_pitchers_l14.csv (uploaded daily)
 """
 import json, time, requests, csv, datetime
@@ -225,9 +225,15 @@ def fetch_lineups():
         json.dump(games, f, indent=2)
     return games
 
-# ── 6. WEATHER ────────────────────────────────────────────────────────────────
+# ── 6. WEATHER — manual weather.json wins; Open-Meteo fallback ────────────────
 def fetch_weather(games):
-    print("Fetching weather from Open-Meteo...")
+    weather_path = OUT / "weather.json"
+
+    if weather_path.exists():
+        print("  weather.json found — using manual upload, skipping Open-Meteo")
+        return json.loads(weather_path.read_text())
+
+    print("  No manual weather.json — fetching from Open-Meteo...")
     weather = {}
     for team in {g["home_team"] for g in games.values()}:
         if team not in STADIUMS:
@@ -255,7 +261,7 @@ def fetch_weather(games):
             idx = min(game_hour, 23)
             weather[team] = {
                 "park":       park_name,
-                "temp":       h.get("temperature_2m",          [72] * 24)[idx],
+                "temp":       h.get("temperature_2m",           [72] * 24)[idx],
                 "precip_pct": h.get("precipitation_probability", [0] * 24)[idx],
                 "wind_mph":   h.get("wind_speed_10m",            [5] * 24)[idx],
                 "wind_dir":   deg_to_compass(h.get("wind_direction_10m", [180] * 24)[idx]),
@@ -266,8 +272,9 @@ def fetch_weather(games):
             weather[team] = {"park": park_name, "temp": 72, "precip_pct": 0,
                              "wind_mph": 5, "wind_dir": "N", "roof": roof}
         time.sleep(0.15)
+
     print(f"  Weather: {len(weather)} stadiums")
-    with open(OUT / "weather.json", "w") as f:
+    with open(weather_path, "w") as f:
         json.dump(weather, f, indent=2)
     return weather
 
@@ -352,7 +359,7 @@ def fetch_pitcher_statcast():
                 era  = float(row.get("ERA")  or 4.0)
                 if ip < 1:
                     continue
-                bf      = round(ip * 4.3)
+                bf = round(ip * 4.3)
                 pitchers[name] = {
                     "l14_bf":      bf,
                     "l14_hr_rate": round(hr9 / 27, 4),
