@@ -66,7 +66,6 @@ PA_EVENTS = {
     "other_out","field_error","catcher_interf","intent_walk",
 }
 
-# ── 8. STATCAST L14 — replace existing fetch_statcast() ──────────────────────
 # ── 8. STATCAST L14 — reads data/fangraphs_l14.csv (uploaded daily) ──────────
 def fetch_statcast():
     print("Fetching L14 hitter data from FanGraphs CSV...")
@@ -125,79 +124,63 @@ def fetch_statcast():
     return statcast
 
 
-# ── 9. PITCHER L14 — replace existing fetch_pitcher_statcast() ───────────────
+# ── 9. PITCHER L14 — reads data/fangraphs_pitchers_l14.csv (uploaded daily) ──
 def fetch_pitcher_statcast():
-    print("Fetching Statcast L14 pitcher data...")
-    today = datetime.date.today()
-    start = (today - datetime.timedelta(days=14)).strftime("%Y-%m-%d")
-    end   = today.strftime("%Y-%m-%d")
-    url = (
-        f"https://baseballsavant.mlb.com/statcast_search/csv"
-        f"?all=true&player_type=pitcher&hfGT=R%7C&hfSea=2026%7C"
-        f"&game_date_gt={start}&game_date_lt={end}"
-        f"&min_abs=10&group_by=name&sort_col=pitches&sort_order=desc&type=details&"
-    )
+    print("Fetching L14 pitcher data from FanGraphs CSV...")
+    fg_path = OUT / "fangraphs_pitchers_l14.csv"
     pitchers = {}
+
+    if not fg_path.exists():
+        print("  WARNING: fangraphs_pitchers_l14.csv not found — pitcher L14 will be empty")
+        with open(OUT / "pitchers_l14.json", "w") as f:
+            json.dump({}, f)
+        return {}
+
     try:
-        r = requests.get(url, timeout=60)
-        r.raise_for_status()
-        reader = csv.DictReader(io.StringIO(r.text))
-        agg = defaultdict(lambda: {"bf":0,"hr":0,"k":0,"bb":0})
-        for row in reader:
-            raw = (row.get("player_name","") or "").strip()
-            if not raw: continue
-            if "," in raw:
-                last, first = raw.split(",", 1)
-                name = f"{first.strip()} {last.strip()}".lower()
-            else:
+        with open(fg_path, encoding="utf-8-sig") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                raw = (row.get("Name") or row.get("NameASCII") or "").strip()
+                if not raw:
+                    continue
                 name = raw.lower()
 
-            events = row.get("events","") or ""
+                ip   = float(row.get("IP")   or 0)
+                hr9  = float(row.get("HR/9") or 0)
+                k9   = float(row.get("K/9")  or 0)
+                bb9  = float(row.get("BB/9") or 0)
+                xfip = float(row.get("xFIP") or 4.0)
+                era  = float(row.get("ERA")  or 4.0)
 
-            if events in PA_EVENTS:
-                agg[name]["bf"] += 1
-                if events == "home_run":
-                    agg[name]["hr"] += 1
-                if events in ("strikeout","strikeout_double_play"):
-                    agg[name]["k"] += 1
-                if events in ("walk","intent_walk"):
-                    agg[name]["bb"] += 1
+                if ip < 1:
+                    continue
 
-        for name, d in agg.items():
-            bf = max(d["bf"], 1)
-            pitchers[name] = {
-                "l14_bf":      d["bf"],
-                "l14_hr_rate": round(d["hr"] / bf, 4),
-                "l14_k_rate":  round(d["k"]  / bf, 4),
-                "l14_bb_rate": round(d["bb"] / bf, 4),
-            }
+                # Convert rate stats to per-BF approximations
+                # ~4.3 PA per inning is standard
+                bf = round(ip * 4.3)
+                hr_rate = round(hr9 / 27, 4)   # HR/9 → HR per BF (27 outs/9 inn)
+                k_rate  = round(k9  / 27, 4)
+                bb_rate = round(bb9 / 27, 4)
+
+                pitchers[name] = {
+                    "l14_bf":      bf,
+                    "l14_hr_rate": hr_rate,
+                    "l14_k_rate":  k_rate,
+                    "l14_bb_rate": bb_rate,
+                    "l14_xfip":    xfip,
+                    "l14_era":     era,
+                }
+
     except Exception as e:
-        print(f"  Pitcher error: {e}")
+        print(f"  FanGraphs pitcher parse error: {e}")
+        with open(OUT / "pitchers_l14.json", "w") as f:
+            json.dump({}, f)
+        return {}
 
-    print(f"  Statcast pitchers: {len(pitchers)}")
+    print(f"  L14 pitchers: {len(pitchers)} players loaded from FanGraphs")
     with open(OUT / "pitchers_l14.json", "w") as f:
         json.dump(pitchers, f, indent=2)
     return pitchers
-    
-def mlb_get(path, params=None):
-    r = requests.get(f"https://statsapi.mlb.com/api/v1{path}", params=params, timeout=20)
-    r.raise_for_status()
-    return r.json()
-
-def player_name_key(name):
-    return name.lower().strip()
-
-# ── 1. ODDS — read from data/odds.json (uploaded daily) ──────────────────────
-def load_odds():
-    odds_path = OUT / "odds.json"
-    if odds_path.exists():
-        with open(odds_path) as f:
-            odds = json.load(f)
-        print(f"  Odds: loaded {len(odds)} players from data/odds.json")
-        return odds
-    else:
-        print("  Odds: data/odds.json not found — running without odds")
-        return {}
 
 # ── 2. SCHEDULE ───────────────────────────────────────────────────────────────
 def fetch_schedule():
