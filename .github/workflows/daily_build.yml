@@ -9,23 +9,12 @@ permissions:
   pages: write
   id-token: write
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - name: Install dependencies
-        run: pip install requests
-      - name: Fetch daily data
-        env:
-          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
-        run: python3 fetch_data.py
-      - name: Build index.html
+  - name: Build index.html
         run: python3 auto_build.py
+
+      - name: Persist picks & DFS record
+        run: python3 update_stats.py
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
