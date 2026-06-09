@@ -456,7 +456,7 @@ def build():
                 "pos": pos, "dk_pos": pos, "fd_pos": pos,
                 "location": "home" if is_home else "away",
                 "team": team, "opp": opp, "away": away_team, "home": home_team,
-                "game": game_label, "time": time_str,
+                "game": game_label, "time": time_str, "game_key": game_key,
                 "venue": park, "weather_label": wlabel,
                 "wind_from": wind_dir, "wind_factor": wf,
                 "wind_alignment": walign, "park_hr": park_f, "env_factor": wf,
