@@ -1,5 +1,16 @@
 """
-model.py — Onyx Baseball v13 HR probability + DFS projection model
+model.py — Onyx Baseball v14 HR probability + DFS projection model
+
+v14 changes vs v13:
+  - sc_score() now prefers LIVE L14 Statcast (real barrel%/EV90/hardhit% from
+    statcast_l14.json) when a hitter has 15+ recent PA; career fields are fallback.
+  - project_player() base rate uses 2026 season home/away splits from splits.json
+    (built by fetch_data.py fetch_splits()), regressed via SPLIT_REG_K.
+
+PATH NOTE: SEASON_SPLITS loads from _BASE / "data" / "splits.json".
+fetch_data.py writes splits.json into its OUT dir (data/). As long as model.py
+sits at repo root and the build runs from root, these line up. If you ever see
+SEASON_SPLITS come back empty, check this path first.
 """
 
 import json, math
@@ -11,6 +22,16 @@ with open(_BASE / "career_db.json") as f:
     CAREER_DB = json.load(f)
 with open(_BASE / "pitcher_db.json") as f:
     PITCHER_CAREER_DB = json.load(f)
+
+# Optional season home/away splits produced by fetch_data.py fetch_splits().
+# Safe if the file is missing — model falls back to CAREER_DB ch/ca fields.
+try:
+    with open(_BASE / "data" / "splits.json") as f:
+        SEASON_SPLITS = json.load(f)
+    print(f"  model: SEASON_SPLITS loaded ({len(SEASON_SPLITS)} players)")
+except Exception:
+    SEASON_SPLITS = {}
+    print("  model: splits.json not found — using CAREER_DB ch/ca fallback")
 
 # ── CONSTANTS ──────────────────────────────────────────────────────────────────
 POS_HR_AVG = {
@@ -127,15 +148,29 @@ def wind_env(park: str, wind_dir: str, wind_mph: float, temp: float, roof: bool)
     env += max(0, (temp - 72) * 0.002)
     return max(0.85, min(1.15, env))
 
-def sc_score(d: dict) -> float:
-    b  = d.get("b3", 0.085) or 0.085
-    h  = d.get("h3", 0.40)  or 0.40
-    e  = d.get("e3", 95)    or 95
-    i  = d.get("i3", 0.165) or 0.165
-    pa = d.get("p3", 0)     or 0
+def sc_score(d: dict, l14: dict = None) -> float:
+    """
+    Statcast quality score. Prefers LIVE L14 Statcast (real barrel%/EV90/hardhit
+    from statcast_l14.json) when present; falls back to baked-in career fields.
+    """
+    if l14 and l14.get("l14_pa", 0) >= 15:
+        b  = l14.get("l14_barrel_pct", 0.085) or 0.085
+        h  = l14.get("l14_hh_pct", 0.40)      or 0.40
+        e  = l14.get("l14_avg_ev", 95)        or 95
+        i  = l14.get("l14_iso", 0.165)        or 0.165
+        pa = l14.get("l14_pa", 0)             or 0
+        pa_ref = 120          # L14 sample matures faster than 3yr
+    else:
+        b  = d.get("b3", 0.085) or 0.085
+        h  = d.get("h3", 0.40)  or 0.40
+        e  = d.get("e3", 95)    or 95
+        i  = d.get("i3", 0.165) or 0.165
+        pa = d.get("p3", 0)     or 0
+        pa_ref = 400
+
     sc_raw = (0.35*(b/0.085) + 0.25*(h/0.40) + 0.25*((e-85)/20) + 0.15*(i/0.165))
     sc_raw = max(0.60, min(1.35, sc_raw))
-    pa_conf = min(pa / 400, 1.0)
+    pa_conf = min(pa / pa_ref, 1.0)
     return pa_conf * sc_raw + (1 - pa_conf) * 0.90
 
 def pitcher_factor(pitcher_name: str, l14_pitchers: dict = None, is_home_pitcher: bool = False) -> float:
@@ -145,7 +180,6 @@ def pitcher_factor(pitcher_name: str, l14_pitchers: dict = None, is_home_pitcher
     """
     pk = pitcher_name.lower()
     pd = PITCHER_CAREER_DB.get(pk, {})
-    # Use home/away split if available, else global pf, else derive from xFIP
     if is_home_pitcher and pd.get("pfh"):
         base_pf = max(0.50, min(1.80, float(pd["pfh"])))
     elif not is_home_pitcher and pd.get("pfa"):
@@ -156,7 +190,6 @@ def pitcher_factor(pitcher_name: str, l14_pitchers: dict = None, is_home_pitcher
         base_xfip = pd.get("xf3") or pd.get("xf6") or 4.0
         base_pf = max(0.50, min(1.80, base_xfip / 4.0))
 
-    # Blend in L14 if available (max 30% weight if 10+ BF)
     if l14_pitchers and pk in l14_pitchers:
         l14 = l14_pitchers[pk]
         bf = l14.get("l14_bf", 0)
@@ -221,19 +254,22 @@ def project_player(
     pos_avg     = POS_HR_AVG.get(pos, 0.038)
     c_adj = (career_rate * pa_3yr + REG_K * pos_avg) / (pa_3yr + REG_K)
 
-    # Home/away split — actual split rate drives the base
-    # ch = career HR/PA at home, ca = career HR/PA away
-    split_rate = d.get("ch" if is_home else "ca", career_rate) or career_rate
-    split_pa   = max(pa_3yr / 2, 1)  # approximate split PA
+    # Home/away split — prefer 2026 season splits (splits.json), else CAREER_DB ch/ca
+    _split = SEASON_SPLITS.get(player_key, {})
+    side_key = "ch" if is_home else "ca"
+    if _split.get(side_key) is not None:
+        split_rate = _split[side_key] or career_rate
+        split_pa   = _split.get(f"{side_key}_pa", 0) or 1
+    else:
+        split_rate = d.get(side_key, career_rate) or career_rate
+        split_pa   = max(pa_3yr / 2, 1)
 
     if split_pa >= 50 and career_rate > 0:
-        # Bayesian-regress the split toward position average (not career overall)
-        # Lower REG_K = more weight to actual split data
         SPLIT_REG_K = 75
         pos_avg = POS_HR_AVG.get(pos, 0.038)
         base = (split_rate * split_pa + pos_avg * SPLIT_REG_K) / (split_pa + SPLIT_REG_K)
     else:
-        base = c_adj  # not enough data, use Bayesian career rate
+        base = c_adj
 
     # 2. L14 form adjustment
     if l14 and l14.get("l14_pa", 0) >= 20:
@@ -241,11 +277,10 @@ def project_player(
         form_adj = max(0.85, min(1.20, l14_rate / base)) if base > 0 else 1.0
         base = base * form_adj
 
-    # 3. SC score
-    sc = sc_score(d)
+    # 3. SC score (prefers live L14 Statcast)
+    sc = sc_score(d, l14)
 
     # 4. Pitcher factor
-    # is_home_pitcher = True when pitcher pitches at home (batter is away team)
     pf = pitcher_factor(opp_pitcher, l14_pitchers, is_home_pitcher=not is_home)
 
     # 5. Park + weather environment
@@ -259,20 +294,16 @@ def project_player(
     raw_prob = max(1.0, min(30.0, base * sc * 3.5 * 100 * pf * env * park_f * due_mult))
 
     # 8. Market calibration
-    # Market is well-calibrated for HR props — give it more weight
-    # Model runs ~1.4x above market; use market as anchor, model for edge detection
     if dk_odds is not None:
         mkt_prob = implied_prob(dk_odds) * 100
-        # Higher market weight = final prob closer to true probability
-        # Model still contributes for edge detection but doesn't inflate absolute prob
-        if dk_odds <= 250:   w = 0.35  # heavy favorites — trust market most
-        elif dk_odds <= 400: w = 0.45  # core range
-        elif dk_odds <= 600: w = 0.50  # mid range
-        elif dk_odds <= 900: w = 0.45  # longer shots
-        else:                w = 0.35  # big longshots — market knows
+        if dk_odds <= 250:   w = 0.35
+        elif dk_odds <= 400: w = 0.45
+        elif dk_odds <= 600: w = 0.50
+        elif dk_odds <= 900: w = 0.45
+        else:                w = 0.35
         final_prob = w * raw_prob + (1 - w) * mkt_prob
     else:
-        final_prob = raw_prob * 0.75   # no odds = bigger haircut
+        final_prob = raw_prob * 0.75
         mkt_prob = final_prob
 
     edge = final_prob - (implied_prob(dk_odds) * 100 if dk_odds else final_prob)
