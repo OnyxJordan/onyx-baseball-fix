@@ -1,9 +1,11 @@
 """
-fetch_data.py — Onyx Baseball daily data fetcher v6
+fetch_data.py — Onyx Baseball daily data fetcher v7
 Odds:    reads data/odds.json directly (uploaded manually each morning)
 Lineups: MLB Stats API with roster fallback
 Weather: manual data/weather.json wins; falls back to Open-Meteo if missing
-Statcast: reads data/fangraphs_l14.csv + data/fangraphs_pitchers_l14.csv (uploaded daily)
+Hitters: data/fangraphs_l14.csv + real Statcast (statcast_l14.csv / statcast_season.csv)
+Splits:  data/hitters_home.csv + data/hitters_away.csv -> splits.json
+Pitchers: data/fangraphs_pitchers_l14.csv
 """
 import json, time, requests, csv, datetime
 from pathlib import Path
@@ -83,6 +85,21 @@ def deg_to_compass(deg):
     dirs = ["N","NNE","NE","ENE","E","ESE","SE","SSE",
             "S","SSW","SW","WSW","W","WNW","NW","NNW"]
     return dirs[round(deg / 22.5) % 16]
+
+def _f(row, *keys, default=0.0):
+    """First non-empty float among keys; strips % signs."""
+    for k in keys:
+        v = row.get(k)
+        if v not in (None, "", "NA"):
+            try:
+                return float(str(v).replace("%", ""))
+            except ValueError:
+                continue
+    return default
+
+def _name_key(row):
+    raw = (row.get("Name") or row.get("NameASCII") or "").strip()
+    return raw.lower() if raw else None
 
 # ── 1. SCHEDULE ───────────────────────────────────────────────────────────────
 def fetch_schedule():
@@ -278,105 +295,154 @@ def fetch_weather(games):
         json.dump(weather, f, indent=2)
     return weather
 
-# ── 7. HITTER L14 — reads data/fangraphs_l14.csv ─────────────────────────────
-def fetch_statcast():
-    print("Fetching L14 hitter data from FanGraphs CSV...")
-    fg_path = OUT / "fangraphs_l14.csv"
-    statcast = {}
+# ── STATCAST LOADER (season + L14) ────────────────────────────────────────────
+def _load_statcast_file(path):
+    """Return {name_lower: {ev90, barrel_pct, hardhit_pct, xwoba, pa}}."""
+    out = {}
+    if not path.exists():
+        return out
+    with open(path, encoding="utf-8-sig") as f:
+        for row in csv.DictReader(f):
+            nk = _name_key(row)
+            if not nk:
+                continue
+            pa = int(_f(row, "PA"))
+            if pa < 1:
+                continue
+            bpct = _f(row, "Barrel%")
+            hpct = _f(row, "HardHit%")
+            if bpct > 1: bpct /= 100
+            if hpct > 1: hpct /= 100
+            out[nk] = {
+                "ev90":        _f(row, "EV90", "EV", default=95.0),
+                "barrel_pct":  round(bpct, 4),
+                "hardhit_pct": round(hpct, 4),
+                "xwoba":       _f(row, "xwOBA", "wOBA", default=0.320),
+                "pa":          pa,
+            }
+    return out
 
+# ── 7. HITTER L14 — FanGraphs L14 + real Statcast ─────────────────────────────
+def fetch_statcast():
+    print("Fetching L14 hitter data (FanGraphs L14 + Statcast)...")
+    fg_path   = OUT / "fangraphs_l14.csv"
+    sc_l14    = _load_statcast_file(OUT / "statcast_l14.csv")
+    sc_season = _load_statcast_file(OUT / "statcast_season.csv")
+
+    statcast = {}
     if not fg_path.exists():
         print("  WARNING: fangraphs_l14.csv not found — L14 hitter data will be empty")
-        with open(OUT / "statcast_l14.json", "w") as f:
-            json.dump({}, f)
+        (OUT / "statcast_l14.json").write_text("{}")
         return {}
 
     try:
         with open(fg_path, encoding="utf-8-sig") as f:
-            reader = csv.DictReader(f)
-            for row in reader:
-                raw = (row.get("Name") or row.get("NameASCII") or "").strip()
-                if not raw:
+            for row in csv.DictReader(f):
+                nk = _name_key(row)
+                if not nk:
                     continue
-                name = raw.lower()
-                pa   = int(float(row.get("PA")  or 0))
-                hr   = int(float(row.get("HR")  or 0))
-                iso  = float(row.get("ISO")  or 0)
-                bb_pct = float((row.get("BB%") or "0").replace("%", "")) / 100
-                k_pct  = float((row.get("K%")  or "0").replace("%", "")) / 100
-                xwoba  = float(row.get("xwOBA") or row.get("wOBA") or 0.320)
-                woba   = float(row.get("wOBA")  or 0.320)
+                pa = int(_f(row, "PA"))
+                hr = int(_f(row, "HR"))
                 if pa < 1:
                     continue
-                statcast[name] = {
+                iso   = _f(row, "ISO")
+                bb    = _f(row, "BB%") / 100
+                kk    = _f(row, "K%") / 100
+                xwoba = _f(row, "xwOBA", "wOBA", default=0.320)
+                woba  = _f(row, "wOBA", default=0.320)
+
+                sc = sc_l14.get(nk) or sc_season.get(nk) or {}
+                barrel  = sc.get("barrel_pct", round(iso * 0.18, 4))
+                hardhit = sc.get("hardhit_pct", round(iso * 0.45 + 0.20, 4))
+                ev90    = sc.get("ev90", 95.0)
+
+                statcast[nk] = {
                     "l14_pa":         pa,
                     "l14_hr":         hr,
                     "l14_rate":       round(hr / pa, 4),
-                    "l14_avg_ev":     90.0,
-                    "l14_barrel_pct": round(iso * 0.18, 4),
-                    "l14_hh_pct":     round(iso * 0.45, 4),
+                    "l14_avg_ev":     round(ev90, 1),
+                    "l14_barrel_pct": barrel,
+                    "l14_hh_pct":     hardhit,
                     "l14_hit_rate":   round(woba / 1.25, 4),
-                    "l14_xwoba":      xwoba,
+                    "l14_xwoba":      round(xwoba, 4),
                     "l14_iso":        iso,
-                    "l14_bb_pct":     bb_pct,
-                    "l14_k_pct":      k_pct,
+                    "l14_bb_pct":     round(bb, 4),
+                    "l14_k_pct":      round(kk, 4),
                 }
     except Exception as e:
         print(f"  FanGraphs hitter parse error: {e}")
-        with open(OUT / "statcast_l14.json", "w") as f:
-            json.dump({}, f)
+        (OUT / "statcast_l14.json").write_text("{}")
         return {}
 
-    print(f"  L14 hitters: {len(statcast)} players loaded")
-    with open(OUT / "statcast_l14.json", "w") as f:
-        json.dump(statcast, f, indent=2)
+    matched_sc = sum(1 for nk in statcast if nk in sc_l14 or nk in sc_season)
+    print(f"  L14 hitters: {len(statcast)} loaded, {matched_sc} with real Statcast")
+    (OUT / "statcast_l14.json").write_text(json.dumps(statcast, indent=2))
     return statcast
 
-# ── 8. PITCHER L14 — reads data/fangraphs_pitchers_l14.csv ───────────────────
+# ── 7b. SEASON SPLITS — home/away HR-per-PA -> splits.json ────────────────────
+def fetch_splits():
+    print("Fetching home/away HR splits...")
+    splits = {}
+
+    def load_side(path, key):
+        if not path.exists():
+            print(f"  WARNING: {path.name} not found — {key} split falls back to career")
+            return
+        with open(path, encoding="utf-8-sig") as f:
+            for row in csv.DictReader(f):
+                nk = _name_key(row)
+                if not nk:
+                    continue
+                pa = int(_f(row, "PA"))
+                hr = int(_f(row, "HR"))
+                if pa < 1:
+                    continue
+                rec = splits.setdefault(nk, {})
+                rec[key] = round(hr / pa, 5)
+                rec[f"{key}_pa"] = pa
+
+    load_side(OUT / "hitters_home.csv", "ch")
+    load_side(OUT / "hitters_away.csv", "ca")
+
+    for nk, rec in splits.items():
+        rec["split_pa"] = rec.get("ch_pa", 0) + rec.get("ca_pa", 0)
+
+    print(f"  Splits: {len(splits)} players")
+    (OUT / "splits.json").write_text(json.dumps(splits, indent=2))
+    return splits
+
+# ── 8. PITCHER data — reads fangraphs_pitchers_l14.csv ────────────────────────
 def fetch_pitcher_statcast():
-    print("Fetching L14 pitcher data from FanGraphs CSV...")
+    print("Fetching pitcher data from FanGraphs CSV...")
     fg_path = OUT / "fangraphs_pitchers_l14.csv"
     pitchers = {}
-
     if not fg_path.exists():
-        print("  WARNING: fangraphs_pitchers_l14.csv not found — pitcher L14 will be empty")
-        with open(OUT / "pitchers_l14.json", "w") as f:
-            json.dump({}, f)
+        print("  WARNING: fangraphs_pitchers_l14.csv not found — pitcher data empty")
+        (OUT / "pitchers_l14.json").write_text("{}")
         return {}
-
     try:
         with open(fg_path, encoding="utf-8-sig") as f:
-            reader = csv.DictReader(f)
-            for row in reader:
-                raw = (row.get("Name") or row.get("NameASCII") or "").strip()
-                if not raw:
+            for row in csv.DictReader(f):
+                nk = _name_key(row)
+                if not nk:
                     continue
-                name = raw.lower()
-                ip   = float(row.get("IP")   or 0)
-                hr9  = float(row.get("HR/9") or 0)
-                k9   = float(row.get("K/9")  or 0)
-                bb9  = float(row.get("BB/9") or 0)
-                xfip = float(row.get("xFIP") or 4.0)
-                era  = float(row.get("ERA")  or 4.0)
+                ip = _f(row, "IP")
                 if ip < 1:
                     continue
-                bf = round(ip * 4.3)
-                pitchers[name] = {
-                    "l14_bf":      bf,
-                    "l14_hr_rate": round(hr9 / 27, 4),
-                    "l14_k_rate":  round(k9  / 27, 4),
-                    "l14_bb_rate": round(bb9 / 27, 4),
-                    "l14_xfip":    xfip,
-                    "l14_era":     era,
+                pitchers[nk] = {
+                    "l14_bf":      round(ip * 4.3),
+                    "l14_hr_rate": round(_f(row, "HR/9") / 27, 4),
+                    "l14_k_rate":  round(_f(row, "K/9") / 27, 4),
+                    "l14_bb_rate": round(_f(row, "BB/9") / 27, 4),
+                    "l14_xfip":    _f(row, "xFIP", default=4.0),
+                    "l14_era":     _f(row, "ERA", default=4.0),
                 }
     except Exception as e:
         print(f"  FanGraphs pitcher parse error: {e}")
-        with open(OUT / "pitchers_l14.json", "w") as f:
-            json.dump({}, f)
+        (OUT / "pitchers_l14.json").write_text("{}")
         return {}
-
-    print(f"  L14 pitchers: {len(pitchers)} players loaded")
-    with open(OUT / "pitchers_l14.json", "w") as f:
-        json.dump(pitchers, f, indent=2)
+    print(f"  Pitchers: {len(pitchers)} loaded")
+    (OUT / "pitchers_l14.json").write_text(json.dumps(pitchers, indent=2))
     return pitchers
 
 # ── MAIN ──────────────────────────────────────────────────────────────────────
@@ -385,5 +451,6 @@ if __name__ == "__main__":
     games = fetch_lineups()
     fetch_weather(games)
     fetch_statcast()
+    fetch_splits()
     fetch_pitcher_statcast()
     print("\n=== Done. Ready for auto_build.py ===")
