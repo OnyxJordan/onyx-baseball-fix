@@ -84,7 +84,7 @@ def pitcher_hand(pname):
         return PITCHER_HAND[pk]
     db_hand = PITCHER_CAREER_DB.get(pk, {}).get("hand")
     return db_hand if db_hand in ("L", "R") else "R"
-  
+
 # Wind FROM these compass directions blows OUT toward CF (approx CF bearings,
 # tune per park as results come in). Roofed parks never reach these tables.
 PARK_OUT = {
@@ -484,10 +484,10 @@ def build():
             game_map[gk] = []
         game_map[gk].append(r)
 
- SUMMARIES = []
-for gk, players in game_map.items():
-    top = sorted(players, key=lambda x: -x["composite"])[:3]
-    home_team = lineups[gk]["home_team"]
+    SUMMARIES = []
+    for gk, players in game_map.items():
+        top = sorted(players, key=lambda x: -x["composite"])[:3]
+        home_team = lineups[gk]["home_team"]
         park, roof = TEAM_PARK.get(home_team, ("Unknown", False))
         w  = weather.get(home_team, {})
         gl = get_game_line(game_lines, gk)
