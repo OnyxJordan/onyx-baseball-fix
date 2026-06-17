@@ -55,6 +55,36 @@ TEAM_PARK = {
     "LAA": ("Angel Stadium",           False),
 }
 
+PITCHER_HAND = {
+    # June 17 LHP starters
+    "anthony kay": "L",
+    "nick lodolo": "L",
+    "sam aldegheri": "L",
+    "carlos rodon": "L",
+    "robbie ray": "L",
+    "shane mcclanahan": "L",
+    "eduardo rodriguez": "L",
+    "jake bennett": "L",
+    "sean sullivan": "L",
+    # Common LHP starters (kept so they're correct on future days too)
+    "jesus luzardo": "L", "framber valdez": "L", "payton tolle": "L",
+    "foster griffin": "L", "robert gasser": "L", "justin wrobleski": "L",
+    "andrew abbott": "L", "mackenzie gore": "L", "garrett crochet": "L",
+    "cole ragans": "L", "max fried": "L", "tarik skubal": "L",
+    "blake snell": "L", "chris sale": "L", "yusei kikuchi": "L",
+    "kyle harrison": "L", "dylan cease": "R",  # (Cease is R — explicit guard)
+}
+
+def pitcher_hand(pname):
+    """Return 'L' or 'R'. Checks PITCHER_HAND, then pitcher_db 'hand', else 'R'."""
+    if not pname:
+        return "R"
+    pk = pname.lower()
+    if pk in PITCHER_HAND:
+        return PITCHER_HAND[pk]
+    db_hand = PITCHER_CAREER_DB.get(pk, {}).get("hand")
+    return db_hand if db_hand in ("L", "R") else "R"
+  
 # Wind FROM these compass directions blows OUT toward CF (approx CF bearings,
 # tune per park as results come in). Roofed parks never reach these tables.
 PARK_OUT = {
@@ -400,7 +430,7 @@ def build():
                 "wind_mph":          wind_mph,
                 # Pitcher
                 "opp_pitcher":       opp_pitcher,
-                "opp_pitcher_hand":  "R",
+                "opp_pitcher_hand":  pitcher_hand(opp_pitcher),
                 "opp_pitcher_hr9":   opp_hr9,
                 "opp_pitcher_era":   opp_era,
                 "p_factor":          opp_pf,
