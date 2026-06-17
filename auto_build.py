@@ -484,10 +484,9 @@ def build():
             game_map[gk] = []
         game_map[gk].append(r)
 
-  SUMMARIES = []
-for gk in lineups:
-    players = game_map.get(gk, [])
-    top = sorted(players, key=lambda x: -x["composite"])[:3] if players else []
+ SUMMARIES = []
+for gk, players in game_map.items():
+    top = sorted(players, key=lambda x: -x["composite"])[:3]
     home_team = lineups[gk]["home_team"]
         park, roof = TEAM_PARK.get(home_team, ("Unknown", False))
         w  = weather.get(home_team, {})
