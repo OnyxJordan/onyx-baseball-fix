@@ -1,12 +1,12 @@
 """
-auto_build.py — Onyx Baseball daily build v3
+auto_build.py — Onyx Baseball daily build v4
 
 Reads data/ JSON files → runs model → injects into shell.html → writes index.html
-v3 changes:
-  - Wind factor now covers ALL outdoor parks (was 8-park whitelist → neutral everywhere else)
-  - SUMMARIES includes away_pitcher / home_pitcher (fixes "vs undefined" on game cards)
-  - ATH / Las Vegas Ballpark support + OAK<->ATH game_key aliasing for game_lines.json
-  - Date header replacement is case-insensitive (fixes frozen "MAY 23" board header)
+v4 changes vs v3:
+  - calc_wind_factor() rewritten to parse descriptive labels ("out"/"in"/"L-R"/
+    "calm") + compass tokens, ~3x stronger out-wind weight, roof returns 1.0.
+    Kept in lockstep with model.wind_env().
+  - Weather label reads "Dome 🏟️" for roofed parks (was showing bogus ↗ OUT).
 """
 
 import json, re, unicodedata, datetime
@@ -266,15 +266,30 @@ def wind_label(wind_dir, wind_mph, park, wind_factor):
     return f"{wind_dir} {int(wind_mph)}mph {arrow} {direction}"
 
 def calc_wind_factor(park, wind_dir, wind_mph, temp, roof):
+    """
+    Displayed HR environment factor. Kept in lockstep with model.wind_env():
+    parses descriptive labels + compass tokens, roof returns flat 1.0.
+    """
     if roof:
-        return max(0.96, 1 + (temp - 72) * 0.002)
+        return 1.0
     factor = 1.0
-    if park in PARK_OUT and wind_dir in PARK_OUT[park]:
-        factor += 0.005 * min(wind_mph, 20)
-    elif wind_dir in PARK_IN.get(park, []):
-        factor -= 0.004 * min(wind_mph, 20)
-    factor += max(0, (temp - 72) * 0.002)
-    return round(max(0.85, min(1.15, factor)), 4)
+    wd  = str(wind_dir or "").strip().lower()
+    mph = min(float(wind_mph or 0), 25)
+
+    if   wd.startswith("out"):                        blow = "out"
+    elif wd.startswith("in"):                         blow = "in"
+    elif wd in ("l-r", "r-l", "cross", "across"):     blow = "cross"
+    elif wd == "calm":                                blow = None
+    elif park in PARK_OUT and wind_dir in PARK_OUT[park]:        blow = "out"
+    elif wind_dir in PARK_IN.get(park, []):                     blow = "in"
+    else:                                             blow = "cross" if mph >= 8 else None
+
+    if   blow == "out":   factor += 0.010 * mph      # ~+0.15 at 15mph straight out
+    elif blow == "in":    factor -= 0.008 * mph
+    elif blow == "cross": factor += 0.002 * mph
+
+    factor += (temp - 72) * 0.0025
+    return round(max(0.82, min(1.22, factor)), 4)
 
 def format_game_time(game_time_iso):
     try:
@@ -316,7 +331,7 @@ def build():
         precip_pct = w.get("precip_pct", 0)
         wflag      = weather_flag(precip_pct)
         wf         = calc_wind_factor(park, wind_dir, wind_mph, temp, roof)
-        wlabel     = wind_label(wind_dir, wind_mph, park, wf)
+        wlabel     = "Dome 🏟️" if roof else wind_label(wind_dir, wind_mph, park, wf)
 
         game_time  = game.get("game_time", "")
         time_str   = format_game_time(game_time)
