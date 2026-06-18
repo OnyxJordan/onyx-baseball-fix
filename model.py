@@ -1,11 +1,14 @@
 """
-model.py — Onyx Baseball v14 HR probability + DFS projection model
+model.py — Onyx Baseball v15 HR probability + DFS projection model
 
-v14 changes vs v13:
-  - sc_score() now prefers LIVE L14 Statcast (real barrel%/EV90/hardhit% from
-    statcast_l14.json) when a hitter has 15+ recent PA; career fields are fallback.
-  - project_player() base rate uses 2026 season home/away splits from splits.json
-    (built by fetch_data.py fetch_splits()), regressed via SPLIT_REG_K.
+v15 changes vs v14:
+  - De-vig: market implied prob is stripped of HR_VIG before it anchors the
+    blend AND before edge is measured, so edge = w*(raw - fair) cleanly.
+  - Market-blend weights w widened ~+0.15/tier so model factors (incl. weather)
+    show through instead of being damped to a third of their size.
+  - wind_env() rewritten: parses descriptive labels ("out"/"in"/"L-R"/"calm")
+    as well as compass tokens, ~3x stronger out-wind coefficient, wider clamp,
+    roof returns flat 1.0.
 
 PATH NOTE: SEASON_SPLITS loads from _BASE / "data" / "splits.json".
 fetch_data.py writes splits.json into its OUT dir (data/). As long as model.py
@@ -38,8 +41,9 @@ POS_HR_AVG = {
     "C": 0.032, "1B": 0.050, "2B": 0.028, "3B": 0.035,
     "SS": 0.025, "OF": 0.038, "DH": 0.043, "P": 0.005,
 }
-REG_K = 250
-SCALE = 0.86
+REG_K  = 250
+SCALE  = 0.86
+HR_VIG = 0.13   # approx single-side hold on HR-Yes props; calibrate vs resolved results
 
 PA_TABLE   = {1:4.492,2:4.363,3:4.367,4:4.269,5:4.223,6:4.059,7:3.946,8:3.831,9:3.748}
 RUNS_BY_BO = {1:0.533,2:0.543,3:0.476,4:0.469,5:0.451,6:0.401,7:0.403,8:0.399,9:0.409}
@@ -138,15 +142,31 @@ def implied_prob(american_odds: int) -> float:
     return abs(american_odds) / (abs(american_odds) + 100)
 
 def wind_env(park: str, wind_dir: str, wind_mph: float, temp: float, roof: bool) -> float:
+    """
+    HR environment factor from wind + temperature. Parses descriptive labels
+    ("out"/"in"/"L-R"/"calm") as well as compass tokens. Roof = flat 1.0.
+    Kept in lockstep with auto_build.calc_wind_factor().
+    """
     if roof:
-        return max(0.96, 1 + (temp - 72) * 0.002)
+        return 1.0
     env = 1.0
-    if park in PARK_OUT and wind_dir in PARK_OUT[park]:
-        env += 0.005 * min(wind_mph, 20)
-    elif park in PARK_IN and wind_dir in PARK_IN.get(park, []):
-        env -= 0.004 * min(wind_mph, 20)
-    env += max(0, (temp - 72) * 0.002)
-    return max(0.85, min(1.15, env))
+    wd  = str(wind_dir or "").strip().lower()
+    mph = min(float(wind_mph or 0), 25)
+
+    if   wd.startswith("out"):                        blow = "out"
+    elif wd.startswith("in"):                         blow = "in"
+    elif wd in ("l-r", "r-l", "cross", "across"):     blow = "cross"
+    elif wd == "calm":                                blow = None
+    elif park in PARK_OUT and wind_dir in PARK_OUT[park]:        blow = "out"
+    elif park in PARK_IN  and wind_dir in PARK_IN.get(park, []): blow = "in"
+    else:                                             blow = "cross" if mph >= 8 else None
+
+    if   blow == "out":   env += 0.010 * mph      # ~+0.15 at 15mph straight out
+    elif blow == "in":    env -= 0.008 * mph
+    elif blow == "cross": env += 0.002 * mph
+
+    env += (temp - 72) * 0.0025
+    return max(0.82, min(1.22, env))
 
 def sc_score(d: dict, l14: dict = None) -> float:
     """
@@ -295,18 +315,19 @@ def project_player(
 
     # 8. Market calibration
     if dk_odds is not None:
-        mkt_prob = implied_prob(dk_odds) * 100
-        if dk_odds <= 250:   w = 0.35
-        elif dk_odds <= 400: w = 0.45
-        elif dk_odds <= 600: w = 0.50
-        elif dk_odds <= 900: w = 0.45
-        else:                w = 0.35
-        final_prob = w * raw_prob + (1 - w) * mkt_prob
+        mkt_prob  = implied_prob(dk_odds) * 100
+        fair_prob = mkt_prob * (1 - HR_VIG)          # strip vig before anchoring + measuring
+        if dk_odds <= 250:   w = 0.50
+        elif dk_odds <= 400: w = 0.60
+        elif dk_odds <= 600: w = 0.65
+        elif dk_odds <= 900: w = 0.58
+        else:                w = 0.48
+        final_prob = w * raw_prob + (1 - w) * fair_prob
     else:
         final_prob = raw_prob * 0.75
-        mkt_prob = final_prob
+        fair_prob  = final_prob
 
-    edge = final_prob - (implied_prob(dk_odds) * 100 if dk_odds else final_prob)
+    edge = final_prob - fair_prob
 
     # 9. Composite score
     gate = 1.0 if final_prob >= 22 else 0.72 if final_prob >= 18 else 0.45 if final_prob >= 14 else 0.20
