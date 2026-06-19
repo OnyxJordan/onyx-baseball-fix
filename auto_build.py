@@ -186,6 +186,24 @@ def lookup_salary(sal_map, name):
         lookup_salary._cache = idx
     return idx.get(target, {})
 
+def lookup_odds(odds_map, name):
+    """Return american HR odds for a player, tolerant of accent/format differences.
+    Mirrors lookup_salary so e.g. lineups.json 'Andrés Giménez' matches odds.json 'andres gimenez'."""
+    if not name:
+        return None
+    nk = name.lower()
+    if nk in odds_map:
+        return odds_map[nk]
+    target = _norm_name(name)
+    cache_key = id(odds_map)
+    idx = getattr(lookup_odds, "_cache", None)
+    if idx is None or idx.get("_key") != cache_key:
+        idx = {"_key": cache_key}
+        for k, v in odds_map.items():
+            idx[_norm_name(k)] = v
+        lookup_odds._cache = idx
+    return idx.get(target)
+
 def load_salaries():
     """Load salaries.json → {player_name_lower: {dk, fd}}"""
     path = DATA / "salaries.json"
@@ -388,7 +406,7 @@ def build():
                 else (home_pf, home_era, home_xfip, home_hr9)
             )
 
-            dk_odds = odds_map.get(name.lower())
+            dk_odds = lookup_odds(odds_map, name)
 
             # ── Salary lookup (replaces hardcoded $3000/$7000/$8000) ──────────
             bsal       = lookup_salary(sal_map, name)
