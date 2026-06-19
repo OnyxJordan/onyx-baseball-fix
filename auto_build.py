@@ -1,7 +1,17 @@
 """
-auto_build.py — Onyx Baseball daily build v4
+auto_build.py — Onyx Baseball daily build v5
 
 Reads data/ JSON files → runs model → injects into shell.html → writes index.html
+v5 changes vs v4:
+  - SUMMARIES rewritten to the schema the shell's renderGameCards() reads:
+    awayP/homeP, awayHand/homeHand, awayP_hr9/homeP_hr9, away_top/home_top,
+    away_top_prob/home_top_prob, away_exp_hr/home_exp_hr, n_away/n_home,
+    wind_factor/wind_from/weather_label/wind_alignment/env_factor/roof.
+    (Fixes "vs undefined / undefinedHP / 0 xHR / 0 batters" on Today's Games.)
+  - RESULTS Statcast columns (ev90_26/barrel_26/hh_pct + barrel_pct/ev90) now
+    read L14 (statcast_l14.json: l14_avg_ev/l14_barrel_pct/l14_hh_pct) with
+    career as fallback, instead of always showing career b3/h3/e3.
+  - Nav/drawer date pill "MMM DD · YYYY" (middot) now updates with the build.
 v4 changes vs v3:
   - calc_wind_factor() rewritten to parse descriptive labels ("out"/"in"/"L-R"/
     "calm") + compass tokens, ~3x stronger out-wind weight, roof returns 1.0.
@@ -66,6 +76,13 @@ PITCHER_HAND = {
     "eduardo rodriguez": "L",
     "jake bennett": "L",
     "sean sullivan": "L",
+    # June 19 LHP starters
+    "brandon eisert": "L",
+    "martin perez": "L",
+    "kyle freeland": "L",
+    "jeffrey springs": "L",
+    "connor prielipp": "L",
+    "ranger suarez": "L",
     # Common LHP starters (kept so they're correct on future days too)
     "jesus luzardo": "L", "framber valdez": "L", "payton tolle": "L",
     "foster griffin": "L", "robert gasser": "L", "justin wrobleski": "L",
@@ -76,13 +93,14 @@ PITCHER_HAND = {
 }
 
 def pitcher_hand(pname):
-    """Return 'L' or 'R'. Checks PITCHER_HAND, then pitcher_db 'hand', else 'R'."""
+    """Return 'L' or 'R'. Checks PITCHER_HAND (accent-insensitive), then pitcher_db 'hand', else 'R'."""
     if not pname:
         return "R"
-    pk = pname.lower()
+    # Accent-insensitive key so "Martín Pérez"/"Ranger Suárez"/"Carlos Rodón" match ASCII map keys
+    pk = unicodedata.normalize("NFKD", pname).encode("ascii", "ignore").decode().lower().strip()
     if pk in PITCHER_HAND:
         return PITCHER_HAND[pk]
-    db_hand = PITCHER_CAREER_DB.get(pk, {}).get("hand")
+    db_hand = PITCHER_CAREER_DB.get(pname.lower(), {}).get("hand")
     return db_hand if db_hand in ("L", "R") else "R"
 
 # Wind FROM these compass directions blows OUT toward CF (approx CF bearings,
@@ -449,19 +467,19 @@ def build():
                 "opp_pitcher_hr9":   opp_hr9,
                 "opp_pitcher_era":   opp_era,
                 "p_factor":          opp_pf,
-                # Career / Statcast
+                # Career / Statcast — L14 with career fallback (v5)
                 "career_hr_pa":      round(career_rate, 5),
                 "split_hr_pa":       round(split_rate, 5),
                 "l14_hr":            l14_hr,
                 "l14_pa":            l14_pa,
                 "l14_xwoba":         round(l14.get("l14_hit_rate", 0.30), 4),
-                "ev90_26":           d.get("e3", 95),
-                "barrel_26":         d.get("b3", 0.08),
-                "hh_pct":            d.get("h3", 0.40),
+                "ev90_26":           l14.get("l14_avg_ev",     d.get("e3", 95)),
+                "barrel_26":         l14.get("l14_barrel_pct", d.get("b3", 0.08)),
+                "hh_pct":            l14.get("l14_hh_pct",      d.get("h3", 0.40)),
                 "iso_ctx":           d.get("i3", 0.165),
                 "sc_score":          sc,
-                "barrel_pct":        d.get("b3", 0.08),
-                "ev90":              d.get("e3", 95),
+                "barrel_pct":        l14.get("l14_barrel_pct", d.get("b3", 0.08)),
+                "ev90":              l14.get("l14_avg_ev",     d.get("e3", 95)),
                 # Model outputs
                 "hr_per_pa":         round(proj["hr_prob"] / 100 / 4.3, 5),
                 "hr_pg":             round(proj["hr_prob"] / 100, 4),
@@ -491,7 +509,7 @@ def build():
     RESULTS = apply_game_diversity(RESULTS)
     print(f"Model ran: {len(RESULTS)} players across {len(lineups)} games")
 
-    # ── SUMMARIES (with game_key + pitchers + moneylines/total) ──────────────
+    # ── SUMMARIES — schema matched to shell renderGameCards() (v5) ────────────
     game_map = {}
     for r in RESULTS:
         gk = r["game_key"]
@@ -501,38 +519,72 @@ def build():
 
     SUMMARIES = []
     for gk, players in game_map.items():
-        top = sorted(players, key=lambda x: -x["composite"])[:3]
-        home_team = lineups[gk]["home_team"]
+        home_team  = lineups[gk]["home_team"]
+        away_team  = lineups[gk]["away_team"]
         park, roof = TEAM_PARK.get(home_team, ("Unknown", False))
         w  = weather.get(home_team, {})
+        wf = calc_wind_factor(park, w.get("wind_dir", "N"), w.get("wind_mph", 5),
+                              w.get("temp", 72), roof)
+        wlabel = "Dome 🏟️" if roof else wind_label(
+            w.get("wind_dir", "N"), w.get("wind_mph", 5), park, wf)
         gl = get_game_line(game_lines, gk)
+
+        away_players = [p for p in players if p["location"] == "away"]
+        home_players = [p for p in players if p["location"] == "home"]
+
+        away_pitcher = lineups[gk].get("away_pitcher", "TBD")
+        home_pitcher = lineups[gk].get("home_pitcher", "TBD")
+
+        # Home batters face the away pitcher (and vice-versa) — hr9 already on the faced batter
+        awayP_hr9 = next((p["opp_pitcher_hr9"] for p in home_players), None)
+        homeP_hr9 = next((p["opp_pitcher_hr9"] for p in away_players), None)
+
+        def _top(side):
+            if not side:
+                return "", 0
+            t = max(side, key=lambda x: x["composite"])
+            return t["batter_name"], t["hr_prob"]
+
+        away_top, away_top_prob = _top(away_players)
+        home_top, home_top_prob = _top(home_players)
+
         SUMMARIES.append({
-            "game_key":      gk,
-            "game":          players[0]["game"],
-            "label":         players[0]["game"],
-            "away":          lineups[gk]["away_team"],
-            "home":          home_team,
-            "away_pitcher":  lineups[gk].get("away_pitcher", "TBD"),
-            "home_pitcher":  lineups[gk].get("home_pitcher", "TBD"),
-            "time":          players[0]["time"],
-            "park":          park,
-            "park_factor":   PARK_HR_FACTOR.get(park, 1.0),
-            "weather_flag":  players[0]["weather_flag"],
-            "temp":          w.get("temp", 72),
-            "wind_mph":      w.get("wind_mph", 5),
-            "wind_dir":      w.get("wind_dir", "N"),
-            "ou":            gl.get("ou"),
-            "away_ml":       gl.get("away_ml", ""),
-            "home_ml":       gl.get("home_ml", ""),
-            "top_plays":     [
-                {
-                    "name":      p["batter_name"],
-                    "prob":      p["hr_prob"],
-                    "edge":      p["hr_edge"],
-                    "composite": p["composite"],
-                }
-                for p in top
-            ],
+            "game_key":       gk,
+            "game":           players[0]["game"],
+            "label":          players[0]["game"],
+            "time":           players[0]["time"],
+            "away":           away_team,
+            "home":           home_team,
+            "venue":          park,
+            "park":           park,
+            "park_factor":    PARK_HR_FACTOR.get(park, 1.0),
+            "roof":           roof,
+            "weather_flag":   players[0]["weather_flag"],
+            "weather_label":  wlabel,
+            "temp":           w.get("temp", 72),
+            "wind_mph":       w.get("wind_mph", 5),
+            "wind_dir":       w.get("wind_dir", "N"),
+            "wind_from":      w.get("wind_dir", "N"),
+            "wind_factor":    wf,
+            "env_factor":     wf,
+            "wind_alignment": round(wf - 1.0, 4),
+            "ou":             gl.get("ou"),
+            "away_ml":        gl.get("away_ml", ""),
+            "home_ml":        gl.get("home_ml", ""),
+            "awayP":          away_pitcher,
+            "homeP":          home_pitcher,
+            "awayHand":       pitcher_hand(away_pitcher),
+            "homeHand":       pitcher_hand(home_pitcher),
+            "awayP_hr9":      awayP_hr9,
+            "homeP_hr9":      homeP_hr9,
+            "away_top":       away_top,
+            "away_top_prob":  away_top_prob,
+            "home_top":       home_top,
+            "home_top_prob":  home_top_prob,
+            "away_exp_hr":    round(sum(p["hr_pg"] for p in away_players), 2),
+            "home_exp_hr":    round(sum(p["hr_pg"] for p in home_players), 2),
+            "n_away":         len(away_players),
+            "n_home":         len(home_players),
         })
 
     # ── PITCHERS ──────────────────────────────────────────────────────────────
@@ -588,6 +640,10 @@ def build():
         rf"(?i)(top edge plays\s*[—–-]+\s*)({months})[a-z]*\.? ?\d{{1,2}}",
         lambda m: m.group(1) + today.strftime("%b %-d").upper(),
         html)
+    # Nav/drawer date pill: "MAY 23 · 2026" → "JUN 19 · 2026" (middot form, v5)
+    html = re.sub(
+        rf"(?i)({months})[a-z]* \d{{1,2}} · \d{{4}}",
+        today.strftime("%b %-d · %Y").upper(), html)
     html = re.sub(
         rf"(?i)<title>Onyx Baseball · ({months})[a-z]* \d{{1,2}}</title>",
         f"<title>Onyx Baseball · {today.strftime('%b %-d')}</title>", html)
