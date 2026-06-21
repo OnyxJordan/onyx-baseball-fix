@@ -388,29 +388,32 @@ def fetch_splits():
         if not path.exists():
             print(f"  WARNING: {path.name} not found — {key} split falls back to career")
             return
-        with open(path, encoding="utf-8-sig") as f:
-            for row in csv.DictReader(f):
-                nk = _name_key(row)
-                if not nk:
-                    continue
-                pa = int(_f(row, "PA"))
-                hr = int(_f(row, "HR"))
-                if pa < 1:
-                    continue
-                rec = splits.setdefault(nk, {})
-                rec[key] = round(hr / pa, 5)
-                rec[f"{key}_pa"] = pa
-
-    load_side(OUT / "hitters_home.csv", "ch")
-    load_side(OUT / "hitters_away.csv", "ca")
-
-    for nk, rec in splits.items():
-        rec["split_pa"] = rec.get("ch_pa", 0) + rec.get("ca_pa", 0)
-
-    print(f"  Splits: {len(splits)} players")
-    (OUT / "splits.json").write_text(json.dumps(splits, indent=2))
-    return splits
-
+       with open(path, encoding="utf-8-sig") as f:
+        for row in csv.DictReader(f):
+            nk = _name_key(row)
+            if not nk:
+                continue
+            # Statcast exports (EV90/Barrel%/HardHit%/xBA/xSLG) carry NO PA column.
+            # Do NOT gate on PA — that silently dropped every row, so barrels/HH/EV
+            # all fell back to the ISO estimate + EV 95.0 for the entire slate.
+            pa   = int(_f(row, "PA", "pa", default=0))
+            bpct = _f(row, "Barrel%", "barrel_pct", "Brl%", "Barrels/PA%")
+            hpct = _f(row, "HardHit%", "hardhit_pct", "HardHit", "HH%")
+            ev90 = _f(row, "EV90", "EV", "avg_best_speed", default=95.0)
+            xw   = _f(row, "xwOBA", "wOBA", "est_woba", default=0.320)
+            # keep any row that carries a real quality signal
+            if bpct == 0 and hpct == 0 and ev90 == 95.0:
+                continue
+            if bpct > 1: bpct /= 100
+            if hpct > 1: hpct /= 100
+            out[nk] = {
+                "ev90":        round(ev90, 1),
+                "barrel_pct":  round(bpct, 4),
+                "hardhit_pct": round(hpct, 4),
+                "xwoba":       round(xw, 4),
+                "pa":          pa,
+            }
+    return out
 # ── 8. PITCHER data — reads fangraphs_pitchers_l14.csv ────────────────────────
 def fetch_pitcher_statcast():
     print("Fetching pitcher data from FanGraphs CSV...")
