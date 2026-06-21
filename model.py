@@ -179,7 +179,7 @@ def sc_score(d: dict, l14: dict = None) -> float:
         e  = l14.get("l14_avg_ev", 95)        or 95
         i  = l14.get("l14_iso", 0.165)        or 0.165
         pa = l14.get("l14_pa", 0)             or 0
-        pa_ref = 120          # L14 sample matures faster than 3yr
+        pa_ref = 55           # barrel%/EV/HH stabilize fast — trust a ~50-PA L14 window          # L14 sample matures faster than 3yr
     else:
         b  = d.get("b3", 0.085) or 0.085
         h  = d.get("h3", 0.40)  or 0.40
