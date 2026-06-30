@@ -1,11 +1,24 @@
 """
-fetch_data.py — Onyx Baseball daily data fetcher v7
+fetch_data.py — Onyx Baseball daily data fetcher v8
 Odds:    reads data/odds.json directly (uploaded manually each morning)
-Lineups: MLB Stats API with roster fallback
+Lineups: MLB Stats API with roster fallback -> data/lineups.json (FLAT list for auto_build)
 Weather: manual data/weather.json wins; falls back to Open-Meteo if missing
 Hitters: data/fangraphs_l14.csv + real Statcast (statcast_l14.csv / statcast_season.csv)
 Splits:  data/hitters_home.csv + data/hitters_away.csv -> splits.json
 Pitchers: data/fangraphs_pitchers_l14.csv
+
+v8 fixes:
+  - fetch_splits(): repaired IndentationError + wrong body (had Statcast loader
+    pasted in referencing undefined `out`). Now reads hitters_home/away CSVs and
+    writes splits.json with ch/ca + _pa keys that model.py expects.
+  - _load_statcast_file(): removed the `if pa < 1: continue` gate. Statcast
+    quality exports carry no PA column, so that gate silently dropped EVERY row
+    and hitters fell back to iso*0.18 barrel estimates. Now keeps any row with a
+    real quality signal, with aliased headers for resilience.
+  - fetch_lineups(): writes data/lineups.json as a FLAT list of batter dicts
+    (name/team/game_key/batting_order/pos), the format auto_build.py iterates.
+  - Abbr alignment: WAS->WSH, OAK->ATH so game_keys match the manual
+    odds/game_lines/weather files (CWS_BAL, WSH_BOS, LAD_ATH, ...).
 """
 import json, time, requests, csv, datetime
 from pathlib import Path
@@ -40,9 +53,9 @@ STADIUMS = {
     "SF":  ("Oracle Park",              37.7786, -122.3893, False),
     "COL": ("Coors Field",              39.7559, -104.9942, False),
     "ARI": ("Chase Field",              33.4453, -112.0667, True),
-    "WAS": ("Nationals Park",           38.8730,  -77.0074, False),
+    "WSH": ("Nationals Park",           38.8730,  -77.0074, False),
     "ATL": ("Truist Park",              33.8908,  -84.4678, False),
-    "OAK": ("Oakland Coliseum",         37.7516, -122.2005, False),
+    "ATH": ("Sutter Health Park",       38.5800, -121.5130, False),
     "SD":  ("Petco Park",               32.7076, -117.1570, False),
     "TEX": ("Globe Life Field",         32.7473,  -97.0845, True),
     "LAA": ("Angel Stadium",            33.8003, -117.8827, False),
@@ -51,7 +64,7 @@ STADIUMS = {
 TEAM_ID_TO_ABBR = {
     108:"LAA", 109:"ARI", 110:"BAL", 111:"BOS", 112:"CHC", 113:"CIN",
     114:"CLE", 115:"COL", 116:"DET", 117:"HOU", 118:"KC",  119:"LAD",
-    120:"WAS", 121:"NYM", 133:"OAK", 134:"PIT", 135:"SD",  136:"SEA",
+    120:"WSH", 121:"NYM", 133:"ATH", 134:"PIT", 135:"SD",  136:"SEA",
     137:"SF",  138:"STL", 139:"TB",  140:"TEX", 141:"TOR", 142:"MIN",
     143:"PHI", 144:"ATL", 145:"CWS", 146:"MIA", 147:"NYY", 158:"MIL",
 }
@@ -162,7 +175,7 @@ def fetch_roster(team_id):
             for p in data.get("roster", [])
             if p.get("position", {}).get("abbreviation", "P") not in ("P", "SP", "RP")
         ]
-    except:
+    except Exception:
         return []
 
 # ── 4. BUILD LINEUP ───────────────────────────────────────────────────────────
@@ -200,18 +213,20 @@ def build_lineup(game, recent_orders, side):
         p["batting_order"] = i + 1
     return lineup, team_abbr, False
 
-# ── 5. FETCH LINEUPS ──────────────────────────────────────────────────────────
+# ── 5. FETCH LINEUPS — writes FLAT data/lineups.json for auto_build ────────────
 def fetch_lineups():
     print("Fetching lineups...")
     games_raw     = fetch_schedule()
     recent_orders = fetch_recent_batting_orders()
-    games = {}
+    games = {}     # internal, keyed by game_key — used by fetch_weather
+    flat  = []     # what auto_build.py iterates
+
     for g in games_raw:
-        away_id   = g["teams"]["away"]["team"]["id"]
-        home_id   = g["teams"]["home"]["team"]["id"]
-        away_abbr = TEAM_ID_TO_ABBR.get(away_id, str(away_id))
-        home_abbr = TEAM_ID_TO_ABBR.get(home_id, str(home_id))
-        game_key  = f"{away_abbr}_{home_abbr}"
+        away_abbr = TEAM_ID_TO_ABBR.get(g["teams"]["away"]["team"]["id"], "")
+        home_abbr = TEAM_ID_TO_ABBR.get(g["teams"]["home"]["team"]["id"], "")
+        if not away_abbr or not home_abbr:
+            continue
+        game_key = f"{away_abbr}_{home_abbr}"
 
         away_pitcher = g["teams"]["away"].get("probablePitcher", {}).get("fullName", "TBD")
         home_pitcher = g["teams"]["home"].get("probablePitcher", {}).get("fullName", "TBD")
@@ -220,26 +235,40 @@ def fetch_lineups():
         home_lineup, _, home_conf = build_lineup(g, recent_orders, "home")
 
         games[game_key] = {
-            "game_key":       game_key,
-            "game_id":        g["gamePk"],
-            "game_time":      g.get("gameDate", ""),
-            "away_team":      away_abbr,
-            "home_team":      home_abbr,
-            "away_pitcher":   away_pitcher,
-            "home_pitcher":   home_pitcher,
-            "away_lineup":    away_lineup,
-            "home_lineup":    home_lineup,
-            "away_confirmed": away_conf,
-            "home_confirmed": home_conf,
-            "status":         g.get("status", {}).get("detailedState", ""),
+            "game_key":     game_key,
+            "game_id":      g["gamePk"],
+            "game_time":    g.get("gameDate", ""),
+            "away_team":    away_abbr,
+            "home_team":    home_abbr,
+            "away_pitcher": away_pitcher,
+            "home_pitcher": home_pitcher,
+            "status":       g.get("status", {}).get("detailedState", ""),
         }
+
+        for team, lineup, conf in [(away_abbr, away_lineup, away_conf),
+                                   (home_abbr, home_lineup, home_conf)]:
+            for p in lineup:
+                pos = p["pos"]
+                flat.append({
+                    "name":             p["name"],
+                    "team":             team,
+                    "game_key":         game_key,
+                    "batting_order":    p["batting_order"],
+                    "pos":              pos,
+                    "dk_pos":           pos,
+                    "fd_pos":           pos,
+                    "hand":             "R",   # MLB lineup feed omits bat side; display-only
+                    "lineup_confirmed": conf,
+                })
+
         conf = "✓ confirmed" if (away_conf and home_conf) else "~ projected"
         print(f"  {game_key:12s}  {away_pitcher:22s} vs {home_pitcher:22s}  [{conf}]")
 
-    fully = sum(1 for g in games.values() if g["away_confirmed"] and g["home_confirmed"])
-    print(f"\n  Total: {len(games)} games, {fully} fully confirmed")
+    fully = sum(1 for g in games.values()
+                if any(b["lineup_confirmed"] for b in flat if b["game_key"] == g["game_key"]))
+    print(f"\n  Total: {len(games)} games, {len(flat)} batters")
     with open(OUT / "lineups.json", "w") as f:
-        json.dump(games, f, indent=2)
+        json.dump(flat, f, indent=2)
     return games
 
 # ── 6. WEATHER — manual weather.json wins; Open-Meteo fallback ────────────────
@@ -256,7 +285,7 @@ def fetch_weather(games):
         if team not in STADIUMS:
             continue
         park_name, lat, lon, roof = STADIUMS[team]
-        game_hour = 14
+        game_hour = 19
         for g in games.values():
             if g["home_team"] == team and g.get("game_time"):
                 try:
@@ -264,7 +293,7 @@ def fetch_weather(games):
                     eastern = dt.astimezone(datetime.timezone(datetime.timedelta(hours=-4)))
                     game_hour = eastern.hour
                     break
-                except:
+                except Exception:
                     pass
         try:
             r = requests.get("https://api.open-meteo.com/v1/forecast", params={
@@ -277,17 +306,18 @@ def fetch_weather(games):
             h   = r.json().get("hourly", {})
             idx = min(game_hour, 23)
             weather[team] = {
-                "park":       park_name,
-                "temp":       h.get("temperature_2m",           [72] * 24)[idx],
-                "precip_pct": h.get("precipitation_probability", [0] * 24)[idx],
-                "wind_mph":   h.get("wind_speed_10m",            [5] * 24)[idx],
-                "wind_dir":   deg_to_compass(h.get("wind_direction_10m", [180] * 24)[idx]),
-                "roof":       roof,
+                "venue":     park_name,
+                "temp":      h.get("temperature_2m",            [72] * 24)[idx],
+                "precip":    h.get("precipitation_probability", [0]  * 24)[idx],
+                "wind_spd":  h.get("wind_speed_10m",            [5]  * 24)[idx],
+                "wind_dir":  deg_to_compass(h.get("wind_direction_10m", [180] * 24)[idx]),
+                "roof":      roof,
+                "flag":      "clear",
             }
         except Exception as e:
             print(f"  Weather error {team}: {e}")
-            weather[team] = {"park": park_name, "temp": 72, "precip_pct": 0,
-                             "wind_mph": 5, "wind_dir": "N", "roof": roof}
+            weather[team] = {"venue": park_name, "temp": 72, "precip": 0,
+                             "wind_spd": 5, "wind_dir": "N", "roof": roof, "flag": "clear"}
         time.sleep(0.15)
 
     print(f"  Weather: {len(weather)} stadiums")
@@ -297,7 +327,12 @@ def fetch_weather(games):
 
 # ── STATCAST LOADER (season + L14) ────────────────────────────────────────────
 def _load_statcast_file(path):
-    """Return {name_lower: {ev90, barrel_pct, hardhit_pct, xwoba, pa}}."""
+    """
+    Return {name_lower: {ev90, barrel_pct, hardhit_pct, xwoba, pa}}.
+    Statcast quality exports often carry NO PA column — gating on PA dropped
+    every row and forced the ISO fallback. Keep any row with a real quality
+    signal (barrel / hardhit / EV present); aliased headers for resilience.
+    """
     out = {}
     if not path.exists():
         return out
@@ -306,18 +341,20 @@ def _load_statcast_file(path):
             nk = _name_key(row)
             if not nk:
                 continue
-            pa = int(_f(row, "PA"))
-            if pa < 1:
-                continue
-            bpct = _f(row, "Barrel%")
-            hpct = _f(row, "HardHit%")
+            pa   = int(_f(row, "PA", "pa", default=0))
+            bpct = _f(row, "Barrel%", "barrel_pct", "Brl%", "Barrels/PA%")
+            hpct = _f(row, "HardHit%", "hardhit_pct", "HardHit", "HH%")
+            ev90 = _f(row, "EV90", "EV", "avg_best_speed", default=0.0)
+            xw   = _f(row, "xwOBA", "wOBA", "est_woba", default=0.320)
+            if bpct == 0 and hpct == 0 and ev90 == 0:
+                continue  # no real Statcast signal in this row
             if bpct > 1: bpct /= 100
             if hpct > 1: hpct /= 100
             out[nk] = {
-                "ev90":        _f(row, "EV90", "EV", default=95.0),
+                "ev90":        round(ev90 or 95.0, 1),
                 "barrel_pct":  round(bpct, 4),
                 "hardhit_pct": round(hpct, 4),
-                "xwoba":       _f(row, "xwOBA", "wOBA", default=0.320),
+                "xwoba":       round(xw, 4),
                 "pa":          pa,
             }
     return out
@@ -341,7 +378,7 @@ def fetch_statcast():
                 nk = _name_key(row)
                 if not nk:
                     continue
-                pa = int(_f(row, "PA"))
+                pa = int(_f(row, "PA"))     # FanGraphs L14 HAS a PA column — gate is correct here
                 hr = int(_f(row, "HR"))
                 if pa < 1:
                     continue
@@ -361,6 +398,7 @@ def fetch_statcast():
                     "l14_hr":         hr,
                     "l14_rate":       round(hr / pa, 4),
                     "l14_avg_ev":     round(ev90, 1),
+                    "l14_ev90":       round(ev90, 1),
                     "l14_barrel_pct": barrel,
                     "l14_hh_pct":     hardhit,
                     "l14_hit_rate":   round(woba / 1.25, 4),
@@ -375,7 +413,8 @@ def fetch_statcast():
         return {}
 
     matched_sc = sum(1 for nk in statcast if nk in sc_l14 or nk in sc_season)
-    print(f"  L14 hitters: {len(statcast)} loaded, {matched_sc} with real Statcast")
+    print(f"  L14 hitters: {len(statcast)} loaded, {matched_sc} with real Statcast "
+          f"(rest on ISO estimate)")
     (OUT / "statcast_l14.json").write_text(json.dumps(statcast, indent=2))
     return statcast
 
@@ -384,36 +423,30 @@ def fetch_splits():
     print("Fetching home/away HR splits...")
     splits = {}
 
-    def load_side(path, key):
+    def load_side(path, side_key):
         if not path.exists():
-            print(f"  WARNING: {path.name} not found — {key} split falls back to career")
+            print(f"  WARNING: {path.name} not found — {side_key} split falls back to career")
             return
-       with open(path, encoding="utf-8-sig") as f:
-        for row in csv.DictReader(f):
-            nk = _name_key(row)
-            if not nk:
-                continue
-            # Statcast exports (EV90/Barrel%/HardHit%/xBA/xSLG) carry NO PA column.
-            # Do NOT gate on PA — that silently dropped every row, so barrels/HH/EV
-            # all fell back to the ISO estimate + EV 95.0 for the entire slate.
-            pa   = int(_f(row, "PA", "pa", default=0))
-            bpct = _f(row, "Barrel%", "barrel_pct", "Brl%", "Barrels/PA%")
-            hpct = _f(row, "HardHit%", "hardhit_pct", "HardHit", "HH%")
-            ev90 = _f(row, "EV90", "EV", "avg_best_speed", default=95.0)
-            xw   = _f(row, "xwOBA", "wOBA", "est_woba", default=0.320)
-            # keep any row that carries a real quality signal
-            if bpct == 0 and hpct == 0 and ev90 == 95.0:
-                continue
-            if bpct > 1: bpct /= 100
-            if hpct > 1: hpct /= 100
-            out[nk] = {
-                "ev90":        round(ev90, 1),
-                "barrel_pct":  round(bpct, 4),
-                "hardhit_pct": round(hpct, 4),
-                "xwoba":       round(xw, 4),
-                "pa":          pa,
-            }
-    return out
+        with open(path, encoding="utf-8-sig") as f:
+            for row in csv.DictReader(f):
+                nk = _name_key(row)
+                if not nk:
+                    continue
+                pa = int(_f(row, "PA", "pa", default=0))
+                hr = int(_f(row, "HR", "hr", default=0))
+                if pa < 1:
+                    continue
+                rec = splits.setdefault(nk, {})
+                rec[side_key] = round(hr / pa, 5)
+                rec[f"{side_key}_pa"] = pa
+
+    load_side(OUT / "hitters_home.csv", "ch")
+    load_side(OUT / "hitters_away.csv", "ca")
+
+    print(f"  Splits: {len(splits)} players")
+    (OUT / "splits.json").write_text(json.dumps(splits, indent=2))
+    return splits
+
 # ── 8. PITCHER data — reads fangraphs_pitchers_l14.csv ────────────────────────
 def fetch_pitcher_statcast():
     print("Fetching pitcher data from FanGraphs CSV...")
@@ -434,9 +467,9 @@ def fetch_pitcher_statcast():
                     continue
                 pitchers[nk] = {
                     "l14_bf":      round(ip * 4.3),
-                    "l14_hr_rate": round(_f(row, "HR/9") / 27, 4),
-                    "l14_k_rate":  round(_f(row, "K/9") / 27, 4),
-                    "l14_bb_rate": round(_f(row, "BB/9") / 27, 4),
+                    "l14_hr_rate": round(_f(row, "HR/9") / 38.7, 4),
+                    "l14_k_rate":  round(_f(row, "K/9") / 38.7, 4),
+                    "l14_bb_rate": round(_f(row, "BB/9") / 38.7, 4),
                     "l14_xfip":    _f(row, "xFIP", default=4.0),
                     "l14_era":     _f(row, "ERA", default=4.0),
                 }
