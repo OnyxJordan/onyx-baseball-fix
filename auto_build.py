@@ -45,49 +45,24 @@ def _pct(v):
     v = f(v); return v/100 if v > 1 else v   # FanGraphs reports % as 11.9, Savant as 0.119
 
 def load_l14_hitters():
-    out = {}
-    p = os.path.join(DATA, "fangraphs_l14.csv")
-    if not os.path.exists(p): return out
-    with open(p, newline="") as fh:
-        for row in csv.DictReader(fh):
-            r = {(k or "").strip().lower(): v for k, v in row.items()}
-            name = r.get("name") or r.get("nameascii")
-            if not name: continue
-            pa, hr = f(r.get("pa")), f(r.get("hr"))
-            ev_avg = f(r.get("ev") or r.get("avg_ev") or r.get("exitvelocity"))
-            ev90   = f(r.get("ev90") or r.get("ev_90")) or ev_avg
-            rec = {
-                "l14_pa": pa, "l14_hr": hr,
-                "l14_rate": (hr / pa) if pa else 0.0,
-                "l14_iso": f(r.get("iso"), 0.0),
-                "l14_xwoba": f(r.get("xwoba")),
-                "l14_barrel_pct": _pct(r.get("barrel%") or r.get("barrel_pct") or r.get("brl%")),
-                "l14_hh_pct": _pct(r.get("hardhit%") or r.get("hardhit_pct") or r.get("hard%")),
-                "l14_avg_ev": ev_avg or 0.0,
-                "l14_ev90": ev90 or 0.0,
-            }
-            out[nk(name)] = rec
-            if r.get("nameascii"): out[nk(r["nameascii"])] = rec
-    return out
+    """Read data/statcast_l14.json produced by fetch_data.fetch_statcast()."""
+    p = os.path.join(DATA, "statcast_l14.json")
+    if not os.path.exists(p):
+        print("  WARNING: statcast_l14.json missing — run fetch_data.py first")
+        return {}
+    with open(p) as fh:
+        raw = json.load(fh)
+    # already keyed by name_lower with l14_* fields model.py expects; just normalize key
+    return {nk(k): v for k, v in raw.items()}
 
 def load_l14_pitchers():
-    out = {}
-    p = os.path.join(DATA, "fangraphs_pitchers_l14.csv")
-    if not os.path.exists(p): return out
-    with open(p, newline="") as fh:
-        for row in csv.DictReader(fh):
-            r = {(k or "").strip().lower(): v for k, v in row.items()}
-            name = r.get("name") or r.get("nameascii")
-            if not name: continue
-            ip  = f(r.get("ip"))
-            hr9 = f(r.get("hr/9") or r.get("hr9"))
-            out[nk(name)] = {
-                "l14_bf": ip * 4.3,
-                "l14_hr_rate": (hr9 / 38.7) if hr9 else 0.0,   # HR per BF
-                "l14_hr9": hr9, "l14_ip": ip,
-            }
-    return out
-
+    """Read data/pitchers_l14.json produced by fetch_data.fetch_pitcher_statcast()."""
+    p = os.path.join(DATA, "pitchers_l14.json")
+    if not os.path.exists(p):
+        return {}
+    with open(p) as fh:
+        raw = json.load(fh)
+    return {nk(k): v for k, v in raw.items()}
 hit_l14 = load_l14_hitters()
 pit_l14 = load_l14_pitchers()
 
