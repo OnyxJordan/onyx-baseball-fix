@@ -128,8 +128,8 @@ for b in lineups:
         "wind_factor": res["env"], "env_factor": res["env"], "wind_alignment": wa,
         "park_hr": res["park_factor"],
         "opp_pitcher_hand": pdb.get("hand", "R"),
-        "opp_pitcher_hr9": f(pdb.get("hr9"), 1.20),
-        "opp_pitcher_era": f(pdb.get("era"), 4.20),
+        "opp_pitcher_hr9": f(pdb.get("h3"), 1.20),
+        "opp_pitcher_era": f(pdb.get("e3"), 4.20),
         "career_hr_pa": f(cdb.get("c"), 0.025),
         "split_hr_pa": f(cdb.get("ch" if is_home else "ca"), f(cdb.get("c"), 0.025)),
         "l14_hr": l14.get("l14_hr", 0), "l14_pa": l14.get("l14_pa", 0),
@@ -180,8 +180,8 @@ for gk, players in groups.items():
         "awayP": gl.get("awayP", ""), "homeP": gl.get("homeP", ""),
         "awayHand": model.PITCHER_CAREER_DB.get(nk(gl.get("awayP","")), {}).get("hand", "R"),
         "homeHand": model.PITCHER_CAREER_DB.get(nk(gl.get("homeP","")), {}).get("hand", "R"),
-        "awayP_hr9": f(model.PITCHER_CAREER_DB.get(nk(gl.get("awayP","")), {}).get("hr9"), 1.2),
-        "homeP_hr9": f(model.PITCHER_CAREER_DB.get(nk(gl.get("homeP","")), {}).get("hr9"), 1.2),
+        "awayP_hr9": f(model.PITCHER_CAREER_DB.get(nk(gl.get("awayP","")), {}).get("h3"), 1.2),
+        "homeP_hr9": f(model.PITCHER_CAREER_DB.get(nk(gl.get("homeP","")), {}).get("h3"), 1.2),
         "away_top": at[0]["batter_name"] if at else "", "away_top_prob": at[0]["hr_prob"] if at else 0,
         "home_top": ht[0]["batter_name"] if ht else "", "home_top_prob": ht[0]["hr_prob"] if ht else 0,
         "away_exp_hr": round(sum(p["hr_prob"] for p in ap) / 100, 2),
@@ -204,8 +204,8 @@ for gk, gl in game_lines.items():
         PITCHERS.append({
             "name": pname, "hand": pdb.get("hand", "R"),
             "team": (away if side == "awayP" else home), "opp": opp, "game": gk,
-            "era": round(f(pdb.get("era"), 4.20), 2), "hr9": round(f(pdb.get("hr9"), 1.20), 2),
-            "xfip": round(f(pdb.get("xfip"), 4.00), 2),
+            "era": round(f(pdb.get("e3"), 4.20), 2), "hr9": round(f(pdb.get("h3"), 1.20), 2),
+            "xfip": round(f(pdb.get("xf3"), 4.00), 2),
             "p_factor": model.pitcher_factor(pname, pit_l14, is_home_pitcher=is_home_p),
             "dk_salary": 0, "fd_salary": 0, "dk_proj": 0, "fd_proj": 0,  # SP salaries not captured this slate
         })
