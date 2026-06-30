@@ -2312,8 +2312,8 @@ function renderRankings() {
     let av = a[rSort.k] ?? -999;
     let bv = b[rSort.k] ?? -999;
     if (rSort.k === 'due_score_ui') {
-      av = a.due_adj ?? 1;
-      bv = b.due_adj ?? 1;
+  av = a.due_score ?? 0;
+  bv = b.due_score ?? 0;
     }
     if (typeof av === 'string') return rSort.d * av.localeCompare(bv);
     return rSort.d * (av - bv);
