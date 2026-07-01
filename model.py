@@ -222,11 +222,6 @@ def pitcher_factor(pitcher_name: str, l14_pitchers: dict = None, is_home_pitcher
     return round(base_pf, 3)
 
 def due_meter(d: dict, sc: float, l14: dict = None) -> float:
-  due_mult = due_meter(d, sc, l14)
-_dpa = (l14 or {}).get("l14_pa", 0) or 0
-_dhr = (l14 or {}).get("l14_hr", 0) or 0
-_drate = d.get("c", 0.038) or 0.038
-def due_meter(d: dict, sc: float, l14: dict = None) -> float:
     """Multiplicative due meter based on career expectation vs recent results."""
     if not l14:
         return 1.0
@@ -314,6 +309,10 @@ def project_player(
 
     # 6. Due meter
     due_mult = due_meter(d, sc, l14)
+    _dpa = (l14 or {}).get("l14_pa", 0) or 0
+    _dhr = (l14 or {}).get("l14_hr", 0) or 0
+    _drate = d.get("c", 0.038) or 0.038
+    due_score = ((_drate * _dpa) - _dhr) * sc if _dpa >= 20 else 0.0
 
     # 7. Raw probability
     raw_prob = max(1.0, min(30.0, base * sc * 3.5 * 100 * pf * env * park_f * due_mult))
