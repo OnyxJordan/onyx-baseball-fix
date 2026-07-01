@@ -6,15 +6,21 @@ reads data/ files and L14 CSVs directly, injects RESULTS/SUMMARIES/PITCHERS into
 shell.html -> index.html. No fetch_data dependency.
 
 v16 changes vs v15 auto_build:
-  - Passes humidity/pressure from weather.json into model.project_player() so
-    the new air-density terms in wind_env() actually receive real data instead
-    of silently defaulting to 50%/1013mb for every game.
-  - wind_alignment now reads model's own wind_blow classification (res["wind_blow"])
-    instead of a local "startswith('out')" check that never matched compass-token
-    wind data (SW, NE, etc.) — this was silently broken for every game since it
-    was written; wind_alignment has been 0.0 across the board until this fix.
-  - VENUE_ALIAS trimmed — Daikin Park / Sutter Health Park / loanDepot park are
-    now real keys in model.PARK_HR_FACTOR, no longer need remapping.
+  - lineups.json and salaries.json split — lineups stays MLB-Stats-API-only
+    (auto-fetchable), salaries/positions come from DK/FD cards separately.
+  - pitcher_hand.json added as an override layer since pitcher_db.json has no
+    "hand" field and is a do-not-regenerate file.
+  - Passes humidity/pressure from weather.json into model.project_player().
+  - wind_alignment now reads model's own wind_blow classification instead of
+    a local "startswith('out')" check that never matched compass-token data.
+  - batter_hand / opp_pitcher_hand now passed into project_player() for the
+    new platoon_factor() layer in model.py.
+
+REQUIRES model.py to already define project_player() with humidity=,
+pressure_mb=, batter_hand=, opp_pitcher_hand= params, plus classify_wind(),
+PARK_WIND_SENSITIVITY, PARK_WIND_NEUTRAL, and platoon_factor(). If this file
+throws "unexpected keyword argument," model.py has not been updated/deployed
+yet — check that file first, not this one.
 """
 import json, re, os, csv, datetime, unicodedata
 from collections import defaultdict
@@ -40,16 +46,29 @@ def jload(name, default=None):
     if not os.path.exists(p): return default if default is not None else {}
     with open(p) as fh: return json.load(fh)
 
-# ── committed inputs (formats built this session) ───────────────────────────────
-lineups    = jload("lineups.json", [])      # list of batter dicts
-odds       = jload("odds.json", {})         # name_lower (+ "(team)" for dupes) -> american
-game_lines = jload("game_lines.json", {})   # AWAY_HOME -> {time,total,awayP,homeP,away_ml,home_ml,...}
-weather    = jload("weather.json", {})      # home_abbr -> {venue,temp,precip,wind_spd,wind_dir,roof,flag,humidity_pct,pressure_mb}
+# ── committed inputs ─────────────────────────────────────────────────────────
+lineups    = jload("lineups.json", [])       # list of {name,team,game_key,batting_order,hand,pos} — no salary
+salaries   = jload("salaries.json", {})      # name_lower (+ "(team)") -> {dk_salary,dk_pos,fd_salary,fd_pos}
+odds       = jload("odds.json", {})          # name_lower (+ "(team)") -> american
+game_lines = jload("game_lines.json", {})    # AWAY_HOME -> {time,total,awayP,homeP,away_ml,home_ml,...}
+weather    = jload("weather.json", {})       # home_abbr -> {venue,temp,precip,wind_spd,wind_dir,roof,flag,humidity_pct,pressure_mb}
+pitcher_hand_override = jload("pitcher_hand.json", {})  # name_lower -> "L"/"R" — bridges missing pitcher_db.json field
 
 def get_odds(name, team):
     return (odds.get(f"{nk(name)} ({team.lower()})")
             or odds.get(name.lower())
             or odds.get(nk(name)))
+
+def get_salary(name, team):
+    s = (salaries.get(f"{nk(name)} ({team.lower()})")
+         or salaries.get(name.lower())
+         or salaries.get(nk(name))
+         or {})
+    return (s.get("dk_salary", 3000), s.get("dk_pos", "OF"),
+            s.get("fd_salary", 3000), s.get("fd_pos", "OF"))
+
+def get_pitcher_hand(pname):
+    return pitcher_hand_override.get(nk(pname)) or model.PITCHER_CAREER_DB.get(nk(pname), {}).get("hand", "R")
 
 def load_l14_hitters():
     p = os.path.join(DATA, "statcast_l14.json")
@@ -72,8 +91,6 @@ hit_l14 = load_l14_hitters()
 pit_l14 = load_l14_pitchers()
 
 # ── venue -> model.PARK_HR_FACTOR key ────────────────────────────────────────
-# Trimmed: Daikin Park / Sutter Health Park / loanDepot park are now real keys
-# in model.PARK_HR_FACTOR directly. Only genuine naming mismatches stay here.
 VENUE_ALIAS = {
     "Oriole Park at Camden Yards": "Camden Yards",
 }
@@ -101,6 +118,8 @@ for b in lineups:
     opp_p = (gl.get("awayP") if is_home else gl.get("homeP")) or ""
     odds_val = get_odds(name, team)
     pf = park_factor(venue)
+    dk_sal, dk_pos, fd_sal, fd_pos = get_salary(name, team)
+    opp_p_hand = get_pitcher_hand(opp_p)
 
     res = model.project_player(
         name=name, pos=b.get("pos", "OF"), batting_order=b.get("batting_order", 5),
@@ -108,10 +127,11 @@ for b in lineups:
         wind_dir=w.get("wind_dir", "calm"), wind_mph=w.get("wind_spd", 0),
         temp=w.get("temp", 72), roof=bool(w.get("roof", False)),
         humidity=w.get("humidity_pct", 50.0), pressure_mb=w.get("pressure_mb", 1013.0),
-        dk_odds=odds_val, dk_salary=b.get("dk_salary", 3000), fd_salary=b.get("fd_salary", 3000),
+        dk_odds=odds_val, dk_salary=dk_sal, fd_salary=fd_sal,
         l14_statcast=hit_l14, l14_pitchers=pit_l14,
         game_key=gk, game_label=f"{away} @ {home} ({gl.get('time','')} ET)".strip(),
         team=team, weather_flag=w.get("flag", "clear"),
+        batter_hand=b.get("hand", "R"), opp_pitcher_hand=opp_p_hand,
     )
 
     l14 = hit_l14.get(nk(name), {})
@@ -119,13 +139,11 @@ for b in lineups:
     cdb = model.CAREER_DB.get(nk(name), {})
     implied = model.implied_prob(odds_val) * 100 if odds_val else None
     dk_proj, fd_proj = res["dk_pts"], res["fd_pts"]
-    dk_sal, fd_sal = res["dk_salary"], res["fd_salary"]
     wa = WIND_ALIGN.get(res.get("wind_blow"), 0.0)
 
     res.update({
         "matched_name": name,
-        "dk_pos": b.get("dk_pos", b.get("pos", "OF")),
-        "fd_pos": b.get("fd_pos", b.get("pos", "OF")),
+        "dk_pos": dk_pos, "fd_pos": fd_pos,
         "batter_hand": b.get("hand", "R"),
         "location": "home" if is_home else "away",
         "opp": away if is_home else home, "away": away, "home": home,
@@ -134,7 +152,7 @@ for b in lineups:
         "wind_from": w.get("wind_dir", ""),
         "wind_factor": res["env"], "env_factor": res["env"], "wind_alignment": wa,
         "park_hr": res["park_factor"],
-        "opp_pitcher_hand": pdb.get("hand", "R"),
+        "opp_pitcher_hand": opp_p_hand,
         "opp_pitcher_hr9": f(pdb.get("h3"), 1.20),
         "opp_pitcher_era": f(pdb.get("e3"), 4.20),
         "career_hr_pa": f(cdb.get("c"), 0.025),
@@ -186,8 +204,8 @@ for gk, players in groups.items():
         "park_hr": park_factor(w.get("venue", "")),
         "ou": gl.get("total", 8.0), "away_ml": gl.get("away_ml") or "+100", "home_ml": gl.get("home_ml") or "-120",
         "awayP": gl.get("awayP", ""), "homeP": gl.get("homeP", ""),
-        "awayHand": model.PITCHER_CAREER_DB.get(nk(gl.get("awayP","")), {}).get("hand", "R"),
-        "homeHand": model.PITCHER_CAREER_DB.get(nk(gl.get("homeP","")), {}).get("hand", "R"),
+        "awayHand": get_pitcher_hand(gl.get("awayP", "")),
+        "homeHand": get_pitcher_hand(gl.get("homeP", "")),
         "awayP_hr9": f(model.PITCHER_CAREER_DB.get(nk(gl.get("awayP","")), {}).get("h3"), 1.2),
         "homeP_hr9": f(model.PITCHER_CAREER_DB.get(nk(gl.get("homeP","")), {}).get("h3"), 1.2),
         "away_top": at[0]["batter_name"] if at else "", "away_top_prob": at[0]["hr_prob"] if at else 0,
@@ -210,7 +228,7 @@ for gk, gl in game_lines.items():
         seen.add(pname)
         pdb = model.PITCHER_CAREER_DB.get(nk(pname), {})
         PITCHERS.append({
-            "name": pname, "hand": pdb.get("hand", "R"),
+            "name": pname, "hand": get_pitcher_hand(pname),
             "team": (away if side == "awayP" else home), "opp": opp, "game": gk,
             "era": round(f(pdb.get("e3"), 4.20), 2), "hr9": round(f(pdb.get("h3"), 1.20), 2),
             "xfip": round(f(pdb.get("xf3"), 4.00), 2),
