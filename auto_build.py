@@ -1,13 +1,24 @@
 #!/usr/bin/env python3
 """
-auto_build.py — Onyx Baseball daily build (pairs with model.py v15)
+auto_build.py — Onyx Baseball daily build (pairs with model.py v16)
 Imports project_player()/apply_game_diversity() + career/pitcher DBs from model,
 reads data/ files and L14 CSVs directly, injects RESULTS/SUMMARIES/PITCHERS into
 shell.html -> index.html. No fetch_data dependency.
+
+v16 changes vs v15 auto_build:
+  - Passes humidity/pressure from weather.json into model.project_player() so
+    the new air-density terms in wind_env() actually receive real data instead
+    of silently defaulting to 50%/1013mb for every game.
+  - wind_alignment now reads model's own wind_blow classification (res["wind_blow"])
+    instead of a local "startswith('out')" check that never matched compass-token
+    wind data (SW, NE, etc.) — this was silently broken for every game since it
+    was written; wind_alignment has been 0.0 across the board until this fix.
+  - VENUE_ALIAS trimmed — Daikin Park / Sutter Health Park / loanDepot park are
+    now real keys in model.PARK_HR_FACTOR, no longer need remapping.
 """
 import json, re, os, csv, datetime, unicodedata
 from collections import defaultdict
-import model  # v15 — loads career_db.json, pitcher_db.json, splits.json on import
+import model  # v16 — loads career_db.json, pitcher_db.json, splits.json on import
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(BASE, "data")
@@ -33,44 +44,38 @@ def jload(name, default=None):
 lineups    = jload("lineups.json", [])      # list of batter dicts
 odds       = jload("odds.json", {})         # name_lower (+ "(team)" for dupes) -> american
 game_lines = jload("game_lines.json", {})   # AWAY_HOME -> {time,total,awayP,homeP,away_ml,home_ml,...}
-weather    = jload("weather.json", {})      # home_abbr -> {venue,temp,precip,wind_spd,wind_dir,roof,flag}
+weather    = jload("weather.json", {})      # home_abbr -> {venue,temp,precip,wind_spd,wind_dir,roof,flag,humidity_pct,pressure_mb}
 
 def get_odds(name, team):
     return (odds.get(f"{nk(name)} ({team.lower()})")
             or odds.get(name.lower())
             or odds.get(nk(name)))
 
-# ── L14 from CSV (this is the fetch_data PA-gate fix, done right: no row dropped) ─
-def _pct(v):
-    v = f(v); return v/100 if v > 1 else v   # FanGraphs reports % as 11.9, Savant as 0.119
-
 def load_l14_hitters():
-    """Read data/statcast_l14.json produced by fetch_data.fetch_statcast()."""
     p = os.path.join(DATA, "statcast_l14.json")
     if not os.path.exists(p):
         print("  WARNING: statcast_l14.json missing — run fetch_data.py first")
         return {}
     with open(p) as fh:
         raw = json.load(fh)
-    # already keyed by name_lower with l14_* fields model.py expects; just normalize key
     return {nk(k): v for k, v in raw.items()}
 
 def load_l14_pitchers():
-    """Read data/pitchers_l14.json produced by fetch_data.fetch_pitcher_statcast()."""
     p = os.path.join(DATA, "pitchers_l14.json")
     if not os.path.exists(p):
         return {}
     with open(p) as fh:
         raw = json.load(fh)
     return {nk(k): v for k, v in raw.items()}
+
 hit_l14 = load_l14_hitters()
 pit_l14 = load_l14_pitchers()
 
-# ── venue -> model.PARK_HR_FACTOR key (names differ in weather.json) ─────────────
+# ── venue -> model.PARK_HR_FACTOR key ────────────────────────────────────────
+# Trimmed: Daikin Park / Sutter Health Park / loanDepot park are now real keys
+# in model.PARK_HR_FACTOR directly. Only genuine naming mismatches stay here.
 VENUE_ALIAS = {
     "Oriole Park at Camden Yards": "Camden Yards",
-    "Daikin Park": "Minute Maid Park",
-    "Sutter Health Park": "Oakland Coliseum",   # A's Sacramento — approx, neutral-ish
 }
 def park_factor(venue):
     return model.PARK_HR_FACTOR.get(VENUE_ALIAS.get(venue, venue), 1.0)
@@ -80,6 +85,8 @@ def due_label(m):
     for thr, lbl in DUE:
         if m >= thr: return lbl
     return "FIRE"
+
+WIND_ALIGN = {"out": 0.6, "in": -0.6, "cross": 0.0, None: 0.0}
 
 # ── build RESULTS ────────────────────────────────────────────────────────────
 RESULTS = []
@@ -100,6 +107,7 @@ for b in lineups:
         is_home=is_home, opp_pitcher=opp_p, park=venue, park_factor=pf,
         wind_dir=w.get("wind_dir", "calm"), wind_mph=w.get("wind_spd", 0),
         temp=w.get("temp", 72), roof=bool(w.get("roof", False)),
+        humidity=w.get("humidity_pct", 50.0), pressure_mb=w.get("pressure_mb", 1013.0),
         dk_odds=odds_val, dk_salary=b.get("dk_salary", 3000), fd_salary=b.get("fd_salary", 3000),
         l14_statcast=hit_l14, l14_pitchers=pit_l14,
         game_key=gk, game_label=f"{away} @ {home} ({gl.get('time','')} ET)".strip(),
@@ -112,8 +120,7 @@ for b in lineups:
     implied = model.implied_prob(odds_val) * 100 if odds_val else None
     dk_proj, fd_proj = res["dk_pts"], res["fd_pts"]
     dk_sal, fd_sal = res["dk_salary"], res["fd_salary"]
-    wd = str(w.get("wind_dir", "")).lower()
-    wa = 0.6 if wd.startswith("out") else -0.6 if wd.startswith("in") else 0.0
+    wa = WIND_ALIGN.get(res.get("wind_blow"), 0.0)
 
     res.update({
         "matched_name": name,
@@ -170,6 +177,7 @@ for gk, players in groups.items():
         "time": gl.get("time", ""), "away": away, "home": home,
         "venue": w.get("venue", ""), "roof": bool(w.get("roof", False)),
         "temp": w.get("temp", 72), "wind_spd": w.get("wind_spd", 0), "wind_dir": w.get("wind_dir", ""),
+        "humidity_pct": w.get("humidity_pct", 50), "pressure_mb": w.get("pressure_mb", 1013),
         "weather_label": f'{w.get("wind_dir","")} {w.get("wind_spd",0)}mph'.strip(),
         "wind_from": w.get("wind_dir", ""),
         "wind_factor": players[0]["env_factor"] if players else 1.0,
@@ -207,7 +215,7 @@ for gk, gl in game_lines.items():
             "era": round(f(pdb.get("e3"), 4.20), 2), "hr9": round(f(pdb.get("h3"), 1.20), 2),
             "xfip": round(f(pdb.get("xf3"), 4.00), 2),
             "p_factor": model.pitcher_factor(pname, pit_l14, is_home_pitcher=is_home_p),
-            "dk_salary": 0, "fd_salary": 0, "dk_proj": 0, "fd_proj": 0,  # SP salaries not captured this slate
+            "dk_salary": 0, "fd_salary": 0, "dk_proj": 0, "fd_proj": 0,
         })
 
 ALL_GAME_KEYS = [s["game"] for s in SUMMARIES]
