@@ -44,7 +44,12 @@ def f(x, d=0.0):
 def jload(name, default=None):
     p = os.path.join(DATA, name)
     if not os.path.exists(p): return default if default is not None else {}
-    with open(p) as fh: return json.load(fh)
+    with open(p) as fh:
+        try:
+            return json.load(fh)
+        except json.JSONDecodeError as e:
+            print(f"  ERROR: {name} is not valid JSON — {e}")
+            raise
 
 # ── committed inputs ─────────────────────────────────────────────────────────
 lineups    = jload("lineups.json", [])       # list of {name,team,game_key,batting_order,hand,pos} — no salary
