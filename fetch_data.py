@@ -297,23 +297,25 @@ def fetch_weather(games):
                     pass
         try:
             r = requests.get("https://api.open-meteo.com/v1/forecast", params={
-                "latitude": lat, "longitude": lon,
-                "hourly": "temperature_2m,precipitation_probability,wind_speed_10m,wind_direction_10m",
-                "temperature_unit": "fahrenheit", "wind_speed_unit": "mph",
-                "forecast_days": 1, "timezone": "America/New_York",
-            }, timeout=25)
-            r.raise_for_status()
-            h   = r.json().get("hourly", {})
-            idx = min(game_hour, 23)
-            weather[team] = {
-                "venue":     park_name,
-                "temp":      h.get("temperature_2m",            [72] * 24)[idx],
-                "precip":    h.get("precipitation_probability", [0]  * 24)[idx],
-                "wind_spd":  h.get("wind_speed_10m",            [5]  * 24)[idx],
-                "wind_dir":  deg_to_compass(h.get("wind_direction_10m", [180] * 24)[idx]),
-                "roof":      roof,
-                "flag":      "clear",
-            }
+    "latitude": lat, "longitude": lon,
+    "hourly": "temperature_2m,precipitation_probability,wind_speed_10m,wind_direction_10m,relative_humidity_2m,surface_pressure",
+    "temperature_unit": "fahrenheit", "wind_speed_unit": "mph",
+    "forecast_days": 1, "timezone": "America/New_York",
+}, timeout=25)
+r.raise_for_status()
+h = r.json().get("hourly", {})
+idx = min(game_hour, 23)
+weather[team] = {
+    "venue":        park_name,
+    "temp":         h.get("temperature_2m",            [72]  * 24)[idx],
+    "precip":       h.get("precipitation_probability", [0]   * 24)[idx],
+    "wind_spd":     h.get("wind_speed_10m",             [5]   * 24)[idx],
+    "wind_dir":     deg_to_compass(h.get("wind_direction_10m", [180] * 24)[idx]),
+    "humidity_pct": h.get("relative_humidity_2m",       [50]  * 24)[idx],
+    "pressure_mb":  h.get("surface_pressure",           [1013]* 24)[idx],
+    "roof":         roof,
+    "flag":         "clear",
+        }
         except Exception as e:
             print(f"  Weather error {team}: {e}")
             weather[team] = {"venue": park_name, "temp": 72, "precip": 0,
