@@ -35,6 +35,8 @@ DATE_FULL  = TODAY.strftime("%B %-d, %Y")
 def nk(s):
     s = unicodedata.normalize("NFKD", str(s or "")).encode("ascii", "ignore").decode()
     s = re.sub(r"\s*\(.*?\)\s*", "", s)        # drop "(LAD)" disambiguation tags
+    s = s.replace(".", "")                      # strip periods: "J.T." -> "JT", "A.J." -> "AJ"
+    s = re.sub(r"\s+", " ", s)                  # collapse any double spaces left behind
     return s.strip().lower()
 
 def f(x, d=0.0):
