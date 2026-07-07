@@ -1,18 +1,16 @@
 {
-  "STL_G1": {"time": "2:15 PM", "temp_f": 86, "precip_pct": 16, "wind_mph": 7, "wind_dir": "N", "conditions": "partially cloudy", "roof": false},
   "BAL": {"time": "6:35 PM", "temp_f": 81, "precip_pct": 42, "wind_mph": 5, "wind_dir": "ENE", "conditions": "rain, partially cloudy", "roof": false, "risk": "chance_for_delay"},
   "PIT": {"time": "6:40 PM", "temp_f": 80, "precip_pct": 25, "wind_mph": 5, "wind_dir": "NNW", "conditions": "partially cloudy", "roof": false, "risk": "chance_for_delay"},
-  "TBR": {"time": "6:40 PM", "roof": true, "note": "closed dome, weather has no effect"},
+  "TB": {"time": "6:40 PM", "roof": true, "note": "closed dome, weather has no effect"},
   "DET": {"time": "6:40 PM", "temp_f": 78, "precip_pct": 1, "wind_mph": 8, "wind_dir": "ENE", "conditions": "clear", "roof": false},
   "MIA": {"time": "6:40 PM", "temp_f": 87, "precip_pct": 13, "wind_mph": 8, "wind_dir": "roof", "conditions": "partially cloudy", "roof": true},
-  "WAS": {"time": "6:45 PM", "temp_f": 80, "precip_pct": 46, "wind_mph": 5, "wind_dir": "ENE", "conditions": "rain, partially cloudy", "roof": false, "risk": "delay_likely_chance_postponement"},
+  "WSH": {"time": "6:45 PM", "temp_f": 80, "precip_pct": 46, "wind_mph": 5, "wind_dir": "ENE", "conditions": "rain, partially cloudy", "roof": false, "risk": "delay_likely_chance_postponement"},
   "NYM": {"time": "7:10 PM", "temp_f": 70, "precip_pct": 10, "wind_mph": 9, "wind_dir": "N", "conditions": "partially cloudy", "roof": false},
   "CIN": {"time": "7:10 PM", "temp_f": 82, "precip_pct": 7, "wind_mph": 4, "wind_dir": "N", "conditions": "partially cloudy", "roof": false},
   "MIN": {"time": "7:40 PM", "temp_f": 85, "precip_pct": 13, "wind_mph": 4, "wind_dir": "S", "conditions": "partially cloudy", "roof": false},
-  "CHW": {"time": "7:40 PM", "temp_f": 75, "precip_pct": 0, "wind_mph": 5, "wind_dir": "ESE", "conditions": "clear", "roof": false},
-  "STL_G2": {"time": "7:45 PM", "temp_f": 85, "precip_pct": 14, "wind_mph": 5, "wind_dir": "NE", "conditions": "partially cloudy", "roof": false},
+  "CWS": {"time": "7:40 PM", "temp_f": 75, "precip_pct": 0, "wind_mph": 5, "wind_dir": "ESE", "conditions": "clear", "roof": false},
   "TEX": {"time": "8:05 PM", "temp_f": 91, "precip_pct": 18, "wind_mph": 5, "wind_dir": "roof", "conditions": "partially cloudy", "roof": true},
-  "SDP": {"time": "9:40 PM", "temp_f": 69, "precip_pct": 0, "wind_mph": 8, "wind_dir": "W", "conditions": "clear", "roof": false},
-  "SFG": {"time": "9:45 PM", "temp_f": 58, "precip_pct": 1, "wind_mph": 16, "wind_dir": "WSW", "conditions": "partially cloudy", "roof": false},
+  "SD": {"time": "9:40 PM", "temp_f": 69, "precip_pct": 0, "wind_mph": 8, "wind_dir": "W", "conditions": "clear", "roof": false},
+  "SF": {"time": "9:45 PM", "temp_f": 58, "precip_pct": 1, "wind_mph": 16, "wind_dir": "WSW", "conditions": "partially cloudy", "roof": false},
   "LAD": {"time": "10:10 PM", "temp_f": 75, "precip_pct": 0, "wind_mph": 6, "wind_dir": "SW", "conditions": "clear", "roof": false}
 }
