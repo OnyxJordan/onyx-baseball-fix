@@ -158,7 +158,13 @@ def get_prob(batter_name, pitcher_name, game_ctx):
 players, games_out = [], []
 now = datetime.now(timezone.utc)
 
-for game in (LINEUPS.get("games") or LINEUPS if isinstance(LINEUPS, list) else []):
+if isinstance(LINEUPS, list):
+    _games_iter = LINEUPS
+elif isinstance(LINEUPS, dict):
+    _games_iter = LINEUPS.get("games") or LINEUPS.get("schedule") or []
+else:
+    _games_iter = []
+for game in _games_iter:
     if not isinstance(game, dict):
         continue
     temp = game_temp(game)
