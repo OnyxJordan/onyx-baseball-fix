@@ -5,6 +5,8 @@ on:
 jobs:
   rebuild:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -15,8 +17,14 @@ jobs:
         run: python rebuild_dbs.py
       - name: Build pitcher hands from MLB API
         run: python build_pitcher_hand.py
-      - name: Upload results
-        uses: actions/upload-artifact@v4
-        with:
-          name: rebuilt-dbs
-          path: out/
+      - name: Commit rebuilt DBs into repo
+        run: |
+          cp out/career_db.json career_db.json
+          cp out/pitcher_db.json pitcher_db.json
+          cp out/bullpen_db.json bullpen_db.json
+          cp out/pitcher_hand.json data/pitcher_hand.json
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add career_db.json pitcher_db.json bullpen_db.json data/pitcher_hand.json
+          git commit -m "Rebuild DBs: second-half refresh" || echo "nothing to commit"
+          git push
