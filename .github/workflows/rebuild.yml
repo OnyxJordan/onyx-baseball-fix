@@ -1,0 +1,22 @@
+name: Rebuild DBs (manual)
+on:
+  workflow_dispatch:
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pandas
+      - name: Run rebuild
+        run: python rebuild_dbs.py
+      - name: Build pitcher hands from MLB API
+        run: python build_pitcher_hand.py
+      - name: Upload results
+        uses: actions/upload-artifact@v4
+        with:
+          name: rebuilt-dbs
+          path: out/
