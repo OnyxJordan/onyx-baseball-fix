@@ -7,6 +7,8 @@ without modifying model.py. Applies second-half adjustments (platoon,
 blended pitcher factor, bullpen exposure, pull-air, temperature) as a
 post-model layer. Reads new odds.json format (nk keys -> american odds).
 Auto-logs edge plays to picks_input.json when odds are present.
+Groups flat lineups.json rows (bot-written) into game objects keyed by
+game_key, pulling pitchers and lines from game_lines.json.
 """
 
 import json, os, re, sys, unicodedata
@@ -159,22 +161,49 @@ def get_prob(batter_name, pitcher_name, game_ctx):
 players, games_out = [], []
 now = datetime.now(timezone.utc)
 
-if isinstance(LINEUPS, list):
-    _games_iter = LINEUPS
-elif isinstance(LINEUPS, dict):
-    _games_iter = LINEUPS.get("games") or LINEUPS.get("schedule") or []
-else:
-    _games_iter = []
-for game in _games_iter:
-    if not isinstance(game, dict):
-        continue
+# ---- group flat lineups.json rows into game objects ----
+# lineups.json (bot-written): flat array of
+# {name, team, game_key, batting_order, pos, dk_pos, fd_pos, hand, lineup_confirmed}
+_rows = LINEUPS if isinstance(LINEUPS, list) else \
+        (LINEUPS.get("games") or LINEUPS.get("schedule") or [])
+_by_game = {}
+for r in _rows:
+    if isinstance(r, dict) and r.get("game_key") and r.get("name"):
+        _by_game.setdefault(r["game_key"], []).append(r)
+
+def _order(r):
+    try:
+        return int(r.get("batting_order") or 0)
+    except (TypeError, ValueError):
+        return 0
+
+for gk, rows in _by_game.items():
+    away, _, home = gk.partition("_")
+    gl = GAMES.get(gk, {}) if isinstance(GAMES, dict) else {}
+    game = {
+        "game_key": gk,
+        "away_team": away, "home_team": home,
+        "away_pitcher": gl.get("awayP") or "",
+        "home_pitcher": gl.get("homeP") or "",
+        "total": gl.get("total"),
+        "away_ml": gl.get("away_ml"), "home_ml": gl.get("home_ml"),
+        "time": gl.get("time", ""), "venue": gl.get("venue", ""),
+        "weather": (WEATHER.get(gk) if isinstance(WEATHER, dict) else None) or {},
+        "away_lineup": [], "home_lineup": [],
+    }
+    for r in sorted(rows, key=_order):
+        side = "away" if r.get("team") == away else "home"
+        game[f"{side}_lineup"].append({"name": r.get("name", ""),
+                                       "hand": r.get("hand", "")})
+    games_out.append(game)
+
+# ---- score every batter ----
+for game in games_out:
     temp = game_temp(game)
     for side in ("home", "away"):
-        lineup   = game.get(f"{side}_lineup") or game.get(side, {}).get("lineup") or []
-        opp_sp   = game.get(f"{'away' if side=='home' else 'home'}_pitcher") \
-                   or game.get("pitchers", {}).get("away" if side == "home" else "home")
-        opp_team = game.get(f"{'away' if side=='home' else 'home'}_team") \
-                   or game.get("away" if side == "home" else "home", {}).get("team")
+        lineup   = game.get(f"{side}_lineup") or []
+        opp_sp   = game.get(f"{'away' if side=='home' else 'home'}_pitcher")
+        opp_team = game.get(f"{'away' if side=='home' else 'home'}_team")
         sp_e   = PITCHERS.get(nk(opp_sp or ""))
         p_hand = (sp_e or {}).get("hand") or HANDS.get(nk(opp_sp or ""))
 
@@ -206,7 +235,6 @@ for game in _games_iter:
                 "edge": edge,
                 "bat": bat or {}, "pit": sp_e or {},
             })
-    games_out.append(game)
 
 players.sort(key=lambda x: (x["edge"] is None, -(x["edge"] or 0)))
 
@@ -229,12 +257,9 @@ else:
     print("picks: no qualifying edge plays (or no odds) - nothing logged")
 
 # ---------------------------------------------------------------- inject payload into shell
-payload = {
-    "built": now.isoformat(), "date": now.strftime("%b %d, %Y").upper(),
-    "players": players, "games": len(games_out), "bullpen": BULLPEN,
-}
 with open("shell.html", encoding="utf-8") as f:
     shell = f.read()
+
 def replace_const(src, name, payload):
     pat = re.compile(r"^(\s*const %s\s*=\s*).*$" % re.escape(name), re.M)
     if not pat.search(src):
