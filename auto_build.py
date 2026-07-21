@@ -1,279 +1,239 @@
 #!/usr/bin/env python3
 """
-auto_build.py — Onyx Baseball daily build (pairs with model.py v16)
-Imports project_player()/apply_game_diversity() + career/pitcher DBs from model,
-reads data/ files and L14 CSVs directly, injects RESULTS/SUMMARIES/PITCHERS into
-shell.html -> index.html. No fetch_data dependency.
-
-v16 changes vs v15 auto_build:
-  - lineups.json and salaries.json split — lineups stays MLB-Stats-API-only
-    (auto-fetchable), salaries/positions come from DK/FD cards separately.
-  - pitcher_hand.json added as an override layer since pitcher_db.json has no
-    "hand" field and is a do-not-regenerate file.
-  - Passes humidity/pressure from weather.json into model.project_player().
-  - wind_alignment now reads model's own wind_blow classification instead of
-    a local "startswith('out')" check that never matched compass-token data.
-  - batter_hand / opp_pitcher_hand now passed into project_player() for the
-    new platoon_factor() layer in model.py.
-
-REQUIRES model.py to already define project_player() with humidity=,
-pressure_mb=, batter_hand=, opp_pitcher_hand= params, plus classify_wind(),
-PARK_WIND_SENSITIVITY, PARK_WIND_NEUTRAL, and platoon_factor(). If this file
-throws "unexpected keyword argument," model.py has not been updated/deployed
-yet — check that file first, not this one.
+Onyx Baseball - auto_build.py (second-half rebuild)
+Single loader for all DBs. Normalizes every name to nk() form BEFORE any
+model lookup, killing the O'Hearn/Crow-Armstrong default-fallback bug
+without modifying model.py. Applies second-half adjustments (platoon,
+blended pitcher factor, bullpen exposure, pull-air, temperature) as a
+post-model layer. Reads new odds.json format (nk keys -> american odds).
+Auto-logs edge plays to picks_input.json when odds are present.
 """
-import json, re, os, csv, datetime, unicodedata
-from collections import defaultdict
-import model  # v16 — loads career_db.json, pitcher_db.json, splits.json on import
 
-BASE = os.path.dirname(os.path.abspath(__file__))
-DATA = os.path.join(BASE, "data")
-TODAY = datetime.date.today()
-DATE_LABEL = TODAY.strftime("%B %-d")
-DATE_FULL  = TODAY.strftime("%B %-d, %Y")
+import json, os, re, sys, unicodedata
+from datetime import datetime, timezone
 
-def nk(s):
-    s = unicodedata.normalize("NFKD", str(s or "")).encode("ascii", "ignore").decode()
-    s = re.sub(r"\s*\(.*?\)\s*", "", s)        # drop "(LAD)" disambiguation tags
-    s = s.replace(".", "")                      # strip periods: "J.T." -> "JT", "A.J." -> "AJ"
-    s = re.sub(r"\s+", " ", s)                  # collapse any double spaces left behind
-    return s.strip().lower()
+# ---------------------------------------------------------------- paths
+DATA = "data"
+def dpath(f): return os.path.join(DATA, f)
 
-def f(x, d=0.0):
-    try: return float(x)
-    except (TypeError, ValueError): return d
+# ---------------------------------------------------------------- normalizer (matches rebuild_dbs.nk_db)
+def nk(name: str) -> str:
+    s = unicodedata.normalize("NFKD", str(name))
+    s = "".join(ch for ch in s if not unicodedata.combining(ch))
+    s = re.sub(r"[.\u2019'\-]", " ", s)
+    s = re.sub(r"\s+", " ", s).strip().lower()
+    return s
 
-def jload(name, default=None):
-    p = os.path.join(DATA, name)
-    if not os.path.exists(p): return default if default is not None else {}
-    with open(p) as fh:
-        try:
-            return json.load(fh)
-        except json.JSONDecodeError as e:
-            print(f"  ERROR: {name} is not valid JSON — {e}")
-            raise
+def jload(path, default):
+    try:
+        with open(path, encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return default
 
-# ── committed inputs ─────────────────────────────────────────────────────────
-lineups    = jload("lineups.json", [])       # list of {name,team,game_key,batting_order,hand,pos} — no salary
-salaries   = jload("salaries.json", {})      # name_lower (+ "(team)") -> {dk_salary,dk_pos,fd_salary,fd_pos}
-odds       = jload("odds.json", {})          # name_lower (+ "(team)") -> american
-game_lines = jload("game_lines.json", {})    # AWAY_HOME -> {time,total,awayP,homeP,away_ml,home_ml,...}
-weather    = jload("weather.json", {})       # home_abbr -> {venue,temp,precip,wind_spd,wind_dir,roof,flag,humidity_pct,pressure_mb}
-pitcher_hand_override = jload("pitcher_hand.json", {})  # name_lower -> "L"/"R" — bridges missing pitcher_db.json field
+# ---------------------------------------------------------------- load DBs (root) + daily data
+CAREER   = jload("career_db.json", {})
+PITCHERS = jload("pitcher_db.json", {})
+BULLPEN  = jload("bullpen_db.json", {})
+HANDS    = jload(dpath("pitcher_hand.json"), {})
 
-def get_odds(name, team):
-    return (odds.get(f"{nk(name)} ({team.lower()})")
-            or odds.get(name.lower())
-            or odds.get(nk(name)))
+LINEUPS  = jload(dpath("lineups.json"), {})
+WEATHER  = jload(dpath("weather.json"), {})
+ODDS_RAW = jload(dpath("odds.json"), {})
+GAMES    = jload(dpath("game_lines.json"), {})
+L14      = jload(dpath("statcast_l14.json"), {})
+P14      = jload(dpath("pitchers_l14.json"), {})
 
-def get_salary(name, team):
-    s = (salaries.get(f"{nk(name)} ({team.lower()})")
-         or salaries.get(name.lower())
-         or salaries.get(nk(name))
-         or {})
-    return (s.get("dk_salary", 3000), s.get("dk_pos", "OF"),
-            s.get("fd_salary", 3000), s.get("fd_pos", "OF"))
+# odds.json (new): { nk_name: american_int }. Tolerate old formats gracefully.
+def american_to_prob(a):
+    try:
+        a = int(a)
+    except (TypeError, ValueError):
+        return None
+    return (100.0 / (a + 100.0)) if a > 0 else (abs(a) / (abs(a) + 100.0))
 
-def get_pitcher_hand(pname):
-    return pitcher_hand_override.get(nk(pname)) or model.PITCHER_CAREER_DB.get(nk(pname), {}).get("hand", "R")
+ODDS = {}
+for k, v in (ODDS_RAW.items() if isinstance(ODDS_RAW, dict) else []):
+    if isinstance(v, dict):                      # legacy shape {name: {"dk": +450, ...}}
+        v = v.get("dk") or v.get("odds") or v.get("american")
+    p = american_to_prob(v)
+    if p:
+        ODDS[nk(k)] = {"american": int(v), "prob": p}
 
-def load_l14_hitters():
-    p = os.path.join(DATA, "statcast_l14.json")
-    if not os.path.exists(p):
-        print("  WARNING: statcast_l14.json missing — run fetch_data.py first")
-        return {}
-    with open(p) as fh:
-        raw = json.load(fh)
-    return {nk(k): v for k, v in raw.items()}
+# ---------------------------------------------------------------- blended pitcher factor (pre-compute onto PITCHERS)
+def blended_factor(e, base):
+    """Blend xFIP-derived factor with HR-specific legs: HR/9, HR/FB, air rate, Barrel% allowed."""
+    if base is None:
+        base = 1.0
+    legs, weights = [], []
+    hr9 = e.get("hr9_6") if e.get("hr9_6") else e.get("hr9_3")
+    if hr9 is not None:
+        legs.append(min(max(float(hr9) / 1.15, 0.6), 1.8)); weights.append(0.30)
+    hrfb = e.get("hrfb6") if e.get("hrfb6") else e.get("hrfb3")
+    if hrfb is not None:
+        legs.append(min(max(float(hrfb) / 0.115, 0.6), 1.8)); weights.append(0.15)
+    gb = e.get("gb6") if e.get("gb6") else e.get("gb3")
+    if gb is not None:
+        legs.append(min(max((1.0 - float(gb)) / 0.575, 0.6), 1.8)); weights.append(0.10)
+    brl = e.get("brl3")
+    if brl is not None:
+        legs.append(min(max(float(brl) / 0.075, 0.6), 1.8)); weights.append(0.05)
+    if not legs:
+        return base
+    hr_leg = sum(l * w for l, w in zip(legs, weights)) / sum(weights)
+    hr_w = sum(weights)                          # up to 0.60
+    return round(base * (1 - hr_w) + hr_leg * hr_w, 4)
 
-def load_l14_pitchers():
-    p = os.path.join(DATA, "pitchers_l14.json")
-    if not os.path.exists(p):
-        return {}
-    with open(p) as fh:
-        raw = json.load(fh)
-    return {nk(k): v for k, v in raw.items()}
+for key, e in PITCHERS.items():
+    b = blended_factor(e, e.get("pf", 1.0))
+    e["pf_blend"] = b
+    e["pfh"] = round((e.get("pfh") or b) * 0.5 + b * 0.5, 4)
+    e["pfa"] = round((e.get("pfa") or b) * 0.5 + b * 0.5, 4)
+    if not e.get("hand"):
+        e["hand"] = HANDS.get(key)
 
-hit_l14 = load_l14_hitters()
-pit_l14 = load_l14_pitchers()
+# ---------------------------------------------------------------- inject into model (model.py stays untouched)
+import model
+for attr, obj in (("CAREER_DB", CAREER), ("PITCHER_CAREER_DB", PITCHERS),
+                  ("PITCHER_DB", PITCHERS), ("PITCHER_HAND", HANDS)):
+    if hasattr(model, attr):
+        setattr(model, attr, obj)
+print(f"model: DBs injected ({len(CAREER)} hitters, {len(PITCHERS)} pitchers, "
+      f"{len(BULLPEN)} bullpens, {len(HANDS)} hands)")
 
-# ── venue -> model.PARK_HR_FACTOR key ────────────────────────────────────────
-VENUE_ALIAS = {
-    "Oriole Park at Camden Yards": "Camden Yards",
+# ---------------------------------------------------------------- adjustment layer
+def platoon_mult(bat, p_hand):
+    """Regressed batter-vs-hand HR rate vs overall. Capped, sample-aware."""
+    if not bat or p_hand not in ("L", "R") or not bat.get("c"):
+        return 1.0
+    tag, ptag = ("vl", "pvl") if p_hand == "L" else ("vr", "pvr")
+    rate, pa = bat.get(tag), bat.get(ptag, 0)
+    if rate is None or pa < 40:
+        return 1.0
+    base = bat["c"]
+    w = min(pa / 400.0, 1.0)                     # full trust at ~400 PA vs hand
+    blended = base * (1 - w) + rate * w
+    return min(max(blended / base, 0.75), 1.30) if base > 0 else 1.0
+
+def bullpen_mult(team_abbr, starter_e):
+    """~40% of PAs vs bullpen: blend starter suppression with team relief HR/9."""
+    bp = BULLPEN.get(team_abbr)
+    if not bp or not bp.get("hr9"):
+        return 1.0
+    bp_leg = min(max(float(bp["hr9"]) / 1.05, 0.7), 1.5)
+    sp_leg = (starter_e or {}).get("pf_blend", 1.0)
+    return round((0.60 * sp_leg + 0.40 * bp_leg) / max(sp_leg, 1e-6), 4)
+
+def pull_air_mult(bat):
+    if not bat or bat.get("pl") is None or bat.get("fb") is None:
+        return 1.0
+    pa_rate = float(bat["pl"]) * float(bat["fb"])      # crude pulled-air proxy
+    return min(max(1.0 + (pa_rate - 0.155) * 1.2, 0.90), 1.12)
+
+def temp_mult(temp_f):
+    if temp_f is None:
+        return 1.0
+    try:
+        return min(max(1.0 + (float(temp_f) - 72.0) * 0.004, 0.90), 1.12)
+    except (TypeError, ValueError):
+        return 1.0
+
+def game_temp(game):
+    w = game.get("weather") or {}
+    return w.get("temp") or w.get("temperature")
+
+# ---------------------------------------------------------------- build slate
+def get_prob(batter_name, pitcher_name, game_ctx):
+    """model.py call with nk-normalized names; nk output is lowercase so
+    model's internal .lower() lookups now hit the real DB keys."""
+    bkey, pkey = nk(batter_name), nk(pitcher_name or "")
+    try:
+        p = model.hr_probability(bkey, pkey, game_ctx)      # primary interface
+    except AttributeError:
+        p = model.calc_hr_prob(bkey, pkey, game_ctx)        # legacy name
+    except Exception:
+        p = None
+    return p
+
+players, games_out = [], []
+now = datetime.now(timezone.utc)
+
+for game in (LINEUPS.get("games") or LINEUPS if isinstance(LINEUPS, list) else []):
+    if not isinstance(game, dict):
+        continue
+    temp = game_temp(game)
+    for side in ("home", "away"):
+        lineup   = game.get(f"{side}_lineup") or game.get(side, {}).get("lineup") or []
+        opp_sp   = game.get(f"{'away' if side=='home' else 'home'}_pitcher") \
+                   or game.get("pitchers", {}).get("away" if side == "home" else "home")
+        opp_team = game.get(f"{'away' if side=='home' else 'home'}_team") \
+                   or game.get("away" if side == "home" else "home", {}).get("team")
+        sp_e   = PITCHERS.get(nk(opp_sp or ""))
+        p_hand = (sp_e or {}).get("hand") or HANDS.get(nk(opp_sp or ""))
+
+        for spot, batter in enumerate(lineup, 1):
+            bname = batter if isinstance(batter, str) else batter.get("name", "")
+            if not bname:
+                continue
+            bkey = nk(bname)
+            bat  = CAREER.get(bkey)
+            base = get_prob(bname, opp_sp, game)
+            if base is None:
+                continue
+            adj = base
+            adj *= platoon_mult(bat, p_hand)
+            adj *= bullpen_mult(opp_team, sp_e)
+            adj *= pull_air_mult(bat)
+            adj *= temp_mult(temp)
+            adj = min(max(adj, 0.005), 0.45)
+
+            o = ODDS.get(bkey)
+            edge = round(adj - o["prob"], 4) if o else None
+            players.append({
+                "name": bname, "key": bkey, "spot": spot,
+                "team": game.get(f"{side}_team") or "",
+                "opp_sp": opp_sp or "", "sp_hand": p_hand or "",
+                "prob": round(adj, 4), "base_prob": round(base, 4),
+                "odds": o["american"] if o else None,
+                "market_prob": round(o["prob"], 4) if o else None,
+                "edge": edge,
+                "bat": bat or {}, "pit": sp_e or {},
+            })
+    games_out.append(game)
+
+players.sort(key=lambda x: (x["edge"] is None, -(x["edge"] or 0)))
+
+# ---------------------------------------------------------------- auto-log picks (guarded: no odds, no picks)
+EDGE_MIN = 0.015
+todays = [p for p in players if p["edge"] is not None and p["edge"] >= EDGE_MIN
+          and (p["bat"].get("e3") or 0) >= 102 and (p["bat"].get("b3") or 0) >= 0.110]
+if todays:
+    picks = jload(dpath("picks_input.json"), [])
+    stamp = now.strftime("%Y-%m-%d")
+    have = {(p.get("date"), p.get("key")) for p in picks if isinstance(p, dict)}
+    for p in todays[:8]:
+        if (stamp, p["key"]) not in have:
+            picks.append({"date": stamp, "name": p["name"], "key": p["key"],
+                          "odds": p["odds"], "prob": p["prob"], "result": None})
+    with open(dpath("picks_input.json"), "w", encoding="utf-8") as f:
+        json.dump(picks, f, indent=1, ensure_ascii=False)
+    print(f"picks: auto-logged {min(len(todays),8)} edge plays for {stamp}")
+else:
+    print("picks: no qualifying edge plays (or no odds) - nothing logged")
+
+# ---------------------------------------------------------------- inject payload into shell
+payload = {
+    "built": now.isoformat(), "date": now.strftime("%b %d, %Y").upper(),
+    "players": players, "games": len(games_out), "bullpen": BULLPEN,
 }
-def park_factor(venue):
-    return model.PARK_HR_FACTOR.get(VENUE_ALIAS.get(venue, venue), 1.0)
-
-DUE = [(1.30,"OVERDUE"),(1.15,"DUE"),(1.05,"COOL"),(1.00,"NORMAL"),(0.97,"WARM"),(0.93,"HOT")]
-def due_label(m):
-    for thr, lbl in DUE:
-        if m >= thr: return lbl
-    return "FIRE"
-
-WIND_ALIGN = {"out": 0.6, "in": -0.6, "cross": 0.0, None: 0.0}
-
-# ── build RESULTS ────────────────────────────────────────────────────────────
-RESULTS = []
-for b in lineups:
-    name, team, gk = b["name"], b["team"], b["game_key"]
-    gl = game_lines.get(gk, {})
-    if "_" not in gk: continue
-    away, home = gk.split("_", 1)
-    is_home = (team == home)
-    w = weather.get(home, {})
-    venue = w.get("venue", "")
-    opp_p = (gl.get("awayP") if is_home else gl.get("homeP")) or ""
-    odds_val = get_odds(name, team)
-    pf = park_factor(venue)
-    dk_sal, dk_pos, fd_sal, fd_pos = get_salary(name, team)
-    opp_p_hand = get_pitcher_hand(opp_p)
-
-    res = model.project_player(
-        name=name, pos=b.get("pos", "OF"), batting_order=b.get("batting_order", 5),
-        is_home=is_home, opp_pitcher=opp_p, park=venue, park_factor=pf,
-        wind_dir=w.get("wind_dir", "calm"), wind_mph=w.get("wind_spd", 0),
-        temp=w.get("temp", 72), roof=bool(w.get("roof", False)),
-        humidity=w.get("humidity_pct", 50.0), pressure_mb=w.get("pressure_mb", 1013.0),
-        dk_odds=odds_val, dk_salary=dk_sal, fd_salary=fd_sal,
-        l14_statcast=hit_l14, l14_pitchers=pit_l14,
-        game_key=gk, game_label=f"{away} @ {home} ({gl.get('time','')} ET)".strip(),
-        team=team, weather_flag=w.get("flag", "clear"),
-        batter_hand=b.get("hand", "R"), opp_pitcher_hand=opp_p_hand,
-    )
-
-    l14 = hit_l14.get(nk(name), {})
-    pdb = model.PITCHER_CAREER_DB.get(nk(opp_p), {})
-    cdb = model.CAREER_DB.get(nk(name), {})
-    implied = model.implied_prob(odds_val) * 100 if odds_val else None
-    dk_proj, fd_proj = res["dk_pts"], res["fd_pts"]
-    wa = WIND_ALIGN.get(res.get("wind_blow"), 0.0)
-
-    res.update({
-        "matched_name": name,
-        "dk_pos": dk_pos, "fd_pos": fd_pos,
-        "batter_hand": b.get("hand", "R"),
-        "location": "home" if is_home else "away",
-        "opp": away if is_home else home, "away": away, "home": home,
-        "game": res["game_label"], "time": gl.get("time", ""), "venue": venue,
-        "weather_label": f'{w.get("wind_dir","")} {w.get("wind_spd",0)}mph'.strip(),
-        "wind_from": w.get("wind_dir", ""),
-        "wind_factor": res["env"], "env_factor": res["env"], "wind_alignment": wa,
-        "park_hr": res["park_factor"],
-        "opp_pitcher_hand": opp_p_hand,
-        "opp_pitcher_hr9": f(pdb.get("h3"), 1.20),
-        "opp_pitcher_era": f(pdb.get("e3"), 4.20),
-        "career_hr_pa": f(cdb.get("c"), 0.025),
-        "split_hr_pa": f(cdb.get("ch" if is_home else "ca"), f(cdb.get("c"), 0.025)),
-        "l14_hr": l14.get("l14_hr", 0), "l14_pa": l14.get("l14_pa", 0),
-        "l14_xwoba": l14.get("l14_xwoba", 0),
-        "ev90_26": round(l14.get("l14_ev90", 0), 1),
-        "barrel_26": round(l14.get("l14_barrel_pct", 0), 4),
-        "hh_pct": round(l14.get("l14_hh_pct", 0), 4),
-        "iso_ctx": round(l14.get("l14_iso", 0), 4),
-        "barrel_pct": round(l14.get("l14_barrel_pct", 0), 4),
-        "ev90": round(l14.get("l14_ev90", 0), 1),
-        "due_adj": res["due_mult"], "due_label": due_label(res["due_mult"]),
-        "due_detail": f'{int(l14.get("l14_hr",0))}HR/{int(l14.get("l14_pa",0))}PA',
-        "dk_proj": round(dk_proj, 2), "fd_proj": round(fd_proj, 2),
-        "dk_value": round(dk_proj / (dk_sal / 1000), 2) if dk_sal else 0,
-        "fd_value": round(fd_proj / (fd_sal / 1000), 2) if fd_sal else 0,
-        "dk_hr_odds": odds_val,
-        "dk_hr_implied": round(implied, 2) if implied else None,
-    })
-    RESULTS.append(res)
-
-RESULTS = model.apply_game_diversity(RESULTS)
-
-# ── SUMMARIES ────────────────────────────────────────────────────────────────
-groups = defaultdict(list)
-for r in RESULTS: groups[r["game_key"]].append(r)
-
-SUMMARIES = []
-for gk, players in groups.items():
-    gl = game_lines.get(gk, {}); away, home = gk.split("_", 1)
-    w = weather.get(home, {})
-    ap = [p for p in players if p["team"] == away]
-    hp = [p for p in players if p["team"] == home]
-    at = sorted(ap, key=lambda x: -x["hr_prob"])
-    ht = sorted(hp, key=lambda x: -x["hr_prob"])
-    top = sorted(players, key=lambda x: -x["composite"])[:3]
-    SUMMARIES.append({
-        "game": gk, "label": gl.get("label", f"{away} @ {home}"),
-        "time": gl.get("time", ""), "away": away, "home": home,
-        "venue": w.get("venue", ""), "roof": bool(w.get("roof", False)),
-        "temp": w.get("temp", 72), "wind_spd": w.get("wind_spd", 0), "wind_dir": w.get("wind_dir", ""),
-        "humidity_pct": w.get("humidity_pct", 50), "pressure_mb": w.get("pressure_mb", 1013),
-        "weather_label": f'{w.get("wind_dir","")} {w.get("wind_spd",0)}mph'.strip(),
-        "wind_from": w.get("wind_dir", ""),
-        "wind_factor": players[0]["env_factor"] if players else 1.0,
-        "wind_alignment": players[0]["wind_alignment"] if players else 0.0,
-        "env_factor": players[0]["env_factor"] if players else 1.0,
-        "park_hr": park_factor(w.get("venue", "")),
-        "ou": gl.get("total", 8.0), "away_ml": gl.get("away_ml") or "+100", "home_ml": gl.get("home_ml") or "-120",
-        "awayP": gl.get("awayP", ""), "homeP": gl.get("homeP", ""),
-        "awayHand": get_pitcher_hand(gl.get("awayP", "")),
-        "homeHand": get_pitcher_hand(gl.get("homeP", "")),
-        "awayP_hr9": f(model.PITCHER_CAREER_DB.get(nk(gl.get("awayP","")), {}).get("h3"), 1.2),
-        "homeP_hr9": f(model.PITCHER_CAREER_DB.get(nk(gl.get("homeP","")), {}).get("h3"), 1.2),
-        "away_top": at[0]["batter_name"] if at else "", "away_top_prob": at[0]["hr_prob"] if at else 0,
-        "home_top": ht[0]["batter_name"] if ht else "", "home_top_prob": ht[0]["hr_prob"] if ht else 0,
-        "away_exp_hr": round(sum(p["hr_prob"] for p in ap) / 100, 2),
-        "home_exp_hr": round(sum(p["hr_prob"] for p in hp) / 100, 2),
-        "n_away": len(ap), "n_home": len(hp),
-        "top_targets": [{"name": p["batter_name"], "prob": p["hr_prob"], "edge": p["hr_edge"]} for p in top],
-        "avg_hr_prob": round(sum(p["hr_prob"] for p in players) / len(players), 1) if players else 0,
-    })
-SUMMARIES.sort(key=lambda x: x["time"])
-
-# ── PITCHERS ─────────────────────────────────────────────────────────────────
-PITCHERS, seen = [], set()
-for gk, gl in game_lines.items():
-    away, home = gk.split("_", 1)
-    for side, opp, is_home_p in [("awayP", home, False), ("homeP", away, True)]:
-        pname = gl.get(side, "")
-        if not pname or pname in seen: continue
-        seen.add(pname)
-        pdb = model.PITCHER_CAREER_DB.get(nk(pname), {})
-        PITCHERS.append({
-            "name": pname, "hand": get_pitcher_hand(pname),
-            "team": (away if side == "awayP" else home), "opp": opp, "game": gk,
-            "era": round(f(pdb.get("e3"), 4.20), 2), "hr9": round(f(pdb.get("h3"), 1.20), 2),
-            "xfip": round(f(pdb.get("xf3"), 4.00), 2),
-            "p_factor": model.pitcher_factor(pname, pit_l14, is_home_pitcher=is_home_p),
-            "dk_salary": 0, "fd_salary": 0, "dk_proj": 0, "fd_proj": 0,
-        })
-
-ALL_GAME_KEYS = [s["game"] for s in SUMMARIES]
-
-# ── inject into shell.html ───────────────────────────────────────────────────
-with open(os.path.join(BASE, "shell.html")) as fh:
-    html = fh.read()
-
-def bracket_replace(html, var, val):
-    idx = html.find(f"const {var} = ")
-    if idx < 0: return html
-    start = idx + len(f"const {var} = "); ch = html[start]; end = "]" if ch == "[" else "}"
-    depth, i = 0, start
-    while i < len(html):
-        if html[i] == ch: depth += 1
-        elif html[i] == end:
-            depth -= 1
-            if depth == 0:
-                ei = i + 1 + (1 if i + 1 < len(html) and html[i+1] == ";" else 0)
-                return html[:idx] + f"const {var} = {json.dumps(val)};" + html[ei:]
-        i += 1
-    return html
-
-for var, val in [("RESULTS", RESULTS), ("SUMMARIES", SUMMARIES),
-                 ("PITCHERS", PITCHERS), ("ALL_GAME_KEYS", ALL_GAME_KEYS)]:
-    html = bracket_replace(html, var, val)
-
-html = re.sub(r"[A-Z][a-z]+ \d+, 2026", DATE_FULL, html)
-html = re.sub(r"[A-Z][a-z]+ \d+ · 2026", f"{DATE_LABEL} · 2026", html)
-html = re.sub(r"Live · [A-Z][a-z]+ \d+, 2026", f"Live · {DATE_FULL}", html)
-html = re.sub(r"<title>Onyx Baseball · [^<]*</title>", f"<title>Onyx Baseball · {DATE_LABEL}</title>", html)
-
-with open(os.path.join(BASE, "index.html"), "w") as fh:
-    fh.write(html)
-
-print(f"✓ index.html: {len(RESULTS)} players, {len(SUMMARIES)} games")
+with open("shell.html", encoding="utf-8") as f:
+    shell = f.read()
+MARK = re.search(r"(/\*ONYX_DATA_START\*/)(.*?)(/\*ONYX_DATA_END\*/)", shell, re.S) \
+       or re.search(r"(<!--DATA_START-->)(.*?)(<!--DATA_END-->)", shell, re.S)
+if not MARK:
+    sys.exit("FATAL: no data injection markers found in shell.html - refusing to build")
+blob = json.dumps(payload, ensure_ascii=False)
+html = shell[:MARK.start(2)] + f"\nwindow.ONYX_DATA = {blob};\n" + shell[MARK.end(2):]
+with open("index.html", "w", encoding="utf-8") as f:
+    f.write(html)
+print(f"✓ index.html: {len(players)} players, {len(games_out)} games")
