@@ -52,8 +52,9 @@ def american_to_prob(a):
         return None
     return (100.0 / (a + 100.0)) if a > 0 else (abs(a) / (abs(a) + 100.0))
 
+ODDS_META = jload(dpath("odds_meta.json"), {"fresh": False})
 ODDS = {}
-for k, v in (ODDS_RAW.items() if isinstance(ODDS_RAW, dict) else []):
+for k, v in (ODDS_RAW.items() if (isinstance(ODDS_RAW, dict) and ODDS_META.get("fresh")) else []):
     if isinstance(v, dict):                      # legacy shape {name: {"dk": +450, ...}}
         v = v.get("dk") or v.get("odds") or v.get("american")
     p = american_to_prob(v)
