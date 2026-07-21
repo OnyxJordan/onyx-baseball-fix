@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 """
 Onyx Baseball - auto_build.py (second-half rebuild)
-Single loader for all DBs. Normalizes every name to nk() form BEFORE any
-model lookup, killing the O'Hearn/Crow-Armstrong default-fallback bug
-without modifying model.py. Applies second-half adjustments (platoon,
-blended pitcher factor, bullpen exposure, pull-air, temperature) as a
-post-model layer. Reads new odds.json format (nk keys -> american odds).
-Auto-logs edge plays to picks_input.json when odds are present.
 Groups flat lineups.json rows (bot-written) into game objects keyed by
-game_key, pulling pitchers and lines from game_lines.json.
+game_key, pulling pitchers and lines from game_lines.json. Calls
+model.project_player() for each batter (model handles platoon, park,
+wind, temp, humidity, pitcher factor internally). Applies only the
+adjustments model.py does NOT cover: bullpen exposure and pull-air.
+Reads new odds.json format (nk keys -> american odds). Auto-logs edge
+plays to picks_input.json when odds are present.
 """
 
 import json, os, re, sys, unicodedata
@@ -104,20 +103,7 @@ for attr, obj in (("CAREER_DB", CAREER), ("PITCHER_CAREER_DB", PITCHERS),
 print(f"model: DBs injected ({len(CAREER)} hitters, {len(PITCHERS)} pitchers, "
       f"{len(BULLPEN)} bullpens, {len(HANDS)} hands)")
 
-# ---------------------------------------------------------------- adjustment layer
-def platoon_mult(bat, p_hand):
-    """Regressed batter-vs-hand HR rate vs overall. Capped, sample-aware."""
-    if not bat or p_hand not in ("L", "R") or not bat.get("c"):
-        return 1.0
-    tag, ptag = ("vl", "pvl") if p_hand == "L" else ("vr", "pvr")
-    rate, pa = bat.get(tag), bat.get(ptag, 0)
-    if rate is None or pa < 40:
-        return 1.0
-    base = bat["c"]
-    w = min(pa / 400.0, 1.0)                     # full trust at ~400 PA vs hand
-    blended = base * (1 - w) + rate * w
-    return min(max(blended / base, 0.75), 1.30) if base > 0 else 1.0
-
+# ---------------------------------------------------------------- adjustment layer (only what model.py does NOT cover)
 def bullpen_mult(team_abbr, starter_e):
     """~40% of PAs vs bullpen: blend starter suppression with team relief HR/9."""
     bp = BULLPEN.get(team_abbr)
@@ -133,31 +119,7 @@ def pull_air_mult(bat):
     pa_rate = float(bat["pl"]) * float(bat["fb"])      # crude pulled-air proxy
     return min(max(1.0 + (pa_rate - 0.155) * 1.2, 0.90), 1.12)
 
-def temp_mult(temp_f):
-    if temp_f is None:
-        return 1.0
-    try:
-        return min(max(1.0 + (float(temp_f) - 72.0) * 0.004, 0.90), 1.12)
-    except (TypeError, ValueError):
-        return 1.0
-
-def game_temp(game):
-    w = game.get("weather") or {}
-    return w.get("temp") or w.get("temperature")
-
 # ---------------------------------------------------------------- build slate
-def get_prob(batter_name, pitcher_name, game_ctx):
-    """model.py call with nk-normalized names; nk output is lowercase so
-    model's internal .lower() lookups now hit the real DB keys."""
-    bkey, pkey = nk(batter_name), nk(pitcher_name or "")
-    try:
-        p = model.hr_probability(bkey, pkey, game_ctx)      # primary interface
-    except AttributeError:
-        p = model.calc_hr_prob(bkey, pkey, game_ctx)        # legacy name
-    except Exception:
-        p = None
-    return p
-
 players, games_out = [], []
 now = datetime.now(timezone.utc)
 
@@ -180,6 +142,7 @@ def _order(r):
 for gk, rows in _by_game.items():
     away, _, home = gk.partition("_")
     gl = GAMES.get(gk, {}) if isinstance(GAMES, dict) else {}
+    wx = (WEATHER.get(gk) if isinstance(WEATHER, dict) else None) or {}
     game = {
         "game_key": gk,
         "away_team": away, "home_team": home,
@@ -187,25 +150,41 @@ for gk, rows in _by_game.items():
         "home_pitcher": gl.get("homeP") or "",
         "total": gl.get("total"),
         "away_ml": gl.get("away_ml"), "home_ml": gl.get("home_ml"),
-        "time": gl.get("time", ""), "venue": gl.get("venue", ""),
-        "weather": (WEATHER.get(gk) if isinstance(WEATHER, dict) else None) or {},
+        "time": gl.get("time", ""), "venue": gl.get("venue", "") or wx.get("park", ""),
+        "weather": wx,
         "away_lineup": [], "home_lineup": [],
     }
     for r in sorted(rows, key=_order):
         side = "away" if r.get("team") == away else "home"
         game[f"{side}_lineup"].append({"name": r.get("name", ""),
-                                       "hand": r.get("hand", "")})
+                                       "hand": r.get("hand", ""),
+                                       "pos": r.get("pos", "")})
     games_out.append(game)
 
-# ---- score every batter ----
+# ---- score every batter via model.project_player ----
+def _num(v, default):
+    try:
+        return float(v)
+    except (TypeError, ValueError):
+        return default
+
 for game in games_out:
-    temp = game_temp(game)
+    wx = game.get("weather") or {}
+    park      = game.get("venue") or wx.get("park") or ""
+    wind_dir  = wx.get("wind_dir") or wx.get("wind_direction") or ""
+    wind_mph  = _num(wx.get("wind_mph") or wx.get("wind_speed"), 0.0)
+    temp      = _num(wx.get("temp") or wx.get("temperature"), 72.0)
+    roof      = bool(wx.get("roof") or wx.get("roof_closed"))
+    humidity  = _num(wx.get("humidity"), 50.0)
+    pressure  = _num(wx.get("pressure_mb") or wx.get("pressure"), 1013.0)
+
     for side in ("home", "away"):
+        is_home  = side == "home"
         lineup   = game.get(f"{side}_lineup") or []
-        opp_sp   = game.get(f"{'away' if side=='home' else 'home'}_pitcher")
-        opp_team = game.get(f"{'away' if side=='home' else 'home'}_team")
+        opp_sp   = game.get(f"{'away' if is_home else 'home'}_pitcher")
+        opp_team = game.get(f"{'away' if is_home else 'home'}_team")
         sp_e   = PITCHERS.get(nk(opp_sp or ""))
-        p_hand = (sp_e or {}).get("hand") or HANDS.get(nk(opp_sp or ""))
+        p_hand = (sp_e or {}).get("hand") or HANDS.get(nk(opp_sp or "")) or "R"
 
         for spot, batter in enumerate(lineup, 1):
             bname = batter if isinstance(batter, str) else batter.get("name", "")
@@ -213,17 +192,44 @@ for game in games_out:
                 continue
             bkey = nk(bname)
             bat  = CAREER.get(bkey)
-            base = get_prob(bname, opp_sp, game)
-            if base is None:
+            b_hand = "" if isinstance(batter, str) else (batter.get("hand") or "")
+            b_pos  = "" if isinstance(batter, str) else (batter.get("pos") or "")
+            o = ODDS.get(bkey)
+
+            try:
+                r = model.project_player(
+                    name=bkey,
+                    pos=b_pos or "OF",
+                    batting_order=spot,
+                    is_home=is_home,
+                    opp_pitcher=nk(opp_sp or ""),
+                    park=park,
+                    park_factor=1.0,
+                    wind_dir=wind_dir,
+                    wind_mph=wind_mph,
+                    temp=temp,
+                    roof=roof,
+                    dk_odds=o["american"] if o else None,
+                    l14_statcast=L14 if isinstance(L14, dict) else None,
+                    l14_pitchers=P14 if isinstance(P14, dict) else None,
+                    game_key=game["game_key"],
+                    team=game.get(f"{side}_team") or "",
+                    humidity=humidity,
+                    pressure_mb=pressure,
+                    batter_hand=b_hand or "R",
+                    opp_pitcher_hand=p_hand,
+                )
+            except Exception:
+                continue
+
+            base = (r.get("hr_prob") or 0) / 100.0
+            if base <= 0:
                 continue
             adj = base
-            adj *= platoon_mult(bat, p_hand)
             adj *= bullpen_mult(opp_team, sp_e)
             adj *= pull_air_mult(bat)
-            adj *= temp_mult(temp)
             adj = min(max(adj, 0.005), 0.45)
 
-            o = ODDS.get(bkey)
             edge = round(adj - o["prob"], 4) if o else None
             players.append({
                 "name": bname, "key": bkey, "spot": spot,
