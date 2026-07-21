@@ -59,7 +59,9 @@ def load_csv(role, required_cols, min_rows):
         return None
     path = EXPORT_DIR / fname
     if not path.exists():
-        sys.exit(f"FATAL: {role} file not found: {path}")
+        path = EXPORT_DIR / (fname + ".csv")
+    if not path.exists():
+        sys.exit(f"FATAL: {role} file not found: {EXPORT_DIR/fname} (with or without .csv)")
     df = pd.read_csv(path)
     df.columns = [c.strip() for c in df.columns]
     missing = [c for c in required_cols if c not in df.columns]
