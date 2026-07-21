@@ -16,26 +16,24 @@ OLD_DIR    = Path("old")     # old career_db.json, pitcher_db.json, pitcher_hand
 OUT_DIR    = Path("out")
 
 FILES = {
-    # hitters
-    "hit_3yr_std":     "fangraphsleaderboards29.csv",  # 3yr standard + Pull% + FB%
-    "hit_3yr_home":    "fangraphsleaderboards31.csv",
-    "hit_3yr_away":    "fangraphsleaderboards32.csv",
-    "hit_3yr_vsl":     "fangraphsleaderboards33.csv",
-    "hit_3yr_vsr":     "fangraphsleaderboards34.csv",
-    "hit_3yr_sc":      "fangraphsleaderboards35.csv",  # 3yr statcast
-    "hit_26_std":      "fangraphsleaderboards36.csv",  # 2026 dashboard (has ISO)
-    "hit_26_sc":       "fangraphsleaderboards37.csv",  # 2026 statcast
+    "hit_3yr_std":    "fangraphs-leaderboards-29",
+    "hit_3yr_home":   "fangraphs-leaderboards-31",
+    "hit_3yr_away":   "fangraphs-leaderboards-32",
+    "hit_3yr_vsl":    "fangraphs-leaderboards-33",
+    "hit_3yr_vsr":    "fangraphs-leaderboards-34",
+    "hit_3yr_sc":     "fangraphs-leaderboards-35",
+    "hit_26_std":     "fangraphs-leaderboards-36",
+    "hit_26_sc":      "fangraphs-leaderboards-37",
     "hit_26_home":    "fangraphs-leaderboards-48",
     "hit_26_away":    "fangraphs-leaderboards-49",
-    # pitchers
-    "pit_3yr_dash":    "fangraphsleaderboards38.csv",  # 3yr dashboard (xFIP, HR/9, GB%, HR/FB)
-    "pit_3yr_sc":      "fangraphsleaderboards39.csv",  # 3yr statcast (Barrel% allowed)
-    "pit_26_dash":     "fangraphsleaderboards41.csv",  # 2026 dashboard
-    "pit_26_home":     "fangraphsleaderboards42.csv",  # 2026 home splits  <-- verify filename
-    "pit_26_away":     "fangraphsleaderboards43.csv",
-     "pit_26_sc":      "fangraphs-leaderboards-50",  
-    # team
-    "team_relief_26":  "fangraphsleaderboards47.csv",
+    "pit_3yr_dash":   "fangraphs-leaderboards-38",
+    "pit_3yr_sc":     "fangraphs-leaderboards-39",
+    "pit_26_dash":    "fangraphs-leaderboards-41",
+    "pit_26_home":    "fangraphs-leaderboards-42",
+    "pit_26_away":    "fangraphs-leaderboards-43",
+    "pit_26_sc":      "fangraphs-leaderboards-50",
+    "team_relief_26": "fangraphs-leaderboards-47",
+}
 }
 
 CLAMP_LO, CLAMP_HI = 0.6, 1.8
