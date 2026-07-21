@@ -25,15 +25,15 @@ FILES = {
     "hit_3yr_sc":      "fangraphsleaderboards35.csv",  # 3yr statcast
     "hit_26_std":      "fangraphsleaderboards36.csv",  # 2026 dashboard (has ISO)
     "hit_26_sc":       "fangraphsleaderboards37.csv",  # 2026 statcast
-    "hit_26_home":     None,   # optional - set filename if pulled
-    "hit_26_away":     None,   # optional - set filename if pulled
+    "hit_26_home":    "fangraphs-leaderboards-48",
+    "hit_26_away":    "fangraphs-leaderboards-49",
     # pitchers
     "pit_3yr_dash":    "fangraphsleaderboards38.csv",  # 3yr dashboard (xFIP, HR/9, GB%, HR/FB)
     "pit_3yr_sc":      "fangraphsleaderboards39.csv",  # 3yr statcast (Barrel% allowed)
     "pit_26_dash":     "fangraphsleaderboards41.csv",  # 2026 dashboard
     "pit_26_home":     "fangraphsleaderboards42.csv",  # 2026 home splits  <-- verify filename
     "pit_26_away":     "fangraphsleaderboards43.csv",
-    "pit_26_sc":       None,   # optional 2026 pitcher statcast
+     "pit_26_sc":      "fangraphs-leaderboards-50",  
     # team
     "team_relief_26":  "fangraphsleaderboards47.csv",
 }
