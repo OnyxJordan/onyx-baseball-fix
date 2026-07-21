@@ -255,6 +255,24 @@ for p in players:
         "opp_sp": p.get("opp_sp",""), "sp_hand": p.get("sp_hand",""),
         "prob": p.get("prob"), "base_prob": p.get("base_prob"), "odds": p.get("odds"),
         "market_prob": p.get("market_prob"), "edge": p.get("edge")})
+
+shell = replace_const(shell, "RESULTS", results_out)
+shell = replace_const(shell, "SUMMARIES", sums_out)
+shell = replace_const(shell, "ALL_GAME_KEYS", keys_out)
+with open("index.html", "w", encoding="utf-8") as f:
+    f.write(shell)
+print(f"index.html: {len(players)} players, {len(games_out)} games")
+    keys_out.append(k)
+    sums_out.append({"game": k, "time": g.get("time",""), "away": g.get("away_team",""),
+        "home": g.get("home_team",""), "venue": g.get("venue",""), "ou": g.get("total"),
+        "roof": False, "away_ml": g.get("away_ml",""), "home_ml": g.get("home_ml","")})
+for p in players:
+    results_out.append({"batter_name": p["name"], "matched_name": p["name"],
+        "batting_order": p.get("spot",0), "batter_hand": (p.get("bat") or {}).get("hand",""),
+        "pos": "", "dk_pos": "", "fd_pos": "", "location": "", "team": p.get("team",""),
+        "opp_sp": p.get("opp_sp",""), "sp_hand": p.get("sp_hand",""),
+        "prob": p.get("prob"), "base_prob": p.get("base_prob"), "odds": p.get("odds"),
+        "market_prob": p.get("market_prob"), "edge": p.get("edge")})
 pits_out = [{"name": k, "hand": v.get("hand",""), "team": "", "opp": "", "role": "",
              "location": "", "game": "", "time": "", "venue": ""} for k, v in PITCHERS.items() if v.get("hand")]
 
