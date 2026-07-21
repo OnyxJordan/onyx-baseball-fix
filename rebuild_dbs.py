@@ -34,7 +34,6 @@ FILES = {
     "pit_26_sc":      "fangraphs-leaderboards-50",
     "team_relief_26": "fangraphs-leaderboards-47",
 }
-}
 
 CLAMP_LO, CLAMP_HI = 0.6, 1.8
 NEUTRAL_SPLIT = 0.030          # neutral HR/PA default, matches live-file convention
