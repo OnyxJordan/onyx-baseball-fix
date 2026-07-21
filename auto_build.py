@@ -3,12 +3,14 @@
 Onyx Baseball - auto_build.py (second-half rebuild)
 Groups flat lineups.json rows (bot-written) into game objects keyed by
 game_key, pulling pitchers and lines from game_lines.json. Calls
-model.project_player() for each batter (model handles platoon, park,
-wind, temp, humidity, pitcher factor internally). Applies only the
-adjustments model.py does NOT cover: bullpen exposure and pull-air.
-Reads new odds.json format (nk keys -> american odds). Auto-logs edge
-plays to picks_input.json when odds are present. Prints the first few
-model exceptions with full tracebacks instead of failing silently.
+model.project_player() per batter; injects the model's NATIVE return
+dicts as RESULTS (shell.html reads those fields directly, e.g.
+r.due_score, r.dk_pts). Game keys use the shell's baked label format
+"AWAY @ HOME (TIME)". Pre-normalizes statcast_l14 entries so l14_rate
+always exists (model does a hard l14["l14_rate"] lookup). Applies only
+adjustments model.py does NOT cover (bullpen exposure, pull-air) to the
+edge/picks lane. Reads new odds.json format. Auto-logs edge plays.
+Prints the first few model exceptions with tracebacks.
 """
 
 import json, os, re, sys, traceback, unicodedata
@@ -45,6 +47,28 @@ ODDS_RAW = jload(dpath("odds.json"), {})
 GAMES    = jload(dpath("game_lines.json"), {})
 L14      = jload(dpath("statcast_l14.json"), {})
 P14      = jload(dpath("pitchers_l14.json"), {})
+SALARIES = jload(dpath("salaries.json"), {})
+
+# ---- normalize L14 hitters: nk keys + guarantee l14_rate exists ----
+# model.py does l14["l14_rate"] (hard lookup, no default) inside its form
+# adjustment for any batter with l14_pa >= 20 - i.e. nearly every starter.
+L14N = {}
+if isinstance(L14, dict):
+    for k, v in L14.items():
+        if not isinstance(v, dict):
+            continue
+        v = dict(v)
+        if v.get("l14_rate") is None:
+            pa = v.get("l14_pa") or 0
+            hr = v.get("l14_hr") or 0
+            try:
+                v["l14_rate"] = (float(hr) / float(pa)) if pa else 0.0
+            except (TypeError, ValueError):
+                v["l14_rate"] = 0.0
+        L14N[nk(k)] = v
+
+P14N = {nk(k): v for k, v in P14.items() if isinstance(v, dict)} \
+       if isinstance(P14, dict) else {}
 
 # odds.json (new): { nk_name: american_int }. Tolerate old formats gracefully.
 def american_to_prob(a):
@@ -121,12 +145,10 @@ def pull_air_mult(bat):
     return min(max(1.0 + (pa_rate - 0.155) * 1.2, 0.90), 1.12)
 
 # ---------------------------------------------------------------- build slate
-players, games_out = [], []
+players, games_out, results_out = [], [], []
 now = datetime.now(timezone.utc)
 
 # ---- group flat lineups.json rows into game objects ----
-# lineups.json (bot-written): flat array of
-# {name, team, game_key, batting_order, pos, dk_pos, fd_pos, hand, lineup_confirmed}
 _rows = LINEUPS if isinstance(LINEUPS, list) else \
         (LINEUPS.get("games") or LINEUPS.get("schedule") or [])
 _by_game = {}
@@ -144,14 +166,16 @@ for gk, rows in _by_game.items():
     away, _, home = gk.partition("_")
     gl = GAMES.get(gk, {}) if isinstance(GAMES, dict) else {}
     wx = (WEATHER.get(gk) if isinstance(WEATHER, dict) else None) or {}
+    time_s = gl.get("time", "") or ""
+    label = f"{away} @ {home}" + (f" ({time_s})" if time_s else "")
     game = {
-        "game_key": gk,
+        "game_key": gk, "label": label,
         "away_team": away, "home_team": home,
         "away_pitcher": gl.get("awayP") or "",
         "home_pitcher": gl.get("homeP") or "",
         "total": gl.get("total"),
         "away_ml": gl.get("away_ml"), "home_ml": gl.get("home_ml"),
-        "time": gl.get("time", ""), "venue": gl.get("venue", "") or wx.get("park", ""),
+        "time": time_s, "venue": gl.get("venue", "") or wx.get("park", ""),
         "weather": wx,
         "away_lineup": [], "home_lineup": [],
     }
@@ -196,12 +220,15 @@ for game in games_out:
             bat  = CAREER.get(bkey)
             b_hand = "" if isinstance(batter, str) else (batter.get("hand") or "")
             b_pos  = "" if isinstance(batter, str) else (batter.get("pos") or "")
+            sal = {}
+            if isinstance(SALARIES, dict):
+                sal = SALARIES.get(bkey) or SALARIES.get(bname.lower()) or {}
             o = ODDS.get(bkey)
 
             try:
                 r = model.project_player(
                     name=bkey,
-                    pos=b_pos or "OF",
+                    pos=(sal.get("dk_pos") or b_pos or "OF"),
                     batting_order=spot,
                     is_home=is_home,
                     opp_pitcher=nk(opp_sp or ""),
@@ -212,9 +239,12 @@ for game in games_out:
                     temp=temp,
                     roof=roof,
                     dk_odds=o["american"] if o else None,
-                    l14_statcast=L14 if isinstance(L14, dict) else None,
-                    l14_pitchers=P14 if isinstance(P14, dict) else None,
-                    game_key=game["game_key"],
+                    dk_salary=int(sal.get("dk_salary") or 3000),
+                    fd_salary=int(sal.get("fd_salary") or 3000),
+                    l14_statcast=L14N,
+                    l14_pitchers=P14N,
+                    game_key=game["label"],
+                    game_label=game["label"],
                     team=game.get(f"{side}_team") or "",
                     humidity=humidity,
                     pressure_mb=pressure,
@@ -228,6 +258,19 @@ for game in games_out:
                     traceback.print_exc()
                 continue
 
+            # ---- shell payload: model-native record (shell reads these fields) ----
+            rec = dict(r)
+            rec["batter_name"]  = bname            # display name, not nk key
+            rec["matched_name"] = bname
+            rec["batter_hand"]  = (b_hand or (bat or {}).get("hand") or "")
+            rec["dk_pos"]       = sal.get("dk_pos") or b_pos or ""
+            rec["fd_pos"]       = sal.get("fd_pos") or b_pos or ""
+            rec["location"]     = "home" if is_home else "away"
+            rec["opp_sp"]       = opp_sp or ""
+            rec["sp_hand"]      = p_hand or ""
+            results_out.append(rec)
+
+            # ---- edge/picks lane: model prob + bullpen & pull-air layers ----
             base = (r.get("hr_prob") or 0) / 100.0
             if base <= 0:
                 continue
@@ -251,6 +294,7 @@ for game in games_out:
 print(f"model: {len(players)} scored, {_model_errs} errors")
 
 players.sort(key=lambda x: (x["edge"] is None, -(x["edge"] or 0)))
+results_out.sort(key=lambda x: -(x.get("composite") or 0))
 
 # ---------------------------------------------------------------- auto-log picks (guarded: no odds, no picks)
 EDGE_MIN = 0.015
@@ -280,24 +324,19 @@ def replace_const(src, name, payload):
         sys.exit(f"FATAL: const {name} not found in shell.html")
     return pat.sub(lambda m: m.group(1) + json.dumps(payload, ensure_ascii=False) + ";", src, count=1)
 
-results_out, sums_out, pits_out, keys_out = [], [], [], []
+sums_out, keys_out = [], []
 for g in games_out:
-    k = f'{g.get("away_team","")}_{g.get("home_team","")}'
+    k = g["label"]
     keys_out.append(k)
     sums_out.append({"game": k, "time": g.get("time",""), "away": g.get("away_team",""),
         "home": g.get("home_team",""), "venue": g.get("venue",""), "ou": g.get("total"),
-        "roof": False, "away_ml": g.get("away_ml",""), "home_ml": g.get("home_ml","")})
-for p in players:
-    results_out.append({"batter_name": p["name"], "matched_name": p["name"],
-        "batting_order": p.get("spot",0), "batter_hand": (p.get("bat") or {}).get("hand",""),
-        "pos": "", "dk_pos": "", "fd_pos": "", "location": "", "team": p.get("team",""),
-        "opp_sp": p.get("opp_sp",""), "sp_hand": p.get("sp_hand",""),
-        "prob": p.get("prob"), "base_prob": p.get("base_prob"), "odds": p.get("odds"),
-        "market_prob": p.get("market_prob"), "edge": p.get("edge")})
+        "roof": False,
+        "away_ml": ("" if g.get("away_ml") is None else str(g["away_ml"])),
+        "home_ml": ("" if g.get("home_ml") is None else str(g["home_ml"]))})
 
 shell = replace_const(shell, "RESULTS", results_out)
 shell = replace_const(shell, "SUMMARIES", sums_out)
 shell = replace_const(shell, "ALL_GAME_KEYS", keys_out)
 with open("index.html", "w", encoding="utf-8") as f:
     f.write(shell)
-print(f"index.html: {len(players)} players, {len(games_out)} games")
+print(f"index.html: {len(results_out)} players, {len(games_out)} games")
