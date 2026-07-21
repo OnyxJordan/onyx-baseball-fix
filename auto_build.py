@@ -7,10 +7,11 @@ model.project_player() for each batter (model handles platoon, park,
 wind, temp, humidity, pitcher factor internally). Applies only the
 adjustments model.py does NOT cover: bullpen exposure and pull-air.
 Reads new odds.json format (nk keys -> american odds). Auto-logs edge
-plays to picks_input.json when odds are present.
+plays to picks_input.json when odds are present. Prints the first few
+model exceptions with full tracebacks instead of failing silently.
 """
 
-import json, os, re, sys, unicodedata
+import json, os, re, sys, traceback, unicodedata
 from datetime import datetime, timezone
 
 # ---------------------------------------------------------------- paths
@@ -168,6 +169,7 @@ def _num(v, default):
     except (TypeError, ValueError):
         return default
 
+_model_errs = 0
 for game in games_out:
     wx = game.get("weather") or {}
     park      = game.get("venue") or wx.get("park") or ""
@@ -219,7 +221,11 @@ for game in games_out:
                     batter_hand=b_hand or "R",
                     opp_pitcher_hand=p_hand,
                 )
-            except Exception:
+            except Exception as ex:
+                _model_errs += 1
+                if _model_errs <= 3:
+                    print(f"model error for {bname}: {ex!r}")
+                    traceback.print_exc()
                 continue
 
             base = (r.get("hr_prob") or 0) / 100.0
@@ -241,6 +247,8 @@ for game in games_out:
                 "edge": edge,
                 "bat": bat or {}, "pit": sp_e or {},
             })
+
+print(f"model: {len(players)} scored, {_model_errs} errors")
 
 players.sort(key=lambda x: (x["edge"] is None, -(x["edge"] or 0)))
 
