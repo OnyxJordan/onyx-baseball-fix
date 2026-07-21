@@ -235,12 +235,32 @@ payload = {
 }
 with open("shell.html", encoding="utf-8") as f:
     shell = f.read()
-MARK = re.search(r"(/\*ONYX_DATA_START\*/)(.*?)(/\*ONYX_DATA_END\*/)", shell, re.S) \
-       or re.search(r"(<!--DATA_START-->)(.*?)(<!--DATA_END-->)", shell, re.S)
-if not MARK:
-    sys.exit("FATAL: no data injection markers found in shell.html - refusing to build")
-blob = json.dumps(payload, ensure_ascii=False)
-html = shell[:MARK.start(2)] + f"\nwindow.ONYX_DATA = {blob};\n" + shell[MARK.end(2):]
+def replace_const(src, name, payload):
+    pat = re.compile(r"^(\s*const %s\s*=\s*).*$" % re.escape(name), re.M)
+    if not pat.search(src):
+        sys.exit(f"FATAL: const {name} not found in shell.html")
+    return pat.sub(lambda m: m.group(1) + json.dumps(payload, ensure_ascii=False) + ";", src, count=1)
+
+results_out, sums_out, pits_out, keys_out = [], [], [], []
+for g in games_out:
+    k = f'{g.get("away_team","")}_{g.get("home_team","")}'
+    keys_out.append(k)
+    sums_out.append({"game": k, "time": g.get("time",""), "away": g.get("away_team",""),
+        "home": g.get("home_team",""), "venue": g.get("venue",""), "ou": g.get("total"),
+        "roof": False, "away_ml": g.get("away_ml",""), "home_ml": g.get("home_ml","")})
+for p in players:
+    results_out.append({"batter_name": p["name"], "matched_name": p["name"],
+        "batting_order": p.get("spot",0), "batter_hand": (p.get("bat") or {}).get("hand",""),
+        "pos": "", "dk_pos": "", "fd_pos": "", "location": "", "team": p.get("team",""),
+        "opp_sp": p.get("opp_sp",""), "sp_hand": p.get("sp_hand",""),
+        "prob": p.get("prob"), "base_prob": p.get("base_prob"), "odds": p.get("odds"),
+        "market_prob": p.get("market_prob"), "edge": p.get("edge")})
+pits_out = [{"name": k, "hand": v.get("hand",""), "team": "", "opp": "", "role": "",
+             "location": "", "game": "", "time": "", "venue": ""} for k, v in PITCHERS.items() if v.get("hand")]
+
+shell = replace_const(shell, "RESULTS", results_out)
+shell = replace_const(shell, "SUMMARIES", sums_out)
+shell = replace_const(shell, "ALL_GAME_KEYS", keys_out)
 with open("index.html", "w", encoding="utf-8") as f:
-    f.write(html)
-print(f"✓ index.html: {len(players)} players, {len(games_out)} games")
+    f.write(shell)
+print(f"index.html: {len(players)} players, {len(games_out)} games")
