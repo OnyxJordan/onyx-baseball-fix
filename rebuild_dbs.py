@@ -243,8 +243,9 @@ P26S = p_26sc.set_index("PlayerId") if p_26sc is not None else None
 pitcher = {}
 pnotes = {"no_hand":[], "no_2026":[], "new_2026_only":[]}
 all_pid = set(PD_.index) | set(P26.index)
-if pid not in P26.index and pid not in PD_.index:
-        continue
+if pid not in P26.index:
+        if pid not in PD_.index or float(pd.to_numeric(pd.Series([PD_.loc[pid]["IP"]]), errors="coerce").iloc[0] or 0) < 30:
+            continue
 
 for pid in all_pid:
     b3 = PD_.loc[pid] if pid in PD_.index else None
