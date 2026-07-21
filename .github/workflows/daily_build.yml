@@ -22,6 +22,10 @@ jobs:
         run: pip install requests
       - name: Fetch daily data
         run: python3 fetch_data.py
+      - name: Fetch odds
+        run: python3 fetch_odds.py
+      - name: Heal pitcher hands
+        run: python3 heal_hands.py
       - name: Build index.html
         run: python3 auto_build.py
       - name: Persist picks & DFS record
