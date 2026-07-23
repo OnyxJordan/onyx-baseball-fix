@@ -269,15 +269,67 @@ def fetch_lineups():
     print(f"\n  Total: {len(games)} games, {len(flat)} batters")
     with open(OUT / "lineups.json", "w") as f:
         json.dump(flat, f, indent=2)
+    write_game_lines(games)
     return games
 
-# ── 6. WEATHER — manual weather.json wins; Open-Meteo fallback ────────────────
+# ── 5b. GAME LINES — auto-written from schedule; manual lines merged in ───────
+def _format_et(iso_ts):
+    """ISO UTC timestamp -> '7:05 PM' Eastern. Empty string on failure."""
+    if not iso_ts:
+        return ""
+    try:
+        dt = datetime.datetime.fromisoformat(iso_ts.replace("Z", "+00:00"))
+        try:
+            from zoneinfo import ZoneInfo
+            et = dt.astimezone(ZoneInfo("America/New_York"))
+        except Exception:
+            et = dt.astimezone(datetime.timezone(datetime.timedelta(hours=-4)))
+        return et.strftime("%-I:%M %p") if hasattr(et, "strftime") else ""
+    except Exception:
+        return ""
+
+def write_game_lines(games):
+    """
+    Replaces the manual game_lines.json workflow. Pitchers, start times, and
+    venues come straight from the MLB schedule. Betting lines (total, ML) are
+    preserved from the existing file when the game_key matches, since there is
+    no free lines API yet; they simply stay null otherwise.
+    """
+    path = OUT / "game_lines.json"
+    old = {}
+    if path.exists():
+        try:
+            old = json.loads(path.read_text())
+        except Exception:
+            old = {}
+    lines = {}
+    for gk, g in games.items():
+        prev = old.get(gk, {}) if isinstance(old, dict) else {}
+        venue = STADIUMS.get(g["home_team"], ("",))[0]
+        lines[gk] = {
+            "awayP":   g.get("away_pitcher") or "",
+            "homeP":   g.get("home_pitcher") or "",
+            "time":    _format_et(g.get("game_time")),
+            "venue":   venue,
+            "total":   prev.get("total"),
+            "away_ml": prev.get("away_ml"),
+            "home_ml": prev.get("home_ml"),
+        }
+    with open(path, "w") as f:
+        json.dump(lines, f, indent=2)
+    carried = sum(1 for v in lines.values() if v["total"] is not None)
+    print(f"  Game lines: {len(lines)} games written ({carried} with carried-over totals)")
+
+# ── 6. WEATHER — always fetch fresh; weather_manual.json overrides per team ───
 def fetch_weather(games):
+    """
+    Always pulls fresh Open-Meteo data (the old behavior of skipping when
+    weather.json existed froze weather forever once the daily build committed
+    the file). Manual per-team overrides go in data/weather_manual.json using
+    the same shape; they are merged on top of the fresh fetch.
+    """
     weather_path = OUT / "weather.json"
-    if weather_path.exists():
-        print("  weather.json found — using manual upload, skipping Open-Meteo")
-        return json.loads(weather_path.read_text())
-    print("  No manual weather.json — fetching from Open-Meteo...")
+    print("  Fetching fresh weather from Open-Meteo...")
     weather = {}
     for team in {g["home_team"] for g in games.values()}:
         if team not in STADIUMS:
@@ -319,6 +371,16 @@ def fetch_weather(games):
             weather[team] = {"venue": park_name, "temp": 72, "precip": 0,
                              "wind_spd": 5, "wind_dir": "N", "roof": roof, "flag": "clear"}
         time.sleep(0.15)
+    manual_path = OUT / "weather_manual.json"
+    if manual_path.exists():
+        try:
+            overrides = json.loads(manual_path.read_text())
+            for team, wx in overrides.items():
+                if isinstance(wx, dict):
+                    weather.setdefault(team, {}).update(wx)
+            print(f"  Weather: merged manual overrides for {len(overrides)} teams")
+        except Exception as e:
+            print(f"  WARNING: weather_manual.json unreadable ({e}) — ignored")
     print(f"  Weather: {len(weather)} stadiums")
     with open(weather_path, "w") as f:
         json.dump(weather, f, indent=2)
