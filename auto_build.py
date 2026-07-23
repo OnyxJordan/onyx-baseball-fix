@@ -351,7 +351,7 @@ for game in games_out:
                 "dk_hr_implied": o_imp,
                 "avg_implied":   o_imp,
                 "consensus_odds": o["american"] if o else None,
-                "best_book":     "DK" if o else None,
+                "best_book":     "Onyx" if o else None,
                 "open":          None,
                 "dk_proj":       round(dk_pts, 2),
                 "fd_proj":       round(fd_pts, 2),
