@@ -1,0 +1,52 @@
+name: Market Pulse (line snapshots)
+on:
+  schedule:
+    # every 20 minutes, 11 AM - 10 PM ET (15-23 UTC and 0-2 UTC during EDT)
+    - cron: "*/20 15-23 * * *"
+    - cron: "*/20 0-2 * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+concurrency:
+  group: onyx-build
+  cancel-in-progress: false
+jobs:
+  pulse:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Snapshot market lines
+        run: python3 fetch_odds.py --pulse
+        env:
+          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
+      - name: Commit snapshot (only if something changed)
+        id: commit
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/game_lines.json data/line_history.json
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "no line movement"
+          else
+            git commit -m "Market pulse $(date -u +%H:%M)"
+            git push
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Upload Pages artifact
+        if: steps.commit.outputs.changed == 'true'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+      - name: Deploy to GitHub Pages
+        if: steps.commit.outputs.changed == 'true'
+        uses: actions/deploy-pages@v4

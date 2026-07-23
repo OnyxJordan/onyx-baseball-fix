@@ -292,5 +292,19 @@ def run():
         print(f"WARNING: odds.json is {age_h:.1f}h old ({count} players) - "
               f"treating as STALE, building without edges/picks")
 
+def pulse():
+    """Lightweight market pulse: refresh totals/moneylines and append a line
+    history snapshot. Run every 20 minutes by market_pulse.yml. Costs 2 Odds
+    API credits per run (h2h + totals, one region); no props fetched."""
+    key = os.environ.get("ODDS_API_KEY", "").strip()
+    if key:
+        merge_game_lines(key)
+    else:
+        print("ODDS_API_KEY not set - snapshotting existing lines only")
+    snapshot_line_history()
+
 if __name__ == "__main__":
-    main()
+    if "--pulse" in sys.argv:
+        pulse()
+    else:
+        main()
