@@ -474,8 +474,10 @@ for g in games_out:
     h_top, h_top_p, h_exp = _side_stats(hrows)
     r0 = rows[0] if rows else {}
     wx = g.get("weather") or {}
+    gl = GAMES.get(g["game_key"], {}) if isinstance(GAMES, dict) else {}
     sums_out.append({
         "game": k, "label": k, "time": g.get("time",""),
+        "game_key": g["game_key"], "start": gl.get("start"),
         "away": g.get("away_team",""), "home": g.get("home_team",""),
         "venue": g.get("venue",""), "ou": g.get("total"),
         "gamePk": gl_pk_by_label.get(k),
@@ -499,6 +501,7 @@ for g in games_out:
 shell = replace_const(shell, "RESULTS", results_out)
 shell = replace_const(shell, "SUMMARIES", sums_out)
 shell = replace_const(shell, "ALL_GAME_KEYS", keys_out)
+shell = replace_const(shell, "LINE_HISTORY", jload(dpath("line_history.json"), []))
 
 # ---- stamp the build date over the baked date literals ----
 _badge = f"{now.strftime('%b').upper()} {now.day} · {now.year}"      # JUL 23 · 2026

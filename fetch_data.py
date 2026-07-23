@@ -310,6 +310,7 @@ def write_game_lines(games):
             "awayP":   g.get("away_pitcher") or "",
             "homeP":   g.get("home_pitcher") or "",
             "time":    _format_et(g.get("game_time")),
+            "start":   g.get("game_time"),
             "venue":   venue,
             "gamePk":  g.get("game_id"),
             "total":   prev.get("total"),
