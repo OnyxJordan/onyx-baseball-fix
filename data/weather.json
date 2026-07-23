@@ -21,15 +21,15 @@
     "roof": false,
     "flag": "clear"
   },
-  "STL": {
-    "venue": "Busch Stadium",
-    "temp": 81.5,
-    "precip": 1,
-    "wind_spd": 3.9,
-    "wind_dir": "N",
-    "humidity_pct": 42,
-    "pressure_mb": 1002.6,
-    "roof": false,
+  "TOR": {
+    "venue": "Rogers Centre",
+    "temp": 69.3,
+    "precip": 0,
+    "wind_spd": 9.8,
+    "wind_dir": "S",
+    "humidity_pct": 65,
+    "pressure_mb": 1010.5,
+    "roof": true,
     "flag": "clear"
   },
   "ATL": {
@@ -43,15 +43,15 @@
     "roof": false,
     "flag": "clear"
   },
-  "TOR": {
-    "venue": "Rogers Centre",
-    "temp": 69.3,
-    "precip": 0,
-    "wind_spd": 9.8,
-    "wind_dir": "S",
-    "humidity_pct": 65,
-    "pressure_mb": 1010.5,
-    "roof": true,
+  "STL": {
+    "venue": "Busch Stadium",
+    "temp": 81.5,
+    "precip": 1,
+    "wind_spd": 3.9,
+    "wind_dir": "N",
+    "humidity_pct": 42,
+    "pressure_mb": 1002.6,
+    "roof": false,
     "flag": "clear"
   }
 }
