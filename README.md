@@ -85,7 +85,7 @@ If odds are stale or missing the site still builds, just without edges or new pi
 | `grade_picks.py` | Automatic pick grading from final boxscores |
 | `auto_build.py` | Model run + HTML injection |
 | `update_stats.py` | Pick record persistence across rebuilds |
-| `model.py` | v16 HR probability model |
+| `model.py` | v17 HR probability model |
 | `career_db.json` | Hitter career database (canonical, never regenerate) |
 | `pitcher_db.json` | Pitcher career database (canonical, never regenerate) |
 | `bullpen_db.json` | Team bullpen HR/9 |
