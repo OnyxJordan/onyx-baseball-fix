@@ -337,8 +337,11 @@ for game in games_out:
                 # then L14 measurements) - POWER_FLOOR reads these
                 "ev90_26":       batd.get("e6") or batd.get("e3") or l14.get("l14_ev90"),
                 "barrel_26":     batd.get("b6") or batd.get("b3") or l14.get("l14_barrel_pct"),
-                # h3 is HardHit%; h6/a6 are recent home/away HR splits, NOT hardhit
-                "hh_pct":        batd.get("h3") or l14.get("l14_hh_pct"),
+                # h3 is career HardHit%, but tiny-sample players carry junk
+                # values (up to 1.000); anything past 62% is treated as
+                # unreliable and falls back to the L14 measurement
+                "hh_pct":        (batd.get("h3") if batd.get("h3") and batd["h3"] <= 0.62
+                                  else l14.get("l14_hh_pct")) or l14.get("l14_hh_pct") or 0.38,
                 "iso_ctx":       batd.get("i6") or batd.get("i3") or l14.get("l14_iso"),
                 "ev90":          l14.get("l14_ev90") or batd.get("e3"),
                 "barrel_pct":    l14.get("l14_barrel_pct") or batd.get("b3"),

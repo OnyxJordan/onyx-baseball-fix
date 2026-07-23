@@ -1182,8 +1182,8 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
   </div>
 </div>
 
-<!-- ═══ SEARCH ════════════════════════════════════════════════ -->
-<div class="search-bar">
+<!-- ═══ SEARCH (only on tabs with searchable tables) ═══════════ -->
+<div class="search-bar" id="searchBar">
   <div class="search-inner">
     <svg viewBox="0 0 16 16"><circle cx="6.5" cy="6.5" r="4"></circle><path d="M10 10l3.5 3.5"></path></svg>
     <input type="text" id="srch" placeholder="Search players, teams, matchups…" oninput="onSearch()">
@@ -2146,6 +2146,9 @@ function gotoTab(tab) {
   document.querySelectorAll('.pane').forEach(p => p.classList.toggle('active', p.id===`pane-${tab}`));
   if(tab!=='gamecenter' && typeof stopGC === 'function') stopGC();
   if(tab!=='markets' && typeof stopMarkets === 'function') stopMarkets();
+  // search bar only where something is searchable
+  const sb = document.getElementById('searchBar');
+  if (sb) sb.style.display = (tab === 'board' || tab === 'rankings') ? '' : 'none';
   if(tab==='home')     { updateHomeStats(); }
   if(tab==='model')    {}
   if(tab==='board')    { renderTargets(); renderGameCards(); }
@@ -2222,7 +2225,7 @@ function buildTicker() {
   if (!best.length) return;
 
   const makeItem = (p, forceClass) => {
-    const live = livePlayerData[p.batter_name.toLowerCase()] || {};
+    const live = livePlayerData[nkjs(p.batter_name)] || {};
     const hitHR    = live.hitHR    || false;
     const gameLoss = live.gameLoss || false;
     const gameOver = live.gameOver || false;
@@ -2281,9 +2284,24 @@ const MLB_ABBR = {
 
 // gamePk -> {status, awayScore, homeScore, inning, half, awayAbbr, homeAbbr}
 let liveGameData = {};
-// lowercased player name -> {hitHR, gameOver, gameLoss, score, gamePk}
+// normalized player name -> {hitHR, hrGames[], gameOver, gameLoss, score, gamePk}
 let livePlayerData = {};
 let liveLoaded = false;
+
+// normalize names the same way the pipeline does (accents, hyphens, dots)
+// so "Crow-Armstrong" and "José Ramírez" match across MLB feed and RESULTS
+function nkjs(s) {
+  return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[.'\u2019-]/g, ' ').replace(/\s+/g, ' ').trim().toLowerCase();
+}
+let _mrMap = null;
+function modelRow(name) {
+  if (!_mrMap) {
+    _mrMap = {};
+    RESULTS.forEach(r => { _mrMap[nkjs(r.batter_name)] = r; });
+  }
+  return _mrMap[nkjs(name)];
+}
 
 // Parse ESPN scoreboard response into MLB Stats API format
 function parseESPN(espn) {
@@ -2392,11 +2410,14 @@ async function fetchLiveScores() {
         const pd = await pr.json();
         (pd?.allPlays || []).forEach(play => {
           if (play?.result?.eventType === 'home_run' || play?.result?.event === 'Home Run') {
-            const name = play?.matchup?.batter?.fullName?.toLowerCase();
+            const name = nkjs(play?.matchup?.batter?.fullName);
             if (name) {
               if (!livePlayerData[name]) livePlayerData[name] = {};
               livePlayerData[name].hitHR = true;
               livePlayerData[name].gamePk = pk;
+              // per-game record so doubleheaders credit the right game
+              const hg = (livePlayerData[name].hrGames = livePlayerData[name].hrGames || []);
+              if (!hg.includes(pk)) hg.push(pk);
             }
           }
         });
@@ -2405,7 +2426,7 @@ async function fetchLiveScores() {
 
     // Map game outcomes onto modeled players
     RESULTS.forEach(p => {
-      const pname = p.batter_name.toLowerCase();
+      const pname = nkjs(p.batter_name);
       const gm = (p.game || p.game_label || '').match(/^(\w+)\s*@\s*(\w+)/);
       if (!gm) return;
       const awayAbbr = gm[1], homeAbbr = gm[2];
@@ -2593,12 +2614,14 @@ async function loadGC() {
 }
 
 function gcModelChip(name) {
-  const key = (name || '').toLowerCase();
-  const lp = livePlayerData[key] || {};
-  const mr = RESULTS.find(x => (x.batter_name || '').toLowerCase() === key);
+  const lp = livePlayerData[nkjs(name)] || {};
+  const mr = modelRow(name);
   let out = '';
   if (mr && mr.hr_prob) out += `<span class="gc-hrprob">${(+mr.hr_prob).toFixed(1)}%</span>`;
-  if (lp.hitHR) out += `<span class="gc-hitbadge">HR ✓</span>`;
+  // HR badge only for THIS game: doubleheaders must not cross-credit
+  if ((lp.hrGames || []).includes(+gcPk) || (lp.hrGames || []).includes(String(gcPk))) {
+    out += `<span class="gc-hitbadge">HR ✓</span>`;
+  }
   return out;
 }
 
@@ -2770,10 +2793,12 @@ function mlToProb(ml) {
   if (!v || isNaN(v)) return null;
   return v > 0 ? 100 / (v + 100) : Math.abs(v) / (Math.abs(v) + 100);
 }
-function devig(aml, hml) {
+// true market prices: each side's implied probability straight from its
+// moneyline, exactly what the market charges (no devig)
+function marketProbs(aml, hml) {
   const a = mlToProb(aml), h = mlToProb(hml);
   if (!a || !h) return null;
-  return [a / (a + h), h / (a + h)];
+  return [a, h];
 }
 
 function stopMarkets() {
@@ -2838,14 +2863,20 @@ function mktChart(pts, aCol, hCol, aAb, hAb) {
   if (pts.length === 1) pts = [pts[0], {...pts[0], t: pts[0].t + 1}];
   const t0 = pts[0].t, t1 = pts[pts.length - 1].t || t0 + 1;
   const X = t => 2 + (t - t0) / Math.max(t1 - t0, 1) * (W - 4);
-  const Y = p => H - (p * H);
+  // auto-zoom the y axis to the data so small moves read as real swings
+  const vals = pts.flatMap(p => [p.a, p.h]);
+  let lo = Math.min(...vals), hi = Math.max(...vals);
+  const padY = Math.max((hi - lo) * 0.3, 0.04);
+  lo = Math.max(0, lo - padY); hi = Math.min(1, hi + padY);
+  const Y = p => H - ((p - lo) / (hi - lo)) * H;
   const line = key => pts.map(p => `${X(p.t).toFixed(1)},${Y(p[key]).toFixed(1)}`).join(' ');
   const last = pts[pts.length - 1];
   const lbl = (p, ab, col) => `<div class="mkt-endlbl" style="top:${(8 + (Y(p) / H) * 84).toFixed(1)}%">
       <div class="t" style="color:${col}">${ab}</div><div class="p" style="color:${col}">${Math.round(p * 100)}%</div></div>`;
+  const gridVals = [0.25, 0.5, 0.75].map(k => lo + (hi - lo) * k);
   return `<div class="mkt-chart">
     <div class="mkt-grid">
-      ${[25, 50, 75].map(v => `<div style="top:${100 - v}%"><span>${v}%</span></div>`).join('')}
+      ${gridVals.map(v => `<div style="top:${(100 - ((v - lo) / (hi - lo)) * 100).toFixed(1)}%"><span>${Math.round(v * 100)}%</span></div>`).join('')}
     </div>
     <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
       <polyline points="${line('a')}" fill="none" stroke="${aCol}" stroke-width="2" stroke-linejoin="round"/>
@@ -2870,8 +2901,8 @@ function renderMarkets() {
     const pts = mktSeries(gk);
     const live = liveGameData[s.gamePk] || Object.values(liveGameData)
       .find(g => g.awayAbbr === s.away && g.homeAbbr === s.home) || {};
-    // current probabilities: live points win, else latest snapshot, else devig now
-    let probs = pts.length ? [pts[pts.length - 1].a, pts[pts.length - 1].h] : devig(s.away_ml, s.home_ml);
+    // current probabilities: live points win, else latest snapshot, else the moneylines now
+    let probs = pts.length ? [pts[pts.length - 1].a, pts[pts.length - 1].h] : marketProbs(s.away_ml, s.home_ml);
     if (!probs) probs = [0.5, 0.5];
     // movement vs first point of the series
     const d0 = pts.length > 1 ? [(probs[0] - pts[0].a) * 100, (probs[1] - pts[0].h) * 100] : [0, 0];
@@ -2912,7 +2943,6 @@ function renderMarkets() {
         ${row(s.away, s.away, probs[0], d0[0], A_COL)}
         ${row(s.home, s.home, probs[1], d0[1], H_COL)}
       </div>
-      <div class="mkt-note">Devigged from market moneylines · live win probability via MLB once in play · not betting prices</div>
     </div>`;
   });
   body.innerHTML = cards.join('') || '<div class="gc-empty">No games on the slate today.</div>';
