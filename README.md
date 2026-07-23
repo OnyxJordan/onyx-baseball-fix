@@ -1,109 +1,100 @@
-[README-8.md](https://github.com/user-attachments/files/28290262/README-8.md)
 # Onyx Baseball
 
-A daily HR probability engine and DFS tool for MLB. Combines Statcast quality metrics, pitcher matchups, park environment, and market calibration to surface edge plays where the model diverges from DraftKings lines.
+A daily MLB home run probability engine. Combines career Statcast profiles, recent form, pitcher matchups, park factors, and live weather to surface plays where the model diverges from the market.
 
 **Live site:** https://onyxjordan.github.io/onyx-baseball-fix
+
+The site is evolving into Onyx Sports Insights: a multi-sport shell that renders per-sport JSON data envelopes. Odds and probabilities only. DFS fields have been retired and will not return.
 
 ---
 
 ## What it does
 
-- **HR probability model** — career rate (Bayesian-regressed), Statcast SC score, pitcher xFIP, park factor, wind/weather, due meter, market calibration
-- **Live score ticker** — real-time MLB scores scrolling across the top, green when a player hits an HR, red when their game ends without one
-- **Edge plays board** — top plays where model probability exceeds DK implied odds, filtered by power floor (EV90 ≥ 102, barrel ≥ 7%, ISO ≥ 0.110)
-- **DFS projections** — full slash-line model (1B/2B/3B/HR/BB/SB/R/RBI) calibrated to DK and FD scoring
-- **SB record** — every HR prop pick tracked with odds and result
-- **DFS record** — entry/win tracking with P&L charts
-
-## Current record (as of May 26, 2026)
-
-| | Record | P&L |
-|---|---|---|
-| HR Props | 11-43 (20.4%) | — |
-| DraftKings DFS | — | -$64 |
-| FanDuel DFS | — | +$46 |
-| **Combined DFS** | | **-$18** |
-
----
+- **HR probability model (v16)**: Bayesian-regressed career base rates, Statcast SC score, L14 form, platoon splits, pitcher factor blended from xFIP / HR9 / HRFB / GB% / Barrel%, park HR factor with per-park wind sensitivity, air density (temperature, humidity, pressure), due meter
+- **Edge board**: model probability vs DraftKings implied probability where odds are available, with an honest freshness gate (stale odds means no edges and no picks, never fake data)
+- **Pick tracking**: qualifying edge plays are auto-logged daily and merged into the running record on the site
 
 ## How the autonomous build works
 
-The site rebuilds itself automatically every day at **11:30 AM ET** via GitHub Actions:
+GitHub Actions runs the full pipeline daily at 11:30 AM ET (cron 15:30 UTC):
 
 ```
-GitHub Actions (cron: 11:30 AM ET)
-  → fetch_data.py
-      → reads data/odds.json       ← uploaded manually each morning
-      → reads data/salaries.json   ← uploaded manually each morning
-      → fetches lineups from MLB Stats API (confirmed + projected fallback)
-      → fetches weather from Open-Meteo
-      → fetches Statcast L14 from Baseball Savant
-  → auto_build.py
-      → runs v13 HR model + DFS projections
-      → injects into shell.html
-      → writes index.html
-  → deploys to GitHub Pages (~60s)
+fetch_data.py
+    lineups + probables from MLB Stats API (confirmed, roster fallback)
+    game_lines.json written from the schedule (pitchers, ET start times,
+        venues, gamePk); betting lines carried over until fetch_odds updates them
+    weather.json fetched fresh from Open-Meteo every run
+        (per-team overrides via data/weather_manual.json)
+    hitter + pitcher L14 form from MLB Stats API byDateRange aggregates
+        (Statcast CSVs enrich barrel/EV when present; FanGraphs CSVs are
+        only a fallback if the API fails)
+fetch_odds.py
+    1) The Odds API (ODDS_API_KEY secret): HR props per event, prefers DK
+       book; also fills totals + moneylines into game_lines.json
+    2) DraftKings direct (403 from datacenter IPs; self-upgrades if lifted)
+    3) manual data/odds.json, gated by last git commit time (36h max)
+heal_hands.py
+    backfills throwing hand for any new probable starter via MLB Stats API
+grade_picks.py
+    grades pending picks from final boxscores (HR -> hit, played -> miss,
+    never appeared -> stays pending)
+auto_build.py
+    scores every batter with model.project_player()
+    applies bullpen exposure and pull-air adjustments to the edge lane
+    injects RESULTS / SUMMARIES / ALL_GAME_KEYS into shell.html -> index.html
+    fails loudly: zero scored players aborts the build and keeps yesterday's page
+    off-days exit clean without touching the page
+update_stats.py
+    merges data/picks_input.json into the PICKS record inside index.html
+deploy to GitHub Pages
 ```
 
-## Daily update routine (5 minutes)
+A second workflow (`refresh_build.yml`) reruns the pipeline hourly from 1:30
+to 7:30 PM ET to pick up confirmed lineups, fresh weather, and line moves,
+committing and redeploying only when something changed.
 
-Each morning before games start:
+## Live layer (client-side, zero backend)
 
-1. **Download the DK HR odds page as PDF** → upload to Claude → download `odds.json`
-2. **Download the DK + FD lineups page as PDF** → upload to Claude → download `salaries.json`
-3. **Upload both files** to the repo under `data/odds.json` and `data/salaries.json`
-4. **Log today's picks** — add to `data/picks_input.json` before first pitch
-5. **After games** — update `data/picks_input.json` with results (hit/miss)
+The shell now carries a live score ticker pinned under the nav: all of
+today's games with team logos, live scores, inning state, and LIVE / F
+badges, polling the MLB Stats API every 90 seconds with an ESPN fallback.
+When a modeled player homers, play-by-play detection lights their edge
+ticker entry green with an HR badge; a final loss grays it out. All of it
+degrades gracefully: with no network the bar simply shows the day's
+schedule from the baked payload.
 
-The workflow triggers automatically at 11:30 AM ET. You can also trigger manually from the Actions tab.
+## Daily routine
 
-## Logging picks and results
+With the `ODDS_API_KEY` secret set: nothing. Odds, totals, moneylines, lineups, weather, L14 form, and pick grading are all automatic. Manual hooks that still work if ever needed:
 
-To track HR props, create/update `data/picks_input.json`:
+- `data/odds.json` upload (fallback when The Odds API is unavailable; freshness gated at 36h via git commit time)
+- `data/weather_manual.json` per-team weather overrides
+- Hand-editing `"hit"` in `data/picks_input.json` (auto-grading normally does this)
 
-```json
-[
-  {"date":"5/26","player":"Aaron Judge","odds":220,"hit":null},
-  {"date":"5/26","player":"Kyle Schwarber","odds":262,"hit":null}
-]
-```
-
-Set `"hit": true` or `"hit": false` after the game. The build merges these into the PICKS history automatically.
+If odds are stale or missing the site still builds, just without edges or new picks.
 
 ## Files in this repo
 
 | File | Purpose |
 |---|---|
-| `index.html` | The full Onyx Baseball app (auto-generated daily) |
-| `shell.html` | Base template with CAREER_DB baked in |
-| `auto_build.py` | Orchestrates model run and HTML injection |
-| `fetch_data.py` | Pulls lineups, weather, Statcast from APIs |
-| `model.py` | v13 HR probability + DFS projection model |
-| `career_db.json` | 687-player career Statcast database |
-| `pitcher_db.json` | 828-pitcher career database |
-| `data/odds.json` | Today's DK HR odds (uploaded daily) |
-| `data/salaries.json` | Today's DK + FD salaries (uploaded daily) |
-| `data/picks_input.json` | Today's HR prop picks + results |
+| `index.html` | The built site (generated daily, do not edit) |
+| `shell.html` | Canonical template. Never regenerate; surgical edits only |
+| `fetch_data.py` | Lineups, game lines, weather, L14 form |
+| `fetch_odds.py` | The Odds API -> DK -> manual fallback chain + freshness gate |
+| `heal_hands.py` | Rolling pitcher-hand backfill |
+| `grade_picks.py` | Automatic pick grading from final boxscores |
+| `auto_build.py` | Model run + HTML injection |
+| `update_stats.py` | Pick record persistence across rebuilds |
+| `model.py` | v16 HR probability model |
+| `career_db.json` | Hitter career database (canonical, never regenerate) |
+| `pitcher_db.json` | Pitcher career database (canonical, never regenerate) |
+| `bullpen_db.json` | Team bullpen HR/9 |
+| `rebuild_dbs.py` + `rebuild.yml` | Manual workflow to refresh the career DBs |
 
 ## Model version
 
-**v13** — Bayesian base rate regression, full slash-line DFS projections, park-aware composite scoring, live MLB API scoring. See the **Model** tab on the live site for full build history and technical spec.
-
----
-
-## GitHub Secrets required
-
-| Secret | Source |
-|---|---|
-| *(none required)* | Odds and salaries are uploaded manually as JSON files |
-
----
+**v16**: per-park wind sensitivity, wind classification exposed as `wind_blow`, humidity and pressure air-density terms, platoon factor, 2026 park factor refresh, due meter in output. Every model change gets a version bump and a changelog line at the top of `model.py`.
 
 ## Roadmap
 
-- Platt scaling (need ~50 outcomes)
-- Hit rate by probability bucket
-- Speed tier table for SB projections
-- Pull% × park interaction
-- Auto-parse odds/salaries from PDF via GitHub Actions
+See [ROADMAP.md](ROADMAP.md) for the full build-out plan: odds automation, live ticker, in-game HR tracking, pipeline hardening, and the multi-sport envelope.

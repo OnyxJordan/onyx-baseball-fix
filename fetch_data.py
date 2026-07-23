@@ -269,15 +269,68 @@ def fetch_lineups():
     print(f"\n  Total: {len(games)} games, {len(flat)} batters")
     with open(OUT / "lineups.json", "w") as f:
         json.dump(flat, f, indent=2)
+    write_game_lines(games)
     return games
 
-# ── 6. WEATHER — manual weather.json wins; Open-Meteo fallback ────────────────
+# ── 5b. GAME LINES — auto-written from schedule; manual lines merged in ───────
+def _format_et(iso_ts):
+    """ISO UTC timestamp -> '7:05 PM' Eastern. Empty string on failure."""
+    if not iso_ts:
+        return ""
+    try:
+        dt = datetime.datetime.fromisoformat(iso_ts.replace("Z", "+00:00"))
+        try:
+            from zoneinfo import ZoneInfo
+            et = dt.astimezone(ZoneInfo("America/New_York"))
+        except Exception:
+            et = dt.astimezone(datetime.timezone(datetime.timedelta(hours=-4)))
+        return et.strftime("%-I:%M %p") if hasattr(et, "strftime") else ""
+    except Exception:
+        return ""
+
+def write_game_lines(games):
+    """
+    Replaces the manual game_lines.json workflow. Pitchers, start times, and
+    venues come straight from the MLB schedule. Betting lines (total, ML) are
+    preserved from the existing file when the game_key matches, since there is
+    no free lines API yet; they simply stay null otherwise.
+    """
+    path = OUT / "game_lines.json"
+    old = {}
+    if path.exists():
+        try:
+            old = json.loads(path.read_text())
+        except Exception:
+            old = {}
+    lines = {}
+    for gk, g in games.items():
+        prev = old.get(gk, {}) if isinstance(old, dict) else {}
+        venue = STADIUMS.get(g["home_team"], ("",))[0]
+        lines[gk] = {
+            "awayP":   g.get("away_pitcher") or "",
+            "homeP":   g.get("home_pitcher") or "",
+            "time":    _format_et(g.get("game_time")),
+            "venue":   venue,
+            "gamePk":  g.get("game_id"),
+            "total":   prev.get("total"),
+            "away_ml": prev.get("away_ml"),
+            "home_ml": prev.get("home_ml"),
+        }
+    with open(path, "w") as f:
+        json.dump(lines, f, indent=2)
+    carried = sum(1 for v in lines.values() if v["total"] is not None)
+    print(f"  Game lines: {len(lines)} games written ({carried} with carried-over totals)")
+
+# ── 6. WEATHER — always fetch fresh; weather_manual.json overrides per team ───
 def fetch_weather(games):
+    """
+    Always pulls fresh Open-Meteo data (the old behavior of skipping when
+    weather.json existed froze weather forever once the daily build committed
+    the file). Manual per-team overrides go in data/weather_manual.json using
+    the same shape; they are merged on top of the fresh fetch.
+    """
     weather_path = OUT / "weather.json"
-    if weather_path.exists():
-        print("  weather.json found — using manual upload, skipping Open-Meteo")
-        return json.loads(weather_path.read_text())
-    print("  No manual weather.json — fetching from Open-Meteo...")
+    print("  Fetching fresh weather from Open-Meteo...")
     weather = {}
     for team in {g["home_team"] for g in games.values()}:
         if team not in STADIUMS:
@@ -319,6 +372,16 @@ def fetch_weather(games):
             weather[team] = {"venue": park_name, "temp": 72, "precip": 0,
                              "wind_spd": 5, "wind_dir": "N", "roof": roof, "flag": "clear"}
         time.sleep(0.15)
+    manual_path = OUT / "weather_manual.json"
+    if manual_path.exists():
+        try:
+            overrides = json.loads(manual_path.read_text())
+            for team, wx in overrides.items():
+                if isinstance(wx, dict):
+                    weather.setdefault(team, {}).update(wx)
+            print(f"  Weather: merged manual overrides for {len(overrides)} teams")
+        except Exception as e:
+            print(f"  WARNING: weather_manual.json unreadable ({e}) — ignored")
     print(f"  Weather: {len(weather)} stadiums")
     with open(weather_path, "w") as f:
         json.dump(weather, f, indent=2)
@@ -358,12 +421,77 @@ def _load_statcast_file(path):
             }
     return out
 
-# ── 7. HITTER L14 — FanGraphs L14 + real Statcast ─────────────────────────────
+# ── 7. HITTER L14 — MLB Stats API primary, FanGraphs CSV fallback ────────────
+def _pct_str(v, default=0.0):
+    """Parse MLB API rate strings like '.517'; tolerate '-.--' and None."""
+    try:
+        return float(v)
+    except (TypeError, ValueError):
+        return default
+
+def _l14_from_mlb_api(sc_l14, sc_season):
+    """
+    L14 hitter form straight from the MLB Stats API (byDateRange aggregate,
+    playerPool=all). No key, no CSV upload. Statcast CSV quality metrics are
+    merged on top when present, same as the FanGraphs path.
+    """
+    today = datetime.date.today()
+    data = mlb_get("/stats", {
+        "stats": "byDateRange", "group": "hitting", "sportId": 1,
+        "startDate": (today - datetime.timedelta(days=14)).strftime("%Y-%m-%d"),
+        "endDate": today.strftime("%Y-%m-%d"),
+        "limit": 3000, "offset": 0, "playerPool": "all",
+    })
+    splits = (data.get("stats") or [{}])[0].get("splits") or []
+    out = {}
+    for sp in splits:
+        name = (sp.get("player") or {}).get("fullName") or ""
+        nk = name.lower().strip()
+        st = sp.get("stat") or {}
+        pa = int(st.get("plateAppearances") or 0)
+        if not nk or pa < 1:
+            continue
+        hr  = int(st.get("homeRuns") or 0)
+        avg = _pct_str(st.get("avg"));  slg = _pct_str(st.get("slg"))
+        obp = _pct_str(st.get("obp"))
+        iso = max(slg - avg, 0.0)
+        bb  = (st.get("baseOnBalls") or 0) / pa
+        kk  = (st.get("strikeOuts") or 0) / pa
+        # rough wOBA estimate (no wOBA on this endpoint); Statcast xwOBA
+        # overrides it whenever the quality CSVs are present. Clamped so
+        # tiny samples (1-for-1 days) cannot produce absurd rates.
+        woba_est = (obp + slg) / 2 * 0.88 if (obp or slg) else 0.320
+        woba_est = min(max(woba_est, 0.200), 0.480)
+        sc = sc_l14.get(nk) or sc_season.get(nk) or {}
+        out[nk] = {
+            "l14_pa":         pa,
+            "l14_hr":         hr,
+            "l14_rate":       round(hr / pa, 4),
+            "l14_avg_ev":     round(sc.get("ev90", 95.0), 1),
+            "l14_ev90":       round(sc.get("ev90", 95.0), 1),
+            "l14_barrel_pct": sc.get("barrel_pct", round(iso * 0.18, 4)),
+            "l14_hh_pct":     sc.get("hardhit_pct", round(iso * 0.45 + 0.20, 4)),
+            "l14_hit_rate":   round(woba_est / 1.25, 4),
+            "l14_xwoba":      sc.get("xwoba", round(woba_est, 4)),
+            "l14_iso":        round(iso, 4),
+            "l14_bb_pct":     round(bb, 4),
+            "l14_k_pct":      round(kk, 4),
+        }
+    return out
+
 def fetch_statcast():
-    print("Fetching L14 hitter data (FanGraphs L14 + Statcast)...")
+    print("Fetching L14 hitter data (MLB API + Statcast, FanGraphs fallback)...")
     fg_path   = OUT / "fangraphs_l14.csv"
     sc_l14    = _load_statcast_file(OUT / "statcast_l14.csv")
     sc_season = _load_statcast_file(OUT / "statcast_season.csv")
+
+    api = _l14_from_mlb_api(sc_l14, sc_season)
+    if len(api) >= 100:
+        matched_sc = sum(1 for nk in api if nk in sc_l14 or nk in sc_season)
+        print(f"  L14 hitters: {len(api)} from MLB API, {matched_sc} with real Statcast")
+        (OUT / "statcast_l14.json").write_text(json.dumps(api, indent=2))
+        return api
+    print(f"  MLB API L14 returned only {len(api)} hitters — falling back to FanGraphs CSV")
 
     statcast = {}
     if not fg_path.exists():
@@ -446,9 +574,59 @@ def fetch_splits():
     (OUT / "splits.json").write_text(json.dumps(splits, indent=2))
     return splits
 
-# ── 8. PITCHER data — reads fangraphs_pitchers_l14.csv ────────────────────────
+# ── 8. PITCHER data — MLB Stats API primary, FanGraphs CSV fallback ──────────
+def _ip_to_float(ip):
+    """MLB innings strings: '12.1' means 12 and 1/3."""
+    try:
+        s = str(ip)
+        whole, _, frac = s.partition(".")
+        return int(whole) + {"1": 1 / 3, "2": 2 / 3}.get(frac, 0.0)
+    except (TypeError, ValueError):
+        return 0.0
+
+def _l14_pitchers_from_mlb_api():
+    today = datetime.date.today()
+    data = mlb_get("/stats", {
+        "stats": "byDateRange", "group": "pitching", "sportId": 1,
+        "startDate": (today - datetime.timedelta(days=14)).strftime("%Y-%m-%d"),
+        "endDate": today.strftime("%Y-%m-%d"),
+        "limit": 3000, "offset": 0, "playerPool": "all",
+    })
+    splits = (data.get("stats") or [{}])[0].get("splits") or []
+    out = {}
+    for sp in splits:
+        name = (sp.get("player") or {}).get("fullName") or ""
+        nk = name.lower().strip()
+        st = sp.get("stat") or {}
+        ip = _ip_to_float(st.get("inningsPitched"))
+        if not nk or ip < 1:
+            continue
+        hr = int(st.get("homeRuns") or 0)
+        k  = int(st.get("strikeOuts") or 0)
+        bb = int(st.get("baseOnBalls") or 0)
+        hr9, k9, bb9 = hr * 9 / ip, k * 9 / ip, bb * 9 / ip
+        era = _pct_str(st.get("era"), 4.0)
+        # no xFIP on this endpoint; FIP is the closest keyless stand-in
+        fip = (13 * hr + 3 * bb - 2 * k) / ip + 3.1
+        out[nk] = {
+            "l14_bf":      int(st.get("battersFaced") or round(ip * 4.3)),
+            "l14_hr_rate": round(hr9 / 38.7, 4),
+            "l14_k_rate":  round(k9 / 38.7, 4),
+            "l14_bb_rate": round(bb9 / 38.7, 4),
+            "l14_xfip":    round(min(max(fip, 1.5), 8.0), 2),
+            "l14_era":     round(min(max(era, 0.0), 15.0), 2),
+        }
+    return out
+
 def fetch_pitcher_statcast():
-    print("Fetching pitcher data from FanGraphs CSV...")
+    print("Fetching pitcher data (MLB API, FanGraphs fallback)...")
+    api = _l14_pitchers_from_mlb_api()
+    if len(api) >= 80:
+        print(f"  Pitchers: {len(api)} from MLB API")
+        (OUT / "pitchers_l14.json").write_text(json.dumps(api, indent=2))
+        return api
+    print(f"  MLB API L14 returned only {len(api)} pitchers — falling back to FanGraphs CSV")
+
     fg_path = OUT / "fangraphs_pitchers_l14.csv"
     pitchers = {}
     if not fg_path.exists():

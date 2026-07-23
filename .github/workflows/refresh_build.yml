@@ -1,9 +1,10 @@
-name: Daily Onyx Build
+name: Hourly Refresh (lineups + weather + odds)
 on:
   schedule:
-    # 11:30 AM ET = 15:30 UTC (EDT, Apr–Nov)
-    - cron: "30 15 * * *"
-  workflow_dispatch:  # allow manual trigger from Actions tab
+    # Hourly 1:30 PM - 7:30 PM ET (17:30-23:30 UTC during EDT):
+    # picks up confirmed lineups and fresh weather until first pitch
+    - cron: "30 17-23 * * *"
+  workflow_dispatch:
 permissions:
   contents: write
   pages: write
@@ -12,8 +13,10 @@ concurrency:
   group: onyx-build
   cancel-in-progress: false
 jobs:
-  build:
+  refresh:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -23,7 +26,7 @@ jobs:
           python-version: "3.11"
       - name: Install dependencies
         run: pip install requests
-      - name: Fetch daily data
+      - name: Fetch fresh data
         run: python3 fetch_data.py
       - name: Fetch odds
         run: python3 fetch_odds.py
@@ -31,30 +34,29 @@ jobs:
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
       - name: Heal pitcher hands
         run: python3 heal_hands.py
-      - name: Grade pending picks
-        run: python3 grade_picks.py
       - name: Build index.html
         run: python3 auto_build.py
-      - name: Persist picks & DFS record
+      - name: Persist picks record
         run: python3 update_stats.py
-      - name: Commit refreshed data & index
+      - name: Commit refresh (only if something changed)
+        id: commit
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add -A data index.html
-          git commit -m "Daily build $(date -u +%Y-%m-%d)" || echo "nothing to commit"
-          git push
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "nothing to commit"
+          else
+            git commit -m "Refresh build $(date -u +%Y-%m-%dT%H:%M)"
+            git push
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
       - name: Upload Pages artifact
+        if: steps.commit.outputs.changed == 'true'
         uses: actions/upload-pages-artifact@v3
         with:
           path: .
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
       - name: Deploy to GitHub Pages
-        id: deployment
+        if: steps.commit.outputs.changed == 'true'
         uses: actions/deploy-pages@v4

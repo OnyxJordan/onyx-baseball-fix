@@ -162,7 +162,7 @@ def main():
         else:
             keyfn = lambda p: (
                 str(p.get("date", "")).strip(),
-                str(p.get("player", "")).strip().lower(),
+                str(p.get("player") or p.get("name") or "").strip().lower(),
             )
             picks, a, u = merge(picks, incoming, keyfn)
             html = replace_span(html, span, "PICKS", picks)

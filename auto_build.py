@@ -162,10 +162,20 @@ def _order(r):
     except (TypeError, ValueError):
         return 0
 
+# No games scheduled (off-day, All-Star break): leave yesterday's page live
+# and exit clean so the Action stays green.
+if not _by_game:
+    print("no games today - leaving index.html untouched")
+    sys.exit(0)
+
 for gk, rows in _by_game.items():
     away, _, home = gk.partition("_")
     gl = GAMES.get(gk, {}) if isinstance(GAMES, dict) else {}
-    wx = (WEATHER.get(gk) if isinstance(WEATHER, dict) else None) or {}
+    # weather.json is keyed by HOME team abbr (fetch_data.fetch_weather);
+    # tolerate legacy game_key-keyed files too
+    wx = {}
+    if isinstance(WEATHER, dict):
+        wx = WEATHER.get(home) or WEATHER.get(gk) or {}
     time_s = gl.get("time", "") or ""
     label = f"{away} @ {home}" + (f" ({time_s})" if time_s else "")
     game = {
@@ -175,7 +185,7 @@ for gk, rows in _by_game.items():
         "home_pitcher": gl.get("homeP") or "",
         "total": gl.get("total"),
         "away_ml": gl.get("away_ml"), "home_ml": gl.get("home_ml"),
-        "time": time_s, "venue": gl.get("venue", "") or wx.get("park", ""),
+        "time": time_s, "venue": gl.get("venue", "") or wx.get("venue", "") or wx.get("park", ""),
         "weather": wx,
         "away_lineup": [], "home_lineup": [],
     }
@@ -187,6 +197,10 @@ for gk, rows in _by_game.items():
     games_out.append(game)
 
 # ---- score every batter via model.project_player ----
+# label -> gamePk map for live-layer wiring in the shell
+gl_pk_by_label = {g["label"]: (GAMES.get(g["game_key"], {}) or {}).get("gamePk")
+                  for g in games_out}
+
 def _num(v, default):
     try:
         return float(v)
@@ -196,12 +210,12 @@ def _num(v, default):
 _model_errs = 0
 for game in games_out:
     wx = game.get("weather") or {}
-    park      = game.get("venue") or wx.get("park") or ""
+    park      = game.get("venue") or wx.get("venue") or wx.get("park") or ""
     wind_dir  = wx.get("wind_dir") or wx.get("wind_direction") or ""
-    wind_mph  = _num(wx.get("wind_mph") or wx.get("wind_speed"), 0.0)
+    wind_mph  = _num(wx.get("wind_mph") or wx.get("wind_speed") or wx.get("wind_spd"), 0.0)
     temp      = _num(wx.get("temp") or wx.get("temperature"), 72.0)
     roof      = bool(wx.get("roof") or wx.get("roof_closed"))
-    humidity  = _num(wx.get("humidity"), 50.0)
+    humidity  = _num(wx.get("humidity") or wx.get("humidity_pct"), 50.0)
     pressure  = _num(wx.get("pressure_mb") or wx.get("pressure"), 1013.0)
 
     for side in ("home", "away"):
@@ -260,6 +274,8 @@ for game in games_out:
 
             # ---- shell payload: model-native record (shell reads these fields) ----
             rec = dict(r)
+            rec["game"]         = game["label"]    # shell filters/ticker read r.game
+            rec["gamePk"]       = gl_pk_by_label.get(game["label"])
             rec["batter_name"]  = bname            # display name, not nk key
             rec["matched_name"] = bname
             rec["batter_hand"]  = (b_hand or (bat or {}).get("hand") or "")
@@ -303,11 +319,14 @@ todays = [p for p in players if p["edge"] is not None and p["edge"] >= EDGE_MIN
 if todays:
     picks = jload(dpath("picks_input.json"), [])
     stamp = now.strftime("%Y-%m-%d")
-    have = {(p.get("date"), p.get("key")) for p in picks if isinstance(p, dict)}
+    # shell PICKS schema: date / player / odds / hit (update_stats merges on
+    # (date, player) and counts hit) - keep "prob" as extra model context
+    have = {(p.get("date"), nk(p.get("player") or p.get("name") or ""))
+            for p in picks if isinstance(p, dict)}
     for p in todays[:8]:
         if (stamp, p["key"]) not in have:
-            picks.append({"date": stamp, "name": p["name"], "key": p["key"],
-                          "odds": p["odds"], "prob": p["prob"], "result": None})
+            picks.append({"date": stamp, "player": p["name"],
+                          "odds": p["odds"], "prob": p["prob"], "hit": None})
     with open(dpath("picks_input.json"), "w", encoding="utf-8") as f:
         json.dump(picks, f, indent=1, ensure_ascii=False)
     print(f"picks: auto-logged {min(len(todays),8)} edge plays for {stamp}")
@@ -315,6 +334,11 @@ else:
     print("picks: no qualifying edge plays (or no odds) - nothing logged")
 
 # ---------------------------------------------------------------- inject payload into shell
+# Fail loudly: an empty slate means upstream data broke. Abort without touching
+# index.html so yesterday's page stays live instead of shipping a blank board.
+if not results_out:
+    sys.exit("FATAL: 0 players scored - refusing to overwrite index.html")
+
 with open("shell.html", encoding="utf-8") as f:
     shell = f.read()
 
@@ -330,6 +354,7 @@ for g in games_out:
     keys_out.append(k)
     sums_out.append({"game": k, "time": g.get("time",""), "away": g.get("away_team",""),
         "home": g.get("home_team",""), "venue": g.get("venue",""), "ou": g.get("total"),
+        "gamePk": gl_pk_by_label.get(k),
         "roof": False,
         "away_ml": ("" if g.get("away_ml") is None else str(g["away_ml"])),
         "home_ml": ("" if g.get("home_ml") is None else str(g["home_ml"]))})

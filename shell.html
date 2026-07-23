@@ -447,6 +447,9 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
   /* Hero */
   .home-hero{padding:44px 20px 0;min-height:auto}
   .hero-ticker-wrap{margin:28px -20px 0 -20px}
+  .score-ticker-bar{height:36px}
+  .score-game{padding:0 14px;height:36px}
+  .sticker-logo{width:18px;height:18px}
   .home-hero-title{font-size:clamp(38px,10vw,54px)}
   .home-hero-sub{font-size:14px}
   .hero-live-badge{margin-bottom:16px}
@@ -815,6 +818,94 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
 .home-section-body{font-size:14px;line-height:1.75;color:var(--text2)}
 .home-section-body p{margin-bottom:14px}
 .home-section-body p:last-child{margin-bottom:0}
+
+/* ── LIVE SCORE TICKER ───────────────────────────────────────── */
+.ticker-item.live-hr {
+  background:rgba(0,255,136,.08);
+  border-right-color:rgba(0,255,136,.2);
+}
+.ticker-item.live-hr .ticker-name { color:var(--neon-green); }
+.ticker-item.live-hr .ticker-pct  { color:var(--neon-green); text-shadow:0 0 8px rgba(0,255,136,.5); }
+.ticker-item.live-loss {
+  background:rgba(239,68,68,.07);
+  border-right-color:rgba(239,68,68,.2);
+}
+.ticker-item.live-loss .ticker-name { color:#f87171; }
+.ticker-item.live-loss .ticker-odds { color:#f87171; }
+.ticker-pulse {
+  display:inline-block;width:6px;height:6px;border-radius:50%;
+  background:var(--neon-green);box-shadow:0 0 5px var(--neon-green);
+  animation:dotBlink 1.2s ease-in-out infinite;margin-right:2px;flex-shrink:0;
+}
+.ticker-item.live-loss .ticker-pulse { background:#f87171;box-shadow:0 0 5px #f87171; }
+.ticker-score {
+  font-family:monospace;font-size:10px;color:var(--text3);
+  background:var(--bg3);padding:1px 5px;border-radius:3px;
+}
+.ticker-item.live-hr .ticker-score { background:rgba(0,255,136,.1);color:var(--neon-green); }
+.ticker-item.live-loss .ticker-score { background:rgba(239,68,68,.1);color:#f87171; }
+
+/* ── SCORE TICKER BAR ────────────────────────────────────────── */
+.score-ticker-bar {
+  background:var(--bg2);
+  border-bottom:1px solid var(--border);
+  height:38px;overflow:hidden;display:flex;align-items:center;
+  position:relative;
+}
+.score-ticker-bar::before,
+.score-ticker-bar::after {
+  content:'';position:absolute;top:0;bottom:0;width:32px;z-index:2;
+  pointer-events:none;
+}
+.score-ticker-bar::before { left:0;  background:linear-gradient(90deg,var(--bg2),transparent); }
+.score-ticker-bar::after  { right:0; background:linear-gradient(270deg,var(--bg2),transparent); }
+.score-ticker-track {
+  display:flex;white-space:nowrap;gap:0;
+  animation:scoreTicker 60s linear infinite;
+  will-change:transform;
+  -webkit-transform:translateZ(0);
+  transform:translateZ(0);
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+}
+.score-ticker-track:hover { animation-play-state:paused; }
+@keyframes scoreTicker {
+  0%   { transform:translateX(0); }
+  100% { transform:translateX(-50%); }
+}
+.score-game {
+  display:inline-flex;align-items:center;gap:7px;
+  padding:0 20px;height:38px;cursor:default;
+  border-right:1px solid var(--border);
+  font-size:11px;transition:background .15s;
+  flex-shrink:0;
+}
+.score-game:hover { background:var(--bg3); }
+.score-team { font-weight:700;font-size:11px;color:var(--text2);font-family:monospace; }
+.score-num  { font-weight:800;font-size:13px;font-family:monospace;min-width:14px;text-align:center; }
+.score-num.winning { color:var(--text); }
+.score-num.losing  { color:var(--text3); }
+.score-sep  { color:var(--border3);font-size:10px; }
+.score-state {
+  font-size:9px;font-weight:700;letter-spacing:.04em;
+  font-family:monospace;color:var(--text3);min-width:28px;text-align:center;
+}
+.score-state.live   { color:var(--neon-green);animation:dotBlink 1.4s ease-in-out infinite; }
+.score-state.final  { color:var(--text3); }
+.score-state.sched  { color:var(--text3);opacity:.6; }
+
+.sticker-logo {
+  width:22px;height:22px;border-radius:5px;flex-shrink:0;
+  background-size:contain;background-repeat:no-repeat;background-position:center;
+  background-color:var(--bg3);
+  display:inline-block;
+}
+
+/* Worst edge plays in ticker */
+.ticker-item.ticker-bad .ticker-name { color:var(--text2); }
+.ticker-item.ticker-bad .ticker-pct  { color:#f87171; }
+.ticker-item.ticker-bad { background:rgba(239,68,68,.05); border-right-color:rgba(239,68,68,.15); }
+.ticker-section-sep { padding:0 8px; border-right:none; }
 </style>
 <meta property="og:title" content="Onyx Baseball · May 23" data-id="th-modified" ><meta property="og:image" content="https://tiiny.host/assets/logo-purple-bg.png" data-id="th-modified" ><meta property="og:image:width" content="1501" data-id="th-modified" ><meta property="og:image:height" content="1501" data-id="th-modified" ><meta property="og:image:type" content="image/png" data-id="th-modified" ><meta property="og:url" content="https://onyxbaseballtest.tiiny.site/" data-id="th-modified" ><meta property="og:type" content="website" data-id="th-modified" ><script defer data-domain="onyxbaseballtest.tiiny.site" src="https://analytics.tiiny.site/js/plausible.js"></script></head>
 <body>
@@ -975,6 +1066,13 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
   </div>
 </div>
 <div class="brand-line"></div>
+
+<!-- ═══ LIVE SCORE TICKER ═══════════════════════════════════════ -->
+<div class="score-ticker-bar" id="scoreTickerBar">
+  <div class="score-ticker-track" id="scoreTickerTrack">
+    <!-- populated by JS from live MLB data + fallback from ALL_GAME_KEYS -->
+  </div>
+</div>
 
 <!-- ═══ SEARCH ════════════════════════════════════════════════ -->
 <div class="search-bar">
@@ -2082,28 +2180,302 @@ function animateCount(el, target) {
 function buildTicker() {
   const ticker = document.getElementById('heroTicker');
   if (!ticker) return;
-  // Top edge plays sorted by composite
-  const plays = RESULTS
+
+  // Top edge plays
+  const best = RESULTS
     .filter(r => r.dk_hr_odds && r.hr_edge > 0 && r.composite > 0.08)
     .sort((a,b) => b.composite - a.composite)
-    .slice(0, 12);
-  if (!plays.length) return;
+    .slice(0, 10);
 
-  const makeItem = p => {
-    const sign = p.hr_edge > 0 ? '+' : '';
-    return `<span class="ticker-item">
-      <span class="ticker-name">${p.batter_name}</span>
+  // Worst edge plays (model thinks market is overpricing them)
+  const worst = RESULTS
+    .filter(r => r.dk_hr_odds && r.hr_edge < -2)
+    .sort((a,b) => a.hr_edge - b.hr_edge)
+    .slice(0, 6);
+
+  if (!best.length) return;
+
+  const makeItem = (p, forceClass) => {
+    const live = livePlayerData[p.batter_name.toLowerCase()] || {};
+    const hitHR    = live.hitHR    || false;
+    const gameLoss = live.gameLoss || false;
+    const gameOver = live.gameOver || false;
+    const score    = live.score    || '';
+
+    let cls = forceClass || 'ticker-item';
+    if (!forceClass) {
+      if (hitHR)         cls += ' live-hr';
+      else if (gameLoss) cls += ' live-loss';
+    }
+
+    const pulse    = (hitHR || gameLoss) ? `<span class="ticker-pulse"></span>` : '';
+    const hrBadge  = hitHR ? `<span class="ticker-sep">·</span><span class="ticker-pct" style="color:var(--neon-green)">HR ✓</span>` : '';
+    const lossBadge = (!hitHR && gameOver) ? `<span class="ticker-sep">·</span><span class="ticker-odds" style="opacity:.7">No HR</span>` : '';
+    const scorePart = score ? `<span class="ticker-sep">·</span><span class="ticker-score">${score}</span>` : '';
+    const sign = p.hr_edge >= 0 ? '+' : '';
+
+    return `<span class="${cls}">
+      ${pulse}<span class="ticker-name">${p.batter_name}</span>
       <span class="ticker-sep">·</span>
       <span class="ticker-pct">${p.hr_prob.toFixed(1)}%</span>
-      <span class="ticker-sep">vs mkt</span>
-      <span class="ticker-odds">${p.dk_hr_implied ? p.dk_hr_implied.toFixed(1) + '%' : '—'}</span>
-      <span class="ticker-sep">·</span>
+      <span class="ticker-sep">edge</span>
       <span class="ticker-pct">${sign}${p.hr_edge.toFixed(1)}pp</span>
+      ${hrBadge}${lossBadge}${scorePart}
     </span>`;
   };
+
+  // Separator between best and worst sections
+  const sep = `<span class="ticker-item ticker-section-sep">
+    <span class="ticker-sep" style="font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);opacity:.5">▸ AVOID</span>
+  </span>`;
+
+  const bestItems  = best.map(p  => makeItem(p, ''))  .join('');
+  const worstItems = worst.map(p => makeItem(p, 'ticker-item ticker-bad')).join('');
+
+  const half   = bestItems + (worstItems ? sep + worstItems : '');
+  ticker.innerHTML = half + half;
+}
+
+// ─── LIVE LAYER: score ticker + HR tracking (client-side only) ───
+// Abbrs match the pipeline's game keys (MLB-style: CWS, KC, SD, SF, TB, WSH)
+const MLB_ABBR = {
+  ARI:'Arizona Diamondbacks',ATH:'Athletics',ATL:'Atlanta Braves',
+  BAL:'Baltimore Orioles',BOS:'Boston Red Sox',CHC:'Chicago Cubs',
+  CWS:'Chicago White Sox',CIN:'Cincinnati Reds',CLE:'Cleveland Guardians',
+  COL:'Colorado Rockies',DET:'Detroit Tigers',HOU:'Houston Astros',
+  KC:'Kansas City Royals',LAA:'Los Angeles Angels',LAD:'Los Angeles Dodgers',
+  MIA:'Miami Marlins',MIL:'Milwaukee Brewers',MIN:'Minnesota Twins',
+  NYM:'New York Mets',NYY:'New York Yankees',PHI:'Philadelphia Phillies',
+  PIT:'Pittsburgh Pirates',SD:'San Diego Padres',SEA:'Seattle Mariners',
+  SF:'San Francisco Giants',STL:'St. Louis Cardinals',TB:'Tampa Bay Rays',
+  TEX:'Texas Rangers',TOR:'Toronto Blue Jays',WSH:'Washington Nationals'
+};
+
+// gamePk -> {status, awayScore, homeScore, inning, half, awayAbbr, homeAbbr}
+let liveGameData = {};
+// lowercased player name -> {hitHR, gameOver, gameLoss, score, gamePk}
+let livePlayerData = {};
+let liveLoaded = false;
+
+// Parse ESPN scoreboard response into MLB Stats API format
+function parseESPN(espn) {
+  const events = espn?.events || [];
+  if (!events.length) return null;
+  const games = events.map(ev => {
+    const comp = ev.competitions?.[0] || {};
+    const away = comp.competitors?.find(c => c.homeAway === 'away') || {};
+    const home = comp.competitors?.find(c => c.homeAway === 'home') || {};
+    const status = comp.status?.type?.name || '';
+    // ESPN abbrs are already MLB-style except these
+    const espnToOurs = {CHW:'CWS', OAK:'ATH'};
+    const awayAbbr = espnToOurs[away.team?.abbreviation] || away.team?.abbreviation || '';
+    const homeAbbr = espnToOurs[home.team?.abbreviation] || home.team?.abbreviation || '';
+    const period = comp.status?.period || 0;
+    const isLive  = status === 'STATUS_IN_PROGRESS';
+    const isFinal = status === 'STATUS_FINAL';
+    return {
+      gamePk: ev.id,
+      teams: {
+        away: {team: {name: away.team?.displayName || awayAbbr}},
+        home: {team: {name: home.team?.displayName || homeAbbr}}
+      },
+      status: {
+        detailedState: isFinal ? 'Final' : isLive ? 'In Progress' : 'Scheduled'
+      },
+      linescore: {
+        currentInning: period,
+        inningHalf: '',
+        teams: {
+          away: {runs: isFinal||isLive ? parseInt(away.score)||0 : null},
+          home: {runs: isFinal||isLive ? parseInt(home.score)||0 : null}
+        }
+      },
+      _awayAbbr: awayAbbr,
+      _homeAbbr: homeAbbr,
+    };
+  });
+  return {dates: [{games}]};
+}
+
+async function fetchLiveScores() {
+  // file:// blocks all fetch() — the bar just stays in schedule mode
+  if (location.protocol === 'file:') return;
+  const d = new Date().toISOString().split('T')[0];
+  try {
+    // MLB Stats API first, ESPN fallback
+    let data;
+    try {
+      const r = await fetch(
+        `https://statsapi.mlb.com/api/v1/schedule?sportId=1&date=${d}&hydrate=linescore`,
+        {mode:'cors'}
+      );
+      if (r.ok) data = await r.json();
+    } catch(e) {}
+
+    if (!data) {
+      try {
+        const r2 = await fetch(
+          `https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard?dates=${d.replace(/-/g,'')}`,
+          {mode:'cors'}
+        );
+        if (r2.ok) data = parseESPN(await r2.json());
+      } catch(e) {}
+    }
+
+    if (!data) return;   // degrade gracefully: keep schedule-mode bar
+    const games = data?.dates?.[0]?.games || [];
+
+    // away_abbr@home_abbr -> gamePk
+    const pkMap = {};
+    games.forEach(g => {
+      const awayFull = g.teams.away.team.name;
+      const homeFull = g.teams.home.team.name;
+      const awayAbbr = g._awayAbbr || Object.keys(MLB_ABBR).find(k => MLB_ABBR[k] === awayFull) || '';
+      const homeAbbr = g._homeAbbr || Object.keys(MLB_ABBR).find(k => MLB_ABBR[k] === homeFull) || '';
+      const ls = g.linescore || {};
+      const status = g.status?.detailedState || '';
+      const isLive = status === 'In Progress';
+      const isFinal = status === 'Final' || status === 'Game Over';
+      liveGameData[g.gamePk] = {
+        status, isLive, isFinal,
+        awayAbbr, homeAbbr,
+        awayScore: ls.teams?.away?.runs ?? null,
+        homeScore: ls.teams?.home?.runs ?? null,
+        inning: ls.currentInning || '',
+        half: ls.inningHalf || ''
+      };
+      if (awayAbbr && homeAbbr) pkMap[`${awayAbbr}@${homeAbbr}`] = g.gamePk;
+    });
+
+    // Live/final games: play-by-play to find HR hitters
+    const activePks = games
+      .filter(g => {
+        const s = g.status?.detailedState || '';
+        return s === 'In Progress' || s === 'Final' || s === 'Game Over';
+      })
+      .map(g => g.gamePk);
+
+    await Promise.all(activePks.map(async pk => {
+      try {
+        const pr = await fetch(`https://statsapi.mlb.com/api/v1/game/${pk}/playByPlay`);
+        if (!pr.ok) return;
+        const pd = await pr.json();
+        (pd?.allPlays || []).forEach(play => {
+          if (play?.result?.eventType === 'home_run' || play?.result?.event === 'Home Run') {
+            const name = play?.matchup?.batter?.fullName?.toLowerCase();
+            if (name) {
+              if (!livePlayerData[name]) livePlayerData[name] = {};
+              livePlayerData[name].hitHR = true;
+              livePlayerData[name].gamePk = pk;
+            }
+          }
+        });
+      } catch(e) {}
+    }));
+
+    // Map game outcomes onto modeled players
+    RESULTS.forEach(p => {
+      const pname = p.batter_name.toLowerCase();
+      const gm = (p.game || p.game_label || '').match(/^(\w+)\s*@\s*(\w+)/);
+      if (!gm) return;
+      const awayAbbr = gm[1], homeAbbr = gm[2];
+      const pk = pkMap[`${awayAbbr}@${homeAbbr}`];
+      if (!pk) return;
+      const gd = liveGameData[pk];
+      if (!gd) return;
+      if (!livePlayerData[pname]) livePlayerData[pname] = {};
+      livePlayerData[pname].gamePk = pk;
+      livePlayerData[pname].gameOver = gd.isFinal;
+      if (gd.isFinal) {
+        const away = gd.awayScore ?? 0;
+        const home = gd.homeScore ?? 0;
+        const playerIsAway = p.team === awayAbbr;
+        const playerWon = playerIsAway ? away > home : home > away;
+        livePlayerData[pname].gameLoss = !playerWon;
+        livePlayerData[pname].score = `${awayAbbr} ${away}–${home} ${homeAbbr}`;
+      } else if (gd.isLive) {
+        const away = gd.awayScore ?? 0;
+        const home = gd.homeScore ?? 0;
+        livePlayerData[pname].score = `${away}–${home} ${gd.half?.[0]||''}${gd.inning}`;
+      }
+    });
+
+    liveLoaded = true;
+    buildTicker();       // refresh edge ticker with live badges
+    buildScoreTicker();  // refresh score bar
+  } catch(e) { console.warn('Live scores unavailable:', e); }
+}
+
+// ── SCORE TICKER BAR ───────────────────────────────────────────
+function buildScoreTicker() {
+  const track = document.getElementById('scoreTickerTrack');
+  if (!track) return;
+
+  const TICKER_COLORS = {"ARI":"#A71930","ATH":"#003831","ATL":"#CE1141","BAL":"#DF4601","BOS":"#BD3039","CHC":"#0E3386","CWS":"#27251F","CIN":"#C6011F","CLE":"#00385D","COL":"#33006F","DET":"#0C2340","HOU":"#002D62","KC":"#004687","LAA":"#BA0021","LAD":"#005A9C","MIA":"#00A3E0","MIL":"#FFC52F","MIN":"#002B5C","NYM":"#002D72","NYY":"#003087","PHI":"#E81828","PIT":"#FDB827","SD":"#2F241D","SEA":"#0C2C56","SF":"#FD5A1E","STL":"#C41E3A","TB":"#092C5C","TEX":"#003278","TOR":"#134A8E","WSH":"#AB0003"};
+  const teamBadge = abbr => {
+    const col = TICKER_COLORS[abbr] || '#1c3252';
+    // TEAM_LOGOS carries both MLB-style and FanGraphs-style keys
+    const FG = {CWS:'CHW', KC:'KCR', SD:'SDP', SF:'SFG', TB:'TBR', WSH:'WAS'};
+    const logo = (typeof TEAM_LOGOS !== 'undefined' && (TEAM_LOGOS[abbr] || TEAM_LOGOS[FG[abbr]])) || '';
+    if (logo) return `<span class="sticker-logo" style="background-image:url(${logo})"></span>`;
+    return `<span class="score-team" style="background:${col}">${abbr}</span>`;
+  };
+
+  const makeGame = (awayAbbr, homeAbbr, state, awayScore, homeScore) => {
+    const isLive   = state === 'live';
+    const isFinal  = state === 'final';
+    const hasScore = awayScore !== null && homeScore !== null;
+    const awayWin  = hasScore && awayScore > homeScore;
+    const homeWin  = hasScore && homeScore > awayScore;
+    const stateLabel = isLive ? 'LIVE' : isFinal ? 'F' : '';
+    const stateCls   = isLive ? 'live' : isFinal ? 'final' : 'sched';
+
+    return `<div class="score-game">
+      ${teamBadge(awayAbbr)}
+      ${hasScore ? `<span class="score-num ${awayWin?'winning':'losing'}">${awayScore}</span><span class="score-sep">–</span><span class="score-num ${homeWin?'winning':'losing'}">${homeScore}</span>` : '<span class="score-sep">·</span>'}
+      ${teamBadge(homeAbbr)}
+      ${stateLabel ? `<span class="score-state ${stateCls}">${stateLabel}</span>` : ''}
+    </div>`;
+  };
+
+  let games = [];
+  if (Object.keys(liveGameData).length > 0) {
+    Object.values(liveGameData).forEach(gd => {
+      if (!gd.awayAbbr || !gd.homeAbbr) return;
+      const state = gd.isLive ? 'live' : gd.isFinal ? 'final' : 'sched';
+      const hasScore = gd.awayScore !== null && gd.homeScore !== null;
+      games.push(makeGame(
+        gd.awayAbbr, gd.homeAbbr, state,
+        hasScore ? gd.awayScore : null,
+        hasScore ? gd.homeScore : null
+      ));
+    });
+  } else {
+    // Pre-poll fallback: today's slate from the baked payload
+    ALL_GAME_KEYS.forEach(key => {
+      const m = key.match(/^(\w+)\s*@\s*(\w+)/);
+      if (m) games.push(makeGame(m[1], m[2], 'sched', null, null));
+    });
+  }
+
+  if (!games.length) {
+    document.getElementById('scoreTickerBar')?.style.setProperty('display','none');
+    return;
+  }
   // Duplicate for seamless loop
-  const html = plays.map(makeItem).join('') + plays.map(makeItem).join('');
-  ticker.innerHTML = html;
+  track.innerHTML = games.join('') + games.join('');
+}
+
+// Poll every 90 seconds; bar renders instantly in schedule mode
+function startLivePolling() {
+  buildScoreTicker();
+  fetchLiveScores();
+  setInterval(fetchLiveScores, 90000);
+}
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', startLivePolling);
+} else {
+  startLivePolling();
 }
 
 let searchQ = '';
