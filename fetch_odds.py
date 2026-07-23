@@ -73,6 +73,16 @@ def _event_is_today(ev):
     except Exception:
         return False
 
+def _event_still_relevant(ev):
+    """Skip HR-prop pulls for games that started long enough ago to be over.
+    At a 20-minute cadence this saves prop credits on essentially-final games
+    (no board value: their batters have no PA left)."""
+    try:
+        dt = datetime.fromisoformat(ev["commence_time"].replace("Z", "+00:00"))
+        return (datetime.now(timezone.utc) - dt) <= timedelta(hours=4.5)
+    except Exception:
+        return True   # unknown start: don't skip
+
 def _pick_book(bookmakers, market_key):
     """Preferred book that actually carries the market; else first with it."""
     with_mkt = [b for b in (bookmakers or [])
@@ -105,7 +115,11 @@ def try_odds_api():
         return None
 
     odds, remaining = {}, None
-    for ev in todays:
+    live_or_upcoming = [e for e in todays if _event_still_relevant(e)]
+    skipped = len(todays) - len(live_or_upcoming)
+    if skipped:
+        print(f"skipping HR props for {skipped} likely-final game(s) to save credits")
+    for ev in live_or_upcoming:
         try:
             data, remaining = _oapi_get(
                 f"/events/{ev['id']}/odds", key,
