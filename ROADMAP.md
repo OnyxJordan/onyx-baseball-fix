@@ -17,25 +17,22 @@ Ordered by priority. Each phase is shippable on its own.
 - Auto-logged picks now match the shell PICKS schema (`player` / `hit`), so they merge into the record instead of collapsing
 - Build fails loudly on an empty slate and exits clean on off-days
 
-## Phase 1: Kill the manual morning routine (automation)
+## Phase 1: Kill the manual morning routine (DONE, this branch)
 
-The only remaining manual inputs are odds, betting lines, FanGraphs L14 CSVs, and pick results. Automate each:
+1. **Odds via The Odds API**: `fetch_odds.py` now tries The Odds API first (GitHub secret `ODDS_API_KEY`, DK book preferred per event), then DK direct, then the manual file with its git-time freshness gate. Game totals and moneylines from the same source are merged into `game_lines.json`. ACTION NEEDED: add the `ODDS_API_KEY` repo secret (Settings -> Secrets and variables -> Actions).
+2. **L14 form without CSV uploads**: hitter and pitcher L14 now come from MLB Stats API byDateRange aggregates (421 hitters / 447 pitchers on first run vs 414 / 285 from the CSVs). Statcast CSVs still enrich barrel/EV when present; FanGraphs CSVs remain as a fallback only.
+3. **Auto-grade picks**: `grade_picks.py` grades pending picks from final boxscores in the daily run. Verified against real slates: HR hit -> true, appeared without HR -> false, never appeared -> stays pending (voided prop).
+4. **Confirmed-lineup refresh**: `refresh_build.yml` reruns the pipeline hourly 1:30-7:30 PM ET and commits/deploys only when output changed.
 
-1. **Odds via The Odds API** (the-odds-api.com)
-   - `batter_home_runs` player prop market, free tier is enough for one fetch per day
-   - New `fetch_odds.py` path: try The Odds API (key via GitHub secret `ODDS_API_KEY`), then DK direct, then manual file; write `odds_meta.json` with the true source
-   - Also grab game totals and moneylines from the same call and merge into `game_lines.json`, removing that manual input too
-2. **L14 form without CSV uploads**
-   - Replace the FanGraphs CSV dependency with MLB Stats API aggregates: `/api/v1/stats` with `stats=byDateRange` gives PA/HR/ISO per hitter for any window, no key, CORS-friendly
-   - Statcast quality (barrel, EV) via pybaseball in the Action (pip install in workflow) writing the same `statcast_l14.json` shape; keep the CSV path as a fallback loader
-3. **Auto-grade picks**
-   - New `grade_picks.py` post-games step (second cron, ~3 AM ET): for each pending pick, hit the MLB Stats API boxscore for that date and set `hit` true/false automatically
-   - Manual editing of `picks_input.json` becomes optional forever
-4. **Confirmed-lineup refresh**
-   - Second lightweight workflow run hourly from 3 PM to first pitch: refetch lineups and weather only, rebuild, commit only if lineups changed
-   - Fixes the "11:30 AM projected lineups" weakness; also improve the projected fallback (recent-orders hydrate currently returns zero; use per-game boxscores from the last 10 finals instead)
+Remaining in this phase: improve the projected-lineup fallback (the recent-orders hydrate returns zero entries; use per-game boxscores from the last 10 finals instead). Statcast quality via pybaseball in the Action is optional polish on top of the CSV enrichment path.
 
-Exit criteria: on a normal day, zero human actions and the board still shows odds, edges, confirmed lineups, and graded picks.
+## Phase 3 head start (DONE, this branch): live score ticker
+
+Ported from the early New-Baseball-Test iteration and adapted to the current pipeline's team abbreviations and payload fields:
+- Score ticker bar pinned under the nav: every game today with logos, live scores, inning, LIVE / F states
+- Polls MLB Stats API every 90s, ESPN scoreboard fallback, schedule-mode fallback from the baked payload when both fail; never breaks the page
+- Play-by-play HR detection lights modeled players green in the edge ticker (HR badge + live score), grays out finished no-HR games
+- `gamePk` now flows from the schedule into `game_lines.json`, RESULTS rows, and SUMMARIES, ready for live game cards and board badges
 
 ## Phase 2: Pipeline hardening
 
@@ -44,14 +41,13 @@ Exit criteria: on a normal day, zero human actions and the board still shows odd
 3. **Envelope extraction**: move the injected payload out of regex-on-HTML into a real `data/envelope_mlb.json` fetched by the shell (`{ sport, version, generated_at, columns[], rows[] }`); shell falls back to baked constants if fetch fails. This is the foundation for Phase 5 and removes the fragile `replace_const` regex entirely (schema version bumped in shell and builder in the same commit)
 4. **Second-half DB refresh cadence**: run the `rebuild.yml` DB rebuild monthly on a schedule instead of manually
 
-## Phase 3: Live layer (client-side, zero backend)
+## Phase 3: Live layer, remaining work (client-side, zero backend)
 
-1. **Live ticker** (top product priority)
-   - Horizontal scroll strip pinned above the board, polling `statsapi.mlb.com/api/v1/schedule?sportId=1&hydrate=linescore` every 30s on game days
-   - Matchup, score, inning + half, outs, runners as diamond icons; pregame shows start time + probables; final shows final
-   - Fails silent: any fetch error hides the ticker, never breaks the page
+The ticker and HR detection shipped early (see above). Still to build:
+
+1. **Ticker detail**: outs and runners-on-base diamond icons on live games; pregame probables on hover; optional 30s poll rate on game days
 2. **Live game cards**: expand a ticker game into current batter / pitcher / count / last play via the live feed endpoint; highlight modeled batters at the plate
-3. **In-game HR tracking**: when a modeled batter homers, HIT badge on the board row and a running daily model record (hits vs pending vs misses)
+3. **In-game HR tracking on the board**: HIT badge on main board rows (livePlayerData is already populated; the board renderer just needs to read it) and a running daily model record (hits vs pending vs misses)
 4. **Live-adjusting board**: gray out finished games, badge batters who already homered, estimated PAs remaining per batter
 
 ## Phase 4: Board UX polish
