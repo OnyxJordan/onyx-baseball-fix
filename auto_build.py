@@ -527,6 +527,14 @@ shell = replace_const(shell, "ALL_GAME_KEYS", keys_out)
 shell = replace_const(shell, "LINE_HISTORY", jload(dpath("line_history.json"), []))
 shell = replace_const(shell, "DAILY_RECAP", jload(dpath("recap.json"), {}))
 
+# ---- Onyx game links: only today's harvested slugs ever ship ----
+from zoneinfo import ZoneInfo
+_onyx = jload(dpath("onyx_games.json"), {}) or {}
+_et_today = datetime.now(ZoneInfo("America/New_York")).strftime("%Y-%m-%d")
+_onyx_links = _onyx.get("links") or {} if _onyx.get("date") == _et_today else {}
+shell = replace_const(shell, "ONYX_GAME_LINKS", _onyx_links)
+print(f"onyx links: {len(_onyx_links)} game(s) wired for {_et_today}")
+
 # ---- stamp the build date over the baked date literals ----
 _badge = f"{now.strftime('%b').upper()} {now.day} · {now.year}"      # JUL 23 · 2026
 _short = f"{now.strftime('%B')} {now.day}"                            # July 23

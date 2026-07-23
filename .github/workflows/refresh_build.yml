@@ -38,6 +38,10 @@ jobs:
         run: python3 fetch_odds.py
         env:
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
+      - name: Fetch Onyx game links
+        run: python3 fetch_onyx.py
+        env:
+          ONYX_COOKIE: ${{ secrets.ONYX_COOKIE }}
       - name: Heal pitcher hands
         run: python3 heal_hands.py
       - name: Build index.html
