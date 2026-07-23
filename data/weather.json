@@ -1,4 +1,15 @@
 {
+  "STL": {
+    "venue": "Busch Stadium",
+    "temp": 81.1,
+    "precip": 1,
+    "wind_spd": 5.8,
+    "wind_dir": "NNE",
+    "humidity_pct": 43,
+    "pressure_mb": 1002.2,
+    "roof": false,
+    "flag": "clear"
+  },
   "CLE": {
     "venue": "Progressive Field",
     "temp": 75.1,
@@ -7,17 +18,6 @@
     "wind_dir": "N",
     "humidity_pct": 51,
     "pressure_mb": 999.1,
-    "roof": false,
-    "flag": "clear"
-  },
-  "DET": {
-    "venue": "Comerica Park",
-    "temp": 77.5,
-    "precip": 0,
-    "wind_spd": 6.0,
-    "wind_dir": "ESE",
-    "humidity_pct": 34,
-    "pressure_mb": 1000.2,
     "roof": false,
     "flag": "clear"
   },
@@ -32,14 +32,14 @@
     "roof": true,
     "flag": "clear"
   },
-  "STL": {
-    "venue": "Busch Stadium",
-    "temp": 81.1,
-    "precip": 1,
-    "wind_spd": 5.8,
-    "wind_dir": "NNE",
-    "humidity_pct": 43,
-    "pressure_mb": 1002.2,
+  "DET": {
+    "venue": "Comerica Park",
+    "temp": 77.5,
+    "precip": 0,
+    "wind_spd": 6.0,
+    "wind_dir": "ESE",
+    "humidity_pct": 34,
+    "pressure_mb": 1000.2,
     "roof": false,
     "flag": "clear"
   }
