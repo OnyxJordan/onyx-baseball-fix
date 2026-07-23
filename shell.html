@@ -961,7 +961,7 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
 .gc-line td:first-child, .gc-line th:first-child { text-align:left; font-weight:800; }
 .gc-line td.cur { background:rgba(160,32,240,.12); }
 .gc-line .rhe { font-weight:800; border-left:1px solid var(--border2); }
-.gc-matchup { display:grid; grid-template-columns:1fr 1fr auto; gap:16px; align-items:center; }
+.gc-matchup { display:grid; grid-template-columns:1fr 1fr auto auto; gap:16px; align-items:center; }
 .gc-mu-role { font-size:9px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text3); }
 .gc-mu-name { font-size:14px; font-weight:800; margin:3px 0 2px; background:linear-gradient(90deg,#A020F0,#4060F0); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
 .gc-mu-line { font-size:11px; color:var(--text2); font-family:monospace; }
@@ -971,6 +971,25 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
 .gc-dot.on-b { background:#4060F0; border-color:#4060F0; }
 .gc-dot.on-s { background:#A020F0; border-color:#A020F0; }
 .gc-dot.on-o { background:#f87171; border-color:#f87171; }
+.gc-subnav { display:flex; gap:8px; margin:0 0 14px; }
+.gc-subnav button { background:var(--card); border:1px solid var(--border2); color:var(--text3); font-family:monospace; font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; padding:8px 14px; border-radius:8px; cursor:pointer; transition:all .15s; }
+.gc-subnav button.on { color:#fff; border-color:rgba(160,32,240,.6); background:rgba(160,32,240,.14); }
+.gc-zonewrap { display:flex; flex-direction:column; align-items:center; gap:3px; }
+.gc-zonewrap .zl { font-size:8px; font-weight:700; letter-spacing:.12em; color:var(--text3); text-transform:uppercase; }
+.gc-pitchrow { display:flex; align-items:center; gap:8px; padding:4px 0; font-size:11px; color:var(--text2); border-top:1px solid rgba(26,37,53,.5); font-family:monospace; }
+.gc-pitchrow .pn { width:16px; height:16px; border-radius:50%; color:#0a0a14; font-weight:800; font-size:9px; display:inline-flex; align-items:center; justify-content:center; flex:none; }
+.gc-pitchrow .pc { min-width:120px; font-weight:700; }
+.gc-pitchrow .pt { color:var(--text3); }
+.gc-pbp-inn { font-family:monospace; font-size:10px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--text3); padding:14px 2px 6px; }
+.gc-pbp-row { background:var(--card); border:1px solid var(--border2); border-radius:10px; padding:10px 12px; margin-bottom:8px; cursor:pointer; transition:border-color .15s; }
+.gc-pbp-row:hover { border-color:rgba(160,32,240,.45); }
+.gc-pbp-row.scoring { border-color:rgba(52,211,153,.45); }
+.gc-pbp-row .ev { font-family:monospace; font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#A020F0; }
+.gc-pbp-row.scoring .ev { color:#34d399; }
+.gc-pbp-row .sc { float:right; font-family:monospace; font-size:11px; font-weight:800; color:var(--text2); }
+.gc-pbp-row .ds { font-size:12px; color:var(--text2); line-height:1.5; margin-top:3px; }
+.gc-pbp-x { display:flex; gap:16px; margin-top:10px; padding-top:10px; border-top:1px solid rgba(26,37,53,.5); flex-wrap:wrap; align-items:flex-start; }
+.gc-pbp-x .pl { flex:1; min-width:220px; }
 .gc-boxes { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
 .gc-box-table { width:100%; border-collapse:collapse; font-size:11px; }
 .gc-box-table th { padding:5px 6px; font-size:9px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--text3); border-bottom:1px solid var(--border); text-align:right; }
@@ -2984,6 +3003,8 @@ function initGamecenter() {
 
 function gcSelect(pk) {
   gcPk = +pk;
+  gcPbpOpen.clear();
+  _gcLastFeed = null; _gcLastWp = null;
   const b = document.getElementById('gcBody');
   if (b) { delete b.dataset.loaded; b.innerHTML = '<div class="gc-empty">Loading…</div>'; }
   stopGC();
@@ -3142,9 +3163,108 @@ function gcHitTable(teamBox, teamName, logoAbbr) {
 }
 
 let _gcPrevScore = {};
+// ─── GAMECENTER: strike zone + play-by-play ─────────────────────
+// Every pitch in the GUMBO feed carries pitchData.coordinates (pX/pZ in
+// feet, catcher's view) plus the batter's personal zone top/bottom, so the
+// zone plot and the AB-by-AB log are free: no extra requests.
+function gcPitchClr(ev) {
+  const d = ev.details || {};
+  if (d.isInPlay) return '#34d399';
+  if (d.isBall) return '#4060F0';
+  const c = ((d.call || {}).description || d.description || '').toLowerCase();
+  if (c.includes('foul')) return '#eab308';
+  return '#f87171';   // called or swinging strike
+}
+function gcZone(events, big) {
+  const pitches = (events || []).filter(e => e.isPitch && e.pitchData
+    && e.pitchData.coordinates && e.pitchData.coordinates.pX != null
+    && e.pitchData.coordinates.pZ != null);
+  const last = pitches[pitches.length - 1];
+  const szT = (last && last.pitchData.strikeZoneTop) || 3.4;
+  const szB = (last && last.pitchData.strikeZoneBottom) || 1.57;
+  const X0 = -1.6, X1 = 1.6, Z0 = 0.7, Z1 = 4.4, W = 110, H = 138;
+  const sx = x => ((x - X0) / (X1 - X0)) * W;
+  const sy = z => H - ((z - Z0) / (Z1 - Z0)) * H;
+  const zx = sx(-0.708), zw = sx(0.708) - sx(-0.708);
+  const zy = sy(szT), zh = sy(szB) - sy(szT);
+  let grid = '';
+  for (let i = 1; i < 3; i++) {
+    grid += `<line x1="${(zx + zw * i / 3).toFixed(1)}" y1="${zy.toFixed(1)}" x2="${(zx + zw * i / 3).toFixed(1)}" y2="${(zy + zh).toFixed(1)}" stroke="rgba(255,255,255,.07)"/>
+      <line x1="${zx.toFixed(1)}" y1="${(zy + zh * i / 3).toFixed(1)}" x2="${(zx + zw).toFixed(1)}" y2="${(zy + zh * i / 3).toFixed(1)}" stroke="rgba(255,255,255,.07)"/>`;
+  }
+  const dots = pitches.map(ev => {
+    const c = ev.pitchData.coordinates;
+    const x = Math.max(6, Math.min(W - 6, sx(+c.pX)));
+    const y = Math.max(6, Math.min(H - 6, sy(+c.pZ)));
+    return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="6.5" fill="${gcPitchClr(ev)}" fill-opacity=".92" stroke="rgba(0,0,0,.55)" stroke-width="1"/>
+      <text x="${x.toFixed(1)}" y="${(y + 2.8).toFixed(1)}" text-anchor="middle" font-size="8" font-weight="800" fill="#0a0a14">${ev.pitchNumber || ''}</text>`;
+  }).join('');
+  const s = big ? 1.25 : 1;
+  return `<svg viewBox="0 0 ${W} ${H}" width="${Math.round(W * s)}" height="${Math.round(H * s)}" style="display:block">
+    <rect x="0" y="0" width="${W}" height="${H}" rx="8" fill="rgba(255,255,255,.02)" stroke="rgba(26,37,53,.6)"/>
+    <rect x="${zx.toFixed(1)}" y="${zy.toFixed(1)}" width="${zw.toFixed(1)}" height="${zh.toFixed(1)}" fill="rgba(160,32,240,.08)" stroke="rgba(160,32,240,.55)" stroke-width="1.5"/>
+    ${grid}${dots}
+  </svg>`;
+}
+function gcPitchList(events) {
+  const pitches = (events || []).filter(e => e.isPitch);
+  if (!pitches.length) return '<div style="font-size:11px;color:var(--text3);padding:6px 0">No pitches yet</div>';
+  return pitches.map(ev => {
+    const d = ev.details || {};
+    const t = ((d.type || {}).description) || '';
+    const v = (ev.pitchData || {}).startSpeed;
+    return `<div class="gc-pitchrow"><span class="pn" style="background:${gcPitchClr(ev)}">${ev.pitchNumber || ''}</span>
+      <span class="pc">${(d.call || {}).description || d.description || ''}</span>
+      <span class="pt">${t}${v ? ' · ' + (+v).toFixed(0) + ' mph' : ''}</span></div>`;
+  }).join('');
+}
+
+let gcView = 'overview';
+const gcPbpOpen = new Set();
+let _gcLastFeed = null, _gcLastWp = null;
+function gcSetView(v) { gcView = v; if (_gcLastFeed) renderGC(_gcLastFeed, _gcLastWp); }
+function gcTogglePlay(i) {
+  if (gcPbpOpen.has(i)) gcPbpOpen.delete(i); else gcPbpOpen.add(i);
+  if (_gcLastFeed) renderGC(_gcLastFeed, _gcLastWp);
+}
+
+function gcPbpHtml(ld) {
+  const all = ((ld.plays || {}).allPlays || [])
+    .filter(p => (p.about || {}).isComplete || (p.playEvents || []).some(e => e.isPitch));
+  if (!all.length) return '<div class="gc-card"><div class="gc-empty" style="padding:20px">No plays yet — the log starts at first pitch.</div></div>';
+  let rows = '', lastKey = '';
+  all.slice().reverse().forEach(p => {
+    const ab = p.about || {}, res = p.result || {}, mu = p.matchup || {};
+    const key = `${ab.halfInning}-${ab.inning}`;
+    if (key !== lastKey) {
+      lastKey = key;
+      rows += `<div class="gc-pbp-inn">${ab.halfInning === 'top' ? '▲ Top' : '▼ Bottom'} ${ab.inning}</div>`;
+    }
+    const i = ab.atBatIndex;
+    const open = gcPbpOpen.has(i);
+    const scoring = ab.isScoringPlay === true || (res.rbi || 0) > 0;
+    const inProg = !ab.isComplete;
+    const ev = inProg ? 'In progress' : (res.event || 'Play');
+    const batter = (mu.batter || {}).fullName || '';
+    const pitcher = (mu.pitcher || {}).fullName || '';
+    const desc = res.description || (inProg ? `${batter} batting vs ${pitcher}` : '');
+    const score = scoring ? `<span class="sc">${res.awayScore ?? ''}–${res.homeScore ?? ''}</span>` : '';
+    const detail = open ? `<div class="gc-pbp-x">
+        <div class="gc-zonewrap"><div class="zl">Zone · catcher's view</div>${gcZone(p.playEvents, true)}</div>
+        <div class="pl">${gcPitchList(p.playEvents)}</div>
+      </div>` : '';
+    rows += `<div class="gc-pbp-row${scoring ? ' scoring' : ''}" onclick="gcTogglePlay(${i})">
+      ${score}<span class="ev">${ev}</span>
+      <div class="ds">${desc}</div>${detail}
+    </div>`;
+  });
+  return `<div style="max-width:760px;margin:0 auto">${rows}</div>`;
+}
+
 function renderGC(feed, wp) {
   const body = document.getElementById('gcBody');
   if (!body) return;
+  _gcLastFeed = feed; _gcLastWp = wp;
   const gd = feed.gameData || {}, ld = feed.liveData || {};
   const away = (gd.teams || {}).away || {}, home = (gd.teams || {}).home || {};
   const aAb = gcAb(away.abbreviation), hAb = gcAb(home.abbreviation);
@@ -3279,7 +3399,10 @@ function renderGC(feed, wp) {
         <div class="gc-dots">S ${gcDots(count.strikes || 0, 3, 'on-s')}</div>
         <div class="gc-dots">O ${gcDots(count.outs || 0, 3, 'on-o')}</div>
       </div>
-    </div></div>`;
+      <div class="gc-zonewrap"><div class="zl">Strike zone</div>${gcZone((((ld.plays || {}).currentPlay || {}).playEvents))}</div>
+    </div>
+    <div style="margin-top:10px">${gcPitchList((((ld.plays || {}).currentPlay || {}).playEvents))}</div>
+    </div>`;
   }
 
   // last play
@@ -3296,7 +3419,13 @@ function renderGC(feed, wp) {
     ${gcHitTable(box.home, (home.teamName || home.name || hAb), hAb)}
   </div>`;
 
-  body.innerHTML = header + wpHtml + lineHtml + muHtml + playHtml + spHtml + boxes;
+  const subnav = `<div class="gc-subnav">
+    <button class="${gcView === 'overview' ? 'on' : ''}" onclick="gcSetView('overview')">Overview</button>
+    <button class="${gcView === 'pbp' ? 'on' : ''}" onclick="gcSetView('pbp')">Play by play</button>
+  </div>`;
+  body.innerHTML = gcView === 'pbp'
+    ? header + subnav + lineHtml + gcPbpHtml(ld)
+    : header + subnav + wpHtml + lineHtml + muHtml + playHtml + spHtml + boxes;
 }
 
 // ─── MARKETS: Kalshi-style win probability tracker ──────────────
