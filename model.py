@@ -1,5 +1,13 @@
 """
-model.py — Onyx Baseball v16 HR probability + DFS projection model
+model.py — Onyx Baseball v17 HR probability model
+
+v17: recency de-weighted across the board — small-sample L14 outcomes were
+compounding through four multipliers (batter form, SC quality replacement,
+pitcher L14 leg, due meter) and letting one cold pitcher stack a whole
+lineup at the top of the board. Form is now reliability-shrunk (PA-based,
+capped ±12%/−10%), L14 quality blends with career instead of replacing it
+(max 65%), the pitcher L14 leg needs 25+ BF and maxes at 15% weight inside
+tighter clamps, and the due meter's range narrows to 0.92–1.18.
 
 v16 changes vs v15:
   - wind_env() rewritten again: adds a per-park PARK_WIND_SENSITIVITY multiplier
@@ -242,25 +250,27 @@ def sc_score(d: dict, l14: dict = None) -> float:
     Statcast quality score. Prefers LIVE L14 Statcast (real barrel%/EV90/hardhit
     from statcast_l14.json) when present; falls back to baked-in career fields.
     """
-    if l14 and l14.get("l14_pa", 0) >= 15:
-        b  = l14.get("l14_barrel_pct", 0.085) or 0.085
-        h  = l14.get("l14_hh_pct", 0.40)      or 0.40
-        e  = l14.get("l14_avg_ev", 95)        or 95
-        i  = l14.get("l14_iso", 0.165)        or 0.165
-        pa = l14.get("l14_pa", 0)             or 0
-        pa_ref = 55           # barrel%/EV/HH stabilize fast — trust a ~50-PA L14 window
-    else:
-        b  = d.get("b3", 0.085) or 0.085
-        h  = d.get("h3", 0.40)  or 0.40
-        e  = d.get("e3", 95)    or 95
-        i  = d.get("i3", 0.165) or 0.165
-        pa = d.get("p3", 0)     or 0
-        pa_ref = 400
+    def _raw(b, h, e, i):
+        r = (0.35*(b/0.085) + 0.25*(h/0.40) + 0.25*((e-85)/20) + 0.15*(i/0.165))
+        return max(0.60, min(1.35, r))
 
-    sc_raw = (0.35*(b/0.085) + 0.25*(h/0.40) + 0.25*((e-85)/20) + 0.15*(i/0.165))
-    sc_raw = max(0.60, min(1.35, sc_raw))
-    pa_conf = min(pa / pa_ref, 1.0)
-    return pa_conf * sc_raw + (1 - pa_conf) * 0.90
+    # career quality is the anchor
+    car_pa = d.get("p3", 0) or 0
+    car_raw = _raw(d.get("b3", 0.085) or 0.085, d.get("h3", 0.40) or 0.40,
+                   d.get("e3", 95) or 95, d.get("i3", 0.165) or 0.165)
+    car_conf = min(car_pa / 400.0, 1.0)
+    career_sc = car_conf * car_raw + (1 - car_conf) * 0.90
+
+    # L14 quality NUDGES the career anchor, never replaces it (max 65%)
+    if l14 and l14.get("l14_pa", 0) >= 15:
+        pa = l14.get("l14_pa", 0) or 0
+        l14_raw = _raw(l14.get("l14_barrel_pct", 0.085) or 0.085,
+                       l14.get("l14_hh_pct", 0.40) or 0.40,
+                       l14.get("l14_avg_ev", 95) or 95,
+                       l14.get("l14_iso", 0.165) or 0.165)
+        w = min(pa / 120.0, 0.65)
+        return w * l14_raw + (1 - w) * career_sc
+    return career_sc
 
 def pitcher_factor(pitcher_name: str, l14_pitchers: dict = None, is_home_pitcher: bool = False) -> float:
     """
@@ -279,13 +289,15 @@ def pitcher_factor(pitcher_name: str, l14_pitchers: dict = None, is_home_pitcher
         base_xfip = pd.get("xf3") or pd.get("xf6") or 4.0
         base_pf = max(0.50, min(1.80, base_xfip / 4.0))
 
+    # L14 pitcher HR rate is 2-3 starts of outcome noise: it nudges the
+    # career/season factor only with a real sample, tight clamps, max 15%
     if l14_pitchers and pk in l14_pitchers:
         l14 = l14_pitchers[pk]
         bf = l14.get("l14_bf", 0)
-        if bf >= 10:
+        if bf >= 25:
             hr_rate = l14.get("l14_hr_rate", 0.03)
-            l14_pf = max(0.60, min(1.50, hr_rate / 0.033))
-            w = min(bf / 100, 0.30)
+            l14_pf = max(0.75, min(1.30, hr_rate / 0.033))
+            w = min(bf / 150, 0.15)
             base_pf = (1 - w) * base_pf + w * l14_pf
 
     return round(base_pf, 3)
@@ -301,13 +313,13 @@ def due_meter(d: dict, sc: float, l14: dict = None) -> float:
         return 1.0
     expected = career_rate * l14_pa
     due_score = (expected - l14_hr) * sc
-    if due_score > 1.2:   return 1.30
-    if due_score > 0.6:   return 1.15
-    if due_score > 0.15:  return 1.05
+    if due_score > 1.2:   return 1.18
+    if due_score > 0.6:   return 1.10
+    if due_score > 0.15:  return 1.04
     if due_score > -0.15: return 1.00
-    if due_score > -0.6:  return 0.97
-    if due_score > -1.2:  return 0.93
-    return 0.88
+    if due_score > -0.6:  return 0.98
+    if due_score > -1.2:  return 0.95
+    return 0.92
 
 # ── MAIN PROJECTION ────────────────────────────────────────────────────────────
 def project_player(
@@ -364,10 +376,14 @@ def project_player(
     else:
         base = c_adj
 
-    # 2. L14 form adjustment
-    if l14 and l14.get("l14_pa", 0) >= 20:
-        l14_rate = l14["l14_rate"]
-        form_adj = max(0.85, min(1.20, l14_rate / base)) if base > 0 else 1.0
+    # 2. L14 form adjustment — reliability-shrunk. HR/PA needs ~170 PA to
+    # stabilize; a 50-PA window is mostly noise, so the observed ratio is
+    # regressed toward 1.0 by sample size and capped tight.
+    if l14 and l14.get("l14_pa", 0) >= 20 and base > 0:
+        l14_pa_f = l14.get("l14_pa", 0) or 0
+        ratio = max(0.5, min(1.8, l14["l14_rate"] / base))
+        rel = l14_pa_f / (l14_pa_f + 130.0)
+        form_adj = max(0.90, min(1.12, 1.0 + (ratio - 1.0) * rel))
         base = base * form_adj
 
     # 3. SC score (prefers live L14 Statcast)
