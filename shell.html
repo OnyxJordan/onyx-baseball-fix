@@ -1406,7 +1406,7 @@ tr.row-done td, .tcard.card-done { opacity:.5; }
         </div>
         <div class="model-note">
           <div class="model-note-label">Odds + Game Lines</div>
-          <div class="model-note-val">HR props pulled per game with DraftKings book preference, plus totals and moneylines merged into every game card. Stale or missing odds are gated honestly: no edges shown, no picks logged, never fake numbers.</div>
+          <div class="model-note-val">HR props priced per game through the Onyx line feed, plus totals and moneylines merged into every game card. Stale or missing odds are gated honestly: no edges shown, no picks logged, never fake numbers.</div>
         </div>
         <div class="model-note">
           <div class="model-note-label">Top 5 Tracker</div>
@@ -1520,7 +1520,7 @@ tr.row-done td, .tcard.card-done { opacity:.5; }
         <div class="factor-card">
           <div class="factor-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12l4-5 3 3 3-4 2 2"></path></svg></div>
           <div class="factor-title">Market Calibration</div>
-          <div class="factor-desc">Model probability is blended with DraftKings implied probability. Shorter odds (sharper markets) get more market weight: ≤+300 is 60/40 model/market; longer odds (+650+) are 75/25. This corrects for model overconfidence in well-priced favorites.</div>
+          <div class="factor-desc">Model probability is blended with the Onyx line's implied probability. Shorter odds (sharper markets) get more market weight: ≤+300 is 60/40 model/market; longer odds (+650+) are 75/25. This corrects for model overconfidence in well-priced favorites.</div>
           <span class="factor-tag blue">Market</span>
         </div>
 
@@ -1546,7 +1546,7 @@ tr.row-done td, .tcard.card-done { opacity:.5; }
           <div class="tl-dot active"></div>
           <div class="tl-date">May 23 — current</div>
           <div class="tl-title">Projection model v13: slash-line DFS + base rate regression</div>
-          <div class="tl-body">DFS projections rebuilt from scratch. Previous system was HR-only (hr_prob × 0.12 × multiplier) — singles, doubles, walks, runs, RBI, and stolen bases were completely ignored. v13 replaced it with a full slash-line model: xwOBA drives contact rates, hr_prob drives HR, ISO drives doubles, EV90 drives walks, HH% proxies stolen bases, with empirical R/RBI tables by batting order. Global SCALE=0.86 calibrated against a reference projection system on 69 matched players (FD MAE 1.00pt, DK MAE 0.82pt). Also fixed: sc_score was being applied twice — once inside hr_prob, again in the hit rate formula — causing ~16% systematic overestimation across all contact projections. Separately, career HR/PA rates now Bayesian-regressed toward position averages (k=250 PA pseudocount) to stop small-sample 2026 call-ups from inflating the model.</div>
+          <div class="tl-body">DFS projections rebuilt from scratch. Previous system was HR-only (hr_prob × 0.12 × multiplier) — singles, doubles, walks, runs, RBI, and stolen bases were completely ignored. v13 replaced it with a full slash-line model: xwOBA drives contact rates, hr_prob drives HR, ISO drives doubles, EV90 drives walks, HH% proxies stolen bases, with empirical R/RBI tables by batting order. Global SCALE=0.86 calibrated against a reference projection system on 69 matched players (validated against a reference projection set). Also fixed: sc_score was being applied twice — once inside hr_prob, again in the hit rate formula — causing ~16% systematic overestimation across all contact projections. Separately, career HR/PA rates now Bayesian-regressed toward position averages (k=250 PA pseudocount) to stop small-sample 2026 call-ups from inflating the model.</div>
         </div>
 
         <div class="tl-item">
@@ -1567,7 +1567,7 @@ tr.row-done td, .tcard.card-done { opacity:.5; }
           <div class="tl-dot"></div>
           <div class="tl-date">May 6–20</div>
           <div class="tl-title">Initial build and early iteration</div>
-          <div class="tl-body">Launched with a base model: career HR/PA + home/away splits + L14 recency form adjustment + pitcher xFIP factor + DraftKings odds calibration. Market blending tiered by odds length. Statcast SC score introduced using barrel rate, EV90, hard-hit%, and ISO. Park HR indices and wind/temperature environment factor added. The composite score was established as the primary ranking signal — edge vs market (50%), probability (35%), expected value (15%). The record from this period (11-43 overall through May 23) reflects both the model finding its footing and the genuine difficulty of the problem: HR props are priced efficiently. The signal is real; the edges are small.</div>
+          <div class="tl-body">Launched with a base model: career HR/PA + home/away splits + L14 recency form adjustment + pitcher xFIP factor + Onyx line calibration. Market blending tiered by odds length. Statcast SC score introduced using barrel rate, EV90, hard-hit%, and ISO. Park HR indices and wind/temperature environment factor added. The composite score was established as the primary ranking signal — edge vs market (50%), probability (35%), expected value (15%). The record from this period (11-43 overall through May 23) reflects both the model finding its footing and the genuine difficulty of the problem: HR props are priced efficiently. The signal is real; the edges are small.</div>
         </div>
 
       </div>
@@ -1644,7 +1644,7 @@ tr.row-done td, .tcard.card-done { opacity:.5; }
         <tr><td>Composite</td><td>gate × (0.35×prob/28 + 0.50×edge/12 + 0.15×EV/0.40) × dueMult × park_adj. Gate: ≥22% → 1.0 · ≥18% → 0.72 · ≥14% → 0.45 · below → 0.20</td></tr>
         <tr><td>Park composite adj</td><td>≤0.90 park: ×0.80 · ≤0.95: ×0.90 · neutral: ×1.00 · ≤1.10: ×1.05 · &gt;1.10: ×1.10</td></tr>
         <tr><td>Game diversity discount</td><td>Rank 1: ×1.00 · Rank 2: ×0.90 · Rank 3: ×0.78 · Rank 4: ×0.65 · Rank 5+: ×0.55</td></tr>
-        <tr><td>DFS projection (v13)</td><td>Full slash-line: xwOBA→contact · hr_prob→HR · ISO→2B · EV90→BB · HH%→SB proxy. SCALE=0.86 (FD MAE 1.00pt · DK MAE 0.82pt validated 5/22 on 69 players)</td></tr>
+        <tr><td>DFS projection (v13)</td><td>Full slash-line: xwOBA→contact · hr_prob→HR · ISO→2B · EV90→BB · HH%→SB proxy. SCALE=0.86 (validated 5/22 on 69 matched players)</td></tr>
         <tr><td>SCALE recalibration</td><td>Recalibrate if SCALE drifts outside 0.78–0.94 for 3+ consecutive days with reference CSV available</td></tr>
         <tr><td>Career database</td><td>687 hitters · 828 pitcher profiles · refresh ~June 4</td></tr>
       </table>
@@ -2466,7 +2466,7 @@ function openPlayerCard(name) {
     </div>
     <div class="pmodal-prob">
       <div class="big">${(+r.hr_prob || 0).toFixed(1)}%</div>
-      <div class="cap">HR probability${r.dk_hr_odds ? ` · market ${r.dk_hr_odds > 0 ? '+' : ''}${r.dk_hr_odds} (${(r.dk_hr_implied || 0).toFixed(1)}%) · edge ${r.hr_edge > 0 ? '+' : ''}${(+r.hr_edge || 0).toFixed(1)}pp` : ' · no market line'}</div>
+      <div class="cap">HR probability${r.dk_hr_odds ? ` · Onyx line ${r.dk_hr_odds > 0 ? '+' : ''}${r.dk_hr_odds} (${(r.dk_hr_implied || 0).toFixed(1)}%) · edge ${r.hr_edge > 0 ? '+' : ''}${(+r.hr_edge || 0).toFixed(1)}pp` : ' · no market line'}</div>
     </div>
     <div class="pmodal-grid">
       ${stat(p3(r.iso_ctx), 'ISO')}
@@ -3380,7 +3380,7 @@ function renderTargets() {
     const edgeCol = edgeVal>8?'#22c55e':edgeVal>3?'#60a5fa':edgeVal<-3?'#f87171':'var(--text3)';
     const edgeStr = edgeVal!=null?(edgeVal>0?'+':'')+edgeVal.toFixed(1)+'%':'—';
     const bestOdds = r.dk_hr_odds!=null?'+'+r.dk_hr_odds:'—';
-    const bestBook = r.best_book || 'DraftKings';
+    const bestBook = r.best_book || 'Onyx';
     const hasMultiBook = r.consensus_odds != null;
     const oddsStr = hasMultiBook
       ? bestOdds + ' <span style="font-size:8px;background:rgba(96,165,250,.2);color:#60a5fa;padding:1px 4px;border-radius:3px;margin-left:2px">' + bestBook + '</span>'
@@ -3866,7 +3866,7 @@ function renderPower() {
         </div>
         <div style="background:var(--card);padding:8px;text-align:center">
           <div style="font-size:18px;font-weight:900;font-family:monospace;color:${edCol}">${edge>0?'+':''}${edge.toFixed(1)}%</div>
-          <div style="font-size:7.5px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">vs ${impl}% Mkt</div>
+          <div style="font-size:7.5px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">vs ${impl}% Onyx</div>
         </div>
         <div style="background:var(--card);padding:8px;text-align:center">
           <div style="font-size:18px;font-weight:900;font-family:monospace;color:${evCol}">${evStr}</div>
