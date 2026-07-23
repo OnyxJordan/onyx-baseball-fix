@@ -998,7 +998,7 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
 .mkt-endlbl .p { font-size:15px; font-weight:800; }
 .mkt-grid { position:absolute; inset:8px 64px 8px 10px; pointer-events:none; }
 .mkt-grid div { position:absolute; left:0; right:0; border-top:1px dashed rgba(255,255,255,.06); font-size:8px; color:var(--text3); font-family:monospace; }
-.mkt-grid div span { position:absolute; right:-46px; top:-6px; }
+.mkt-grid div span { position:absolute; left:4px; top:-11px; opacity:.55; }
 .mkt-rows { border-top:1px solid var(--border); }
 .mkt-row { display:flex; align-items:center; gap:12px; padding:11px 18px; border-bottom:1px solid rgba(26,37,53,.5); }
 .mkt-row:last-child { border-bottom:none; }
@@ -1097,6 +1097,7 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
 
   <div class="nav-right">
     <span class="nav-badge">JUL 23 · 2026</span>
+    <span class="nav-date" id="buildStamp">updated 11:35 pm et</span>
     <span class="nav-date" id="liveCount"></span>
   </div>
 </nav>
@@ -2786,7 +2787,9 @@ function renderGC(feed) {
 // chart). Once a game is live, MLB's contextMetrics win probability takes
 // over and points accumulate client-side while the tab is open.
 let mktTimer = null, mktCountdownTimer = null;
-const mktLivePts = {};   // game_key -> [{t, a, h}]
+// game_key -> {pk, done, pts:[{t,a,h}]} : the in-game win probability arc
+// (per play, from MLB winProbability) for live and final games
+const mktGameArc = {};
 
 function mlToProb(ml) {
   const v = parseInt(String(ml || '').replace('+', ''), 10);
@@ -2821,23 +2824,34 @@ function mktTickCountdowns() {
   });
 }
 
+async function mktFetchArc(pk, gk, isFinal) {
+  if (mktGameArc[gk] && mktGameArc[gk].done) return;
+  try {
+    const r = await fetch(`https://statsapi.mlb.com/api/v1/game/${pk}/winProbability`);
+    if (!r.ok) return;
+    const raw = await r.json();
+    const plays = Array.isArray(raw) ? raw : (raw.allPlays || []);
+    const pts = [];
+    let base = null, step = 0;
+    plays.forEach(p => {
+      if (p.homeTeamWinProbability == null) return;
+      const h = +p.homeTeamWinProbability / 100;
+      let t = p.playEndTime ? new Date(p.playEndTime).getTime() / 1000 : null;
+      if (t) { base = t; step = 0; }
+      else if (base != null) { t = base + (++step) * 120; }
+      else { t = Date.now() / 1000; base = t; }
+      pts.push({t, a: 1 - h, h});
+    });
+    if (pts.length) mktGameArc[gk] = {pk: +pk, done: !!isFinal, pts};
+  } catch (e) {}
+}
+
 async function mktPoll() {
   if (typeof curTab !== 'undefined' && curTab !== 'markets') return;
   const jobs = [];
   Object.entries(liveGameData).forEach(([pk, g]) => {
-    if (!g.isLive) return;
-    const gk = `${g.awayAbbr}_${g.homeAbbr}`;
-    jobs.push(fetch(`https://statsapi.mlb.com/api/v1/game/${pk}/contextMetrics`)
-      .then(r => r.ok ? r.json() : null)
-      .then(d => {
-        if (!d) return;
-        let hp = d.homeWinProbability;
-        if (hp == null && d.game) hp = d.game.homeWinProbability;
-        if (hp == null) return;
-        hp = +hp > 1 ? +hp / 100 : +hp;
-        (mktLivePts[gk] = mktLivePts[gk] || []).push({t: Date.now() / 1000, a: 1 - hp, h: hp});
-        if (mktLivePts[gk].length > 400) mktLivePts[gk].shift();
-      }).catch(() => {}));
+    if (!g.isLive && !g.isFinal) return;
+    jobs.push(mktFetchArc(pk, `${g.awayAbbr}_${g.homeAbbr}`, g.isFinal));
   });
   await Promise.all(jobs);
   renderMarkets();
@@ -2847,14 +2861,21 @@ async function mktPoll() {
 }
 
 function mktSeries(gk) {
-  // [{t, a, h}] from baked snapshots + any client-side live points
+  // pregame market snapshots, then the in-game win probability arc
   const pts = [];
   (typeof LINE_HISTORY !== 'undefined' ? LINE_HISTORY : []).forEach(snap => {
     const g = (snap.games || {})[gk];
     if (g) pts.push({t: snap.ts, a: g[0], h: g[1]});
   });
-  (mktLivePts[gk] || []).forEach(p => pts.push(p));
-  return pts.sort((x, y) => x.t - y.t);
+  pts.sort((x, y) => x.t - y.t);
+  const arc = mktGameArc[gk];
+  if (arc && arc.pts.length) {
+    // drop pregame points that timestamp after first pitch, then append the arc
+    const t0 = arc.pts[0].t;
+    const pre = pts.filter(p => p.t < t0);
+    return pre.concat(arc.pts);
+  }
+  return pts;
 }
 
 function mktChart(pts, aCol, hCol, aAb, hAb) {
@@ -2871,7 +2892,17 @@ function mktChart(pts, aCol, hCol, aAb, hAb) {
   const Y = p => H - ((p - lo) / (hi - lo)) * H;
   const line = key => pts.map(p => `${X(p.t).toFixed(1)},${Y(p[key]).toFixed(1)}`).join(' ');
   const last = pts[pts.length - 1];
-  const lbl = (p, ab, col) => `<div class="mkt-endlbl" style="top:${(8 + (Y(p) / H) * 84).toFixed(1)}%">
+  // end labels: keep them apart so close lines never overlap
+  let yH = 6 + (Y(last.h) / H) * 82;
+  let yA = 6 + (Y(last.a) / H) * 82;
+  const MIN_GAP = 22;
+  if (Math.abs(yH - yA) < MIN_GAP) {
+    const mid = (yH + yA) / 2;
+    if (yH <= yA) { yH = mid - MIN_GAP / 2; yA = mid + MIN_GAP / 2; }
+    else          { yA = mid - MIN_GAP / 2; yH = mid + MIN_GAP / 2; }
+  }
+  yH = Math.min(84, Math.max(2, yH)); yA = Math.min(84, Math.max(2, yA));
+  const lbl = (p, ab, col, top) => `<div class="mkt-endlbl" style="top:${top.toFixed(1)}%">
       <div class="t" style="color:${col}">${ab}</div><div class="p" style="color:${col}">${Math.round(p * 100)}%</div></div>`;
   const gridVals = [0.25, 0.5, 0.75].map(k => lo + (hi - lo) * k);
   return `<div class="mkt-chart">
@@ -2884,8 +2915,8 @@ function mktChart(pts, aCol, hCol, aAb, hAb) {
       <circle cx="${X(last.t)}" cy="${Y(last.a)}" r="3.5" fill="${aCol}"/>
       <circle cx="${X(last.t)}" cy="${Y(last.h)}" r="3.5" fill="${hCol}"/>
     </svg>
-    ${lbl(last.h, hAb, hCol)}
-    ${lbl(last.a, aAb, aCol)}
+    ${lbl(last.h, hAb, hCol, yH)}
+    ${lbl(last.a, aAb, aCol, yA)}
   </div>`;
 }
 
@@ -2904,16 +2935,26 @@ function renderMarkets() {
     // current probabilities: live points win, else latest snapshot, else the moneylines now
     let probs = pts.length ? [pts[pts.length - 1].a, pts[pts.length - 1].h] : marketProbs(s.away_ml, s.home_ml);
     if (!probs) probs = [0.5, 0.5];
+    // a decided game settles like a real market: winner 100, loser 0
+    const settled = live.isFinal && live.awayScore != null && live.homeScore != null
+                    && live.awayScore !== live.homeScore;
+    if (settled) {
+      const awayWon = live.awayScore > live.homeScore;
+      probs = awayWon ? [1, 0] : [0, 1];
+      const tLast = pts.length ? pts[pts.length - 1].t + 60 : Date.now() / 1000;
+      pts.push({t: tLast, a: probs[0], h: probs[1]});
+    }
     // movement vs first point of the series
     const d0 = pts.length > 1 ? [(probs[0] - pts[0].a) * 100, (probs[1] - pts[0].h) * 100] : [0, 0];
     const delta = v => Math.abs(v) < 0.5 ? `<span class="mkt-delta fl">·</span>`
       : v > 0 ? `<span class="mkt-delta up">▲${Math.abs(v).toFixed(0)}</span>`
               : `<span class="mkt-delta dn">▼${Math.abs(v).toFixed(0)}</span>`;
-    const cents = p => Math.min(99, Math.max(1, Math.round(p * 100)));
+    const cents = p => settled ? Math.round(p * 100)
+                               : Math.min(99, Math.max(1, Math.round(p * 100)));
 
     let stateHtml;
     if (live.isLive) stateHtml = `<span class="live">● LIVE ${(live.half||'').charAt(0)}${live.inning}</span> · ${live.awayScore ?? 0}–${live.homeScore ?? 0}`;
-    else if (live.isFinal) stateHtml = `FINAL · ${live.awayScore ?? ''}–${live.homeScore ?? ''}`;
+    else if (live.isFinal) stateHtml = `FINAL · ${live.awayScore ?? ''}–${live.homeScore ?? ''}${settled ? ' · SETTLED' : ''}`;
     else if (s.start) stateHtml = `<span data-mkt-start="${s.start}">…</span> · ${s.time || ''} ET`;
     else stateHtml = s.time ? `${s.time} ET` : '';
 

@@ -514,6 +514,16 @@ shell = re.sub(r"[A-Z]{3} \d{1,2} · \d{4}", _badge, shell)
 shell = re.sub(r"(Live · |Today · )[A-Z][a-z]+ \d{1,2}, \d{4}", r"\g<1>" + _long, shell)
 shell = re.sub(r"(Onyx Baseball · )[A-Z][a-z]+ \d{1,2}", r"\g<1>" + _short, shell)
 shell = re.sub(r"(Top Edge Plays — )[A-Z][a-z]+ \d{1,2}", r"\g<1>" + _short, shell)
+
+# last-updated stamp in the nav (Eastern)
+try:
+    from zoneinfo import ZoneInfo
+    _et = now.astimezone(ZoneInfo("America/New_York"))
+except Exception:
+    from datetime import timedelta as _td, timezone as _tz
+    _et = now.astimezone(_tz(_td(hours=-4)))
+_stamp = "updated " + _et.strftime("%-I:%M %p ET").lower()
+shell = re.sub(r'(id="buildStamp">)[^<]*', r"\g<1>" + _stamp, shell)
 with open("index.html", "w", encoding="utf-8") as f:
     f.write(shell)
 print(f"index.html: {len(results_out)} players, {len(games_out)} games")
