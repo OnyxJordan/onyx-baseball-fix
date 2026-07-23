@@ -1338,7 +1338,7 @@ body::after {
   <div class="nav-right">
     <button class="notif-bell" id="notifBell" onclick="toggleNotif()" title="Browser alert when a modeled batter homers">🔔</button>
     <span class="nav-badge">JUL 23 · 2026</span>
-    <span class="nav-date" id="buildStamp">updated 2:28 pm et</span>
+    <span class="nav-date" id="buildStamp">updated 2:38 pm et</span>
     <span class="nav-date" id="liveCount"></span>
   </div>
 </nav>
@@ -4033,30 +4033,64 @@ function mktHistTable(gk, aAb, hAb, aCol, hCol) {
 }
 
 // ─── ONYX TICKET DEEP LINKS ─────────────────────────────────────
-// Onyx game pages live at app.onyxodds.com/game/{id1}-{id2}-{date}-{nn}.
-// Resolution order for every bet button on the site:
-//   1. ONYX_GAME_LINKS: exact slug for a game key (away_home), wins always
-//   2. ONYX_TEAM_IDS: once the per-team ids are confirmed, slugs build
-//      automatically as {awayId}-{homeId}-{today}-{ONYX_GAME_SUFFIX}
-//   3. fallback: parameterized onyxodds.com URL carrying the full pick
+// Onyx's public share endpoint resolves a full selection server-side and
+// renders a live-priced ticket preview with the app CTA:
+//   app.onyxodds.com/share?selection={slug}:o_default_v8:{market}:{label}:null
+// slug = {id1}-{id2}-{date}-{nn} (same as the game page). Verified market
+// keys: moneyline ("Atlanta Braves"), run_line ("San Diego Padres +1.5"),
+// total_runs ("Over 9.5"). HR props use player_home_runs (best guess until
+// a real HR share link confirms; unresolved selections still land on a
+// branded Onyx page with the app CTA, so nothing breaks).
+// Resolution: exact slug from ONYX_GAME_LINKS, else auto-built from
+// ONYX_TEAM_IDS once per-team ids are confirmed, else the parameterized
+// fallback URL carrying the full pick.
 var ONYX_GAME_LINKS = {
   'SD_ATL': '14818-25683-2026-07-23-09',
 };
 var ONYX_TEAM_IDS = {};        // e.g. {SD: 14818, ATL: 25683} once confirmed
 var ONYX_GAME_SUFFIX = '09';
+var ONYX_REFERRER = 'KR680261';
+var ONYX_HR_MARKET = 'player_home_runs';
 var ONYX_BET_URL = 'https://onyxodds.com/sportsbook/add?sport=mlb&date={date}&game={away}@{home}&market={market}&pick={pick}&side={side}&odds={odds}';
-function onyxGameUrl(away, home) {
+var ONYX_TEAM_NAMES = {ARI:'Arizona Diamondbacks', ATL:'Atlanta Braves', BAL:'Baltimore Orioles',
+  BOS:'Boston Red Sox', CHC:'Chicago Cubs', CWS:'Chicago White Sox', CHW:'Chicago White Sox',
+  CIN:'Cincinnati Reds', CLE:'Cleveland Guardians', COL:'Colorado Rockies', DET:'Detroit Tigers',
+  HOU:'Houston Astros', KC:'Kansas City Royals', KCR:'Kansas City Royals', LAA:'Los Angeles Angels',
+  LAD:'Los Angeles Dodgers', MIA:'Miami Marlins', MIL:'Milwaukee Brewers', MIN:'Minnesota Twins',
+  NYM:'New York Mets', NYY:'New York Yankees', OAK:'Athletics', ATH:'Athletics',
+  PHI:'Philadelphia Phillies', PIT:'Pittsburgh Pirates', SD:'San Diego Padres', SDP:'San Diego Padres',
+  SEA:'Seattle Mariners', SF:'San Francisco Giants', SFG:'San Francisco Giants',
+  STL:'St. Louis Cardinals', TB:'Tampa Bay Rays', TBR:'Tampa Bay Rays', TEX:'Texas Rangers',
+  TOR:'Toronto Blue Jays', WSH:'Washington Nationals', WSN:'Washington Nationals'};
+function onyxSlug(away, home) {
   const key = away + '_' + home;
-  if (ONYX_GAME_LINKS[key]) return 'https://app.onyxodds.com/game/' + ONYX_GAME_LINKS[key];
+  if (ONYX_GAME_LINKS[key]) return ONYX_GAME_LINKS[key];
   if (ONYX_TEAM_IDS[away] && ONYX_TEAM_IDS[home]) {
     const d = new Date().toLocaleDateString('en-CA', {timeZone: 'America/New_York'});
-    return 'https://app.onyxodds.com/game/' + ONYX_TEAM_IDS[away] + '-' + ONYX_TEAM_IDS[home] + '-' + d + '-' + ONYX_GAME_SUFFIX;
+    return ONYX_TEAM_IDS[away] + '-' + ONYX_TEAM_IDS[home] + '-' + d + '-' + ONYX_GAME_SUFFIX;
   }
   return null;
 }
 function onyxTicket(p) {
-  const gu = (p.away && p.home) ? onyxGameUrl(p.away, p.home) : null;
-  if (gu) { window.open(gu, '_blank', 'noopener'); return; }
+  const slug = (p.away && p.home) ? onyxSlug(p.away, p.home) : null;
+  if (slug) {
+    let market, label;
+    if (p.market === 'ML') {
+      market = 'moneyline';
+      // Kalshi-style "No" on a moneyline is "Yes" on the other side
+      let team = p.pick;
+      if (p.side === 'no') team = (team === p.away) ? p.home : p.away;
+      label = ONYX_TEAM_NAMES[team] || team;
+    } else if (p.market === 'HR') {
+      market = ONYX_HR_MARKET;
+      label = p.pick + ' Over 0.5';
+    } else { market = p.market; label = p.pick; }
+    const u = 'https://app.onyxodds.com/share?selection='
+      + encodeURIComponent(slug + ':o_default_v8:' + market + ':' + label + ':null')
+      + (ONYX_REFERRER ? '&referrer=' + encodeURIComponent(ONYX_REFERRER) : '');
+    window.open(u, '_blank', 'noopener');
+    return;
+  }
   p = Object.assign({date: new Date().toLocaleDateString('en-CA', {timeZone: 'America/New_York'})}, p);
   let u = ONYX_BET_URL;
   Object.keys(p).forEach(k => { u = u.split('{' + k + '}').join(encodeURIComponent(p[k] == null ? '' : p[k])); });
