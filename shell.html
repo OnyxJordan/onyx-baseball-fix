@@ -2234,6 +2234,8 @@ function buildTicker() {
 
   const half   = bestItems + (worstItems ? sep + worstItems : '');
   ticker.innerHTML = half + half;
+  // pace the scroll to the item count so short lists do not fly by
+  ticker.style.animationDuration = Math.max(60, (best.length + worst.length) * 8) + 's';
 }
 
 // ─── LIVE LAYER: score ticker + HR tracking (client-side only) ───
@@ -2300,7 +2302,9 @@ function parseESPN(espn) {
 async function fetchLiveScores() {
   // file:// blocks all fetch() — the bar just stays in schedule mode
   if (location.protocol === 'file:') return;
-  const d = new Date().toISOString().split('T')[0];
+  // MLB game days follow the EASTERN calendar: at 10 PM ET the UTC date has
+  // already rolled over and would hide tonight's live games
+  const d = new Intl.DateTimeFormat('en-CA', {timeZone: 'America/New_York'}).format(new Date());
   try {
     // MLB Stats API first, ESPN fallback
     let data;
@@ -2421,13 +2425,14 @@ function buildScoreTicker() {
     return `<span class="score-team" style="background:${col}">${abbr}</span>`;
   };
 
-  const makeGame = (awayAbbr, homeAbbr, state, awayScore, homeScore) => {
+  const makeGame = (awayAbbr, homeAbbr, state, awayScore, homeScore, detail) => {
     const isLive   = state === 'live';
     const isFinal  = state === 'final';
     const hasScore = awayScore !== null && homeScore !== null;
     const awayWin  = hasScore && awayScore > homeScore;
     const homeWin  = hasScore && homeScore > awayScore;
-    const stateLabel = isLive ? 'LIVE' : isFinal ? 'F' : '';
+    // live games show the inning (T6 / B3) instead of a generic LIVE
+    const stateLabel = isLive ? (detail || 'LIVE') : isFinal ? 'F' : (detail || '');
     const stateCls   = isLive ? 'live' : isFinal ? 'final' : 'sched';
 
     return `<div class="score-game">
@@ -2444,17 +2449,20 @@ function buildScoreTicker() {
       if (!gd.awayAbbr || !gd.homeAbbr) return;
       const state = gd.isLive ? 'live' : gd.isFinal ? 'final' : 'sched';
       const hasScore = gd.awayScore !== null && gd.homeScore !== null;
+      const inning = gd.isLive && gd.inning
+        ? `${(gd.half || '').charAt(0).toUpperCase()}${gd.inning}` : '';
       games.push(makeGame(
         gd.awayAbbr, gd.homeAbbr, state,
         hasScore ? gd.awayScore : null,
-        hasScore ? gd.homeScore : null
+        hasScore ? gd.homeScore : null,
+        inning
       ));
     });
   } else {
     // Pre-poll fallback: today's slate from the baked payload
     ALL_GAME_KEYS.forEach(key => {
       const m = key.match(/^(\w+)\s*@\s*(\w+)/);
-      if (m) games.push(makeGame(m[1], m[2], 'sched', null, null));
+      if (m) games.push(makeGame(m[1], m[2], 'sched', null, null, ''));
     });
   }
 
@@ -2462,8 +2470,10 @@ function buildScoreTicker() {
     document.getElementById('scoreTickerBar')?.style.setProperty('display','none');
     return;
   }
-  // Duplicate for seamless loop
+  // Duplicate for seamless loop; pace the scroll to the number of games so
+  // short slates do not whip past
   track.innerHTML = games.join('') + games.join('');
+  track.style.animationDuration = Math.max(45, games.length * 14) + 's';
 }
 
 // Poll every 90 seconds; bar renders instantly in schedule mode
