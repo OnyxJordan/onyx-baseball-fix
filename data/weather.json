@@ -1,4 +1,15 @@
 {
+  "STL": {
+    "venue": "Busch Stadium",
+    "temp": 81.5,
+    "precip": 1,
+    "wind_spd": 3.9,
+    "wind_dir": "N",
+    "humidity_pct": 42,
+    "pressure_mb": 1002.6,
+    "roof": false,
+    "flag": "clear"
+  },
   "DET": {
     "venue": "Comerica Park",
     "temp": 77.9,
@@ -10,14 +21,14 @@
     "roof": false,
     "flag": "clear"
   },
-  "CLE": {
-    "venue": "Progressive Field",
-    "temp": 74.5,
+  "ATL": {
+    "venue": "Truist Park",
+    "temp": 82.8,
     "precip": 0,
-    "wind_spd": 7.0,
-    "wind_dir": "N",
-    "humidity_pct": 48,
-    "pressure_mb": 997.9,
+    "wind_spd": 6.5,
+    "wind_dir": "SW",
+    "humidity_pct": 78,
+    "pressure_mb": 982.4,
     "roof": false,
     "flag": "clear"
   },
@@ -32,25 +43,14 @@
     "roof": true,
     "flag": "clear"
   },
-  "ATL": {
-    "venue": "Truist Park",
-    "temp": 82.8,
+  "CLE": {
+    "venue": "Progressive Field",
+    "temp": 74.5,
     "precip": 0,
-    "wind_spd": 6.5,
-    "wind_dir": "SW",
-    "humidity_pct": 78,
-    "pressure_mb": 982.4,
-    "roof": false,
-    "flag": "clear"
-  },
-  "STL": {
-    "venue": "Busch Stadium",
-    "temp": 81.5,
-    "precip": 1,
-    "wind_spd": 3.9,
+    "wind_spd": 7.0,
     "wind_dir": "N",
-    "humidity_pct": 42,
-    "pressure_mb": 1002.6,
+    "humidity_pct": 48,
+    "pressure_mb": 997.9,
     "roof": false,
     "flag": "clear"
   }
