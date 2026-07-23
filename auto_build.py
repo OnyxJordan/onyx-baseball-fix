@@ -89,26 +89,29 @@ for k, v in (ODDS_RAW.items() if (isinstance(ODDS_RAW, dict) and ODDS_META.get("
 
 # ---------------------------------------------------------------- blended pitcher factor (pre-compute onto PITCHERS)
 def blended_factor(e, base):
-    """Blend xFIP-derived factor with HR-specific legs: HR/9, HR/FB, air rate, Barrel% allowed."""
+    """Blend xFIP-derived factor with HR-specific legs (HR/9, HR/FB, air
+    rate, Barrel% allowed). v17 tuning: legs cap at 30% total weight inside
+    tighter clamps, and prefer the 3-year rates over the noisier current
+    season splits so one bad stretch cannot dominate the factor."""
     if base is None:
         base = 1.0
     legs, weights = [], []
-    hr9 = e.get("hr9_6") if e.get("hr9_6") else e.get("hr9_3")
+    hr9 = e.get("hr9_3") if e.get("hr9_3") else e.get("hr9_6")
     if hr9 is not None:
-        legs.append(min(max(float(hr9) / 1.15, 0.6), 1.8)); weights.append(0.30)
-    hrfb = e.get("hrfb6") if e.get("hrfb6") else e.get("hrfb3")
+        legs.append(min(max(float(hr9) / 1.15, 0.7), 1.5)); weights.append(0.15)
+    hrfb = e.get("hrfb3") if e.get("hrfb3") else e.get("hrfb6")
     if hrfb is not None:
-        legs.append(min(max(float(hrfb) / 0.115, 0.6), 1.8)); weights.append(0.15)
-    gb = e.get("gb6") if e.get("gb6") else e.get("gb3")
+        legs.append(min(max(float(hrfb) / 0.115, 0.7), 1.5)); weights.append(0.08)
+    gb = e.get("gb3") if e.get("gb3") else e.get("gb6")
     if gb is not None:
-        legs.append(min(max((1.0 - float(gb)) / 0.575, 0.6), 1.8)); weights.append(0.10)
+        legs.append(min(max((1.0 - float(gb)) / 0.575, 0.7), 1.5)); weights.append(0.05)
     brl = e.get("brl3")
     if brl is not None:
-        legs.append(min(max(float(brl) / 0.075, 0.6), 1.8)); weights.append(0.05)
+        legs.append(min(max(float(brl) / 0.075, 0.7), 1.5)); weights.append(0.02)
     if not legs:
         return base
     hr_leg = sum(l * w for l, w in zip(legs, weights)) / sum(weights)
-    hr_w = sum(weights)                          # up to 0.60
+    hr_w = sum(weights)                          # up to 0.30
     return round(base * (1 - hr_w) + hr_leg * hr_w, 4)
 
 for key, e in PITCHERS.items():
