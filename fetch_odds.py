@@ -177,8 +177,9 @@ def _implied(a):
     return (100.0 / (a + 100.0)) if a > 0 else (abs(a) / (abs(a) + 100.0))
 
 def snapshot_line_history():
-    """Append one devigged win-probability snapshot per run so the Markets
-    tab can chart line movement across builds. Trimmed to 14 days."""
+    """Append one win-probability snapshot per run so the Markets tab can
+    chart line movement across builds. Raw market-implied probabilities,
+    exactly what each moneyline charges. Trimmed to 14 days."""
     try:
         lines = json.load(open(GAMELINES, encoding="utf-8"))
     except Exception:
@@ -187,8 +188,7 @@ def snapshot_line_history():
     for gk, e in (lines.items() if isinstance(lines, dict) else []):
         pa, ph = _implied(e.get("away_ml")), _implied(e.get("home_ml"))
         if pa and ph:
-            tot = pa + ph
-            games[gk] = [round(pa / tot, 4), round(ph / tot, 4)]
+            games[gk] = [round(pa, 4), round(ph, 4)]
     if not games:
         print("line history: no moneylines to snapshot")
         return
