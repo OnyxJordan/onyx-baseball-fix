@@ -404,10 +404,14 @@ def _ev(r):
     o = r.get("dk_hr_odds") or 0
     return p * (o / 100.0) - (1 - p) if o > 0 else -1.0
 
-board = [r for r in results_out
-         if r.get("dk_hr_odds") and (r.get("hr_edge") or 0) > 0
-         and _ev(r) > 0 and _power_floor(r)]
-board.sort(key=lambda r: -(r.get("hr_edge") or 0))
+# ONLY positive-EV plays are tracked and graded: the record is the money
+# record and the calibration signal. On tight days fewer than five log,
+# and that is the honest answer.
+_cands = [r for r in results_out if r.get("dk_hr_odds") and _power_floor(r)]
+board = sorted([r for r in _cands if (r.get("hr_edge") or 0) > 0 and _ev(r) > 0],
+               key=lambda r: -(r.get("hr_edge") or 0))
+for r in board:
+    r["_tier"] = "edge"
 if board:
     picks = jload(dpath("picks_input.json"), [])
     if not isinstance(picks, list):
@@ -427,6 +431,7 @@ if board:
                       "odds": r.get("dk_hr_odds"),
                       "prob": round((r.get("hr_prob") or 0) / 100, 4),
                       "edge": round(r.get("hr_edge") or 0, 2),
+                      "tier": r.get("_tier", "edge"),
                       "hit": None})
         added += 1
     if added:

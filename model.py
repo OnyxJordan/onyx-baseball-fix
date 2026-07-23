@@ -1,5 +1,11 @@
 """
-model.py — Onyx Baseball v18 HR probability model
+model.py — Onyx Baseball v19 HR probability model
+
+v19: continuous self-calibration — calibrate.py measures every graded pick
+against its stated probability nightly and writes a shrunk global factor
+(clamped 0.75-1.25, active at 25+ graded picks) that scales raw
+probabilities, so the model keeps tuning itself toward what actually
+cashes.
 
 v18: output normalization — raw probabilities shrink toward the league
 per-game HR rate (0.8 factor, cap 25 instead of 30) and the market becomes
@@ -61,6 +67,17 @@ with open(_BASE / "career_db.json") as f:
     CAREER_DB = json.load(f)
 with open(_BASE / "pitcher_db.json") as f:
     PITCHER_CAREER_DB = json.load(f)
+
+# Self-calibration factor written nightly by calibrate.py from graded picks.
+# Inactive (1.0) until 25+ picks have settled; always clamped 0.75-1.25.
+try:
+    with open(_BASE / "data" / "calibration.json") as f:
+        _CAL = json.load(f)
+    CAL_SCALE = max(0.75, min(1.25, float(_CAL.get("scale", 1.0)))) if _CAL.get("active") else 1.0
+    print(f"  model: calibration scale {CAL_SCALE} "
+          f"({'active' if _CAL.get('active') else 'collecting'}, n={_CAL.get('n', 0)})")
+except Exception:
+    CAL_SCALE = 1.0
 
 # Optional season home/away splits produced by fetch_data.py fetch_splits().
 # Safe if the file is missing — model falls back to CAREER_DB ch/ca fields.
@@ -420,6 +437,8 @@ def project_player(
     raw_prob = max(1.0, min(30.0, base * sc * 3.5 * 100 * pf * env * park_f * due_mult * plat))
     LEAGUE_GAME_HR = 12.5
     raw_prob = max(1.0, min(25.0, LEAGUE_GAME_HR + (raw_prob - LEAGUE_GAME_HR) * 0.8))
+    # v19: nightly self-calibration from graded picks
+    raw_prob = max(1.0, min(25.0, raw_prob * CAL_SCALE))
 
     # 8. Market calibration — the market is the anchor. HR props are priced
     # efficiently, so the model LEANS off the fair price rather than
