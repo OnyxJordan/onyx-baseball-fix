@@ -1,15 +1,4 @@
 {
-  "TOR": {
-    "venue": "Rogers Centre",
-    "temp": 70.3,
-    "precip": 0,
-    "wind_spd": 10.5,
-    "wind_dir": "S",
-    "humidity_pct": 61,
-    "pressure_mb": 1010.9,
-    "roof": true,
-    "flag": "clear"
-  },
   "STL": {
     "venue": "Busch Stadium",
     "temp": 80.6,
@@ -19,6 +8,17 @@
     "humidity_pct": 45,
     "pressure_mb": 1002.6,
     "roof": false,
+    "flag": "clear"
+  },
+  "TOR": {
+    "venue": "Rogers Centre",
+    "temp": 70.3,
+    "precip": 0,
+    "wind_spd": 10.5,
+    "wind_dir": "S",
+    "humidity_pct": 61,
+    "pressure_mb": 1010.9,
+    "roof": true,
     "flag": "clear"
   },
   "DET": {
