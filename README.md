@@ -10,7 +10,7 @@ The site is evolving into Onyx Sports Insights: a multi-sport shell that renders
 
 ## What it does
 
-- **HR probability model (v17)**: Bayesian-regressed career base rates, Statcast SC score, L14 form, platoon splits, pitcher factor blended from xFIP / HR9 / HRFB / GB% / Barrel%, park HR factor with per-park wind sensitivity, air density (temperature, humidity, pressure), due meter
+- **HR probability model (v18)**: Bayesian-regressed career base rates, Statcast SC score, L14 form, platoon splits, pitcher factor blended from xFIP / HR9 / HRFB / GB% / Barrel%, park HR factor with per-park wind sensitivity, air density (temperature, humidity, pressure), due meter
 - **Edge board**: model probability vs DraftKings implied probability where odds are available, with an honest freshness gate (stale odds means no edges and no picks, never fake data)
 - **Pick tracking**: qualifying edge plays are auto-logged daily and merged into the running record on the site
 
@@ -85,7 +85,7 @@ If odds are stale or missing the site still builds, just without edges or new pi
 | `grade_picks.py` | Automatic pick grading from final boxscores |
 | `auto_build.py` | Model run + HTML injection |
 | `update_stats.py` | Pick record persistence across rebuilds |
-| `model.py` | v17 HR probability model |
+| `model.py` | v18 HR probability model |
 | `career_db.json` | Hitter career database (canonical, never regenerate) |
 | `pitcher_db.json` | Pitcher career database (canonical, never regenerate) |
 | `bullpen_db.json` | Team bullpen HR/9 |
@@ -93,7 +93,7 @@ If odds are stale or missing the site still builds, just without edges or new pi
 
 ## Model version
 
-**v17**: recency de-weighted so small-sample hot and cold streaks nudge rather than drive projections; v16 added per-park wind sensitivity, wind classification exposed as `wind_blow`, humidity and pressure air-density terms, platoon factor, 2026 park factor refresh, due meter in output. Every model change gets a version bump and a changelog line at the top of `model.py`.
+**v18**: output normalized, market-anchored blend, edges land in the honest 1-5pp range; v17 de-weighted recency so small-sample hot and cold streaks nudge rather than drive projections; v16 added per-park wind sensitivity, wind classification exposed as `wind_blow`, humidity and pressure air-density terms, platoon factor, 2026 park factor refresh, due meter in output. Every model change gets a version bump and a changelog line at the top of `model.py`.
 
 ## Roadmap
 

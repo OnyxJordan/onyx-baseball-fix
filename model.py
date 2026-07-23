@@ -1,5 +1,12 @@
 """
-model.py — Onyx Baseball v17 HR probability model
+model.py — Onyx Baseball v18 HR probability model
+
+v18: output normalization — raw probabilities shrink toward the league
+per-game HR rate (0.8 factor, cap 25 instead of 30) and the market becomes
+the blend anchor (model weight 0.30-0.40 by odds band instead of 0.48-0.65).
+HR prop markets are efficient; edges now land in the honest 1-5pp range
+instead of double digits, and composite gates re-tiered to the compressed
+scale.
 
 v17: recency de-weighted across the board — small-sample L14 outcomes were
 compounding through four multipliers (batter form, SC quality replacement,
@@ -406,18 +413,25 @@ def project_player(
     # 6b. Platoon factor (batter hand vs pitcher hand — independent of home/away split)
     plat = platoon_factor(batter_hand, opp_pitcher_hand)
 
-    # 7. Raw probability
+    # 7. Raw probability, then shrink toward the league per-game HR rate.
+    # The multiplier chain can stack good-but-correlated signals into
+    # implausible territory; deviations from league average compress 20%
+    # and the ceiling drops to 25.
     raw_prob = max(1.0, min(30.0, base * sc * 3.5 * 100 * pf * env * park_f * due_mult * plat))
+    LEAGUE_GAME_HR = 12.5
+    raw_prob = max(1.0, min(25.0, LEAGUE_GAME_HR + (raw_prob - LEAGUE_GAME_HR) * 0.8))
 
-    # 8. Market calibration
+    # 8. Market calibration — the market is the anchor. HR props are priced
+    # efficiently, so the model LEANS off the fair price rather than
+    # overruling it; honest edges live in the 1-5pp range.
     if dk_odds is not None:
         mkt_prob  = implied_prob(dk_odds) * 100
         fair_prob = mkt_prob * (1 - HR_VIG)          # strip vig before anchoring + measuring
-        if dk_odds <= 250:   w = 0.50
-        elif dk_odds <= 400: w = 0.60
-        elif dk_odds <= 600: w = 0.65
-        elif dk_odds <= 900: w = 0.58
-        else:                w = 0.48
+        if dk_odds <= 250:   w = 0.35
+        elif dk_odds <= 400: w = 0.38
+        elif dk_odds <= 600: w = 0.38
+        elif dk_odds <= 900: w = 0.34
+        else:                w = 0.30
         final_prob = w * raw_prob + (1 - w) * fair_prob
     else:
         final_prob = raw_prob * 0.75
@@ -425,8 +439,8 @@ def project_player(
 
     edge = final_prob - fair_prob
 
-    # 9. Composite score
-    gate = 1.0 if final_prob >= 22 else 0.72 if final_prob >= 18 else 0.45 if final_prob >= 14 else 0.20
+    # 9. Composite score (gates re-tiered for the v18 compressed scale)
+    gate = 1.0 if final_prob >= 19 else 0.72 if final_prob >= 16 else 0.45 if final_prob >= 13 else 0.20
     ev_val = (final_prob / 100) * (dk_odds / 100 if dk_odds and dk_odds >= 0 else 1.0)
     park_comp_adj = (
         0.80 if park_f <= 0.90 else
