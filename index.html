@@ -1196,7 +1196,7 @@ tr.row-done td, .tcard.card-done { opacity:.5; }
   <div class="nav-right">
     <button class="notif-bell" id="notifBell" onclick="toggleNotif()" title="Browser alert when a modeled batter homers">🔔</button>
     <span class="nav-badge">JUL 23 · 2026</span>
-    <span class="nav-date" id="buildStamp">updated 12:12 am et</span>
+    <span class="nav-date" id="buildStamp">updated 12:22 am et</span>
     <span class="nav-date" id="liveCount"></span>
   </div>
 </nav>
@@ -2841,23 +2841,39 @@ function gcSelect(pk) {
 function renderGCStrip() {
   const el = document.getElementById('gcStrip');
   if (!el) return;
+  // start times by matchup for pregame chips
+  const timeByPair = {};
+  (typeof SUMMARIES !== 'undefined' ? SUMMARIES : []).forEach(s => {
+    if (s.time) timeByPair[`${s.away}@${s.home}`] = s.time + ' ET';
+  });
+  const logo = ab => {
+    const FG = {CWS:'CHW', KC:'KCR', SD:'SDP', SF:'SFG', TB:'TBR', WSH:'WAS'};
+    const l = (typeof TEAM_LOGOS !== 'undefined' && (TEAM_LOGOS[ab] || TEAM_LOGOS[FG[ab]])) || '';
+    return l ? `<span class="sticker-logo" style="width:18px;height:18px;background-image:url(${l})"></span>` : ab;
+  };
   const seen = new Set();
   const chips = [];
-  const addChip = (pk, away, home, stateTxt, stateCls, score) => {
+  // same visual grammar as the score ticker: logos, score or dot, state
+  const addChip = (pk, away, home, stateTxt, stateCls, aScore, hScore) => {
     if (!pk || seen.has(+pk)) return;
     seen.add(+pk);
+    const hasScore = aScore != null && hScore != null;
+    const mid = hasScore
+      ? `<span class="score-num ${aScore > hScore ? 'winning' : 'losing'}">${aScore}</span><span class="score-sep">–</span><span class="score-num ${hScore > aScore ? 'winning' : 'losing'}">${hScore}</span>`
+      : '<span class="score-sep">·</span>';
     chips.push(`<div class="gc-chip${+pk === +gcPk ? ' active' : ''}" onclick="gcSelect(${pk})">
-      ${away} ${score || '@'} ${home} <span class="gcc-state ${stateCls}">${stateTxt}</span>
+      ${logo(away)} ${mid} ${logo(home)}
+      ${stateTxt ? `<span class="gcc-state ${stateCls}">${stateTxt}</span>` : ''}
     </div>`);
   };
   Object.entries(liveGameData).forEach(([pk, g]) => {
-    const st = g.isLive ? `${(g.half||'').charAt(0)}${g.inning}` : g.isFinal ? 'F' : '';
+    const st = g.isLive ? `${(g.half||'').charAt(0)}${g.inning}` : g.isFinal ? 'F'
+             : (timeByPair[`${g.awayAbbr}@${g.homeAbbr}`] || '');
     const cls = g.isLive ? 'live' : '';
-    const sc = (g.awayScore != null && g.homeScore != null) ? `${g.awayScore}–${g.homeScore}` : '@';
-    addChip(pk, g.awayAbbr, g.homeAbbr, st, cls, sc);
+    addChip(pk, g.awayAbbr, g.homeAbbr, st, cls, g.awayScore, g.homeScore);
   });
   (typeof SUMMARIES !== 'undefined' ? SUMMARIES : []).forEach(s => {
-    if (s.gamePk) addChip(s.gamePk, s.away, s.home, s.time || '', '', '@');
+    if (s.gamePk) addChip(s.gamePk, s.away, s.home, s.time ? s.time + ' ET' : '', '', null, null);
   });
   el.innerHTML = chips.join('');
 }
@@ -3294,7 +3310,7 @@ function renderMarkets() {
     };
     const row = (ab, name, p, dv, col) => `<div class="mkt-row">
       ${logo(ab)}
-      <div class="mkt-team" style="color:${col}">${name}<span class="ml">${name === s.away ? (s.away_ml ? 'ML ' + s.away_ml : '') : (s.home_ml ? 'ML ' + s.home_ml : '')}</span></div>
+      <div class="mkt-team" style="color:${col}">${name}<span class="ml">${name === s.away ? (s.away_ml ? 'ML ' + fmtOdds(s.away_ml) : '') : (s.home_ml ? 'ML ' + fmtOdds(s.home_ml) : '')}</span></div>
       <div class="mkt-pct" style="color:${col}">${Math.round(p * 100)}%</div>
       ${delta(dv)}
       <div class="mkt-chip yes">Yes ${cents(p)}¢</div>
@@ -3379,7 +3395,7 @@ function renderTargets() {
     const edgeVal = r.hr_edge;
     const edgeCol = edgeVal>8?'#22c55e':edgeVal>3?'#60a5fa':edgeVal<-3?'#f87171':'var(--text3)';
     const edgeStr = edgeVal!=null?(edgeVal>0?'+':'')+edgeVal.toFixed(1)+'%':'—';
-    const bestOdds = r.dk_hr_odds!=null?'+'+r.dk_hr_odds:'—';
+    const bestOdds = fmtOdds(r.dk_hr_odds);
     const bestBook = r.best_book || 'Onyx';
     const hasMultiBook = r.consensus_odds != null;
     const oddsStr = hasMultiBook
@@ -3802,7 +3818,7 @@ function renderPower() {
     const ev    = roiEV(r);
     const dm    = dueMult(r);
     const edge  = (r.hr_edge||0);
-    const odds  = '+'+r.dk_hr_odds;
+    const odds  = fmtOdds(r.dk_hr_odds);
     const impl  = r.dk_hr_implied?r.dk_hr_implied.toFixed(1):'—';
     const evStr = (ev>=0?'+':'')+( ev*100).toFixed(0)+'¢';
     const evCol = ev>0.25?'#22c55e':ev>0.08?'#60a5fa':ev>0?'#93c5fd':'#f87171';
@@ -3906,10 +3922,18 @@ function renderPower() {
 
 // ─── JUMP FROM GAME CARD → RANKINGS ───────────────────────────
 function jumpToGame(label) {
-  const g = label.replace(/ \(\d+:\d+ [AP]M ET\)/, '').trim();
+  // labels look like "TB @ TOR (3:07 PM)": strip anything parenthesized
+  const g = String(label || '').replace(/\s*\([^)]*\)/g, '').trim();
   gotoTab('rankings');
-  const chip = [...document.querySelectorAll('.rfchip')].find(c => c.textContent === g.replace(' @ ','@'));
+  const chip = [...document.querySelectorAll('.rfchip')].find(c => c.textContent.trim() === g.replace(' @ ', '@'));
   setRF(g, chip);
+}
+
+// american odds always signed, exactly as the feed priced them
+function fmtOdds(v) {
+  const n = parseInt(String(v ?? '').replace('+', ''), 10);
+  if (isNaN(n) || n === 0) return '—';
+  return n > 0 ? '+' + n : String(n);
 }
 
 
@@ -4063,12 +4087,12 @@ function renderRecord() {
     const stTxt = p.hit === true ? '✓ HR' : p.hit === false ? '✗ No' : '⏳ Pending';
     const stBg  = p.hit === true ? 'rgba(34,197,94,.2)' : p.hit === false ? 'rgba(239,68,68,.15)' : 'rgba(245,158,11,.15)';
     const stCol = p.hit === true ? '#4ade80' : p.hit === false ? '#f87171' : '#f59e0b';
-    const impliedPct = (100/(p.odds+100)*100).toFixed(0);
+    const impliedPct = ((mlToProb(p.odds) || 0) * 100).toFixed(0);
     tbodyHtml += `<tr style="background:${p.hit?'rgba(34,197,94,0.04)':'transparent'}">
       <td style="padding:7px 8px;border-bottom:1px solid rgba(26,37,53,.5);font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;font-size:11px;color:var(--text3);text-align:left">${p.date}</td>
       <td style="padding:7px 8px;border-bottom:1px solid rgba(26,37,53,.5);font-size:13px;font-weight:700;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.player}</td>
       <td style="padding:7px 8px;border-bottom:1px solid rgba(26,37,53,.5);font-size:10px;color:var(--text3);text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">HR prop · ${impliedPct}% implied</td>
-      <td style="padding:7px 8px;border-bottom:1px solid rgba(26,37,53,.5);font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;font-size:12px;font-weight:700;text-align:center;color:var(--text2)">+${p.odds}</td>
+      <td style="padding:7px 8px;border-bottom:1px solid rgba(26,37,53,.5);font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;font-size:12px;font-weight:700;text-align:center;color:var(--text2)">${fmtOdds(p.odds)}</td>
       <td style="padding:7px 8px;border-bottom:1px solid rgba(26,37,53,.5);text-align:center">
         <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;background:${stBg};color:${stCol}">${stTxt}</span>
       </td>
