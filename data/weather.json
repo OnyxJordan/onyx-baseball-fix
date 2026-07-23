@@ -1,4 +1,15 @@
 {
+  "DET": {
+    "venue": "Comerica Park",
+    "temp": 78.9,
+    "precip": 0,
+    "wind_spd": 6.7,
+    "wind_dir": "ESE",
+    "humidity_pct": 32,
+    "pressure_mb": 999.9,
+    "roof": false,
+    "flag": "clear"
+  },
   "ATL": {
     "venue": "Truist Park",
     "temp": 82.9,
@@ -19,17 +30,6 @@
     "humidity_pct": 65,
     "pressure_mb": 1010.7,
     "roof": true,
-    "flag": "clear"
-  },
-  "DET": {
-    "venue": "Comerica Park",
-    "temp": 78.9,
-    "precip": 0,
-    "wind_spd": 6.7,
-    "wind_dir": "ESE",
-    "humidity_pct": 32,
-    "pressure_mb": 999.9,
-    "roof": false,
     "flag": "clear"
   },
   "STL": {
