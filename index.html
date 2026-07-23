@@ -1225,7 +1225,15 @@ body::after {
   min-width:86px; text-align:center; padding:8px 0; border-radius:9px;
   font-size:12px; font-weight:700; font-family:monospace;
   background:var(--bg3); border:1px solid var(--border2);
+  cursor:pointer; transition:all .15s;
 }
+.mkt-chip:hover { border-color:rgba(160,32,240,.6); box-shadow:0 0 10px rgba(160,32,240,.25); transform:translateY(-1px); }
+.onyx-bet-btn { display:inline-flex; align-items:center; gap:5px; margin-left:auto;
+  font-size:10px; font-weight:800; font-family:monospace; letter-spacing:.04em;
+  color:#fff; background:linear-gradient(90deg,#A020F0,#4060F0);
+  border:1px solid rgba(160,32,240,.7); border-radius:6px; padding:5px 11px;
+  cursor:pointer; transition:all .15s; white-space:nowrap; }
+.onyx-bet-btn:hover { box-shadow:0 0 14px rgba(160,32,240,.5); transform:translateY(-1px); filter:brightness(1.12); }
 .mkt-chip.yes { color:#4ade80; } .mkt-chip.no { color:#f87171; }
 .mkt-note { padding:8px 18px 12px; font-size:9px; color:var(--text3); font-family:monospace; letter-spacing:.04em; }
 .mkt-head { cursor:pointer; }
@@ -1330,7 +1338,7 @@ body::after {
   <div class="nav-right">
     <button class="notif-bell" id="notifBell" onclick="toggleNotif()" title="Browser alert when a modeled batter homers">🔔</button>
     <span class="nav-badge">JUL 23 · 2026</span>
-    <span class="nav-date" id="buildStamp">updated 1:15 pm et</span>
+    <span class="nav-date" id="buildStamp">updated 2:20 pm et</span>
     <span class="nav-date" id="liveCount"></span>
   </div>
 </nav>
@@ -2607,6 +2615,7 @@ function openPlayerCard(name) {
     <div class="pmodal-prob">
       <div class="big">${(+r.hr_prob || 0).toFixed(1)}%</div>
       <div class="cap">HR probability${r.dk_hr_odds ? ` · Onyx line ${r.dk_hr_odds > 0 ? '+' : ''}${r.dk_hr_odds} (${(r.dk_hr_implied || 0).toFixed(1)}%) · edge ${r.hr_edge > 0 ? '+' : ''}${(+r.hr_edge || 0).toFixed(1)}pp` : ' · no market line'}</div>
+      ${r.dk_hr_odds ? `<div style="margin-top:8px"><span class="onyx-bet-btn" data-pick="${(r.matched_name||'').replace(/"/g,'&quot;')}" data-o="${r.dk_hr_odds}" data-a="${r.away||''}" data-h="${r.home||''}" onclick="event.stopPropagation();onyxTicket({market:'HR',side:'yes',pick:this.dataset.pick,odds:this.dataset.o,away:this.dataset.a,home:this.dataset.h})">⚡ Add to Onyx ticket ${r.dk_hr_odds > 0 ? '+' : ''}${r.dk_hr_odds}</span></div>` : ''}
     </div>
     <div class="pmodal-grid">
       ${stat(p3(r.iso_ctx), 'ISO')}
@@ -4023,6 +4032,20 @@ function mktHistTable(gk, aAb, hAb, aCol, hCol) {
   </table></div>`;
 }
 
+// ─── ONYX TICKET DEEP LINKS ─────────────────────────────────────
+// Every price on the site can push straight into an Onyx betslip.
+// ONYX_BET_URL is the single place to set the real betslip pattern once
+// the sportsbook exposes it; {placeholders} fill per pick, unknown ones
+// are stripped, so changing the pattern never touches the call sites.
+var ONYX_BET_URL = 'https://onyxodds.com/sportsbook/add?sport=mlb&date={date}&game={away}@{home}&market={market}&pick={pick}&side={side}&odds={odds}';
+function onyxTicket(p) {
+  p = Object.assign({date: new Date().toLocaleDateString('en-CA', {timeZone: 'America/New_York'})}, p);
+  let u = ONYX_BET_URL;
+  Object.keys(p).forEach(k => { u = u.split('{' + k + '}').join(encodeURIComponent(p[k] == null ? '' : p[k])); });
+  u = u.replace(/\{[a-z]+\}/g, '');
+  window.open(u, '_blank', 'noopener');
+}
+
 function renderMarkets() {
   const body = document.getElementById('mktBody');
   if (!body || typeof SUMMARIES === 'undefined') return;
@@ -4070,11 +4093,21 @@ function renderMarkets() {
       <div class="mkt-team" style="color:${col}">${name}<span class="ml">${name === s.away ? (s.away_ml ? 'ML ' + fmtOdds(s.away_ml) : '') : (s.home_ml ? 'ML ' + fmtOdds(s.home_ml) : '')}</span></div>
       <div class="mkt-pct" style="color:${col}">${Math.round(p * 100)}%</div>
       ${delta(dv)}
-      <div class="mkt-chip yes">Yes ${cents(p)}¢</div>
-      <div class="mkt-chip no">No ${cents(1 - p)}¢</div>
+      <div class="mkt-chip yes" title="Add to Onyx ticket" data-a="${s.away}" data-h="${s.home}" data-p="${name}" data-o="${name === s.away ? (s.away_ml || '') : (s.home_ml || '')}" onclick="event.stopPropagation();onyxTicket({away:this.dataset.a,home:this.dataset.h,market:'ML',pick:this.dataset.p,side:'yes',odds:this.dataset.o})">Yes ${cents(p)}¢</div>
+      <div class="mkt-chip no" title="Add to Onyx ticket" data-a="${s.away}" data-h="${s.home}" data-p="${name}" data-o="${name === s.away ? (s.away_ml || '') : (s.home_ml || '')}" onclick="event.stopPropagation();onyxTicket({away:this.dataset.a,home:this.dataset.h,market:'ML',pick:this.dataset.p,side:'no',odds:this.dataset.o})">No ${cents(1 - p)}¢</div>
     </div>`;
 
     const isOpen = mktOpen.has(gk);
+    // once the game starts, the card chart flips to the in-game arc only:
+    // the pregame line was eating the whole width. Full history (pregame
+    // included) stays one click away in the History dropdown.
+    const arcL = mktGameArc[gk];
+    let chartPts = pts;
+    if (!isOpen && (live.isLive || live.isFinal) && arcL && arcL.pts.length > 1) {
+      const tL0 = arcL.pts[0].t;
+      const liveOnly = pts.filter(p => p.t >= tL0);
+      if (liveOnly.length > 1) chartPts = liveOnly;
+    }
     return `<div class="mkt-card${isOpen ? ' open' : ''}">
       <div class="mkt-head" onclick="mktToggle('${gk}')" title="Show line movement over time">
         <div>
@@ -4086,7 +4119,7 @@ function renderMarkets() {
           <button class="mkt-histbtn" onclick="event.stopPropagation();mktToggle('${gk}')">${isOpen ? 'Hide history' : 'History'} <span class="mkt-chev">▾</span></button>
         </div>
       </div>
-      ${mktChart(pts, A_COL, H_COL, s.away, s.home, isOpen)}
+      ${mktChart(chartPts, A_COL, H_COL, s.away, s.home, isOpen)}
       <div class="mkt-rows">
         ${row(s.away, s.away, probs[0], d0[0], A_COL)}
         ${row(s.home, s.home, probs[1], d0[1], H_COL)}
@@ -4696,6 +4729,7 @@ function renderPower() {
         <span style="font-size:10px;background:var(--bg);border:1px solid var(--border);border-radius:5px;padding:3px 8px;color:var(--text-muted)">SC ${(r.sc_score||0).toFixed(3)}</span>
         <span style="font-size:10px;background:var(--bg);border:1px solid var(--border);border-radius:5px;padding:3px 8px;color:var(--text-muted)">xwOBA ${r.l14_xwoba!=null?('.'+Math.round(r.l14_xwoba*1000).toString().padStart(3,'0')):'—'}</span>
         <span style="font-size:10px;font-weight:700;background:${cl.bg};border:1px solid ${cl.bd};border-radius:5px;padding:3px 10px;color:${cl.col}">${cl.txt}</span>
+        ${r.dk_hr_odds ? `<span class="onyx-bet-btn" data-pick="${(r.matched_name||'').replace(/"/g,'&quot;')}" data-o="${r.dk_hr_odds}" data-a="${r.away||''}" data-h="${r.home||''}" onclick="event.stopPropagation();onyxTicket({market:'HR',side:'yes',pick:this.dataset.pick,odds:this.dataset.o,away:this.dataset.a,home:this.dataset.h})">⚡ Add to Onyx ticket ${odds}</span>` : ''}
       </div>
     </div>`;
   }).join('');
