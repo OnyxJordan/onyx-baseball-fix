@@ -1343,7 +1343,7 @@ body::after {
   <div class="nav-right">
     <button class="notif-bell" id="notifBell" onclick="toggleNotif()" title="Browser alert when a modeled batter homers">🔔</button>
     <span class="nav-badge">JUL 23 · 2026</span>
-    <span class="nav-date" id="buildStamp">updated 3:43 pm et</span>
+    <span class="nav-date" id="buildStamp">updated 5:03 pm et</span>
     <span class="nav-date" id="liveCount"></span>
   </div>
 </nav>
@@ -2565,18 +2565,48 @@ function modelRow(name) {
   return _mrMap[nkjs(name)];
 }
 
-// ─── LIVE BOARD BADGES ──────────────────────────────────────────
+// ─── LIVE BOARD BADGES + PA DECAY ───────────────────────────────
+const PA_FULL = 4.3;   // expected plate appearances in a full game
+// game state for a modeled player's matchup, or null
+function liveGameOf(r) {
+  const lp = livePlayerData[nkjs(r.batter_name || r.matched_name)] || {};
+  return lp.gamePk ? (liveGameData[lp.gamePk] || null) : null;
+}
+function gameStarted(r) {
+  const gd = liveGameOf(r);
+  return !!(gd && (gd.isLive || gd.isFinal));
+}
+// remaining plate appearances from game progress (never negative)
 function paEstimate(gd) {
-  const inn = +gd.inning || 1;
-  const rem = Math.max(0, 9 - inn + (String(gd.half).startsWith('T') || gd.half === 'Top' ? 0.5 : 0));
-  return Math.max(0, Math.round(rem * 4.3 / 9));
+  if (!gd || gd.isFinal) return 0;
+  const inn = Math.max(1, +gd.inning || 1);
+  const halfDone = (String(gd.half).charAt(0).toUpperCase() === 'B') ? 0.5 : 0;
+  const elapsed = Math.min(9, (inn - 1) + halfDone);
+  const frac = Math.max(0, 1 - elapsed / 9);
+  return Math.max(0, Math.min(5, Math.round(PA_FULL * frac)));
+}
+// pregame full-game HR% decayed to what's actually left to happen. Once the
+// game is over (or no PA remain) a player who has not homered is ~0.
+function liveHRProb(r) {
+  const base = +r.hr_prob || 0;
+  const lp = livePlayerData[nkjs(r.batter_name || r.matched_name)] || {};
+  const gd = liveGameOf(r);
+  if (!gd || (!gd.isLive && !gd.isFinal)) return base;      // pregame: unchanged
+  if (lp.hitHR) return base;                                 // already cashed
+  const paLeft = paEstimate(gd);
+  if (paLeft <= 0) return 0;                                 // no chances left
+  const noHRperPA = Math.pow(1 - base / 100, 1 / PA_FULL);
+  return (1 - Math.pow(noHRperPA, paLeft)) * 100;
 }
 function liveBadges(r) {
   const lp = livePlayerData[nkjs(r.batter_name || r.matched_name)] || {};
   if (lp.hitHR) return '<span class="hit-flag">HR ✓</span>';
   if (lp.gameOver) return '<span class="done-flag">FINAL</span>';
   const gd = lp.gamePk ? liveGameData[lp.gamePk] : null;
-  if (gd && gd.isLive) return `<span class="pa-flag">~${paEstimate(gd)} PA left</span>`;
+  if (gd && gd.isLive) {
+    const pa = paEstimate(gd);
+    return `<span class="pa-flag">LIVE · ${pa} PA left</span>`;
+  }
   return '';
 }
 function rowDone(r) {
@@ -2618,9 +2648,18 @@ function openPlayerCard(name) {
       <button class="pmodal-close" onclick="closePlayerCard()">×</button>
     </div>
     <div class="pmodal-prob">
-      <div class="big">${(+r.hr_prob || 0).toFixed(1)}%</div>
-      <div class="cap">HR probability${r.dk_hr_odds ? ` · Onyx line ${r.dk_hr_odds > 0 ? '+' : ''}${r.dk_hr_odds} (${(r.dk_hr_implied || 0).toFixed(1)}%) · edge ${r.hr_edge > 0 ? '+' : ''}${(+r.hr_edge || 0).toFixed(1)}pp` : ' · no market line'}</div>
-      ${r.dk_hr_odds ? `<div style="margin-top:8px"><span class="onyx-bet-btn" data-pick="${(r.matched_name||'').replace(/"/g,'&quot;')}" data-o="${r.dk_hr_odds}" data-a="${r.away||''}" data-h="${r.home||''}" onclick="event.stopPropagation();onyxTicket({market:'HR',side:'yes',pick:this.dataset.pick,odds:this.dataset.o,away:this.dataset.a,home:this.dataset.h})">⚡ Add to Onyx ticket ${r.dk_hr_odds > 0 ? '+' : ''}${r.dk_hr_odds}</span></div>` : ''}
+      ${(() => {
+        const started = gameStarted(r), gd = liveGameOf(r);
+        if (lp.hitHR) return `<div class="big" style="color:#fbbf24">HR ✓</div><div class="cap">Home run cashed · pregame model ${(+r.hr_prob||0).toFixed(1)}%</div>`;
+        if (started) {
+          const lv = liveHRProb(r).toFixed(1), pa = gd ? paEstimate(gd) : 0;
+          const st = gd && gd.isFinal ? 'FINAL' : `LIVE · ${pa} PA left`;
+          return `<div class="big">${lv}%</div><div class="cap">Live HR probability · ${st} · pregame ${(+r.hr_prob||0).toFixed(1)}%</div>`;
+        }
+        return `<div class="big">${(+r.hr_prob || 0).toFixed(1)}%</div>
+          <div class="cap">HR probability${r.dk_hr_odds ? ` · Onyx line ${r.dk_hr_odds > 0 ? '+' : ''}${r.dk_hr_odds} (${(r.dk_hr_implied || 0).toFixed(1)}%) · edge ${r.hr_edge > 0 ? '+' : ''}${(+r.hr_edge || 0).toFixed(1)}pp` : ' · no market line'}</div>
+          ${r.dk_hr_odds ? `<div style="margin-top:8px"><span class="onyx-bet-btn" data-pick="${(r.matched_name||'').replace(/"/g,'&quot;')}" data-o="${r.dk_hr_odds}" data-a="${r.away||''}" data-h="${r.home||''}" onclick="event.stopPropagation();onyxTicket({market:'HR',side:'yes',pick:this.dataset.pick,odds:this.dataset.o,away:this.dataset.a,home:this.dataset.h})">⚡ Add to Onyx ticket ${r.dk_hr_odds > 0 ? '+' : ''}${r.dk_hr_odds}</span></div>` : ''}`;
+      })()}
     </div>
     <div class="pmodal-grid">
       ${stat(p3(r.iso_ctx), 'ISO')}
@@ -4233,9 +4272,14 @@ function renderTargets() {
     const eb = b.hr_edge != null ? b.hr_edge : -99;
     return eb - ea;
   });
-  // Only show players where our model has edge over the market (hr_edge > 0)
-  const top = powered.filter(r => r.hr_edge != null && r.hr_edge > 0);
-  document.getElementById('tc-count').textContent = top.length+' edge plays today';
+  // Only show players where our model has edge over the market (hr_edge > 0).
+  // Once a game starts the pregame line is no longer bettable, so those
+  // players drop off the board (the ticker/Gamecenter carry them live).
+  const edged = powered.filter(r => r.hr_edge != null && r.hr_edge > 0);
+  const top = edged.filter(r => !gameStarted(r));
+  const hiddenLive = edged.length - top.length;
+  document.getElementById('tc-count').textContent = top.length + ' edge plays today'
+    + (hiddenLive ? ` · ${hiddenLive} in-play hidden` : '');
   document.getElementById('topTargets').innerHTML = top.map((r,i) => {
     const col  = probColor(r.hr_prob);
     const g    = probGrade(r.hr_prob);
@@ -4436,7 +4480,7 @@ function renderRankings() {
           </div>
         </div>
       </td>
-      <td class="rprob" style="color:${col}">${(+r.hr_prob||0).toFixed(1)}% <span style="font-size:9px;color:${g.c};opacity:.8">${g.l}</span></td>
+      <td class="rprob" style="color:${col}">${(gameStarted(r) ? liveHRProb(r) : (+r.hr_prob||0)).toFixed(1)}%${gameStarted(r) ? '<span style="font-size:8px;color:var(--text3);margin-left:3px">live</span>' : ` <span style="font-size:9px;color:${g.c};opacity:.8">${g.l}</span>`}</td>
       <td style="text-align:left">
         <div style="font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.opp_pitcher||'—'} <span class="${hand==='L'?'lhp':'rhp'} hand-pill">${hand}HP</span></div>
         <div style="font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;font-size:10px;color:${h9c}">HR/9 ${r.opp_pitcher_hr9!=null?r.opp_pitcher_hr9.toFixed(2):'—'}</div>
