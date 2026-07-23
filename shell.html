@@ -2598,6 +2598,20 @@ function liveHRProb(r) {
   const noHRperPA = Math.pow(1 - base / 100, 1 / PA_FULL);
   return (1 - Math.pow(noHRperPA, paLeft)) * 100;
 }
+// probability to show on the board: pregame model, or live-decayed once
+// the game is underway
+function boardProb(r) {
+  return gameStarted(r) ? liveHRProb(r) : (+r.hr_prob || 0);
+}
+// edge to rank/qualify on: pregame edge, or LIVE edge = decayed model prob
+// minus the current line's implied prob. Started games stay on the board
+// only when they still beat the (live) odds. null = no comparable line.
+function boardEdge(r) {
+  if (!gameStarted(r)) return r.hr_edge;
+  const imp = r.dk_hr_implied;
+  if (imp == null) return null;          // no live line to beat
+  return liveHRProb(r) - imp;
+}
 function liveBadges(r) {
   const lp = livePlayerData[nkjs(r.batter_name || r.matched_name)] || {};
   if (lp.hitHR) return '<span class="hit-flag">HR ✓</span>';
@@ -4265,21 +4279,15 @@ function renderTargets() {
     (r.barrel_26 || 0) >= 0.070 &&
     (r.iso_ctx || 0) >= 0.110;
   const powered = data.filter(POWER_FLOOR);
-  const unpowered = data.filter(r => !POWER_FLOOR(r));
-  // Sort powered players by edge, append unpowered at bottom (greyed)
-  powered.sort((a,b) => {
-    const ea = a.hr_edge != null ? a.hr_edge : -99;
-    const eb = b.hr_edge != null ? b.hr_edge : -99;
-    return eb - ea;
-  });
-  // Only show players where our model has edge over the market (hr_edge > 0).
-  // Once a game starts the pregame line is no longer bettable, so those
-  // players drop off the board (the ticker/Gamecenter carry them live).
-  const edged = powered.filter(r => r.hr_edge != null && r.hr_edge > 0);
-  const top = edged.filter(r => !gameStarted(r));
-  const hiddenLive = edged.length - top.length;
+  // Rank on edge vs the current line: pregame edge before first pitch, LIVE
+  // edge (decayed model prob vs the live implied) once underway. A started
+  // game stays on the board only while it still beats the live odds.
+  const top = powered
+    .filter(r => { const e = boardEdge(r); return e != null && e > 0; })
+    .sort((a,b) => boardEdge(b) - boardEdge(a));
+  const liveCount = top.filter(gameStarted).length;
   document.getElementById('tc-count').textContent = top.length + ' edge plays today'
-    + (hiddenLive ? ` · ${hiddenLive} in-play hidden` : '');
+    + (liveCount ? ` · ${liveCount} live` : '');
   document.getElementById('topTargets').innerHTML = top.map((r,i) => {
     const col  = probColor(r.hr_prob);
     const g    = probGrade(r.hr_prob);
@@ -4293,9 +4301,11 @@ function renderTargets() {
     const hh   = r.hh_pct!=null?(r.hh_pct*100).toFixed(0)+'%':'—';
     const ev   = r.ev90_26!=null?r.ev90_26.toFixed(1):'—';
     const tc   = tbg(r.team);
-    const edgeVal = r.hr_edge;
+    const started = gameStarted(r);
+    const shownProb = boardProb(r);
+    const edgeVal = boardEdge(r);
     const edgeCol = edgeVal>8?'#22c55e':edgeVal>3?'#60a5fa':edgeVal<-3?'#f87171':'var(--text3)';
-    const edgeStr = edgeVal!=null?(edgeVal>0?'+':'')+edgeVal.toFixed(1)+'%':'—';
+    const edgeStr = edgeVal!=null?(edgeVal>0?'+':'')+edgeVal.toFixed(1)+'%'+(started?' live':'')+' edge':'—';
     const bestOdds = fmtOdds(r.dk_hr_odds);
     const bestBook = r.best_book || 'Onyx';
     const hasMultiBook = r.consensus_odds != null;
@@ -4312,8 +4322,8 @@ function renderTargets() {
           <div class="tc-sub">#${r.batting_order} ${r.pos} · <span style="cursor:pointer;text-decoration:underline dotted;text-underline-offset:2px" onclick="event.stopPropagation();jumpToGame('${r.game}')">${r.away} @ ${r.home}</span></div>
         </div>
         <div class="tc-pct-wrap">
-          <div class="tc-pct" style="color:${col}">${(+r.hr_prob||0).toFixed(1)}%</div>
-          <div style="font-size:10px;font-weight:700;color:${edgeCol};font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;margin-top:2px">${edgeStr} edge</div>
+          <div class="tc-pct" style="color:${col}">${shownProb.toFixed(1)}%</div>
+          <div style="font-size:10px;font-weight:700;color:${edgeCol};font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;margin-top:2px">${edgeStr}</div>
         </div>
       </div>
       <div class="tc-pitcher">
