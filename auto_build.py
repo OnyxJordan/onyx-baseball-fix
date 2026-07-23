@@ -437,7 +437,7 @@ with open("shell.html", encoding="utf-8") as f:
     shell = f.read()
 
 def replace_const(src, name, payload):
-    pat = re.compile(r"^(\s*const %s\s*=\s*).*$" % re.escape(name), re.M)
+    pat = re.compile(r"^(\s*(?:const|var|let) %s\s*=\s*).*$" % re.escape(name), re.M)
     if not pat.search(src):
         sys.exit(f"FATAL: const {name} not found in shell.html")
     return pat.sub(lambda m: m.group(1) + json.dumps(payload, ensure_ascii=False) + ";", src, count=1)
@@ -506,6 +506,7 @@ shell = replace_const(shell, "RESULTS", results_out)
 shell = replace_const(shell, "SUMMARIES", sums_out)
 shell = replace_const(shell, "ALL_GAME_KEYS", keys_out)
 shell = replace_const(shell, "LINE_HISTORY", jload(dpath("line_history.json"), []))
+shell = replace_const(shell, "DAILY_RECAP", jload(dpath("recap.json"), {}))
 
 # ---- stamp the build date over the baked date literals ----
 _badge = f"{now.strftime('%b').upper()} {now.day} · {now.year}"      # JUL 23 · 2026
