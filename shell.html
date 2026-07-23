@@ -3989,10 +3989,13 @@ function renderPower() {
     if (seen.has(r.matched_name)) continue;
     if (!r.hr_prob || !r.dk_hr_odds || r.dk_hr_odds <= 0) continue;
     seen.add(r.matched_name);
-    // qualified plays beat the LISTED price: positive edge vs fair AND
-    // positive EV after the vig. The rest can only appear as backfill,
-    // clearly tagged MARKET PRICED, so the page always fields five.
-    r._qualified = (r.hr_edge || 0) > 0 && evOf(r) > 0;
+    // qualified plays beat the LISTED price (positive edge = positive EV)
+    // AND clear the v21 quality floor: min 32% hard-hit and 5% barrel rate,
+    // mirroring QUALITY_HH_MIN / QUALITY_BARREL_MIN in model.py. Speed-only
+    // profiles never make the money list. The rest can only appear as
+    // backfill, clearly tagged, so the page always fields five.
+    r._qualified = (r.hr_edge || 0) > 0 && evOf(r) > 0
+      && (r.hh_pct || 0) >= 0.32 && (r.barrel_26 || 0) >= 0.05;
     pool.push(r);
   }
 

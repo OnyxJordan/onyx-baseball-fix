@@ -1,5 +1,12 @@
 """
-model.py — Onyx Baseball v20 HR probability model
+model.py — Onyx Baseball v21 HR probability model
+
+v21: pick quality floor — a player must show a minimum hard-hit rate
+(32%) and barrel rate (5%) to qualify for the tracked money list. Small
+positive edges on pure speed profiles (near-zero barrel rate) are market
+noise, not signal; they now land on the watchlist instead of the record.
+Floors live here as QUALITY_HH_MIN / QUALITY_BARREL_MIN and gate the
+board in auto_build.py and the shell.
 
 v20: one definition of edge — measured against the LISTED price, so a
 positive edge is always a bettable positive-EV play (previously edge was
@@ -103,6 +110,12 @@ POS_HR_AVG = {
 REG_K  = 250
 SCALE  = 0.86
 HR_VIG = 0.07   # approx single-side hold on HR-Yes props; calibrate vs resolved results
+
+# v21 pick quality floor: minimum contact quality to qualify for the tracked
+# money list. Keeps slap/speed profiles (Simpson-types) off the board even
+# when the market briefly prices them a tick generous.
+QUALITY_HH_MIN     = 0.32   # hard-hit rate
+QUALITY_BARREL_MIN = 0.05   # barrel rate
 
 PA_TABLE   = {1:4.492,2:4.363,3:4.367,4:4.269,5:4.223,6:4.059,7:3.946,8:3.831,9:3.748}
 RUNS_BY_BO = {1:0.533,2:0.543,3:0.476,4:0.469,5:0.451,6:0.401,7:0.403,8:0.399,9:0.409}
