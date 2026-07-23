@@ -1235,6 +1235,11 @@ body::after {
   cursor:pointer; transition:all .15s; white-space:nowrap; }
 .onyx-bet-btn:hover { box-shadow:0 0 14px rgba(160,32,240,.5); transform:translateY(-1px); filter:brightness(1.12); }
 .mkt-chip.yes { color:#4ade80; } .mkt-chip.no { color:#f87171; }
+.mkt-chip.rl { color:#c084fc; min-width:70px; }
+.mkt-ou { font-family:monospace; font-size:10px; font-weight:700; color:var(--text2);
+  background:var(--bg3); border:1px solid var(--border2); border-radius:6px;
+  padding:4px 8px; cursor:pointer; transition:all .15s; }
+.mkt-ou:hover { border-color:rgba(160,32,240,.6); color:#fff; box-shadow:0 0 8px rgba(160,32,240,.25); }
 .mkt-note { padding:8px 18px 12px; font-size:9px; color:var(--text3); font-family:monospace; letter-spacing:.04em; }
 .mkt-head { cursor:pointer; }
 .mkt-histbtn { display:inline-flex; align-items:center; gap:5px; background:var(--bg3);
@@ -1338,7 +1343,7 @@ body::after {
   <div class="nav-right">
     <button class="notif-bell" id="notifBell" onclick="toggleNotif()" title="Browser alert when a modeled batter homers">🔔</button>
     <span class="nav-badge">JUL 23 · 2026</span>
-    <span class="nav-date" id="buildStamp">updated 2:39 pm et</span>
+    <span class="nav-date" id="buildStamp">updated 2:50 pm et</span>
     <span class="nav-date" id="liveCount"></span>
   </div>
 </nav>
@@ -4044,9 +4049,7 @@ function mktHistTable(gk, aAb, hAb, aCol, hCol) {
 // Resolution: exact slug from ONYX_GAME_LINKS, else auto-built from
 // ONYX_TEAM_IDS once per-team ids are confirmed, else the parameterized
 // fallback URL carrying the full pick.
-var ONYX_GAME_LINKS = {
-  'SD_ATL': '14818-25683-2026-07-23-09',
-};
+var ONYX_GAME_LINKS = {"SD_ATL": "14818-25683-2026-07-23-09"};
 var ONYX_TEAM_IDS = {};        // e.g. {SD: 14818, ATL: 25683} once confirmed
 var ONYX_GAME_SUFFIX = '09';
 var ONYX_REFERRER = 'KR680261';
@@ -4084,6 +4087,12 @@ function onyxTicket(p) {
     } else if (p.market === 'HR') {
       market = ONYX_HR_MARKET;
       label = p.pick + ' Over 0.5';
+    } else if (p.market === 'RL') {
+      market = 'run_line';
+      label = (ONYX_TEAM_NAMES[p.pick] || p.pick) + ' ' + (p.line || '');
+    } else if (p.market === 'TOTAL') {
+      market = 'total_runs';
+      label = p.pick;
     } else { market = p.market; label = p.pick; }
     const u = 'https://app.onyxodds.com/share?selection='
       + encodeURIComponent(slug + ':o_default_v8:' + market + ':' + label + ':null')
@@ -4140,6 +4149,10 @@ function renderMarkets() {
       const l = TEAM_LOGOS[ab] || '';
       return l ? `<span class="sticker-logo" style="background-image:url(${l})"></span>` : '';
     };
+    // run line chips: MLB run line is ±1.5, favorite (better ML) lays it
+    const _aP = mlToProb(s.away_ml), _hP = mlToProb(s.home_ml);
+    const rlOf = ab => (_aP == null || _hP == null) ? null
+      : (ab === s.away ? (_aP > _hP ? '-1.5' : '+1.5') : (_hP > _aP ? '-1.5' : '+1.5'));
     const row = (ab, name, p, dv, col) => `<div class="mkt-row">
       ${logo(ab)}
       <div class="mkt-team" style="color:${col}">${name}<span class="ml">${name === s.away ? (s.away_ml ? 'ML ' + fmtOdds(s.away_ml) : '') : (s.home_ml ? 'ML ' + fmtOdds(s.home_ml) : '')}</span></div>
@@ -4147,6 +4160,7 @@ function renderMarkets() {
       ${delta(dv)}
       <div class="mkt-chip yes" title="Add to Onyx ticket" data-a="${s.away}" data-h="${s.home}" data-p="${name}" data-o="${name === s.away ? (s.away_ml || '') : (s.home_ml || '')}" onclick="event.stopPropagation();onyxTicket({away:this.dataset.a,home:this.dataset.h,market:'ML',pick:this.dataset.p,side:'yes',odds:this.dataset.o})">Yes ${cents(p)}¢</div>
       <div class="mkt-chip no" title="Add to Onyx ticket" data-a="${s.away}" data-h="${s.home}" data-p="${name}" data-o="${name === s.away ? (s.away_ml || '') : (s.home_ml || '')}" onclick="event.stopPropagation();onyxTicket({away:this.dataset.a,home:this.dataset.h,market:'ML',pick:this.dataset.p,side:'no',odds:this.dataset.o})">No ${cents(1 - p)}¢</div>
+      ${rlOf(ab) ? `<div class="mkt-chip rl" title="Run line on Onyx" data-a="${s.away}" data-h="${s.home}" data-p="${ab}" data-l="${rlOf(ab)}" onclick="event.stopPropagation();onyxTicket({away:this.dataset.a,home:this.dataset.h,market:'RL',pick:this.dataset.p,line:this.dataset.l})">RL ${rlOf(ab)}</div>` : ''}
     </div>`;
 
     const isOpen = mktOpen.has(gk);
@@ -4167,7 +4181,10 @@ function renderMarkets() {
           <div class="mkt-sub">${stateHtml}</div>
         </div>
         <div style="display:flex;align-items:center;gap:10px">
-          <div class="mkt-sub">${s.ou ? 'O/U ' + s.ou : ''}</div>
+          ${s.ou ? `<div class="mkt-sub" style="display:flex;gap:5px;align-items:center">
+            <span class="mkt-ou" title="Over on Onyx" data-a="${s.away}" data-h="${s.home}" data-p="Over ${s.ou}" onclick="event.stopPropagation();onyxTicket({away:this.dataset.a,home:this.dataset.h,market:'TOTAL',pick:this.dataset.p})">O ${s.ou}</span>
+            <span class="mkt-ou" title="Under on Onyx" data-a="${s.away}" data-h="${s.home}" data-p="Under ${s.ou}" onclick="event.stopPropagation();onyxTicket({away:this.dataset.a,home:this.dataset.h,market:'TOTAL',pick:this.dataset.p})">U ${s.ou}</span>
+          </div>` : ''}
           <button class="mkt-histbtn" onclick="event.stopPropagation();mktToggle('${gk}')">${isOpen ? 'Hide history' : 'History'} <span class="mkt-chev">▾</span></button>
         </div>
       </div>

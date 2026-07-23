@@ -63,6 +63,27 @@ ticker entry green with an HR badge; a final loss grays it out. All of it
 degrades gracefully: with no network the bar simply shows the day's
 schedule from the baked payload.
 
+## Onyx ticket links
+
+Every price on the site (moneyline Yes/No, run lines, totals, HR props on
+the Plays board and player cards) deep links to Onyx's public share
+endpoint, which resolves the pick server-side against live Onyx odds and
+renders a branded ticket preview with the app CTA. Game slugs change
+daily and the league board is login-gated, so `fetch_onyx.py` harvests
+them each run:
+
+- Set the `ONYX_COOKIE` secret to a logged-in `app.onyxodds.com` session
+  cookie (DevTools -> Network -> any request -> Request Headers -> copy
+  the whole `Cookie:` value). The script pulls `/leagues/MLB`, extracts
+  every game link, and resolves away/home per slug through the public
+  share endpoint. Refresh the secret when the session expires.
+- No cookie (or expired): existing `data/onyx_games.json` is kept.
+  The file can also be hand-edited (`{"date": "YYYY-MM-DD", "links":
+  {"SD_ATL": "<slug>"}}`).
+- `auto_build.py` injects only same-day links; games without a slug fall
+  back to a parameterized onyxodds.com URL. All links carry the referral
+  code (`ONYX_REFERRER` in `shell.html`).
+
 ## Daily routine
 
 With the `ODDS_API_KEY` secret set: nothing. Odds, totals, moneylines, lineups, weather, L14 form, and pick grading are all automatic. Manual hooks that still work if ever needed:
