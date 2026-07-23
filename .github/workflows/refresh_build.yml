@@ -1,11 +1,11 @@
-name: Hourly Refresh (lineups + weather + odds)
+name: Refresh (lineups + weather + odds, every 20 min)
 on:
   schedule:
-    # Noon ET pass so early (12:15-1:10) games catch their confirmed lineups
-    - cron: "0 16 * * *"
-    # Hourly 1:30 PM - 7:30 PM ET (17:30-23:30 UTC during EDT):
-    # picks up confirmed lineups and fresh weather until first pitch
-    - cron: "30 17-23 * * *"
+    # Every 20 minutes across the slate: 11 AM - 11 PM ET
+    # (15-23 UTC + 0-3 UTC during EDT). Keeps HR-prop odds and the live
+    # edge board fresh through in-game at-bats, not just hourly.
+    - cron: "*/20 15-23 * * *"
+    - cron: "*/20 0-3 * * *"
   workflow_dispatch:
 permissions:
   contents: write
