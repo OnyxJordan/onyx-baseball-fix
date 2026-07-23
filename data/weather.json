@@ -1,12 +1,12 @@
 {
-  "CLE": {
-    "venue": "Progressive Field",
-    "temp": 68.8,
+  "DET": {
+    "venue": "Comerica Park",
+    "temp": 75.2,
     "precip": 0,
-    "wind_spd": 10.0,
-    "wind_dir": "NNW",
-    "humidity_pct": 60,
-    "pressure_mb": 990.9,
+    "wind_spd": 8.0,
+    "wind_dir": "NW",
+    "humidity_pct": 35,
+    "pressure_mb": 995.3,
     "roof": false,
     "flag": "clear"
   },
@@ -21,6 +21,17 @@
     "roof": false,
     "flag": "clear"
   },
+  "TOR": {
+    "venue": "Rogers Centre",
+    "temp": 69.4,
+    "precip": 0,
+    "wind_spd": 10.7,
+    "wind_dir": "W",
+    "humidity_pct": 56,
+    "pressure_mb": 1001.5,
+    "roof": true,
+    "flag": "clear"
+  },
   "STL": {
     "venue": "Busch Stadium",
     "temp": 81.1,
@@ -32,26 +43,15 @@
     "roof": false,
     "flag": "clear"
   },
-  "DET": {
-    "venue": "Comerica Park",
-    "temp": 75.2,
+  "CLE": {
+    "venue": "Progressive Field",
+    "temp": 68.8,
     "precip": 0,
-    "wind_spd": 8.0,
-    "wind_dir": "NW",
-    "humidity_pct": 35,
-    "pressure_mb": 995.3,
+    "wind_spd": 10.0,
+    "wind_dir": "NNW",
+    "humidity_pct": 60,
+    "pressure_mb": 990.9,
     "roof": false,
-    "flag": "clear"
-  },
-  "TOR": {
-    "venue": "Rogers Centre",
-    "temp": 69.4,
-    "precip": 0,
-    "wind_spd": 10.7,
-    "wind_dir": "W",
-    "humidity_pct": 56,
-    "pressure_mb": 1001.5,
-    "roof": true,
     "flag": "clear"
   }
 }
