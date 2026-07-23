@@ -889,6 +889,7 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
 .score-state {
   font-size:9px;font-weight:700;letter-spacing:.04em;
   font-family:monospace;color:var(--text3);min-width:28px;text-align:center;
+  white-space:nowrap;
 }
 .score-state.live   { color:var(--neon-green);animation:dotBlink 1.4s ease-in-out infinite; }
 .score-state.final  { color:var(--text3); }
@@ -1094,7 +1095,12 @@ tr.row-done td, .tcard.card-done { opacity:.5; }
 .mkt-chip.yes { color:#4ade80; } .mkt-chip.no { color:#f87171; }
 .mkt-note { padding:8px 18px 12px; font-size:9px; color:var(--text3); font-family:monospace; letter-spacing:.04em; }
 .mkt-head { cursor:pointer; }
-.mkt-chev { font-size:11px; color:var(--text3); transition:transform .2s; display:inline-block; margin-left:8px; }
+.mkt-histbtn { display:inline-flex; align-items:center; gap:5px; background:var(--bg3);
+  border:1px solid var(--border2); border-radius:8px; color:var(--text2); font-size:11px;
+  font-weight:700; padding:6px 11px; cursor:pointer; white-space:nowrap; transition:all .15s; }
+.mkt-histbtn:hover { color:var(--text); border-color:rgba(160,32,240,.5); }
+.mkt-card.open .mkt-histbtn { color:#b38cff; border-color:rgba(160,32,240,.5); }
+.mkt-chev { font-size:11px; color:inherit; transition:transform .2s; display:inline-block; }
 .mkt-card.open .mkt-chev { transform:rotate(180deg); }
 .mkt-chart.big { height:230px; }
 .mkt-axis { position:relative; height:18px; margin:0 64px 4px 10px; }
@@ -1190,7 +1196,7 @@ tr.row-done td, .tcard.card-done { opacity:.5; }
   <div class="nav-right">
     <button class="notif-bell" id="notifBell" onclick="toggleNotif()" title="Browser alert when a modeled batter homers">🔔</button>
     <span class="nav-badge">JUL 23 · 2026</span>
-    <span class="nav-date" id="buildStamp">updated 11:59 pm et</span>
+    <span class="nav-date" id="buildStamp">updated 12:07 am et</span>
     <span class="nav-date" id="liveCount"></span>
   </div>
 </nav>
@@ -2346,7 +2352,7 @@ function buildTicker() {
     const scorePart = score ? `<span class="ticker-sep">·</span><span class="ticker-score">${score}</span>` : '';
     const sign = p.hr_edge >= 0 ? '+' : '';
 
-    return `<span class="${cls}">
+    return `<span class="${cls}" style="cursor:pointer" data-p="${(p.batter_name||'').replace(/"/g,'&quot;')}" onclick="openPlayerCard(this.dataset.p)">
       ${pulse}<span class="ticker-name">${p.batter_name}</span>
       <span class="ticker-sep">·</span>
       <span class="ticker-pct">${p.hr_prob.toFixed(1)}%</span>
@@ -2743,10 +2749,12 @@ function buildScoreTicker() {
     </div>`;
   };
 
-  // gamePk lookup for click-through in schedule mode
-  const pkByPair = {};
+  // gamePk + start time lookups for schedule mode
+  const pkByPair = {}, timeByPair = {};
   (typeof SUMMARIES !== 'undefined' ? SUMMARIES : []).forEach(s => {
-    if (s.gamePk) pkByPair[`${s.away}@${s.home}`] = s.gamePk;
+    const key = `${s.away}@${s.home}`;
+    if (s.gamePk) pkByPair[key] = s.gamePk;
+    if (s.time) timeByPair[key] = s.time + ' ET';
   });
 
   let games = [];
@@ -2755,20 +2763,23 @@ function buildScoreTicker() {
       if (!gd.awayAbbr || !gd.homeAbbr) return;
       const state = gd.isLive ? 'live' : gd.isFinal ? 'final' : 'sched';
       const hasScore = gd.awayScore !== null && gd.homeScore !== null;
-      const inning = gd.isLive && gd.inning
-        ? `${(gd.half || '').charAt(0).toUpperCase()}${gd.inning}` : '';
+      // live shows the inning, pregame shows the ET start time
+      const detail = gd.isLive && gd.inning
+        ? `${(gd.half || '').charAt(0).toUpperCase()}${gd.inning}`
+        : (!gd.isFinal ? (timeByPair[`${gd.awayAbbr}@${gd.homeAbbr}`] || '') : '');
       games.push(makeGame(
         gd.awayAbbr, gd.homeAbbr, state,
         hasScore ? gd.awayScore : null,
         hasScore ? gd.homeScore : null,
-        inning, +pk
+        detail, +pk
       ));
     });
   } else {
     // Pre-poll fallback: today's slate from the baked payload
     ALL_GAME_KEYS.forEach(key => {
       const m = key.match(/^(\w+)\s*@\s*(\w+)/);
-      if (m) games.push(makeGame(m[1], m[2], 'sched', null, null, '', pkByPair[`${m[1]}@${m[2]}`]));
+      if (m) games.push(makeGame(m[1], m[2], 'sched', null, null,
+        timeByPair[`${m[1]}@${m[2]}`] || '', pkByPair[`${m[1]}@${m[2]}`]));
     });
   }
 
@@ -2776,10 +2787,15 @@ function buildScoreTicker() {
     document.getElementById('scoreTickerBar')?.style.setProperty('display','none');
     return;
   }
-  // Duplicate for seamless loop; pace the scroll to the number of games so
-  // short slates do not whip past
-  track.innerHTML = games.join('') + games.join('');
-  track.style.animationDuration = Math.max(45, games.length * 14) + 's';
+  // Repeat the sequence until one copy at least fills the bar, then double it
+  // for the seamless -50% loop: no dead space, games re-enter from the right
+  const bar = document.getElementById('scoreTickerBar');
+  const barW = (bar && bar.clientWidth) || 1400;
+  const reps = Math.max(1, Math.ceil(barW / Math.max(games.length * 150, 1)));
+  let seq = '';
+  for (let i = 0; i < reps; i++) seq += games.join('');
+  track.innerHTML = seq + seq;
+  track.style.animationDuration = Math.max(45, games.length * reps * 14) + 's';
 }
 
 // Poll every 90 seconds; bar renders instantly in schedule mode
@@ -3287,12 +3303,15 @@ function renderMarkets() {
 
     const isOpen = mktOpen.has(gk);
     return `<div class="mkt-card${isOpen ? ' open' : ''}">
-      <div class="mkt-head" onclick="mktToggle('${gk}')" title="Click for market history">
+      <div class="mkt-head" onclick="mktToggle('${gk}')" title="Show line movement over time">
         <div>
-          <div class="mkt-title">${s.away} @ ${s.home}${s.venue ? ` <span style="font-weight:400;color:var(--text3);font-size:11px">· ${s.venue}</span>` : ''}<span class="mkt-chev">▾</span></div>
+          <div class="mkt-title">${s.away} @ ${s.home}${s.venue ? ` <span style="font-weight:400;color:var(--text3);font-size:11px">· ${s.venue}</span>` : ''}</div>
           <div class="mkt-sub">${stateHtml}</div>
         </div>
-        <div class="mkt-sub">${s.ou ? 'O/U ' + s.ou : ''}</div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="mkt-sub">${s.ou ? 'O/U ' + s.ou : ''}</div>
+          <button class="mkt-histbtn" onclick="event.stopPropagation();mktToggle('${gk}')">${isOpen ? 'Hide history' : 'History'} <span class="mkt-chev">▾</span></button>
+        </div>
       </div>
       ${mktChart(pts, A_COL, H_COL, s.away, s.home, isOpen)}
       <div class="mkt-rows">
@@ -3444,7 +3463,7 @@ function renderGameCards() {
           <div class="tr-text">
             <div class="tr-name" style="color:var(--text)">${team}</div>
             <div class="tr-pitcher">vs ${pitcher} <span class="${phand==='L'?'lhp':'rhp'} hand-pill" style="font-size:9px">${phand}HP</span> <span style="font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;font-size:10px;color:${hc}">HR/9 ${p_hr9!=null?(+p_hr9).toFixed(2):'—'}</span></div>
-            ${topH?`<div class="tr-top">Top: <strong>${topName}</strong> <span style="font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;font-size:10px;font-weight:700;color:${pc}">${(+topP||0).toFixed(1)}%</span></div>`:''}
+            ${topH?`<div class="tr-top">Top: <strong style="cursor:pointer" data-p="${(topH||'').replace(/"/g,'&quot;')}" onclick="event.stopPropagation();openPlayerCard(this.dataset.p)">${topName}</strong> <span style="font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;font-size:10px;font-weight:700;color:${pc}">${(+topP||0).toFixed(1)}%</span></div>`:''}
           </div>
         </div>
         <div class="odds-val">
@@ -3817,7 +3836,7 @@ function renderPower() {
       ? `<strong style="color:#f87171">Tough</strong> ${r.opp_pitcher} (${r.opp_pitcher_hand}HP, ERA ${r.opp_pitcher_era?.toFixed(2)||'—'}) — difficult matchup`
       : `${r.opp_pitcher} (${r.opp_pitcher_hand}HP, ERA ${r.opp_pitcher_era?.toFixed(2)||'—'}) — average matchup`;
 
-    return `<div style="background:var(--card);border:2px solid ${cl.bd};border-radius:14px;overflow:hidden;margin-bottom:12px">
+    return `<div style="background:var(--card);border:2px solid ${cl.bd};border-radius:14px;overflow:hidden;margin-bottom:12px;cursor:pointer" data-p="${(r.matched_name||'').replace(/"/g,'&quot;')}" onclick="openPlayerCard(this.dataset.p)">
 
       <!-- confidence bar -->
       <div style="height:5px;background:var(--bg)">
@@ -3876,7 +3895,7 @@ function renderPower() {
         <span style="font-size:10px;background:var(--bg);border:1px solid var(--border);border-radius:5px;padding:3px 8px;color:var(--text-muted)">EV90 ${ev90}</span>
         <span style="font-size:10px;background:var(--bg);border:1px solid var(--border);border-radius:5px;padding:3px 8px;color:var(--text-muted)">ISO ${r.iso_ctx>0?r.iso_ctx.toFixed(3):'—'}</span>
         <span style="font-size:10px;background:var(--bg);border:1px solid var(--border);border-radius:5px;padding:3px 8px;color:var(--text-muted)">SC ${(r.sc_score||0).toFixed(3)}</span>
-        <span style="font-size:10px;background:var(--bg);border:1px solid var(--border);border-radius:5px;padding:3px 8px;color:var(--text-muted)">DK $${(r.dk_salary/1000).toFixed(1)}K · ${r.dk_value?.toFixed(2)||'—'}x</span>
+        <span style="font-size:10px;background:var(--bg);border:1px solid var(--border);border-radius:5px;padding:3px 8px;color:var(--text-muted)">xwOBA ${r.l14_xwoba!=null?('.'+Math.round(r.l14_xwoba*1000).toString().padStart(3,'0')):'—'}</span>
         <span style="font-size:10px;font-weight:700;background:${cl.bg};border:1px solid ${cl.bd};border-radius:5px;padding:3px 10px;color:${cl.col}">${cl.txt}</span>
       </div>
     </div>`;
