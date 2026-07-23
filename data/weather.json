@@ -1,26 +1,4 @@
 {
-  "TOR": {
-    "venue": "Rogers Centre",
-    "temp": 68.7,
-    "precip": 0,
-    "wind_spd": 10.3,
-    "wind_dir": "S",
-    "humidity_pct": 65,
-    "pressure_mb": 1010.7,
-    "roof": true,
-    "flag": "clear"
-  },
-  "CLE": {
-    "venue": "Progressive Field",
-    "temp": 75.1,
-    "precip": 0,
-    "wind_spd": 7.3,
-    "wind_dir": "NNW",
-    "humidity_pct": 44,
-    "pressure_mb": 998.4,
-    "roof": false,
-    "flag": "clear"
-  },
   "DET": {
     "venue": "Comerica Park",
     "temp": 78.9,
@@ -30,6 +8,17 @@
     "humidity_pct": 32,
     "pressure_mb": 999.9,
     "roof": false,
+    "flag": "clear"
+  },
+  "TOR": {
+    "venue": "Rogers Centre",
+    "temp": 68.7,
+    "precip": 0,
+    "wind_spd": 10.3,
+    "wind_dir": "S",
+    "humidity_pct": 65,
+    "pressure_mb": 1010.7,
+    "roof": true,
     "flag": "clear"
   },
   "STL": {
@@ -51,6 +40,17 @@
     "wind_dir": "SSW",
     "humidity_pct": 74,
     "pressure_mb": 982.1,
+    "roof": false,
+    "flag": "clear"
+  },
+  "CLE": {
+    "venue": "Progressive Field",
+    "temp": 75.1,
+    "precip": 0,
+    "wind_spd": 7.3,
+    "wind_dir": "NNW",
+    "humidity_pct": 44,
+    "pressure_mb": 998.4,
     "roof": false,
     "flag": "clear"
   }
