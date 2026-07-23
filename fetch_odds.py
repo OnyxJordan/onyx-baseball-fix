@@ -58,13 +58,17 @@ def _oapi_get(path, key, **params):
         remaining = r.headers.get("x-requests-remaining")
         return json.loads(r.read().decode("utf-8")), remaining
 
-def _today_et():
-    return (datetime.now(timezone.utc) - timedelta(hours=4)).date()
+def _slate_date():
+    """The slate being built = fetch_data's schedule date, which is the
+    runner's UTC date. Late-night ET runs would otherwise filter for
+    yesterday's (already delisted) props while the build targets tomorrow."""
+    return datetime.now(timezone.utc).date()
 
 def _event_is_today(ev):
     try:
         dt = datetime.fromisoformat(ev["commence_time"].replace("Z", "+00:00"))
-        return (dt - timedelta(hours=4)).date() == _today_et()
+        # event's ET calendar day vs the slate date
+        return (dt - timedelta(hours=4)).date() == _slate_date()
     except Exception:
         return False
 

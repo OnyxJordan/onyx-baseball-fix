@@ -17,6 +17,10 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          # full history: fetch_odds judges odds.json freshness by its last
+          # commit time, which a shallow clone reports as "just now"
+          fetch-depth: 0
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
