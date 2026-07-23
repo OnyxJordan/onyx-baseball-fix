@@ -1029,6 +1029,16 @@ tr.row-done td, .tcard.card-done { opacity:.5; }
 .pmodal-stat { background:var(--bg3); border:1px solid var(--border); border-radius:9px; padding:9px 6px; text-align:center; }
 .pmodal-stat .v { font-size:14px; font-weight:800; font-family:monospace; }
 .pmodal-stat .k { font-size:8px; letter-spacing:.08em; text-transform:uppercase; color:var(--text3); margin-top:2px; }
+.pmodal-l5 { padding:0 22px 8px; }
+.pmodal-l5-title { font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text3); margin-bottom:8px; }
+.pml5-row { display:flex; gap:7px; }
+.pml5-g { flex:1; text-align:center; background:var(--bg3); border:1px solid var(--border); border-radius:9px; padding:8px 4px; }
+.pml5-g.hr { background:rgba(0,255,136,.08); border-color:rgba(0,255,136,.3); }
+.pml5-g .d { font-size:8px; color:var(--text3); font-family:monospace; }
+.pml5-g .o { font-size:9px; color:var(--text2); font-weight:700; margin:2px 0; }
+.pml5-g .h { font-size:13px; font-weight:800; font-family:monospace; }
+.pml5-g.hr .h { color:var(--neon-green); }
+.pml5-g .h.zero { color:var(--text3); }
 .pmodal-fac { padding:0 22px 22px; }
 .pmodal-fac-title { font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text3); margin-bottom:10px; }
 .pfac-row { display:flex; align-items:center; gap:10px; margin-bottom:7px; }
@@ -2462,11 +2472,48 @@ function openPlayerCard(name) {
       ${stat(r.sc_score != null ? (+r.sc_score).toFixed(2) : '—', 'SC score')}
       ${stat(r.due_label || '—', 'Due')}
     </div>
+    <div class="pmodal-l5" id="pml5"></div>
     <div class="pmodal-fac">
       <div class="pmodal-fac-title">Model factors · today</div>
       ${facs.map(facRow).join('')}
     </div>`;
   document.getElementById('pmodalBack').classList.add('open');
+  loadLast5(r.mid);
+}
+
+// last 5 games HR log from the MLB game log endpoint
+const _l5Cache = {};
+async function loadLast5(mid) {
+  const el = document.getElementById('pml5');
+  if (!el || !mid) return;
+  if (_l5Cache[mid]) { el.innerHTML = _l5Cache[mid]; return; }
+  el.innerHTML = '<div class="pmodal-l5-title">Last 5 games</div><div style="font-size:11px;color:var(--text3)">Loading…</div>';
+  try {
+    const yr = new Date().getFullYear();
+    const r = await fetch(`https://statsapi.mlb.com/api/v1/people/${mid}/stats?stats=gameLog&group=hitting&season=${yr}`);
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const d = await r.json();
+    const splits = ((d.stats || [])[0] || {}).splits || [];
+    const last5 = splits.slice(-5).reverse();
+    if (!last5.length) { el.innerHTML = ''; return; }
+    const cells = last5.map(s => {
+      const hr = (s.stat || {}).homeRuns || 0;
+      const hits = (s.stat || {}).hits || 0;
+      const ab = (s.stat || {}).atBats || 0;
+      const opp = ((s.opponent || {}).abbreviation) || '';
+      const dt = s.date ? s.date.slice(5).replace('-', '/') : '';
+      return `<div class="pml5-g${hr ? ' hr' : ''}">
+        <div class="d">${dt}</div>
+        <div class="o">${(s.isHome === false ? '@' : '')}${opp}</div>
+        <div class="h${hr ? '' : ' zero'}">${hr ? hr + ' HR' : hits + '-' + ab}</div>
+      </div>`;
+    }).join('');
+    const html = `<div class="pmodal-l5-title">Last 5 games</div><div class="pml5-row">${cells}</div>`;
+    _l5Cache[mid] = html;
+    el.innerHTML = html;
+  } catch (e) {
+    el.innerHTML = '';
+  }
 }
 
 // ─── HR NOTIFICATIONS ───────────────────────────────────────────
@@ -3320,13 +3367,13 @@ function renderTargets() {
       ? bestOdds + ' <span style="font-size:8px;background:rgba(96,165,250,.2);color:#60a5fa;padding:1px 4px;border-radius:3px;margin-left:2px">' + bestBook + '</span>'
       : bestOdds;
     const avgImpliedStr = r.avg_implied ? r.avg_implied+'% avg' : (r.dk_hr_implied ? r.dk_hr_implied+'%' : '');
-    return `<div class="tcard${rowDone(r) ? ' card-done' : ''}" onclick="jumpToGame('${r.game}')">
+    return `<div class="tcard${rowDone(r) ? ' card-done' : ''}" style="cursor:pointer" data-p="${(r.matched_name||'').replace(/"/g,'&quot;')}" onclick="openPlayerCard(this.dataset.p)">
       <div style="position:absolute;top:10px;right:10px;width:18px;height:18px;border-radius:50%;background:var(--bg4);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--text3);font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace">${i+1}</div>
       <div class="tc-row1">
         <div class="tc-badge" style="background:transparent">${teamBadge(r.team,'38')}</div>
         <div class="tc-meta">
-          <div class="tc-name" style="cursor:pointer" data-p="${(r.matched_name||'').replace(/"/g,'&quot;')}" onclick="event.stopPropagation();openPlayerCard(this.dataset.p)">${r.matched_name}${liveBadges(r)}</div>
-          <div class="tc-sub">#${r.batting_order} ${r.pos} · ${r.away} @ ${r.home}</div>
+          <div class="tc-name">${r.matched_name}${liveBadges(r)}</div>
+          <div class="tc-sub">#${r.batting_order} ${r.pos} · <span style="cursor:pointer;text-decoration:underline dotted;text-underline-offset:2px" onclick="event.stopPropagation();jumpToGame('${r.game}')">${r.away} @ ${r.home}</span></div>
         </div>
         <div class="tc-pct-wrap">
           <div class="tc-pct" style="color:${col}">${(+r.hr_prob||0).toFixed(1)}%</div>
