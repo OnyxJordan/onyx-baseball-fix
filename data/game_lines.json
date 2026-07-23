@@ -1,17 +1,47 @@
 {
-  "LAD_PHI": {"total": 9.0, "away_ml": 109, "home_ml": -131, "awayP": "Justin Wrobleski", "homeP": "Zack Wheeler"},
-  "MIN_CLE": {"total": 8.0, "away_ml": 124, "home_ml": -150, "awayP": "Kendry Rojas", "homeP": "Parker Messick"},
-  "PIT_NYY": {"total": 9.5, "away_ml": 130, "home_ml": -157, "awayP": "Bubba Chandler", "homeP": "Will Warren"},
-  "TB_TOR": {"total": 7.5, "away_ml": -112, "home_ml": -107, "awayP": "Drew Rasmussen", "homeP": "Kevin Gausman"},
-  "BAL_BOS": {"total": 8.5, "away_ml": 118, "home_ml": -142, "awayP": "Kyle Bradish", "homeP": "Ranger Suarez"},
-  "SD_ATL": {"total": 9.0, "away_ml": 122, "home_ml": -147, "awayP": "Walker Buehler", "homeP": "Reynaldo Lopez"},
-  "NYM_MIL": {"total": 9.0, "away_ml": 123, "home_ml": -149, "awayP": "Zach Thornton", "homeP": "Brandon Sproat"},
-  "SF_KC": {"total": 9.5, "away_ml": -114, "home_ml": -105, "awayP": "Tyler Mahle", "homeP": "Luinder Avila"},
-  "DET_CHC": {"total": 8.0, "away_ml": 101, "home_ml": -122, "awayP": "Framber Valdez", "homeP": "David Peterson"},
-  "CWS_TEX": {"total": 8.5, "away_ml": 105, "home_ml": -127, "awayP": "Noah Schultz", "homeP": "Kumar Rocker"},
-  "MIA_HOU": {"total": 9.0, "away_ml": 104, "home_ml": -126, "awayP": "Tyler Phillips", "homeP": "Tatsuya Imai"},
-  "WSH_COL": {"total": 13.0, "away_ml": -112, "home_ml": -107, "awayP": "Miles Mikolas", "homeP": "Michael Lorenzen"},
-  "STL_LAA": {"total": 9.0, "away_ml": -104, "home_ml": -115, "awayP": "Matthew Liberatore", "homeP": "Walbert Urena"},
-  "CIN_SEA": {"total": 7.5, "away_ml": 102, "home_ml": -123, "awayP": "Chase Burns", "homeP": "Luis Castillo"},
-  "ATH_ARI": {"total": 9.5, "away_ml": 114, "home_ml": -137, "awayP": "Jack Perkins", "homeP": "Kohl Drake"}
+  "SD_ATL": {
+    "awayP": "Griffin Canning",
+    "homeP": "Chris Sale",
+    "time": "12:15 PM",
+    "venue": "Truist Park",
+    "total": 9.0,
+    "away_ml": 122,
+    "home_ml": -147
+  },
+  "MIN_CLE": {
+    "awayP": "Taj Bradley",
+    "homeP": "Gavin Williams",
+    "time": "1:10 PM",
+    "venue": "Progressive Field",
+    "total": 8.0,
+    "away_ml": 124,
+    "home_ml": -150
+  },
+  "TB_TOR": {
+    "awayP": "Ian Seymour",
+    "homeP": "Shane Bieber",
+    "time": "3:07 PM",
+    "venue": "Rogers Centre",
+    "total": 7.5,
+    "away_ml": -112,
+    "home_ml": -107
+  },
+  "ARI_STL": {
+    "awayP": "Brandon Pfaadt",
+    "homeP": "Michael McGreevy",
+    "time": "5:15 PM",
+    "venue": "Busch Stadium",
+    "total": null,
+    "away_ml": null,
+    "home_ml": null
+  },
+  "KC_DET": {
+    "awayP": "Randy Dobnak",
+    "homeP": "Troy Melton",
+    "time": "6:40 PM",
+    "venue": "Comerica Park",
+    "total": null,
+    "away_ml": null,
+    "home_ml": null
+  }
 }
