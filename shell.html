@@ -981,6 +981,74 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
 .gc-hitbadge { font-size:8px; font-weight:800; padding:1px 5px; border-radius:3px; background:rgba(0,255,136,.15); color:var(--neon-green); margin-left:5px; }
 .gc-empty { text-align:center; color:var(--text3); padding:60px 20px; font-size:13px; }
 
+/* ── REVAMP: SPACING RHYTHM ─────────────────────────────────── */
+.home-section { margin-bottom:64px; }
+.home-section-title { margin:6px 0 22px; }
+.flag-grid { gap:12px; margin-top:18px; }
+.model-notes-grid { gap:14px; margin-top:18px; }
+.model-note { padding:18px 20px; }
+.sec-hdr { padding:20px 20px 14px; }
+.rank-table th { padding:10px 8px; }
+.rank-table td { padding:9px 8px; }
+.tcard { padding:16px 18px; }
+.gc-card { padding:16px 18px; margin-bottom:16px; }
+.mkt-card { margin-bottom:18px; }
+.mkt-row { padding:13px 18px; }
+#record-summary { gap:10px; padding:14px 20px; }
+@media(max-width:700px){
+  .rank-table th { padding:8px 5px; }
+  .rank-table td { padding:7px 5px; font-size:11px; }
+  .home-section { margin-bottom:44px; }
+}
+
+/* live board badges */
+.hit-flag { font-size:9px; font-weight:800; padding:2px 6px; border-radius:4px;
+  background:rgba(0,255,136,.15); color:var(--neon-green); margin-left:6px; white-space:nowrap; }
+.done-flag { font-size:9px; font-weight:700; padding:2px 6px; border-radius:4px;
+  background:rgba(255,255,255,.06); color:var(--text3); margin-left:6px; white-space:nowrap; }
+.pa-flag { font-size:9px; font-weight:600; color:var(--text3); font-family:monospace; margin-left:6px; white-space:nowrap; }
+tr.row-done td, .tcard.card-done { opacity:.5; }
+
+/* player drill-down modal */
+.pmodal-back { position:fixed; inset:0; background:rgba(5,6,10,.75); backdrop-filter:blur(6px);
+  z-index:100000; display:none; align-items:flex-start; justify-content:center; padding:60px 16px; overflow-y:auto; }
+.pmodal-back.open { display:flex; }
+.pmodal { background:var(--bg2); border:1px solid var(--border2); border-radius:16px;
+  width:100%; max-width:520px; overflow:hidden; position:relative; }
+.pmodal::before { content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background:linear-gradient(90deg,#A020F0,#4060F0); }
+.pmodal-head { display:flex; align-items:center; gap:12px; padding:20px 22px 14px; }
+.pmodal-close { margin-left:auto; background:none; border:none; color:var(--text3); font-size:20px; cursor:pointer; }
+.pmodal-name { font-size:18px; font-weight:800; }
+.pmodal-sub { font-size:11px; color:var(--text3); font-family:monospace; margin-top:2px; }
+.pmodal-prob { text-align:center; padding:6px 0 16px; }
+.pmodal-prob .big { font-size:40px; font-weight:800; font-family:monospace;
+  background:linear-gradient(90deg,#A020F0,#4060F0); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+.pmodal-prob .cap { font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--text3); }
+.pmodal-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; padding:0 22px 16px; }
+.pmodal-stat { background:var(--bg3); border:1px solid var(--border); border-radius:9px; padding:9px 6px; text-align:center; }
+.pmodal-stat .v { font-size:14px; font-weight:800; font-family:monospace; }
+.pmodal-stat .k { font-size:8px; letter-spacing:.08em; text-transform:uppercase; color:var(--text3); margin-top:2px; }
+.pmodal-fac { padding:0 22px 22px; }
+.pmodal-fac-title { font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text3); margin-bottom:10px; }
+.pfac-row { display:flex; align-items:center; gap:10px; margin-bottom:7px; }
+.pfac-name { flex:0 0 110px; font-size:11px; color:var(--text2); }
+.pfac-bar { flex:1; height:6px; background:var(--bg4); border-radius:3px; position:relative; overflow:hidden; }
+.pfac-fill { position:absolute; top:0; bottom:0; border-radius:3px; }
+.pfac-val { flex:0 0 52px; text-align:right; font-size:11px; font-weight:700; font-family:monospace; }
+
+/* calibration buckets */
+.cal-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; padding:4px 20px 18px; }
+.cal-cell { background:var(--bg2); border:1px solid var(--border); border-radius:10px; padding:12px 12px 10px; text-align:center; }
+.cal-cell .rng { font-size:10px; font-weight:700; color:var(--text3); font-family:monospace; }
+.cal-cell .rate { font-size:19px; font-weight:800; font-family:monospace; margin:4px 0 1px; }
+.cal-cell .n { font-size:9px; color:var(--text3); }
+
+/* notification bell */
+.notif-bell { background:none; border:1px solid var(--border2); border-radius:8px; color:var(--text3);
+  width:30px; height:30px; cursor:pointer; font-size:14px; line-height:1; transition:all .15s; }
+.notif-bell.on { color:var(--neon-green); border-color:rgba(0,255,136,.4); box-shadow:0 0 8px rgba(0,255,136,.15); }
+
 /* ── MARKETS (Kalshi-style win probability) ─────────────────── */
 .mkt-wrap { padding:14px 16px 40px; max-width:900px; margin:0 auto; }
 .mkt-card {
@@ -1096,6 +1164,7 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
   </button>
 
   <div class="nav-right">
+    <button class="notif-bell" id="notifBell" onclick="toggleNotif()" title="Browser alert when a modeled batter homers">🔔</button>
     <span class="nav-badge">MAY 23 · 2026</span>
     <span class="nav-date" id="buildStamp"></span>
     <span class="nav-date" id="liveCount"></span>
@@ -1584,9 +1653,10 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
     <div class="rank-scroll">
     <table class="rank-table" id="rankTable">
       <colgroup>
-        <col style="width:32px"><col style="width:170px"><col style="width:60px">
-        <col style="width:160px"><col style="width:86px"><col style="width:56px">
-        <col style="width:48px"><col style="width:52px"><col style="width:46px"><col style="width:46px"><col style="width:58px">
+        <col style="width:34px"><col style="width:180px"><col style="width:64px">
+        <col style="width:165px"><col style="width:90px"><col style="width:60px">
+        <col style="width:52px"><col style="width:50px"><col style="width:50px">
+        <col style="width:52px"><col style="width:56px"><col style="width:46px"><col style="width:60px">
       </colgroup>
       <thead><tr>
         <th style="width:34px">#</th>
@@ -1598,8 +1668,9 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
         <th onclick="sortR('barrel_26')">Brrl%</th>
         <th onclick="sortR('hh_pct')">HH%</th>
         <th onclick="sortR('ev90_26')">EV90</th>
-        <th onclick="sortR('dk_proj')">DK</th>
-        <th onclick="sortR('fd_proj')">FD</th>
+        <th onclick="sortR('iso_ctx')" title="Isolated power: extra bases per at bat">ISO</th>
+        <th onclick="sortR('l14_xwoba')" title="Expected wOBA, last 14 days">xwOBA</th>
+        <th onclick="sortR('sc_score')" title="Statcast composite quality score">SC</th>
         <th onclick="sortR('hr_edge')">Edge</th>
       </tr></thead>
       <tbody id="rankBody"></tbody>
@@ -1621,6 +1692,8 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
     <span class="sec-count" id="record-count"></span>
   </div>
   <div id="record-summary" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;padding:12px 20px"></div>
+  <div style="padding:2px 20px 0;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)">Calibration · hit rate by model probability</div>
+  <div class="cal-grid" id="calGrid"></div>
   <div style="padding:0 20px 8px">
     <div id="record-chart" style="position:relative;height:160px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden;padding:16px 16px 32px"></div>
   </div>
@@ -1656,6 +1729,11 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
     <div class="gc-strip" id="gcStrip"></div>
     <div id="gcBody"><div class="gc-empty">Loading live games…</div></div>
   </div>
+</div>
+
+<!-- ═══ PLAYER DRILL-DOWN MODAL ════════════════════════════════ -->
+<div class="pmodal-back" id="pmodalBack" onclick="if(event.target===this)closePlayerCard()">
+  <div class="pmodal" id="pmodal"></div>
 </div>
 
 <!-- ═══ PANE: MARKETS ══════════════════════════════════════════ -->
@@ -2304,6 +2382,112 @@ function modelRow(name) {
   return _mrMap[nkjs(name)];
 }
 
+// ─── LIVE BOARD BADGES ──────────────────────────────────────────
+function paEstimate(gd) {
+  const inn = +gd.inning || 1;
+  const rem = Math.max(0, 9 - inn + (String(gd.half).startsWith('T') || gd.half === 'Top' ? 0.5 : 0));
+  return Math.max(0, Math.round(rem * 4.3 / 9));
+}
+function liveBadges(r) {
+  const lp = livePlayerData[nkjs(r.batter_name || r.matched_name)] || {};
+  if (lp.hitHR) return '<span class="hit-flag">HR ✓</span>';
+  if (lp.gameOver) return '<span class="done-flag">FINAL</span>';
+  const gd = lp.gamePk ? liveGameData[lp.gamePk] : null;
+  if (gd && gd.isLive) return `<span class="pa-flag">~${paEstimate(gd)} PA left</span>`;
+  return '';
+}
+function rowDone(r) {
+  const lp = livePlayerData[nkjs(r.batter_name || r.matched_name)] || {};
+  return !!lp.gameOver && !lp.hitHR;
+}
+
+// ─── PLAYER DRILL-DOWN ──────────────────────────────────────────
+function closePlayerCard() { document.getElementById('pmodalBack').classList.remove('open'); }
+function openPlayerCard(name) {
+  const r = modelRow(name);
+  if (!r) return;
+  const el = document.getElementById('pmodal');
+  const lp = livePlayerData[nkjs(name)] || {};
+  const stat = (v, k) => `<div class="pmodal-stat"><div class="v">${v}</div><div class="k">${k}</div></div>`;
+  const p3 = v => v != null ? '.' + Math.round(v * 1000).toString().padStart(3, '0') : '—';
+  const facs = [
+    ['Park',    r.park_factor],
+    ['Weather', r.env_factor],
+    ['Pitcher', r.p_factor],
+    ['Platoon', r.platoon_factor],
+    ['Due',     r.due_mult],
+  ].filter(f => f[1] != null);
+  const facRow = ([n, v]) => {
+    const lo = 0.7, hi = 1.4;
+    const w = Math.min(100, Math.max(3, (v - lo) / (hi - lo) * 100));
+    const col = v > 1.02 ? '#34d399' : v < 0.98 ? '#f87171' : '#4d6580';
+    return `<div class="pfac-row"><div class="pfac-name">${n}</div>
+      <div class="pfac-bar"><div class="pfac-fill" style="left:0;width:${w.toFixed(0)}%;background:${col}"></div></div>
+      <div class="pfac-val" style="color:${col}">×${(+v).toFixed(2)}</div></div>`;
+  };
+  el.innerHTML = `
+    <div class="pmodal-head">
+      ${typeof teamBadge === 'function' ? teamBadge(r.team, '38') : ''}
+      <div>
+        <div class="pmodal-name">${r.matched_name}${lp.hitHR ? ' <span class="hit-flag">HR ✓</span>' : ''}</div>
+        <div class="pmodal-sub">#${r.batting_order} ${r.pos} · ${r.team} · vs ${r.opp_pitcher || 'TBD'} ${r.opp_pitcher_hand || ''}HP · ${r.venue || ''}</div>
+      </div>
+      <button class="pmodal-close" onclick="closePlayerCard()">×</button>
+    </div>
+    <div class="pmodal-prob">
+      <div class="big">${(+r.hr_prob || 0).toFixed(1)}%</div>
+      <div class="cap">HR probability${r.dk_hr_odds ? ` · market ${r.dk_hr_odds > 0 ? '+' : ''}${r.dk_hr_odds} (${(r.dk_hr_implied || 0).toFixed(1)}%) · edge ${r.hr_edge > 0 ? '+' : ''}${(+r.hr_edge || 0).toFixed(1)}pp` : ' · no market line'}</div>
+    </div>
+    <div class="pmodal-grid">
+      ${stat(p3(r.iso_ctx), 'ISO')}
+      ${stat(r.barrel_26 != null ? (r.barrel_26 * 100).toFixed(1) + '%' : '—', 'Barrel')}
+      ${stat(r.hh_pct != null ? (r.hh_pct * 100).toFixed(0) + '%' : '—', 'HardHit')}
+      ${stat(r.ev90_26 != null ? (+r.ev90_26).toFixed(1) : '—', 'EV90')}
+      ${stat(p3(r.l14_xwoba), 'xwOBA L14')}
+      ${stat(`${r.l14_hr || 0}/${r.l14_pa || 0}`, 'HR/PA L14')}
+      ${stat(r.sc_score != null ? (+r.sc_score).toFixed(2) : '—', 'SC score')}
+      ${stat(r.due_label || '—', 'Due')}
+    </div>
+    <div class="pmodal-fac">
+      <div class="pmodal-fac-title">Model factors · today</div>
+      ${facs.map(facRow).join('')}
+    </div>`;
+  document.getElementById('pmodalBack').classList.add('open');
+}
+
+// ─── HR NOTIFICATIONS ───────────────────────────────────────────
+let notifOn = localStorage.getItem('onyxNotify') === '1';
+const _notified = new Set();
+function syncBell() {
+  const b = document.getElementById('notifBell');
+  if (b) b.classList.toggle('on', notifOn && typeof Notification !== 'undefined' && Notification.permission === 'granted');
+}
+async function toggleNotif() {
+  if (typeof Notification === 'undefined') return;
+  if (!notifOn) {
+    const perm = await Notification.requestPermission();
+    if (perm !== 'granted') { syncBell(); return; }
+    notifOn = true;
+  } else {
+    notifOn = false;
+  }
+  localStorage.setItem('onyxNotify', notifOn ? '1' : '0');
+  syncBell();
+}
+function maybeNotifyHR(name) {
+  if (!notifOn || typeof Notification === 'undefined' || Notification.permission !== 'granted') return;
+  const key = nkjs(name);
+  if (_notified.has(key)) return;
+  const r = modelRow(name);
+  if (!r) return;
+  _notified.add(key);
+  try {
+    new Notification('Onyx: HR ✓ ' + (r.matched_name || name),
+      {body: `${r.team} · modeled at ${(+r.hr_prob || 0).toFixed(1)}%${r.dk_hr_odds ? ' · was ' + (r.dk_hr_odds > 0 ? '+' : '') + r.dk_hr_odds : ''}`});
+  } catch (e) {}
+}
+document.addEventListener('DOMContentLoaded', syncBell);
+
 // Parse ESPN scoreboard response into MLB Stats API format
 function parseESPN(espn) {
   const events = espn?.events || [];
@@ -2419,6 +2603,7 @@ async function fetchLiveScores() {
               // per-game record so doubleheaders credit the right game
               const hg = (livePlayerData[name].hrGames = livePlayerData[name].hrGames || []);
               if (!hg.includes(pk)) hg.push(pk);
+              maybeNotifyHR(name);
             }
           }
         });
@@ -2455,6 +2640,11 @@ async function fetchLiveScores() {
     liveLoaded = true;
     buildTicker();       // refresh edge ticker with live badges
     buildScoreTicker();  // refresh score bar
+    // live-adjusting board: refresh whatever pane is open
+    if (typeof curTab !== 'undefined') {
+      if (curTab === 'board')    { renderTargets(); renderGameCards(); }
+      if (curTab === 'rankings') renderRankings();
+    }
   } catch(e) { console.warn('Live scores unavailable:', e); }
 }
 
@@ -3051,12 +3241,12 @@ function renderTargets() {
       ? bestOdds + ' <span style="font-size:8px;background:rgba(96,165,250,.2);color:#60a5fa;padding:1px 4px;border-radius:3px;margin-left:2px">' + bestBook + '</span>'
       : bestOdds;
     const avgImpliedStr = r.avg_implied ? r.avg_implied+'% avg' : (r.dk_hr_implied ? r.dk_hr_implied+'%' : '');
-    return `<div class="tcard" onclick="jumpToGame('${r.game}')">
+    return `<div class="tcard${rowDone(r) ? ' card-done' : ''}" onclick="jumpToGame('${r.game}')">
       <div style="position:absolute;top:10px;right:10px;width:18px;height:18px;border-radius:50%;background:var(--bg4);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--text3);font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace">${i+1}</div>
       <div class="tc-row1">
         <div class="tc-badge" style="background:transparent">${teamBadge(r.team,'38')}</div>
         <div class="tc-meta">
-          <div class="tc-name">${r.matched_name}</div>
+          <div class="tc-name" style="cursor:pointer" data-p="${(r.matched_name||'').replace(/"/g,'&quot;')}" onclick="event.stopPropagation();openPlayerCard(this.dataset.p)">${r.matched_name}${liveBadges(r)}</div>
           <div class="tc-sub">#${r.batting_order} ${r.pos} · ${r.away} @ ${r.home}</div>
         </div>
         <div class="tc-pct-wrap">
@@ -3086,8 +3276,8 @@ function renderTargets() {
       </div>
       <div class="tc-bot">
         <div class="tc-dfs">
-          <span class="dfs-chip dk">DK ${(+r.dk_proj||0).toFixed(1)}</span>
-          <span class="dfs-chip ap" style="background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.25);padding:2px 6px;border-radius:4px;font-size:10px">FD ${r.fd_proj!=null?(+r.fd_proj).toFixed(1):'—'}</span>
+          <span class="dfs-chip" style="background:rgba(176,56,249,.12);color:#b38cff;border:1px solid rgba(176,56,249,.25);padding:2px 6px;border-radius:4px;font-size:10px">ISO ${r.iso_ctx!=null?('.'+Math.round(r.iso_ctx*1000).toString().padStart(3,'0')):'—'}</span>
+          <span class="dfs-chip" style="background:rgba(52,211,153,.12);color:#34d399;border:1px solid rgba(52,211,153,.25);padding:2px 6px;border-radius:4px;font-size:10px">xwOBA ${r.l14_xwoba!=null?('.'+Math.round(r.l14_xwoba*1000).toString().padStart(3,'0')):'—'}</span>
           ${r.dk_hr_odds ? `<span style="font-size:10px;color:var(--text3);background:var(--bg3);padding:2px 6px;border-radius:4px;border:1px solid var(--border)">${oddsStr}</span>` : ''}
         </div>
         <div class="tc-env">
@@ -3216,13 +3406,13 @@ function renderRankings() {
     const wl  = r.weather_label||'';
     const hand= r.opp_pitcher_hand;
     const tc  = tbg(r.team);
-    return `<tr>
+    return `<tr${rowDone(r) ? ' class="row-done"' : ''}>
       <td class="rn">${i+1}</td>
       <td style="text-align:left">
-        <div style="display:flex;align-items:center;gap:8px;overflow:hidden">
+        <div style="display:flex;align-items:center;gap:8px;overflow:hidden;cursor:pointer" data-p="${(r.matched_name||'').replace(/"/g,'&quot;')}" onclick="openPlayerCard(this.dataset.p)">
           ${teamBadge(r.team,'22')}
           <div style="overflow:hidden;min-width:0">
-            <div style="font-size:13px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.matched_name}</div>
+            <div style="font-size:13px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.matched_name}${liveBadges(r)}</div>
             <div style="font-size:10px;color:var(--text3);white-space:nowrap">#${r.batting_order} ${r.pos} · ${r.away}@${r.home}</div>
           </div>
         </div>
@@ -3249,8 +3439,9 @@ function renderRankings() {
       <td class="rmono" style="color:${(r.barrel_26||0)>0.12?'#b038f9':'var(--text2)'}">${r.barrel_26!=null?(r.barrel_26*100).toFixed(1)+'%':'—'}</td>
       <td class="rmono">${r.hh_pct!=null?(r.hh_pct*100).toFixed(0)+'%':'—'}</td>
       <td class="rmono">${r.ev90_26!=null?r.ev90_26.toFixed(1):'—'}</td>
-      <td style="font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;font-size:12px;color:#60a5fa">${(+r.dk_proj||0).toFixed(1)}</td>
-      <td style="font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;font-size:12px;color:#22c55e">${r.fd_proj!=null?(+r.fd_proj).toFixed(1):'—'}</td>
+      <td class="rmono" style="color:${(r.iso_ctx||0)>=0.220?'#b038f9':(r.iso_ctx||0)>=0.160?'var(--text)':'var(--text2)'}">${r.iso_ctx!=null?('.'+Math.round(r.iso_ctx*1000).toString().padStart(3,'0')):'—'}</td>
+      <td class="rmono" style="color:${(r.l14_xwoba||0)>=0.370?'#34d399':'var(--text2)'}">${r.l14_xwoba!=null?('.'+Math.round(r.l14_xwoba*1000).toString().padStart(3,'0')):'—'}</td>
+      <td class="rmono" style="color:${(r.sc_score||0)>=1.1?'#b038f9':'var(--text2)'}">${r.sc_score!=null?(+r.sc_score).toFixed(2):'—'}</td>
       <td style="font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;font-size:12px;font-weight:700;color:${r.hr_edge==null?'var(--text3)':r.hr_edge>8?'#22c55e':r.hr_edge>3?'#60a5fa':r.hr_edge<-8?'#f87171':r.hr_edge<-3?'#f59e0b':'var(--text3)'}">${r.hr_edge!=null?(r.hr_edge>0?'+':'')+r.hr_edge.toFixed(1)+'%':'—'}</td>
     </tr>`;
   }).join('');
@@ -3646,6 +3837,30 @@ function renderRecord() {
       <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-top:3px">${s.label}</div>
     </div>`
   ).join('');
+
+  // calibration: hit rate by model probability bucket (settled picks with a prob)
+  const calEl = document.getElementById('calGrid');
+  if (calEl) {
+    const graded = settled.filter(p => p.prob != null);
+    const buckets = [
+      [0,    0.10, 'under 10%'],
+      [0.10, 0.15, '10-15%'],
+      [0.15, 0.20, '15-20%'],
+      [0.20, 1.01, '20%+'],
+    ];
+    calEl.innerHTML = buckets.map(([lo2, hi2, lbl2]) => {
+      const bp = graded.filter(p => p.prob >= lo2 && p.prob < hi2);
+      const bh = bp.filter(p => p.hit === true).length;
+      const rate = bp.length ? (bh / bp.length * 100) : null;
+      const exp = bp.length ? (bp.reduce((s2, p) => s2 + p.prob, 0) / bp.length * 100) : null;
+      const col2 = rate == null ? 'var(--text3)' : rate >= exp ? '#34d399' : '#f59e0b';
+      return `<div class="cal-cell">
+        <div class="rng">${lbl2}</div>
+        <div class="rate" style="color:${col2}">${rate == null ? '—' : rate.toFixed(0) + '%'}</div>
+        <div class="n">${bp.length ? bp.length + ' picks · model avg ' + exp.toFixed(0) + '%' : 'no settled picks yet'}</div>
+      </div>`;
+    }).join('');
+  }
 
   // Sparkline chart - group by the dates actually in the record
   const dates = [...new Set(cumArr.map(p => p.date))];
