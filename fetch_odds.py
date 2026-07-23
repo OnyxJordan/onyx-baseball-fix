@@ -10,7 +10,7 @@ It still tries a DK fetch first, so if the block ever lifts, it self-upgrades.
 Writes data/odds_meta.json so the page can display odds freshness honestly.
 """
 
-import json, os, sys, time, unicodedata, re, urllib.request
+import json, os, subprocess, sys, time, unicodedata, re, urllib.request
 from datetime import datetime, timezone
 
 ODDS = "data/odds.json"
@@ -64,7 +64,20 @@ def main():
         print("WARNING: no odds.json present - building without odds (no edges, no picks)")
         return
 
-    age_h = (time.time() - os.path.getmtime(ODDS)) / 3600.0
+    # File mtime is useless in CI (git checkout resets it, so year-old odds
+    # look minutes old). Prefer the last commit that touched odds.json.
+    ts = None
+    try:
+        out = subprocess.run(
+            ["git", "log", "-1", "--format=%ct", "--", ODDS],
+            capture_output=True, text=True, timeout=15)
+        if out.returncode == 0 and out.stdout.strip():
+            ts = float(out.stdout.strip())
+    except Exception:
+        pass
+    if ts is None:
+        ts = os.path.getmtime(ODDS)
+    age_h = (time.time() - ts) / 3600.0
     try:
         count = len(json.load(open(ODDS, encoding="utf-8")))
     except Exception:
