@@ -131,39 +131,47 @@ def fetch_schedule():
 
 # ── 2. RECENT BATTING ORDERS ──────────────────────────────────────────────────
 def fetch_recent_batting_orders():
+    """
+    Projected-lineup source: each team's ACTUAL batting order from its most
+    recent final boxscore. (The old schedule hydrate=lineups returned nothing
+    on past dates, which is why projections were falling back to raw roster
+    guesses and missing half the real lineup.)
+    """
     today = datetime.date.today()
-    start = (today - datetime.timedelta(days=14)).strftime("%Y-%m-%d")
+    start = (today - datetime.timedelta(days=5)).strftime("%Y-%m-%d")
     end   = (today - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
-    print("  Fetching recent batting orders...")
-    data = mlb_get("/schedule", {
-        "sportId": 1, "startDate": start, "endDate": end,
-        "hydrate": "lineups,team", "gameType": "R",
-    })
-    team_orders = defaultdict(lambda: defaultdict(list))
+    print("  Fetching recent batting orders (last final boxscore per team)...")
+    data = mlb_get("/schedule", {"sportId": 1, "startDate": start, "endDate": end})
+    latest = {}   # team_abbr -> (gamePk, side), walked in date order so last wins
     for de in data.get("dates", []):
         for g in de.get("games", []):
-            lineups = g.get("lineups", {})
-            if not lineups:
+            if g.get("status", {}).get("abstractGameState") != "Final":
                 continue
-            away_abbr = TEAM_ID_TO_ABBR.get(g["teams"]["away"]["team"]["id"], "")
-            home_abbr = TEAM_ID_TO_ABBR.get(g["teams"]["home"]["team"]["id"], "")
-            for p in lineups.get("awayPlayers", []):
-                nk = player_name_key(p.get("fullName", ""))
-                bo = p.get("battingOrder", 0) // 100
-                if nk and 1 <= bo <= 9:
-                    team_orders[away_abbr][nk].append(bo)
-            for p in lineups.get("homePlayers", []):
-                nk = player_name_key(p.get("fullName", ""))
-                bo = p.get("battingOrder", 0) // 100
-                if nk and 1 <= bo <= 9:
-                    team_orders[home_abbr][nk].append(bo)
-    avg_orders = {
-        team: {name: round(sum(o) / len(o)) for name, o in players.items()}
-        for team, players in team_orders.items()
-    }
-    total = sum(len(v) for v in avg_orders.values())
-    print(f"  Recent batting orders: {total} entries across {len(avg_orders)} teams")
-    return avg_orders
+            for side in ("away", "home"):
+                ab = TEAM_ID_TO_ABBR.get(g["teams"][side]["team"]["id"], "")
+                if ab:
+                    latest[ab] = (g["gamePk"], side)
+    team_orders, box_cache = {}, {}
+    for ab, (pk, side) in latest.items():
+        try:
+            box = box_cache.get(pk)
+            if box is None:
+                box = mlb_get(f"/game/{pk}/boxscore")
+                box_cache[pk] = box
+            t = box.get("teams", {}).get(side, {})
+            orders = {}
+            for i, pid in enumerate((t.get("battingOrder") or [])[:9], 1):
+                p = (t.get("players") or {}).get("ID" + str(pid)) or {}
+                nk = player_name_key((p.get("person") or {}).get("fullName", ""))
+                if nk:
+                    orders[nk] = i
+            if orders:
+                team_orders[ab] = orders
+        except Exception:
+            continue
+    total = sum(len(v) for v in team_orders.values())
+    print(f"  Recent batting orders: {total} entries across {len(team_orders)} teams")
+    return team_orders
 
 # ── 3. ROSTER FALLBACK ────────────────────────────────────────────────────────
 def fetch_roster(team_id):

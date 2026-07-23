@@ -1,6 +1,8 @@
 name: Hourly Refresh (lineups + weather + odds)
 on:
   schedule:
+    # Noon ET pass so early (12:15-1:10) games catch their confirmed lineups
+    - cron: "0 16 * * *"
     # Hourly 1:30 PM - 7:30 PM ET (17:30-23:30 UTC during EDT):
     # picks up confirmed lineups and fresh weather until first pitch
     - cron: "30 17-23 * * *"
