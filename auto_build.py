@@ -399,8 +399,14 @@ def _power_floor(r):
             and (r.get("barrel_26") or 0) >= 0.070
             and (r.get("iso_ctx") or 0) >= 0.110)
 
+def _ev(r):
+    p = (r.get("hr_prob") or 0) / 100.0
+    o = r.get("dk_hr_odds") or 0
+    return p * (o / 100.0) - (1 - p) if o > 0 else -1.0
+
 board = [r for r in results_out
-         if r.get("dk_hr_odds") and (r.get("hr_edge") or 0) > 0 and _power_floor(r)]
+         if r.get("dk_hr_odds") and (r.get("hr_edge") or 0) > 0
+         and _ev(r) > 0 and _power_floor(r)]
 board.sort(key=lambda r: -(r.get("hr_edge") or 0))
 if board:
     picks = jload(dpath("picks_input.json"), [])

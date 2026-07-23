@@ -3981,9 +3981,16 @@ function sortPow(k) {
 function renderPower() {
   const seen = new Set();
   const pool = [];
+  const evOf = r => {
+    const p = (r.hr_prob || 0) / 100, o = r.dk_hr_odds || 0;
+    return o > 0 ? p * (o / 100) - (1 - p) : -1;
+  };
   for (const r of RESULTS) {
     if (seen.has(r.matched_name)) continue;
     if (!r.hr_prob || !r.dk_hr_odds || r.dk_hr_odds <= 0) continue;
+    // a suggested play must beat the LISTED price: positive edge vs fair
+    // AND positive expected value after the vig - never negative-EV picks
+    if ((r.hr_edge || 0) <= 0 || evOf(r) <= 0) continue;
     seen.add(r.matched_name);
     pool.push(r);
   }
@@ -4023,7 +4030,7 @@ function renderPower() {
   // Header summary card
   const headerHtml = `<div style="background:linear-gradient(135deg,#1e1b4b,#1e2a4a);border:1px solid rgba(167,139,250,.3);border-radius:14px;padding:16px 20px;margin-bottom:16px">
     <div style="font-size:11px;color:#a78bfa;font-weight:700;letter-spacing:.1em;margin-bottom:4px">ONYX TOP 5 PICKS — ${new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'})}</div>
-    <div style="font-size:13px;color:rgba(255,255,255,.7);line-height:1.5">Players ranked by composite score combining model edge, market value, EV, and <strong style="color:#b038f9">due meter</strong>. OVERDUE players receive a 30% composite boost — prioritizing hitters statistically owed a HR.</div>
+    <div style="font-size:13px;color:rgba(255,255,255,.7);line-height:1.5">Only plays where the model beats the listed Onyx price are featured: <strong style="color:#b038f9">positive edge vs the fair line and positive expected value after the vig</strong>. Ranked by composite score. On efficiently priced days this list is short by design.</div>
   </div>`;
 
   const dueCol  = {OVERDUE:'#b038f9',DUE:'#f59e0b',COOL:'#60a5fa',NORMAL:'var(--text3)',WARM:'#f59e0b',HOT:'#f87171',FIRE:'#ef4444'};
@@ -4142,7 +4149,9 @@ function renderPower() {
     </div>`;
   }).join('');
 
-  container.innerHTML = headerHtml + cardsHtml;
+  const emptyHtml = top5.length ? '' :
+    `<div class="gc-empty" style="padding:40px 20px">No positive-EV plays on the board right now. The market is priced tight today; the list refills when lines move or lineups shift.</div>`;
+  container.innerHTML = headerHtml + cardsHtml + emptyHtml;
 }
 
 // ─── JUMP FROM GAME CARD → RANKINGS ───────────────────────────
