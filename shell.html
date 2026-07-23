@@ -4033,12 +4033,30 @@ function mktHistTable(gk, aAb, hAb, aCol, hCol) {
 }
 
 // ─── ONYX TICKET DEEP LINKS ─────────────────────────────────────
-// Every price on the site can push straight into an Onyx betslip.
-// ONYX_BET_URL is the single place to set the real betslip pattern once
-// the sportsbook exposes it; {placeholders} fill per pick, unknown ones
-// are stripped, so changing the pattern never touches the call sites.
+// Onyx game pages live at app.onyxodds.com/game/{id1}-{id2}-{date}-{nn}.
+// Resolution order for every bet button on the site:
+//   1. ONYX_GAME_LINKS: exact slug for a game key (away_home), wins always
+//   2. ONYX_TEAM_IDS: once the per-team ids are confirmed, slugs build
+//      automatically as {awayId}-{homeId}-{today}-{ONYX_GAME_SUFFIX}
+//   3. fallback: parameterized onyxodds.com URL carrying the full pick
+var ONYX_GAME_LINKS = {
+  'SD_ATL': '14818-25683-2026-07-23-09',
+};
+var ONYX_TEAM_IDS = {};        // e.g. {SD: 14818, ATL: 25683} once confirmed
+var ONYX_GAME_SUFFIX = '09';
 var ONYX_BET_URL = 'https://onyxodds.com/sportsbook/add?sport=mlb&date={date}&game={away}@{home}&market={market}&pick={pick}&side={side}&odds={odds}';
+function onyxGameUrl(away, home) {
+  const key = away + '_' + home;
+  if (ONYX_GAME_LINKS[key]) return 'https://app.onyxodds.com/game/' + ONYX_GAME_LINKS[key];
+  if (ONYX_TEAM_IDS[away] && ONYX_TEAM_IDS[home]) {
+    const d = new Date().toLocaleDateString('en-CA', {timeZone: 'America/New_York'});
+    return 'https://app.onyxodds.com/game/' + ONYX_TEAM_IDS[away] + '-' + ONYX_TEAM_IDS[home] + '-' + d + '-' + ONYX_GAME_SUFFIX;
+  }
+  return null;
+}
 function onyxTicket(p) {
+  const gu = (p.away && p.home) ? onyxGameUrl(p.away, p.home) : null;
+  if (gu) { window.open(gu, '_blank', 'noopener'); return; }
   p = Object.assign({date: new Date().toLocaleDateString('en-CA', {timeZone: 'America/New_York'})}, p);
   let u = ONYX_BET_URL;
   Object.keys(p).forEach(k => { u = u.split('{' + k + '}').join(encodeURIComponent(p[k] == null ? '' : p[k])); });
