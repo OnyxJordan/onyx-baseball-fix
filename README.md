@@ -68,21 +68,26 @@ schedule from the baked payload.
 Every price on the site (moneyline Yes/No, run lines, totals, HR props on
 the Plays board and player cards) deep links to Onyx's public share
 endpoint, which resolves the pick server-side against live Onyx odds and
-renders a branded ticket preview with the app CTA. Game slugs change
-daily and the league board is login-gated, so `fetch_onyx.py` harvests
-them each run:
+renders a branded ticket preview with the app CTA.
 
-- Set the `ONYX_COOKIE` secret to a logged-in `app.onyxodds.com` session
-  cookie (DevTools -> Network -> any request -> Request Headers -> copy
-  the whole `Cookie:` value). The script pulls `/leagues/MLB`, extracts
-  every game link, and resolves away/home per slug through the public
-  share endpoint. Refresh the secret when the session expires.
-- No cookie (or expired): existing `data/onyx_games.json` is kept.
-  The file can also be hand-edited (`{"date": "YYYY-MM-DD", "links":
-  {"SD_ATL": "<slug>"}}`).
+Onyx is built on OpticOdds, and a game's Onyx URL uses the OpticOdds
+fixture id as its slug (`{id1}-{id2}-{date}-{nn}`). Slugs change daily, so
+`fetch_onyx.py` pulls them straight from the OpticOdds fixtures API each
+run:
+
+- Set the `OPTICODDS_API_KEY` secret (Onyx's OpticOdds/OddsJam key). The
+  script fetches `api.opticodds.com/api/v3/fixtures?league=mlb` for today,
+  reads each fixture id (= slug) and its home/away teams, and writes
+  `data/onyx_games.json`. No cookie, nothing that expires.
+- No key: the existing `data/onyx_games.json` is kept. The file can also
+  be hand-edited (`{"date": "YYYY-MM-DD", "links": {"SD_ATL": "<slug>"}}`).
 - `auto_build.py` injects only same-day links; games without a slug fall
-  back to a parameterized onyxodds.com URL. All links carry the referral
-  code (`ONYX_REFERRER` in `shell.html`).
+  back to the real Onyx MLB board (`ONYX_FALLBACK_URL`), never a 404. All
+  links carry the referral code (`ONYX_REFERRER` in `shell.html`).
+
+Verified market keys for the share endpoint: `moneyline` ("Atlanta
+Braves"), `run_line` ("San Diego Padres +1.5"), `total_runs` ("Over 9.5"),
+`player_home_runs` ("{Player} Over 0.5").
 
 ## Daily routine
 
