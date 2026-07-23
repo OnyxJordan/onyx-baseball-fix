@@ -382,26 +382,46 @@ print(f"model: {len(players)} scored, {_model_errs} errors")
 players.sort(key=lambda x: (x["edge"] is None, -(x["edge"] or 0)))
 results_out.sort(key=lambda x: -(x.get("composite") or 0))
 
-# ---------------------------------------------------------------- auto-log picks (guarded: no odds, no picks)
-EDGE_MIN = 0.015
-todays = [p for p in players if p["edge"] is not None and p["edge"] >= EDGE_MIN
-          and (p["bat"].get("e3") or 0) >= 102 and (p["bat"].get("b3") or 0) >= 0.110]
-if todays:
+# ---------------------------------------------------------------- auto-log the TOP 5 board plays
+# Mirrors the shell's Top Edge Plays tab exactly (POWER_FLOOR + positive edge,
+# sorted by edge). Exactly these 5 form the daily tracked record; grade_picks
+# settles them from boxscores the next morning. Hard cap of 5 per day even
+# across hourly refresh runs.
+def _power_floor(r):
+    return ((r.get("ev90_26") or 0) >= 102.0
+            and (r.get("barrel_26") or 0) >= 0.070
+            and (r.get("iso_ctx") or 0) >= 0.110)
+
+board = [r for r in results_out
+         if r.get("dk_hr_odds") and (r.get("hr_edge") or 0) > 0 and _power_floor(r)]
+board.sort(key=lambda r: -(r.get("hr_edge") or 0))
+if board:
     picks = jload(dpath("picks_input.json"), [])
+    if not isinstance(picks, list):
+        picks = []
     stamp = now.strftime("%Y-%m-%d")
-    # shell PICKS schema: date / player / odds / hit (update_stats merges on
-    # (date, player) and counts hit) - keep "prob" as extra model context
     have = {(p.get("date"), nk(p.get("player") or p.get("name") or ""))
             for p in picks if isinstance(p, dict)}
-    for p in todays[:8]:
-        if (stamp, p["key"]) not in have:
-            picks.append({"date": stamp, "player": p["name"],
-                          "odds": p["odds"], "prob": p["prob"], "hit": None})
-    with open(dpath("picks_input.json"), "w", encoding="utf-8") as f:
-        json.dump(picks, f, indent=1, ensure_ascii=False)
-    print(f"picks: auto-logged {min(len(todays),8)} edge plays for {stamp}")
+    room = 5 - sum(1 for p in picks if isinstance(p, dict) and p.get("date") == stamp)
+    added = 0
+    for r in board:
+        if room - added <= 0:
+            break
+        key = nk(r["batter_name"])
+        if (stamp, key) in have:
+            continue
+        picks.append({"date": stamp, "player": r["batter_name"],
+                      "odds": r.get("dk_hr_odds"),
+                      "prob": round((r.get("hr_prob") or 0) / 100, 4),
+                      "edge": round(r.get("hr_edge") or 0, 2),
+                      "hit": None})
+        added += 1
+    if added:
+        with open(dpath("picks_input.json"), "w", encoding="utf-8") as f:
+            json.dump(picks, f, indent=1, ensure_ascii=False)
+    print(f"picks: top-5 tracker logged {added} new play(s) for {stamp}")
 else:
-    print("picks: no qualifying edge plays (or no odds) - nothing logged")
+    print("picks: no qualifying board plays (or no odds) - nothing logged")
 
 # ---------------------------------------------------------------- inject payload into shell
 # Fail loudly: an empty slate means upstream data broke. Abort without touching
