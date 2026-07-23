@@ -197,6 +197,10 @@ for gk, rows in _by_game.items():
     games_out.append(game)
 
 # ---- score every batter via model.project_player ----
+# label -> gamePk map for live-layer wiring in the shell
+gl_pk_by_label = {g["label"]: (GAMES.get(g["game_key"], {}) or {}).get("gamePk")
+                  for g in games_out}
+
 def _num(v, default):
     try:
         return float(v)
@@ -270,6 +274,8 @@ for game in games_out:
 
             # ---- shell payload: model-native record (shell reads these fields) ----
             rec = dict(r)
+            rec["game"]         = game["label"]    # shell filters/ticker read r.game
+            rec["gamePk"]       = gl_pk_by_label.get(game["label"])
             rec["batter_name"]  = bname            # display name, not nk key
             rec["matched_name"] = bname
             rec["batter_hand"]  = (b_hand or (bat or {}).get("hand") or "")
@@ -348,6 +354,7 @@ for g in games_out:
     keys_out.append(k)
     sums_out.append({"game": k, "time": g.get("time",""), "away": g.get("away_team",""),
         "home": g.get("home_team",""), "venue": g.get("venue",""), "ou": g.get("total"),
+        "gamePk": gl_pk_by_label.get(k),
         "roof": False,
         "away_ml": ("" if g.get("away_ml") is None else str(g["away_ml"])),
         "home_ml": ("" if g.get("home_ml") is None else str(g["home_ml"]))})
