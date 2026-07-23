@@ -1007,6 +1007,17 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
 .gc-ars-typerow .bar { flex:1; height:5px; background:var(--bg4); border-radius:3px; overflow:hidden; }
 .gc-ars-typerow .bar i { display:block; height:5px; border-radius:3px; }
 .gc-ars-typerow .st { font-family:monospace; font-size:10px; color:var(--text3); min-width:118px; text-align:right; }
+.gc-hr-row { display:flex; gap:10px; align-items:center; padding:7px 10px; border-radius:8px; background:rgba(251,191,36,.06); border:1px solid rgba(251,191,36,.28); margin-bottom:6px; }
+.gc-hr-row .hb { font-size:11px; font-weight:800; flex:1; }
+.gc-hr-row .hd { font-family:monospace; font-size:12px; font-weight:800; color:#fbbf24; }
+.gc-hr-row .hm { font-family:monospace; font-size:10px; color:var(--text3); }
+.gc-ev-row { display:flex; gap:10px; align-items:center; padding:5px 8px; font-size:11px; color:var(--text2); border-top:1px solid rgba(26,37,53,.5); }
+.gc-ev-row .eb { flex:1; font-weight:700; }
+.gc-ev-row .ee { font-family:monospace; font-size:11px; font-weight:800; }
+.gc-ev-row .er { font-family:monospace; font-size:10px; color:var(--text3); min-width:80px; text-align:right; }
+.gc-ev-leg { display:flex; gap:8px; align-items:center; margin-top:8px; flex-wrap:wrap; }
+.gc-ev-leg span { display:inline-flex; align-items:center; gap:4px; font-family:monospace; font-size:8px; letter-spacing:.06em; text-transform:uppercase; color:var(--text3); }
+.gc-ev-leg i { width:8px; height:8px; border-radius:50%; display:inline-block; }
 @keyframes gcDotIn { from { opacity:0; transform:scale(.2); } to { opacity:1; transform:scale(1); } }
 .gc-dotin { animation:gcDotIn .45s cubic-bezier(.34,1.56,.64,1) backwards; transform-box:fill-box; transform-origin:center; }
 @media (max-width:760px) { .gc-ars { grid-template-columns:1fr; justify-items:center; } .gc-ars-tiles { width:100%; } }
@@ -2993,7 +3004,7 @@ function buildScoreTicker() {
 function startLivePolling() {
   buildScoreTicker();
   fetchLiveScores();
-  setInterval(fetchLiveScores, 90000);
+  setInterval(fetchLiveScores, 60000);
 }
 
 // ─── GAMECENTER: full live game view (GUMBO feed, 20s poll) ─────
@@ -3025,6 +3036,7 @@ function gcSelect(pk) {
   gcPk = +pk;
   gcPbpOpen.clear();
   gcArsSel = null; gcArsType = 'ALL'; gcArsRes = 'ALL';
+  gcBbTeam = 'ALL'; gcBbMode = 'ALL';
   _gcLastFeed = null; _gcLastWp = null;
   const b = document.getElementById('gcBody');
   if (b) { delete b.dataset.loaded; b.innerHTML = '<div class="gc-empty">Loading…</div>'; }
@@ -3122,7 +3134,7 @@ async function loadGC() {
     if (!body.dataset.loaded) body.innerHTML = '<div class="gc-empty">Live feed unavailable — retrying shortly…</div>';
   }
   stopGC();
-  gcTimer = setTimeout(loadGC, 20000);
+  gcTimer = setTimeout(loadGC, 10000);
 }
 
 function gcModelChip(name) {
@@ -3409,6 +3421,150 @@ function gcArsenalHtml(ld, ls) {
   </div>`;
 }
 
+// ─── GAMECENTER: batted balls / exit velocity spray chart ───────
+// Every ball in play from the GUMBO feed's hitData: Gameday coordinates
+// (home plate ~ (125.4, 198.3), ~2.53 ft per unit), exit velo, launch
+// angle, distance. HRs carry the brand: gold, glowing, distance-tagged.
+const GC_FT = 2.53, GC_HX = 125.42, GC_HY = 198.27;
+function gcEvCol(ev) {
+  if (ev == null) return '#64748b';
+  if (ev >= 105) return '#f43f5e';
+  if (ev >= 100) return '#fb923c';
+  if (ev >= 95)  return '#A020F0';
+  if (ev >= 90)  return '#6366F1';
+  return '#475569';
+}
+function gcCollectBattedBalls(ld) {
+  const balls = [];
+  (((ld.plays || {}).allPlays) || []).forEach(p => {
+    (p.playEvents || []).forEach(ev => {
+      if (!ev.isPitch || !((ev.details || {}).isInPlay) || !ev.hitData) return;
+      const hd = ev.hitData, co = hd.coordinates || {};
+      balls.push({
+        batter: ((p.matchup || {}).batter || {}).fullName || '',
+        event: (p.result || {}).event || '',
+        inning: (p.about || {}).inning,
+        half: (p.about || {}).halfInning,
+        team: (p.about || {}).halfInning === 'top' ? 'away' : 'home',
+        isHR: /home run/i.test((p.result || {}).event || ''),
+        ev: hd.launchSpeed != null ? +hd.launchSpeed : null,
+        la: hd.launchAngle != null ? +hd.launchAngle : null,
+        dist: hd.totalDistance != null ? +hd.totalDistance : null,
+        x: co.coordX != null ? +co.coordX : null,
+        y: co.coordY != null ? +co.coordY : null,
+      });
+    });
+  });
+  return balls;
+}
+let gcBbTeam = 'ALL', gcBbMode = 'ALL';
+function gcBbSet(k, v) {
+  if (k === 't') gcBbTeam = (gcBbTeam === v) ? 'ALL' : v;
+  if (k === 'm') gcBbMode = (gcBbMode === v) ? 'ALL' : v;
+  if (_gcLastFeed) renderGC(_gcLastFeed, _gcLastWp);
+}
+function gcFieldSvg(balls) {
+  const W = 250, H = 212;
+  // distance arcs between the foul lines
+  const arc = ft => {
+    const r = ft / GC_FT, dx = r * 0.7071;
+    return `<path d="M ${(GC_HX - dx).toFixed(1)} ${(GC_HY - dx).toFixed(1)} A ${r.toFixed(1)} ${r.toFixed(1)} 0 0 1 ${(GC_HX + dx).toFixed(1)} ${(GC_HY - dx).toFixed(1)}" fill="none" stroke="rgba(255,255,255,.055)" stroke-dasharray="3,4"/>
+      <text x="${GC_HX}" y="${(GC_HY - r - 3).toFixed(1)}" text-anchor="middle" font-size="6.5" fill="rgba(255,255,255,.22)" font-family="monospace">${ft}</text>`;
+  };
+  // outfield wall: 330 down the lines, ~405 to center
+  const rl = 330 / GC_FT, rc = 405 / GC_FT, dxl = rl * 0.7071;
+  const wallY = ((GC_HY - dxl) + 2 * (GC_HY - rc)) / 2;  // quad control for apex at CF
+  const wall = `M ${(GC_HX - dxl).toFixed(1)} ${(GC_HY - dxl).toFixed(1)} Q ${GC_HX} ${(2 * (GC_HY - rc) - wallY).toFixed(1)} ${(GC_HX + dxl).toFixed(1)} ${(GC_HY - dxl).toFixed(1)}`;
+  // infield diamond (90 ft bases)
+  const bd = 90 / GC_FT / Math.SQRT2;
+  const diamond = `M ${GC_HX} ${GC_HY} L ${(GC_HX + bd).toFixed(1)} ${(GC_HY - bd).toFixed(1)} L ${GC_HX} ${(GC_HY - 2 * bd).toFixed(1)} L ${(GC_HX - bd).toFixed(1)} ${(GC_HY - bd).toFixed(1)} Z`;
+  const foul = `<line x1="${GC_HX}" y1="${GC_HY}" x2="${(GC_HX - dxl - 6).toFixed(1)}" y2="${(GC_HY - dxl - 6).toFixed(1)}" stroke="rgba(255,255,255,.14)" stroke-width="1"/>
+    <line x1="${GC_HX}" y1="${GC_HY}" x2="${(GC_HX + dxl + 6).toFixed(1)}" y2="${(GC_HY - dxl - 6).toFixed(1)}" stroke="rgba(255,255,255,.14)" stroke-width="1"/>`;
+  const dots = balls.filter(b => b.x != null && b.y != null).map((b, i) => {
+    const x = Math.max(4, Math.min(W - 4, b.x));
+    const y = Math.max(8, Math.min(H - 4, b.y));
+    const r = b.ev != null ? Math.max(3, Math.min(6, 3 + (b.ev - 80) / 10)) : 3;
+    const tip = `<title>${b.batter} · ${b.event}${b.ev != null ? ' · ' + b.ev.toFixed(1) + ' mph' : ''}${b.la != null ? ' · ' + b.la.toFixed(0) + '°' : ''}${b.dist != null ? ' · ' + Math.round(b.dist) + ' ft' : ''}</title>`;
+    if (b.isHR) {
+      return `<g class="gc-dotin" style="animation-delay:${Math.min(i * 22, 600)}ms">${tip}
+        <circle cx="${x}" cy="${y}" r="${r + 1.5}" fill="#fbbf24" stroke="rgba(0,0,0,.55)" stroke-width=".8" style="filter:drop-shadow(0 0 5px rgba(251,191,36,.85))"/>
+        <circle cx="${x}" cy="${y}" fill="none" stroke="#fbbf24" stroke-width="1.2">
+          <animate attributeName="r" values="${r + 2};${r + 8};${r + 2}" dur="2s" repeatCount="indefinite"/>
+          <animate attributeName="stroke-opacity" values=".9;0;.9" dur="2s" repeatCount="indefinite"/>
+        </circle>
+        ${b.dist ? `<text x="${x}" y="${(y - r - 4).toFixed(1)}" text-anchor="middle" font-size="7.5" font-weight="800" fill="#fbbf24" font-family="monospace" style="filter:drop-shadow(0 0 3px rgba(0,0,0,.9))">${Math.round(b.dist)} FT</text>` : ''}</g>`;
+    }
+    return `<g class="gc-dotin" style="animation-delay:${Math.min(i * 22, 600)}ms">${tip}
+      <circle cx="${x}" cy="${y}" r="${r.toFixed(1)}" fill="${gcEvCol(b.ev)}" fill-opacity=".9" stroke="rgba(0,0,0,.5)" stroke-width=".7"/></g>`;
+  }).join('');
+  return `<svg viewBox="0 0 ${W} ${H}" width="310" height="263" style="display:block;max-width:100%">
+    <defs><radialGradient id="gcFieldG" cx="0.5" cy="0.94" r="1">
+      <stop offset="0" stop-color="rgba(160,32,240,.07)"/><stop offset=".55" stop-color="rgba(64,96,240,.045)"/><stop offset="1" stop-color="rgba(255,255,255,.015)"/>
+    </radialGradient></defs>
+    <rect x="0" y="0" width="${W}" height="${H}" rx="12" fill="rgba(255,255,255,.015)" stroke="rgba(26,37,53,.6)"/>
+    <path d="${wall} L ${GC_HX} ${GC_HY} Z" fill="url(#gcFieldG)"/>
+    ${arc(200)}${arc(300)}${arc(400)}
+    <path d="${wall}" fill="none" stroke="rgba(160,32,240,.5)" stroke-width="1.6" style="filter:drop-shadow(0 0 5px rgba(160,32,240,.35))"/>
+    ${foul}
+    <path d="${diamond}" fill="rgba(255,255,255,.03)" stroke="rgba(255,255,255,.16)" stroke-width="1"/>
+    ${dots}
+  </svg>`;
+}
+function gcBattedHtml(ld, aAb, hAb) {
+  const all = gcCollectBattedBalls(ld);
+  if (!all.length) return '';
+  const teamFiltered = gcBbTeam === 'ALL' ? all : all.filter(b => b.team === gcBbTeam);
+  const plotted = gcBbMode === 'HR' ? teamFiltered.filter(b => b.isHR)
+    : gcBbMode === 'HARD' ? teamFiltered.filter(b => (b.ev || 0) >= 95)
+    : teamFiltered;
+  const hrs = teamFiltered.filter(b => b.isHR);
+  const hard = teamFiltered.filter(b => (b.ev || 0) >= 95);
+  const maxEv = Math.max(0, ...teamFiltered.map(b => b.ev || 0));
+  const maxDist = Math.max(0, ...teamFiltered.map(b => b.dist || 0));
+  const teamChips = [['ALL', 'Both teams'], ['away', aAb], ['home', hAb]].map(([v, l]) =>
+    `<span class="gc-ars-chip${gcBbTeam === v ? ' on' : ''}" onclick="gcBbSet('t','${v}')">${l}</span>`).join('');
+  const modeChips = [['HR', `Home runs ${hrs.length}`], ['HARD', `Hard hit 95+ ${hard.length}`]].map(([v, l]) =>
+    `<span class="gc-ars-chip${gcBbMode === v ? ' on' : ''}" onclick="gcBbSet('m','${v}')">${l}</span>`).join('');
+  const hrRows = hrs.slice().sort((a, b) => (b.dist || 0) - (a.dist || 0)).map(b =>
+    `<div class="gc-hr-row"><span style="font-size:13px">🚀</span><span class="hb">${b.batter}</span>
+      <span class="hm">${b.ev != null ? b.ev.toFixed(1) + ' mph · ' : ''}${b.la != null ? b.la.toFixed(0) + '°' : ''}</span>
+      <span class="hd">${b.dist ? Math.round(b.dist) + ' FT' : ''}</span></div>`).join('')
+    || `<div style="font-size:11px;color:var(--text3);padding:6px 2px">No home runs yet — the gold dots land here.</div>`;
+  const evRows = teamFiltered.filter(b => b.ev != null).sort((a, b) => b.ev - a.ev).slice(0, 5).map(b =>
+    `<div class="gc-ev-row"><span class="eb">${b.batter}</span>
+      <span class="ee" style="color:${gcEvCol(b.ev)}">${b.ev.toFixed(1)} mph</span>
+      <span class="er">${b.event}</span></div>`).join('');
+  const legend = `<div class="gc-ev-leg">
+    <span><i style="background:#fbbf24;box-shadow:0 0 4px #fbbf24"></i>HR</span>
+    <span><i style="background:#f43f5e"></i>105+</span>
+    <span><i style="background:#fb923c"></i>100+</span>
+    <span><i style="background:#A020F0"></i>95+</span>
+    <span><i style="background:#6366F1"></i>90+</span>
+    <span><i style="background:#475569"></i>&lt;90</span></div>`;
+  return `<div class="gc-card">
+    <div class="gc-card-title">Batted balls · exit velocity</div>
+    <div class="gc-ars-chips">${teamChips}<span style="width:8px"></span>${modeChips}</div>
+    <div class="gc-ars">
+      <div>
+        <div class="gc-zonewrap"><div class="zl">${plotted.filter(b => b.x != null).length} of ${all.length} balls in play</div>${gcFieldSvg(plotted)}</div>
+        ${legend}
+      </div>
+      <div>
+        <div class="gc-ars-tiles">
+          <div class="gc-ars-tile"><div class="v">${teamFiltered.length}</div><div class="k">In play</div></div>
+          <div class="gc-ars-tile"><div class="v">${hard.length}</div><div class="k">Hard hit</div></div>
+          <div class="gc-ars-tile"><div class="v">${maxEv ? maxEv.toFixed(1) : '—'}</div><div class="k">Max EV</div></div>
+          <div class="gc-ars-tile"><div class="v" style="background:linear-gradient(90deg,#fbbf24,#fb923c);-webkit-background-clip:text;background-clip:text">${maxDist ? Math.round(maxDist) : '—'}</div><div class="k">Longest ft</div></div>
+        </div>
+        <div style="font-size:8px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#fbbf24;margin:2px 0 6px">Home runs</div>
+        ${hrRows}
+        <div style="font-size:8px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin:12px 0 2px">Hardest hit</div>
+        ${evRows}
+      </div>
+    </div>
+  </div>`;
+}
+
 let gcView = 'overview';
 const gcPbpOpen = new Set();
 let _gcLastFeed = null, _gcLastWp = null;
@@ -3614,9 +3770,10 @@ function renderGC(feed, wp) {
     <button class="${gcView === 'pbp' ? 'on' : ''}" onclick="gcSetView('pbp')">Play by play</button>
   </div>`;
   const arsHtml = (isLive || isFinal) ? gcArsenalHtml(ld, ls) : '';
+  const bbHtml = (isLive || isFinal) ? gcBattedHtml(ld, aAb, hAb) : '';
   body.innerHTML = gcView === 'pbp'
     ? header + subnav + lineHtml + gcPbpHtml(ld)
-    : header + subnav + wpHtml + lineHtml + muHtml + playHtml + arsHtml + spHtml + boxes;
+    : header + subnav + wpHtml + lineHtml + muHtml + playHtml + bbHtml + arsHtml + spHtml + boxes;
 }
 
 // ─── MARKETS: Kalshi-style win probability tracker ──────────────
