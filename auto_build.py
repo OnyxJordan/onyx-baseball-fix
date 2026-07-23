@@ -300,6 +300,7 @@ for game in games_out:
             rec.update({
                 "game":          game["label"],
                 "gamePk":        gl_pk_by_label.get(game["label"]),
+                "mid":           batd.get("mid"),   # MLB player id for game logs
                 "batter_name":   bname,
                 "matched_name":  bname,
                 "batter_hand":   b_hand or batd.get("hand") or "",
