@@ -17,6 +17,7 @@ from datetime import datetime, timezone, timedelta
 ODDS = "data/odds.json"
 META = "data/odds_meta.json"
 GAMELINES = "data/game_lines.json"
+LINE_HISTORY = "data/line_history.json"
 LEAGUE_URL = "https://sportsbook-nash.draftkings.com/api/sportscontent/dkusnj/v1/leagues/84240"
 UA = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)"}
 MAX_AGE_HOURS = 36
@@ -168,6 +169,45 @@ def merge_game_lines(key):
                   indent=2, ensure_ascii=False)
         print(f"game_lines.json: totals/ML updated for {updated} games")
 
+def _implied(a):
+    try:
+        a = int(a)
+    except (TypeError, ValueError):
+        return None
+    return (100.0 / (a + 100.0)) if a > 0 else (abs(a) / (abs(a) + 100.0))
+
+def snapshot_line_history():
+    """Append one devigged win-probability snapshot per run so the Markets
+    tab can chart line movement across builds. Trimmed to 14 days."""
+    try:
+        lines = json.load(open(GAMELINES, encoding="utf-8"))
+    except Exception:
+        return
+    games = {}
+    for gk, e in (lines.items() if isinstance(lines, dict) else []):
+        pa, ph = _implied(e.get("away_ml")), _implied(e.get("home_ml"))
+        if pa and ph:
+            tot = pa + ph
+            games[gk] = [round(pa / tot, 4), round(ph / tot, 4)]
+    if not games:
+        print("line history: no moneylines to snapshot")
+        return
+    try:
+        hist = json.load(open(LINE_HISTORY, encoding="utf-8"))
+        if not isinstance(hist, list):
+            hist = []
+    except Exception:
+        hist = []
+    now_ts = int(time.time())
+    # skip if the last snapshot is under 10 minutes old (double-triggered runs)
+    if hist and now_ts - hist[-1].get("ts", 0) < 600:
+        return
+    hist.append({"ts": now_ts, "games": games})
+    cutoff = now_ts - 14 * 86400
+    hist = [h for h in hist if h.get("ts", 0) >= cutoff]
+    json.dump(hist, open(LINE_HISTORY, "w", encoding="utf-8"))
+    print(f"line history: snapshot #{len(hist)} ({len(games)} games)")
+
 def try_dk():
     try:
         req = urllib.request.Request(LEAGUE_URL, headers=UA)
@@ -191,6 +231,13 @@ def try_dk():
     return odds if len(odds) >= 50 else None
 
 def main():
+    now = datetime.now(timezone.utc)
+    try:
+        run()
+    finally:
+        snapshot_line_history()
+
+def run():
     now = datetime.now(timezone.utc)
 
     oapi = try_odds_api()
