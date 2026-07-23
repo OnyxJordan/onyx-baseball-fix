@@ -1,12 +1,12 @@
 {
   "ATL": {
     "venue": "Truist Park",
-    "temp": 86.3,
+    "temp": 85.9,
     "precip": 3,
-    "wind_spd": 8.9,
+    "wind_spd": 9.3,
     "wind_dir": "SW",
-    "humidity_pct": 56,
-    "pressure_mb": 982.4,
+    "humidity_pct": 60,
+    "pressure_mb": 982.6,
     "roof": false,
     "flag": "clear"
   },
@@ -23,35 +23,35 @@
   },
   "STL": {
     "venue": "Busch Stadium",
-    "temp": 83.5,
+    "temp": 83.2,
     "precip": 2,
-    "wind_spd": 4.5,
-    "wind_dir": "N",
+    "wind_spd": 4.9,
+    "wind_dir": "NNE",
     "humidity_pct": 37,
     "pressure_mb": 1001.9,
     "roof": false,
     "flag": "clear"
   },
-  "CLE": {
-    "venue": "Progressive Field",
-    "temp": 74.2,
-    "precip": 0,
-    "wind_spd": 8.3,
-    "wind_dir": "NNW",
-    "humidity_pct": 46,
-    "pressure_mb": 998.5,
-    "roof": false,
-    "flag": "clear"
-  },
   "TOR": {
     "venue": "Rogers Centre",
-    "temp": 68.0,
+    "temp": 68.4,
     "precip": 0,
-    "wind_spd": 11.7,
-    "wind_dir": "S",
+    "wind_spd": 11.9,
+    "wind_dir": "SSW",
     "humidity_pct": 62,
-    "pressure_mb": 1011.5,
+    "pressure_mb": 1011.3,
     "roof": true,
+    "flag": "clear"
+  },
+  "CLE": {
+    "venue": "Progressive Field",
+    "temp": 74.0,
+    "precip": 0,
+    "wind_spd": 6.7,
+    "wind_dir": "NW",
+    "humidity_pct": 45,
+    "pressure_mb": 999.0,
+    "roof": false,
     "flag": "clear"
   }
 }
