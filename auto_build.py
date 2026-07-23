@@ -394,23 +394,26 @@ results_out.sort(key=lambda x: -(x.get("composite") or 0))
 # sorted by edge). Exactly these 5 form the daily tracked record; grade_picks
 # settles them from boxscores the next morning. Hard cap of 5 per day even
 # across hourly refresh runs.
-def _power_floor(r):
-    return ((r.get("ev90_26") or 0) >= 102.0
-            and (r.get("barrel_26") or 0) >= 0.070
-            and (r.get("iso_ctx") or 0) >= 0.110)
+def _quality_floor(r):
+    # v21: a pick must show real contact quality. Speed-only profiles with
+    # near-zero barrel rates never qualify, whatever the market prices.
+    return ((r.get("hh_pct") or 0) >= model.QUALITY_HH_MIN
+            and (r.get("barrel_26") or 0) >= model.QUALITY_BARREL_MIN)
 
 def _ev(r):
     p = (r.get("hr_prob") or 0) / 100.0
     o = r.get("dk_hr_odds") or 0
     return p * (o / 100.0) - (1 - p) if o > 0 else -1.0
 
-# ONLY positive-EV plays are tracked and graded: the record is the money
-# record and the calibration signal. v20 edge is vs the listed price, so
-# edge > 0 IS positive EV; the model's own probability already prices
-# power, so no separate power floor gates the money list. On tight days
-# fewer than five log, and that is the honest answer.
+# ONLY positive-EV plays that clear the v21 quality floor are tracked and
+# graded: the record is the money record and the calibration signal. v20
+# edge is vs the listed price, so edge > 0 IS positive EV; the quality
+# floor (min hard-hit + barrel rate) then screens out market noise on
+# no-power profiles. On tight days fewer than five log, and that is the
+# honest answer.
 _cands = [r for r in results_out if r.get("dk_hr_odds")]
-board = sorted([r for r in _cands if (r.get("hr_edge") or 0) > 0 and _ev(r) > 0],
+board = sorted([r for r in _cands
+                if (r.get("hr_edge") or 0) > 0 and _ev(r) > 0 and _quality_floor(r)],
                key=lambda r: -(r.get("hr_edge") or 0))
 for r in board:
     r["_tier"] = "edge"
