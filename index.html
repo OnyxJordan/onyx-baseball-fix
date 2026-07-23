@@ -1343,7 +1343,7 @@ body::after {
   <div class="nav-right">
     <button class="notif-bell" id="notifBell" onclick="toggleNotif()" title="Browser alert when a modeled batter homers">🔔</button>
     <span class="nav-badge">JUL 23 · 2026</span>
-    <span class="nav-date" id="buildStamp">updated 2:52 pm et</span>
+    <span class="nav-date" id="buildStamp">updated 2:56 pm et</span>
     <span class="nav-date" id="liveCount"></span>
   </div>
 </nav>
@@ -4054,7 +4054,9 @@ var ONYX_TEAM_IDS = {};        // e.g. {SD: 14818, ATL: 25683} once confirmed
 var ONYX_GAME_SUFFIX = '09';
 var ONYX_REFERRER = 'KR680261';
 var ONYX_HR_MARKET = 'player_home_runs';
-var ONYX_BET_URL = 'https://onyxodds.com/sportsbook/add?sport=mlb&date={date}&game={away}@{home}&market={market}&pick={pick}&side={side}&odds={odds}';
+// games without a harvested slug land on the real MLB board (login sends
+// the user right back to it), never on an invented URL that can 404
+var ONYX_FALLBACK_URL = 'https://app.onyxodds.com/leagues/MLB';
 var ONYX_TEAM_NAMES = {ARI:'Arizona Diamondbacks', ATL:'Atlanta Braves', BAL:'Baltimore Orioles',
   BOS:'Boston Red Sox', CHC:'Chicago Cubs', CWS:'Chicago White Sox', CHW:'Chicago White Sox',
   CIN:'Cincinnati Reds', CLE:'Cleveland Guardians', COL:'Colorado Rockies', DET:'Detroit Tigers',
@@ -4100,11 +4102,7 @@ function onyxTicket(p) {
     window.open(u, '_blank', 'noopener');
     return;
   }
-  p = Object.assign({date: new Date().toLocaleDateString('en-CA', {timeZone: 'America/New_York'})}, p);
-  let u = ONYX_BET_URL;
-  Object.keys(p).forEach(k => { u = u.split('{' + k + '}').join(encodeURIComponent(p[k] == null ? '' : p[k])); });
-  u = u.replace(/\{[a-z]+\}/g, '');
-  window.open(u, '_blank', 'noopener');
+  window.open(ONYX_FALLBACK_URL, '_blank', 'noopener');
 }
 
 function renderMarkets() {
