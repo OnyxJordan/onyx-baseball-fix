@@ -1,11 +1,12 @@
-name: Refresh (lineups + weather + odds, every 20 min)
+name: Refresh (lineups + weather + odds, every 30 min)
 on:
   schedule:
-    # Every 20 minutes across the slate: 11 AM - 11 PM ET
+    # Every 30 minutes across the slate: 11 AM - 11 PM ET
     # (15-23 UTC + 0-3 UTC during EDT). Keeps HR-prop odds and the live
-    # edge board fresh through in-game at-bats, not just hourly.
-    - cron: "*/20 15-23 * * *"
-    - cron: "*/20 0-3 * * *"
+    # edge board fresh through in-game at-bats without over-spending Odds
+    # API credits; the OpticOdds feed will sharpen this once wired in.
+    - cron: "0,30 15-23 * * *"
+    - cron: "0,30 0-3 * * *"
   workflow_dispatch:
 permissions:
   contents: write

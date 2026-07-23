@@ -49,7 +49,7 @@ update_stats.py
 deploy to GitHub Pages
 ```
 
-A second workflow (`refresh_build.yml`) reruns the full pipeline every 20
+A second workflow (`refresh_build.yml`) reruns the full pipeline every 30
 minutes from 11 AM to 11 PM ET to pick up confirmed lineups, fresh weather,
 and HR-prop line moves through in-game at-bats, committing and redeploying
 only when something changed. This keeps the live edge board (decayed model
