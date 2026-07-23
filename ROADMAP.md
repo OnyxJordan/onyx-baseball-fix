@@ -43,10 +43,21 @@ Ported from the early New-Baseball-Test iteration and adapted to the current pip
 
 ## Phase 3: Live layer, remaining work (client-side, zero backend)
 
-The ticker and HR detection shipped early (see above). Still to build:
+The ticker and HR detection shipped early (see above). Still to build, with the
+Gamecenter as the flagship:
 
-1. **Ticker detail**: outs and runners-on-base diamond icons on live games; pregame probables on hover; optional 30s poll rate on game days
-2. **Live game cards**: expand a ticker game into current batter / pitcher / count / last play via the live feed endpoint; highlight modeled batters at the plate
+1. **GAMECENTER (flagship)**: a full live-game viewing experience comparable to
+   competitor gamecasts. Clicking any ticker game or game card opens a dedicated
+   live view driven by the MLB Stats API live feed (GUMBO,
+   /api/v1.1/game/{gamePk}/feed/live, gamePk already flows through the payload):
+   - Field/diamond visual with runners on base, outs, count, current batter and
+     pitcher with their model card stats
+   - Pitch-by-pitch and play-by-play log, scoring plays highlighted
+   - Line score by inning, team stats, win probability if available
+   - Model overlay: every batter in the game ranked by HR prob, modeled players
+     flagged, HIT badges as HRs land, PAs-remaining estimates
+   - Onyx branding: near-black base, magenta-to-violet gradient accents
+2. **Ticker detail**: outs and runners-on-base diamond icons on live games; pregame probables on hover; optional 30s poll rate on game days
 3. **In-game HR tracking on the board**: HIT badge on main board rows (livePlayerData is already populated; the board renderer just needs to read it) and a running daily model record (hits vs pending vs misses)
 4. **Live-adjusting board**: gray out finished games, badge batters who already homered, estimated PAs remaining per batter
 
