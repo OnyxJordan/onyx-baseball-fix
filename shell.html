@@ -2573,6 +2573,7 @@ function parseESPN(espn) {
     const isFinal = status === 'STATUS_FINAL';
     return {
       gamePk: ev.id,
+      _date: ev.date || null,
       teams: {
         away: {team: {name: away.team?.displayName || awayAbbr}},
         home: {team: {name: home.team?.displayName || homeAbbr}}
@@ -2642,7 +2643,8 @@ async function fetchLiveScores() {
         awayScore: ls.teams?.away?.runs ?? null,
         homeScore: ls.teams?.home?.runs ?? null,
         inning: ls.currentInning || '',
-        half: ls.inningHalf || ''
+        half: ls.inningHalf || '',
+        start: g.gameDate || g._date || null
       };
       if (awayAbbr && homeAbbr) pkMap[`${awayAbbr}@${homeAbbr}`] = g.gamePk;
     });
@@ -2759,7 +2761,9 @@ function buildScoreTicker() {
 
   let games = [];
   if (Object.keys(liveGameData).length > 0) {
-    Object.entries(liveGameData).forEach(([pk, gd]) => {
+    Object.entries(liveGameData)
+      .sort((a, b) => new Date(a[1].start || 0) - new Date(b[1].start || 0))
+      .forEach(([pk, gd]) => {
       if (!gd.awayAbbr || !gd.homeAbbr) return;
       const state = gd.isLive ? 'live' : gd.isFinal ? 'final' : 'sched';
       const hasScore = gd.awayScore !== null && gd.homeScore !== null;
@@ -2866,15 +2870,27 @@ function renderGCStrip() {
       ${stateTxt ? `<span class="gcc-state ${stateCls}">${stateTxt}</span>` : ''}
     </div>`);
   };
-  Object.entries(liveGameData).forEach(([pk, g]) => {
+  // chronological: earliest first pitch first
+  const startByPair = {};
+  (typeof SUMMARIES !== 'undefined' ? SUMMARIES : []).forEach(s => {
+    if (s.start) startByPair[`${s.away}@${s.home}`] = new Date(s.start).getTime();
+  });
+  const ordered = Object.entries(liveGameData)
+    .map(([pk, g]) => ({pk, g,
+      t: g.start ? new Date(g.start).getTime()
+        : (startByPair[`${g.awayAbbr}@${g.homeAbbr}`] || Number.MAX_SAFE_INTEGER)}))
+    .sort((a, b) => a.t - b.t);
+  ordered.forEach(({pk, g}) => {
     const st = g.isLive ? `${(g.half||'').charAt(0)}${g.inning}` : g.isFinal ? 'F'
              : (timeByPair[`${g.awayAbbr}@${g.homeAbbr}`] || '');
     const cls = g.isLive ? 'live' : '';
     addChip(pk, g.awayAbbr, g.homeAbbr, st, cls, g.awayScore, g.homeScore);
   });
-  (typeof SUMMARIES !== 'undefined' ? SUMMARIES : []).forEach(s => {
-    if (s.gamePk) addChip(s.gamePk, s.away, s.home, s.time ? s.time + ' ET' : '', '', null, null);
-  });
+  [...(typeof SUMMARIES !== 'undefined' ? SUMMARIES : [])]
+    .sort((a, b) => new Date(a.start || 0) - new Date(b.start || 0))
+    .forEach(s => {
+      if (s.gamePk) addChip(s.gamePk, s.away, s.home, s.time ? s.time + ' ET' : '', '', null, null);
+    });
   el.innerHTML = chips.join('');
 }
 
