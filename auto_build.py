@@ -405,9 +405,11 @@ def _ev(r):
     return p * (o / 100.0) - (1 - p) if o > 0 else -1.0
 
 # ONLY positive-EV plays are tracked and graded: the record is the money
-# record and the calibration signal. On tight days fewer than five log,
-# and that is the honest answer.
-_cands = [r for r in results_out if r.get("dk_hr_odds") and _power_floor(r)]
+# record and the calibration signal. v20 edge is vs the listed price, so
+# edge > 0 IS positive EV; the model's own probability already prices
+# power, so no separate power floor gates the money list. On tight days
+# fewer than five log, and that is the honest answer.
+_cands = [r for r in results_out if r.get("dk_hr_odds")]
 board = sorted([r for r in _cands if (r.get("hr_edge") or 0) > 0 and _ev(r) > 0],
                key=lambda r: -(r.get("hr_edge") or 0))
 for r in board:

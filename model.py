@@ -1,5 +1,11 @@
 """
-model.py — Onyx Baseball v19 HR probability model
+model.py — Onyx Baseball v20 HR probability model
+
+v20: one definition of edge — measured against the LISTED price, so a
+positive edge is always a bettable positive-EV play (previously edge was
+vs a vig-stripped fair line, leaving a dead zone of +edge/-EV players
+that could never qualify as picks). HR_VIG recalibrated 0.13 to 0.07 for
+the internal blend anchor.
 
 v19: continuous self-calibration — calibrate.py measures every graded pick
 against its stated probability nightly and writes a shrunk global factor
@@ -96,7 +102,7 @@ POS_HR_AVG = {
 }
 REG_K  = 250
 SCALE  = 0.86
-HR_VIG = 0.13   # approx single-side hold on HR-Yes props; calibrate vs resolved results
+HR_VIG = 0.07   # approx single-side hold on HR-Yes props; calibrate vs resolved results
 
 PA_TABLE   = {1:4.492,2:4.363,3:4.367,4:4.269,5:4.223,6:4.059,7:3.946,8:3.831,9:3.748}
 RUNS_BY_BO = {1:0.533,2:0.543,3:0.476,4:0.469,5:0.451,6:0.401,7:0.403,8:0.399,9:0.409}
@@ -456,7 +462,8 @@ def project_player(
         final_prob = raw_prob * 0.75
         fair_prob  = final_prob
 
-    edge = final_prob - fair_prob
+    # v20: edge is vs the LISTED price. Positive edge = positive EV = pick.
+    edge = (final_prob - mkt_prob) if dk_odds is not None else 0.0
 
     # 9. Composite score (gates re-tiered for the v18 compressed scale)
     gate = 1.0 if final_prob >= 19 else 0.72 if final_prob >= 16 else 0.45 if final_prob >= 13 else 0.20
