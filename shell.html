@@ -990,6 +990,26 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
 .gc-pbp-row .ds { font-size:12px; color:var(--text2); line-height:1.5; margin-top:3px; }
 .gc-pbp-x { display:flex; gap:16px; margin-top:10px; padding-top:10px; border-top:1px solid rgba(26,37,53,.5); flex-wrap:wrap; align-items:flex-start; }
 .gc-pbp-x .pl { flex:1; min-width:220px; }
+.gc-ars { display:grid; grid-template-columns:auto 1fr; gap:20px; align-items:start; }
+.gc-ars-chips { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+.gc-ars-chip { font-family:monospace; font-size:9px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--text3); background:var(--bg4); border:1px solid var(--border2); border-radius:20px; padding:5px 11px; cursor:pointer; transition:all .15s; }
+.gc-ars-chip:hover { color:var(--text2); border-color:rgba(160,32,240,.4); }
+.gc-ars-chip.on { color:#fff; border-color:rgba(160,32,240,.65); background:rgba(160,32,240,.16); box-shadow:0 0 12px rgba(160,32,240,.25); }
+.gc-ars-tiles { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:12px; }
+.gc-ars-tile { background:var(--bg4); border:1px solid var(--border2); border-radius:10px; padding:9px 10px 7px; text-align:center; }
+.gc-ars-tile .v { font-family:monospace; font-size:19px; font-weight:800; background:linear-gradient(90deg,#A020F0,#4060F0); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+.gc-ars-tile .k { font-size:8px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--text3); margin-top:2px; }
+.gc-ars-typerow { display:flex; align-items:center; gap:9px; padding:6px 9px; border-radius:8px; cursor:pointer; border:1px solid transparent; transition:all .12s; }
+.gc-ars-typerow:hover { background:var(--bg4); }
+.gc-ars-typerow.on { border-color:rgba(160,32,240,.5); background:rgba(160,32,240,.1); }
+.gc-ars-typerow .sw { width:10px; height:10px; border-radius:3px; flex:none; }
+.gc-ars-typerow .nm { font-size:11px; font-weight:700; min-width:112px; }
+.gc-ars-typerow .bar { flex:1; height:5px; background:var(--bg4); border-radius:3px; overflow:hidden; }
+.gc-ars-typerow .bar i { display:block; height:5px; border-radius:3px; }
+.gc-ars-typerow .st { font-family:monospace; font-size:10px; color:var(--text3); min-width:118px; text-align:right; }
+@keyframes gcDotIn { from { opacity:0; transform:scale(.2); } to { opacity:1; transform:scale(1); } }
+.gc-dotin { animation:gcDotIn .45s cubic-bezier(.34,1.56,.64,1) backwards; transform-box:fill-box; transform-origin:center; }
+@media (max-width:760px) { .gc-ars { grid-template-columns:1fr; justify-items:center; } .gc-ars-tiles { width:100%; } }
 .gc-boxes { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
 .gc-box-table { width:100%; border-collapse:collapse; font-size:11px; }
 .gc-box-table th { padding:5px 6px; font-size:9px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--text3); border-bottom:1px solid var(--border); text-align:right; }
@@ -3004,6 +3024,7 @@ function initGamecenter() {
 function gcSelect(pk) {
   gcPk = +pk;
   gcPbpOpen.clear();
+  gcArsSel = null; gcArsType = 'ALL'; gcArsRes = 'ALL';
   _gcLastFeed = null; _gcLastWp = null;
   const b = document.getElementById('gcBody');
   if (b) { delete b.dataset.loaded; b.innerHTML = '<div class="gc-empty">Loading…</div>'; }
@@ -3219,6 +3240,175 @@ function gcPitchList(events) {
   }).join('');
 }
 
+// ─── GAMECENTER: pitcher arsenal broadcast graphic ──────────────
+// Whole-outing zone plot, dots colored by pitch type, whiffs ringed,
+// filterable by type and result, velocity trend, latest pitch pulsing.
+const GC_PT_COL = {FF:'#A855F7', FA:'#A855F7', SI:'#6366F1', FC:'#22d3ee',
+  SL:'#34d399', ST:'#10b981', SV:'#14b8a6', CU:'#eab308', KC:'#f59e0b',
+  CS:'#f59e0b', CH:'#f472b6', FS:'#fb7185', FO:'#fb7185', SC:'#fb923c',
+  KN:'#94a3b8', EP:'#94a3b8'};
+function gcPtCol(code) { return GC_PT_COL[code] || '#94a3b8'; }
+function gcPitchRes(ev) {
+  const d = ev.details || {};
+  const c = ((d.call || {}).description || d.description || '').toLowerCase();
+  if (d.isInPlay) return 'inplay';
+  if (d.isBall) return 'ball';
+  if (c.includes('swinging') || c.includes('foul tip') || c.includes('missed bunt')) return 'whiff';
+  if (c.includes('foul')) return 'foul';
+  return 'called';
+}
+const GC_RES_LBL = {whiff:'Whiffs', called:'Called strikes', foul:'Fouls', ball:'Balls', inplay:'In play'};
+function gcCollectPitches(ld) {
+  const map = new Map();
+  (((ld.plays || {}).allPlays) || []).forEach(p => {
+    const pit = (p.matchup || {}).pitcher || {};
+    if (!pit.id) return;
+    (p.playEvents || []).forEach(ev => {
+      if (!ev.isPitch) return;
+      if (!map.has(pit.id)) map.set(pit.id, {id: pit.id, name: pit.fullName || '', pitches: []});
+      map.get(pit.id).pitches.push(ev);
+    });
+  });
+  return map;
+}
+let gcArsSel = null, gcArsType = 'ALL', gcArsRes = 'ALL';
+function gcArsSet(k, v) {
+  if (k === 'p') { gcArsSel = +v; gcArsType = 'ALL'; gcArsRes = 'ALL'; }
+  if (k === 't') gcArsType = (gcArsType === v) ? 'ALL' : v;
+  if (k === 'r') gcArsRes = (gcArsRes === v) ? 'ALL' : v;
+  if (_gcLastFeed) renderGC(_gcLastFeed, _gcLastWp);
+}
+function gcZoneBig(pitches, lastEv) {
+  const X0 = -1.7, X1 = 1.7, Z0 = 0.6, Z1 = 4.5, W = 200, H = 240;
+  const sx = x => ((x - X0) / (X1 - X0)) * W;
+  const sy = z => H - ((z - Z0) / (Z1 - Z0)) * H;
+  const withXY = pitches.filter(e => e.pitchData && e.pitchData.coordinates
+    && e.pitchData.coordinates.pX != null && e.pitchData.coordinates.pZ != null);
+  const ref = withXY[withXY.length - 1];
+  const szT = (ref && ref.pitchData.strikeZoneTop) || 3.4;
+  const szB = (ref && ref.pitchData.strikeZoneBottom) || 1.57;
+  const zx = sx(-0.708), zw = sx(0.708) - sx(-0.708);
+  const zy = sy(szT), zh = sy(szB) - sy(szT);
+  let grid = '';
+  for (let i = 1; i < 3; i++) {
+    grid += `<line x1="${(zx + zw * i / 3).toFixed(1)}" y1="${zy.toFixed(1)}" x2="${(zx + zw * i / 3).toFixed(1)}" y2="${(zy + zh).toFixed(1)}" stroke="rgba(255,255,255,.06)"/>
+      <line x1="${zx.toFixed(1)}" y1="${(zy + zh * i / 3).toFixed(1)}" x2="${(zx + zw).toFixed(1)}" y2="${(zy + zh * i / 3).toFixed(1)}" stroke="rgba(255,255,255,.06)"/>`;
+  }
+  const plateY = H - 8;
+  const plate = `<path d="M ${sx(-0.708)} ${plateY} L ${sx(0.708)} ${plateY} L ${sx(0.708)} ${plateY + 3} L ${sx(0)} ${plateY + 6} L ${sx(-0.708)} ${plateY + 3} Z" fill="rgba(255,255,255,.10)"/>`;
+  const dots = withXY.map((ev, i) => {
+    const c = ev.pitchData.coordinates;
+    const x = Math.max(6, Math.min(W - 6, sx(+c.pX)));
+    const y = Math.max(6, Math.min(H - 6, sy(+c.pZ)));
+    const d = ev.details || {};
+    const code = ((d.type || {}).code) || '?';
+    const res = gcPitchRes(ev);
+    const op = res === 'ball' ? .42 : res === 'foul' ? .68 : .95;
+    const col = gcPtCol(code);
+    const v = (ev.pitchData || {}).startSpeed;
+    const tip = `<title>#${ev.pitchNumber || ''} ${(d.type || {}).description || ''}${v ? ' · ' + (+v).toFixed(1) + ' mph' : ''} — ${(d.call || {}).description || ''}</title>`;
+    const ring = res === 'whiff'
+      ? `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="7.5" fill="none" stroke="#fff" stroke-opacity=".85" stroke-width="1.4"/>` : '';
+    const pulse = (ev === lastEv)
+      ? `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" fill="none" stroke="${col}" stroke-width="1.6">
+           <animate attributeName="r" values="6;12;6" dur="1.8s" repeatCount="indefinite"/>
+           <animate attributeName="stroke-opacity" values=".9;0;.9" dur="1.8s" repeatCount="indefinite"/>
+         </circle>` : '';
+    return `<g class="gc-dotin" style="animation-delay:${Math.min(i * 14, 700)}ms">${tip}
+      <circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4.8" fill="${col}" fill-opacity="${op}" stroke="rgba(0,0,0,.5)" stroke-width=".8"/>
+      ${ring}${pulse}</g>`;
+  }).join('');
+  return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="display:block">
+    <defs><linearGradient id="gcZoneG" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="rgba(160,32,240,.10)"/><stop offset="1" stop-color="rgba(64,96,240,.08)"/>
+    </linearGradient></defs>
+    <rect x="0" y="0" width="${W}" height="${H}" rx="10" fill="rgba(255,255,255,.02)" stroke="rgba(26,37,53,.6)"/>
+    <rect x="${zx.toFixed(1)}" y="${zy.toFixed(1)}" width="${zw.toFixed(1)}" height="${zh.toFixed(1)}" fill="url(#gcZoneG)" stroke="rgba(160,32,240,.7)" stroke-width="1.8" style="filter:drop-shadow(0 0 7px rgba(160,32,240,.45))"/>
+    ${grid}${plate}${dots}
+  </svg>`;
+}
+function gcVeloTrend(pitches) {
+  const sp = pitches.map(e => (e.pitchData || {}).startSpeed).filter(v => v);
+  if (sp.length < 3) return '';
+  const W = 220, H = 36;
+  const lo = Math.min(...sp) - 1.5, hi = Math.max(...sp) + 1;
+  const px = i => (i / (sp.length - 1)) * W;
+  const py = v => H - ((v - lo) / (hi - lo)) * H;
+  const pts = sp.map((v, i) => `${px(i).toFixed(1)},${py(v).toFixed(1)}`).join(' ');
+  return `<div style="margin-top:10px">
+    <div style="display:flex;justify-content:space-between;align-items:baseline">
+      <span style="font-size:8px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text3)">Velo trend</span>
+      <span style="font-family:monospace;font-size:11px;font-weight:800;color:var(--text2)">${sp[sp.length-1].toFixed(1)} mph</span>
+    </div>
+    <svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}" preserveAspectRatio="none" style="display:block;margin-top:3px">
+      <polyline points="${pts}" fill="none" stroke="#A020F0" stroke-width="1.6" stroke-linejoin="round" opacity=".85"/>
+      <circle cx="${W}" cy="${py(sp[sp.length-1]).toFixed(1)}" r="2.6" fill="#A020F0"/>
+    </svg></div>`;
+}
+function gcArsenalHtml(ld, ls) {
+  const map = gcCollectPitches(ld);
+  if (!map.size) return '';
+  let sel = (gcArsSel && map.get(gcArsSel)) || null;
+  if (!sel) {
+    const curId = ((((ls || {}).defense) || {}).pitcher || {}).id;
+    sel = map.get(curId) || [...map.values()].sort((a, b) => b.pitches.length - a.pitches.length)[0];
+  }
+  const chips = [...map.values()].sort((a, b) => b.pitches.length - a.pitches.length).map(p =>
+    `<span class="gc-ars-chip${p.id === sel.id ? ' on' : ''}" onclick="gcArsSet('p',${p.id})">${p.name} · ${p.pitches.length}</span>`).join('');
+  const all = sel.pitches;
+  // per-type aggregates from the full outing
+  const types = new Map();
+  all.forEach(ev => {
+    const d = ev.details || {};
+    const code = ((d.type || {}).code) || '?';
+    if (!types.has(code)) types.set(code, {code, desc: ((d.type || {}).description) || 'Unknown', n: 0, vSum: 0, vN: 0, vMax: 0, whiffs: 0});
+    const t = types.get(code);
+    t.n++;
+    const v = (ev.pitchData || {}).startSpeed;
+    if (v) { t.vSum += +v; t.vN++; t.vMax = Math.max(t.vMax, +v); }
+    if (gcPitchRes(ev) === 'whiff') t.whiffs++;
+  });
+  const tRows = [...types.values()].sort((a, b) => b.n - a.n).map(t => {
+    const col = gcPtCol(t.code);
+    return `<div class="gc-ars-typerow${gcArsType === t.code ? ' on' : ''}" onclick="gcArsSet('t','${t.code}')">
+      <span class="sw" style="background:${col};box-shadow:0 0 6px ${col}66"></span>
+      <span class="nm">${t.desc}</span>
+      <span class="bar"><i style="width:${Math.round(t.n / all.length * 100)}%;background:linear-gradient(90deg,${col},${col}88)"></i></span>
+      <span class="st">${t.n} · ${t.vN ? (t.vSum / t.vN).toFixed(1) : '—'} mph · ${t.whiffs}W</span>
+    </div>`;
+  }).join('');
+  const typeFiltered = gcArsType === 'ALL' ? all : all.filter(ev => (((ev.details || {}).type || {}).code || '?') === gcArsType);
+  const resCounts = {whiff: 0, called: 0, foul: 0, ball: 0, inplay: 0};
+  typeFiltered.forEach(ev => resCounts[gcPitchRes(ev)]++);
+  const resChips = Object.keys(GC_RES_LBL).map(k =>
+    `<span class="gc-ars-chip${gcArsRes === k ? ' on' : ''}" onclick="gcArsSet('r','${k}')">${GC_RES_LBL[k]} ${resCounts[k]}</span>`).join('');
+  const plotted = gcArsRes === 'ALL' ? typeFiltered : typeFiltered.filter(ev => gcPitchRes(ev) === gcArsRes);
+  const whiffsAll = all.filter(ev => gcPitchRes(ev) === 'whiff').length;
+  const calledAll = all.filter(ev => gcPitchRes(ev) === 'called').length;
+  const vMax = Math.max(0, ...all.map(ev => +((ev.pitchData || {}).startSpeed || 0)));
+  const lastEv = plotted.length && plotted[plotted.length - 1] === all[all.length - 1] ? all[all.length - 1] : null;
+  return `<div class="gc-card">
+    <div class="gc-card-title">Pitch arsenal</div>
+    <div class="gc-ars-chips">${chips}</div>
+    <div class="gc-ars">
+      <div>
+        <div class="gc-zonewrap"><div class="zl">${plotted.length} of ${all.length} pitches · catcher's view</div>${gcZoneBig(plotted, lastEv)}</div>
+        ${gcVeloTrend(typeFiltered)}
+      </div>
+      <div>
+        <div class="gc-ars-tiles">
+          <div class="gc-ars-tile"><div class="v">${all.length}</div><div class="k">Pitches</div></div>
+          <div class="gc-ars-tile"><div class="v">${whiffsAll}</div><div class="k">Whiffs</div></div>
+          <div class="gc-ars-tile"><div class="v">${calledAll}</div><div class="k">Called K</div></div>
+          <div class="gc-ars-tile"><div class="v">${vMax ? vMax.toFixed(1) : '—'}</div><div class="k">Max mph</div></div>
+        </div>
+        ${tRows}
+        <div class="gc-ars-chips" style="margin:10px 0 0">${resChips}</div>
+      </div>
+    </div>
+  </div>`;
+}
+
 let gcView = 'overview';
 const gcPbpOpen = new Set();
 let _gcLastFeed = null, _gcLastWp = null;
@@ -3423,9 +3613,10 @@ function renderGC(feed, wp) {
     <button class="${gcView === 'overview' ? 'on' : ''}" onclick="gcSetView('overview')">Overview</button>
     <button class="${gcView === 'pbp' ? 'on' : ''}" onclick="gcSetView('pbp')">Play by play</button>
   </div>`;
+  const arsHtml = (isLive || isFinal) ? gcArsenalHtml(ld, ls) : '';
   body.innerHTML = gcView === 'pbp'
     ? header + subnav + lineHtml + gcPbpHtml(ld)
-    : header + subnav + wpHtml + lineHtml + muHtml + playHtml + spHtml + boxes;
+    : header + subnav + wpHtml + lineHtml + muHtml + playHtml + arsHtml + spHtml + boxes;
 }
 
 // ─── MARKETS: Kalshi-style win probability tracker ──────────────
