@@ -1,26 +1,4 @@
 {
-  "CLE": {
-    "venue": "Progressive Field",
-    "temp": 74.2,
-    "precip": 0,
-    "wind_spd": 8.3,
-    "wind_dir": "NNW",
-    "humidity_pct": 46,
-    "pressure_mb": 998.5,
-    "roof": false,
-    "flag": "clear"
-  },
-  "TOR": {
-    "venue": "Rogers Centre",
-    "temp": 68.0,
-    "precip": 0,
-    "wind_spd": 11.7,
-    "wind_dir": "S",
-    "humidity_pct": 62,
-    "pressure_mb": 1011.5,
-    "roof": true,
-    "flag": "clear"
-  },
   "ATL": {
     "venue": "Truist Park",
     "temp": 86.3,
@@ -52,6 +30,28 @@
     "humidity_pct": 37,
     "pressure_mb": 1001.9,
     "roof": false,
+    "flag": "clear"
+  },
+  "CLE": {
+    "venue": "Progressive Field",
+    "temp": 74.2,
+    "precip": 0,
+    "wind_spd": 8.3,
+    "wind_dir": "NNW",
+    "humidity_pct": 46,
+    "pressure_mb": 998.5,
+    "roof": false,
+    "flag": "clear"
+  },
+  "TOR": {
+    "venue": "Rogers Centre",
+    "temp": 68.0,
+    "precip": 0,
+    "wind_spd": 11.7,
+    "wind_dir": "S",
+    "humidity_pct": 62,
+    "pressure_mb": 1011.5,
+    "roof": true,
     "flag": "clear"
   }
 }
