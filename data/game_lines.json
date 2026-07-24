@@ -1,24 +1,167 @@
 {
-  "ARI_STL": {
-    "awayP": "Brandon Pfaadt",
-    "homeP": "Michael McGreevy",
-    "time": "5:15 PM",
-    "start": "2026-07-23T21:15:00Z",
-    "venue": "Busch Stadium",
-    "gamePk": 823042,
-    "total": 11.5,
-    "away_ml": -10000,
-    "home_ml": 3300
+  "COL_MIL": {
+    "awayP": "Tomoyuki Sugano",
+    "homeP": "Shane Drohan",
+    "time": "4:10 PM",
+    "start": "2026-07-24T20:10:00Z",
+    "venue": "American Family Field",
+    "gamePk": 823759,
+    "total": 8.5,
+    "away_ml": 198,
+    "home_ml": -245
   },
   "KC_DET": {
-    "awayP": "Randy Dobnak",
-    "homeP": "Troy Melton",
+    "awayP": "TBD",
+    "homeP": "Tarik Skubal",
     "time": "6:40 PM",
-    "start": "2026-07-23T22:40:00Z",
+    "start": "2026-07-24T22:40:00Z",
     "venue": "Comerica Park",
-    "gamePk": 824247,
+    "gamePk": 824248,
     "total": 7.5,
     "away_ml": 235,
     "home_ml": -290
+  },
+  "CHC_PIT": {
+    "awayP": "Matthew Boyd",
+    "homeP": "Jared Jones",
+    "time": "6:40 PM",
+    "start": "2026-07-24T22:40:00Z",
+    "venue": "PNC Park",
+    "gamePk": 823352,
+    "total": 8.0,
+    "away_ml": 104,
+    "home_ml": -125
+  },
+  "ARI_WSH": {
+    "awayP": "Eduardo Rodriguez",
+    "homeP": "Carson Palmquist",
+    "time": "6:45 PM",
+    "start": "2026-07-24T22:45:00Z",
+    "venue": "Nationals Park",
+    "gamePk": 822707,
+    "total": 9.5,
+    "away_ml": -119,
+    "home_ml": -101
+  },
+  "NYY_PHI": {
+    "awayP": "Will Warren",
+    "homeP": "Jesús Luzardo",
+    "time": "6:45 PM",
+    "start": "2026-07-24T22:45:00Z",
+    "venue": "Citizens Bank Park",
+    "gamePk": 823434,
+    "total": 8.0,
+    "away_ml": 108,
+    "home_ml": -130
+  },
+  "ATL_BAL": {
+    "awayP": "Grant Holmes",
+    "homeP": "TBD",
+    "time": "7:05 PM",
+    "start": "2026-07-24T23:05:00Z",
+    "venue": "Camden Yards",
+    "gamePk": 824812,
+    "total": 9.0,
+    "away_ml": 100,
+    "home_ml": -120
+  },
+  "LAD_NYM": {
+    "awayP": "Roki Sasaki",
+    "homeP": "Sean Manaea",
+    "time": "7:10 PM",
+    "start": "2026-07-24T23:10:00Z",
+    "venue": "Citi Field",
+    "gamePk": 823601,
+    "total": 9.0,
+    "away_ml": -157,
+    "home_ml": 130
+  },
+  "CLE_TB": {
+    "awayP": "Joey Cantillo",
+    "homeP": "Shane McClanahan",
+    "time": "7:10 PM",
+    "start": "2026-07-24T23:10:00Z",
+    "venue": "Tropicana Field",
+    "gamePk": 822952,
+    "total": 7.5,
+    "away_ml": 114,
+    "home_ml": -137
+  },
+  "SD_MIA": {
+    "awayP": "Germán Márquez",
+    "homeP": "TBD",
+    "time": "7:10 PM",
+    "start": "2026-07-24T23:10:00Z",
+    "venue": "loanDepot Park",
+    "gamePk": 823843,
+    "total": 9.0,
+    "away_ml": 113,
+    "home_ml": -136
+  },
+  "TOR_BOS": {
+    "awayP": "Trey Yesavage",
+    "homeP": "Patrick Sandoval",
+    "time": "7:15 PM",
+    "start": "2026-07-24T23:15:00Z",
+    "venue": "Fenway Park",
+    "gamePk": 824733,
+    "total": 8.5,
+    "away_ml": 104,
+    "home_ml": -126
+  },
+  "HOU_CWS": {
+    "awayP": "Spencer Arrighetti",
+    "homeP": "Davis Martin",
+    "time": "7:40 PM",
+    "start": "2026-07-24T23:40:00Z",
+    "venue": "Rate Field",
+    "gamePk": 824573,
+    "total": 8.5,
+    "away_ml": 124,
+    "home_ml": -150
+  },
+  "SEA_TEX": {
+    "awayP": "Bryce Miller",
+    "homeP": "MacKenzie Gore",
+    "time": "8:05 PM",
+    "start": "2026-07-25T00:05:00Z",
+    "venue": "Globe Life Field",
+    "gamePk": 822872,
+    "total": 7.5,
+    "away_ml": -122,
+    "home_ml": 101
+  },
+  "ATH_MIN": {
+    "awayP": "Jacob Lopez",
+    "homeP": "Zebby Matthews",
+    "time": "8:10 PM",
+    "start": "2026-07-25T00:10:00Z",
+    "venue": "Target Field",
+    "gamePk": 823680,
+    "total": 9.5,
+    "away_ml": 119,
+    "home_ml": -144
+  },
+  "CIN_STL": {
+    "awayP": "Rhett Lowder",
+    "homeP": "Dustin May",
+    "time": "8:15 PM",
+    "start": "2026-07-25T00:15:00Z",
+    "venue": "Busch Stadium",
+    "gamePk": 823031,
+    "total": 8.5,
+    "away_ml": 139,
+    "home_ml": -168
+  },
+  "LAA_SF": {
+    "awayP": "Grayson Rodriguez",
+    "homeP": "Logan Webb",
+    "time": "10:15 PM",
+    "start": "2026-07-25T02:15:00Z",
+    "venue": "Oracle Park",
+    "gamePk": 823196,
+    "total": 8.0,
+    "away_ml": 142,
+    "home_ml": -172
   }
 }
