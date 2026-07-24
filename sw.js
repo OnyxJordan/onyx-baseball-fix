@@ -1,7 +1,7 @@
 /* Onyx Baseball service worker: network-first for same-origin requests so
    the baked slate is always fresh, cached copy only as an offline fallback.
    Cross-origin (MLB Stats API, Onyx, logos CDN) is never intercepted. */
-const CACHE = 'onyx-v1';
+const CACHE = 'onyx-v2';
 
 self.addEventListener('install', e => { self.skipWaiting(); });
 
