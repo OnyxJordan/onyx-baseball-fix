@@ -583,6 +583,79 @@ def fetch_splits():
     (OUT / "splits.json").write_text(json.dumps(splits, indent=2))
     return splits
 
+# ── 7c. VS-HAND POWER SPLITS — career+season HR/PA vs L and vs R ─────────────
+def fetch_hand_splits():
+    """Per-player vs-LHP / vs-RHP HR power for today's lineup bats, written to
+    data/hand_splits.json for model.platoon_factor(). Career splits anchor the
+    sample; the current season is added on top (career already contains it, so
+    this double-weights the season as a recency tilt). Keyed by lowercase name
+    to match CAREER_DB / project_player's player_key."""
+    print("Fetching vs-hand power splits...")
+    try:
+        with open(OUT / "lineups.json") as f:
+            lineups = json.load(f)
+        with open(Path(__file__).parent / "career_db.json") as f:
+            cdb = json.load(f)
+    except Exception as e:
+        print(f"  WARNING: hand splits skipped ({e})")
+        return {}
+
+    # same normalizer as auto_build.nk / rebuild_dbs.nk_db so keys line up
+    # with CAREER_DB and with the player_key model.project_player receives
+    import unicodedata, re as _re
+    def _nk(name):
+        s = unicodedata.normalize("NFKD", str(name))
+        s = "".join(ch for ch in s if not unicodedata.combining(ch))
+        s = _re.sub(r"[.’'\-]", " ", s)
+        return _re.sub(r"\s+", " ", s).strip().lower()
+
+    season = datetime.date.today().year
+    id_to_name = {}
+    for p in lineups:
+        nkey = _nk(p.get("name") or "")
+        mid = (cdb.get(nkey) or {}).get("mid")
+        if nkey and mid:
+            id_to_name[int(mid)] = nkey
+
+    out = {}
+    ids = sorted(id_to_name)
+    for i in range(0, len(ids), 40):
+        batch = ids[i:i + 40]
+        try:
+            r = requests.get(
+                "https://statsapi.mlb.com/api/v1/people",
+                params={
+                    "personIds": ",".join(map(str, batch)),
+                    "hydrate": f"stats(group=[hitting],type=[statSplits,careerStatSplits],sitCodes=[vl,vr],season={season})",
+                }, timeout=30)
+            r.raise_for_status()
+            people = r.json().get("people") or []
+        except Exception as e:
+            print(f"  WARNING: hand-split batch failed ({e})")
+            continue
+        for person in people:
+            nkey2 = id_to_name.get(person.get("id"))
+            if not nkey2:
+                continue
+            rec = {"vl_hr": 0, "vl_pa": 0, "vr_hr": 0, "vr_pa": 0}
+            side = ((person.get("batSide") or {}).get("code") or "").upper()
+            if side in ("L", "R", "S"):
+                rec["bats"] = side
+            for st in person.get("stats") or []:
+                for s in st.get("splits") or []:
+                    code = (s.get("split") or {}).get("code")
+                    if code not in ("vl", "vr"):
+                        continue
+                    stat = s.get("stat") or {}
+                    rec[f"{code}_hr"] += int(stat.get("homeRuns") or 0)
+                    rec[f"{code}_pa"] += int(stat.get("plateAppearances") or 0)
+            if rec["vl_pa"] + rec["vr_pa"] > 0 or rec.get("bats"):
+                out[nkey2] = rec
+
+    print(f"  Hand splits: {len(out)} players")
+    (OUT / "hand_splits.json").write_text(json.dumps(out, indent=2))
+    return out
+
 # ── 8. PITCHER data — MLB Stats API primary, FanGraphs CSV fallback ──────────
 def _ip_to_float(ip):
     """MLB innings strings: '12.1' means 12 and 1/3."""
@@ -674,5 +747,6 @@ if __name__ == "__main__":
     fetch_weather(games)
     fetch_statcast()
     fetch_splits()
+    fetch_hand_splits()
     fetch_pitcher_statcast()
     print("\n=== Done. Ready for auto_build.py ===")

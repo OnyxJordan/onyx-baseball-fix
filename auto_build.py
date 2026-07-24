@@ -40,6 +40,7 @@ CAREER   = jload("career_db.json", {})
 PITCHERS = jload("pitcher_db.json", {})
 BULLPEN  = jload("bullpen_db.json", {})
 HANDS    = jload(dpath("pitcher_hand.json"), {})
+HSPLITS  = jload(dpath("hand_splits.json"), {})   # vs-hand power + real batSide
 
 LINEUPS  = jload(dpath("lineups.json"), {})
 WEATHER  = jload(dpath("weather.json"), {})
@@ -235,7 +236,11 @@ for game in games_out:
                 continue
             bkey = nk(bname)
             bat  = CAREER.get(bkey)
+            # lineups.json "hand" is a hardcoded display placeholder ("R" for
+            # everyone); the real bat side comes from the MLB people batSide
+            # captured in hand_splits.json
             b_hand = "" if isinstance(batter, str) else (batter.get("hand") or "")
+            b_hand = (HSPLITS.get(bkey) or {}).get("bats") or b_hand
             b_pos  = "" if isinstance(batter, str) else (batter.get("pos") or "")
             sal = {}
             if isinstance(SALARIES, dict):
