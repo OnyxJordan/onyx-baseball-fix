@@ -1060,9 +1060,9 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
   box-shadow:0 0 0 2px rgba(160,32,240,.65), 0 0 14px rgba(160,32,240,.25); }
 .gc-hs.hit .gc-hs-img { box-shadow:0 0 0 2px #fbbf24, 0 0 16px rgba(251,191,36,.55); }
 /* small ringed headshot for tables (rankings): contain, never crop the head */
-.rk-hs { width:28px; height:28px; border-radius:50%; flex-shrink:0; display:inline-block;
+.rk-hs { width:30px; height:30px; border-radius:50%; flex-shrink:0; display:inline-block;
   background-color:#12101d; background-size:contain; background-position:center; background-repeat:no-repeat;
-  box-shadow:0 0 0 1.5px rgba(160,32,240,.65); }
+  box-shadow:0 0 0 1.5px rgba(160,32,240,.65); margin:0 3px 0 2px; align-self:center; vertical-align:middle; }
 .gc-hs-pct { font-family:monospace; font-size:11px; font-weight:800; color:#c9a6ff; margin-top:5px; }
 .gc-hs.hit .gc-hs-pct { color:#fbbf24; }
 .gc-hs-name { font-size:10px; font-weight:700; color:var(--text2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -1511,7 +1511,7 @@ body::after {
   <div class="nav-right">
     <button class="notif-bell" id="notifBell" onclick="toggleNotif()" title="Browser alert when a modeled batter homers">🔔</button>
     <span class="nav-badge">JUL 24 · 2026</span>
-    <span class="nav-date" id="buildStamp">updated 9:23 pm et</span>
+    <span class="nav-date" id="buildStamp">updated 11:21 am et</span>
     <span class="nav-date" id="liveCount"></span>
   </div>
 </nav>
@@ -4433,7 +4433,7 @@ function mktHistTable(gk, aAb, hAb, aCol, hCol) {
 // Resolution: exact slug from ONYX_GAME_LINKS, else auto-built from
 // ONYX_TEAM_IDS once per-team ids are confirmed, else the parameterized
 // fallback URL carrying the full pick.
-var ONYX_GAME_LINKS = {"SD_ATL": "14818-25683-2026-07-23-09"};
+var ONYX_GAME_LINKS = {};
 var ONYX_TEAM_IDS = {};        // e.g. {SD: 14818, ATL: 25683} once confirmed
 var ONYX_GAME_SUFFIX = '09';
 var ONYX_REFERRER = 'KR680261';
@@ -4718,7 +4718,7 @@ function renderGameCards() {
       const topName = topH ? topH.replace(/^(\S+)\s+(\S+).*/, '$1 $2') : '';
       return `<div class="team-row${isHome?' home':''}" onclick="jumpToGame('${s.label}')">
         <div class="tr-info">
-          ${teamBadge(team,'32').replace('<svg','<svg style="flex-shrink:0"')}
+          <span class="sticker-logo" style="width:34px;height:34px;border-radius:8px;background-image:url(${(typeof TEAM_LOGOS !== 'undefined' && TEAM_LOGOS[team]) || ''})"></span>
           <div class="tr-text">
             <div class="tr-name" style="color:var(--text)">${team}</div>
             <div class="tr-pitcher">vs ${pitcher} <span class="${phand==='L'?'lhp':'rhp'} hand-pill" style="font-size:9px">${phand}HP</span> <span style="font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;font-size:10px;color:${hc}">HR/9 ${p_hr9!=null?(+p_hr9).toFixed(2):'—'}</span></div>
