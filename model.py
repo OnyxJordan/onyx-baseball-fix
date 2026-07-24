@@ -1,5 +1,18 @@
 """
-model.py — Onyx Baseball v23 HR probability model
+model.py — Onyx Baseball v24 HR probability model
+
+v24: player-specific platoon power. The platoon factor had been a flat
+constant (same-hand 0.93 / opposite 1.07 / switch 1.03) — every
+lefty-lefty matchup ate the same -7% whether the bat actually mashes
+lefties or is helpless against them. fetch_data.py now pulls each
+lineup bat's real vs-LHP / vs-RHP HR-per-PA (career + current season
+double-weighted, MLB Stats API statSplits) into data/hand_splits.json,
+and platoon_factor() shrinks the player's own vs-hand power ratio
+toward the league prior by sample size (K=300 PA, 60 PA minimum,
+clamped 0.80-1.22). Schwarber's career 5.1% vs L / 7.0% vs R now costs
+him ~0.85 against a lefty instead of the generic 0.93, while a true
+lefty-masher earns his spot on the board instead of a blanket penalty.
+File missing = exact v23 behavior.
 
 v23: the pressure term becomes a real weather signal. It had been fed
 station (surface) pressure against a sea-level 1013 constant, so the
@@ -122,6 +135,16 @@ try:
 except Exception:
     SEASON_SPLITS = {}
     print("  model: splits.json not found — using CAREER_DB ch/ca fallback")
+
+# Optional vs-hand power splits produced by fetch_data.py fetch_hand_splits().
+# Safe if the file is missing — platoon_factor falls back to league priors.
+try:
+    with open(_BASE / "data" / "hand_splits.json") as f:
+        HAND_SPLITS = json.load(f)
+    print(f"  model: HAND_SPLITS loaded ({len(HAND_SPLITS)} players)")
+except Exception:
+    HAND_SPLITS = {}
+    print("  model: hand_splits.json not found — using league platoon priors")
 
 # ── CONSTANTS ──────────────────────────────────────────────────────────────────
 POS_HR_AVG = {
@@ -301,18 +324,40 @@ def wind_env(park: str, wind_dir: str, wind_mph: float, temp: float, roof: bool,
 
     return max(0.78, min(1.35, env))
 
-def platoon_factor(batter_hand: str, pitcher_hand: str) -> float:
+def platoon_factor(batter_hand: str, pitcher_hand: str, hand_split: dict = None) -> float:
     """Batter-vs-pitcher-hand adjustment, independent of the home/away split.
-    Switch hitters get a modest fixed edge since they always bat from the
-    favorable side — smaller than a true opposite-hand matchup since we don't
-    have their actual split-specific rate, just the general handedness tendency."""
+
+    League priors: same-hand 0.93, opposite 1.07, switch 1.03 (always bats
+    from the favorable side). v24: when the player's own vs-hand HR-per-PA is
+    available (data/hand_splits.json), his observed vs-hand power ratio
+    replaces the prior, shrunk toward it by sample size — a career lefty-
+    masher keeps his power against a southpaw, a true platoon liability eats
+    more than the generic -7%. 60 PA minimum vs that hand, K=300 shrinkage,
+    clamped 0.80-1.22 so no split can swing a projection more than ~20%."""
     bh = str(batter_hand or "R").upper()
     ph = str(pitcher_hand or "R").upper()
     if bh == "S":
-        return 1.03
-    if bh == ph:
-        return 0.93
-    return 1.07
+        prior = 1.03
+    elif bh == ph:
+        prior = 0.93
+    else:
+        prior = 1.07
+
+    hs = hand_split or {}
+    key = "vl" if ph == "L" else "vr"
+    pa_h = hs.get(f"{key}_pa") or 0
+    hr_h = hs.get(f"{key}_hr") or 0
+    pa_all = (hs.get("vl_pa") or 0) + (hs.get("vr_pa") or 0)
+    hr_all = (hs.get("vl_hr") or 0) + (hs.get("vr_hr") or 0)
+    if pa_h < 60 or pa_all <= 0 or hr_all <= 0:
+        return prior
+    rate_h   = hr_h / pa_h
+    rate_all = hr_all / pa_all
+    if rate_all <= 0:
+        return prior
+    observed = rate_h / rate_all
+    w = pa_h / (pa_h + 300.0)
+    return max(0.80, min(1.22, (1 - w) * prior + w * observed))
 
 def sc_score(d: dict, l14: dict = None) -> float:
     """
@@ -483,8 +528,20 @@ def project_player(
     _drate = d.get("c", 0.038) or 0.038
     due_score = ((_drate * _dpa) - _dhr) * sc if _dpa >= 20 else 0.0
 
-    # 6b. Platoon factor (batter hand vs pitcher hand — independent of home/away split)
-    plat = platoon_factor(batter_hand, opp_pitcher_hand)
+    # 6b. Platoon factor — v24: uses the player's own vs-hand power split
+    # (data/hand_splits.json) shrunk toward the league prior when available.
+    # The lineup feed's bat side is a display placeholder ("R" for everyone),
+    # so the MLB people batSide riding on the hand-splits file wins whenever
+    # present; without it every lefty scored as a righty and lefty-lefty
+    # matchups were BOOSTED 1.07 instead of penalized. Career-DB vl/vr rates
+    # are the fallback split source when the fresh file is missing.
+    _hs = HAND_SPLITS.get(player_key)
+    if _hs and _hs.get("bats"):
+        batter_hand = _hs["bats"]
+    if not _hs and (d.get("pvl") or d.get("pvr")):
+        _hs = {"vl_hr": (d.get("vl") or 0) * (d.get("pvl") or 0), "vl_pa": d.get("pvl") or 0,
+               "vr_hr": (d.get("vr") or 0) * (d.get("pvr") or 0), "vr_pa": d.get("pvr") or 0}
+    plat = platoon_factor(batter_hand, opp_pitcher_hand, _hs)
 
     # 7. Raw probability, then shrink toward the league per-game HR rate.
     # The multiplier chain can stack good-but-correlated signals into
