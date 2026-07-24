@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Onyx Odds Mini Games Gauntlet Leaderboard</title>
+<style>
+  :root {
+    --bg: #0b0d12;
+    --panel: #12151d;
+    --border: #232836;
+    --text: #e8eaf0;
+    --muted: #8b93a7;
+    --accent: #d4af37;
+    --row-hover: #1a1f2b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    min-height: 100vh;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 32px 16px 64px; }
+  header { text-align: center; margin-bottom: 24px; }
+  header h1 { font-size: 1.5rem; letter-spacing: 0.02em; }
+  header h1 span { color: var(--accent); }
+  .updated { color: var(--muted); font-size: 0.85rem; margin-top: 6px; }
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .scroller { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { padding: 10px 14px; text-align: left; white-space: nowrap; }
+  th {
+    background: #0e1118;
+    color: var(--muted);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    user-select: none;
+    border-bottom: 1px solid var(--border);
+  }
+  th .arrow { color: var(--accent); margin-left: 4px; }
+  tbody tr { border-bottom: 1px solid var(--border); }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--row-hover); }
+  tr.top1 td:first-child::before { content: "🥇 "; }
+  tr.top2 td:first-child::before { content: "🥈 "; }
+  tr.top3 td:first-child::before { content: "🥉 "; }
+  .pager {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 14px;
+    flex-wrap: wrap;
+  }
+  .pager button, .pager select {
+    background: #0e1118;
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 14px;
+    font: inherit;
+    cursor: pointer;
+  }
+  .pager button:disabled { opacity: 0.35; cursor: default; }
+  .pager .info { color: var(--muted); font-size: 0.85rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Onyx Odds <span>Mini Games Gauntlet</span> Leaderboard</h1>
+    <div class="updated">Updated as of __UPDATED__</div>
+  </header>
+  <div class="panel">
+    <div class="scroller"><table id="lb"><thead></thead><tbody></tbody></table></div>
+    <div class="pager">
+      <button id="prev">&larr; Prev</button>
+      <span class="info" id="pageinfo"></span>
+      <button id="next">Next &rarr;</button>
+      <select id="size">
+        <option>25</option><option>50</option><option>100</option><option>250</option>
+      </select>
+    </div>
+  </div>
+</div>
+<script>
+const ROWS = __DATA__;
+
+const PREFERRED = ["rank", "player", "name", "username", "prize"];
+const keys = Object.keys(ROWS[0] || {});
+const COLS = PREFERRED.filter(k => keys.includes(k))
+  .concat(keys.filter(k => !PREFERRED.includes(k)));
+
+const label = k => k === "rank" ? "#" :
+  k.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+
+const num = v => {
+  if (v === null || v === undefined || v === "") return NaN;
+  return parseFloat(String(v).replace(/[$,%\s]/g, ""));
+};
+
+let sortKey = COLS.includes("rank") ? "rank" : COLS[0];
+let sortAsc = true;
+let page = 0;
+let size = 25;
+
+function sorted() {
+  const rows = ROWS.slice();
+  rows.sort((a, b) => {
+    const av = a[sortKey], bv = b[sortKey];
+    const an = num(av), bn = num(bv);
+    let cmp;
+    if (!isNaN(an) && !isNaN(bn)) cmp = an - bn;
+    else cmp = String(av ?? "").localeCompare(String(bv ?? ""));
+    return sortAsc ? cmp : -cmp;
+  });
+  return rows;
+}
+
+function draw() {
+  const thead = document.querySelector("#lb thead");
+  thead.innerHTML = "<tr>" + COLS.map(k =>
+    `<th data-k="${k}">${label(k)}` +
+    (k === sortKey ? `<span class="arrow">${sortAsc ? "↑" : "↓"}</span>` : "") +
+    "</th>").join("") + "</tr>";
+  thead.querySelectorAll("th").forEach(th => th.onclick = () => {
+    const k = th.dataset.k;
+    if (k === sortKey) sortAsc = !sortAsc; else { sortKey = k; sortAsc = true; }
+    page = 0; draw();
+  });
+
+  const rows = sorted();
+  const pages = Math.max(1, Math.ceil(rows.length / size));
+  page = Math.min(page, pages - 1);
+  const slice = rows.slice(page * size, (page + 1) * size);
+
+  const esc = s => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;");
+  document.querySelector("#lb tbody").innerHTML = slice.map(r => {
+    const rk = num(r.rank);
+    const cls = rk === 1 ? "top1" : rk === 2 ? "top2" : rk === 3 ? "top3" : "";
+    return `<tr class="${cls}">` + COLS.map(k => `<td>${esc(r[k])}</td>`).join("") + "</tr>";
+  }).join("");
+
+  document.getElementById("pageinfo").textContent =
+    `${page * size + 1}–${Math.min((page + 1) * size, rows.length)} of ${rows.length}`;
+  document.getElementById("prev").disabled = page === 0;
+  document.getElementById("next").disabled = page >= pages - 1;
+}
+
+document.getElementById("prev").onclick = () => { page--; draw(); };
+document.getElementById("next").onclick = () => { page++; draw(); };
+document.getElementById("size").onchange = e => { size = +e.target.value; page = 0; draw(); };
+draw();
+</script>
+</body>
+</html>

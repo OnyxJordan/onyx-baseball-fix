@@ -1,0 +1,31 @@
+name: Gauntlet leaderboard
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: gauntlet-leaderboard
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Build and publish leaderboard
+        env:
+          RETOOL_WEBHOOK_URL: ${{ secrets.RETOOL_WEBHOOK_URL }}
+          RETOOL_WORKFLOW_KEY: ${{ secrets.RETOOL_WORKFLOW_KEY }}
+          TIINY_API_KEY: ${{ secrets.TIINY_API_KEY }}
+          TIINY_DOMAIN: ${{ vars.TIINY_DOMAIN || 'onyxgamesgauntlet.tiiny.site' }}
+        run: python gauntlet/build_leaderboard.py
