@@ -2013,7 +2013,7 @@ body::after {
         <th onclick="sortR('hr_prob')" class="desc">HR%</th>
         <th onclick="sortR('opp_pitcher_hr9')">Pitcher</th>
         <th onclick="sortR('env_factor')">Env</th>
-        <th onclick="sortR('due_score_ui')" title="1-10 due scale: 10=most due (cold streak), 1=hottest (regression risk). Based on last 7 days vs season pace.">📊 Due</th>
+        <th onclick="sortR('due_score_ui')" title="1-10 due scale: 10=most due (cold streak), 1=hottest (regression risk). Last 14 days vs career pace, neutral = 5.5.">📊 Due</th>
         <th onclick="sortR('barrel_26')">Brrl%</th>
         <th onclick="sortR('hh_pct')">HH%</th>
         <th onclick="sortR('ev90_26')">EV90</th>
@@ -4836,7 +4836,7 @@ function renderRankings() {
       <td style="text-align:center">
         ${(()=>{
           const ds=r.due_score!=null?r.due_score:0;
-          const s=Math.max(1.0,Math.min(10.0,((ds+3.5)/5.0)*9+1)).toFixed(1);
+          const s=Math.max(1.0,Math.min(10.0,5.5+ds*3)).toFixed(1);
           const lbl=r.due_label||'NORMAL';
           const clr=lbl==='OVERDUE'?'#818cf8':lbl==='DUE'?'#34d399':lbl==='COOL'?'#60a5fa':lbl==='NORMAL'?'#4d6580':lbl==='WARM'?'#fb923c':lbl==='HOT'?'#f87171':'#ef4444';
           const detail=r.due_detail||`${r.week_hr}HR/${r.week_pa}PA`;
