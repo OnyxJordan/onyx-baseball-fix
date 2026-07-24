@@ -1,5 +1,15 @@
 """
-model.py — Onyx Baseball v21 HR probability model
+model.py — Onyx Baseball v22 HR probability model
+
+v22: power-anchored base rate + soft ceiling. The base HR/PA now blends
+the outcome history 55/45 with an expected HR/PA built from contact
+quality (barrel rate mapped through the league barrel-to-HR curve), so a
+speed profile with near-zero barrels cannot project like a slugger no
+matter what his small-sample outcomes say, and real power is credited
+even through cold outcome stretches. The hard 25-point ceiling that was
+bunching the top of the board into identical values (the wall of 18.8s
+= cap x no-odds shrink) becomes a soft compression above 20, so ordering
+and separation survive at the top.
 
 v21: pick quality floor — a player must show a minimum hard-hit rate
 (32%) and barrel rate (5%) to qualify for the tracked money list. Small
@@ -402,6 +412,17 @@ def project_player(
     pos_avg     = POS_HR_AVG.get(pos, 0.038)
     c_adj = (career_rate * pa_3yr + REG_K * pos_avg) / (pa_3yr + REG_K)
 
+    # 1b. v22 power anchor: expected HR/PA from contact quality. Barrels
+    # convert to homers at a stable league rate (~52% of barrels + a small
+    # residual for non-barrel HR), and a batter puts ~64% of PA in play.
+    # Blending 45% of this into the base means outcomes alone can never
+    # carry a no-power profile to a slugger's number, and real power holds
+    # its level through cold outcome stretches.
+    _b3 = d.get("b3", None)
+    if _b3 is not None and pa_3yr >= 150:
+        xhr_pa = max(0.002, min(0.075, (0.52 * float(_b3) + 0.006) * 0.64))
+        c_adj = 0.55 * c_adj + 0.45 * xhr_pa
+
     # Home/away split — prefer 2026 season splits (splits.json), else CAREER_DB ch/ca
     _split = SEASON_SPLITS.get(player_key, {})
     side_key = "ch" if is_home else "ca"
@@ -451,13 +472,18 @@ def project_player(
 
     # 7. Raw probability, then shrink toward the league per-game HR rate.
     # The multiplier chain can stack good-but-correlated signals into
-    # implausible territory; deviations from league average compress 20%
-    # and the ceiling drops to 25.
-    raw_prob = max(1.0, min(30.0, base * sc * 3.5 * 100 * pf * env * park_f * due_mult * plat))
+    # implausible territory; deviations from league average compress 20%.
+    # v22: the old hard 25 ceiling created a wall of identical top values
+    # (cap x no-odds shrink = the 18.8% ties); a soft compression above 20
+    # keeps separation and ordering alive at the top of the board.
+    raw_prob = base * sc * 3.5 * 100 * pf * env * park_f * due_mult * plat
     LEAGUE_GAME_HR = 12.5
-    raw_prob = max(1.0, min(25.0, LEAGUE_GAME_HR + (raw_prob - LEAGUE_GAME_HR) * 0.8))
+    raw_prob = LEAGUE_GAME_HR + (raw_prob - LEAGUE_GAME_HR) * 0.8
     # v19: nightly self-calibration from graded picks
-    raw_prob = max(1.0, min(25.0, raw_prob * CAL_SCALE))
+    raw_prob = raw_prob * CAL_SCALE
+    if raw_prob > 20.0:
+        raw_prob = 20.0 + (raw_prob - 20.0) * 0.5
+    raw_prob = max(1.0, min(28.0, raw_prob))
 
     # 8. Market calibration — the market is the anchor. HR props are priced
     # efficiently, so the model LEANS off the fair price rather than
