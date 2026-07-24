@@ -1059,9 +1059,11 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
   background-repeat:no-repeat; background-position:center;
   box-shadow:0 0 0 2px rgba(160,32,240,.65), 0 0 14px rgba(160,32,240,.25); }
 .gc-hs.hit .gc-hs-img { box-shadow:0 0 0 2px #fbbf24, 0 0 16px rgba(251,191,36,.55); }
-/* small ringed headshot for tables (rankings): contain, never crop the head */
+/* small ringed headshot for tables (rankings): face fills the ring.
+   Spot images frame the head small inside their own disc; zooming to 122%
+   biased toward the face gives the tight avatar look without cutting caps */
 .rk-hs { width:30px; height:30px; border-radius:50%; flex-shrink:0; display:inline-block;
-  background-color:#12101d; background-size:contain; background-position:center; background-repeat:no-repeat;
+  background-color:#12101d; background-size:122%; background-position:50% 22%; background-repeat:no-repeat;
   box-shadow:0 0 0 1.5px rgba(160,32,240,.65); margin:0 3px 0 2px; align-self:center; vertical-align:middle; }
 .gc-hs-pct { font-family:monospace; font-size:11px; font-weight:800; color:#c9a6ff; margin-top:5px; }
 .gc-hs.hit .gc-hs-pct { color:#fbbf24; }
@@ -3522,7 +3524,7 @@ function gcHrStrip() {
     let lastName = parts.slice(-1)[0];
     if (/^(jr\.?|sr\.?|ii|iii|iv)$/i.test(lastName) && parts.length > 2) lastName = parts.slice(-2).join(' ');
     return `<div class="gc-hs${hit ? ' hit' : ''}" data-p="${(r.matched_name || '').replace(/"/g, '&quot;')}" onclick="openPlayerCard(this.dataset.p)">
-      <div class="gc-hs-img" style="background-image:url(https://midfield.mlbstatic.com/v1/people/${r.mid}/spots/120),radial-gradient(circle at 50% 42%, rgba(160,32,240,.16), rgba(13,17,23,.9) 78%);background-size:contain,cover"></div>
+      <div class="gc-hs-img" style="background-image:url(https://midfield.mlbstatic.com/v1/people/${r.mid}/spots/120),radial-gradient(circle at 50% 42%, rgba(160,32,240,.16), rgba(13,17,23,.9) 78%);background-size:122% ,cover;background-position:50% 22%,center"></div>
       <div class="gc-hs-pct">${hit ? 'HR ✓' : pct + '%'}</div>
       <div class="gc-hs-name">${lastName}</div>
       ${r.dk_hr_odds && !hit ? `<div class="gc-hs-odds">${fmtOdds(r.dk_hr_odds)}</div>` : ''}
