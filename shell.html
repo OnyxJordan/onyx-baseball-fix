@@ -1057,14 +1057,15 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
 .gc-hs:active { transform:scale(.94); }
 .gc-hs-img { width:58px; height:58px; margin:0 auto; border-radius:50%;
   background-repeat:no-repeat; background-position:center;
-  box-shadow:0 0 0 2px rgba(160,32,240,.65), 0 0 14px rgba(160,32,240,.25); }
-.gc-hs.hit .gc-hs-img { box-shadow:0 0 0 2px #fbbf24, 0 0 16px rgba(251,191,36,.55); }
-/* small ringed headshot for tables (rankings): face fills the ring.
-   Spot images frame the head small inside their own disc; zooming to 122%
-   biased toward the face gives the tight avatar look without cutting caps */
+  box-shadow:inset 0 0 0 2px rgba(160,32,240,.65), 0 0 14px rgba(160,32,240,.25); }
+.gc-hs.hit .gc-hs-img { box-shadow:inset 0 0 0 2px #fbbf24, 0 0 16px rgba(251,191,36,.55); }
+/* small ringed headshot for tables (rankings). The ring is drawn INSET so
+   the ring + full spot disc live entirely inside this element's own box;
+   tight overflow:hidden ancestors (table cells, tc-badge) can never slice
+   the circle. Disc at 86% clears the 1.5px inset ring at every size. */
 .rk-hs { width:30px; height:30px; border-radius:50%; flex-shrink:0; display:inline-block;
-  background-color:#12101d; background-size:90%; background-position:center; background-repeat:no-repeat;
-  box-shadow:0 0 0 1.5px rgba(160,32,240,.65); margin:0 3px 0 2px; align-self:center; vertical-align:middle; }
+  background-color:#12101d; background-size:86%; background-position:center; background-repeat:no-repeat;
+  box-shadow:inset 0 0 0 1.5px rgba(160,32,240,.65); margin:0 3px 0 2px; align-self:center; vertical-align:middle; }
 .gc-hs-pct { font-family:monospace; font-size:11px; font-weight:800; color:#c9a6ff; margin-top:5px; }
 .gc-hs.hit .gc-hs-pct { color:#fbbf24; }
 .gc-hs-name { font-size:10px; font-weight:700; color:var(--text2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -2843,7 +2844,7 @@ function openPlayerCard(name) {
   };
   el.innerHTML = `
     <div class="pmodal-head">
-      ${r.mid ? `<span class="rk-hs" style="width:46px;height:46px;background-image:url(https://midfield.mlbstatic.com/v1/people/${r.mid}/spots/120);box-shadow:0 0 0 2px rgba(160,32,240,.65), 0 0 12px rgba(160,32,240,.25)"></span>` : (typeof teamBadge === 'function' ? teamBadge(r.team, '38') : '')}
+      ${r.mid ? `<span class="rk-hs" style="width:46px;height:46px;background-image:url(https://midfield.mlbstatic.com/v1/people/${r.mid}/spots/120);box-shadow:inset 0 0 0 2px rgba(160,32,240,.65), 0 0 12px rgba(160,32,240,.25)"></span>` : (typeof teamBadge === 'function' ? teamBadge(r.team, '38') : '')}
       <div>
         <div class="pmodal-name">${r.matched_name}${lp.hitHR ? ' <span class="hit-flag">HR ✓</span>' : ''}</div>
         <div class="pmodal-sub">#${r.batting_order} ${r.pos} · ${r.team} · vs ${r.opp_pitcher || 'TBD'} ${r.opp_pitcher_hand || ''}HP · ${r.venue || ''}</div>
@@ -3524,7 +3525,7 @@ function gcHrStrip() {
     let lastName = parts.slice(-1)[0];
     if (/^(jr\.?|sr\.?|ii|iii|iv)$/i.test(lastName) && parts.length > 2) lastName = parts.slice(-2).join(' ');
     return `<div class="gc-hs${hit ? ' hit' : ''}" data-p="${(r.matched_name || '').replace(/"/g, '&quot;')}" onclick="openPlayerCard(this.dataset.p)">
-      <div class="gc-hs-img" style="background-image:url(https://midfield.mlbstatic.com/v1/people/${r.mid}/spots/120),radial-gradient(circle at 50% 42%, rgba(160,32,240,.16), rgba(13,17,23,.9) 78%);background-size:90%,cover;background-position:center,center"></div>
+      <div class="gc-hs-img" style="background-image:url(https://midfield.mlbstatic.com/v1/people/${r.mid}/spots/120),radial-gradient(circle at 50% 42%, rgba(160,32,240,.16), rgba(13,17,23,.9) 78%);background-size:86%,cover;background-position:center,center"></div>
       <div class="gc-hs-pct">${hit ? 'HR ✓' : pct + '%'}</div>
       <div class="gc-hs-name">${lastName}</div>
       ${r.dk_hr_odds && !hit ? `<div class="gc-hs-odds">${fmtOdds(r.dk_hr_odds)}</div>` : ''}
@@ -4649,7 +4650,7 @@ function renderTargets() {
     return `<div class="tcard${rowDone(r) ? ' card-done' : ''}" style="cursor:pointer" data-p="${(r.matched_name||'').replace(/"/g,'&quot;')}" onclick="openPlayerCard(this.dataset.p)">
       <div style="position:absolute;top:10px;right:10px;width:18px;height:18px;border-radius:50%;background:var(--bg4);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--text3);font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace">${i+1}</div>
       <div class="tc-row1">
-        <div class="tc-badge" style="background:transparent">${r.mid ? `<span class="rk-hs" style="width:40px;height:40px;background-image:url(https://midfield.mlbstatic.com/v1/people/${r.mid}/spots/90);box-shadow:0 0 0 2px rgba(160,32,240,.6), 0 0 10px rgba(160,32,240,.22)"></span>` : teamBadge(r.team,'38')}</div>
+        <div class="tc-badge" style="background:transparent;overflow:visible">${r.mid ? `<span class="rk-hs" style="width:40px;height:40px;background-image:url(https://midfield.mlbstatic.com/v1/people/${r.mid}/spots/90);box-shadow:inset 0 0 0 2px rgba(160,32,240,.6), 0 0 10px rgba(160,32,240,.22)"></span>` : teamBadge(r.team,'38')}</div>
         <div class="tc-meta">
           <div class="tc-name">${r.matched_name}${liveBadges(r)}</div>
           <div class="tc-sub">#${r.batting_order} ${r.pos} · <span style="cursor:pointer;text-decoration:underline dotted;text-underline-offset:2px" onclick="event.stopPropagation();jumpToGame('${r.game}')">${r.away} @ ${r.home}</span></div>
@@ -5132,7 +5133,7 @@ function renderPower() {
       <!-- top row: rank + name + conf score -->
       <div style="display:flex;align-items:center;gap:12px;padding:14px 16px 10px">
         <div style="width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;flex-shrink:0;${rankBadge[i]}">${i+1}</div>
-        ${r.mid ? `<span class="rk-hs" style="width:40px;height:40px;background-image:url(https://midfield.mlbstatic.com/v1/people/${r.mid}/spots/90);box-shadow:0 0 0 2px rgba(160,32,240,.6), 0 0 10px rgba(160,32,240,.22)"></span>` : teamBadge(r.team,'38')}
+        ${r.mid ? `<span class="rk-hs" style="width:40px;height:40px;background-image:url(https://midfield.mlbstatic.com/v1/people/${r.mid}/spots/90);box-shadow:inset 0 0 0 2px rgba(160,32,240,.6), 0 0 10px rgba(160,32,240,.22)"></span>` : teamBadge(r.team,'38')}
         <div style="flex:1;min-width:0">
           <div style="font-size:17px;font-weight:800;color:var(--text);line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.matched_name}</div>
           <div style="font-size:10px;color:var(--text-muted);margin-top:1px">#${r.batting_order} ${r.pos||r.dk_pos} · ${r.team} · vs ${r.opp_pitcher}</div>
