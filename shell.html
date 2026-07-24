@@ -2333,7 +2333,7 @@ function openSwapPanel(outName, slot) {
       const safeN = encodeURIComponent(n);
       const safeOut = encodeURIComponent(outName);
       return '<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border)">'
-        +teamBadge(r.team||'','20')
+        +(r.mid ? '<span class="rk-hs" style="width:22px;height:22px;background-image:url(https://midfield.mlbstatic.com/v1/people/'+r.mid+'/spots/60)"></span>' : teamBadge(r.team||'','20'))
         +'<div style="flex:1;min-width:0">'
           +'<div style="font-size:12px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+n+'</div>'
           +'<div style="font-size:10px;color:var(--text3)">'+prob+' HR · '+edge+' edge · <span style="color:'+dueC+'">'+due+'</span></div>'
@@ -2437,7 +2437,7 @@ function renderLineup(result, stack) {
 
     return '<div class="lu-card" style="' + (isStacked ? 'border:2px solid var(--purple)' : 'border:1px solid var(--border)') + '">' +
       '<div class="lu-slot" style="color:' + (isPit ? '#f59e0b' : 'var(--text3)') + '">' + displaySlot + '</div>' +
-      teamBadge(p.team||'', '26') +
+      (p.mid ? '<span class="rk-hs" style="width:26px;height:26px;background-image:url(https://midfield.mlbstatic.com/v1/people/' + p.mid + '/spots/60)"></span>' : teamBadge(p.team||'', '26')) +
       '<div style="flex:1;min-width:0">' +
         '<div class="lu-name">' + name + stackBadge + '</div>' +
         '<div class="lu-sub">' + sub + edgeBit + '</div>' +
@@ -4647,7 +4647,7 @@ function renderTargets() {
     return `<div class="tcard${rowDone(r) ? ' card-done' : ''}" style="cursor:pointer" data-p="${(r.matched_name||'').replace(/"/g,'&quot;')}" onclick="openPlayerCard(this.dataset.p)">
       <div style="position:absolute;top:10px;right:10px;width:18px;height:18px;border-radius:50%;background:var(--bg4);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--text3);font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace">${i+1}</div>
       <div class="tc-row1">
-        <div class="tc-badge" style="background:transparent">${teamBadge(r.team,'38')}</div>
+        <div class="tc-badge" style="background:transparent">${r.mid ? `<span class="rk-hs" style="width:40px;height:40px;background-image:url(https://midfield.mlbstatic.com/v1/people/${r.mid}/spots/90);box-shadow:0 0 0 2px rgba(160,32,240,.6), 0 0 10px rgba(160,32,240,.22)"></span>` : teamBadge(r.team,'38')}</div>
         <div class="tc-meta">
           <div class="tc-name">${r.matched_name}${liveBadges(r)}</div>
           <div class="tc-sub">#${r.batting_order} ${r.pos} · <span style="cursor:pointer;text-decoration:underline dotted;text-underline-offset:2px" onclick="event.stopPropagation();jumpToGame('${r.game}')">${r.away} @ ${r.home}</span></div>
@@ -4954,7 +4954,7 @@ function renderDFS() {
       <td class="rn">${i+1}</td>
       <td style="text-align:left">
         <div style="display:flex;align-items:center;gap:8px;overflow:hidden">
-          ${teamBadge(r.team,'22')}
+          ${r.mid ? `<span class="rk-hs" style="width:24px;height:24px;background-image:url(https://midfield.mlbstatic.com/v1/people/${r.mid}/spots/60)"></span>` : teamBadge(r.team,'22')}
           <div style="overflow:hidden">
             <div style="font-size:13px;font-weight:700;overflow:hidden;text-overflow:ellipsis">${r.matched_name}</div>
             <div style="font-size:10px;color:var(--text3)">#${r.batting_order} ${r.pos}</div>
@@ -5130,7 +5130,7 @@ function renderPower() {
       <!-- top row: rank + name + conf score -->
       <div style="display:flex;align-items:center;gap:12px;padding:14px 16px 10px">
         <div style="width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;flex-shrink:0;${rankBadge[i]}">${i+1}</div>
-        ${teamBadge(r.team,'38')}
+        ${r.mid ? `<span class="rk-hs" style="width:40px;height:40px;background-image:url(https://midfield.mlbstatic.com/v1/people/${r.mid}/spots/90);box-shadow:0 0 0 2px rgba(160,32,240,.6), 0 0 10px rgba(160,32,240,.22)"></span>` : teamBadge(r.team,'38')}
         <div style="flex:1;min-width:0">
           <div style="font-size:17px;font-weight:800;color:var(--text);line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.matched_name}</div>
           <div style="font-size:10px;color:var(--text-muted);margin-top:1px">#${r.batting_order} ${r.pos||r.dk_pos} · ${r.team} · vs ${r.opp_pitcher}</div>
