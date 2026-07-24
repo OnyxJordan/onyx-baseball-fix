@@ -1,5 +1,16 @@
 """
-model.py — Onyx Baseball v22 HR probability model
+model.py — Onyx Baseball v23 HR probability model
+
+v23: the pressure term becomes a real weather signal. It had been fed
+station (surface) pressure against a sea-level 1013 constant, so the
+number mostly encoded stadium elevation (already in the park factors)
+and its coefficient had to be tuned so small (0.00015/mb) that genuine
+day-to-day barometric swings were invisible. fetch_data.py now pulls
+sea-level pressure (pressure_msl), and the coefficient is recalibrated
+to physics (0.0012/mb — air density is ~0.1%/mb and HR carry runs
+~1.3-1.5x density), so a strong high sits a play down ~1.5% and a deep
+low lifts it ~2%. Wind and temperature terms are unchanged; they were
+already carrying their weight (an 11mph out day at 81F reads x1.14).
 
 v22: power-anchored base rate + soft ceiling. The base HR/PA now blends
 the outcome history 55/45 with an expected HR/PA built from contact
@@ -281,7 +292,12 @@ def wind_env(park: str, wind_dir: str, wind_mph: float, temp: float, roof: bool,
 
     env += (temp - 72) * 0.0025            # warm air is thinner, more carry
     env += (humidity - 50) * 0.0006        # humid air is *less* dense than dry air
-    env += (1013 - pressure_mb) * 0.00015  # lower pressure = thinner air, more carry
+    # Sea-level pressure (pressure_msl) so this is pure weather, not stadium
+    # elevation (park factors already own altitude). ~0.1% air density per mb,
+    # HR carry ~1.3-1.5x density: deep low ≈ +2%, strong high ≈ -1.5%. Clamped
+    # to the physically possible MSL range so a bad feed (e.g. station
+    # pressure sneaking back in) can never masquerade as a weather edge.
+    env += max(-0.030, min(0.040, (1013 - pressure_mb) * 0.0012))
 
     return max(0.78, min(1.35, env))
 

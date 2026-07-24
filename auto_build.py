@@ -293,8 +293,19 @@ for game in games_out:
             hr9 = spl.get("l14_hr_rate") and round(spl["l14_hr_rate"] * 38.7, 2)
             if not hr9:
                 hr9 = (sp_e or {}).get("hr9_6") or (sp_e or {}).get("hr9_3")
+            # 7-tier heat label on the model's real due_score scale (expected
+            # HRs minus actual over L14, sc-weighted; realistic range ~ -4..+2).
+            # Bands mirror model.due_meter so the label always matches the
+            # multiplier actually applied. Old +-3 thresholds landed everyone
+            # on NORMAL forever.
             ds = r.get("due_score") or 0
-            due_label = "DUE" if ds >= 3 else ("HOT" if ds <= -3 else "NORMAL")
+            if   ds >  1.2:  due_label = "OVERDUE"
+            elif ds >  0.6:  due_label = "DUE"
+            elif ds >  0.15: due_label = "COOL"
+            elif ds > -0.15: due_label = "NORMAL"
+            elif ds > -0.6:  due_label = "WARM"
+            elif ds > -1.2:  due_label = "HOT"
+            else:            due_label = "FIRE"
             dk_pts, fd_pts = r.get("dk_pts") or 0, r.get("fd_pts") or 0
             dk_sal = r.get("dk_salary") or 3000
             fd_sal = r.get("fd_salary") or 3000
