@@ -1034,8 +1034,10 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
 .gc-hs-row { display:flex; gap:12px; overflow-x:auto; padding:4px 2px 10px; scrollbar-width:thin; }
 .gc-hs { flex:none; width:74px; text-align:center; cursor:pointer; transition:transform .12s; }
 .gc-hs:active { transform:scale(.94); }
-.gc-hs-img { width:58px; height:58px; margin:0 auto; border-radius:50%; background-color:var(--bg3); background-size:cover; background-position:center top; border:2px solid rgba(160,32,240,.55); box-shadow:0 0 10px rgba(160,32,240,.2); }
-.gc-hs.hit .gc-hs-img { border-color:#fbbf24; box-shadow:0 0 12px rgba(251,191,36,.5); }
+.gc-hs-img { width:58px; height:58px; margin:0 auto; border-radius:50%;
+  background-repeat:no-repeat; background-position:center;
+  box-shadow:0 0 0 2px rgba(160,32,240,.65), 0 0 14px rgba(160,32,240,.25); }
+.gc-hs.hit .gc-hs-img { box-shadow:0 0 0 2px #fbbf24, 0 0 16px rgba(251,191,36,.55); }
 .gc-hs-pct { font-family:monospace; font-size:11px; font-weight:800; color:#c9a6ff; margin-top:5px; }
 .gc-hs.hit .gc-hs-pct { color:#fbbf24; }
 .gc-hs-name { font-size:10px; font-weight:700; color:var(--text2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -1047,6 +1049,15 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
     background:rgba(6,9,18,.92); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
     border-top:1px solid var(--border2); padding:6px 4px calc(6px + env(safe-area-inset-bottom)); }
   body { padding-bottom:76px; }
+  /* header: no wrapped meta text on phones; badge + bell only */
+  .nav-date { display:none !important; }
+  .nav-badge { font-size:9px; padding:3px 8px; white-space:nowrap; }
+  .nav-right { gap:6px; flex-shrink:0; }
+  /* gamecast funnel fits edge-to-edge */
+  .gc-betbar { flex-direction:column; align-items:stretch; gap:8px; }
+  .gc-bet-cta { text-align:center; }
+  .gc-bet-chips { display:grid; grid-template-columns:repeat(2,1fr); }
+  .gc-bet-chip { text-align:center; }
 }
 .bnav-item { flex:1; background:none; border:none; color:var(--text3); font-family:monospace; font-size:9px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; display:flex; flex-direction:column; align-items:center; gap:3px; padding:4px 0; cursor:pointer; }
 .bnav-item .bi { font-size:18px; filter:grayscale(1); opacity:.65; transition:all .15s; }
@@ -1268,7 +1279,7 @@ body::after {
 /* gamecenter: win probability strip + scoring plays */
 .gc-wp-wrap { position:relative; height:64px; }
 .gc-wp-wrap svg { position:absolute; inset:0; width:100%; height:100%; }
-.gc-wp-lbl { position:absolute; right:0; font-size:10px; font-weight:800; font-family:monospace; }
+.gc-wp-lbl { position:absolute; right:4px; font-size:10px; font-weight:800; font-family:monospace; background:rgba(6,9,18,.75); padding:1px 6px; border-radius:5px; }
 .gc-play { display:flex; gap:10px; padding:8px 0; border-bottom:1px solid rgba(26,37,53,.5); font-size:12px; line-height:1.6; }
 .gc-play:last-child { border-bottom:none; }
 .gc-play .inn { flex:0 0 44px; font-family:monospace; font-size:10px; font-weight:700; color:var(--text3); padding-top:2px; }
@@ -1357,7 +1368,7 @@ body::after {
   .gc-dots { justify-content:flex-start; }
 }
 </style>
-<meta property="og:title" content="Onyx Baseball · July 23" data-id="th-modified" ><meta property="og:image" content="https://tiiny.host/assets/logo-purple-bg.png" data-id="th-modified" ><meta property="og:image:width" content="1501" data-id="th-modified" ><meta property="og:image:height" content="1501" data-id="th-modified" ><meta property="og:image:type" content="image/png" data-id="th-modified" ><meta property="og:url" content="https://onyxbaseballtest.tiiny.site/" data-id="th-modified" ><meta property="og:type" content="website" data-id="th-modified" ><script defer data-domain="onyxbaseballtest.tiiny.site" src="https://analytics.tiiny.site/js/plausible.js"></script></head>
+<meta property="og:title" content="Onyx Baseball · July 24" data-id="th-modified" ><meta property="og:image" content="https://tiiny.host/assets/logo-purple-bg.png" data-id="th-modified" ><meta property="og:image:width" content="1501" data-id="th-modified" ><meta property="og:image:height" content="1501" data-id="th-modified" ><meta property="og:image:type" content="image/png" data-id="th-modified" ><meta property="og:url" content="https://onyxbaseballtest.tiiny.site/" data-id="th-modified" ><meta property="og:type" content="website" data-id="th-modified" ><script defer data-domain="onyxbaseballtest.tiiny.site" src="https://analytics.tiiny.site/js/plausible.js"></script></head>
 <body>
 
 <!-- ═══ NAV ═══════════════════════════════════════════════════ -->
@@ -1423,8 +1434,8 @@ body::after {
 
   <div class="nav-right">
     <button class="notif-bell" id="notifBell" onclick="toggleNotif()" title="Browser alert when a modeled batter homers">🔔</button>
-    <span class="nav-badge">JUL 23 · 2026</span>
-    <span class="nav-date" id="buildStamp">updated 7:51 pm et</span>
+    <span class="nav-badge">JUL 24 · 2026</span>
+    <span class="nav-date" id="buildStamp">updated 8:02 pm et</span>
     <span class="nav-date" id="liveCount"></span>
   </div>
 </nav>
@@ -1439,7 +1450,7 @@ body::after {
       </div>
     </div>
     <div style="display:flex;align-items:center;gap:10px">
-      <span style="font-size:10px;font-weight:700;font-family:monospace;color:var(--neon-green);background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.2);padding:3px 10px;border-radius:20px">JUL 23 · 2026</span>
+      <span style="font-size:10px;font-weight:700;font-family:monospace;color:var(--neon-green);background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.2);padding:3px 10px;border-radius:20px">JUL 24 · 2026</span>
       <button class="nav-drawer-close" onclick="closeDrawer()">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3l10 10M13 3L3 13"></path></svg>
       </button>
@@ -1527,7 +1538,7 @@ body::after {
 
       <div class="hero-live-badge">
         <span class="hero-live-dot"></span>
-        Live · July 23, 2026
+        Live · July 24, 2026
       </div>
 
       <h1 class="home-hero-title">
@@ -1585,7 +1596,7 @@ body::after {
   <div class="home-body">
     <div id="recapHome" style="display:none" class="recap-card" onclick="openRecap()"></div>
     <div class="home-section">
-      <div class="home-section-tag">Today · July 23, 2026</div>
+      <div class="home-section-tag">Today · July 24, 2026</div>
       <h2 class="home-section-title">What's shaping today's slate</h2>
 
       <!-- Weather / Park flags: rendered live from SUMMARIES by renderSlateFlags() -->
@@ -1885,7 +1896,7 @@ body::after {
 <!-- ═══ PANE: BOARD ═══════════════════════════════════════════ -->
 <div class="pane" id="pane-board">
   <div class="sec-hdr">
-    <span class="sec-title">Top Edge Plays — July 23 <span style="font-size:10px;font-weight:400;color:var(--text3);margin-left:8px">market-calibrated · recency-weighted · team K% adjusted · positive edge only</span></span>
+    <span class="sec-title">Top Edge Plays — July 24 <span style="font-size:10px;font-weight:400;color:var(--text3);margin-left:8px">market-calibrated · recency-weighted · team K% adjusted · positive edge only</span></span>
     <span class="sec-count" id="tc-count"></span>
   </div>
   <div class="targets-grid" id="topTargets"></div>
@@ -3185,8 +3196,18 @@ const GC_ABBR_FIX = {CHW:'CWS', OAK:'ATH'};
 const gcAb = a => GC_ABBR_FIX[a] || a || '';
 
 function openGamecenter(pk) {
-  if (pk) gcPk = +pk;
+  // ticker chips / widgets land on the full gamecast, cleanly reset
+  if (pk && +pk !== +gcPk) {
+    gcPk = +pk;
+    gcPbpOpen.clear();
+    gcArsSel = null; gcArsType = 'ALL'; gcArsRes = 'ALL';
+    gcBbTeam = 'ALL'; gcBbMode = 'ALL';
+    _gcLastFeed = null; _gcLastWp = null;
+    const b = document.getElementById('gcBody');
+    if (b) { delete b.dataset.loaded; b.innerHTML = '<div class="gc-empty">Loading…</div>'; }
+  }
   gotoTab('gamecenter');
+  document.getElementById('gcStrip')?.scrollIntoView({behavior: 'smooth', block: 'start'});
 }
 function stopGC() { if (gcTimer) { clearTimeout(gcTimer); gcTimer = null; } }
 
@@ -3354,7 +3375,7 @@ function gcHrStrip() {
     let lastName = parts.slice(-1)[0];
     if (/^(jr\.?|sr\.?|ii|iii|iv)$/i.test(lastName) && parts.length > 2) lastName = parts.slice(-2).join(' ');
     return `<div class="gc-hs${hit ? ' hit' : ''}" data-p="${(r.matched_name || '').replace(/"/g, '&quot;')}" onclick="openPlayerCard(this.dataset.p)">
-      <div class="gc-hs-img" style="background-image:url(https://img.mlbstatic.com/mlb-photos/image/upload/w_120,q_auto:good/v1/people/${r.mid}/headshot/67/current)"></div>
+      <div class="gc-hs-img" style="background-image:url(https://midfield.mlbstatic.com/v1/people/${r.mid}/spots/120),radial-gradient(circle at 50% 42%, rgba(160,32,240,.16), rgba(13,17,23,.9) 78%);background-size:92%,100%"></div>
       <div class="gc-hs-pct">${hit ? 'HR ✓' : pct + '%'}</div>
       <div class="gc-hs-name">${lastName}</div>
       ${r.dk_hr_odds && !hit ? `<div class="gc-hs-odds">${fmtOdds(r.dk_hr_odds)}</div>` : ''}
