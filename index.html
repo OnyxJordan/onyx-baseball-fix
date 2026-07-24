@@ -1059,9 +1059,9 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
   background-repeat:no-repeat; background-position:center;
   box-shadow:0 0 0 2px rgba(160,32,240,.65), 0 0 14px rgba(160,32,240,.25); }
 .gc-hs.hit .gc-hs-img { box-shadow:0 0 0 2px #fbbf24, 0 0 16px rgba(251,191,36,.55); }
-/* small ringed headshot for tables (rankings) */
-.rk-hs { width:26px; height:26px; border-radius:50%; flex-shrink:0; display:inline-block;
-  background-color:#12101d; background-size:92%; background-position:center; background-repeat:no-repeat;
+/* small ringed headshot for tables (rankings): contain, never crop the head */
+.rk-hs { width:28px; height:28px; border-radius:50%; flex-shrink:0; display:inline-block;
+  background-color:#12101d; background-size:contain; background-position:center; background-repeat:no-repeat;
   box-shadow:0 0 0 1.5px rgba(160,32,240,.65); }
 .gc-hs-pct { font-family:monospace; font-size:11px; font-weight:800; color:#c9a6ff; margin-top:5px; }
 .gc-hs.hit .gc-hs-pct { color:#fbbf24; }
@@ -1511,7 +1511,7 @@ body::after {
   <div class="nav-right">
     <button class="notif-bell" id="notifBell" onclick="toggleNotif()" title="Browser alert when a modeled batter homers">🔔</button>
     <span class="nav-badge">JUL 24 · 2026</span>
-    <span class="nav-date" id="buildStamp">updated 9:15 pm et</span>
+    <span class="nav-date" id="buildStamp">updated 9:22 pm et</span>
     <span class="nav-date" id="liveCount"></span>
   </div>
 </nav>
@@ -2841,7 +2841,7 @@ function openPlayerCard(name) {
   };
   el.innerHTML = `
     <div class="pmodal-head">
-      ${typeof teamBadge === 'function' ? teamBadge(r.team, '38') : ''}
+      ${r.mid ? `<span class="rk-hs" style="width:46px;height:46px;background-image:url(https://midfield.mlbstatic.com/v1/people/${r.mid}/spots/120);box-shadow:0 0 0 2px rgba(160,32,240,.65), 0 0 12px rgba(160,32,240,.25)"></span>` : (typeof teamBadge === 'function' ? teamBadge(r.team, '38') : '')}
       <div>
         <div class="pmodal-name">${r.matched_name}${lp.hitHR ? ' <span class="hit-flag">HR ✓</span>' : ''}</div>
         <div class="pmodal-sub">#${r.batting_order} ${r.pos} · ${r.team} · vs ${r.opp_pitcher || 'TBD'} ${r.opp_pitcher_hand || ''}HP · ${r.venue || ''}</div>
@@ -3522,7 +3522,7 @@ function gcHrStrip() {
     let lastName = parts.slice(-1)[0];
     if (/^(jr\.?|sr\.?|ii|iii|iv)$/i.test(lastName) && parts.length > 2) lastName = parts.slice(-2).join(' ');
     return `<div class="gc-hs${hit ? ' hit' : ''}" data-p="${(r.matched_name || '').replace(/"/g, '&quot;')}" onclick="openPlayerCard(this.dataset.p)">
-      <div class="gc-hs-img" style="background-image:url(https://midfield.mlbstatic.com/v1/people/${r.mid}/spots/120),radial-gradient(circle at 50% 42%, rgba(160,32,240,.16), rgba(13,17,23,.9) 78%);background-size:92%,100%"></div>
+      <div class="gc-hs-img" style="background-image:url(https://midfield.mlbstatic.com/v1/people/${r.mid}/spots/120),radial-gradient(circle at 50% 42%, rgba(160,32,240,.16), rgba(13,17,23,.9) 78%);background-size:contain,cover"></div>
       <div class="gc-hs-pct">${hit ? 'HR ✓' : pct + '%'}</div>
       <div class="gc-hs-name">${lastName}</div>
       ${r.dk_hr_odds && !hit ? `<div class="gc-hs-odds">${fmtOdds(r.dk_hr_odds)}</div>` : ''}
