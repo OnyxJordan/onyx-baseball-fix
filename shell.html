@@ -22,6 +22,7 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
+html,body{overflow-x:hidden}
 :root{
   /* Exact colors from the screenshot */
   --bg:        #060912;
@@ -464,7 +465,7 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
   .nav-logo{margin-right:0}
   /* Hero */
   .home-hero{padding:44px 20px 0;min-height:auto}
-  .hero-ticker-wrap{margin:28px -20px 0 -20px}
+  .hero-ticker-wrap{margin:28px -20px 0 -20px;width:calc(100% + 40px);max-width:100vw}
   .score-ticker-bar{height:36px}
   .score-game{padding:0 14px;height:36px}
   .sticker-logo{width:18px;height:18px}
@@ -1002,6 +1003,9 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
   .sb-ab { font-size:12px; }
 }
 .sb-card { background:var(--card); border:1px solid var(--border2); border-radius:14px; padding:12px 13px; display:flex; justify-content:space-between; gap:8px; cursor:pointer; transition:border-color .15s, transform .12s; min-width:0; overflow:hidden; }
+.sb-card.sched { flex-direction:column; gap:9px; }
+.sb-toprow { display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(26,37,53,.55); padding-bottom:7px; }
+.sb-card.sched .sb-ml { min-width:64px; text-align:center; }
 .sb-card:hover { border-color:rgba(160,32,240,.4); transform:translateY(-2px); }
 .sb-card:active { transform:scale(.97); }
 .sb-card.sel { border-color:rgba(160,32,240,.65); box-shadow:0 0 14px rgba(160,32,240,.15); }
@@ -1393,9 +1397,14 @@ body::after {
 .mkt-hist td:first-child { text-align:left; color:var(--text3); }
 .mkt-hist .mv-up { color:#4ade80; } .mkt-hist .mv-dn { color:#f87171; }
 @media(max-width:640px){
-  .mkt-chip { min-width:64px; font-size:11px; }
+  .mkt-chip { min-width:58px; font-size:11px; padding:7px 0; }
   .mkt-chart { height:120px; }
-  .mkt-pct { font-size:14px; min-width:46px; }
+  .mkt-pct { font-size:14px; min-width:42px; }
+  /* market rows wrap on phones: team+price line, chips drop to their own line */
+  .mkt-row { flex-wrap:wrap; row-gap:7px; gap:8px; padding:11px 12px; }
+  .mkt-chip { flex:1; }
+  .mkt-chip.rl { flex:0 0 74px; }
+  .mkt-delta { min-width:26px; }
 }
 @media(max-width:760px){
   .gc-boxes { grid-template-columns:1fr; }
@@ -2572,7 +2581,7 @@ function bootAppShell() {
   const nav = document.createElement('nav');
   nav.className = 'bnav';
   nav.innerHTML = `
-    <button class="bnav-item" data-tab="home" onclick="gotoTab('home')"><span class="bi">🏠</span>Home</button>
+    <button class="bnav-item" data-tab="board" onclick="gotoTab('board')"><span class="bi">📋</span>Board</button>
     <button class="bnav-item" data-tab="power" onclick="gotoTab('power')"><span class="bi">🎯</span>Plays</button>
     <button class="bnav-item big" data-tab="gamecenter" onclick="gotoTab('gamecenter')"><span class="bi">⚾</span>Games</button>
     <button class="bnav-item" data-tab="markets" onclick="gotoTab('markets')"><span class="bi">📈</span>Markets</button>
@@ -3394,12 +3403,23 @@ function renderGCStrip() {
           ? `<span class="sb-score${dim ? ' lose' : ''}${bumped ? ' bump' : ''}">${sc ?? ''}</span>`
           : (ml ? `<span class="sb-ml" data-a="${r.away}" data-h="${r.home}" data-p="${ab}" data-o="${ml}" onclick="event.stopPropagation();onyxTicket({away:this.dataset.a,home:this.dataset.h,market:'ML',pick:this.dataset.p,side:'yes',odds:this.dataset.o})">${fmtOdds(ml)}</span>` : '')}
       </div>`;
+    const cls = `sb-card${+r.pk === +gcPk ? ' sel' : ''}${live ? ' live' : ''}${!_sbSeen ? ' sb-in' : ''}`;
+    const anim = !_sbSeen ? ` style="animation-delay:${Math.min(idx * 55, 500)}ms"` : '';
+    const open = `onclick="gcSelect(${r.pk});document.getElementById('gcBody')?.scrollIntoView({behavior:'smooth',block:'start'})"`;
+    if (!live && !fin) {
+      // scheduled: time and total get their own row so nothing collides
+      return `<div class="${cls} sched"${anim} ${open}>
+        <div class="sb-toprow"><span class="sb-state sched">${s.time || ''}</span>${s.ou ? `<span class="sb-ou">O/U ${s.ou}</span>` : ''}</div>
+        <div class="sb-teams">
+          ${team(r.away, null, false, s.away_ml)}
+          ${team(r.home, null, false, s.home_ml)}
+        </div>
+      </div>`;
+    }
     const side = live
       ? `<div class="sb-state live"><span class="sb-dot"></span>${(String(g.half || 'T')[0] === 'B' ? 'Bot' : 'Top')} ${g.inning}</div>${diamond(g)}<div class="sb-oc">${outdots(g)}${count(g)}</div>`
-      : fin
-      ? `<div class="sb-state fin">FINAL</div>`
-      : `<div class="sb-state sched">${s.time || ''}</div>${s.ou ? `<div class="sb-ou">O/U ${s.ou}</div>` : ''}`;
-    return `<div class="sb-card${+r.pk === +gcPk ? ' sel' : ''}${live ? ' live' : ''}${!_sbSeen ? ' sb-in' : ''}"${!_sbSeen ? ` style="animation-delay:${Math.min(idx * 55, 500)}ms"` : ''} onclick="gcSelect(${r.pk});document.getElementById('gcBody')?.scrollIntoView({behavior:'smooth',block:'start'})">
+      : `<div class="sb-state fin">FINAL</div>`;
+    return `<div class="${cls}"${anim} ${open}>
       <div class="sb-teams">
         ${team(r.away, aS, fin && aS < hS, s.away_ml)}
         ${team(r.home, hS, fin && hS < aS, s.home_ml)}
