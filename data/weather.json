@@ -1,26 +1,4 @@
 {
-  "MIL": {
-    "venue": "American Family Field",
-    "temp": 77.0,
-    "precip": 0,
-    "wind_spd": 13.7,
-    "wind_dir": "ESE",
-    "humidity_pct": 46,
-    "pressure_mb": 994.8,
-    "roof": true,
-    "flag": "clear"
-  },
-  "PHI": {
-    "venue": "Citizens Bank Park",
-    "temp": 83.7,
-    "precip": 0,
-    "wind_spd": 5.5,
-    "wind_dir": "ESE",
-    "humidity_pct": 34,
-    "pressure_mb": 1019.9,
-    "roof": false,
-    "flag": "clear"
-  },
   "BOS": {
     "venue": "Fenway Park",
     "temp": 80.7,
@@ -29,6 +7,28 @@
     "wind_dir": "ESE",
     "humidity_pct": 35,
     "pressure_mb": 1020.7,
+    "roof": false,
+    "flag": "clear"
+  },
+  "NYM": {
+    "venue": "Citi Field",
+    "temp": 77.2,
+    "precip": 0,
+    "wind_spd": 9.7,
+    "wind_dir": "SE",
+    "humidity_pct": 38,
+    "pressure_mb": 1020.9,
+    "roof": false,
+    "flag": "clear"
+  },
+  "WSH": {
+    "venue": "Nationals Park",
+    "temp": 81.4,
+    "precip": 0,
+    "wind_spd": 6.8,
+    "wind_dir": "E",
+    "humidity_pct": 43,
+    "pressure_mb": 1019.2,
     "roof": false,
     "flag": "clear"
   },
@@ -43,6 +43,28 @@
     "roof": false,
     "flag": "clear"
   },
+  "MIL": {
+    "venue": "American Family Field",
+    "temp": 77.0,
+    "precip": 0,
+    "wind_spd": 13.7,
+    "wind_dir": "ESE",
+    "humidity_pct": 46,
+    "pressure_mb": 994.8,
+    "roof": true,
+    "flag": "clear"
+  },
+  "STL": {
+    "venue": "Busch Stadium",
+    "temp": 73.9,
+    "precip": 15,
+    "wind_spd": 4.0,
+    "wind_dir": "ESE",
+    "humidity_pct": 69,
+    "pressure_mb": 1000.5,
+    "roof": false,
+    "flag": "clear"
+  },
   "MIA": {
     "venue": "loanDepot Park",
     "temp": 86.7,
@@ -51,17 +73,6 @@
     "wind_dir": "E",
     "humidity_pct": 69,
     "pressure_mb": 1017.7,
-    "roof": true,
-    "flag": "clear"
-  },
-  "TEX": {
-    "venue": "Globe Life Field",
-    "temp": 91.9,
-    "precip": 0,
-    "wind_spd": 10.3,
-    "wind_dir": "S",
-    "humidity_pct": 50,
-    "pressure_mb": 994.4,
     "roof": true,
     "flag": "clear"
   },
@@ -87,6 +98,39 @@
     "roof": false,
     "flag": "clear"
   },
+  "DET": {
+    "venue": "Comerica Park",
+    "temp": 80.2,
+    "precip": 0,
+    "wind_spd": 5.5,
+    "wind_dir": "ESE",
+    "humidity_pct": 41,
+    "pressure_mb": 997.1,
+    "roof": false,
+    "flag": "clear"
+  },
+  "PHI": {
+    "venue": "Citizens Bank Park",
+    "temp": 83.7,
+    "precip": 0,
+    "wind_spd": 5.5,
+    "wind_dir": "ESE",
+    "humidity_pct": 34,
+    "pressure_mb": 1019.9,
+    "roof": false,
+    "flag": "clear"
+  },
+  "SF": {
+    "venue": "Oracle Park",
+    "temp": 63.1,
+    "precip": 0,
+    "wind_spd": 20.5,
+    "wind_dir": "WNW",
+    "humidity_pct": 81,
+    "pressure_mb": 1012.0,
+    "roof": false,
+    "flag": "clear"
+  },
   "PIT": {
     "venue": "PNC Park",
     "temp": 82.8,
@@ -98,60 +142,24 @@
     "roof": false,
     "flag": "clear"
   },
-  "NYM": {
-    "venue": "Citi Field",
-    "temp": 77.2,
-    "precip": 0,
-    "wind_spd": 9.7,
-    "wind_dir": "SE",
-    "humidity_pct": 38,
-    "pressure_mb": 1020.9,
-    "roof": false,
-    "flag": "clear"
-  },
-  "STL": {
-    "venue": "Busch Stadium",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
-    "roof": false,
-    "flag": "clear"
-  },
   "TB": {
     "venue": "Tropicana Field",
+    "temp": 88.6,
+    "precip": 14,
+    "wind_spd": 9.2,
+    "wind_dir": "WNW",
+    "humidity_pct": 60,
+    "pressure_mb": 1015.0,
+    "roof": true,
+    "flag": "clear"
+  },
+  "TEX": {
+    "venue": "Globe Life Field",
     "temp": 72,
     "precip": 0,
     "wind_spd": 5,
     "wind_dir": "N",
     "roof": true,
-    "flag": "clear"
-  },
-  "WSH": {
-    "venue": "Nationals Park",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
-    "roof": false,
-    "flag": "clear"
-  },
-  "SF": {
-    "venue": "Oracle Park",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
-    "roof": false,
-    "flag": "clear"
-  },
-  "DET": {
-    "venue": "Comerica Park",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
-    "roof": false,
     "flag": "clear"
   }
 }
