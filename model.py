@@ -1,5 +1,19 @@
 """
-model.py — Onyx Baseball v24 HR probability model
+model.py — Onyx Baseball v25 HR probability model
+
+v25: the top of the board gets honest headroom, and plate appearances
+follow the lineup card. Two structural biases against elite hitters:
+(1) the v22 soft ceiling (halve above 20, hard cap 28) meant the model
+could never even MATCH a short price — a 34% implied slugger needed
+raw ~39 to break even, mathematically impossible at cap 28, so every
+great hitter in a great spot was negative-edge by construction. The
+compression now starts at 24 with a gentler 0.6 slope and a 34 cap, so
+a true monster day can price in the low 30s while the anti-wall
+separation logic survives. (2) every batter was multiplied by a flat
+3.5 PA/game, but leadoff sees ~4.7 PAs and the 9-hole ~3.8; expected
+PA now scales by batting-order slot (level-neutral around the lineup
+mean), which moves top-of-order sluggers up ~5-11% and the bottom of
+the card down the same, exactly where HR-per-game reality lives.
 
 v24: player-specific platoon power. The platoon factor had been a flat
 constant (same-hand 0.93 / opposite 1.07 / switch 1.03) — every
@@ -549,14 +563,24 @@ def project_player(
     # v22: the old hard 25 ceiling created a wall of identical top values
     # (cap x no-odds shrink = the 18.8% ties); a soft compression above 20
     # keeps separation and ordering alive at the top of the board.
-    raw_prob = base * sc * 3.5 * 100 * pf * env * park_f * due_mult * plat
+    # v25: expected PAs follow the lineup card instead of a flat 3.5 for all —
+    # leadoff sees ~4.7 PA/game, the 9-hole ~3.8. Level-neutral: scaled by the
+    # lineup-average slot so the league-wide calibration point doesn't move.
+    PA_BY_ORDER = {1: 4.68, 2: 4.57, 3: 4.46, 4: 4.36, 5: 4.26,
+                   6: 4.15, 7: 4.04, 8: 3.93, 9: 3.82}
+    pa_mult = PA_BY_ORDER.get(int(batting_order or 0), 4.23) / 4.23
+    raw_prob = base * sc * 3.5 * pa_mult * 100 * pf * env * park_f * due_mult * plat
     LEAGUE_GAME_HR = 12.5
     raw_prob = LEAGUE_GAME_HR + (raw_prob - LEAGUE_GAME_HR) * 0.8
     # v19: nightly self-calibration from graded picks
     raw_prob = raw_prob * CAL_SCALE
-    if raw_prob > 20.0:
-        raw_prob = 20.0 + (raw_prob - 20.0) * 0.5
-    raw_prob = max(1.0, min(28.0, raw_prob))
+    # v25: compression starts at 24 with a 0.6 slope and a 34 cap (was 20 /
+    # 0.5 / 28) — the old ceiling made it mathematically impossible to even
+    # match a short price, locking every elite hitter into negative edge no
+    # matter the matchup. Separation at the top still survives the slope.
+    if raw_prob > 24.0:
+        raw_prob = 24.0 + (raw_prob - 24.0) * 0.6
+    raw_prob = max(1.0, min(34.0, raw_prob))
 
     # 8. Market calibration — the market is the anchor. HR props are priced
     # efficiently, so the model LEANS off the fair price rather than
@@ -585,7 +609,7 @@ def project_player(
         0.90 if park_f <= 0.95 else
         1.05 if park_f <= 1.10 else 1.10
     )
-    raw_comp = gate * (0.35 * min(final_prob / 28, 1) + 0.50 * min(max(edge, 0) / 12, 1) + 0.15 * min(ev_val / 0.40, 1))
+    raw_comp = gate * (0.35 * min(final_prob / 32, 1) + 0.50 * min(max(edge, 0) / 12, 1) + 0.15 * min(ev_val / 0.40, 1))
     composite = raw_comp * park_comp_adj
 
     # 10. DFS projections
