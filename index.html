@@ -1074,6 +1074,35 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
 .bnav-item .bi { font-size:18px; filter:grayscale(1); opacity:.65; transition:all .15s; }
 .bnav-item.active { color:#c9a6ff; }
 .bnav-item.active .bi { filter:none; opacity:1; }
+/* big raised center action: Games is the app's flagship button */
+.bnav-item.big .bi { width:52px; height:52px; margin-top:-28px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center; font-size:24px;
+  background:linear-gradient(135deg,#A020F0,#4060F0);
+  box-shadow:0 6px 18px rgba(160,32,240,.45), 0 0 0 4px rgba(6,9,18,.95);
+  filter:none; opacity:1; }
+.bnav-item.big { color:var(--text2); }
+.bnav-item.big.active { color:#c9a6ff; }
+.bnav-item.big.active .bi { box-shadow:0 6px 24px rgba(160,32,240,.75), 0 0 0 4px rgba(6,9,18,.95); }
+/* notification preferences menu */
+.notif-menu { position:fixed; top:calc(60px + env(safe-area-inset-top, 0px)); right:12px; z-index:1200;
+  width:270px; background:rgba(10,14,24,.98); border:1px solid var(--border2); border-radius:14px;
+  box-shadow:0 12px 40px rgba(0,0,0,.6); padding:12px; backdrop-filter:blur(16px); }
+.notif-hd { font-family:monospace; font-size:10px; font-weight:700; letter-spacing:.12em;
+  text-transform:uppercase; color:var(--text3); padding:2px 4px 10px; }
+.notif-row { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:9px 4px;
+  border-top:1px solid rgba(26,37,53,.5); }
+.notif-row.dis { opacity:.45; }
+.nr-l { font-size:12px; font-weight:700; }
+.nr-s { font-size:10px; color:var(--text3); margin-top:1px; }
+.notif-tog { width:40px; height:22px; border-radius:12px; border:1px solid var(--border2);
+  background:var(--bg3); cursor:pointer; position:relative; flex-shrink:0; transition:all .15s; }
+.notif-tog span { position:absolute; top:2px; left:2px; width:16px; height:16px; border-radius:50%;
+  background:var(--text3); transition:all .18s; }
+.notif-tog.on { background:linear-gradient(90deg,#A020F0,#4060F0); border-color:rgba(160,32,240,.6); }
+.notif-tog.on span { left:20px; background:#fff; }
+.notif-enable { width:100%; font-family:monospace; font-size:11px; font-weight:800; color:#fff;
+  background:linear-gradient(90deg,#A020F0,#4060F0); border:none; border-radius:9px;
+  padding:10px; cursor:pointer; margin-bottom:4px; }
 .gc-subnav { display:flex; gap:8px; margin:0 0 14px; }
 .gc-subnav button { background:var(--card); border:1px solid var(--border2); color:var(--text3); font-family:monospace; font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; padding:8px 14px; border-radius:8px; cursor:pointer; transition:all .15s; }
 .gc-subnav button.on { color:#fff; border-color:rgba(160,32,240,.6); background:rgba(160,32,240,.14); }
@@ -1370,13 +1399,25 @@ body::after {
 }
 @media(max-width:760px){
   .gc-boxes { grid-template-columns:1fr; }
-  .gc-header { padding:16px 14px; }
-  .gc-tscore { font-size:32px; }
-  .gc-logo { width:38px; height:38px; }
-  .gc-tname { font-size:12px; }
+  /* game header: both teams always fully on screen */
+  .gc-header { padding:14px 10px; gap:6px; }
+  .gc-side { gap:7px; flex:1; min-width:0; }
+  .gc-tscore { font-size:28px; }
+  .gc-logo { width:32px; height:32px; }
+  .gc-tname { font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:62px; }
+  .gc-trec { font-size:9px; }
+  .gc-mid { min-width:92px; }
   .gc-matchup { grid-template-columns:1fr; }
   .gc-count { text-align:left; }
   .gc-dots { justify-content:flex-start; }
+  /* board game table: drop the duplicate O/U column (it lives in the
+     header pill) so team + xHR + moneyline all fit */
+  .team-row { grid-template-columns:1fr 82px 84px; padding:10px 10px; }
+  .team-row > div:nth-child(3) { display:none; }
+  .tr-name { font-size:12px; }
+  .tr-pitcher, .tr-top { font-size:10px; }
+  .odds-main { font-size:12px; }
+  .game-pills .gpill-venue { display:none; }
 }
 </style>
 <meta property="og:title" content="Onyx Baseball · July 24" data-id="th-modified" ><meta property="og:image" content="https://tiiny.host/assets/logo-purple-bg.png" data-id="th-modified" ><meta property="og:image:width" content="1501" data-id="th-modified" ><meta property="og:image:height" content="1501" data-id="th-modified" ><meta property="og:image:type" content="image/png" data-id="th-modified" ><meta property="og:url" content="https://onyxbaseballtest.tiiny.site/" data-id="th-modified" ><meta property="og:type" content="website" data-id="th-modified" ><script defer data-domain="onyxbaseballtest.tiiny.site" src="https://analytics.tiiny.site/js/plausible.js"></script></head>
@@ -1384,7 +1425,7 @@ body::after {
 
 <!-- ═══ NAV ═══════════════════════════════════════════════════ -->
 <nav class="nav">
-  <a class="nav-logo" href="#" onclick="gotoTab('gamecenter');return false">
+  <a class="nav-logo" href="#" onclick="gotoTab('home');return false">
     <!-- Exact Onyx logo: two 3D-ish rectangular shapes, purple left + blue-violet right -->
     <img src="icon-192.png" class="logo-svg" style="width:32px;height:32px;border-radius:6px;object-fit:contain" alt="Onyx">
     <div class="logo-words">
@@ -1394,7 +1435,11 @@ body::after {
   </a>
 
   <div class="nav-tabs">
-    <button class="nav-tab active" data-tab="gamecenter" onclick="gotoTab('gamecenter')">
+    <button class="nav-tab active" data-tab="home" onclick="gotoTab('home')">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 6.5L8 2l6 4.5V14a1 1 0 01-1 1H3a1 1 0 01-1-1V6.5z"></path><path d="M6 15V9h4v6"></path></svg>
+      Home
+    </button>
+    <button class="nav-tab" data-tab="gamecenter" onclick="gotoTab('gamecenter')">
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"></circle><circle cx="8" cy="8" r="2" fill="currentColor" stroke="none"></circle></svg>
       Games
     </button>
@@ -1418,10 +1463,6 @@ body::after {
         </button>
       </div>
     </div>
-    <button class="nav-tab" data-tab="home" onclick="gotoTab('home')">
-      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 6.5L8 2l6 4.5V14a1 1 0 01-1 1H3a1 1 0 01-1-1V6.5z"></path><path d="M6 15V9h4v6"></path></svg>
-      Home
-    </button>
     <button class="nav-tab" data-tab="markets" onclick="gotoTab('markets')">
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 13l3.5-4 3 2.5L14 5"></path><path d="M10.5 5H14v3.5"></path></svg>
       Markets
@@ -1446,7 +1487,7 @@ body::after {
   <div class="nav-right">
     <button class="notif-bell" id="notifBell" onclick="toggleNotif()" title="Browser alert when a modeled batter homers">🔔</button>
     <span class="nav-badge">JUL 24 · 2026</span>
-    <span class="nav-date" id="buildStamp">updated 8:29 pm et</span>
+    <span class="nav-date" id="buildStamp">updated 8:50 pm et</span>
     <span class="nav-date" id="liveCount"></span>
   </div>
 </nav>
@@ -2531,13 +2572,13 @@ function bootAppShell() {
   const nav = document.createElement('nav');
   nav.className = 'bnav';
   nav.innerHTML = `
-    <button class="bnav-item" data-tab="gamecenter" onclick="gotoTab('gamecenter')"><span class="bi">⚾</span>Games</button>
+    <button class="bnav-item" data-tab="home" onclick="gotoTab('home')"><span class="bi">🏠</span>Home</button>
     <button class="bnav-item" data-tab="power" onclick="gotoTab('power')"><span class="bi">🎯</span>Plays</button>
+    <button class="bnav-item big" data-tab="gamecenter" onclick="gotoTab('gamecenter')"><span class="bi">⚾</span>Games</button>
     <button class="bnav-item" data-tab="markets" onclick="gotoTab('markets')"><span class="bi">📈</span>Markets</button>
-    <button class="bnav-item" data-tab="rankings" onclick="gotoTab('rankings')"><span class="bi">📊</span>Ranks</button>
-    <button class="bnav-item" data-tab="home" onclick="gotoTab('home')"><span class="bi">🏠</span>Home</button>`;
+    <button class="bnav-item" data-tab="rankings" onclick="gotoTab('rankings')"><span class="bi">📊</span>Ranks</button>`;
   document.body.appendChild(nav);
-  gotoTab('gamecenter');
+  gotoTab('home');
 }
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', bootAppShell);
@@ -2851,27 +2892,65 @@ async function loadLast5(mid) {
   }
 }
 
-// ─── HR NOTIFICATIONS ───────────────────────────────────────────
+// ─── NOTIFICATIONS: home runs + finals, each with its own toggle ─
 let notifOn = localStorage.getItem('onyxNotify') === '1';
+let notifHR = localStorage.getItem('onyxNotifyHR') !== '0';       // default on
+let notifFinal = localStorage.getItem('onyxNotifyFinal') !== '0'; // default on
 const _notified = new Set();
+const _finalNotified = new Set();
+function _notifGranted() {
+  return typeof Notification !== 'undefined' && Notification.permission === 'granted';
+}
 function syncBell() {
   const b = document.getElementById('notifBell');
-  if (b) b.classList.toggle('on', notifOn && typeof Notification !== 'undefined' && Notification.permission === 'granted');
+  if (b) b.classList.toggle('on', notifOn && _notifGranted() && (notifHR || notifFinal));
 }
-async function toggleNotif() {
+function toggleNotif() { toggleNotifMenu(); }
+async function notifEnable() {
   if (typeof Notification === 'undefined') return;
-  if (!notifOn) {
-    const perm = await Notification.requestPermission();
-    if (perm !== 'granted') { syncBell(); return; }
-    notifOn = true;
-  } else {
-    notifOn = false;
-  }
-  localStorage.setItem('onyxNotify', notifOn ? '1' : '0');
-  syncBell();
+  const perm = await Notification.requestPermission();
+  if (perm === 'granted') { notifOn = true; localStorage.setItem('onyxNotify', '1'); }
+  syncBell(); renderNotifMenu();
+}
+function notifSet(kind, on) {
+  if (kind === 'hr') { notifHR = on; localStorage.setItem('onyxNotifyHR', on ? '1' : '0'); }
+  if (kind === 'final') { notifFinal = on; localStorage.setItem('onyxNotifyFinal', on ? '1' : '0'); }
+  if (kind === 'master') { notifOn = on; localStorage.setItem('onyxNotify', on ? '1' : '0'); }
+  syncBell(); renderNotifMenu();
+}
+function toggleNotifMenu() {
+  let m = document.getElementById('notifMenu');
+  if (m) { m.remove(); return; }
+  m = document.createElement('div');
+  m.id = 'notifMenu';
+  m.className = 'notif-menu';
+  document.body.appendChild(m);
+  renderNotifMenu();
+  setTimeout(() => document.addEventListener('click', _notifOutside, {once: true}), 0);
+}
+function _notifOutside(e) {
+  const m = document.getElementById('notifMenu');
+  if (m && !m.contains(e.target) && e.target.id !== 'notifBell') m.remove();
+  else if (m) setTimeout(() => document.addEventListener('click', _notifOutside, {once: true}), 0);
+}
+function renderNotifMenu() {
+  const m = document.getElementById('notifMenu');
+  if (!m) return;
+  const granted = _notifGranted();
+  const row = (label, sub, kind, on, disabled) => `
+    <div class="notif-row${disabled ? ' dis' : ''}">
+      <div><div class="nr-l">${label}</div><div class="nr-s">${sub}</div></div>
+      <button class="notif-tog${on ? ' on' : ''}" ${disabled ? 'disabled' : ''}
+        onclick="event.stopPropagation();notifSet('${kind}', ${on ? 'false' : 'true'})"><span></span></button>
+    </div>`;
+  m.innerHTML = `<div class="notif-hd">Notifications</div>
+    ${!granted ? `<button class="notif-enable" onclick="event.stopPropagation();notifEnable()">Enable push notifications</button>`
+      : row('All notifications', 'Master switch', 'master', notifOn, false)}
+    ${row('Home runs', 'When a modeled batter goes deep', 'hr', notifHR, !granted || !notifOn)}
+    ${row('Finals', 'When a game goes final', 'final', notifFinal, !granted || !notifOn)}`;
 }
 function maybeNotifyHR(name) {
-  if (!notifOn || typeof Notification === 'undefined' || Notification.permission !== 'granted') return;
+  if (!notifOn || !notifHR || !_notifGranted()) return;
   const key = nkjs(name);
   if (_notified.has(key)) return;
   const r = modelRow(name);
@@ -2880,6 +2959,16 @@ function maybeNotifyHR(name) {
   try {
     new Notification('Onyx: HR ✓ ' + (r.matched_name || name),
       {body: `${r.team} · modeled at ${(+r.hr_prob || 0).toFixed(1)}%${r.dk_hr_odds ? ' · was ' + (r.dk_hr_odds > 0 ? '+' : '') + r.dk_hr_odds : ''}`});
+  } catch (e) {}
+}
+function maybeNotifyFinal(pk, g) {
+  // fires only on a live-to-final transition seen this session, never on load
+  if (!notifOn || !notifFinal || !_notifGranted()) return;
+  if (_finalNotified.has(+pk)) return;
+  _finalNotified.add(+pk);
+  try {
+    new Notification(`Onyx: FINAL · ${g.awayAbbr} ${g.awayScore ?? ''}–${g.homeScore ?? ''} ${g.homeAbbr}`,
+      {body: 'Tap for the full gamecast and recap.'});
   } catch (e) {}
 }
 document.addEventListener('DOMContentLoaded', syncBell);
@@ -3013,6 +3102,7 @@ async function fetchLiveScores() {
       const status = g.status?.detailedState || '';
       const isLive = status === 'In Progress';
       const isFinal = status === 'Final' || status === 'Game Over';
+      const _wasLive = !!(liveGameData[g.gamePk] && liveGameData[g.gamePk].isLive);
       liveGameData[g.gamePk] = {
         status, isLive, isFinal,
         awayAbbr, homeAbbr,
@@ -3027,6 +3117,7 @@ async function fetchLiveScores() {
         strikes: ls.strikes ?? null,
         on1: !!(ls.offense?.first), on2: !!(ls.offense?.second), on3: !!(ls.offense?.third)
       };
+      if (_wasLive && isFinal) maybeNotifyFinal(g.gamePk, liveGameData[g.gamePk]);
       if (awayAbbr && homeAbbr) pkMap[`${awayAbbr}@${homeAbbr}`] = g.gamePk;
     });
 
@@ -3192,6 +3283,9 @@ function buildScoreTicker() {
   track.innerHTML = seq + seq;
   track.style.animationDuration = Math.max(45, games.length * reps * 14) + 's';
   _tickerPrev = {..._tickerPrev, ..._tickerNext};
+  // no games -> no empty band under the header
+  const _stBar = track.closest('.score-ticker-bar');
+  if (_stBar) _stBar.style.display = games.length ? '' : 'none';
 }
 
 // Poll every 90 seconds; bar renders instantly in schedule mode
