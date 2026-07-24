@@ -62,7 +62,10 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
 
 /* ── NAV ─────────────────────────────────────────────────────── */
 .nav{
-  height:58px;padding:0 20px;
+  /* installed PWA draws under the status bar / Dynamic Island: the
+     safe-area inset pushes the header (and its tap targets) below it */
+  height:calc(58px + env(safe-area-inset-top, 0px));
+  padding:env(safe-area-inset-top, 0px) 20px 0;
   display:flex;align-items:center;gap:0;
   background:rgba(6,9,18,.92);
   border-bottom:1px solid rgba(255,255,255,.06);
@@ -423,7 +426,8 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
 .nav-drawer.open{display:flex}
 .nav-drawer-header{
   display:flex;align-items:center;justify-content:space-between;
-  padding:0 20px;height:58px;
+  padding:env(safe-area-inset-top, 0px) 20px 0;
+  height:calc(58px + env(safe-area-inset-top, 0px));
   border-bottom:1px solid var(--border);flex-shrink:0;
 }
 .nav-drawer-close{
@@ -1160,7 +1164,7 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
 tr.row-done td, .tcard.card-done { opacity:.5; }
 
 /* player drill-down modal */
-.pmodal-back { position:fixed; inset:0; background:rgba(5,6,10,.75); backdrop-filter:blur(6px);
+.pmodal-back { position:fixed; inset:0; padding-top:env(safe-area-inset-top, 0px); background:rgba(5,6,10,.75); backdrop-filter:blur(6px);
   z-index:100000; display:none; align-items:flex-start; justify-content:center; padding:60px 16px; overflow-y:auto; }
 .pmodal-back.open { display:flex; }
 .pmodal { background:var(--bg2); border:1px solid var(--border2); border-radius:16px;
