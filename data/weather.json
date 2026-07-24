@@ -1,24 +1,13 @@
 {
-  "BOS": {
-    "venue": "Fenway Park",
-    "temp": 77.3,
+  "PIT": {
+    "venue": "PNC Park",
+    "temp": 77.1,
     "precip": 0,
-    "wind_spd": 4.6,
-    "wind_dir": "W",
-    "humidity_pct": 39,
-    "pressure_mb": 1019.2,
+    "wind_spd": 5.6,
+    "wind_dir": "NNE",
+    "humidity_pct": 41,
+    "pressure_mb": 994.4,
     "roof": false,
-    "flag": "clear"
-  },
-  "TEX": {
-    "venue": "Globe Life Field",
-    "temp": 95.4,
-    "precip": 0,
-    "wind_spd": 12.2,
-    "wind_dir": "ENE",
-    "humidity_pct": 43,
-    "pressure_mb": 992.5,
-    "roof": true,
     "flag": "clear"
   },
   "MIL": {
@@ -32,14 +21,47 @@
     "roof": true,
     "flag": "clear"
   },
-  "NYM": {
-    "venue": "Citi Field",
-    "temp": 77.0,
+  "BOS": {
+    "venue": "Fenway Park",
+    "temp": 77.3,
     "precip": 0,
-    "wind_spd": 8.4,
-    "wind_dir": "SSE",
-    "humidity_pct": 43,
+    "wind_spd": 4.6,
+    "wind_dir": "W",
+    "humidity_pct": 39,
+    "pressure_mb": 1019.2,
+    "roof": false,
+    "flag": "clear"
+  },
+  "WSH": {
+    "venue": "Nationals Park",
+    "temp": 81.6,
+    "precip": 0,
+    "wind_spd": 6.8,
+    "wind_dir": "ESE",
+    "humidity_pct": 41,
     "pressure_mb": 1019.8,
+    "roof": false,
+    "flag": "clear"
+  },
+  "MIN": {
+    "venue": "Target Field",
+    "temp": 77.5,
+    "precip": 0,
+    "wind_spd": 6.5,
+    "wind_dir": "S",
+    "humidity_pct": 43,
+    "pressure_mb": 987.7,
+    "roof": false,
+    "flag": "clear"
+  },
+  "PHI": {
+    "venue": "Citizens Bank Park",
+    "temp": 81.2,
+    "precip": 0,
+    "wind_spd": 4.9,
+    "wind_dir": "SE",
+    "humidity_pct": 38,
+    "pressure_mb": 1019.9,
     "roof": false,
     "flag": "clear"
   },
@@ -54,14 +76,14 @@
     "roof": true,
     "flag": "clear"
   },
-  "CWS": {
-    "venue": "Rate Field",
-    "temp": 73.4,
+  "BAL": {
+    "venue": "Camden Yards",
+    "temp": 79.6,
     "precip": 0,
-    "wind_spd": 9.8,
-    "wind_dir": "ESE",
-    "humidity_pct": 46,
-    "pressure_mb": 999.2,
+    "wind_spd": 7.3,
+    "wind_dir": "SE",
+    "humidity_pct": 45,
+    "pressure_mb": 1020.1,
     "roof": false,
     "flag": "clear"
   },
@@ -76,28 +98,6 @@
     "roof": true,
     "flag": "clear"
   },
-  "MIN": {
-    "venue": "Target Field",
-    "temp": 77.5,
-    "precip": 0,
-    "wind_spd": 6.5,
-    "wind_dir": "S",
-    "humidity_pct": 43,
-    "pressure_mb": 987.7,
-    "roof": false,
-    "flag": "clear"
-  },
-  "PIT": {
-    "venue": "PNC Park",
-    "temp": 77.1,
-    "precip": 0,
-    "wind_spd": 5.6,
-    "wind_dir": "NNE",
-    "humidity_pct": 41,
-    "pressure_mb": 994.4,
-    "roof": false,
-    "flag": "clear"
-  },
   "DET": {
     "venue": "Comerica Park",
     "temp": 75.5,
@@ -109,49 +109,57 @@
     "roof": false,
     "flag": "clear"
   },
-  "STL": {
-    "venue": "Busch Stadium",
-    "temp": 72,
+  "NYM": {
+    "venue": "Citi Field",
+    "temp": 77.0,
     "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
+    "wind_spd": 8.4,
+    "wind_dir": "SSE",
+    "humidity_pct": 43,
+    "pressure_mb": 1019.8,
     "roof": false,
     "flag": "clear"
   },
   "SF": {
     "venue": "Oracle Park",
-    "temp": 72,
+    "temp": 63.1,
     "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
+    "wind_spd": 18.0,
+    "wind_dir": "WNW",
+    "humidity_pct": 80,
+    "pressure_mb": 1013.0,
     "roof": false,
     "flag": "clear"
   },
-  "BAL": {
-    "venue": "Camden Yards",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
+  "STL": {
+    "venue": "Busch Stadium",
+    "temp": 78.5,
+    "precip": 1,
+    "wind_spd": 4.0,
+    "wind_dir": "NE",
+    "humidity_pct": 48,
+    "pressure_mb": 1001.3,
     "roof": false,
     "flag": "clear"
   },
-  "PHI": {
-    "venue": "Citizens Bank Park",
-    "temp": 72,
+  "CWS": {
+    "venue": "Rate Field",
+    "temp": 73.4,
     "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
+    "wind_spd": 9.8,
+    "wind_dir": "ESE",
+    "humidity_pct": 46,
+    "pressure_mb": 999.2,
     "roof": false,
     "flag": "clear"
   },
-  "WSH": {
-    "venue": "Nationals Park",
+  "TEX": {
+    "venue": "Globe Life Field",
     "temp": 72,
     "precip": 0,
     "wind_spd": 5,
     "wind_dir": "N",
-    "roof": false,
+    "roof": true,
     "flag": "clear"
   }
 }
