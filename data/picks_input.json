@@ -5,7 +5,7 @@
   "odds": 550,
   "prob": 0.242,
   "edge": 10.8,
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-07-23",
@@ -13,7 +13,7 @@
   "odds": 450,
   "prob": 0.217,
   "edge": 5.9,
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-07-23",
@@ -21,7 +21,7 @@
   "odds": 540,
   "prob": 0.169,
   "edge": 3.3,
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-07-23",
@@ -29,7 +29,7 @@
   "odds": 500,
   "prob": 0.172,
   "edge": 2.7,
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-07-23",
@@ -37,6 +37,51 @@
   "odds": 360,
   "prob": 0.213,
   "edge": 2.4,
+  "hit": true
+ },
+ {
+  "date": "2026-07-24",
+  "player": "Marcell Ozuna",
+  "odds": 525,
+  "prob": 0.182,
+  "edge": 2.2,
+  "tier": "edge",
+  "hit": null
+ },
+ {
+  "date": "2026-07-24",
+  "player": "Brandon Lowe",
+  "odds": 460,
+  "prob": 0.193,
+  "edge": 1.4,
+  "tier": "edge",
+  "hit": null
+ },
+ {
+  "date": "2026-07-24",
+  "player": "Christian Yelich",
+  "odds": 575,
+  "prob": 0.16,
+  "edge": 1.2,
+  "tier": "edge",
+  "hit": null
+ },
+ {
+  "date": "2026-07-24",
+  "player": "A.J. Ewing",
+  "odds": 600,
+  "prob": 0.154,
+  "edge": 1.1,
+  "tier": "edge",
+  "hit": null
+ },
+ {
+  "date": "2026-07-24",
+  "player": "Trent Grisham",
+  "odds": 600,
+  "prob": 0.152,
+  "edge": 0.9,
+  "tier": "edge",
   "hit": null
  }
 ]
