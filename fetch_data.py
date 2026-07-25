@@ -656,6 +656,83 @@ def fetch_hand_splits():
     (OUT / "hand_splits.json").write_text(json.dumps(out, indent=2))
     return out
 
+# ── 7d. STARTER SEASON STATS — K/BF, IP/GS, pitches/GS for K projections ─────
+def fetch_starter_season():
+    """Season pitching aggregates for today's probable starters, written to
+    data/pitcher_season.json for model.project_pitcher(). Keyed by normalized
+    name; mids come from pitcher_db.json."""
+    print("Fetching starter season stats...")
+    try:
+        with open(OUT / "game_lines.json") as f:
+            gl = json.load(f)
+        with open(Path(__file__).parent / "pitcher_db.json") as f:
+            pdb = json.load(f)
+    except Exception as e:
+        print(f"  WARNING: starter season skipped ({e})")
+        return {}
+
+    import unicodedata, re as _re
+    def _nk(name):
+        s = unicodedata.normalize("NFKD", str(name))
+        s = "".join(ch for ch in s if not unicodedata.combining(ch))
+        s = _re.sub(r"[.’'\-]", " ", s)
+        return _re.sub(r"\s+", " ", s).strip().lower()
+
+    def _ipf(v):
+        try:
+            w, _, f = str(v or "0").partition(".")
+            return int(w) + {"1": 1 / 3, "2": 2 / 3}.get(f, 0.0)
+        except Exception:
+            return 0.0
+
+    names = set()
+    games = gl if isinstance(gl, list) else list(gl.values())
+    for g in games:
+        for k in ("awayP", "homeP"):
+            if g.get(k):
+                names.add(_nk(g[k]))
+    id_to_name = {}
+    for n in names:
+        mid = (pdb.get(n) or {}).get("mid")
+        if mid:
+            id_to_name[int(mid)] = n
+
+    season = datetime.date.today().year
+    out = {}
+    ids = sorted(id_to_name)
+    for i in range(0, len(ids), 40):
+        batch = ids[i:i + 40]
+        try:
+            r = requests.get(
+                "https://statsapi.mlb.com/api/v1/people",
+                params={"personIds": ",".join(map(str, batch)),
+                        "hydrate": f"stats(group=[pitching],type=[season],season={season})"},
+                timeout=30)
+            r.raise_for_status()
+            people = r.json().get("people") or []
+        except Exception as e:
+            print(f"  WARNING: starter batch failed ({e})")
+            continue
+        for person in people:
+            n = id_to_name.get(person.get("id"))
+            if not n:
+                continue
+            for st in person.get("stats") or []:
+                for sp in st.get("splits") or []:
+                    stat = sp.get("stat") or {}
+                    out[n] = {
+                        "so":      int(stat.get("strikeOuts") or 0),
+                        "bf":      int(stat.get("battersFaced") or 0),
+                        "ip":      round(_ipf(stat.get("inningsPitched")), 1),
+                        "gs":      int(stat.get("gamesStarted") or 0),
+                        "pitches": int(stat.get("numberOfPitches") or 0),
+                        "wins":    int(stat.get("wins") or 0),
+                        "era":     stat.get("era"),
+                    }
+    print(f"  Starter season: {len(out)} pitchers")
+    (OUT / "pitcher_season.json").write_text(json.dumps(out, indent=2))
+    return out
+
 # ── 8. PITCHER data — MLB Stats API primary, FanGraphs CSV fallback ──────────
 def _ip_to_float(ip):
     """MLB innings strings: '12.1' means 12 and 1/3."""
@@ -748,5 +825,6 @@ if __name__ == "__main__":
     fetch_statcast()
     fetch_splits()
     fetch_hand_splits()
+    fetch_starter_season()
     fetch_pitcher_statcast()
     print("\n=== Done. Ready for auto_build.py ===")

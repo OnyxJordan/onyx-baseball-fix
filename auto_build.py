@@ -56,6 +56,8 @@ HSPLITS  = jload(dpath("hand_splits.json"), {})   # vs-hand power + real batSide
 LINEUPS  = jload(dpath("lineups.json"), {})
 WEATHER  = jload(dpath("weather.json"), {})
 ODDS_RAW = jload(dpath("odds.json"), {})
+SEASONP  = jload(dpath("pitcher_season.json"), {})   # starter season K/IP/pitch pace
+KLINES   = jload(dpath("k_lines.json"), {})          # listed K prop lines
 GAMES    = jload(dpath("game_lines.json"), {})
 L14      = jload(dpath("statcast_l14.json"), {})
 P14      = jload(dpath("pitchers_l14.json"), {})
@@ -527,7 +529,14 @@ def _side_stats(rows):
     exp = round(sum((x.get("hr_prob") or 0) for x in rows) / 100.0, 2)
     return top["batter_name"], top.get("hr_prob") or 0, exp
 
-sums_out, keys_out = [], []
+KLINES_NK = {nk(k): v for k, v in KLINES.items()} if isinstance(KLINES, dict) else {}
+
+def _opp_k_pct(opprows):
+    vals = [(L14N.get(nk(x.get("batter_name") or "")) or {}).get("l14_k_pct") for x in opprows]
+    vals = [v for v in vals if v]
+    return sum(vals) / len(vals) if len(vals) >= 5 else None
+
+sums_out, keys_out, pitchers_out = [], [], []
 for g in games_out:
     k = g["label"]
     keys_out.append(k)
@@ -562,10 +571,47 @@ for g in games_out:
         "wind_from": r0.get("wind_from",""),
     })
 
+    # ---- Pitchers tab: K / pitch-count / HRs-allowed / win projections for
+    # both probables, opponent recency read from the ACTUAL opposing lineup
+    for side, pname, is_home in (("away", g.get("away_pitcher"), False),
+                                 ("home", g.get("home_pitcher"), True)):
+        if not pname:
+            continue
+        pk_ = nk(pname)
+        opprows = hrows if side == "away" else arows
+        try:
+            proj = model.project_pitcher(
+                pname,
+                pdb_entry=PITCHERS.get(pk_),
+                l14=P14N.get(pk_),
+                season=SEASONP.get(pk_),
+                opp_k_pct=_opp_k_pct(opprows),
+                park=g.get("venue") or "",
+                is_home=is_home,
+                ml_self=g.get("home_ml") if is_home else g.get("away_ml"),
+                ml_opp=g.get("away_ml") if is_home else g.get("home_ml"),
+                k_line=KLINES.get(pname) or KLINES_NK.get(pk_),
+            )
+        except Exception:
+            proj = None
+        if not proj:
+            continue
+        proj.update({
+            "name": pname,
+            "team": g.get(f"{side}_team") or "",
+            "opp":  g.get("home_team" if side == "away" else "away_team") or "",
+            "game": k, "time": g.get("time", ""),
+            "venue": g.get("venue", ""),
+        })
+        pitchers_out.append(proj)
+
+pitchers_out.sort(key=lambda p: (p.get("k_edge") is None, -(p.get("k_edge") or 0), -(p.get("k_proj") or 0)))
+
 shell = replace_const(shell, "RESULTS", results_out)
 shell = replace_const(shell, "SUMMARIES", sums_out)
 shell = replace_const(shell, "ALL_GAME_KEYS", keys_out)
 shell = replace_const(shell, "LINE_HISTORY", jload(dpath("line_history.json"), []))
+shell = replace_const(shell, "PITCHER_PROJ", pitchers_out)
 shell = replace_const(shell, "DAILY_RECAP", jload(dpath("recap.json"), {}))
 
 # ---- Onyx game links: only today's harvested slugs ever ship ----
