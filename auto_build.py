@@ -28,6 +28,17 @@ def nk(name: str) -> str:
     s = re.sub(r"\s+", " ", s).strip().lower()
     return s
 
+def _hours_since_start(iso):
+    """Hours since scheduled first pitch; 0.0 pregame or unparseable."""
+    if not iso:
+        return 0.0
+    try:
+        import datetime as _dt
+        st = _dt.datetime.fromisoformat(str(iso).replace("Z", "+00:00"))
+        return max(0.0, (_dt.datetime.now(_dt.timezone.utc) - st).total_seconds() / 3600.0)
+    except Exception:
+        return 0.0
+
 def jload(path, default):
     try:
         with open(path, encoding="utf-8") as f:
@@ -314,6 +325,20 @@ for game in games_out:
             dk_pts, fd_pts = r.get("dk_pts") or 0, r.get("fd_pts") or 0
             dk_sal = r.get("dk_salary") or 3000
             fd_sal = r.get("fd_salary") or 3000
+
+            # ---- live-slate honesty: a mid-game rebuild reprices this bat
+            # against LIVE odds (remaining-ABs prices), but the model number
+            # is a FULL-GAME probability. Measure edge with the probability
+            # decayed by probable ABs remaining (elapsed time since first
+            # pitch) so a +2000 live line never reads as a +8 "edge" against
+            # a full-game 12%. hr_prob itself stays full-game — the shell's
+            # live layer owns the displayed decay.
+            _sh = _hours_since_start(gl.get("start"))
+            if _sh > 0.05 and (r.get("hr_prob") or 0) > 0 and o_imp is not None:
+                _frac_left = max(0.0, 1.0 - _sh / 2.9)
+                _p = min(0.95, (r.get("hr_prob") or 0) / 100.0)
+                _dec = (1.0 - (1.0 - _p) ** _frac_left) * 100.0
+                r["hr_edge"] = round(_dec - o_imp, 1)
 
             rec = dict(r)
             rec.update({
