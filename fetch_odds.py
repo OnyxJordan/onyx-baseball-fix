@@ -131,17 +131,39 @@ def try_odds_api():
         if not book:
             continue
         mkt = _market(book, "batter_home_runs")
+        # Over 0.5 HR is the "to hit a HR" line. Responses can carry
+        # ALTERNATE lines too (Over 1.5 / 2.5); without a point filter the
+        # last outcome wins and every batter gets his 2+ HR price (the
+        # +1400-Yordan board). Keep only the lowest point per player and
+        # accept it only if it is the 0.5 standard.
+        best = {}
         for o in mkt.get("outcomes", []):
-            # Over 0.5 HR is the standard "to hit a HR" line
-            if o.get("name") == "Over" and o.get("description") and o.get("price") is not None:
-                try:
-                    odds[o["description"]] = int(o["price"])
-                except (TypeError, ValueError):
-                    pass
+            if o.get("name") != "Over" or not o.get("description") or o.get("price") is None:
+                continue
+            try:
+                pt = 0.5 if o.get("point") is None else float(o["point"])
+                price = int(o["price"])
+            except (TypeError, ValueError):
+                continue
+            cur = best.get(o["description"])
+            if cur is None or pt < cur[0]:
+                best[o["description"]] = (pt, price)
+        for name, (pt, price) in best.items():
+            if pt <= 0.5:
+                odds[name] = price
 
     merge_game_lines(key)
     if remaining is not None:
         print(f"The Odds API credits remaining: {remaining}")
+    # Slate-level sanity: the median "to hit a HR" price runs ~+350 to +600.
+    # A median past +1500 means the wrong market leaked through (alternate
+    # lines, wrong point) — better no odds than poison odds.
+    if len(odds) >= 20:
+        srt = sorted(odds.values())
+        med = srt[len(srt) // 2]
+        if med > 1500:
+            print(f"WARNING: HR odds median +{med} is not a 0.5-line slate — discarding pull")
+            return None
     # A short slate can legitimately be under 50 players; require a sane floor
     return odds if len(odds) >= 20 else None
 
@@ -292,11 +314,18 @@ def run():
     if ts is None:
         ts = os.path.getmtime(ODDS)
     age_h = (time.time() - ts) / 3600.0
+    med = 0
     try:
-        count = len(json.load(open(ODDS, encoding="utf-8")))
+        vals = sorted(v for v in json.load(open(ODDS, encoding="utf-8")).values()
+                      if isinstance(v, (int, float)))
+        count = len(vals)
+        med = vals[count // 2] if count else 0
     except Exception:
         count = 0
-    fresh = age_h <= MAX_AGE_HOURS and count >= 50
+    # median past +1500 = alternate-line / wrong-market poison, never usable
+    fresh = age_h <= MAX_AGE_HOURS and count >= 50 and med <= 1500
+    if med > 1500:
+        print(f"WARNING: odds.json median +{med} is not a 0.5-line slate - marked stale")
     json.dump({"source": "manual-upload", "age_hours": round(age_h, 1),
                "count": count, "fresh": fresh},
               open(META, "w", encoding="utf-8"))
