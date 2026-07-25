@@ -3718,62 +3718,136 @@ function gcSwungAt(ev) {
   const c = ((d.call || {}).description || d.description || '').toLowerCase();
   return c.includes('swinging') || c.includes('foul');
 }
-function gcZone(events, big, batSide, isCur) {
+// ── backyard-ball kits: jersey colors per team ──
+const TEAM_KIT = {ARI:['#A71930','#E3D4AD'], ATL:['#CE1141','#13274F'], BAL:['#DF4601','#1a1a1a'],
+  BOS:['#BD3039','#0C2340'], CHC:['#0E3386','#CC3433'], CWS:['#27251F','#C4CED4'], CIN:['#C6011F','#1a1a1a'],
+  CLE:['#00385D','#E50022'], COL:['#333366','#C4CED4'], DET:['#0C2340','#FA4616'], HOU:['#002D62','#EB6E1F'],
+  KC:['#004687','#BD9B60'], LAA:['#BA0021','#003263'], LAD:['#005A9C','#EF3E42'], MIA:['#00A3E0','#EF3340'],
+  MIL:['#12284B','#FFC52F'], MIN:['#002B5C','#D31145'], NYM:['#002D72','#FF5910'], NYY:['#0C2340','#C4CED4'],
+  ATH:['#003831','#EFB21E'], OAK:['#003831','#EFB21E'], PHI:['#E81828','#002D72'], PIT:['#FDB827','#1a1a1a'],
+  SD:['#2F241D','#FFC425'], SEA:['#0C2C56','#005C5C'], SF:['#FD5A1E','#27251F'], STL:['#C41E3A','#0C2340'],
+  TB:['#092C5C','#8FBCE6'], TEX:['#003278','#C0111F'], TOR:['#134A8E','#E8291C'], WSH:['#AB0003','#14225A']};
+const KID_SKIN = ['#f0c8a0', '#c98d5f', '#8d5a3b', '#e8b98a'];
+// One big-headed backyard kid: the player's REAL headshot disc as a
+// bobblehead on a tiny team-color body. kind 'bat' swings, 'pitch' throws.
+// vbx = viewBox x-origin offset for CSS transform-origin math.
+function gcKid(x, gy, s, mid, team, kind, dir, cls, vbx) {
+  const kit = TEAM_KIT[team] || ['#7a2ce0', '#2a2440'];
+  const skin = KID_SKIN[(+mid || 0) % 4];
+  const hr = 13 * s;                       // head radius: the whole joke
+  const shY = gy - 32 * s;                 // shoulder line
+  const hcy = shY - hr + 3 * s;            // head overlaps shoulders a touch
+  const legs = `<path d="M ${x - 5 * s} ${gy - 15 * s} L ${x - 6 * s} ${gy - 1} M ${x + 5 * s} ${gy - 15 * s} L ${x + 6 * s} ${gy - 1}" stroke="#1b2338" stroke-width="${5 * s}" stroke-linecap="round"/>
+    <ellipse cx="${x - 7 * s}" cy="${gy}" rx="${4.5 * s}" ry="${2 * s}" fill="#0e1420"/>
+    <ellipse cx="${x + 7 * s}" cy="${gy}" rx="${4.5 * s}" ry="${2 * s}" fill="#0e1420"/>`;
+  const jersey = `<rect x="${x - 11 * s}" y="${shY}" width="${22 * s}" height="${19 * s}" rx="${7 * s}" fill="${kit[0]}" stroke="rgba(0,0,0,.35)"/>
+    <rect x="${x - 11 * s}" y="${shY + 14 * s}" width="${22 * s}" height="${5 * s}" rx="${2.5 * s}" fill="${kit[1]}" opacity=".85"/>`;
+  const head = mid
+    ? `<circle cx="${x}" cy="${hcy}" r="${hr + 1.2}" fill="#12101d" stroke="rgba(160,32,240,.65)" stroke-width="1.4"/>
+       <image href="https://midfield.mlbstatic.com/v1/people/${mid}/spots/90" x="${x - hr}" y="${hcy - hr}" width="${hr * 2}" height="${hr * 2}"/>`
+    : `<circle cx="${x}" cy="${hcy}" r="${hr}" fill="${skin}" stroke="rgba(0,0,0,.3)"/>
+       <circle cx="${x - 4 * s}" cy="${hcy - 2 * s}" r="${1.6 * s}" fill="#111"/><circle cx="${x + 4 * s}" cy="${hcy - 2 * s}" r="${1.6 * s}" fill="#111"/>
+       <path d="M ${x - 4 * s} ${hcy + 4 * s} Q ${x} ${hcy + 7 * s} ${x + 4 * s} ${hcy + 4 * s}" stroke="#111" stroke-width="1.2" fill="none"/>`;
+  let arms = '';
+  if (kind === 'bat') {
+    const hx = x + dir * 13 * s, hy = shY + 7 * s;
+    arms = `<path d="M ${x + dir * 8 * s} ${shY + 4 * s} L ${hx} ${hy}" stroke="${skin}" stroke-width="${3.6 * s}" stroke-linecap="round"/>
+      <g class="bat" style="transform-box:view-box;transform-origin:${hx - vbx}px ${hy}px">
+        <line x1="${hx}" y1="${hy}" x2="${hx + dir * 10 * s}" y2="${hy - 30 * s}" stroke="#C89B6C" stroke-width="${4.6 * s}" stroke-linecap="round"/>
+        <line x1="${hx + dir * 7 * s}" y1="${hy - 21 * s}" x2="${hx + dir * 10 * s}" y2="${hy - 30 * s}" stroke="#a87c50" stroke-width="${4.6 * s}" stroke-linecap="round"/>
+      </g>`;
+  } else {
+    const gx = x - dir * 12 * s, gy2 = shY + 9 * s;
+    arms = `<path d="M ${x - dir * 8 * s} ${shY + 4 * s} L ${gx} ${gy2}" stroke="${skin}" stroke-width="${3.6 * s}" stroke-linecap="round"/>
+      <circle cx="${gx}" cy="${gy2}" r="${4.5 * s}" fill="#7a4a21" stroke="#5c3717" stroke-width="1"/>
+      <g class="parm" style="transform-box:view-box;transform-origin:${x + dir * 7 * s - vbx}px ${shY + 3 * s}px">
+        <path d="M ${x + dir * 7 * s} ${shY + 3 * s} L ${x + dir * 14 * s} ${shY + 11 * s}" stroke="${skin}" stroke-width="${3.6 * s}" stroke-linecap="round"/>
+        <circle cx="${x + dir * 14 * s}" cy="${shY + 11 * s}" r="${2.6 * s}" fill="#fff" stroke="#d33" stroke-width=".8"/>
+      </g>`;
+  }
+  return `<g class="gc-kid${cls ? ' ' + cls : ''}">${legs}${jersey}${arms}${head}</g>`;
+}
+function gcZone(events, big, batSide, isCur, kid) {
+  kid = kid || {};
   const pitches = (events || []).filter(e => e.isPitch && e.pitchData
     && e.pitchData.coordinates && e.pitchData.coordinates.pX != null
     && e.pitchData.coordinates.pZ != null);
   const last = pitches[pitches.length - 1];
   const szT = (last && last.pitchData.strikeZoneTop) || 3.4;
   const szB = (last && last.pitchData.strikeZoneBottom) || 1.57;
-  const X0 = -1.6, X1 = 1.6, Z0 = 0.7, Z1 = 4.4, W = 110, H = 138;
-  const sx = x => ((x - X0) / (X1 - X0)) * W;
-  const sy = z => H - ((z - Z0) / (Z1 - Z0)) * H;
+  // backyard scene: pitcher on the mound in the distance, big-head batter
+  // beside the zone, real headshots on tiny team-color bodies
+  const VW = 260, VH = 160;
+  const ZX = 122, ZW = 88, ZY = 10, ZH = 118;
+  const X0 = -1.6, X1 = 1.6, Z0 = 0.7, Z1 = 4.4;
+  const sx = x => ZX + ((x - X0) / (X1 - X0)) * ZW;
+  const sy = z => ZY + (1 - (z - Z0) / (Z1 - Z0)) * ZH;
   const zx = sx(-0.708), zw = sx(0.708) - sx(-0.708);
   const zy = sy(szT), zh = sy(szB) - sy(szT);
   let grid = '';
   for (let i = 1; i < 3; i++) {
-    grid += `<line x1="${(zx + zw * i / 3).toFixed(1)}" y1="${zy.toFixed(1)}" x2="${(zx + zw * i / 3).toFixed(1)}" y2="${(zy + zh).toFixed(1)}" stroke="rgba(255,255,255,.07)"/>
-      <line x1="${zx.toFixed(1)}" y1="${(zy + zh * i / 3).toFixed(1)}" x2="${(zx + zw).toFixed(1)}" y2="${(zy + zh * i / 3).toFixed(1)}" stroke="rgba(255,255,255,.07)"/>`;
+    grid += `<line x1="${(zx + zw * i / 3).toFixed(1)}" y1="${zy.toFixed(1)}" x2="${(zx + zw * i / 3).toFixed(1)}" y2="${(zy + zh).toFixed(1)}" stroke="rgba(255,255,255,.08)"/>
+      <line x1="${zx.toFixed(1)}" y1="${(zy + zh * i / 3).toFixed(1)}" x2="${(zx + zw).toFixed(1)}" y2="${(zy + zh * i / 3).toFixed(1)}" stroke="rgba(255,255,255,.08)"/>`;
   }
   let lastXY = null;
   const dots = pitches.map(ev => {
     const c = ev.pitchData.coordinates;
-    const x = Math.max(6, Math.min(W - 6, sx(+c.pX)));
-    const y = Math.max(6, Math.min(H - 6, sy(+c.pZ)));
+    const x = Math.max(ZX + 5, Math.min(ZX + ZW - 5, sx(+c.pX)));
+    const y = Math.max(ZY + 5, Math.min(ZY + ZH - 5, sy(+c.pZ)));
     lastXY = [x, y, ev];
-    return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="6.5" fill="${gcPitchClr(ev)}" fill-opacity=".92" stroke="rgba(0,0,0,.55)" stroke-width="1"/>
-      <text x="${x.toFixed(1)}" y="${(y + 2.8).toFixed(1)}" text-anchor="middle" font-size="8" font-weight="800" fill="#0a0a14">${ev.pitchNumber || ''}</text>`;
+    return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5.8" fill="${gcPitchClr(ev)}" fill-opacity=".93" stroke="rgba(0,0,0,.55)" stroke-width="1"/>
+      <text x="${x.toFixed(1)}" y="${(y + 2.6).toFixed(1)}" text-anchor="middle" font-size="7.5" font-weight="800" fill="#0a0a14">${ev.pitchNumber || ''}</text>`;
   }).join('');
-  // broadcast batter silhouette on the correct side of the plate (catcher's
-  // view: RHB stands to the left of the zone, LHB to the right), bat swings
-  // on any offer (foul / whiff / ball in play), once per new pitch
+  // animation gating: one throw + track (+ swing on an offer) per NEW pitch
   const lefty = String(batSide || 'R').toUpperCase() === 'L';
-  const bx = lefty ? 138 : -28, dir = lefty ? -1 : 1;
-  const handX = bx + dir * 14, handY = 52;
-  let swingNow = false, streak = '';
+  const bDir = lefty ? -1 : 1;                       // batter faces the zone
+  const bX = lefty ? 238 : 96, bG = 154;             // batter feet
+  const pX = 44, pG = 120;                           // pitcher feet (distance)
+  let swingNow = false, newPitch = false, streak = '', track = '';
   if (last) {
-    const pitchKey = `${(last.index != null ? last.index : last.pitchNumber)}|${pitches.length}|${last.pitchNumber}`;
+    const pitchKey = `${pitches.length}|${last.pitchNumber}|${(last.details || {}).description || ''}`;
     if (isCur) {
-      if (gcSwungAt(last) && pitchKey !== window._gcSwingKey && window._gcSwingKey != null) swingNow = true;
+      newPitch = pitchKey !== window._gcSwingKey && window._gcSwingKey != null;
+      if (newPitch && gcSwungAt(last)) swingNow = true;
       if (pitchKey !== window._gcSwingKey) window._gcSwingKey = pitchKey;
     }
-    if ((last.details || {}).isInPlay && lastXY) {
-      streak = `<line x1="${lastXY[0].toFixed(1)}" y1="${lastXY[1].toFixed(1)}" x2="${(lastXY[0] + dir * -30).toFixed(1)}" y2="4" class="gc-inplay-streak" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-opacity=".7"/>`;
+    if (lastXY) {
+      const hx = pX + 10, hy = pG - 22;              // release point
+      const cpx = (hx + lastXY[0]) / 2, cpy = Math.min(hy, lastXY[1]) - 26;
+      const path = `M ${hx} ${hy} Q ${cpx.toFixed(1)} ${cpy.toFixed(1)} ${lastXY[0].toFixed(1)} ${lastXY[1].toFixed(1)}`;
+      if (newPitch) {
+        track = `<path d="${path}" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="1.2" stroke-dasharray="3,3" class="gc-pitch-trail"/>
+          <circle r="2" fill="#fff" stroke="#d33" stroke-width=".6">
+            <animateMotion path="${path}" dur="0.5s" fill="freeze" calcMode="spline" keySplines="0.3 0 0.8 1" keyTimes="0;1"/>
+            <animate attributeName="r" values="2;5.5" dur="0.5s" fill="freeze"/>
+            <animate attributeName="opacity" values="1;1;0" keyTimes="0;0.85;1" dur="0.9s" fill="freeze"/>
+          </circle>`;
+      }
+      if ((last.details || {}).isInPlay) {
+        streak = `<line x1="${lastXY[0].toFixed(1)}" y1="${lastXY[1].toFixed(1)}" x2="${(lastXY[0] - bDir * 46).toFixed(1)}" y2="6" class="gc-inplay-streak" stroke="#34d399" stroke-width="2.2" stroke-linecap="round" stroke-opacity=".75"/>
+          <circle cx="${(lastXY[0] - bDir * 46).toFixed(1)}" cy="8" r="3" fill="#34d399" opacity="0"><animate attributeName="opacity" values="0;0;1;0" keyTimes="0;0.5;0.75;1" dur="1.3s" fill="freeze"/></circle>`;
+      }
     }
   }
-  const batter = `<g class="gc-batter${swingNow ? ' swingnow' : ''}">
-    <circle cx="${bx}" cy="32" r="6" fill="rgba(255,255,255,.28)"/>
-    <path d="M ${bx} 40 L ${bx} 80 M ${bx} 80 L ${bx - 8} 112 M ${bx} 80 L ${bx + 8} 112 M ${bx} 50 L ${handX} ${handY}" stroke="rgba(255,255,255,.28)" stroke-width="3.4" stroke-linecap="round" fill="none"/>
-    <g class="bat" style="transform-box:view-box;transform-origin:${handX + 42}px ${handY}px">
-      <line x1="${handX}" y1="${handY}" x2="${handX + dir * 12}" y2="14" stroke="rgba(160,32,240,.85)" stroke-width="4.2" stroke-linecap="round" style="filter:drop-shadow(0 0 4px rgba(160,32,240,.5))"/>
-    </g>
-  </g>`;
-  const s = big ? 1.25 : 1;
-  const VX = -42, VW = 194;
-  return `<svg viewBox="${VX} 0 ${VW} ${H}" width="${Math.round(VW * s * 0.85)}" height="${Math.round(H * s)}" style="display:block;max-width:100%">
-    <rect x="0" y="0" width="${W}" height="${H}" rx="8" fill="rgba(255,255,255,.02)" stroke="rgba(26,37,53,.6)"/>
-    <rect x="${zx.toFixed(1)}" y="${zy.toFixed(1)}" width="${zw.toFixed(1)}" height="${zh.toFixed(1)}" fill="rgba(160,32,240,.08)" stroke="rgba(160,32,240,.55)" stroke-width="1.5"/>
-    ${grid}${batter}${streak}${dots}
+  const scene = `
+    <defs><linearGradient id="gcSkyG" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0a0e1e"/><stop offset=".75" stop-color="#101527"/><stop offset="1" stop-color="#0d1f16"/>
+    </linearGradient></defs>
+    <rect x="0" y="0" width="${VW}" height="${VH}" rx="10" fill="url(#gcSkyG)" stroke="rgba(26,37,53,.6)"/>
+    <circle cx="226" cy="22" r="9" fill="rgba(255,244,200,.13)"/><circle cx="229" cy="19" r="6" fill="rgba(255,244,200,.10)"/>
+    <path d="M 0 126 L 260 126" stroke="rgba(90,120,90,.25)" stroke-width="1"/>
+    ${[0,1,2,3,4,5,6,7,8,9,10,11,12].map(i => `<rect x="${4 + i * 20}" y="116" width="4" height="10" rx="1.5" fill="rgba(120,140,120,.10)"/>`).join('')}
+    <rect x="0" y="126" width="${VW}" height="${VH - 126}" fill="rgba(24,52,32,.35)"/>
+    <ellipse cx="${pX}" cy="${pG + 2}" rx="26" ry="7" fill="rgba(120,90,60,.28)"/>
+    <ellipse cx="${bX}" cy="${bG + 2}" rx="24" ry="6" fill="rgba(120,90,60,.2)"/>
+    <path d="M ${ZX + ZW / 2 - 12} 150 L ${ZX + ZW / 2 + 12} 150 L ${ZX + ZW / 2 + 12} 155 L ${ZX + ZW / 2} 159 L ${ZX + ZW / 2 - 12} 155 Z" fill="rgba(255,255,255,.16)"/>`;
+  const pitcherKid = gcKid(pX, pG, 0.72, kid.pitMid, kid.pitTeam, 'pitch', 1, newPitch ? 'throwing' : '', 0);
+  const batterKid = gcKid(bX, bG, 1.0, kid.batMid, kid.batTeam, 'bat', bDir, swingNow ? 'swingnow' : '', 0);
+  const s = big ? 1.2 : 1.05;
+  return `<svg viewBox="0 0 ${VW} ${VH}" width="${Math.round(VW * s)}" height="${Math.round(VH * s)}" style="display:block;max-width:100%">
+    ${scene}
+    <rect x="${zx.toFixed(1)}" y="${zy.toFixed(1)}" width="${zw.toFixed(1)}" height="${zh.toFixed(1)}" fill="rgba(160,32,240,.09)" stroke="rgba(160,32,240,.6)" stroke-width="1.5" rx="2" style="filter:drop-shadow(0 0 6px rgba(160,32,240,.3))"/>
+    ${grid}${pitcherKid}${batterKid}${track}${streak}${dots}
   </svg>`;
 }
 function gcPitchList(events) {
@@ -4221,6 +4295,7 @@ function gcBattedHtml(ld, aAb, hAb, venue) {
 
 let gcView = 'overview';
 const gcPbpOpen = new Set();
+let gcPbpAway = '', gcPbpHome = '';   // team kits for the PBP zone scenes
 let _gcLastFeed = null, _gcLastWp = null;
 function gcSetView(v) { gcView = v; if (_gcLastFeed) renderGC(_gcLastFeed, _gcLastWp); }
 function gcTogglePlay(i) {
@@ -4250,7 +4325,8 @@ function gcPbpHtml(ld) {
     const desc = res.description || (inProg ? `${batter} batting vs ${pitcher}` : '');
     const score = scoring ? `<span class="sc">${res.awayScore ?? ''}–${res.homeScore ?? ''}</span>` : '';
     const detail = open ? `<div class="gc-pbp-x">
-        <div class="gc-zonewrap"><div class="zl">Zone · catcher's view</div>${gcZone(p.playEvents, true, ((mu.batSide || {}).code))}</div>
+        <div class="gc-zonewrap"><div class="zl">Zone · catcher's view</div>${gcZone(p.playEvents, true, ((mu.batSide || {}).code), false,
+          {batMid: (mu.batter || {}).id, batTeam: ab.halfInning === 'top' ? gcPbpAway : gcPbpHome, pitMid: (mu.pitcher || {}).id, pitTeam: ab.halfInning === 'top' ? gcPbpHome : gcPbpAway})}</div>
         <div class="pl">${gcPitchList(p.playEvents)}</div>
       </div>` : '';
     const isHrPlay = /home run/i.test(res.event || '');
@@ -4281,6 +4357,7 @@ function renderGC(feed, wp) {
   const gd = feed.gameData || {}, ld = feed.liveData || {};
   const away = (gd.teams || {}).away || {}, home = (gd.teams || {}).home || {};
   const aAb = gcAb(away.abbreviation), hAb = gcAb(home.abbreviation);
+  gcPbpAway = aAb; gcPbpHome = hAb;
   const aRec = (away.record || {}), hRec = (home.record || {});
   const ls = ld.linescore || {};
   const status = (gd.status || {}).detailedState || '';
@@ -4414,7 +4491,8 @@ function renderGC(feed, wp) {
         <div class="gc-dots">S ${gcDots(count.strikes || 0, 3, 'on-s')}</div>
         <div class="gc-dots">O ${gcDots(count.outs || 0, 3, 'on-o')}</div>
       </div>
-      <div class="gc-zonewrap"><div class="zl">Strike zone · live</div>${gcZone((((ld.plays || {}).currentPlay || {}).playEvents), false, curBatSide, true)}</div>
+      <div class="gc-zonewrap"><div class="zl">Strike zone · live</div>${gcZone((((ld.plays || {}).currentPlay || {}).playEvents), false, curBatSide, true,
+        {batMid: bat.id, batTeam: offSide === 'away' ? aAb : hAb, pitMid: pit.id, pitTeam: offSide === 'away' ? hAb : aAb})}</div>
     </div>
     <div style="margin-top:10px">${gcPitchList((((ld.plays || {}).currentPlay || {}).playEvents))}</div>
     </div>`;
