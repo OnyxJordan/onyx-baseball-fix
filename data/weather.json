@@ -1,13 +1,46 @@
 {
-  "TEX": {
-    "venue": "Globe Life Field",
-    "temp": 99.2,
-    "precip": 1,
-    "wind_spd": 10.4,
-    "wind_dir": "S",
-    "humidity_pct": 31,
-    "pressure_mb": 1013.8,
+  "PHI": {
+    "venue": "Citizens Bank Park",
+    "temp": 80.8,
+    "precip": 0,
+    "wind_spd": 6.4,
+    "wind_dir": "ENE",
+    "humidity_pct": 37,
+    "pressure_mb": 1016.4,
+    "roof": false,
+    "flag": "clear"
+  },
+  "TB": {
+    "venue": "Tropicana Field",
+    "temp": 86.9,
+    "precip": 10,
+    "wind_spd": 9.4,
+    "wind_dir": "WNW",
+    "humidity_pct": 72,
+    "pressure_mb": 1017.3,
     "roof": true,
+    "flag": "clear"
+  },
+  "STL": {
+    "venue": "Busch Stadium",
+    "temp": 92.0,
+    "precip": 1,
+    "wind_spd": 1.3,
+    "wind_dir": "SSW",
+    "humidity_pct": 52,
+    "pressure_mb": 1012.8,
+    "roof": false,
+    "flag": "clear"
+  },
+  "MIN": {
+    "venue": "Target Field",
+    "temp": 87.2,
+    "precip": 1,
+    "wind_spd": 5.2,
+    "wind_dir": "S",
+    "humidity_pct": 65,
+    "pressure_mb": 1009.5,
+    "roof": false,
     "flag": "clear"
   },
   "SF": {
@@ -32,15 +65,26 @@
     "roof": false,
     "flag": "clear"
   },
-  "PHI": {
-    "venue": "Citizens Bank Park",
-    "temp": 80.8,
+  "BOS": {
+    "venue": "Fenway Park",
+    "temp": 74.9,
     "precip": 0,
-    "wind_spd": 6.4,
-    "wind_dir": "ENE",
-    "humidity_pct": 37,
-    "pressure_mb": 1016.4,
+    "wind_spd": 10.9,
+    "wind_dir": "E",
+    "humidity_pct": 50,
+    "pressure_mb": 1017.6,
     "roof": false,
+    "flag": "clear"
+  },
+  "TEX": {
+    "venue": "Globe Life Field",
+    "temp": 99.2,
+    "precip": 1,
+    "wind_spd": 10.4,
+    "wind_dir": "S",
+    "humidity_pct": 31,
+    "pressure_mb": 1013.8,
+    "roof": true,
     "flag": "clear"
   },
   "MIA": {
@@ -51,50 +95,6 @@
     "wind_dir": "SE",
     "humidity_pct": 66,
     "pressure_mb": 1016.8,
-    "roof": true,
-    "flag": "clear"
-  },
-  "STL": {
-    "venue": "Busch Stadium",
-    "temp": 92.0,
-    "precip": 1,
-    "wind_spd": 1.3,
-    "wind_dir": "SSW",
-    "humidity_pct": 52,
-    "pressure_mb": 1012.8,
-    "roof": false,
-    "flag": "clear"
-  },
-  "WSH": {
-    "venue": "Nationals Park",
-    "temp": 82.7,
-    "precip": 0,
-    "wind_spd": 4.2,
-    "wind_dir": "SE",
-    "humidity_pct": 40,
-    "pressure_mb": 1016.2,
-    "roof": false,
-    "flag": "clear"
-  },
-  "MIL": {
-    "venue": "American Family Field",
-    "temp": 83.5,
-    "precip": 0,
-    "wind_spd": 9.3,
-    "wind_dir": "W",
-    "humidity_pct": 53,
-    "pressure_mb": 1012.4,
-    "roof": true,
-    "flag": "clear"
-  },
-  "TB": {
-    "venue": "Tropicana Field",
-    "temp": 86.9,
-    "precip": 10,
-    "wind_spd": 9.4,
-    "wind_dir": "WNW",
-    "humidity_pct": 72,
-    "pressure_mb": 1017.3,
     "roof": true,
     "flag": "clear"
   },
@@ -109,19 +109,30 @@
     "roof": false,
     "flag": "clear"
   },
-  "BAL": {
-    "venue": "Camden Yards",
-    "temp": 80.2,
+  "MIL": {
+    "venue": "American Family Field",
+    "temp": 83.5,
     "precip": 0,
-    "wind_spd": 5.9,
-    "wind_dir": "ESE",
-    "humidity_pct": 47,
-    "pressure_mb": 1015.8,
-    "roof": false,
+    "wind_spd": 9.3,
+    "wind_dir": "W",
+    "humidity_pct": 53,
+    "pressure_mb": 1012.4,
+    "roof": true,
     "flag": "clear"
   },
   "NYM": {
     "venue": "Citi Field",
+    "temp": 76.7,
+    "precip": 0,
+    "wind_spd": 7.1,
+    "wind_dir": "ESE",
+    "humidity_pct": 43,
+    "pressure_mb": 1016.8,
+    "roof": false,
+    "flag": "clear"
+  },
+  "WSH": {
+    "venue": "Nationals Park",
     "temp": 72,
     "precip": 0,
     "wind_spd": 5,
@@ -129,17 +140,8 @@
     "roof": false,
     "flag": "clear"
   },
-  "BOS": {
-    "venue": "Fenway Park",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
-    "roof": false,
-    "flag": "clear"
-  },
-  "MIN": {
-    "venue": "Target Field",
+  "BAL": {
+    "venue": "Camden Yards",
     "temp": 72,
     "precip": 0,
     "wind_spd": 5,

@@ -119,14 +119,30 @@ def try_odds_api():
     skipped = len(todays) - len(live_or_upcoming)
     if skipped:
         print(f"skipping HR props for {skipped} likely-final game(s) to save credits")
+    k_lines = {}
     for ev in live_or_upcoming:
         try:
             data, remaining = _oapi_get(
                 f"/events/{ev['id']}/odds", key,
-                regions="us", markets="batter_home_runs", oddsFormat="american")
+                regions="us", markets="batter_home_runs,pitcher_strikeouts",
+                oddsFormat="american")
         except Exception as ex:
             print(f"  props fetch failed for {ev.get('away_team')} @ {ev.get('home_team')}: {ex}")
             continue
+        # starter K prop lines ride the same call for the Pitchers tab
+        kb = _pick_book(data.get("bookmakers"), "pitcher_strikeouts")
+        if kb:
+            for o in _market(kb, "pitcher_strikeouts").get("outcomes", []):
+                nm, pt = o.get("description"), o.get("point")
+                if not nm or pt is None or o.get("price") is None:
+                    continue
+                rec = k_lines.setdefault(nm, {"line": float(pt)})
+                if float(pt) == rec["line"]:
+                    side = "over" if o.get("name") == "Over" else "under"
+                    try:
+                        rec[side] = int(o["price"])
+                    except (TypeError, ValueError):
+                        pass
         book = _pick_book(data.get("bookmakers"), "batter_home_runs")
         if not book:
             continue
@@ -153,6 +169,9 @@ def try_odds_api():
                 odds[name] = price
 
     merge_game_lines(key)
+    if k_lines:
+        json.dump(k_lines, open("data/k_lines.json", "w", encoding="utf-8"), indent=1)
+        print(f"K prop lines written: {len(k_lines)} starters")
     if remaining is not None:
         print(f"The Odds API credits remaining: {remaining}")
     # Slate-level sanity: the median "to hit a HR" price runs ~+350 to +600.

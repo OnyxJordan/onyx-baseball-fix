@@ -1,5 +1,19 @@
 """
-model.py — Onyx Baseball v26 HR probability model
+model.py — Onyx Baseball v27 HR probability model + pitcher K projections
+
+v27: calibration medium + the pitcher projection module. The v26
+consensus correction overshot relative to the graded evidence of our
+own tuning arc; the middle holds: HR_VIG 0.16 -> 0.12 and LEVEL_CAL
+0.90 -> 0.95 (bias vs pro consensus lands ~+2.2pp instead of +3.0 hot
+or +1.6 muted, and the board keeps a real day''s worth of edges).
+New project_pitcher(): expected strikeouts for today''s starters built
+from season K/BF blended with L14 recency, the OPPOSING LINEUP''s
+actual last-14-day K% (the nine bats due up, not a season team stat),
+park K factor, and home/away as the heaviest situational weight, with
+xFIP (SIERA stand-in) and hard-hit-allowed shading. Also projects
+pitch count (season pitches/start pace), HRs allowed, and win
+likelihood from the devigged moneyline. Powers the Pitchers tab and
+compares against the listed K prop line.
 
 v26: consensus-calibrated level. Gut check against a professional
 projection slate (256 matched bats, 7/25): rank correlation 0.942 —
@@ -178,14 +192,14 @@ POS_HR_AVG = {
 }
 REG_K  = 250
 SCALE  = 0.86
-HR_VIG = 0.16   # single-side hold on HR-Yes props. Empirical: books' implied
-                # mean ran ~14% vs a professional consensus truth of ~11% on a
-                # full slate (7/25 gut check), ~20% one-sided juice; 0.16 strips
-                # most of it while leaving room for real market information.
-LEVEL_CAL = 0.90  # global level anchor from the same consensus check: our raw
-                  # chain ran hot at every scale, this is the fixed correction.
-                  # calibrate.py's nightly CAL_SCALE layers on top from actual
-                  # graded results and remains the long-run authority.
+HR_VIG = 0.12   # single-side hold on HR-Yes props. The 7/25 consensus gut
+                # check measured ~20% one-sided juice; 0.12 is the deliberate
+                # medium — strips most of the hold without fully deferring to
+                # one afternoon's consensus over our own graded tuning arc.
+LEVEL_CAL = 0.95  # global level anchor, same medium: consensus said 0.90, our
+                  # tuning history says closer to 1.0; calibrate.py's nightly
+                  # CAL_SCALE layers on top from actual graded results and
+                  # remains the long-run authority.
 
 # v21 pick quality floor: minimum contact quality to qualify for the tracked
 # money list. Keeps slap/speed profiles (Simpson-types) off the board even
@@ -695,3 +709,106 @@ def apply_game_diversity(results: list) -> list:
         mult = 1.0 if rank==1 else 0.90 if rank==2 else 0.78 if rank==3 else 0.65 if rank==4 else 0.55
         r["composite"] = round(r["composite"] * mult, 4)
     return results
+
+
+# ── PITCHER K PROJECTIONS ──────────────────────────────────────────────────────
+# Expected strikeouts for a starter, blended per the product spec: opponent
+# recency (the actual nine bats' L14 K%) and park with home/away carrying the
+# heaviest situational weight, on a base of season K/BF blended with L14 form,
+# shaded by xFIP (SIERA stand-in) and hard-hit rate allowed.
+LEAGUE_K_PCT = 0.222        # league batter K% baseline
+PARK_K_FACTOR = {
+    "Coors Field": 0.92, "Fenway Park": 0.96, "Wrigley Field": 0.98,
+    "Oracle Park": 1.03, "Petco Park": 1.03, "T-Mobile Park": 1.05,
+    "Tropicana Field": 1.03, "Daikin Park": 1.02, "Citi Field": 1.02,
+    "loanDepot park": 1.03, "American Family Field": 1.01,
+}
+
+def project_pitcher(name, pdb_entry=None, l14=None, season=None,
+                    opp_k_pct=None, park="", is_home=True,
+                    ml_self=None, ml_opp=None, k_line=None):
+    """Returns the pitcher projection dict for the Pitchers tab, or None when
+    there is nothing to project from."""
+    e = pdb_entry or {}
+    l14 = l14 or {}
+    sea = season or {}
+
+    # base K rate per batter faced: season anchor, L14 recency on top
+    k_sea = None
+    if sea.get("so") and sea.get("bf"):
+        k_sea = sea["so"] / max(1, sea["bf"])
+    k_l14 = l14.get("l14_k_rate") or None
+    bf_l14 = l14.get("l14_bf") or 0
+    if k_sea is not None and k_l14 is not None:
+        w14 = min(0.25, bf_l14 / 300.0)          # recency capped at 25% — season is the signal
+        k_bf = (1 - w14) * k_sea + w14 * k_l14
+    else:
+        k_bf = k_l14 if k_l14 is not None else k_sea
+    if k_bf is None:
+        return None
+    k_bf = max(0.10, min(0.42, k_bf))
+
+    # expected length: innings pace from season IP/GS, pitches from season
+    # pitches-per-start; sane fallbacks for debuts
+    gs = max(1, sea.get("gs") or 1)
+    ip_start = (sea.get("ip") or 0) / gs if sea.get("ip") else 5.3
+    # openers/relievers pressed into starts: season IP spread over relief
+    # appearances lies about tonight's leash
+    if (sea.get("gs") or 0) < 4 and ip_start > 6.0:
+        ip_start = 4.7
+    ip_start = max(4.0, min(7.0, ip_start or 5.3))
+    pitches = sea.get("pitches") and sea["pitches"] / gs
+    if not pitches or pitches > 118 or pitches < 55:
+        pitches = ip_start * 15.6
+    pitches = max(58, min(112, pitches))
+    exp_bf = ip_start * 4.27
+
+    # situational multipliers — home/away heaviest per spec, then the actual
+    # opposing lineup's L14 K%, then park, then stuff/contact shading
+    m_ha   = 1.06 if is_home else 0.95
+    m_opp  = (max(0.15, min(0.31, opp_k_pct)) / LEAGUE_K_PCT) ** 0.6 if opp_k_pct else 1.0
+    m_park = PARK_K_FACTOR.get(park, 1.0)
+    xf     = e.get("xf3") or 4.2
+    m_stuff = 1.0 + max(-0.30, min(0.30, (4.20 - xf))) * 0.030
+    # hard-hit allowed stays on the card as context; it is not a K predictor
+    K_LEVEL = 0.88   # global damp, consensus-anchored (was running +1.2 hot)
+
+    k_proj = exp_bf * k_bf * m_ha * m_opp * m_park * m_stuff * K_LEVEL
+    k_proj = max(1.5, min(11.5, k_proj))
+
+    # HRs allowed over the expected outing
+    hr9 = l14.get("l14_hr_rate") and l14["l14_hr_rate"] * 38.7
+    if not hr9:
+        hr9 = e.get("hr9_6") or e.get("hr9_3") or 1.15
+    hr_allowed = max(0.05, min(3.0, hr9 * ip_start / 9.0))
+
+    # win likelihood from the devigged moneyline
+    win_pct = None
+    if ml_self is not None and ml_opp is not None:
+        try:
+            ps, po = implied_prob(int(ml_self)), implied_prob(int(ml_opp))
+            win_pct = round(ps / (ps + po) * 100, 1)
+        except Exception:
+            win_pct = None
+
+    out = {
+        "k_proj":     round(k_proj, 1),
+        "k_bf":       round(k_bf, 4),
+        "ip_proj":    round(ip_start, 1),
+        "pitches":    int(round(pitches)),
+        "hr_allowed": round(hr_allowed, 2),
+        "win_pct":    win_pct,
+        "opp_k_pct":  round(opp_k_pct, 3) if opp_k_pct else None,
+        "park_k":     m_park,
+        "is_home":    bool(is_home),
+        "xfip":       e.get("xf3"),
+        "hh_allowed": e.get("h3"),
+        "mid":        e.get("mid"),
+        "hand":       e.get("hand"),
+    }
+    if k_line is not None and isinstance(k_line, dict) and k_line.get("line") is not None:
+        out["k_line"]  = k_line["line"]
+        out["k_over"]  = k_line.get("over")
+        out["k_under"] = k_line.get("under")
+        out["k_edge"]  = round(k_proj - float(k_line["line"]), 2)
+    return out
