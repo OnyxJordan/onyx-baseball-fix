@@ -46,7 +46,7 @@
   "prob": 0.182,
   "edge": 2.2,
   "tier": "edge",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-07-24",
@@ -55,7 +55,7 @@
   "prob": 0.193,
   "edge": 1.4,
   "tier": "edge",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-07-24",
@@ -64,7 +64,7 @@
   "prob": 0.16,
   "edge": 1.2,
   "tier": "edge",
-  "hit": null
+  "hit": true
  },
  {
   "date": "2026-07-24",
@@ -73,7 +73,7 @@
   "prob": 0.154,
   "edge": 1.1,
   "tier": "edge",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-07-24",
@@ -81,6 +81,51 @@
   "odds": 600,
   "prob": 0.152,
   "edge": 0.9,
+  "tier": "edge",
+  "hit": false
+ },
+ {
+  "date": "2026-07-25",
+  "player": "Christian Yelich",
+  "odds": 9000,
+  "prob": 0.073,
+  "edge": 6.2,
+  "tier": "edge",
+  "hit": null
+ },
+ {
+  "date": "2026-07-25",
+  "player": "Hunter Goodman",
+  "odds": 525,
+  "prob": 0.208,
+  "edge": 4.8,
+  "tier": "edge",
+  "hit": null
+ },
+ {
+  "date": "2026-07-25",
+  "player": "Ben Rice",
+  "odds": 460,
+  "prob": 0.202,
+  "edge": 2.3,
+  "tier": "edge",
+  "hit": null
+ },
+ {
+  "date": "2026-07-25",
+  "player": "Trent Grisham",
+  "odds": 650,
+  "prob": 0.153,
+  "edge": 2.0,
+  "tier": "edge",
+  "hit": null
+ },
+ {
+  "date": "2026-07-25",
+  "player": "Luis García Jr.",
+  "odds": 800,
+  "prob": 0.128,
+  "edge": 1.7,
   "tier": "edge",
   "hit": null
  },
