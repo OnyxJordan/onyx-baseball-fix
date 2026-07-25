@@ -1,5 +1,16 @@
 """
-model.py — Onyx Baseball v25 HR probability model
+model.py — Onyx Baseball v26 HR probability model
+
+v26: consensus-calibrated level. Gut check against a professional
+projection slate (256 matched bats, 7/25): rank correlation 0.942 —
+the model orders hitters like the pros — but the LEVEL ran +3.0pp hot
+(mean 14.0% vs 11.0%, i.e. ~1.35 HR/team-game vs the league's ~1.1).
+Two knobs, no structural change: HR_VIG 0.07 -> 0.16 (books' implied
+mean ran ~14% vs ~11% truth: real one-sided juice is ~20%, our strip
+was a third of it, so the market anchor itself was hot) and a fixed
+LEVEL_CAL 0.90 on the raw chain. Bias drops to +1.6pp, MAE 3.0 -> 1.8,
+correlation holds, and the PA-by-lineup-slot table matched the
+consensus PA projections within ~0.1 PA at every spot.
 
 v25: the top of the board gets honest headroom, and plate appearances
 follow the lineup card. Two structural biases against elite hitters:
@@ -167,7 +178,14 @@ POS_HR_AVG = {
 }
 REG_K  = 250
 SCALE  = 0.86
-HR_VIG = 0.07   # approx single-side hold on HR-Yes props; calibrate vs resolved results
+HR_VIG = 0.16   # single-side hold on HR-Yes props. Empirical: books' implied
+                # mean ran ~14% vs a professional consensus truth of ~11% on a
+                # full slate (7/25 gut check), ~20% one-sided juice; 0.16 strips
+                # most of it while leaving room for real market information.
+LEVEL_CAL = 0.90  # global level anchor from the same consensus check: our raw
+                  # chain ran hot at every scale, this is the fixed correction.
+                  # calibrate.py's nightly CAL_SCALE layers on top from actual
+                  # graded results and remains the long-run authority.
 
 # v21 pick quality floor: minimum contact quality to qualify for the tracked
 # money list. Keeps slap/speed profiles (Simpson-types) off the board even
@@ -572,8 +590,9 @@ def project_player(
     raw_prob = base * sc * 3.5 * pa_mult * 100 * pf * env * park_f * due_mult * plat
     LEAGUE_GAME_HR = 12.5
     raw_prob = LEAGUE_GAME_HR + (raw_prob - LEAGUE_GAME_HR) * 0.8
-    # v19: nightly self-calibration from graded picks
-    raw_prob = raw_prob * CAL_SCALE
+    # v19: nightly self-calibration from graded picks; v26: times the fixed
+    # consensus-anchored level correction
+    raw_prob = raw_prob * CAL_SCALE * LEVEL_CAL
     # v25: compression starts at 24 with a 0.6 slope and a 34 cap (was 20 /
     # 0.5 / 28) — the old ceiling made it mathematically impossible to even
     # match a short price, locking every elite hitter into negative edge no
