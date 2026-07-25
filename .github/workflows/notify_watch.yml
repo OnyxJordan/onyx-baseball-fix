@@ -1,0 +1,32 @@
+name: Push notification watcher
+
+# Closed-app push for HRs + finals: each run polls the MLB Stats API every
+# ~45s for ~28 minutes and sends OneSignal pushes, so back-to-back runs give
+# continuous coverage through game hours. Free no-op until the
+# ONESIGNAL_APP_ID / ONESIGNAL_API_KEY secrets exist.
+
+on:
+  schedule:
+    - cron: "*/30 17-23 * * *"   # 1pm-8pm ET
+    - cron: "*/30 0-6 * * *"     # 8pm-2am ET
+  workflow_dispatch:
+
+concurrency:
+  group: push-watch
+  cancel-in-progress: false
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 29
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests
+      - name: Watch live games and push
+        env:
+          ONESIGNAL_APP_ID: ${{ secrets.ONESIGNAL_APP_ID }}
+          ONESIGNAL_API_KEY: ${{ secrets.ONESIGNAL_API_KEY }}
+        run: python push_watch.py
