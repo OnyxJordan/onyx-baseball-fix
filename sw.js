@@ -1,7 +1,10 @@
 /* Onyx Baseball service worker: network-first for same-origin requests so
    the baked slate is always fresh, cached copy only as an offline fallback.
-   Cross-origin (MLB Stats API, Onyx, logos CDN) is never intercepted. */
-const CACHE = 'onyx-v2';
+   Cross-origin (MLB Stats API, Onyx, logos CDN) is never intercepted.
+   OneSignal's worker rides along for closed-app push (HRs + finals from
+   the notify_watch workflow); harmless no-op until the app id is wired. */
+try { importScripts('https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js'); } catch (e) {}
+const CACHE = 'onyx-v3';
 
 self.addEventListener('install', e => { self.skipWaiting(); });
 

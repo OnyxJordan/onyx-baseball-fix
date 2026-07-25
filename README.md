@@ -94,6 +94,27 @@ Verified market keys for the share endpoint: `moneyline` ("Atlanta
 Braves"), `run_line` ("San Diego Padres +1.5"), `total_runs` ("Over 9.5"),
 `player_home_runs` ("{Player} Over 0.5").
 
+## Push notifications (closed-app)
+
+In-app alerts (Notification API) fire while the site is open. True push
+with the app closed rides OneSignal's free tier plus a GitHub Actions
+watcher (`notify_watch.yml` -> `push_watch.py`) that polls live games
+every ~45 seconds through game hours and sends within about a minute:
+
+- **HR pushes**: modeled batters only — headline `💣 HR — {name} ({team})`,
+  body carries the Statcast line (distance, EV, launch angle, pitcher) and
+  what the model projected pregame (probability, edge, listed odds).
+- **Final pushes**: score line when a game the watcher saw live goes final.
+
+Setup (one time): create a free OneSignal Web Push app pointed at the live
+site URL, paste the Web App ID into `ONESIGNAL_APP_ID` in `shell.html`,
+and add `ONESIGNAL_APP_ID` + `ONESIGNAL_API_KEY` (REST key) repo secrets.
+The in-app bell toggles map to OneSignal tags (`hr`, `final`), so HR-only
+or finals-only preferences hold across both delivery paths. Without the
+keys everything is a free no-op and in-app alerts still work. iPhone users
+must add the site to their home screen (iOS requires an installed PWA for
+web push).
+
 ## Daily routine
 
 With the `ODDS_API_KEY` secret set: nothing. Odds, totals, moneylines, lineups, weather, L14 form, and pick grading are all automatic. Manual hooks that still work if ever needed:
