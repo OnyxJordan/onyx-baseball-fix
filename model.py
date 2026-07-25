@@ -1,5 +1,16 @@
 """
-model.py — Onyx Baseball v28 HR probability model + pitcher K projections
+model.py — Onyx Baseball v29 HR probability model + pitcher K projections
+
+v29: career anchors everywhere — large samples project, recency
+advises. Site-wide principle applied to the spots still leading with
+small windows: (1) HRs-allowed on the Pitchers tab was L14-first (two
+bad starts tripled Eovaldi to 3.0; his 3-year HR/9 is 1.19) — now
+career 3-year HR/9 anchors, the season shrinks in by innings, L14 is
+a <=15% nudge, capped at 2.2 per start. (2) The Statcast quality
+score let 78 recent PAs outvote a career (65% cap at pa/120) — now
+45% max at pa/150. (3) The board's displayed pitcher HR/9 used the
+L14 number when present — now shows the same career-anchored blend
+the model actually uses.
 
 v28: the K model gets a real sample. The season-only K/BF anchor was
 a few hundred batters for young arms and the opponent read was pure
@@ -436,7 +447,7 @@ def sc_score(d: dict, l14: dict = None) -> float:
                        l14.get("l14_hh_pct", 0.40) or 0.40,
                        l14.get("l14_avg_ev", 95) or 95,
                        l14.get("l14_iso", 0.165) or 0.165)
-        w = min(pa / 120.0, 0.65)
+        w = min(pa / 150.0, 0.45)   # v29: recent quality advises, career decides
         return w * l14_raw + (1 - w) * career_sc
     return career_sc
 
@@ -804,11 +815,19 @@ def project_pitcher(name, pdb_entry=None, l14=None, season=None,
     k_proj = exp_bf * k_bf * m_ha * m_opp * m_park * m_stuff * K_LEVEL
     k_proj = max(1.5, min(11.5, k_proj))
 
-    # HRs allowed over the expected outing
-    hr9 = l14.get("l14_hr_rate") and l14["l14_hr_rate"] * 38.7
-    if not hr9:
-        hr9 = e.get("hr9_6") or e.get("hr9_3") or 1.15
-    hr_allowed = max(0.05, min(3.0, hr9 * ip_start / 9.0))
+    # HRs allowed over the expected outing — career 3-year HR/9 anchors,
+    # season shrinks in by innings, L14 is a nudge; one bad fortnight can
+    # no longer triple the number
+    hr9_car, hr9_sea = e.get("hr9_3"), e.get("hr9_6")
+    hr9 = hr9_car or hr9_sea or 1.15
+    if hr9_car and hr9_sea:
+        w_sea = min(0.45, (sea.get("ip") or 0) / 220.0)
+        hr9 = (1 - w_sea) * hr9_car + w_sea * hr9_sea
+    hr14 = l14.get("l14_hr_rate") and l14["l14_hr_rate"] * 38.7
+    if hr14:
+        w14 = min(0.15, bf_l14 / 400.0)
+        hr9 = (1 - w14) * hr9 + w14 * hr14
+    hr_allowed = max(0.05, min(2.2, hr9 * ip_start / 9.0))
 
     # win likelihood from the devigged moneyline
     win_pct = None
