@@ -56,8 +56,9 @@ HSPLITS  = jload(dpath("hand_splits.json"), {})   # vs-hand power + real batSide
 LINEUPS  = jload(dpath("lineups.json"), {})
 WEATHER  = jload(dpath("weather.json"), {})
 ODDS_RAW = jload(dpath("odds.json"), {})
-SEASONP  = jload(dpath("pitcher_season.json"), {})   # starter season K/IP/pitch pace
+SEASONP  = jload(dpath("pitcher_season.json"), {})   # starter season + 3yr K history
 KLINES   = jload(dpath("k_lines.json"), {})          # listed K prop lines
+TEAMK    = jload(dpath("team_k.json"), {})           # season team K% vs hand
 GAMES    = jload(dpath("game_lines.json"), {})
 L14      = jload(dpath("statcast_l14.json"), {})
 P14      = jload(dpath("pitchers_l14.json"), {})
@@ -586,6 +587,7 @@ for g in games_out:
                 l14=P14N.get(pk_),
                 season=SEASONP.get(pk_),
                 opp_k_pct=_opp_k_pct(opprows),
+                opp_team_k=TEAMK.get(g.get("home_team" if side == "away" else "away_team") or ""),
                 park=g.get("venue") or "",
                 is_home=is_home,
                 ml_self=g.get("home_ml") if is_home else g.get("away_ml"),

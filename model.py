@@ -1,5 +1,13 @@
 """
-model.py — Onyx Baseball v27 HR probability model + pitcher K projections
+model.py — Onyx Baseball v28 HR probability model + pitcher K projections
+
+v28: the K model gets a real sample. The season-only K/BF anchor was
+a few hundred batters for young arms and the opponent read was pure
+L14 lineup noise. Now: 3-year K/BF history is the base with the
+current season shrunk in by its own sample size (BF/(BF+250)), L14
+form trimmed to a nudge, and the opponent adjustment blends the
+SEASON team K% vs this pitcher's hand (60%, thousands of PAs) with
+the actual lineup's L14 K% (40%, who is really playing tonight).
 
 v27: calibration medium + the pitcher projection module. The v26
 consensus correction overshot relative to the graded evidence of our
@@ -725,7 +733,7 @@ PARK_K_FACTOR = {
 }
 
 def project_pitcher(name, pdb_entry=None, l14=None, season=None,
-                    opp_k_pct=None, park="", is_home=True,
+                    opp_k_pct=None, opp_team_k=None, park="", is_home=True,
                     ml_self=None, ml_opp=None, k_line=None):
     """Returns the pitcher projection dict for the Pitchers tab, or None when
     there is nothing to project from."""
@@ -733,17 +741,27 @@ def project_pitcher(name, pdb_entry=None, l14=None, season=None,
     l14 = l14 or {}
     sea = season or {}
 
-    # base K rate per batter faced: season anchor, L14 recency on top
+    # base K rate per batter faced — v28: the 3-YEAR history is the anchor
+    # (real sample), the current season shrinks in by its own BF, and L14
+    # form is only a nudge on top
+    k3 = None
+    if sea.get("so3") and (sea.get("bf3") or 0) >= 150:
+        k3 = sea["so3"] / sea["bf3"]
     k_sea = None
     if sea.get("so") and sea.get("bf"):
         k_sea = sea["so"] / max(1, sea["bf"])
+    if k3 is not None and k_sea is not None:
+        w_sea = (sea.get("bf") or 0) / ((sea.get("bf") or 0) + 250.0)
+        k_base = w_sea * k_sea + (1 - w_sea) * k3
+    else:
+        k_base = k_sea if k_sea is not None else k3
     k_l14 = l14.get("l14_k_rate") or None
     bf_l14 = l14.get("l14_bf") or 0
-    if k_sea is not None and k_l14 is not None:
-        w14 = min(0.25, bf_l14 / 300.0)          # recency capped at 25% — season is the signal
-        k_bf = (1 - w14) * k_sea + w14 * k_l14
+    if k_base is not None and k_l14 is not None:
+        w14 = min(0.15, bf_l14 / 400.0)          # recency is a nudge, not a base
+        k_bf = (1 - w14) * k_base + w14 * k_l14
     else:
-        k_bf = k_l14 if k_l14 is not None else k_sea
+        k_bf = k_base if k_base is not None else k_l14
     if k_bf is None:
         return None
     k_bf = max(0.10, min(0.42, k_bf))
@@ -766,7 +784,17 @@ def project_pitcher(name, pdb_entry=None, l14=None, season=None,
     # situational multipliers — home/away heaviest per spec, then the actual
     # opposing lineup's L14 K%, then park, then stuff/contact shading
     m_ha   = 1.06 if is_home else 0.95
-    m_opp  = (max(0.15, min(0.31, opp_k_pct)) / LEAGUE_K_PCT) ** 0.6 if opp_k_pct else 1.0
+    # opponent: season team K% vs this pitcher's hand carries the sample
+    # (60%), the actual lineup's L14 K% carries tonight's personnel (40%)
+    hand = str(e.get("hand") or "R").upper()
+    tk = None
+    if isinstance(opp_team_k, dict):
+        tk = opp_team_k.get("vl" if hand == "L" else "vr")
+    if tk and opp_k_pct:
+        opp_eff = 0.6 * tk + 0.4 * opp_k_pct
+    else:
+        opp_eff = tk or opp_k_pct
+    m_opp = (max(0.15, min(0.31, opp_eff)) / LEAGUE_K_PCT) ** 0.6 if opp_eff else 1.0
     m_park = PARK_K_FACTOR.get(park, 1.0)
     xf     = e.get("xf3") or 4.2
     m_stuff = 1.0 + max(-0.30, min(0.30, (4.20 - xf))) * 0.030
@@ -798,7 +826,7 @@ def project_pitcher(name, pdb_entry=None, l14=None, season=None,
         "pitches":    int(round(pitches)),
         "hr_allowed": round(hr_allowed, 2),
         "win_pct":    win_pct,
-        "opp_k_pct":  round(opp_k_pct, 3) if opp_k_pct else None,
+        "opp_k_pct":  round(opp_eff, 3) if opp_eff else None,
         "park_k":     m_park,
         "is_home":    bool(is_home),
         "xfip":       e.get("xf3"),

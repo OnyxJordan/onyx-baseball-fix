@@ -706,7 +706,7 @@ def fetch_starter_season():
             r = requests.get(
                 "https://statsapi.mlb.com/api/v1/people",
                 params={"personIds": ",".join(map(str, batch)),
-                        "hydrate": f"stats(group=[pitching],type=[season],season={season})"},
+                        "hydrate": f"stats(group=[pitching],type=[season,yearByYear],season={season})"},
                 timeout=30)
             r.raise_for_status()
             people = r.json().get("people") or []
@@ -717,20 +717,62 @@ def fetch_starter_season():
             n = id_to_name.get(person.get("id"))
             if not n:
                 continue
+            rec = out.setdefault(n, {"so3": 0, "bf3": 0})
             for st in person.get("stats") or []:
+                tname = ((st.get("type") or {}).get("displayName") or "")
                 for sp in st.get("splits") or []:
                     stat = sp.get("stat") or {}
-                    out[n] = {
-                        "so":      int(stat.get("strikeOuts") or 0),
-                        "bf":      int(stat.get("battersFaced") or 0),
-                        "ip":      round(_ipf(stat.get("inningsPitched")), 1),
-                        "gs":      int(stat.get("gamesStarted") or 0),
-                        "pitches": int(stat.get("numberOfPitches") or 0),
-                        "wins":    int(stat.get("wins") or 0),
-                        "era":     stat.get("era"),
-                    }
+                    if tname == "yearByYear":
+                        # 3-year K history: the real sample behind the K rate
+                        try:
+                            if int(sp.get("season") or 0) >= season - 2:
+                                rec["so3"] += int(stat.get("strikeOuts") or 0)
+                                rec["bf3"] += int(stat.get("battersFaced") or 0)
+                        except (TypeError, ValueError):
+                            pass
+                    else:
+                        rec.update({
+                            "so":      int(stat.get("strikeOuts") or 0),
+                            "bf":      int(stat.get("battersFaced") or 0),
+                            "ip":      round(_ipf(stat.get("inningsPitched")), 1),
+                            "gs":      int(stat.get("gamesStarted") or 0),
+                            "pitches": int(stat.get("numberOfPitches") or 0),
+                            "wins":    int(stat.get("wins") or 0),
+                            "era":     stat.get("era"),
+                        })
     print(f"  Starter season: {len(out)} pitchers")
     (OUT / "pitcher_season.json").write_text(json.dumps(out, indent=2))
+    return out
+
+# ── 7e. TEAM K% vs HAND — season-long, all 30 teams -> team_k.json ───────────
+def fetch_team_k():
+    """Season team strikeout rate vs LHP and vs RHP: the large-sample side of
+    the opponent adjustment in model.project_pitcher() (the L14 lineup K% is
+    the who-is-actually-playing side)."""
+    print("Fetching team K% vs hand...")
+    season = datetime.date.today().year
+    out = {}
+    for tid, ab in TEAM_ID_TO_ABBR.items():
+        try:
+            r = requests.get(
+                f"https://statsapi.mlb.com/api/v1/teams/{tid}/stats",
+                params={"stats": "statSplits", "group": "hitting",
+                        "sitCodes": "vl,vr", "season": season}, timeout=20)
+            r.raise_for_status()
+            rec = {}
+            for st in r.json().get("stats") or []:
+                for sp in st.get("splits") or []:
+                    code = (sp.get("split") or {}).get("code")
+                    stat = sp.get("stat") or {}
+                    so, pa = int(stat.get("strikeOuts") or 0), int(stat.get("plateAppearances") or 0)
+                    if code in ("vl", "vr") and pa > 100:
+                        rec[code] = round(so / pa, 4)
+            if rec:
+                out[ab] = rec
+        except Exception:
+            continue
+    print(f"  Team K%: {len(out)} teams")
+    (OUT / "team_k.json").write_text(json.dumps(out, indent=2))
     return out
 
 # ── 8. PITCHER data — MLB Stats API primary, FanGraphs CSV fallback ──────────
@@ -826,5 +868,6 @@ if __name__ == "__main__":
     fetch_splits()
     fetch_hand_splits()
     fetch_starter_season()
+    fetch_team_k()
     fetch_pitcher_statcast()
     print("\n=== Done. Ready for auto_build.py ===")
