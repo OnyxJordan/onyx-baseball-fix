@@ -1096,14 +1096,22 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
   100% { transform:translateX(-50%) translateY(0) scale(1); opacity:1; } }
 @keyframes gcPopOut { to { transform:translateX(-50%) translateY(-18px) scale(.85); opacity:0; } }
 @keyframes gcShock { 0% { transform:scale(1); opacity:.85; } 100% { transform:scale(1.28); opacity:0; } }
-/* ── strike-zone batter + swing ── */
-.gc-batter { opacity:.85; }
-.gc-batter .bat { transition:transform .1s; }
-.gc-batter.swingnow .bat { animation:gcSwing .55s cubic-bezier(.5,0,.2,1) 1; }
-@keyframes gcSwing { 0% { transform:rotate(0deg); } 35% { transform:rotate(-38deg); }
-  70% { transform:rotate(150deg); } 100% { transform:rotate(0deg); } }
+/* ── backyard-ball zone scene: big-head kids, swing, throw, pitch track ── */
+.gc-kid .bat { transition:transform .1s; }
+.gc-kid.swingnow .bat { animation:gcSwing .5s cubic-bezier(.5,0,.2,1) 1; }
+@keyframes gcSwing { 0% { transform:rotate(0deg); } 30% { transform:rotate(-42deg); }
+  65% { transform:rotate(148deg); } 100% { transform:rotate(0deg); } }
+.gc-kid .parm { }
+.gc-kid.throwing .parm { animation:gcThrow .65s cubic-bezier(.4,0,.3,1) 1; }
+@keyframes gcThrow { 0% { transform:rotate(0deg); } 38% { transform:rotate(-120deg); }
+  68% { transform:rotate(22deg); } 100% { transform:rotate(0deg); } }
+.gc-kid.swingnow { animation:gcHips .5s ease-out 1; }
+@keyframes gcHips { 0% { transform:translateX(0); } 45% { transform:translateX(-2px); }
+  75% { transform:translateX(1.5px); } 100% { transform:translateX(0); } }
 .gc-inplay-streak { stroke-dasharray:60; stroke-dashoffset:60; animation:gcStreak .6s ease-out .25s forwards; }
 @keyframes gcStreak { to { stroke-dashoffset:0; } }
+.gc-pitch-trail { opacity:0; animation:gcTrail .8s ease-out forwards; }
+@keyframes gcTrail { 0% { opacity:0; } 35% { opacity:.5; } 100% { opacity:0; } }
 /* ── bottom app nav (mobile) ── */
 .bnav { display:none; }
 @media (max-width:760px) {
@@ -2796,9 +2804,19 @@ function liveGameOf(r) {
   const lp = livePlayerData[nkjs(r.batter_name || r.matched_name)] || {};
   return lp.gamePk ? (liveGameData[lp.gamePk] || null) : null;
 }
+function gameStartTs(r) {
+  if (typeof SUMMARIES === 'undefined' || !SUMMARIES) return null;
+  const s = SUMMARIES.find(x => x.label === r.game || x.game === r.game
+    || (x.away === r.away && x.home === r.home));
+  return (s && s.start) ? Date.parse(s.start) : null;
+}
 function gameStarted(r) {
   const gd = liveGameOf(r);
-  return !!(gd && (gd.isLive || gd.isFinal));
+  if (gd && (gd.isLive || gd.isFinal)) return true;
+  // schedule fallback: live data can lag the first poll (or miss a match);
+  // past first pitch is past first pitch either way
+  const ts = gameStartTs(r);
+  return ts != null && Date.now() > ts + 3 * 60 * 1000;
 }
 // remaining plate appearances from game progress (never negative)
 function paEstimate(gd) {
@@ -2814,11 +2832,21 @@ function paEstimate(gd) {
 function liveHRProb(r) {
   const base = +r.hr_prob || 0;
   const lp = livePlayerData[nkjs(r.batter_name || r.matched_name)] || {};
-  const gd = liveGameOf(r);
-  if (!gd || (!gd.isLive && !gd.isFinal)) return base;      // pregame: unchanged
   if (lp.hitHR) return base;                                 // already cashed
-  const paLeft = paEstimate(gd);
-  if (paLeft <= 0) return 0;                                 // no chances left
+  const gd = liveGameOf(r);
+  if (gd && (gd.isLive || gd.isFinal)) {
+    const paLeft = paEstimate(gd);
+    if (paLeft <= 0) return 0;                               // no chances left
+    const noHRperPA = Math.pow(1 - base / 100, 1 / PA_FULL);
+    return (1 - Math.pow(noHRperPA, paLeft)) * 100;
+  }
+  // no live match yet: decay off the schedule clock so a started game can
+  // never show its full-game number against a live line
+  const ts = gameStartTs(r);
+  if (ts == null || Date.now() <= ts + 3 * 60 * 1000) return base;  // pregame
+  const elapsedH = (Date.now() - ts) / 36e5;
+  const paLeft = PA_FULL * Math.max(0, 1 - elapsedH / 2.9);
+  if (paLeft <= 0.05) return 0;
   const noHRperPA = Math.pow(1 - base / 100, 1 / PA_FULL);
   return (1 - Math.pow(noHRperPA, paLeft)) * 100;
 }
