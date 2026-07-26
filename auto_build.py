@@ -59,6 +59,31 @@ ODDS_RAW = jload(dpath("odds.json"), {})
 SEASONP  = jload(dpath("pitcher_season.json"), {})   # starter season + 3yr K history
 KLINES   = jload(dpath("k_lines.json"), {})          # listed K prop lines
 TEAMK    = jload(dpath("team_k.json"), {})           # season team K% vs hand
+
+def _sp_hand(name):
+    key = nk(name or "")
+    return (PITCHERS.get(key) or {}).get("hand") or HANDS.get(key) or "R"
+
+def _sp_hr9(name):
+    """Career-anchored HR/9 for display: 3-year base, season shrunk in by
+    innings, L14 a nudge — the same shape the model uses (v29)."""
+    key = nk(name or "")
+    e = PITCHERS.get(key) or {}
+    spl = P14N.get(key) or {}
+    car, sea = e.get("hr9_3"), e.get("hr9_6")
+    hr9 = car or sea
+    if car and sea:
+        ip_sea = (SEASONP.get(key) or {}).get("ip") or 0
+        w = min(0.45, ip_sea / 220.0)
+        hr9 = (1 - w) * car + w * sea
+    l14 = spl.get("l14_hr_rate") and spl["l14_hr_rate"] * 38.7
+    if l14 and hr9:
+        w14 = min(0.15, (spl.get("l14_bf") or 0) / 400.0)
+        hr9 = (1 - w14) * hr9 + w14 * l14
+    elif l14 and not hr9:
+        hr9 = l14
+    return round(hr9, 2) if hr9 else None
+
 GAMES    = jload(dpath("game_lines.json"), {})
 L14      = jload(dpath("statcast_l14.json"), {})
 P14      = jload(dpath("pitchers_l14.json"), {})
@@ -309,9 +334,8 @@ for game in games_out:
                 wlabel = f"{wind_dir} {int(round(wind_mph))}mph {tag}".strip()
             else:
                 wlabel = ""
-            hr9 = spl.get("l14_hr_rate") and round(spl["l14_hr_rate"] * 38.7, 2)
-            if not hr9:
-                hr9 = (sp_e or {}).get("hr9_6") or (sp_e or {}).get("hr9_3")
+            # v29: career-anchored, not L14-first — same blend the model uses
+            hr9 = _sp_hr9(opp_sp or "")
             # 7-tier heat label on the model's real due_score scale (expected
             # HRs minus actual over L14, sc-weighted; realistic range ~ -4..+2).
             # Bands mirror model.due_meter so the label always matches the
@@ -504,19 +528,6 @@ def replace_const(src, name, payload):
     if not pat.search(src):
         sys.exit(f"FATAL: const {name} not found in shell.html")
     return pat.sub(lambda m: m.group(1) + json.dumps(payload, ensure_ascii=False) + ";", src, count=1)
-
-def _sp_hand(name):
-    key = nk(name or "")
-    return (PITCHERS.get(key) or {}).get("hand") or HANDS.get(key) or "R"
-
-def _sp_hr9(name):
-    key = nk(name or "")
-    spl = P14N.get(key) or {}
-    if spl.get("l14_hr_rate"):
-        return round(spl["l14_hr_rate"] * 38.7, 2)
-    e = PITCHERS.get(key) or {}
-    v = e.get("hr9_6") or e.get("hr9_3")
-    return round(v, 2) if v else None
 
 # group scored records per game for card aggregates
 _by_label = {}
