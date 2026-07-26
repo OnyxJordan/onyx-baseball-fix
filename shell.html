@@ -1130,6 +1130,9 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
 .slam-meta { flex:1; min-width:0; }
 .slam-name { font-size:13px; font-weight:800; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .slam-sub { font-size:9.5px; color:var(--text3); margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.slam-why { display:flex; gap:4px; flex-wrap:wrap; margin-top:3px; }
+.slam-why span { font-size:8px; font-weight:700; font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;
+  padding:1.5px 6px; border-radius:10px; background:rgba(52,211,153,.10); color:#6ee7b7; border:1px solid rgba(52,211,153,.25); }
 .slam-prob { font-size:16px; font-weight:800; color:#c9a6ff; font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace; flex-shrink:0; }
 .slam-odds { font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace; font-size:11px; font-weight:700; color:var(--text2);
   background:var(--bg3); border:1px solid var(--border2); border-radius:7px; padding:4px 8px; cursor:pointer; flex-shrink:0;
@@ -5465,11 +5468,15 @@ function sortPow(k) {
   });
   renderPower();
 }
-// ─── THE MODEL'S TICKET: pure probability parlay, edge be damned ─
-// "Regardless of edge, who does the model think homers TODAY?" Legs are the
-// highest raw HR probabilities on the slate (quality-floored, pregame only);
-// the leg count follows confidence — every bat the model puts at 24%+ makes
-// the ticket, min 2, max 5.
+// ─── THE MODEL'S TICKET: conviction parlay, edge be damned ─
+// "Who does the model believe homers TODAY?" Legs rank by the ticket
+// conviction score baked per player: raw probability softened, with the
+// day's situation stack amplified on top — weather, pitcher matchup,
+// platoon, due meter, batter FB% vs the pitcher's fly-ball tendency,
+// bullpen exposure, park, lineup-slot ABs. The leg count follows how many
+// bats clear the conviction bar (0.65), min 2, max 5 — so the ticket
+// follows the slate, not a static list of sluggers.
+const SLAM_T = 0.65;
 function buildSlamTicket() {
   const el = document.getElementById('slamTicket');
   if (!el) return;
@@ -5479,9 +5486,10 @@ function buildSlamTicket() {
       if (!r.hr_prob || !r.mid || seen.has(r.matched_name)) return false;
       seen.add(r.matched_name);
       if (gameStarted(r)) return false;
+      if ((r.hr_prob || 0) < 15) return false;
       return (r.hh_pct || 0) >= 0.32 && (r.barrel_26 || 0) >= 0.05;
     })
-    .sort((a, b) => b.hr_prob - a.hr_prob);
+    .sort((a, b) => (b.ticket_score || b.hr_prob / 40) - (a.ticket_score || a.hr_prob / 40));
   if (pool.length < 2) {
     el.innerHTML = pool.length === 0 && (RESULTS || []).some(r => gameStarted(r))
       ? `<div class="slam-wrap"><div class="slam-head"><span class="slam-tag">🎟 THE MODEL'S TICKET</span></div>
@@ -5489,7 +5497,7 @@ function buildSlamTicket() {
       : '';
     return;
   }
-  let legs = pool.filter(r => r.hr_prob >= 24).length;
+  let legs = pool.filter(r => (r.ticket_score || 0) >= SLAM_T).length;
   legs = Math.max(2, Math.min(5, legs));
   const picks = pool.slice(0, legs);
   const confLbl = legs >= 5 ? 'MAX SEND · 5 LEGS' : legs === 4 ? 'HIGH CONFIDENCE · 4 LEGS'
@@ -5509,6 +5517,7 @@ function buildSlamTicket() {
       <div class="slam-meta">
         <div class="slam-name">${r.matched_name}</div>
         <div class="slam-sub">${r.team} · vs ${r.opp_pitcher || '—'}${r.time ? ' · ' + r.time : ''}</div>
+        ${(r.ticket_why || []).length ? `<div class="slam-why">${r.ticket_why.map(w => `<span>${w}</span>`).join('')}</div>` : ''}
       </div>
       <div class="slam-prob">${(+r.hr_prob).toFixed(1)}%</div>
       ${r.dk_hr_odds ? `<span class="slam-odds" data-a="${r.away}" data-h="${r.home}" data-p="${(r.matched_name || '').replace(/"/g, '&quot;')}" data-o="${r.dk_hr_odds}"
@@ -5519,7 +5528,7 @@ function buildSlamTicket() {
       <span class="slam-tag">🎟 THE MODEL'S TICKET</span>
       <span class="slam-conf">${confLbl}</span>
     </div>
-    <div class="slam-note">Highest HR probabilities on today's slate, edge ignored — the leg count follows the model's confidence.</div>
+    <div class="slam-note">Conviction-ranked, edge ignored — weather, pitcher, platoon, due, fly-ball matchup, bullpen, park and lineup slot all vote, so the ticket follows the slate, not the same sluggers.</div>
     ${legRows}
     <div class="slam-foot">
       ${priced ? `<span class="slam-pay">$10 pays <b>$${payout.toFixed(0)}</b></span>` : ''}

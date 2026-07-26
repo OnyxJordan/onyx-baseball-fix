@@ -429,6 +429,47 @@ for game in games_out:
                 "dk_value":      round(dk_pts / (dk_sal / 1000.0), 2) if dk_sal else 0,
                 "fd_value":      round(fd_pts / (fd_sal / 1000.0), 2) if fd_sal else 0,
             })
+            # ---- ticket conviction: the Model's Ticket follows the DAY, not
+            # a static list of sluggers. Raw probability is softened (^0.7)
+            # and TODAY's situation stack is amplified on top: weather/env,
+            # pitcher matchup, platoon, due meter, batter air geometry vs the
+            # pitcher's fly-ball tendency, bullpen exposure, park, and
+            # lineup-slot ABs. The top reasons ride along as chips.
+            _why = []
+            _sit = 1.0
+            _envf = rec.get("env_factor") or 1.0
+            _sit *= _envf ** 1.6
+            if _envf >= 1.05: _why.append((_envf - 1, f"wind/heat ×{_envf:.2f}"))
+            _pf = rec.get("p_factor") or 1.0
+            _sit *= _pf ** 1.3
+            if _pf >= 1.06: _why.append((_pf - 1, f"pitcher matchup ×{_pf:.2f}"))
+            _plat = rec.get("platoon_factor") or 1.0
+            _sit *= _plat
+            if _plat >= 1.06: _why.append((_plat - 1, "platoon edge"))
+            _duem = {"OVERDUE": 1.10, "DUE": 1.05, "COOL": 1.02}.get(rec.get("due_label") or "", 1.0)
+            _sit *= _duem
+            if _duem >= 1.05: _why.append((_duem - 1, (rec.get("due_label") or "").lower()))
+            _bfb = (bat or {}).get("fb")
+            if _bfb:
+                _m = 1 + 0.35 * (float(_bfb) - 0.38) / 0.38
+                _sit *= _m
+                if _m >= 1.07: _why.append((_m - 1, f"{round(float(_bfb) * 100)}% FB bat"))
+            _gb = (sp_e or {}).get("gb3") or (sp_e or {}).get("gb6")
+            if _gb:
+                _m = 1 + 0.30 * ((1 - float(_gb)) - 0.56) / 0.56
+                _sit *= _m
+                if _m >= 1.05: _why.append((_m - 1, "fly-ball pitcher"))
+            _bpm = bullpen_mult(opp_team, sp_e)
+            _sit *= _bpm
+            if _bpm >= 1.04: _why.append((_bpm - 1, "soft bullpen"))
+            _sit *= {1: 1.10, 2: 1.07, 3: 1.05, 4: 1.03, 5: 1.00,
+                     6: 0.97, 7: 0.94, 8: 0.92, 9: 0.90}.get(spot, 1.0)
+            _parkf = rec.get("park_hr") or 1.0
+            _sit *= _parkf ** 0.7
+            if _parkf >= 1.08: _why.append((_parkf - 1, f"park ×{_parkf:.2f}"))
+            rec["ticket_score"] = round(((rec.get("hr_prob") or 0) / 100.0) ** 0.7 * _sit, 4)
+            rec["ticket_why"] = [w for t in sorted([x for x in _why if x], reverse=True)[:3] for w in [t[1]]]
+
             results_out.append(rec)
 
             # ---- edge/picks lane: model prob + bullpen & pull-air layers ----
