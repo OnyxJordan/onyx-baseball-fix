@@ -165,6 +165,18 @@ def main():
                 str(p.get("player") or p.get("name") or "").strip().lower(),
             )
             picks, a, u = merge(picks, incoming, keyfn)
+            # HARD CAP: the tracked record is exactly five picks per slate.
+            # Anything beyond five for a date (old build races, merge unions)
+            # is deleted here so the baked history heals itself on rebuild.
+            per_day, capped = {}, []
+            for p in picks:
+                d = str(p.get("date", "")).strip()
+                per_day[d] = per_day.get(d, 0) + 1
+                if per_day[d] <= 5:
+                    capped.append(p)
+            if len(capped) != len(picks):
+                print(f"  PICKS: removed {len(picks) - len(capped)} over-cap entr(ies)")
+            picks = capped
             html = replace_span(html, span, "PICKS", picks)
             wins = sum(1 for p in picks if p.get("hit") is True)
             losses = sum(1 for p in picks if p.get("hit") is False)

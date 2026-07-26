@@ -13,7 +13,8 @@ The site is evolving into Onyx Sports Insights: a multi-sport shell that renders
 - **HR probability model (v30)**: Bayesian-regressed career base rates, Statcast SC score, L14 form, platoon splits, pitcher factor blended from xFIP / HR9 / HRFB / GB% / Barrel%, park HR factor with per-park wind sensitivity, air density (temperature, humidity, pressure), due meter
 - **Edge board**: model probability vs DraftKings implied probability where odds are available, with an honest freshness gate (stale odds means no edges and no picks, never fake data)
 - **Pitcher K projections**: expected strikeouts for every starter vs the listed K prop line — 3-year K/BF history anchoring the current season by sample size, season team K% vs the pitcher's hand blended with the actual lineup's L14 K%, park K factor, home/away weighting, xFIP shading; plus projected pitch count, HRs allowed, and win likelihood from the devigged moneyline (Pitchers & Ks tab under SB Tools)
-- **Pick tracking**: the top five qualifying edge plays LOCK at the slate's first pregame build (never topped up mid-day) and are auto-graded into the running record
+- **The Model's Ticket**: a pure-probability HR parlay atop the Plays tab — the model's best bets to homer today regardless of edge, leg count (2-5) driven by confidence, with combined payout, all-connect probability, and Onyx-clickable legs
+- **Pick tracking**: the top five qualifying edge plays LOCK at the slate's first pregame build (never topped up mid-day), the record hard-caps at five per date on every rebuild, and grading is automatic
 
 ## How the autonomous build works
 

@@ -1112,6 +1112,36 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
 @keyframes gcStreak { to { stroke-dashoffset:0; } }
 .gc-pitch-trail { opacity:0; animation:gcTrail .8s ease-out forwards; }
 @keyframes gcTrail { 0% { opacity:0; } 35% { opacity:.5; } 100% { opacity:0; } }
+/* ── The Model's Ticket (HR parlay) ── */
+.slam-wrap { margin:16px 12px 4px; padding:15px 16px 13px; border-radius:14px; position:relative;
+  background:linear-gradient(155deg, rgba(160,32,240,.13), var(--bg2) 55%); border:1px solid rgba(160,32,240,.4);
+  box-shadow:0 0 24px rgba(160,32,240,.10); }
+.slam-head { display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; }
+.slam-tag { font-size:12px; font-weight:900; letter-spacing:.14em; color:#fff; }
+.slam-conf { font-size:9px; font-weight:800; letter-spacing:.12em; padding:3px 9px; border-radius:14px;
+  background:linear-gradient(90deg,#fbbf24,#fb7136); color:#151005; }
+.slam-note { font-size:10px; color:var(--text3); margin:5px 0 10px; line-height:1.4; }
+.slam-leg { display:flex; align-items:center; gap:10px; padding:8px 6px; border-radius:10px; cursor:pointer; transition:background .12s; }
+.slam-leg:hover { background:rgba(255,255,255,.03); }
+.slam-leg + .slam-leg { border-top:1px dashed rgba(160,32,240,.18); }
+.slam-n { width:17px; height:17px; border-radius:50%; background:var(--bg4); border:1px solid var(--border2);
+  display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:800; color:var(--text3); flex-shrink:0;
+  font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace; }
+.slam-meta { flex:1; min-width:0; }
+.slam-name { font-size:13px; font-weight:800; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.slam-sub { font-size:9.5px; color:var(--text3); margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.slam-prob { font-size:16px; font-weight:800; color:#c9a6ff; font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace; flex-shrink:0; }
+.slam-odds { font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace; font-size:11px; font-weight:700; color:var(--text2);
+  background:var(--bg3); border:1px solid var(--border2); border-radius:7px; padding:4px 8px; cursor:pointer; flex-shrink:0;
+  display:inline-flex; align-items:center; gap:5px; transition:all .13s; }
+.slam-odds i { font-style:normal; font-size:8px; font-weight:800; color:#60a5fa; background:rgba(96,165,250,.15); padding:1px 5px; border-radius:4px; }
+.slam-odds:hover { border-color:rgba(160,32,240,.6); color:#fff; box-shadow:0 0 8px rgba(160,32,240,.3); }
+.slam-foot { display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-top:11px; padding-top:10px; border-top:1px solid rgba(160,32,240,.22); }
+.slam-pay, .slam-all { font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace; font-size:11px; color:var(--text2); }
+.slam-pay b { color:#34d399; font-size:13px; } .slam-all b { color:#c9a6ff; }
+.slam-cta { margin-left:auto; font-size:11px; font-weight:800; padding:7px 14px; border-radius:9px; cursor:pointer;
+  background:linear-gradient(90deg,#7a2ce0,#a020f0); color:#fff; box-shadow:0 0 12px rgba(160,32,240,.35); transition:all .15s; }
+.slam-cta:hover { box-shadow:0 0 18px rgba(160,32,240,.6); transform:translateY(-1px); }
 /* ── Pitchers & Ks tab ── */
 .pt-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(310px,1fr)); gap:10px; padding:0 20px 24px; }
 .pt-card { background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:14px 16px; position:relative; }
@@ -1581,7 +1611,7 @@ body::after {
   <div class="nav-right">
     <button class="notif-bell" id="notifBell" onclick="toggleNotif()" title="Browser alert when a modeled batter homers">🔔</button>
     <span class="nav-badge">JUL 26 · 2026</span>
-    <span class="nav-date" id="buildStamp">updated 11:00 am et</span>
+    <span class="nav-date" id="buildStamp">updated 11:09 am et</span>
     <span class="nav-date" id="liveCount"></span>
   </div>
 </nav>
@@ -2101,6 +2131,7 @@ body::after {
 
 <!-- ═══ PANE: POWER ═══════════════════════════════════════════ -->
 <div class="pane" id="pane-power">
+  <div id="slamTicket"></div>
   <div class="power-note" id="plays-note">Top 10 plays of the day — ranked by composite score blending model HR probability, market edge, and expected ROI</div>
   <div id="playsContainer" style="padding:16px 12px;display:flex;flex-direction:column;gap:12px"></div>
 </div>
@@ -5434,7 +5465,72 @@ function sortPow(k) {
   });
   renderPower();
 }
+// ─── THE MODEL'S TICKET: pure probability parlay, edge be damned ─
+// "Regardless of edge, who does the model think homers TODAY?" Legs are the
+// highest raw HR probabilities on the slate (quality-floored, pregame only);
+// the leg count follows confidence — every bat the model puts at 24%+ makes
+// the ticket, min 2, max 5.
+function buildSlamTicket() {
+  const el = document.getElementById('slamTicket');
+  if (!el) return;
+  const seen = new Set();
+  const pool = (typeof RESULTS !== 'undefined' ? RESULTS : [])
+    .filter(r => {
+      if (!r.hr_prob || !r.mid || seen.has(r.matched_name)) return false;
+      seen.add(r.matched_name);
+      if (gameStarted(r)) return false;
+      return (r.hh_pct || 0) >= 0.32 && (r.barrel_26 || 0) >= 0.05;
+    })
+    .sort((a, b) => b.hr_prob - a.hr_prob);
+  if (pool.length < 2) {
+    el.innerHTML = pool.length === 0 && (RESULTS || []).some(r => gameStarted(r))
+      ? `<div class="slam-wrap"><div class="slam-head"><span class="slam-tag">🎟 THE MODEL'S TICKET</span></div>
+         <div style="font-size:11px;color:var(--text3);padding:10px 2px">Slate underway — tonight's ticket is closed. Tomorrow's builds pregame.</div></div>`
+      : '';
+    return;
+  }
+  let legs = pool.filter(r => r.hr_prob >= 24).length;
+  legs = Math.max(2, Math.min(5, legs));
+  const picks = pool.slice(0, legs);
+  const confLbl = legs >= 5 ? 'MAX SEND · 5 LEGS' : legs === 4 ? 'HIGH CONFIDENCE · 4 LEGS'
+    : legs === 3 ? 'CONFIDENT · 3 LEGS' : 'SELECTIVE · 2 LEGS';
+  const allHit = picks.reduce((m, r) => m * (r.hr_prob / 100), 1);
+  let dec = 1, priced = true;
+  picks.forEach(r => {
+    const o = r.dk_hr_odds;
+    if (o == null) { priced = false; return; }
+    dec *= o > 0 ? 1 + o / 100 : 1 + 100 / Math.abs(o);
+  });
+  const payout = priced ? (10 * dec) : null;
+  const legRows = picks.map((r, i) => `
+    <div class="slam-leg" data-p="${(r.matched_name || '').replace(/"/g, '&quot;')}" onclick="openPlayerCard(this.dataset.p)">
+      <span class="slam-n">${i + 1}</span>
+      <span class="rk-hs" style="width:34px;height:34px;background-image:url(https://midfield.mlbstatic.com/v1/people/${r.mid}/spots/90);box-shadow:inset 0 0 0 1.5px rgba(160,32,240,.65)"></span>
+      <div class="slam-meta">
+        <div class="slam-name">${r.matched_name}</div>
+        <div class="slam-sub">${r.team} · vs ${r.opp_pitcher || '—'}${r.time ? ' · ' + r.time : ''}</div>
+      </div>
+      <div class="slam-prob">${(+r.hr_prob).toFixed(1)}%</div>
+      ${r.dk_hr_odds ? `<span class="slam-odds" data-a="${r.away}" data-h="${r.home}" data-p="${(r.matched_name || '').replace(/"/g, '&quot;')}" data-o="${r.dk_hr_odds}"
+        onclick="event.stopPropagation();onyxTicket({away:this.dataset.a,home:this.dataset.h,market:'HR',pick:this.dataset.p,side:'yes',odds:this.dataset.o})">${fmtOdds(r.dk_hr_odds)}<i>Onyx</i></span>` : ''}
+    </div>`).join('');
+  el.innerHTML = `<div class="slam-wrap">
+    <div class="slam-head">
+      <span class="slam-tag">🎟 THE MODEL'S TICKET</span>
+      <span class="slam-conf">${confLbl}</span>
+    </div>
+    <div class="slam-note">Highest HR probabilities on today's slate, edge ignored — the leg count follows the model's confidence.</div>
+    ${legRows}
+    <div class="slam-foot">
+      ${priced ? `<span class="slam-pay">$10 pays <b>$${payout.toFixed(0)}</b></span>` : ''}
+      <span class="slam-all">all ${legs} connect: <b>${(allHit * 100).toFixed(1)}%</b></span>
+      <span class="slam-cta" onclick="window.open(ONYX_FALLBACK_URL + '?utm_source=onyxbaseball&referrer=' + ONYX_REFERRER, '_blank')">⚡ Build it on Onyx</span>
+    </div>
+  </div>`;
+}
+
 function renderPower() {
+  buildSlamTicket();
   const seen = new Set();
   const pool = [];
   const evOf = r => {
