@@ -1,5 +1,16 @@
 """
-model.py — Onyx Baseball v29 HR probability model + pitcher K projections
+model.py — Onyx Baseball v30 HR probability model + pitcher K projections
+
+v30: launch geometry joins the power anchor, validated on the last
+three weeks of actual homers (466 HR across 244 qualified hitters):
+among equal-barrel hitters the high-FB% tercile out-homered the
+low-FB% tercile 1.20x, with pull rate adding a little more — so the
+expected-HR/PA anchor now tilts by career fly-ball rate (primary) and
+pull rate (secondary), clamped +/-20%, league-neutral at FB 38% /
+Pull 41% so the overall level does not move. Picks also LOCK at the
+slate's first qualifying pregame build: exactly five, no topping up
+across refresh runs, duplicates collapsed (a build race had logged
+8-10 on 7/25).
 
 v29: career anchors everywhere — large samples project, recency
 advises. Site-wide principle applied to the spots still leading with
@@ -545,8 +556,18 @@ def project_player(
     # carry a no-power profile to a slugger's number, and real power holds
     # its level through cold outcome stretches.
     _b3 = d.get("b3", None)
+    xhr_pa = None
     if _b3 is not None and pa_3yr >= 150:
         xhr_pa = max(0.002, min(0.075, (0.52 * float(_b3) + 0.006) * 0.64))
+        # v30: launch geometry — barrels only become homers in the air, to
+        # the pull side. Empirical (last-3-weeks study): equal-barrel
+        # hitters split by career FB% homer at a 1.20x ratio. Neutral at
+        # league FB 38% / Pull 41%; clamped so geometry adjusts, never rules.
+        _fb, _pl = d.get("fb"), d.get("pl")
+        geo = 1.0
+        if _fb: geo += 0.50 * (float(_fb) - 0.38) / 0.38
+        if _pl: geo += 0.25 * (float(_pl) - 0.41) / 0.41
+        xhr_pa *= max(0.80, min(1.22, geo))
         c_adj = 0.55 * c_adj + 0.45 * xhr_pa
 
     # Home/away split — prefer 2026 season splits (splits.json), else CAREER_DB ch/ca
@@ -563,6 +584,12 @@ def project_player(
         SPLIT_REG_K = 75
         pos_avg = POS_HR_AVG.get(pos, 0.038)
         base = (split_rate * split_pa + pos_avg * SPLIT_REG_K) / (split_pa + SPLIT_REG_K)
+        # v30: the contact-quality anchor applies on EVERY path. It had only
+        # been reachable through the no-split fallback below, leaving the
+        # v22 power anchor (and the new launch geometry) dormant for every
+        # regular with 50+ split PAs — outcomes were projecting unchecked.
+        if xhr_pa is not None:
+            base = 0.55 * base + 0.45 * xhr_pa
     else:
         base = c_adj
 
