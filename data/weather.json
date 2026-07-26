@@ -1,4 +1,15 @@
 {
+  "PHI": {
+    "venue": "Citizens Bank Park",
+    "temp": 80.6,
+    "precip": 1,
+    "wind_spd": 6.4,
+    "wind_dir": "S",
+    "humidity_pct": 47,
+    "pressure_mb": 1010.8,
+    "roof": false,
+    "flag": "clear"
+  },
   "TEX": {
     "venue": "Globe Life Field",
     "temp": 95.5,
@@ -10,122 +21,14 @@
     "roof": true,
     "flag": "clear"
   },
-  "PHI": {
-    "venue": "Citizens Bank Park",
-    "temp": 81.0,
-    "precip": 1,
-    "wind_spd": 7.2,
-    "wind_dir": "S",
-    "humidity_pct": 46,
-    "pressure_mb": 1010.7,
-    "roof": false,
-    "flag": "clear"
-  },
-  "BAL": {
-    "venue": "Camden Yards",
-    "temp": 81.7,
-    "precip": 1,
-    "wind_spd": 7.1,
-    "wind_dir": "SE",
-    "humidity_pct": 65,
-    "pressure_mb": 1012.9,
-    "roof": false,
-    "flag": "clear"
-  },
-  "MIA": {
-    "venue": "loanDepot Park",
-    "temp": 89.5,
-    "precip": 11,
-    "wind_spd": 3.0,
-    "wind_dir": "SW",
-    "humidity_pct": 69,
-    "pressure_mb": 1016.7,
-    "roof": true,
-    "flag": "clear"
-  },
-  "MIL": {
-    "venue": "American Family Field",
-    "temp": 80.4,
-    "precip": 2,
-    "wind_spd": 7.8,
-    "wind_dir": "E",
-    "humidity_pct": 98,
-    "pressure_mb": 1011.5,
-    "roof": true,
-    "flag": "clear"
-  },
-  "NYM": {
-    "venue": "Citi Field",
-    "temp": 82.7,
-    "precip": 0,
-    "wind_spd": 2.9,
-    "wind_dir": "N",
-    "humidity_pct": 44,
-    "pressure_mb": 1012.0,
-    "roof": false,
-    "flag": "clear"
-  },
   "SF": {
     "venue": "Oracle Park",
-    "temp": 66.3,
+    "temp": 64.1,
     "precip": 1,
-    "wind_spd": 14.7,
+    "wind_spd": 13.6,
     "wind_dir": "W",
-    "humidity_pct": 76,
-    "pressure_mb": 1017.3,
-    "roof": false,
-    "flag": "clear"
-  },
-  "CWS": {
-    "venue": "Rate Field",
-    "temp": 82.5,
-    "precip": 0,
-    "wind_spd": 5.6,
-    "wind_dir": "E",
-    "humidity_pct": 83,
-    "pressure_mb": 1012.0,
-    "roof": false,
-    "flag": "clear"
-  },
-  "STL": {
-    "venue": "Busch Stadium",
-    "temp": 93.8,
-    "precip": 0,
-    "wind_spd": 2.1,
-    "wind_dir": "SW",
-    "humidity_pct": 74,
-    "pressure_mb": 1012.0,
-    "roof": false,
-    "flag": "clear"
-  },
-  "DET": {
-    "venue": "Comerica Park",
-    "temp": 82.6,
-    "precip": 6,
-    "wind_spd": 6.8,
-    "wind_dir": "SW",
-    "humidity_pct": 63,
-    "pressure_mb": 1011.7,
-    "roof": false,
-    "flag": "clear"
-  },
-  "MIN": {
-    "venue": "Target Field",
-    "temp": 93.5,
-    "precip": 0,
-    "wind_spd": 7.7,
-    "wind_dir": "SSW",
-    "humidity_pct": 56,
-    "pressure_mb": 1008.3,
-    "roof": false,
-    "flag": "clear"
-  },
-  "WSH": {
-    "venue": "Nationals Park",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
+    "humidity_pct": 79,
+    "pressure_mb": 1017.4,
     "roof": false,
     "flag": "clear"
   }
