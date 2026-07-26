@@ -485,21 +485,37 @@ board = sorted([r for r in _cands
                key=lambda r: -(r.get("hr_edge") or 0))
 for r in board:
     r["_tier"] = "edge"
-if board:
-    picks = jload(dpath("picks_input.json"), [])
-    if not isinstance(picks, list):
-        picks = []
-    stamp = now.strftime("%Y-%m-%d")
-    have = {(p.get("date"), nk(p.get("player") or p.get("name") or ""))
-            for p in picks if isinstance(p, dict)}
-    room = 5 - sum(1 for p in picks if isinstance(p, dict) and p.get("date") == stamp)
-    added = 0
-    for r in board:
-        if room - added <= 0:
-            break
-        key = nk(r["batter_name"])
-        if (stamp, key) in have:
-            continue
+picks = jload(dpath("picks_input.json"), [])
+if not isinstance(picks, list):
+    picks = []
+stamp = now.strftime("%Y-%m-%d")
+
+# v30: collapse duplicate (date, player) entries — build races / merge
+# unions had doubled entries (7/25 carried 10 picks incl. the same player
+# twice). First occurrence wins; the record is sacred.
+_seen, _clean = set(), []
+for p in picks:
+    if not isinstance(p, dict):
+        continue
+    kk = (p.get("date"), nk(p.get("player") or p.get("name") or ""))
+    if kk in _seen:
+        continue
+    _seen.add(kk)
+    _clean.append(p)
+_deduped = len(picks) - len(_clean)
+picks = _clean
+
+# v30 SLATE LOCK: the day's five picks are chosen ONCE, by the first build
+# that has qualifying pregame plays. Later refresh runs never add, replace,
+# or top up — what we lock at the start of the slate is what we track.
+_today_ct = sum(1 for p in picks if p.get("date") == stamp)
+_pregame = [r for r in board
+            if _hours_since_start((GAMES.get(
+                next((g["game_key"] for g in games_out if g["label"] == r.get("game")), ""), {})
+                or {}).get("start")) <= 0.0]
+added = 0
+if _today_ct == 0 and _pregame:
+    for r in _pregame[:5]:
         picks.append({"date": stamp, "player": r["batter_name"],
                       "odds": r.get("dk_hr_odds"),
                       "prob": round((r.get("hr_prob") or 0) / 100, 4),
@@ -507,12 +523,17 @@ if board:
                       "tier": r.get("_tier", "edge"),
                       "hit": None})
         added += 1
-    if added:
-        with open(dpath("picks_input.json"), "w", encoding="utf-8") as f:
-            json.dump(picks, f, indent=1, ensure_ascii=False)
-    print(f"picks: top-5 tracker logged {added} new play(s) for {stamp}")
+if added or _deduped:
+    with open(dpath("picks_input.json"), "w", encoding="utf-8") as f:
+        json.dump(picks, f, indent=1, ensure_ascii=False)
+if added:
+    print(f"picks: slate LOCKED — {added} play(s) for {stamp}")
+elif _today_ct:
+    print(f"picks: slate already locked for {stamp} ({_today_ct} play(s)) - no changes")
 else:
-    print("picks: no qualifying board plays (or no odds) - nothing logged")
+    print("picks: no qualifying pregame plays yet - lock deferred to next run")
+if _deduped:
+    print(f"picks: removed {_deduped} duplicate record entr(ies)")
 
 # ---------------------------------------------------------------- inject payload into shell
 # Fail loudly: an empty slate means upstream data broke. Abort without touching
