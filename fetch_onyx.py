@@ -375,6 +375,171 @@ def harvest_players(key):
     return cache
 
 
+GAMELINES = "data/game_lines.json"
+ODDS_JSON = "data/odds.json"
+ODDS_META = "data/odds_meta.json"
+# the Onyx book's identity on OpticOdds; overridable without a code change
+BOOK_CANDIDATES = [b for b in [
+    (os.environ.get("ONYX_SPORTSBOOK") or "").strip(), "onyx", "Onyx", "o_default_v8",
+] if b]
+
+
+def _american(v):
+    """Coerce an OpticOdds price to an American int (tolerates decimal odds)."""
+    try:
+        f = float(v)
+    except (TypeError, ValueError):
+        return None
+    if abs(f) >= 100:
+        return int(round(f))
+    if f >= 2.0:
+        return int(round((f - 1.0) * 100))
+    if f > 1.01:
+        return -int(round(100.0 / (f - 1.0)))
+    return None
+
+
+def harvest_game_odds(key, links):
+    """Price the board straight from the ONYX book via OpticOdds so the site
+    matches app.onyxodds.com exactly (user report: site TEX +116 vs Onyx
+    +144 — consensus books are not Onyx's prices). Fills game_lines.json
+    moneylines/totals and, when the slate is covered, replaces odds.json HR
+    props. The Odds API stays the fallback: on any miss here, its numbers
+    survive untouched."""
+    try:
+        lines = json.load(open(GAMELINES, encoding="utf-8"))
+        assert isinstance(lines, dict) and lines
+    except Exception:
+        print("onyx odds: no game_lines.json; skipping Onyx pricing")
+        return
+    # board order (game 1 before its doubleheader twin) so name-keyed HR
+    # prices keep the current game's number, mirroring fetch_odds
+    ordered = [(k, links[k]) for k in lines if links.get(k)]
+    if not ordered:
+        print("onyx odds: no fixture links match the board; skipping")
+        return
+    slug_to_gk = {s: k for k, s in ordered}
+    book = None
+    hr, ml_games, tot_games = {}, set(), set()
+    for i in range(0, len(ordered), 5):
+        chunk = ordered[i:i + 5]
+        fx_q = "".join(f"&fixture_id={urllib.parse.quote(s)}" for _, s in chunk)
+        rows = None
+        for bk in ([book] if book else BOOK_CANDIDATES):
+            url = (f"{OPTIC}/fixtures/odds?sport=baseball&league=mlb"
+                   f"&sportsbook={urllib.parse.quote(bk)}"
+                   f"&market=moneyline&market=total_runs&market=player_home_runs"
+                   f"&odds_format=AMERICAN{fx_q}")
+            data = None
+            for attempt in range(3):
+                try:
+                    data = http_json(url, headers={"X-Api-Key": key})
+                    break
+                except Exception as e:
+                    msg = str(e)
+                    print(f"onyx odds: book={bk} -> {msg[:220]}")
+                    if "HTTP 429" in msg and attempt < 2:
+                        m = re.search(r"'[Rr]etry-[Aa]fter':\s*'?(\d+)", msg)
+                        time.sleep(min(60, int(m.group(1)) if m else 15))
+                        continue
+                    break
+            cand = data.get("data") if isinstance(data, dict) else data
+            if isinstance(cand, list) and any(isinstance(r, dict) and r.get("odds") for r in cand):
+                rows, book = cand, bk
+                break
+        if rows is None:
+            continue
+        for row in rows:
+            slug = _slug_from_row(row) or str(row.get("id") or "")
+            gk = slug_to_gk.get(slug)
+            if not gk:
+                continue
+            parts = gk.split("_")
+            if len(parts) > 2 and parts[-1].isdigit():
+                parts = parts[:-1]
+            gk_away, gk_home = parts[0], parts[1]
+            parsed_any = False
+            for od in (row.get("odds") or []):
+                if not isinstance(od, dict):
+                    continue
+                mkt = str(od.get("market") or od.get("market_id") or "").lower()
+                nm = str(od.get("name") or od.get("selection") or "")
+                price = _american(od.get("price"))
+                if price is None:
+                    continue
+                if "moneyline" in mkt:
+                    ab = _abbr_from(od.get("team_id")) or _abbr_from(nm) \
+                         or _abbr_from(od.get("selection"))
+                    if ab == gk_away:
+                        lines[gk]["away_ml"] = price; ml_games.add(gk); parsed_any = True
+                    elif ab == gk_home:
+                        lines[gk]["home_ml"] = price; ml_games.add(gk); parsed_any = True
+                elif "total" in mkt and "team" not in mkt:
+                    sel = str(od.get("selection_line") or "").lower()
+                    if sel == "over" or (not sel and nm.lower().startswith("over")):
+                        pts = od.get("points")
+                        if pts is None:
+                            m = re.search(r"(\d+(?:\.\d+)?)", nm)
+                            pts = m.group(1) if m else None
+                        try:
+                            lines[gk]["total"] = float(pts); tot_games.add(gk); parsed_any = True
+                        except (TypeError, ValueError):
+                            pass
+                elif "home_run" in mkt:
+                    sel = str(od.get("selection_line") or "").lower()
+                    over = sel == "over" or re.search(r"\bover\b", nm, re.I)
+                    pts = od.get("points")
+                    if pts is None:
+                        m = re.search(r"over\s+(\d+(?:\.\d+)?)", nm, re.I)
+                        pts = m.group(1) if m else None
+                    try:
+                        pts = float(pts)
+                    except (TypeError, ValueError):
+                        continue
+                    if not over or pts > 0.5:
+                        continue
+                    player = od.get("selection") if od.get("selection_line") else None
+                    player = player or re.sub(r"\s+(over|under)\s+[\d.]+\s*$", "", nm, flags=re.I)
+                    if player:
+                        hr.setdefault(_nk(player), price)
+                        parsed_any = True
+            if not parsed_any and row.get("odds"):
+                o0 = row["odds"][0]
+                diag = {k: o0.get(k) for k in list(o0.keys())[:12]} if isinstance(o0, dict) else o0
+                print("onyx odds: unparsed odds row shape: "
+                      + json.dumps(diag, ensure_ascii=False, default=str)[:400])
+        time.sleep(1.2)
+
+    if not book:
+        print(f"onyx odds: no book matched (tried {BOOK_CANDIDATES}); "
+              "consensus lines kept")
+        return
+    if ml_games or tot_games:
+        now_ts = int(time.time())
+        for gk in ml_games | tot_games:
+            lines[gk]["onyx_ts"] = now_ts   # fetch_odds --pulse respects this
+        json.dump(lines, open(GAMELINES, "w", encoding="utf-8"),
+                  indent=2, ensure_ascii=False)
+        print(f"onyx odds: book '{book}' priced ML for {len(ml_games)} and "
+              f"totals for {len(tot_games)} of {len(ordered)} games")
+    # only take over the HR board when coverage is real; a thin result keeps
+    # the consensus odds.json (median tripwire mirrors fetch_odds)
+    if len(hr) >= 20:
+        srt = sorted(hr.values())
+        med = srt[len(srt) // 2]
+        if med > 1500:
+            print(f"onyx odds: HR median +{med} is not a 0.5-line slate - discarded")
+            return
+        json.dump(hr, open(ODDS_JSON, "w", encoding="utf-8"), indent=1, ensure_ascii=False)
+        json.dump({"source": "onyx-opticodds",
+                   "fetched": datetime.now(ZoneInfo("UTC")).isoformat(),
+                   "count": len(hr), "fresh": True},
+                  open(ODDS_META, "w", encoding="utf-8"))
+        print(f"onyx odds: odds.json now Onyx-priced ({len(hr)} HR props, median +{med})")
+    elif hr:
+        print(f"onyx odds: only {len(hr)} HR props from Onyx - keeping consensus odds.json")
+
+
 def verify(slug):
     """Confirm one slug resolves on the public share endpoint (best effort)."""
     for full in ("Atlanta Braves", "New York Yankees", "Los Angeles Dodgers",
@@ -423,10 +588,13 @@ def main():
     harvest_players(key)
     if not links:
         print(f"onyx: no fixtures harvested; keeping existing links ({len(prev_links)})")
+        if prev_links:
+            harvest_game_odds(key, prev_links)
         return
 
     merged = dict(prev_links)
     merged.update(links)   # harvested wins over any hand-seeded entry
+    harvest_game_odds(key, merged)
     json.dump({"date": today, "links": merged},
               open(OUT, "w", encoding="utf-8"), indent=1)
     for k, v in sorted(links.items()):

@@ -231,6 +231,11 @@ def merge_game_lines(key):
         gk = _line_key(away, home, g.get("commence_time")) if away and home else None
         if not gk:
             continue
+        # fetch_onyx prices this game from the ONYX book itself; consensus
+        # numbers must not clobber a fresh Onyx price (site vs app mismatch).
+        # After ~45 min without a re-stamp the consensus fallback resumes.
+        if (lines[gk].get("onyx_ts") or 0) > time.time() - 2700:
+            continue
         h2h_book = _pick_book(g.get("bookmakers"), "h2h")
         tot_book = _pick_book(g.get("bookmakers"), "totals")
         if h2h_book:
