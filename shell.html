@@ -1098,16 +1098,20 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
 @keyframes gcShock { 0% { transform:scale(1); opacity:.85; } 100% { transform:scale(1.28); opacity:0; } }
 /* ── backyard-ball zone scene: big-head kids, swing, throw, pitch track ── */
 .gc-kid .bat { transition:transform .1s; }
-.gc-kid.swingnow .bat { animation:gcSwing .5s cubic-bezier(.5,0,.2,1) 1; }
-@keyframes gcSwing { 0% { transform:rotate(0deg); } 30% { transform:rotate(-42deg); }
-  65% { transform:rotate(148deg); } 100% { transform:rotate(0deg); } }
+/* level swing through the zone, timed so the barrel arrives with the ball
+   (incoming track = 0.5s): small load back, whip through contact, hold the
+   follow-through, reset. Batter always faces screen-left (the mound). */
+.gc-kid.swingnow .bat { animation:gcSwing .7s cubic-bezier(.45,0,.2,1) .18s 1; }
+@keyframes gcSwing { 0% { transform:rotate(0deg); } 22% { transform:rotate(16deg); }
+  48% { transform:rotate(-118deg); } 66% { transform:rotate(-165deg); }
+  86% { transform:rotate(-165deg); } 100% { transform:rotate(0deg); } }
 .gc-kid .parm { }
-.gc-kid.throwing .parm { animation:gcThrow .65s cubic-bezier(.4,0,.3,1) 1; }
-@keyframes gcThrow { 0% { transform:rotate(0deg); } 38% { transform:rotate(-120deg); }
-  68% { transform:rotate(22deg); } 100% { transform:rotate(0deg); } }
-.gc-kid.swingnow { animation:gcHips .5s ease-out 1; }
-@keyframes gcHips { 0% { transform:translateX(0); } 45% { transform:translateX(-2px); }
-  75% { transform:translateX(1.5px); } 100% { transform:translateX(0); } }
+.gc-kid.throwing .parm { animation:gcThrow .6s cubic-bezier(.4,0,.3,1) 1; }
+@keyframes gcThrow { 0% { transform:rotate(0deg); } 30% { transform:rotate(-28deg); }
+  60% { transform:rotate(118deg); } 100% { transform:rotate(0deg); } }
+.gc-kid.swingnow { animation:gcHips .7s ease-out .18s 1; }
+@keyframes gcHips { 0% { transform:translateX(0); } 40% { transform:translateX(3px); }
+  60% { transform:translateX(-4px); } 100% { transform:translateX(0); } }
 .gc-inplay-streak { stroke-dasharray:60; stroke-dashoffset:60; animation:gcStreak .6s ease-out .25s forwards; }
 @keyframes gcStreak { to { stroke-dashoffset:0; } }
 .gc-pitch-trail { opacity:0; animation:gcTrail .8s ease-out forwards; }
@@ -3837,24 +3841,42 @@ function gcKid(x, gy, s, mid, team, kind, dir, cls, vbx) {
     : `<circle cx="${x}" cy="${hcy}" r="${hr}" fill="${skin}" stroke="rgba(0,0,0,.3)"/>
        <circle cx="${x - 4 * s}" cy="${hcy - 2 * s}" r="${1.6 * s}" fill="#111"/><circle cx="${x + 4 * s}" cy="${hcy - 2 * s}" r="${1.6 * s}" fill="#111"/>
        <path d="M ${x - 4 * s} ${hcy + 4 * s} Q ${x} ${hcy + 7 * s} ${x + 4 * s} ${hcy + 4 * s}" stroke="#111" stroke-width="1.2" fill="none"/>`;
-  let arms = '';
+  let arms = '', legOverride = null;
   if (kind === 'bat') {
-    const hx = x + dir * 13 * s, hy = shY + 7 * s;
-    arms = `<path d="M ${x + dir * 8 * s} ${shY + 4 * s} L ${hx} ${hy}" stroke="${skin}" stroke-width="${3.6 * s}" stroke-linecap="round"/>
+    // real batting stance: `dir` is the way he FACES (toward the pitcher).
+    // Staggered feet (open stride toward the mound), both hands together at
+    // the back shoulder, bat loaded up and back behind the head. The swing
+    // (CSS gcSwing) whips the barrel level through the zone toward the
+    // pitcher, with a little stride lunge from gcHips.
+    legOverride = `<path d="M ${x + dir * 3 * s} ${gy - 16 * s} L ${x + dir * 9 * s} ${gy - 1} M ${x - dir * 3 * s} ${gy - 16 * s} L ${x - dir * 8 * s} ${gy - 1}" stroke="#1b2338" stroke-width="${5 * s}" stroke-linecap="round"/>
+      <ellipse cx="${x + dir * 10 * s}" cy="${gy}" rx="${4.5 * s}" ry="${2 * s}" fill="#0e1420"/>
+      <ellipse cx="${x - dir * 9 * s}" cy="${gy}" rx="${4.5 * s}" ry="${2 * s}" fill="#0e1420"/>`;
+    const hx = x - dir * 8 * s, hy = shY + 2 * s;      // hands at the BACK shoulder
+    arms = `<path d="M ${x + dir * 7 * s} ${shY + 5 * s} L ${hx} ${hy} M ${x - dir * 5 * s} ${shY + 5 * s} L ${hx} ${hy}" stroke="${skin}" stroke-width="${3.4 * s}" stroke-linecap="round" fill="none"/>
       <g class="bat" style="transform-box:view-box;transform-origin:${hx - vbx}px ${hy}px">
-        <line x1="${hx}" y1="${hy}" x2="${hx + dir * 10 * s}" y2="${hy - 30 * s}" stroke="#C89B6C" stroke-width="${4.6 * s}" stroke-linecap="round"/>
-        <line x1="${hx + dir * 7 * s}" y1="${hy - 21 * s}" x2="${hx + dir * 10 * s}" y2="${hy - 30 * s}" stroke="#a87c50" stroke-width="${4.6 * s}" stroke-linecap="round"/>
+        <line x1="${hx}" y1="${hy}" x2="${(hx - dir * 11 * s)}" y2="${hy - 28 * s}" stroke="#C89B6C" stroke-width="${4.4 * s}" stroke-linecap="round"/>
+        <line x1="${(hx - dir * 8 * s)}" y1="${hy - 20 * s}" x2="${(hx - dir * 11 * s)}" y2="${hy - 28 * s}" stroke="#a87c50" stroke-width="${4.4 * s}" stroke-linecap="round"/>
+        <circle cx="${hx}" cy="${hy}" r="${2.6 * s}" fill="${skin}"/>
       </g>`;
   } else {
-    const gx = x - dir * 12 * s, gy2 = shY + 9 * s;
-    arms = `<path d="M ${x - dir * 8 * s} ${shY + 4 * s} L ${gx} ${gy2}" stroke="${skin}" stroke-width="${3.6 * s}" stroke-linecap="round"/>
-      <circle cx="${gx}" cy="${gy2}" r="${4.5 * s}" fill="#7a4a21" stroke="#5c3717" stroke-width="1"/>
-      <g class="parm" style="transform-box:view-box;transform-origin:${x + dir * 7 * s - vbx}px ${shY + 3 * s}px">
-        <path d="M ${x + dir * 7 * s} ${shY + 3 * s} L ${x + dir * 14 * s} ${shY + 11 * s}" stroke="${skin}" stroke-width="${3.6 * s}" stroke-linecap="round"/>
-        <circle cx="${x + dir * 14 * s}" cy="${shY + 11 * s}" r="${2.6 * s}" fill="#fff" stroke="#d33" stroke-width=".8"/>
+    // pitcher faces the plate (`dir`); the BALL rides in his real throwing
+    // hand (kid.pitHand): a righty's arm loads on the far side of his body
+    // from the catcher's view, a lefty's on the near side. Glove on the
+    // other hand, out front. gcThrow whips the arm over the top.
+    const throwBack = (String(cls || '').includes('lefty')) ? 1 : -1;  // set via cls flag
+    const gx = x - throwBack * 12 * s, gy2 = shY + 8 * s;   // glove opposite the ball hand
+    const sx0 = x + throwBack * 6 * s, sy0 = shY + 2 * s;              // throwing shoulder
+    const hx2 = x + throwBack * 12 * s, hy2 = shY - 6 * s;             // hand cocked up-back
+    arms = `<path d="M ${x + dir * 7 * s} ${shY + 4 * s} L ${gx} ${gy2}" stroke="${skin}" stroke-width="${3.6 * s}" stroke-linecap="round"/>
+      <circle cx="${gx}" cy="${gy2}" r="${4.8 * s}" fill="#7a4a21" stroke="#5c3717" stroke-width="1"/>
+      <circle cx="${gx - 1.5 * s}" cy="${gy2 - 1 * s}" r="${2 * s}" fill="#5c3717" opacity=".6"/>
+      <g class="parm" style="transform-box:view-box;transform-origin:${sx0 - vbx}px ${sy0}px">
+        <path d="M ${sx0} ${sy0} L ${hx2} ${hy2}" stroke="${skin}" stroke-width="${3.6 * s}" stroke-linecap="round"/>
+        <circle cx="${hx2}" cy="${hy2}" r="${2.7 * s}" fill="#fff" stroke="#d33" stroke-width=".8"/>
+        <path d="M ${hx2 - 1.2 * s} ${hy2 - 1 * s} Q ${hx2} ${hy2 + 1.5 * s} ${hx2 + 1.2 * s} ${hy2 - 1 * s}" stroke="#d33" stroke-width=".6" fill="none"/>
       </g>`;
   }
-  return `<g class="gc-kid${cls ? ' ' + cls : ''}">${legs}${jersey}${arms}${head}</g>`;
+  return `<g class="gc-kid${cls ? ' ' + cls : ''}">${legOverride || legs}${jersey}${arms}${head}</g>`;
 }
 function gcZone(events, big, batSide, isCur, kid) {
   kid = kid || {};
@@ -3887,11 +3909,12 @@ function gcZone(events, big, batSide, isCur, kid) {
     return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5.8" fill="${gcPitchClr(ev)}" fill-opacity=".93" stroke="rgba(0,0,0,.55)" stroke-width="1"/>
       <text x="${x.toFixed(1)}" y="${(y + 2.6).toFixed(1)}" text-anchor="middle" font-size="7.5" font-weight="800" fill="#0a0a14">${ev.pitchNumber || ''}</text>`;
   }).join('');
-  // animation gating: one throw + track (+ swing on an offer) per NEW pitch
+  // animation gating: one throw + track (+ swing on an offer) per NEW pitch.
+  // Handedness picks which batter's box he stands in; EVERY batter faces the
+  // pitcher (screen-left), like a real stance.
   const lefty = String(batSide || 'R').toUpperCase() === 'L';
-  const bDir = lefty ? -1 : 1;                       // batter faces the zone
-  const bX = lefty ? 238 : 96, bG = 154;             // batter feet
-  const pX = 44, pG = 120;                           // pitcher feet (distance)
+  const bX = lefty ? 238 : 96, bG = 154;             // batter feet (box by hand)
+  const pX = 44, pG = 120;                           // pitcher feet (mound)
   let swingNow = false, newPitch = false, streak = '', track = '';
   if (last) {
     const pitchKey = `${pitches.length}|${last.pitchNumber}|${(last.details || {}).description || ''}`;
@@ -3901,8 +3924,8 @@ function gcZone(events, big, batSide, isCur, kid) {
       if (pitchKey !== window._gcSwingKey) window._gcSwingKey = pitchKey;
     }
     if (lastXY) {
-      const hx = pX + 10, hy = pG - 22;              // release point
-      const cpx = (hx + lastXY[0]) / 2, cpy = Math.min(hy, lastXY[1]) - 26;
+      const hx = pX + 6, hy = pG - 40;               // overhead release point
+      const cpx = (hx + lastXY[0]) / 2, cpy = Math.min(hy, lastXY[1]) - 24;
       const path = `M ${hx} ${hy} Q ${cpx.toFixed(1)} ${cpy.toFixed(1)} ${lastXY[0].toFixed(1)} ${lastXY[1].toFixed(1)}`;
       if (newPitch) {
         track = `<path d="${path}" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="1.2" stroke-dasharray="3,3" class="gc-pitch-trail"/>
@@ -3913,8 +3936,26 @@ function gcZone(events, big, batSide, isCur, kid) {
           </circle>`;
       }
       if ((last.details || {}).isInPlay) {
-        streak = `<line x1="${lastXY[0].toFixed(1)}" y1="${lastXY[1].toFixed(1)}" x2="${(lastXY[0] - bDir * 46).toFixed(1)}" y2="6" class="gc-inplay-streak" stroke="#34d399" stroke-width="2.2" stroke-linecap="round" stroke-opacity=".75"/>
-          <circle cx="${(lastXY[0] - bDir * 46).toFixed(1)}" cy="8" r="3" fill="#34d399" opacity="0"><animate attributeName="opacity" values="0;0;1;0" keyTimes="0;0.5;0.75;1" dur="1.3s" fill="freeze"/></circle>`;
+        const px2 = lastXY[0].toFixed(1), py2 = lastXY[1].toFixed(1);
+        if (newPitch) {
+          // the full contact experience: ball arrives (0.5s), barrel meets it
+          // (white crack ring), ball climbs off the bat back over the mound
+          // and out of frame toward the field
+          const outPath = `M ${px2} ${py2} Q ${(lastXY[0] - 85).toFixed(1)} ${(lastXY[1] - 78).toFixed(1)} -10 ${Math.max(4, lastXY[1] - 96).toFixed(1)}`;
+          streak = `
+            <circle cx="${px2}" cy="${py2}" r="1" fill="none" stroke="#fff" stroke-width="1.8" opacity="0">
+              <animate attributeName="r" values="1;12" begin="0.5s" dur="0.35s" fill="freeze"/>
+              <animate attributeName="opacity" values="0;.95;0" keyTimes="0;0.25;1" begin="0.5s" dur="0.45s" fill="freeze"/>
+            </circle>
+            <circle r="4.5" fill="#fff" stroke="#d33" stroke-width=".7" opacity="0">
+              <animateMotion path="${outPath}" begin="0.55s" dur="0.8s" fill="freeze" calcMode="spline" keySplines="0.2 0.6 0.6 1" keyTimes="0;1"/>
+              <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.06;0.9;1" begin="0.55s" dur="0.8s" fill="freeze"/>
+              <animate attributeName="r" values="4.8;2.2" begin="0.55s" dur="0.8s" fill="freeze"/>
+            </circle>
+            <path d="${outPath}" fill="none" stroke="rgba(52,211,153,.55)" stroke-width="1.6" stroke-dasharray="4,4" class="gc-pitch-trail" style="animation-delay:.55s"/>`;
+        } else {
+          streak = `<line x1="${px2}" y1="${py2}" x2="${(lastXY[0] - 60).toFixed(1)}" y2="${Math.max(6, lastXY[1] - 70).toFixed(1)}" stroke="rgba(52,211,153,.4)" stroke-width="1.6" stroke-linecap="round" stroke-dasharray="4,4"/>`;
+        }
       }
     }
   }
@@ -3930,8 +3971,10 @@ function gcZone(events, big, batSide, isCur, kid) {
     <ellipse cx="${pX}" cy="${pG + 2}" rx="26" ry="7" fill="rgba(120,90,60,.28)"/>
     <ellipse cx="${bX}" cy="${bG + 2}" rx="24" ry="6" fill="rgba(120,90,60,.2)"/>
     <path d="M ${ZX + ZW / 2 - 12} 150 L ${ZX + ZW / 2 + 12} 150 L ${ZX + ZW / 2 + 12} 155 L ${ZX + ZW / 2} 159 L ${ZX + ZW / 2 - 12} 155 Z" fill="rgba(255,255,255,.16)"/>`;
-  const pitcherKid = gcKid(pX, pG, 0.72, kid.pitMid, kid.pitTeam, 'pitch', 1, newPitch ? 'throwing' : '', 0);
-  const batterKid = gcKid(bX, bG, 1.0, kid.batMid, kid.batTeam, 'bat', bDir, swingNow ? 'swingnow' : '', 0);
+  const pitLefty = String(kid.pitHand || 'R').toUpperCase() === 'L';
+  const pitcherKid = gcKid(pX, pG, 0.72, kid.pitMid, kid.pitTeam, 'pitch', 1,
+    (newPitch ? 'throwing ' : '') + (pitLefty ? 'lefty' : ''), 0);
+  const batterKid = gcKid(bX, bG, 1.0, kid.batMid, kid.batTeam, 'bat', -1, swingNow ? 'swingnow' : '', 0);
   const s = big ? 1.2 : 1.05;
   return `<svg viewBox="0 0 ${VW} ${VH}" width="${Math.round(VW * s)}" height="${Math.round(VH * s)}" style="display:block;max-width:100%">
     ${scene}
@@ -4415,7 +4458,8 @@ function gcPbpHtml(ld) {
     const score = scoring ? `<span class="sc">${res.awayScore ?? ''}–${res.homeScore ?? ''}</span>` : '';
     const detail = open ? `<div class="gc-pbp-x">
         <div class="gc-zonewrap"><div class="zl">Zone · catcher's view</div>${gcZone(p.playEvents, true, ((mu.batSide || {}).code), false,
-          {batMid: (mu.batter || {}).id, batTeam: ab.halfInning === 'top' ? gcPbpAway : gcPbpHome, pitMid: (mu.pitcher || {}).id, pitTeam: ab.halfInning === 'top' ? gcPbpHome : gcPbpAway})}</div>
+          {batMid: (mu.batter || {}).id, batTeam: ab.halfInning === 'top' ? gcPbpAway : gcPbpHome, pitMid: (mu.pitcher || {}).id, pitTeam: ab.halfInning === 'top' ? gcPbpHome : gcPbpAway,
+           pitHand: ((mu.pitchHand || {}).code) || 'R'})}</div>
         <div class="pl">${gcPitchList(p.playEvents)}</div>
       </div>` : '';
     const isHrPlay = /home run/i.test(res.event || '');
@@ -4581,7 +4625,8 @@ function renderGC(feed, wp) {
         <div class="gc-dots">O ${gcDots(count.outs || 0, 3, 'on-o')}</div>
       </div>
       <div class="gc-zonewrap"><div class="zl">Strike zone · live</div>${gcZone((((ld.plays || {}).currentPlay || {}).playEvents), false, curBatSide, true,
-        {batMid: bat.id, batTeam: offSide === 'away' ? aAb : hAb, pitMid: pit.id, pitTeam: offSide === 'away' ? hAb : aAb})}</div>
+        {batMid: bat.id, batTeam: offSide === 'away' ? aAb : hAb, pitMid: pit.id, pitTeam: offSide === 'away' ? hAb : aAb,
+         pitHand: ((curMu.pitchHand || {}).code) || 'R'})}</div>
     </div>
     <div style="margin-top:10px">${gcPitchList((((ld.plays || {}).currentPlay || {}).playEvents))}</div>
     </div>`;
