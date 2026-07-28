@@ -60,8 +60,10 @@ CODE_ABBR = {
 SLUG_RE = re.compile(r"^\d+-\d+-\d{4}-\d{2}-\d{2}-\d+$")
 
 
-def http_json(url, timeout=30):
-    req = urllib.request.Request(url, headers={"User-Agent": UA, "Accept": "application/json"})
+def http_json(url, timeout=30, headers=None):
+    h = {"User-Agent": UA, "Accept": "application/json"}
+    h.update(headers or {})
+    req = urllib.request.Request(url, headers=h)
     with urllib.request.urlopen(req, timeout=timeout) as r:
         return json.loads(r.read().decode("utf-8", "replace"))
 
@@ -109,46 +111,80 @@ def team_abbr(fx, side):
     return None
 
 
+def _slug_from_row(fx):
+    """Find the Onyx slug anywhere in a fixture row: the usual id fields
+    first, then any string value matching the strict slug shape (some API
+    versions carry it as game_id inside a nested fixture object)."""
+    for k in ("id", "fixture_id", "game_id", "slug"):
+        v = str(fx.get(k) or "")
+        if SLUG_RE.match(v):
+            return v
+    for v in fx.values():
+        if isinstance(v, str) and SLUG_RE.match(v):
+            return v
+        if isinstance(v, dict):
+            for vv in v.values():
+                if isinstance(vv, str) and SLUG_RE.match(vv):
+                    return vv
+    return None
+
+
 def harvest_optic(key, date):
-    """Every MLB fixture id (= slug) for the date, keyed away_home."""
-    links, sample = {}, None
+    """Every MLB fixture id (= slug) for the date, keyed away_home. Tries
+    both auth styles (X-Api-Key header, key= query param) across v3 and
+    legacy paths, and LOGS the response shape whenever nothing maps so the
+    next run's output is the diagnosis."""
+    links = {}
     qk = urllib.parse.quote(key)
-    urls = [
-        f"{OPTIC}/fixtures?key={qk}&league=mlb&start_date={date}",
-        f"{OPTIC}/fixtures?key={qk}&sport=baseball&league=mlb&start_date={date}",
-        f"{OPTIC}/fixtures/active?key={qk}&league=mlb",
-        f"{OPTIC}/fixtures?key={qk}&league=mlb",
+    attempts = [
+        (f"{OPTIC}/fixtures?sport=baseball&league=mlb&start_date={date}", {"X-Api-Key": key}),
+        (f"{OPTIC}/fixtures?sport=baseball&league=MLB&start_date={date}", {"X-Api-Key": key}),
+        (f"{OPTIC}/fixtures/active?sport=baseball&league=mlb", {"X-Api-Key": key}),
+        (f"{OPTIC}/fixtures?key={qk}&sport=baseball&league=mlb&start_date={date}", None),
+        (f"{OPTIC}/fixtures?key={qk}&league=mlb&start_date={date}", None),
+        (f"{OPTIC}/fixtures?key={qk}&league=mlb", None),
+        (f"https://api.opticodds.com/api/v2/fixtures?key={qk}&league=MLB", None),
+        (f"https://api.opticodds.com/api/v2/games?key={qk}&league=MLB", None),
     ]
-    for url in urls:
+    for url, hdrs in attempts:
+        safe_url = url.replace(qk, "***")
         try:
-            data = http_json(url)
+            data = http_json(url, headers=hdrs)
         except Exception as e:
-            print(f"onyx: fixtures fetch failed ({e})")
+            print(f"onyx: {safe_url} -> {e}")
             continue
-        rows = data.get("data") if isinstance(data, dict) else data
+        rows = None
+        if isinstance(data, dict):
+            for k in ("data", "fixtures", "games", "results"):
+                if isinstance(data.get(k), list):
+                    rows = data[k]
+                    break
+        elif isinstance(data, list):
+            rows = data
         if not isinstance(rows, list) or not rows:
+            keys = list(data.keys())[:8] if isinstance(data, dict) else type(data).__name__
+            print(f"onyx: {safe_url} -> 200 but no fixture list (top-level: {keys})")
             continue
+        matched_slug = 0
         for fx in rows:
             if not isinstance(fx, dict):
                 continue
-            fid = str(fx.get("id") or fx.get("fixture_id") or fx.get("game_id") or "")
-            if not SLUG_RE.match(fid):
+            slug = _slug_from_row(fx)
+            if not slug:
                 continue
-            if sample is None:
-                sample = fx
+            matched_slug += 1
             away, home = team_abbr(fx, "away"), team_abbr(fx, "home")
             if away and home:
-                links[f"{away}_{home}"] = fid
+                links[f"{away}_{home}"] = slug
         if links:
+            print(f"onyx: harvested via {safe_url}")
             break
-    if not links and sample is not None:
-        # fixtures came back but nothing mapped: show the raw team fields so
-        # any name/code mismatch is an obvious one-line dictionary fix
-        team_fields = {k: v for k, v in sample.items()
-                       if "team" in k.lower() or "competitor" in k.lower()}
-        print("onyx: fixtures returned but no teams mapped. Raw team fields "
-              "from first fixture:")
-        print("      " + json.dumps(team_fields, ensure_ascii=False)[:600])
+        # rows exist but nothing usable: dump the first row's shape so the
+        # log IS the diagnosis (keys + id-ish and team-ish fields)
+        r0 = rows[0]
+        diag = {k: r0.get(k) for k in list(r0.keys())[:14]}
+        print(f"onyx: {safe_url} -> {len(rows)} row(s), {matched_slug} slug-shaped id(s), 0 mapped")
+        print("      first row: " + json.dumps(diag, ensure_ascii=False, default=str)[:700])
     return links
 
 
