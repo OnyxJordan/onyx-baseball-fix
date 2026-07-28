@@ -340,6 +340,7 @@ def write_game_lines(games):
             "total":   prev.get("total"),
             "away_ml": prev.get("away_ml"),
             "home_ml": prev.get("home_ml"),
+            "onyx_ts": prev.get("onyx_ts"),
         }
     with open(path, "w") as f:
         json.dump(lines, f, indent=2)
