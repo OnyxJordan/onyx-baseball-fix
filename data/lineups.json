@@ -1782,13 +1782,13 @@
     "lineup_confirmed": false
   },
   {
-    "name": "Paul Goldschmidt",
+    "name": "Max Schuemann",
     "team": "NYY",
     "game_key": "NYY_CWS",
     "batting_order": 1,
-    "pos": "1B",
-    "dk_pos": "1B",
-    "fd_pos": "1B",
+    "pos": "SS",
+    "dk_pos": "SS",
+    "fd_pos": "SS",
     "hand": "R",
     "lineup_confirmed": false
   },
@@ -1804,13 +1804,13 @@
     "lineup_confirmed": false
   },
   {
-    "name": "Ryan McMahon",
+    "name": "Paul Goldschmidt",
     "team": "NYY",
     "game_key": "NYY_CWS",
     "batting_order": 3,
-    "pos": "3B",
-    "dk_pos": "3B",
-    "fd_pos": "3B",
+    "pos": "1B",
+    "dk_pos": "1B",
+    "fd_pos": "1B",
     "hand": "R",
     "lineup_confirmed": false
   },
@@ -1837,24 +1837,13 @@
     "lineup_confirmed": false
   },
   {
-    "name": "Trent Grisham",
+    "name": "Jazz Chisholm Jr.",
     "team": "NYY",
     "game_key": "NYY_CWS",
     "batting_order": 6,
-    "pos": "CF",
-    "dk_pos": "CF",
-    "fd_pos": "CF",
-    "hand": "R",
-    "lineup_confirmed": false
-  },
-  {
-    "name": "Spencer Jones",
-    "team": "NYY",
-    "game_key": "NYY_CWS",
-    "batting_order": 7,
-    "pos": "CF",
-    "dk_pos": "CF",
-    "fd_pos": "CF",
+    "pos": "2B",
+    "dk_pos": "2B",
+    "fd_pos": "2B",
     "hand": "R",
     "lineup_confirmed": false
   },
@@ -1862,7 +1851,7 @@
     "name": "Jos\u00e9 Caballero",
     "team": "NYY",
     "game_key": "NYY_CWS",
-    "batting_order": 8,
+    "batting_order": 7,
     "pos": "SS",
     "dk_pos": "SS",
     "fd_pos": "SS",
@@ -1870,7 +1859,18 @@
     "lineup_confirmed": false
   },
   {
-    "name": "Austin Wells",
+    "name": "Trent Grisham",
+    "team": "NYY",
+    "game_key": "NYY_CWS",
+    "batting_order": 8,
+    "pos": "CF",
+    "dk_pos": "CF",
+    "fd_pos": "CF",
+    "hand": "R",
+    "lineup_confirmed": false
+  },
+  {
+    "name": "Ali S\u00e1nchez",
     "team": "NYY",
     "game_key": "NYY_CWS",
     "batting_order": 9,
@@ -1881,10 +1881,21 @@
     "lineup_confirmed": false
   },
   {
-    "name": "Munetaka Murakami",
+    "name": "Sam Antonacci",
     "team": "CWS",
     "game_key": "NYY_CWS",
     "batting_order": 1,
+    "pos": "LF",
+    "dk_pos": "LF",
+    "fd_pos": "LF",
+    "hand": "R",
+    "lineup_confirmed": false
+  },
+  {
+    "name": "Munetaka Murakami",
+    "team": "CWS",
+    "game_key": "NYY_CWS",
+    "batting_order": 2,
     "pos": "1B",
     "dk_pos": "1B",
     "fd_pos": "1B",
@@ -1895,7 +1906,7 @@
     "name": "Miguel Vargas",
     "team": "CWS",
     "game_key": "NYY_CWS",
-    "batting_order": 2,
+    "batting_order": 3,
     "pos": "3B",
     "dk_pos": "3B",
     "fd_pos": "3B",
@@ -1903,54 +1914,10 @@
     "lineup_confirmed": false
   },
   {
-    "name": "Braden Montgomery",
-    "team": "CWS",
-    "game_key": "NYY_CWS",
-    "batting_order": 3,
-    "pos": "RF",
-    "dk_pos": "RF",
-    "fd_pos": "RF",
-    "hand": "R",
-    "lineup_confirmed": false
-  },
-  {
-    "name": "Andrew Benintendi",
+    "name": "Colson Montgomery",
     "team": "CWS",
     "game_key": "NYY_CWS",
     "batting_order": 4,
-    "pos": "DH",
-    "dk_pos": "DH",
-    "fd_pos": "DH",
-    "hand": "R",
-    "lineup_confirmed": false
-  },
-  {
-    "name": "Tristan Peters",
-    "team": "CWS",
-    "game_key": "NYY_CWS",
-    "batting_order": 5,
-    "pos": "CF",
-    "dk_pos": "CF",
-    "fd_pos": "CF",
-    "hand": "R",
-    "lineup_confirmed": false
-  },
-  {
-    "name": "Chase Meidroth",
-    "team": "CWS",
-    "game_key": "NYY_CWS",
-    "batting_order": 6,
-    "pos": "2B",
-    "dk_pos": "2B",
-    "fd_pos": "2B",
-    "hand": "R",
-    "lineup_confirmed": false
-  },
-  {
-    "name": "Luisangel Acu\u00f1a",
-    "team": "CWS",
-    "game_key": "NYY_CWS",
-    "batting_order": 7,
     "pos": "SS",
     "dk_pos": "SS",
     "fd_pos": "SS",
@@ -1958,7 +1925,40 @@
     "lineup_confirmed": false
   },
   {
-    "name": "Drew Romo",
+    "name": "Chase Meidroth",
+    "team": "CWS",
+    "game_key": "NYY_CWS",
+    "batting_order": 5,
+    "pos": "2B",
+    "dk_pos": "2B",
+    "fd_pos": "2B",
+    "hand": "R",
+    "lineup_confirmed": false
+  },
+  {
+    "name": "Braden Montgomery",
+    "team": "CWS",
+    "game_key": "NYY_CWS",
+    "batting_order": 6,
+    "pos": "RF",
+    "dk_pos": "RF",
+    "fd_pos": "RF",
+    "hand": "R",
+    "lineup_confirmed": false
+  },
+  {
+    "name": "Tristan Peters",
+    "team": "CWS",
+    "game_key": "NYY_CWS",
+    "batting_order": 7,
+    "pos": "CF",
+    "dk_pos": "CF",
+    "fd_pos": "CF",
+    "hand": "R",
+    "lineup_confirmed": false
+  },
+  {
+    "name": "Edgar Quero",
     "team": "CWS",
     "game_key": "NYY_CWS",
     "batting_order": 8,
@@ -1969,13 +1969,13 @@
     "lineup_confirmed": false
   },
   {
-    "name": "Colson Montgomery",
+    "name": "Andrew Benintendi",
     "team": "CWS",
     "game_key": "NYY_CWS",
     "batting_order": 9,
-    "pos": "SS",
-    "dk_pos": "SS",
-    "fd_pos": "SS",
+    "pos": "DH",
+    "dk_pos": "DH",
+    "fd_pos": "DH",
     "hand": "R",
     "lineup_confirmed": false
   },
@@ -2002,46 +2002,13 @@
     "lineup_confirmed": false
   },
   {
-    "name": "Michael Busch",
+    "name": "Alex Bregman",
     "team": "CHC",
     "game_key": "CHC_STL",
     "batting_order": 3,
-    "pos": "1B",
-    "dk_pos": "1B",
-    "fd_pos": "1B",
-    "hand": "R",
-    "lineup_confirmed": false
-  },
-  {
-    "name": "Ian Happ",
-    "team": "CHC",
-    "game_key": "CHC_STL",
-    "batting_order": 4,
-    "pos": "LF",
-    "dk_pos": "LF",
-    "fd_pos": "LF",
-    "hand": "R",
-    "lineup_confirmed": false
-  },
-  {
-    "name": "Nico Hoerner",
-    "team": "CHC",
-    "game_key": "CHC_STL",
-    "batting_order": 5,
-    "pos": "2B",
-    "dk_pos": "2B",
-    "fd_pos": "2B",
-    "hand": "R",
-    "lineup_confirmed": false
-  },
-  {
-    "name": "Michael Conforto",
-    "team": "CHC",
-    "game_key": "CHC_STL",
-    "batting_order": 6,
-    "pos": "DH",
-    "dk_pos": "DH",
-    "fd_pos": "DH",
+    "pos": "3B",
+    "dk_pos": "3B",
+    "fd_pos": "3B",
     "hand": "R",
     "lineup_confirmed": false
   },
@@ -2049,7 +2016,7 @@
     "name": "Carson Kelly",
     "team": "CHC",
     "game_key": "CHC_STL",
-    "batting_order": 7,
+    "batting_order": 4,
     "pos": "C",
     "dk_pos": "C",
     "fd_pos": "C",
@@ -2057,10 +2024,21 @@
     "lineup_confirmed": false
   },
   {
-    "name": "Pedro Ram\u00edrez",
+    "name": "Michael Busch",
     "team": "CHC",
     "game_key": "CHC_STL",
-    "batting_order": 8,
+    "batting_order": 5,
+    "pos": "1B",
+    "dk_pos": "1B",
+    "fd_pos": "1B",
+    "hand": "R",
+    "lineup_confirmed": false
+  },
+  {
+    "name": "Nico Hoerner",
+    "team": "CHC",
+    "game_key": "CHC_STL",
+    "batting_order": 6,
     "pos": "2B",
     "dk_pos": "2B",
     "fd_pos": "2B",
@@ -2068,13 +2046,35 @@
     "lineup_confirmed": false
   },
   {
+    "name": "Ian Happ",
+    "team": "CHC",
+    "game_key": "CHC_STL",
+    "batting_order": 7,
+    "pos": "LF",
+    "dk_pos": "LF",
+    "fd_pos": "LF",
+    "hand": "R",
+    "lineup_confirmed": false
+  },
+  {
     "name": "Dansby Swanson",
     "team": "CHC",
     "game_key": "CHC_STL",
-    "batting_order": 9,
+    "batting_order": 8,
     "pos": "SS",
     "dk_pos": "SS",
     "fd_pos": "SS",
+    "hand": "R",
+    "lineup_confirmed": false
+  },
+  {
+    "name": "Miguel Amaya",
+    "team": "CHC",
+    "game_key": "CHC_STL",
+    "batting_order": 9,
+    "pos": "C",
+    "dk_pos": "C",
+    "fd_pos": "C",
     "hand": "R",
     "lineup_confirmed": false
   },
@@ -2112,13 +2112,13 @@
     "lineup_confirmed": false
   },
   {
-    "name": "Nathan Church",
+    "name": "Alec Burleson",
     "team": "STL",
     "game_key": "CHC_STL",
     "batting_order": 4,
-    "pos": "CF",
-    "dk_pos": "CF",
-    "fd_pos": "CF",
+    "pos": "1B",
+    "dk_pos": "1B",
+    "fd_pos": "1B",
     "hand": "R",
     "lineup_confirmed": false
   },
@@ -2134,7 +2134,7 @@
     "lineup_confirmed": false
   },
   {
-    "name": "Jos\u00e9 Ferm\u00edn",
+    "name": "Bryan Torres",
     "team": "STL",
     "game_key": "CHC_STL",
     "batting_order": 6,
@@ -2145,7 +2145,7 @@
     "lineup_confirmed": false
   },
   {
-    "name": "Lars Nootbaar",
+    "name": "Jos\u00e9 Ferm\u00edn",
     "team": "STL",
     "game_key": "CHC_STL",
     "batting_order": 7,
@@ -2156,10 +2156,21 @@
     "lineup_confirmed": false
   },
   {
-    "name": "Blaze Jordan",
+    "name": "Lars Nootbaar",
     "team": "STL",
     "game_key": "CHC_STL",
     "batting_order": 8,
+    "pos": "LF",
+    "dk_pos": "LF",
+    "fd_pos": "LF",
+    "hand": "R",
+    "lineup_confirmed": false
+  },
+  {
+    "name": "Blaze Jordan",
+    "team": "STL",
+    "game_key": "CHC_STL",
+    "batting_order": 9,
     "pos": "3B",
     "dk_pos": "3B",
     "fd_pos": "3B",
@@ -2167,18 +2178,7 @@
     "lineup_confirmed": false
   },
   {
-    "name": "Jimmy Crooks",
-    "team": "STL",
-    "game_key": "CHC_STL",
-    "batting_order": 9,
-    "pos": "C",
-    "dk_pos": "C",
-    "fd_pos": "C",
-    "hand": "R",
-    "lineup_confirmed": false
-  },
-  {
-    "name": "Nick Allen",
+    "name": "Jeremy Pe\u00f1a",
     "team": "HOU",
     "game_key": "HOU_LAA",
     "batting_order": 1,
@@ -2189,13 +2189,13 @@
     "lineup_confirmed": false
   },
   {
-    "name": "Christian V\u00e1zquez",
+    "name": "Yordan Alvarez",
     "team": "HOU",
     "game_key": "HOU_LAA",
     "batting_order": 2,
-    "pos": "C",
-    "dk_pos": "C",
-    "fd_pos": "C",
+    "pos": "DH",
+    "dk_pos": "DH",
+    "fd_pos": "DH",
     "hand": "R",
     "lineup_confirmed": false
   },
@@ -2211,54 +2211,10 @@
     "lineup_confirmed": false
   },
   {
-    "name": "Jose Altuve",
-    "team": "HOU",
-    "game_key": "HOU_LAA",
-    "batting_order": 4,
-    "pos": "2B",
-    "dk_pos": "2B",
-    "fd_pos": "2B",
-    "hand": "R",
-    "lineup_confirmed": false
-  },
-  {
-    "name": "LaMonte Wade Jr.",
-    "team": "HOU",
-    "game_key": "HOU_LAA",
-    "batting_order": 5,
-    "pos": "LF",
-    "dk_pos": "LF",
-    "fd_pos": "LF",
-    "hand": "R",
-    "lineup_confirmed": false
-  },
-  {
-    "name": "Yainer Diaz",
-    "team": "HOU",
-    "game_key": "HOU_LAA",
-    "batting_order": 6,
-    "pos": "C",
-    "dk_pos": "C",
-    "fd_pos": "C",
-    "hand": "R",
-    "lineup_confirmed": false
-  },
-  {
-    "name": "Taylor Trammell",
-    "team": "HOU",
-    "game_key": "HOU_LAA",
-    "batting_order": 7,
-    "pos": "CF",
-    "dk_pos": "CF",
-    "fd_pos": "CF",
-    "hand": "R",
-    "lineup_confirmed": false
-  },
-  {
     "name": "Cam Smith",
     "team": "HOU",
     "game_key": "HOU_LAA",
-    "batting_order": 8,
+    "batting_order": 4,
     "pos": "RF",
     "dk_pos": "RF",
     "fd_pos": "RF",
@@ -2266,13 +2222,57 @@
     "lineup_confirmed": false
   },
   {
-    "name": "Zach Dezenzo",
+    "name": "Jose Altuve",
+    "team": "HOU",
+    "game_key": "HOU_LAA",
+    "batting_order": 5,
+    "pos": "2B",
+    "dk_pos": "2B",
+    "fd_pos": "2B",
+    "hand": "R",
+    "lineup_confirmed": false
+  },
+  {
+    "name": "Taylor Trammell",
+    "team": "HOU",
+    "game_key": "HOU_LAA",
+    "batting_order": 6,
+    "pos": "CF",
+    "dk_pos": "CF",
+    "fd_pos": "CF",
+    "hand": "R",
+    "lineup_confirmed": false
+  },
+  {
+    "name": "Nick Allen",
+    "team": "HOU",
+    "game_key": "HOU_LAA",
+    "batting_order": 7,
+    "pos": "SS",
+    "dk_pos": "SS",
+    "fd_pos": "SS",
+    "hand": "R",
+    "lineup_confirmed": false
+  },
+  {
+    "name": "Lucas Spence",
+    "team": "HOU",
+    "game_key": "HOU_LAA",
+    "batting_order": 8,
+    "pos": "CF",
+    "dk_pos": "CF",
+    "fd_pos": "CF",
+    "hand": "R",
+    "lineup_confirmed": false
+  },
+  {
+    "name": "Christian V\u00e1zquez",
     "team": "HOU",
     "game_key": "HOU_LAA",
     "batting_order": 9,
-    "pos": "LF",
-    "dk_pos": "LF",
-    "fd_pos": "LF",
+    "pos": "C",
+    "dk_pos": "C",
+    "fd_pos": "C",
     "hand": "R",
     "lineup_confirmed": false
   },
@@ -2299,32 +2299,10 @@
     "lineup_confirmed": false
   },
   {
-    "name": "Oswald Peraza",
-    "team": "LAA",
-    "game_key": "HOU_LAA",
-    "batting_order": 3,
-    "pos": "2B",
-    "dk_pos": "2B",
-    "fd_pos": "2B",
-    "hand": "R",
-    "lineup_confirmed": false
-  },
-  {
-    "name": "Jorge Soler",
-    "team": "LAA",
-    "game_key": "HOU_LAA",
-    "batting_order": 4,
-    "pos": "DH",
-    "dk_pos": "DH",
-    "fd_pos": "DH",
-    "hand": "R",
-    "lineup_confirmed": false
-  },
-  {
     "name": "Nolan Schanuel",
     "team": "LAA",
     "game_key": "HOU_LAA",
-    "batting_order": 5,
+    "batting_order": 3,
     "pos": "1B",
     "dk_pos": "1B",
     "fd_pos": "1B",
@@ -2332,10 +2310,43 @@
     "lineup_confirmed": false
   },
   {
-    "name": "Jo Adell",
+    "name": "Oswald Peraza",
+    "team": "LAA",
+    "game_key": "HOU_LAA",
+    "batting_order": 4,
+    "pos": "2B",
+    "dk_pos": "2B",
+    "fd_pos": "2B",
+    "hand": "R",
+    "lineup_confirmed": false
+  },
+  {
+    "name": "Vaughn Grissom",
+    "team": "LAA",
+    "game_key": "HOU_LAA",
+    "batting_order": 5,
+    "pos": "2B",
+    "dk_pos": "2B",
+    "fd_pos": "2B",
+    "hand": "R",
+    "lineup_confirmed": false
+  },
+  {
+    "name": "Jose Siri",
     "team": "LAA",
     "game_key": "HOU_LAA",
     "batting_order": 6,
+    "pos": "CF",
+    "dk_pos": "CF",
+    "fd_pos": "CF",
+    "hand": "R",
+    "lineup_confirmed": false
+  },
+  {
+    "name": "Jo Adell",
+    "team": "LAA",
+    "game_key": "HOU_LAA",
+    "batting_order": 7,
     "pos": "RF",
     "dk_pos": "RF",
     "fd_pos": "RF",
@@ -2346,7 +2357,7 @@
     "name": "Denzer Guzman",
     "team": "LAA",
     "game_key": "HOU_LAA",
-    "batting_order": 7,
+    "batting_order": 8,
     "pos": "3B",
     "dk_pos": "3B",
     "fd_pos": "3B",
@@ -2354,18 +2365,7 @@
     "lineup_confirmed": false
   },
   {
-    "name": "Jose Siri",
-    "team": "LAA",
-    "game_key": "HOU_LAA",
-    "batting_order": 8,
-    "pos": "CF",
-    "dk_pos": "CF",
-    "fd_pos": "CF",
-    "hand": "R",
-    "lineup_confirmed": false
-  },
-  {
-    "name": "Logan O'Hoppe",
+    "name": "Tyler Heineman",
     "team": "LAA",
     "game_key": "HOU_LAA",
     "batting_order": 9,
@@ -2376,35 +2376,24 @@
     "lineup_confirmed": false
   },
   {
-    "name": "Jahmai Jones",
+    "name": "Masataka Yoshida",
     "team": "BOS",
     "game_key": "BOS_ATH",
     "batting_order": 1,
-    "pos": "OF",
-    "dk_pos": "OF",
-    "fd_pos": "OF",
+    "pos": "DH",
+    "dk_pos": "DH",
+    "fd_pos": "DH",
     "hand": "R",
     "lineup_confirmed": false
   },
   {
-    "name": "Ceddanne Rafaela",
+    "name": "Anthony Seigler",
     "team": "BOS",
     "game_key": "BOS_ATH",
     "batting_order": 2,
-    "pos": "CF",
-    "dk_pos": "CF",
-    "fd_pos": "CF",
-    "hand": "R",
-    "lineup_confirmed": false
-  },
-  {
-    "name": "Wilyer Abreu",
-    "team": "BOS",
-    "game_key": "BOS_ATH",
-    "batting_order": 3,
-    "pos": "RF",
-    "dk_pos": "RF",
-    "fd_pos": "RF",
+    "pos": "2B",
+    "dk_pos": "2B",
+    "fd_pos": "2B",
     "hand": "R",
     "lineup_confirmed": false
   },
@@ -2412,7 +2401,7 @@
     "name": "Willson Contreras",
     "team": "BOS",
     "game_key": "BOS_ATH",
-    "batting_order": 4,
+    "batting_order": 3,
     "pos": "1B",
     "dk_pos": "1B",
     "fd_pos": "1B",
@@ -2420,24 +2409,35 @@
     "lineup_confirmed": false
   },
   {
-    "name": "Caleb Durbin",
+    "name": "Wilyer Abreu",
     "team": "BOS",
     "game_key": "BOS_ATH",
-    "batting_order": 5,
-    "pos": "3B",
-    "dk_pos": "3B",
-    "fd_pos": "3B",
+    "batting_order": 4,
+    "pos": "RF",
+    "dk_pos": "RF",
+    "fd_pos": "RF",
     "hand": "R",
     "lineup_confirmed": false
   },
   {
-    "name": "Romy Gonzalez",
+    "name": "Ceddanne Rafaela",
+    "team": "BOS",
+    "game_key": "BOS_ATH",
+    "batting_order": 5,
+    "pos": "CF",
+    "dk_pos": "CF",
+    "fd_pos": "CF",
+    "hand": "R",
+    "lineup_confirmed": false
+  },
+  {
+    "name": "Caleb Durbin",
     "team": "BOS",
     "game_key": "BOS_ATH",
     "batting_order": 6,
-    "pos": "DH",
-    "dk_pos": "DH",
-    "fd_pos": "DH",
+    "pos": "3B",
+    "dk_pos": "3B",
+    "fd_pos": "3B",
     "hand": "R",
     "lineup_confirmed": false
   },
@@ -2464,7 +2464,7 @@
     "lineup_confirmed": false
   },
   {
-    "name": "Carlos Narv\u00e1ez",
+    "name": "Connor Wong",
     "team": "BOS",
     "game_key": "BOS_ATH",
     "batting_order": 9,
@@ -2486,13 +2486,13 @@
     "lineup_confirmed": false
   },
   {
-    "name": "Nick Kurtz",
+    "name": "Tyler Soderstrom",
     "team": "ATH",
     "game_key": "BOS_ATH",
     "batting_order": 2,
-    "pos": "1B",
-    "dk_pos": "1B",
-    "fd_pos": "1B",
+    "pos": "LF",
+    "dk_pos": "LF",
+    "fd_pos": "LF",
     "hand": "R",
     "lineup_confirmed": false
   },
@@ -2508,13 +2508,13 @@
     "lineup_confirmed": false
   },
   {
-    "name": "Tyler Soderstrom",
+    "name": "Colby Thomas",
     "team": "ATH",
     "game_key": "BOS_ATH",
     "batting_order": 4,
-    "pos": "LF",
-    "dk_pos": "LF",
-    "fd_pos": "LF",
+    "pos": "RF",
+    "dk_pos": "RF",
+    "fd_pos": "RF",
     "hand": "R",
     "lineup_confirmed": false
   },
@@ -2530,21 +2530,10 @@
     "lineup_confirmed": false
   },
   {
-    "name": "Lawrence Butler",
-    "team": "ATH",
-    "game_key": "BOS_ATH",
-    "batting_order": 6,
-    "pos": "RF",
-    "dk_pos": "RF",
-    "fd_pos": "RF",
-    "hand": "R",
-    "lineup_confirmed": false
-  },
-  {
     "name": "Donovan Walton",
     "team": "ATH",
     "game_key": "BOS_ATH",
-    "batting_order": 7,
+    "batting_order": 6,
     "pos": "3B",
     "dk_pos": "3B",
     "fd_pos": "3B",
@@ -2552,18 +2541,29 @@
     "lineup_confirmed": false
   },
   {
-    "name": "Jeff McNeil",
+    "name": "Henry Bolte",
     "team": "ATH",
     "game_key": "BOS_ATH",
-    "batting_order": 8,
-    "pos": "2B",
-    "dk_pos": "2B",
-    "fd_pos": "2B",
+    "batting_order": 7,
+    "pos": "CF",
+    "dk_pos": "CF",
+    "fd_pos": "CF",
     "hand": "R",
     "lineup_confirmed": false
   },
   {
-    "name": "Carlos Cortes",
+    "name": "Alika Williams",
+    "team": "ATH",
+    "game_key": "BOS_ATH",
+    "batting_order": 8,
+    "pos": "SS",
+    "dk_pos": "SS",
+    "fd_pos": "SS",
+    "hand": "R",
+    "lineup_confirmed": false
+  },
+  {
+    "name": "Lawrence Butler",
     "team": "ATH",
     "game_key": "BOS_ATH",
     "batting_order": 9,
@@ -2772,10 +2772,21 @@
     "lineup_confirmed": false
   },
   {
-    "name": "Jackson Chourio",
+    "name": "Christian Yelich",
     "team": "MIL",
     "game_key": "MIL_SF",
     "batting_order": 1,
+    "pos": "DH",
+    "dk_pos": "DH",
+    "fd_pos": "DH",
+    "hand": "R",
+    "lineup_confirmed": false
+  },
+  {
+    "name": "Jackson Chourio",
+    "team": "MIL",
+    "game_key": "MIL_SF",
+    "batting_order": 2,
     "pos": "LF",
     "dk_pos": "LF",
     "fd_pos": "LF",
@@ -2786,21 +2797,10 @@
     "name": "Brice Turang",
     "team": "MIL",
     "game_key": "MIL_SF",
-    "batting_order": 2,
+    "batting_order": 3,
     "pos": "2B",
     "dk_pos": "2B",
     "fd_pos": "2B",
-    "hand": "R",
-    "lineup_confirmed": false
-  },
-  {
-    "name": "Andrew Vaughn",
-    "team": "MIL",
-    "game_key": "MIL_SF",
-    "batting_order": 3,
-    "pos": "1B",
-    "dk_pos": "1B",
-    "fd_pos": "1B",
     "hand": "R",
     "lineup_confirmed": false
   },
@@ -2816,35 +2816,35 @@
     "lineup_confirmed": false
   },
   {
-    "name": "Blake Perkins",
-    "team": "MIL",
-    "game_key": "MIL_SF",
-    "batting_order": 5,
-    "pos": "CF",
-    "dk_pos": "CF",
-    "fd_pos": "CF",
-    "hand": "R",
-    "lineup_confirmed": false
-  },
-  {
-    "name": "Gary S\u00e1nchez",
-    "team": "MIL",
-    "game_key": "MIL_SF",
-    "batting_order": 6,
-    "pos": "C",
-    "dk_pos": "C",
-    "fd_pos": "C",
-    "hand": "R",
-    "lineup_confirmed": false
-  },
-  {
     "name": "Luis Lara",
     "team": "MIL",
     "game_key": "MIL_SF",
-    "batting_order": 7,
+    "batting_order": 5,
     "pos": "RF",
     "dk_pos": "RF",
     "fd_pos": "RF",
+    "hand": "R",
+    "lineup_confirmed": false
+  },
+  {
+    "name": "Andrew Vaughn",
+    "team": "MIL",
+    "game_key": "MIL_SF",
+    "batting_order": 6,
+    "pos": "1B",
+    "dk_pos": "1B",
+    "fd_pos": "1B",
+    "hand": "R",
+    "lineup_confirmed": false
+  },
+  {
+    "name": "Garrett Mitchell",
+    "team": "MIL",
+    "game_key": "MIL_SF",
+    "batting_order": 7,
+    "pos": "CF",
+    "dk_pos": "CF",
+    "fd_pos": "CF",
     "hand": "R",
     "lineup_confirmed": false
   },
@@ -2915,24 +2915,24 @@
     "lineup_confirmed": false
   },
   {
-    "name": "Casey Schmitt",
+    "name": "Christian Koss",
     "team": "SF",
     "game_key": "MIL_SF",
     "batting_order": 5,
-    "pos": "LF",
-    "dk_pos": "LF",
-    "fd_pos": "LF",
+    "pos": "2B",
+    "dk_pos": "2B",
+    "fd_pos": "2B",
     "hand": "R",
     "lineup_confirmed": false
   },
   {
-    "name": "Jesus Rodriguez",
+    "name": "Drew Gilbert",
     "team": "SF",
     "game_key": "MIL_SF",
     "batting_order": 6,
-    "pos": "C",
-    "dk_pos": "C",
-    "fd_pos": "C",
+    "pos": "CF",
+    "dk_pos": "CF",
+    "fd_pos": "CF",
     "hand": "R",
     "lineup_confirmed": false
   },
@@ -2948,13 +2948,13 @@
     "lineup_confirmed": false
   },
   {
-    "name": "Drew Cavanaugh",
+    "name": "Grant McCray",
     "team": "SF",
     "game_key": "MIL_SF",
     "batting_order": 8,
-    "pos": "C",
-    "dk_pos": "C",
-    "fd_pos": "C",
+    "pos": "CF",
+    "dk_pos": "CF",
+    "fd_pos": "CF",
     "hand": "R",
     "lineup_confirmed": false
   },
