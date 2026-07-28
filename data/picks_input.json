@@ -136,7 +136,7 @@
   "prob": 0.239,
   "edge": 1.7,
   "tier": "edge",
-  "hit": null
+  "hit": true
  },
  {
   "date": "2026-07-26",
@@ -145,7 +145,7 @@
   "prob": 0.116,
   "edge": 1.1,
   "tier": "edge",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-07-26",
@@ -154,7 +154,7 @@
   "prob": 0.175,
   "edge": 0.1,
   "tier": "edge",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-07-26",
@@ -163,7 +163,7 @@
   "prob": 0.217,
   "edge": 1.7,
   "tier": "edge",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-07-26",
@@ -171,6 +171,78 @@
   "odds": 850,
   "prob": 0.12,
   "edge": 1.5,
+  "tier": "edge",
+  "hit": false
+ },
+ {
+  "date": "2026-07-27",
+  "player": "Eugenio Suárez",
+  "odds": 370,
+  "prob": 0.232,
+  "edge": 1.9,
+  "tier": "edge",
+  "hit": false
+ },
+ {
+  "date": "2026-07-27",
+  "player": "Esmerlyn Valdez",
+  "odds": 350,
+  "prob": 0.228,
+  "edge": 0.6,
+  "tier": "edge",
+  "hit": false
+ },
+ {
+  "date": "2026-07-27",
+  "player": "Taylor Ward",
+  "odds": 625,
+  "prob": 0.141,
+  "edge": 0.3,
+  "tier": "edge",
+  "hit": false
+ },
+ {
+  "date": "2026-07-28",
+  "player": "Kyle Stowers",
+  "odds": 500,
+  "prob": 0.184,
+  "edge": 1.7,
+  "tier": "edge",
+  "hit": null
+ },
+ {
+  "date": "2026-07-28",
+  "player": "Michael Busch",
+  "odds": 540,
+  "prob": 0.164,
+  "edge": 0.7,
+  "tier": "edge",
+  "hit": null
+ },
+ {
+  "date": "2026-07-28",
+  "player": "Ryan Waldschmidt",
+  "odds": 850,
+  "prob": 0.112,
+  "edge": 0.7,
+  "tier": "edge",
+  "hit": null
+ },
+ {
+  "date": "2026-07-28",
+  "player": "Ketel Marte",
+  "odds": 425,
+  "prob": 0.196,
+  "edge": 0.6,
+  "tier": "edge",
+  "hit": null
+ },
+ {
+  "date": "2026-07-28",
+  "player": "JJ Wetherholt",
+  "odds": 800,
+  "prob": 0.116,
+  "edge": 0.4,
   "tier": "edge",
   "hit": null
  }
