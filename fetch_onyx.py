@@ -232,6 +232,89 @@ def harvest_optic(key, date):
     return links
 
 
+PLAYERS_OUT = "data/onyx_players.json"
+
+def _nk(name):
+    import unicodedata
+    s = unicodedata.normalize("NFKD", str(name))
+    s = "".join(ch for ch in s if not unicodedata.combining(ch))
+    s = re.sub(r"[.’'\-]", " ", s)
+    return re.sub(r"\s+", " ", s).strip().lower()
+
+
+def harvest_players(key):
+    """OpticOdds player ids for today's lineup bats + starters. Player-prop
+    share selections REQUIRE the player id as the tail (verified live:
+    'player_home_runs:Pete Alonso Over 0.5:74987F97F7F3' renders a priced
+    ticket, ':null' does not). Ids are stable, so the cache only refetches
+    when someone in today's lineups is missing from it."""
+    try:
+        cache = json.load(open(PLAYERS_OUT, encoding="utf-8"))
+        if not isinstance(cache, dict):
+            cache = {}
+    except Exception:
+        cache = {}
+
+    needed = set()
+    try:
+        for p in json.load(open("data/lineups.json", encoding="utf-8")):
+            if p.get("name"):
+                needed.add(_nk(p["name"]))
+    except Exception:
+        pass
+    try:
+        gl = json.load(open("data/game_lines.json", encoding="utf-8"))
+        for g in (gl if isinstance(gl, list) else gl.values()):
+            for k in ("awayP", "homeP"):
+                if g.get(k):
+                    needed.add(_nk(g[k]))
+    except Exception:
+        pass
+
+    missing = {n for n in needed if n not in cache}
+    if not missing:
+        print(f"onyx: player ids cached for all {len(needed)} names")
+        return cache
+    print(f"onyx: {len(missing)} player id(s) missing; paging the players API")
+
+    got = 0
+    for page in range(1, 13):
+        url = f"{OPTIC}/players?sport=baseball&league=mlb&page={page}"
+        data = None
+        for attempt in range(3):
+            try:
+                data = http_json(url, headers={"X-Api-Key": key})
+                break
+            except Exception as e:
+                msg = str(e)
+                print(f"onyx: players page {page} -> {msg[:200]}")
+                if "HTTP 429" in msg and attempt < 2:
+                    time.sleep(15)
+                    continue
+                break
+        if data is None:
+            break
+        rows = data.get("data") if isinstance(data, dict) else data
+        if not isinstance(rows, list) or not rows:
+            if page == 1 and isinstance(data, dict):
+                print(f"onyx: players response top-level keys: {list(data.keys())[:8]}")
+            break
+        for r in rows:
+            if not isinstance(r, dict):
+                continue
+            pid = str(r.get("id") or "")
+            nm = r.get("name") or r.get("full_name") or ""
+            if pid and nm:
+                cache[_nk(nm)] = pid
+                got += 1
+        time.sleep(1.5)
+    json.dump(cache, open(PLAYERS_OUT, "w", encoding="utf-8"))
+    still = len({n for n in needed if n not in cache})
+    print(f"onyx: player ids -> {got} harvested this run, cache {len(cache)}, "
+          f"{still} of today's names still unmatched")
+    return cache
+
+
 def verify(slug):
     """Confirm one slug resolves on the public share endpoint (best effort)."""
     for full in ("Atlanta Braves", "New York Yankees", "Los Angeles Dodgers",
@@ -258,6 +341,11 @@ def main():
     except Exception:
         pass
     prev_links = prev.get("links") or {} if prev.get("date") == today else {}
+    # same stale guard on carried-over entries: a slug dated before today is
+    # yesterday's game (or a pre-fix orphan key) and must not survive merges
+    prev_links = {k: v for k, v in prev_links.items()
+                  if not (re.search(r"(\d{4}-\d{2}-\d{2})", v)
+                          and re.search(r"(\d{4}-\d{2}-\d{2})", v).group(1) < today)}
 
     key = (os.environ.get("OPTICODDS_API_KEY") or "").strip()
     if not key:
@@ -266,6 +354,7 @@ def main():
         return
 
     links = harvest_optic(key, today)
+    harvest_players(key)
     if not links:
         print(f"onyx: no fixtures harvested; keeping existing links ({len(prev_links)})")
         return
