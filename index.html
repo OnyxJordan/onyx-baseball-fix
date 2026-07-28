@@ -1618,7 +1618,7 @@ body::after {
   <div class="nav-right">
     <button class="notif-bell" id="notifBell" onclick="toggleNotif()" title="Browser alert when a modeled batter homers">🔔</button>
     <span class="nav-badge">JUL 28 · 2026</span>
-    <span class="nav-date" id="buildStamp">updated 4:07 pm et</span>
+    <span class="nav-date" id="buildStamp">updated 4:09 pm et</span>
     <span class="nav-date" id="liveCount"></span>
   </div>
 </nav>
@@ -3791,6 +3791,36 @@ function gcHitTable(teamBox, teamName, logoAbbr) {
   </div>`;
 }
 
+function gcPitTable(teamBox, teamName, logoAbbr) {
+  const players = (teamBox && teamBox.players) || {};
+  const order = (teamBox && teamBox.pitchers) || [];
+  if (!order.length) return '';
+  const rows = order.map(id => {
+    const p = players['ID' + id] || {};
+    const nm = (p.person || {}).fullName || '';
+    const st = (p.stats || {}).pitching || {};
+    const season = (p.seasonStats || {}).pitching || {};
+    return `<tr>
+      <td>${nm}${st.note ? ` <span style="font-size:9px;color:var(--text3)">${st.note}</span>` : ''}</td>
+      <td>${st.inningsPitched ?? '0.0'}</td><td>${st.hits ?? 0}</td><td>${st.earnedRuns ?? 0}</td>
+      <td>${st.strikeOuts ?? 0}</td><td>${st.baseOnBalls ?? 0}</td><td>${st.homeRuns ?? 0}</td>
+      <td>${st.numberOfPitches ?? st.pitchesThrown ?? 0}</td>
+      <td>${season.era || '—'}</td>
+    </tr>`;
+  }).join('');
+  const logo = TEAM_LOGOS[logoAbbr] || '';
+  return `<div class="gc-card">
+    <div class="gc-card-title" style="display:flex;align-items:center;gap:7px">
+      ${logo ? `<span class="sticker-logo" style="width:16px;height:16px;background-image:url(${logo})"></span>` : ''}
+      ${teamName} pitching
+    </div>
+    <table class="gc-box-table">
+      <thead><tr><th>Pitchers</th><th>IP</th><th>H</th><th>ER</th><th>K</th><th>BB</th><th>HR</th><th>P</th><th>ERA</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>`;
+}
+
 let _gcPrevScore = {};
 // ─── GAMECENTER: strike zone + play-by-play ─────────────────────
 // Every pitch in the GUMBO feed carries pitchData.coordinates (pX/pZ in
@@ -4644,6 +4674,8 @@ function renderGC(feed, wp) {
   const boxes = `<div class="gc-boxes">
     ${gcHitTable(box.away, (away.teamName || away.name || aAb), aAb)}
     ${gcHitTable(box.home, (home.teamName || home.name || hAb), hAb)}
+    ${gcPitTable(box.away, (away.teamName || away.name || aAb), aAb)}
+    ${gcPitTable(box.home, (home.teamName || home.name || hAb), hAb)}
   </div>`;
 
   const subnav = `<div class="gc-subnav">
