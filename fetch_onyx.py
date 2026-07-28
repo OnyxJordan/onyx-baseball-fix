@@ -23,7 +23,7 @@ data/onyx_games.json can also be hand-edited:
 {"date": "YYYY-MM-DD", "links": {"SD_ATL": "<slug>"}}.
 """
 
-import json, os, re, urllib.parse, urllib.request
+import json, os, re, time, urllib.error, urllib.parse, urllib.request
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
@@ -61,11 +61,24 @@ SLUG_RE = re.compile(r"^\d+-\d+-\d{4}-\d{2}-\d{2}-\d+$")
 
 
 def http_json(url, timeout=30, headers=None):
+    """GET json. On HTTP errors, raise with the response BODY and rate-limit
+    headers attached — a 429's body says whether it's burst pacing or a
+    exhausted plan quota, which are fixed very differently."""
     h = {"User-Agent": UA, "Accept": "application/json"}
     h.update(headers or {})
     req = urllib.request.Request(url, headers=h)
-    with urllib.request.urlopen(req, timeout=timeout) as r:
-        return json.loads(r.read().decode("utf-8", "replace"))
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as r:
+            return json.loads(r.read().decode("utf-8", "replace"))
+    except urllib.error.HTTPError as e:
+        try:
+            body = e.read().decode("utf-8", "replace")[:300]
+        except Exception:
+            body = ""
+        meta = {k: v for k, v in (e.headers or {}).items()
+                if k.lower() in ("retry-after", "x-ratelimit-limit",
+                                 "x-ratelimit-remaining", "x-ratelimit-reset")}
+        raise RuntimeError(f"HTTP {e.code} {meta or ''} body: {body or '(empty)'}") from None
 
 
 def today_et():
@@ -136,22 +149,33 @@ def harvest_optic(key, date):
     next run's output is the diagnosis."""
     links = {}
     qk = urllib.parse.quote(key)
+    # every v3 call 429'd back-to-back on the first keyed run, so: space the
+    # attempts, and on 429 wait (Retry-After if given, else 15s) and retry
+    # the SAME url twice before moving on
     attempts = [
         (f"{OPTIC}/fixtures?sport=baseball&league=mlb&start_date={date}", {"X-Api-Key": key}),
-        (f"{OPTIC}/fixtures?sport=baseball&league=MLB&start_date={date}", {"X-Api-Key": key}),
-        (f"{OPTIC}/fixtures/active?sport=baseball&league=mlb", {"X-Api-Key": key}),
         (f"{OPTIC}/fixtures?key={qk}&sport=baseball&league=mlb&start_date={date}", None),
-        (f"{OPTIC}/fixtures?key={qk}&league=mlb&start_date={date}", None),
-        (f"{OPTIC}/fixtures?key={qk}&league=mlb", None),
-        (f"https://api.opticodds.com/api/v2/fixtures?key={qk}&league=MLB", None),
-        (f"https://api.opticodds.com/api/v2/games?key={qk}&league=MLB", None),
+        (f"{OPTIC}/fixtures/active?sport=baseball&league=mlb", {"X-Api-Key": key}),
     ]
     for url, hdrs in attempts:
         safe_url = url.replace(qk, "***")
-        try:
-            data = http_json(url, headers=hdrs)
-        except Exception as e:
-            print(f"onyx: {safe_url} -> {e}")
+        data = None
+        for attempt in range(3):
+            try:
+                data = http_json(url, headers=hdrs)
+                break
+            except Exception as e:
+                msg = str(e)
+                print(f"onyx: {safe_url} -> {msg[:280]}")
+                if "HTTP 429" in msg and attempt < 2:
+                    m = re.search(r"'[Rr]etry-[Aa]fter':\s*'?(\d+)", msg)
+                    wait = min(60, int(m.group(1)) if m else 15)
+                    print(f"onyx: rate limited, waiting {wait}s and retrying")
+                    time.sleep(wait)
+                    continue
+                break
+        if data is None:
+            time.sleep(3)
             continue
         rows = None
         if isinstance(data, dict):
