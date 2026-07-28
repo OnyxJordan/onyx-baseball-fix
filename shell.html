@@ -4987,6 +4987,10 @@ var ONYX_TEAM_IDS = {};        // e.g. {SD: 14818, ATL: 25683} once confirmed
 var ONYX_GAME_SUFFIX = '09';
 var ONYX_REFERRER = 'KR680261';
 var ONYX_HR_MARKET = 'player_home_runs';
+// nk(player name) -> OpticOdds player id. Player-prop selections REQUIRE
+// this id as the selection tail (verified 7/28: with it the share endpoint
+// renders "Pete Alonso Over 0.5 +280", with null only a generic page).
+var ONYX_PLAYER_IDS = {};
 // games without a harvested slug land on the real MLB board (login sends
 // the user right back to it), never on an invented URL that can 404
 var ONYX_FALLBACK_URL = 'https://app.onyxodds.com/leagues/MLB';
@@ -5012,7 +5016,7 @@ function onyxSlug(away, home) {
 function onyxTicket(p) {
   const slug = (p.away && p.home) ? onyxSlug(p.away, p.home) : null;
   if (slug) {
-    let market, label;
+    let market, label, tail = 'null';
     if (p.market === 'ML') {
       market = 'moneyline';
       // Kalshi-style "No" on a moneyline is "Yes" on the other side
@@ -5022,6 +5026,8 @@ function onyxTicket(p) {
     } else if (p.market === 'HR') {
       market = ONYX_HR_MARKET;
       label = p.pick + ' Over 0.5';
+      // player props need the OpticOdds player id as the selection tail
+      tail = (typeof ONYX_PLAYER_IDS !== 'undefined' && ONYX_PLAYER_IDS[nkjs(p.pick)]) || 'null';
     } else if (p.market === 'RL') {
       market = 'run_line';
       label = (ONYX_TEAM_NAMES[p.pick] || p.pick) + ' ' + (p.line || '');
@@ -5030,7 +5036,7 @@ function onyxTicket(p) {
       label = p.pick;
     } else { market = p.market; label = p.pick; }
     const u = 'https://app.onyxodds.com/share?selection='
-      + encodeURIComponent(slug + ':o_default_v8:' + market + ':' + label + ':null')
+      + encodeURIComponent(slug + ':o_default_v8:' + market + ':' + label + ':' + tail)
       + (ONYX_REFERRER ? '&referrer=' + encodeURIComponent(ONYX_REFERRER) : '');
     window.open(u, '_blank', 'noopener');
     return;

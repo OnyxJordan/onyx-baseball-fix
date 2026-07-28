@@ -695,6 +695,23 @@ _onyx = jload(dpath("onyx_games.json"), {}) or {}
 _et_today = datetime.now(ZoneInfo("America/New_York")).strftime("%Y-%m-%d")
 _onyx_links = _onyx.get("links") or {} if _onyx.get("date") == _et_today else {}
 shell = replace_const(shell, "ONYX_GAME_LINKS", _onyx_links)
+
+# OpticOdds player ids for today's bats + starters: player-prop share
+# selections need the id as the tail. Injected only for today's names so
+# the payload stays small.
+_opids_all = jload(dpath("onyx_players.json"), {})
+_opids = {}
+if isinstance(_opids_all, dict):
+    for rec in results_out:
+        k2 = nk(rec.get("matched_name") or "")
+        if k2 in _opids_all:
+            _opids[k2] = _opids_all[k2]
+    for p in pitchers_out:
+        k2 = nk(p.get("name") or "")
+        if k2 in _opids_all:
+            _opids[k2] = _opids_all[k2]
+shell = replace_const(shell, "ONYX_PLAYER_IDS", _opids)
+print(f"onyx player ids: {len(_opids)} injected for today")
 print(f"onyx links: {len(_onyx_links)} game(s) wired for {_et_today}")
 
 # ---- stamp the build date over the baked date literals ----
