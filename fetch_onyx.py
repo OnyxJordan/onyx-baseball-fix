@@ -275,7 +275,13 @@ def harvest_optic(key, date):
                                        and k[len(pair) + 1:].isdigit())),
                      key=lambda k: (len(k), k))
         if not exp:
-            links[pair] = cand[0][0]   # pair not on today's board: keep old behavior
+            # pair not on today's board: keep only a TODAY-dated slug (the
+            # active list sweeps in future series — 45 links incl. Aug/Sep
+            # fixtures landed in the 7/28 file otherwise)
+            slug0 = cand[0][0]
+            dm = re.search(r"(\d{4}-\d{2}-\d{2})", slug0)
+            if dm and dm.group(1) == date:
+                links[pair] = slug0
             continue
         used = set()
         for k in exp:
@@ -421,7 +427,39 @@ def harvest_game_odds(key, links):
     slug_to_gk = {s: k for k, s in ordered}
     book = None
     hr, ml_games, tot_games = {}, set(), set()
+
+    # The key's 4000-req/15s window is shared with production traffic and is
+    # often pinned at remaining:0 for minutes (verified in the 7/28 logs, where
+    # every naive retry burned quota and lost). Sleep to the advertised reset
+    # (+2s so we are not first in the stampede) and retry up to 8 times inside
+    # a shared wall-clock budget instead of rotating book names on 429 — a 429
+    # says nothing about the book, they all share one limiter.
+    budget = [300.0]
+    def _get(url):
+        for attempt in range(8):
+            try:
+                return http_json(url, headers={"X-Api-Key": key})
+            except Exception as e:
+                msg = str(e)
+                print(f"onyx odds: {msg[:180]}")
+                if "HTTP 429" not in msg or budget[0] <= 0:
+                    return None
+                m = (re.search(r"[Rr]eset at:\s*(\d{9,11})", msg)
+                     or re.search(r"ratelimit-reset':\s*'?(\d{9,11})", msg))
+                wait = 16.0
+                if m:
+                    wait = max(2.0, min(45.0, int(m.group(1)) - time.time() + 2.0))
+                wait = min(wait, max(0.0, budget[0]))
+                if wait <= 0:
+                    return None
+                time.sleep(wait)
+                budget[0] -= wait
+        return None
+
     for i in range(0, len(ordered), 5):
+        if budget[0] <= 0:
+            print("onyx odds: retry budget exhausted; finishing with what we have")
+            break
         chunk = ordered[i:i + 5]
         fx_q = "".join(f"&fixture_id={urllib.parse.quote(s)}" for _, s in chunk)
         rows = None
@@ -430,23 +468,15 @@ def harvest_game_odds(key, links):
                    f"&sportsbook={urllib.parse.quote(bk)}"
                    f"&market=moneyline&market=total_runs&market=player_home_runs"
                    f"&odds_format=AMERICAN{fx_q}")
-            data = None
-            for attempt in range(3):
-                try:
-                    data = http_json(url, headers={"X-Api-Key": key})
-                    break
-                except Exception as e:
-                    msg = str(e)
-                    print(f"onyx odds: book={bk} -> {msg[:220]}")
-                    if "HTTP 429" in msg and attempt < 2:
-                        m = re.search(r"'[Rr]etry-[Aa]fter':\s*'?(\d+)", msg)
-                        time.sleep(min(60, int(m.group(1)) if m else 15))
-                        continue
-                    break
+            data = _get(url)
+            if data is None:
+                break   # rate-limit storm or hard error: other books share the limiter
             cand = data.get("data") if isinstance(data, dict) else data
             if isinstance(cand, list) and any(isinstance(r, dict) and r.get("odds") for r in cand):
                 rows, book = cand, bk
                 break
+            keys = list(data.keys())[:8] if isinstance(data, dict) else type(data).__name__
+            print(f"onyx odds: book '{bk}' -> 200 but no odds rows (top-level: {keys})")
         if rows is None:
             continue
         for row in rows:
@@ -511,8 +541,23 @@ def harvest_game_odds(key, links):
         time.sleep(1.2)
 
     if not book:
-        print(f"onyx odds: no book matched (tried {BOOK_CANDIDATES}); "
+        print(f"onyx odds: no book matched/reachable (tried {BOOK_CANDIDATES}); "
               "consensus lines kept")
+        # one unauthenticated peek at the public game page so the log shows
+        # where Onyx's own odds live, ready for a scrape fallback if the API
+        # quota stays saturated
+        try:
+            gk0, slug0 = ordered[0]
+            req = urllib.request.Request(f"https://app.onyxodds.com/game/{slug0}",
+                                         headers={"User-Agent": UA})
+            with urllib.request.urlopen(req, timeout=20) as r:
+                page = r.read().decode("utf-8", "replace")
+            j = page.find("moneyline")
+            print(f"onyx odds: game page {slug0} ({gk0}): {len(page)} bytes, "
+                  f"'moneyline' at {j}: "
+                  + json.dumps(page[max(0, j - 120):j + 520])[:760])
+        except Exception as e:
+            print(f"onyx odds: game page probe failed: {e}")
         return
     if ml_games or tot_games:
         now_ts = int(time.time())
@@ -585,16 +630,16 @@ def main():
         return
 
     links = harvest_optic(key, today)
+    merged = dict(prev_links)
+    merged.update(links)   # harvested wins over any hand-seeded entry
+    # price the board FIRST: the shared quota is heavily contended and this
+    # is the call that makes site lines match the Onyx app
+    if merged:
+        harvest_game_odds(key, merged)
     harvest_players(key)
     if not links:
         print(f"onyx: no fixtures harvested; keeping existing links ({len(prev_links)})")
-        if prev_links:
-            harvest_game_odds(key, prev_links)
         return
-
-    merged = dict(prev_links)
-    merged.update(links)   # harvested wins over any hand-seeded entry
-    harvest_game_odds(key, merged)
     json.dump({"date": today, "links": merged},
               open(OUT, "w", encoding="utf-8"), indent=1)
     for k, v in sorted(links.items()):
