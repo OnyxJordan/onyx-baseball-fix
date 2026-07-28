@@ -1,34 +1,56 @@
 {
-  "WSH": {
-    "venue": "Nationals Park",
-    "temp": 85.1,
-    "precip": 64,
-    "wind_spd": 5.9,
-    "wind_dir": "S",
-    "humidity_pct": 59,
-    "pressure_mb": 1001.2,
-    "roof": false,
-    "flag": "clear"
-  },
-  "LAD": {
-    "venue": "Dodger Stadium",
-    "temp": 74.0,
-    "precip": 0,
-    "wind_spd": 6.9,
+  "TB": {
+    "venue": "Tropicana Field",
+    "temp": 83.9,
+    "precip": 13,
+    "wind_spd": 8.4,
     "wind_dir": "WSW",
-    "humidity_pct": 74,
-    "pressure_mb": 1009.1,
+    "humidity_pct": 80,
+    "pressure_mb": 1011.2,
+    "roof": true,
+    "flag": "clear"
+  },
+  "MIN": {
+    "venue": "Target Field",
+    "temp": 88.8,
+    "precip": 1,
+    "wind_spd": 1.8,
+    "wind_dir": "ENE",
+    "humidity_pct": 44,
+    "pressure_mb": 1011.1,
     "roof": false,
     "flag": "clear"
   },
-  "ATH": {
-    "venue": "Sutter Health Park",
-    "temp": 92.6,
-    "precip": 0,
+  "PIT": {
+    "venue": "PNC Park",
+    "temp": 79.7,
+    "precip": 3,
     "wind_spd": 10.2,
-    "wind_dir": "SW",
-    "humidity_pct": 24,
-    "pressure_mb": 1009.1,
+    "wind_dir": "NW",
+    "humidity_pct": 64,
+    "pressure_mb": 1002.8,
+    "roof": false,
+    "flag": "clear"
+  },
+  "DET": {
+    "venue": "Comerica Park",
+    "temp": 80.5,
+    "precip": 0,
+    "wind_spd": 11.8,
+    "wind_dir": "NNW",
+    "humidity_pct": 52,
+    "pressure_mb": 1006.4,
+    "roof": false,
+    "flag": "clear"
+  },
+  "CWS": {
+    "venue": "Rate Field",
+    "temp": 68.8,
+    "precip": 0,
+    "wind_spd": 12.3,
+    "wind_dir": "N",
+    "humidity_pct": 83,
+    "pressure_mb": 1011.5,
     "roof": false,
     "flag": "clear"
   },
@@ -54,37 +76,15 @@
     "roof": false,
     "flag": "clear"
   },
-  "CWS": {
-    "venue": "Rate Field",
-    "temp": 68.8,
-    "precip": 0,
-    "wind_spd": 12.3,
-    "wind_dir": "N",
-    "humidity_pct": 83,
-    "pressure_mb": 1011.5,
+  "WSH": {
+    "venue": "Nationals Park",
+    "temp": 85.1,
+    "precip": 64,
+    "wind_spd": 5.9,
+    "wind_dir": "S",
+    "humidity_pct": 59,
+    "pressure_mb": 1001.2,
     "roof": false,
-    "flag": "clear"
-  },
-  "PIT": {
-    "venue": "PNC Park",
-    "temp": 79.7,
-    "precip": 3,
-    "wind_spd": 10.2,
-    "wind_dir": "NW",
-    "humidity_pct": 64,
-    "pressure_mb": 1002.8,
-    "roof": false,
-    "flag": "clear"
-  },
-  "MIA": {
-    "venue": "loanDepot Park",
-    "temp": 86.4,
-    "precip": 23,
-    "wind_spd": 5.3,
-    "wind_dir": "SW",
-    "humidity_pct": 67,
-    "pressure_mb": 1012.6,
-    "roof": true,
     "flag": "clear"
   },
   "LAA": {
@@ -98,14 +98,25 @@
     "roof": false,
     "flag": "clear"
   },
-  "DET": {
-    "venue": "Comerica Park",
-    "temp": 80.5,
+  "LAD": {
+    "venue": "Dodger Stadium",
+    "temp": 74.0,
     "precip": 0,
-    "wind_spd": 11.8,
-    "wind_dir": "NNW",
-    "humidity_pct": 52,
-    "pressure_mb": 1006.4,
+    "wind_spd": 6.9,
+    "wind_dir": "WSW",
+    "humidity_pct": 74,
+    "pressure_mb": 1009.1,
+    "roof": false,
+    "flag": "clear"
+  },
+  "ATH": {
+    "venue": "Sutter Health Park",
+    "temp": 92.6,
+    "precip": 0,
+    "wind_spd": 10.2,
+    "wind_dir": "SW",
+    "humidity_pct": 24,
+    "pressure_mb": 1009.1,
     "roof": false,
     "flag": "clear"
   },
@@ -120,6 +131,15 @@
     "roof": false,
     "flag": "clear"
   },
+  "MIA": {
+    "venue": "loanDepot Park",
+    "temp": 72,
+    "precip": 0,
+    "wind_spd": 5,
+    "wind_dir": "N",
+    "roof": true,
+    "flag": "clear"
+  },
   "STL": {
     "venue": "Busch Stadium",
     "temp": 72,
@@ -127,24 +147,6 @@
     "wind_spd": 5,
     "wind_dir": "N",
     "roof": false,
-    "flag": "clear"
-  },
-  "MIN": {
-    "venue": "Target Field",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
-    "roof": false,
-    "flag": "clear"
-  },
-  "TB": {
-    "venue": "Tropicana Field",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
-    "roof": true,
     "flag": "clear"
   }
 }
