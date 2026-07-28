@@ -40,7 +40,7 @@ NAME_ABBR = {
     "Detroit Tigers": "DET", "Houston Astros": "HOU", "Kansas City Royals": "KC",
     "Los Angeles Angels": "LAA", "Los Angeles Dodgers": "LAD", "Miami Marlins": "MIA",
     "Milwaukee Brewers": "MIL", "Minnesota Twins": "MIN", "New York Mets": "NYM",
-    "New York Yankees": "NYY", "Athletics": "OAK", "Oakland Athletics": "OAK",
+    "New York Yankees": "NYY", "Athletics": "ATH", "Oakland Athletics": "ATH",
     "Philadelphia Phillies": "PHI", "Pittsburgh Pirates": "PIT", "San Diego Padres": "SD",
     "Seattle Mariners": "SEA", "San Francisco Giants": "SF", "St. Louis Cardinals": "STL",
     "Tampa Bay Rays": "TB", "Texas Rangers": "TEX", "Toronto Blue Jays": "TOR",
@@ -52,7 +52,7 @@ CODE_ABBR = {
     "CHC": "CHC", "CHW": "CWS", "CWS": "CWS", "CIN": "CIN", "CLE": "CLE",
     "COL": "COL", "DET": "DET", "HOU": "HOU", "KC": "KC", "KCR": "KC",
     "LAA": "LAA", "LAD": "LAD", "MIA": "MIA", "MIL": "MIL", "MIN": "MIN",
-    "NYM": "NYM", "NYY": "NYY", "OAK": "OAK", "ATH": "OAK", "PHI": "PHI",
+    "NYM": "NYM", "NYY": "NYY", "OAK": "ATH", "ATH": "ATH", "PHI": "PHI",
     "PIT": "PIT", "SD": "SD", "SDP": "SD", "SEA": "SEA", "SF": "SF",
     "SFG": "SF", "STL": "STL", "TB": "TB", "TBR": "TB", "TEX": "TEX",
     "TOR": "TOR", "WSH": "WSH", "WSN": "WSH", "WAS": "WSH",
@@ -143,21 +143,36 @@ def _slug_from_row(fx):
 
 
 def harvest_optic(key, date):
-    """Every MLB fixture id (= slug) for the date, keyed away_home. Tries
-    both auth styles (X-Api-Key header, key= query param) across v3 and
-    legacy paths, and LOGS the response shape whenever nothing maps so the
-    next run's output is the diagnosis."""
+    """Every MLB fixture id (= slug) for the slate, keyed away_home.
+
+    Verified live 7/28: the fixtures endpoint works with X-Api-Key auth but
+    bursts get 429'd (hence spacing + Retry-After retries), the active list
+    can still carry YESTERDAY's finished fixtures (hence the slug-date
+    filter — a stale slug resolves to the wrong game's ticket), and late
+    West Coast starts live on TOMORROW's UTC date (hence the second
+    start_date harvest)."""
     links = {}
     qk = urllib.parse.quote(key)
-    # every v3 call 429'd back-to-back on the first keyed run, so: space the
-    # attempts, and on 429 wait (Retry-After if given, else 15s) and retry
-    # the SAME url twice before moving on
+    try:
+        from datetime import datetime as _dt, timedelta as _td
+        tomorrow = (_dt.strptime(date, "%Y-%m-%d") + _td(days=1)).strftime("%Y-%m-%d")
+    except Exception:
+        tomorrow = date
+    # explicit plan: today (header auth), then key-param fallback if that
+    # failed, then tomorrow's UTC date for late West Coast starts, then the
+    # active list as a last resort if still empty
     attempts = [
-        (f"{OPTIC}/fixtures?sport=baseball&league=mlb&start_date={date}", {"X-Api-Key": key}),
-        (f"{OPTIC}/fixtures?key={qk}&sport=baseball&league=mlb&start_date={date}", None),
-        (f"{OPTIC}/fixtures/active?sport=baseball&league=mlb", {"X-Api-Key": key}),
+        ("today",    f"{OPTIC}/fixtures?sport=baseball&league=mlb&start_date={date}", {"X-Api-Key": key}),
+        ("today2",   f"{OPTIC}/fixtures?key={qk}&sport=baseball&league=mlb&start_date={date}", None),
+        ("tomorrow", f"{OPTIC}/fixtures?sport=baseball&league=mlb&start_date={tomorrow}", {"X-Api-Key": key}),
+        ("active",   f"{OPTIC}/fixtures/active?sport=baseball&league=mlb", {"X-Api-Key": key}),
     ]
-    for url, hdrs in attempts:
+    today_ok = False
+    for phase, url, hdrs in attempts:
+        if phase == "today2" and today_ok:
+            continue
+        if phase == "active" and links:
+            break
         safe_url = url.replace(qk, "***")
         data = None
         for attempt in range(3):
@@ -196,13 +211,18 @@ def harvest_optic(key, date):
             slug = _slug_from_row(fx)
             if not slug:
                 continue
+            # stale-fixture guard: the slug embeds its own date; anything
+            # before today ET is yesterday's game and must never be linked
+            dm = re.search(r"(\d{4}-\d{2}-\d{2})", slug)
+            if dm and dm.group(1) < date:
+                continue
             matched_slug += 1
             away, home = team_abbr(fx, "away"), team_abbr(fx, "home")
             if away and home:
-                links[f"{away}_{home}"] = slug
-        if links:
-            print(f"onyx: harvested via {safe_url}")
-            break
+                links.setdefault(f"{away}_{home}", slug)   # today's harvest wins
+        if links and phase in ("today", "today2"):
+            today_ok = True
+            print(f"onyx: harvested {len(links)} via {safe_url}")
         # rows exist but nothing usable: dump the first row's shape so the
         # log IS the diagnosis (keys + id-ish and team-ish fields)
         r0 = rows[0]
