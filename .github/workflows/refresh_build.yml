@@ -60,7 +60,16 @@ jobs:
             echo "nothing to commit"
           else
             git commit -m "Refresh build $(date -u +%Y-%m-%dT%H:%M)"
-            git push
+            # main moves under us (PR merges, sibling runs): rebase our build
+            # commit on top and retry, preferring OUR files on conflict (the
+            # freshly built data/index are newer and fully regenerable)
+            for i in 1 2 3 4; do
+              if git push; then break; fi
+              echo "push rejected, rebasing onto fresh main (attempt $i)"
+              git pull --rebase -X theirs origin main || { git rebase --abort || true; git pull --rebase -s ours origin main || true; }
+              sleep $((i * 3))
+            done
+            git push || { echo "::warning::push lost the race 4x; next 30-min run recovers"; exit 0; }
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
       - name: Upload Pages artifact
