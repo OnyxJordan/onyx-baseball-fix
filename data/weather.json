@@ -1,4 +1,15 @@
 {
+  "MIN": {
+    "venue": "Target Field",
+    "temp": 89.8,
+    "precip": 1,
+    "wind_spd": 3.7,
+    "wind_dir": "NNE",
+    "humidity_pct": 40,
+    "pressure_mb": 1010.5,
+    "roof": false,
+    "flag": "clear"
+  },
   "ATH": {
     "venue": "Sutter Health Park",
     "temp": 92.8,
@@ -7,17 +18,6 @@
     "wind_dir": "SW",
     "humidity_pct": 25,
     "pressure_mb": 1009.2,
-    "roof": false,
-    "flag": "clear"
-  },
-  "STL": {
-    "venue": "Busch Stadium",
-    "temp": 93.1,
-    "precip": 2,
-    "wind_spd": 8.6,
-    "wind_dir": "NNE",
-    "humidity_pct": 50,
-    "pressure_mb": 1007.9,
     "roof": false,
     "flag": "clear"
   },
@@ -32,58 +32,25 @@
     "roof": true,
     "flag": "clear"
   },
-  "CWS": {
-    "venue": "Rate Field",
-    "temp": 68.9,
-    "precip": 0,
-    "wind_spd": 11.9,
-    "wind_dir": "N",
-    "humidity_pct": 83,
-    "pressure_mb": 1011.1,
-    "roof": false,
-    "flag": "clear"
-  },
-  "PIT": {
-    "venue": "PNC Park",
-    "temp": 79.3,
-    "precip": 4,
-    "wind_spd": 9.5,
+  "WSH": {
+    "venue": "Nationals Park",
+    "temp": 85.1,
+    "precip": 71,
+    "wind_spd": 11.3,
     "wind_dir": "NW",
-    "humidity_pct": 63,
-    "pressure_mb": 1003.3,
+    "humidity_pct": 59,
+    "pressure_mb": 1001.5,
     "roof": false,
     "flag": "clear"
   },
-  "SF": {
-    "venue": "Oracle Park",
-    "temp": 68.2,
-    "precip": 0,
-    "wind_spd": 18.3,
-    "wind_dir": "WNW",
-    "humidity_pct": 70,
-    "pressure_mb": 1012.2,
-    "roof": false,
-    "flag": "clear"
-  },
-  "TB": {
-    "venue": "Tropicana Field",
-    "temp": 84.1,
-    "precip": 13,
-    "wind_spd": 7.4,
-    "wind_dir": "WSW",
-    "humidity_pct": 77,
-    "pressure_mb": 1011.9,
-    "roof": true,
-    "flag": "clear"
-  },
-  "LAA": {
-    "venue": "Angel Stadium",
-    "temp": 78.9,
-    "precip": 0,
-    "wind_spd": 7.9,
-    "wind_dir": "SW",
-    "humidity_pct": 66,
-    "pressure_mb": 1009.7,
+  "STL": {
+    "venue": "Busch Stadium",
+    "temp": 93.1,
+    "precip": 2,
+    "wind_spd": 8.6,
+    "wind_dir": "NNE",
+    "humidity_pct": 50,
+    "pressure_mb": 1007.9,
     "roof": false,
     "flag": "clear"
   },
@@ -98,6 +65,17 @@
     "roof": false,
     "flag": "clear"
   },
+  "LAA": {
+    "venue": "Angel Stadium",
+    "temp": 78.9,
+    "precip": 0,
+    "wind_spd": 7.9,
+    "wind_dir": "SW",
+    "humidity_pct": 66,
+    "pressure_mb": 1009.7,
+    "roof": false,
+    "flag": "clear"
+  },
   "CIN": {
     "venue": "Great American Ball Park",
     "temp": 86.3,
@@ -109,14 +87,14 @@
     "roof": false,
     "flag": "clear"
   },
-  "WSH": {
-    "venue": "Nationals Park",
-    "temp": 85.1,
-    "precip": 71,
-    "wind_spd": 11.3,
+  "PIT": {
+    "venue": "PNC Park",
+    "temp": 79.3,
+    "precip": 4,
+    "wind_spd": 9.5,
     "wind_dir": "NW",
-    "humidity_pct": 59,
-    "pressure_mb": 1001.5,
+    "humidity_pct": 63,
+    "pressure_mb": 1003.3,
     "roof": false,
     "flag": "clear"
   },
@@ -131,21 +109,47 @@
     "roof": false,
     "flag": "clear"
   },
-  "SD": {
-    "venue": "Petco Park",
-    "temp": 72,
+  "CWS": {
+    "venue": "Rate Field",
+    "temp": 68.9,
     "precip": 0,
-    "wind_spd": 5,
+    "wind_spd": 11.9,
     "wind_dir": "N",
+    "humidity_pct": 83,
+    "pressure_mb": 1011.1,
     "roof": false,
     "flag": "clear"
   },
-  "MIN": {
-    "venue": "Target Field",
-    "temp": 72,
+  "TB": {
+    "venue": "Tropicana Field",
+    "temp": 84.1,
+    "precip": 13,
+    "wind_spd": 7.4,
+    "wind_dir": "WSW",
+    "humidity_pct": 77,
+    "pressure_mb": 1011.9,
+    "roof": true,
+    "flag": "clear"
+  },
+  "SD": {
+    "venue": "Petco Park",
+    "temp": 74.2,
     "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
+    "wind_spd": 6.1,
+    "wind_dir": "SW",
+    "humidity_pct": 79,
+    "pressure_mb": 1010.3,
+    "roof": false,
+    "flag": "clear"
+  },
+  "SF": {
+    "venue": "Oracle Park",
+    "temp": 68.2,
+    "precip": 0,
+    "wind_spd": 18.3,
+    "wind_dir": "WNW",
+    "humidity_pct": 70,
+    "pressure_mb": 1012.2,
     "roof": false,
     "flag": "clear"
   }
