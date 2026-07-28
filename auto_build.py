@@ -212,7 +212,11 @@ if not _by_game:
     sys.exit(0)
 
 for gk, rows in _by_game.items():
-    away, _, home = gk.partition("_")
+    # doubleheader keys carry a numeric suffix (CLE_CIN_2): strip it before
+    # deriving team abbrs, else the home team parses as "CIN_2"
+    _kparts = gk.split("_")
+    _gm = _kparts.pop() if (len(_kparts) > 2 and _kparts[-1].isdigit()) else ""
+    away, home = _kparts[0], _kparts[1]
     gl = GAMES.get(gk, {}) if isinstance(GAMES, dict) else {}
     # weather.json is keyed by HOME team abbr (fetch_data.fetch_weather);
     # tolerate legacy game_key-keyed files too
@@ -220,7 +224,8 @@ for gk, rows in _by_game.items():
     if isinstance(WEATHER, dict):
         wx = WEATHER.get(home) or WEATHER.get(gk) or {}
     time_s = gl.get("time", "") or ""
-    label = f"{away} @ {home}" + (f" ({time_s})" if time_s else "")
+    _tag = ", ".join(x for x in ([f"Gm {_gm}"] if _gm else []) + ([time_s] if time_s else []))
+    label = f"{away} @ {home}" + (f" ({_tag})" if _tag else "")
     game = {
         "game_key": gk, "label": label,
         "away_team": away, "home_team": home,

@@ -116,6 +116,12 @@ def try_odds_api():
 
     odds, remaining = {}, None
     live_or_upcoming = [e for e in todays if _event_still_relevant(e)]
+    # DOUBLEHEADERS: both games list the same batters, and props are keyed
+    # by player name. Walk events in start order and let the FIRST still-
+    # relevant game's price win (setdefault below) so game 2's props don't
+    # overwrite game 1's while game 1 is still being played; once game 1
+    # ages out of relevance, game 2's prices take over naturally.
+    live_or_upcoming.sort(key=lambda e: e.get("commence_time") or "")
     skipped = len(todays) - len(live_or_upcoming)
     if skipped:
         print(f"skipping HR props for {skipped} likely-final game(s) to save credits")
@@ -166,7 +172,7 @@ def try_odds_api():
                 best[o["description"]] = (pt, price)
         for name, (pt, price) in best.items():
             if pt <= 0.5:
-                odds[name] = price
+                odds.setdefault(name, price)   # earliest event wins (DH)
 
     merge_game_lines(key)
     if k_lines:
@@ -199,12 +205,31 @@ def merge_game_lines(key):
     except Exception as ex:
         print(f"game lines fetch failed ({ex}) - totals/ML unchanged")
         return
+    def _line_key(away, home, commence):
+        """Resolve an event to its game_lines key. Doubleheaders put two keys
+        on the board (CLE_CIN and CLE_CIN_2); match by start-time proximity so
+        each event's total/ML lands on ITS game instead of both landing on
+        game 1 (the mismatched-lines bug)."""
+        base = f"{away}_{home}"
+        cands = [k for k in lines
+                 if k == base or (k.startswith(base + "_") and k[len(base) + 1:].isdigit())]
+        if len(cands) <= 1:
+            return cands[0] if cands else None
+        def dist(k):
+            try:
+                st = datetime.fromisoformat(str(lines[k].get("start") or "").replace("Z", "+00:00"))
+                ct = datetime.fromisoformat(str(commence or "").replace("Z", "+00:00"))
+                return abs((st - ct).total_seconds())
+            except Exception:
+                return float("inf")
+        return min(cands, key=dist)
+
     updated = 0
     for g in games:
         away = TEAMNAME_TO_ABBR.get(g.get("away_team", ""))
         home = TEAMNAME_TO_ABBR.get(g.get("home_team", ""))
-        gk = f"{away}_{home}" if away and home else None
-        if not gk or gk not in lines:
+        gk = _line_key(away, home, g.get("commence_time")) if away and home else None
+        if not gk:
             continue
         h2h_book = _pick_book(g.get("bookmakers"), "h2h")
         tot_book = _pick_book(g.get("bookmakers"), "totals")
