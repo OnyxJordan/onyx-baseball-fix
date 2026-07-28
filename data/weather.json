@@ -1,37 +1,4 @@
 {
-  "LAA": {
-    "venue": "Angel Stadium",
-    "temp": 78.5,
-    "precip": 0,
-    "wind_spd": 8.4,
-    "wind_dir": "SW",
-    "humidity_pct": 65,
-    "pressure_mb": 1009.9,
-    "roof": false,
-    "flag": "clear"
-  },
-  "DET": {
-    "venue": "Comerica Park",
-    "temp": 80.5,
-    "precip": 0,
-    "wind_spd": 11.8,
-    "wind_dir": "NNW",
-    "humidity_pct": 52,
-    "pressure_mb": 1006.4,
-    "roof": false,
-    "flag": "clear"
-  },
-  "PIT": {
-    "venue": "PNC Park",
-    "temp": 79.7,
-    "precip": 4,
-    "wind_spd": 10.2,
-    "wind_dir": "NW",
-    "humidity_pct": 64,
-    "pressure_mb": 1002.8,
-    "roof": false,
-    "flag": "clear"
-  },
   "MIN": {
     "venue": "Target Field",
     "temp": 88.8,
@@ -40,6 +7,17 @@
     "wind_dir": "ENE",
     "humidity_pct": 44,
     "pressure_mb": 1011.1,
+    "roof": false,
+    "flag": "clear"
+  },
+  "SF": {
+    "venue": "Oracle Park",
+    "temp": 68.0,
+    "precip": 0,
+    "wind_spd": 18.2,
+    "wind_dir": "WNW",
+    "humidity_pct": 71,
+    "pressure_mb": 1012.2,
     "roof": false,
     "flag": "clear"
   },
@@ -54,14 +32,25 @@
     "roof": false,
     "flag": "clear"
   },
-  "ATH": {
-    "venue": "Sutter Health Park",
-    "temp": 92.6,
+  "CIN": {
+    "venue": "Great American Ball Park",
+    "temp": 85.0,
     "precip": 0,
+    "wind_spd": 7.9,
+    "wind_dir": "N",
+    "humidity_pct": 54,
+    "pressure_mb": 1006.3,
+    "roof": false,
+    "flag": "clear"
+  },
+  "PIT": {
+    "venue": "PNC Park",
+    "temp": 79.7,
+    "precip": 4,
     "wind_spd": 10.2,
-    "wind_dir": "SW",
-    "humidity_pct": 24,
-    "pressure_mb": 1009.1,
+    "wind_dir": "NW",
+    "humidity_pct": 64,
+    "pressure_mb": 1002.8,
     "roof": false,
     "flag": "clear"
   },
@@ -76,14 +65,14 @@
     "roof": true,
     "flag": "clear"
   },
-  "SF": {
-    "venue": "Oracle Park",
-    "temp": 68.0,
+  "LAD": {
+    "venue": "Dodger Stadium",
+    "temp": 74.0,
     "precip": 0,
-    "wind_spd": 18.2,
-    "wind_dir": "WNW",
-    "humidity_pct": 71,
-    "pressure_mb": 1012.2,
+    "wind_spd": 6.9,
+    "wind_dir": "WSW",
+    "humidity_pct": 74,
+    "pressure_mb": 1009.1,
     "roof": false,
     "flag": "clear"
   },
@@ -98,25 +87,25 @@
     "roof": false,
     "flag": "clear"
   },
-  "LAD": {
-    "venue": "Dodger Stadium",
-    "temp": 74.0,
-    "precip": 0,
-    "wind_spd": 6.9,
-    "wind_dir": "WSW",
-    "humidity_pct": 74,
-    "pressure_mb": 1009.1,
-    "roof": false,
+  "MIA": {
+    "venue": "loanDepot Park",
+    "temp": 86.4,
+    "precip": 15,
+    "wind_spd": 5.3,
+    "wind_dir": "SW",
+    "humidity_pct": 67,
+    "pressure_mb": 1012.6,
+    "roof": true,
     "flag": "clear"
   },
-  "CIN": {
-    "venue": "Great American Ball Park",
-    "temp": 85.0,
+  "ATH": {
+    "venue": "Sutter Health Park",
+    "temp": 92.6,
     "precip": 0,
-    "wind_spd": 7.9,
-    "wind_dir": "N",
-    "humidity_pct": 54,
-    "pressure_mb": 1006.3,
+    "wind_spd": 10.2,
+    "wind_dir": "SW",
+    "humidity_pct": 24,
+    "pressure_mb": 1009.1,
     "roof": false,
     "flag": "clear"
   },
@@ -131,6 +120,28 @@
     "roof": false,
     "flag": "clear"
   },
+  "DET": {
+    "venue": "Comerica Park",
+    "temp": 80.5,
+    "precip": 0,
+    "wind_spd": 11.8,
+    "wind_dir": "NNW",
+    "humidity_pct": 52,
+    "pressure_mb": 1006.4,
+    "roof": false,
+    "flag": "clear"
+  },
+  "LAA": {
+    "venue": "Angel Stadium",
+    "temp": 78.5,
+    "precip": 0,
+    "wind_spd": 8.4,
+    "wind_dir": "SW",
+    "humidity_pct": 65,
+    "pressure_mb": 1009.9,
+    "roof": false,
+    "flag": "clear"
+  },
   "SD": {
     "venue": "Petco Park",
     "temp": 73.5,
@@ -140,15 +151,6 @@
     "humidity_pct": 79,
     "pressure_mb": 1010.5,
     "roof": false,
-    "flag": "clear"
-  },
-  "MIA": {
-    "venue": "loanDepot Park",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
-    "roof": true,
     "flag": "clear"
   }
 }
