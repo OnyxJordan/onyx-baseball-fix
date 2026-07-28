@@ -229,12 +229,28 @@ def fetch_lineups():
     games = {}     # internal, keyed by game_key — used by fetch_weather
     flat  = []     # what auto_build.py iterates
 
+    # DOUBLEHEADERS: two games share away_home; without distinct keys the
+    # second game overwrites the first's pitchers and the two lineups
+    # concatenate (players duplicated at spots 10-18). Key game 2 by MLB's
+    # own gameNumber (AWAY_HOME_2) — stable across builds even after game 1
+    # goes Final and drops off the schedule filter, unlike pair counting.
+    games_raw = sorted(games_raw,
+                       key=lambda g: (g.get("gameDate", ""), g.get("gameNumber") or 1))
     for g in games_raw:
         away_abbr = TEAM_ID_TO_ABBR.get(g["teams"]["away"]["team"]["id"], "")
         home_abbr = TEAM_ID_TO_ABBR.get(g["teams"]["home"]["team"]["id"], "")
         if not away_abbr or not home_abbr:
             continue
-        game_key = f"{away_abbr}_{home_abbr}"
+        _pair = f"{away_abbr}_{home_abbr}"
+        try:
+            _gnum = int(g.get("gameNumber") or 1)
+        except (TypeError, ValueError):
+            _gnum = 1
+        _is_dh = g.get("doubleHeader") in ("Y", "S")
+        game_key = _pair if (_gnum <= 1 or not _is_dh) else f"{_pair}_{_gnum}"
+        while game_key in games:   # belt-and-suspenders vs missing DH flags
+            _gnum += 1
+            game_key = f"{_pair}_{_gnum}"
 
         away_pitcher = g["teams"]["away"].get("probablePitcher", {}).get("fullName", "TBD")
         home_pitcher = g["teams"]["home"].get("probablePitcher", {}).get("fullName", "TBD")

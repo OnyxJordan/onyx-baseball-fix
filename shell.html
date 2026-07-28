@@ -3600,7 +3600,7 @@ function renderGCStrip() {
         <span class="sb-ab">${ab}</span>
         ${(live || fin)
           ? `<span class="sb-score${dim ? ' lose' : ''}${bumped ? ' bump' : ''}">${sc ?? ''}</span>`
-          : (ml ? `<span class="sb-ml" data-a="${r.away}" data-h="${r.home}" data-p="${ab}" data-o="${ml}" onclick="event.stopPropagation();onyxTicket({away:this.dataset.a,home:this.dataset.h,market:'ML',pick:this.dataset.p,side:'yes',odds:this.dataset.o})">${fmtOdds(ml)}</span>` : '')}
+          : (ml ? `<span class="sb-ml" data-a="${r.away}" data-h="${r.home}" data-gk="${(s && s.game_key) || ''}" data-p="${ab}" data-o="${ml}" onclick="event.stopPropagation();onyxTicket({away:this.dataset.a,home:this.dataset.h,gk:this.dataset.gk,market:'ML',pick:this.dataset.p,side:'yes',odds:this.dataset.o})">${fmtOdds(ml)}</span>` : '')}
       </div>`;
     const cls = `sb-card${+r.pk === +gcPk ? ' sel' : ''}${live ? ' live' : ''}${!_sbSeen ? ' sb-in' : ''}`;
     const anim = !_sbSeen ? ` style="animation-delay:${Math.min(idx * 55, 500)}ms"` : '';
@@ -3672,16 +3672,16 @@ async function loadGC() {
 }
 
 // ─── GAMECENTER: Onyx funnel (bet bar + HR watch strip) ─────────
-function onyxOpenGame(away, home) {
-  const slug = onyxSlug(away, home);
+function onyxOpenGame(away, home, gk) {
+  const slug = onyxSlug(away, home, gk);
   window.open(slug ? 'https://app.onyxodds.com/game/' + slug : ONYX_FALLBACK_URL, '_blank', 'noopener');
 }
 function gcBetBar(aAb, hAb, isLive, isFinal) {
   if (isFinal) return '';
   const s = (typeof SUMMARIES !== 'undefined' ? SUMMARIES : []).find(x => +x.gamePk === +gcPk) || {};
   const chip = (label, mkt, pick, o) =>
-    `<span class="gc-bet-chip" data-a="${aAb}" data-h="${hAb}" data-p="${pick}" data-m="${mkt}" data-o="${o || ''}"
-      onclick="event.stopPropagation();onyxTicket({away:this.dataset.a,home:this.dataset.h,market:this.dataset.m,pick:this.dataset.p,side:'yes',odds:this.dataset.o,line:'${mkt==='TOTAL'?'':''}'})">${label}</span>`;
+    `<span class="gc-bet-chip" data-a="${aAb}" data-h="${hAb}" data-gk="${s.game_key || ''}" data-p="${pick}" data-m="${mkt}" data-o="${o || ''}"
+      onclick="event.stopPropagation();onyxTicket({away:this.dataset.a,home:this.dataset.h,gk:this.dataset.gk,market:this.dataset.m,pick:this.dataset.p,side:'yes',odds:this.dataset.o,line:'${mkt==='TOTAL'?'':''}'})">${label}</span>`;
   const chips = [
     s.away_ml ? chip(`${aAb} ${fmtOdds(s.away_ml)}`, 'ML', aAb, s.away_ml) : '',
     s.home_ml ? chip(`${hAb} ${fmtOdds(s.home_ml)}`, 'ML', hAb, s.home_ml) : '',
@@ -3704,7 +3704,7 @@ function gcBetBar(aAb, hAb, isLive, isFinal) {
     }
   } catch (e) {}
   return `<div class="gc-betbar">
-    <div class="gc-bet-cta" data-a="${aAb}" data-h="${hAb}" onclick="onyxOpenGame(this.dataset.a,this.dataset.h)">⚡ Bet this game on Onyx${isLive ? ' · LIVE' : ''}</div>
+    <div class="gc-bet-cta" data-a="${aAb}" data-h="${hAb}" data-gk="${s.game_key || ''}" onclick="onyxOpenGame(this.dataset.a,this.dataset.h,this.dataset.gk)">⚡ Bet this game on Onyx${isLive ? ' · LIVE' : ''}</div>
     <div class="gc-bet-chips">${chips}</div>${mv}
   </div>`;
 }
@@ -5004,9 +5004,26 @@ var ONYX_TEAM_NAMES = {ARI:'Arizona Diamondbacks', ATL:'Atlanta Braves', BAL:'Ba
   SEA:'Seattle Mariners', SF:'San Francisco Giants', SFG:'San Francisco Giants',
   STL:'St. Louis Cardinals', TB:'Tampa Bay Rays', TBR:'Tampa Bay Rays', TEX:'Texas Rangers',
   TOR:'Toronto Blue Jays', WSH:'Washington Nationals', WSN:'Washington Nationals'};
-function onyxSlug(away, home) {
+function onyxSlug(away, home, gk) {
+  // explicit game_key (Gamecenter knows exactly which game it shows) wins —
+  // doubleheader game 2 lives under AWAY_HOME_2
+  if (gk && ONYX_GAME_LINKS[gk]) return ONYX_GAME_LINKS[gk];
   const key = away + '_' + home;
-  if (ONYX_GAME_LINKS[key]) return ONYX_GAME_LINKS[key];
+  const l1 = ONYX_GAME_LINKS[key], l2 = ONYX_GAME_LINKS[key + '_2'];
+  if (l1 && l2) {
+    // doubleheader without explicit context: ticket game 1 until it is
+    // final (or ~4h past start / off the board), then game 2
+    try {
+      const s1 = (typeof SUMMARIES !== 'undefined' ? SUMMARIES : [])
+        .find(x => (x.game_key || `${x.away}_${x.home}`) === key);
+      if (!s1) return l2;   // game 1 already dropped off the slate
+      const t1 = s1.start ? Date.parse(s1.start) : null;
+      const live1 = (typeof liveGameData !== 'undefined' && liveGameData[s1.gamePk]) || null;
+      if ((live1 && live1.isFinal) || (t1 && Date.now() - t1 > 4 * 3600 * 1000)) return l2;
+    } catch (e) {}
+    return l1;
+  }
+  if (l1 || l2) return l1 || l2;
   if (ONYX_TEAM_IDS[away] && ONYX_TEAM_IDS[home]) {
     const d = new Date().toLocaleDateString('en-CA', {timeZone: 'America/New_York'});
     return ONYX_TEAM_IDS[away] + '-' + ONYX_TEAM_IDS[home] + '-' + d + '-' + ONYX_GAME_SUFFIX;
@@ -5014,7 +5031,7 @@ function onyxSlug(away, home) {
   return null;
 }
 function onyxTicket(p) {
-  const slug = (p.away && p.home) ? onyxSlug(p.away, p.home) : null;
+  const slug = (p.away && p.home) ? onyxSlug(p.away, p.home, p.gk) : null;
   if (slug) {
     let market, label, tail = 'null';
     if (p.market === 'ML') {
@@ -5095,9 +5112,9 @@ function renderMarkets() {
       <div class="mkt-team" style="color:${col}">${name}<span class="ml">${name === s.away ? (s.away_ml ? 'ML ' + fmtOdds(s.away_ml) : '') : (s.home_ml ? 'ML ' + fmtOdds(s.home_ml) : '')}</span></div>
       <div class="mkt-pct" style="color:${col}">${Math.round(p * 100)}%</div>
       ${delta(dv)}
-      <div class="mkt-chip yes" title="Add to Onyx ticket" data-a="${s.away}" data-h="${s.home}" data-p="${name}" data-o="${name === s.away ? (s.away_ml || '') : (s.home_ml || '')}" onclick="event.stopPropagation();onyxTicket({away:this.dataset.a,home:this.dataset.h,market:'ML',pick:this.dataset.p,side:'yes',odds:this.dataset.o})">Yes ${cents(p)}¢</div>
-      <div class="mkt-chip no" title="Add to Onyx ticket" data-a="${s.away}" data-h="${s.home}" data-p="${name}" data-o="${name === s.away ? (s.away_ml || '') : (s.home_ml || '')}" onclick="event.stopPropagation();onyxTicket({away:this.dataset.a,home:this.dataset.h,market:'ML',pick:this.dataset.p,side:'no',odds:this.dataset.o})">No ${cents(1 - p)}¢</div>
-      ${rlOf(ab) ? `<div class="mkt-chip rl" title="Run line on Onyx" data-a="${s.away}" data-h="${s.home}" data-p="${ab}" data-l="${rlOf(ab)}" onclick="event.stopPropagation();onyxTicket({away:this.dataset.a,home:this.dataset.h,market:'RL',pick:this.dataset.p,line:this.dataset.l})">RL ${rlOf(ab)}</div>` : ''}
+      <div class="mkt-chip yes" title="Add to Onyx ticket" data-a="${s.away}" data-h="${s.home}" data-gk="${gk}" data-p="${name}" data-o="${name === s.away ? (s.away_ml || '') : (s.home_ml || '')}" onclick="event.stopPropagation();onyxTicket({away:this.dataset.a,home:this.dataset.h,gk:this.dataset.gk,market:'ML',pick:this.dataset.p,side:'yes',odds:this.dataset.o})">Yes ${cents(p)}¢</div>
+      <div class="mkt-chip no" title="Add to Onyx ticket" data-a="${s.away}" data-h="${s.home}" data-gk="${gk}" data-p="${name}" data-o="${name === s.away ? (s.away_ml || '') : (s.home_ml || '')}" onclick="event.stopPropagation();onyxTicket({away:this.dataset.a,home:this.dataset.h,gk:this.dataset.gk,market:'ML',pick:this.dataset.p,side:'no',odds:this.dataset.o})">No ${cents(1 - p)}¢</div>
+      ${rlOf(ab) ? `<div class="mkt-chip rl" title="Run line on Onyx" data-a="${s.away}" data-h="${s.home}" data-gk="${gk}" data-p="${ab}" data-l="${rlOf(ab)}" onclick="event.stopPropagation();onyxTicket({away:this.dataset.a,home:this.dataset.h,gk:this.dataset.gk,market:'RL',pick:this.dataset.p,line:this.dataset.l})">RL ${rlOf(ab)}</div>` : ''}
     </div>`;
 
     const isOpen = mktOpen.has(gk);
@@ -5114,13 +5131,13 @@ function renderMarkets() {
     return `<div class="mkt-card${isOpen ? ' open' : ''}">
       <div class="mkt-head" onclick="mktToggle('${gk}')" title="Show line movement over time">
         <div>
-          <div class="mkt-title">${s.away} @ ${s.home}${s.venue ? ` <span style="font-weight:400;color:var(--text3);font-size:11px">· ${s.venue}</span>` : ''}</div>
+          <div class="mkt-title">${s.away} @ ${s.home}${/_\d+$/.test(gk) ? ` <span style="font-weight:600;color:var(--text2);font-size:11px">Gm ${gk.split('_').pop()}</span>` : ''}${s.venue ? ` <span style="font-weight:400;color:var(--text3);font-size:11px">· ${s.venue}</span>` : ''}</div>
           <div class="mkt-sub">${stateHtml}</div>
         </div>
         <div style="display:flex;align-items:center;gap:10px">
           ${s.ou ? `<div class="mkt-sub" style="display:flex;gap:5px;align-items:center">
-            <span class="mkt-ou" title="Over on Onyx" data-a="${s.away}" data-h="${s.home}" data-p="Over ${s.ou}" onclick="event.stopPropagation();onyxTicket({away:this.dataset.a,home:this.dataset.h,market:'TOTAL',pick:this.dataset.p})">O ${s.ou}</span>
-            <span class="mkt-ou" title="Under on Onyx" data-a="${s.away}" data-h="${s.home}" data-p="Under ${s.ou}" onclick="event.stopPropagation();onyxTicket({away:this.dataset.a,home:this.dataset.h,market:'TOTAL',pick:this.dataset.p})">U ${s.ou}</span>
+            <span class="mkt-ou" title="Over on Onyx" data-a="${s.away}" data-h="${s.home}" data-gk="${gk}" data-p="Over ${s.ou}" onclick="event.stopPropagation();onyxTicket({away:this.dataset.a,home:this.dataset.h,gk:this.dataset.gk,market:'TOTAL',pick:this.dataset.p})">O ${s.ou}</span>
+            <span class="mkt-ou" title="Under on Onyx" data-a="${s.away}" data-h="${s.home}" data-gk="${gk}" data-p="Under ${s.ou}" onclick="event.stopPropagation();onyxTicket({away:this.dataset.a,home:this.dataset.h,gk:this.dataset.gk,market:'TOTAL',pick:this.dataset.p})">U ${s.ou}</span>
           </div>` : ''}
           <button class="mkt-histbtn" onclick="event.stopPropagation();mktToggle('${gk}')">${isOpen ? 'Hide history' : 'History'} <span class="mkt-chev">▾</span></button>
         </div>

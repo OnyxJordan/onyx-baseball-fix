@@ -142,6 +142,34 @@ def _slug_from_row(fx):
     return None
 
 
+def _fx_start(fx):
+    """Best-effort fixture start timestamp string, for doubleheader ordering."""
+    for k in ("start_date", "start_time", "game_date", "commence_time"):
+        v = fx.get(k)
+        if v:
+            return str(v)
+    return ""
+
+
+def _board_keys():
+    """The slate's authoritative game keys (incl. AWAY_HOME_2 doubleheader
+    keys) from game_lines.json, written by fetch_data earlier in the run."""
+    try:
+        gl = json.load(open("data/game_lines.json", encoding="utf-8"))
+        return gl if isinstance(gl, dict) else {}
+    except Exception:
+        return {}
+
+
+def _start_dist(iso_a, iso_b):
+    try:
+        a = datetime.fromisoformat(str(iso_a or "").replace("Z", "+00:00"))
+        b = datetime.fromisoformat(str(iso_b or "").replace("Z", "+00:00"))
+        return abs((a - b).total_seconds())
+    except Exception:
+        return float("inf")
+
+
 def harvest_optic(key, date):
     """Every MLB fixture id (= slug) for the slate, keyed away_home.
 
@@ -150,8 +178,13 @@ def harvest_optic(key, date):
     can still carry YESTERDAY's finished fixtures (hence the slug-date
     filter — a stale slug resolves to the wrong game's ticket), and late
     West Coast starts live on TOMORROW's UTC date (hence the second
-    start_date harvest)."""
-    links = {}
+    start_date harvest).
+
+    DOUBLEHEADERS: a pair can have two fixtures today. Fixtures are collected
+    per pair, then matched to the board's keys (AWAY_HOME / AWAY_HOME_2 from
+    game_lines.json) by start-time proximity, so each game's bet buttons deep
+    link to ITS OWN Onyx ticket."""
+    links, by_pair = {}, {}   # by_pair: pair -> {slug: start_ts}
     qk = urllib.parse.quote(key)
     try:
         from datetime import datetime as _dt, timedelta as _td
@@ -171,7 +204,7 @@ def harvest_optic(key, date):
     for phase, url, hdrs in attempts:
         if phase == "today2" and today_ok:
             continue
-        if phase == "active" and links:
+        if phase == "active" and by_pair:
             break
         safe_url = url.replace(qk, "***")
         data = None
@@ -219,16 +252,43 @@ def harvest_optic(key, date):
             matched_slug += 1
             away, home = team_abbr(fx, "away"), team_abbr(fx, "home")
             if away and home:
-                links.setdefault(f"{away}_{home}", slug)   # today's harvest wins
-        if links and phase in ("today", "today2"):
+                by_pair.setdefault(f"{away}_{home}", {}).setdefault(slug, _fx_start(fx))
+        if by_pair and phase in ("today", "today2"):
             today_ok = True
-            print(f"onyx: harvested {len(links)} via {safe_url}")
+            n_fx = sum(len(v) for v in by_pair.values())
+            print(f"onyx: harvested {n_fx} fixture(s) via {safe_url}")
         # rows exist but nothing usable: dump the first row's shape so the
         # log IS the diagnosis (keys + id-ish and team-ish fields)
         r0 = rows[0]
         diag = {k: r0.get(k) for k in list(r0.keys())[:14]}
         print(f"onyx: {safe_url} -> {len(rows)} row(s), {matched_slug} slug-shaped id(s), 0 mapped")
         print("      first row: " + json.dumps(diag, ensure_ascii=False, default=str)[:700])
+
+    # assign harvested fixtures to board keys; greedy nearest-start matching
+    # covers doubleheaders (and keeps tomorrow's same-pair fixture, swept in
+    # by the tomorrow-UTC phase, from claiming today's key)
+    GL = _board_keys()
+    for pair, slugs in by_pair.items():
+        cand = sorted(slugs.items(), key=lambda kv: (kv[1] or "9999", kv[0]))
+        exp = sorted((k for k in GL
+                      if k == pair or (k.startswith(pair + "_")
+                                       and k[len(pair) + 1:].isdigit())),
+                     key=lambda k: (len(k), k))
+        if not exp:
+            links[pair] = cand[0][0]   # pair not on today's board: keep old behavior
+            continue
+        used = set()
+        for k in exp:
+            best_s, best_d = None, None
+            for slug, st in cand:
+                if slug in used:
+                    continue
+                d = _start_dist(GL[k].get("start"), st)
+                if best_d is None or d < best_d:
+                    best_s, best_d = slug, d
+            if best_s:
+                used.add(best_s)
+                links[k] = best_s
     return links
 
 
@@ -346,6 +406,12 @@ def main():
     prev_links = {k: v for k, v in prev_links.items()
                   if not (re.search(r"(\d{4}-\d{2}-\d{2})", v)
                           and re.search(r"(\d{4}-\d{2}-\d{2})", v).group(1) < today)}
+    # and drop carried keys no longer on today's board (e.g. a doubleheader's
+    # plain AWAY_HOME after game 1 went final) — a stale key would shadow the
+    # right game's slug in the shell's fallback lookup
+    _board = _board_keys()
+    if _board:
+        prev_links = {k: v for k, v in prev_links.items() if k in _board}
 
     key = (os.environ.get("OPTICODDS_API_KEY") or "").strip()
     if not key:
