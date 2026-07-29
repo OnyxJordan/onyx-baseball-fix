@@ -1,37 +1,4 @@
 {
-  "LAD": {
-    "venue": "Dodger Stadium",
-    "temp": 74.8,
-    "precip": 0,
-    "wind_spd": 7.5,
-    "wind_dir": "WSW",
-    "humidity_pct": 70,
-    "pressure_mb": 1009.1,
-    "roof": false,
-    "flag": "clear"
-  },
-  "CWS": {
-    "venue": "Rate Field",
-    "temp": 71.9,
-    "precip": 0,
-    "wind_spd": 6.3,
-    "wind_dir": "N",
-    "humidity_pct": 75,
-    "pressure_mb": 1015.6,
-    "roof": false,
-    "flag": "clear"
-  },
-  "STL": {
-    "venue": "Busch Stadium",
-    "temp": 88.3,
-    "precip": 0,
-    "wind_spd": 7.4,
-    "wind_dir": "NNE",
-    "humidity_pct": 35,
-    "pressure_mb": 1013.1,
-    "roof": false,
-    "flag": "clear"
-  },
   "CIN": {
     "venue": "Great American Ball Park",
     "temp": 82.5,
@@ -54,14 +21,14 @@
     "roof": false,
     "flag": "clear"
   },
-  "SF": {
-    "venue": "Oracle Park",
-    "temp": 68.4,
-    "precip": 1,
-    "wind_spd": 10.1,
-    "wind_dir": "W",
-    "humidity_pct": 73,
-    "pressure_mb": 1013.6,
+  "SD": {
+    "venue": "Petco Park",
+    "temp": 80.1,
+    "precip": 0,
+    "wind_spd": 8.5,
+    "wind_dir": "WSW",
+    "humidity_pct": 65,
+    "pressure_mb": 1010.4,
     "roof": false,
     "flag": "clear"
   },
@@ -73,17 +40,6 @@
     "wind_dir": "WSW",
     "humidity_pct": 29,
     "pressure_mb": 1012.1,
-    "roof": false,
-    "flag": "clear"
-  },
-  "NYM": {
-    "venue": "Citi Field",
-    "temp": 74.3,
-    "precip": 3,
-    "wind_spd": 9.1,
-    "wind_dir": "WNW",
-    "humidity_pct": 81,
-    "pressure_mb": 1001.9,
     "roof": false,
     "flag": "clear"
   },
@@ -111,37 +67,56 @@
   },
   "ATH": {
     "venue": "Sutter Health Park",
-    "temp": 72,
+    "temp": 93.5,
     "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
+    "wind_spd": 10.4,
+    "wind_dir": "SW",
+    "humidity_pct": 24,
+    "pressure_mb": 1008.4,
     "roof": false,
     "flag": "clear"
   },
   "MIA": {
     "venue": "loanDepot Park",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
+    "temp": 88.4,
+    "precip": 6,
+    "wind_spd": 8.6,
+    "wind_dir": "SW",
+    "humidity_pct": 65,
+    "pressure_mb": 1015.6,
     "roof": true,
     "flag": "clear"
   },
-  "SD": {
-    "venue": "Petco Park",
-    "temp": 72,
+  "STL": {
+    "venue": "Busch Stadium",
+    "temp": 88.3,
     "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
+    "wind_spd": 7.4,
+    "wind_dir": "NNE",
+    "humidity_pct": 35,
+    "pressure_mb": 1013.1,
     "roof": false,
     "flag": "clear"
   },
   "LAA": {
     "venue": "Angel Stadium",
-    "temp": 72,
+    "temp": 79.6,
     "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
+    "wind_spd": 7.4,
+    "wind_dir": "SW",
+    "humidity_pct": 63,
+    "pressure_mb": 1009.2,
+    "roof": false,
+    "flag": "clear"
+  },
+  "LAD": {
+    "venue": "Dodger Stadium",
+    "temp": 74.8,
+    "precip": 0,
+    "wind_spd": 7.5,
+    "wind_dir": "WSW",
+    "humidity_pct": 70,
+    "pressure_mb": 1009.1,
     "roof": false,
     "flag": "clear"
   },
@@ -152,6 +127,33 @@
     "wind_spd": 5,
     "wind_dir": "N",
     "roof": true,
+    "flag": "clear"
+  },
+  "CWS": {
+    "venue": "Rate Field",
+    "temp": 72,
+    "precip": 0,
+    "wind_spd": 5,
+    "wind_dir": "N",
+    "roof": false,
+    "flag": "clear"
+  },
+  "NYM": {
+    "venue": "Citi Field",
+    "temp": 72,
+    "precip": 0,
+    "wind_spd": 5,
+    "wind_dir": "N",
+    "roof": false,
+    "flag": "clear"
+  },
+  "SF": {
+    "venue": "Oracle Park",
+    "temp": 72,
+    "precip": 0,
+    "wind_spd": 5,
+    "wind_dir": "N",
+    "roof": false,
     "flag": "clear"
   }
 }
