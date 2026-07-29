@@ -1,5 +1,27 @@
 """
-model.py — Onyx Baseball v30 HR probability model + pitcher K projections
+model.py — Onyx Baseball v31 HR probability model + pitcher K projections
+
+v31: the self-calibration gets the same large-sample discipline as
+the rest of the site. It flipped ACTIVE at 28 graded picks and applied
+scale 0.8626 — an 18.6% haircut (with LEVEL_CAL) off a sample whose
+gap (4 HR actual vs 4.9 expected) is inside one standard deviation of
+pure noise — and the entire slate went negative-edge overnight (one
+positive player on 7/29). The correction is now credibility-weighted
+in units of EXPECTED HRs, the actual information content: scale =
+(actual + K) / (expected + K) with K = 25 expected HRs (~150 picks),
+clamped 0.85-1.15 on both the writer and the reader. At today's
+sample that is 0.970, and it takes ~150 picks of sustained miss to
+move the level even 10%. Large samples decide, recency advises —
+including about the model itself.
+
+v31 (2): the market blend flips from market-led to model-led. Weights
+were w x model + (1-w) x fair with w = 0.30-0.38, so edge (measured
+vs the listed price) could only go positive when the raw model beat
+the listed implied probability by ~22% RELATIVE — beyond the 34-point
+cap for every favorite. The model now carries 0.52-0.60 (deepest in
+the +250..+600 band), the market stays the anchor, and edge is still
+vs the listed price: positive edge remains positive EV at the
+bettable number, with the nightly calibration guarding the level.
 
 v30: launch geometry joins the power anchor, validated on the last
 three weeks of actual homers (466 HR across 244 qualified hitters):
@@ -185,11 +207,13 @@ with open(_BASE / "pitcher_db.json") as f:
     PITCHER_CAREER_DB = json.load(f)
 
 # Self-calibration factor written nightly by calibrate.py from graded picks.
-# Inactive (1.0) until 25+ picks have settled; always clamped 0.75-1.25.
+# Inactive (1.0) until 25+ picks have settled. v31: clamp tightened to
+# 0.85-1.15 — the reader-side backstop against any stale pre-v31 file whose
+# pick-count shrink let a noise-sized sample swing the whole board.
 try:
     with open(_BASE / "data" / "calibration.json") as f:
         _CAL = json.load(f)
-    CAL_SCALE = max(0.75, min(1.25, float(_CAL.get("scale", 1.0)))) if _CAL.get("active") else 1.0
+    CAL_SCALE = max(0.85, min(1.15, float(_CAL.get("scale", 1.0)))) if _CAL.get("active") else 1.0
     print(f"  model: calibration scale {CAL_SCALE} "
           f"({'active' if _CAL.get('active') else 'collecting'}, n={_CAL.get('n', 0)})")
 except Exception:
@@ -661,17 +685,24 @@ def project_player(
         raw_prob = 24.0 + (raw_prob - 24.0) * 0.6
     raw_prob = max(1.0, min(34.0, raw_prob))
 
-    # 8. Market calibration — the market is the anchor. HR props are priced
-    # efficiently, so the model LEANS off the fair price rather than
-    # overruling it; honest edges live in the 1-5pp range.
+    # 8. Market calibration — the market anchors, the MODEL decides. v31: the
+    # old weights (model 0.30-0.38) meant a batter had to beat the LISTED
+    # implied probability by ~22% relative before edge could go positive —
+    # Ohtani pinned at the 34-point cap still showed -2.1 on 7/29, and the
+    # whole slate held one positive player. That is the v25 impossible-edge
+    # bug recreated in the blend. Model now carries the majority (0.52-0.60,
+    # highest in the +250..+600 band where its samples are deepest); edge
+    # stays measured vs the listed price, so positive edge still means
+    # positive EV at what you can actually bet — the vig is a real hurdle,
+    # just no longer an artificial triple one.
     if dk_odds is not None:
         mkt_prob  = implied_prob(dk_odds) * 100
         fair_prob = mkt_prob * (1 - HR_VIG)          # strip vig before anchoring + measuring
-        if dk_odds <= 250:   w = 0.35
-        elif dk_odds <= 400: w = 0.38
-        elif dk_odds <= 600: w = 0.38
-        elif dk_odds <= 900: w = 0.34
-        else:                w = 0.30
+        if dk_odds <= 250:   w = 0.55
+        elif dk_odds <= 400: w = 0.60
+        elif dk_odds <= 600: w = 0.60
+        elif dk_odds <= 900: w = 0.57
+        else:                w = 0.52
         final_prob = w * raw_prob + (1 - w) * fair_prob
     else:
         final_prob = raw_prob * 0.75

@@ -6,8 +6,8 @@ probability with what actually happened and writes a single shrunk
 correction factor to data/calibration.json. model.py applies it to raw
 probabilities once enough evidence exists (25+ graded picks), so the
 system continually tunes itself toward the numbers that actually cash.
-Shrinkage (8 pseudo-picks at expectation) keeps early noise from
-whipsawing the model; the factor is clamped to 0.75-1.25.
+Shrinkage (v31: 25 pseudo-HRs of prior, credibility in units of expected
+HRs) keeps sample noise from whipsawing the model; clamped to 0.85-1.15.
 """
 
 import json
@@ -31,10 +31,15 @@ def main():
     actual = sum(1 for p in graded if p["hit"] is True)
 
     if n:
-        pbar = expected / n
-        k = 8.0                      # pseudo-picks at expectation
-        scale = (actual + k * pbar) / (expected + k * pbar)
-        scale = max(0.75, min(1.25, round(scale, 4)))
+        # v31: credibility shrink in units of EXPECTED HRs — the sample's real
+        # information content — not picks. The old 8-pseudo-pick shrink let 28
+        # graded picks (4 actual vs 4.9 expected, inside one sigma of noise)
+        # write scale 0.8626 and wipe the board's edge column. With K = 25
+        # expected HRs (~150 picks) the same sample yields 0.970, and only a
+        # sustained miss over a real sample can move the level materially.
+        K = 25.0
+        scale = (actual + K) / (expected + K)
+        scale = max(0.85, min(1.15, round(scale, 4)))
     else:
         scale = 1.0
 
