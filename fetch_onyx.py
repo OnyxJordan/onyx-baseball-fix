@@ -515,9 +515,11 @@ def harvest_game_odds(key, links, fids=None, prev_book=""):
         fx_q = "".join(f"&fixture_id={urllib.parse.quote(s)}" for _, s in chunk)
         rows = None
         for bk in ([book] if book else candidates):
+            # no market filter: naming varies (7/29 run returned ML+totals but
+            # zero HR rows under market=player_home_runs); pull the book's full
+            # board per fixture and let the parser pick what it understands
             url = (f"{OPTIC}/fixtures/odds?sport=baseball&league=mlb"
                    f"&sportsbook={urllib.parse.quote(bk)}"
-                   f"&market=moneyline&market=total_runs&market=player_home_runs"
                    f"&odds_format=AMERICAN{fx_q}")
             data = _get(url)
             if data is None:
@@ -539,40 +541,55 @@ def harvest_game_odds(key, links, fids=None, prev_book=""):
             if len(parts) > 2 and parts[-1].isdigit():
                 parts = parts[:-1]
             gk_away, gk_home = parts[0], parts[1]
-            parsed_any = False
+            mkts_seen = set()
             for od in (row.get("odds") or []):
                 if not isinstance(od, dict):
                     continue
-                mkt = str(od.get("market") or od.get("market_id") or "").lower()
+                mkt = str(od.get("market") or od.get("market_id") or "")
+                mkt = re.sub(r"[\s\-]+", "_", mkt.strip().lower())
+                mkts_seen.add(mkt)
+                # full-game markets only: no 1st-inning / first-5 / period lines
+                if re.search(r"1st|first|inning|period|half|f5", mkt):
+                    continue
                 nm = str(od.get("name") or od.get("selection") or "")
                 price = _american(od.get("price"))
                 if price is None:
                     continue
-                if "moneyline" in mkt:
-                    ab = _abbr_from(od.get("team_id")) or _abbr_from(nm) \
-                         or _abbr_from(od.get("selection"))
+                if "moneyline" in mkt and "method" not in mkt:
+                    ab = _abbr_from(nm) or _abbr_from(od.get("selection")) \
+                         or _abbr_from(od.get("team"))
                     if ab == gk_away:
-                        lines[gk]["away_ml"] = price; ml_games.add(gk); parsed_any = True
+                        lines[gk]["away_ml"] = price; ml_games.add(gk)
                     elif ab == gk_home:
-                        lines[gk]["home_ml"] = price; ml_games.add(gk); parsed_any = True
-                elif "total" in mkt and "team" not in mkt:
+                        lines[gk]["home_ml"] = price; ml_games.add(gk)
+                elif ("total" in mkt and "team" not in mkt and "player" not in mkt
+                      and "hit" not in mkt and "base" not in mkt and "strikeout" not in mkt):
+                    # the odds list carries ALTERNATE totals too (Over 15.5 was
+                    # winning as the last row on 7/29). Only the book's main
+                    # line counts; without an is_main flag, first row wins.
                     sel = str(od.get("selection_line") or "").lower()
                     if sel == "over" or (not sel and nm.lower().startswith("over")):
-                        pts = od.get("points")
-                        if pts is None:
-                            m = re.search(r"(\d+(?:\.\d+)?)", nm)
-                            pts = m.group(1) if m else None
-                        try:
-                            lines[gk]["total"] = float(pts); tot_games.add(gk); parsed_any = True
-                        except (TypeError, ValueError):
-                            pass
-                elif "home_run" in mkt:
+                        is_main = od.get("is_main")
+                        if is_main is True or gk not in tot_games:
+                            pts = od.get("points")
+                            if pts is None:
+                                m = re.search(r"(\d+(?:\.\d+)?)", nm)
+                                pts = m.group(1) if m else None
+                            try:
+                                pts = float(pts)
+                            except (TypeError, ValueError):
+                                continue
+                            if 5.0 <= pts <= 14.0:   # sanity: MLB game totals
+                                lines[gk]["total"] = pts
+                                tot_games.add(gk)
+                elif "home_run" in mkt and "team" not in mkt:
                     sel = str(od.get("selection_line") or "").lower()
-                    over = sel == "over" or re.search(r"\bover\b", nm, re.I)
+                    over = sel == "over" or re.search(r"\bover\b", nm, re.I) \
+                           or "to_hit" in mkt or "to_record" in mkt
                     pts = od.get("points")
                     if pts is None:
                         m = re.search(r"over\s+(\d+(?:\.\d+)?)", nm, re.I)
-                        pts = m.group(1) if m else None
+                        pts = float(m.group(1)) if m else 0.5
                     try:
                         pts = float(pts)
                     except (TypeError, ValueError):
@@ -583,12 +600,12 @@ def harvest_game_odds(key, links, fids=None, prev_book=""):
                     player = player or re.sub(r"\s+(over|under)\s+[\d.]+\s*$", "", nm, flags=re.I)
                     if player:
                         hr.setdefault(_nk(player), price)
-                        parsed_any = True
-            if not parsed_any and row.get("odds"):
-                o0 = row["odds"][0]
-                diag = {k: o0.get(k) for k in list(o0.keys())[:12]} if isinstance(o0, dict) else o0
-                print("onyx odds: unparsed odds row shape: "
-                      + json.dumps(diag, ensure_ascii=False, default=str)[:400])
+            if i == 0 and not hr and mkts_seen:
+                hrish = sorted(m for m in mkts_seen if "home" in m or "player" in m)
+                print("onyx odds: no HR props parsed; markets seen: "
+                      + ", ".join(sorted(mkts_seen))[:600])
+                if hrish:
+                    print("onyx odds: HR-ish candidates: " + ", ".join(hrish)[:300])
         time.sleep(1.2)
 
     if not book:
