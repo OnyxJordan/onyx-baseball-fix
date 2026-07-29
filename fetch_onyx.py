@@ -542,6 +542,7 @@ def harvest_game_odds(key, links, fids=None, prev_book=""):
                 parts = parts[:-1]
             gk_away, gk_home = parts[0], parts[1]
             mkts_seen = set()
+            tcand = {}   # total points -> {"over": price, "under": price, "main": bool}
             for od in (row.get("odds") or []):
                 if not isinstance(od, dict):
                     continue
@@ -564,24 +565,29 @@ def harvest_game_odds(key, links, fids=None, prev_book=""):
                         lines[gk]["home_ml"] = price; ml_games.add(gk)
                 elif ("total" in mkt and "team" not in mkt and "player" not in mkt
                       and "hit" not in mkt and "base" not in mkt and "strikeout" not in mkt):
-                    # the odds list carries ALTERNATE totals too (Over 15.5 was
-                    # winning as the last row on 7/29). Only the book's main
-                    # line counts; without an is_main flag, first row wins.
+                    # the odds list carries ALTERNATE totals too (Over 15.5,
+                    # then Over 5.5 on MIL_SF, kept winning). Collect every
+                    # line's two sides and resolve the MAIN line after the
+                    # loop: is_main if the book flags it, else the line with
+                    # the most balanced over/under juice.
                     sel = str(od.get("selection_line") or "").lower()
-                    if sel == "over" or (not sel and nm.lower().startswith("over")):
-                        is_main = od.get("is_main")
-                        if is_main is True or gk not in tot_games:
-                            pts = od.get("points")
-                            if pts is None:
-                                m = re.search(r"(\d+(?:\.\d+)?)", nm)
-                                pts = m.group(1) if m else None
-                            try:
-                                pts = float(pts)
-                            except (TypeError, ValueError):
-                                continue
-                            if 5.0 <= pts <= 14.0:   # sanity: MLB game totals
-                                lines[gk]["total"] = pts
-                                tot_games.add(gk)
+                    if sel not in ("over", "under"):
+                        low = nm.lower()
+                        sel = "over" if low.startswith("over") else \
+                              "under" if low.startswith("under") else ""
+                    pts = od.get("points")
+                    if pts is None:
+                        m = re.search(r"(\d+(?:\.\d+)?)", nm)
+                        pts = m.group(1) if m else None
+                    try:
+                        pts = float(pts)
+                    except (TypeError, ValueError):
+                        continue
+                    if sel and 5.0 <= pts <= 14.0:   # sanity: MLB game totals
+                        e = tcand.setdefault(pts, {})
+                        e[sel] = price
+                        if od.get("is_main") is True:
+                            e["main"] = True
                 elif "home_run" in mkt and "team" not in mkt:
                     sel = str(od.get("selection_line") or "").lower()
                     over = sel == "over" or re.search(r"\bover\b", nm, re.I) \
@@ -600,6 +606,19 @@ def harvest_game_odds(key, links, fids=None, prev_book=""):
                     player = player or re.sub(r"\s+(over|under)\s+[\d.]+\s*$", "", nm, flags=re.I)
                     if player:
                         hr.setdefault(_nk(player), price)
+            if tcand:
+                def _mainness(p):
+                    e = tcand[p]
+                    if e.get("main"):
+                        return (0, 0)
+                    o, u = e.get("over"), e.get("under")
+                    if o is not None and u is not None:
+                        return (1, abs(abs(o) - abs(u)))   # balanced juice = main
+                    return (2, 0)
+                best = min(tcand, key=_mainness)
+                if _mainness(best)[0] < 2 or gk not in tot_games:
+                    lines[gk]["total"] = best
+                    tot_games.add(gk)
             if i == 0 and not hr and mkts_seen:
                 hrish = sorted(m for m in mkts_seen if "home" in m or "player" in m)
                 print("onyx odds: no HR props parsed; markets seen: "
