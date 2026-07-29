@@ -183,8 +183,13 @@ def harvest_optic(key, date):
     DOUBLEHEADERS: a pair can have two fixtures today. Fixtures are collected
     per pair, then matched to the board's keys (AWAY_HOME / AWAY_HOME_2 from
     game_lines.json) by start-time proximity, so each game's bet buttons deep
-    link to ITS OWN Onyx ticket."""
-    links, by_pair = {}, {}   # by_pair: pair -> {slug: start_ts}
+    link to ITS OWN Onyx ticket.
+
+    Returns (links, fids): links maps game_key -> share slug (the fixture's
+    game_id); fids maps game_key -> the fixture's actual API id (e.g.
+    202607306B77C754), which is what /fixtures/odds filters on — passing the
+    slug there matches nothing (verified 7/29: 200 with empty data)."""
+    links, by_pair = {}, {}   # by_pair: pair -> {slug: (start_ts, fid)}
     qk = urllib.parse.quote(key)
     try:
         from datetime import datetime as _dt, timedelta as _td
@@ -252,7 +257,10 @@ def harvest_optic(key, date):
             matched_slug += 1
             away, home = team_abbr(fx, "away"), team_abbr(fx, "home")
             if away and home:
-                by_pair.setdefault(f"{away}_{home}", {}).setdefault(slug, _fx_start(fx))
+                fid = str(fx.get("id") or "")
+                fid = fid if fid and fid != slug else ""
+                by_pair.setdefault(f"{away}_{home}", {}).setdefault(
+                    slug, (_fx_start(fx), fid))
         if by_pair and phase in ("today", "today2"):
             today_ok = True
             n_fx = sum(len(v) for v in by_pair.values())
@@ -268,8 +276,10 @@ def harvest_optic(key, date):
     # covers doubleheaders (and keeps tomorrow's same-pair fixture, swept in
     # by the tomorrow-UTC phase, from claiming today's key)
     GL = _board_keys()
+    fids = {}
+    fid_of = {s: v[1] for slugs in by_pair.values() for s, v in slugs.items()}
     for pair, slugs in by_pair.items():
-        cand = sorted(slugs.items(), key=lambda kv: (kv[1] or "9999", kv[0]))
+        cand = sorted(slugs.items(), key=lambda kv: (kv[1][0] or "9999", kv[0]))
         exp = sorted((k for k in GL
                       if k == pair or (k.startswith(pair + "_")
                                        and k[len(pair) + 1:].isdigit())),
@@ -282,11 +292,13 @@ def harvest_optic(key, date):
             dm = re.search(r"(\d{4}-\d{2}-\d{2})", slug0)
             if dm and dm.group(1) == date:
                 links[pair] = slug0
+                if fid_of.get(slug0):
+                    fids[pair] = fid_of[slug0]
             continue
         used = set()
         for k in exp:
             best_s, best_d = None, None
-            for slug, st in cand:
+            for slug, (st, _fid) in cand:
                 if slug in used:
                     continue
                 d = _start_dist(GL[k].get("start"), st)
@@ -295,7 +307,9 @@ def harvest_optic(key, date):
             if best_s:
                 used.add(best_s)
                 links[k] = best_s
-    return links
+                if fid_of.get(best_s):
+                    fids[k] = fid_of[best_s]
+    return links, fids
 
 
 PLAYERS_OUT = "data/onyx_players.json"
@@ -405,26 +419,36 @@ def _american(v):
     return None
 
 
-def harvest_game_odds(key, links):
+def harvest_game_odds(key, links, fids=None, prev_book=""):
     """Price the board straight from the ONYX book via OpticOdds so the site
     matches app.onyxodds.com exactly (user report: site TEX +116 vs Onyx
     +144 — consensus books are not Onyx's prices). Fills game_lines.json
     moneylines/totals and, when the slate is covered, replaces odds.json HR
     props. The Odds API stays the fallback: on any miss here, its numbers
-    survive untouched."""
+    survive untouched.
+
+    /fixtures/odds filters on the fixture's API id, NOT the share slug
+    (7/29 log: slug-filtered queries returned 200 with empty data for every
+    book name). Queries go out with fids and responses map back through
+    both id and game_id. Returns the resolved book name for caching."""
+    fids = fids or {}
     try:
         lines = json.load(open(GAMELINES, encoding="utf-8"))
         assert isinstance(lines, dict) and lines
     except Exception:
         print("onyx odds: no game_lines.json; skipping Onyx pricing")
-        return
+        return prev_book
     # board order (game 1 before its doubleheader twin) so name-keyed HR
     # prices keep the current game's number, mirroring fetch_odds
-    ordered = [(k, links[k]) for k in lines if links.get(k)]
+    ordered = [(k, fids.get(k) or links[k]) for k in lines if links.get(k)]
     if not ordered:
         print("onyx odds: no fixture links match the board; skipping")
-        return
-    slug_to_gk = {s: k for k, s in ordered}
+        return prev_book
+    # responses map back via BOTH the API id and the slug-shaped game_id
+    id_to_gk = {fx: k for k, fx in ordered}
+    for k in lines:
+        if links.get(k):
+            id_to_gk.setdefault(links[k], k)
     book = None
     hr, ml_games, tot_games = {}, set(), set()
 
@@ -456,6 +480,33 @@ def harvest_game_odds(key, links):
                 budget[0] -= wait
         return None
 
+    # resolve the ONYX book's identity from the API's own sportsbook list
+    # instead of guessing names: env override, then last run's cached answer,
+    # then /sportsbooks (anything containing 'onyx'), then the static guesses
+    candidates = list(BOOK_CANDIDATES)
+    if prev_book and prev_book not in candidates:
+        candidates.insert(0, prev_book)
+    if not (os.environ.get("ONYX_SPORTSBOOK") or "").strip() and not prev_book:
+        for sb_url in (f"{OPTIC}/sportsbooks?sport=baseball", f"{OPTIC}/sportsbooks"):
+            data = _get(sb_url)
+            rows0 = data.get("data") if isinstance(data, dict) else data
+            if not isinstance(rows0, list) or not rows0:
+                continue
+            names = []
+            for r in rows0:
+                if isinstance(r, dict):
+                    nid, nnm = str(r.get("id") or ""), str(r.get("name") or "")
+                    names.append(nid or nnm)
+                    if "onyx" in (nid + " " + nnm).lower():
+                        candidates.insert(0, nid or nnm)
+            hits = [c for c in candidates if "onyx" in c.lower()]
+            if hits:
+                print(f"onyx odds: sportsbooks list matched {hits}")
+            else:
+                print(f"onyx odds: no 'onyx' among {len(names)} sportsbooks; "
+                      "sample: " + ", ".join(names[:40]))
+            break
+
     for i in range(0, len(ordered), 5):
         if budget[0] <= 0:
             print("onyx odds: retry budget exhausted; finishing with what we have")
@@ -463,7 +514,7 @@ def harvest_game_odds(key, links):
         chunk = ordered[i:i + 5]
         fx_q = "".join(f"&fixture_id={urllib.parse.quote(s)}" for _, s in chunk)
         rows = None
-        for bk in ([book] if book else BOOK_CANDIDATES):
+        for bk in ([book] if book else candidates):
             url = (f"{OPTIC}/fixtures/odds?sport=baseball&league=mlb"
                    f"&sportsbook={urllib.parse.quote(bk)}"
                    f"&market=moneyline&market=total_runs&market=player_home_runs"
@@ -480,8 +531,8 @@ def harvest_game_odds(key, links):
         if rows is None:
             continue
         for row in rows:
-            slug = _slug_from_row(row) or str(row.get("id") or "")
-            gk = slug_to_gk.get(slug)
+            gk = (id_to_gk.get(str(row.get("id") or ""))
+                  or id_to_gk.get(_slug_from_row(row) or ""))
             if not gk:
                 continue
             parts = gk.split("_")
@@ -541,24 +592,9 @@ def harvest_game_odds(key, links):
         time.sleep(1.2)
 
     if not book:
-        print(f"onyx odds: no book matched/reachable (tried {BOOK_CANDIDATES}); "
+        print(f"onyx odds: no book matched/reachable (tried {candidates}); "
               "consensus lines kept")
-        # one unauthenticated peek at the public game page so the log shows
-        # where Onyx's own odds live, ready for a scrape fallback if the API
-        # quota stays saturated
-        try:
-            gk0, slug0 = ordered[0]
-            req = urllib.request.Request(f"https://app.onyxodds.com/game/{slug0}",
-                                         headers={"User-Agent": UA})
-            with urllib.request.urlopen(req, timeout=20) as r:
-                page = r.read().decode("utf-8", "replace")
-            j = page.find("moneyline")
-            print(f"onyx odds: game page {slug0} ({gk0}): {len(page)} bytes, "
-                  f"'moneyline' at {j}: "
-                  + json.dumps(page[max(0, j - 120):j + 520])[:760])
-        except Exception as e:
-            print(f"onyx odds: game page probe failed: {e}")
-        return
+        return prev_book
     if ml_games or tot_games:
         now_ts = int(time.time())
         for gk in ml_games | tot_games:
@@ -574,7 +610,7 @@ def harvest_game_odds(key, links):
         med = srt[len(srt) // 2]
         if med > 1500:
             print(f"onyx odds: HR median +{med} is not a 0.5-line slate - discarded")
-            return
+            return book
         json.dump(hr, open(ODDS_JSON, "w", encoding="utf-8"), indent=1, ensure_ascii=False)
         json.dump({"source": "onyx-opticodds",
                    "fetched": datetime.now(ZoneInfo("UTC")).isoformat(),
@@ -583,6 +619,7 @@ def harvest_game_odds(key, links):
         print(f"onyx odds: odds.json now Onyx-priced ({len(hr)} HR props, median +{med})")
     elif hr:
         print(f"onyx odds: only {len(hr)} HR props from Onyx - keeping consensus odds.json")
+    return book
 
 
 def verify(slug):
@@ -629,18 +666,27 @@ def main():
               f"({len(prev_links)} for today)")
         return
 
-    links = harvest_optic(key, today)
+    prev_fids = prev.get("fids") or {} if prev.get("date") == today else {}
+    prev_book = str(prev.get("book") or "")
+
+    links, fids = harvest_optic(key, today)
     merged = dict(prev_links)
     merged.update(links)   # harvested wins over any hand-seeded entry
+    merged_fids = dict(prev_fids)
+    merged_fids.update(fids)
     # price the board FIRST: the shared quota is heavily contended and this
     # is the call that makes site lines match the Onyx app
+    book = prev_book
     if merged:
-        harvest_game_odds(key, merged)
+        book = harvest_game_odds(key, merged, merged_fids, prev_book) or ""
     harvest_players(key)
     if not links:
         print(f"onyx: no fixtures harvested; keeping existing links ({len(prev_links)})")
+        if book != prev_book and prev.get("date") == today:
+            prev["book"] = book
+            json.dump(prev, open(OUT, "w", encoding="utf-8"), indent=1)
         return
-    json.dump({"date": today, "links": merged},
+    json.dump({"date": today, "links": merged, "fids": merged_fids, "book": book},
               open(OUT, "w", encoding="utf-8"), indent=1)
     for k, v in sorted(links.items()):
         print(f"onyx: {k.replace('_', ' @ ')} -> {v}")
