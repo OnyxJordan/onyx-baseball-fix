@@ -1,131 +1,144 @@
 {
-  "CIN": {
-    "venue": "Great American Ball Park",
-    "temp": 90.6,
-    "precip": 0,
-    "wind_spd": 6.5,
-    "wind_dir": "SE",
-    "humidity_pct": 28,
-    "pressure_mb": 1011.7,
-    "roof": false,
-    "flag": "clear"
-  },
-  "NYM": {
-    "venue": "Citi Field",
-    "temp": 79.3,
-    "precip": 2,
-    "wind_spd": 7.2,
-    "wind_dir": "SSE",
-    "humidity_pct": 68,
-    "pressure_mb": 1014.6,
-    "roof": false,
-    "flag": "clear"
-  },
-  "SEA": {
-    "venue": "T-Mobile Park",
-    "temp": 79.1,
-    "precip": 0,
-    "wind_spd": 3.4,
-    "wind_dir": "N",
-    "humidity_pct": 35,
-    "pressure_mb": 1015.6,
-    "roof": false,
-    "flag": "clear"
-  },
   "LAA": {
     "venue": "Angel Stadium",
-    "temp": 84.5,
+    "temp": 84.6,
     "precip": 0,
-    "wind_spd": 6.8,
-    "wind_dir": "WSW",
-    "humidity_pct": 55,
-    "pressure_mb": 1011.9,
-    "roof": false,
-    "flag": "clear"
-  },
-  "BAL": {
-    "venue": "Camden Yards",
-    "temp": 85.9,
-    "precip": 0,
-    "wind_spd": 5.3,
-    "wind_dir": "SE",
-    "humidity_pct": 45,
-    "pressure_mb": 1014.3,
-    "roof": false,
-    "flag": "clear"
-  },
-  "ATH": {
-    "venue": "Sutter Health Park",
-    "temp": 96.9,
-    "precip": 0,
-    "wind_spd": 8.6,
+    "wind_spd": 7.2,
     "wind_dir": "SW",
-    "humidity_pct": 15,
-    "pressure_mb": 1012.4,
-    "roof": false,
-    "flag": "clear"
-  },
-  "HOU": {
-    "venue": "Daikin Park",
-    "temp": 91.4,
-    "precip": 1,
-    "wind_spd": 11.2,
-    "wind_dir": "S",
-    "humidity_pct": 51,
-    "pressure_mb": 1013.6,
-    "roof": true,
-    "flag": "clear"
-  },
-  "COL": {
-    "venue": "Coors Field",
-    "temp": 91.2,
-    "precip": 16,
-    "wind_spd": 9.5,
-    "wind_dir": "ENE",
-    "humidity_pct": 16,
-    "pressure_mb": 1011.4,
-    "roof": false,
-    "flag": "clear"
-  },
-  "TOR": {
-    "venue": "Rogers Centre",
-    "temp": 79.2,
-    "precip": 2,
-    "wind_spd": 3.8,
-    "wind_dir": "E",
-    "humidity_pct": 53,
-    "pressure_mb": 1012.9,
-    "roof": true,
-    "flag": "clear"
-  },
-  "CLE": {
-    "venue": "Progressive Field",
-    "temp": 83.1,
-    "precip": 0,
-    "wind_spd": 5.6,
-    "wind_dir": "NNE",
-    "humidity_pct": 51,
-    "pressure_mb": 1013.1,
-    "roof": false,
-    "flag": "clear"
-  },
-  "SD": {
-    "venue": "Petco Park",
-    "temp": 74.4,
-    "precip": 0,
-    "wind_spd": 6.3,
-    "wind_dir": "NW",
-    "humidity_pct": 85,
-    "pressure_mb": 1012.8,
+    "humidity_pct": 55,
+    "pressure_mb": 1011.3,
     "roof": false,
     "flag": "clear"
   },
   "CHC": {
     "venue": "Wrigley Field",
-    "temp": 72,
+    "temp": 78.4,
+    "precip": 4,
+    "wind_spd": 12.1,
+    "wind_dir": "ESE",
+    "humidity_pct": 72,
+    "pressure_mb": 1012.2,
+    "roof": false,
+    "flag": "clear"
+  },
+  "TB": {
+    "venue": "Tropicana Field",
+    "temp": 82.7,
+    "precip": 6,
+    "wind_spd": 5.0,
+    "wind_dir": "W",
+    "humidity_pct": 86,
+    "pressure_mb": 1016.3,
+    "roof": true,
+    "flag": "clear"
+  },
+  "CLE": {
+    "venue": "Progressive Field",
+    "temp": 83.5,
     "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
+    "wind_spd": 5.6,
+    "wind_dir": "NE",
+    "humidity_pct": 49,
+    "pressure_mb": 1012.5,
+    "roof": false,
+    "flag": "clear"
+  },
+  "CIN": {
+    "venue": "Great American Ball Park",
+    "temp": 90.0,
+    "precip": 0,
+    "wind_spd": 8.6,
+    "wind_dir": "E",
+    "humidity_pct": 31,
+    "pressure_mb": 1011.6,
+    "roof": false,
+    "flag": "clear"
+  },
+  "BAL": {
+    "venue": "Camden Yards",
+    "temp": 81.7,
+    "precip": 0,
+    "wind_spd": 3.7,
+    "wind_dir": "ESE",
+    "humidity_pct": 62,
+    "pressure_mb": 1014.5,
+    "roof": false,
+    "flag": "clear"
+  },
+  "TOR": {
+    "venue": "Rogers Centre",
+    "temp": 78.1,
+    "precip": 2,
+    "wind_spd": 5.5,
+    "wind_dir": "SSE",
+    "humidity_pct": 53,
+    "pressure_mb": 1012.4,
+    "roof": true,
+    "flag": "clear"
+  },
+  "ATL": {
+    "venue": "Truist Park",
+    "temp": 89.5,
+    "precip": 0,
+    "wind_spd": 4.7,
+    "wind_dir": "WSW",
+    "humidity_pct": 31,
+    "pressure_mb": 1012.6,
+    "roof": false,
+    "flag": "clear"
+  },
+  "HOU": {
+    "venue": "Daikin Park",
+    "temp": 91.0,
+    "precip": 1,
+    "wind_spd": 10.1,
+    "wind_dir": "S",
+    "humidity_pct": 52,
+    "pressure_mb": 1013.3,
+    "roof": true,
+    "flag": "clear"
+  },
+  "ATH": {
+    "venue": "Sutter Health Park",
+    "temp": 97.7,
+    "precip": 0,
+    "wind_spd": 8.0,
+    "wind_dir": "SW",
+    "humidity_pct": 14,
+    "pressure_mb": 1011.9,
+    "roof": false,
+    "flag": "clear"
+  },
+  "NYM": {
+    "venue": "Citi Field",
+    "temp": 79.0,
+    "precip": 2,
+    "wind_spd": 7.5,
+    "wind_dir": "SSE",
+    "humidity_pct": 68,
+    "pressure_mb": 1014.5,
+    "roof": false,
+    "flag": "clear"
+  },
+  "SD": {
+    "venue": "Petco Park",
+    "temp": 73.9,
+    "precip": 0,
+    "wind_spd": 5.9,
+    "wind_dir": "WNW",
+    "humidity_pct": 86,
+    "pressure_mb": 1012.3,
+    "roof": false,
+    "flag": "clear"
+  },
+  "COL": {
+    "venue": "Coors Field",
+    "temp": 87.5,
+    "precip": 16,
+    "wind_spd": 7.8,
+    "wind_dir": "S",
+    "humidity_pct": 20,
+    "pressure_mb": 1011.5,
     "roof": false,
     "flag": "clear"
   },
@@ -138,22 +151,13 @@
     "roof": false,
     "flag": "clear"
   },
-  "ATL": {
-    "venue": "Truist Park",
+  "SEA": {
+    "venue": "T-Mobile Park",
     "temp": 72,
     "precip": 0,
     "wind_spd": 5,
     "wind_dir": "N",
     "roof": false,
-    "flag": "clear"
-  },
-  "TB": {
-    "venue": "Tropicana Field",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
-    "roof": true,
     "flag": "clear"
   }
 }
