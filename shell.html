@@ -1077,6 +1077,26 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
   box-shadow:0 0 10px rgba(251,191,36,.25); }
 .gc-parks.scrape { background:rgba(96,165,250,.12); color:#93c5fd; border-color:rgba(96,165,250,.35); }
 /* ── NO DOUBTER popup ── */
+/* broadcast camera for the live at-bat scene: punch in on contact, pan
+   with the flight; the HR shot tracks longer and hands off to the modal */
+.gc-scene .gc-cam { transform-box:view-box; transform-origin:166px 82px; }
+.gc-scene.cam-inplay .gc-cam { animation:gcCamPlay 1.9s cubic-bezier(.3,.08,.25,1) both; }
+.gc-scene.cam-hr .gc-cam { animation:gcCamHR 2.7s cubic-bezier(.3,.08,.25,1) both; }
+@keyframes gcCamPlay {
+  0% { transform:none; }
+  22% { transform:scale(1.32); }
+  34% { transform:scale(1.34); }
+  72% { transform:scale(1.1) translate(26px,14px); }
+  100% { transform:none; }
+}
+@keyframes gcCamHR {
+  0% { transform:none; }
+  17% { transform:scale(1.45); }
+  27% { transform:scale(1.48); }
+  62% { transform:scale(1.22) translate(58px,40px); }
+  84% { transform:scale(1.22) translate(60px,42px); }
+  100% { transform:none; }
+}
 .gc-hrpop { position:fixed; left:50%; top:calc(84px + env(safe-area-inset-top)); transform:translateX(-50%);
   z-index:9000; width:min(400px, calc(100vw - 32px)); background:linear-gradient(160deg,#191129,#0b0f1c 70%);
   border:1px solid rgba(251,191,36,.5); border-radius:18px; padding:16px 18px 14px; cursor:pointer;
@@ -3901,8 +3921,8 @@ function gcKid(x, gy, s, mid, team, kind, dir, cls, vbx) {
   const jersey = `<rect x="${x - 11 * s}" y="${shY}" width="${22 * s}" height="${19 * s}" rx="${7 * s}" fill="${kit[0]}" stroke="rgba(0,0,0,.35)"/>
     <rect x="${x - 11 * s}" y="${shY + 14 * s}" width="${22 * s}" height="${5 * s}" rx="${2.5 * s}" fill="${kit[1]}" opacity=".85"/>`;
   const head = mid
-    ? `<circle cx="${x}" cy="${hcy}" r="${hr + 1.2}" fill="#12101d" stroke="rgba(160,32,240,.65)" stroke-width="1.4"/>
-       <image href="https://midfield.mlbstatic.com/v1/people/${mid}/spots/90" x="${x - hr}" y="${hcy - hr}" width="${hr * 2}" height="${hr * 2}"/>`
+    ? `<defs><clipPath id="gchc-${mid}-${kind}"><circle cx="${x}" cy="${hcy}" r="${hr}"/></clipPath></defs>
+       <image href="https://midfield.mlbstatic.com/v1/people/${mid}/spots/120" x="${x - hr * 1.08}" y="${hcy - hr * 1.08}" width="${hr * 2.16}" height="${hr * 2.16}" clip-path="url(#gchc-${mid}-${kind})" style="filter:drop-shadow(0 1.5px 2.5px rgba(0,0,0,.55))"/>`
     : `<circle cx="${x}" cy="${hcy}" r="${hr}" fill="${skin}" stroke="rgba(0,0,0,.3)"/>
        <circle cx="${x - 4 * s}" cy="${hcy - 2 * s}" r="${1.6 * s}" fill="#111"/><circle cx="${x + 4 * s}" cy="${hcy - 2 * s}" r="${1.6 * s}" fill="#111"/>
        <path d="M ${x - 4 * s} ${hcy + 4 * s} Q ${x} ${hcy + 7 * s} ${x + 4 * s} ${hcy + 4 * s}" stroke="#111" stroke-width="1.2" fill="none"/>`;
@@ -3943,8 +3963,9 @@ function gcKid(x, gy, s, mid, team, kind, dir, cls, vbx) {
   }
   return `<g class="gc-kid${cls ? ' ' + cls : ''}">${legOverride || legs}${jersey}${arms}${head}</g>`;
 }
-function gcZone(events, big, batSide, isCur, kid) {
+function gcZone(events, big, batSide, isCur, kid, play) {
   kid = kid || {};
+  play = play || {};
   const pitches = (events || []).filter(e => e.isPitch && e.pitchData
     && e.pitchData.coordinates && e.pitchData.coordinates.pX != null
     && e.pitchData.coordinates.pZ != null);
@@ -3980,7 +4001,7 @@ function gcZone(events, big, batSide, isCur, kid) {
   const lefty = String(batSide || 'R').toUpperCase() === 'L';
   const bX = lefty ? 238 : 96, bG = 154;             // batter feet (box by hand)
   const pX = 44, pG = 120;                           // pitcher feet (mound)
-  let swingNow = false, newPitch = false, streak = '', track = '';
+  let swingNow = false, newPitch = false, streak = '', track = '', camCls = '', flash = '';
   if (last) {
     const pitchKey = `${pitches.length}|${last.pitchNumber}|${(last.details || {}).description || ''}`;
     if (isCur) {
@@ -3988,11 +4009,22 @@ function gcZone(events, big, batSide, isCur, kid) {
       if (newPitch && gcSwungAt(last)) swingNow = true;
       if (pitchKey !== window._gcSwingKey) window._gcSwingKey = pitchKey;
     }
+    // HR CAM gating: the home_run result often lands one poll AFTER the
+    // in-play pitch event, so the replay gets its own key — when the call
+    // becomes official we run the full contact + tracking shot once, even
+    // if the pitch itself animated on an earlier tick
+    const resType = ((play.result || {}).eventType) || '';
+    const isHR = resType === 'home_run';
+    let hrNow = false;
+    if (isCur && isHR && last.hitData) {
+      const hrKey = `${gcPk}|${(play.about || {}).atBatIndex}|hrcam`;
+      if (window._gcHRCamKey !== hrKey) { hrNow = true; window._gcHRCamKey = hrKey; }
+    }
     if (lastXY) {
       const hx = pX + 6, hy = pG - 40;               // overhead release point
       const cpx = (hx + lastXY[0]) / 2, cpy = Math.min(hy, lastXY[1]) - 24;
       const path = `M ${hx} ${hy} Q ${cpx.toFixed(1)} ${cpy.toFixed(1)} ${lastXY[0].toFixed(1)} ${lastXY[1].toFixed(1)}`;
-      if (newPitch) {
+      if (newPitch || hrNow) {
         track = `<path d="${path}" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="1.2" stroke-dasharray="3,3" class="gc-pitch-trail"/>
           <circle r="2" fill="#fff" stroke="#d33" stroke-width=".6">
             <animateMotion path="${path}" dur="0.5s" fill="freeze" calcMode="spline" keySplines="0.3 0 0.8 1" keyTimes="0;1"/>
@@ -4002,22 +4034,61 @@ function gcZone(events, big, batSide, isCur, kid) {
       }
       if ((last.details || {}).isInPlay) {
         const px2 = lastXY[0].toFixed(1), py2 = lastXY[1].toFixed(1);
-        if (newPitch) {
-          // the full contact experience: ball arrives (0.5s), barrel meets it
-          // (white crack ring), ball climbs off the bat back over the mound
-          // and out of frame toward the field
-          const outPath = `M ${px2} ${py2} Q ${(lastXY[0] - 85).toFixed(1)} ${(lastXY[1] - 78).toFixed(1)} -10 ${Math.max(4, lastXY[1] - 96).toFixed(1)}`;
+        if (newPitch || hrNow) {
+          swingNow = swingNow || hrNow;
+          // BROADCAST SHOT, built from the real Statcast read: launch angle
+          // shapes the arc's apex, distance sets how deep and how long the
+          // ball carries, exit velo sets its pace — the same numbers the
+          // batted-ball chart plots. The camera (CSS on .gc-cam) punches in
+          // on contact and pans out with the flight.
+          const hd = last.hitData || {};
+          const la = isFinite(+hd.launchAngle) ? Math.max(-10, Math.min(65, +hd.launchAngle)) : 24;
+          const dist = +hd.totalDistance > 0 ? +hd.totalDistance : (isHR ? 400 : 240);
+          const evv = +hd.launchSpeed || 95;
+          const deep = isHR || dist >= 300;
+          const flight = Math.max(0.7, Math.min(2.0, 0.55 + dist / 320));
+          // landing / exit geometry in scene units (field exits screen-left)
+          const endX = deep ? -16 : Math.max(6, lastXY[0] - (dist / 420) * 200);
+          const grounder = la < 9;
+          const endY = deep ? Math.max(4, 64 - la) : (grounder ? 124 : 120);
+          const apexY = grounder ? lastXY[1] - 6
+                      : Math.max(2, Math.min(lastXY[1] - 20, lastXY[1] - 26 - la * 1.1));
+          const cpx2 = (lastXY[0] + endX) * 0.45, cpy2 = apexY - (deep ? 14 : 6);
+          const outPath = `M ${px2} ${py2} Q ${cpx2.toFixed(1)} ${cpy2.toFixed(1)} ${endX.toFixed(1)} ${endY.toFixed(1)}`;
+          camCls = hrNow ? 'cam-hr' : 'cam-inplay';
           streak = `
             <circle cx="${px2}" cy="${py2}" r="1" fill="none" stroke="#fff" stroke-width="1.8" opacity="0">
               <animate attributeName="r" values="1;12" begin="0.5s" dur="0.35s" fill="freeze"/>
               <animate attributeName="opacity" values="0;.95;0" keyTimes="0;0.25;1" begin="0.5s" dur="0.45s" fill="freeze"/>
             </circle>
             <circle r="4.5" fill="#fff" stroke="#d33" stroke-width=".7" opacity="0">
-              <animateMotion path="${outPath}" begin="0.55s" dur="0.8s" fill="freeze" calcMode="spline" keySplines="0.2 0.6 0.6 1" keyTimes="0;1"/>
-              <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.06;0.9;1" begin="0.55s" dur="0.8s" fill="freeze"/>
-              <animate attributeName="r" values="4.8;2.2" begin="0.55s" dur="0.8s" fill="freeze"/>
+              <animateMotion path="${outPath}" begin="0.55s" dur="${flight.toFixed(2)}s" fill="freeze" calcMode="spline" keySplines="0.25 0.55 0.65 1" keyTimes="0;1"/>
+              <animate attributeName="opacity" values="0;1;1;${deep ? 0 : 1}" keyTimes="0;0.06;0.92;1" begin="0.55s" dur="${flight.toFixed(2)}s" fill="freeze"/>
+              <animate attributeName="r" values="4.8;${grounder ? 3.4 : 2.0}" begin="0.55s" dur="${flight.toFixed(2)}s" fill="freeze"/>
             </circle>
-            <path d="${outPath}" fill="none" stroke="rgba(52,211,153,.55)" stroke-width="1.6" stroke-dasharray="4,4" class="gc-pitch-trail" style="animation-delay:.55s"/>`;
+            <path d="${outPath}" fill="none" stroke="rgba(52,211,153,.55)" stroke-width="1.6" stroke-dasharray="4,4" class="gc-pitch-trail" style="animation-delay:.55s"/>
+            <text x="${(lastXY[0] - 26).toFixed(1)}" y="${(lastXY[1] - 22).toFixed(1)}" font-size="8.5" font-weight="800" fill="rgba(255,255,255,.85)" opacity="0" text-anchor="middle">${Math.round(evv)} mph · ${Math.round(la)}°
+              <animate attributeName="opacity" values="0;.95;.95;0" keyTimes="0;0.15;0.75;1" begin="0.62s" dur="1.4s" fill="freeze"/>
+            </text>`;
+          if (hrNow) {
+            // HR CAM: sky flash + starburst as the ball clears the fence
+            // line, then the no-doubter modal takes the hand-off (deferred
+            // until this shot finishes via _gcHRCamUntil)
+            const burstT = (0.55 + flight * 0.62).toFixed(2);
+            window._gcHRCamUntil = Date.now() + Math.round((0.55 + flight) * 1000) + 500;
+            flash = `
+              <rect x="0" y="0" width="${VW}" height="${VH}" rx="10" fill="#fff" opacity="0" pointer-events="none">
+                <animate attributeName="opacity" values="0;0;.5;0" keyTimes="0;0.98;0.99;1" begin="0s" dur="${burstT}s" fill="freeze"/>
+              </rect>
+              ${[[-30,-16],[-22,8],[-8,-26],[6,-12],[-16,-4],[2,10]].map(([dx, dy], i) => `
+                <circle r="2.2" fill="${i % 2 ? '#fbbf24' : '#f472b6'}" opacity="0">
+                  <animateMotion path="M ${(endX + 26).toFixed(1)} ${(endY + 8).toFixed(1)} q ${dx} ${dy} ${dx * 2.1} ${dy * 2.1}" begin="${burstT}s" dur="0.7s" fill="freeze"/>
+                  <animate attributeName="opacity" values="0;1;0" keyTimes="0;0.15;1" begin="${burstT}s" dur="0.7s" fill="freeze"/>
+                </circle>`).join('')}
+              <text x="${VW / 2}" y="30" text-anchor="middle" font-size="15" font-weight="900" fill="#fbbf24" opacity="0" style="letter-spacing:.2em">GONE!
+                <animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.55;0.62;0.9;1" begin="0s" dur="${(0.55 + flight + 0.8).toFixed(2)}s" fill="freeze"/>
+              </text>`;
+          }
         } else {
           streak = `<line x1="${px2}" y1="${py2}" x2="${(lastXY[0] - 60).toFixed(1)}" y2="${Math.max(6, lastXY[1] - 70).toFixed(1)}" stroke="rgba(52,211,153,.4)" stroke-width="1.6" stroke-linecap="round" stroke-dasharray="4,4"/>`;
         }
@@ -4041,10 +4112,16 @@ function gcZone(events, big, batSide, isCur, kid) {
     (newPitch ? 'throwing ' : '') + (pitLefty ? 'lefty' : ''), 0);
   const batterKid = gcKid(bX, bG, 1.0, kid.batMid, kid.batTeam, 'bat', -1, swingNow ? 'swingnow' : '', 0);
   const s = big ? 1.2 : 1.05;
-  return `<svg viewBox="0 0 ${VW} ${VH}" width="${Math.round(VW * s)}" height="${Math.round(VH * s)}" style="display:block;max-width:100%">
+  // .gc-cam is the broadcast camera: CSS keyframes punch in on contact and
+  // pan with the flight (cam-inplay), or run the full HR tracking shot
+  // (cam-hr). The flash layer stays screen-space, outside the camera.
+  return `<svg viewBox="0 0 ${VW} ${VH}" width="${Math.round(VW * s)}" height="${Math.round(VH * s)}" class="gc-scene ${camCls}" style="display:block;max-width:100%">
+    <g class="gc-cam">
     ${scene}
     <rect x="${zx.toFixed(1)}" y="${zy.toFixed(1)}" width="${zw.toFixed(1)}" height="${zh.toFixed(1)}" fill="rgba(160,32,240,.09)" stroke="rgba(160,32,240,.6)" stroke-width="1.5" rx="2" style="filter:drop-shadow(0 0 6px rgba(160,32,240,.3))"/>
     ${grid}${pitcherKid}${batterKid}${track}${streak}${dots}
+    </g>
+    ${flash}
   </svg>`;
 }
 function gcPitchList(events) {
@@ -4691,7 +4768,7 @@ function renderGC(feed, wp) {
       </div>
       <div class="gc-zonewrap"><div class="zl">Strike zone · live</div>${gcZone((((ld.plays || {}).currentPlay || {}).playEvents), false, curBatSide, true,
         {batMid: bat.id, batTeam: offSide === 'away' ? aAb : hAb, pitMid: pit.id, pitTeam: offSide === 'away' ? hAb : aAb,
-         pitHand: ((curMu.pitchHand || {}).code) || 'R'})}</div>
+         pitHand: ((curMu.pitchHand || {}).code) || 'R'}, ((ld.plays || {}).currentPlay || {}))}</div>
     </div>
     <div style="margin-top:10px">${gcPitchList((((ld.plays || {}).currentPlay || {}).playEvents))}</div>
     </div>`;
@@ -4738,7 +4815,12 @@ function gcHrPopupScan(ld, gd) {
     const k = pk + '|' + b.key;
     if (_gcHrSeen.has(k)) return;
     _gcHrSeen.add(k);
-    if (primed) gcHrPopup(b);
+    if (primed) {
+      // if the HR cam is mid-shot, the modal waits for the hand-off
+      const wait = (window._gcHRCamUntil || 0) - Date.now();
+      if (wait > 0) setTimeout(() => gcHrPopup(b), wait);
+      else gcHrPopup(b);
+    }
   });
   _gcHrPrimedPk = pk;
 }
