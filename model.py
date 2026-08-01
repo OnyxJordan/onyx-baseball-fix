@@ -1,5 +1,20 @@
 """
-model.py — Onyx Baseball v31 HR probability model + pitcher K projections
+model.py — Onyx Baseball v32 HR probability model + pitcher K projections
+
+v32: the recommendation surfaces become one locked, graded story, and
+bullpen exposure goes day-specific. (1) Picks TOP UP until the slate's
+first pitch then freeze — the old lock-once rule closed the book at the
+first morning build (7/29 locked one pick at 11:30 AM; B. Lowe rose to
+#1 on the live board hours later, homered, and was never tracked), and
+the tracked slate now renders pinned above the board so what grades is
+never a mystery. (2) The Model's Ticket is decided server-side
+(ticket_lock.json), refreshes only on pregame builds, and freezes at
+first pitch — it was rebuilt client-side per render, losing legs as
+games started. (3) Bullpen share of PAs scales with TODAY'S starter's
+expected length (ip/gs, 25-55%, was flat 40%): an opener day makes a
+soft bullpen a real HR factor, a horse day mutes it — one more input
+that changes daily instead of repeating yesterday's board. (4) Every
+lineup surface shows live-decayed HR% once games start.
 
 v31: the self-calibration gets the same large-sample discipline as
 the rest of the site. It flipped ACTIVE at 28 graded picks and applied
