@@ -2187,6 +2187,36 @@ body::after {
     </table>
     </div>
   </div>
+
+  <div class="sec-hdr" style="padding-bottom:0">
+    <span class="sec-title">Model's Ticket Record — one $10 parlay per day, locked at first pitch, auto-graded</span>
+    <span class="sec-count" id="parlay-count"></span>
+  </div>
+  <div id="parlay-summary" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;padding:12px 20px"></div>
+  <div style="padding:0 20px 8px">
+    <div id="parlay-chart" style="position:relative;height:160px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden;padding:16px 16px 32px"></div>
+  </div>
+  <div style="padding:0 20px 32px">
+    <div style="overflow:auto;max-height:calc(100vh - 420px);border-radius:8px;border:1px solid var(--border)">
+    <table style="width:100%;border-collapse:collapse;table-layout:fixed">
+      <colgroup>
+        <col style="width:52px"><col><col style="width:82px">
+        <col style="width:60px"><col style="width:72px"><col style="width:76px">
+      </colgroup>
+      <thead>
+        <tr>
+          <th style="padding:7px 8px;text-align:left;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg2);position:sticky;top:0">Date</th>
+          <th style="padding:7px 8px;text-align:left;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg2);position:sticky;top:0">Legs</th>
+          <th style="padding:7px 8px;text-align:center;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg2);position:sticky;top:0">Pays</th>
+          <th style="padding:7px 8px;text-align:center;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg2);position:sticky;top:0">Result</th>
+          <th style="padding:7px 8px;text-align:right;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg2);position:sticky;top:0">P&amp;L</th>
+          <th style="padding:7px 8px;text-align:right;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg2);position:sticky;top:0">Running</th>
+        </tr>
+      </thead>
+      <tbody id="parlay-body"></tbody>
+    </table>
+    </div>
+  </div>
 </div>
 
 
@@ -5933,6 +5963,7 @@ updateHomeStats();
 // reads these (even typeof throws) — v32's blank-site bug
 var PICKS = [];
 var TICKET_LOCK = null;
+var TICKET_HISTORY = [];
 const LINE_HISTORY = [];
 const PITCHER_PROJ = [];
 var DAILY_RECAP = {};
@@ -6121,6 +6152,101 @@ function renderRecord() {
     </tr>`;
   });
   document.getElementById('record-body').innerHTML = tbodyHtml;
+  renderParlay();
+}
+
+// Model's Ticket record: one $10 parlay per day, same format as the picks
+// record above. Ledger rows come baked from data/ticket_history.json;
+// grade_picks settles them off the box scores (void legs drop from payout).
+function renderParlay() {
+  const body = document.getElementById('parlay-body');
+  if (!body) return;
+  const th = Array.isArray(TICKET_HISTORY) ? TICKET_HISTORY.filter(t => t && t.date) : [];
+  const dec = o => { const a = +o; if (!a) return 1; return a > 0 ? 1 + a / 100 : 1 + 100 / Math.abs(a); };
+  const chrono = [...th].sort((a, b) => String(a.date).localeCompare(String(b.date)));
+  let cum = 0;
+  const rows = chrono.map(t => {
+    const stake = +t.stake || 10;
+    const liveLegs = (t.legs || []).filter(l => l.hit !== 'void');
+    const decAll = liveLegs.reduce((m, l) => m * dec(l.odds), 1);
+    const pays = stake * decAll;
+    const pnl = t.result === 'win' ? (t.pnl != null ? +t.pnl : +(pays - stake).toFixed(2))
+              : t.result === 'loss' ? -stake : 0;
+    if (t.result === 'win' || t.result === 'loss') cum = +(cum + pnl).toFixed(2);
+    return {...t, stake, pays, pnl, cum};
+  });
+  const settled = rows.filter(t => t.result === 'win' || t.result === 'loss');
+  const w = settled.filter(t => t.result === 'win').length, l = settled.length - w;
+  const totalPnl = rows.length ? rows[rows.length - 1].cum : 0;
+  const wagered = settled.reduce((s, t) => s + t.stake, 0);
+  const roi = wagered ? (totalPnl / wagered * 100).toFixed(1) : '0.0';
+  const cnt = document.getElementById('parlay-count');
+  if (cnt) cnt.textContent = th.length + ' tickets tracked';
+  const sum = document.getElementById('parlay-summary');
+  if (sum) sum.innerHTML = [
+    {label:'Record',    value: w + '–' + l, color: w > l ? '#22c55e' : w === l ? '#f59e0b' : '#ef4444'},
+    {label:'Pending',   value: String(rows.filter(t => t.result == null).length), color:'#f59e0b'},
+    {label:'Total P&L', value: (totalPnl >= 0 ? '+$' : '-$') + Math.abs(totalPnl).toFixed(2), color: totalPnl >= 0 ? '#22c55e' : '#ef4444'},
+    {label:'ROI',       value: (totalPnl >= 0 ? '+' : '') + roi + '%', color: totalPnl >= 0 ? '#22c55e' : '#ef4444'},
+    {label:'Per Ticket', value:'$10', color:'var(--text3)'},
+  ].map(s =>
+    `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;text-align:center">
+      <div style="font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;font-size:20px;font-weight:800;color:${s.color}">${s.value}</div>
+      <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-top:3px">${s.label}</div>
+    </div>`).join('');
+
+  const chartEl = document.getElementById('parlay-chart');
+  if (chartEl) {
+    const dates = rows.map(t => t.date);
+    const vals = [0, ...rows.map(t => t.cum)];
+    const minV = Math.min(...vals), maxV = Math.max(...vals);
+    const range = Math.max(maxV - minV, 10);
+    const W = chartEl.clientWidth || 560, H = chartEl.clientHeight || 112, pad = 8;
+    const toX = i => pad + (i / Math.max(vals.length - 1, 1)) * (W - pad * 2);
+    const toY = v => H - pad - ((v - minV) / range) * (H - pad * 2);
+    const pts = vals.map((v, i) => `${toX(i).toFixed(1)},${toY(v).toFixed(1)}`).join(' ');
+    const fillPts = `${toX(0).toFixed(1)},${toY(minV).toFixed(1)} ${pts} ${toX(vals.length - 1).toFixed(1)},${toY(minV).toFixed(1)}`;
+    const col = totalPnl >= 0 ? '#22c55e' : '#ef4444';
+    chartEl.innerHTML = `
+      <svg width="100%" height="100%" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="position:absolute;top:0;left:0;width:100%;height:100%">
+        <defs><linearGradient id="parlayGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="${col}" stop-opacity="0.25"/>
+          <stop offset="100%" stop-color="${col}" stop-opacity="0.02"/>
+        </linearGradient></defs>
+        <line x1="${pad}" y1="${toY(0).toFixed(1)}" x2="${W - pad}" y2="${toY(0).toFixed(1)}" stroke="rgba(255,255,255,0.08)" stroke-width="1" stroke-dasharray="4,4"/>
+        <polygon points="${fillPts}" fill="url(#parlayGrad)"/>
+        <polyline points="${pts}" fill="none" stroke="${col}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+        ${vals.map((v, i) => `<circle cx="${toX(i).toFixed(1)}" cy="${toY(v).toFixed(1)}" r="4" fill="${v >= 0 ? '#22c55e' : '#ef4444'}" stroke="var(--bg2)" stroke-width="2"/>`).join('')}
+      </svg>
+      ${['Start', ...dates].map((lb, i) => `<span style="position:absolute;bottom:6px;left:${(toX(i) / W) * 100}%;transform:translateX(-50%);font-size:9px;font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;color:var(--text3);white-space:nowrap">${lb}</span>`).join('')}`;
+  }
+
+  body.innerHTML = [...rows].reverse().map(t => {
+    const pending = t.result == null;
+    const legHtml = (t.legs || []).map(lg => {
+      const lp = livePlayerData[nkjs(lg.player || '')] || {};
+      const liveHit = pending && lp.hitHR;
+      const c = lg.hit === true || liveHit ? '#4ade80' : lg.hit === false ? '#f87171' : lg.hit === 'void' ? 'var(--text3)' : 'var(--text2)';
+      const mk = lg.hit === true || liveHit ? ' ✓' : lg.hit === false ? ' ✗' : lg.hit === 'void' ? ' (void)' : '';
+      return `<span style="color:${c};font-weight:700">${lg.player} ${fmtOdds(lg.odds)}${mk}</span>`;
+    }).join('<span style="color:var(--text3)"> · </span>');
+    const stTxt = t.result === 'win' ? '✓ WIN' : t.result === 'loss' ? '✗ Loss' : t.result === 'void' ? 'Void' : '⏳ Pending';
+    const stBg  = t.result === 'win' ? 'rgba(34,197,94,.2)' : t.result === 'loss' ? 'rgba(239,68,68,.15)' : 'rgba(245,158,11,.15)';
+    const stCol = t.result === 'win' ? '#4ade80' : t.result === 'loss' ? '#f87171' : '#f59e0b';
+    const pnlStr = pending || t.result === 'void' ? '—' : (t.pnl >= 0 ? '+$' : '-$') + Math.abs(t.pnl).toFixed(2);
+    const pnlCol = pending ? 'var(--text3)' : t.pnl >= 0 ? '#22c55e' : '#ef4444';
+    const cumStr = (t.cum >= 0 ? '+$' : '-$') + Math.abs(t.cum).toFixed(2);
+    return `<tr style="background:${t.result === 'win' ? 'rgba(34,197,94,0.04)' : 'transparent'}">
+      <td style="padding:7px 8px;border-bottom:1px solid rgba(26,37,53,.5);font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;font-size:11px;color:var(--text3);text-align:left">${t.date}</td>
+      <td style="padding:7px 8px;border-bottom:1px solid rgba(26,37,53,.5);font-size:12px;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${legHtml}</td>
+      <td style="padding:7px 8px;border-bottom:1px solid rgba(26,37,53,.5);font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;font-size:12px;font-weight:700;text-align:center;color:var(--text2)">$${t.pays.toFixed(0)}</td>
+      <td style="padding:7px 8px;border-bottom:1px solid rgba(26,37,53,.5);text-align:center">
+        <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;background:${stBg};color:${stCol}">${stTxt}</span>
+      </td>
+      <td style="padding:7px 8px;border-bottom:1px solid rgba(26,37,53,.5);font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;font-size:12px;font-weight:700;text-align:right;color:${pnlCol}">${pnlStr}</td>
+      <td style="padding:7px 8px;border-bottom:1px solid rgba(26,37,53,.5);font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;font-size:12px;font-weight:700;text-align:right;color:${t.cum >= 0 ? '#22c55e' : '#ef4444'}">${cumStr}</td>
+    </tr>`;
+  }).join('');
 }
 
 

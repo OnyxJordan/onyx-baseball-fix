@@ -7,7 +7,11 @@ or not, favorite first) and fill with the best positive-edge plays;
 the old edge-only gate let the site's #1 recommendation stay off the
 graded record (7/30: B. Lowe 25.8% at +270, homered, untracked while
 three +800 longshots graded — retro-added and graded off the real box
-score). Tier field marks the lane ("ticket"/"edge") in the ledger.
+score). Tier field marks the lane ("ticket"/"edge") in the ledger. The
+ticket itself is also a tracked bet: one $10 parlay per day
+(ticket_history.json), frozen with the lock, legs settled off box
+scores (scratched legs void out of the payout, book convention), with
+its own record/P&L/ROI chart on the tracking page beside the picks.
 
 v32: the recommendation surfaces become one locked, graded story, and
 bullpen exposure goes day-specific. (1) Picks TOP UP until the slate's

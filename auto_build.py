@@ -612,6 +612,31 @@ elif _tlock.get("date") == stamp and not _tlock.get("locked"):
         json.dump(_tlock, f, indent=1, ensure_ascii=False)
     print(f"ticket: FROZEN for {stamp} ({len(_tlock.get('legs') or [])} legs)")
 
+# v33 TICKET LEDGER: one $10 parlay per day, tracked and graded like the
+# picks. The day's entry follows the ticket lock while it is still pregame,
+# freezes with it, and grade_picks settles the legs off the box scores.
+TH_PATH = dpath("ticket_history.json")
+_thist = jload(TH_PATH, [])
+if not isinstance(_thist, list):
+    _thist = []
+if _tlock.get("date") == stamp and (_tlock.get("legs") or []):
+    _legs_h = [{"player": l.get("player"), "odds": l.get("odds"),
+                "prob": l.get("prob"), "hit": None} for l in _tlock["legs"]]
+    _entry = next((t for t in _thist if isinstance(t, dict) and t.get("date") == stamp), None)
+    if _entry is None:
+        _thist.append({"date": stamp, "stake": 10, "legs": _legs_h,
+                       "result": None, "pnl": None})
+        _thist.sort(key=lambda t: str(t.get("date") or ""))
+        with open(TH_PATH, "w", encoding="utf-8") as f:
+            json.dump(_thist, f, indent=1, ensure_ascii=False)
+        print(f"ticket ledger: opened {stamp} ({len(_legs_h)} legs, $10 stake)")
+    elif not _tlock.get("locked") and _entry.get("result") is None:
+        if _entry.get("legs") != _legs_h:
+            _entry["legs"] = _legs_h
+            with open(TH_PATH, "w", encoding="utf-8") as f:
+                json.dump(_thist, f, indent=1, ensure_ascii=False)
+            print(f"ticket ledger: refreshed {stamp} legs (pregame)")
+
 # v33 SLATE LOCK: ONE story between the ticket and the record. The tracked
 # five now lead with the TICKET LEGS — the model's favorite plays regardless
 # of edge — then fill with the best positive-edge plays. The old edge-only
@@ -776,6 +801,7 @@ shell = replace_const(shell, "LINE_HISTORY", jload(dpath("line_history.json"), [
 shell = replace_const(shell, "PITCHER_PROJ", pitchers_out)
 shell = replace_const(shell, "DAILY_RECAP", jload(dpath("recap.json"), {}))
 shell = replace_const(shell, "TICKET_LOCK", _tlock if _tlock.get("legs") else None)
+shell = replace_const(shell, "TICKET_HISTORY", _thist)
 
 # ---- Onyx game links: only today's harvested slugs ever ship ----
 from zoneinfo import ZoneInfo
