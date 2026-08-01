@@ -1,5 +1,13 @@
 """
-model.py — Onyx Baseball v32 HR probability model + pitcher K projections
+model.py — Onyx Baseball v33 HR probability model + pitcher K projections
+
+v33: the ticket and the tracker keep ONE scoreboard. The tracked five
+lead with the Model's Ticket legs (the day's most-likely homers, edge
+or not, favorite first) and fill with the best positive-edge plays;
+the old edge-only gate let the site's #1 recommendation stay off the
+graded record (7/30: B. Lowe 25.8% at +270, homered, untracked while
+three +800 longshots graded — retro-added and graded off the real box
+score). Tier field marks the lane ("ticket"/"edge") in the ledger.
 
 v32: the recommendation surfaces become one locked, graded story, and
 bullpen exposure goes day-specific. (1) Picks TOP UP until the slate's
