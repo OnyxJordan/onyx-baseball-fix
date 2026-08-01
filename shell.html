@@ -2818,7 +2818,7 @@ function buildTicker() {
     return `<span class="${cls}" style="cursor:pointer" data-p="${(p.batter_name||'').replace(/"/g,'&quot;')}" onclick="openPlayerCard(this.dataset.p)">
       ${pulse}<span class="ticker-name">${p.batter_name}</span>
       <span class="ticker-sep">·</span>
-      <span class="ticker-pct">${p.hr_prob.toFixed(1)}%</span>
+      <span class="ticker-pct">${(!hitHR && typeof gameStarted === 'function' && gameStarted(p) ? liveHRProb(p) : (+p.hr_prob || 0)).toFixed(1)}%</span>
       <span class="ticker-sep">edge</span>
       <span class="ticker-pct">${sign}${p.hr_edge.toFixed(1)}pp</span>
       ${hrBadge}${lossBadge}${scorePart}
@@ -3737,7 +3737,12 @@ function gcModelChip(name) {
   const lp = livePlayerData[nkjs(name)] || {};
   const mr = modelRow(name);
   let out = '';
-  if (mr && mr.hr_prob) out += `<span class="gc-hrprob">${(+mr.hr_prob).toFixed(1)}%</span>`;
+  if (mr && mr.hr_prob) {
+    // live-decayed probability once the game is underway, not the pregame number
+    const started = typeof gameStarted === 'function' && gameStarted(mr);
+    const pct = started ? liveHRProb(mr) : (+mr.hr_prob || 0);
+    out += `<span class="gc-hrprob">${(+pct).toFixed(1)}%${started ? '<i style="font-style:normal;font-size:7px;opacity:.65"> live</i>' : ''}</span>`;
+  }
   // HR badge only for THIS game: doubleheaders must not cross-credit
   if ((lp.hrGames || []).includes(+gcPk) || (lp.hrGames || []).includes(String(gcPk))) {
     out += `<span class="gc-hitbadge">HR ✓</span>`;
@@ -5580,26 +5585,51 @@ const SLAM_T = 0.65;
 function buildSlamTicket() {
   const el = document.getElementById('slamTicket');
   if (!el) return;
-  const seen = new Set();
-  const pool = (typeof RESULTS !== 'undefined' ? RESULTS : [])
-    .filter(r => {
-      if (!r.hr_prob || !r.mid || seen.has(r.matched_name)) return false;
-      seen.add(r.matched_name);
-      if (gameStarted(r)) return false;
-      if ((r.hr_prob || 0) < 15) return false;
-      return (r.hh_pct || 0) >= 0.32 && (r.barrel_26 || 0) >= 0.05;
-    })
-    .sort((a, b) => (b.ticket_score || b.hr_prob / 40) - (a.ticket_score || a.hr_prob / 40));
-  if (pool.length < 2) {
-    el.innerHTML = pool.length === 0 && (RESULTS || []).some(r => gameStarted(r))
-      ? `<div class="slam-wrap"><div class="slam-head"><span class="slam-tag">🎟 THE MODEL'S TICKET</span></div>
-         <div style="font-size:11px;color:var(--text3);padding:10px 2px">Slate underway — tonight's ticket is closed. Tomorrow's builds pregame.</div></div>`
-      : '';
-    return;
+  // server-locked ticket: the build decides the legs pregame and freezes
+  // them at the slate's first pitch — the ticket never re-sorts or loses
+  // legs client-side; only each leg's live status updates during games
+  const todayET = new Date().toLocaleDateString('en-CA', {timeZone: 'America/New_York'});
+  const tl = (typeof TICKET_LOCK !== 'undefined' && TICKET_LOCK
+              && TICKET_LOCK.date === todayET && (TICKET_LOCK.legs || []).length >= 2)
+             ? TICKET_LOCK : null;
+  let picks;
+  const lockedTag = tl ? (tl.locked ? '🔒 LOCKED' : '🔓 LOCKS AT FIRST PITCH') : '';
+  if (tl) {
+    picks = tl.legs.map(l => {
+      const r0 = (typeof RESULTS !== 'undefined' ? RESULTS : [])
+        .find(x => nkjs(x.matched_name || '') === nkjs(l.player)) || {};
+      return Object.assign({}, r0, {
+        matched_name: l.player, mid: l.mid || r0.mid, team: l.team || r0.team,
+        dk_hr_odds: (l.odds != null ? l.odds : r0.dk_hr_odds),
+        hr_prob: (l.prob != null ? l.prob : r0.hr_prob),
+        ticket_why: (l.why && l.why.length ? l.why : r0.ticket_why),
+        opp_pitcher: l.opp || r0.opp_pitcher, time: l.time || r0.time,
+        away: l.away || r0.away, home: l.home || r0.home,
+      });
+    });
+  } else {
+    const seen = new Set();
+    const pool = (typeof RESULTS !== 'undefined' ? RESULTS : [])
+      .filter(r => {
+        if (!r.hr_prob || !r.mid || seen.has(r.matched_name)) return false;
+        seen.add(r.matched_name);
+        if (gameStarted(r)) return false;
+        if ((r.hr_prob || 0) < 15) return false;
+        return (r.hh_pct || 0) >= 0.32 && (r.barrel_26 || 0) >= 0.05;
+      })
+      .sort((a, b) => (b.ticket_score || b.hr_prob / 40) - (a.ticket_score || a.hr_prob / 40));
+    if (pool.length < 2) {
+      el.innerHTML = pool.length === 0 && (RESULTS || []).some(r => gameStarted(r))
+        ? `<div class="slam-wrap"><div class="slam-head"><span class="slam-tag">🎟 THE MODEL'S TICKET</span></div>
+           <div style="font-size:11px;color:var(--text3);padding:10px 2px">Slate underway — tonight's ticket is closed. Tomorrow's builds pregame.</div></div>`
+        : '';
+      return;
+    }
+    let legCt = pool.filter(r => (r.ticket_score || 0) >= SLAM_T).length;
+    legCt = Math.max(2, Math.min(5, legCt));
+    picks = pool.slice(0, legCt);
   }
-  let legs = pool.filter(r => (r.ticket_score || 0) >= SLAM_T).length;
-  legs = Math.max(2, Math.min(5, legs));
-  const picks = pool.slice(0, legs);
+  const legs = picks.length;
   const confLbl = legs >= 5 ? 'MAX SEND · 5 LEGS' : legs === 4 ? 'HIGH CONFIDENCE · 4 LEGS'
     : legs === 3 ? 'CONFIDENT · 3 LEGS' : 'SELECTIVE · 2 LEGS';
   const allHit = picks.reduce((m, r) => m * (r.hr_prob / 100), 1);
@@ -5610,7 +5640,16 @@ function buildSlamTicket() {
     dec *= o > 0 ? 1 + o / 100 : 1 + 100 / Math.abs(o);
   });
   const payout = priced ? (10 * dec) : null;
-  const legRows = picks.map((r, i) => `
+  const legRows = picks.map((r, i) => {
+    const lp = livePlayerData[nkjs(r.matched_name || '')] || {};
+    const hit = !!lp.hitHR;
+    const started = !hit && typeof gameStarted === 'function' && gameStarted(r);
+    const probCell = hit
+      ? `<div class="slam-prob" style="color:#fbbf24">HR ✓</div>`
+      : started
+      ? `<div class="slam-prob">${liveHRProb(r).toFixed(1)}%<i style="font-style:normal;display:block;font-size:7px;color:var(--text3);letter-spacing:.08em">LIVE</i></div>`
+      : `<div class="slam-prob">${(+r.hr_prob || 0).toFixed(1)}%</div>`;
+    return `
     <div class="slam-leg" data-p="${(r.matched_name || '').replace(/"/g, '&quot;')}" onclick="openPlayerCard(this.dataset.p)">
       <span class="slam-n">${i + 1}</span>
       <span class="rk-hs" style="width:34px;height:34px;background-image:url(https://midfield.mlbstatic.com/v1/people/${r.mid}/spots/90);box-shadow:inset 0 0 0 1.5px rgba(160,32,240,.65)"></span>
@@ -5619,13 +5658,13 @@ function buildSlamTicket() {
         <div class="slam-sub">${r.team} · vs ${r.opp_pitcher || '—'}${r.time ? ' · ' + r.time : ''}</div>
         ${(r.ticket_why || []).length ? `<div class="slam-why">${r.ticket_why.map(w => `<span>${w}</span>`).join('')}</div>` : ''}
       </div>
-      <div class="slam-prob">${(+r.hr_prob).toFixed(1)}%</div>
+      ${probCell}
       ${r.dk_hr_odds ? `<span class="slam-odds" data-a="${r.away}" data-h="${r.home}" data-p="${(r.matched_name || '').replace(/"/g, '&quot;')}" data-o="${r.dk_hr_odds}"
         onclick="event.stopPropagation();onyxTicket({away:this.dataset.a,home:this.dataset.h,market:'HR',pick:this.dataset.p,side:'yes',odds:this.dataset.o})">${fmtOdds(r.dk_hr_odds)}<i>Onyx</i></span>` : ''}
-    </div>`).join('');
+    </div>`; }).join('');
   el.innerHTML = `<div class="slam-wrap">
     <div class="slam-head">
-      <span class="slam-tag">🎟 THE MODEL'S TICKET</span>
+      <span class="slam-tag">🎟 THE MODEL'S TICKET${lockedTag ? ` <span style="font-size:9px;font-weight:800;color:#fbbf24;letter-spacing:.06em">${lockedTag}</span>` : ''}</span>
       <span class="slam-conf">${confLbl}</span>
     </div>
     <div class="slam-note">Conviction-ranked, edge ignored — weather, pitcher, platoon, due, fly-ball matchup, bullpen, park and lineup slot all vote, so the ticket follows the slate, not the same sluggers.</div>
@@ -5788,8 +5827,8 @@ function renderPower() {
       <!-- 5 stat boxes -->
       <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--border);margin:0 0 1px">
         <div style="background:var(--card);padding:8px;text-align:center">
-          <div style="font-size:18px;font-weight:900;font-family:monospace;color:${prCol}">${r.hr_prob.toFixed(1)}%</div>
-          <div style="font-size:7.5px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">Model</div>
+          <div style="font-size:18px;font-weight:900;font-family:monospace;color:${prCol}">${(gameStarted(r) ? liveHRProb(r) : (+r.hr_prob || 0)).toFixed(1)}%</div>
+          <div style="font-size:7.5px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">${gameStarted(r) ? 'Model · Live' : 'Model'}</div>
         </div>
         <div style="background:var(--card);padding:8px;text-align:center">
           <div style="font-size:18px;font-weight:900;font-family:monospace;color:${edCol}">${edge>0?'+':''}${edge.toFixed(1)}%</div>
@@ -5831,7 +5870,23 @@ function renderPower() {
 
   const emptyHtml = top5.length ? '' :
     `<div class="gc-empty" style="padding:40px 20px">No positive-EV plays on the board right now. The market is priced tight today; the list refills when lines move or lineups shift.</div>`;
-  container.innerHTML = headerHtml + cardsHtml + emptyHtml;
+  // Tracked slate strip: THE record. These are the locked, graded picks —
+  // shown pinned above the live board so what's tracked is never a mystery.
+  const _tpDay = new Date().toLocaleDateString('en-CA', {timeZone: 'America/New_York'});
+  const _tp = (typeof PICKS !== 'undefined' ? PICKS : []).filter(p => p && p.date === _tpDay);
+  const trackedHtml = _tp.length ? `<div style="background:var(--card);border:1.5px solid rgba(251,191,36,.45);border-radius:14px;padding:12px 16px;margin-bottom:14px">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+      <span style="font-size:10px;font-weight:900;letter-spacing:.12em;color:#fbbf24">📌 TRACKED SLATE · ${_tp.length}/5 · WHAT THE RECORD GRADES</span>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:7px">${_tp.map(p => {
+      const lp = livePlayerData[nkjs(p.player || '')] || {};
+      const st = p.hit === true || lp.hitHR ? ['HR ✓', '#22c55e'] : p.hit === false ? ['miss', '#ef4444'] : ['pending', 'var(--text3)'];
+      return `<span data-p="${(p.player || '').replace(/"/g, '&quot;')}" onclick="openPlayerCard(this.dataset.p)" style="cursor:pointer;display:inline-flex;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:5px 9px;font-size:11px;font-weight:700">
+        ${p.player}${p.odds ? ` <i style="font-style:normal;color:var(--text3)">${fmtOdds(p.odds)}</i>` : ''}
+        <i style="font-style:normal;font-size:9px;font-weight:800;color:${st[1]}">${st[0]}</i></span>`;
+    }).join('')}</div>
+  </div>` : '';
+  container.innerHTML = trackedHtml + headerHtml + cardsHtml + emptyHtml;
 }
 
 // ─── JUMP FROM GAME CARD → RANKINGS ───────────────────────────
@@ -5874,6 +5929,7 @@ updateHomeStats();
 
 // ─── RECORD TAB ───────────────────────────────────────────────
 const PICKS = [];
+const TICKET_LOCK = null;
 const LINE_HISTORY = [];
 const PITCHER_PROJ = [];
 var DAILY_RECAP = {};

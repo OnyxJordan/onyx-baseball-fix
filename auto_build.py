@@ -172,14 +172,25 @@ print(f"model: DBs injected ({len(CAREER)} hitters, {len(PITCHERS)} pitchers, "
       f"{len(BULLPEN)} bullpens, {len(HANDS)} hands)")
 
 # ---------------------------------------------------------------- adjustment layer (only what model.py does NOT cover)
-def bullpen_mult(team_abbr, starter_e):
-    """~40% of PAs vs bullpen: blend starter suppression with team relief HR/9."""
+def bullpen_mult(team_abbr, starter_e, starter_name=None):
+    """Blend starter suppression with team relief HR/9, weighted by how deep
+    TODAY'S starter actually goes (v32 — was a flat 40% bullpen share). A
+    6.5-IP horse leaves ~28% of PAs to relievers; a 4-inning opener leaves
+    ~55%, and facing a soft bullpen matters that much more that day."""
     bp = BULLPEN.get(team_abbr)
     if not bp or not bp.get("hr9"):
         return 1.0
+    share = 0.40
+    sp = SEASONP.get(nk(starter_name or "")) or {}
+    try:
+        ip, gs = float(sp.get("ip") or 0), float(sp.get("gs") or 0)
+        if gs >= 3 and ip > 0:
+            share = min(0.55, max(0.25, 1.0 - (ip / gs) / 9.0))
+    except (TypeError, ValueError):
+        pass
     bp_leg = min(max(float(bp["hr9"]) / 1.05, 0.7), 1.5)
     sp_leg = (starter_e or {}).get("pf_blend", 1.0)
-    return round((0.60 * sp_leg + 0.40 * bp_leg) / max(sp_leg, 1e-6), 4)
+    return round(((1.0 - share) * sp_leg + share * bp_leg) / max(sp_leg, 1e-6), 4)
 
 def pull_air_mult(bat):
     if not bat or bat.get("pl") is None or bat.get("fb") is None:
@@ -464,7 +475,7 @@ for game in games_out:
                 _m = 1 + 0.30 * ((1 - float(_gb)) - 0.56) / 0.56
                 _sit *= _m
                 if _m >= 1.05: _why.append((_m - 1, "fly-ball pitcher"))
-            _bpm = bullpen_mult(opp_team, sp_e)
+            _bpm = bullpen_mult(opp_team, sp_e, opp_sp)
             _sit *= _bpm
             if _bpm >= 1.04: _why.append((_bpm - 1, "soft bullpen"))
             _sit *= {1: 1.10, 2: 1.07, 3: 1.05, 4: 1.03, 5: 1.00,
@@ -482,7 +493,7 @@ for game in games_out:
             if base <= 0:
                 continue
             adj = base
-            adj *= bullpen_mult(opp_team, sp_e)
+            adj *= bullpen_mult(opp_team, sp_e, opp_sp)
             adj *= pull_air_mult(bat)
             adj = min(max(adj, 0.005), 0.45)
 
@@ -551,35 +562,94 @@ for p in picks:
 _deduped = len(picks) - len(_clean)
 picks = _clean
 
-# v30 SLATE LOCK: the day's five picks are chosen ONCE, by the first build
-# that has qualifying pregame plays. Later refresh runs never add, replace,
-# or top up — what we lock at the start of the slate is what we track.
-_today_ct = sum(1 for p in picks if p.get("date") == stamp)
+# v32 SLATE LOCK: picks TOP UP until the slate's first pitch, then freeze.
+# The old lock-once rule closed the book at the first morning build with any
+# qualifying play — 7/29 locked a single pick at 11:30 AM while the board
+# kept re-sorting all day, so the #1 play users saw at game time (B. Lowe,
+# who homered) was never tracked. Now every pregame build may ADD qualifying
+# plays (never remove or replace) up to five; the moment any game starts,
+# the day's slate is whatever has been locked.
+_today_names = {nk(p.get("player") or "") for p in picks if p.get("date") == stamp}
+_slate_started = any(
+    _hours_since_start((g or {}).get("start")) > 0.0
+    for g in (GAMES.values() if isinstance(GAMES, dict) else []))
 _pregame = [r for r in board
             if _hours_since_start((GAMES.get(
                 next((g["game_key"] for g in games_out if g["label"] == r.get("game")), ""), {})
                 or {}).get("start")) <= 0.0]
 added = 0
-if _today_ct == 0 and _pregame:
-    for r in _pregame[:5]:
+if not _slate_started:
+    for r in _pregame:
+        if len(_today_names) >= 5:
+            break
+        if nk(r.get("batter_name") or "") in _today_names:
+            continue
         picks.append({"date": stamp, "player": r["batter_name"],
                       "odds": r.get("dk_hr_odds"),
                       "prob": round((r.get("hr_prob") or 0) / 100, 4),
                       "edge": round(r.get("hr_edge") or 0, 2),
                       "tier": r.get("_tier", "edge"),
                       "hit": None})
+        _today_names.add(nk(r["batter_name"]))
         added += 1
 if added or _deduped:
     with open(dpath("picks_input.json"), "w", encoding="utf-8") as f:
         json.dump(picks, f, indent=1, ensure_ascii=False)
 if added:
-    print(f"picks: slate LOCKED — {added} play(s) for {stamp}")
-elif _today_ct:
-    print(f"picks: slate already locked for {stamp} ({_today_ct} play(s)) - no changes")
+    print(f"picks: +{added} play(s) -> {len(_today_names)}/5 for {stamp}"
+          f"{' (slate open, top-up until first pitch)' if not _slate_started else ''}")
+elif _slate_started:
+    print(f"picks: slate LOCKED for {stamp} ({len(_today_names)} play(s))")
 else:
-    print("picks: no qualifying pregame plays yet - lock deferred to next run")
+    print(f"picks: {len(_today_names)}/5 for {stamp} - no new qualifying plays this run")
 if _deduped:
     print(f"picks: removed {_deduped} duplicate record entr(ies)")
+
+# v32 TICKET LOCK: the Model's Ticket is decided server-side and FROZEN at
+# the slate's first pitch. It was rebuilt client-side from the live pool on
+# every render, so legs dropped out as their games started and the ticket
+# visibly wandered all evening. Pregame builds may refresh it (fresher
+# lineups/odds); once any game starts, the saved ticket is the ticket.
+TICKET_PATH = dpath("ticket_lock.json")
+_tlock = jload(TICKET_PATH, {})
+if _tlock.get("date") != stamp or not _slate_started:
+    _tl_pool, _tl_seen = [], set()
+    for r in sorted(results_out, key=lambda x: -(x.get("ticket_score") or 0)):
+        if not r.get("mid") or (r.get("hr_prob") or 0) < 15:
+            continue
+        if (r.get("hh_pct") or 0) < 0.32 or (r.get("barrel_26") or 0) < 0.05:
+            continue
+        k = nk(r.get("batter_name") or "")
+        if k in _tl_seen:
+            continue
+        gk_ = next((g["game_key"] for g in games_out if g["label"] == r.get("game")), "")
+        if _hours_since_start((GAMES.get(gk_, {}) or {}).get("start")) > 0.0:
+            continue
+        _tl_seen.add(k)
+        _tl_pool.append(r)
+    if len(_tl_pool) >= 2:
+        _legs_n = max(2, min(5, sum(1 for r in _tl_pool if (r.get("ticket_score") or 0) >= 0.65)))
+        _tlock = {"date": stamp,
+                  "locked": bool(_slate_started),
+                  "legs": [{"player": r.get("batter_name"), "mid": r.get("mid"),
+                            "team": r.get("team"), "odds": r.get("dk_hr_odds"),
+                            "prob": r.get("hr_prob"),
+                            "score": round(r.get("ticket_score") or 0, 3),
+                            "why": r.get("ticket_why") or [],
+                            "away": r.get("away") or "", "home": r.get("home") or "",
+                            "opp": r.get("opp_pitcher") or "", "time": r.get("time") or ""}
+                           for r in _tl_pool[:_legs_n]]}
+        with open(TICKET_PATH, "w", encoding="utf-8") as f:
+            json.dump(_tlock, f, indent=1, ensure_ascii=False)
+        print(f"ticket: {len(_tlock['legs'])} leg(s) for {stamp} "
+              f"({'FROZEN' if _slate_started else 'refreshing until first pitch'})")
+    elif _tlock.get("date") != stamp:
+        _tlock = {}
+elif _tlock.get("date") == stamp and not _tlock.get("locked"):
+    _tlock["locked"] = True   # slate started: freeze whatever the last pregame build saved
+    with open(TICKET_PATH, "w", encoding="utf-8") as f:
+        json.dump(_tlock, f, indent=1, ensure_ascii=False)
+    print(f"ticket: FROZEN for {stamp} ({len(_tlock.get('legs') or [])} legs)")
 
 # ---------------------------------------------------------------- inject payload into shell
 # Fail loudly: an empty slate means upstream data broke. Abort without touching
@@ -693,6 +763,7 @@ shell = replace_const(shell, "ALL_GAME_KEYS", keys_out)
 shell = replace_const(shell, "LINE_HISTORY", jload(dpath("line_history.json"), []))
 shell = replace_const(shell, "PITCHER_PROJ", pitchers_out)
 shell = replace_const(shell, "DAILY_RECAP", jload(dpath("recap.json"), {}))
+shell = replace_const(shell, "TICKET_LOCK", _tlock if _tlock.get("legs") else None)
 
 # ---- Onyx game links: only today's harvested slugs ever ship ----
 from zoneinfo import ZoneInfo
