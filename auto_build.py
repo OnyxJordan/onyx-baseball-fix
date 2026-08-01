@@ -562,48 +562,9 @@ for p in picks:
 _deduped = len(picks) - len(_clean)
 picks = _clean
 
-# v32 SLATE LOCK: picks TOP UP until the slate's first pitch, then freeze.
-# The old lock-once rule closed the book at the first morning build with any
-# qualifying play — 7/29 locked a single pick at 11:30 AM while the board
-# kept re-sorting all day, so the #1 play users saw at game time (B. Lowe,
-# who homered) was never tracked. Now every pregame build may ADD qualifying
-# plays (never remove or replace) up to five; the moment any game starts,
-# the day's slate is whatever has been locked.
-_today_names = {nk(p.get("player") or "") for p in picks if p.get("date") == stamp}
 _slate_started = any(
     _hours_since_start((g or {}).get("start")) > 0.0
     for g in (GAMES.values() if isinstance(GAMES, dict) else []))
-_pregame = [r for r in board
-            if _hours_since_start((GAMES.get(
-                next((g["game_key"] for g in games_out if g["label"] == r.get("game")), ""), {})
-                or {}).get("start")) <= 0.0]
-added = 0
-if not _slate_started:
-    for r in _pregame:
-        if len(_today_names) >= 5:
-            break
-        if nk(r.get("batter_name") or "") in _today_names:
-            continue
-        picks.append({"date": stamp, "player": r["batter_name"],
-                      "odds": r.get("dk_hr_odds"),
-                      "prob": round((r.get("hr_prob") or 0) / 100, 4),
-                      "edge": round(r.get("hr_edge") or 0, 2),
-                      "tier": r.get("_tier", "edge"),
-                      "hit": None})
-        _today_names.add(nk(r["batter_name"]))
-        added += 1
-if added or _deduped:
-    with open(dpath("picks_input.json"), "w", encoding="utf-8") as f:
-        json.dump(picks, f, indent=1, ensure_ascii=False)
-if added:
-    print(f"picks: +{added} play(s) -> {len(_today_names)}/5 for {stamp}"
-          f"{' (slate open, top-up until first pitch)' if not _slate_started else ''}")
-elif _slate_started:
-    print(f"picks: slate LOCKED for {stamp} ({len(_today_names)} play(s))")
-else:
-    print(f"picks: {len(_today_names)}/5 for {stamp} - no new qualifying plays this run")
-if _deduped:
-    print(f"picks: removed {_deduped} duplicate record entr(ies)")
 
 # v32 TICKET LOCK: the Model's Ticket is decided server-side and FROZEN at
 # the slate's first pitch. It was rebuilt client-side from the live pool on
@@ -650,6 +611,57 @@ elif _tlock.get("date") == stamp and not _tlock.get("locked"):
     with open(TICKET_PATH, "w", encoding="utf-8") as f:
         json.dump(_tlock, f, indent=1, ensure_ascii=False)
     print(f"ticket: FROZEN for {stamp} ({len(_tlock.get('legs') or [])} legs)")
+
+# v33 SLATE LOCK: ONE story between the ticket and the record. The tracked
+# five now lead with the TICKET LEGS — the model's favorite plays regardless
+# of edge — then fill with the best positive-edge plays. The old edge-only
+# gate is how 7/30's #1 conviction play (B. Lowe, 25.8%, +270, homered)
+# stayed off the ledger while three +800 longshots got graded: the ticket
+# and the tracker were keeping different scoreboards. Top-up until the
+# slate's first pitch (add-only, never replace), then freeze.
+_today_names = {nk(p.get("player") or "") for p in picks if p.get("date") == stamp}
+_pregame = [r for r in board
+            if _hours_since_start((GAMES.get(
+                next((g["game_key"] for g in games_out if g["label"] == r.get("game")), ""), {})
+                or {}).get("start")) <= 0.0]
+_ticket_rows, _ticket_ids = [], set()
+if _tlock.get("date") == stamp:
+    _by_bname = {nk(r.get("batter_name") or ""): r for r in results_out}
+    for l in (_tlock.get("legs") or []):
+        rr = _by_bname.get(nk(l.get("player") or ""))
+        if rr is None:
+            continue
+        gk_ = next((g["game_key"] for g in games_out if g["label"] == rr.get("game")), "")
+        if _hours_since_start((GAMES.get(gk_, {}) or {}).get("start")) <= 0.0:
+            _ticket_rows.append(rr)
+            _ticket_ids.add(id(rr))
+added = 0
+if not _slate_started:
+    for r in _ticket_rows + _pregame:
+        if len(_today_names) >= 5:
+            break
+        if nk(r.get("batter_name") or "") in _today_names:
+            continue
+        picks.append({"date": stamp, "player": r["batter_name"],
+                      "odds": r.get("dk_hr_odds"),
+                      "prob": round((r.get("hr_prob") or 0) / 100, 4),
+                      "edge": round(r.get("hr_edge") or 0, 2),
+                      "tier": "ticket" if id(r) in _ticket_ids else r.get("_tier", "edge"),
+                      "hit": None})
+        _today_names.add(nk(r["batter_name"]))
+        added += 1
+if added or _deduped:
+    with open(dpath("picks_input.json"), "w", encoding="utf-8") as f:
+        json.dump(picks, f, indent=1, ensure_ascii=False)
+if added:
+    print(f"picks: +{added} play(s) -> {len(_today_names)}/5 for {stamp}"
+          f"{' (slate open, top-up until first pitch)' if not _slate_started else ''}")
+elif _slate_started:
+    print(f"picks: slate LOCKED for {stamp} ({len(_today_names)} play(s))")
+else:
+    print(f"picks: {len(_today_names)}/5 for {stamp} - no new qualifying plays this run")
+if _deduped:
+    print(f"picks: removed {_deduped} duplicate record entr(ies)")
 
 # ---------------------------------------------------------------- inject payload into shell
 # Fail loudly: an empty slate means upstream data broke. Abort without touching
