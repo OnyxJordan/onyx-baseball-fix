@@ -639,20 +639,33 @@ def harvest_game_odds(key, links, fids=None, prev_book=""):
                   indent=2, ensure_ascii=False)
         print(f"onyx odds: book '{book}' priced ML for {len(ml_games)} and "
               f"totals for {len(tot_games)} of {len(ordered)} games")
-    # only take over the HR board when coverage is real; a thin result keeps
-    # the consensus odds.json (median tripwire mirrors fetch_odds)
+    # MERGE Onyx HR props over the consensus board, never replace it: partial
+    # pulls (the shared quota storms leave 50-150 of ~250 props per run) used
+    # to WIPE odds for everyone else — on 7/30 the board flapped all day and
+    # B. Lowe, edge-positive at +308 mid-day, kept losing his price entirely.
+    # Onyx wins per player; consensus fills the rest of the slate.
     if len(hr) >= 20:
         srt = sorted(hr.values())
         med = srt[len(srt) // 2]
         if med > 1500:
             print(f"onyx odds: HR median +{med} is not a 0.5-line slate - discarded")
             return book
-        json.dump(hr, open(ODDS_JSON, "w", encoding="utf-8"), indent=1, ensure_ascii=False)
-        json.dump({"source": "onyx-opticodds",
+        merged = {}
+        try:
+            base = json.load(open(ODDS_JSON, encoding="utf-8"))
+            if isinstance(base, dict):
+                merged = {_nk(k): v for k, v in base.items() if isinstance(v, (int, float))}
+        except Exception:
+            pass
+        n_base = len(merged)
+        merged.update(hr)
+        json.dump(merged, open(ODDS_JSON, "w", encoding="utf-8"), indent=1, ensure_ascii=False)
+        json.dump({"source": "onyx-opticodds" if len(hr) >= n_base else "onyx+consensus",
                    "fetched": datetime.now(ZoneInfo("UTC")).isoformat(),
-                   "count": len(hr), "fresh": True},
+                   "count": len(merged), "onyx": len(hr), "fresh": True},
                   open(ODDS_META, "w", encoding="utf-8"))
-        print(f"onyx odds: odds.json now Onyx-priced ({len(hr)} HR props, median +{med})")
+        print(f"onyx odds: {len(hr)} Onyx HR props (median +{med}) merged over "
+              f"{n_base} consensus -> {len(merged)} priced")
     elif hr:
         print(f"onyx odds: only {len(hr)} HR props from Onyx - keeping consensus odds.json")
     return book
