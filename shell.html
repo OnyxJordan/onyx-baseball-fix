@@ -5928,8 +5928,11 @@ updateHomeStats();
 
 
 // ─── RECORD TAB ───────────────────────────────────────────────
-const PICKS = [];
-const TICKET_LOCK = null;
+// var, not const: the initial render fires from an earlier script block, and
+// a const here would be in its temporal dead zone when renderPower first
+// reads these (even typeof throws) — v32's blank-site bug
+var PICKS = [];
+var TICKET_LOCK = null;
 const LINE_HISTORY = [];
 const PITCHER_PROJ = [];
 var DAILY_RECAP = {};
