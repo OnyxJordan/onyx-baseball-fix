@@ -2,23 +2,12 @@
   "TB": {
     "venue": "Tropicana Field",
     "temp": 83.0,
-    "precip": 60,
+    "precip": 63,
     "wind_spd": 8.8,
     "wind_dir": "SW",
     "humidity_pct": 77,
     "pressure_mb": 1015.3,
     "roof": true,
-    "flag": "clear"
-  },
-  "CLE": {
-    "venue": "Progressive Field",
-    "temp": 79.8,
-    "precip": 16,
-    "wind_spd": 10.7,
-    "wind_dir": "SSW",
-    "humidity_pct": 71,
-    "pressure_mb": 1005.4,
-    "roof": false,
     "flag": "clear"
   },
   "HOU": {
@@ -30,17 +19,6 @@
     "humidity_pct": 43,
     "pressure_mb": 1012.6,
     "roof": true,
-    "flag": "clear"
-  },
-  "LAA": {
-    "venue": "Angel Stadium",
-    "temp": 87.8,
-    "precip": 0,
-    "wind_spd": 7.3,
-    "wind_dir": "WSW",
-    "humidity_pct": 50,
-    "pressure_mb": 1010.5,
-    "roof": false,
     "flag": "clear"
   },
   "COL": {
@@ -65,32 +43,10 @@
     "roof": false,
     "flag": "clear"
   },
-  "CIN": {
-    "venue": "Great American Ball Park",
-    "temp": 76.0,
-    "precip": 8,
-    "wind_spd": 3.7,
-    "wind_dir": "WSW",
-    "humidity_pct": 78,
-    "pressure_mb": 1006.7,
-    "roof": false,
-    "flag": "clear"
-  },
-  "SD": {
-    "venue": "Petco Park",
-    "temp": 79.5,
-    "precip": 0,
-    "wind_spd": 8.0,
-    "wind_dir": "SW",
-    "humidity_pct": 72,
-    "pressure_mb": 1010.7,
-    "roof": false,
-    "flag": "clear"
-  },
   "ATL": {
     "venue": "Truist Park",
     "temp": 85.4,
-    "precip": 11,
+    "precip": 12,
     "wind_spd": 9.2,
     "wind_dir": "SW",
     "humidity_pct": 68,
@@ -98,58 +54,14 @@
     "roof": false,
     "flag": "clear"
   },
-  "NYM": {
-    "venue": "Citi Field",
-    "temp": 84.2,
+  "LAA": {
+    "venue": "Angel Stadium",
+    "temp": 87.8,
     "precip": 0,
-    "wind_spd": 15.1,
-    "wind_dir": "SSE",
-    "humidity_pct": 66,
-    "pressure_mb": 1014.1,
-    "roof": false,
-    "flag": "clear"
-  },
-  "LAD": {
-    "venue": "Dodger Stadium",
-    "temp": 86.9,
-    "precip": 0,
-    "wind_spd": 8.1,
+    "wind_spd": 7.3,
     "wind_dir": "WSW",
-    "humidity_pct": 48,
-    "pressure_mb": 1008.6,
-    "roof": false,
-    "flag": "clear"
-  },
-  "TOR": {
-    "venue": "Rogers Centre",
-    "temp": 70.7,
-    "precip": 48,
-    "wind_spd": 11.2,
-    "wind_dir": "NE",
-    "humidity_pct": 91,
-    "pressure_mb": 1008.4,
-    "roof": true,
-    "flag": "clear"
-  },
-  "SEA": {
-    "venue": "T-Mobile Park",
-    "temp": 64.3,
-    "precip": 3,
-    "wind_spd": 7.9,
-    "wind_dir": "NW",
-    "humidity_pct": 70,
-    "pressure_mb": 1022.9,
-    "roof": false,
-    "flag": "clear"
-  },
-  "CHC": {
-    "venue": "Wrigley Field",
-    "temp": 71.7,
-    "precip": 1,
-    "wind_spd": 16.0,
-    "wind_dir": "N",
-    "humidity_pct": 91,
-    "pressure_mb": 1011.5,
+    "humidity_pct": 50,
+    "pressure_mb": 1010.5,
     "roof": false,
     "flag": "clear"
   },
@@ -161,6 +73,84 @@
     "wind_dir": "SE",
     "humidity_pct": 68,
     "pressure_mb": 1011.3,
+    "roof": false,
+    "flag": "clear"
+  },
+  "TOR": {
+    "venue": "Rogers Centre",
+    "temp": 70.7,
+    "precip": 64,
+    "wind_spd": 11.2,
+    "wind_dir": "NE",
+    "humidity_pct": 91,
+    "pressure_mb": 1008.4,
+    "roof": true,
+    "flag": "clear"
+  },
+  "CHC": {
+    "venue": "Wrigley Field",
+    "temp": 71.7,
+    "precip": 0,
+    "wind_spd": 16.0,
+    "wind_dir": "N",
+    "humidity_pct": 91,
+    "pressure_mb": 1011.5,
+    "roof": false,
+    "flag": "clear"
+  },
+  "LAD": {
+    "venue": "Dodger Stadium",
+    "temp": 72,
+    "precip": 0,
+    "wind_spd": 5,
+    "wind_dir": "N",
+    "roof": false,
+    "flag": "clear"
+  },
+  "SD": {
+    "venue": "Petco Park",
+    "temp": 72,
+    "precip": 0,
+    "wind_spd": 5,
+    "wind_dir": "N",
+    "roof": false,
+    "flag": "clear"
+  },
+  "CLE": {
+    "venue": "Progressive Field",
+    "temp": 72,
+    "precip": 0,
+    "wind_spd": 5,
+    "wind_dir": "N",
+    "roof": false,
+    "flag": "clear"
+  },
+  "NYM": {
+    "venue": "Citi Field",
+    "temp": 72,
+    "precip": 0,
+    "wind_spd": 5,
+    "wind_dir": "N",
+    "roof": false,
+    "flag": "clear"
+  },
+  "CIN": {
+    "venue": "Great American Ball Park",
+    "temp": 72,
+    "precip": 0,
+    "wind_spd": 5,
+    "wind_dir": "N",
+    "roof": false,
+    "flag": "clear"
+  },
+  "SEA": {
+    "venue": "T-Mobile Park",
+    "temp": 64.3,
+    "precip": 3,
+    "wind_spd": 7.9,
+    "wind_dir": "NW",
+    "humidity_pct": 70,
+    "pressure_mb": 1022.9,
     "roof": false,
     "flag": "clear"
   }
