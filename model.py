@@ -1,5 +1,16 @@
 """
-model.py — Onyx Baseball v33 HR probability model + pitcher K projections
+model.py — Onyx Baseball v34 HR probability model + pitcher K projections
+
+v34: weather-aware market deference. Edge was clustering wherever the
+weather went wild (a windy Wrigley slate lit up the whole game) —
+but a gale is public information and the listed prices had already
+moved on the same forecast, so most of that "edge" was weather counted
+twice. In the market blend, the model's weight now scales down as
+|env - 1| passes 4pp (to a floor of 62% of its band weight): an
+extreme-weather bat only shows edge when the model beats the line
+even after respecting the book's own weather move. Probabilities keep
+full weather credit — picks, the ticket, and conviction scoring still
+chase the wind — only the edge-vs-line measurement defers.
 
 v33: the ticket and the tracker keep ONE scoreboard. The tracked five
 lead with the Model's Ticket legs (the day's most-likely homers, edge
@@ -730,6 +741,19 @@ def project_player(
         elif dk_odds <= 600: w = 0.60
         elif dk_odds <= 900: w = 0.57
         else:                w = 0.52
+        # v34: WEATHER-AWARE DEFERENCE. A Wrigley gale is public information
+        # — the listed price already moved on the same forecast our env
+        # multiplier uses, so on extreme-weather slates the whole game was
+        # lighting up with edge that was really the weather counted twice
+        # (once by us, once by the book). As |env - 1| grows past 4pp the
+        # model hands weight back to the market (floor: 62% of its normal
+        # say); a weather game only shows edge when the model beats the
+        # line even after the book's own weather move is respected. The
+        # probability itself keeps full weather credit for picks and the
+        # ticket — this deference applies only where edge is measured.
+        wx_tilt = abs(env - 1.0)
+        if wx_tilt > 0.04:
+            w *= max(0.62, 1.0 - 1.6 * (wx_tilt - 0.04))
         final_prob = w * raw_prob + (1 - w) * fair_prob
     else:
         final_prob = raw_prob * 0.75
