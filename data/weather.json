@@ -1,12 +1,12 @@
 {
-  "SEA": {
-    "venue": "T-Mobile Park",
-    "temp": 63.6,
-    "precip": 4,
-    "wind_spd": 5.7,
-    "wind_dir": "WNW",
-    "humidity_pct": 77,
-    "pressure_mb": 1023.5,
+  "LAD": {
+    "venue": "Dodger Stadium",
+    "temp": 88.6,
+    "precip": 0,
+    "wind_spd": 8.0,
+    "wind_dir": "WSW",
+    "humidity_pct": 42,
+    "pressure_mb": 1007.7,
     "roof": false,
     "flag": "clear"
   },
@@ -21,17 +21,6 @@
     "roof": false,
     "flag": "clear"
   },
-  "BAL": {
-    "venue": "Camden Yards",
-    "temp": 84.2,
-    "precip": 20,
-    "wind_spd": 12.2,
-    "wind_dir": "SSE",
-    "humidity_pct": 73,
-    "pressure_mb": 1011.2,
-    "roof": false,
-    "flag": "clear"
-  },
   "ATH": {
     "venue": "Sutter Health Park",
     "temp": 96.5,
@@ -43,25 +32,14 @@
     "roof": false,
     "flag": "clear"
   },
-  "CLE": {
-    "venue": "Progressive Field",
-    "temp": 79.8,
-    "precip": 13,
-    "wind_spd": 8.1,
-    "wind_dir": "S",
-    "humidity_pct": 74,
-    "pressure_mb": 1004.9,
-    "roof": false,
-    "flag": "clear"
-  },
-  "LAD": {
-    "venue": "Dodger Stadium",
-    "temp": 87.4,
-    "precip": 0,
-    "wind_spd": 9.2,
-    "wind_dir": "WSW",
-    "humidity_pct": 45,
-    "pressure_mb": 1007.7,
+  "SEA": {
+    "venue": "T-Mobile Park",
+    "temp": 63.6,
+    "precip": 4,
+    "wind_spd": 5.7,
+    "wind_dir": "WNW",
+    "humidity_pct": 77,
+    "pressure_mb": 1023.5,
     "roof": false,
     "flag": "clear"
   }
