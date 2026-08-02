@@ -45,6 +45,16 @@ jobs:
           OPTICODDS_API_KEY: ${{ secrets.OPTICODDS_API_KEY }}
       - name: Heal pitcher hands
         run: python3 heal_hands.py
+      # grading rode ONLY the once-daily build; when that cron slipped
+      # (8/2: no results on the site at noon), yesterday stayed ungraded
+      # all day. Refresh runs now settle picks, tickets, calibration, and
+      # the recap too — cheap no-ops when there is nothing pending.
+      - name: Grade pending picks
+        run: python3 grade_picks.py
+      - name: Self-calibrate model
+        run: python3 calibrate.py
+      - name: Write daily recap
+        run: python3 generate_recap.py
       - name: Build index.html
         run: python3 auto_build.py
       - name: Persist picks record
