@@ -1,37 +1,4 @@
 {
-  "ARI": {
-    "venue": "Chase Field",
-    "temp": 111.0,
-    "precip": 0,
-    "wind_spd": 5.1,
-    "wind_dir": "W",
-    "humidity_pct": 17,
-    "pressure_mb": 1001.3,
-    "roof": true,
-    "flag": "clear"
-  },
-  "MIL": {
-    "venue": "American Family Field",
-    "temp": 70.9,
-    "precip": 1,
-    "wind_spd": 11.5,
-    "wind_dir": "NNE",
-    "humidity_pct": 81,
-    "pressure_mb": 1011.3,
-    "roof": true,
-    "flag": "clear"
-  },
-  "HOU": {
-    "venue": "Daikin Park",
-    "temp": 92.6,
-    "precip": 0,
-    "wind_spd": 3.2,
-    "wind_dir": "SW",
-    "humidity_pct": 43,
-    "pressure_mb": 1008.2,
-    "roof": true,
-    "flag": "clear"
-  },
   "COL": {
     "venue": "Coors Field",
     "temp": 101.7,
@@ -74,6 +41,39 @@
     "humidity_pct": 75,
     "pressure_mb": 1009.3,
     "roof": false,
+    "flag": "clear"
+  },
+  "HOU": {
+    "venue": "Daikin Park",
+    "temp": 92.6,
+    "precip": 0,
+    "wind_spd": 3.2,
+    "wind_dir": "SW",
+    "humidity_pct": 43,
+    "pressure_mb": 1008.2,
+    "roof": true,
+    "flag": "clear"
+  },
+  "ARI": {
+    "venue": "Chase Field",
+    "temp": 111.9,
+    "precip": 0,
+    "wind_spd": 7.7,
+    "wind_dir": "W",
+    "humidity_pct": 16,
+    "pressure_mb": 1001.2,
+    "roof": true,
+    "flag": "clear"
+  },
+  "MIL": {
+    "venue": "American Family Field",
+    "temp": 70.9,
+    "precip": 1,
+    "wind_spd": 11.5,
+    "wind_dir": "NNE",
+    "humidity_pct": 81,
+    "pressure_mb": 1011.3,
+    "roof": true,
     "flag": "clear"
   },
   "NYY": {
