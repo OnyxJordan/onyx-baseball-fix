@@ -3,40 +3,6 @@
  "locked": false,
  "legs": [
   {
-   "player": "Jonathan Aranda",
-   "mid": 666018,
-   "team": "TB",
-   "odds": 383,
-   "prob": 22.3,
-   "score": 1.11,
-   "why": [
-    "park ×1.35",
-    "wind/heat ×1.24",
-    "pitcher matchup ×1.22"
-   ],
-   "away": "TB",
-   "home": "COL",
-   "opp": "Michael Lorenzen",
-   "time": "8:40 PM"
-  },
-  {
-   "player": "Junior Caminero",
-   "mid": 691406,
-   "team": "TB",
-   "odds": 255,
-   "prob": 28.6,
-   "score": 1.093,
-   "why": [
-    "park ×1.35",
-    "wind/heat ×1.24",
-    "pitcher matchup ×1.22"
-   ],
-   "away": "TB",
-   "home": "COL",
-   "opp": "Michael Lorenzen",
-   "time": "8:40 PM"
-  },
-  {
    "player": "Kazuma Okamoto",
    "mid": 672960,
    "team": "TOR",
@@ -69,6 +35,40 @@
    "home": "HOU",
    "opp": "Cristian Javier",
    "time": "8:10 PM"
+  },
+  {
+   "player": "Junior Caminero",
+   "mid": 691406,
+   "team": "TB",
+   "odds": 245,
+   "prob": 28.0,
+   "score": 0.675,
+   "why": [
+    "park ×1.35",
+    "pitcher matchup ×1.22",
+    "overdue"
+   ],
+   "away": "TB",
+   "home": "COL",
+   "opp": "Michael Lorenzen",
+   "time": "8:40 PM"
+  },
+  {
+   "player": "Jonathan Aranda",
+   "mid": 666018,
+   "team": "TB",
+   "odds": 389,
+   "prob": 21.2,
+   "score": 0.672,
+   "why": [
+    "park ×1.35",
+    "pitcher matchup ×1.22",
+    "platoon edge"
+   ],
+   "away": "TB",
+   "home": "COL",
+   "opp": "Michael Lorenzen",
+   "time": "8:40 PM"
   }
  ]
 }
