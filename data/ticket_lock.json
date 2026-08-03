@@ -1,4 +1,50 @@
 {
+<<<<<<< HEAD
+ "date": "2026-08-03",
+ "locked": false,
+ "legs": [
+  {
+   "player": "Kazuma Okamoto",
+   "mid": 672960,
+   "team": "TOR",
+   "odds": null,
+   "prob": 23.9,
+   "score": 0.799,
+   "why": [
+    "pitcher matchup ×1.32",
+    "park ×1.24",
+    "fly-ball pitcher"
+   ],
+   "away": "TOR",
+   "home": "HOU",
+   "opp": "Cristian Javier",
+   "time": "8:10 PM"
+  },
+  {
+   "player": "Kyle Schwarber",
+   "mid": 656941,
+   "team": "PHI",
+   "odds": null,
+   "prob": 25.2,
+   "score": 0.71,
+   "why": [
+    "soft bullpen",
+    "park ×1.13",
+    "overdue"
+   ],
+   "away": "WSH",
+   "home": "PHI",
+   "opp": "TBD",
+   "time": "6:40 PM"
+  },
+  {
+   "player": "Jonathan Aranda",
+   "mid": 666018,
+   "team": "TB",
+   "odds": null,
+   "prob": 18.9,
+   "score": 0.689,
+=======
  "date": "2026-08-02",
  "locked": true,
  "legs": [
@@ -26,15 +72,38 @@
    "odds": 276,
    "prob": 25.8,
    "score": 0.67,
+>>>>>>> origin/main
    "why": [
     "park ×1.35",
-    "pitcher matchup ×1.11",
+    "pitcher matchup ×1.22",
     "platoon edge"
    ],
-   "away": "KC",
+   "away": "TB",
    "home": "COL",
+<<<<<<< HEAD
+   "opp": "Michael Lorenzen",
+   "time": "8:40 PM"
+  },
+  {
+   "player": "Junior Caminero",
+   "mid": 691406,
+   "team": "TB",
+   "odds": null,
+   "prob": 24.3,
+   "score": 0.679,
+   "why": [
+    "park ×1.35",
+    "pitcher matchup ×1.22",
+    "overdue"
+   ],
+   "away": "TB",
+   "home": "COL",
+   "opp": "Michael Lorenzen",
+   "time": "8:40 PM"
+=======
    "opp": "Kyle Freeland",
    "time": "3:10 PM"
+>>>>>>> origin/main
   }
  ]
 }
