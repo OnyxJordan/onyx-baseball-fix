@@ -1,5 +1,4 @@
 {
-<<<<<<< HEAD
  "date": "2026-08-03",
  "locked": false,
  "legs": [
@@ -7,9 +6,9 @@
    "player": "Kazuma Okamoto",
    "mid": 672960,
    "team": "TOR",
-   "odds": null,
-   "prob": 23.9,
-   "score": 0.799,
+   "odds": 255,
+   "prob": 29.0,
+   "score": 0.915,
    "why": [
     "pitcher matchup ×1.32",
     "park ×1.24",
@@ -19,6 +18,23 @@
    "home": "HOU",
    "opp": "Cristian Javier",
    "time": "8:10 PM"
+  },
+  {
+   "player": "Junior Caminero",
+   "mid": 691406,
+   "team": "TB",
+   "odds": 265,
+   "prob": 29.1,
+   "score": 0.771,
+   "why": [
+    "park ×1.35",
+    "pitcher matchup ×1.22",
+    "overdue"
+   ],
+   "away": "TB",
+   "home": "COL",
+   "opp": "Michael Lorenzen",
+   "time": "8:40 PM"
   },
   {
    "player": "Kyle Schwarber",
@@ -44,35 +60,6 @@
    "odds": null,
    "prob": 18.9,
    "score": 0.689,
-=======
- "date": "2026-08-02",
- "locked": true,
- "legs": [
-  {
-   "player": "Mickey Moniak",
-   "mid": 666160,
-   "team": "COL",
-   "odds": 299,
-   "prob": 25.0,
-   "score": 0.67,
-   "why": [
-    "park ×1.35",
-    "soft bullpen",
-    "platoon edge"
-   ],
-   "away": "KC",
-   "home": "COL",
-   "opp": "Seth Lugo",
-   "time": "3:10 PM"
-  },
-  {
-   "player": "Salvador Perez",
-   "mid": 521692,
-   "team": "KC",
-   "odds": 276,
-   "prob": 25.8,
-   "score": 0.67,
->>>>>>> origin/main
    "why": [
     "park ×1.35",
     "pitcher matchup ×1.22",
@@ -80,30 +67,25 @@
    ],
    "away": "TB",
    "home": "COL",
-<<<<<<< HEAD
    "opp": "Michael Lorenzen",
    "time": "8:40 PM"
   },
   {
-   "player": "Junior Caminero",
-   "mid": 691406,
-   "team": "TB",
-   "odds": null,
-   "prob": 24.3,
-   "score": 0.679,
+   "player": "Vladimir Guerrero Jr.",
+   "mid": 665489,
+   "team": "TOR",
+   "odds": 475,
+   "prob": 20.9,
+   "score": 0.683,
    "why": [
-    "park ×1.35",
-    "pitcher matchup ×1.22",
+    "pitcher matchup ×1.32",
+    "park ×1.24",
     "overdue"
    ],
-   "away": "TB",
-   "home": "COL",
-   "opp": "Michael Lorenzen",
-   "time": "8:40 PM"
-=======
-   "opp": "Kyle Freeland",
-   "time": "3:10 PM"
->>>>>>> origin/main
+   "away": "TOR",
+   "home": "HOU",
+   "opp": "Cristian Javier",
+   "time": "8:10 PM"
   }
  ]
 }
