@@ -1010,7 +1010,10 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
 .sb-card:not(.sched) { align-items:center; }
 .sb-card:not(.sched) .sb-teams { justify-content:center; }
 .sb-card:not(.sched) .sb-side { gap:4px; }
-.sb-toprow { display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(26,37,53,.55); padding-bottom:7px; }
+.sb-toprow { display:flex; justify-content:space-between; align-items:center; gap:8px; border-bottom:1px solid rgba(26,37,53,.55); padding-bottom:7px; }
+.sb-toprow .sb-state.sched { min-width:0; overflow:hidden; text-overflow:ellipsis; }
+.sb-toprow .sb-ou { flex-shrink:0; }
+.sb-team .sticker-logo, .sb-team .sb-ab, .sb-team .sb-ml { flex-shrink:0; }
 .sb-card.sched .sb-ml { min-width:64px; text-align:center; }
 .sb-card:hover { border-color:rgba(160,32,240,.4); transform:translateY(-2px); }
 .sb-card:active { transform:scale(.97); }
@@ -3319,12 +3322,18 @@ function parseESPN(espn) {
   return {dates: [{games}]};
 }
 
+// The BASEBALL day rolls at 4 AM ET, not midnight: at 12:01 AM a West
+// Coast game is still in the 7th, and flipping the scoreboard to
+// "tomorrow" wiped it mid-game. Everything date-scoped to "today's
+// slate" (scoreboard fetch, ticket lock, tracked strip) uses this.
+function etGameDay() {
+  return new Intl.DateTimeFormat('en-CA', {timeZone: 'America/New_York'})
+    .format(new Date(Date.now() - 4 * 3600 * 1000));
+}
 async function fetchLiveScores() {
   // file:// blocks all fetch() — the bar just stays in schedule mode
   if (location.protocol === 'file:') return;
-  // MLB game days follow the EASTERN calendar: at 10 PM ET the UTC date has
-  // already rolled over and would hide tonight's live games
-  const d = new Intl.DateTimeFormat('en-CA', {timeZone: 'America/New_York'}).format(new Date());
+  const d = etGameDay();
   try {
     // MLB Stats API first, ESPN fallback
     let data;
@@ -3358,11 +3367,18 @@ async function fetchLiveScores() {
       const homeAbbr = g._homeAbbr || Object.keys(MLB_ABBR).find(k => MLB_ABBR[k] === homeFull) || '';
       const ls = g.linescore || {};
       const status = g.status?.detailedState || '';
-      const isLive = status === 'In Progress';
-      const isFinal = status === 'Final' || status === 'Game Over';
+      const abstract = g.status?.abstractGameState || '';
+      // "Delayed: Rain" mid-game is still a LIVE game with a score — the
+      // old exact-match check dumped delayed games back to their pregame
+      // card ("goes haywire"). Suspended/umpire-review states same deal.
+      const delayed = /delayed|suspended/i.test(status);
+      const isFinal = status === 'Final' || status === 'Game Over' || abstract === 'Final';
+      const isLive = !isFinal && (status === 'In Progress'
+        || (delayed && (ls.currentInning || 0) > 0)
+        || (abstract === 'Live' && !/warmup|pre-?game|scheduled|delayed start/i.test(status)));
       const _wasLive = !!(liveGameData[g.gamePk] && liveGameData[g.gamePk].isLive);
       liveGameData[g.gamePk] = {
-        status, isLive, isFinal,
+        status, isLive, isFinal, delayed,
         awayAbbr, homeAbbr,
         awayScore: ls.teams?.away?.runs ?? null,
         homeScore: ls.teams?.home?.runs ?? null,
@@ -3468,7 +3484,10 @@ function buildScoreTicker() {
   const makeGame = (awayAbbr, homeAbbr, state, awayScore, homeScore, detail, pk) => {
     const isLive   = state === 'live';
     const isFinal  = state === 'final';
-    const hasScore = awayScore !== null && homeScore !== null;
+    // pregame games near first pitch report 0-0 from the linescore hydrate;
+    // printing it next to the start time made the strip items collide —
+    // scores are a live/final thing only
+    const hasScore = awayScore !== null && homeScore !== null && (isLive || isFinal);
     const awayWin  = hasScore && awayScore > homeScore;
     const homeWin  = hasScore && homeScore > awayScore;
     // live games show the inning (T6 / B3) instead of a generic LIVE
@@ -3507,10 +3526,11 @@ function buildScoreTicker() {
       if (!gd.awayAbbr || !gd.homeAbbr) return;
       const state = gd.isLive ? 'live' : gd.isFinal ? 'final' : 'sched';
       const hasScore = gd.awayScore !== null && gd.homeScore !== null;
-      // live shows the inning, pregame shows the ET start time
-      const detail = gd.isLive && gd.inning
-        ? `${(gd.half || '').charAt(0).toUpperCase()}${gd.inning}`
-        : (!gd.isFinal ? (timeByPair[`${gd.awayAbbr}@${gd.homeAbbr}`] || '') : '');
+      // live shows the inning (a delay says so), pregame shows the ET start
+      const detail = gd.isLive
+        ? (gd.delayed ? `DLY${gd.inning ? ' ' + (gd.half || '').charAt(0).toUpperCase() + gd.inning : ''}`
+                      : (gd.inning ? `${(gd.half || '').charAt(0).toUpperCase()}${gd.inning}` : 'LIVE'))
+        : (!gd.isFinal ? (gd.delayed ? 'DLY' : (timeByPair[`${gd.awayAbbr}@${gd.homeAbbr}`] || '')) : '');
       games.push(makeGame(
         gd.awayAbbr, gd.homeAbbr, state,
         hasScore ? gd.awayScore : null,
@@ -3656,9 +3676,10 @@ function renderGCStrip() {
     const anim = !_sbSeen ? ` style="animation-delay:${Math.min(idx * 55, 500)}ms"` : '';
     const open = `onclick="gcSelect(${r.pk});document.getElementById('gcBody')?.scrollIntoView({behavior:'smooth',block:'start'})"`;
     if (!live && !fin) {
-      // scheduled: time and total get their own row so nothing collides
+      // scheduled: time and total get their own row so nothing collides;
+      // a rain-delayed start says so instead of quietly showing the old time
       return `<div class="${cls} sched"${anim} ${open}>
-        <div class="sb-toprow"><span class="sb-state sched">${s.time || ''}</span>${s.ou ? `<span class="sb-ou">O/U ${s.ou}</span>` : ''}</div>
+        <div class="sb-toprow"><span class="sb-state sched"${g.delayed ? ' style="color:#f59e0b"' : ''}>${g.delayed ? '⏸ DELAYED' : (s.time || '')}</span>${s.ou ? `<span class="sb-ou">O/U ${s.ou}</span>` : ''}</div>
         <div class="sb-teams">
           ${team(r.away, null, false, s.away_ml)}
           ${team(r.home, null, false, s.home_ml)}
@@ -3666,7 +3687,9 @@ function renderGCStrip() {
       </div>`;
     }
     const side = live
-      ? `<div class="sb-state live"><span class="sb-dot"></span>${(String(g.half || 'T')[0] === 'B' ? 'Bot' : 'Top')} ${g.inning}</div>${diamond(g)}<div class="sb-oc">${outdots(g)}${count(g)}</div>`
+      ? `<div class="sb-state live"${g.delayed ? ' style="color:#f59e0b"' : ''}>${g.delayed
+          ? `⏸ DELAY${g.inning ? ' ' + (String(g.half || 'T')[0] === 'B' ? 'B' : 'T') + g.inning : ''}`
+          : `<span class="sb-dot"></span>${(String(g.half || 'T')[0] === 'B' ? 'Bot' : 'Top')} ${g.inning}`}</div>${diamond(g)}<div class="sb-oc">${outdots(g)}${count(g)}</div>`
       : `<div class="sb-state fin">FINAL</div>`;
     return `<div class="${cls}"${anim} ${open}>
       <div class="sb-teams">
@@ -4636,8 +4659,13 @@ function renderGC(feed, wp) {
   const aRec = (away.record || {}), hRec = (home.record || {});
   const ls = ld.linescore || {};
   const status = (gd.status || {}).detailedState || '';
-  const isLive = status === 'In Progress';
   const isFinal = /Final|Game Over|Completed/.test(status);
+  const gcDelayed = /delayed|suspended/i.test(status);
+  // a mid-game rain delay is still a live game — the exact-match check was
+  // flipping the whole Gamecenter back to its pregame layout
+  const isLive = !isFinal && (status === 'In Progress'
+    || (gcDelayed && (ls.currentInning || 0) > 0)
+    || ((gd.status || {}).abstractGameState === 'Live' && !/warmup|pre-?game|scheduled|delayed start/i.test(status)));
   const aRuns = ((ls.teams || {}).away || {}).runs;
   const hRuns = ((ls.teams || {}).home || {}).runs;
 
@@ -4645,7 +4673,7 @@ function renderGC(feed, wp) {
   let stateHtml;
   if (isLive) {
     const half = ls.inningHalf === 'Top' ? '▲' : '▼';
-    stateHtml = `<div class="gc-state live">${half} ${ls.currentInningOrdinal || ls.currentInning || ''}</div>
+    stateHtml = `<div class="gc-state live"${gcDelayed ? ' style="color:#f59e0b"' : ''}>${gcDelayed ? '⏸ DELAY · ' : half + ' '}${ls.currentInningOrdinal || ls.currentInning || ''}</div>
       <div class="gc-outs">${ls.outs ?? 0} out${(ls.outs === 1) ? '' : 's'}</div>
       ${gcDiamond(ls.offense)}`;
   } else if (isFinal) {
@@ -5142,7 +5170,7 @@ function onyxSlug(away, home, gk) {
   }
   if (l1 || l2) return l1 || l2;
   if (ONYX_TEAM_IDS[away] && ONYX_TEAM_IDS[home]) {
-    const d = new Date().toLocaleDateString('en-CA', {timeZone: 'America/New_York'});
+    const d = etGameDay();
     return ONYX_TEAM_IDS[away] + '-' + ONYX_TEAM_IDS[home] + '-' + d + '-' + ONYX_GAME_SUFFIX;
   }
   return null;
@@ -5700,7 +5728,7 @@ function buildSlamTicket() {
   // server-locked ticket: the build decides the legs pregame and freezes
   // them at the slate's first pitch — the ticket never re-sorts or loses
   // legs client-side; only each leg's live status updates during games
-  const todayET = new Date().toLocaleDateString('en-CA', {timeZone: 'America/New_York'});
+  const todayET = etGameDay();
   const tl = (typeof TICKET_LOCK !== 'undefined' && TICKET_LOCK
               && TICKET_LOCK.date === todayET && (TICKET_LOCK.legs || []).length >= 2)
              ? TICKET_LOCK : null;
@@ -5984,7 +6012,7 @@ function renderPower() {
     `<div class="gc-empty" style="padding:40px 20px">No positive-EV plays on the board right now. The market is priced tight today; the list refills when lines move or lineups shift.</div>`;
   // Tracked slate strip: THE record. These are the locked, graded picks —
   // shown pinned above the live board so what's tracked is never a mystery.
-  const _tpDay = new Date().toLocaleDateString('en-CA', {timeZone: 'America/New_York'});
+  const _tpDay = etGameDay();
   const _tp = (typeof PICKS !== 'undefined' ? PICKS : []).filter(p => p && p.date === _tpDay);
   const trackedHtml = _tp.length ? `<div style="background:var(--card);border:1.5px solid rgba(251,191,36,.45);border-radius:14px;padding:12px 16px;margin-bottom:14px">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">

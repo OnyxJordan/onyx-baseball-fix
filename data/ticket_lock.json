@@ -1,121 +1,74 @@
 {
- "date": "2026-08-02",
-<<<<<<< HEAD
- "locked": true,
-=======
+ "date": "2026-08-03",
  "locked": false,
->>>>>>> origin/main
  "legs": [
   {
-   "player": "Brandon Lowe",
-   "mid": 664040,
-   "team": "PIT",
-   "odds": 276,
-<<<<<<< HEAD
-   "prob": 26.7,
-   "score": 0.767,
+   "player": "Kazuma Okamoto",
+   "mid": 672960,
+   "team": "TOR",
+   "odds": null,
+   "prob": 23.9,
+   "score": 0.799,
    "why": [
-    "park ×1.31",
-    "soft bullpen",
-    "wind/heat ×1.08"
-=======
-   "prob": 25.8,
-   "score": 0.693,
-   "why": [
-    "park ×1.31",
-    "soft bullpen",
-    "due"
->>>>>>> origin/main
+    "pitcher matchup ×1.32",
+    "park ×1.24",
+    "fly-ball pitcher"
    ],
-   "away": "PIT",
-   "home": "CIN",
-   "opp": "Chase Burns",
-   "time": "1:40 PM"
+   "away": "TOR",
+   "home": "HOU",
+   "opp": "Cristian Javier",
+   "time": "8:10 PM"
   },
   {
-<<<<<<< HEAD
-   "player": "Esmerlyn Valdez",
-   "mid": 699013,
-   "team": "PIT",
-   "odds": 300,
-   "prob": 23.7,
-   "score": 0.671,
+   "player": "Kyle Schwarber",
+   "mid": 656941,
+   "team": "PHI",
+   "odds": null,
+   "prob": 25.2,
+   "score": 0.71,
    "why": [
-    "park ×1.31",
     "soft bullpen",
-    "56% FB bat"
-   ],
-   "away": "PIT",
-   "home": "CIN",
-   "opp": "Chase Burns",
-   "time": "1:40 PM"
-  },
-  {
-   "player": "Mickey Moniak",
-   "mid": 666160,
-   "team": "COL",
-   "odds": 284,
-   "prob": 25.6,
-   "score": 0.662,
-   "why": [
-    "park ×1.35",
-    "soft bullpen",
-    "platoon edge"
-   ],
-   "away": "KC",
-   "home": "COL",
-   "opp": "Seth Lugo",
-   "time": "3:10 PM"
-  },
-  {
-   "player": "Alec Burleson",
-   "mid": 676475,
-   "team": "STL",
-   "odds": 372,
-   "prob": 20.2,
-   "score": 0.66,
-   "why": [
-    "pitcher matchup ×1.45",
-    "platoon edge",
+    "park ×1.13",
     "overdue"
    ],
-=======
-   "player": "Alec Burleson",
-   "mid": 676475,
-   "team": "STL",
-   "odds": 410,
-   "prob": 19.2,
-   "score": 0.637,
-   "why": [
-    "pitcher matchup ×1.45",
-    "platoon edge",
-    "overdue"
-   ],
->>>>>>> origin/main
-   "away": "STL",
-   "home": "TOR",
-   "opp": "Max Scherzer",
-   "time": "1:37 PM"
-<<<<<<< HEAD
+   "away": "WSH",
+   "home": "PHI",
+   "opp": "TBD",
+   "time": "6:40 PM"
   },
   {
-   "player": "Salvador Perez",
-   "mid": 521692,
-   "team": "KC",
-   "odds": 265,
-   "prob": 26.3,
-   "score": 0.659,
+   "player": "Jonathan Aranda",
+   "mid": 666018,
+   "team": "TB",
+   "odds": null,
+   "prob": 18.9,
+   "score": 0.689,
    "why": [
     "park ×1.35",
-    "pitcher matchup ×1.11",
+    "pitcher matchup ×1.22",
     "platoon edge"
    ],
-   "away": "KC",
+   "away": "TB",
    "home": "COL",
-   "opp": "Kyle Freeland",
-   "time": "3:10 PM"
-=======
->>>>>>> origin/main
+   "opp": "Michael Lorenzen",
+   "time": "8:40 PM"
+  },
+  {
+   "player": "Junior Caminero",
+   "mid": 691406,
+   "team": "TB",
+   "odds": null,
+   "prob": 24.3,
+   "score": 0.679,
+   "why": [
+    "park ×1.35",
+    "pitcher matchup ×1.22",
+    "overdue"
+   ],
+   "away": "TB",
+   "home": "COL",
+   "opp": "Michael Lorenzen",
+   "time": "8:40 PM"
   }
  ]
 }
