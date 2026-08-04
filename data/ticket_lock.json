@@ -3,38 +3,38 @@
  "locked": false,
  "legs": [
   {
-   "player": "Bryce Harper",
-   "mid": 547180,
-   "team": "PHI",
-   "odds": 400,
-   "prob": 23.1,
-   "score": 0.749,
-   "why": [
-    "pitcher matchup ×1.21",
-    "park ×1.13",
-    "platoon edge"
-   ],
-   "away": "WSH",
-   "home": "PHI",
-   "opp": "Zack Littell",
-   "time": "6:40 PM"
-  },
-  {
    "player": "Shohei Ohtani",
    "mid": 660271,
    "team": "LAD",
-   "odds": 357,
-   "prob": 26.4,
-   "score": 0.64,
+   "odds": 206,
+   "prob": 30.7,
+   "score": 0.819,
    "why": [
+    "wind/heat ×1.11",
     "overdue",
-    "pitcher matchup ×1.08",
-    "platoon edge"
+    "pitcher matchup ×1.08"
    ],
    "away": "LAD",
    "home": "CHC",
    "opp": "Javier Assad",
    "time": "8:05 PM"
+  },
+  {
+   "player": "Yordan Alvarez",
+   "mid": 670541,
+   "team": "HOU",
+   "odds": 249,
+   "prob": 27.7,
+   "score": 0.742,
+   "why": [
+    "park ×1.24",
+    "pitcher matchup ×1.12",
+    "overdue"
+   ],
+   "away": "TOR",
+   "home": "HOU",
+   "opp": "Trey Yesavage",
+   "time": "8:10 PM"
   }
  ]
 }
