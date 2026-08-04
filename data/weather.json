@@ -1,15 +1,4 @@
 {
-  "BAL": {
-    "venue": "Camden Yards",
-    "temp": 86.6,
-    "precip": 0,
-    "wind_spd": 7.2,
-    "wind_dir": "E",
-    "humidity_pct": 45,
-    "pressure_mb": 1017.2,
-    "roof": false,
-    "flag": "clear"
-  },
   "BOS": {
     "venue": "Fenway Park",
     "temp": 78.6,
@@ -21,54 +10,10 @@
     "roof": false,
     "flag": "clear"
   },
-  "CIN": {
-    "venue": "Great American Ball Park",
-    "temp": 87.6,
-    "precip": 0,
-    "wind_spd": 1.6,
-    "wind_dir": "SE",
-    "humidity_pct": 33,
-    "pressure_mb": 1014.2,
-    "roof": false,
-    "flag": "clear"
-  },
-  "TEX": {
-    "venue": "Globe Life Field",
-    "temp": 99.5,
-    "precip": 0,
-    "wind_spd": 9.7,
-    "wind_dir": "S",
-    "humidity_pct": 24,
-    "pressure_mb": 1010.7,
-    "roof": true,
-    "flag": "clear"
-  },
-  "NYY": {
-    "venue": "Yankee Stadium",
-    "temp": 77.4,
-    "precip": 0,
-    "wind_spd": 5.7,
-    "wind_dir": "SE",
-    "humidity_pct": 72,
-    "pressure_mb": 1019.4,
-    "roof": false,
-    "flag": "clear"
-  },
-  "CLE": {
-    "venue": "Progressive Field",
-    "temp": 78.9,
-    "precip": 0,
-    "wind_spd": 8.5,
-    "wind_dir": "N",
-    "humidity_pct": 40,
-    "pressure_mb": 1015.7,
-    "roof": false,
-    "flag": "clear"
-  },
   "ATL": {
     "venue": "Truist Park",
     "temp": 81.9,
-    "precip": 9,
+    "precip": 11,
     "wind_spd": 1.6,
     "wind_dir": "SE",
     "humidity_pct": 59,
@@ -76,14 +21,14 @@
     "roof": false,
     "flag": "clear"
   },
-  "ARI": {
-    "venue": "Chase Field",
-    "temp": 107.1,
-    "precip": 2,
-    "wind_spd": 13.4,
-    "wind_dir": "W",
-    "humidity_pct": 21,
-    "pressure_mb": 1003.0,
+  "MIL": {
+    "venue": "American Family Field",
+    "temp": 86.0,
+    "precip": 1,
+    "wind_spd": 7.4,
+    "wind_dir": "SW",
+    "humidity_pct": 49,
+    "pressure_mb": 1013.2,
     "roof": true,
     "flag": "clear"
   },
@@ -98,6 +43,28 @@
     "roof": false,
     "flag": "clear"
   },
+  "PHI": {
+    "venue": "Citizens Bank Park",
+    "temp": 84.7,
+    "precip": 0,
+    "wind_spd": 8.3,
+    "wind_dir": "E",
+    "humidity_pct": 49,
+    "pressure_mb": 1018.0,
+    "roof": false,
+    "flag": "clear"
+  },
+  "NYY": {
+    "venue": "Yankee Stadium",
+    "temp": 77.4,
+    "precip": 0,
+    "wind_spd": 5.7,
+    "wind_dir": "SE",
+    "humidity_pct": 72,
+    "pressure_mb": 1019.4,
+    "roof": false,
+    "flag": "clear"
+  },
   "CHC": {
     "venue": "Wrigley Field",
     "temp": 73.6,
@@ -106,6 +73,50 @@
     "wind_dir": "SE",
     "humidity_pct": 75,
     "pressure_mb": 1014.5,
+    "roof": false,
+    "flag": "clear"
+  },
+  "ARI": {
+    "venue": "Chase Field",
+    "temp": 107.1,
+    "precip": 2,
+    "wind_spd": 13.4,
+    "wind_dir": "W",
+    "humidity_pct": 21,
+    "pressure_mb": 1003.0,
+    "roof": true,
+    "flag": "clear"
+  },
+  "TEX": {
+    "venue": "Globe Life Field",
+    "temp": 99.5,
+    "precip": 0,
+    "wind_spd": 9.7,
+    "wind_dir": "S",
+    "humidity_pct": 24,
+    "pressure_mb": 1010.7,
+    "roof": true,
+    "flag": "clear"
+  },
+  "CLE": {
+    "venue": "Progressive Field",
+    "temp": 78.9,
+    "precip": 0,
+    "wind_spd": 8.5,
+    "wind_dir": "N",
+    "humidity_pct": 40,
+    "pressure_mb": 1015.7,
+    "roof": false,
+    "flag": "clear"
+  },
+  "CIN": {
+    "venue": "Great American Ball Park",
+    "temp": 87.6,
+    "precip": 0,
+    "wind_spd": 1.6,
+    "wind_dir": "SE",
+    "humidity_pct": 33,
+    "pressure_mb": 1014.2,
     "roof": false,
     "flag": "clear"
   },
@@ -120,25 +131,12 @@
     "roof": false,
     "flag": "clear"
   },
-  "PHI": {
-    "venue": "Citizens Bank Park",
-    "temp": 84.7,
-    "precip": 0,
-    "wind_spd": 8.3,
-    "wind_dir": "E",
-    "humidity_pct": 49,
-    "pressure_mb": 1018.0,
-    "roof": false,
-    "flag": "clear"
-  },
   "KC": {
     "venue": "Kauffman Stadium",
-    "temp": 93.4,
-    "precip": 1,
-    "wind_spd": 7.5,
-    "wind_dir": "SE",
-    "humidity_pct": 34,
-    "pressure_mb": 1011.7,
+    "temp": 72,
+    "precip": 0,
+    "wind_spd": 5,
+    "wind_dir": "N",
     "roof": false,
     "flag": "clear"
   },
@@ -151,13 +149,13 @@
     "roof": true,
     "flag": "clear"
   },
-  "MIL": {
-    "venue": "American Family Field",
+  "BAL": {
+    "venue": "Camden Yards",
     "temp": 72,
     "precip": 0,
     "wind_spd": 5,
     "wind_dir": "N",
-    "roof": true,
+    "roof": false,
     "flag": "clear"
   }
 }
