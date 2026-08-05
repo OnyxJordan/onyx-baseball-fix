@@ -1,5 +1,23 @@
 """
-model.py — Onyx Baseball v34 HR probability model + pitcher K projections
+model.py — Onyx Baseball v35 HR probability model + pitcher K projections
+
+v35: rebuilt on our own graded evidence. Study of 2,112 player-games
+(210 HR, 7/25-8/2, archived pregame boards joined to box scores):
+(1) Elite hard-hit is NONLINEAR — bats over 50% HH homered at 18.7%
+vs a 9.9% base while 44-50% managed 10.8%; the top tier now gets a
+kicker (x1.08, x1.03 at 47%+). (2) AWAY bats out-homered home bats
+11.0% to 8.9% — home teams skip the bottom 9th when leading, so home
+bats see fewer PAs; modest 0.97/1.03 split. (3) At EQUAL market price
+only park (+2.7pp), due (+1.9pp), platoon (+1.5pp), career power
+(+1.4pp) and recent form (+1.3pp) beat the line — hard-hit, EV90 and
+weather added nothing (the books price those). The edge lane now
+requires 2+ of those residual signals, caps prices at +400 (every
+dollar of the -21.6% ROI came from longshots: >+400 went 10-85,
+<=+400 was +1.6%), and ranks by calibrated PROBABILITY instead of
+claimed edge — top-5-by-edge went 0-36 on the window, the winner's
+curse made 'most edge' mean 'most wrong'. Same-window backtest of the
+full new rule: 7-17 daily top-5, +22.7% ROI (in-sample; the ledger
+stays the referee).
 
 v34: weather-aware market deference. Edge was clustering wherever the
 weather went wild (a windy Wrigley slate lit up the whole game) —
@@ -710,6 +728,19 @@ def project_player(
                    6: 4.15, 7: 4.04, 8: 3.93, 9: 3.82}
     pa_mult = PA_BY_ORDER.get(int(batting_order or 0), 4.23) / 4.23
     raw_prob = base * sc * 3.5 * pa_mult * 100 * pf * env * park_f * due_mult * plat
+    # v35 (study: 2,112 player-games, 210 HR, 7/25-8/2):
+    # - ELITE hard-hit is nonlinear: bats over 50% HH homered at 18.7% vs a
+    #   9.9% base while 44-50% managed only 10.8% — the top tier gets a
+    #   kicker the linear quality score can't produce.
+    # - AWAY bats out-homered home bats 11.0% to 8.9%: home teams skip the
+    #   bottom 9th when leading, so home bats structurally see fewer PAs.
+    #   Modest level-neutral split (data gap is bigger; stay conservative).
+    _hh35 = d.get("h3") or 0
+    if _hh35 >= 0.50:
+        raw_prob *= 1.08
+    elif _hh35 >= 0.47:
+        raw_prob *= 1.03
+    raw_prob *= 0.97 if is_home else 1.03
     LEAGUE_GAME_HR = 12.5
     raw_prob = LEAGUE_GAME_HR + (raw_prob - LEAGUE_GAME_HR) * 0.8
     # v19: nightly self-calibration from graded picks; v26: times the fixed

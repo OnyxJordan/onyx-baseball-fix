@@ -5887,7 +5887,9 @@ function renderPower() {
     // profiles never make the money list. The rest can only appear as
     // backfill, clearly tagged, so the page always fields five.
     r._qualified = (r.hr_edge || 0) > 0 && evOf(r) > 0
-      && (r.hh_pct || 0) >= 0.32 && (r.barrel_26 || 0) >= 0.05;
+      && (r.hh_pct || 0) >= 0.32 && (r.barrel_26 || 0) >= 0.05
+      && (r.res_sig == null || r.res_sig >= 2)   // v35: needs 2+ residual signals
+      && r.dk_hr_odds <= 400;                    // v35: no longshot edges (vig traps)
     pool.push(r);
   }
 
