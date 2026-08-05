@@ -1080,6 +1080,33 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
   box-shadow:0 0 10px rgba(251,191,36,.25); }
 .gc-parks.scrape { background:rgba(96,165,250,.12); color:#93c5fd; border-color:rgba(96,165,250,.35); }
 /* ── NO DOUBTER popup ── */
+/* parlay builder: floating slip + armed-mode glow on every odds button */
+#parlayFab { position:fixed; right:14px; bottom:calc(14px + env(safe-area-inset-bottom)); z-index:96;
+  display:flex; flex-direction:column; align-items:flex-end; gap:8px; max-width:min(340px, calc(100vw - 28px)); }
+.pb-fab { background:linear-gradient(135deg,#7a2ce0,#b038f9); color:#fff; font-size:12px; font-weight:800;
+  padding:10px 15px; border-radius:22px; cursor:pointer; box-shadow:0 4px 18px rgba(122,44,224,.45);
+  user-select:none; letter-spacing:.02em; }
+.pb-fab.on { background:linear-gradient(135deg,#16a34a,#22c55e); box-shadow:0 4px 18px rgba(34,197,94,.4); }
+.pb-fab b { background:rgba(0,0,0,.25); border-radius:10px; padding:1px 7px; margin-left:4px; }
+.pb-panel { background:var(--card); border:1.5px solid rgba(160,32,240,.5); border-radius:14px;
+  padding:10px 12px; width:100%; box-shadow:0 8px 30px rgba(0,0,0,.5); }
+.pb-head { font-size:10px; font-weight:900; letter-spacing:.12em; color:#b038f9; margin-bottom:7px;
+  display:flex; justify-content:space-between; align-items:center; }
+.pb-clear { color:var(--text3); font-weight:700; cursor:pointer; letter-spacing:0; font-size:10px; }
+.pb-leg { display:flex; align-items:center; gap:8px; padding:5px 0; border-bottom:1px solid var(--border);
+  font-size:12px; }
+.pb-lbl { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:700; }
+.pb-odds { font-family:monospace; font-size:11px; font-weight:700; color:var(--text2); flex-shrink:0; }
+.pb-x { color:#ef4444; font-weight:900; cursor:pointer; padding:0 3px; flex-shrink:0; }
+.pb-foot { display:flex; justify-content:space-between; align-items:center; gap:8px; padding-top:8px; }
+.pb-pay { font-size:11px; font-weight:700; color:var(--text2); }
+.pb-pay b { color:#22c55e; }
+.pb-go { background:linear-gradient(135deg,#7a2ce0,#b038f9); color:#fff; font-size:11px; font-weight:800;
+  padding:7px 12px; border-radius:9px; cursor:pointer; white-space:nowrap; }
+body.parlay-armed .onyx-bet-btn, body.parlay-armed .sb-ml, body.parlay-armed .slam-odds,
+body.parlay-armed .mkt-chip, body.parlay-armed .mkt-ou, body.parlay-armed .gc-bet-chip {
+  box-shadow:0 0 0 1.5px rgba(34,197,94,.75), 0 0 9px rgba(34,197,94,.3) !important; }
+
 /* broadcast camera for the live at-bat scene: punch in on contact, pan
    with the flight; the HR shot tracks longer and hands off to the modal */
 .gc-scene .gc-cam { transform-box:view-box; transform-origin:166px 82px; }
@@ -5227,36 +5254,114 @@ function onyxSlug(away, home, gk) {
   }
   return null;
 }
-function onyxTicket(p) {
+// One pick -> {sel, label} in Onyx's share wire format, or null when the
+// game has no slug. Shared by single-tap tickets AND the parlay builder.
+function onyxSelection(p) {
   const slug = (p.away && p.home) ? onyxSlug(p.away, p.home, p.gk) : null;
-  if (slug) {
-    let market, label, tail = 'null';
-    if (p.market === 'ML') {
-      market = 'moneyline';
-      // Kalshi-style "No" on a moneyline is "Yes" on the other side
-      let team = p.pick;
-      if (p.side === 'no') team = (team === p.away) ? p.home : p.away;
-      label = ONYX_TEAM_NAMES[team] || team;
-    } else if (p.market === 'HR') {
-      market = ONYX_HR_MARKET;
-      label = p.pick + ' Over 0.5';
-      // player props need the OpticOdds player id as the selection tail
-      tail = (typeof ONYX_PLAYER_IDS !== 'undefined' && ONYX_PLAYER_IDS[nkjs(p.pick)]) || 'null';
-    } else if (p.market === 'RL') {
-      market = 'run_line';
-      label = (ONYX_TEAM_NAMES[p.pick] || p.pick) + ' ' + (p.line || '');
-    } else if (p.market === 'TOTAL') {
-      market = 'total_runs';
-      label = p.pick;
-    } else { market = p.market; label = p.pick; }
-    const u = 'https://app.onyxodds.com/share?selection='
-      + encodeURIComponent(slug + ':o_default_v8:' + market + ':' + label + ':' + tail)
+  if (!slug) return null;
+  let market, label, tail = 'null';
+  if (p.market === 'ML') {
+    market = 'moneyline';
+    // Kalshi-style "No" on a moneyline is "Yes" on the other side
+    let team = p.pick;
+    if (p.side === 'no') team = (team === p.away) ? p.home : p.away;
+    label = ONYX_TEAM_NAMES[team] || team;
+  } else if (p.market === 'HR') {
+    market = ONYX_HR_MARKET;
+    label = p.pick + ' Over 0.5';
+    // player props need the OpticOdds player id as the selection tail
+    tail = (typeof ONYX_PLAYER_IDS !== 'undefined' && ONYX_PLAYER_IDS[nkjs(p.pick)]) || 'null';
+  } else if (p.market === 'RL') {
+    market = 'run_line';
+    label = (ONYX_TEAM_NAMES[p.pick] || p.pick) + ' ' + (p.line || '');
+  } else if (p.market === 'TOTAL') {
+    market = 'total_runs';
+    label = p.pick;
+  } else { market = p.market; label = p.pick; }
+  return { sel: slug + ':o_default_v8:' + market + ':' + label + ':' + tail, label };
+}
+function onyxTicket(p) {
+  // builder armed: every bet button feeds the slip instead of opening Onyx
+  if (typeof parlayMode !== 'undefined' && parlayMode) { parlayAdd(p); return; }
+  const s = onyxSelection(p);
+  if (s) {
+    const u = 'https://app.onyxodds.com/share?selection=' + encodeURIComponent(s.sel)
       + (ONYX_REFERRER ? '&referrer=' + encodeURIComponent(ONYX_REFERRER) : '');
     window.open(u, '_blank', 'noopener');
     return;
   }
   window.open(ONYX_FALLBACK_URL, '_blank', 'noopener');
 }
+
+// ─── PARLAY BUILDER ─────────────────────────────────────────────
+// Arm the builder and every existing Onyx odds button on the site becomes
+// an "add leg" tap. The slip shows combined odds and a $10 payout, then
+// ships ALL legs to Onyx in one share URL (repeated selection params —
+// verified: the share endpoint hydrates every leg).
+var parlayMode = false;
+var parlaySlip = [];
+try { parlaySlip = JSON.parse(localStorage.getItem('onyxParlaySlip') || '[]') || []; } catch (e) {}
+function parlaySave() { try { localStorage.setItem('onyxParlaySlip', JSON.stringify(parlaySlip)); } catch (e) {} }
+function parlayToggle() {
+  parlayMode = !parlayMode;
+  document.body.classList.toggle('parlay-armed', parlayMode);
+  renderParlaySlip();
+}
+function parlayAdd(p) {
+  const s = onyxSelection(p);
+  if (!s) return;
+  if (parlaySlip.some(x => x.sel === s.sel)) { parlayRemove(s.sel); return; }   // tap again = remove
+  if (parlaySlip.length >= 10) return;
+  parlaySlip.push({ sel: s.sel, label: s.label, odds: p.odds ? parseInt(p.odds, 10) || null : null });
+  parlaySave(); renderParlaySlip();
+}
+function parlayRemove(sel) {
+  parlaySlip = parlaySlip.filter(x => x.sel !== sel);
+  parlaySave(); renderParlaySlip();
+}
+function parlayClear() { parlaySlip = []; parlaySave(); renderParlaySlip(); }
+function parlayBuild() {
+  if (!parlaySlip.length) return;
+  const u = 'https://app.onyxodds.com/share?'
+    + parlaySlip.map(x => 'selection=' + encodeURIComponent(x.sel)).join('&')
+    + (ONYX_REFERRER ? '&referrer=' + encodeURIComponent(ONYX_REFERRER) : '');
+  window.open(u, '_blank', 'noopener');
+}
+function renderParlaySlip() {
+  let el = document.getElementById('parlayFab');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'parlayFab';
+    document.body.appendChild(el);
+  }
+  const n = parlaySlip.length;
+  let dec = 1, priced = n > 0;
+  parlaySlip.forEach(x => {
+    if (x.odds == null) { priced = false; return; }
+    dec *= x.odds > 0 ? 1 + x.odds / 100 : 1 + 100 / Math.abs(x.odds);
+  });
+  const amer = priced && dec > 1 ? (dec >= 2 ? '+' + Math.round((dec - 1) * 100) : '-' + Math.round(100 / (dec - 1))) : null;
+  const legRows = parlaySlip.map(x => `
+    <div class="pb-leg">
+      <span class="pb-lbl">${x.label}</span>
+      <span class="pb-odds">${x.odds != null ? fmtOdds(x.odds) : '—'}</span>
+      <span class="pb-x" data-sel="${x.sel.replace(/"/g, '&quot;')}" onclick="parlayRemove(this.dataset.sel)">×</span>
+    </div>`).join('');
+  el.innerHTML = `
+    ${parlayMode && n ? `<div class="pb-panel">
+      <div class="pb-head">🧾 PARLAY SLIP · ${n} leg${n === 1 ? '' : 's'}
+        <span class="pb-clear" onclick="parlayClear()">clear</span></div>
+      ${legRows}
+      <div class="pb-foot">
+        ${amer ? `<span class="pb-pay">${amer} · $10 pays <b>$${(10 * dec).toFixed(0)}</b></span>` : `<span class="pb-pay" style="color:var(--text3)">add priced legs for payout</span>`}
+        <span class="pb-go" onclick="parlayBuild()">⚡ Build on Onyx</span>
+      </div>
+    </div>` : ''}
+    <div class="pb-fab${parlayMode ? ' on' : ''}" onclick="parlayToggle()">
+      🧾 ${parlayMode ? 'Building · tap odds to add' : 'Parlay Builder'}${n ? ` <b>${n}</b>` : ''}
+    </div>`;
+}
+document.addEventListener('DOMContentLoaded', renderParlaySlip);
 
 function renderMarkets() {
   const body = document.getElementById('mktBody');
