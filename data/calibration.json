@@ -1,38 +1,38 @@
 {
- "n": 50,
- "expected_hr": 9.28,
- "actual_hr": 8,
- "scale": 0.9626,
- "active": true,
+ "n": 0,
+ "expected_hr": 0,
+ "actual_hr": 0,
+ "scale": 1.0,
+ "active": false,
  "buckets": [
   {
    "range": "under 10%",
-   "n": 1,
+   "n": 0,
    "hits": 0,
-   "hit_rate": 0.0,
-   "model_avg": 0.073
+   "hit_rate": null,
+   "model_avg": null
   },
   {
    "range": "10-15%",
-   "n": 9,
+   "n": 0,
    "hits": 0,
-   "hit_rate": 0.0,
-   "model_avg": 0.1191
+   "hit_rate": null,
+   "model_avg": null
   },
   {
    "range": "15-20%",
-   "n": 19,
-   "hits": 3,
-   "hit_rate": 0.1579,
-   "model_avg": 0.1748
+   "n": 0,
+   "hits": 0,
+   "hit_rate": null,
+   "model_avg": null
   },
   {
    "range": "20%+",
-   "n": 21,
-   "hits": 5,
-   "hit_rate": 0.2381,
-   "model_avg": 0.2294
+   "n": 0,
+   "hits": 0,
+   "hit_rate": null,
+   "model_avg": null
   }
  ],
- "updated": "2026-08-05T00:09:41.218022+00:00"
+ "updated": "2026-08-05T00:56:59.311318+00:00"
 }
