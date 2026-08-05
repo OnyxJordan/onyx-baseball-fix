@@ -616,7 +616,20 @@ if _tlock.get("date") != stamp or not _slate_started:
         _tl_seen.add(k)
         _tl_pool.append(r)
     if len(_tl_pool) >= 2:
-        _legs_n = max(2, min(5, sum(1 for r in _tl_pool if (r.get("ticket_score") or 0) >= 0.65)))
+        # v35 ticket discipline: 4 legs MAX (a 5th leg multiplies risk faster
+        # than payout at these probabilities) and no more than 2 bats from
+        # one team — a single opposing pitcher must never be able to kill
+        # three legs by himself.
+        _legs_n = max(2, min(4, sum(1 for r in _tl_pool if (r.get("ticket_score") or 0) >= 0.65)))
+        _tl_take, _team_ct = [], {}
+        for r in _tl_pool:
+            if len(_tl_take) >= _legs_n:
+                break
+            tm = r.get("team") or ""
+            if _team_ct.get(tm, 0) >= 2:
+                continue
+            _team_ct[tm] = _team_ct.get(tm, 0) + 1
+            _tl_take.append(r)
         _tlock = {"date": stamp,
                   "locked": bool(_slate_started),
                   "legs": [{"player": r.get("batter_name"), "mid": r.get("mid"),
@@ -626,7 +639,7 @@ if _tlock.get("date") != stamp or not _slate_started:
                             "why": r.get("ticket_why") or [],
                             "away": r.get("away") or "", "home": r.get("home") or "",
                             "opp": r.get("opp_pitcher") or "", "time": r.get("time") or ""}
-                           for r in _tl_pool[:_legs_n]]}
+                           for r in _tl_take]}
         with open(TICKET_PATH, "w", encoding="utf-8") as f:
             json.dump(_tlock, f, indent=1, ensure_ascii=False)
         print(f"ticket: {len(_tlock['legs'])} leg(s) for {stamp} "
