@@ -1,90 +1,13 @@
 {
-  "BOS": {
-    "venue": "Fenway Park",
-    "temp": 84.9,
+  "HOU": {
+    "venue": "Daikin Park",
+    "temp": 91.9,
     "precip": 0,
-    "wind_spd": 5.4,
-    "wind_dir": "W",
-    "humidity_pct": 36,
-    "pressure_mb": 1018.1,
-    "roof": false,
-    "flag": "clear"
-  },
-  "CLE": {
-    "venue": "Progressive Field",
-    "temp": 79.0,
-    "precip": 0,
-    "wind_spd": 6.7,
-    "wind_dir": "NNE",
-    "humidity_pct": 56,
-    "pressure_mb": 1015.9,
-    "roof": false,
-    "flag": "clear"
-  },
-  "COL": {
-    "venue": "Coors Field",
-    "temp": 69.7,
-    "precip": 1,
-    "wind_spd": 5.4,
-    "wind_dir": "NE",
-    "humidity_pct": 44,
-    "pressure_mb": 1007.9,
-    "roof": false,
-    "flag": "clear"
-  },
-  "CIN": {
-    "venue": "Great American Ball Park",
-    "temp": 82.9,
-    "precip": 0,
-    "wind_spd": 2.5,
-    "wind_dir": "NE",
-    "humidity_pct": 57,
-    "pressure_mb": 1015.1,
-    "roof": false,
-    "flag": "clear"
-  },
-  "CHC": {
-    "venue": "Wrigley Field",
-    "temp": 78.2,
-    "precip": 0,
-    "wind_spd": 5.3,
-    "wind_dir": "ESE",
-    "humidity_pct": 73,
-    "pressure_mb": 1015.4,
-    "roof": false,
-    "flag": "clear"
-  },
-  "NYY": {
-    "venue": "Yankee Stadium",
-    "temp": 81.8,
-    "precip": 0,
-    "wind_spd": 9.7,
-    "wind_dir": "SSE",
-    "humidity_pct": 43,
-    "pressure_mb": 1019.3,
-    "roof": false,
-    "flag": "clear"
-  },
-  "SEA": {
-    "venue": "T-Mobile Park",
-    "temp": 75.6,
-    "precip": 0,
-    "wind_spd": 7.2,
-    "wind_dir": "NNW",
-    "humidity_pct": 56,
-    "pressure_mb": 1014.0,
-    "roof": false,
-    "flag": "clear"
-  },
-  "ATL": {
-    "venue": "Truist Park",
-    "temp": 82.0,
-    "precip": 9,
-    "wind_spd": 3.3,
-    "wind_dir": "WSW",
-    "humidity_pct": 68,
-    "pressure_mb": 1013.9,
-    "roof": false,
+    "wind_spd": 4.1,
+    "wind_dir": "SSW",
+    "humidity_pct": 63,
+    "pressure_mb": 1014.4,
+    "roof": true,
     "flag": "clear"
   },
   "KC": {
@@ -98,14 +21,36 @@
     "roof": false,
     "flag": "clear"
   },
-  "HOU": {
-    "venue": "Daikin Park",
-    "temp": 91.9,
+  "ARI": {
+    "venue": "Chase Field",
+    "temp": 104.1,
     "precip": 0,
-    "wind_spd": 4.1,
-    "wind_dir": "SSW",
-    "humidity_pct": 63,
-    "pressure_mb": 1014.4,
+    "wind_spd": 8.5,
+    "wind_dir": "W",
+    "humidity_pct": 22,
+    "pressure_mb": 1003.7,
+    "roof": true,
+    "flag": "clear"
+  },
+  "SEA": {
+    "venue": "T-Mobile Park",
+    "temp": 76.4,
+    "precip": 0,
+    "wind_spd": 7.0,
+    "wind_dir": "NNW",
+    "humidity_pct": 55,
+    "pressure_mb": 1013.5,
+    "roof": false,
+    "flag": "clear"
+  },
+  "TEX": {
+    "venue": "Globe Life Field",
+    "temp": 97.9,
+    "precip": 0,
+    "wind_spd": 9.7,
+    "wind_dir": "SSE",
+    "humidity_pct": 39,
+    "pressure_mb": 1012.8,
     "roof": true,
     "flag": "clear"
   },
@@ -120,22 +65,15 @@
     "roof": true,
     "flag": "clear"
   },
-  "TEX": {
-    "venue": "Globe Life Field",
-    "temp": 72,
+  "CIN": {
+    "venue": "Great American Ball Park",
+    "temp": 82.9,
     "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
-    "roof": true,
-    "flag": "clear"
-  },
-  "ARI": {
-    "venue": "Chase Field",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
-    "roof": true,
+    "wind_spd": 2.5,
+    "wind_dir": "NE",
+    "humidity_pct": 57,
+    "pressure_mb": 1015.1,
+    "roof": false,
     "flag": "clear"
   },
   "PHI": {
@@ -149,6 +87,28 @@
     "roof": false,
     "flag": "clear"
   },
+  "CHC": {
+    "venue": "Wrigley Field",
+    "temp": 78.2,
+    "precip": 0,
+    "wind_spd": 5.3,
+    "wind_dir": "ESE",
+    "humidity_pct": 73,
+    "pressure_mb": 1015.4,
+    "roof": false,
+    "flag": "clear"
+  },
+  "BOS": {
+    "venue": "Fenway Park",
+    "temp": 84.9,
+    "precip": 0,
+    "wind_spd": 5.4,
+    "wind_dir": "W",
+    "humidity_pct": 36,
+    "pressure_mb": 1018.1,
+    "roof": false,
+    "flag": "clear"
+  },
   "BAL": {
     "venue": "Camden Yards",
     "temp": 85.1,
@@ -157,6 +117,50 @@
     "wind_dir": "ESE",
     "humidity_pct": 60,
     "pressure_mb": 1019.0,
+    "roof": false,
+    "flag": "clear"
+  },
+  "COL": {
+    "venue": "Coors Field",
+    "temp": 69.7,
+    "precip": 1,
+    "wind_spd": 5.4,
+    "wind_dir": "NE",
+    "humidity_pct": 44,
+    "pressure_mb": 1007.9,
+    "roof": false,
+    "flag": "clear"
+  },
+  "NYY": {
+    "venue": "Yankee Stadium",
+    "temp": 81.8,
+    "precip": 0,
+    "wind_spd": 9.7,
+    "wind_dir": "SSE",
+    "humidity_pct": 43,
+    "pressure_mb": 1019.3,
+    "roof": false,
+    "flag": "clear"
+  },
+  "ATL": {
+    "venue": "Truist Park",
+    "temp": 82.0,
+    "precip": 9,
+    "wind_spd": 3.3,
+    "wind_dir": "WSW",
+    "humidity_pct": 68,
+    "pressure_mb": 1013.9,
+    "roof": false,
+    "flag": "clear"
+  },
+  "CLE": {
+    "venue": "Progressive Field",
+    "temp": 79.0,
+    "precip": 0,
+    "wind_spd": 6.7,
+    "wind_dir": "NNE",
+    "humidity_pct": 56,
+    "pressure_mb": 1015.9,
     "roof": false,
     "flag": "clear"
   }
