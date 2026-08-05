@@ -5817,12 +5817,21 @@ function buildSlamTicket() {
         : '';
       return;
     }
+    // v35 discipline: 4 legs max, no more than 2 bats from one team
     let legCt = pool.filter(r => (r.ticket_score || 0) >= SLAM_T).length;
-    legCt = Math.max(2, Math.min(5, legCt));
-    picks = pool.slice(0, legCt);
+    legCt = Math.max(2, Math.min(4, legCt));
+    picks = [];
+    const teamCt = {};
+    for (const r of pool) {
+      if (picks.length >= legCt) break;
+      const tm = r.team || '';
+      if ((teamCt[tm] || 0) >= 2) continue;
+      teamCt[tm] = (teamCt[tm] || 0) + 1;
+      picks.push(r);
+    }
   }
   const legs = picks.length;
-  const confLbl = legs >= 5 ? 'MAX SEND · 5 LEGS' : legs === 4 ? 'HIGH CONFIDENCE · 4 LEGS'
+  const confLbl = legs >= 4 ? 'MAX SEND · 4 LEGS'
     : legs === 3 ? 'CONFIDENT · 3 LEGS' : 'SELECTIVE · 2 LEGS';
   const allHit = picks.reduce((m, r) => m * (r.hr_prob / 100), 1);
   let dec = 1, priced = true;
