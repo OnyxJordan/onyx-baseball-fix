@@ -525,6 +525,22 @@ def _quality_floor(r):
     return ((r.get("hh_pct") or 0) >= model.QUALITY_HH_MIN
             and (r.get("barrel_26") or 0) >= model.QUALITY_BARREL_MIN)
 
+def _res_signals(r):
+    """v35 residual-signal count. The 2,112-play study found that at EQUAL
+    market price only these beat the line: park (+2.7pp), due (+1.9pp),
+    platoon (+1.5pp), career power (+1.4pp), recent form (+1.3pp) — while
+    hard-hit / EV90 / weather added nothing (the books price those). An
+    edge play must carry at least two of the signals that actually cash,
+    so a disagreement built purely on contact quality never gets bet."""
+    n = 0
+    if (r.get("park_hr") or 1.0) > 1.05: n += 1
+    if (r.get("due_score") or 0) > 0: n += 1
+    if (r.get("platoon_factor") or 1.0) > 1.0: n += 1
+    if (r.get("career_hr_pa") or 0) > 0.04: n += 1
+    l14pa = r.get("l14_pa") or 0
+    if l14pa >= 20 and (r.get("l14_hr") or 0) / l14pa > 0.04: n += 1
+    return n
+
 def _ev(r):
     p = (r.get("hr_prob") or 0) / 100.0
     o = r.get("dk_hr_odds") or 0
@@ -537,9 +553,20 @@ def _ev(r):
 # no-power profiles. On tight days fewer than five log, and that is the
 # honest answer.
 _cands = [r for r in results_out if r.get("dk_hr_odds")]
+for r in _cands:
+    r["res_sig"] = _res_signals(r)
+# v35 edge lane, rebuilt on the graded evidence (124 settled edge plays):
+#   - PRICE CAP +400: every dollar the lane lost came from longshots
+#     (>+400 went 10-85; <=+400 was +1.6% ROI) — deep tails are where the
+#     vig is fattest and the model's disagreements least trustworthy.
+#   - RANK BY PROBABILITY, not by claimed edge: top-5-by-edge went 0-36 on
+#     the window (max stated edge = max model error, the winner's curse);
+#     the model's probability buckets are calibrated, so the most-likely
+#     homer among qualified plays leads the board.
 board = sorted([r for r in _cands
-                if (r.get("hr_edge") or 0) > 0 and _ev(r) > 0 and _quality_floor(r)],
-               key=lambda r: -(r.get("hr_edge") or 0))
+                if (r.get("hr_edge") or 0) > 0 and _ev(r) > 0 and _quality_floor(r)
+                and r["res_sig"] >= 2 and r["dk_hr_odds"] <= 400],
+               key=lambda r: -(r.get("hr_prob") or 0))
 for r in board:
     r["_tier"] = "edge"
 picks = jload(dpath("picks_input.json"), [])
@@ -854,7 +881,8 @@ for r in results_out:
     if _hours_since_start((GAMES.get(gk_, {}) or {}).get("start")) > 0.0:
         continue
     _hrh.append({"date": stamp, "player": r["matched_name"], "prob": round(r["hr_prob"], 1),
-                 "implied": _imp, "odds": r["dk_hr_odds"], "hr": None, "win": None})
+                 "implied": _imp, "odds": r["dk_hr_odds"], "sig": r.get("res_sig"),
+                 "hr": None, "win": None})
     _hseen.add(kk)
     _hadd += 1
 if _hadd:
