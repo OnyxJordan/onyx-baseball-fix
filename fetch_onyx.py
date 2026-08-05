@@ -358,7 +358,13 @@ def harvest_players(key):
     print(f"onyx: {len(missing)} player id(s) missing; paging the players API")
 
     got = 0
-    for page in range(1, 13):
+    # page until the API runs dry or every missing name is found — the old
+    # hard stop at page 12 re-pulled the same 1,212 ids every run and made
+    # anyone deeper in the list (Yordan Alvarez) permanently unharvestable
+    for page in range(1, 41):
+        if not any(n not in cache for n in missing):
+            print(f"onyx: all missing names resolved by page {page - 1}")
+            break
         url = f"{OPTIC}/players?sport=baseball&league=mlb&page={page}"
         data = None
         for attempt in range(3):
@@ -451,6 +457,7 @@ def harvest_game_odds(key, links, fids=None, prev_book=""):
             id_to_gk.setdefault(links[k], k)
     book = None
     hr, ml_games, tot_games = {}, set(), set()
+    hr_pids = {}   # nk(player) -> OpticOdds player id, straight off the prop rows
 
     # The key's 4000-req/15s window is shared with production traffic and is
     # often pinned at remaining:0 for minutes (verified in the 7/28 logs, where
@@ -606,6 +613,16 @@ def harvest_game_odds(key, links, fids=None, prev_book=""):
                     player = player or re.sub(r"\s+(over|under)\s+[\d.]+\s*$", "", nm, flags=re.I)
                     if player:
                         hr.setdefault(_nk(player), price)
+                        # the prop row itself names the player id — the ONLY
+                        # id source guaranteed to cover everyone with an Onyx
+                        # HR button (the /players pager stops at 12 pages, so
+                        # Y. Alvarez's slip leg shipped ':null' and Onyx
+                        # silently dropped it from a 3-leg build on 8/5)
+                        pid = od.get("player_id")
+                        if not pid and isinstance(od.get("player"), dict):
+                            pid = od["player"].get("id")
+                        if pid:
+                            hr_pids[_nk(player)] = str(pid)
             if tcand:
                 def _mainness(p):
                     e = tcand[p]
@@ -626,6 +643,22 @@ def harvest_game_odds(key, links, fids=None, prev_book=""):
                 if hrish:
                     print("onyx odds: HR-ish candidates: " + ", ".join(hrish)[:300])
         time.sleep(1.2)
+
+    # bank player ids off the prop rows immediately — even a partial pull
+    # teaches the cache ids the /players pager can never reach
+    if hr_pids:
+        try:
+            pcache = json.load(open(PLAYERS_OUT, encoding="utf-8"))
+            if not isinstance(pcache, dict):
+                pcache = {}
+        except Exception:
+            pcache = {}
+        fresh = {k: v for k, v in hr_pids.items() if pcache.get(k) != v}
+        if fresh:
+            pcache.update(fresh)
+            json.dump(pcache, open(PLAYERS_OUT, "w", encoding="utf-8"))
+            print(f"onyx odds: {len(fresh)} player id(s) learned from prop rows "
+                  f"-> cache {len(pcache)}")
 
     if not book:
         print(f"onyx odds: no book matched/reachable (tried {candidates}); "
