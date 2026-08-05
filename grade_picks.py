@@ -15,6 +15,7 @@ from datetime import datetime, timedelta, timezone
 
 PICKS = "data/picks_input.json"
 TICKETS = "data/ticket_history.json"
+KHIST = "data/k_history.json"
 MLB = "https://statsapi.mlb.com/api/v1"
 
 def nk(name):
@@ -46,8 +47,10 @@ def parse_date(d):
         return None
 
 def day_hr_map(date_str):
-    """{nk_name: hr_count} plus set of players who appeared, for one date."""
-    hrs, appeared = {}, set()
+    """(hrs, appeared, starter_ks) for one date: batter HR counts, everyone
+    who appeared, and each STARTING pitcher's strikeouts (first pitcher in
+    the team's boxscore order) — one pull serves pick, ticket, K grading."""
+    hrs, appeared, ks = {}, set(), {}
     sched = get(f"{MLB}/schedule?sportId=1&date={date_str}")
     pks = [g["gamePk"] for de in sched.get("dates", []) for g in de.get("games", [])
            if g.get("status", {}).get("abstractGameState") == "Final"]
@@ -57,7 +60,8 @@ def day_hr_map(date_str):
         except Exception:
             continue
         for side in ("home", "away"):
-            for pdata in (box.get("teams", {}).get(side, {}).get("players") or {}).values():
+            t = box.get("teams", {}).get(side, {})
+            for pdata in (t.get("players") or {}).values():
                 name = nk((pdata.get("person") or {}).get("fullName") or "")
                 if not name:
                     continue
@@ -66,7 +70,14 @@ def day_hr_map(date_str):
                 if pa > 0 or bat.get("gamesPlayed"):
                     appeared.add(name)
                     hrs[name] = hrs.get(name, 0) + (bat.get("homeRuns") or 0)
-    return hrs, appeared
+            order = t.get("pitchers") or []
+            if order:
+                p0 = (t.get("players") or {}).get("ID" + str(order[0])) or {}
+                sname = nk((p0.get("person") or {}).get("fullName") or "")
+                st = (p0.get("stats") or {}).get("pitching") or {}
+                if sname:
+                    ks[sname] = st.get("strikeOuts") or 0
+    return hrs, appeared, ks
 
 def _dec(american):
     try:
@@ -100,7 +111,7 @@ def grade_tickets(day_maps):
             except Exception as ex:
                 print(f"  ticket {iso}: boxscore fetch failed ({ex}) - retry next run")
                 continue
-        hrs, appeared = day_maps[iso]
+        hrs, appeared, _ks = day_maps[iso]
         live = []
         for l in (t.get("legs") or []):
             key = nk(l.get("player") or "")
@@ -133,6 +144,87 @@ def grade_tickets(day_maps):
     pnl = sum(float(t.get("pnl") or 0) for t in tickets if isinstance(t, dict))
     print(f"tickets: {changed} settled this run, parlay record {w}-{l}, total P&L {pnl:+.2f}")
 
+def grade_ks(day_maps):
+    """Settle the K-projection ledger: the model's side of the listed line
+    (over when projection > line) vs the starter's actual strikeouts. A
+    scratched starter voids (actual 'dnp', win stays null, excluded from
+    the record)."""
+    try:
+        kh = json.load(open(KHIST, encoding="utf-8"))
+        assert isinstance(kh, list)
+    except Exception:
+        return
+    cutoff = today_et()
+    changed = 0
+    for p in kh:
+        if not isinstance(p, dict) or p.get("win") is not None or p.get("actual") is not None:
+            continue
+        d = parse_date(p.get("date"))
+        if d is None or d >= cutoff:
+            continue
+        iso = d.strftime("%Y-%m-%d")
+        if iso not in day_maps:
+            try:
+                day_maps[iso] = day_hr_map(iso)
+            except Exception as ex:
+                print(f"  k {iso}: boxscore fetch failed ({ex}) - retry next run")
+                continue
+        ks = day_maps[iso][2]
+        a = ks.get(nk(p.get("pitcher") or ""))
+        if a is None:
+            p["actual"] = "dnp"    # scratched / never started: void
+        else:
+            p["actual"] = a
+            if a != p.get("line"):
+                p["win"] = (a > p["line"]) if p.get("side") == "over" else (a < p["line"])
+        changed += 1
+    if changed:
+        json.dump(kh, open(KHIST, "w", encoding="utf-8"), indent=1, ensure_ascii=False)
+    w = sum(1 for p in kh if isinstance(p, dict) and p.get("win") is True)
+    l = sum(1 for p in kh if isinstance(p, dict) and p.get("win") is False)
+    pct = f" ({w / (w + l) * 100:.1f}%)" if (w + l) else ""
+    print(f"k plays: {changed} settled this run, K record {w}-{l}{pct}")
+
+HRHIST = "data/hr_history.json"
+
+def grade_hrs(day_maps):
+    """Settle the HR board ledger: the model's side of the 0.5 line (over
+    when its probability beat the implied) vs whether the bat homered.
+    Never-appeared bats void."""
+    try:
+        hh = json.load(open(HRHIST, encoding="utf-8"))
+        assert isinstance(hh, list)
+    except Exception:
+        return
+    cutoff = today_et()
+    changed = 0
+    for p in hh:
+        if not isinstance(p, dict) or p.get("win") is not None or p.get("hr") is not None:
+            continue
+        d = parse_date(p.get("date"))
+        if d is None or d >= cutoff:
+            continue
+        iso = d.strftime("%Y-%m-%d")
+        if iso not in day_maps:
+            try:
+                day_maps[iso] = day_hr_map(iso)
+            except Exception as ex:
+                print(f"  hr {iso}: boxscore fetch failed ({ex}) - retry next run")
+                continue
+        hrs, appeared, _ = day_maps[iso]
+        k = nk(p.get("player") or "")
+        if k not in appeared:
+            p["hr"] = "dnp"    # scratched: void
+        else:
+            p["hr"] = 1 if hrs.get(k, 0) >= 1 else 0
+            p["win"] = bool(p["hr"]) if p.get("side") == "over" else not p["hr"]
+        changed += 1
+    if changed:
+        json.dump(hh, open(HRHIST, "w", encoding="utf-8"), ensure_ascii=False)
+    ov = [p for p in hh if isinstance(p, dict) and p.get("side") == "over" and p.get("win") is not None]
+    ow = sum(1 for p in ov if p["win"])
+    print(f"hr board: {changed} settled this run, overs {ow}-{len(ov) - ow}")
+
 def main():
     day_maps = {}
     try:
@@ -159,7 +251,7 @@ def main():
                 except Exception as ex:
                     print(f"  {iso}: boxscore fetch failed ({ex}) - will retry next run")
                     continue
-            hrs, appeared = day_maps[iso]
+            hrs, appeared, _ks = day_maps[iso]
             for p in picks:
                 if not isinstance(p, dict) or p.get("hit") is not None:
                     continue
@@ -181,6 +273,8 @@ def main():
         print(f"graded: {graded}, still pending: {voided}, record now {wins}-{losses}")
 
     grade_tickets(day_maps)
+    grade_ks(day_maps)
+    grade_hrs(day_maps)
 
 if __name__ == "__main__":
     main()
