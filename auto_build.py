@@ -828,11 +828,12 @@ if _kadd:
         json.dump(_khist, f, indent=1, ensure_ascii=False)
     print(f"k ledger: +{_kadd} lined projection(s) for {stamp}")
 
-# v35 HR BOARD LEDGER: every priced bat is a graded call — the model's side
-# of the 0.5 line (over when its probability beats the implied). Same
-# per-game pregame freeze as the K ledger; grade_picks settles vs the box
-# scores; only per-day AGGREGATES ship to the page (2000+ rows would bloat
-# it). Raw plays live in data/hr_history.json, pruned at 60 days.
+# v35 HR EDGE LEDGER: every POSITIVE-EDGE bat is a graded call, straight up
+# (did he homer), priced at his listed odds so the record shows the edge we
+# actually realized — no unders, no base-rate padding. Same per-game
+# pregame freeze as the K ledger; grade_picks settles vs the box scores;
+# only per-day AGGREGATES ship to the page. Raw plays live in
+# data/hr_history.json, pruned at 60 days.
 HRH_PATH = dpath("hr_history.json")
 _hrh = jload(HRH_PATH, [])
 if not isinstance(_hrh, list):
@@ -842,17 +843,18 @@ _hadd = 0
 for r in results_out:
     if not r.get("dk_hr_odds") or not r.get("hr_prob"):
         continue
+    _imp = round((r.get("dk_hr_implied") or (100.0 / (r["dk_hr_odds"] + 100.0) * 100 if r["dk_hr_odds"] > 0
+                  else abs(r["dk_hr_odds"]) / (abs(r["dk_hr_odds"]) + 100.0) * 100)), 1)
+    if r["hr_prob"] <= _imp:
+        continue   # positive-edge lane only
     kk = (stamp, nk(r.get("matched_name") or ""))
     if kk in _hseen:
         continue
     gk_ = next((g["game_key"] for g in games_out if g["label"] == r.get("game")), "")
     if _hours_since_start((GAMES.get(gk_, {}) or {}).get("start")) > 0.0:
         continue
-    _imp = round((r.get("dk_hr_implied") or (100.0 / (r["dk_hr_odds"] + 100.0) * 100 if r["dk_hr_odds"] > 0
-                  else abs(r["dk_hr_odds"]) / (abs(r["dk_hr_odds"]) + 100.0) * 100)), 1)
     _hrh.append({"date": stamp, "player": r["matched_name"], "prob": round(r["hr_prob"], 1),
-                 "implied": _imp, "odds": r["dk_hr_odds"],
-                 "side": "over" if r["hr_prob"] > _imp else "under", "hr": None, "win": None})
+                 "implied": _imp, "odds": r["dk_hr_odds"], "hr": None, "win": None})
     _hseen.add(kk)
     _hadd += 1
 if _hadd:
@@ -860,25 +862,21 @@ if _hadd:
     _hrh = [p for p in _hrh if str(p.get("date")) >= _cut]
     with open(HRH_PATH, "w", encoding="utf-8") as f:
         json.dump(_hrh, f, ensure_ascii=False)
-    print(f"hr ledger: +{_hadd} priced bat(s) for {stamp}")
+    print(f"hr ledger: +{_hadd} positive-edge bat(s) for {stamp}")
 
-# per-day aggregates for the page
+# per-day aggregates for the page ($10 flat per play)
 _hr_days = {}
 for p in _hrh:
     if not isinstance(p, dict) or p.get("win") is None:
         continue
-    e = _hr_days.setdefault(str(p.get("date")), {"date": str(p.get("date")),
-                                                 "w": 0, "l": 0, "ow": 0, "ol": 0, "uw": 0, "ul": 0})
+    e = _hr_days.setdefault(str(p.get("date")), {"date": str(p.get("date")), "w": 0, "l": 0, "pnl": 0.0})
     e["w" if p["win"] else "l"] += 1
-    if p.get("side") == "over":
-        e["ow" if p["win"] else "ol"] += 1
-    else:
-        e["uw" if p["win"] else "ul"] += 1
-_hr_overs = [p for p in _hrh if isinstance(p, dict) and p.get("side") == "over" and p.get("win") is not None]
+    e["pnl"] = round(e["pnl"] + ((10.0 * (p.get("odds") or 0) / 100.0) if p["win"] else -10.0), 2)
+_hr_set = [p for p in _hrh if isinstance(p, dict) and p.get("win") is not None]
 _hr_rec = {"days": sorted(_hr_days.values(), key=lambda e: e["date"], reverse=True),
            "pending": sum(1 for p in _hrh if isinstance(p, dict) and p.get("win") is None and p.get("hr") is None),
-           "over_imp_avg": round(sum(p["implied"] for p in _hr_overs) / len(_hr_overs), 1) if _hr_overs else None,
-           "over_prob_avg": round(sum(p["prob"] for p in _hr_overs) / len(_hr_overs), 1) if _hr_overs else None}
+           "imp_avg": round(sum(p["implied"] for p in _hr_set) / len(_hr_set), 1) if _hr_set else None,
+           "prob_avg": round(sum(p["prob"] for p in _hr_set) / len(_hr_set), 1) if _hr_set else None}
 
 shell = replace_const(shell, "RESULTS", results_out)
 shell = replace_const(shell, "SUMMARIES", sums_out)

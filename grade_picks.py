@@ -188,9 +188,8 @@ def grade_ks(day_maps):
 HRHIST = "data/hr_history.json"
 
 def grade_hrs(day_maps):
-    """Settle the HR board ledger: the model's side of the 0.5 line (over
-    when its probability beat the implied) vs whether the bat homered.
-    Never-appeared bats void."""
+    """Settle the HR edge ledger: every positive-edge bat, straight up —
+    win only if he homered. Never-appeared bats void."""
     try:
         hh = json.load(open(HRHIST, encoding="utf-8"))
         assert isinstance(hh, list)
@@ -217,13 +216,14 @@ def grade_hrs(day_maps):
             p["hr"] = "dnp"    # scratched: void
         else:
             p["hr"] = 1 if hrs.get(k, 0) >= 1 else 0
-            p["win"] = bool(p["hr"]) if p.get("side") == "over" else not p["hr"]
+            p["win"] = bool(p["hr"])
         changed += 1
     if changed:
         json.dump(hh, open(HRHIST, "w", encoding="utf-8"), ensure_ascii=False)
-    ov = [p for p in hh if isinstance(p, dict) and p.get("side") == "over" and p.get("win") is not None]
-    ow = sum(1 for p in ov if p["win"])
-    print(f"hr board: {changed} settled this run, overs {ow}-{len(ov) - ow}")
+    st = [p for p in hh if isinstance(p, dict) and p.get("win") is not None]
+    sw = sum(1 for p in st if p["win"])
+    pnl = sum((10.0 * (p.get("odds") or 0) / 100.0) if p["win"] else -10.0 for p in st)
+    print(f"hr edges: {changed} settled this run, record {sw}-{len(st) - sw}, $10-flat P&L {pnl:+.2f}")
 
 def main():
     day_maps = {}

@@ -2270,22 +2270,22 @@ body::after {
   </div>
 
   <div class="sec-hdr" style="padding-bottom:0">
-    <span class="sec-title">HR Board Record — every priced bat, the model's side of the 0.5 line, auto-graded</span>
+    <span class="sec-title">HR Edge Record — every positive-edge bat, straight up at his listed price</span>
     <span class="sec-count" id="hrrec-count"></span>
   </div>
-  <div style="padding:6px 20px 0;font-size:11px;color:var(--text3);line-height:1.5">Unders win by default (most bats don't homer), so the number that matters is the <strong style="color:var(--text2)">overs line</strong>: when the model says a bat beats the listed price, does he actually go deep more often than the price implied?</div>
+  <div style="padding:6px 20px 0;font-size:11px;color:var(--text3);line-height:1.5">Every bat the model priced <strong style="color:var(--text2)">above the Onyx line</strong>, graded on whether he actually homered, with the P&amp;L a flat $10 on each would have returned — the realized edge, not the theoretical one.</div>
   <div id="hrrec-summary" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;padding:12px 20px"></div>
   <div style="padding:0 20px 32px">
     <div style="overflow:auto;border-radius:8px;border:1px solid var(--border)">
     <table style="width:100%;border-collapse:collapse;table-layout:fixed">
-      <colgroup><col style="width:70px"><col><col><col><col style="width:70px"></colgroup>
+      <colgroup><col style="width:70px"><col><col><col><col style="width:84px"></colgroup>
       <thead>
         <tr>
           <th style="padding:7px 8px;text-align:left;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg2)">Date</th>
-          <th style="padding:7px 8px;text-align:center;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg2)">Overs (model likes)</th>
-          <th style="padding:7px 8px;text-align:center;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg2)">Unders</th>
-          <th style="padding:7px 8px;text-align:center;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg2)">Total</th>
-          <th style="padding:7px 8px;text-align:right;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg2)">Right side</th>
+          <th style="padding:7px 8px;text-align:center;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg2)">Record</th>
+          <th style="padding:7px 8px;text-align:center;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg2)">Hit rate</th>
+          <th style="padding:7px 8px;text-align:center;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg2)">P&amp;L ($10/play)</th>
+          <th style="padding:7px 8px;text-align:right;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg2)">Running</th>
         </tr>
       </thead>
       <tbody id="hrrec-body"></tbody>
@@ -6321,42 +6321,50 @@ function renderRecord() {
   renderHRRecord();
 }
 
-// HR Board record: per-day aggregates of every priced bat, model's side of
-// the 0.5 line. Overs are the tell — the rest is the under base rate.
+// HR Edge record: every positive-edge bat graded straight up at his listed
+// price — the realized edge, $10 flat per play.
 function renderHRRecord() {
   const body = document.getElementById('hrrec-body');
   if (!body || !HR_RECORD || !Array.isArray(HR_RECORD.days)) return;
-  const days = HR_RECORD.days;
-  const T = k => days.reduce((s, d) => s + (d[k] || 0), 0);
-  const w = T('w'), l = T('l'), ow = T('ow'), ol = T('ol'), uw = T('uw'), ul = T('ul');
-  const oPct = (ow + ol) ? (ow / (ow + ol) * 100) : null;
-  const impAvg = HR_RECORD.over_imp_avg, probAvg = HR_RECORD.over_prob_avg;
-  const oCol = oPct == null ? 'var(--text3)' : impAvg != null && oPct >= impAvg ? '#22c55e' : '#f59e0b';
+  const days = HR_RECORD.days;   // newest first from the build
+  const w = days.reduce((s, d) => s + (d.w || 0), 0);
+  const l = days.reduce((s, d) => s + (d.l || 0), 0);
+  const pnl = days.reduce((s, d) => s + (d.pnl || 0), 0);
+  const wagered = (w + l) * 10;
+  const pct = (w + l) ? (w / (w + l) * 100) : null;
+  const impAvg = HR_RECORD.imp_avg, probAvg = HR_RECORD.prob_avg;
+  const pnlCol = pnl >= 0 ? '#22c55e' : '#ef4444';
+  const hitCol = pct == null ? 'var(--text3)' : impAvg != null && pct >= impAvg ? '#22c55e' : '#f59e0b';
   const cnt = document.getElementById('hrrec-count');
-  if (cnt) cnt.textContent = (w + l) + ' calls graded';
+  if (cnt) cnt.textContent = (w + l) + ' edge plays graded';
   const sum = document.getElementById('hrrec-summary');
   if (sum) sum.innerHTML = [
-    {label:'Overs Record', value: ow + '–' + ol, color: oCol},
-    {label:'Overs Hit Rate', value: oPct == null ? '—' : oPct.toFixed(1) + '%', color: oCol},
+    {label:'Record',   value: w + '–' + l, color: hitCol},
+    {label:'Hit Rate', value: pct == null ? '—' : pct.toFixed(1) + '%', color: hitCol},
     {label:'Market Implied', value: impAvg == null ? '—' : impAvg.toFixed(1) + '%', color:'var(--text2)'},
     {label:'Model Said', value: probAvg == null ? '—' : probAvg.toFixed(1) + '%', color:'var(--text2)'},
-    {label:'All Calls', value: w + '–' + l, color:'var(--text2)'},
+    {label:'Total P&L', value: (pnl >= 0 ? '+$' : '-$') + Math.abs(pnl).toFixed(2), color: pnlCol},
+    {label:'Realized ROI', value: wagered ? (pnl >= 0 ? '+' : '') + (pnl / wagered * 100).toFixed(1) + '%' : '—', color: pnlCol},
     {label:'Pending', value: String(HR_RECORD.pending || 0), color:'#f59e0b'},
   ].map(s =>
     `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;text-align:center">
       <div style="font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;font-size:20px;font-weight:800;color:${s.color}">${s.value}</div>
       <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-top:3px">${s.label}</div>
     </div>`).join('');
+  // running total accumulates oldest -> newest, displayed newest first
+  const chrono = [...days].sort((a, b) => String(a.date).localeCompare(String(b.date)));
+  let cum = 0;
+  const cumBy = {};
+  chrono.forEach(d => { cum = +(cum + (d.pnl || 0)).toFixed(2); cumBy[d.date] = cum; });
   const td = 'padding:7px 8px;border-bottom:1px solid rgba(26,37,53,.5);font-family:monospace;font-size:12px;';
   body.innerHTML = days.map(d => {
-    const dw = d.w || 0, dl = d.l || 0;
-    const pct = (dw + dl) ? (dw / (dw + dl) * 100).toFixed(0) : '—';
+    const dw = d.w || 0, dl = d.l || 0, dp = d.pnl || 0, c = cumBy[d.date] || 0;
     return `<tr>
       <td style="${td}color:var(--text3);text-align:left">${String(d.date).slice(5)}</td>
-      <td style="${td}text-align:center;font-weight:800;color:${(d.ow || 0) > (d.ol || 0) ? '#4ade80' : 'var(--text2)'}">${d.ow || 0}–${d.ol || 0}</td>
-      <td style="${td}text-align:center;color:var(--text3)">${d.uw || 0}–${d.ul || 0}</td>
-      <td style="${td}text-align:center;font-weight:700">${dw}–${dl}</td>
-      <td style="${td}text-align:right;font-weight:700">${pct}%</td>
+      <td style="${td}text-align:center;font-weight:800">${dw}–${dl}</td>
+      <td style="${td}text-align:center;color:var(--text2)">${(dw + dl) ? (dw / (dw + dl) * 100).toFixed(0) + '%' : '—'}</td>
+      <td style="${td}text-align:center;font-weight:700;color:${dp >= 0 ? '#22c55e' : '#ef4444'}">${(dp >= 0 ? '+$' : '-$') + Math.abs(dp).toFixed(2)}</td>
+      <td style="${td}text-align:right;font-weight:700;color:${c >= 0 ? '#22c55e' : '#ef4444'}">${(c >= 0 ? '+$' : '-$') + Math.abs(c).toFixed(2)}</td>
     </tr>`;
   }).join('');
 }
