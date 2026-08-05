@@ -187,6 +187,7 @@
   "legs": [
    {
     "player": "Kazuma Okamoto",
+<<<<<<< HEAD
     "odds": null,
     "prob": 23.9,
     "hit": false
@@ -227,12 +228,109 @@
     "player": "Yordan Alvarez",
     "odds": null,
     "prob": 24.4,
+=======
+    "odds": 361,
+    "prob": 26.3,
+    "hit": false
+   },
+   {
+    "player": "Vladimir Guerrero Jr.",
+    "odds": 478,
+    "prob": 20.6,
+    "hit": false
+   },
+   {
+    "player": "Junior Caminero",
+    "odds": 245,
+    "prob": 28.0,
+    "hit": true
+   },
+   {
+    "player": "Jonathan Aranda",
+    "odds": 389,
+    "prob": 21.2,
+    "hit": false
+   }
+  ],
+  "result": "loss",
+  "pnl": -10.0
+ },
+ {
+  "date": "2026-08-04",
+  "stake": 10,
+  "legs": [
+   {
+    "player": "Kyle Schwarber",
+    "odds": 157,
+    "prob": 33.8,
+    "hit": null
+   },
+   {
+    "player": "Yordan Alvarez",
+    "odds": 237,
+    "prob": 28.1,
+    "hit": null
+   },
+   {
+    "player": "Shohei Ohtani",
+    "odds": 205,
+    "prob": 30.0,
+    "hit": null
+   },
+   {
+    "player": "Pete Alonso",
+    "odds": 282,
+    "prob": 25.0,
+    "hit": null
+   },
+   {
+    "player": "Kody Clemens",
+    "odds": 368,
+    "prob": 21.7,
+    "hit": null
+   }
+  ],
+  "result": null,
+  "pnl": null
+ },
+ {
+  "date": "2026-08-05",
+  "stake": 10,
+  "legs": [
+   {
+    "player": "Yordan Alvarez",
+    "odds": 226,
+    "prob": 29.6,
+    "hit": null
+   },
+   {
+    "player": "Sal Stewart",
+    "odds": 400,
+    "prob": 24.4,
+    "hit": null
+   },
+   {
+    "player": "Jonathan Aranda",
+    "odds": 419,
+    "prob": 21.4,
+    "hit": null
+   },
+   {
+    "player": "Junior Caminero",
+    "odds": 229,
+    "prob": 29.3,
+>>>>>>> origin/main
     "hit": null
    },
    {
     "player": "Elly De La Cruz",
+<<<<<<< HEAD
     "odds": null,
     "prob": 19.1,
+=======
+    "odds": 400,
+    "prob": 21.5,
+>>>>>>> origin/main
     "hit": null
    }
   ],
