@@ -2240,6 +2240,34 @@ body::after {
     </table>
     </div>
   </div>
+
+  <div class="sec-hdr" style="padding-bottom:0">
+    <span class="sec-title">K Projections Record — every lined projection, the model's side vs the line, auto-graded</span>
+    <span class="sec-count" id="krec-count"></span>
+  </div>
+  <div id="krec-summary" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;padding:12px 20px"></div>
+  <div style="padding:0 20px 32px">
+    <div style="overflow:auto;max-height:calc(100vh - 420px);border-radius:8px;border:1px solid var(--border)">
+    <table style="width:100%;border-collapse:collapse;table-layout:fixed">
+      <colgroup>
+        <col style="width:52px"><col><col style="width:56px"><col style="width:52px">
+        <col style="width:58px"><col style="width:56px"><col style="width:64px">
+      </colgroup>
+      <thead>
+        <tr>
+          <th style="padding:7px 8px;text-align:left;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg2);position:sticky;top:0">Date</th>
+          <th style="padding:7px 8px;text-align:left;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg2);position:sticky;top:0">Pitcher</th>
+          <th style="padding:7px 8px;text-align:center;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg2);position:sticky;top:0">Proj</th>
+          <th style="padding:7px 8px;text-align:center;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg2);position:sticky;top:0">Line</th>
+          <th style="padding:7px 8px;text-align:center;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg2);position:sticky;top:0">Side</th>
+          <th style="padding:7px 8px;text-align:center;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg2);position:sticky;top:0">Ks</th>
+          <th style="padding:7px 8px;text-align:center;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg2);position:sticky;top:0">Result</th>
+        </tr>
+      </thead>
+      <tbody id="krec-body"></tbody>
+    </table>
+    </div>
+  </div>
 </div>
 
 
@@ -6074,6 +6102,7 @@ updateHomeStats();
 var PICKS = [];
 var TICKET_LOCK = null;
 var TICKET_HISTORY = [];
+var K_HISTORY = [];
 const LINE_HISTORY = [];
 const PITCHER_PROJ = [];
 var DAILY_RECAP = {};
@@ -6263,6 +6292,53 @@ function renderRecord() {
   });
   document.getElementById('record-body').innerHTML = tbodyHtml;
   renderParlay();
+  renderKRecord();
+}
+
+// K Projections record: the model's side of every listed K line, graded
+// against the starter's actual strikeouts (scratches void).
+function renderKRecord() {
+  const body = document.getElementById('krec-body');
+  if (!body) return;
+  const kh = (Array.isArray(K_HISTORY) ? K_HISTORY : []).filter(p => p && p.date);
+  const settled = kh.filter(p => p.win === true || p.win === false);
+  const w = settled.filter(p => p.win === true).length, l = settled.length - w;
+  const overs = settled.filter(p => p.side === 'over');
+  const unders = settled.filter(p => p.side === 'under');
+  const ow = overs.filter(p => p.win === true).length;
+  const uw = unders.filter(p => p.win === true).length;
+  const pend = kh.filter(p => p.win == null && p.actual == null).length;
+  const cnt = document.getElementById('krec-count');
+  if (cnt) cnt.textContent = kh.length + ' projections tracked';
+  const sum = document.getElementById('krec-summary');
+  if (sum) sum.innerHTML = [
+    {label:'Record',   value: w + '–' + l, color: w > l ? '#22c55e' : w === l ? '#f59e0b' : '#ef4444'},
+    {label:'Win Rate', value: settled.length ? (w / settled.length * 100).toFixed(1) + '%' : '—',
+     color: settled.length && w / settled.length > 0.524 ? '#22c55e' : '#f59e0b'},
+    {label:'Overs',    value: ow + '–' + (overs.length - ow), color:'var(--text2)'},
+    {label:'Unders',   value: uw + '–' + (unders.length - uw), color:'var(--text2)'},
+    {label:'Pending',  value: String(pend), color:'#f59e0b'},
+  ].map(s =>
+    `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;text-align:center">
+      <div style="font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;font-size:20px;font-weight:800;color:${s.color}">${s.value}</div>
+      <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-top:3px">${s.label}</div>
+    </div>`).join('');
+  const td = 'padding:6px 8px;border-bottom:1px solid rgba(26,37,53,.5);';
+  body.innerHTML = [...kh].sort((a, b) => String(b.date).localeCompare(String(a.date))).map(p => {
+    const voided = p.actual === 'dnp';
+    const stTxt = p.win === true ? '✓ WIN' : p.win === false ? '✗ Loss' : voided ? 'Void' : '⏳';
+    const stCol = p.win === true ? '#4ade80' : p.win === false ? '#f87171' : 'var(--text3)';
+    const sideCol = p.side === 'over' ? '#4ade80' : '#60a5fa';
+    return `<tr>
+      <td style="${td}font-family:monospace;font-size:11px;color:var(--text3)">${String(p.date).slice(5)}</td>
+      <td style="${td}font-size:12px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.pitcher}</td>
+      <td style="${td}font-family:monospace;font-size:12px;text-align:center">${(+p.proj).toFixed(1)}</td>
+      <td style="${td}font-family:monospace;font-size:12px;text-align:center;color:var(--text2)">${p.line}</td>
+      <td style="${td}text-align:center"><span style="font-size:10px;font-weight:800;color:${sideCol}">${(p.side || '').toUpperCase()}</span></td>
+      <td style="${td}font-family:monospace;font-size:12px;font-weight:800;text-align:center">${voided ? '—' : (p.actual ?? '—')}</td>
+      <td style="${td}text-align:center"><span style="font-size:10px;font-weight:700;color:${stCol}">${stTxt}</span></td>
+    </tr>`;
+  }).join('');
 }
 
 // Model's Ticket record: one $10 parlay per day, same format as the picks

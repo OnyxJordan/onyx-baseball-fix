@@ -794,6 +794,40 @@ for g in games_out:
 
 pitchers_out.sort(key=lambda p: (p.get("k_edge") is None, -(p.get("k_edge") or 0), -(p.get("k_proj") or 0)))
 
+# v35 K LEDGER: every lined K projection is a graded play. The model's side
+# is whichever side of the listed line the projection sits on; each play
+# locks at ITS game's first pitch (lines post all day, so per-game freeze,
+# not slate freeze) and grade_picks settles it off the starter's actual Ks.
+KH_PATH = dpath("k_history.json")
+_khist = jload(KH_PATH, [])
+if not isinstance(_khist, list):
+    _khist = []
+_kseen = {(str(p.get("date")), nk(p.get("pitcher") or "")) for p in _khist if isinstance(p, dict)}
+_kadd = 0
+for p in pitchers_out:
+    if p.get("k_line") is None or p.get("k_proj") is None:
+        continue
+    try:
+        ln, pj = float(p["k_line"]), float(p["k_proj"])
+    except (TypeError, ValueError):
+        continue
+    if abs(pj - ln) < 1e-9:
+        continue
+    kk = (stamp, nk(p.get("name") or ""))
+    if kk in _kseen:
+        continue
+    gk_ = next((g["game_key"] for g in games_out if g["label"] == p.get("game")), "")
+    if _hours_since_start((GAMES.get(gk_, {}) or {}).get("start")) > 0.0:
+        continue
+    _khist.append({"date": stamp, "pitcher": p.get("name"), "proj": pj, "line": ln,
+                   "side": "over" if pj > ln else "under", "actual": None, "win": None})
+    _kseen.add(kk)
+    _kadd += 1
+if _kadd:
+    with open(KH_PATH, "w", encoding="utf-8") as f:
+        json.dump(_khist, f, indent=1, ensure_ascii=False)
+    print(f"k ledger: +{_kadd} lined projection(s) for {stamp}")
+
 shell = replace_const(shell, "RESULTS", results_out)
 shell = replace_const(shell, "SUMMARIES", sums_out)
 shell = replace_const(shell, "ALL_GAME_KEYS", keys_out)
@@ -802,6 +836,7 @@ shell = replace_const(shell, "PITCHER_PROJ", pitchers_out)
 shell = replace_const(shell, "DAILY_RECAP", jload(dpath("recap.json"), {}))
 shell = replace_const(shell, "TICKET_LOCK", _tlock if _tlock.get("legs") else None)
 shell = replace_const(shell, "TICKET_HISTORY", _thist)
+shell = replace_const(shell, "K_HISTORY", _khist)
 
 # ---- Onyx game links: only today's harvested slugs ever ship ----
 from zoneinfo import ZoneInfo

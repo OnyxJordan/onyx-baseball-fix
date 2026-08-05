@@ -169,17 +169,17 @@
     "player": "Brandon Lowe",
     "odds": 276,
     "prob": 25.8,
-    "hit": null
+    "hit": false
    },
    {
     "player": "Alec Burleson",
     "odds": 410,
     "prob": 19.2,
-    "hit": null
+    "hit": false
    }
   ],
-  "result": null,
-  "pnl": null
+  "result": "loss",
+  "pnl": -10.0
  },
  {
   "date": "2026-08-03",
@@ -189,24 +189,50 @@
     "player": "Kazuma Okamoto",
     "odds": null,
     "prob": 23.9,
-    "hit": null
+    "hit": false
    },
    {
     "player": "Kyle Schwarber",
     "odds": null,
     "prob": 25.2,
-    "hit": null
+    "hit": false
    },
    {
     "player": "Jonathan Aranda",
     "odds": null,
     "prob": 18.9,
-    "hit": null
+    "hit": false
    },
    {
     "player": "Junior Caminero",
     "odds": null,
     "prob": 24.3,
+    "hit": true
+   }
+  ],
+  "result": "loss",
+  "pnl": -10.0
+ },
+ {
+  "date": "2026-08-05",
+  "stake": 10,
+  "legs": [
+   {
+    "player": "Sal Stewart",
+    "odds": null,
+    "prob": 23.1,
+    "hit": null
+   },
+   {
+    "player": "Yordan Alvarez",
+    "odds": null,
+    "prob": 24.4,
+    "hit": null
+   },
+   {
+    "player": "Elly De La Cruz",
+    "odds": null,
+    "prob": 19.1,
     "hit": null
    }
   ],
