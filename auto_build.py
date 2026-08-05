@@ -828,6 +828,58 @@ if _kadd:
         json.dump(_khist, f, indent=1, ensure_ascii=False)
     print(f"k ledger: +{_kadd} lined projection(s) for {stamp}")
 
+# v35 HR BOARD LEDGER: every priced bat is a graded call — the model's side
+# of the 0.5 line (over when its probability beats the implied). Same
+# per-game pregame freeze as the K ledger; grade_picks settles vs the box
+# scores; only per-day AGGREGATES ship to the page (2000+ rows would bloat
+# it). Raw plays live in data/hr_history.json, pruned at 60 days.
+HRH_PATH = dpath("hr_history.json")
+_hrh = jload(HRH_PATH, [])
+if not isinstance(_hrh, list):
+    _hrh = []
+_hseen = {(str(p.get("date")), nk(p.get("player") or "")) for p in _hrh if isinstance(p, dict)}
+_hadd = 0
+for r in results_out:
+    if not r.get("dk_hr_odds") or not r.get("hr_prob"):
+        continue
+    kk = (stamp, nk(r.get("matched_name") or ""))
+    if kk in _hseen:
+        continue
+    gk_ = next((g["game_key"] for g in games_out if g["label"] == r.get("game")), "")
+    if _hours_since_start((GAMES.get(gk_, {}) or {}).get("start")) > 0.0:
+        continue
+    _imp = round((r.get("dk_hr_implied") or (100.0 / (r["dk_hr_odds"] + 100.0) * 100 if r["dk_hr_odds"] > 0
+                  else abs(r["dk_hr_odds"]) / (abs(r["dk_hr_odds"]) + 100.0) * 100)), 1)
+    _hrh.append({"date": stamp, "player": r["matched_name"], "prob": round(r["hr_prob"], 1),
+                 "implied": _imp, "odds": r["dk_hr_odds"],
+                 "side": "over" if r["hr_prob"] > _imp else "under", "hr": None, "win": None})
+    _hseen.add(kk)
+    _hadd += 1
+if _hadd:
+    _cut = (now - __import__("datetime").timedelta(days=60)).strftime("%Y-%m-%d")
+    _hrh = [p for p in _hrh if str(p.get("date")) >= _cut]
+    with open(HRH_PATH, "w", encoding="utf-8") as f:
+        json.dump(_hrh, f, ensure_ascii=False)
+    print(f"hr ledger: +{_hadd} priced bat(s) for {stamp}")
+
+# per-day aggregates for the page
+_hr_days = {}
+for p in _hrh:
+    if not isinstance(p, dict) or p.get("win") is None:
+        continue
+    e = _hr_days.setdefault(str(p.get("date")), {"date": str(p.get("date")),
+                                                 "w": 0, "l": 0, "ow": 0, "ol": 0, "uw": 0, "ul": 0})
+    e["w" if p["win"] else "l"] += 1
+    if p.get("side") == "over":
+        e["ow" if p["win"] else "ol"] += 1
+    else:
+        e["uw" if p["win"] else "ul"] += 1
+_hr_overs = [p for p in _hrh if isinstance(p, dict) and p.get("side") == "over" and p.get("win") is not None]
+_hr_rec = {"days": sorted(_hr_days.values(), key=lambda e: e["date"], reverse=True),
+           "pending": sum(1 for p in _hrh if isinstance(p, dict) and p.get("win") is None and p.get("hr") is None),
+           "over_imp_avg": round(sum(p["implied"] for p in _hr_overs) / len(_hr_overs), 1) if _hr_overs else None,
+           "over_prob_avg": round(sum(p["prob"] for p in _hr_overs) / len(_hr_overs), 1) if _hr_overs else None}
+
 shell = replace_const(shell, "RESULTS", results_out)
 shell = replace_const(shell, "SUMMARIES", sums_out)
 shell = replace_const(shell, "ALL_GAME_KEYS", keys_out)
@@ -837,6 +889,7 @@ shell = replace_const(shell, "DAILY_RECAP", jload(dpath("recap.json"), {}))
 shell = replace_const(shell, "TICKET_LOCK", _tlock if _tlock.get("legs") else None)
 shell = replace_const(shell, "TICKET_HISTORY", _thist)
 shell = replace_const(shell, "K_HISTORY", _khist)
+shell = replace_const(shell, "HR_RECORD", _hr_rec)
 
 # ---- Onyx game links: only today's harvested slugs ever ship ----
 from zoneinfo import ZoneInfo

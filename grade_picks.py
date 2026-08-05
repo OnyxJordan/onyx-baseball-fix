@@ -185,6 +185,46 @@ def grade_ks(day_maps):
     pct = f" ({w / (w + l) * 100:.1f}%)" if (w + l) else ""
     print(f"k plays: {changed} settled this run, K record {w}-{l}{pct}")
 
+HRHIST = "data/hr_history.json"
+
+def grade_hrs(day_maps):
+    """Settle the HR board ledger: the model's side of the 0.5 line (over
+    when its probability beat the implied) vs whether the bat homered.
+    Never-appeared bats void."""
+    try:
+        hh = json.load(open(HRHIST, encoding="utf-8"))
+        assert isinstance(hh, list)
+    except Exception:
+        return
+    cutoff = today_et()
+    changed = 0
+    for p in hh:
+        if not isinstance(p, dict) or p.get("win") is not None or p.get("hr") is not None:
+            continue
+        d = parse_date(p.get("date"))
+        if d is None or d >= cutoff:
+            continue
+        iso = d.strftime("%Y-%m-%d")
+        if iso not in day_maps:
+            try:
+                day_maps[iso] = day_hr_map(iso)
+            except Exception as ex:
+                print(f"  hr {iso}: boxscore fetch failed ({ex}) - retry next run")
+                continue
+        hrs, appeared, _ = day_maps[iso]
+        k = nk(p.get("player") or "")
+        if k not in appeared:
+            p["hr"] = "dnp"    # scratched: void
+        else:
+            p["hr"] = 1 if hrs.get(k, 0) >= 1 else 0
+            p["win"] = bool(p["hr"]) if p.get("side") == "over" else not p["hr"]
+        changed += 1
+    if changed:
+        json.dump(hh, open(HRHIST, "w", encoding="utf-8"), ensure_ascii=False)
+    ov = [p for p in hh if isinstance(p, dict) and p.get("side") == "over" and p.get("win") is not None]
+    ow = sum(1 for p in ov if p["win"])
+    print(f"hr board: {changed} settled this run, overs {ow}-{len(ov) - ow}")
+
 def main():
     day_maps = {}
     try:
@@ -234,6 +274,7 @@ def main():
 
     grade_tickets(day_maps)
     grade_ks(day_maps)
+    grade_hrs(day_maps)
 
 if __name__ == "__main__":
     main()

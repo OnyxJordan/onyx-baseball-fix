@@ -2268,6 +2268,30 @@ body::after {
     </table>
     </div>
   </div>
+
+  <div class="sec-hdr" style="padding-bottom:0">
+    <span class="sec-title">HR Board Record — every priced bat, the model's side of the 0.5 line, auto-graded</span>
+    <span class="sec-count" id="hrrec-count"></span>
+  </div>
+  <div style="padding:6px 20px 0;font-size:11px;color:var(--text3);line-height:1.5">Unders win by default (most bats don't homer), so the number that matters is the <strong style="color:var(--text2)">overs line</strong>: when the model says a bat beats the listed price, does he actually go deep more often than the price implied?</div>
+  <div id="hrrec-summary" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;padding:12px 20px"></div>
+  <div style="padding:0 20px 32px">
+    <div style="overflow:auto;border-radius:8px;border:1px solid var(--border)">
+    <table style="width:100%;border-collapse:collapse;table-layout:fixed">
+      <colgroup><col style="width:70px"><col><col><col><col style="width:70px"></colgroup>
+      <thead>
+        <tr>
+          <th style="padding:7px 8px;text-align:left;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg2)">Date</th>
+          <th style="padding:7px 8px;text-align:center;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg2)">Overs (model likes)</th>
+          <th style="padding:7px 8px;text-align:center;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg2)">Unders</th>
+          <th style="padding:7px 8px;text-align:center;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg2)">Total</th>
+          <th style="padding:7px 8px;text-align:right;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg2)">Right side</th>
+        </tr>
+      </thead>
+      <tbody id="hrrec-body"></tbody>
+    </table>
+    </div>
+  </div>
 </div>
 
 
@@ -6103,6 +6127,7 @@ var PICKS = [];
 var TICKET_LOCK = null;
 var TICKET_HISTORY = [];
 var K_HISTORY = [];
+var HR_RECORD = null;
 const LINE_HISTORY = [];
 const PITCHER_PROJ = [];
 var DAILY_RECAP = {};
@@ -6293,6 +6318,47 @@ function renderRecord() {
   document.getElementById('record-body').innerHTML = tbodyHtml;
   renderParlay();
   renderKRecord();
+  renderHRRecord();
+}
+
+// HR Board record: per-day aggregates of every priced bat, model's side of
+// the 0.5 line. Overs are the tell — the rest is the under base rate.
+function renderHRRecord() {
+  const body = document.getElementById('hrrec-body');
+  if (!body || !HR_RECORD || !Array.isArray(HR_RECORD.days)) return;
+  const days = HR_RECORD.days;
+  const T = k => days.reduce((s, d) => s + (d[k] || 0), 0);
+  const w = T('w'), l = T('l'), ow = T('ow'), ol = T('ol'), uw = T('uw'), ul = T('ul');
+  const oPct = (ow + ol) ? (ow / (ow + ol) * 100) : null;
+  const impAvg = HR_RECORD.over_imp_avg, probAvg = HR_RECORD.over_prob_avg;
+  const oCol = oPct == null ? 'var(--text3)' : impAvg != null && oPct >= impAvg ? '#22c55e' : '#f59e0b';
+  const cnt = document.getElementById('hrrec-count');
+  if (cnt) cnt.textContent = (w + l) + ' calls graded';
+  const sum = document.getElementById('hrrec-summary');
+  if (sum) sum.innerHTML = [
+    {label:'Overs Record', value: ow + '–' + ol, color: oCol},
+    {label:'Overs Hit Rate', value: oPct == null ? '—' : oPct.toFixed(1) + '%', color: oCol},
+    {label:'Market Implied', value: impAvg == null ? '—' : impAvg.toFixed(1) + '%', color:'var(--text2)'},
+    {label:'Model Said', value: probAvg == null ? '—' : probAvg.toFixed(1) + '%', color:'var(--text2)'},
+    {label:'All Calls', value: w + '–' + l, color:'var(--text2)'},
+    {label:'Pending', value: String(HR_RECORD.pending || 0), color:'#f59e0b'},
+  ].map(s =>
+    `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;text-align:center">
+      <div style="font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;font-size:20px;font-weight:800;color:${s.color}">${s.value}</div>
+      <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-top:3px">${s.label}</div>
+    </div>`).join('');
+  const td = 'padding:7px 8px;border-bottom:1px solid rgba(26,37,53,.5);font-family:monospace;font-size:12px;';
+  body.innerHTML = days.map(d => {
+    const dw = d.w || 0, dl = d.l || 0;
+    const pct = (dw + dl) ? (dw / (dw + dl) * 100).toFixed(0) : '—';
+    return `<tr>
+      <td style="${td}color:var(--text3);text-align:left">${String(d.date).slice(5)}</td>
+      <td style="${td}text-align:center;font-weight:800;color:${(d.ow || 0) > (d.ol || 0) ? '#4ade80' : 'var(--text2)'}">${d.ow || 0}–${d.ol || 0}</td>
+      <td style="${td}text-align:center;color:var(--text3)">${d.uw || 0}–${d.ul || 0}</td>
+      <td style="${td}text-align:center;font-weight:700">${dw}–${dl}</td>
+      <td style="${td}text-align:right;font-weight:700">${pct}%</td>
+    </tr>`;
+  }).join('');
 }
 
 // K Projections record: the model's side of every listed K line, graded
