@@ -6,13 +6,13 @@
    "player": "Kyle Schwarber",
    "mid": 656941,
    "team": "PHI",
-   "odds": 215,
-   "prob": 31.3,
-   "score": 0.895,
+   "odds": 208,
+   "prob": 31.0,
+   "score": 1.144,
    "why": [
     "pitcher matchup ×1.22",
-    "park ×1.13",
-    "overdue"
+    "wind/heat ×1.15",
+    "park ×1.13"
    ],
    "away": "WSH",
    "home": "PHI",
@@ -20,12 +20,45 @@
    "time": "6:05 PM"
   },
   {
+   "player": "Bryce Harper",
+   "mid": 547180,
+   "team": "PHI",
+   "odds": 280,
+   "prob": 25.4,
+   "score": 0.842,
+   "why": [
+    "pitcher matchup ×1.22",
+    "wind/heat ×1.15",
+    "park ×1.13"
+   ],
+   "away": "WSH",
+   "home": "PHI",
+   "opp": "Miles Mikolas",
+   "time": "6:05 PM"
+  },
+  {
+   "player": "Pete Alonso",
+   "mid": 624413,
+   "team": "BAL",
+   "odds": 278,
+   "prob": 26.3,
+   "score": 0.763,
+   "why": [
+    "pitcher matchup ×1.37",
+    "wind/heat ×1.09"
+   ],
+   "away": "LAA",
+   "home": "BAL",
+   "opp": "Ryan Johnson",
+   "time": "12:35 PM"
+  },
+  {
    "player": "Eugenio Suárez",
    "mid": 553993,
    "team": "CIN",
-   "odds": 293,
-   "prob": 25.5,
-   "score": 0.75,
+   "odds": 331,
+   "prob": 24.6,
+   "score": 0.718,
    "why": [
     "park ×1.31",
     "overdue",
@@ -35,21 +68,6 @@
    "home": "CIN",
    "opp": "Mason Barnett",
    "time": "12:40 PM"
-  },
-  {
-   "player": "Pete Alonso",
-   "mid": 624413,
-   "team": "BAL",
-   "odds": 283,
-   "prob": 25.9,
-   "score": 0.687,
-   "why": [
-    "pitcher matchup ×1.37"
-   ],
-   "away": "LAA",
-   "home": "BAL",
-   "opp": "Ryan Johnson",
-   "time": "12:35 PM"
   }
  ]
 }
