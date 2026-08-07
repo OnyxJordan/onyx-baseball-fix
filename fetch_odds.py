@@ -60,10 +60,12 @@ def _oapi_get(path, key, **params):
         return json.loads(r.read().decode("utf-8")), remaining
 
 def _slate_date():
-    """The slate being built = fetch_data's schedule date, which is the
-    runner's UTC date. Late-night ET runs would otherwise filter for
-    yesterday's (already delisted) props while the build targets tomorrow."""
-    return datetime.now(timezone.utc).date()
+    """The slate being built = fetch_data's schedule date = the baseball day
+    (ET minus 4h, matching the shell's etGameDay). Was the runner's UTC date,
+    which flips to tomorrow at 8 PM ET and had evening runs pricing the wrong
+    slate."""
+    from zoneinfo import ZoneInfo
+    return (datetime.now(ZoneInfo("America/New_York")) - timedelta(hours=4)).date()
 
 def _event_is_today(ev):
     try:

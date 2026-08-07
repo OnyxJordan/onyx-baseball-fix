@@ -201,6 +201,14 @@ def pull_air_mult(bat):
 # ---------------------------------------------------------------- build slate
 players, games_out, results_out = [], [], []
 now = datetime.now(timezone.utc)
+# the baseball day (ET - 4h, the shell's etGameDay convention): every ledger
+# stamp and the header date come from THIS, never from UTC. The 8/6 9 PM ET
+# build ran on UTC date 8/7 and stamped 3 phantom next-day picks, rebuilt the
+# locked ticket for a slate that didn't exist yet, and opened a phantom
+# ticket-history day.
+from zoneinfo import ZoneInfo as _ZI
+from datetime import timedelta as _TD
+ball_now = datetime.now(_ZI("America/New_York")) - _TD(hours=4)
 
 # ---- group flat lineups.json rows into game objects ----
 _rows = LINEUPS if isinstance(LINEUPS, list) else \
@@ -572,7 +580,7 @@ for r in board:
 picks = jload(dpath("picks_input.json"), [])
 if not isinstance(picks, list):
     picks = []
-stamp = now.strftime("%Y-%m-%d")
+stamp = ball_now.strftime("%Y-%m-%d")
 
 # v30: collapse duplicate (date, player) entries — build races / merge
 # unions had doubled entries (7/25 carried 10 picks incl. the same player
@@ -956,9 +964,9 @@ print(f"onyx player ids: {len(_opids)} injected for today")
 print(f"onyx links: {len(_onyx_links)} game(s) wired for {_et_today}")
 
 # ---- stamp the build date over the baked date literals ----
-_badge = f"{now.strftime('%b').upper()} {now.day} · {now.year}"      # JUL 23 · 2026
-_short = f"{now.strftime('%B')} {now.day}"                            # July 23
-_long  = f"{_short}, {now.year}"                                      # July 23, 2026
+_badge = f"{ball_now.strftime('%b').upper()} {ball_now.day} · {ball_now.year}"   # JUL 23 · 2026
+_short = f"{ball_now.strftime('%B')} {ball_now.day}"                              # July 23
+_long  = f"{_short}, {ball_now.year}"                                             # July 23, 2026
 shell = re.sub(r"[A-Z]{3} \d{1,2} · \d{4}", _badge, shell)
 shell = re.sub(r"(Live · |Today · )[A-Z][a-z]+ \d{1,2}, \d{4}", r"\g<1>" + _long, shell)
 shell = re.sub(r"(Onyx Baseball · )[A-Z][a-z]+ \d{1,2}", r"\g<1>" + _short, shell)

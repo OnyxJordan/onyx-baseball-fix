@@ -114,9 +114,18 @@ def _name_key(row):
     raw = (row.get("Name") or row.get("NameASCII") or "").strip()
     return raw.lower() if raw else None
 
+def ball_today():
+    """The baseball day: ET minus 4 hours, matching the shell's etGameDay().
+    The runner's clock is UTC, so date.today() flips to tomorrow at 8 PM ET —
+    the 8/6 9 PM build fetched the 8/7 schedule mid-slate, wiping the live
+    board and seeding phantom next-day picks and a phantom ticket."""
+    from zoneinfo import ZoneInfo
+    return (datetime.datetime.now(ZoneInfo("America/New_York"))
+            - datetime.timedelta(hours=4)).date()
+
 # ── 1. SCHEDULE ───────────────────────────────────────────────────────────────
 def fetch_schedule():
-    today = datetime.date.today().strftime("%Y-%m-%d")
+    today = ball_today().strftime("%Y-%m-%d")
     data = mlb_get("/schedule", {
         "sportId": 1, "date": today,
         "hydrate": "lineups,probablePitcher,team,linescore",
