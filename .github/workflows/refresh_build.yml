@@ -12,14 +12,22 @@ permissions:
   contents: write
   pages: write
   id-token: write
+# cancel-in-progress: a run stuck in the github-pages "waiting" gate held
+# this group for 20 hours on 8/6 and froze the whole site (every later run
+# cancelled or queued). Ticks are 30 min apart and a healthy run takes ~5,
+# so letting the next tick evict a stuck one costs nothing and self-heals.
 concurrency:
   group: onyx-build
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
+    # no environment here: gating the WHOLE job on github-pages approval is
+    # what let a stalled gate block even the data fetch + grading. Only the
+    # deploy job below needs the environment.
+    timeout-minutes: 25
+    outputs:
+      changed: ${{ steps.commit.outputs.changed }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -87,6 +95,15 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: .
+  deploy:
+    needs: refresh
+    if: needs.refresh.outputs.changed == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
       - name: Deploy to GitHub Pages
-        if: steps.commit.outputs.changed == 'true'
+        id: deployment
         uses: actions/deploy-pages@v4

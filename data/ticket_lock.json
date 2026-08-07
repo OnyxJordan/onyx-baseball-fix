@@ -1,74 +1,73 @@
 {
- "date": "2026-08-05",
+ "date": "2026-08-06",
  "locked": false,
  "legs": [
-  {
-   "player": "Elly De La Cruz",
-   "mid": 682829,
-   "team": "CIN",
-   "odds": 287,
-   "prob": 24.8,
-   "score": 0.999,
-   "why": [
-    "park ×1.31",
-    "pitcher matchup ×1.27",
-    "wind/heat ×1.12"
-   ],
-   "away": "ATH",
-   "home": "CIN",
-   "opp": "Jacob Lopez",
-   "time": "6:40 PM"
-  },
-  {
-   "player": "Sal Stewart",
-   "mid": 701398,
-   "team": "CIN",
-   "odds": 317,
-   "prob": 26.2,
-   "score": 0.996,
-   "why": [
-    "park ×1.31",
-    "pitcher matchup ×1.27",
-    "wind/heat ×1.12"
-   ],
-   "away": "ATH",
-   "home": "CIN",
-   "opp": "Jacob Lopez",
-   "time": "6:40 PM"
-  },
   {
    "player": "Kyle Schwarber",
    "mid": 656941,
    "team": "PHI",
-   "odds": 184,
-   "prob": 32.6,
-   "score": 0.889,
+   "odds": 208,
+   "prob": 31.0,
+   "score": 1.144,
    "why": [
-    "park ×1.13",
-    "overdue",
-    "platoon edge"
+    "pitcher matchup ×1.22",
+    "wind/heat ×1.15",
+    "park ×1.13"
    ],
    "away": "WSH",
    "home": "PHI",
-   "opp": "Jake Irvin",
-   "time": "6:40 PM"
+   "opp": "Miles Mikolas",
+   "time": "6:05 PM"
   },
   {
-   "player": "Yordan Alvarez",
-   "mid": 670541,
-   "team": "HOU",
-   "odds": 230,
-   "prob": 29.4,
-   "score": 0.826,
+   "player": "Bryce Harper",
+   "mid": 547180,
+   "team": "PHI",
+   "odds": 280,
+   "prob": 25.4,
+   "score": 0.842,
    "why": [
-    "park ×1.24",
     "pitcher matchup ×1.22",
-    "overdue"
+    "wind/heat ×1.15",
+    "park ×1.13"
    ],
-   "away": "TOR",
-   "home": "HOU",
-   "opp": "Jameson Taillon",
-   "time": "2:10 PM"
+   "away": "WSH",
+   "home": "PHI",
+   "opp": "Miles Mikolas",
+   "time": "6:05 PM"
+  },
+  {
+   "player": "Pete Alonso",
+   "mid": 624413,
+   "team": "BAL",
+   "odds": 278,
+   "prob": 26.3,
+   "score": 0.763,
+   "why": [
+    "pitcher matchup ×1.37",
+    "wind/heat ×1.09"
+   ],
+   "away": "LAA",
+   "home": "BAL",
+   "opp": "Ryan Johnson",
+   "time": "12:35 PM"
+  },
+  {
+   "player": "Eugenio Suárez",
+   "mid": 553993,
+   "team": "CIN",
+   "odds": 331,
+   "prob": 24.6,
+   "score": 0.718,
+   "why": [
+    "park ×1.31",
+    "overdue",
+    "pitcher matchup ×1.09"
+   ],
+   "away": "ATH",
+   "home": "CIN",
+   "opp": "Mason Barnett",
+   "time": "12:40 PM"
   }
  ]
 }

@@ -256,27 +256,59 @@
   "stake": 10,
   "legs": [
    {
-    "player": "Elly De La Cruz",
-    "odds": 287,
-    "prob": 24.8,
-    "hit": null
-   },
-   {
     "player": "Sal Stewart",
     "odds": 317,
     "prob": 26.2,
-    "hit": null
+    "hit": false
+   },
+   {
+    "player": "Elly De La Cruz",
+    "odds": 288,
+    "prob": 24.7,
+    "hit": false
    },
    {
     "player": "Kyle Schwarber",
     "odds": 184,
     "prob": 32.6,
-    "hit": null
+    "hit": false
    },
    {
     "player": "Yordan Alvarez",
-    "odds": 230,
-    "prob": 29.4,
+    "odds": 240,
+    "prob": 29.0,
+    "hit": false
+   }
+  ],
+  "result": "loss",
+  "pnl": -10.0
+ },
+ {
+  "date": "2026-08-06",
+  "stake": 10,
+  "legs": [
+   {
+    "player": "Kyle Schwarber",
+    "odds": 208,
+    "prob": 31.0,
+    "hit": null
+   },
+   {
+    "player": "Bryce Harper",
+    "odds": 280,
+    "prob": 25.4,
+    "hit": null
+   },
+   {
+    "player": "Pete Alonso",
+    "odds": 278,
+    "prob": 26.3,
+    "hit": null
+   },
+   {
+    "player": "Eugenio Suárez",
+    "odds": 331,
+    "prob": 24.6,
     "hit": null
    }
   ],
