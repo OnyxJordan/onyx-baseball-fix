@@ -1,4 +1,15 @@
 {
+  "ARI": {
+    "venue": "Chase Field",
+    "temp": 102.4,
+    "precip": 0,
+    "wind_spd": 11.6,
+    "wind_dir": "W",
+    "humidity_pct": 27,
+    "pressure_mb": 1008.0,
+    "roof": true,
+    "flag": "clear"
+  },
   "BOS": {
     "venue": "Fenway Park",
     "temp": 90.8,
@@ -18,28 +29,6 @@
     "wind_dir": "S",
     "humidity_pct": 73,
     "pressure_mb": 1019.5,
-    "roof": false,
-    "flag": "clear"
-  },
-  "ARI": {
-    "venue": "Chase Field",
-    "temp": 102.1,
-    "precip": 0,
-    "wind_spd": 8.5,
-    "wind_dir": "W",
-    "humidity_pct": 28,
-    "pressure_mb": 1007.1,
-    "roof": true,
-    "flag": "clear"
-  },
-  "KC": {
-    "venue": "Kauffman Stadium",
-    "temp": 78.6,
-    "precip": 0,
-    "wind_spd": 6.9,
-    "wind_dir": "ENE",
-    "humidity_pct": 79,
-    "pressure_mb": 1014.5,
     "roof": false,
     "flag": "clear"
   }
