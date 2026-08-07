@@ -1673,7 +1673,7 @@ body::after {
   <div class="nav-right">
     <button class="notif-bell" id="notifBell" onclick="toggleNotif()" title="Browser alert when a modeled batter homers">🔔</button>
     <span class="nav-badge">AUG 7 · 2026</span>
-    <span class="nav-date" id="buildStamp">updated 4:39 pm et</span>
+    <span class="nav-date" id="buildStamp">updated 4:45 pm et</span>
     <span class="nav-date" id="liveCount"></span>
   </div>
 </nav>
@@ -2831,6 +2831,7 @@ function isFav(ml) {
 let curTab = 'board';
 function gotoTab(tab) {
   curTab = tab;
+  if (typeof track === 'function') track('tab_view', { tab: tab });
   document.querySelectorAll('.nav-tab').forEach(b => b.classList.toggle('active', b.dataset.tab===tab));
   document.querySelectorAll('.pane').forEach(p => p.classList.toggle('active', p.id===`pane-${tab}`));
   if(tab!=='gamecenter' && typeof stopGC === 'function') stopGC();
@@ -5215,6 +5216,30 @@ var ONYX_GAME_LINKS = {"NYM_PIT": "12164-36707-2026-08-07-15", "TOR_PHI": "37900
 var ONYX_TEAM_IDS = {};        // e.g. {SD: 14818, ATL: 25683} once confirmed
 var ONYX_GAME_SUFFIX = '09';
 var ONYX_REFERRER = 'KR680261';
+// ─── SITE ANALYTICS (Google Analytics 4) ────────────────────────
+// Visitors, uniques, geography and devices come free with the page_view
+// stream; every Onyx clickthrough and parlay build fires a custom event so
+// the funnel to app.onyxodds.com is measurable per player/market/odds.
+// Empty id = everything no-ops; paste the GA4 "G-XXXXXXXXXX" measurement id
+// here and the tracker goes live on the next build.
+var GA_MEASUREMENT_ID = '';
+function initAnalytics() {
+  if (!GA_MEASUREMENT_ID) return;
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = window.gtag || function () { dataLayer.push(arguments); };
+  gtag('js', new Date());
+  gtag('config', GA_MEASUREMENT_ID);
+  var s = document.createElement('script');
+  s.async = true;
+  s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_MEASUREMENT_ID;
+  document.head.appendChild(s);
+}
+function track(name, params) {
+  try {
+    if (GA_MEASUREMENT_ID && window.gtag) gtag('event', name, params || {});
+  } catch (e) {}
+}
+document.addEventListener('DOMContentLoaded', initAnalytics);
 var ONYX_HR_MARKET = 'player_home_runs';
 // nk(player name) -> OpticOdds player id. Player-prop selections REQUIRE
 // this id as the selection tail (verified 7/28: with it the share endpoint
@@ -5290,11 +5315,14 @@ function onyxTicket(p) {
   if (typeof parlayMode !== 'undefined' && parlayMode) { parlayAdd(p); return; }
   const s = onyxSelection(p);
   if (s) {
+    track('onyx_click', { link_type: 'single', market: p.market || '',
+      selection: s.label, odds: p.odds != null ? String(p.odds) : '' });
     const u = 'https://app.onyxodds.com/share?selection=' + encodeURIComponent(s.sel)
       + (ONYX_REFERRER ? '&referrer=' + encodeURIComponent(ONYX_REFERRER) : '');
     window.open(u, '_blank', 'noopener');
     return;
   }
+  track('onyx_click', { link_type: 'fallback', market: p.market || '' });
   window.open(ONYX_FALLBACK_URL, '_blank', 'noopener');
 }
 
@@ -5317,6 +5345,7 @@ function parlayAdd(p) {
   if (!s) return;
   if (parlaySlip.some(x => x.sel === s.sel)) { parlayRemove(s.sel); return; }   // tap again = remove
   if (parlaySlip.length >= 10) return;
+  track('parlay_add', { selection: s.label, legs: parlaySlip.length + 1 });
   parlaySlip.push({ sel: s.sel, label: s.label, odds: p.odds ? parseInt(p.odds, 10) || null : null });
   parlaySave(); renderParlaySlip();
 }
@@ -5327,6 +5356,8 @@ function parlayRemove(sel) {
 function parlayClear() { parlaySlip = []; parlaySave(); renderParlaySlip(); }
 function parlayBuild() {
   if (!parlaySlip.length) return;
+  track('onyx_click', { link_type: 'parlay', legs: parlaySlip.length,
+    selections: parlaySlip.map(x => x.label).join(' / ').slice(0, 100) });
   const u = 'https://app.onyxodds.com/share?'
     + parlaySlip.map(x => 'selection=' + encodeURIComponent(x.sel)).join('&')
     + (ONYX_REFERRER ? '&referrer=' + encodeURIComponent(ONYX_REFERRER) : '');
