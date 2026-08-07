@@ -1,45 +1,23 @@
 {
-  "NYY": {
-    "venue": "Yankee Stadium",
-    "temp": 88.3,
-    "precip": 2,
-    "wind_spd": 5.2,
-    "wind_dir": "SSE",
-    "humidity_pct": 68,
-    "pressure_mb": 1017.8,
+  "KC": {
+    "venue": "Kauffman Stadium",
+    "temp": 78.6,
+    "precip": 0,
+    "wind_spd": 6.9,
+    "wind_dir": "ENE",
+    "humidity_pct": 79,
+    "pressure_mb": 1014.5,
     "roof": false,
     "flag": "clear"
   },
-  "CWS": {
-    "venue": "Rate Field",
-    "temp": 76.2,
-    "precip": 6,
-    "wind_spd": 6.5,
-    "wind_dir": "SE",
-    "humidity_pct": 91,
-    "pressure_mb": 1017.4,
-    "roof": false,
-    "flag": "clear"
-  },
-  "STL": {
-    "venue": "Busch Stadium",
-    "temp": 72.4,
-    "precip": 5,
-    "wind_spd": 3.0,
-    "wind_dir": "NE",
-    "humidity_pct": 92,
-    "pressure_mb": 1018.0,
-    "roof": false,
-    "flag": "clear"
-  },
-  "WSH": {
-    "venue": "Nationals Park",
-    "temp": 85.4,
-    "precip": 13,
-    "wind_spd": 5.1,
-    "wind_dir": "NW",
-    "humidity_pct": 70,
-    "pressure_mb": 1019.2,
+  "ATL": {
+    "venue": "Truist Park",
+    "temp": 82.2,
+    "precip": 21,
+    "wind_spd": 4.8,
+    "wind_dir": "S",
+    "humidity_pct": 73,
+    "pressure_mb": 1019.5,
     "roof": false,
     "flag": "clear"
   },
@@ -54,106 +32,15 @@
     "roof": false,
     "flag": "clear"
   },
-  "KC": {
-    "venue": "Kauffman Stadium",
-    "temp": 78.1,
-    "precip": 0,
-    "wind_spd": 6.9,
-    "wind_dir": "E",
-    "humidity_pct": 80,
-    "pressure_mb": 1014.1,
-    "roof": false,
-    "flag": "clear"
-  },
-  "SD": {
-    "venue": "Petco Park",
-    "temp": 77.2,
-    "precip": 3,
-    "wind_spd": 6.0,
-    "wind_dir": "WNW",
-    "humidity_pct": 75,
-    "pressure_mb": 1011.7,
-    "roof": false,
-    "flag": "clear"
-  },
-  "SF": {
-    "venue": "Oracle Park",
-    "temp": 61.8,
-    "precip": 0,
-    "wind_spd": 12.0,
-    "wind_dir": "WNW",
-    "humidity_pct": 88,
-    "pressure_mb": 1013.0,
-    "roof": false,
-    "flag": "clear"
-  },
-  "MIL": {
-    "venue": "American Family Field",
-    "temp": 75.4,
-    "precip": 0,
-    "wind_spd": 7.2,
-    "wind_dir": "ESE",
-    "humidity_pct": 77,
-    "pressure_mb": 1017.2,
-    "roof": true,
-    "flag": "clear"
-  },
-  "TEX": {
-    "venue": "Globe Life Field",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
-    "roof": true,
-    "flag": "clear"
-  },
-  "SEA": {
-    "venue": "T-Mobile Park",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
-    "roof": false,
-    "flag": "clear"
-  },
-  "PIT": {
-    "venue": "PNC Park",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
-    "roof": false,
-    "flag": "clear"
-  },
-  "MIA": {
-    "venue": "loanDepot Park",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
-    "roof": true,
-    "flag": "clear"
-  },
   "ARI": {
     "venue": "Chase Field",
     "temp": 102.1,
-    "precip": 1,
+    "precip": 0,
     "wind_spd": 8.5,
     "wind_dir": "W",
     "humidity_pct": 28,
     "pressure_mb": 1007.1,
     "roof": true,
-    "flag": "clear"
-  },
-  "PHI": {
-    "venue": "Citizens Bank Park",
-    "temp": 87.5,
-    "precip": 5,
-    "wind_spd": 7.0,
-    "wind_dir": "SSW",
-    "humidity_pct": 68,
-    "pressure_mb": 1018.8,
-    "roof": false,
     "flag": "clear"
   }
 }
