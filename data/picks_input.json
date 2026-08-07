@@ -541,7 +541,7 @@
   "prob": 0.313,
   "edge": -0.5,
   "tier": "ticket",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-08-06",
@@ -550,7 +550,7 @@
   "prob": 0.255,
   "edge": 0.1,
   "tier": "ticket",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-08-06",
@@ -559,7 +559,7 @@
   "prob": 0.259,
   "edge": -0.2,
   "tier": "ticket",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-08-06",
@@ -568,7 +568,7 @@
   "prob": 0.235,
   "edge": 0.9,
   "tier": "edge",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-08-06",
@@ -576,6 +576,51 @@
   "odds": 353,
   "prob": 0.233,
   "edge": 1.2,
+  "tier": "edge",
+  "hit": true
+ },
+ {
+  "date": "2026-08-07",
+  "player": "CJ Abrams",
+  "odds": 355,
+  "prob": 0.178,
+  "edge": -4.2,
+  "tier": "ticket",
+  "hit": null
+ },
+ {
+  "date": "2026-08-07",
+  "player": "Ben Rice",
+  "odds": 302,
+  "prob": 0.268,
+  "edge": 2.0,
+  "tier": "ticket",
+  "hit": null
+ },
+ {
+  "date": "2026-08-07",
+  "player": "Jo Adell",
+  "odds": 376,
+  "prob": 0.221,
+  "edge": 1.1,
+  "tier": "ticket",
+  "hit": null
+ },
+ {
+  "date": "2026-08-07",
+  "player": "Kyle Schwarber",
+  "odds": 267,
+  "prob": 0.286,
+  "edge": 1.3,
+  "tier": "ticket",
+  "hit": null
+ },
+ {
+  "date": "2026-08-07",
+  "player": "Shohei Ohtani",
+  "odds": 293,
+  "prob": 0.276,
+  "edge": 2.1,
   "tier": "edge",
   "hit": null
  }
