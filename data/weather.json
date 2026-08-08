@@ -1,35 +1,13 @@
 {
-  "KC": {
-    "venue": "Kauffman Stadium",
-    "temp": 87.7,
-    "precip": 0,
-    "wind_spd": 7.9,
-    "wind_dir": "NE",
-    "humidity_pct": 56,
-    "pressure_mb": 1014.3,
-    "roof": false,
-    "flag": "clear"
-  },
-  "STL": {
-    "venue": "Busch Stadium",
-    "temp": 90.0,
-    "precip": 0,
-    "wind_spd": 5.0,
-    "wind_dir": "WSW",
-    "humidity_pct": 50,
-    "pressure_mb": 1014.8,
-    "roof": false,
-    "flag": "clear"
-  },
-  "SEA": {
-    "venue": "T-Mobile Park",
-    "temp": 77.6,
-    "precip": 0,
-    "wind_spd": 5.6,
-    "wind_dir": "N",
-    "humidity_pct": 49,
-    "pressure_mb": 1017.5,
-    "roof": false,
+  "ARI": {
+    "venue": "Chase Field",
+    "temp": 111.0,
+    "precip": 1,
+    "wind_spd": 6.5,
+    "wind_dir": "SW",
+    "humidity_pct": 15,
+    "pressure_mb": 1005.3,
+    "roof": true,
     "flag": "clear"
   },
   "CWS": {
@@ -43,17 +21,6 @@
     "roof": false,
     "flag": "clear"
   },
-  "TEX": {
-    "venue": "Globe Life Field",
-    "temp": 100.6,
-    "precip": 3,
-    "wind_spd": 9.2,
-    "wind_dir": "S",
-    "humidity_pct": 29,
-    "pressure_mb": 1013.0,
-    "roof": true,
-    "flag": "clear"
-  },
   "SD": {
     "venue": "Petco Park",
     "temp": 82.7,
@@ -65,36 +32,36 @@
     "roof": false,
     "flag": "clear"
   },
-  "BOS": {
-    "venue": "Fenway Park",
-    "temp": 92.4,
-    "precip": 11,
-    "wind_spd": 10.8,
-    "wind_dir": "SW",
-    "humidity_pct": 45,
-    "pressure_mb": 1011.8,
+  "WSH": {
+    "venue": "Nationals Park",
+    "temp": 88.5,
+    "precip": 29,
+    "wind_spd": 4.7,
+    "wind_dir": "WSW",
+    "humidity_pct": 61,
+    "pressure_mb": 1015.2,
     "roof": false,
     "flag": "clear"
   },
-  "SF": {
-    "venue": "Oracle Park",
-    "temp": 64.3,
-    "precip": 1,
-    "wind_spd": 13.4,
+  "MIL": {
+    "venue": "American Family Field",
+    "temp": 82.4,
+    "precip": 0,
+    "wind_spd": 6.4,
     "wind_dir": "W",
-    "humidity_pct": 83,
-    "pressure_mb": 1013.5,
-    "roof": false,
+    "humidity_pct": 36,
+    "pressure_mb": 1014.6,
+    "roof": true,
     "flag": "clear"
   },
-  "ARI": {
-    "venue": "Chase Field",
-    "temp": 111.0,
-    "precip": 1,
-    "wind_spd": 6.5,
-    "wind_dir": "SW",
-    "humidity_pct": 15,
-    "pressure_mb": 1005.3,
+  "TEX": {
+    "venue": "Globe Life Field",
+    "temp": 100.6,
+    "precip": 3,
+    "wind_spd": 9.2,
+    "wind_dir": "S",
+    "humidity_pct": 29,
+    "pressure_mb": 1013.0,
     "roof": true,
     "flag": "clear"
   },
@@ -109,8 +76,41 @@
     "roof": false,
     "flag": "clear"
   },
-  "WSH": {
-    "venue": "Nationals Park",
+  "PHI": {
+    "venue": "Citizens Bank Park",
+    "temp": 80.7,
+    "precip": 2,
+    "wind_spd": 7.2,
+    "wind_dir": "SW",
+    "humidity_pct": 79,
+    "pressure_mb": 1015.2,
+    "roof": false,
+    "flag": "clear"
+  },
+  "SF": {
+    "venue": "Oracle Park",
+    "temp": 64.3,
+    "precip": 1,
+    "wind_spd": 13.4,
+    "wind_dir": "W",
+    "humidity_pct": 83,
+    "pressure_mb": 1013.5,
+    "roof": false,
+    "flag": "clear"
+  },
+  "SEA": {
+    "venue": "T-Mobile Park",
+    "temp": 77.6,
+    "precip": 0,
+    "wind_spd": 5.6,
+    "wind_dir": "N",
+    "humidity_pct": 49,
+    "pressure_mb": 1017.5,
+    "roof": false,
+    "flag": "clear"
+  },
+  "KC": {
+    "venue": "Kauffman Stadium",
     "temp": 72,
     "precip": 0,
     "wind_spd": 5,
@@ -118,17 +118,8 @@
     "roof": false,
     "flag": "clear"
   },
-  "MIL": {
-    "venue": "American Family Field",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
-    "roof": true,
-    "flag": "clear"
-  },
-  "PHI": {
-    "venue": "Citizens Bank Park",
+  "STL": {
+    "venue": "Busch Stadium",
     "temp": 72,
     "precip": 0,
     "wind_spd": 5,
