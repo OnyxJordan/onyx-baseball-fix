@@ -1,51 +1,17 @@
 {
  "date": "2026-08-09",
- "locked": true,
+ "locked": false,
  "legs": [
-  {
-   "player": "Kyle Schwarber",
-   "mid": 656941,
-   "team": "PHI",
-   "odds": 220,
-   "prob": 30.6,
-   "score": 0.888,
-   "why": [
-    "pitcher matchup ×1.13",
-    "park ×1.13",
-    "wind/heat ×1.12"
-   ],
-   "away": "TOR",
-   "home": "PHI",
-   "opp": "Shane Bieber",
-   "time": "1:35 PM"
-  },
   {
    "player": "Manny Machado",
    "mid": 592518,
    "team": "SD",
-   "odds": 326,
-   "prob": 23.1,
-   "score": 0.864,
+   "odds": null,
+   "prob": 18.2,
+   "score": 0.658,
    "why": [
     "pitcher matchup ×1.41",
-    "wind/heat ×1.10",
-    "overdue"
-   ],
-   "away": "HOU",
-   "home": "SD",
-   "opp": "Cristian Javier",
-   "time": "8:20 PM"
-  },
-  {
-   "player": "Fernando Tatis Jr.",
-   "mid": 665487,
-   "team": "SD",
-   "odds": 357,
-   "prob": 22.1,
-   "score": 0.755,
-   "why": [
-    "pitcher matchup ×1.41",
-    "wind/heat ×1.10",
+    "overdue",
     "fly-ball pitcher"
    ],
    "away": "HOU",
@@ -54,21 +20,21 @@
    "time": "8:20 PM"
   },
   {
-   "player": "Esmerlyn Valdez",
-   "mid": 699013,
-   "team": "PIT",
-   "odds": 352,
-   "prob": 26.4,
-   "score": 0.751,
+   "player": "Yordan Alvarez",
+   "mid": 670541,
+   "team": "HOU",
+   "odds": null,
+   "prob": 22.9,
+   "score": 0.587,
    "why": [
-    "platoon edge",
-    "56% FB bat",
-    "overdue"
+    "pitcher matchup ×1.16",
+    "overdue",
+    "48% FB bat"
    ],
-   "away": "NYM",
-   "home": "PIT",
-   "opp": "Sean Manaea",
-   "time": "1:35 PM"
+   "away": "HOU",
+   "home": "SD",
+   "opp": "Randy Vásquez",
+   "time": "8:20 PM"
   }
  ]
 }
