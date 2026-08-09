@@ -631,7 +631,7 @@
   "prob": 0.249,
   "edge": -0.7,
   "tier": "ticket",
-  "hit": null
+  "hit": true
  },
  {
   "date": "2026-08-08",
@@ -640,7 +640,7 @@
   "prob": 0.277,
   "edge": -1.2,
   "tier": "ticket",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-08-08",
@@ -649,7 +649,7 @@
   "prob": 0.256,
   "edge": 1.0,
   "tier": "ticket",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-08-08",
@@ -658,7 +658,7 @@
   "prob": 0.268,
   "edge": 0.6,
   "tier": "edge",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-08-08",
@@ -666,6 +666,51 @@
   "odds": 349,
   "prob": 0.228,
   "edge": 0.6,
+  "tier": "edge",
+  "hit": false
+ },
+ {
+  "date": "2026-08-09",
+  "player": "Fernando Tatis Jr.",
+  "odds": 305,
+  "prob": 0.232,
+  "edge": -1.5,
+  "tier": "ticket",
+  "hit": null
+ },
+ {
+  "date": "2026-08-09",
+  "player": "Ben Rice",
+  "odds": 225,
+  "prob": 0.295,
+  "edge": -1.2,
+  "tier": "ticket",
+  "hit": null
+ },
+ {
+  "date": "2026-08-09",
+  "player": "Manny Machado",
+  "odds": null,
+  "prob": 0.189,
+  "edge": 0,
+  "tier": "ticket",
+  "hit": null
+ },
+ {
+  "date": "2026-08-09",
+  "player": "Trent Grisham",
+  "odds": 280,
+  "prob": 0.253,
+  "edge": -1.0,
+  "tier": "ticket",
+  "hit": null
+ },
+ {
+  "date": "2026-08-09",
+  "player": "Esmerlyn Valdez",
+  "odds": 348,
+  "prob": 0.255,
+  "edge": 3.2,
   "tier": "edge",
   "hit": null
  }

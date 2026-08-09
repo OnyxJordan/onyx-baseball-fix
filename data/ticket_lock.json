@@ -1,56 +1,74 @@
 {
- "date": "2026-08-08",
- "locked": true,
+ "date": "2026-08-09",
+ "locked": false,
  "legs": [
   {
-   "player": "Bryce Harper",
-   "mid": 547180,
-   "team": "PHI",
-   "odds": 291,
-   "prob": 24.8,
-   "score": 0.721,
+   "player": "Fernando Tatis Jr.",
+   "mid": 665487,
+   "team": "SD",
+   "odds": 305,
+   "prob": 23.2,
+   "score": 0.776,
    "why": [
-    "pitcher matchup ×1.23",
-    "park ×1.13",
-    "wind/heat ×1.12"
-   ],
-   "away": "TOR",
-   "home": "PHI",
-   "opp": "Max Scherzer",
-   "time": "6:05 PM"
-  },
-  {
-   "player": "Matt Olson",
-   "mid": 621566,
-   "team": "ATL",
-   "odds": 272,
-   "prob": 26.8,
-   "score": 0.685,
-   "why": [
-    "park ×1.33",
-    "wind/heat ×1.16"
-   ],
-   "away": "ATL",
-   "home": "NYY",
-   "opp": "Gerrit Cole",
-   "time": "3:05 PM"
-  },
-  {
-   "player": "Yordan Alvarez",
-   "mid": 670541,
-   "team": "HOU",
-   "odds": 247,
-   "prob": 27.7,
-   "score": 0.671,
-   "why": [
-    "overdue",
-    "48% FB bat",
-    "pitcher matchup ×1.08"
+    "pitcher matchup ×1.41",
+    "wind/heat ×1.10",
+    "fly-ball pitcher"
    ],
    "away": "HOU",
    "home": "SD",
-   "opp": "Michael King",
-   "time": "7:15 PM"
+   "opp": "Cristian Javier",
+   "time": "8:20 PM"
+  },
+  {
+   "player": "Ben Rice",
+   "mid": 700250,
+   "team": "NYY",
+   "odds": 225,
+   "prob": 29.5,
+   "score": 0.759,
+   "why": [
+    "park ×1.33",
+    "pitcher matchup ×1.12",
+    "overdue"
+   ],
+   "away": "ATL",
+   "home": "NYY",
+   "opp": "Grant Holmes",
+   "time": "1:35 PM"
+  },
+  {
+   "player": "Manny Machado",
+   "mid": 592518,
+   "team": "SD",
+   "odds": null,
+   "prob": 18.9,
+   "score": 0.746,
+   "why": [
+    "pitcher matchup ×1.41",
+    "wind/heat ×1.10",
+    "overdue"
+   ],
+   "away": "HOU",
+   "home": "SD",
+   "opp": "Cristian Javier",
+   "time": "8:20 PM"
+  },
+  {
+   "player": "Trent Grisham",
+   "mid": 663757,
+   "team": "NYY",
+   "odds": 280,
+   "prob": 25.3,
+   "score": 0.734,
+   "why": [
+    "park ×1.33",
+    "pitcher matchup ×1.12",
+    "overdue"
+   ],
+   "away": "ATL",
+   "home": "NYY",
+   "opp": "Grant Holmes",
+   "time": "1:35 PM"
   }
  ]
 }

@@ -355,18 +355,50 @@
     "player": "Bryce Harper",
     "odds": 291,
     "prob": 24.8,
-    "hit": null
+    "hit": true
    },
    {
     "player": "Matt Olson",
     "odds": 272,
     "prob": 26.8,
-    "hit": null
+    "hit": false
    },
    {
     "player": "Yordan Alvarez",
     "odds": 247,
     "prob": 27.7,
+    "hit": false
+   }
+  ],
+  "result": "loss",
+  "pnl": -10.0
+ },
+ {
+  "date": "2026-08-09",
+  "stake": 10,
+  "legs": [
+   {
+    "player": "Fernando Tatis Jr.",
+    "odds": 305,
+    "prob": 23.2,
+    "hit": null
+   },
+   {
+    "player": "Ben Rice",
+    "odds": 225,
+    "prob": 29.5,
+    "hit": null
+   },
+   {
+    "player": "Manny Machado",
+    "odds": null,
+    "prob": 18.9,
+    "hit": null
+   },
+   {
+    "player": "Trent Grisham",
+    "odds": 280,
+    "prob": 25.3,
     "hit": null
    }
   ],
