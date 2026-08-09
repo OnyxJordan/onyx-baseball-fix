@@ -3,12 +3,46 @@
  "locked": false,
  "legs": [
   {
+   "player": "Kyle Schwarber",
+   "mid": 656941,
+   "team": "PHI",
+   "odds": 220,
+   "prob": 30.6,
+   "score": 0.888,
+   "why": [
+    "pitcher matchup ×1.13",
+    "park ×1.13",
+    "wind/heat ×1.12"
+   ],
+   "away": "TOR",
+   "home": "PHI",
+   "opp": "Shane Bieber",
+   "time": "1:35 PM"
+  },
+  {
+   "player": "Manny Machado",
+   "mid": 592518,
+   "team": "SD",
+   "odds": 326,
+   "prob": 23.1,
+   "score": 0.864,
+   "why": [
+    "pitcher matchup ×1.41",
+    "wind/heat ×1.10",
+    "overdue"
+   ],
+   "away": "HOU",
+   "home": "SD",
+   "opp": "Cristian Javier",
+   "time": "8:20 PM"
+  },
+  {
    "player": "Fernando Tatis Jr.",
    "mid": 665487,
    "team": "SD",
-   "odds": 305,
-   "prob": 23.2,
-   "score": 0.776,
+   "odds": 357,
+   "prob": 22.1,
+   "score": 0.755,
    "why": [
     "pitcher matchup ×1.41",
     "wind/heat ×1.10",
@@ -20,54 +54,20 @@
    "time": "8:20 PM"
   },
   {
-   "player": "Ben Rice",
-   "mid": 700250,
-   "team": "NYY",
-   "odds": 225,
-   "prob": 29.5,
-   "score": 0.759,
+   "player": "Esmerlyn Valdez",
+   "mid": 699013,
+   "team": "PIT",
+   "odds": 352,
+   "prob": 26.4,
+   "score": 0.751,
    "why": [
-    "park ×1.33",
-    "pitcher matchup ×1.12",
+    "platoon edge",
+    "56% FB bat",
     "overdue"
    ],
-   "away": "ATL",
-   "home": "NYY",
-   "opp": "Grant Holmes",
-   "time": "1:35 PM"
-  },
-  {
-   "player": "Manny Machado",
-   "mid": 592518,
-   "team": "SD",
-   "odds": null,
-   "prob": 18.9,
-   "score": 0.746,
-   "why": [
-    "pitcher matchup ×1.41",
-    "wind/heat ×1.10",
-    "overdue"
-   ],
-   "away": "HOU",
-   "home": "SD",
-   "opp": "Cristian Javier",
-   "time": "8:20 PM"
-  },
-  {
-   "player": "Trent Grisham",
-   "mid": 663757,
-   "team": "NYY",
-   "odds": 280,
-   "prob": 25.3,
-   "score": 0.734,
-   "why": [
-    "park ×1.33",
-    "pitcher matchup ×1.12",
-    "overdue"
-   ],
-   "away": "ATL",
-   "home": "NYY",
-   "opp": "Grant Holmes",
+   "away": "NYM",
+   "home": "PIT",
+   "opp": "Sean Manaea",
    "time": "1:35 PM"
   }
  ]
