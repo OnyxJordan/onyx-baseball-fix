@@ -1,37 +1,4 @@
 {
-  "MIN": {
-    "venue": "Target Field",
-    "temp": 88.4,
-    "precip": 0,
-    "wind_spd": 5.4,
-    "wind_dir": "NE",
-    "humidity_pct": 23,
-    "pressure_mb": 1011.6,
-    "roof": false,
-    "flag": "clear"
-  },
-  "ARI": {
-    "venue": "Chase Field",
-    "temp": 106.3,
-    "precip": 2,
-    "wind_spd": 9.2,
-    "wind_dir": "WNW",
-    "humidity_pct": 20,
-    "pressure_mb": 1007.2,
-    "roof": true,
-    "flag": "clear"
-  },
-  "LAA": {
-    "venue": "Angel Stadium",
-    "temp": 79.2,
-    "precip": 1,
-    "wind_spd": 8.3,
-    "wind_dir": "SW",
-    "humidity_pct": 63,
-    "pressure_mb": 1012.6,
-    "roof": false,
-    "flag": "clear"
-  },
   "LAD": {
     "venue": "Dodger Stadium",
     "temp": 74.2,
@@ -43,36 +10,25 @@
     "roof": false,
     "flag": "clear"
   },
-  "ATL": {
-    "venue": "Truist Park",
-    "temp": 91.4,
-    "precip": 13,
-    "wind_spd": 7.4,
-    "wind_dir": "W",
-    "humidity_pct": 47,
-    "pressure_mb": 1018.5,
+  "STL": {
+    "venue": "Busch Stadium",
+    "temp": 97.8,
+    "precip": 4,
+    "wind_spd": 11.3,
+    "wind_dir": "SSW",
+    "humidity_pct": 40,
+    "pressure_mb": 1013.0,
     "roof": false,
     "flag": "clear"
   },
-  "TOR": {
-    "venue": "Rogers Centre",
-    "temp": 81.4,
-    "precip": 4,
-    "wind_spd": 8.4,
-    "wind_dir": "SW",
-    "humidity_pct": 57,
-    "pressure_mb": 1010.7,
-    "roof": true,
-    "flag": "clear"
-  },
-  "SF": {
-    "venue": "Oracle Park",
-    "temp": 62.6,
-    "precip": 2,
-    "wind_spd": 12.9,
-    "wind_dir": "W",
-    "humidity_pct": 78,
-    "pressure_mb": 1012.4,
+  "MIN": {
+    "venue": "Target Field",
+    "temp": 88.4,
+    "precip": 0,
+    "wind_spd": 5.4,
+    "wind_dir": "NE",
+    "humidity_pct": 23,
+    "pressure_mb": 1011.6,
     "roof": false,
     "flag": "clear"
   },
@@ -87,15 +43,26 @@
     "roof": false,
     "flag": "clear"
   },
-  "STL": {
-    "venue": "Busch Stadium",
-    "temp": 97.8,
+  "TOR": {
+    "venue": "Rogers Centre",
+    "temp": 81.4,
     "precip": 3,
-    "wind_spd": 11.3,
-    "wind_dir": "SSW",
-    "humidity_pct": 40,
-    "pressure_mb": 1013.0,
-    "roof": false,
+    "wind_spd": 8.4,
+    "wind_dir": "SW",
+    "humidity_pct": 57,
+    "pressure_mb": 1010.7,
+    "roof": true,
+    "flag": "clear"
+  },
+  "ARI": {
+    "venue": "Chase Field",
+    "temp": 106.3,
+    "precip": 3,
+    "wind_spd": 9.2,
+    "wind_dir": "WNW",
+    "humidity_pct": 20,
+    "pressure_mb": 1007.2,
+    "roof": true,
     "flag": "clear"
   },
   "SD": {
@@ -106,6 +73,39 @@
     "wind_dir": "WSW",
     "humidity_pct": 76,
     "pressure_mb": 1013.3,
+    "roof": false,
+    "flag": "clear"
+  },
+  "ATL": {
+    "venue": "Truist Park",
+    "temp": 91.4,
+    "precip": 13,
+    "wind_spd": 7.4,
+    "wind_dir": "W",
+    "humidity_pct": 47,
+    "pressure_mb": 1018.5,
+    "roof": false,
+    "flag": "clear"
+  },
+  "LAA": {
+    "venue": "Angel Stadium",
+    "temp": 79.2,
+    "precip": 1,
+    "wind_spd": 8.3,
+    "wind_dir": "SW",
+    "humidity_pct": 63,
+    "pressure_mb": 1012.6,
+    "roof": false,
+    "flag": "clear"
+  },
+  "SF": {
+    "venue": "Oracle Park",
+    "temp": 62.6,
+    "precip": 1,
+    "wind_spd": 12.9,
+    "wind_dir": "W",
+    "humidity_pct": 78,
+    "pressure_mb": 1012.4,
     "roof": false,
     "flag": "clear"
   }
