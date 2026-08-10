@@ -381,12 +381,32 @@
     "player": "Manny Machado",
     "odds": null,
     "prob": 18.2,
-    "hit": null
+    "hit": false
    },
    {
     "player": "Yordan Alvarez",
     "odds": null,
     "prob": 22.9,
+    "hit": false
+   }
+  ],
+  "result": "loss",
+  "pnl": -10.0
+ },
+ {
+  "date": "2026-08-10",
+  "stake": 10,
+  "legs": [
+   {
+    "player": "Junior Caminero",
+    "odds": 209,
+    "prob": 28.6,
+    "hit": null
+   },
+   {
+    "player": "Yandy Díaz",
+    "odds": 398,
+    "prob": 15.1,
     "hit": null
    }
   ],
