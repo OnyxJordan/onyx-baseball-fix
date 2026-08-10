@@ -1,45 +1,23 @@
 {
-  "LAD": {
-    "venue": "Dodger Stadium",
-    "temp": 73.9,
-    "precip": 1,
-    "wind_spd": 7.2,
-    "wind_dir": "WSW",
-    "humidity_pct": 73,
-    "pressure_mb": 1012.5,
-    "roof": false,
-    "flag": "clear"
-  },
-  "STL": {
-    "venue": "Busch Stadium",
-    "temp": 95.9,
-    "precip": 7,
-    "wind_spd": 10.8,
-    "wind_dir": "S",
-    "humidity_pct": 50,
-    "pressure_mb": 1013.0,
-    "roof": false,
+  "ARI": {
+    "venue": "Chase Field",
+    "temp": 106.0,
+    "precip": 3,
+    "wind_spd": 9.2,
+    "wind_dir": "W",
+    "humidity_pct": 20,
+    "pressure_mb": 1006.7,
+    "roof": true,
     "flag": "clear"
   },
   "ATL": {
     "venue": "Truist Park",
     "temp": 90.0,
-    "precip": 10,
+    "precip": 11,
     "wind_spd": 4.8,
     "wind_dir": "WSW",
     "humidity_pct": 49,
     "pressure_mb": 1019.0,
-    "roof": false,
-    "flag": "clear"
-  },
-  "SF": {
-    "venue": "Oracle Park",
-    "temp": 61.5,
-    "precip": 1,
-    "wind_spd": 12.6,
-    "wind_dir": "W",
-    "humidity_pct": 87,
-    "pressure_mb": 1012.5,
     "roof": false,
     "flag": "clear"
   },
@@ -54,10 +32,21 @@
     "roof": false,
     "flag": "clear"
   },
+  "SF": {
+    "venue": "Oracle Park",
+    "temp": 61.5,
+    "precip": 1,
+    "wind_spd": 12.6,
+    "wind_dir": "W",
+    "humidity_pct": 87,
+    "pressure_mb": 1012.5,
+    "roof": false,
+    "flag": "clear"
+  },
   "TOR": {
     "venue": "Rogers Centre",
     "temp": 73.6,
-    "precip": 7,
+    "precip": 10,
     "wind_spd": 3.6,
     "wind_dir": "SW",
     "humidity_pct": 91,
@@ -65,25 +54,25 @@
     "roof": true,
     "flag": "clear"
   },
-  "ARI": {
-    "venue": "Chase Field",
-    "temp": 106.0,
-    "precip": 3,
-    "wind_spd": 9.2,
-    "wind_dir": "W",
-    "humidity_pct": 20,
-    "pressure_mb": 1006.7,
-    "roof": true,
+  "STL": {
+    "venue": "Busch Stadium",
+    "temp": 95.9,
+    "precip": 8,
+    "wind_spd": 10.8,
+    "wind_dir": "S",
+    "humidity_pct": 50,
+    "pressure_mb": 1013.0,
+    "roof": false,
     "flag": "clear"
   },
-  "MIN": {
-    "venue": "Target Field",
-    "temp": 87.8,
+  "ATH": {
+    "venue": "Sutter Health Park",
+    "temp": 89.3,
     "precip": 0,
-    "wind_spd": 5.0,
-    "wind_dir": "ENE",
-    "humidity_pct": 26,
-    "pressure_mb": 1012.4,
+    "wind_spd": 11.4,
+    "wind_dir": "SW",
+    "humidity_pct": 32,
+    "pressure_mb": 1009.3,
     "roof": false,
     "flag": "clear"
   },
@@ -98,14 +87,25 @@
     "roof": false,
     "flag": "clear"
   },
-  "ATH": {
-    "venue": "Sutter Health Park",
-    "temp": 89.3,
+  "LAD": {
+    "venue": "Dodger Stadium",
+    "temp": 73.9,
+    "precip": 1,
+    "wind_spd": 7.2,
+    "wind_dir": "WSW",
+    "humidity_pct": 73,
+    "pressure_mb": 1012.5,
+    "roof": false,
+    "flag": "clear"
+  },
+  "MIN": {
+    "venue": "Target Field",
+    "temp": 87.8,
     "precip": 0,
-    "wind_spd": 11.4,
-    "wind_dir": "SW",
-    "humidity_pct": 32,
-    "pressure_mb": 1009.3,
+    "wind_spd": 5.0,
+    "wind_dir": "ENE",
+    "humidity_pct": 26,
+    "pressure_mb": 1012.4,
     "roof": false,
     "flag": "clear"
   }
