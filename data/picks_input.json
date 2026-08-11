@@ -721,7 +721,7 @@
   "prob": 0.286,
   "edge": -3.8,
   "tier": "ticket",
-  "hit": null
+  "hit": true
  },
  {
   "date": "2026-08-10",
@@ -730,7 +730,7 @@
   "prob": 0.151,
   "edge": -5.0,
   "tier": "ticket",
-  "hit": null
+  "hit": true
  },
  {
   "date": "2026-08-10",
@@ -739,7 +739,7 @@
   "prob": 0.215,
   "edge": 0.1,
   "tier": "edge",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-08-10",
@@ -748,6 +748,42 @@
   "prob": 0.266,
   "edge": -1.9,
   "tier": "ticket",
+  "hit": false
+ },
+ {
+  "date": "2026-08-11",
+  "player": "Jonathan Aranda",
+  "odds": 352,
+  "prob": 0.207,
+  "edge": -1.4,
+  "tier": "ticket",
+  "hit": null
+ },
+ {
+  "date": "2026-08-11",
+  "player": "Junior Caminero",
+  "odds": 243,
+  "prob": 0.281,
+  "edge": -1.1,
+  "tier": "ticket",
+  "hit": null
+ },
+ {
+  "date": "2026-08-11",
+  "player": "Ben Rice",
+  "odds": 279,
+  "prob": 0.273,
+  "edge": 0.9,
+  "tier": "ticket",
+  "hit": null
+ },
+ {
+  "date": "2026-08-11",
+  "player": "Cal Raleigh",
+  "odds": 300,
+  "prob": 0.257,
+  "edge": 0.7,
+  "tier": "edge",
   "hit": null
  }
 ]

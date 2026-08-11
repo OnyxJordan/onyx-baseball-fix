@@ -1,40 +1,57 @@
 {
- "date": "2026-08-10",
- "locked": true,
+ "date": "2026-08-11",
+ "locked": false,
  "legs": [
   {
-   "player": "Junior Caminero",
-   "mid": 691406,
+   "player": "Jonathan Aranda",
+   "mid": 666018,
    "team": "TB",
-   "odds": 161,
-   "prob": 31.0,
-   "score": 0.775,
+   "odds": 352,
+   "prob": 20.7,
+   "score": 0.757,
    "why": [
-    "pitcher matchup ×1.31",
-    "fly-ball pitcher",
-    "wind/heat ×1.06"
-   ],
-   "away": "TB",
-   "home": "ATH",
-   "opp": "Jacob Lopez",
-   "time": "9:40 PM"
-  },
-  {
-   "player": "Yandy Díaz",
-   "mid": 650490,
-   "team": "TB",
-   "odds": 376,
-   "prob": 15.4,
-   "score": 0.615,
-   "why": [
-    "pitcher matchup ×1.31",
+    "pitcher matchup ×1.28",
     "platoon edge",
     "fly-ball pitcher"
    ],
    "away": "TB",
    "home": "ATH",
-   "opp": "Jacob Lopez",
+   "opp": "Mason Barnett",
    "time": "9:40 PM"
+  },
+  {
+   "player": "Junior Caminero",
+   "mid": 691406,
+   "team": "TB",
+   "odds": 243,
+   "prob": 28.1,
+   "score": 0.749,
+   "why": [
+    "pitcher matchup ×1.28",
+    "fly-ball pitcher",
+    "wind/heat ×1.06"
+   ],
+   "away": "TB",
+   "home": "ATH",
+   "opp": "Mason Barnett",
+   "time": "9:40 PM"
+  },
+  {
+   "player": "Ben Rice",
+   "mid": 700250,
+   "team": "NYY",
+   "odds": 279,
+   "prob": 27.3,
+   "score": 0.678,
+   "why": [
+    "park ×1.33",
+    "wind/heat ×1.13",
+    "overdue"
+   ],
+   "away": "SEA",
+   "home": "NYY",
+   "opp": "Bryan Woo",
+   "time": "7:05 PM"
   }
  ]
 }
