@@ -859,7 +859,10 @@ for p in pitchers_out:
         ln, pj = float(p["k_line"]), float(p["k_proj"])
     except (TypeError, ValueError):
         continue
-    if abs(pj - ln) < 1e-9:
+    # conviction filter (8/11): only track sides where the projection beats
+    # the line by MORE than 10% — 4.5 line needs 4.95+ for the over, 4.05 or
+    # less for the under. Coin-flip projections padded the record with noise.
+    if not (pj > ln * 1.10 or pj < ln * 0.90):
         continue
     kk = (stamp, nk(p.get("name") or ""))
     if kk in _kseen:
@@ -893,8 +896,9 @@ for r in results_out:
         continue
     _imp = round((r.get("dk_hr_implied") or (100.0 / (r["dk_hr_odds"] + 100.0) * 100 if r["dk_hr_odds"] > 0
                   else abs(r["dk_hr_odds"]) / (abs(r["dk_hr_odds"]) + 100.0) * 100)), 1)
-    if r["hr_prob"] <= _imp:
-        continue   # positive-edge lane only
+    if r["hr_prob"] - _imp <= 1.5:
+        continue   # conviction filter (8/11): edge must exceed 1.5 points,
+                   # not merely be positive — sub-1.5 edges were noise plays
     kk = (stamp, nk(r.get("matched_name") or ""))
     if kk in _hseen:
         continue
@@ -913,17 +917,21 @@ if _hadd:
         json.dump(_hrh, f, ensure_ascii=False)
     print(f"hr ledger: +{_hadd} positive-edge bat(s) for {stamp}")
 
-# per-day aggregates for the page ($10 flat per play)
+# per-day aggregates for the page ($10 flat per play). The conviction filter
+# applies HERE too, so the displayed record retro-counts only edge > 1.5
+# plays — the raw ledger keeps every row in case the threshold moves later.
+_hrq = [p for p in _hrh if isinstance(p, dict)
+        and ((p.get("prob") or 0) - (p.get("implied") or 0)) > 1.5]
 _hr_days = {}
-for p in _hrh:
-    if not isinstance(p, dict) or p.get("win") is None:
+for p in _hrq:
+    if p.get("win") is None:
         continue
     e = _hr_days.setdefault(str(p.get("date")), {"date": str(p.get("date")), "w": 0, "l": 0, "pnl": 0.0})
     e["w" if p["win"] else "l"] += 1
     e["pnl"] = round(e["pnl"] + ((10.0 * (p.get("odds") or 0) / 100.0) if p["win"] else -10.0), 2)
-_hr_set = [p for p in _hrh if isinstance(p, dict) and p.get("win") is not None]
+_hr_set = [p for p in _hrq if p.get("win") is not None]
 _hr_rec = {"days": sorted(_hr_days.values(), key=lambda e: e["date"], reverse=True),
-           "pending": sum(1 for p in _hrh if isinstance(p, dict) and p.get("win") is None and p.get("hr") is None),
+           "pending": sum(1 for p in _hrq if p.get("win") is None and p.get("hr") is None),
            "imp_avg": round(sum(p["implied"] for p in _hr_set) / len(_hr_set), 1) if _hr_set else None,
            "prob_avg": round(sum(p["prob"] for p in _hr_set) / len(_hr_set), 1) if _hr_set else None}
 
@@ -935,7 +943,16 @@ shell = replace_const(shell, "PITCHER_PROJ", pitchers_out)
 shell = replace_const(shell, "DAILY_RECAP", jload(dpath("recap.json"), {}))
 shell = replace_const(shell, "TICKET_LOCK", _tlock if _tlock.get("legs") else None)
 shell = replace_const(shell, "TICKET_HISTORY", _thist)
-shell = replace_const(shell, "K_HISTORY", _khist)
+# conviction filter at injection: the K tab and its record retro-count only
+# sides where the projection beats the line by >10%; the file keeps all rows
+def _k_conviction(p):
+    try:
+        pj, ln = float(p.get("proj")), float(p.get("line"))
+    except (TypeError, ValueError):
+        return False
+    return pj > ln * 1.10 or pj < ln * 0.90
+shell = replace_const(shell, "K_HISTORY",
+                      [p for p in _khist if isinstance(p, dict) and _k_conviction(p)])
 shell = replace_const(shell, "HR_RECORD", _hr_rec)
 
 # ---- Onyx game links: only today's harvested slugs ever ship ----
