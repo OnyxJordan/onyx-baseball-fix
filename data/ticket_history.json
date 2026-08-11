@@ -320,27 +320,113 @@
   "stake": 10,
   "legs": [
    {
+    "player": "CJ Abrams",
+    "odds": 370,
+    "prob": 18.2,
+    "hit": false
+   },
+   {
     "player": "Ben Rice",
-    "odds": 301,
-    "prob": 26.6,
-    "hit": null
+    "odds": 290,
+    "prob": 27.2,
+    "hit": false
    },
    {
     "player": "Esmerlyn Valdez",
-    "odds": 375,
-    "prob": 26.4,
-    "hit": null
+    "odds": 399,
+    "prob": 26.1,
+    "hit": false
    },
    {
     "player": "Trent Grisham",
-    "odds": 396,
-    "prob": 21.9,
+    "odds": 360,
+    "prob": 22.9,
+    "hit": false
+   }
+  ],
+  "result": "loss",
+  "pnl": -10.0
+ },
+ {
+  "date": "2026-08-08",
+  "stake": 10,
+  "legs": [
+   {
+    "player": "Bryce Harper",
+    "odds": 291,
+    "prob": 24.8,
+    "hit": true
+   },
+   {
+    "player": "Matt Olson",
+    "odds": 272,
+    "prob": 26.8,
+    "hit": false
+   },
+   {
+    "player": "Yordan Alvarez",
+    "odds": 247,
+    "prob": 27.7,
+    "hit": false
+   }
+  ],
+  "result": "loss",
+  "pnl": -10.0
+ },
+ {
+  "date": "2026-08-09",
+  "stake": 10,
+  "legs": [
+   {
+    "player": "Manny Machado",
+    "odds": null,
+    "prob": 18.2,
+    "hit": false
+   },
+   {
+    "player": "Yordan Alvarez",
+    "odds": null,
+    "prob": 22.9,
+    "hit": false
+   }
+  ],
+  "result": "loss",
+  "pnl": -10.0
+ },
+ {
+  "date": "2026-08-10",
+  "stake": 10,
+  "legs": [
+   {
+    "player": "Junior Caminero",
+    "odds": 161,
+    "prob": 31.0,
+    "hit": true
+   },
+   {
+    "player": "Yandy Díaz",
+    "odds": 376,
+    "prob": 15.4,
+    "hit": true
+   }
+  ],
+  "result": "win",
+  "pnl": 114.24
+ },
+ {
+  "date": "2026-08-11",
+  "stake": 10,
+  "legs": [
+   {
+    "player": "Jonathan Aranda",
+    "odds": 352,
+    "prob": 20.1,
     "hit": null
    },
    {
-    "player": "CJ Abrams",
-    "odds": 369,
-    "prob": 17.5,
+    "player": "Junior Caminero",
+    "odds": 243,
+    "prob": 27.6,
     "hit": null
    }
   ],
