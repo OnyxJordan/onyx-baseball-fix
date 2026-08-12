@@ -1,40 +1,57 @@
 {
- "date": "2026-08-11",
- "locked": true,
+ "date": "2026-08-12",
+ "locked": false,
  "legs": [
   {
-   "player": "Jonathan Aranda",
-   "mid": 666018,
-   "team": "TB",
-   "odds": 340,
-   "prob": 20.9,
-   "score": 0.757,
+   "player": "Munetaka Murakami",
+   "mid": 808959,
+   "team": "CWS",
+   "odds": 270,
+   "prob": 26.1,
+   "score": 0.718,
    "why": [
-    "pitcher matchup ×1.28",
+    "pitcher matchup ×1.22",
     "platoon edge",
-    "fly-ball pitcher"
+    "soft bullpen"
    ],
-   "away": "TB",
-   "home": "ATH",
-   "opp": "Mason Barnett",
-   "time": "9:40 PM"
+   "away": "CIN",
+   "home": "CWS",
+   "opp": "Rhett Lowder",
+   "time": "7:40 PM"
   },
   {
-   "player": "Junior Caminero",
-   "mid": 691406,
-   "team": "TB",
-   "odds": 243,
-   "prob": 28.1,
-   "score": 0.744,
+   "player": "Kyle Schwarber",
+   "mid": 656941,
+   "team": "PHI",
+   "odds": 273,
+   "prob": 26.6,
+   "score": 0.675,
    "why": [
-    "pitcher matchup ×1.28",
-    "fly-ball pitcher",
-    "wind/heat ×1.05"
+    "wind/heat ×1.18",
+    "overdue",
+    "platoon edge"
    ],
-   "away": "TB",
-   "home": "ATH",
-   "opp": "Mason Barnett",
-   "time": "9:40 PM"
+   "away": "PHI",
+   "home": "STL",
+   "opp": "Kyle Leahy",
+   "time": "2:15 PM"
+  },
+  {
+   "player": "Salvador Perez",
+   "mid": 521692,
+   "team": "KC",
+   "odds": 338,
+   "prob": 22.8,
+   "score": 0.656,
+   "why": [
+    "pitcher matchup ×1.30",
+    "overdue",
+    "fly-ball pitcher"
+   ],
+   "away": "KC",
+   "home": "LAD",
+   "opp": "Eric Lauer",
+   "time": "10:10 PM"
   }
  ]
 }
