@@ -1,8 +1,8 @@
 {
- "n": 84,
- "expected_hr": 17.68,
- "actual_hr": 15,
- "scale": 0.9372,
+ "n": 88,
+ "expected_hr": 18.7,
+ "actual_hr": 16,
+ "scale": 0.9383,
  "active": true,
  "buckets": [
   {
@@ -28,11 +28,11 @@
   },
   {
    "range": "20%+",
-   "n": 52,
-   "hits": 11,
-   "hit_rate": 0.2115,
-   "model_avg": 0.2442
+   "n": 56,
+   "hits": 12,
+   "hit_rate": 0.2143,
+   "model_avg": 0.2449
   }
  ],
- "updated": "2026-08-12T01:55:26.364564+00:00"
+ "updated": "2026-08-12T04:08:56.000725+00:00"
 }
