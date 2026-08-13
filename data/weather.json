@@ -1,26 +1,4 @@
 {
-  "WSH": {
-    "venue": "Nationals Park",
-    "temp": 92.8,
-    "precip": 0,
-    "wind_spd": 6.9,
-    "wind_dir": "WNW",
-    "humidity_pct": 38,
-    "pressure_mb": 1012.4,
-    "roof": false,
-    "flag": "clear"
-  },
-  "TOR": {
-    "venue": "Rogers Centre",
-    "temp": 77.8,
-    "precip": 6,
-    "wind_spd": 6.8,
-    "wind_dir": "S",
-    "humidity_pct": 69,
-    "pressure_mb": 1013.1,
-    "roof": true,
-    "flag": "clear"
-  },
   "LAD": {
     "venue": "Dodger Stadium",
     "temp": 71.8,
@@ -29,39 +7,6 @@
     "wind_dir": "WSW",
     "humidity_pct": 76,
     "pressure_mb": 1012.3,
-    "roof": false,
-    "flag": "clear"
-  },
-  "MIA": {
-    "venue": "loanDepot Park",
-    "temp": 89.5,
-    "precip": 2,
-    "wind_spd": 4.7,
-    "wind_dir": "E",
-    "humidity_pct": 67,
-    "pressure_mb": 1019.1,
-    "roof": true,
-    "flag": "clear"
-  },
-  "NYY": {
-    "venue": "Yankee Stadium",
-    "temp": 84.5,
-    "precip": 0,
-    "wind_spd": 8.9,
-    "wind_dir": "WNW",
-    "humidity_pct": 55,
-    "pressure_mb": 1011.2,
-    "roof": false,
-    "flag": "clear"
-  },
-  "LAA": {
-    "venue": "Angel Stadium",
-    "temp": 72.2,
-    "precip": 0,
-    "wind_spd": 7.5,
-    "wind_dir": "SW",
-    "humidity_pct": 76,
-    "pressure_mb": 1013.0,
     "roof": false,
     "flag": "clear"
   },
@@ -87,6 +32,39 @@
     "roof": false,
     "flag": "clear"
   },
+  "MIA": {
+    "venue": "loanDepot Park",
+    "temp": 89.5,
+    "precip": 2,
+    "wind_spd": 4.7,
+    "wind_dir": "E",
+    "humidity_pct": 67,
+    "pressure_mb": 1019.1,
+    "roof": true,
+    "flag": "clear"
+  },
+  "NYY": {
+    "venue": "Yankee Stadium",
+    "temp": 84.5,
+    "precip": 0,
+    "wind_spd": 8.9,
+    "wind_dir": "WNW",
+    "humidity_pct": 55,
+    "pressure_mb": 1011.2,
+    "roof": false,
+    "flag": "clear"
+  },
+  "TOR": {
+    "venue": "Rogers Centre",
+    "temp": 77.8,
+    "precip": 6,
+    "wind_spd": 6.8,
+    "wind_dir": "S",
+    "humidity_pct": 69,
+    "pressure_mb": 1013.1,
+    "roof": true,
+    "flag": "clear"
+  },
   "MIN": {
     "venue": "Target Field",
     "temp": 74.8,
@@ -95,6 +73,28 @@
     "wind_dir": "WSW",
     "humidity_pct": 74,
     "pressure_mb": 1013.3,
+    "roof": false,
+    "flag": "clear"
+  },
+  "WSH": {
+    "venue": "Nationals Park",
+    "temp": 92.8,
+    "precip": 0,
+    "wind_spd": 6.9,
+    "wind_dir": "WNW",
+    "humidity_pct": 38,
+    "pressure_mb": 1012.4,
+    "roof": false,
+    "flag": "clear"
+  },
+  "LAA": {
+    "venue": "Angel Stadium",
+    "temp": 72.2,
+    "precip": 0,
+    "wind_spd": 7.5,
+    "wind_dir": "SW",
+    "humidity_pct": 76,
+    "pressure_mb": 1013.0,
     "roof": false,
     "flag": "clear"
   }
