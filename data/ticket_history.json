@@ -441,28 +441,28 @@
     "player": "Munetaka Murakami",
     "odds": 269,
     "prob": 26.2,
-    "hit": null
+    "hit": false
    },
    {
     "player": "Kyle Schwarber",
     "odds": 273,
     "prob": 26.6,
-    "hit": null
+    "hit": false
    },
    {
     "player": "Salvador Perez",
     "odds": 338,
     "prob": 22.8,
-    "hit": null
+    "hit": "void"
    },
    {
     "player": "Colson Montgomery",
     "odds": 291,
     "prob": 23.9,
-    "hit": null
+    "hit": false
    }
   ],
-  "result": null,
-  "pnl": null
+  "result": "loss",
+  "pnl": -10.0
  }
 ]

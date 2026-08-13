@@ -802,7 +802,7 @@
   "prob": 0.261,
   "edge": -1.0,
   "tier": "ticket",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-08-12",
@@ -811,7 +811,7 @@
   "prob": 0.266,
   "edge": -0.2,
   "tier": "ticket",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-08-12",
@@ -829,7 +829,7 @@
   "prob": 0.227,
   "edge": 0.1,
   "tier": "edge",
-  "hit": null
+  "hit": true
  },
  {
   "date": "2026-08-12",
@@ -838,6 +838,6 @@
   "prob": 0.239,
   "edge": -1.7,
   "tier": "ticket",
-  "hit": null
+  "hit": false
  }
 ]
