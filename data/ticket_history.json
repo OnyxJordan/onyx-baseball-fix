@@ -419,14 +419,66 @@
   "legs": [
    {
     "player": "Jonathan Aranda",
-    "odds": 352,
-    "prob": 20.1,
-    "hit": null
+    "odds": 340,
+    "prob": 20.9,
+    "hit": false
    },
    {
     "player": "Junior Caminero",
     "odds": 243,
-    "prob": 27.6,
+    "prob": 28.1,
+    "hit": true
+   }
+  ],
+  "result": "loss",
+  "pnl": -10.0
+ },
+ {
+  "date": "2026-08-12",
+  "stake": 10,
+  "legs": [
+   {
+    "player": "Munetaka Murakami",
+    "odds": 269,
+    "prob": 26.2,
+    "hit": false
+   },
+   {
+    "player": "Kyle Schwarber",
+    "odds": 273,
+    "prob": 26.6,
+    "hit": false
+   },
+   {
+    "player": "Salvador Perez",
+    "odds": 338,
+    "prob": 22.8,
+    "hit": "void"
+   },
+   {
+    "player": "Colson Montgomery",
+    "odds": 291,
+    "prob": 23.9,
+    "hit": false
+   }
+  ],
+  "result": "loss",
+  "pnl": -10.0
+ },
+ {
+  "date": "2026-08-13",
+  "stake": 10,
+  "legs": [
+   {
+    "player": "Wilyer Abreu",
+    "odds": 302,
+    "prob": 24.1,
+    "hit": null
+   },
+   {
+    "player": "Cal Raleigh",
+    "odds": 314,
+    "prob": 25.8,
     "hit": null
    }
   ],

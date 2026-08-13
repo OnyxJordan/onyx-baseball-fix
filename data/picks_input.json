@@ -757,7 +757,7 @@
   "prob": 0.207,
   "edge": -1.4,
   "tier": "ticket",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-08-11",
@@ -766,7 +766,7 @@
   "prob": 0.281,
   "edge": -1.1,
   "tier": "ticket",
-  "hit": null
+  "hit": true
  },
  {
   "date": "2026-08-11",
@@ -775,7 +775,7 @@
   "prob": 0.273,
   "edge": 0.9,
   "tier": "ticket",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-08-11",
@@ -783,6 +783,105 @@
   "odds": 300,
   "prob": 0.257,
   "edge": 0.7,
+  "tier": "edge",
+  "hit": false
+ },
+ {
+  "date": "2026-08-11",
+  "player": "Yordan Alvarez",
+  "odds": 366,
+  "prob": 0.224,
+  "edge": 0.9,
+  "tier": "edge",
+  "hit": false
+ },
+ {
+  "date": "2026-08-12",
+  "player": "Munetaka Murakami",
+  "odds": 270,
+  "prob": 0.261,
+  "edge": -1.0,
+  "tier": "ticket",
+  "hit": false
+ },
+ {
+  "date": "2026-08-12",
+  "player": "Kyle Schwarber",
+  "odds": 273,
+  "prob": 0.266,
+  "edge": -0.2,
+  "tier": "ticket",
+  "hit": false
+ },
+ {
+  "date": "2026-08-12",
+  "player": "Salvador Perez",
+  "odds": 338,
+  "prob": 0.228,
+  "edge": 0,
+  "tier": "ticket",
+  "hit": false
+ },
+ {
+  "date": "2026-08-12",
+  "player": "Dominic Canzone",
+  "odds": 342,
+  "prob": 0.227,
+  "edge": 0.1,
+  "tier": "edge",
+  "hit": true
+ },
+ {
+  "date": "2026-08-12",
+  "player": "Colson Montgomery",
+  "odds": 291,
+  "prob": 0.239,
+  "edge": -1.7,
+  "tier": "ticket",
+  "hit": false
+ },
+ {
+  "date": "2026-08-13",
+  "player": "Cal Raleigh",
+  "odds": 302,
+  "prob": 0.277,
+  "edge": 2.8,
+  "tier": "ticket",
+  "hit": null
+ },
+ {
+  "date": "2026-08-13",
+  "player": "Wilyer Abreu",
+  "odds": 339,
+  "prob": 0.233,
+  "edge": 0.5,
+  "tier": "ticket",
+  "hit": null
+ },
+ {
+  "date": "2026-08-13",
+  "player": "Ben Rice",
+  "odds": 294,
+  "prob": 0.262,
+  "edge": 0.8,
+  "tier": "edge",
+  "hit": null
+ },
+ {
+  "date": "2026-08-13",
+  "player": "Shohei Ohtani",
+  "odds": 297,
+  "prob": 0.252,
+  "edge": 0.1,
+  "tier": "edge",
+  "hit": null
+ },
+ {
+  "date": "2026-08-13",
+  "player": "Willson Contreras",
+  "odds": 366,
+  "prob": 0.23,
+  "edge": 1.6,
   "tier": "edge",
   "hit": null
  }
