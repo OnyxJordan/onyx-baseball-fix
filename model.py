@@ -1,5 +1,19 @@
 """
-model.py — Onyx Baseball v35 HR probability model + pitcher K projections
+model.py — Onyx Baseball v36 HR probability model + pitcher K projections
+
+v36: recency gets real teeth. The board kept surfacing bats with big
+careers and empty fortnights (Cal Raleigh cold streaks), because the
+L14 form fade floored at -10% while the due meter's top tier handed
+the same drought a +18% boost — a cold slugger netted out BOOSTED.
+Study evidence (1,741 rows, 20+ L14 PA): ice-cold bats (L14 rate under
+0.35x career) cashed at 58% of their implied price — the worst bucket
+on the board; red-hot bats (2x+ career) were nearly as bad at 61%
+(the market over-chases streaks); the due meter's 1.18x tier cashed
+at 66% of price — field average, deserving no boost. Changes: form
+fade floor 0.90 -> 0.80 with reliability pa/(pa+90) (was pa/(pa+130)),
+hot-form cap 1.12 -> 1.08, due meter capped at 1.10 (top tier
+removed). Edge-lane replay: losing plays halved, ROI -14.6% -> -10.6%
+(small n; the ledger stays the referee).
 
 v35: rebuilt on our own graded evidence. Study of 2,112 player-games
 (210 HR, 7/25-8/2, archived pregame boards joined to box scores):
@@ -583,7 +597,9 @@ def due_meter(d: dict, sc: float, l14: dict = None) -> float:
         return 1.0
     expected = career_rate * l14_pa
     due_score = (expected - l14_hr) * sc
-    if due_score > 1.2:   return 1.18
+    # v36: top tier removed — deep droughts got x1.18 but cashed at just
+    # 66% of price (field average, no boost earned); a huge career with an
+    # empty fortnight is as likely decline as due. 1.10 is now the ceiling.
     if due_score > 0.6:   return 1.10
     if due_score > 0.15:  return 1.04
     if due_score > -0.15: return 1.00
@@ -679,8 +695,12 @@ def project_player(
     if l14 and l14.get("l14_pa", 0) >= 20 and base > 0:
         l14_pa_f = l14.get("l14_pa", 0) or 0
         ratio = max(0.5, min(1.8, l14["l14_rate"] / base))
-        rel = l14_pa_f / (l14_pa_f + 130.0)
-        form_adj = max(0.90, min(1.12, 1.0 + (ratio - 1.0) * rel))
+        # v36: the fade has teeth (floor 0.80, was 0.90; rel PA+90, was
+        # PA+130) and the hot boost is trimmed (cap 1.08, was 1.12) — the
+        # study's ice-cold bucket cashed at 58% of price, its on-fire
+        # bucket at 61%; both extremes were overpriced.
+        rel = l14_pa_f / (l14_pa_f + 90.0)
+        form_adj = max(0.80, min(1.08, 1.0 + (ratio - 1.0) * rel))
         base = base * form_adj
 
     # 3. SC score (prefers live L14 Statcast)
