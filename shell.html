@@ -1635,8 +1635,9 @@ body::after {
 /* ── PURPLE LEADS (8/14 pass 2): the brand guide is the direction.
    Purple 400 owns identity + every active/interactive state; Seed is
    reserved for wins, live pulses, and positive money. ── */
-.logo-ball { animation:onyxSpin 7s linear infinite; will-change:transform; border-radius:50%; }
-@keyframes onyxSpin { to { transform:rotate(360deg); } }
+.logo-ball { animation:onyxSpin 4s linear infinite; will-change:transform; border-radius:50%; }
+@keyframes onyxSpin { from { transform:perspective(220px) rotateY(0deg); }
+                      to   { transform:perspective(220px) rotateY(360deg); } }
 @media (prefers-reduced-motion: reduce) { .logo-ball { animation:none; } }
 .nav-tab.active { border-bottom-color:var(--logo-purple); text-shadow:0 0 12px rgba(176,56,249,.35); }
 .dd-item.active, .drawer-item.active { color:#d795ff; }
@@ -1665,22 +1666,19 @@ body::after {
 <!-- ═══ NAV ═══════════════════════════════════════════════════ -->
 <nav class="nav">
   <a class="nav-logo" href="#" onclick="gotoTab('home');return false">
-    <!-- Brand mark: Purple 400 baseball, Onyx seams with Titanium stitching,
-         slow spin (paused for prefers-reduced-motion) -->
+    <!-- The official Onyx graphic mark (from the brand hub), set on a
+         Titanium baseball with Purple 600 seams; spins horizontally.
+         Mark path is verbatim from the brand site SVG. -->
     <svg class="logo-svg logo-ball" viewBox="0 0 64 64" aria-label="Onyx Baseball">
-      <defs>
-        <radialGradient id="ballShine" cx="35%" cy="30%" r="80%">
-          <stop offset="0%" stop-color="#d795ff"/>
-          <stop offset="55%" stop-color="#b038f9"/>
-          <stop offset="100%" stop-color="#8d16b8"/>
-        </radialGradient>
-      </defs>
-      <circle cx="32" cy="32" r="29" fill="url(#ballShine)"/>
-      <path d="M13 8 C 27 21, 27 43, 13 56" stroke="#0c0c0c" stroke-width="4.5" fill="none" stroke-linecap="round"/>
-      <path d="M51 8 C 37 21, 37 43, 51 56" stroke="#0c0c0c" stroke-width="4.5" fill="none" stroke-linecap="round"/>
-      <path d="M13 8 C 27 21, 27 43, 13 56" stroke="#fcfcfc" stroke-width="2" fill="none" stroke-linecap="round" stroke-dasharray="1.5 5"/>
-      <path d="M51 8 C 37 21, 37 43, 51 56" stroke="#fcfcfc" stroke-width="2" fill="none" stroke-linecap="round" stroke-dasharray="1.5 5"/>
-      <circle cx="32" cy="32" r="29" fill="none" stroke="rgba(12,12,12,.55)" stroke-width="1.5"/>
+      <circle cx="32" cy="32" r="29" fill="#fcfcfc"/>
+      <path d="M12 9 C 25.5 21.5, 25.5 42.5, 12 55" stroke="#8d16b8" stroke-width="3.6" fill="none" stroke-linecap="round"/>
+      <path d="M52 9 C 38.5 21.5, 38.5 42.5, 52 55" stroke="#8d16b8" stroke-width="3.6" fill="none" stroke-linecap="round"/>
+      <path d="M12 9 C 25.5 21.5, 25.5 42.5, 12 55" stroke="#d795ff" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-dasharray="1.4 4.6"/>
+      <path d="M52 9 C 38.5 21.5, 38.5 42.5, 52 55" stroke="#d795ff" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-dasharray="1.4 4.6"/>
+      <g transform="translate(21.6,18.2) scale(0.0416)">
+        <path d="M195.205 545.89L287.671 595.205L117.808 684.931L0 621.918V201.37L195.205 99.3151V545.89ZM304.795 139.041L212.329 89.726L382.192 0L500 63.0137V484.247L304.795 586.301V139.041Z" fill="#B038F9"/>
+      </g>
+      <circle cx="32" cy="32" r="29" fill="none" stroke="rgba(12,12,12,.35)" stroke-width="1.5"/>
     </svg>
     <div class="logo-words">
       <div class="logo-onyx">ONYX</div>
