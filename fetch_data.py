@@ -885,6 +885,57 @@ def fetch_pitcher_statcast():
     (OUT / "pitchers_l14.json").write_text(json.dumps(pitchers, indent=2))
     return pitchers
 
+def fetch_trend_splits():
+    """Season TRAJECTORY splits: EARLY (season start through 31 days ago) vs
+    LATE (last 30 days), hitters and pitchers, straight off the MLB Stats
+    API. Feeds the model's v37 trajectory factor — the 1st-half star whose
+    bat died in July (Ben Rice 168 -> 71 wRC+) looks fine to a career anchor
+    and only mildly cold to a 14-day window; the month-scale slide is its
+    own signal. wRC+ itself is a FanGraphs stat, so OPS carries the hitter
+    trend (same ordering for our purpose) and K/BF + HR/BF carry pitchers."""
+    print("Fetching season trend splits (early vs last 30 days)...")
+    today = ball_today()
+    windows = {
+        "e": (datetime.date(today.year, 3, 20), today - datetime.timedelta(days=31)),
+        "l": (today - datetime.timedelta(days=30), today),
+    }
+    out = {"hitters": {}, "pitchers": {}}
+    for grp, bucket in (("hitting", "hitters"), ("pitching", "pitchers")):
+        for win, (s, e) in windows.items():
+            try:
+                data = mlb_get("/stats", {
+                    "stats": "byDateRange", "group": grp, "sportId": 1,
+                    "startDate": s.strftime("%Y-%m-%d"),
+                    "endDate": e.strftime("%Y-%m-%d"),
+                    "limit": 3000, "offset": 0, "playerPool": "all",
+                })
+            except Exception as ex:
+                print(f"  trend {grp}/{win}: fetch failed ({ex}) - factor idles")
+                continue
+            for sp in (data.get("stats") or [{}])[0].get("splits") or []:
+                name = ((sp.get("player") or {}).get("fullName") or "").lower().strip()
+                st = sp.get("stat") or {}
+                if not name:
+                    continue
+                rec = out[bucket].setdefault(name, {})
+                if grp == "hitting":
+                    pa = int(st.get("plateAppearances") or 0)
+                    if pa < 1:
+                        continue
+                    obp = _pct_str(st.get("obp")); slg = _pct_str(st.get("slg"))
+                    rec[f"{win}_pa"]  = pa
+                    rec[f"{win}_ops"] = round(obp + slg, 3)
+                    rec[f"{win}_hr"]  = int(st.get("homeRuns") or 0)
+                else:
+                    bf = int(st.get("battersFaced") or 0)
+                    if bf < 1:
+                        continue
+                    rec[f"{win}_bf"]   = bf
+                    rec[f"{win}_kbf"]  = round((st.get("strikeOuts") or 0) / bf, 4)
+                    rec[f"{win}_hrbf"] = round((st.get("homeRuns") or 0) / bf, 4)
+    (OUT / "trend_splits.json").write_text(json.dumps(out))
+    print(f"  trend splits: {len(out['hitters'])} hitters, {len(out['pitchers'])} pitchers")
+
 # ── MAIN ──────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     print("=== Onyx Baseball — Fetching data ===\n")
@@ -896,4 +947,5 @@ if __name__ == "__main__":
     fetch_starter_season()
     fetch_team_k()
     fetch_pitcher_statcast()
+    fetch_trend_splits()
     print("\n=== Done. Ready for auto_build.py ===")
