@@ -1,5 +1,23 @@
 """
-model.py — Onyx Baseball v37 HR probability model + pitcher K projections
+model.py — Onyx Baseball v38 HR probability model + pitcher K projections
+
+v38: THIS season is evidence — and trajectory is about stability, not
+direction. Two changes, both from a fresh replay (1,398 study rows
+joined to reconstructed early-vs-late-season windows):
+(1) The 2026 season now blends into BOTH anchors by its own sample
+(w = pa26/(pa26+300), cap 60%): the season barrel rate joins the
+quality anchor and the season HR/PA joins the outcome base. The
+3-year window let a monster 2025 carry bats whose 2026 collapsed —
+big careers with sub-11% 2026 barrels cashed at 44% of price (4/46)
+vs 80% when quality held (33/175). Cal Raleigh (career 6.3% HR/PA,
+16.4% barrels; 2026 4.0% and 11.1%) was the poster case.
+(2) Trajectory reshaped stability-first: steady bats cashed at 81%
+of implied while fallers (59-66%) AND risers (54-65%) both lagged —
+the market chases trends in both directions. The v37 linear factor
+is replaced by a fade of |change| (floor 0.82, no boost side); its
+boost leg had created phantom edge on the worst-performing bucket.
+The season outcome rate reads LIVE from the trend windows, not the
+mid-July career-db bake, so the blend sees the slide as it happens.
 
 v37: season TRAJECTORY joins the mix. A month-plus of 2026 history now
 separates early-season level from current level, and the deep fallers
@@ -680,6 +698,14 @@ def project_player(
     # its level through cold outcome stretches.
     _b3 = d.get("b3", None)
     xhr_pa = None
+    # v38: the CURRENT season's barrel rate blends into the quality anchor
+    # by its own sample. The 3-year window let a monster 2025 carry a bat
+    # whose 2026 contact collapsed: big careers with sub-11% 2026 barrels
+    # cashed at 44% of price (4/46) vs 80% when the quality held (33/175).
+    _p6 = d.get("p6") or 0
+    if _b3 is not None and d.get("b6") is not None and _p6 >= 100:
+        _w6q = min(_p6 / (_p6 + 300.0), 0.60)
+        _b3 = (1 - _w6q) * float(_b3) + _w6q * float(d["b6"])
     if _b3 is not None and pa_3yr >= 150:
         xhr_pa = max(0.002, min(0.075, (0.52 * float(_b3) + 0.006) * 0.64))
         # v30: launch geometry — barrels only become homers in the air, to
@@ -716,6 +742,24 @@ def project_player(
     else:
         base = c_adj
 
+    # 1c. v38: the current season's OUTCOME rate joins the base the same
+    # way — this is evidence, not trivia. By August a 300-PA 2026 season
+    # carries ~half the base; the 3-year anchor keeps the other half so
+    # one hot April can't crown a fluke either. The rate comes LIVE from
+    # the trend windows (early + last-30, refreshed every run) — the
+    # career-db h6 bake is frozen mid-July and misses exactly the slide
+    # this factor exists to catch; h6 is only the fallback.
+    _tr_pa = ((trend.get("e_pa") or 0) + (trend.get("l_pa") or 0)) if trend else 0
+    _h6 = d.get("h6")
+    if base > 0:
+        if _tr_pa >= 100:
+            _sr = ((trend.get("e_hr") or 0) + (trend.get("l_hr") or 0)) / _tr_pa
+            _w6 = min(_tr_pa / (_tr_pa + 300.0), 0.60)
+            base = (1 - _w6) * base + _w6 * _sr
+        elif _h6 is not None and _p6 >= 100:
+            _w6 = min(_p6 / (_p6 + 300.0), 0.60)
+            base = (1 - _w6) * base + _w6 * float(_h6)
+
     # 2. L14 form adjustment — reliability-shrunk. HR/PA needs ~170 PA to
     # stabilize; a 50-PA window is mostly noise, so the observed ratio is
     # regressed toward 1.0 by sample size and capped tight.
@@ -730,15 +774,18 @@ def project_player(
         form_adj = max(0.80, min(1.08, 1.0 + (ratio - 1.0) * rel))
         base = base * form_adj
 
-    # 2b. v37 season trajectory — current LEVEL vs early season, on broad
-    # production (OPS), not HR outcomes (that's L14's lane). Catches the
-    # month-scale faller whose career numbers still gleam: Ben Rice at
-    # 168 -> 71 wRC+ halves was a top-3 board fixture all August.
+    # 2b. v38 season trajectory — STABILITY-shaped, not linear. The
+    # historical replay (1,398 rows, reconstructed early-vs-late windows)
+    # showed movement in EITHER direction is overpriced: steady bats cashed
+    # at 81% of implied while fallers (59-66%) AND risers (54-65%) lagged —
+    # the market chases trends both ways. So trajectory fades the extremes
+    # and boosts nothing; v37's linear boost side created phantom edge on
+    # the worst bucket and was pulled after one day.
     traj_mult = 1.0
     if trend and (trend.get("e_pa") or 0) >= 150 and (trend.get("l_pa") or 0) >= 50:
         t_ratio = ((trend.get("l_ops") or 0) + 0.150) / ((trend.get("e_ops") or 0) + 0.150)
         t_rel = trend["l_pa"] / (trend["l_pa"] + 120.0)
-        traj_mult = max(0.85, min(1.10, 1.0 + (t_ratio - 1.0) * t_rel))
+        traj_mult = max(0.82, 1.0 - 0.6 * abs(t_ratio - 1.0) * t_rel)
         base = base * traj_mult
 
     # 3. SC score (prefers live L14 Statcast)
