@@ -1632,6 +1632,25 @@ body::after {
 .gc-lastplay { border-left:3px solid var(--logo-purple); background:linear-gradient(90deg, rgba(176,56,249,.08), transparent 60%), var(--bg2); }
 .gc-lastplay .gc-card-title { color:#d795ff; }
 .gc-lastplay .lp-txt { font-size:13.5px; color:var(--text); line-height:1.55; }
+/* ── PURPLE LEADS (8/14 pass 2): the brand guide is the direction.
+   Purple 400 owns identity + every active/interactive state; Seed is
+   reserved for wins, live pulses, and positive money. ── */
+.logo-ball { animation:onyxSpin 7s linear infinite; will-change:transform; border-radius:50%; }
+@keyframes onyxSpin { to { transform:rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .logo-ball { animation:none; } }
+.nav-tab.active { border-bottom-color:var(--logo-purple); text-shadow:0 0 12px rgba(176,56,249,.35); }
+.dd-item.active, .drawer-item.active { color:#d795ff; }
+.rfchip.active { background:rgba(176,56,249,.12); border-color:rgba(176,56,249,.35); color:#d795ff; }
+.dfs-btn.active { background:var(--logo-purple); color:#fff; }
+.tl-dot.active { border-color:var(--logo-purple); background:rgba(176,56,249,.1); }
+.tl-dot.active::after { background:var(--logo-purple); }
+.gc-subnav button.on { background:rgba(176,56,249,.14); border-color:rgba(176,56,249,.4); color:#d795ff; }
+/* headline gradients lean purple-first: Purple 400 -> Purple 200 -> Blue 400 */
+:root { --brand-grad: linear-gradient(90deg,#b038f9 0%,#d795ff 55%,#635bff 100%);
+        --brand-grad-diag: linear-gradient(135deg,#b038f9 0%,#8d16b8 50%,#635bff 100%); }
+/* one geometry: 16px cards, pill chips, consistent gutters */
+.mkt-card, .power-card, .rk-card, .money-card, .gc-chip, .home-card { border-radius:16px; }
+.rfchip, .lu-game-btn, .dfs-btn { border-radius:999px; }
 /* thumb-friendly odds everywhere - every one of these taps feeds a bet */
 .sb-ml, .gc-bet-chip, .mkt-ou, .mkt-chip { min-height:38px; display:inline-flex; align-items:center; justify-content:center; }
 .onyx-bet-btn { min-height:40px; }
@@ -1646,8 +1665,23 @@ body::after {
 <!-- ═══ NAV ═══════════════════════════════════════════════════ -->
 <nav class="nav">
   <a class="nav-logo" href="#" onclick="gotoTab('home');return false">
-    <!-- Exact Onyx logo: two 3D-ish rectangular shapes, purple left + blue-violet right -->
-    <img src="icon-192.png" class="logo-svg" style="width:32px;height:32px;border-radius:6px;object-fit:contain" alt="Onyx">
+    <!-- Brand mark: Purple 400 baseball, Onyx seams with Titanium stitching,
+         slow spin (paused for prefers-reduced-motion) -->
+    <svg class="logo-svg logo-ball" viewBox="0 0 64 64" aria-label="Onyx Baseball">
+      <defs>
+        <radialGradient id="ballShine" cx="35%" cy="30%" r="80%">
+          <stop offset="0%" stop-color="#d795ff"/>
+          <stop offset="55%" stop-color="#b038f9"/>
+          <stop offset="100%" stop-color="#8d16b8"/>
+        </radialGradient>
+      </defs>
+      <circle cx="32" cy="32" r="29" fill="url(#ballShine)"/>
+      <path d="M13 8 C 27 21, 27 43, 13 56" stroke="#0c0c0c" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+      <path d="M51 8 C 37 21, 37 43, 51 56" stroke="#0c0c0c" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+      <path d="M13 8 C 27 21, 27 43, 13 56" stroke="#fcfcfc" stroke-width="2" fill="none" stroke-linecap="round" stroke-dasharray="1.5 5"/>
+      <path d="M51 8 C 37 21, 37 43, 51 56" stroke="#fcfcfc" stroke-width="2" fill="none" stroke-linecap="round" stroke-dasharray="1.5 5"/>
+      <circle cx="32" cy="32" r="29" fill="none" stroke="rgba(12,12,12,.55)" stroke-width="1.5"/>
+    </svg>
     <div class="logo-words">
       <div class="logo-onyx">ONYX</div>
       <div class="logo-sub">Baseball</div>
@@ -1711,7 +1745,7 @@ body::after {
   <div class="nav-right">
     <button class="notif-bell" id="notifBell" onclick="toggleNotif()" title="Browser alert when a modeled batter homers">🔔</button>
     <span class="nav-badge">AUG 14 · 2026</span>
-    <span class="nav-date" id="buildStamp">updated 2:54 pm et</span>
+    <span class="nav-date" id="buildStamp">updated 3:04 pm et</span>
     <span class="nav-date" id="liveCount"></span>
   </div>
 </nav>
