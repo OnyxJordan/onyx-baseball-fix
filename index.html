@@ -81,7 +81,7 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
 .logo-svg{width:34px;height:34px;flex-shrink:0}
 .logo-words{line-height:1}
 .logo-onyx{font-size:16px;font-weight:800;letter-spacing:.06em;color:var(--text)}
-.logo-sub{font-size:9px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--green);margin-top:1px}
+.logo-sub{font-size:9px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:#d795ff;margin-top:1px}
 .nav-tabs{display:flex;gap:0;flex:1}
 .nav-tab{
   height:58px;display:flex;align-items:center;gap:7px;
@@ -606,7 +606,7 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
 .home-hero-title .line1 { display:block; }
 .home-hero-title .line2 {
   display:block;
-  background:linear-gradient(90deg, #61e970 0%, #635bff 55%, #b038f9 100%);
+  background:linear-gradient(90deg, #b038f9 0%, #d795ff 55%, #635bff 100%);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;
   background-clip:text;
   background-size:200% auto;
@@ -631,14 +631,14 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
   display:inline-flex;align-items:center;gap:9px;
   padding:13px 26px;border-radius:10px;
   font-family:var(--font-body);font-size:13px;font-weight:600;letter-spacing:.02em;
-  background:var(--neon-green);color:#000;
+  background:linear-gradient(135deg,#b038f9,#8d16b8);color:#fff;
   border:none;cursor:pointer;
-  box-shadow:0 0 24px rgba(0,255,136,.25),inset 0 1px 0 rgba(255,255,255,.2);
+  box-shadow:0 0 24px rgba(176,56,249,.3),inset 0 1px 0 rgba(255,255,255,.2);
   transition:all .2s;text-decoration:none;
 }
 .btn-primary:hover {
   transform:translateY(-2px);
-  box-shadow:0 0 40px rgba(0,255,136,.4),0 8px 24px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.25);
+  box-shadow:0 0 40px rgba(176,56,249,.45),0 8px 24px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.25);
 }
 .btn-primary svg{width:15px;height:15px}
 .btn-secondary {
@@ -713,9 +713,9 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
   transition:transform .3s;
 }
 .home-stat:hover .home-stat-val { transform:scale(1.04); }
-.home-stat-val.green  { color:var(--neon-green); text-shadow:0 0 20px rgba(0,255,136,.3); }
-.home-stat-val.purple { color:var(--neon-purple);text-shadow:0 0 20px rgba(191,90,242,.3); }
-.home-stat-val.blue   { color:var(--neon-blue);  text-shadow:0 0 20px rgba(10,132,255,.3); }
+.home-stat-val.green  { color:#b038f9; text-shadow:0 0 20px rgba(176,56,249,.3); }
+.home-stat-val.purple { color:#d795ff; text-shadow:0 0 20px rgba(215,149,255,.3); }
+.home-stat-val.blue   { color:#9b96ff; text-shadow:0 0 20px rgba(155,150,255,.3); }
 .home-stat-label {
   font-family:var(--font-body);
   font-size:10px;font-weight:600;letter-spacing:.14em;
@@ -946,7 +946,7 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
 .gc-chip.active {
   border-color:transparent; color:var(--text);
   background:linear-gradient(var(--bg3),var(--bg3)) padding-box,
-             linear-gradient(90deg,#A020F0,#4060F0) border-box;
+             linear-gradient(90deg,#b038f9,#635bff) border-box;
 }
 .gc-chip .gcc-state { font-size:9px; color:var(--text3); }
 .gc-chip .gcc-state.live { color:var(--neon-green); animation:dotBlink 1.4s ease-in-out infinite; }
@@ -957,7 +957,7 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
 }
 .gc-header::before {
   content:''; position:absolute; top:0; left:0; right:0; height:2px;
-  background:linear-gradient(90deg,transparent,#A020F0,#4060F0,transparent);
+  background:linear-gradient(90deg,transparent,#b038f9,#635bff,transparent);
 }
 .gc-side { display:flex; align-items:center; gap:14px; }
 .gc-side.home { justify-content:flex-end; }
@@ -983,17 +983,17 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
 .gc-line th, .gc-line td { padding:5px 7px; text-align:center; border-bottom:1px solid rgba(26,37,53,.5); }
 .gc-line th { font-size:9px; color:var(--text3); font-weight:700; }
 .gc-line td:first-child, .gc-line th:first-child { text-align:left; font-weight:800; }
-.gc-line td.cur { background:rgba(160,32,240,.12); }
+.gc-line td.cur { background:rgba(176,56,249,.12); }
 .gc-line .rhe { font-weight:800; border-left:1px solid var(--border2); }
 .gc-matchup { display:grid; grid-template-columns:1fr 1fr auto auto; gap:16px; align-items:center; }
 .gc-mu-role { font-size:9px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text3); }
-.gc-mu-name { font-size:14px; font-weight:800; margin:3px 0 2px; background:linear-gradient(90deg,#A020F0,#4060F0); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+.gc-mu-name { font-size:14px; font-weight:800; margin:3px 0 2px; background:linear-gradient(90deg,#b038f9,#635bff); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
 .gc-mu-line { font-size:11px; color:var(--text2); font-family:monospace; }
 .gc-count { text-align:right; font-family:monospace; font-size:10px; color:var(--text3); }
 .gc-dots { display:flex; gap:4px; justify-content:flex-end; margin:2px 0; align-items:center; }
 .gc-dot { width:9px; height:9px; border-radius:50%; background:var(--bg4); border:1px solid var(--border2); }
-.gc-dot.on-b { background:#4060F0; border-color:#4060F0; }
-.gc-dot.on-s { background:#A020F0; border-color:#A020F0; }
+.gc-dot.on-b { background:#635bff; border-color:#635bff; }
+.gc-dot.on-s { background:#b038f9; border-color:#b038f9; }
 .gc-dot.on-o { background:#f87171; border-color:#f87171; }
 /* ── app-style scoreboard grid ── */
 .sb-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:10px; margin-bottom:16px; }
@@ -1018,11 +1018,11 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
 .sb-toprow .sb-ou { flex-shrink:0; }
 .sb-team .sticker-logo, .sb-team .sb-ab, .sb-team .sb-ml { flex-shrink:0; }
 .sb-card.sched .sb-ml { min-width:64px; text-align:center; }
-.sb-card:hover { border-color:rgba(160,32,240,.4); transform:translateY(-2px); }
+.sb-card:hover { border-color:rgba(176,56,249,.4); transform:translateY(-2px); }
 .sb-card:active { transform:scale(.97); }
-.sb-card.sel { border-color:rgba(160,32,240,.65); box-shadow:0 0 14px rgba(160,32,240,.15); }
-.sb-card.live { border-color:rgba(160,32,240,.4); animation:sbGlow 3.2s ease-in-out infinite; }
-@keyframes sbGlow { 0%,100% { box-shadow:0 0 0 rgba(160,32,240,0); } 50% { box-shadow:0 0 18px rgba(160,32,240,.2); } }
+.sb-card.sel { border-color:rgba(176,56,249,.65); box-shadow:0 0 14px rgba(176,56,249,.15); }
+.sb-card.live { border-color:rgba(176,56,249,.4); animation:sbGlow 3.2s ease-in-out infinite; }
+@keyframes sbGlow { 0%,100% { box-shadow:0 0 0 rgba(176,56,249,0); } 50% { box-shadow:0 0 18px rgba(176,56,249,.2); } }
 .sb-in { animation:sbIn .45s cubic-bezier(.2,.9,.3,1.3) backwards; }
 @keyframes sbIn { from { opacity:0; transform:translateY(12px) scale(.96); } }
 .sb-score { display:inline-block; }
@@ -1034,7 +1034,7 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
 .sb-score { margin-left:auto; font-family:monospace; font-size:20px; font-weight:900; line-height:1; }
 .sb-score.lose { color:var(--text3); }
 .sb-ml { margin-left:auto; font-family:monospace; font-size:10px; font-weight:700; color:var(--text2); background:var(--bg3); border:1px solid var(--border2); border-radius:6px; padding:3px 7px; transition:all .15s; }
-.sb-ml:hover { border-color:rgba(160,32,240,.65); color:#fff; box-shadow:0 0 8px rgba(160,32,240,.3); }
+.sb-ml:hover { border-color:rgba(176,56,249,.65); color:#fff; box-shadow:0 0 8px rgba(176,56,249,.3); }
 .sb-side { display:flex; flex-direction:column; align-items:flex-end; justify-content:center; gap:5px; min-width:58px; flex-shrink:0; }
 .sb-state { font-family:monospace; font-size:11px; font-weight:700; letter-spacing:.03em; white-space:nowrap; }
 .sb-state.live { color:#4ade80; display:flex; align-items:center; gap:5px; }
@@ -1044,26 +1044,26 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
 .sb-dot { width:7px; height:7px; border-radius:50%; background:#4ade80; animation:sbPulse 1.6s ease-in-out infinite; }
 @keyframes sbPulse { 50% { opacity:.3; } }
 .sb-dia rect { fill:var(--bg4); stroke:var(--border2); stroke-width:1; }
-.sb-dia rect.on { fill:#A020F0; stroke:#A020F0; }
+.sb-dia rect.on { fill:#b038f9; stroke:#b038f9; }
 .sb-oc { display:flex; align-items:center; gap:6px; }
 .sb-outs { display:flex; gap:3px; }
 .sb-outs span { width:6px; height:6px; border-radius:50%; background:var(--bg4); border:1px solid var(--border2); }
 .sb-outs span.on { background:#f87171; border-color:#f87171; }
 .sb-count { font-family:monospace; font-size:10px; font-weight:800; color:var(--text2); }
 /* ── Onyx bet bar (the funnel) ── */
-.gc-betbar { display:flex; align-items:center; gap:10px; flex-wrap:wrap; background:linear-gradient(90deg, rgba(160,32,240,.12), rgba(64,96,240,.10)); border:1px solid rgba(160,32,240,.4); border-radius:14px; padding:10px 12px; margin-bottom:14px; }
-.gc-bet-cta { font-family:monospace; font-size:12px; font-weight:800; letter-spacing:.04em; color:#fff; background:linear-gradient(90deg,#A020F0,#4060F0); border-radius:9px; padding:10px 16px; cursor:pointer; white-space:nowrap; transition:all .15s; }
-.gc-bet-cta:hover { box-shadow:0 0 16px rgba(160,32,240,.55); transform:translateY(-1px); }
+.gc-betbar { display:flex; align-items:center; gap:10px; flex-wrap:wrap; background:linear-gradient(90deg, rgba(176,56,249,.12), rgba(64,96,240,.10)); border:1px solid rgba(176,56,249,.4); border-radius:14px; padding:10px 12px; margin-bottom:14px; }
+.gc-bet-cta { font-family:monospace; font-size:12px; font-weight:800; letter-spacing:.04em; color:#fff; background:linear-gradient(90deg,#b038f9,#635bff); border-radius:9px; padding:10px 16px; cursor:pointer; white-space:nowrap; transition:all .15s; }
+.gc-bet-cta:hover { box-shadow:0 0 16px rgba(176,56,249,.55); transform:translateY(-1px); }
 .gc-bet-chips { display:flex; gap:6px; flex-wrap:wrap; }
 .gc-bet-chip { font-family:monospace; font-size:11px; font-weight:700; color:var(--text2); background:var(--bg3); border:1px solid var(--border2); border-radius:8px; padding:7px 11px; cursor:pointer; transition:all .15s; white-space:nowrap; }
-.gc-bet-chip:hover { border-color:rgba(160,32,240,.65); color:#fff; box-shadow:0 0 8px rgba(160,32,240,.3); }
+.gc-bet-chip:hover { border-color:rgba(176,56,249,.65); color:#fff; box-shadow:0 0 8px rgba(176,56,249,.3); }
 /* ── HR watch headshot strip ── */
 .gc-hs-row { display:flex; gap:12px; overflow-x:auto; padding:4px 2px 10px; scrollbar-width:thin; }
 .gc-hs { flex:none; width:74px; text-align:center; cursor:pointer; transition:transform .12s; }
 .gc-hs:active { transform:scale(.94); }
 .gc-hs-img { width:58px; height:58px; margin:0 auto; border-radius:50%;
   background-repeat:no-repeat; background-position:center;
-  box-shadow:inset 0 0 0 2px rgba(160,32,240,.65), 0 0 14px rgba(160,32,240,.25); }
+  box-shadow:inset 0 0 0 2px rgba(176,56,249,.65), 0 0 14px rgba(176,56,249,.25); }
 .gc-hs.hit .gc-hs-img { box-shadow:inset 0 0 0 2px #d795ff, 0 0 16px rgba(215,149,255,.55); }
 /* small ringed headshot for tables (rankings). The ring is drawn INSET so
    the ring + full spot disc live entirely inside this element's own box;
@@ -1071,14 +1071,14 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
    the circle. Disc at 86% clears the 1.5px inset ring at every size. */
 .rk-hs { width:30px; height:30px; border-radius:50%; flex-shrink:0; display:inline-block;
   background-color:#12101d; background-size:86%; background-position:center; background-repeat:no-repeat;
-  box-shadow:inset 0 0 0 1.5px rgba(160,32,240,.65); margin:0 3px 0 2px; align-self:center; vertical-align:middle; }
+  box-shadow:inset 0 0 0 1.5px rgba(176,56,249,.65); margin:0 3px 0 2px; align-self:center; vertical-align:middle; }
 .gc-hs-pct { font-family:monospace; font-size:11px; font-weight:800; color:#c9a6ff; margin-top:5px; }
 .gc-hs.hit .gc-hs-pct { color:#d795ff; }
 .gc-hs-name { font-size:10px; font-weight:700; color:var(--text2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .gc-hs-odds { font-family:monospace; font-size:9px; color:var(--text3); }
 /* ── HR-in-N-parks chips ── */
 .gc-parks { display:inline-flex; align-items:center; gap:4px; font-family:monospace; font-size:9px; font-weight:800;
-  padding:2px 7px; border-radius:20px; background:rgba(160,32,240,.14); color:#c9a6ff; border:1px solid rgba(160,32,240,.35); white-space:nowrap; }
+  padding:2px 7px; border-radius:20px; background:rgba(176,56,249,.14); color:#c9a6ff; border:1px solid rgba(176,56,249,.35); white-space:nowrap; }
 .gc-parks.nd { background:linear-gradient(90deg,rgba(215,149,255,.22),rgba(251,113,36,.18)); color:#d795ff; border-color:rgba(215,149,255,.55);
   box-shadow:0 0 10px rgba(215,149,255,.25); }
 .gc-parks.scrape { background:rgba(96,165,250,.12); color:#93c5fd; border-color:rgba(96,165,250,.35); }
@@ -1098,7 +1098,7 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
   user-select:none; letter-spacing:.02em; }
 .pb-fab.on { background:linear-gradient(135deg,#00b000,#61e970); box-shadow:0 4px 18px rgba(97,233,112,.4); }
 .pb-fab b { background:rgba(0,0,0,.25); border-radius:10px; padding:1px 7px; margin-left:4px; }
-.pb-panel { background:#151515; border:1.5px solid rgba(160,32,240,.5); border-radius:14px;
+.pb-panel { background:#151515; border:1.5px solid rgba(176,56,249,.5); border-radius:14px;
   padding:10px 12px; width:100%; box-shadow:0 8px 30px rgba(0,0,0,.65);
   max-height:min(55vh, 420px); overflow-y:auto; }
 .pb-head { font-size:10px; font-weight:900; letter-spacing:.12em; color:#b038f9; margin-bottom:7px;
@@ -1149,7 +1149,7 @@ body.parlay-armed .mkt-chip, body.parlay-armed .mkt-ou, body.parlay-armed .gc-be
 .gc-hrpop .ring { position:absolute; inset:-1px; border-radius:18px; border:2px solid rgba(215,149,255,.8); pointer-events:none;
   animation:gcShock 1.2s ease-out .15s 2; opacity:0; }
 .gc-hrpop .tag { font-size:10px; font-weight:900; letter-spacing:.24em; text-transform:uppercase;
-  background:linear-gradient(90deg,#d795ff,#fb7136); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+  background:linear-gradient(90deg,#d795ff,#8d16b8); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
 .gc-hrpop .who { display:flex; align-items:center; gap:12px; margin-top:8px; }
 .gc-hrpop .nm { font-size:17px; font-weight:800; color:#fff; line-height:1.15; }
 .gc-hrpop .ln { font-family:monospace; font-size:11px; color:var(--text2); margin-top:3px; }
@@ -1181,16 +1181,16 @@ body.parlay-armed .mkt-chip, body.parlay-armed .mkt-ou, body.parlay-armed .gc-be
 @keyframes gcTrail { 0% { opacity:0; } 35% { opacity:.5; } 100% { opacity:0; } }
 /* ── The Model's Ticket (HR parlay) ── */
 .slam-wrap { margin:16px 12px 4px; padding:15px 16px 13px; border-radius:14px; position:relative;
-  background:linear-gradient(155deg, rgba(160,32,240,.13), var(--bg2) 55%); border:1px solid rgba(160,32,240,.4);
-  box-shadow:0 0 24px rgba(160,32,240,.10); }
+  background:linear-gradient(155deg, rgba(176,56,249,.13), var(--bg2) 55%); border:1px solid rgba(176,56,249,.4);
+  box-shadow:0 0 24px rgba(176,56,249,.10); }
 .slam-head { display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; }
 .slam-tag { font-size:12px; font-weight:900; letter-spacing:.14em; color:#fff; }
 .slam-conf { font-size:9px; font-weight:800; letter-spacing:.12em; padding:3px 9px; border-radius:14px;
-  background:linear-gradient(90deg,#d795ff,#fb7136); color:#151005; }
+  background:linear-gradient(90deg,#d795ff,#8d16b8); color:#151005; }
 .slam-note { font-size:10px; color:var(--text3); margin:5px 0 10px; line-height:1.4; }
 .slam-leg { display:flex; align-items:center; gap:10px; padding:8px 6px; border-radius:10px; cursor:pointer; transition:background .12s; }
 .slam-leg:hover { background:rgba(255,255,255,.03); }
-.slam-leg + .slam-leg { border-top:1px dashed rgba(160,32,240,.18); }
+.slam-leg + .slam-leg { border-top:1px dashed rgba(176,56,249,.18); }
 .slam-n { width:17px; height:17px; border-radius:50%; background:var(--bg4); border:1px solid var(--border2);
   display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:800; color:var(--text3); flex-shrink:0;
   font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace; }
@@ -1205,13 +1205,13 @@ body.parlay-armed .mkt-chip, body.parlay-armed .mkt-ou, body.parlay-armed .gc-be
   background:var(--bg3); border:1px solid var(--border2); border-radius:7px; padding:4px 8px; cursor:pointer; flex-shrink:0;
   display:inline-flex; align-items:center; gap:5px; transition:all .13s; }
 .slam-odds i { font-style:normal; font-size:8px; font-weight:800; color:#60a5fa; background:rgba(96,165,250,.15); padding:1px 5px; border-radius:4px; }
-.slam-odds:hover { border-color:rgba(160,32,240,.6); color:#fff; box-shadow:0 0 8px rgba(160,32,240,.3); }
-.slam-foot { display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-top:11px; padding-top:10px; border-top:1px solid rgba(160,32,240,.22); }
+.slam-odds:hover { border-color:rgba(176,56,249,.6); color:#fff; box-shadow:0 0 8px rgba(176,56,249,.3); }
+.slam-foot { display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-top:11px; padding-top:10px; border-top:1px solid rgba(176,56,249,.22); }
 .slam-pay, .slam-all { font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace; font-size:11px; color:var(--text2); }
 .slam-pay b { color:#34d399; font-size:13px; } .slam-all b { color:#c9a6ff; }
 .slam-cta { margin-left:auto; font-size:11px; font-weight:800; padding:7px 14px; border-radius:9px; cursor:pointer;
-  background:linear-gradient(90deg,#7a2ce0,#a020f0); color:#fff; box-shadow:0 0 12px rgba(160,32,240,.35); transition:all .15s; }
-.slam-cta:hover { box-shadow:0 0 18px rgba(160,32,240,.6); transform:translateY(-1px); }
+  background:linear-gradient(90deg,#7a2ce0,#a020f0); color:#fff; box-shadow:0 0 12px rgba(176,56,249,.35); transition:all .15s; }
+.slam-cta:hover { box-shadow:0 0 18px rgba(176,56,249,.6); transform:translateY(-1px); }
 /* ── Pitchers & Ks tab ── */
 .pt-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(310px,1fr)); gap:10px; padding:0 20px 24px; }
 .pt-card { background:var(--bg2); border:1px solid var(--border); border-radius:16px; padding:14px 16px; position:relative; overflow:hidden; }
@@ -1235,7 +1235,7 @@ body.parlay-armed .mkt-chip, body.parlay-armed .mkt-ou, body.parlay-armed .gc-be
 .pt-tile .k { font-size:8px; color:var(--text3); letter-spacing:.06em; text-transform:uppercase; margin-top:2px;
   overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .pt-facts { display:flex; gap:6px; flex-wrap:wrap; margin-top:9px; }
-.pt-fact { font-size:9px; font-weight:700; font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace; padding:2px 7px; border-radius:12px; background:rgba(160,32,240,.10); color:#c9a6ff; border:1px solid rgba(160,32,240,.25); }
+.pt-fact { font-size:9px; font-weight:700; font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace; padding:2px 7px; border-radius:12px; background:rgba(176,56,249,.10); color:#c9a6ff; border:1px solid rgba(176,56,249,.25); }
 .gc-linemv { font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace; font-size:9.5px; color:var(--text3); margin-top:6px; }
 .gc-linemv b { color:var(--text2); }
 /* ── bottom app nav (mobile) ── */
@@ -1267,12 +1267,12 @@ body.parlay-armed .mkt-chip, body.parlay-armed .mkt-ou, body.parlay-armed .gc-be
 /* big raised center action: Games is the app's flagship button */
 .bnav-item.big .bi { width:52px; height:52px; margin-top:-28px; border-radius:50%;
   display:flex; align-items:center; justify-content:center; font-size:24px;
-  background:linear-gradient(135deg,#A020F0,#4060F0);
-  box-shadow:0 6px 18px rgba(160,32,240,.45), 0 0 0 4px rgba(12,12,12,.95);
+  background:linear-gradient(135deg,#b038f9,#635bff);
+  box-shadow:0 6px 18px rgba(176,56,249,.45), 0 0 0 4px rgba(12,12,12,.95);
   filter:none; opacity:1; }
 .bnav-item.big { color:var(--text2); }
 .bnav-item.big.active { color:#c9a6ff; }
-.bnav-item.big.active .bi { box-shadow:0 6px 24px rgba(160,32,240,.75), 0 0 0 4px rgba(12,12,12,.95); }
+.bnav-item.big.active .bi { box-shadow:0 6px 24px rgba(176,56,249,.75), 0 0 0 4px rgba(12,12,12,.95); }
 /* notification preferences menu */
 .notif-menu { position:fixed; top:calc(60px + env(safe-area-inset-top, 0px)); right:12px; z-index:1200;
   width:270px; background:rgba(10,14,24,.98); border:1px solid var(--border2); border-radius:14px;
@@ -1288,14 +1288,14 @@ body.parlay-armed .mkt-chip, body.parlay-armed .mkt-ou, body.parlay-armed .gc-be
   background:var(--bg3); cursor:pointer; position:relative; flex-shrink:0; transition:all .15s; }
 .notif-tog span { position:absolute; top:2px; left:2px; width:16px; height:16px; border-radius:50%;
   background:var(--text3); transition:all .18s; }
-.notif-tog.on { background:linear-gradient(90deg,#A020F0,#4060F0); border-color:rgba(160,32,240,.6); }
+.notif-tog.on { background:linear-gradient(90deg,#b038f9,#635bff); border-color:rgba(176,56,249,.6); }
 .notif-tog.on span { left:20px; background:#fff; }
 .notif-enable { width:100%; font-family:monospace; font-size:11px; font-weight:800; color:#fff;
-  background:linear-gradient(90deg,#A020F0,#4060F0); border:none; border-radius:9px;
+  background:linear-gradient(90deg,#b038f9,#635bff); border:none; border-radius:9px;
   padding:10px; cursor:pointer; margin-bottom:4px; }
 .gc-subnav { display:flex; gap:8px; margin:0 0 14px; }
 .gc-subnav button { background:var(--card); border:1px solid var(--border2); color:var(--text3); font-family:monospace; font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; padding:8px 14px; border-radius:8px; cursor:pointer; transition:all .15s; }
-.gc-subnav button.on { color:#fff; border-color:rgba(160,32,240,.6); background:rgba(160,32,240,.14); }
+.gc-subnav button.on { color:#fff; border-color:rgba(176,56,249,.6); background:rgba(176,56,249,.14); }
 .gc-zonewrap { display:flex; flex-direction:column; align-items:center; gap:3px; }
 .gc-zonewrap .zl { font-size:8px; font-weight:700; letter-spacing:.12em; color:var(--text3); text-transform:uppercase; }
 .gc-pitchrow { display:flex; align-items:center; gap:8px; padding:4px 0; font-size:11px; color:var(--text2); border-top:1px solid rgba(26,37,53,.5); font-family:monospace; }
@@ -1304,9 +1304,9 @@ body.parlay-armed .mkt-chip, body.parlay-armed .mkt-ou, body.parlay-armed .gc-be
 .gc-pitchrow .pt { color:var(--text3); }
 .gc-pbp-inn { font-family:monospace; font-size:10px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--text3); padding:14px 2px 6px; }
 .gc-pbp-row { background:var(--card); border:1px solid var(--border2); border-radius:10px; padding:10px 12px; margin-bottom:8px; cursor:pointer; transition:border-color .15s; }
-.gc-pbp-row:hover { border-color:rgba(160,32,240,.45); }
+.gc-pbp-row:hover { border-color:rgba(176,56,249,.45); }
 .gc-pbp-row.scoring { border-color:rgba(52,211,153,.45); }
-.gc-pbp-row .ev { font-family:monospace; font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#A020F0; }
+.gc-pbp-row .ev { font-family:monospace; font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#b038f9; }
 .gc-pbp-row.scoring .ev { color:#34d399; }
 .gc-pbp-row .sc { float:right; font-family:monospace; font-size:11px; font-weight:800; color:var(--text2); }
 .gc-pbp-row .ds { font-size:12px; color:var(--text2); line-height:1.5; margin-top:3px; }
@@ -1315,15 +1315,15 @@ body.parlay-armed .mkt-chip, body.parlay-armed .mkt-ou, body.parlay-armed .gc-be
 .gc-ars { display:grid; grid-template-columns:auto 1fr; gap:20px; align-items:start; }
 .gc-ars-chips { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
 .gc-ars-chip { font-family:monospace; font-size:9px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--text3); background:var(--bg4); border:1px solid var(--border2); border-radius:20px; padding:5px 11px; cursor:pointer; transition:all .15s; }
-.gc-ars-chip:hover { color:var(--text2); border-color:rgba(160,32,240,.4); }
-.gc-ars-chip.on { color:#fff; border-color:rgba(160,32,240,.65); background:rgba(160,32,240,.16); box-shadow:0 0 12px rgba(160,32,240,.25); }
+.gc-ars-chip:hover { color:var(--text2); border-color:rgba(176,56,249,.4); }
+.gc-ars-chip.on { color:#fff; border-color:rgba(176,56,249,.65); background:rgba(176,56,249,.16); box-shadow:0 0 12px rgba(176,56,249,.25); }
 .gc-ars-tiles { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:12px; }
 .gc-ars-tile { background:var(--bg4); border:1px solid var(--border2); border-radius:10px; padding:9px 10px 7px; text-align:center; }
-.gc-ars-tile .v { font-family:monospace; font-size:19px; font-weight:800; background:linear-gradient(90deg,#A020F0,#4060F0); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+.gc-ars-tile .v { font-family:monospace; font-size:19px; font-weight:800; background:linear-gradient(90deg,#b038f9,#635bff); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
 .gc-ars-tile .k { font-size:8px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--text3); margin-top:2px; }
 .gc-ars-typerow { display:flex; align-items:center; gap:9px; padding:6px 9px; border-radius:8px; cursor:pointer; border:1px solid transparent; transition:all .12s; }
 .gc-ars-typerow:hover { background:var(--bg4); }
-.gc-ars-typerow.on { border-color:rgba(160,32,240,.5); background:rgba(160,32,240,.1); }
+.gc-ars-typerow.on { border-color:rgba(176,56,249,.5); background:rgba(176,56,249,.1); }
 .gc-ars-typerow .sw { width:10px; height:10px; border-radius:3px; flex:none; }
 .gc-ars-typerow .nm { font-size:11px; font-weight:700; min-width:112px; }
 .gc-ars-typerow .bar { flex:1; height:5px; background:var(--bg4); border-radius:3px; overflow:hidden; }
@@ -1389,14 +1389,14 @@ tr.row-done td, .tcard.card-done { opacity:.5; }
 .pmodal { background:var(--bg2); border:1px solid var(--border2); border-radius:16px;
   width:100%; max-width:520px; overflow:hidden; position:relative; }
 .pmodal::before { content:''; position:absolute; top:0; left:0; right:0; height:2px;
-  background:linear-gradient(90deg,#A020F0,#4060F0); }
+  background:linear-gradient(90deg,#b038f9,#635bff); }
 .pmodal-head { display:flex; align-items:center; gap:12px; padding:20px 22px 14px; }
 .pmodal-close { margin-left:auto; background:none; border:none; color:var(--text3); font-size:20px; cursor:pointer; }
 .pmodal-name { font-size:18px; font-weight:800; }
 .pmodal-sub { font-size:11px; color:var(--text3); font-family:monospace; margin-top:2px; }
 .pmodal-prob { text-align:center; padding:6px 0 16px; }
 .pmodal-prob .big { font-size:40px; font-weight:800; font-family:monospace;
-  background:linear-gradient(90deg,#A020F0,#4060F0); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+  background:linear-gradient(90deg,#b038f9,#635bff); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
 .pmodal-prob .cap { font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--text3); }
 .pmodal-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; padding:0 22px 16px; }
 .pmodal-stat { background:var(--bg3); border:1px solid var(--border); border-radius:9px; padding:9px 6px; text-align:center; }
@@ -1438,15 +1438,15 @@ body::after {
   content:''; position:fixed; inset:0; z-index:-1; pointer-events:none;
   background:
     radial-gradient(900px 500px at 85% -10%, rgba(64,96,240,.07), transparent 60%),
-    radial-gradient(700px 420px at 10% 110%, rgba(160,32,240,.06), transparent 60%);
+    radial-gradient(700px 420px at 10% 110%, rgba(176,56,249,.06), transparent 60%);
 }
 /* nav identity: gradient underline on the active tab */
 .nav-tab { position:relative; }
 .nav-tab.active { border-bottom-color:transparent; text-shadow:none; }
 .nav-tab.active::after {
   content:''; position:absolute; left:10px; right:10px; bottom:-1px; height:2px;
-  border-radius:2px; background:linear-gradient(90deg,#A020F0,#4060F0);
-  box-shadow:0 0 10px rgba(160,32,240,.55);
+  border-radius:2px; background:linear-gradient(90deg,#b038f9,#635bff);
+  box-shadow:0 0 10px rgba(176,56,249,.55);
 }
 #liveCount .nav-live-dot {
   display:inline-block; width:6px; height:6px; border-radius:50%;
@@ -1461,8 +1461,8 @@ body::after {
   border-color:var(--border2); transform:translateY(-1px);
 }
 .tcard:hover, .mkt-card:hover, .gc-card:hover {
-  border-color:rgba(160,32,240,.35);
-  box-shadow:0 6px 24px rgba(0,0,0,.35), 0 0 0 1px rgba(160,32,240,.12);
+  border-color:rgba(176,56,249,.35);
+  box-shadow:0 6px 24px rgba(0,0,0,.35), 0 0 0 1px rgba(176,56,249,.12);
 }
 /* number motion when live data changes */
 @keyframes bumpNum { 0%{transform:scale(1)} 35%{transform:scale(1.3);color:var(--neon-green)} 100%{transform:scale(1)} }
@@ -1491,10 +1491,10 @@ body::after {
   padding:20px 22px; margin-bottom:26px; transition:border-color .18s, box-shadow .18s;
 }
 .recap-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px;
-  background:linear-gradient(90deg,#A020F0,#4060F0); }
-.recap-card:hover { border-color:rgba(160,32,240,.4); box-shadow:0 6px 24px rgba(0,0,0,.35); }
+  background:linear-gradient(90deg,#b038f9,#635bff); }
+.recap-card:hover { border-color:rgba(176,56,249,.4); box-shadow:0 6px 24px rgba(0,0,0,.35); }
 .recap-tag { font-size:10px; font-weight:700; letter-spacing:.12em; text-transform:uppercase;
-  background:linear-gradient(90deg,#A020F0,#4060F0); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+  background:linear-gradient(90deg,#b038f9,#635bff); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
 .recap-head { font-size:20px; font-weight:800; margin:6px 0 4px; }
 .recap-sub { font-size:12px; color:var(--text2); font-family:monospace; }
 .recap-cta { font-size:12px; font-weight:700; color:#b38cff; margin-top:10px; }
@@ -1549,26 +1549,26 @@ body::after {
   background:var(--bg3); border:1px solid var(--border2);
   cursor:pointer; transition:all .15s;
 }
-.mkt-chip:hover { border-color:rgba(160,32,240,.6); box-shadow:0 0 10px rgba(160,32,240,.25); transform:translateY(-1px); }
+.mkt-chip:hover { border-color:rgba(176,56,249,.6); box-shadow:0 0 10px rgba(176,56,249,.25); transform:translateY(-1px); }
 .onyx-bet-btn { display:inline-flex; align-items:center; gap:5px; margin-left:auto;
   font-size:10px; font-weight:800; font-family:monospace; letter-spacing:.04em;
-  color:#fff; background:linear-gradient(90deg,#A020F0,#4060F0);
-  border:1px solid rgba(160,32,240,.7); border-radius:6px; padding:5px 11px;
+  color:#fff; background:linear-gradient(90deg,#b038f9,#635bff);
+  border:1px solid rgba(176,56,249,.7); border-radius:6px; padding:5px 11px;
   cursor:pointer; transition:all .15s; white-space:nowrap; }
-.onyx-bet-btn:hover { box-shadow:0 0 14px rgba(160,32,240,.5); transform:translateY(-1px); filter:brightness(1.12); }
+.onyx-bet-btn:hover { box-shadow:0 0 14px rgba(176,56,249,.5); transform:translateY(-1px); filter:brightness(1.12); }
 .mkt-chip.yes { color:#4ade80; } .mkt-chip.no { color:#f87171; }
 .mkt-chip.rl { color:#c084fc; min-width:70px; }
 .mkt-ou { font-family:monospace; font-size:10px; font-weight:700; color:var(--text2);
   background:var(--bg3); border:1px solid var(--border2); border-radius:6px;
   padding:4px 8px; cursor:pointer; transition:all .15s; }
-.mkt-ou:hover { border-color:rgba(160,32,240,.6); color:#fff; box-shadow:0 0 8px rgba(160,32,240,.25); }
+.mkt-ou:hover { border-color:rgba(176,56,249,.6); color:#fff; box-shadow:0 0 8px rgba(176,56,249,.25); }
 .mkt-note { padding:8px 18px 12px; font-size:9px; color:var(--text3); font-family:monospace; letter-spacing:.04em; }
 .mkt-head { cursor:pointer; }
 .mkt-histbtn { display:inline-flex; align-items:center; gap:5px; background:var(--bg3);
   border:1px solid var(--border2); border-radius:8px; color:var(--text2); font-size:11px;
   font-weight:700; padding:6px 11px; cursor:pointer; white-space:nowrap; transition:all .15s; }
-.mkt-histbtn:hover { color:var(--text); border-color:rgba(160,32,240,.5); }
-.mkt-card.open .mkt-histbtn { color:#b38cff; border-color:rgba(160,32,240,.5); }
+.mkt-histbtn:hover { color:var(--text); border-color:rgba(176,56,249,.5); }
+.mkt-card.open .mkt-histbtn { color:#b38cff; border-color:rgba(176,56,249,.5); }
 .mkt-chev { font-size:11px; color:inherit; transition:transform .2s; display:inline-block; }
 .mkt-card.open .mkt-chev { transform:rotate(180deg); }
 .mkt-chart.big { height:230px; }
@@ -1639,7 +1639,11 @@ body::after {
 @keyframes onyxSpin { from { transform:perspective(220px) rotateY(0deg); }
                       to   { transform:perspective(220px) rotateY(360deg); } }
 @media (prefers-reduced-motion: reduce) { .logo-ball { animation:none; } }
-.nav-tab.active { border-bottom-color:var(--logo-purple); text-shadow:0 0 12px rgba(176,56,249,.35); }
+/* ONE active indicator: the ::after pill. The old border-bottom (green,
+   then purple) stacked under it and read as a doubled/dashed line. */
+.nav-tab.active { border-bottom-color:transparent !important; text-shadow:none; }
+.nav-tab.active::after { background:linear-gradient(90deg,#b038f9,#d795ff);
+  box-shadow:0 2px 8px rgba(176,56,249,.35); bottom:0; }
 .dd-item.active, .drawer-item.active { color:#d795ff; }
 .rfchip.active { background:rgba(176,56,249,.12); border-color:rgba(176,56,249,.35); color:#d795ff; }
 .dfs-btn.active { background:var(--logo-purple); color:#fff; }
@@ -1743,7 +1747,7 @@ body::after {
   <div class="nav-right">
     <button class="notif-bell" id="notifBell" onclick="toggleNotif()" title="Browser alert when a modeled batter homers">🔔</button>
     <span class="nav-badge">AUG 14 · 2026</span>
-    <span class="nav-date" id="buildStamp">updated 3:12 pm et</span>
+    <span class="nav-date" id="buildStamp">updated 3:22 pm et</span>
     <span class="nav-date" id="liveCount"></span>
   </div>
 </nav>
@@ -3192,7 +3196,7 @@ function openPlayerCard(name) {
   };
   el.innerHTML = `
     <div class="pmodal-head">
-      ${r.mid ? `<span class="rk-hs" style="width:46px;height:46px;background-image:url(https://midfield.mlbstatic.com/v1/people/${r.mid}/spots/120);box-shadow:inset 0 0 0 2px rgba(160,32,240,.65), 0 0 12px rgba(160,32,240,.25)"></span>` : (typeof teamBadge === 'function' ? teamBadge(r.team, '38') : '')}
+      ${r.mid ? `<span class="rk-hs" style="width:46px;height:46px;background-image:url(https://midfield.mlbstatic.com/v1/people/${r.mid}/spots/120);box-shadow:inset 0 0 0 2px rgba(176,56,249,.65), 0 0 12px rgba(176,56,249,.25)"></span>` : (typeof teamBadge === 'function' ? teamBadge(r.team, '38') : '')}
       <div>
         <div class="pmodal-name">${r.matched_name}${lp.hitHR ? ' <span class="hit-flag">HR ✓</span>' : ''}</div>
         <div class="pmodal-sub">#${r.batting_order} ${r.pos} · ${r.team} · vs ${r.opp_pitcher || 'TBD'} ${r.opp_pitcher_hand || ''}HP · ${r.venue || ''}</div>
@@ -3949,7 +3953,7 @@ function gcHrStrip() {
     let lastName = parts.slice(-1)[0];
     if (/^(jr\.?|sr\.?|ii|iii|iv)$/i.test(lastName) && parts.length > 2) lastName = parts.slice(-2).join(' ');
     return `<div class="gc-hs${hit ? ' hit' : ''}" data-p="${(r.matched_name || '').replace(/"/g, '&quot;')}" onclick="openPlayerCard(this.dataset.p)">
-      <div class="gc-hs-img" style="background-image:url(https://midfield.mlbstatic.com/v1/people/${r.mid}/spots/120),radial-gradient(circle at 50% 42%, rgba(160,32,240,.16), rgba(18,18,18,.9) 78%);background-size:86%,cover;background-position:center,center"></div>
+      <div class="gc-hs-img" style="background-image:url(https://midfield.mlbstatic.com/v1/people/${r.mid}/spots/120),radial-gradient(circle at 50% 42%, rgba(176,56,249,.16), rgba(18,18,18,.9) 78%);background-size:86%,cover;background-position:center,center"></div>
       <div class="gc-hs-pct">${hit ? 'HR ✓' : pct + '%'}</div>
       <div class="gc-hs-name">${lastName}</div>
       ${r.dk_hr_odds && !hit ? `<div class="gc-hs-odds">${fmtOdds(r.dk_hr_odds)}</div>` : ''}
@@ -4062,7 +4066,7 @@ let _gcPrevScore = {};
 function gcPitchClr(ev) {
   const d = ev.details || {};
   if (d.isInPlay) return '#34d399';
-  if (d.isBall) return '#4060F0';
+  if (d.isBall) return '#635bff';
   const c = ((d.call || {}).description || d.description || '').toLowerCase();
   if (c.includes('foul')) return '#d795ff';
   return '#f87171';   // called or swinging strike
@@ -4296,7 +4300,7 @@ function gcZone(events, big, batSide, isCur, kid, play) {
   return `<svg viewBox="0 0 ${VW} ${VH}" width="${Math.round(VW * s)}" height="${Math.round(VH * s)}" class="gc-scene ${camCls}" style="display:block;max-width:100%">
     <g class="gc-cam">
     ${scene}
-    <rect x="${zx.toFixed(1)}" y="${zy.toFixed(1)}" width="${zw.toFixed(1)}" height="${zh.toFixed(1)}" fill="rgba(160,32,240,.09)" stroke="rgba(160,32,240,.6)" stroke-width="1.5" rx="2" style="filter:drop-shadow(0 0 6px rgba(160,32,240,.3))"/>
+    <rect x="${zx.toFixed(1)}" y="${zy.toFixed(1)}" width="${zw.toFixed(1)}" height="${zh.toFixed(1)}" fill="rgba(176,56,249,.09)" stroke="rgba(176,56,249,.6)" stroke-width="1.5" rx="2" style="filter:drop-shadow(0 0 6px rgba(176,56,249,.3))"/>
     ${grid}${pitcherKid}${batterKid}${track}${streak}${dots}
     </g>
     ${flash}
@@ -4320,7 +4324,7 @@ function gcPitchList(events) {
 // filterable by type and result, velocity trend, latest pitch pulsing.
 const GC_PT_COL = {FF:'#A855F7', FA:'#A855F7', SI:'#6366F1', FC:'#22d3ee',
   SL:'#34d399', ST:'#10b981', SV:'#14b8a6', CU:'#d795ff', KC:'#d795ff',
-  CS:'#d795ff', CH:'#f472b6', FS:'#fb7185', FO:'#fb7185', SC:'#fb923c',
+  CS:'#d795ff', CH:'#f472b6', FS:'#fb7185', FO:'#fb7185', SC:'#8d16b8',
   KN:'#94a3b8', EP:'#94a3b8'};
 function gcPtCol(code) { return GC_PT_COL[code] || '#94a3b8'; }
 function gcPitchRes(ev) {
@@ -4395,10 +4399,10 @@ function gcZoneBig(pitches, lastEv) {
   }).join('');
   return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="display:block">
     <defs><linearGradient id="gcZoneG" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="rgba(160,32,240,.10)"/><stop offset="1" stop-color="rgba(64,96,240,.08)"/>
+      <stop offset="0" stop-color="rgba(176,56,249,.10)"/><stop offset="1" stop-color="rgba(64,96,240,.08)"/>
     </linearGradient></defs>
     <rect x="0" y="0" width="${W}" height="${H}" rx="10" fill="rgba(255,255,255,.02)" stroke="rgba(26,37,53,.6)"/>
-    <rect x="${zx.toFixed(1)}" y="${zy.toFixed(1)}" width="${zw.toFixed(1)}" height="${zh.toFixed(1)}" fill="url(#gcZoneG)" stroke="rgba(160,32,240,.7)" stroke-width="1.8" style="filter:drop-shadow(0 0 7px rgba(160,32,240,.45))"/>
+    <rect x="${zx.toFixed(1)}" y="${zy.toFixed(1)}" width="${zw.toFixed(1)}" height="${zh.toFixed(1)}" fill="url(#gcZoneG)" stroke="rgba(176,56,249,.7)" stroke-width="1.8" style="filter:drop-shadow(0 0 7px rgba(176,56,249,.45))"/>
     ${grid}${plate}${dots}
   </svg>`;
 }
@@ -4416,8 +4420,8 @@ function gcVeloTrend(pitches) {
       <span style="font-family:monospace;font-size:11px;font-weight:800;color:var(--text2)">${sp[sp.length-1].toFixed(1)} mph</span>
     </div>
     <svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}" preserveAspectRatio="none" style="display:block;margin-top:3px">
-      <polyline points="${pts}" fill="none" stroke="#A020F0" stroke-width="1.6" stroke-linejoin="round" opacity=".85"/>
-      <circle cx="${W}" cy="${py(sp[sp.length-1]).toFixed(1)}" r="2.6" fill="#A020F0"/>
+      <polyline points="${pts}" fill="none" stroke="#b038f9" stroke-width="1.6" stroke-linejoin="round" opacity=".85"/>
+      <circle cx="${W}" cy="${py(sp[sp.length-1]).toFixed(1)}" r="2.6" fill="#b038f9"/>
     </svg></div>`;
 }
 function gcArsenalHtml(ld, ls) {
@@ -4567,8 +4571,8 @@ function gcParksChip(n, small) {
 function gcEvCol(ev) {
   if (ev == null) return '#64748b';
   if (ev >= 105) return '#f43f5e';
-  if (ev >= 100) return '#fb923c';
-  if (ev >= 95)  return '#A020F0';
+  if (ev >= 100) return '#8d16b8';
+  if (ev >= 95)  return '#b038f9';
   if (ev >= 90)  return '#6366F1';
   return '#475569';
 }
@@ -4630,7 +4634,7 @@ function gcFieldSvg(balls, venue) {
   const wallNums = [-45, -22.5, 0, 22.5, 45].map(a => {
     const w = gcWallAt(dims, a), rad = a * Math.PI / 180, r = w.d / GC_FT + 6;
     const x = GC_HX + r * Math.sin(rad), y = GC_HY - r * Math.cos(rad);
-    return `<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="middle" font-size="6" font-weight="700" fill="rgba(160,32,240,.75)" font-family="monospace">${Math.round(w.d)}${w.h > 12 ? '·' + Math.round(w.h) + 'ft' : ''}</text>`;
+    return `<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="middle" font-size="6" font-weight="700" fill="rgba(176,56,249,.75)" font-family="monospace">${Math.round(w.d)}${w.h > 12 ? '·' + Math.round(w.h) + 'ft' : ''}</text>`;
   }).join('');
   // infield diamond (90 ft bases)
   const bd = 90 / GC_FT / Math.SQRT2;
@@ -4674,12 +4678,12 @@ function gcFieldSvg(balls, venue) {
   }).join('');
   return `<svg viewBox="0 0 ${W} ${H}" width="310" height="263" style="display:block;max-width:100%">
     <defs><radialGradient id="gcFieldG" cx="0.5" cy="0.94" r="1">
-      <stop offset="0" stop-color="rgba(160,32,240,.07)"/><stop offset=".55" stop-color="rgba(64,96,240,.045)"/><stop offset="1" stop-color="rgba(255,255,255,.015)"/>
+      <stop offset="0" stop-color="rgba(176,56,249,.07)"/><stop offset=".55" stop-color="rgba(64,96,240,.045)"/><stop offset="1" stop-color="rgba(255,255,255,.015)"/>
     </radialGradient></defs>
     <rect x="0" y="0" width="${W}" height="${H}" rx="12" fill="rgba(255,255,255,.015)" stroke="rgba(26,37,53,.6)"/>
     <path d="${wall} L ${GC_HX} ${GC_HY} Z" fill="url(#gcFieldG)"/>
     ${arc(250)}${arc(350)}
-    <path d="${wall}" fill="none" stroke="rgba(160,32,240,.5)" stroke-width="1.6" style="filter:drop-shadow(0 0 5px rgba(160,32,240,.35))"/>
+    <path d="${wall}" fill="none" stroke="rgba(176,56,249,.5)" stroke-width="1.6" style="filter:drop-shadow(0 0 5px rgba(176,56,249,.35))"/>
     ${wallNums}
     ${foul}
     <path d="${diamond}" fill="rgba(255,255,255,.03)" stroke="rgba(255,255,255,.16)" stroke-width="1"/>
@@ -4717,8 +4721,8 @@ function gcBattedHtml(ld, aAb, hAb, venue) {
   const legend = `<div class="gc-ev-leg">
     <span><i style="background:#d795ff;box-shadow:0 0 4px #d795ff"></i>HR</span>
     <span><i style="background:#f43f5e"></i>105+</span>
-    <span><i style="background:#fb923c"></i>100+</span>
-    <span><i style="background:#A020F0"></i>95+</span>
+    <span><i style="background:#8d16b8"></i>100+</span>
+    <span><i style="background:#b038f9"></i>95+</span>
     <span><i style="background:#6366F1"></i>90+</span>
     <span><i style="background:#475569"></i>&lt;90</span></div>`;
   return `<div class="gc-card">
@@ -4734,7 +4738,7 @@ function gcBattedHtml(ld, aAb, hAb, venue) {
           <div class="gc-ars-tile"><div class="v">${teamFiltered.length}</div><div class="k">In play</div></div>
           <div class="gc-ars-tile"><div class="v">${hard.length}</div><div class="k">Hard hit</div></div>
           <div class="gc-ars-tile"><div class="v">${maxEv ? maxEv.toFixed(1) : '—'}</div><div class="k">Max EV</div></div>
-          <div class="gc-ars-tile"><div class="v" style="background:linear-gradient(90deg,#d795ff,#fb923c);-webkit-background-clip:text;background-clip:text">${maxDist ? Math.round(maxDist) : '—'}</div><div class="k">Longest ft</div></div>
+          <div class="gc-ars-tile"><div class="v" style="background:linear-gradient(90deg,#d795ff,#8d16b8);-webkit-background-clip:text;background-clip:text">${maxDist ? Math.round(maxDist) : '—'}</div><div class="k">Longest ft</div></div>
         </div>
         <div style="font-size:8px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#d795ff;margin:2px 0 6px">Home runs</div>
         ${hrRows}
@@ -4869,13 +4873,13 @@ function renderGC(feed, wp) {
     const Y2 = v => H2 - (v / 100) * H2;
     const ptsW = wp.map((v, i) => `${X2(i).toFixed(1)},${Y2(v).toFixed(1)}`).join(' ');
     const lastW = Math.round(wp[wp.length - 1]);
-    const wpCol = '#A020F0';
+    const wpCol = '#b038f9';
     wpHtml = `<div class="gc-card">
       <div class="gc-card-title">Win probability · ${home.teamName || hAb}</div>
       <div class="gc-wp-wrap">
         <svg viewBox="0 0 ${W2} ${H2}" preserveAspectRatio="none">
           <line x1="0" y1="${H2/2}" x2="${W2}" y2="${H2/2}" stroke="rgba(255,255,255,.08)" stroke-dasharray="4,4"/>
-          <polygon points="0,${H2} ${ptsW} ${W2},${H2}" fill="rgba(160,32,240,.12)"/>
+          <polygon points="0,${H2} ${ptsW} ${W2},${H2}" fill="rgba(176,56,249,.12)"/>
           <polyline points="${ptsW}" fill="none" stroke="${wpCol}" stroke-width="2" stroke-linejoin="round"/>
           <circle cx="${W2}" cy="${Y2(wp[wp.length-1])}" r="3.5" fill="${wpCol}"/>
         </svg>
@@ -5481,7 +5485,7 @@ function renderMarkets() {
   const cnt = document.getElementById('mktCount');
   if (cnt) cnt.textContent = SUMMARIES.length + ' markets';
 
-  const A_COL = '#4060F0', H_COL = '#A020F0';
+  const A_COL = '#635bff', H_COL = '#b038f9';
   const cards = SUMMARIES.map(s => {
     const gk = s.game_key || `${s.away}_${s.home}`;
     const pts = mktSeries(gk);
@@ -5633,7 +5637,7 @@ function renderTargets() {
     return `<div class="tcard${rowDone(r) ? ' card-done' : ''}" style="cursor:pointer" data-p="${(r.matched_name||'').replace(/"/g,'&quot;')}" onclick="openPlayerCard(this.dataset.p)">
       <div style="position:absolute;top:10px;right:10px;width:18px;height:18px;border-radius:50%;background:var(--bg4);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--text3);font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace">${i+1}</div>
       <div class="tc-row1">
-        <div class="tc-badge" style="background:transparent;overflow:visible">${r.mid ? `<span class="rk-hs" style="width:40px;height:40px;background-image:url(https://midfield.mlbstatic.com/v1/people/${r.mid}/spots/90);box-shadow:inset 0 0 0 2px rgba(160,32,240,.6), 0 0 10px rgba(160,32,240,.22)"></span>` : teamBadge(r.team,'38')}</div>
+        <div class="tc-badge" style="background:transparent;overflow:visible">${r.mid ? `<span class="rk-hs" style="width:40px;height:40px;background-image:url(https://midfield.mlbstatic.com/v1/people/${r.mid}/spots/90);box-shadow:inset 0 0 0 2px rgba(176,56,249,.6), 0 0 10px rgba(176,56,249,.22)"></span>` : teamBadge(r.team,'38')}</div>
         <div class="tc-meta">
           <div class="tc-name">${r.matched_name}${liveBadges(r)}</div>
           <div class="tc-sub">#${r.batting_order} ${r.pos} · <span style="cursor:pointer;text-decoration:underline dotted;text-underline-offset:2px" onclick="event.stopPropagation();jumpToGame('${r.game}')">${r.away} @ ${r.home}</span></div>
@@ -5821,7 +5825,7 @@ function renderRankings() {
           const ds=r.due_score!=null?r.due_score:0;
           const s=Math.max(1.0,Math.min(10.0,5.5+ds*3)).toFixed(1);
           const lbl=r.due_label||'NORMAL';
-          const clr=lbl==='OVERDUE'?'#818cf8':lbl==='DUE'?'#34d399':lbl==='COOL'?'#60a5fa':lbl==='NORMAL'?'#4d6580':lbl==='WARM'?'#fb923c':lbl==='HOT'?'#f87171':'#ef4444';
+          const clr=lbl==='OVERDUE'?'#818cf8':lbl==='DUE'?'#34d399':lbl==='COOL'?'#60a5fa':lbl==='NORMAL'?'#4d6580':lbl==='WARM'?'#8d16b8':lbl==='HOT'?'#f87171':'#ef4444';
           const detail=r.due_detail||`${r.week_hr}HR/${r.week_pa}PA`;
           return `<span style="font-size:13px;font-weight:800;font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;color:${clr}">${s}</span><span style="font-size:9px;color:${clr};display:block;margin-top:1px">${lbl}</span><span style="font-size:9px;color:#3a4f63;display:block">${detail}</span>`;
         })()}
@@ -6070,7 +6074,7 @@ function buildSlamTicket() {
     return `
     <div class="slam-leg" data-p="${(r.matched_name || '').replace(/"/g, '&quot;')}" onclick="openPlayerCard(this.dataset.p)">
       <span class="slam-n">${i + 1}</span>
-      <span class="rk-hs" style="width:34px;height:34px;background-image:url(https://midfield.mlbstatic.com/v1/people/${r.mid}/spots/90);box-shadow:inset 0 0 0 1.5px rgba(160,32,240,.65)"></span>
+      <span class="rk-hs" style="width:34px;height:34px;background-image:url(https://midfield.mlbstatic.com/v1/people/${r.mid}/spots/90);box-shadow:inset 0 0 0 1.5px rgba(176,56,249,.65)"></span>
       <div class="slam-meta">
         <div class="slam-name">${r.matched_name}</div>
         <div class="slam-sub">${r.team} · vs ${r.opp_pitcher || '—'}${r.time ? ' · ' + r.time : ''}</div>
@@ -6232,7 +6236,7 @@ function renderPower() {
       <!-- top row: rank + name + conf score -->
       <div style="display:flex;align-items:center;gap:12px;padding:14px 16px 10px">
         <div style="width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;flex-shrink:0;${rankBadge[i]}">${i+1}</div>
-        ${r.mid ? `<span class="rk-hs" style="width:40px;height:40px;background-image:url(https://midfield.mlbstatic.com/v1/people/${r.mid}/spots/90);box-shadow:inset 0 0 0 2px rgba(160,32,240,.6), 0 0 10px rgba(160,32,240,.22)"></span>` : teamBadge(r.team,'38')}
+        ${r.mid ? `<span class="rk-hs" style="width:40px;height:40px;background-image:url(https://midfield.mlbstatic.com/v1/people/${r.mid}/spots/90);box-shadow:inset 0 0 0 2px rgba(176,56,249,.6), 0 0 10px rgba(176,56,249,.22)"></span>` : teamBadge(r.team,'38')}
         <div style="flex:1;min-width:0">
           <div style="font-size:17px;font-weight:800;color:var(--text);line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.matched_name}</div>
           <div style="font-size:10px;color:var(--text-muted);margin-top:1px">#${r.batting_order} ${r.pos||r.dk_pos} · ${r.team} · vs ${r.opp_pitcher}</div>
@@ -6378,7 +6382,7 @@ function renderPitchers() {
     const play = hasLine && Math.abs(eV) >= 0.8;
     const oddsBit = hasLine ? `${p.k_over != null ? 'O ' + fmtOdds(p.k_over) : ''}${p.k_under != null ? ' · U ' + fmtOdds(p.k_under) : ''}` : '';
     return `<div class="pt-card${play ? ' kplay' : ''}">
-      ${p.mid ? `<span class="rk-hs" style="width:44px;height:44px;background-image:url(https://midfield.mlbstatic.com/v1/people/${p.mid}/spots/90);box-shadow:inset 0 0 0 2px rgba(160,32,240,.6), 0 0 10px rgba(160,32,240,.2);float:left;margin-right:11px"></span>` : ''}
+      ${p.mid ? `<span class="rk-hs" style="width:44px;height:44px;background-image:url(https://midfield.mlbstatic.com/v1/people/${p.mid}/spots/90);box-shadow:inset 0 0 0 2px rgba(176,56,249,.6), 0 0 10px rgba(176,56,249,.2);float:left;margin-right:11px"></span>` : ''}
       <div class="pt-top" style="margin-left:${p.mid ? '0' : '0'}">
         <div>
           <div class="pt-name">${p.name}${p.hand ? ` <span style="font-size:9px;color:var(--text3)">${p.hand}HP</span>` : ''}</div>
