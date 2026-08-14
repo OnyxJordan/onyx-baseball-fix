@@ -847,7 +847,7 @@
   "prob": 0.277,
   "edge": 2.8,
   "tier": "ticket",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-08-13",
@@ -856,7 +856,7 @@
   "prob": 0.233,
   "edge": 0.5,
   "tier": "ticket",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-08-13",
@@ -865,7 +865,7 @@
   "prob": 0.262,
   "edge": 0.8,
   "tier": "edge",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-08-13",
@@ -874,7 +874,7 @@
   "prob": 0.252,
   "edge": 0.1,
   "tier": "edge",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-08-13",
@@ -882,6 +882,51 @@
   "odds": 366,
   "prob": 0.23,
   "edge": 1.6,
+  "tier": "edge",
+  "hit": false
+ },
+ {
+  "date": "2026-08-14",
+  "player": "Cal Raleigh",
+  "odds": 353,
+  "prob": 0.236,
+  "edge": 1.5,
+  "tier": "ticket",
+  "hit": null
+ },
+ {
+  "date": "2026-08-14",
+  "player": "Tyler O'Neill",
+  "odds": 441,
+  "prob": 0.22,
+  "edge": 3.5,
+  "tier": "ticket",
+  "hit": null
+ },
+ {
+  "date": "2026-08-14",
+  "player": "Colson Montgomery",
+  "odds": 348,
+  "prob": 0.231,
+  "edge": 0.7,
+  "tier": "edge",
+  "hit": null
+ },
+ {
+  "date": "2026-08-14",
+  "player": "Munetaka Murakami",
+  "odds": 232,
+  "prob": 0.28,
+  "edge": -2.1,
+  "tier": "ticket",
+  "hit": null
+ },
+ {
+  "date": "2026-08-14",
+  "player": "Eugenio Suárez",
+  "odds": 400,
+  "prob": 0.217,
+  "edge": 1.7,
   "tier": "edge",
   "hit": null
  }

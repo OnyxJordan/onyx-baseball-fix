@@ -470,15 +470,35 @@
   "stake": 10,
   "legs": [
    {
-    "player": "Wilyer Abreu",
-    "odds": 302,
-    "prob": 24.1,
+    "player": "Byron Buxton",
+    "odds": 300,
+    "prob": 24.3,
+    "hit": false
+   },
+   {
+    "player": "Kyle Schwarber",
+    "odds": 231,
+    "prob": 24.7,
+    "hit": true
+   }
+  ],
+  "result": "loss",
+  "pnl": -10.0
+ },
+ {
+  "date": "2026-08-14",
+  "stake": 10,
+  "legs": [
+   {
+    "player": "Munetaka Murakami",
+    "odds": 260,
+    "prob": 27.1,
     "hit": null
    },
    {
-    "player": "Cal Raleigh",
-    "odds": 314,
-    "prob": 25.8,
+    "player": "Tyler O'Neill",
+    "odds": 400,
+    "prob": 23.4,
     "hit": null
    }
   ],
