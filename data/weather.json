@@ -1,4 +1,15 @@
 {
+  "PIT": {
+    "venue": "PNC Park",
+    "temp": 75.4,
+    "precip": 3,
+    "wind_spd": 4.2,
+    "wind_dir": "WSW",
+    "humidity_pct": 82,
+    "pressure_mb": 1017.9,
+    "roof": false,
+    "flag": "clear"
+  },
   "CIN": {
     "venue": "Great American Ball Park",
     "temp": 83.0,
@@ -7,72 +18,6 @@
     "wind_dir": "NE",
     "humidity_pct": 66,
     "pressure_mb": 1017.4,
-    "roof": false,
-    "flag": "clear"
-  },
-  "ATL": {
-    "venue": "Truist Park",
-    "temp": 94.0,
-    "precip": 3,
-    "wind_spd": 6.8,
-    "wind_dir": "W",
-    "humidity_pct": 42,
-    "pressure_mb": 1017.6,
-    "roof": false,
-    "flag": "clear"
-  },
-  "LAA": {
-    "venue": "Angel Stadium",
-    "temp": 76.8,
-    "precip": 0,
-    "wind_spd": 8.5,
-    "wind_dir": "SW",
-    "humidity_pct": 66,
-    "pressure_mb": 1015.2,
-    "roof": false,
-    "flag": "clear"
-  },
-  "LAD": {
-    "venue": "Dodger Stadium",
-    "temp": 72.1,
-    "precip": 0,
-    "wind_spd": 7.6,
-    "wind_dir": "WSW",
-    "humidity_pct": 74,
-    "pressure_mb": 1014.8,
-    "roof": false,
-    "flag": "clear"
-  },
-  "HOU": {
-    "venue": "Daikin Park",
-    "temp": 86.2,
-    "precip": 2,
-    "wind_spd": 10.0,
-    "wind_dir": "SSE",
-    "humidity_pct": 63,
-    "pressure_mb": 1017.9,
-    "roof": true,
-    "flag": "clear"
-  },
-  "DET": {
-    "venue": "Comerica Park",
-    "temp": 86.0,
-    "precip": 2,
-    "wind_spd": 9.4,
-    "wind_dir": "ENE",
-    "humidity_pct": 39,
-    "pressure_mb": 1018.0,
-    "roof": false,
-    "flag": "clear"
-  },
-  "CLE": {
-    "venue": "Progressive Field",
-    "temp": 79.1,
-    "precip": 0,
-    "wind_spd": 6.0,
-    "wind_dir": "NNE",
-    "humidity_pct": 69,
-    "pressure_mb": 1017.9,
     "roof": false,
     "flag": "clear"
   },
@@ -87,6 +32,17 @@
     "roof": true,
     "flag": "clear"
   },
+  "SF": {
+    "venue": "Oracle Park",
+    "temp": 60.1,
+    "precip": 0,
+    "wind_spd": 13.0,
+    "wind_dir": "WNW",
+    "humidity_pct": 91,
+    "pressure_mb": 1017.0,
+    "roof": false,
+    "flag": "clear"
+  },
   "TOR": {
     "venue": "Rogers Centre",
     "temp": 77.9,
@@ -96,6 +52,39 @@
     "humidity_pct": 45,
     "pressure_mb": 1018.7,
     "roof": true,
+    "flag": "clear"
+  },
+  "DET": {
+    "venue": "Comerica Park",
+    "temp": 86.0,
+    "precip": 2,
+    "wind_spd": 9.4,
+    "wind_dir": "ENE",
+    "humidity_pct": 39,
+    "pressure_mb": 1018.0,
+    "roof": false,
+    "flag": "clear"
+  },
+  "LAD": {
+    "venue": "Dodger Stadium",
+    "temp": 72.1,
+    "precip": 0,
+    "wind_spd": 7.6,
+    "wind_dir": "WSW",
+    "humidity_pct": 74,
+    "pressure_mb": 1014.8,
+    "roof": false,
+    "flag": "clear"
+  },
+  "LAA": {
+    "venue": "Angel Stadium",
+    "temp": 76.8,
+    "precip": 0,
+    "wind_spd": 8.5,
+    "wind_dir": "SW",
+    "humidity_pct": 66,
+    "pressure_mb": 1015.2,
+    "roof": false,
     "flag": "clear"
   },
   "ATH": {
@@ -109,30 +98,8 @@
     "roof": false,
     "flag": "clear"
   },
-  "CHC": {
-    "venue": "Wrigley Field",
-    "temp": 75.1,
-    "precip": 2,
-    "wind_spd": 8.7,
-    "wind_dir": "ENE",
-    "humidity_pct": 90,
-    "pressure_mb": 1017.2,
-    "roof": false,
-    "flag": "clear"
-  },
   "NYM": {
     "venue": "Citi Field",
-    "temp": 81.6,
-    "precip": 6,
-    "wind_spd": 6.1,
-    "wind_dir": "SSE",
-    "humidity_pct": 48,
-    "pressure_mb": 1016.9,
-    "roof": false,
-    "flag": "clear"
-  },
-  "SF": {
-    "venue": "Oracle Park",
     "temp": 72,
     "precip": 0,
     "wind_spd": 5,
@@ -140,8 +107,35 @@
     "roof": false,
     "flag": "clear"
   },
-  "PIT": {
-    "venue": "PNC Park",
+  "HOU": {
+    "venue": "Daikin Park",
+    "temp": 72,
+    "precip": 0,
+    "wind_spd": 5,
+    "wind_dir": "N",
+    "roof": true,
+    "flag": "clear"
+  },
+  "CHC": {
+    "venue": "Wrigley Field",
+    "temp": 72,
+    "precip": 0,
+    "wind_spd": 5,
+    "wind_dir": "N",
+    "roof": false,
+    "flag": "clear"
+  },
+  "ATL": {
+    "venue": "Truist Park",
+    "temp": 72,
+    "precip": 0,
+    "wind_spd": 5,
+    "wind_dir": "N",
+    "roof": false,
+    "flag": "clear"
+  },
+  "CLE": {
+    "venue": "Progressive Field",
     "temp": 72,
     "precip": 0,
     "wind_spd": 5,
