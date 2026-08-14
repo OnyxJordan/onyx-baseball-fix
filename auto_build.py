@@ -110,6 +110,12 @@ if isinstance(L14, dict):
 P14N = {nk(k): v for k, v in P14.items() if isinstance(v, dict)} \
        if isinstance(P14, dict) else {}
 
+# v37 season trajectory splits (early season vs last 30 days) — hitters get
+# an OPS-trend factor, pitchers a K/BF and HR/BF trend nudge
+_TREND = jload(dpath("trend_splits.json"), {}) or {}
+TRN = {nk(k): v for k, v in (_TREND.get("hitters") or {}).items() if isinstance(v, dict)}
+TRP = {nk(k): v for k, v in (_TREND.get("pitchers") or {}).items() if isinstance(v, dict)}
+
 # odds.json (new): { nk_name: american_int }. Tolerate old formats gracefully.
 def american_to_prob(a):
     try:
@@ -328,6 +334,8 @@ for game in games_out:
                     fd_salary=int(sal.get("fd_salary") or 3000),
                     l14_statcast=L14N,
                     l14_pitchers=P14N,
+                    trend=TRN.get(bkey),
+                    trend_pitchers=TRP,
                     game_key=game["label"],
                     game_label=game["label"],
                     team=game.get(f"{side}_team") or "",
@@ -826,6 +834,7 @@ for g in games_out:
                 ml_self=g.get("home_ml") if is_home else g.get("away_ml"),
                 ml_opp=g.get("away_ml") if is_home else g.get("home_ml"),
                 k_line=KLINES.get(pname) or KLINES_NK.get(pk_),
+                trend=TRP.get(pk_),
             )
         except Exception:
             proj = None

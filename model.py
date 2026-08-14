@@ -1,5 +1,20 @@
 """
-model.py — Onyx Baseball v36 HR probability model + pitcher K projections
+model.py — Onyx Baseball v37 HR probability model + pitcher K projections
+
+v37: season TRAJECTORY joins the mix. A month-plus of 2026 history now
+separates early-season level from current level, and the deep fallers
+(Ben Rice 168 -> 71 wRC+ halves) look fine to a career anchor and only
+mildly cold to a 14-day window — the month-scale slide is its own
+signal. New data/trend_splits.json (early season vs last 30 days, MLB
+API): hitters carry an OPS-trend multiplier on base HR rate
+(reliability-shrunk by late-window PA, clamp 0.85-1.10, needs 150+
+early / 50+ late PA); pitchers carry the same idea twice — HR/BF trend
+nudges the HR-allowed factor (max 20% weight, clamp 0.90-1.12) and
+K/BF trend nudges the K projection (max 20% weight, clamp 0.92-1.08).
+Windows deliberately overlap L14 only partially: trajectory measures
+LEVEL vs early season on broad production, L14 measures the hot hand
+on outcomes. No backtest exists for this factor yet (trend history
+is not archived) — clamps are conservative and the ledger referees.
 
 v36: recency gets real teeth. The board kept surfacing bats with big
 careers and empty fortnights (Cal Raleigh cold streaks), because the
@@ -556,7 +571,8 @@ def sc_score(d: dict, l14: dict = None) -> float:
         return w * l14_raw + (1 - w) * career_sc
     return career_sc
 
-def pitcher_factor(pitcher_name: str, l14_pitchers: dict = None, is_home_pitcher: bool = False) -> float:
+def pitcher_factor(pitcher_name: str, l14_pitchers: dict = None, is_home_pitcher: bool = False,
+                   trend_pitchers: dict = None) -> float:
     """
     is_home_pitcher: True if this pitcher is pitching at HOME (i.e. batters face him at his home park).
     pfh = factor when pitching at home, pfa = factor when pitching away.
@@ -583,6 +599,15 @@ def pitcher_factor(pitcher_name: str, l14_pitchers: dict = None, is_home_pitcher
             l14_pf = max(0.75, min(1.30, hr_rate / 0.033))
             w = min(bf / 150, 0.15)
             base_pf = (1 - w) * base_pf + w * l14_pf
+
+    # v37 season trajectory: a pitcher whose HR/BF has climbed (or fallen)
+    # over the last 30 days vs his early season gets a nudged factor —
+    # month-scale drift the career anchor and a 2-start L14 both miss.
+    tp = (trend_pitchers or {}).get(pk)
+    if tp and (tp.get("e_bf") or 0) >= 200 and (tp.get("l_bf") or 0) >= 70:
+        t_ratio = ((tp.get("l_hrbf") or 0) + 0.012) / ((tp.get("e_hrbf") or 0) + 0.012)
+        w_t = min((tp.get("l_bf") or 0) / 500.0, 0.20)
+        base_pf *= max(0.90, min(1.12, 1.0 + (t_ratio - 1.0) * w_t))
 
     return round(base_pf, 3)
 
@@ -625,6 +650,8 @@ def project_player(
     fd_salary: int = 3000,
     l14_statcast: dict = None,
     l14_pitchers: dict = None,
+    trend: dict = None,
+    trend_pitchers: dict = None,
     game_key: str = "",
     game_label: str = "",
     team: str = "",
@@ -703,11 +730,23 @@ def project_player(
         form_adj = max(0.80, min(1.08, 1.0 + (ratio - 1.0) * rel))
         base = base * form_adj
 
+    # 2b. v37 season trajectory — current LEVEL vs early season, on broad
+    # production (OPS), not HR outcomes (that's L14's lane). Catches the
+    # month-scale faller whose career numbers still gleam: Ben Rice at
+    # 168 -> 71 wRC+ halves was a top-3 board fixture all August.
+    traj_mult = 1.0
+    if trend and (trend.get("e_pa") or 0) >= 150 and (trend.get("l_pa") or 0) >= 50:
+        t_ratio = ((trend.get("l_ops") or 0) + 0.150) / ((trend.get("e_ops") or 0) + 0.150)
+        t_rel = trend["l_pa"] / (trend["l_pa"] + 120.0)
+        traj_mult = max(0.85, min(1.10, 1.0 + (t_ratio - 1.0) * t_rel))
+        base = base * traj_mult
+
     # 3. SC score (prefers live L14 Statcast)
     sc = sc_score(d, l14)
 
     # 4. Pitcher factor
-    pf = pitcher_factor(opp_pitcher, l14_pitchers, is_home_pitcher=not is_home)
+    pf = pitcher_factor(opp_pitcher, l14_pitchers, is_home_pitcher=not is_home,
+                        trend_pitchers=trend_pitchers)
 
     # 5. Park + weather environment
     env = wind_env(park, wind_dir, wind_mph, temp, roof, humidity=humidity, pressure_mb=pressure_mb)
@@ -874,6 +913,7 @@ def project_player(
         "wind_blow":     classify_wind(park, wind_dir, wind_mph),
         "platoon_factor": round(plat, 3),
         "due_mult":      round(due_mult, 3),
+        "traj_mult":     round(traj_mult, 3),
         "due_score":     round(due_score, 3),
     }
 
@@ -905,7 +945,7 @@ PARK_K_FACTOR = {
 
 def project_pitcher(name, pdb_entry=None, l14=None, season=None,
                     opp_k_pct=None, opp_team_k=None, park="", is_home=True,
-                    ml_self=None, ml_opp=None, k_line=None):
+                    ml_self=None, ml_opp=None, k_line=None, trend=None):
     """Returns the pitcher projection dict for the Pitchers tab, or None when
     there is nothing to project from."""
     e = pdb_entry or {}
@@ -933,6 +973,14 @@ def project_pitcher(name, pdb_entry=None, l14=None, season=None,
         k_bf = (1 - w14) * k_base + w14 * k_l14
     else:
         k_bf = k_base if k_base is not None else k_l14
+
+    # v37 season trajectory: K/BF over the last 30 days vs early season —
+    # a stuff gain or fade the 3-year anchor absorbs too slowly and a
+    # 2-start L14 window can't distinguish from noise.
+    if k_bf and trend and (trend.get("e_bf") or 0) >= 200 and (trend.get("l_bf") or 0) >= 70:
+        t_ratio = ((trend.get("l_kbf") or 0) + 0.05) / ((trend.get("e_kbf") or 0) + 0.05)
+        w_t = min((trend.get("l_bf") or 0) / 500.0, 0.20)
+        k_bf *= max(0.92, min(1.08, 1.0 + (t_ratio - 1.0) * w_t))
     if k_bf is None:
         return None
     k_bf = max(0.10, min(0.42, k_bf))
