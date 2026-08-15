@@ -1,45 +1,12 @@
 {
-  "MIN": {
-    "venue": "Target Field",
-    "temp": 79.8,
-    "precip": 13,
-    "wind_spd": 3.3,
-    "wind_dir": "SSE",
-    "humidity_pct": 77,
-    "pressure_mb": 1013.7,
-    "roof": false,
-    "flag": "clear"
-  },
-  "TB": {
-    "venue": "Tropicana Field",
-    "temp": 88.4,
-    "precip": 13,
-    "wind_spd": 4.6,
-    "wind_dir": "NW",
-    "humidity_pct": 67,
-    "pressure_mb": 1019.1,
-    "roof": true,
-    "flag": "clear"
-  },
-  "NYM": {
-    "venue": "Citi Field",
-    "temp": 84.2,
+  "LAA": {
+    "venue": "Angel Stadium",
+    "temp": 77.8,
     "precip": 0,
-    "wind_spd": 3.6,
-    "wind_dir": "N",
-    "humidity_pct": 39,
-    "pressure_mb": 1020.4,
-    "roof": false,
-    "flag": "clear"
-  },
-  "ATL": {
-    "venue": "Truist Park",
-    "temp": 91.6,
-    "precip": 6,
-    "wind_spd": 5.7,
-    "wind_dir": "NW",
-    "humidity_pct": 48,
-    "pressure_mb": 1018.1,
+    "wind_spd": 7.9,
+    "wind_dir": "WSW",
+    "humidity_pct": 58,
+    "pressure_mb": 1016.7,
     "roof": false,
     "flag": "clear"
   },
@@ -54,17 +21,6 @@
     "roof": false,
     "flag": "clear"
   },
-  "PIT": {
-    "venue": "PNC Park",
-    "temp": 80.8,
-    "precip": 2,
-    "wind_spd": 1.0,
-    "wind_dir": "SSE",
-    "humidity_pct": 68,
-    "pressure_mb": 1018.6,
-    "roof": false,
-    "flag": "clear"
-  },
   "LAD": {
     "venue": "Dodger Stadium",
     "temp": 80.2,
@@ -76,14 +32,58 @@
     "roof": false,
     "flag": "clear"
   },
-  "LAA": {
-    "venue": "Angel Stadium",
-    "temp": 77.8,
-    "precip": 0,
-    "wind_spd": 7.9,
-    "wind_dir": "WSW",
-    "humidity_pct": 58,
-    "pressure_mb": 1016.7,
+  "ATL": {
+    "venue": "Truist Park",
+    "temp": 91.6,
+    "precip": 3,
+    "wind_spd": 5.7,
+    "wind_dir": "NW",
+    "humidity_pct": 48,
+    "pressure_mb": 1018.1,
+    "roof": false,
+    "flag": "clear"
+  },
+  "TB": {
+    "venue": "Tropicana Field",
+    "temp": 88.4,
+    "precip": 13,
+    "wind_spd": 4.6,
+    "wind_dir": "NW",
+    "humidity_pct": 67,
+    "pressure_mb": 1019.1,
+    "roof": true,
+    "flag": "clear"
+  },
+  "PIT": {
+    "venue": "PNC Park",
+    "temp": 80.8,
+    "precip": 2,
+    "wind_spd": 1.0,
+    "wind_dir": "SSE",
+    "humidity_pct": 68,
+    "pressure_mb": 1018.6,
+    "roof": false,
+    "flag": "clear"
+  },
+  "MIN": {
+    "venue": "Target Field",
+    "temp": 79.8,
+    "precip": 12,
+    "wind_spd": 3.3,
+    "wind_dir": "SSE",
+    "humidity_pct": 77,
+    "pressure_mb": 1013.7,
+    "roof": false,
+    "flag": "clear"
+  },
+  "CIN": {
+    "venue": "Great American Ball Park",
+    "temp": 84.6,
+    "precip": 18,
+    "wind_spd": 3.6,
+    "wind_dir": "SE",
+    "humidity_pct": 78,
+    "pressure_mb": 1017.0,
     "roof": false,
     "flag": "clear"
   },
@@ -101,21 +101,12 @@
   "HOU": {
     "venue": "Daikin Park",
     "temp": 92.3,
-    "precip": 0,
+    "precip": 1,
     "wind_spd": 9.1,
     "wind_dir": "SSE",
     "humidity_pct": 52,
     "pressure_mb": 1017.4,
     "roof": true,
-    "flag": "clear"
-  },
-  "CIN": {
-    "venue": "Great American Ball Park",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
-    "roof": false,
     "flag": "clear"
   }
 }
