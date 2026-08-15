@@ -1,13 +1,24 @@
 {
-  "CIN": {
-    "venue": "Great American Ball Park",
-    "temp": 86.9,
-    "precip": 21,
-    "wind_spd": 0.8,
-    "wind_dir": "SW",
-    "humidity_pct": 74,
-    "pressure_mb": 1017.6,
+  "NYM": {
+    "venue": "Citi Field",
+    "temp": 83.6,
+    "precip": 0,
+    "wind_spd": 1.5,
+    "wind_dir": "NNW",
+    "humidity_pct": 39,
+    "pressure_mb": 1019.9,
     "roof": false,
+    "flag": "clear"
+  },
+  "TB": {
+    "venue": "Tropicana Field",
+    "temp": 88.2,
+    "precip": 11,
+    "wind_spd": 2.5,
+    "wind_dir": "W",
+    "humidity_pct": 67,
+    "pressure_mb": 1020.7,
+    "roof": true,
     "flag": "clear"
   },
   "PIT": {
@@ -18,6 +29,17 @@
     "wind_dir": "ENE",
     "humidity_pct": 69,
     "pressure_mb": 1018.2,
+    "roof": false,
+    "flag": "clear"
+  },
+  "MIN": {
+    "venue": "Target Field",
+    "temp": 81.6,
+    "precip": 17,
+    "wind_spd": 7.8,
+    "wind_dir": "S",
+    "humidity_pct": 70,
+    "pressure_mb": 1013.6,
     "roof": false,
     "flag": "clear"
   },
@@ -32,69 +54,25 @@
     "roof": false,
     "flag": "clear"
   },
-  "ATL": {
-    "venue": "Truist Park",
-    "temp": 86.3,
-    "precip": 9,
-    "wind_spd": 0.6,
-    "wind_dir": "SE",
-    "humidity_pct": 60,
-    "pressure_mb": 1018.5,
+  "LAA": {
+    "venue": "Angel Stadium",
+    "temp": 78.6,
+    "precip": 0,
+    "wind_spd": 8.4,
+    "wind_dir": "SW",
+    "humidity_pct": 61,
+    "pressure_mb": 1016.9,
     "roof": false,
     "flag": "clear"
   },
   "CLE": {
     "venue": "Progressive Field",
     "temp": 77.1,
-    "precip": 5,
+    "precip": 2,
     "wind_spd": 3.8,
     "wind_dir": "NNE",
     "humidity_pct": 81,
     "pressure_mb": 1018.5,
-    "roof": false,
-    "flag": "clear"
-  },
-  "CHC": {
-    "venue": "Wrigley Field",
-    "temp": 76.0,
-    "precip": 11,
-    "wind_spd": 6.8,
-    "wind_dir": "SSE",
-    "humidity_pct": 95,
-    "pressure_mb": 1016.9,
-    "roof": false,
-    "flag": "clear"
-  },
-  "MIN": {
-    "venue": "Target Field",
-    "temp": 81.6,
-    "precip": 10,
-    "wind_spd": 7.8,
-    "wind_dir": "S",
-    "humidity_pct": 70,
-    "pressure_mb": 1013.6,
-    "roof": false,
-    "flag": "clear"
-  },
-  "TB": {
-    "venue": "Tropicana Field",
-    "temp": 88.2,
-    "precip": 6,
-    "wind_spd": 2.5,
-    "wind_dir": "W",
-    "humidity_pct": 67,
-    "pressure_mb": 1020.7,
-    "roof": true,
-    "flag": "clear"
-  },
-  "SF": {
-    "venue": "Oracle Park",
-    "temp": 64.9,
-    "precip": 0,
-    "wind_spd": 5.8,
-    "wind_dir": "W",
-    "humidity_pct": 78,
-    "pressure_mb": 1019.8,
     "roof": false,
     "flag": "clear"
   },
@@ -109,41 +87,58 @@
     "roof": true,
     "flag": "clear"
   },
-  "NYM": {
-    "venue": "Citi Field",
-    "temp": 83.6,
-    "precip": 0,
-    "wind_spd": 1.5,
-    "wind_dir": "NNW",
-    "humidity_pct": 39,
-    "pressure_mb": 1019.9,
-    "roof": false,
-    "flag": "clear"
-  },
-  "LAA": {
-    "venue": "Angel Stadium",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
+  "CIN": {
+    "venue": "Great American Ball Park",
+    "temp": 86.9,
+    "precip": 20,
+    "wind_spd": 0.8,
+    "wind_dir": "SW",
+    "humidity_pct": 74,
+    "pressure_mb": 1017.6,
     "roof": false,
     "flag": "clear"
   },
   "HOU": {
     "venue": "Daikin Park",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
+    "temp": 92.8,
+    "precip": 1,
+    "wind_spd": 10.8,
+    "wind_dir": "SSE",
+    "humidity_pct": 53,
+    "pressure_mb": 1018.3,
     "roof": true,
     "flag": "clear"
   },
   "ATH": {
     "venue": "Sutter Health Park",
-    "temp": 72,
+    "temp": 82.7,
     "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
+    "wind_spd": 8.4,
+    "wind_dir": "SW",
+    "humidity_pct": 36,
+    "pressure_mb": 1017.3,
+    "roof": false,
+    "flag": "clear"
+  },
+  "ATL": {
+    "venue": "Truist Park",
+    "temp": 86.3,
+    "precip": 7,
+    "wind_spd": 0.6,
+    "wind_dir": "SE",
+    "humidity_pct": 60,
+    "pressure_mb": 1018.5,
+    "roof": false,
+    "flag": "clear"
+  },
+  "SF": {
+    "venue": "Oracle Park",
+    "temp": 64.9,
+    "precip": 0,
+    "wind_spd": 5.8,
+    "wind_dir": "W",
+    "humidity_pct": 78,
+    "pressure_mb": 1019.8,
     "roof": false,
     "flag": "clear"
   }
