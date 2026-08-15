@@ -493,12 +493,44 @@
     "player": "Munetaka Murakami",
     "odds": 292,
     "prob": 27.1,
-    "hit": null
+    "hit": true
    },
    {
     "player": "Tyler O'Neill",
     "odds": 425,
     "prob": 20.2,
+    "hit": false
+   }
+  ],
+  "result": "loss",
+  "pnl": -10.0
+ },
+ {
+  "date": "2026-08-15",
+  "stake": 10,
+  "legs": [
+   {
+    "player": "JJ Bleday",
+    "odds": 245,
+    "prob": 22.5,
+    "hit": null
+   },
+   {
+    "player": "Eugenio Suárez",
+    "odds": 297,
+    "prob": 25.2,
+    "hit": null
+   },
+   {
+    "player": "Yordan Alvarez",
+    "odds": 259,
+    "prob": 27.0,
+    "hit": null
+   },
+   {
+    "player": "Griffin Conine",
+    "odds": 417,
+    "prob": 21.8,
     "hit": null
    }
   ],

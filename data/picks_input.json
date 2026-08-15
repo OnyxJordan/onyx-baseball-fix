@@ -892,7 +892,7 @@
   "prob": 0.236,
   "edge": 1.5,
   "tier": "ticket",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-08-14",
@@ -901,7 +901,7 @@
   "prob": 0.22,
   "edge": 3.5,
   "tier": "ticket",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-08-14",
@@ -910,7 +910,7 @@
   "prob": 0.231,
   "edge": 0.7,
   "tier": "edge",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-08-14",
@@ -919,7 +919,7 @@
   "prob": 0.28,
   "edge": -2.1,
   "tier": "ticket",
-  "hit": null
+  "hit": true
  },
  {
   "date": "2026-08-14",
@@ -927,6 +927,51 @@
   "odds": 400,
   "prob": 0.217,
   "edge": 1.7,
+  "tier": "edge",
+  "hit": false
+ },
+ {
+  "date": "2026-08-15",
+  "player": "JJ Bleday",
+  "odds": 245,
+  "prob": 0.225,
+  "edge": -6.5,
+  "tier": "ticket",
+  "hit": null
+ },
+ {
+  "date": "2026-08-15",
+  "player": "Eugenio Suárez",
+  "odds": 297,
+  "prob": 0.252,
+  "edge": 0,
+  "tier": "ticket",
+  "hit": null
+ },
+ {
+  "date": "2026-08-15",
+  "player": "Yordan Alvarez",
+  "odds": 259,
+  "prob": 0.27,
+  "edge": -0.9,
+  "tier": "ticket",
+  "hit": null
+ },
+ {
+  "date": "2026-08-15",
+  "player": "Griffin Conine",
+  "odds": 417,
+  "prob": 0.218,
+  "edge": 2.5,
+  "tier": "ticket",
+  "hit": null
+ },
+ {
+  "date": "2026-08-15",
+  "player": "Sal Stewart",
+  "odds": 341,
+  "prob": 0.253,
+  "edge": 2.6,
   "tier": "edge",
   "hit": null
  }

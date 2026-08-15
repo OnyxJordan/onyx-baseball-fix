@@ -1,40 +1,74 @@
 {
- "date": "2026-08-14",
- "locked": true,
+ "date": "2026-08-15",
+ "locked": false,
  "legs": [
   {
-   "player": "Munetaka Murakami",
-   "mid": 808959,
-   "team": "CWS",
-   "odds": 292,
-   "prob": 27.1,
-   "score": 0.704,
+   "player": "JJ Bleday",
+   "mid": 668709,
+   "team": "CIN",
+   "odds": 245,
+   "prob": 22.5,
+   "score": 0.743,
    "why": [
-    "pitcher matchup ×1.24",
-    "platoon edge",
-    "due"
+    "park ×1.31",
+    "pitcher matchup ×1.30",
+    "wind/heat ×1.12"
    ],
-   "away": "CWS",
-   "home": "DET",
-   "opp": "Jackson Jobe",
+   "away": "MIA",
+   "home": "CIN",
+   "opp": "Ryan Gusto",
    "time": "6:40 PM"
   },
   {
-   "player": "Tyler O'Neill",
-   "mid": 641933,
-   "team": "BAL",
-   "odds": 425,
-   "prob": 20.2,
-   "score": 0.569,
+   "player": "Eugenio Suárez",
+   "mid": 553993,
+   "team": "CIN",
+   "odds": 297,
+   "prob": 25.2,
+   "score": 0.719,
    "why": [
-    "platoon edge",
-    "pitcher matchup ×1.14",
-    "50% FB bat"
+    "park ×1.31",
+    "pitcher matchup ×1.30",
+    "wind/heat ×1.12"
    ],
-   "away": "BAL",
-   "home": "TB",
-   "opp": "Steven Matz",
+   "away": "MIA",
+   "home": "CIN",
+   "opp": "Ryan Gusto",
+   "time": "6:40 PM"
+  },
+  {
+   "player": "Yordan Alvarez",
+   "mid": 670541,
+   "team": "HOU",
+   "odds": 259,
+   "prob": 27.0,
+   "score": 0.62,
+   "why": [
+    "park ×1.24",
+    "pitcher matchup ×1.10",
+    "overdue"
+   ],
+   "away": "SEA",
+   "home": "HOU",
+   "opp": "Emerson Hancock",
    "time": "7:10 PM"
+  },
+  {
+   "player": "Griffin Conine",
+   "mid": 665052,
+   "team": "MIA",
+   "odds": 417,
+   "prob": 21.8,
+   "score": 0.562,
+   "why": [
+    "park ×1.31",
+    "platoon edge",
+    "wind/heat ×1.12"
+   ],
+   "away": "MIA",
+   "home": "CIN",
+   "opp": "Brady Singer",
+   "time": "6:40 PM"
   }
  ]
 }
