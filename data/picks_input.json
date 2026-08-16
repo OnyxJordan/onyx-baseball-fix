@@ -937,7 +937,7 @@
   "prob": 0.225,
   "edge": -6.5,
   "tier": "ticket",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-08-15",
@@ -946,7 +946,7 @@
   "prob": 0.252,
   "edge": 0,
   "tier": "ticket",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-08-15",
@@ -955,7 +955,7 @@
   "prob": 0.27,
   "edge": -0.9,
   "tier": "ticket",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-08-15",
@@ -964,7 +964,7 @@
   "prob": 0.218,
   "edge": 2.5,
   "tier": "ticket",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-08-15",
@@ -972,6 +972,33 @@
   "odds": 341,
   "prob": 0.253,
   "edge": 2.6,
+  "tier": "edge",
+  "hit": false
+ },
+ {
+  "date": "2026-08-16",
+  "player": "Heriberto Hernández",
+  "odds": 343,
+  "prob": 0.243,
+  "edge": 1.7,
+  "tier": "ticket",
+  "hit": null
+ },
+ {
+  "date": "2026-08-16",
+  "player": "Jake Burger",
+  "odds": 317,
+  "prob": 0.199,
+  "edge": -4.0,
+  "tier": "ticket",
+  "hit": null
+ },
+ {
+  "date": "2026-08-16",
+  "player": "Munetaka Murakami",
+  "odds": 354,
+  "prob": 0.222,
+  "edge": 0.1,
   "tier": "edge",
   "hit": null
  }
