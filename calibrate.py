@@ -37,9 +37,9 @@ def main():
         # write scale 0.8626 and wipe the board's edge column. With K = 25
         # expected HRs (~150 picks) the same sample yields 0.970, and only a
         # sustained miss over a real sample can move the level materially.
-        K = 25.0
+        K = 15.0
         scale = (actual + K) / (expected + K)
-        scale = max(0.85, min(1.15, round(scale, 4)))
+        scale = max(0.75, min(1.15, round(scale, 4)))
     else:
         scale = 1.0
 
