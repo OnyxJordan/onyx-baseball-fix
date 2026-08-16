@@ -1,12 +1,23 @@
 {
-  "LAA": {
-    "venue": "Angel Stadium",
-    "temp": 83.2,
+  "LAD": {
+    "venue": "Dodger Stadium",
+    "temp": 84.0,
     "precip": 0,
-    "wind_spd": 8.8,
+    "wind_spd": 6.0,
     "wind_dir": "WSW",
-    "humidity_pct": 53,
-    "pressure_mb": 1016.9,
+    "humidity_pct": 52,
+    "pressure_mb": 1016.5,
+    "roof": false,
+    "flag": "clear"
+  },
+  "SF": {
+    "venue": "Oracle Park",
+    "temp": 70.2,
+    "precip": 0,
+    "wind_spd": 1.1,
+    "wind_dir": "N",
+    "humidity_pct": 77,
+    "pressure_mb": 1019.4,
     "roof": false,
     "flag": "clear"
   },
@@ -21,17 +32,6 @@
     "roof": false,
     "flag": "clear"
   },
-  "CHC": {
-    "venue": "Wrigley Field",
-    "temp": 81.8,
-    "precip": 7,
-    "wind_spd": 6.6,
-    "wind_dir": "WNW",
-    "humidity_pct": 77,
-    "pressure_mb": 1013.5,
-    "roof": false,
-    "flag": "clear"
-  },
   "CLE": {
     "venue": "Progressive Field",
     "temp": 81.8,
@@ -43,47 +43,47 @@
     "roof": false,
     "flag": "clear"
   },
+  "LAA": {
+    "venue": "Angel Stadium",
+    "temp": 84.1,
+    "precip": 0,
+    "wind_spd": 7.8,
+    "wind_dir": "WSW",
+    "humidity_pct": 57,
+    "pressure_mb": 1016.7,
+    "roof": false,
+    "flag": "clear"
+  },
   "ATH": {
     "venue": "Sutter Health Park",
-    "temp": 85.9,
+    "temp": 87.0,
     "precip": 0,
-    "wind_spd": 6.4,
+    "wind_spd": 6.3,
     "wind_dir": "N",
     "humidity_pct": 40,
     "pressure_mb": 1017.3,
     "roof": false,
     "flag": "clear"
   },
-  "LAD": {
-    "venue": "Dodger Stadium",
-    "temp": 83.2,
-    "precip": 0,
-    "wind_spd": 7.7,
-    "wind_dir": "WSW",
-    "humidity_pct": 51,
-    "pressure_mb": 1016.8,
-    "roof": false,
-    "flag": "clear"
-  },
-  "SF": {
-    "venue": "Oracle Park",
-    "temp": 68.4,
-    "precip": 0,
-    "wind_spd": 2.1,
-    "wind_dir": "ESE",
-    "humidity_pct": 78,
-    "pressure_mb": 1018.9,
+  "CHC": {
+    "venue": "Wrigley Field",
+    "temp": 81.8,
+    "precip": 7,
+    "wind_spd": 6.6,
+    "wind_dir": "WNW",
+    "humidity_pct": 77,
+    "pressure_mb": 1013.5,
     "roof": false,
     "flag": "clear"
   },
   "HOU": {
     "venue": "Daikin Park",
-    "temp": 89.2,
+    "temp": 89.3,
     "precip": 0,
-    "wind_spd": 8.5,
-    "wind_dir": "SE",
-    "humidity_pct": 59,
-    "pressure_mb": 1017.3,
+    "wind_spd": 8.2,
+    "wind_dir": "ESE",
+    "humidity_pct": 60,
+    "pressure_mb": 1016.6,
     "roof": true,
     "flag": "clear"
   }
