@@ -1,5 +1,29 @@
 """
-model.py — Onyx Baseball v38 HR probability model + pitcher K projections
+model.py — Onyx Baseball v39 HR probability model + pitcher K projections
+
+v39: the HR edge lane was bleeding (11-103, -41.6% realized ROI) and the
+autopsy on 1,940 priced study rows says why, in three parts:
+(1) TOP-END OVERSHOOT — everywhere the model said 20%+, reality paid
+~0.75-0.79 of it (study 20-25 bucket: 17.3% actual; our own graded
+20%+ bucket: model 24.5% -> 19.4% actual). Edge plays live exactly in
+that tail. Compression now starts at 20 (was 24), slope 0.55, cap 30;
+self-calibration gets sharper teeth (K 25 -> 15, clamp floor 0.85 ->
+0.75 in both calibrate.py and the reader) so graded evidence can pull
+the level to truth.
+(2) PRICED-IN FACTORS — across every tercile of env, platoon and
+pitcher factor, actual/implied is FLAT (~0.63): the market fully
+prices weather, handedness and bad pitchers. Worse, the pitcher-factor
+tilt is INVERTED at price (high-pf tercile is the WORST cell, 0.60 —
+bats facing bad pitchers are systematically overpriced). pf and
+platoon are softened 40% toward neutral; what still carries value at
+price: career power (0.71), park (0.69), 2026 quality (v38's 44%-vs-
+80% split), season rate.
+(3) THE VIG IS THE WALL — actual/implied on this board runs ~0.63
+overall (a ~37% haircut baked into HR prop prices). No public-stat
+tercile in our set clears 0.71. Honest probabilities mean the edge
+lane will be QUIET most days — that is the model telling the truth,
+not a bug. The ticket and picks lanes rank by probability and are
+unaffected (a global scale never reorders a board).
 
 v38: THIS season is evidence — and trajectory is about stability, not
 direction. Two changes, both from a fresh replay (1,398 study rows
@@ -316,7 +340,7 @@ with open(_BASE / "pitcher_db.json") as f:
 try:
     with open(_BASE / "data" / "calibration.json") as f:
         _CAL = json.load(f)
-    CAL_SCALE = max(0.85, min(1.15, float(_CAL.get("scale", 1.0)))) if _CAL.get("active") else 1.0
+    CAL_SCALE = max(0.75, min(1.15, float(_CAL.get("scale", 1.0)))) if _CAL.get("active") else 1.0
     print(f"  model: calibration scale {CAL_SCALE} "
           f"({'active' if _CAL.get('active') else 'collecting'}, n={_CAL.get('n', 0)})")
 except Exception:
@@ -833,6 +857,11 @@ def project_player(
     PA_BY_ORDER = {1: 4.68, 2: 4.57, 3: 4.46, 4: 4.36, 5: 4.26,
                    6: 4.15, 7: 4.04, 8: 3.93, 9: 3.82}
     pa_mult = PA_BY_ORDER.get(int(batting_order or 0), 4.23) / 4.23
+    # v39: pf and platoon are fully priced by the market (flat-to-inverted
+    # actual/implied across terciles) — they still shape the ranking but at
+    # 60% strength so they can no longer manufacture edge on their own.
+    pf   = 1.0 + (pf - 1.0) * 0.6
+    plat = 1.0 + (plat - 1.0) * 0.6
     raw_prob = base * sc * 3.5 * pa_mult * 100 * pf * env * park_f * due_mult * plat
     # v35 (study: 2,112 player-games, 210 HR, 7/25-8/2):
     # - ELITE hard-hit is nonlinear: bats over 50% HH homered at 18.7% vs a
@@ -856,9 +885,12 @@ def project_player(
     # 0.5 / 28) — the old ceiling made it mathematically impossible to even
     # match a short price, locking every elite hitter into negative edge no
     # matter the matchup. Separation at the top still survives the slope.
-    if raw_prob > 24.0:
-        raw_prob = 24.0 + (raw_prob - 24.0) * 0.6
-    raw_prob = max(1.0, min(34.0, raw_prob))
+    # v39: compression starts at 20 — every graded bucket above 20 paid
+    # only ~0.75-0.79 of the model's number; the tail is where edge plays
+    # (and the 11-103 record) lived.
+    if raw_prob > 20.0:
+        raw_prob = 20.0 + (raw_prob - 20.0) * 0.55
+    raw_prob = max(1.0, min(30.0, raw_prob))
 
     # 8. Market calibration — the market anchors, the MODEL decides. v31: the
     # old weights (model 0.30-0.38) meant a batter had to beat the LISTED
