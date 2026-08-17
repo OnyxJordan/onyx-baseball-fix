@@ -107,3 +107,13 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+        # the Pages API 503s in bursts (8/17: three midday deploys refused,
+        # data commits unharmed) - one retry after a minute rides them out
+        continue-on-error: true
+      - name: Retry deploy once (Pages API hiccup)
+        if: steps.deployment.outcome == 'failure'
+        run: sleep 60
+      - name: Deploy to GitHub Pages (second attempt)
+        id: deployment2
+        if: steps.deployment.outcome == 'failure'
+        uses: actions/deploy-pages@v4
