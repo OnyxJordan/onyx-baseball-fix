@@ -982,7 +982,7 @@
   "prob": 0.243,
   "edge": 1.7,
   "tier": "ticket",
-  "hit": null
+  "hit": true
  },
  {
   "date": "2026-08-16",
@@ -991,7 +991,7 @@
   "prob": 0.199,
   "edge": -4.0,
   "tier": "ticket",
-  "hit": null
+  "hit": true
  },
  {
   "date": "2026-08-16",
@@ -1000,6 +1000,24 @@
   "prob": 0.222,
   "edge": 0.1,
   "tier": "edge",
+  "hit": true
+ },
+ {
+  "date": "2026-08-17",
+  "player": "Shohei Ohtani",
+  "odds": 179,
+  "prob": 0.307,
+  "edge": -5.1,
+  "tier": "ticket",
+  "hit": null
+ },
+ {
+  "date": "2026-08-17",
+  "player": "Freddie Freeman",
+  "odds": 369,
+  "prob": 0.178,
+  "edge": -3.5,
+  "tier": "ticket",
   "hit": null
  }
 ]
