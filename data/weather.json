@@ -10,83 +10,6 @@
     "roof": false,
     "flag": "clear"
   },
-  "PHI": {
-    "venue": "Citizens Bank Park",
-    "temp": 85.6,
-    "precip": 10,
-    "wind_spd": 1.7,
-    "wind_dir": "NW",
-    "humidity_pct": 66,
-    "pressure_mb": 1008.6,
-    "roof": false,
-    "flag": "clear"
-  },
-  "PIT": {
-    "venue": "PNC Park",
-    "temp": 79.2,
-    "precip": 16,
-    "wind_spd": 4.8,
-    "wind_dir": "NW",
-    "humidity_pct": 73,
-    "pressure_mb": 1011.1,
-    "roof": false,
-    "flag": "clear"
-  },
-  "CHC": {
-    "venue": "Wrigley Field",
-    "temp": 70.8,
-    "precip": 0,
-    "wind_spd": 3.8,
-    "wind_dir": "S",
-    "humidity_pct": 83,
-    "pressure_mb": 1015.3,
-    "roof": false,
-    "flag": "clear"
-  },
-  "CIN": {
-    "venue": "Great American Ball Park",
-    "temp": 81.6,
-    "precip": 20,
-    "wind_spd": 6.5,
-    "wind_dir": "WSW",
-    "humidity_pct": 74,
-    "pressure_mb": 1013.0,
-    "roof": false,
-    "flag": "clear"
-  },
-  "TB": {
-    "venue": "Tropicana Field",
-    "temp": 89.1,
-    "precip": 3,
-    "wind_spd": 9.8,
-    "wind_dir": "W",
-    "humidity_pct": 66,
-    "pressure_mb": 1016.9,
-    "roof": true,
-    "flag": "clear"
-  },
-  "MIN": {
-    "venue": "Target Field",
-    "temp": 83.2,
-    "precip": 2,
-    "wind_spd": 9.7,
-    "wind_dir": "WSW",
-    "humidity_pct": 36,
-    "pressure_mb": 1013.5,
-    "roof": false,
-    "flag": "clear"
-  },
-  "COL": {
-    "venue": "Coors Field",
-    "temp": 92.7,
-    "precip": 1,
-    "wind_spd": 4.6,
-    "wind_dir": "ESE",
-    "humidity_pct": 11,
-    "pressure_mb": 1007.1,
-    "roof": false,
-    "flag": "clear"
-  },
   "BOS": {
     "venue": "Fenway Park",
     "temp": 74.2,
@@ -106,6 +29,83 @@
     "wind_dir": "NNE",
     "humidity_pct": 33,
     "pressure_mb": 1015.7,
+    "roof": false,
+    "flag": "clear"
+  },
+  "COL": {
+    "venue": "Coors Field",
+    "temp": 92.7,
+    "precip": 1,
+    "wind_spd": 4.6,
+    "wind_dir": "ESE",
+    "humidity_pct": 11,
+    "pressure_mb": 1007.1,
+    "roof": false,
+    "flag": "clear"
+  },
+  "CIN": {
+    "venue": "Great American Ball Park",
+    "temp": 81.6,
+    "precip": 20,
+    "wind_spd": 6.5,
+    "wind_dir": "WSW",
+    "humidity_pct": 74,
+    "pressure_mb": 1013.0,
+    "roof": false,
+    "flag": "clear"
+  },
+  "CHC": {
+    "venue": "Wrigley Field",
+    "temp": 70.8,
+    "precip": 0,
+    "wind_spd": 3.8,
+    "wind_dir": "S",
+    "humidity_pct": 83,
+    "pressure_mb": 1015.3,
+    "roof": false,
+    "flag": "clear"
+  },
+  "TB": {
+    "venue": "Tropicana Field",
+    "temp": 89.1,
+    "precip": 3,
+    "wind_spd": 9.8,
+    "wind_dir": "W",
+    "humidity_pct": 66,
+    "pressure_mb": 1016.9,
+    "roof": true,
+    "flag": "clear"
+  },
+  "PIT": {
+    "venue": "PNC Park",
+    "temp": 79.2,
+    "precip": 16,
+    "wind_spd": 4.8,
+    "wind_dir": "NW",
+    "humidity_pct": 73,
+    "pressure_mb": 1011.1,
+    "roof": false,
+    "flag": "clear"
+  },
+  "PHI": {
+    "venue": "Citizens Bank Park",
+    "temp": 85.6,
+    "precip": 10,
+    "wind_spd": 1.7,
+    "wind_dir": "NW",
+    "humidity_pct": 66,
+    "pressure_mb": 1008.6,
+    "roof": false,
+    "flag": "clear"
+  },
+  "MIN": {
+    "venue": "Target Field",
+    "temp": 83.2,
+    "precip": 2,
+    "wind_spd": 9.7,
+    "wind_dir": "WSW",
+    "humidity_pct": 36,
+    "pressure_mb": 1013.5,
     "roof": false,
     "flag": "clear"
   }
