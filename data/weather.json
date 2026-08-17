@@ -1,12 +1,12 @@
 {
-  "NYM": {
-    "venue": "Citi Field",
-    "temp": 75.7,
-    "precip": 3,
-    "wind_spd": 7.0,
-    "wind_dir": "NE",
-    "humidity_pct": 83,
-    "pressure_mb": 1009.7,
+  "PIT": {
+    "venue": "PNC Park",
+    "temp": 79.2,
+    "precip": 16,
+    "wind_spd": 4.8,
+    "wind_dir": "NW",
+    "humidity_pct": 73,
+    "pressure_mb": 1011.1,
     "roof": false,
     "flag": "clear"
   },
@@ -21,25 +21,14 @@
     "roof": false,
     "flag": "clear"
   },
-  "MIN": {
-    "venue": "Target Field",
-    "temp": 83.2,
-    "precip": 2,
-    "wind_spd": 9.7,
-    "wind_dir": "WSW",
-    "humidity_pct": 36,
-    "pressure_mb": 1013.5,
-    "roof": false,
-    "flag": "clear"
-  },
-  "COL": {
-    "venue": "Coors Field",
-    "temp": 92.7,
-    "precip": 1,
-    "wind_spd": 4.6,
-    "wind_dir": "ESE",
-    "humidity_pct": 11,
-    "pressure_mb": 1007.1,
+  "KC": {
+    "venue": "Kauffman Stadium",
+    "temp": 89.3,
+    "precip": 0,
+    "wind_spd": 5.5,
+    "wind_dir": "NNE",
+    "humidity_pct": 33,
+    "pressure_mb": 1015.7,
     "roof": false,
     "flag": "clear"
   },
@@ -54,6 +43,17 @@
     "roof": false,
     "flag": "clear"
   },
+  "NYM": {
+    "venue": "Citi Field",
+    "temp": 75.7,
+    "precip": 3,
+    "wind_spd": 7.0,
+    "wind_dir": "NE",
+    "humidity_pct": 83,
+    "pressure_mb": 1009.7,
+    "roof": false,
+    "flag": "clear"
+  },
   "CHC": {
     "venue": "Wrigley Field",
     "temp": 70.8,
@@ -65,14 +65,25 @@
     "roof": false,
     "flag": "clear"
   },
-  "PIT": {
-    "venue": "PNC Park",
-    "temp": 79.2,
-    "precip": 16,
-    "wind_spd": 4.8,
-    "wind_dir": "NW",
-    "humidity_pct": 73,
-    "pressure_mb": 1011.1,
+  "TB": {
+    "venue": "Tropicana Field",
+    "temp": 89.1,
+    "precip": 3,
+    "wind_spd": 9.8,
+    "wind_dir": "W",
+    "humidity_pct": 66,
+    "pressure_mb": 1016.9,
+    "roof": true,
+    "flag": "clear"
+  },
+  "COL": {
+    "venue": "Coors Field",
+    "temp": 92.7,
+    "precip": 1,
+    "wind_spd": 4.6,
+    "wind_dir": "ESE",
+    "humidity_pct": 11,
+    "pressure_mb": 1007.1,
     "roof": false,
     "flag": "clear"
   },
@@ -87,26 +98,13 @@
     "roof": false,
     "flag": "clear"
   },
-  "KC": {
-    "venue": "Kauffman Stadium",
-    "temp": 89.3,
+  "MIN": {
+    "venue": "Target Field",
+    "temp": 72,
     "precip": 0,
-    "wind_spd": 5.5,
-    "wind_dir": "NNE",
-    "humidity_pct": 33,
-    "pressure_mb": 1015.7,
+    "wind_spd": 5,
+    "wind_dir": "N",
     "roof": false,
-    "flag": "clear"
-  },
-  "TB": {
-    "venue": "Tropicana Field",
-    "temp": 89.1,
-    "precip": 3,
-    "wind_spd": 9.8,
-    "wind_dir": "W",
-    "humidity_pct": 66,
-    "pressure_mb": 1016.9,
-    "roof": true,
     "flag": "clear"
   }
 }
