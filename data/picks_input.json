@@ -1009,7 +1009,7 @@
   "prob": 0.307,
   "edge": -5.1,
   "tier": "ticket",
-  "hit": null
+  "hit": true
  },
  {
   "date": "2026-08-17",
@@ -1018,7 +1018,7 @@
   "prob": 0.178,
   "edge": -3.5,
   "tier": "ticket",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-08-17",
@@ -1027,7 +1027,7 @@
   "prob": 0.299,
   "edge": -5.9,
   "tier": "ticket",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-08-17",
@@ -1036,7 +1036,7 @@
   "prob": 0.209,
   "edge": -2.2,
   "tier": "ticket",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-08-17",
@@ -1044,6 +1044,24 @@
   "odds": 262,
   "prob": 0.215,
   "edge": -6.2,
+  "tier": "ticket",
+  "hit": false
+ },
+ {
+  "date": "2026-08-18",
+  "player": "Mike Trout",
+  "odds": 304,
+  "prob": 0.218,
+  "edge": -3.0,
+  "tier": "ticket",
+  "hit": null
+ },
+ {
+  "date": "2026-08-18",
+  "player": "Munetaka Murakami",
+  "odds": 281,
+  "prob": 0.241,
+  "edge": -2.2,
   "tier": "ticket",
   "hit": null
  }
