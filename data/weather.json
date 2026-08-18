@@ -1,44 +1,55 @@
 {
-  "KC": {
-    "venue": "Kauffman Stadium",
-    "temp": 91.3,
+  "BOS": {
+    "venue": "Fenway Park",
+    "temp": 71.9,
     "precip": 2,
-    "wind_spd": 5.2,
-    "wind_dir": "S",
-    "humidity_pct": 42,
-    "pressure_mb": 1011.7,
+    "wind_spd": 7.2,
+    "wind_dir": "E",
+    "humidity_pct": 82,
+    "pressure_mb": 1011.1,
     "roof": false,
     "flag": "clear"
   },
-  "TEX": {
-    "venue": "Globe Life Field",
-    "temp": 102.0,
-    "precip": 0,
-    "wind_spd": 9.8,
-    "wind_dir": "S",
-    "humidity_pct": 24,
-    "pressure_mb": 1011.7,
-    "roof": true,
+  "CHC": {
+    "venue": "Wrigley Field",
+    "temp": 74.5,
+    "precip": 20,
+    "wind_spd": 6.7,
+    "wind_dir": "SW",
+    "humidity_pct": 76,
+    "pressure_mb": 1012.3,
+    "roof": false,
     "flag": "clear"
   },
-  "TB": {
-    "venue": "Tropicana Field",
-    "temp": 88.4,
-    "precip": 4,
-    "wind_spd": 11.9,
-    "wind_dir": "W",
-    "humidity_pct": 69,
-    "pressure_mb": 1016.4,
-    "roof": true,
+  "PIT": {
+    "venue": "PNC Park",
+    "temp": 79.9,
+    "precip": 0,
+    "wind_spd": 5.1,
+    "wind_dir": "WNW",
+    "humidity_pct": 45,
+    "pressure_mb": 1014.1,
+    "roof": false,
     "flag": "clear"
   },
   "PHI": {
     "venue": "Citizens Bank Park",
     "temp": 77.2,
-    "precip": 6,
+    "precip": 7,
     "wind_spd": 8.5,
     "wind_dir": "ENE",
     "humidity_pct": 85,
+    "pressure_mb": 1011.7,
+    "roof": false,
+    "flag": "clear"
+  },
+  "KC": {
+    "venue": "Kauffman Stadium",
+    "temp": 91.3,
+    "precip": 1,
+    "wind_spd": 5.2,
+    "wind_dir": "S",
+    "humidity_pct": 42,
     "pressure_mb": 1011.7,
     "roof": false,
     "flag": "clear"
@@ -52,6 +63,39 @@
     "humidity_pct": 38,
     "pressure_mb": 1014.1,
     "roof": false,
+    "flag": "clear"
+  },
+  "BAL": {
+    "venue": "Camden Yards",
+    "temp": 87.1,
+    "precip": 4,
+    "wind_spd": 6.7,
+    "wind_dir": "WNW",
+    "humidity_pct": 52,
+    "pressure_mb": 1011.6,
+    "roof": false,
+    "flag": "clear"
+  },
+  "MIL": {
+    "venue": "American Family Field",
+    "temp": 82.3,
+    "precip": 31,
+    "wind_spd": 9.6,
+    "wind_dir": "WSW",
+    "humidity_pct": 53,
+    "pressure_mb": 1011.0,
+    "roof": true,
+    "flag": "clear"
+  },
+  "TEX": {
+    "venue": "Globe Life Field",
+    "temp": 102.0,
+    "precip": 0,
+    "wind_spd": 9.8,
+    "wind_dir": "S",
+    "humidity_pct": 24,
+    "pressure_mb": 1011.7,
+    "roof": true,
     "flag": "clear"
   },
   "NYM": {
@@ -87,30 +131,8 @@
     "roof": false,
     "flag": "clear"
   },
-  "PIT": {
-    "venue": "PNC Park",
-    "temp": 79.9,
-    "precip": 0,
-    "wind_spd": 5.1,
-    "wind_dir": "WNW",
-    "humidity_pct": 45,
-    "pressure_mb": 1014.1,
-    "roof": false,
-    "flag": "clear"
-  },
-  "BOS": {
-    "venue": "Fenway Park",
-    "temp": 71.9,
-    "precip": 3,
-    "wind_spd": 7.2,
-    "wind_dir": "E",
-    "humidity_pct": 82,
-    "pressure_mb": 1011.1,
-    "roof": false,
-    "flag": "clear"
-  },
-  "MIN": {
-    "venue": "Target Field",
+  "CIN": {
+    "venue": "Great American Ball Park",
     "temp": 72,
     "precip": 0,
     "wind_spd": 5,
@@ -118,17 +140,8 @@
     "roof": false,
     "flag": "clear"
   },
-  "BAL": {
-    "venue": "Camden Yards",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
-    "roof": false,
-    "flag": "clear"
-  },
-  "MIL": {
-    "venue": "American Family Field",
+  "TB": {
+    "venue": "Tropicana Field",
     "temp": 72,
     "precip": 0,
     "wind_spd": 5,
@@ -136,21 +149,14 @@
     "roof": true,
     "flag": "clear"
   },
-  "CHC": {
-    "venue": "Wrigley Field",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
-    "roof": false,
-    "flag": "clear"
-  },
-  "CIN": {
-    "venue": "Great American Ball Park",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
+  "MIN": {
+    "venue": "Target Field",
+    "temp": 81.4,
+    "precip": 2,
+    "wind_spd": 8.5,
+    "wind_dir": "NW",
+    "humidity_pct": 42,
+    "pressure_mb": 1011.9,
     "roof": false,
     "flag": "clear"
   }
