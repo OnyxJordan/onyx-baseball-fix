@@ -2,7 +2,7 @@
   "PHI": {
     "venue": "Citizens Bank Park",
     "temp": 84.9,
-    "precip": 7,
+    "precip": 19,
     "wind_spd": 8.1,
     "wind_dir": "NW",
     "humidity_pct": 57,
@@ -10,10 +10,43 @@
     "roof": false,
     "flag": "clear"
   },
+  "TB": {
+    "venue": "Tropicana Field",
+    "temp": 88.4,
+    "precip": 3,
+    "wind_spd": 12.5,
+    "wind_dir": "W",
+    "humidity_pct": 71,
+    "pressure_mb": 1016.2,
+    "roof": true,
+    "flag": "clear"
+  },
+  "CLE": {
+    "venue": "Progressive Field",
+    "temp": 78.6,
+    "precip": 0,
+    "wind_spd": 9.2,
+    "wind_dir": "WNW",
+    "humidity_pct": 46,
+    "pressure_mb": 1014.4,
+    "roof": false,
+    "flag": "clear"
+  },
+  "PIT": {
+    "venue": "PNC Park",
+    "temp": 80.1,
+    "precip": 0,
+    "wind_spd": 4.3,
+    "wind_dir": "NW",
+    "humidity_pct": 44,
+    "pressure_mb": 1013.8,
+    "roof": false,
+    "flag": "clear"
+  },
   "CHC": {
     "venue": "Wrigley Field",
     "temp": 74.1,
-    "precip": 20,
+    "precip": 18,
     "wind_spd": 7.3,
     "wind_dir": "SW",
     "humidity_pct": 78,
@@ -21,15 +54,15 @@
     "roof": false,
     "flag": "clear"
   },
-  "TB": {
-    "venue": "Tropicana Field",
-    "temp": 88.4,
-    "precip": 4,
-    "wind_spd": 12.5,
-    "wind_dir": "W",
-    "humidity_pct": 71,
-    "pressure_mb": 1016.2,
-    "roof": true,
+  "BAL": {
+    "venue": "Camden Yards",
+    "temp": 86.7,
+    "precip": 3,
+    "wind_spd": 7.8,
+    "wind_dir": "WNW",
+    "humidity_pct": 52,
+    "pressure_mb": 1011.5,
+    "roof": false,
     "flag": "clear"
   },
   "CIN": {
@@ -43,58 +76,14 @@
     "roof": false,
     "flag": "clear"
   },
-  "BAL": {
-    "venue": "Camden Yards",
-    "temp": 86.7,
-    "precip": 4,
-    "wind_spd": 7.8,
-    "wind_dir": "WNW",
-    "humidity_pct": 52,
-    "pressure_mb": 1011.5,
-    "roof": false,
-    "flag": "clear"
-  },
-  "TEX": {
-    "venue": "Globe Life Field",
-    "temp": 102.1,
-    "precip": 0,
-    "wind_spd": 9.9,
-    "wind_dir": "S",
-    "humidity_pct": 23,
-    "pressure_mb": 1011.8,
-    "roof": true,
-    "flag": "clear"
-  },
-  "BOS": {
-    "venue": "Fenway Park",
-    "temp": 71.8,
-    "precip": 2,
-    "wind_spd": 7.2,
-    "wind_dir": "E",
-    "humidity_pct": 81,
-    "pressure_mb": 1011.2,
-    "roof": false,
-    "flag": "clear"
-  },
-  "HOU": {
-    "venue": "Daikin Park",
-    "temp": 87.9,
-    "precip": 1,
-    "wind_spd": 8.2,
-    "wind_dir": "S",
-    "humidity_pct": 63,
-    "pressure_mb": 1015.1,
-    "roof": true,
-    "flag": "clear"
-  },
-  "CLE": {
-    "venue": "Progressive Field",
-    "temp": 78.6,
-    "precip": 0,
-    "wind_spd": 9.2,
-    "wind_dir": "WNW",
-    "humidity_pct": 46,
-    "pressure_mb": 1014.4,
+  "NYM": {
+    "venue": "Citi Field",
+    "temp": 77.2,
+    "precip": 7,
+    "wind_spd": 7.1,
+    "wind_dir": "SSE",
+    "humidity_pct": 85,
+    "pressure_mb": 1011.7,
     "roof": false,
     "flag": "clear"
   },
@@ -112,7 +101,7 @@
   "MIN": {
     "venue": "Target Field",
     "temp": 81.5,
-    "precip": 2,
+    "precip": 1,
     "wind_spd": 9.1,
     "wind_dir": "NW",
     "humidity_pct": 41,
@@ -120,37 +109,48 @@
     "roof": false,
     "flag": "clear"
   },
-  "MIL": {
-    "venue": "American Family Field",
-    "temp": 79.2,
-    "precip": 31,
-    "wind_spd": 5.0,
-    "wind_dir": "WSW",
-    "humidity_pct": 67,
-    "pressure_mb": 1011.1,
+  "HOU": {
+    "venue": "Daikin Park",
+    "temp": 87.9,
+    "precip": 2,
+    "wind_spd": 8.2,
+    "wind_dir": "S",
+    "humidity_pct": 63,
+    "pressure_mb": 1015.1,
     "roof": true,
     "flag": "clear"
   },
   "COL": {
     "venue": "Coors Field",
+    "temp": 87.5,
+    "precip": 6,
+    "wind_spd": 5.4,
+    "wind_dir": "NE",
+    "humidity_pct": 22,
+    "pressure_mb": 1008.3,
+    "roof": false,
+    "flag": "clear"
+  },
+  "MIL": {
+    "venue": "American Family Field",
     "temp": 72,
     "precip": 0,
     "wind_spd": 5,
     "wind_dir": "N",
-    "roof": false,
+    "roof": true,
     "flag": "clear"
   },
-  "PIT": {
-    "venue": "PNC Park",
+  "TEX": {
+    "venue": "Globe Life Field",
     "temp": 72,
     "precip": 0,
     "wind_spd": 5,
     "wind_dir": "N",
-    "roof": false,
+    "roof": true,
     "flag": "clear"
   },
-  "NYM": {
-    "venue": "Citi Field",
+  "BOS": {
+    "venue": "Fenway Park",
     "temp": 72,
     "precip": 0,
     "wind_spd": 5,
