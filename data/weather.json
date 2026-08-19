@@ -1,8 +1,30 @@
 {
+  "HOU": {
+    "venue": "Daikin Park",
+    "temp": 89.9,
+    "precip": 1,
+    "wind_spd": 11.2,
+    "wind_dir": "SSE",
+    "humidity_pct": 55,
+    "pressure_mb": 1013.6,
+    "roof": true,
+    "flag": "clear"
+  },
+  "MIL": {
+    "venue": "American Family Field",
+    "temp": 73.8,
+    "precip": 0,
+    "wind_spd": 4.8,
+    "wind_dir": "ENE",
+    "humidity_pct": 50,
+    "pressure_mb": 1013.8,
+    "roof": true,
+    "flag": "clear"
+  },
   "CHC": {
     "venue": "Wrigley Field",
     "temp": 74.5,
-    "precip": 3,
+    "precip": 4,
     "wind_spd": 7.4,
     "wind_dir": "NNE",
     "humidity_pct": 82,
@@ -10,14 +32,14 @@
     "roof": false,
     "flag": "clear"
   },
-  "BAL": {
-    "venue": "Camden Yards",
-    "temp": 88.5,
-    "precip": 1,
-    "wind_spd": 6.5,
-    "wind_dir": "W",
-    "humidity_pct": 40,
-    "pressure_mb": 1012.9,
+  "NYM": {
+    "venue": "Citi Field",
+    "temp": 86.2,
+    "precip": 0,
+    "wind_spd": 8.1,
+    "wind_dir": "SW",
+    "humidity_pct": 41,
+    "pressure_mb": 1011.8,
     "roof": false,
     "flag": "clear"
   },
@@ -43,17 +65,6 @@
     "roof": true,
     "flag": "clear"
   },
-  "NYM": {
-    "venue": "Citi Field",
-    "temp": 86.2,
-    "precip": 0,
-    "wind_spd": 8.1,
-    "wind_dir": "SW",
-    "humidity_pct": 41,
-    "pressure_mb": 1011.8,
-    "roof": false,
-    "flag": "clear"
-  },
   "MIN": {
     "venue": "Target Field",
     "temp": 75.5,
@@ -76,64 +87,44 @@
     "roof": false,
     "flag": "clear"
   },
-  "CLE": {
-    "venue": "Progressive Field",
-    "temp": 78.4,
-    "precip": 0,
-    "wind_spd": 5.4,
-    "wind_dir": "WNW",
-    "humidity_pct": 62,
-    "pressure_mb": 1013.7,
+  "BAL": {
+    "venue": "Camden Yards",
+    "temp": 88.5,
+    "precip": 1,
+    "wind_spd": 6.5,
+    "wind_dir": "W",
+    "humidity_pct": 40,
+    "pressure_mb": 1012.9,
     "roof": false,
     "flag": "clear"
   },
-  "CIN": {
-    "venue": "Great American Ball Park",
-    "temp": 82.8,
-    "precip": 9,
-    "wind_spd": 6.8,
-    "wind_dir": "SSW",
-    "humidity_pct": 55,
-    "pressure_mb": 1013.3,
+  "PHI": {
+    "venue": "Citizens Bank Park",
+    "temp": 86.8,
+    "precip": 1,
+    "wind_spd": 7.8,
+    "wind_dir": "W",
+    "humidity_pct": 38,
+    "pressure_mb": 1012.3,
     "roof": false,
     "flag": "clear"
   },
   "TB": {
     "venue": "Tropicana Field",
-    "temp": 90.3,
-    "precip": 10,
-    "wind_spd": 8.3,
-    "wind_dir": "NW",
-    "humidity_pct": 60,
-    "pressure_mb": 1015.3,
+    "temp": 72,
+    "precip": 0,
+    "wind_spd": 5,
+    "wind_dir": "N",
     "roof": true,
     "flag": "clear"
   },
-  "PHI": {
-    "venue": "Citizens Bank Park",
+  "CLE": {
+    "venue": "Progressive Field",
     "temp": 72,
     "precip": 0,
     "wind_spd": 5,
     "wind_dir": "N",
     "roof": false,
-    "flag": "clear"
-  },
-  "HOU": {
-    "venue": "Daikin Park",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
-    "roof": true,
-    "flag": "clear"
-  },
-  "MIL": {
-    "venue": "American Family Field",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
-    "roof": true,
     "flag": "clear"
   },
   "KC": {
@@ -147,6 +138,15 @@
   },
   "COL": {
     "venue": "Coors Field",
+    "temp": 72,
+    "precip": 0,
+    "wind_spd": 5,
+    "wind_dir": "N",
+    "roof": false,
+    "flag": "clear"
+  },
+  "CIN": {
+    "venue": "Great American Ball Park",
     "temp": 72,
     "precip": 0,
     "wind_spd": 5,
