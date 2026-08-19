@@ -1054,7 +1054,7 @@
   "prob": 0.218,
   "edge": -3.0,
   "tier": "ticket",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-08-18",
@@ -1063,7 +1063,7 @@
   "prob": 0.241,
   "edge": -2.2,
   "tier": "ticket",
-  "hit": null
+  "hit": true
  },
  {
   "date": "2026-08-18",
@@ -1072,7 +1072,7 @@
   "prob": 0.177,
   "edge": -2.3,
   "tier": "ticket",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-08-18",
@@ -1081,6 +1081,33 @@
   "prob": 0.291,
   "edge": -4.1,
   "tier": "ticket",
+  "hit": true
+ },
+ {
+  "date": "2026-08-19",
+  "player": "Kyle Schwarber",
+  "odds": 205,
+  "prob": 0.285,
+  "edge": -4.3,
+  "tier": "ticket",
+  "hit": null
+ },
+ {
+  "date": "2026-08-19",
+  "player": "Yordan Alvarez",
+  "odds": 274,
+  "prob": 0.246,
+  "edge": -2.2,
+  "tier": "ticket",
+  "hit": null
+ },
+ {
+  "date": "2026-08-19",
+  "player": "Munetaka Murakami",
+  "odds": 390,
+  "prob": 0.206,
+  "edge": 0.1,
+  "tier": "edge",
   "hit": null
  }
 ]

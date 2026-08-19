@@ -1,39 +1,39 @@
 {
- "date": "2026-08-18",
- "locked": true,
+ "date": "2026-08-19",
+ "locked": false,
  "legs": [
   {
-   "player": "Mike Trout",
-   "mid": 545361,
-   "team": "LAA",
-   "odds": 311,
-   "prob": 21.6,
-   "score": 0.686,
+   "player": "Kyle Schwarber",
+   "mid": 656941,
+   "team": "PHI",
+   "odds": 205,
+   "prob": 28.5,
+   "score": 0.6,
+   "why": [
+    "park ×1.13",
+    "wind/heat ×1.11"
+   ],
+   "away": "MIA",
+   "home": "PHI",
+   "opp": "Sandy Alcantara",
+   "time": "6:05 PM"
+  },
+  {
+   "player": "Yordan Alvarez",
+   "mid": 670541,
+   "team": "HOU",
+   "odds": 274,
+   "prob": 24.6,
+   "score": 0.589,
    "why": [
     "park ×1.24",
-    "pitcher matchup ×1.19",
-    "fly-ball pitcher"
+    "overdue",
+    "48% FB bat"
    ],
    "away": "LAA",
    "home": "HOU",
-   "opp": "Cristian Javier",
+   "opp": "Walbert Ureña",
    "time": "8:10 PM"
-  },
-  {
-   "player": "Shohei Ohtani",
-   "mid": 660271,
-   "team": "LAD",
-   "odds": 201,
-   "prob": 29.3,
-   "score": 0.667,
-   "why": [
-    "park ×1.35",
-    "pitcher matchup ×1.09"
-   ],
-   "away": "LAD",
-   "home": "COL",
-   "opp": "Ryan Feltner",
-   "time": "8:40 PM"
   }
  ]
 }

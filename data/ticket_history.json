@@ -573,12 +573,32 @@
     "player": "Mike Trout",
     "odds": 311,
     "prob": 21.6,
-    "hit": null
+    "hit": false
    },
    {
     "player": "Shohei Ohtani",
     "odds": 201,
     "prob": 29.3,
+    "hit": true
+   }
+  ],
+  "result": "loss",
+  "pnl": -10.0
+ },
+ {
+  "date": "2026-08-19",
+  "stake": 10,
+  "legs": [
+   {
+    "player": "Kyle Schwarber",
+    "odds": 205,
+    "prob": 28.5,
+    "hit": null
+   },
+   {
+    "player": "Yordan Alvarez",
+    "odds": 274,
+    "prob": 24.6,
     "hit": null
    }
   ],
