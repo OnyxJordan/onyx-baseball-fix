@@ -1,39 +1,40 @@
 {
- "date": "2026-08-19",
- "locked": true,
+ "date": "2026-08-20",
+ "locked": false,
  "legs": [
-  {
-   "player": "Kyle Schwarber",
-   "mid": 656941,
-   "team": "PHI",
-   "odds": 205,
-   "prob": 28.5,
-   "score": 0.605,
-   "why": [
-    "park ×1.13",
-    "wind/heat ×1.12"
-   ],
-   "away": "MIA",
-   "home": "PHI",
-   "opp": "Sandy Alcantara",
-   "time": "6:05 PM"
-  },
   {
    "player": "Yordan Alvarez",
    "mid": 670541,
    "team": "HOU",
-   "odds": 274,
-   "prob": 24.6,
-   "score": 0.589,
+   "odds": 228,
+   "prob": 26.3,
+   "score": 0.765,
    "why": [
     "park ×1.24",
-    "overdue",
-    "48% FB bat"
+    "pitcher matchup ×1.11",
+    "overdue"
    ],
    "away": "LAA",
    "home": "HOU",
-   "opp": "Walbert Ureña",
+   "opp": "Grayson Rodriguez",
    "time": "8:10 PM"
+  },
+  {
+   "player": "Alec Burleson",
+   "mid": 676475,
+   "team": "STL",
+   "odds": 327,
+   "prob": 19.3,
+   "score": 0.525,
+   "why": [
+    "park ×1.31",
+    "soft bullpen",
+    "platoon edge"
+   ],
+   "away": "STL",
+   "home": "CIN",
+   "opp": "Brady Singer",
+   "time": "12:40 PM"
   }
  ]
 }

@@ -593,12 +593,32 @@
     "player": "Kyle Schwarber",
     "odds": 205,
     "prob": 28.5,
-    "hit": null
+    "hit": false
    },
    {
     "player": "Yordan Alvarez",
     "odds": 274,
     "prob": 24.6,
+    "hit": false
+   }
+  ],
+  "result": "loss",
+  "pnl": -10.0
+ },
+ {
+  "date": "2026-08-20",
+  "stake": 10,
+  "legs": [
+   {
+    "player": "Yordan Alvarez",
+    "odds": 228,
+    "prob": 26.3,
+    "hit": null
+   },
+   {
+    "player": "Alec Burleson",
+    "odds": 327,
+    "prob": 19.3,
     "hit": null
    }
   ],
