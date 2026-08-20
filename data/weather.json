@@ -1,15 +1,4 @@
 {
-  "CLE": {
-    "venue": "Progressive Field",
-    "temp": 73.8,
-    "precip": 21,
-    "wind_spd": 4.4,
-    "wind_dir": "NNE",
-    "humidity_pct": 76,
-    "pressure_mb": 1015.6,
-    "roof": false,
-    "flag": "clear"
-  },
   "TEX": {
     "venue": "Globe Life Field",
     "temp": 101.7,
@@ -21,14 +10,47 @@
     "roof": true,
     "flag": "clear"
   },
-  "CWS": {
-    "venue": "Rate Field",
+  "CIN": {
+    "venue": "Great American Ball Park",
+    "temp": 72.9,
+    "precip": 7,
+    "wind_spd": 1.4,
+    "wind_dir": "NW",
+    "humidity_pct": 88,
+    "pressure_mb": 1015.7,
+    "roof": false,
+    "flag": "clear"
+  },
+  "BAL": {
+    "venue": "Camden Yards",
+    "temp": 77.3,
+    "precip": 52,
+    "wind_spd": 2.1,
+    "wind_dir": "SSW",
+    "humidity_pct": 86,
+    "pressure_mb": 1012.6,
+    "roof": false,
+    "flag": "clear"
+  },
+  "HOU": {
+    "venue": "Daikin Park",
+    "temp": 90.3,
+    "precip": 5,
+    "wind_spd": 9.5,
+    "wind_dir": "S",
+    "humidity_pct": 57,
+    "pressure_mb": 1014.1,
+    "roof": true,
+    "flag": "clear"
+  },
+  "CLE": {
+    "venue": "Progressive Field",
     "temp": 73.8,
-    "precip": 0,
-    "wind_spd": 10.9,
-    "wind_dir": "N",
-    "humidity_pct": 59,
-    "pressure_mb": 1016.9,
+    "precip": 21,
+    "wind_spd": 4.4,
+    "wind_dir": "NNE",
+    "humidity_pct": 76,
+    "pressure_mb": 1015.6,
     "roof": false,
     "flag": "clear"
   },
@@ -43,26 +65,26 @@
     "roof": true,
     "flag": "clear"
   },
-  "BAL": {
-    "venue": "Camden Yards",
-    "temp": 77.3,
-    "precip": 68,
-    "wind_spd": 2.1,
-    "wind_dir": "SSW",
-    "humidity_pct": 86,
-    "pressure_mb": 1012.6,
-    "roof": false,
+  "TB": {
+    "venue": "Tropicana Field",
+    "temp": 86.5,
+    "precip": 19,
+    "wind_spd": 7.5,
+    "wind_dir": "WNW",
+    "humidity_pct": 63,
+    "pressure_mb": 1016.7,
+    "roof": true,
     "flag": "clear"
   },
-  "HOU": {
-    "venue": "Daikin Park",
-    "temp": 90.3,
-    "precip": 7,
-    "wind_spd": 9.5,
-    "wind_dir": "S",
-    "humidity_pct": 57,
-    "pressure_mb": 1014.1,
-    "roof": true,
+  "CWS": {
+    "venue": "Rate Field",
+    "temp": 73.8,
+    "precip": 0,
+    "wind_spd": 10.9,
+    "wind_dir": "N",
+    "humidity_pct": 59,
+    "pressure_mb": 1016.9,
+    "roof": false,
     "flag": "clear"
   },
   "KC": {
@@ -74,28 +96,6 @@
     "humidity_pct": 75,
     "pressure_mb": 1016.3,
     "roof": false,
-    "flag": "clear"
-  },
-  "CIN": {
-    "venue": "Great American Ball Park",
-    "temp": 72.9,
-    "precip": 7,
-    "wind_spd": 1.4,
-    "wind_dir": "NW",
-    "humidity_pct": 88,
-    "pressure_mb": 1015.7,
-    "roof": false,
-    "flag": "clear"
-  },
-  "TB": {
-    "venue": "Tropicana Field",
-    "temp": 86.5,
-    "precip": 19,
-    "wind_spd": 7.5,
-    "wind_dir": "WNW",
-    "humidity_pct": 63,
-    "pressure_mb": 1016.7,
-    "roof": true,
     "flag": "clear"
   }
 }
