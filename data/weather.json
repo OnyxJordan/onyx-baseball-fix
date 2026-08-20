@@ -1,4 +1,15 @@
 {
+  "BAL": {
+    "venue": "Camden Yards",
+    "temp": 79.3,
+    "precip": 43,
+    "wind_spd": 12.7,
+    "wind_dir": "WNW",
+    "humidity_pct": 78,
+    "pressure_mb": 1012.5,
+    "roof": false,
+    "flag": "clear"
+  },
   "TEX": {
     "venue": "Globe Life Field",
     "temp": 101.9,
@@ -13,23 +24,12 @@
   "HOU": {
     "venue": "Daikin Park",
     "temp": 90.5,
-    "precip": 4,
+    "precip": 3,
     "wind_spd": 3.6,
     "wind_dir": "E",
     "humidity_pct": 60,
     "pressure_mb": 1013.2,
     "roof": true,
-    "flag": "clear"
-  },
-  "BAL": {
-    "venue": "Camden Yards",
-    "temp": 79.3,
-    "precip": 43,
-    "wind_spd": 12.7,
-    "wind_dir": "WNW",
-    "humidity_pct": 78,
-    "pressure_mb": 1012.5,
-    "roof": false,
     "flag": "clear"
   }
 }
