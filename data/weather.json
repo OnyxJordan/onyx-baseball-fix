@@ -1,15 +1,4 @@
 {
-  "TB": {
-    "venue": "Tropicana Field",
-    "temp": 89.5,
-    "precip": 9,
-    "wind_spd": 7.9,
-    "wind_dir": "WNW",
-    "humidity_pct": 67,
-    "pressure_mb": 1014.8,
-    "roof": true,
-    "flag": "clear"
-  },
   "BAL": {
     "venue": "Camden Yards",
     "temp": 87.3,
@@ -21,59 +10,37 @@
     "roof": false,
     "flag": "clear"
   },
-  "HOU": {
-    "venue": "Daikin Park",
-    "temp": 88.4,
+  "TEX": {
+    "venue": "Globe Life Field",
+    "temp": 102.4,
     "precip": 0,
-    "wind_spd": 6.2,
-    "wind_dir": "SSW",
-    "humidity_pct": 53,
-    "pressure_mb": 1012.5,
+    "wind_spd": 8.7,
+    "wind_dir": "S",
+    "humidity_pct": 24,
+    "pressure_mb": 1009.3,
     "roof": true,
     "flag": "clear"
   },
-  "TEX": {
-    "venue": "Globe Life Field",
-    "temp": 102.0,
-    "precip": 0,
-    "wind_spd": 11.0,
-    "wind_dir": "S",
-    "humidity_pct": 24,
-    "pressure_mb": 1008.8,
-    "roof": true,
+  "KC": {
+    "venue": "Kauffman Stadium",
+    "temp": 80.5,
+    "precip": 3,
+    "wind_spd": 7.7,
+    "wind_dir": "NW",
+    "humidity_pct": 80,
+    "pressure_mb": 1012.2,
+    "roof": false,
     "flag": "clear"
   },
   "MIL": {
     "venue": "American Family Field",
     "temp": 72.4,
     "precip": 0,
-    "wind_spd": 4.6,
-    "wind_dir": "ENE",
-    "humidity_pct": 61,
+    "wind_spd": 4.3,
+    "wind_dir": "ESE",
+    "humidity_pct": 68,
     "pressure_mb": 1013.8,
     "roof": true,
-    "flag": "clear"
-  },
-  "KC": {
-    "venue": "Kauffman Stadium",
-    "temp": 81.1,
-    "precip": 3,
-    "wind_spd": 5.3,
-    "wind_dir": "SSW",
-    "humidity_pct": 75,
-    "pressure_mb": 1010.2,
-    "roof": false,
-    "flag": "clear"
-  },
-  "COL": {
-    "venue": "Coors Field",
-    "temp": 90.4,
-    "precip": 9,
-    "wind_spd": 9.6,
-    "wind_dir": "E",
-    "humidity_pct": 20,
-    "pressure_mb": 1004.2,
-    "roof": false,
     "flag": "clear"
   },
   "CIN": {
@@ -87,24 +54,37 @@
     "roof": false,
     "flag": "clear"
   },
-  "PHI": {
-    "venue": "Citizens Bank Park",
-    "temp": 85.6,
-    "precip": 0,
-    "wind_spd": 6.6,
-    "wind_dir": "W",
-    "humidity_pct": 49,
-    "pressure_mb": 1012.7,
+  "TB": {
+    "venue": "Tropicana Field",
+    "temp": 89.5,
+    "precip": 9,
+    "wind_spd": 7.9,
+    "wind_dir": "WNW",
+    "humidity_pct": 67,
+    "pressure_mb": 1014.8,
+    "roof": true,
+    "flag": "clear"
+  },
+  "COL": {
+    "venue": "Coors Field",
+    "temp": 90.0,
+    "precip": 10,
+    "wind_spd": 11.1,
+    "wind_dir": "ENE",
+    "humidity_pct": 20,
+    "pressure_mb": 1004.2,
     "roof": false,
     "flag": "clear"
   },
-  "CLE": {
-    "venue": "Progressive Field",
-    "temp": 72,
+  "HOU": {
+    "venue": "Daikin Park",
+    "temp": 89.0,
     "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
-    "roof": false,
+    "wind_spd": 4.8,
+    "wind_dir": "SSW",
+    "humidity_pct": 55,
+    "pressure_mb": 1013.6,
+    "roof": true,
     "flag": "clear"
   }
 }
