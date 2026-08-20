@@ -1,37 +1,4 @@
 {
-  "KC": {
-    "venue": "Kauffman Stadium",
-    "temp": 79.6,
-    "precip": 0,
-    "wind_spd": 3.2,
-    "wind_dir": "ENE",
-    "humidity_pct": 83,
-    "pressure_mb": 1016.9,
-    "roof": false,
-    "flag": "clear"
-  },
-  "BAL": {
-    "venue": "Camden Yards",
-    "temp": 83.5,
-    "precip": 56,
-    "wind_spd": 9.6,
-    "wind_dir": "SSW",
-    "humidity_pct": 68,
-    "pressure_mb": 1012.4,
-    "roof": false,
-    "flag": "clear"
-  },
-  "MIL": {
-    "venue": "American Family Field",
-    "temp": 75.4,
-    "precip": 0,
-    "wind_spd": 6.3,
-    "wind_dir": "E",
-    "humidity_pct": 54,
-    "pressure_mb": 1018.1,
-    "roof": true,
-    "flag": "clear"
-  },
   "TEX": {
     "venue": "Globe Life Field",
     "temp": 102.1,
@@ -46,12 +13,23 @@
   "HOU": {
     "venue": "Daikin Park",
     "temp": 93.2,
-    "precip": 3,
+    "precip": 6,
     "wind_spd": 1.6,
     "wind_dir": "E",
     "humidity_pct": 52,
     "pressure_mb": 1014.0,
     "roof": true,
+    "flag": "clear"
+  },
+  "BAL": {
+    "venue": "Camden Yards",
+    "temp": 83.5,
+    "precip": 47,
+    "wind_spd": 9.6,
+    "wind_dir": "SSW",
+    "humidity_pct": 68,
+    "pressure_mb": 1012.4,
+    "roof": false,
     "flag": "clear"
   }
 }
