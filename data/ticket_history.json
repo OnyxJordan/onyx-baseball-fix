@@ -613,12 +613,32 @@
     "player": "Yordan Alvarez",
     "odds": 199,
     "prob": 27.5,
-    "hit": null
+    "hit": false
    },
    {
     "player": "Mike Trout",
     "odds": 362,
     "prob": 19.3,
+    "hit": false
+   }
+  ],
+  "result": "loss",
+  "pnl": -10.0
+ },
+ {
+  "date": "2026-08-21",
+  "stake": 10,
+  "legs": [
+   {
+    "player": "Cal Raleigh",
+    "odds": 324,
+    "prob": 17.7,
+    "hit": null
+   },
+   {
+    "player": "Byron Buxton",
+    "odds": 254,
+    "prob": 25.1,
     "hit": null
    }
   ],

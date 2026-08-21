@@ -1117,7 +1117,7 @@
   "prob": 0.263,
   "edge": -4.2,
   "tier": "ticket",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-08-20",
@@ -1126,7 +1126,7 @@
   "prob": 0.193,
   "edge": -4.1,
   "tier": "ticket",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-08-20",
@@ -1135,6 +1135,33 @@
   "prob": 0.195,
   "edge": -2.6,
   "tier": "ticket",
+  "hit": false
+ },
+ {
+  "date": "2026-08-21",
+  "player": "Cal Raleigh",
+  "odds": 324,
+  "prob": 0.177,
+  "edge": -5.9,
+  "tier": "ticket",
+  "hit": null
+ },
+ {
+  "date": "2026-08-21",
+  "player": "Byron Buxton",
+  "odds": 254,
+  "prob": 0.251,
+  "edge": -3.1,
+  "tier": "ticket",
+  "hit": null
+ },
+ {
+  "date": "2026-08-21",
+  "player": "Ben Rice",
+  "odds": 392,
+  "prob": 0.214,
+  "edge": 1.1,
+  "tier": "edge",
   "hit": null
  }
 ]
