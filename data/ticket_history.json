@@ -633,12 +633,44 @@
     "player": "Byron Buxton",
     "odds": 252,
     "prob": 25.3,
-    "hit": null
+    "hit": false
    },
    {
     "player": "Cal Raleigh",
     "odds": 324,
     "prob": 17.3,
+    "hit": true
+   }
+  ],
+  "result": "loss",
+  "pnl": -10.0
+ },
+ {
+  "date": "2026-08-22",
+  "stake": 10,
+  "legs": [
+   {
+    "player": "Mickey Moniak",
+    "odds": 280,
+    "prob": 23.6,
+    "hit": null
+   },
+   {
+    "player": "José Ramírez",
+    "odds": 400,
+    "prob": 15.7,
+    "hit": null
+   },
+   {
+    "player": "Jo Adell",
+    "odds": 350,
+    "prob": 19.9,
+    "hit": null
+   },
+   {
+    "player": "Tyler O'Neill",
+    "odds": 423,
+    "prob": 18.3,
     "hit": null
    }
   ],

@@ -1,40 +1,74 @@
 {
- "date": "2026-08-21",
- "locked": true,
+ "date": "2026-08-22",
+ "locked": false,
  "legs": [
   {
-   "player": "Byron Buxton",
-   "mid": 621439,
-   "team": "MIN",
-   "odds": 252,
-   "prob": 25.3,
-   "score": 0.571,
+   "player": "Mickey Moniak",
+   "mid": 666160,
+   "team": "COL",
+   "odds": 280,
+   "prob": 23.6,
+   "score": 0.845,
    "why": [
-    "49% FB bat",
-    "overdue",
-    "wind/heat ×1.08"
+    "park ×1.35",
+    "wind/heat ×1.31",
+    "overdue"
    ],
-   "away": "MIN",
-   "home": "SD",
-   "opp": "TBD",
-   "time": "9:40 PM"
+   "away": "CLE",
+   "home": "COL",
+   "opp": "Tanner Bibee",
+   "time": "8:10 PM"
   },
   {
-   "player": "Cal Raleigh",
-   "mid": 663728,
-   "team": "SEA",
-   "odds": 324,
-   "prob": 17.3,
-   "score": 0.514,
+   "player": "José Ramírez",
+   "mid": 608070,
+   "team": "CLE",
+   "odds": 400,
+   "prob": 15.7,
+   "score": 0.739,
    "why": [
-    "56% FB bat",
-    "soft bullpen",
-    "pitcher matchup ×1.14"
+    "park ×1.35",
+    "wind/heat ×1.31",
+    "soft bullpen"
    ],
-   "away": "CHC",
-   "home": "SEA",
-   "opp": "Matthew Boyd",
-   "time": "10:10 PM"
+   "away": "CLE",
+   "home": "COL",
+   "opp": "Gabriel Hughes",
+   "time": "8:10 PM"
+  },
+  {
+   "player": "Jo Adell",
+   "mid": 666176,
+   "team": "CLE",
+   "odds": 350,
+   "prob": 19.9,
+   "score": 0.671,
+   "why": [
+    "park ×1.35",
+    "wind/heat ×1.31",
+    "soft bullpen"
+   ],
+   "away": "CLE",
+   "home": "COL",
+   "opp": "Gabriel Hughes",
+   "time": "8:10 PM"
+  },
+  {
+   "player": "Tyler O'Neill",
+   "mid": 641933,
+   "team": "BAL",
+   "odds": 423,
+   "prob": 18.3,
+   "score": 0.552,
+   "why": [
+    "soft bullpen",
+    "platoon edge",
+    "50% FB bat"
+   ],
+   "away": "TB",
+   "home": "BAL",
+   "opp": "Shane McClanahan",
+   "time": "7:05 PM"
   }
  ]
 }

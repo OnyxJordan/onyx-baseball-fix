@@ -1144,7 +1144,7 @@
   "prob": 0.177,
   "edge": -5.9,
   "tier": "ticket",
-  "hit": null
+  "hit": true
  },
  {
   "date": "2026-08-21",
@@ -1153,7 +1153,7 @@
   "prob": 0.251,
   "edge": -3.1,
   "tier": "ticket",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-08-21",
@@ -1162,7 +1162,7 @@
   "prob": 0.214,
   "edge": 1.1,
   "tier": "edge",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-08-21",
@@ -1171,7 +1171,7 @@
   "prob": 0.214,
   "edge": 0.5,
   "tier": "edge",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-08-21",
@@ -1179,6 +1179,42 @@
   "odds": 231,
   "prob": 0.265,
   "edge": -3.7,
+  "tier": "ticket",
+  "hit": false
+ },
+ {
+  "date": "2026-08-22",
+  "player": "Mickey Moniak",
+  "odds": 280,
+  "prob": 0.236,
+  "edge": -2.7,
+  "tier": "ticket",
+  "hit": null
+ },
+ {
+  "date": "2026-08-22",
+  "player": "José Ramírez",
+  "odds": 400,
+  "prob": 0.157,
+  "edge": -4.3,
+  "tier": "ticket",
+  "hit": null
+ },
+ {
+  "date": "2026-08-22",
+  "player": "Jo Adell",
+  "odds": 350,
+  "prob": 0.199,
+  "edge": -2.4,
+  "tier": "ticket",
+  "hit": null
+ },
+ {
+  "date": "2026-08-22",
+  "player": "Tyler O'Neill",
+  "odds": 423,
+  "prob": 0.183,
+  "edge": -0.9,
   "tier": "ticket",
   "hit": null
  }
