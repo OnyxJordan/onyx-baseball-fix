@@ -1,67 +1,23 @@
 {
-  "MIA": {
-    "venue": "loanDepot Park",
-    "temp": 90.4,
-    "precip": 2,
-    "wind_spd": 8.0,
-    "wind_dir": "SE",
-    "humidity_pct": 68,
-    "pressure_mb": 1016.2,
-    "roof": true,
-    "flag": "clear"
-  },
-  "PHI": {
-    "venue": "Citizens Bank Park",
-    "temp": 75.2,
-    "precip": 13,
-    "wind_spd": 6.8,
-    "wind_dir": "SE",
-    "humidity_pct": 81,
-    "pressure_mb": 1014.6,
-    "roof": false,
-    "flag": "clear"
-  },
-  "ARI": {
-    "venue": "Chase Field",
-    "temp": 112.0,
-    "precip": 1,
-    "wind_spd": 8.5,
-    "wind_dir": "W",
-    "humidity_pct": 11,
-    "pressure_mb": 1006.3,
-    "roof": true,
-    "flag": "clear"
-  },
-  "BAL": {
-    "venue": "Camden Yards",
-    "temp": 74.5,
-    "precip": 9,
-    "wind_spd": 4.3,
-    "wind_dir": "E",
-    "humidity_pct": 84,
-    "pressure_mb": 1012.7,
-    "roof": false,
-    "flag": "clear"
-  },
-  "SEA": {
-    "venue": "T-Mobile Park",
-    "temp": 72.4,
-    "precip": 1,
-    "wind_spd": 5.1,
-    "wind_dir": "S",
-    "humidity_pct": 59,
-    "pressure_mb": 1016.2,
-    "roof": false,
-    "flag": "clear"
-  },
-  "KC": {
-    "venue": "Kauffman Stadium",
-    "temp": 83.4,
+  "SD": {
+    "venue": "Petco Park",
+    "temp": 81.5,
     "precip": 0,
-    "wind_spd": 6.4,
-    "wind_dir": "N",
-    "humidity_pct": 49,
-    "pressure_mb": 1016.7,
+    "wind_spd": 7.2,
+    "wind_dir": "NW",
+    "humidity_pct": 65,
+    "pressure_mb": 1011.7,
+    "roof": false,
+    "flag": "clear"
+  },
+  "BOS": {
+    "venue": "Fenway Park",
+    "temp": 67.4,
+    "precip": 2,
+    "wind_spd": 6.7,
+    "wind_dir": "NNE",
+    "humidity_pct": 85,
+    "pressure_mb": 1016.2,
     "roof": false,
     "flag": "clear"
   },
@@ -76,10 +32,43 @@
     "roof": true,
     "flag": "clear"
   },
+  "PHI": {
+    "venue": "Citizens Bank Park",
+    "temp": 75.2,
+    "precip": 13,
+    "wind_spd": 6.8,
+    "wind_dir": "SE",
+    "humidity_pct": 81,
+    "pressure_mb": 1014.6,
+    "roof": false,
+    "flag": "clear"
+  },
+  "BAL": {
+    "venue": "Camden Yards",
+    "temp": 74.5,
+    "precip": 8,
+    "wind_spd": 4.3,
+    "wind_dir": "E",
+    "humidity_pct": 84,
+    "pressure_mb": 1012.7,
+    "roof": false,
+    "flag": "clear"
+  },
+  "KC": {
+    "venue": "Kauffman Stadium",
+    "temp": 83.4,
+    "precip": 0,
+    "wind_spd": 6.4,
+    "wind_dir": "N",
+    "humidity_pct": 49,
+    "pressure_mb": 1016.7,
+    "roof": false,
+    "flag": "clear"
+  },
   "COL": {
     "venue": "Coors Field",
     "temp": 85.7,
-    "precip": 24,
+    "precip": 22,
     "wind_spd": 12.3,
     "wind_dir": "SSE",
     "humidity_pct": 29,
@@ -98,17 +87,6 @@
     "roof": false,
     "flag": "clear"
   },
-  "SD": {
-    "venue": "Petco Park",
-    "temp": 81.5,
-    "precip": 0,
-    "wind_spd": 7.2,
-    "wind_dir": "NW",
-    "humidity_pct": 65,
-    "pressure_mb": 1011.7,
-    "roof": false,
-    "flag": "clear"
-  },
   "HOU": {
     "venue": "Daikin Park",
     "temp": 99.3,
@@ -120,25 +98,30 @@
     "roof": true,
     "flag": "clear"
   },
+  "ARI": {
+    "venue": "Chase Field",
+    "temp": 72,
+    "precip": 0,
+    "wind_spd": 5,
+    "wind_dir": "N",
+    "roof": true,
+    "flag": "clear"
+  },
   "CWS": {
     "venue": "Rate Field",
-    "temp": 76.5,
-    "precip": 5,
-    "wind_spd": 12.4,
-    "wind_dir": "NW",
-    "humidity_pct": 43,
-    "pressure_mb": 1014.1,
+    "temp": 72,
+    "precip": 0,
+    "wind_spd": 5,
+    "wind_dir": "N",
     "roof": false,
     "flag": "clear"
   },
-  "BOS": {
-    "venue": "Fenway Park",
-    "temp": 67.4,
-    "precip": 3,
-    "wind_spd": 6.7,
-    "wind_dir": "NNE",
-    "humidity_pct": 85,
-    "pressure_mb": 1016.2,
+  "SEA": {
+    "venue": "T-Mobile Park",
+    "temp": 72,
+    "precip": 0,
+    "wind_spd": 5,
+    "wind_dir": "N",
     "roof": false,
     "flag": "clear"
   }
