@@ -10,36 +10,14 @@
     "roof": true,
     "flag": "clear"
   },
-  "LAD": {
-    "venue": "Dodger Stadium",
-    "temp": 98.8,
-    "precip": 0,
-    "wind_spd": 5.1,
-    "wind_dir": "SW",
-    "humidity_pct": 25,
-    "pressure_mb": 1011.8,
-    "roof": false,
-    "flag": "clear"
-  },
-  "SEA": {
-    "venue": "T-Mobile Park",
-    "temp": 67.4,
-    "precip": 2,
-    "wind_spd": 1.8,
-    "wind_dir": "WNW",
-    "humidity_pct": 79,
-    "pressure_mb": 1020.1,
-    "roof": false,
-    "flag": "clear"
-  },
-  "KC": {
-    "venue": "Kauffman Stadium",
-    "temp": 80.2,
-    "precip": 0,
-    "wind_spd": 4.6,
+  "BOS": {
+    "venue": "Fenway Park",
+    "temp": 68.6,
+    "precip": 36,
+    "wind_spd": 6.6,
     "wind_dir": "ENE",
-    "humidity_pct": 46,
-    "pressure_mb": 1019.4,
+    "humidity_pct": 96,
+    "pressure_mb": 1009.9,
     "roof": false,
     "flag": "clear"
   },
@@ -54,25 +32,25 @@
     "roof": true,
     "flag": "clear"
   },
-  "ARI": {
-    "venue": "Chase Field",
-    "temp": 110.7,
+  "SEA": {
+    "venue": "T-Mobile Park",
+    "temp": 67.4,
     "precip": 1,
-    "wind_spd": 4.6,
-    "wind_dir": "SSW",
-    "humidity_pct": 16,
-    "pressure_mb": 1009.1,
-    "roof": true,
+    "wind_spd": 1.8,
+    "wind_dir": "WNW",
+    "humidity_pct": 79,
+    "pressure_mb": 1020.1,
+    "roof": false,
     "flag": "clear"
   },
-  "BOS": {
-    "venue": "Fenway Park",
-    "temp": 68.6,
-    "precip": 36,
-    "wind_spd": 6.6,
-    "wind_dir": "ENE",
-    "humidity_pct": 96,
-    "pressure_mb": 1009.9,
+  "LAD": {
+    "venue": "Dodger Stadium",
+    "temp": 98.8,
+    "precip": 0,
+    "wind_spd": 5.1,
+    "wind_dir": "SW",
+    "humidity_pct": 25,
+    "pressure_mb": 1011.8,
     "roof": false,
     "flag": "clear"
   },
@@ -85,6 +63,17 @@
     "humidity_pct": 56,
     "pressure_mb": 1012.0,
     "roof": false,
+    "flag": "clear"
+  },
+  "ARI": {
+    "venue": "Chase Field",
+    "temp": 110.7,
+    "precip": 0,
+    "wind_spd": 4.6,
+    "wind_dir": "SSW",
+    "humidity_pct": 16,
+    "pressure_mb": 1009.1,
+    "roof": true,
     "flag": "clear"
   },
   "MIL": {
