@@ -1,4 +1,103 @@
 {
+  "HOU": {
+    "venue": "Daikin Park",
+    "temp": 90.4,
+    "precip": 1,
+    "wind_spd": 1.1,
+    "wind_dir": "NW",
+    "humidity_pct": 58,
+    "pressure_mb": 1016.3,
+    "roof": true,
+    "flag": "clear"
+  },
+  "SEA": {
+    "venue": "T-Mobile Park",
+    "temp": 67.1,
+    "precip": 2,
+    "wind_spd": 2.7,
+    "wind_dir": "NW",
+    "humidity_pct": 79,
+    "pressure_mb": 1020.8,
+    "roof": false,
+    "flag": "clear"
+  },
+  "MIL": {
+    "venue": "American Family Field",
+    "temp": 73.8,
+    "precip": 0,
+    "wind_spd": 10.0,
+    "wind_dir": "NW",
+    "humidity_pct": 40,
+    "pressure_mb": 1015.6,
+    "roof": true,
+    "flag": "clear"
+  },
+  "CWS": {
+    "venue": "Rate Field",
+    "temp": 71.1,
+    "precip": 0,
+    "wind_spd": 10.3,
+    "wind_dir": "NNE",
+    "humidity_pct": 65,
+    "pressure_mb": 1016.5,
+    "roof": false,
+    "flag": "clear"
+  },
+  "TEX": {
+    "venue": "Globe Life Field",
+    "temp": 104.4,
+    "precip": 0,
+    "wind_spd": 5.4,
+    "wind_dir": "SW",
+    "humidity_pct": 27,
+    "pressure_mb": 1013.7,
+    "roof": true,
+    "flag": "clear"
+  },
+  "BOS": {
+    "venue": "Fenway Park",
+    "temp": 67.8,
+    "precip": 36,
+    "wind_spd": 5.2,
+    "wind_dir": "E",
+    "humidity_pct": 95,
+    "pressure_mb": 1010.6,
+    "roof": false,
+    "flag": "clear"
+  },
+  "ARI": {
+    "venue": "Chase Field",
+    "temp": 111.7,
+    "precip": 1,
+    "wind_spd": 1.6,
+    "wind_dir": "SSW",
+    "humidity_pct": 15,
+    "pressure_mb": 1008.5,
+    "roof": true,
+    "flag": "clear"
+  },
+  "COL": {
+    "venue": "Coors Field",
+    "temp": 93.9,
+    "precip": 3,
+    "wind_spd": 7.4,
+    "wind_dir": "N",
+    "humidity_pct": 19,
+    "pressure_mb": 1007.1,
+    "roof": false,
+    "flag": "clear"
+  },
+  "NYY": {
+    "venue": "Yankee Stadium",
+    "temp": 78.8,
+    "precip": 3,
+    "wind_spd": 8.4,
+    "wind_dir": "SW",
+    "humidity_pct": 69,
+    "pressure_mb": 1009.4,
+    "roof": false,
+    "flag": "clear"
+  },
   "PHI": {
     "venue": "Citizens Bank Park",
     "temp": 78.4,
@@ -7,61 +106,6 @@
     "wind_dir": "W",
     "humidity_pct": 69,
     "pressure_mb": 1011.1,
-    "roof": false,
-    "flag": "clear"
-  },
-  "ARI": {
-    "venue": "Chase Field",
-    "temp": 112.3,
-    "precip": 1,
-    "wind_spd": 1.5,
-    "wind_dir": "WSW",
-    "humidity_pct": 14,
-    "pressure_mb": 1008.0,
-    "roof": true,
-    "flag": "clear"
-  },
-  "TEX": {
-    "venue": "Globe Life Field",
-    "temp": 105.8,
-    "precip": 0,
-    "wind_spd": 8.7,
-    "wind_dir": "SW",
-    "humidity_pct": 22,
-    "pressure_mb": 1013.6,
-    "roof": true,
-    "flag": "clear"
-  },
-  "LAD": {
-    "venue": "Dodger Stadium",
-    "temp": 100.8,
-    "precip": 0,
-    "wind_spd": 6.0,
-    "wind_dir": "SW",
-    "humidity_pct": 22,
-    "pressure_mb": 1011.3,
-    "roof": false,
-    "flag": "clear"
-  },
-  "MIL": {
-    "venue": "American Family Field",
-    "temp": 73.4,
-    "precip": 0,
-    "wind_spd": 9.0,
-    "wind_dir": "NW",
-    "humidity_pct": 41,
-    "pressure_mb": 1016.1,
-    "roof": true,
-    "flag": "clear"
-  },
-  "SD": {
-    "venue": "Petco Park",
-    "temp": 87.4,
-    "precip": 0,
-    "wind_spd": 9.4,
-    "wind_dir": "NW",
-    "humidity_pct": 61,
-    "pressure_mb": 1011.5,
     "roof": false,
     "flag": "clear"
   },
@@ -87,72 +131,32 @@
     "roof": false,
     "flag": "clear"
   },
-  "NYY": {
-    "venue": "Yankee Stadium",
-    "temp": 78.8,
-    "precip": 3,
-    "wind_spd": 8.4,
-    "wind_dir": "SW",
-    "humidity_pct": 69,
-    "pressure_mb": 1009.4,
+  "SD": {
+    "venue": "Petco Park",
+    "temp": 87.3,
+    "precip": 0,
+    "wind_spd": 8.9,
+    "wind_dir": "NW",
+    "humidity_pct": 58,
+    "pressure_mb": 1011.6,
+    "roof": false,
+    "flag": "clear"
+  },
+  "LAD": {
+    "venue": "Dodger Stadium",
+    "temp": 72,
+    "precip": 0,
+    "wind_spd": 5,
+    "wind_dir": "N",
     "roof": false,
     "flag": "clear"
   },
   "KC": {
     "venue": "Kauffman Stadium",
-    "temp": 81.3,
-    "precip": 0,
-    "wind_spd": 5.0,
-    "wind_dir": "E",
-    "humidity_pct": 33,
-    "pressure_mb": 1019.1,
-    "roof": false,
-    "flag": "clear"
-  },
-  "BOS": {
-    "venue": "Fenway Park",
     "temp": 72,
     "precip": 0,
     "wind_spd": 5,
     "wind_dir": "N",
-    "roof": false,
-    "flag": "clear"
-  },
-  "HOU": {
-    "venue": "Daikin Park",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
-    "roof": true,
-    "flag": "clear"
-  },
-  "CWS": {
-    "venue": "Rate Field",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
-    "roof": false,
-    "flag": "clear"
-  },
-  "SEA": {
-    "venue": "T-Mobile Park",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
-    "roof": false,
-    "flag": "clear"
-  },
-  "COL": {
-    "venue": "Coors Field",
-    "temp": 93.9,
-    "precip": 3,
-    "wind_spd": 7.6,
-    "wind_dir": "NNE",
-    "humidity_pct": 19,
-    "pressure_mb": 1006.0,
     "roof": false,
     "flag": "clear"
   }
