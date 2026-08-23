@@ -1,15 +1,4 @@
 {
-  "SEA": {
-    "venue": "T-Mobile Park",
-    "temp": 68.5,
-    "precip": 1,
-    "wind_spd": 1.9,
-    "wind_dir": "WSW",
-    "humidity_pct": 73,
-    "pressure_mb": 1020.8,
-    "roof": false,
-    "flag": "clear"
-  },
   "MIL": {
     "venue": "American Family Field",
     "temp": 73.4,
@@ -21,25 +10,14 @@
     "roof": true,
     "flag": "clear"
   },
-  "LAD": {
-    "venue": "Dodger Stadium",
-    "temp": 94.9,
+  "SD": {
+    "venue": "Petco Park",
+    "temp": 88.1,
     "precip": 0,
-    "wind_spd": 7.1,
-    "wind_dir": "WSW",
-    "humidity_pct": 38,
-    "pressure_mb": 1011.4,
-    "roof": false,
-    "flag": "clear"
-  },
-  "COL": {
-    "venue": "Coors Field",
-    "temp": 93.5,
-    "precip": 3,
-    "wind_spd": 4.4,
-    "wind_dir": "NNE",
-    "humidity_pct": 24,
-    "pressure_mb": 1007.6,
+    "wind_spd": 8.0,
+    "wind_dir": "NW",
+    "humidity_pct": 56,
+    "pressure_mb": 1012.0,
     "roof": false,
     "flag": "clear"
   },
@@ -54,25 +32,36 @@
     "roof": true,
     "flag": "clear"
   },
-  "BOS": {
-    "venue": "Fenway Park",
-    "temp": 68.6,
-    "precip": 36,
-    "wind_spd": 6.6,
-    "wind_dir": "ENE",
-    "humidity_pct": 96,
-    "pressure_mb": 1009.9,
+  "LAD": {
+    "venue": "Dodger Stadium",
+    "temp": 94.9,
+    "precip": 0,
+    "wind_spd": 7.1,
+    "wind_dir": "WSW",
+    "humidity_pct": 38,
+    "pressure_mb": 1011.4,
     "roof": false,
     "flag": "clear"
   },
-  "SD": {
-    "venue": "Petco Park",
-    "temp": 88.1,
-    "precip": 0,
-    "wind_spd": 8.0,
-    "wind_dir": "NW",
-    "humidity_pct": 56,
-    "pressure_mb": 1012.0,
+  "SEA": {
+    "venue": "T-Mobile Park",
+    "temp": 68.5,
+    "precip": 1,
+    "wind_spd": 1.9,
+    "wind_dir": "WSW",
+    "humidity_pct": 73,
+    "pressure_mb": 1020.8,
+    "roof": false,
+    "flag": "clear"
+  },
+  "COL": {
+    "venue": "Coors Field",
+    "temp": 93.5,
+    "precip": 3,
+    "wind_spd": 4.4,
+    "wind_dir": "NNE",
+    "humidity_pct": 24,
+    "pressure_mb": 1007.6,
     "roof": false,
     "flag": "clear"
   }
