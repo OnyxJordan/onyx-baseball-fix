@@ -4838,8 +4838,8 @@
   "proj": 6.0,
   "line": 3.5,
   "side": "over",
-  "actual": null,
-  "win": null
+  "actual": 4,
+  "win": true
  },
  {
   "date": "2026-08-22",
@@ -4847,8 +4847,8 @@
   "proj": 5.5,
   "line": 4.5,
   "side": "over",
-  "actual": null,
-  "win": null
+  "actual": 8,
+  "win": true
  },
  {
   "date": "2026-08-22",
@@ -4856,8 +4856,8 @@
   "proj": 3.9,
   "line": 3.5,
   "side": "over",
-  "actual": null,
-  "win": null
+  "actual": 8,
+  "win": true
  },
  {
   "date": "2026-08-22",
@@ -4865,8 +4865,8 @@
   "proj": 3.8,
   "line": 4.5,
   "side": "under",
-  "actual": null,
-  "win": null
+  "actual": 0,
+  "win": true
  },
  {
   "date": "2026-08-22",
@@ -4874,8 +4874,8 @@
   "proj": 3.7,
   "line": 4.5,
   "side": "under",
-  "actual": null,
-  "win": null
+  "actual": 6,
+  "win": false
  },
  {
   "date": "2026-08-22",
@@ -4883,8 +4883,8 @@
   "proj": 5.6,
   "line": 6.5,
   "side": "under",
-  "actual": null,
-  "win": null
+  "actual": 4,
+  "win": true
  },
  {
   "date": "2026-08-22",
@@ -4892,8 +4892,8 @@
   "proj": 2.5,
   "line": 3.5,
   "side": "under",
-  "actual": null,
-  "win": null
+  "actual": 7,
+  "win": false
  },
  {
   "date": "2026-08-22",
@@ -4901,8 +4901,8 @@
   "proj": 4.5,
   "line": 5.5,
   "side": "under",
-  "actual": null,
-  "win": null
+  "actual": 6,
+  "win": false
  },
  {
   "date": "2026-08-22",
@@ -4910,8 +4910,8 @@
   "proj": 3.5,
   "line": 4.5,
   "side": "under",
-  "actual": null,
-  "win": null
+  "actual": 4,
+  "win": true
  },
  {
   "date": "2026-08-22",
@@ -4919,8 +4919,8 @@
   "proj": 4.3,
   "line": 5.5,
   "side": "under",
-  "actual": null,
-  "win": null
+  "actual": 3,
+  "win": true
  },
  {
   "date": "2026-08-22",
@@ -4928,8 +4928,8 @@
   "proj": 5.0,
   "line": 6.5,
   "side": "under",
-  "actual": null,
-  "win": null
+  "actual": 4,
+  "win": true
  },
  {
   "date": "2026-08-22",
@@ -4937,8 +4937,8 @@
   "proj": 6.9,
   "line": 8.5,
   "side": "under",
-  "actual": null,
-  "win": null
+  "actual": 11,
+  "win": false
  },
  {
   "date": "2026-08-22",
@@ -4946,8 +4946,8 @@
   "proj": 4.8,
   "line": 6.5,
   "side": "under",
-  "actual": null,
-  "win": null
+  "actual": 6,
+  "win": true
  },
  {
   "date": "2026-08-22",
@@ -4955,8 +4955,8 @@
   "proj": 4.9,
   "line": 5.5,
   "side": "under",
-  "actual": null,
-  "win": null
+  "actual": 3,
+  "win": true
  },
  {
   "date": "2026-08-22",
@@ -4964,8 +4964,8 @@
   "proj": 7.5,
   "line": 4.5,
   "side": "over",
-  "actual": null,
-  "win": null
+  "actual": 3,
+  "win": false
  },
  {
   "date": "2026-08-22",
@@ -4973,13 +4973,139 @@
   "proj": 3.0,
   "line": 3.5,
   "side": "under",
-  "actual": null,
-  "win": null
+  "actual": 1,
+  "win": true
  },
  {
   "date": "2026-08-22",
   "pitcher": "Jared Jones",
   "proj": 4.4,
+  "line": 5.5,
+  "side": "under",
+  "actual": 5,
+  "win": true
+ },
+ {
+  "date": "2026-08-23",
+  "pitcher": "Lake Bachar",
+  "proj": 6.2,
+  "line": 2.5,
+  "side": "over",
+  "actual": null,
+  "win": null
+ },
+ {
+  "date": "2026-08-23",
+  "pitcher": "Cal Quantrill",
+  "proj": 5.7,
+  "line": 3.5,
+  "side": "over",
+  "actual": null,
+  "win": null
+ },
+ {
+  "date": "2026-08-23",
+  "pitcher": "Shane Drohan",
+  "proj": 6.6,
+  "line": 4.5,
+  "side": "over",
+  "actual": null,
+  "win": null
+ },
+ {
+  "date": "2026-08-23",
+  "pitcher": "Jackson Kent",
+  "proj": 5.1,
+  "line": 3.5,
+  "side": "over",
+  "actual": null,
+  "win": null
+ },
+ {
+  "date": "2026-08-23",
+  "pitcher": "Daniel Lynch IV",
+  "proj": 3.4,
+  "line": 2.5,
+  "side": "over",
+  "actual": null,
+  "win": null
+ },
+ {
+  "date": "2026-08-23",
+  "pitcher": "Bryce Miller",
+  "proj": 5.3,
+  "line": 4.5,
+  "side": "over",
+  "actual": null,
+  "win": null
+ },
+ {
+  "date": "2026-08-23",
+  "pitcher": "Kyle Leahy",
+  "proj": 4.1,
+  "line": 3.5,
+  "side": "over",
+  "actual": null,
+  "win": null
+ },
+ {
+  "date": "2026-08-23",
+  "pitcher": "Mitch Bratt",
+  "proj": 2.9,
+  "line": 3.5,
+  "side": "under",
+  "actual": null,
+  "win": null
+ },
+ {
+  "date": "2026-08-23",
+  "pitcher": "Andrew Abbott",
+  "proj": 2.9,
+  "line": 3.5,
+  "side": "under",
+  "actual": null,
+  "win": null
+ },
+ {
+  "date": "2026-08-23",
+  "pitcher": "Cristian Javier",
+  "proj": 3.6,
+  "line": 4.5,
+  "side": "under",
+  "actual": null,
+  "win": null
+ },
+ {
+  "date": "2026-08-23",
+  "pitcher": "Nolan McLean",
+  "proj": 5.3,
+  "line": 6.5,
+  "side": "under",
+  "actual": null,
+  "win": null
+ },
+ {
+  "date": "2026-08-23",
+  "pitcher": "Blake Snell",
+  "proj": 7.0,
+  "line": 8.5,
+  "side": "under",
+  "actual": null,
+  "win": null
+ },
+ {
+  "date": "2026-08-23",
+  "pitcher": "Tyler Mahle",
+  "proj": 4.0,
+  "line": 5.5,
+  "side": "under",
+  "actual": null,
+  "win": null
+ },
+ {
+  "date": "2026-08-23",
+  "pitcher": "José Soriano",
+  "proj": 3.9,
   "line": 5.5,
   "side": "under",
   "actual": null,

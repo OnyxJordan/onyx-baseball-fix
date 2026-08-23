@@ -1189,7 +1189,7 @@
   "prob": 0.236,
   "edge": -2.7,
   "tier": "ticket",
-  "hit": null
+  "hit": true
  },
  {
   "date": "2026-08-22",
@@ -1198,7 +1198,7 @@
   "prob": 0.157,
   "edge": -4.3,
   "tier": "ticket",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-08-22",
@@ -1207,7 +1207,7 @@
   "prob": 0.199,
   "edge": -2.4,
   "tier": "ticket",
-  "hit": null
+  "hit": true
  },
  {
   "date": "2026-08-22",
@@ -1216,7 +1216,7 @@
   "prob": 0.183,
   "edge": -0.9,
   "tier": "ticket",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-08-22",
@@ -1224,6 +1224,42 @@
   "odds": 308,
   "prob": 0.246,
   "edge": 0.1,
+  "tier": "edge",
+  "hit": true
+ },
+ {
+  "date": "2026-08-23",
+  "player": "Shohei Ohtani",
+  "odds": 208,
+  "prob": 0.281,
+  "edge": -4.3,
+  "tier": "ticket",
+  "hit": null
+ },
+ {
+  "date": "2026-08-23",
+  "player": "Pete Alonso",
+  "odds": 273,
+  "prob": 0.234,
+  "edge": -3.4,
+  "tier": "ticket",
+  "hit": null
+ },
+ {
+  "date": "2026-08-23",
+  "player": "Kazuma Okamoto",
+  "odds": 377,
+  "prob": 0.219,
+  "edge": 0.9,
+  "tier": "edge",
+  "hit": null
+ },
+ {
+  "date": "2026-08-23",
+  "player": "Ben Rice",
+  "odds": 390,
+  "prob": 0.215,
+  "edge": 1.1,
   "tier": "edge",
   "hit": null
  }

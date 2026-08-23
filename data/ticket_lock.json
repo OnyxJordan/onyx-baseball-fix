@@ -1,40 +1,39 @@
 {
- "date": "2026-08-22",
- "locked": true,
+ "date": "2026-08-23",
+ "locked": false,
  "legs": [
   {
-   "player": "Tyler O'Neill",
-   "mid": 641933,
-   "team": "BAL",
-   "odds": 423,
-   "prob": 18.2,
-   "score": 0.548,
+   "player": "Shohei Ohtani",
+   "mid": 660271,
+   "team": "LAD",
+   "odds": 208,
+   "prob": 28.1,
+   "score": 0.685,
    "why": [
-    "soft bullpen",
-    "platoon edge",
-    "50% FB bat"
+    "pitcher matchup ×1.15",
+    "wind/heat ×1.07"
+   ],
+   "away": "PIT",
+   "home": "LAD",
+   "opp": "Lake Bachar",
+   "time": "4:10 PM"
+  },
+  {
+   "player": "Pete Alonso",
+   "mid": 624413,
+   "team": "BAL",
+   "odds": 273,
+   "prob": 23.4,
+   "score": 0.639,
+   "why": [
+    "wind/heat ×1.12",
+    "pitcher matchup ×1.11",
+    "soft bullpen"
    ],
    "away": "TB",
    "home": "BAL",
-   "opp": "Shane McClanahan",
-   "time": "7:05 PM"
-  },
-  {
-   "player": "Christian Walker",
-   "mid": 572233,
-   "team": "HOU",
-   "odds": 392,
-   "prob": 17.9,
-   "score": 0.523,
-   "why": [
-    "park ×1.24",
-    "pitcher matchup ×1.18",
-    "fly-ball pitcher"
-   ],
-   "away": "ATH",
-   "home": "HOU",
-   "opp": "Jacob Lopez",
-   "time": "7:10 PM"
+   "opp": "Nick Martinez",
+   "time": "1:35 PM"
   }
  ]
 }
