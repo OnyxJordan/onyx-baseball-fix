@@ -1,12 +1,56 @@
 {
-  "HOU": {
-    "venue": "Daikin Park",
-    "temp": 90.4,
+  "SEA": {
+    "venue": "T-Mobile Park",
+    "temp": 68.5,
     "precip": 1,
-    "wind_spd": 1.1,
+    "wind_spd": 1.9,
+    "wind_dir": "WSW",
+    "humidity_pct": 73,
+    "pressure_mb": 1020.8,
+    "roof": false,
+    "flag": "clear"
+  },
+  "MIL": {
+    "venue": "American Family Field",
+    "temp": 73.4,
+    "precip": 0,
+    "wind_spd": 10.0,
     "wind_dir": "NW",
-    "humidity_pct": 58,
-    "pressure_mb": 1016.3,
+    "humidity_pct": 43,
+    "pressure_mb": 1014.9,
+    "roof": true,
+    "flag": "clear"
+  },
+  "LAD": {
+    "venue": "Dodger Stadium",
+    "temp": 94.9,
+    "precip": 0,
+    "wind_spd": 7.1,
+    "wind_dir": "WSW",
+    "humidity_pct": 38,
+    "pressure_mb": 1011.4,
+    "roof": false,
+    "flag": "clear"
+  },
+  "COL": {
+    "venue": "Coors Field",
+    "temp": 93.5,
+    "precip": 3,
+    "wind_spd": 4.4,
+    "wind_dir": "NNE",
+    "humidity_pct": 24,
+    "pressure_mb": 1007.6,
+    "roof": false,
+    "flag": "clear"
+  },
+  "ARI": {
+    "venue": "Chase Field",
+    "temp": 110.5,
+    "precip": 0,
+    "wind_spd": 6.7,
+    "wind_dir": "S",
+    "humidity_pct": 16,
+    "pressure_mb": 1009.1,
     "roof": true,
     "flag": "clear"
   },
@@ -21,80 +65,14 @@
     "roof": false,
     "flag": "clear"
   },
-  "TEX": {
-    "venue": "Globe Life Field",
-    "temp": 104.4,
-    "precip": 0,
-    "wind_spd": 5.4,
-    "wind_dir": "SW",
-    "humidity_pct": 27,
-    "pressure_mb": 1013.7,
-    "roof": true,
-    "flag": "clear"
-  },
-  "SEA": {
-    "venue": "T-Mobile Park",
-    "temp": 67.4,
-    "precip": 1,
-    "wind_spd": 1.8,
-    "wind_dir": "WNW",
-    "humidity_pct": 79,
-    "pressure_mb": 1020.1,
-    "roof": false,
-    "flag": "clear"
-  },
-  "LAD": {
-    "venue": "Dodger Stadium",
-    "temp": 98.8,
-    "precip": 0,
-    "wind_spd": 5.1,
-    "wind_dir": "SW",
-    "humidity_pct": 25,
-    "pressure_mb": 1011.8,
-    "roof": false,
-    "flag": "clear"
-  },
   "SD": {
     "venue": "Petco Park",
-    "temp": 87.6,
+    "temp": 88.1,
     "precip": 0,
-    "wind_spd": 8.9,
+    "wind_spd": 8.0,
     "wind_dir": "NW",
     "humidity_pct": 56,
     "pressure_mb": 1012.0,
-    "roof": false,
-    "flag": "clear"
-  },
-  "ARI": {
-    "venue": "Chase Field",
-    "temp": 110.7,
-    "precip": 0,
-    "wind_spd": 4.6,
-    "wind_dir": "SSW",
-    "humidity_pct": 16,
-    "pressure_mb": 1009.1,
-    "roof": true,
-    "flag": "clear"
-  },
-  "MIL": {
-    "venue": "American Family Field",
-    "temp": 73.4,
-    "precip": 0,
-    "wind_spd": 10.3,
-    "wind_dir": "NW",
-    "humidity_pct": 40,
-    "pressure_mb": 1015.5,
-    "roof": true,
-    "flag": "clear"
-  },
-  "COL": {
-    "venue": "Coors Field",
-    "temp": 93.5,
-    "precip": 3,
-    "wind_spd": 4.4,
-    "wind_dir": "NNE",
-    "humidity_pct": 24,
-    "pressure_mb": 1007.6,
     "roof": false,
     "flag": "clear"
   }
