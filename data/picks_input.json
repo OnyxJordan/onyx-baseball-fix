@@ -1234,7 +1234,7 @@
   "prob": 0.281,
   "edge": -4.3,
   "tier": "ticket",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-08-23",
@@ -1243,7 +1243,7 @@
   "prob": 0.234,
   "edge": -3.4,
   "tier": "ticket",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-08-23",
@@ -1252,7 +1252,7 @@
   "prob": 0.219,
   "edge": 0.9,
   "tier": "edge",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-08-23",
@@ -1261,6 +1261,24 @@
   "prob": 0.215,
   "edge": 1.1,
   "tier": "edge",
+  "hit": false
+ },
+ {
+  "date": "2026-08-24",
+  "player": "Esmerlyn Valdez",
+  "odds": 353,
+  "prob": 0.211,
+  "edge": -0.9,
+  "tier": "ticket",
+  "hit": null
+ },
+ {
+  "date": "2026-08-24",
+  "player": "Royce Lewis",
+  "odds": 287,
+  "prob": 0.169,
+  "edge": -8.9,
+  "tier": "ticket",
   "hit": null
  }
 ]
