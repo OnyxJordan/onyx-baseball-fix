@@ -1,12 +1,45 @@
 {
-  "SF": {
-    "venue": "Oracle Park",
-    "temp": 60.7,
+  "MIA": {
+    "venue": "loanDepot Park",
+    "temp": 87.2,
+    "precip": 5,
+    "wind_spd": 6.4,
+    "wind_dir": "SE",
+    "humidity_pct": 67,
+    "pressure_mb": 1016.3,
+    "roof": true,
+    "flag": "clear"
+  },
+  "SEA": {
+    "venue": "T-Mobile Park",
+    "temp": 75.6,
+    "precip": 0,
+    "wind_spd": 8.1,
+    "wind_dir": "N",
+    "humidity_pct": 57,
+    "pressure_mb": 1013.7,
+    "roof": false,
+    "flag": "clear"
+  },
+  "ATH": {
+    "venue": "Sutter Health Park",
+    "temp": 89.2,
+    "precip": 0,
+    "wind_spd": 10.0,
+    "wind_dir": "SW",
+    "humidity_pct": 26,
+    "pressure_mb": 1012.6,
+    "roof": false,
+    "flag": "clear"
+  },
+  "DET": {
+    "venue": "Comerica Park",
+    "temp": 73.8,
     "precip": 1,
-    "wind_spd": 13.2,
-    "wind_dir": "W",
-    "humidity_pct": 89,
-    "pressure_mb": 1015.7,
+    "wind_spd": 7.9,
+    "wind_dir": "NW",
+    "humidity_pct": 48,
+    "pressure_mb": 1016.1,
     "roof": false,
     "flag": "clear"
   },
@@ -21,14 +54,25 @@
     "roof": false,
     "flag": "clear"
   },
-  "SEA": {
-    "venue": "T-Mobile Park",
-    "temp": 75.6,
-    "precip": 0,
-    "wind_spd": 8.1,
-    "wind_dir": "N",
-    "humidity_pct": 57,
-    "pressure_mb": 1013.7,
+  "SF": {
+    "venue": "Oracle Park",
+    "temp": 60.7,
+    "precip": 1,
+    "wind_spd": 13.2,
+    "wind_dir": "W",
+    "humidity_pct": 89,
+    "pressure_mb": 1015.7,
+    "roof": false,
+    "flag": "clear"
+  },
+  "WSH": {
+    "venue": "Nationals Park",
+    "temp": 82.0,
+    "precip": 5,
+    "wind_spd": 6.7,
+    "wind_dir": "NW",
+    "humidity_pct": 38,
+    "pressure_mb": 1015.2,
     "roof": false,
     "flag": "clear"
   },
@@ -51,50 +95,6 @@
     "wind_dir": "ENE",
     "humidity_pct": 63,
     "pressure_mb": 1017.7,
-    "roof": false,
-    "flag": "clear"
-  },
-  "MIA": {
-    "venue": "loanDepot Park",
-    "temp": 87.2,
-    "precip": 5,
-    "wind_spd": 6.4,
-    "wind_dir": "SE",
-    "humidity_pct": 67,
-    "pressure_mb": 1016.3,
-    "roof": true,
-    "flag": "clear"
-  },
-  "ATH": {
-    "venue": "Sutter Health Park",
-    "temp": 89.2,
-    "precip": 0,
-    "wind_spd": 10.0,
-    "wind_dir": "SW",
-    "humidity_pct": 26,
-    "pressure_mb": 1012.6,
-    "roof": false,
-    "flag": "clear"
-  },
-  "WSH": {
-    "venue": "Nationals Park",
-    "temp": 82.0,
-    "precip": 5,
-    "wind_spd": 6.7,
-    "wind_dir": "NW",
-    "humidity_pct": 38,
-    "pressure_mb": 1015.2,
-    "roof": false,
-    "flag": "clear"
-  },
-  "DET": {
-    "venue": "Comerica Park",
-    "temp": 73.8,
-    "precip": 1,
-    "wind_spd": 7.9,
-    "wind_dir": "NW",
-    "humidity_pct": 48,
-    "pressure_mb": 1016.1,
     "roof": false,
     "flag": "clear"
   },
