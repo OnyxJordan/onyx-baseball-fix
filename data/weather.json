@@ -1,59 +1,4 @@
 {
-  "WSH": {
-    "venue": "Nationals Park",
-    "temp": 81.6,
-    "precip": 5,
-    "wind_spd": 2.4,
-    "wind_dir": "NW",
-    "humidity_pct": 47,
-    "pressure_mb": 1014.3,
-    "roof": false,
-    "flag": "clear"
-  },
-  "SF": {
-    "venue": "Oracle Park",
-    "temp": 61.6,
-    "precip": 0,
-    "wind_spd": 12.4,
-    "wind_dir": "W",
-    "humidity_pct": 88,
-    "pressure_mb": 1014.8,
-    "roof": false,
-    "flag": "clear"
-  },
-  "LAA": {
-    "venue": "Angel Stadium",
-    "temp": 86.6,
-    "precip": 1,
-    "wind_spd": 8.8,
-    "wind_dir": "SW",
-    "humidity_pct": 48,
-    "pressure_mb": 1011.6,
-    "roof": false,
-    "flag": "clear"
-  },
-  "ARI": {
-    "venue": "Chase Field",
-    "temp": 105.0,
-    "precip": 1,
-    "wind_spd": 6.5,
-    "wind_dir": "W",
-    "humidity_pct": 17,
-    "pressure_mb": 1007.9,
-    "roof": true,
-    "flag": "clear"
-  },
-  "ATH": {
-    "venue": "Sutter Health Park",
-    "temp": 91.1,
-    "precip": 0,
-    "wind_spd": 9.9,
-    "wind_dir": "SW",
-    "humidity_pct": 22,
-    "pressure_mb": 1011.8,
-    "roof": false,
-    "flag": "clear"
-  },
   "SD": {
     "venue": "Petco Park",
     "temp": 78.7,
@@ -62,28 +7,6 @@
     "wind_dir": "SW",
     "humidity_pct": 73,
     "pressure_mb": 1012.9,
-    "roof": false,
-    "flag": "clear"
-  },
-  "DET": {
-    "venue": "Comerica Park",
-    "temp": 74.5,
-    "precip": 0,
-    "wind_spd": 8.2,
-    "wind_dir": "WNW",
-    "humidity_pct": 49,
-    "pressure_mb": 1014.4,
-    "roof": false,
-    "flag": "clear"
-  },
-  "CWS": {
-    "venue": "Rate Field",
-    "temp": 70.6,
-    "precip": 0,
-    "wind_spd": 8.6,
-    "wind_dir": "NE",
-    "humidity_pct": 67,
-    "pressure_mb": 1017.1,
     "roof": false,
     "flag": "clear"
   },
@@ -98,6 +21,72 @@
     "roof": false,
     "flag": "clear"
   },
+  "DET": {
+    "venue": "Comerica Park",
+    "temp": 74.5,
+    "precip": 0,
+    "wind_spd": 8.2,
+    "wind_dir": "WNW",
+    "humidity_pct": 49,
+    "pressure_mb": 1014.4,
+    "roof": false,
+    "flag": "clear"
+  },
+  "LAA": {
+    "venue": "Angel Stadium",
+    "temp": 86.6,
+    "precip": 1,
+    "wind_spd": 8.8,
+    "wind_dir": "SW",
+    "humidity_pct": 48,
+    "pressure_mb": 1011.6,
+    "roof": false,
+    "flag": "clear"
+  },
+  "CWS": {
+    "venue": "Rate Field",
+    "temp": 70.6,
+    "precip": 0,
+    "wind_spd": 8.6,
+    "wind_dir": "NE",
+    "humidity_pct": 67,
+    "pressure_mb": 1017.1,
+    "roof": false,
+    "flag": "clear"
+  },
+  "SF": {
+    "venue": "Oracle Park",
+    "temp": 61.6,
+    "precip": 0,
+    "wind_spd": 12.4,
+    "wind_dir": "W",
+    "humidity_pct": 88,
+    "pressure_mb": 1014.8,
+    "roof": false,
+    "flag": "clear"
+  },
+  "ATH": {
+    "venue": "Sutter Health Park",
+    "temp": 91.1,
+    "precip": 0,
+    "wind_spd": 9.9,
+    "wind_dir": "SW",
+    "humidity_pct": 22,
+    "pressure_mb": 1011.8,
+    "roof": false,
+    "flag": "clear"
+  },
+  "ARI": {
+    "venue": "Chase Field",
+    "temp": 105.0,
+    "precip": 1,
+    "wind_spd": 6.5,
+    "wind_dir": "W",
+    "humidity_pct": 17,
+    "pressure_mb": 1007.9,
+    "roof": true,
+    "flag": "clear"
+  },
   "MIA": {
     "venue": "loanDepot Park",
     "temp": 87.5,
@@ -107,6 +96,17 @@
     "humidity_pct": 65,
     "pressure_mb": 1015.8,
     "roof": true,
+    "flag": "clear"
+  },
+  "WSH": {
+    "venue": "Nationals Park",
+    "temp": 81.6,
+    "precip": 5,
+    "wind_spd": 2.4,
+    "wind_dir": "NW",
+    "humidity_pct": 47,
+    "pressure_mb": 1014.3,
+    "roof": false,
     "flag": "clear"
   }
 }
