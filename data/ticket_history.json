@@ -693,12 +693,32 @@
     "player": "Byron Buxton",
     "odds": 181,
     "prob": 27.8,
-    "hit": null
+    "hit": false
    },
    {
     "player": "Esmerlyn Valdez",
     "odds": 365,
     "prob": 20.9,
+    "hit": true
+   }
+  ],
+  "result": "loss",
+  "pnl": -10.0
+ },
+ {
+  "date": "2026-08-25",
+  "stake": 10,
+  "legs": [
+   {
+    "player": "Yordan Alvarez",
+    "odds": 221,
+    "prob": 28.2,
+    "hit": null
+   },
+   {
+    "player": "Ben Rice",
+    "odds": 305,
+    "prob": 23.8,
     "hit": null
    }
   ],

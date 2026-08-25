@@ -1270,7 +1270,7 @@
   "prob": 0.211,
   "edge": -0.9,
   "tier": "ticket",
-  "hit": null
+  "hit": true
  },
  {
   "date": "2026-08-24",
@@ -1279,7 +1279,7 @@
   "prob": 0.169,
   "edge": -8.9,
   "tier": "ticket",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-08-24",
@@ -1288,6 +1288,33 @@
   "prob": 0.278,
   "edge": -7.8,
   "tier": "ticket",
+  "hit": false
+ },
+ {
+  "date": "2026-08-25",
+  "player": "Yordan Alvarez",
+  "odds": 221,
+  "prob": 0.282,
+  "edge": -3.0,
+  "tier": "ticket",
+  "hit": null
+ },
+ {
+  "date": "2026-08-25",
+  "player": "Ben Rice",
+  "odds": 305,
+  "prob": 0.238,
+  "edge": -0.8,
+  "tier": "ticket",
+  "hit": null
+ },
+ {
+  "date": "2026-08-25",
+  "player": "Junior Caminero",
+  "odds": 360,
+  "prob": 0.219,
+  "edge": 0.2,
+  "tier": "edge",
   "hit": null
  }
 ]
