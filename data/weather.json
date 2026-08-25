@@ -1,101 +1,57 @@
 {
-  "ATH": {
-    "venue": "Sutter Health Park",
-    "temp": 91.4,
-    "precip": 0,
-    "wind_spd": 9.8,
-    "wind_dir": "SW",
-    "humidity_pct": 22,
-    "pressure_mb": 1012.0,
-    "roof": false,
-    "flag": "clear"
-  },
-  "WSH": {
-    "venue": "Nationals Park",
-    "temp": 81.4,
-    "precip": 5,
-    "wind_spd": 7.4,
-    "wind_dir": "NW",
-    "humidity_pct": 49,
-    "pressure_mb": 1014.1,
-    "roof": false,
-    "flag": "clear"
-  },
-  "SEA": {
-    "venue": "T-Mobile Park",
-    "temp": 76.7,
-    "precip": 0,
-    "wind_spd": 6.9,
-    "wind_dir": "N",
-    "humidity_pct": 57,
-    "pressure_mb": 1013.5,
-    "roof": false,
-    "flag": "clear"
-  },
-  "DET": {
-    "venue": "Comerica Park",
-    "temp": 74.7,
-    "precip": 0,
+  "LAA": {
+    "venue": "Angel Stadium",
+    "temp": 89.1,
+    "precip": 1,
     "wind_spd": 8.2,
-    "wind_dir": "WNW",
-    "humidity_pct": 48,
-    "pressure_mb": 1015.0,
+    "wind_dir": "SSW",
+    "humidity_pct": 43,
+    "pressure_mb": 1011.4,
+    "roof": false,
+    "flag": "clear"
+  },
+  "SF": {
+    "venue": "Oracle Park",
+    "temp": 63.2,
+    "precip": 0,
+    "wind_spd": 11.7,
+    "wind_dir": "W",
+    "humidity_pct": 87,
+    "pressure_mb": 1014.8,
     "roof": false,
     "flag": "clear"
   },
   "SD": {
     "venue": "Petco Park",
-    "temp": 78.7,
+    "temp": 76.5,
     "precip": 1,
-    "wind_spd": 5.2,
-    "wind_dir": "W",
-    "humidity_pct": 73,
-    "pressure_mb": 1012.4,
-    "roof": false,
-    "flag": "clear"
-  },
-  "LAA": {
-    "venue": "Angel Stadium",
-    "temp": 87.9,
-    "precip": 1,
-    "wind_spd": 7.3,
+    "wind_spd": 8.1,
     "wind_dir": "SW",
-    "humidity_pct": 44,
-    "pressure_mb": 1011.0,
+    "humidity_pct": 85,
+    "pressure_mb": 1012.6,
     "roof": false,
     "flag": "clear"
   },
-  "MIA": {
-    "venue": "loanDepot Park",
-    "temp": 87.6,
-    "precip": 1,
-    "wind_spd": 6.2,
-    "wind_dir": "SE",
-    "humidity_pct": 68,
-    "pressure_mb": 1015.6,
-    "roof": true,
-    "flag": "clear"
-  },
-  "SF": {
-    "venue": "Oracle Park",
-    "temp": 62.4,
+  "SEA": {
+    "venue": "T-Mobile Park",
+    "temp": 76.4,
     "precip": 0,
-    "wind_spd": 11.5,
-    "wind_dir": "W",
-    "humidity_pct": 88,
-    "pressure_mb": 1015.0,
+    "wind_spd": 5.9,
+    "wind_dir": "N",
+    "humidity_pct": 59,
+    "pressure_mb": 1013.0,
     "roof": false,
     "flag": "clear"
   },
-  "ARI": {
-    "venue": "Chase Field",
-    "temp": 104.3,
-    "precip": 1,
-    "wind_spd": 5.8,
-    "wind_dir": "W",
-    "humidity_pct": 20,
-    "pressure_mb": 1007.2,
-    "roof": true,
+  "ATH": {
+    "venue": "Sutter Health Park",
+    "temp": 91.9,
+    "precip": 0,
+    "wind_spd": 9.9,
+    "wind_dir": "SW",
+    "humidity_pct": 19,
+    "pressure_mb": 1011.8,
+    "roof": false,
     "flag": "clear"
   },
   "CWS": {
@@ -107,6 +63,17 @@
     "humidity_pct": 72,
     "pressure_mb": 1017.8,
     "roof": false,
+    "flag": "clear"
+  },
+  "ARI": {
+    "venue": "Chase Field",
+    "temp": 104.5,
+    "precip": 0,
+    "wind_spd": 6.7,
+    "wind_dir": "W",
+    "humidity_pct": 21,
+    "pressure_mb": 1007.4,
+    "roof": true,
     "flag": "clear"
   }
 }
