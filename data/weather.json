@@ -21,6 +21,17 @@
     "roof": false,
     "flag": "clear"
   },
+  "ARI": {
+    "venue": "Chase Field",
+    "temp": 111.1,
+    "precip": 0,
+    "wind_spd": 8.6,
+    "wind_dir": "W",
+    "humidity_pct": 11,
+    "pressure_mb": 1005.5,
+    "roof": true,
+    "flag": "clear"
+  },
   "MIA": {
     "venue": "loanDepot Park",
     "temp": 87.0,
@@ -30,17 +41,6 @@
     "humidity_pct": 62,
     "pressure_mb": 1015.6,
     "roof": true,
-    "flag": "clear"
-  },
-  "NYY": {
-    "venue": "Yankee Stadium",
-    "temp": 77.4,
-    "precip": 1,
-    "wind_spd": 5.6,
-    "wind_dir": "W",
-    "humidity_pct": 52,
-    "pressure_mb": 1015.9,
-    "roof": false,
     "flag": "clear"
   },
   "LAA": {
@@ -65,39 +65,6 @@
     "roof": false,
     "flag": "clear"
   },
-  "SD": {
-    "venue": "Petco Park",
-    "temp": 83.9,
-    "precip": 1,
-    "wind_spd": 5.6,
-    "wind_dir": "WNW",
-    "humidity_pct": 51,
-    "pressure_mb": 1011.8,
-    "roof": false,
-    "flag": "clear"
-  },
-  "ATH": {
-    "venue": "Sutter Health Park",
-    "temp": 92.0,
-    "precip": 0,
-    "wind_spd": 8.4,
-    "wind_dir": "WSW",
-    "humidity_pct": 22,
-    "pressure_mb": 1013.6,
-    "roof": false,
-    "flag": "clear"
-  },
-  "SEA": {
-    "venue": "T-Mobile Park",
-    "temp": 81.1,
-    "precip": 1,
-    "wind_spd": 8.8,
-    "wind_dir": "WSW",
-    "humidity_pct": 47,
-    "pressure_mb": 1013.9,
-    "roof": false,
-    "flag": "clear"
-  },
   "SF": {
     "venue": "Oracle Park",
     "temp": 67.2,
@@ -106,17 +73,6 @@
     "wind_dir": "WNW",
     "humidity_pct": 75,
     "pressure_mb": 1016.3,
-    "roof": false,
-    "flag": "clear"
-  },
-  "STL": {
-    "venue": "Busch Stadium",
-    "temp": 87.7,
-    "precip": 1,
-    "wind_spd": 6.0,
-    "wind_dir": "SE",
-    "humidity_pct": 47,
-    "pressure_mb": 1015.0,
     "roof": false,
     "flag": "clear"
   },
@@ -131,37 +87,73 @@
     "roof": false,
     "flag": "clear"
   },
+  "SEA": {
+    "venue": "T-Mobile Park",
+    "temp": 81.1,
+    "precip": 1,
+    "wind_spd": 8.8,
+    "wind_dir": "WSW",
+    "humidity_pct": 47,
+    "pressure_mb": 1013.9,
+    "roof": false,
+    "flag": "clear"
+  },
+  "STL": {
+    "venue": "Busch Stadium",
+    "temp": 87.7,
+    "precip": 1,
+    "wind_spd": 6.0,
+    "wind_dir": "SE",
+    "humidity_pct": 47,
+    "pressure_mb": 1015.0,
+    "roof": false,
+    "flag": "clear"
+  },
+  "NYY": {
+    "venue": "Yankee Stadium",
+    "temp": 77.4,
+    "precip": 1,
+    "wind_spd": 5.6,
+    "wind_dir": "W",
+    "humidity_pct": 52,
+    "pressure_mb": 1015.9,
+    "roof": false,
+    "flag": "clear"
+  },
   "WSH": {
     "venue": "Nationals Park",
-    "temp": 81.0,
+    "temp": 72,
     "precip": 0,
-    "wind_spd": 5.1,
-    "wind_dir": "NNW",
-    "humidity_pct": 45,
-    "pressure_mb": 1016.7,
+    "wind_spd": 5,
+    "wind_dir": "N",
+    "roof": false,
+    "flag": "clear"
+  },
+  "SD": {
+    "venue": "Petco Park",
+    "temp": 72,
+    "precip": 0,
+    "wind_spd": 5,
+    "wind_dir": "N",
     "roof": false,
     "flag": "clear"
   },
   "DET": {
     "venue": "Comerica Park",
-    "temp": 78.7,
-    "precip": 1,
-    "wind_spd": 9.0,
-    "wind_dir": "S",
-    "humidity_pct": 47,
-    "pressure_mb": 1016.8,
+    "temp": 72,
+    "precip": 0,
+    "wind_spd": 5,
+    "wind_dir": "N",
     "roof": false,
     "flag": "clear"
   },
-  "ARI": {
-    "venue": "Chase Field",
-    "temp": 111.1,
+  "ATH": {
+    "venue": "Sutter Health Park",
+    "temp": 72,
     "precip": 0,
-    "wind_spd": 8.6,
-    "wind_dir": "W",
-    "humidity_pct": 11,
-    "pressure_mb": 1005.5,
-    "roof": true,
+    "wind_spd": 5,
+    "wind_dir": "N",
+    "roof": false,
     "flag": "clear"
   }
 }
