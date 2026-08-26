@@ -1,5 +1,15 @@
 """
-model.py — Onyx Baseball v39 HR probability model + pitcher K projections
+model.py — Onyx Baseball v40 HR probability model + pitcher K projections
+
+v40: the VISIBLE board agrees with the record. The Plays pane (server
+composite + a duplicated client formula) still ranked edge-first with
+a due tier up to x1.30 — the exact pre-v35 logic the graded study
+killed (top-5-by-edge 0-36). Composite is now calibrated probability
+with a small positive-edge tiebreak, in model.py and the client alike;
+the due x1.30 display tiers are replaced by the model's real due_mult
+(capped 1.10 since v36). Also: morning cron coverage (4/6/8/10 AM ET)
+ends the overnight zombie board — the site used to hold yesterday's
+final slate, live-decayed to 0.0%, until the first 11:30 AM build.
 
 v39: the HR edge lane was bleeding (11-103, -41.6% realized ROI) and the
 autopsy on 1,940 priced study rows says why, in three parts:
@@ -931,16 +941,13 @@ def project_player(
     # v20: edge is vs the LISTED price. Positive edge = positive EV = pick.
     edge = (final_prob - mkt_prob) if dk_odds is not None else 0.0
 
-    # 9. Composite score (gates re-tiered for the v18 compressed scale)
-    gate = 1.0 if final_prob >= 19 else 0.72 if final_prob >= 16 else 0.45 if final_prob >= 13 else 0.20
-    ev_val = (final_prob / 100) * (dk_odds / 100 if dk_odds and dk_odds >= 0 else 1.0)
-    park_comp_adj = (
-        0.80 if park_f <= 0.90 else
-        0.90 if park_f <= 0.95 else
-        1.05 if park_f <= 1.10 else 1.10
-    )
-    raw_comp = gate * (0.35 * min(final_prob / 32, 1) + 0.50 * min(max(edge, 0) / 12, 1) + 0.15 * min(ev_val / 0.40, 1))
-    composite = raw_comp * park_comp_adj
+    # 9. Composite score — v40: CALIBRATED PROBABILITY leads, positive edge
+    # only breaks ties. The old edge-first blend (0.50 weight on edge, park
+    # double-counted, due tier x1.30) was the pre-v35 ranking the graded
+    # study buried: top-5-by-edge went 0-36 while top-5-by-prob cashed.
+    # The tracked five already rank by probability; the visible board now
+    # agrees with the record instead of contradicting it.
+    composite = final_prob / 30.0 + 0.06 * min(max(edge, 0) / 8.0, 1.0)
 
     # 10. DFS projections
     pa        = PA_TABLE.get(batting_order, 4.0)
