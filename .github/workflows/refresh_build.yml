@@ -7,6 +7,11 @@ on:
     # API credits; the OpticOdds feed will sharpen this once wired in.
     - cron: "0,30 15-23 * * *"
     - cron: "0,30 0-3 * * *"
+    # morning coverage: the baseball day rolls at 4 AM ET but the first
+    # build used to wait for 11:30 AM, leaving the site a zombie of the
+    # previous night's final slate all morning (8/26). Light rebuilds at
+    # 4/6/8/10 AM ET pick up today's schedule and probables early.
+    - cron: "0 8,10,12,14 * * *"
   workflow_dispatch:
 permissions:
   contents: write
