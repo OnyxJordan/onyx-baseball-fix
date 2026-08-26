@@ -1297,7 +1297,7 @@
   "prob": 0.282,
   "edge": -3.0,
   "tier": "ticket",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-08-25",
@@ -1306,7 +1306,7 @@
   "prob": 0.238,
   "edge": -0.8,
   "tier": "ticket",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-08-25",
@@ -1315,7 +1315,7 @@
   "prob": 0.219,
   "edge": 0.2,
   "tier": "edge",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-08-25",
@@ -1323,6 +1323,24 @@
   "odds": 217,
   "prob": 0.245,
   "edge": -7.1,
+  "tier": "ticket",
+  "hit": false
+ },
+ {
+  "date": "2026-08-26",
+  "player": "Hunter Goodman",
+  "odds": 282,
+  "prob": 0.248,
+  "edge": -1.4,
+  "tier": "ticket",
+  "hit": null
+ },
+ {
+  "date": "2026-08-26",
+  "player": "Yordan Alvarez",
+  "odds": 265,
+  "prob": 0.274,
+  "edge": 0,
   "tier": "ticket",
   "hit": null
  }

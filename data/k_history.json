@@ -5261,7 +5261,7 @@
   "proj": 7.7,
   "line": 5.5,
   "side": "over",
-  "actual": null,
+  "actual": "dnp",
   "win": null
  },
  {
@@ -5270,8 +5270,8 @@
   "proj": 6.2,
   "line": 4.5,
   "side": "over",
-  "actual": null,
-  "win": null
+  "actual": 6,
+  "win": true
  },
  {
   "date": "2026-08-25",
@@ -5279,8 +5279,8 @@
   "proj": 5.0,
   "line": 3.5,
   "side": "over",
-  "actual": null,
-  "win": null
+  "actual": 2,
+  "win": false
  },
  {
   "date": "2026-08-25",
@@ -5288,8 +5288,8 @@
   "proj": 5.6,
   "line": 4.5,
   "side": "over",
-  "actual": null,
-  "win": null
+  "actual": 3,
+  "win": false
  },
  {
   "date": "2026-08-25",
@@ -5297,8 +5297,8 @@
   "proj": 6.5,
   "line": 5.5,
   "side": "over",
-  "actual": null,
-  "win": null
+  "actual": 7,
+  "win": true
  },
  {
   "date": "2026-08-25",
@@ -5306,8 +5306,8 @@
   "proj": 5.4,
   "line": 4.5,
   "side": "over",
-  "actual": null,
-  "win": null
+  "actual": 1,
+  "win": false
  },
  {
   "date": "2026-08-25",
@@ -5315,8 +5315,8 @@
   "proj": 5.0,
   "line": 4.5,
   "side": "over",
-  "actual": null,
-  "win": null
+  "actual": 4,
+  "win": false
  },
  {
   "date": "2026-08-25",
@@ -5324,8 +5324,8 @@
   "proj": 2.9,
   "line": 3.5,
   "side": "under",
-  "actual": null,
-  "win": null
+  "actual": 4,
+  "win": false
  },
  {
   "date": "2026-08-25",
@@ -5333,8 +5333,8 @@
   "proj": 2.8,
   "line": 3.5,
   "side": "under",
-  "actual": null,
-  "win": null
+  "actual": 4,
+  "win": false
  },
  {
   "date": "2026-08-25",
@@ -5342,8 +5342,8 @@
   "proj": 4.8,
   "line": 5.5,
   "side": "under",
-  "actual": null,
-  "win": null
+  "actual": 11,
+  "win": false
  },
  {
   "date": "2026-08-25",
@@ -5351,8 +5351,8 @@
   "proj": 5.6,
   "line": 6.5,
   "side": "under",
-  "actual": null,
-  "win": null
+  "actual": 4,
+  "win": true
  },
  {
   "date": "2026-08-25",
@@ -5360,8 +5360,8 @@
   "proj": 3.5,
   "line": 4.5,
   "side": "under",
-  "actual": null,
-  "win": null
+  "actual": 5,
+  "win": false
  },
  {
   "date": "2026-08-25",
@@ -5369,8 +5369,8 @@
   "proj": 4.6,
   "line": 5.5,
   "side": "under",
-  "actual": null,
-  "win": null
+  "actual": 9,
+  "win": false
  },
  {
   "date": "2026-08-25",
@@ -5378,8 +5378,8 @@
   "proj": 5.3,
   "line": 3.5,
   "side": "over",
-  "actual": null,
-  "win": null
+  "actual": 7,
+  "win": true
  },
  {
   "date": "2026-08-25",
@@ -5387,13 +5387,166 @@
   "proj": 4.2,
   "line": 3.5,
   "side": "over",
-  "actual": null,
-  "win": null
+  "actual": 5,
+  "win": true
  },
  {
   "date": "2026-08-25",
   "pitcher": "Seth Lugo",
   "proj": 3.1,
+  "line": 3.5,
+  "side": "under",
+  "actual": 5,
+  "win": false
+ },
+ {
+  "date": "2026-08-26",
+  "pitcher": "Robert Stock",
+  "proj": 6.2,
+  "line": 4.5,
+  "side": "over",
+  "actual": null,
+  "win": null
+ },
+ {
+  "date": "2026-08-26",
+  "pitcher": "Tanner Gordon",
+  "proj": 4.3,
+  "line": 3.5,
+  "side": "over",
+  "actual": null,
+  "win": null
+ },
+ {
+  "date": "2026-08-26",
+  "pitcher": "Randy Dobnak",
+  "proj": 3.2,
+  "line": 2.5,
+  "side": "over",
+  "actual": null,
+  "win": null
+ },
+ {
+  "date": "2026-08-26",
+  "pitcher": "Troy Melton",
+  "proj": 4.1,
+  "line": 3.5,
+  "side": "over",
+  "actual": null,
+  "win": null
+ },
+ {
+  "date": "2026-08-26",
+  "pitcher": "Matthew Boyd",
+  "proj": 3.0,
+  "line": 3.5,
+  "side": "under",
+  "actual": null,
+  "win": null
+ },
+ {
+  "date": "2026-08-26",
+  "pitcher": "Grayson Rodriguez",
+  "proj": 3.9,
+  "line": 4.5,
+  "side": "under",
+  "actual": null,
+  "win": null
+ },
+ {
+  "date": "2026-08-26",
+  "pitcher": "Landen Roupp",
+  "proj": 4.9,
+  "line": 5.5,
+  "side": "under",
+  "actual": null,
+  "win": null
+ },
+ {
+  "date": "2026-08-26",
+  "pitcher": "Connor Prielipp",
+  "proj": 4.8,
+  "line": 5.5,
+  "side": "under",
+  "actual": null,
+  "win": null
+ },
+ {
+  "date": "2026-08-26",
+  "pitcher": "Sonny Gray",
+  "proj": 4.8,
+  "line": 5.5,
+  "side": "under",
+  "actual": null,
+  "win": null
+ },
+ {
+  "date": "2026-08-26",
+  "pitcher": "Peter Lambert",
+  "proj": 4.8,
+  "line": 5.5,
+  "side": "under",
+  "actual": null,
+  "win": null
+ },
+ {
+  "date": "2026-08-26",
+  "pitcher": "Nick Lodolo",
+  "proj": 3.7,
+  "line": 4.5,
+  "side": "under",
+  "actual": null,
+  "win": null
+ },
+ {
+  "date": "2026-08-26",
+  "pitcher": "Dustin May",
+  "proj": 3.6,
+  "line": 4.5,
+  "side": "under",
+  "actual": null,
+  "win": null
+ },
+ {
+  "date": "2026-08-26",
+  "pitcher": "AJ Smith-Shawver",
+  "proj": 3.4,
+  "line": 4.5,
+  "side": "under",
+  "actual": null,
+  "win": null
+ },
+ {
+  "date": "2026-08-26",
+  "pitcher": "MacKenzie Gore",
+  "proj": 5.4,
+  "line": 6.5,
+  "side": "under",
+  "actual": null,
+  "win": null
+ },
+ {
+  "date": "2026-08-26",
+  "pitcher": "Roki Sasaki",
+  "proj": 4.1,
+  "line": 5.5,
+  "side": "under",
+  "actual": null,
+  "win": null
+ },
+ {
+  "date": "2026-08-26",
+  "pitcher": "Joey Cantillo",
+  "proj": 5.1,
+  "line": 6.5,
+  "side": "under",
+  "actual": null,
+  "win": null
+ },
+ {
+  "date": "2026-08-26",
+  "pitcher": "Elmer Rodríguez",
+  "proj": 2.0,
   "line": 3.5,
   "side": "under",
   "actual": null,

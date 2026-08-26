@@ -1,39 +1,39 @@
 {
- "date": "2026-08-25",
- "locked": true,
+ "date": "2026-08-26",
+ "locked": false,
  "legs": [
+  {
+   "player": "Hunter Goodman",
+   "mid": 696100,
+   "team": "COL",
+   "odds": 282,
+   "prob": 24.8,
+   "score": 0.615,
+   "why": [
+    "pitcher matchup ×1.12",
+    "wind/heat ×1.10",
+    "soft bullpen"
+   ],
+   "away": "COL",
+   "home": "WSH",
+   "opp": "Matt Waldron",
+   "time": "6:45 PM"
+  },
   {
    "player": "Yordan Alvarez",
    "mid": 670541,
    "team": "HOU",
-   "odds": 209,
-   "prob": 28.6,
-   "score": 0.686,
+   "odds": 265,
+   "prob": 27.4,
+   "score": 0.584,
    "why": [
     "park ×1.33",
-    "overdue",
-    "48% FB bat"
-   ],
-   "away": "HOU",
-   "home": "NYY",
-   "opp": "Will Warren",
-   "time": "7:05 PM"
-  },
-  {
-   "player": "Ben Rice",
-   "mid": 700250,
-   "team": "NYY",
-   "odds": 301,
-   "prob": 23.9,
-   "score": 0.681,
-   "why": [
-    "park ×1.33",
-    "soft bullpen",
+    "pitcher matchup ×1.18",
     "overdue"
    ],
    "away": "HOU",
    "home": "NYY",
-   "opp": "Ethan Pecko",
+   "opp": "Elmer Rodríguez",
    "time": "7:05 PM"
   }
  ]
