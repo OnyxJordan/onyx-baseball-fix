@@ -1,1 +1,79 @@
-{}
+{
+  "NYY": {
+    "venue": "Yankee Stadium",
+    "temp": 72.4,
+    "precip": 22,
+    "wind_spd": 1.6,
+    "wind_dir": "SW",
+    "humidity_pct": 91,
+    "pressure_mb": 1015.4,
+    "roof": false,
+    "flag": "clear"
+  },
+  "STL": {
+    "venue": "Busch Stadium",
+    "temp": 84.1,
+    "precip": 0,
+    "wind_spd": 4.9,
+    "wind_dir": "NW",
+    "humidity_pct": 49,
+    "pressure_mb": 1016.3,
+    "roof": false,
+    "flag": "clear"
+  },
+  "ATL": {
+    "venue": "Truist Park",
+    "temp": 77.4,
+    "precip": 12,
+    "wind_spd": 2.5,
+    "wind_dir": "S",
+    "humidity_pct": 83,
+    "pressure_mb": 1013.2,
+    "roof": false,
+    "flag": "clear"
+  },
+  "SF": {
+    "venue": "Oracle Park",
+    "temp": 73.3,
+    "precip": 2,
+    "wind_spd": 16.3,
+    "wind_dir": "WNW",
+    "humidity_pct": 47,
+    "pressure_mb": 1013.5,
+    "roof": false,
+    "flag": "clear"
+  },
+  "WSH": {
+    "venue": "Nationals Park",
+    "temp": 83.6,
+    "precip": 6,
+    "wind_spd": 9.4,
+    "wind_dir": "SSW",
+    "humidity_pct": 76,
+    "pressure_mb": 1014.4,
+    "roof": false,
+    "flag": "clear"
+  },
+  "NYM": {
+    "venue": "Citi Field",
+    "temp": 73.4,
+    "precip": 20,
+    "wind_spd": 2.8,
+    "wind_dir": "SSW",
+    "humidity_pct": 92,
+    "pressure_mb": 1015.5,
+    "roof": false,
+    "flag": "clear"
+  },
+  "TOR": {
+    "venue": "Rogers Centre",
+    "temp": 76.4,
+    "precip": 0,
+    "wind_spd": 9.2,
+    "wind_dir": "WNW",
+    "humidity_pct": 54,
+    "pressure_mb": 1012.8,
+    "roof": true,
+    "flag": "clear"
+  }
+}
