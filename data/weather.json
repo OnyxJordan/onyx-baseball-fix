@@ -1,57 +1,57 @@
 {
+  "SF": {
+    "venue": "Oracle Park",
+    "temp": 71.4,
+    "precip": 1,
+    "wind_spd": 14.7,
+    "wind_dir": "WNW",
+    "humidity_pct": 53,
+    "pressure_mb": 1013.4,
+    "roof": false,
+    "flag": "clear"
+  },
   "NYY": {
     "venue": "Yankee Stadium",
-    "temp": 72.6,
-    "precip": 32,
-    "wind_spd": 7.2,
+    "temp": 74.1,
+    "precip": 49,
+    "wind_spd": 5.4,
     "wind_dir": "SE",
-    "humidity_pct": 91,
-    "pressure_mb": 1016.4,
+    "humidity_pct": 93,
+    "pressure_mb": 1016.1,
     "roof": false,
     "flag": "clear"
   },
   "ATL": {
     "venue": "Truist Park",
-    "temp": 79.2,
+    "temp": 78.4,
     "precip": 13,
+    "wind_spd": 4.7,
+    "wind_dir": "E",
+    "humidity_pct": 83,
+    "pressure_mb": 1012.8,
+    "roof": false,
+    "flag": "clear"
+  },
+  "NYM": {
+    "venue": "Citi Field",
+    "temp": 73.9,
+    "precip": 43,
     "wind_spd": 1.4,
-    "wind_dir": "SW",
-    "humidity_pct": 79,
-    "pressure_mb": 1013.6,
+    "wind_dir": "ENE",
+    "humidity_pct": 95,
+    "pressure_mb": 1016.1,
     "roof": false,
     "flag": "clear"
   },
   "TOR": {
     "venue": "Rogers Centre",
-    "temp": 75.9,
+    "temp": 75.8,
     "precip": 1,
-    "wind_spd": 9.8,
+    "wind_spd": 10.3,
     "wind_dir": "WNW",
-    "humidity_pct": 60,
-    "pressure_mb": 1013.2,
+    "humidity_pct": 62,
+    "pressure_mb": 1012.8,
     "roof": true,
-    "flag": "clear"
-  },
-  "NYM": {
-    "venue": "Citi Field",
-    "temp": 73.4,
-    "precip": 33,
-    "wind_spd": 2.4,
-    "wind_dir": "SE",
-    "humidity_pct": 95,
-    "pressure_mb": 1016.5,
-    "roof": false,
-    "flag": "clear"
-  },
-  "SF": {
-    "venue": "Oracle Park",
-    "temp": 72.7,
-    "precip": 1,
-    "wind_spd": 15.4,
-    "wind_dir": "WNW",
-    "humidity_pct": 49,
-    "pressure_mb": 1013.6,
-    "roof": false,
     "flag": "clear"
   }
 }
