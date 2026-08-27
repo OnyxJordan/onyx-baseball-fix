@@ -17,6 +17,7 @@ permissions:
   contents: write
   pages: write
   id-token: write
+  actions: write
 # cancel-in-progress: a run stuck in the github-pages "waiting" gate held
 # this group for 20 hours on 8/6 and froze the whole site (every later run
 # cancelled or queued). Ticks are 30 min apart and a healthy run takes ~5,
@@ -122,3 +123,32 @@ jobs:
         id: deployment2
         if: steps.deployment.outcome == 'failure'
         uses: actions/deploy-pages@v4
+  requeue:
+    # GitHub's event delivery for this repo went dark on 8/27: crons AND
+    # workflow_run completions silently stopped arriving (only direct API
+    # dispatches worked). So the chain lives INSIDE the run: after each
+    # refresh, this job sleeps to the next slot and dispatches the next run
+    # via the API - no GitHub event delivery involved anywhere. A cron that
+    # does get delivered cancels the sleeper (concurrency) and re-arms the
+    # chain itself; a dispatch failure retries 3x before giving up to the
+    # cron backup.
+    needs: refresh
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 135
+    steps:
+      - name: Wait for the next slot (30 min in slate hours, 2h overnight)
+        run: |
+          H=$(TZ=America/New_York date +%-H)
+          if [ "$H" -ge 11 ] || [ "$H" -eq 0 ]; then S=1800; else S=7200; fi
+          echo "ET hour $H -> sleeping $S seconds"
+          sleep $S
+      - name: Dispatch the next refresh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for i in 1 2 3; do
+            gh workflow run refresh_build.yml --repo ${{ github.repository }} --ref main && exit 0
+            sleep $((i * 20))
+          done
+          echo "::warning::could not dispatch next refresh; cron backup takes over"
