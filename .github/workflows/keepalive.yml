@@ -1,0 +1,34 @@
+name: Refresh keepalive chain
+# GitHub's cron scheduler silently dropped every scheduled run for 10+
+# hours on 8/27 (workflows "active", zero schedule events delivered), the
+# third scheduler incident in a month. The pipeline now drives itself:
+# every completed refresh queues the next one after a sleep, so the site
+# stays fresh even when GitHub's scheduler goes dark. The crons in
+# refresh_build.yml remain as a backup - if the chain ever dies, any
+# delivered cron (or a manual dispatch) restarts it. cancel-in-progress
+# keeps exactly one sleeper alive, so the cadence self-regulates.
+on:
+  workflow_run:
+    workflows: ["Refresh (lineups + weather + odds, every 30 min)"]
+    types: [completed]
+  workflow_dispatch:
+permissions:
+  actions: write
+concurrency:
+  group: onyx-keepalive
+  cancel-in-progress: true
+jobs:
+  requeue:
+    runs-on: ubuntu-latest
+    timeout-minutes: 135
+    steps:
+      - name: Wait for the next slot (30 min in slate hours, 2h overnight)
+        run: |
+          H=$(TZ=America/New_York date +%-H)
+          if [ "$H" -ge 11 ] || [ "$H" -eq 0 ]; then S=1800; else S=7200; fi
+          echo "ET hour $H -> sleeping $S seconds"
+          sleep $S
+      - name: Dispatch the next refresh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run refresh_build.yml --repo ${{ github.repository }} --ref main
