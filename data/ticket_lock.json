@@ -1,39 +1,40 @@
 {
- "date": "2026-08-27",
- "locked": true,
+ "date": "2026-08-28",
+ "locked": false,
  "legs": [
+  {
+   "player": "Pete Crow-Armstrong",
+   "mid": 691718,
+   "team": "CHC",
+   "odds": 323,
+   "prob": 21.4,
+   "score": 0.659,
+   "why": [
+    "pitcher matchup ×1.23",
+    "47% FB bat",
+    "soft bullpen"
+   ],
+   "away": "CIN",
+   "home": "CHC",
+   "opp": "Rhett Lowder",
+   "time": "2:20 PM"
+  },
   {
    "player": "Yordan Alvarez",
    "mid": 670541,
    "team": "HOU",
-   "odds": 219,
-   "prob": 27.3,
-   "score": 0.608,
+   "odds": 246,
+   "prob": 24.5,
+   "score": 0.589,
    "why": [
-    "park ×1.33",
     "overdue",
-    "48% FB bat"
+    "48% FB bat",
+    "fly-ball pitcher"
    ],
    "away": "HOU",
-   "home": "NYY",
-   "opp": "Gerrit Cole",
-   "time": "7:05 PM"
-  },
-  {
-   "player": "Ben Rice",
-   "mid": 700250,
-   "team": "NYY",
-   "odds": 302,
-   "prob": 24.0,
-   "score": 0.559,
-   "why": [
-    "park ×1.33",
-    "soft bullpen"
-   ],
-   "away": "HOU",
-   "home": "NYY",
-   "opp": "Hayden Wesneski",
-   "time": "7:05 PM"
+   "home": "NYM",
+   "opp": "Christian Scott",
+   "time": "7:10 PM"
   }
  ]
 }
