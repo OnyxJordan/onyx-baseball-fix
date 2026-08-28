@@ -1,13 +1,13 @@
 {
-  "ATL": {
-    "venue": "Truist Park",
-    "temp": 83.6,
-    "precip": 13,
-    "wind_spd": 2.8,
-    "wind_dir": "NNW",
-    "humidity_pct": 63,
-    "pressure_mb": 1013.8,
-    "roof": false,
+  "TOR": {
+    "venue": "Rogers Centre",
+    "temp": 74.3,
+    "precip": 0,
+    "wind_spd": 9.9,
+    "wind_dir": "WNW",
+    "humidity_pct": 66,
+    "pressure_mb": 1012.3,
+    "roof": true,
     "flag": "clear"
   },
   "NYM": {
@@ -21,28 +21,6 @@
     "roof": false,
     "flag": "clear"
   },
-  "NYY": {
-    "venue": "Yankee Stadium",
-    "temp": 72.7,
-    "precip": 48,
-    "wind_spd": 6.5,
-    "wind_dir": "S",
-    "humidity_pct": 86,
-    "pressure_mb": 1015.0,
-    "roof": false,
-    "flag": "clear"
-  },
-  "TOR": {
-    "venue": "Rogers Centre",
-    "temp": 74.3,
-    "precip": 0,
-    "wind_spd": 9.9,
-    "wind_dir": "WNW",
-    "humidity_pct": 66,
-    "pressure_mb": 1012.3,
-    "roof": true,
-    "flag": "clear"
-  },
   "SF": {
     "venue": "Oracle Park",
     "temp": 70.9,
@@ -51,6 +29,28 @@
     "wind_dir": "WNW",
     "humidity_pct": 53,
     "pressure_mb": 1014.2,
+    "roof": false,
+    "flag": "clear"
+  },
+  "ATL": {
+    "venue": "Truist Park",
+    "temp": 83.6,
+    "precip": 13,
+    "wind_spd": 2.8,
+    "wind_dir": "NNW",
+    "humidity_pct": 63,
+    "pressure_mb": 1013.8,
+    "roof": false,
+    "flag": "clear"
+  },
+  "NYY": {
+    "venue": "Yankee Stadium",
+    "temp": 72.7,
+    "precip": 48,
+    "wind_spd": 6.5,
+    "wind_dir": "S",
+    "humidity_pct": 86,
+    "pressure_mb": 1015.0,
     "roof": false,
     "flag": "clear"
   }
