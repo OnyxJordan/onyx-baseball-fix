@@ -1,31 +1,14 @@
 {
  "date": "2026-08-28",
- "locked": true,
+ "locked": false,
  "legs": [
-  {
-   "player": "Pete Crow-Armstrong",
-   "mid": 691718,
-   "team": "CHC",
-   "odds": 280,
-   "prob": 22.2,
-   "score": 0.65,
-   "why": [
-    "pitcher matchup ×1.23",
-    "47% FB bat",
-    "soft bullpen"
-   ],
-   "away": "CIN",
-   "home": "CHC",
-   "opp": "Rhett Lowder",
-   "time": "2:20 PM"
-  },
   {
    "player": "Yordan Alvarez",
    "mid": 670541,
    "team": "HOU",
-   "odds": 250,
-   "prob": 24.8,
-   "score": 0.642,
+   "odds": 268,
+   "prob": 24.0,
+   "score": 0.6,
    "why": [
     "overdue",
     "48% FB bat",
@@ -35,6 +18,23 @@
    "home": "NYM",
    "opp": "Christian Scott",
    "time": "7:10 PM"
+  },
+  {
+   "player": "Pete Alonso",
+   "mid": 624413,
+   "team": "BAL",
+   "odds": 210,
+   "prob": 25.2,
+   "score": 0.573,
+   "why": [
+    "pitcher matchup ×1.13",
+    "fly-ball pitcher",
+    "soft bullpen"
+   ],
+   "away": "BAL",
+   "home": "ATH",
+   "opp": "Jacob Lopez",
+   "time": "9:40 PM"
   }
  ]
 }
