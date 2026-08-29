@@ -773,16 +773,16 @@
     "player": "Yordan Alvarez",
     "odds": 268,
     "prob": 24.0,
-    "hit": null
+    "hit": false
    },
    {
     "player": "Pete Alonso",
     "odds": 210,
     "prob": 25.2,
-    "hit": null
+    "hit": "void"
    }
   ],
-  "result": null,
-  "pnl": null
+  "result": "loss",
+  "pnl": -10.0
  }
 ]
