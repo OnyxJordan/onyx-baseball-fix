@@ -1,57 +1,13 @@
 {
-  "ATH": {
-    "venue": "Sutter Health Park",
-    "temp": 80.7,
-    "precip": 0,
-    "wind_spd": 10.3,
-    "wind_dir": "SW",
-    "humidity_pct": 33,
-    "pressure_mb": 1010.8,
-    "roof": false,
-    "flag": "clear"
-  },
-  "NYY": {
-    "venue": "Yankee Stadium",
-    "temp": 77.8,
-    "precip": 0,
-    "wind_spd": 4.8,
-    "wind_dir": "NNW",
-    "humidity_pct": 35,
-    "pressure_mb": 1022.9,
-    "roof": false,
-    "flag": "clear"
-  },
-  "DET": {
-    "venue": "Comerica Park",
-    "temp": 80.1,
-    "precip": 0,
-    "wind_spd": 8.5,
-    "wind_dir": "SSW",
-    "humidity_pct": 47,
-    "pressure_mb": 1020.5,
-    "roof": false,
-    "flag": "clear"
-  },
-  "LAA": {
-    "venue": "Angel Stadium",
-    "temp": 85.9,
+  "MIN": {
+    "venue": "Target Field",
+    "temp": 73.7,
     "precip": 1,
-    "wind_spd": 4.4,
-    "wind_dir": "WSW",
-    "humidity_pct": 47,
-    "pressure_mb": 1009.2,
+    "wind_spd": 9.6,
+    "wind_dir": "SSE",
+    "humidity_pct": 82,
+    "pressure_mb": 1010.2,
     "roof": false,
-    "flag": "clear"
-  },
-  "MIL": {
-    "venue": "American Family Field",
-    "temp": 72.3,
-    "precip": 7,
-    "wind_spd": 1.7,
-    "wind_dir": "SE",
-    "humidity_pct": 85,
-    "pressure_mb": 1015.1,
-    "roof": true,
     "flag": "clear"
   },
   "CHC": {
@@ -65,14 +21,91 @@
     "roof": false,
     "flag": "clear"
   },
-  "SF": {
-    "venue": "Oracle Park",
-    "temp": 67.6,
+  "WSH": {
+    "venue": "Nationals Park",
+    "temp": 84.4,
+    "precip": 0,
+    "wind_spd": 2.7,
+    "wind_dir": "SE",
+    "humidity_pct": 43,
+    "pressure_mb": 1022.4,
+    "roof": false,
+    "flag": "clear"
+  },
+  "CLE": {
+    "venue": "Progressive Field",
+    "temp": 81.5,
+    "precip": 0,
+    "wind_spd": 8.0,
+    "wind_dir": "NNW",
+    "humidity_pct": 42,
+    "pressure_mb": 1019.8,
+    "roof": false,
+    "flag": "clear"
+  },
+  "ATL": {
+    "venue": "Truist Park",
+    "temp": 80.3,
+    "precip": 5,
+    "wind_spd": 6.9,
+    "wind_dir": "S",
+    "humidity_pct": 77,
+    "pressure_mb": 1019.0,
+    "roof": false,
+    "flag": "clear"
+  },
+  "TOR": {
+    "venue": "Rogers Centre",
+    "temp": 77.5,
+    "precip": 5,
+    "wind_spd": 9.2,
+    "wind_dir": "S",
+    "humidity_pct": 50,
+    "pressure_mb": 1020.1,
+    "roof": true,
+    "flag": "clear"
+  },
+  "TB": {
+    "venue": "Tropicana Field",
+    "temp": 88.8,
+    "precip": 9,
+    "wind_spd": 1.6,
+    "wind_dir": "N",
+    "humidity_pct": 56,
+    "pressure_mb": 1015.7,
+    "roof": true,
+    "flag": "clear"
+  },
+  "MIL": {
+    "venue": "American Family Field",
+    "temp": 72.3,
+    "precip": 7,
+    "wind_spd": 1.7,
+    "wind_dir": "SE",
+    "humidity_pct": 85,
+    "pressure_mb": 1015.1,
+    "roof": true,
+    "flag": "clear"
+  },
+  "LAA": {
+    "venue": "Angel Stadium",
+    "temp": 85.9,
     "precip": 1,
-    "wind_spd": 11.9,
-    "wind_dir": "W",
-    "humidity_pct": 72,
-    "pressure_mb": 1015.6,
+    "wind_spd": 4.4,
+    "wind_dir": "WSW",
+    "humidity_pct": 47,
+    "pressure_mb": 1009.2,
+    "roof": false,
+    "flag": "clear"
+  },
+  "ATH": {
+    "venue": "Sutter Health Park",
+    "temp": 80.7,
+    "precip": 0,
+    "wind_spd": 10.3,
+    "wind_dir": "SW",
+    "humidity_pct": 33,
+    "pressure_mb": 1010.8,
     "roof": false,
     "flag": "clear"
   },
@@ -87,32 +120,14 @@
     "roof": false,
     "flag": "clear"
   },
-  "TB": {
-    "venue": "Tropicana Field",
-    "temp": 88.8,
-    "precip": 14,
-    "wind_spd": 1.6,
-    "wind_dir": "N",
-    "humidity_pct": 56,
-    "pressure_mb": 1015.7,
-    "roof": true,
-    "flag": "clear"
-  },
-  "ATL": {
-    "venue": "Truist Park",
-    "temp": 72,
+  "NYY": {
+    "venue": "Yankee Stadium",
+    "temp": 77.8,
     "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
-    "roof": false,
-    "flag": "clear"
-  },
-  "MIN": {
-    "venue": "Target Field",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
+    "wind_spd": 4.8,
+    "wind_dir": "NNW",
+    "humidity_pct": 35,
+    "pressure_mb": 1022.9,
     "roof": false,
     "flag": "clear"
   },
@@ -125,17 +140,8 @@
     "roof": false,
     "flag": "clear"
   },
-  "TOR": {
-    "venue": "Rogers Centre",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
-    "roof": true,
-    "flag": "clear"
-  },
-  "CLE": {
-    "venue": "Progressive Field",
+  "DET": {
+    "venue": "Comerica Park",
     "temp": 72,
     "precip": 0,
     "wind_spd": 5,
@@ -143,14 +149,12 @@
     "roof": false,
     "flag": "clear"
   },
-  "WSH": {
-    "venue": "Nationals Park",
-    "temp": 84.4,
+  "SF": {
+    "venue": "Oracle Park",
+    "temp": 72,
     "precip": 0,
-    "wind_spd": 2.7,
-    "wind_dir": "SE",
-    "humidity_pct": 43,
-    "pressure_mb": 1022.4,
+    "wind_spd": 5,
+    "wind_dir": "N",
     "roof": false,
     "flag": "clear"
   }
