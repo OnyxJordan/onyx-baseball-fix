@@ -1,12 +1,23 @@
 {
-  "ATL": {
-    "venue": "Truist Park",
-    "temp": 77.2,
-    "precip": 12,
-    "wind_spd": 3.6,
-    "wind_dir": "N",
-    "humidity_pct": 88,
-    "pressure_mb": 1017.8,
+  "LAA": {
+    "venue": "Angel Stadium",
+    "temp": 85.9,
+    "precip": 1,
+    "wind_spd": 6.2,
+    "wind_dir": "WNW",
+    "humidity_pct": 46,
+    "pressure_mb": 1009.0,
+    "roof": false,
+    "flag": "clear"
+  },
+  "ATH": {
+    "venue": "Sutter Health Park",
+    "temp": 80.7,
+    "precip": 0,
+    "wind_spd": 9.7,
+    "wind_dir": "SW",
+    "humidity_pct": 32,
+    "pressure_mb": 1010.4,
     "roof": false,
     "flag": "clear"
   },
@@ -21,25 +32,25 @@
     "roof": true,
     "flag": "clear"
   },
-  "MIL": {
-    "venue": "American Family Field",
-    "temp": 74.5,
-    "precip": 19,
-    "wind_spd": 5.4,
-    "wind_dir": "SSE",
-    "humidity_pct": 71,
-    "pressure_mb": 1014.8,
-    "roof": true,
+  "ATL": {
+    "venue": "Truist Park",
+    "temp": 77.2,
+    "precip": 12,
+    "wind_spd": 3.6,
+    "wind_dir": "N",
+    "humidity_pct": 88,
+    "pressure_mb": 1017.8,
+    "roof": false,
     "flag": "clear"
   },
-  "ATH": {
-    "venue": "Sutter Health Park",
-    "temp": 80.7,
+  "WSH": {
+    "venue": "Nationals Park",
+    "temp": 83.7,
     "precip": 0,
-    "wind_spd": 9.7,
-    "wind_dir": "SW",
-    "humidity_pct": 32,
-    "pressure_mb": 1010.4,
+    "wind_spd": 5.9,
+    "wind_dir": "SE",
+    "humidity_pct": 42,
+    "pressure_mb": 1022.0,
     "roof": false,
     "flag": "clear"
   },
@@ -54,17 +65,6 @@
     "roof": false,
     "flag": "clear"
   },
-  "TOR": {
-    "venue": "Rogers Centre",
-    "temp": 76.9,
-    "precip": 5,
-    "wind_spd": 9.7,
-    "wind_dir": "S",
-    "humidity_pct": 67,
-    "pressure_mb": 1020.3,
-    "roof": true,
-    "flag": "clear"
-  },
   "SF": {
     "venue": "Oracle Park",
     "temp": 69.2,
@@ -76,26 +76,15 @@
     "roof": false,
     "flag": "clear"
   },
-  "LAA": {
-    "venue": "Angel Stadium",
-    "temp": 85.9,
-    "precip": 1,
-    "wind_spd": 6.2,
-    "wind_dir": "WNW",
-    "humidity_pct": 46,
-    "pressure_mb": 1009.0,
-    "roof": false,
-    "flag": "clear"
-  },
-  "NYM": {
-    "venue": "Citi Field",
-    "temp": 79.0,
-    "precip": 0,
-    "wind_spd": 4.8,
-    "wind_dir": "NW",
-    "humidity_pct": 37,
-    "pressure_mb": 1021.3,
-    "roof": false,
+  "TOR": {
+    "venue": "Rogers Centre",
+    "temp": 76.9,
+    "precip": 5,
+    "wind_spd": 9.7,
+    "wind_dir": "S",
+    "humidity_pct": 67,
+    "pressure_mb": 1020.3,
+    "roof": true,
     "flag": "clear"
   },
   "NYY": {
@@ -109,14 +98,23 @@
     "roof": false,
     "flag": "clear"
   },
-  "WSH": {
-    "venue": "Nationals Park",
-    "temp": 83.7,
+  "MIL": {
+    "venue": "American Family Field",
+    "temp": 74.5,
+    "precip": 19,
+    "wind_spd": 5.4,
+    "wind_dir": "SSE",
+    "humidity_pct": 71,
+    "pressure_mb": 1014.8,
+    "roof": true,
+    "flag": "clear"
+  },
+  "NYM": {
+    "venue": "Citi Field",
+    "temp": 72,
     "precip": 0,
-    "wind_spd": 5.9,
-    "wind_dir": "SE",
-    "humidity_pct": 42,
-    "pressure_mb": 1022.0,
+    "wind_spd": 5,
+    "wind_dir": "N",
     "roof": false,
     "flag": "clear"
   }
