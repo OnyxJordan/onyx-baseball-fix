@@ -1,15 +1,4 @@
 {
-  "STL": {
-    "venue": "Busch Stadium",
-    "temp": 87.8,
-    "precip": 0,
-    "wind_spd": 7.1,
-    "wind_dir": "S",
-    "humidity_pct": 38,
-    "pressure_mb": 1018.6,
-    "roof": false,
-    "flag": "clear"
-  },
   "DET": {
     "venue": "Comerica Park",
     "temp": 81.2,
@@ -21,37 +10,26 @@
     "roof": false,
     "flag": "clear"
   },
-  "TB": {
-    "venue": "Tropicana Field",
-    "temp": 88.5,
-    "precip": 15,
-    "wind_spd": 4.3,
-    "wind_dir": "WNW",
-    "humidity_pct": 69,
-    "pressure_mb": 1016.0,
-    "roof": true,
-    "flag": "clear"
-  },
-  "TOR": {
-    "venue": "Rogers Centre",
-    "temp": 76.9,
-    "precip": 3,
-    "wind_spd": 14.7,
+  "STL": {
+    "venue": "Busch Stadium",
+    "temp": 87.8,
+    "precip": 0,
+    "wind_spd": 7.1,
     "wind_dir": "S",
-    "humidity_pct": 44,
-    "pressure_mb": 1020.2,
-    "roof": true,
+    "humidity_pct": 38,
+    "pressure_mb": 1018.6,
+    "roof": false,
     "flag": "clear"
   },
-  "MIL": {
-    "venue": "American Family Field",
-    "temp": 77.0,
+  "ATL": {
+    "venue": "Truist Park",
+    "temp": 84.8,
     "precip": 7,
-    "wind_spd": 8.2,
+    "wind_spd": 1.7,
     "wind_dir": "SSE",
     "humidity_pct": 65,
-    "pressure_mb": 1015.5,
-    "roof": true,
+    "pressure_mb": 1018.6,
+    "roof": false,
     "flag": "clear"
   },
   "NYM": {
@@ -62,28 +40,6 @@
     "wind_dir": "WNW",
     "humidity_pct": 31,
     "pressure_mb": 1021.8,
-    "roof": false,
-    "flag": "clear"
-  },
-  "MIN": {
-    "venue": "Target Field",
-    "temp": 74.7,
-    "precip": 1,
-    "wind_spd": 10.0,
-    "wind_dir": "SSE",
-    "humidity_pct": 80,
-    "pressure_mb": 1010.2,
-    "roof": false,
-    "flag": "clear"
-  },
-  "SF": {
-    "venue": "Oracle Park",
-    "temp": 68.8,
-    "precip": 1,
-    "wind_spd": 11.9,
-    "wind_dir": "W",
-    "humidity_pct": 68,
-    "pressure_mb": 1015.7,
     "roof": false,
     "flag": "clear"
   },
@@ -98,25 +54,14 @@
     "roof": false,
     "flag": "clear"
   },
-  "ATL": {
-    "venue": "Truist Park",
-    "temp": 84.8,
-    "precip": 10,
-    "wind_spd": 1.7,
-    "wind_dir": "SSE",
-    "humidity_pct": 65,
-    "pressure_mb": 1018.6,
-    "roof": false,
-    "flag": "clear"
-  },
-  "LAA": {
-    "venue": "Angel Stadium",
-    "temp": 85.1,
+  "SF": {
+    "venue": "Oracle Park",
+    "temp": 68.8,
     "precip": 1,
-    "wind_spd": 4.9,
-    "wind_dir": "WSW",
-    "humidity_pct": 54,
-    "pressure_mb": 1008.9,
+    "wind_spd": 11.9,
+    "wind_dir": "W",
+    "humidity_pct": 68,
+    "pressure_mb": 1015.7,
     "roof": false,
     "flag": "clear"
   },
@@ -131,15 +76,26 @@
     "roof": false,
     "flag": "clear"
   },
-  "NYY": {
-    "venue": "Yankee Stadium",
-    "temp": 77.3,
-    "precip": 0,
-    "wind_spd": 5.7,
-    "wind_dir": "NW",
-    "humidity_pct": 39,
-    "pressure_mb": 1023.7,
+  "CHC": {
+    "venue": "Wrigley Field",
+    "temp": 83.4,
+    "precip": 1,
+    "wind_spd": 9.3,
+    "wind_dir": "SW",
+    "humidity_pct": 46,
+    "pressure_mb": 1019.4,
     "roof": false,
+    "flag": "clear"
+  },
+  "TB": {
+    "venue": "Tropicana Field",
+    "temp": 88.5,
+    "precip": 16,
+    "wind_spd": 4.3,
+    "wind_dir": "WNW",
+    "humidity_pct": 69,
+    "pressure_mb": 1016.0,
+    "roof": true,
     "flag": "clear"
   },
   "WSH": {
@@ -153,14 +109,54 @@
     "roof": false,
     "flag": "clear"
   },
-  "CHC": {
-    "venue": "Wrigley Field",
-    "temp": 83.4,
-    "precip": 2,
-    "wind_spd": 9.3,
-    "wind_dir": "SW",
-    "humidity_pct": 46,
-    "pressure_mb": 1019.4,
+  "MIN": {
+    "venue": "Target Field",
+    "temp": 74.7,
+    "precip": 1,
+    "wind_spd": 10.0,
+    "wind_dir": "SSE",
+    "humidity_pct": 80,
+    "pressure_mb": 1010.2,
+    "roof": false,
+    "flag": "clear"
+  },
+  "MIL": {
+    "venue": "American Family Field",
+    "temp": 77.0,
+    "precip": 8,
+    "wind_spd": 8.2,
+    "wind_dir": "SSE",
+    "humidity_pct": 65,
+    "pressure_mb": 1015.5,
+    "roof": true,
+    "flag": "clear"
+  },
+  "LAA": {
+    "venue": "Angel Stadium",
+    "temp": 85.1,
+    "precip": 1,
+    "wind_spd": 4.9,
+    "wind_dir": "WSW",
+    "humidity_pct": 54,
+    "pressure_mb": 1008.9,
+    "roof": false,
+    "flag": "clear"
+  },
+  "TOR": {
+    "venue": "Rogers Centre",
+    "temp": 72,
+    "precip": 0,
+    "wind_spd": 5,
+    "wind_dir": "N",
+    "roof": true,
+    "flag": "clear"
+  },
+  "NYY": {
+    "venue": "Yankee Stadium",
+    "temp": 72,
+    "precip": 0,
+    "wind_spd": 5,
+    "wind_dir": "N",
     "roof": false,
     "flag": "clear"
   }
