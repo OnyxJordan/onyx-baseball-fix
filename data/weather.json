@@ -1,57 +1,57 @@
 {
-  "SF": {
-    "venue": "Oracle Park",
-    "temp": 63.6,
-    "precip": 0,
-    "wind_spd": 15.4,
-    "wind_dir": "WNW",
-    "humidity_pct": 68,
-    "pressure_mb": 1013.1,
-    "roof": false,
-    "flag": "clear"
-  },
-  "ATH": {
-    "venue": "Sutter Health Park",
-    "temp": 79.4,
-    "precip": 0,
-    "wind_spd": 10.5,
-    "wind_dir": "SW",
-    "humidity_pct": 35,
-    "pressure_mb": 1010.7,
-    "roof": false,
-    "flag": "clear"
-  },
-  "NYY": {
-    "venue": "Yankee Stadium",
-    "temp": 76.0,
-    "precip": 0,
-    "wind_spd": 4.7,
-    "wind_dir": "W",
-    "humidity_pct": 41,
-    "pressure_mb": 1021.5,
-    "roof": false,
+  "MIL": {
+    "venue": "American Family Field",
+    "temp": 71.7,
+    "precip": 19,
+    "wind_spd": 7.1,
+    "wind_dir": "SE",
+    "humidity_pct": 86,
+    "pressure_mb": 1015.6,
+    "roof": true,
     "flag": "clear"
   },
   "LAA": {
     "venue": "Angel Stadium",
     "temp": 81.0,
     "precip": 1,
-    "wind_spd": 5.9,
+    "wind_spd": 5.6,
     "wind_dir": "SW",
-    "humidity_pct": 57,
-    "pressure_mb": 1009.3,
+    "humidity_pct": 59,
+    "pressure_mb": 1009.1,
     "roof": false,
     "flag": "clear"
   },
-  "MIL": {
-    "venue": "American Family Field",
-    "temp": 74.2,
-    "precip": 19,
-    "wind_spd": 5.0,
-    "wind_dir": "SSE",
-    "humidity_pct": 79,
-    "pressure_mb": 1014.3,
-    "roof": true,
+  "ATH": {
+    "venue": "Sutter Health Park",
+    "temp": 78.6,
+    "precip": 0,
+    "wind_spd": 10.6,
+    "wind_dir": "SW",
+    "humidity_pct": 35,
+    "pressure_mb": 1010.3,
+    "roof": false,
+    "flag": "clear"
+  },
+  "NYY": {
+    "venue": "Yankee Stadium",
+    "temp": 76.7,
+    "precip": 0,
+    "wind_spd": 3.5,
+    "wind_dir": "WNW",
+    "humidity_pct": 39,
+    "pressure_mb": 1020.4,
+    "roof": false,
+    "flag": "clear"
+  },
+  "SF": {
+    "venue": "Oracle Park",
+    "temp": 63.1,
+    "precip": 0,
+    "wind_spd": 16.5,
+    "wind_dir": "WNW",
+    "humidity_pct": 71,
+    "pressure_mb": 1012.9,
+    "roof": false,
     "flag": "clear"
   }
 }
