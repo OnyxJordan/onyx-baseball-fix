@@ -1,19 +1,19 @@
 {
-  "MIL": {
-    "venue": "American Family Field",
-    "temp": 70.4,
-    "precip": 19,
-    "wind_spd": 6.1,
-    "wind_dir": "ESE",
-    "humidity_pct": 94,
-    "pressure_mb": 1015.2,
-    "roof": true,
+  "SF": {
+    "venue": "Oracle Park",
+    "temp": 63.8,
+    "precip": 0,
+    "wind_spd": 16.3,
+    "wind_dir": "WNW",
+    "humidity_pct": 71,
+    "pressure_mb": 1012.8,
+    "roof": false,
     "flag": "clear"
   },
   "LAA": {
     "venue": "Angel Stadium",
     "temp": 80.5,
-    "precip": 1,
+    "precip": 0,
     "wind_spd": 5.2,
     "wind_dir": "SW",
     "humidity_pct": 63,
@@ -32,15 +32,15 @@
     "roof": false,
     "flag": "clear"
   },
-  "SF": {
-    "venue": "Oracle Park",
-    "temp": 63.8,
-    "precip": 0,
-    "wind_spd": 16.3,
-    "wind_dir": "WNW",
-    "humidity_pct": 71,
-    "pressure_mb": 1012.8,
-    "roof": false,
+  "MIL": {
+    "venue": "American Family Field",
+    "temp": 70.4,
+    "precip": 19,
+    "wind_spd": 6.1,
+    "wind_dir": "ESE",
+    "humidity_pct": 94,
+    "pressure_mb": 1015.2,
+    "roof": true,
     "flag": "clear"
   },
   "NYY": {
