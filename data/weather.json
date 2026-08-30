@@ -10,25 +10,14 @@
     "roof": false,
     "flag": "clear"
   },
-  "DET": {
-    "venue": "Comerica Park",
-    "temp": 70.8,
-    "precip": 45,
-    "wind_spd": 6.8,
+  "NYM": {
+    "venue": "Citi Field",
+    "temp": 78.8,
+    "precip": 7,
+    "wind_spd": 9.2,
     "wind_dir": "SSW",
-    "humidity_pct": 91,
-    "pressure_mb": 1017.9,
-    "roof": false,
-    "flag": "clear"
-  },
-  "CHC": {
-    "venue": "Wrigley Field",
-    "temp": 75.3,
-    "precip": 15,
-    "wind_spd": 6.7,
-    "wind_dir": "SSW",
-    "humidity_pct": 79,
-    "pressure_mb": 1015.2,
+    "humidity_pct": 71,
+    "pressure_mb": 1019.3,
     "roof": false,
     "flag": "clear"
   },
@@ -54,36 +43,14 @@
     "roof": true,
     "flag": "clear"
   },
-  "NYM": {
-    "venue": "Citi Field",
-    "temp": 78.8,
-    "precip": 7,
-    "wind_spd": 9.2,
+  "CHC": {
+    "venue": "Wrigley Field",
+    "temp": 75.3,
+    "precip": 15,
+    "wind_spd": 6.7,
     "wind_dir": "SSW",
-    "humidity_pct": 71,
-    "pressure_mb": 1019.3,
-    "roof": false,
-    "flag": "clear"
-  },
-  "TB": {
-    "venue": "Tropicana Field",
-    "temp": 85.8,
-    "precip": 3,
-    "wind_spd": 3.6,
-    "wind_dir": "E",
-    "humidity_pct": 81,
-    "pressure_mb": 1017.8,
-    "roof": true,
-    "flag": "clear"
-  },
-  "STL": {
-    "venue": "Busch Stadium",
-    "temp": 91.5,
-    "precip": 0,
-    "wind_spd": 6.3,
-    "wind_dir": "S",
-    "humidity_pct": 41,
-    "pressure_mb": 1015.9,
+    "humidity_pct": 79,
+    "pressure_mb": 1015.2,
     "roof": false,
     "flag": "clear"
   }
