@@ -1,15 +1,4 @@
 {
-  "CHC": {
-    "venue": "Wrigley Field",
-    "temp": 75.6,
-    "precip": 22,
-    "wind_spd": 3.0,
-    "wind_dir": "NW",
-    "humidity_pct": 88,
-    "pressure_mb": 1015.4,
-    "roof": false,
-    "flag": "clear"
-  },
   "ATH": {
     "venue": "Sutter Health Park",
     "temp": 82.3,
@@ -21,6 +10,17 @@
     "roof": false,
     "flag": "clear"
   },
+  "CHC": {
+    "venue": "Wrigley Field",
+    "temp": 75.6,
+    "precip": 22,
+    "wind_spd": 3.0,
+    "wind_dir": "NW",
+    "humidity_pct": 88,
+    "pressure_mb": 1015.4,
+    "roof": false,
+    "flag": "clear"
+  },
   "LAA": {
     "venue": "Angel Stadium",
     "temp": 87.7,
@@ -29,17 +29,6 @@
     "wind_dir": "WSW",
     "humidity_pct": 59,
     "pressure_mb": 1011.5,
-    "roof": false,
-    "flag": "clear"
-  },
-  "NYM": {
-    "venue": "Citi Field",
-    "temp": 78.8,
-    "precip": 7,
-    "wind_spd": 9.2,
-    "wind_dir": "SSW",
-    "humidity_pct": 71,
-    "pressure_mb": 1019.3,
     "roof": false,
     "flag": "clear"
   }
