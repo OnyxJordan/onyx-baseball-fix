@@ -1,46 +1,13 @@
 {
   "SF": {
     "venue": "Oracle Park",
-    "temp": 63.8,
+    "temp": 63.1,
     "precip": 0,
-    "wind_spd": 16.3,
+    "wind_spd": 15.6,
     "wind_dir": "WNW",
     "humidity_pct": 71,
-    "pressure_mb": 1012.8,
+    "pressure_mb": 1013.7,
     "roof": false,
-    "flag": "clear"
-  },
-  "LAA": {
-    "venue": "Angel Stadium",
-    "temp": 80.5,
-    "precip": 0,
-    "wind_spd": 5.2,
-    "wind_dir": "SW",
-    "humidity_pct": 63,
-    "pressure_mb": 1009.4,
-    "roof": false,
-    "flag": "clear"
-  },
-  "ATH": {
-    "venue": "Sutter Health Park",
-    "temp": 79.2,
-    "precip": 0,
-    "wind_spd": 10.6,
-    "wind_dir": "SW",
-    "humidity_pct": 40,
-    "pressure_mb": 1010.2,
-    "roof": false,
-    "flag": "clear"
-  },
-  "MIL": {
-    "venue": "American Family Field",
-    "temp": 70.4,
-    "precip": 19,
-    "wind_spd": 6.1,
-    "wind_dir": "ESE",
-    "humidity_pct": 94,
-    "pressure_mb": 1015.2,
-    "roof": true,
     "flag": "clear"
   },
   "NYY": {
@@ -51,6 +18,28 @@
     "wind_dir": "NW",
     "humidity_pct": 29,
     "pressure_mb": 1021.9,
+    "roof": false,
+    "flag": "clear"
+  },
+  "LAA": {
+    "venue": "Angel Stadium",
+    "temp": 80.8,
+    "precip": 0,
+    "wind_spd": 5.9,
+    "wind_dir": "WSW",
+    "humidity_pct": 63,
+    "pressure_mb": 1009.8,
+    "roof": false,
+    "flag": "clear"
+  },
+  "ATH": {
+    "venue": "Sutter Health Park",
+    "temp": 78.4,
+    "precip": 0,
+    "wind_spd": 11.1,
+    "wind_dir": "SW",
+    "humidity_pct": 40,
+    "pressure_mb": 1010.9,
     "roof": false,
     "flag": "clear"
   }
