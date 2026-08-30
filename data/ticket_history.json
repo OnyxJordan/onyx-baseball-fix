@@ -793,16 +793,16 @@
     "player": "Shohei Ohtani",
     "odds": 311,
     "prob": 24.7,
-    "hit": null
+    "hit": false
    },
    {
     "player": "Kyle Schwarber",
     "odds": 184,
     "prob": 27.4,
-    "hit": null
+    "hit": "void"
    }
   ],
-  "result": null,
-  "pnl": null
+  "result": "loss",
+  "pnl": -10.0
  }
 ]
