@@ -1,78 +1,12 @@
 {
-  "WSH": {
-    "venue": "Nationals Park",
-    "temp": 87.0,
-    "precip": 7,
-    "wind_spd": 2.1,
-    "wind_dir": "SE",
-    "humidity_pct": 56,
-    "pressure_mb": 1017.1,
-    "roof": false,
-    "flag": "clear"
-  },
-  "MIN": {
-    "venue": "Target Field",
-    "temp": 90.8,
-    "precip": 0,
-    "wind_spd": 6.9,
-    "wind_dir": "WNW",
-    "humidity_pct": 31,
-    "pressure_mb": 1009.9,
-    "roof": false,
-    "flag": "clear"
-  },
-  "TEX": {
-    "venue": "Globe Life Field",
-    "temp": 97.3,
-    "precip": 0,
-    "wind_spd": 8.7,
-    "wind_dir": "SE",
-    "humidity_pct": 28,
-    "pressure_mb": 1013.0,
-    "roof": true,
-    "flag": "clear"
-  },
-  "ARI": {
-    "venue": "Chase Field",
-    "temp": 92.6,
-    "precip": 3,
-    "wind_spd": 4.8,
-    "wind_dir": "SE",
-    "humidity_pct": 36,
-    "pressure_mb": 1008.7,
-    "roof": true,
-    "flag": "clear"
-  },
-  "ATL": {
-    "venue": "Truist Park",
-    "temp": 93.0,
-    "precip": 0,
-    "wind_spd": 5.1,
-    "wind_dir": "ENE",
-    "humidity_pct": 35,
-    "pressure_mb": 1017.0,
-    "roof": false,
-    "flag": "clear"
-  },
   "HOU": {
     "venue": "Daikin Park",
     "temp": 89.4,
     "precip": 3,
     "wind_spd": 5.2,
     "wind_dir": "SE",
-    "humidity_pct": 55,
-    "pressure_mb": 1013.9,
-    "roof": true,
-    "flag": "clear"
-  },
-  "TB": {
-    "venue": "Tropicana Field",
-    "temp": 84.8,
-    "precip": 17,
-    "wind_spd": 6.0,
-    "wind_dir": "N",
-    "humidity_pct": 80,
-    "pressure_mb": 1014.8,
+    "humidity_pct": 59,
+    "pressure_mb": 1013.4,
     "roof": true,
     "flag": "clear"
   },
@@ -82,8 +16,30 @@
     "precip": 5,
     "wind_spd": 9.7,
     "wind_dir": "SW",
-    "humidity_pct": 51,
-    "pressure_mb": 1011.4,
+    "humidity_pct": 56,
+    "pressure_mb": 1011.1,
+    "roof": false,
+    "flag": "clear"
+  },
+  "MIN": {
+    "venue": "Target Field",
+    "temp": 90.8,
+    "precip": 0,
+    "wind_spd": 6.9,
+    "wind_dir": "WNW",
+    "humidity_pct": 35,
+    "pressure_mb": 1009.9,
+    "roof": false,
+    "flag": "clear"
+  },
+  "LAA": {
+    "venue": "Angel Stadium",
+    "temp": 77.7,
+    "precip": 0,
+    "wind_spd": 8.4,
+    "wind_dir": "WSW",
+    "humidity_pct": 60,
+    "pressure_mb": 1011.3,
     "roof": false,
     "flag": "clear"
   },
@@ -93,22 +49,57 @@
     "precip": 24,
     "wind_spd": 5.4,
     "wind_dir": "ESE",
-    "humidity_pct": 18,
-    "pressure_mb": 1006.5,
+    "humidity_pct": 19,
+    "pressure_mb": 1006.9,
     "roof": false,
     "flag": "clear"
   },
-  "LAA": {
-    "venue": "Angel Stadium",
-    "temp": 72,
+  "ATL": {
+    "venue": "Truist Park",
+    "temp": 93.0,
     "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
+    "wind_spd": 5.1,
+    "wind_dir": "ENE",
+    "humidity_pct": 40,
+    "pressure_mb": 1016.8,
     "roof": false,
     "flag": "clear"
   },
   "CIN": {
     "venue": "Great American Ball Park",
+    "temp": 94.8,
+    "precip": 1,
+    "wind_spd": 9.5,
+    "wind_dir": "SW",
+    "humidity_pct": 35,
+    "pressure_mb": 1015.3,
+    "roof": false,
+    "flag": "clear"
+  },
+  "TB": {
+    "venue": "Tropicana Field",
+    "temp": 84.8,
+    "precip": 17,
+    "wind_spd": 6.0,
+    "wind_dir": "N",
+    "humidity_pct": 80,
+    "pressure_mb": 1014.7,
+    "roof": true,
+    "flag": "clear"
+  },
+  "ARI": {
+    "venue": "Chase Field",
+    "temp": 92.6,
+    "precip": 3,
+    "wind_spd": 4.8,
+    "wind_dir": "SE",
+    "humidity_pct": 48,
+    "pressure_mb": 1009.2,
+    "roof": true,
+    "flag": "clear"
+  },
+  "WSH": {
+    "venue": "Nationals Park",
     "temp": 72,
     "precip": 0,
     "wind_spd": 5,
@@ -123,6 +114,15 @@
     "wind_spd": 5,
     "wind_dir": "N",
     "roof": false,
+    "flag": "clear"
+  },
+  "TEX": {
+    "venue": "Globe Life Field",
+    "temp": 72,
+    "precip": 0,
+    "wind_spd": 5,
+    "wind_dir": "N",
+    "roof": true,
     "flag": "clear"
   }
 }
