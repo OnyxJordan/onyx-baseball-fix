@@ -1,13 +1,13 @@
 {
-  "ARI": {
-    "venue": "Chase Field",
-    "temp": 88.2,
+  "LAA": {
+    "venue": "Angel Stadium",
+    "temp": 77.9,
     "precip": 0,
-    "wind_spd": 3.8,
-    "wind_dir": "E",
-    "humidity_pct": 43,
-    "pressure_mb": 1009.3,
-    "roof": true,
+    "wind_spd": 7.8,
+    "wind_dir": "SW",
+    "humidity_pct": 60,
+    "pressure_mb": 1011.7,
+    "roof": false,
     "flag": "clear"
   },
   "HOU": {
@@ -21,28 +21,6 @@
     "roof": true,
     "flag": "clear"
   },
-  "TEX": {
-    "venue": "Globe Life Field",
-    "temp": 99.1,
-    "precip": 0,
-    "wind_spd": 7.6,
-    "wind_dir": "SE",
-    "humidity_pct": 26,
-    "pressure_mb": 1012.4,
-    "roof": true,
-    "flag": "clear"
-  },
-  "LAA": {
-    "venue": "Angel Stadium",
-    "temp": 78.9,
-    "precip": 0,
-    "wind_spd": 7.6,
-    "wind_dir": "SW",
-    "humidity_pct": 47,
-    "pressure_mb": 1012.1,
-    "roof": false,
-    "flag": "clear"
-  },
   "COL": {
     "venue": "Coors Field",
     "temp": 84.8,
@@ -52,6 +30,17 @@
     "humidity_pct": 22,
     "pressure_mb": 1007.5,
     "roof": false,
+    "flag": "clear"
+  },
+  "ARI": {
+    "venue": "Chase Field",
+    "temp": 88.7,
+    "precip": 0,
+    "wind_spd": 5.6,
+    "wind_dir": "SE",
+    "humidity_pct": 41,
+    "pressure_mb": 1009.7,
+    "roof": true,
     "flag": "clear"
   }
 }
