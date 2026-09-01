@@ -1,40 +1,74 @@
 {
- "date": "2026-08-31",
- "locked": true,
+ "date": "2026-09-01",
+ "locked": false,
  "legs": [
   {
    "player": "Manny Machado",
    "mid": 592518,
    "team": "SD",
-   "odds": 413,
-   "prob": 19.1,
-   "score": 0.666,
+   "odds": 293,
+   "prob": 22.3,
+   "score": 0.853,
    "why": [
     "park ×1.31",
-    "wind/heat ×1.13",
-    "soft bullpen"
+    "pitcher matchup ×1.18",
+    "wind/heat ×1.13"
    ],
    "away": "SD",
    "home": "CIN",
-   "opp": "Brady Singer",
+   "opp": "Nick Lodolo",
    "time": "6:40 PM"
   },
   {
-   "player": "Jackson Merrill",
-   "mid": 701538,
+   "player": "Fernando Tatis Jr.",
+   "mid": 665487,
    "team": "SD",
-   "odds": 318,
-   "prob": 20.4,
-   "score": 0.647,
+   "odds": 255,
+   "prob": 22.9,
+   "score": 0.772,
    "why": [
     "park ×1.31",
-    "wind/heat ×1.13",
-    "soft bullpen"
+    "pitcher matchup ×1.18",
+    "wind/heat ×1.13"
    ],
    "away": "SD",
    "home": "CIN",
-   "opp": "Brady Singer",
+   "opp": "Nick Lodolo",
    "time": "6:40 PM"
+  },
+  {
+   "player": "Matt Olson",
+   "mid": 621566,
+   "team": "ATL",
+   "odds": 244,
+   "prob": 24.7,
+   "score": 0.694,
+   "why": [
+    "wind/heat ×1.13",
+    "pitcher matchup ×1.12",
+    "overdue"
+   ],
+   "away": "ATL",
+   "home": "WSH",
+   "opp": "Jake Irvin",
+   "time": "6:45 PM"
+  },
+  {
+   "player": "Yordan Alvarez",
+   "mid": 670541,
+   "team": "HOU",
+   "odds": 255,
+   "prob": 24.8,
+   "score": 0.663,
+   "why": [
+    "park ×1.24",
+    "overdue",
+    "48% FB bat"
+   ],
+   "away": "CWS",
+   "home": "HOU",
+   "opp": "Sean Burke",
+   "time": "8:10 PM"
   }
  ]
 }

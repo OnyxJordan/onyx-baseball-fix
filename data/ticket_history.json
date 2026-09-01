@@ -844,5 +844,37 @@
   ],
   "result": "loss",
   "pnl": -10.0
+ },
+ {
+  "date": "2026-09-01",
+  "stake": 10,
+  "legs": [
+   {
+    "player": "Manny Machado",
+    "odds": 293,
+    "prob": 22.3,
+    "hit": null
+   },
+   {
+    "player": "Fernando Tatis Jr.",
+    "odds": 255,
+    "prob": 22.9,
+    "hit": null
+   },
+   {
+    "player": "Matt Olson",
+    "odds": 244,
+    "prob": 24.7,
+    "hit": null
+   },
+   {
+    "player": "Yordan Alvarez",
+    "odds": 255,
+    "prob": 24.8,
+    "hit": null
+   }
+  ],
+  "result": null,
+  "pnl": null
  }
 ]
