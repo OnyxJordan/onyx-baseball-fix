@@ -1,37 +1,4 @@
 {
-  "ARI": {
-    "venue": "Chase Field",
-    "temp": 88.1,
-    "precip": 1,
-    "wind_spd": 5.9,
-    "wind_dir": "SE",
-    "humidity_pct": 42,
-    "pressure_mb": 1009.9,
-    "roof": true,
-    "flag": "clear"
-  },
-  "WSH": {
-    "venue": "Nationals Park",
-    "temp": 85.3,
-    "precip": 10,
-    "wind_spd": 2.0,
-    "wind_dir": "N",
-    "humidity_pct": 66,
-    "pressure_mb": 1018.2,
-    "roof": false,
-    "flag": "clear"
-  },
-  "MIN": {
-    "venue": "Target Field",
-    "temp": 87.8,
-    "precip": 0,
-    "wind_spd": 5.6,
-    "wind_dir": "NW",
-    "humidity_pct": 39,
-    "pressure_mb": 1010.3,
-    "roof": false,
-    "flag": "clear"
-  },
   "CHC": {
     "venue": "Wrigley Field",
     "temp": 81.5,
@@ -43,14 +10,14 @@
     "roof": false,
     "flag": "clear"
   },
-  "TEX": {
-    "venue": "Globe Life Field",
-    "temp": 98.1,
+  "HOU": {
+    "venue": "Daikin Park",
+    "temp": 85.4,
     "precip": 0,
-    "wind_spd": 8.3,
-    "wind_dir": "SSE",
-    "humidity_pct": 27,
-    "pressure_mb": 1011.6,
+    "wind_spd": 3.3,
+    "wind_dir": "SSW",
+    "humidity_pct": 81,
+    "pressure_mb": 1013.5,
     "roof": true,
     "flag": "clear"
   },
@@ -76,37 +43,37 @@
     "roof": false,
     "flag": "clear"
   },
-  "CIN": {
-    "venue": "Great American Ball Park",
-    "temp": 90.7,
+  "ARI": {
+    "venue": "Chase Field",
+    "temp": 88.1,
     "precip": 0,
-    "wind_spd": 7.4,
-    "wind_dir": "SW",
-    "humidity_pct": 49,
-    "pressure_mb": 1016.1,
-    "roof": false,
-    "flag": "clear"
-  },
-  "BOS": {
-    "venue": "Fenway Park",
-    "temp": 75.7,
-    "precip": 0,
-    "wind_spd": 2.9,
-    "wind_dir": "E",
-    "humidity_pct": 51,
-    "pressure_mb": 1018.5,
-    "roof": false,
-    "flag": "clear"
-  },
-  "HOU": {
-    "venue": "Daikin Park",
-    "temp": 85.4,
-    "precip": 0,
-    "wind_spd": 3.3,
-    "wind_dir": "SSW",
-    "humidity_pct": 81,
-    "pressure_mb": 1013.5,
+    "wind_spd": 5.9,
+    "wind_dir": "SE",
+    "humidity_pct": 42,
+    "pressure_mb": 1009.9,
     "roof": true,
+    "flag": "clear"
+  },
+  "TEX": {
+    "venue": "Globe Life Field",
+    "temp": 98.1,
+    "precip": 0,
+    "wind_spd": 8.3,
+    "wind_dir": "SSE",
+    "humidity_pct": 27,
+    "pressure_mb": 1011.6,
+    "roof": true,
+    "flag": "clear"
+  },
+  "MIN": {
+    "venue": "Target Field",
+    "temp": 87.8,
+    "precip": 0,
+    "wind_spd": 5.6,
+    "wind_dir": "NW",
+    "humidity_pct": 39,
+    "pressure_mb": 1010.3,
+    "roof": false,
     "flag": "clear"
   }
 }
