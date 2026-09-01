@@ -1,26 +1,4 @@
 {
-  "COL": {
-    "venue": "Coors Field",
-    "temp": 85.4,
-    "precip": 8,
-    "wind_spd": 8.9,
-    "wind_dir": "NNE",
-    "humidity_pct": 18,
-    "pressure_mb": 1004.9,
-    "roof": false,
-    "flag": "clear"
-  },
-  "LAA": {
-    "venue": "Angel Stadium",
-    "temp": 74.5,
-    "precip": 0,
-    "wind_spd": 7.5,
-    "wind_dir": "SW",
-    "humidity_pct": 56,
-    "pressure_mb": 1014.3,
-    "roof": false,
-    "flag": "clear"
-  },
   "ARI": {
     "venue": "Chase Field",
     "temp": 97.9,
@@ -30,6 +8,17 @@
     "humidity_pct": 29,
     "pressure_mb": 1008.5,
     "roof": true,
+    "flag": "clear"
+  },
+  "COL": {
+    "venue": "Coors Field",
+    "temp": 85.4,
+    "precip": 8,
+    "wind_spd": 8.9,
+    "wind_dir": "NNE",
+    "humidity_pct": 18,
+    "pressure_mb": 1004.9,
+    "roof": false,
     "flag": "clear"
   }
 }
