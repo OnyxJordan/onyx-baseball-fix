@@ -1,26 +1,4 @@
 {
-  "WSH": {
-    "venue": "Nationals Park",
-    "temp": 96.3,
-    "precip": 1,
-    "wind_spd": 6.8,
-    "wind_dir": "WSW",
-    "humidity_pct": 38,
-    "pressure_mb": 1013.8,
-    "roof": false,
-    "flag": "clear"
-  },
-  "CHC": {
-    "venue": "Wrigley Field",
-    "temp": 91.8,
-    "precip": 3,
-    "wind_spd": 7.6,
-    "wind_dir": "SW",
-    "humidity_pct": 50,
-    "pressure_mb": 1012.4,
-    "roof": false,
-    "flag": "clear"
-  },
   "CLE": {
     "venue": "Progressive Field",
     "temp": 88.1,
@@ -29,61 +7,6 @@
     "wind_dir": "W",
     "humidity_pct": 64,
     "pressure_mb": 1014.0,
-    "roof": false,
-    "flag": "clear"
-  },
-  "BOS": {
-    "venue": "Fenway Park",
-    "temp": 66.1,
-    "precip": 22,
-    "wind_spd": 3.2,
-    "wind_dir": "E",
-    "humidity_pct": 88,
-    "pressure_mb": 1018.1,
-    "roof": false,
-    "flag": "clear"
-  },
-  "HOU": {
-    "venue": "Daikin Park",
-    "temp": 78.1,
-    "precip": 9,
-    "wind_spd": 8.6,
-    "wind_dir": "NNE",
-    "humidity_pct": 83,
-    "pressure_mb": 1012.9,
-    "roof": true,
-    "flag": "clear"
-  },
-  "COL": {
-    "venue": "Coors Field",
-    "temp": 85.7,
-    "precip": 3,
-    "wind_spd": 1.6,
-    "wind_dir": "S",
-    "humidity_pct": 19,
-    "pressure_mb": 1005.2,
-    "roof": false,
-    "flag": "clear"
-  },
-  "TEX": {
-    "venue": "Globe Life Field",
-    "temp": 95.4,
-    "precip": 5,
-    "wind_spd": 5.2,
-    "wind_dir": "SE",
-    "humidity_pct": 36,
-    "pressure_mb": 1012.7,
-    "roof": true,
-    "flag": "clear"
-  },
-  "LAD": {
-    "venue": "Dodger Stadium",
-    "temp": 70.1,
-    "precip": 0,
-    "wind_spd": 6.2,
-    "wind_dir": "WSW",
-    "humidity_pct": 59,
-    "pressure_mb": 1013.6,
     "roof": false,
     "flag": "clear"
   },
@@ -98,6 +21,72 @@
     "roof": false,
     "flag": "clear"
   },
+  "MIN": {
+    "venue": "Target Field",
+    "temp": 88.2,
+    "precip": 5,
+    "wind_spd": 7.4,
+    "wind_dir": "W",
+    "humidity_pct": 37,
+    "pressure_mb": 1011.5,
+    "roof": false,
+    "flag": "clear"
+  },
+  "BOS": {
+    "venue": "Fenway Park",
+    "temp": 66.1,
+    "precip": 28,
+    "wind_spd": 3.2,
+    "wind_dir": "E",
+    "humidity_pct": 88,
+    "pressure_mb": 1018.1,
+    "roof": false,
+    "flag": "clear"
+  },
+  "KC": {
+    "venue": "Kauffman Stadium",
+    "temp": 99.7,
+    "precip": 0,
+    "wind_spd": 11.7,
+    "wind_dir": "SSW",
+    "humidity_pct": 25,
+    "pressure_mb": 1012.1,
+    "roof": false,
+    "flag": "clear"
+  },
+  "CHC": {
+    "venue": "Wrigley Field",
+    "temp": 91.8,
+    "precip": 2,
+    "wind_spd": 7.6,
+    "wind_dir": "SW",
+    "humidity_pct": 50,
+    "pressure_mb": 1012.4,
+    "roof": false,
+    "flag": "clear"
+  },
+  "LAD": {
+    "venue": "Dodger Stadium",
+    "temp": 70.1,
+    "precip": 0,
+    "wind_spd": 6.2,
+    "wind_dir": "WSW",
+    "humidity_pct": 59,
+    "pressure_mb": 1013.6,
+    "roof": false,
+    "flag": "clear"
+  },
+  "WSH": {
+    "venue": "Nationals Park",
+    "temp": 96.3,
+    "precip": 1,
+    "wind_spd": 6.8,
+    "wind_dir": "WSW",
+    "humidity_pct": 38,
+    "pressure_mb": 1013.8,
+    "roof": false,
+    "flag": "clear"
+  },
   "CIN": {
     "venue": "Great American Ball Park",
     "temp": 96.1,
@@ -109,28 +98,41 @@
     "roof": false,
     "flag": "clear"
   },
-  "LAA": {
-    "venue": "Angel Stadium",
-    "temp": 77.3,
-    "precip": 0,
-    "wind_spd": 7.1,
-    "wind_dir": "SW",
-    "humidity_pct": 48,
-    "pressure_mb": 1013.6,
-    "roof": false,
-    "flag": "clear"
-  },
   "TB": {
     "venue": "Tropicana Field",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
+    "temp": 83.4,
+    "precip": 46,
+    "wind_spd": 3.5,
+    "wind_dir": "NE",
+    "humidity_pct": 79,
+    "pressure_mb": 1015.8,
     "roof": true,
     "flag": "clear"
   },
-  "MIN": {
-    "venue": "Target Field",
+  "HOU": {
+    "venue": "Daikin Park",
+    "temp": 78.1,
+    "precip": 17,
+    "wind_spd": 8.6,
+    "wind_dir": "NNE",
+    "humidity_pct": 83,
+    "pressure_mb": 1012.9,
+    "roof": true,
+    "flag": "clear"
+  },
+  "TEX": {
+    "venue": "Globe Life Field",
+    "temp": 95.4,
+    "precip": 5,
+    "wind_spd": 5.2,
+    "wind_dir": "SE",
+    "humidity_pct": 36,
+    "pressure_mb": 1012.7,
+    "roof": true,
+    "flag": "clear"
+  },
+  "LAA": {
+    "venue": "Angel Stadium",
     "temp": 72,
     "precip": 0,
     "wind_spd": 5,
@@ -138,8 +140,8 @@
     "roof": false,
     "flag": "clear"
   },
-  "KC": {
-    "venue": "Kauffman Stadium",
+  "COL": {
+    "venue": "Coors Field",
     "temp": 72,
     "precip": 0,
     "wind_spd": 5,
