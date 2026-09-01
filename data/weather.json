@@ -1,45 +1,12 @@
 {
-  "CHC": {
-    "venue": "Wrigley Field",
-    "temp": 82.1,
-    "precip": 19,
-    "wind_spd": 3.4,
-    "wind_dir": "W",
-    "humidity_pct": 80,
-    "pressure_mb": 1011.0,
-    "roof": false,
-    "flag": "clear"
-  },
-  "TB": {
-    "venue": "Tropicana Field",
-    "temp": 84.7,
-    "precip": 17,
-    "wind_spd": 7.6,
-    "wind_dir": "N",
-    "humidity_pct": 83,
-    "pressure_mb": 1016.0,
-    "roof": true,
-    "flag": "clear"
-  },
-  "ATL": {
-    "venue": "Truist Park",
+  "CIN": {
+    "venue": "Great American Ball Park",
     "temp": 90.7,
     "precip": 0,
-    "wind_spd": 2.1,
-    "wind_dir": "ENE",
-    "humidity_pct": 47,
-    "pressure_mb": 1017.6,
-    "roof": false,
-    "flag": "clear"
-  },
-  "LAA": {
-    "venue": "Angel Stadium",
-    "temp": 77.4,
-    "precip": 0,
-    "wind_spd": 7.7,
-    "wind_dir": "WSW",
-    "humidity_pct": 59,
-    "pressure_mb": 1011.7,
+    "wind_spd": 7.4,
+    "wind_dir": "SW",
+    "humidity_pct": 49,
+    "pressure_mb": 1016.1,
     "roof": false,
     "flag": "clear"
   },
@@ -54,25 +21,58 @@
     "roof": false,
     "flag": "clear"
   },
-  "COL": {
-    "venue": "Coors Field",
-    "temp": 84.8,
-    "precip": 7,
-    "wind_spd": 8.4,
-    "wind_dir": "ESE",
-    "humidity_pct": 23,
-    "pressure_mb": 1006.6,
+  "LAA": {
+    "venue": "Angel Stadium",
+    "temp": 77.8,
+    "precip": 0,
+    "wind_spd": 7.9,
+    "wind_dir": "WSW",
+    "humidity_pct": 59,
+    "pressure_mb": 1011.6,
     "roof": false,
+    "flag": "clear"
+  },
+  "CHC": {
+    "venue": "Wrigley Field",
+    "temp": 81.5,
+    "precip": 19,
+    "wind_spd": 5.0,
+    "wind_dir": "SSW",
+    "humidity_pct": 81,
+    "pressure_mb": 1012.0,
+    "roof": false,
+    "flag": "clear"
+  },
+  "HOU": {
+    "venue": "Daikin Park",
+    "temp": 85.4,
+    "precip": 0,
+    "wind_spd": 3.3,
+    "wind_dir": "SSW",
+    "humidity_pct": 81,
+    "pressure_mb": 1013.5,
+    "roof": true,
     "flag": "clear"
   },
   "TEX": {
     "venue": "Globe Life Field",
-    "temp": 98.0,
+    "temp": 98.1,
     "precip": 0,
-    "wind_spd": 10.1,
-    "wind_dir": "SE",
+    "wind_spd": 8.3,
+    "wind_dir": "SSE",
     "humidity_pct": 27,
     "pressure_mb": 1011.6,
+    "roof": true,
+    "flag": "clear"
+  },
+  "ARI": {
+    "venue": "Chase Field",
+    "temp": 88.1,
+    "precip": 1,
+    "wind_spd": 5.9,
+    "wind_dir": "SE",
+    "humidity_pct": 42,
+    "pressure_mb": 1009.9,
     "roof": true,
     "flag": "clear"
   },
@@ -87,48 +87,37 @@
     "roof": false,
     "flag": "clear"
   },
-  "ARI": {
-    "venue": "Chase Field",
-    "temp": 87.9,
-    "precip": 1,
-    "wind_spd": 4.6,
-    "wind_dir": "SE",
-    "humidity_pct": 43,
-    "pressure_mb": 1010.0,
-    "roof": true,
-    "flag": "clear"
-  },
-  "CIN": {
-    "venue": "Great American Ball Park",
-    "temp": 90.7,
-    "precip": 0,
-    "wind_spd": 7.4,
-    "wind_dir": "SW",
-    "humidity_pct": 49,
-    "pressure_mb": 1016.1,
-    "roof": false,
-    "flag": "clear"
-  },
   "MIN": {
     "venue": "Target Field",
-    "temp": 87.7,
+    "temp": 87.8,
     "precip": 0,
-    "wind_spd": 6.3,
-    "wind_dir": "WNW",
-    "humidity_pct": 38,
-    "pressure_mb": 1010.0,
+    "wind_spd": 5.6,
+    "wind_dir": "NW",
+    "humidity_pct": 39,
+    "pressure_mb": 1010.3,
     "roof": false,
     "flag": "clear"
   },
-  "HOU": {
-    "venue": "Daikin Park",
-    "temp": 85.9,
-    "precip": 0,
-    "wind_spd": 2.3,
-    "wind_dir": "SSW",
-    "humidity_pct": 82,
-    "pressure_mb": 1013.2,
+  "TB": {
+    "venue": "Tropicana Field",
+    "temp": 84.7,
+    "precip": 17,
+    "wind_spd": 7.6,
+    "wind_dir": "N",
+    "humidity_pct": 83,
+    "pressure_mb": 1016.0,
     "roof": true,
+    "flag": "clear"
+  },
+  "COL": {
+    "venue": "Coors Field",
+    "temp": 84.9,
+    "precip": 7,
+    "wind_spd": 9.7,
+    "wind_dir": "SE",
+    "humidity_pct": 24,
+    "pressure_mb": 1008.2,
+    "roof": false,
     "flag": "clear"
   }
 }
