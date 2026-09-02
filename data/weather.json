@@ -1,4 +1,26 @@
 {
+  "LAD": {
+    "venue": "Dodger Stadium",
+    "temp": 71.2,
+    "precip": 0,
+    "wind_spd": 6.4,
+    "wind_dir": "WSW",
+    "humidity_pct": 59,
+    "pressure_mb": 1013.1,
+    "roof": false,
+    "flag": "clear"
+  },
+  "CHC": {
+    "venue": "Wrigley Field",
+    "temp": 92.2,
+    "precip": 0,
+    "wind_spd": 9.7,
+    "wind_dir": "SW",
+    "humidity_pct": 49,
+    "pressure_mb": 1010.6,
+    "roof": false,
+    "flag": "clear"
+  },
   "PIT": {
     "venue": "PNC Park",
     "temp": 92.5,
@@ -7,6 +29,17 @@
     "wind_dir": "SW",
     "humidity_pct": 45,
     "pressure_mb": 1013.7,
+    "roof": false,
+    "flag": "clear"
+  },
+  "LAA": {
+    "venue": "Angel Stadium",
+    "temp": 76.0,
+    "precip": 0,
+    "wind_spd": 7.9,
+    "wind_dir": "WSW",
+    "humidity_pct": 53,
+    "pressure_mb": 1013.8,
     "roof": false,
     "flag": "clear"
   },
@@ -32,50 +65,6 @@
     "roof": true,
     "flag": "clear"
   },
-  "MIN": {
-    "venue": "Target Field",
-    "temp": 86.6,
-    "precip": 0,
-    "wind_spd": 2.5,
-    "wind_dir": "E",
-    "humidity_pct": 44,
-    "pressure_mb": 1008.9,
-    "roof": false,
-    "flag": "clear"
-  },
-  "LAD": {
-    "venue": "Dodger Stadium",
-    "temp": 71.2,
-    "precip": 0,
-    "wind_spd": 6.4,
-    "wind_dir": "WSW",
-    "humidity_pct": 59,
-    "pressure_mb": 1013.1,
-    "roof": false,
-    "flag": "clear"
-  },
-  "LAA": {
-    "venue": "Angel Stadium",
-    "temp": 76.0,
-    "precip": 0,
-    "wind_spd": 7.9,
-    "wind_dir": "WSW",
-    "humidity_pct": 53,
-    "pressure_mb": 1013.8,
-    "roof": false,
-    "flag": "clear"
-  },
-  "KC": {
-    "venue": "Kauffman Stadium",
-    "temp": 98.8,
-    "precip": 0,
-    "wind_spd": 11.8,
-    "wind_dir": "SSW",
-    "humidity_pct": 27,
-    "pressure_mb": 1010.3,
-    "roof": false,
-    "flag": "clear"
-  },
   "CLE": {
     "venue": "Progressive Field",
     "temp": 92.7,
@@ -87,14 +76,25 @@
     "roof": false,
     "flag": "clear"
   },
-  "CHC": {
-    "venue": "Wrigley Field",
-    "temp": 92.2,
+  "MIN": {
+    "venue": "Target Field",
+    "temp": 86.6,
     "precip": 0,
-    "wind_spd": 9.7,
-    "wind_dir": "SW",
-    "humidity_pct": 49,
-    "pressure_mb": 1010.6,
+    "wind_spd": 2.5,
+    "wind_dir": "E",
+    "humidity_pct": 44,
+    "pressure_mb": 1008.9,
+    "roof": false,
+    "flag": "clear"
+  },
+  "KC": {
+    "venue": "Kauffman Stadium",
+    "temp": 98.8,
+    "precip": 0,
+    "wind_spd": 11.8,
+    "wind_dir": "SSW",
+    "humidity_pct": 27,
+    "pressure_mb": 1010.3,
     "roof": false,
     "flag": "clear"
   }
