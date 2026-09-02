@@ -1,24 +1,24 @@
 {
-  "CHC": {
-    "venue": "Wrigley Field",
-    "temp": 87.2,
+  "COL": {
+    "venue": "Coors Field",
+    "temp": 88.1,
     "precip": 1,
-    "wind_spd": 2.1,
-    "wind_dir": "SW",
-    "humidity_pct": 76,
-    "pressure_mb": 1012.7,
+    "wind_spd": 4.1,
+    "wind_dir": "NE",
+    "humidity_pct": 14,
+    "pressure_mb": 1005.2,
     "roof": false,
     "flag": "clear"
   },
-  "HOU": {
-    "venue": "Daikin Park",
-    "temp": 79.9,
-    "precip": 17,
-    "wind_spd": 2.2,
-    "wind_dir": "W",
-    "humidity_pct": 90,
-    "pressure_mb": 1012.3,
-    "roof": true,
+  "LAD": {
+    "venue": "Dodger Stadium",
+    "temp": 70.6,
+    "precip": 0,
+    "wind_spd": 6.4,
+    "wind_dir": "WSW",
+    "humidity_pct": 70,
+    "pressure_mb": 1012.8,
+    "roof": false,
     "flag": "clear"
   },
   "ARI": {
@@ -41,39 +41,6 @@
     "humidity_pct": 50,
     "pressure_mb": 1013.1,
     "roof": false,
-    "flag": "clear"
-  },
-  "LAD": {
-    "venue": "Dodger Stadium",
-    "temp": 70.6,
-    "precip": 0,
-    "wind_spd": 6.4,
-    "wind_dir": "WSW",
-    "humidity_pct": 70,
-    "pressure_mb": 1012.8,
-    "roof": false,
-    "flag": "clear"
-  },
-  "COL": {
-    "venue": "Coors Field",
-    "temp": 88.1,
-    "precip": 1,
-    "wind_spd": 4.1,
-    "wind_dir": "NE",
-    "humidity_pct": 14,
-    "pressure_mb": 1005.2,
-    "roof": false,
-    "flag": "clear"
-  },
-  "TEX": {
-    "venue": "Globe Life Field",
-    "temp": 95.6,
-    "precip": 2,
-    "wind_spd": 8.9,
-    "wind_dir": "ESE",
-    "humidity_pct": 41,
-    "pressure_mb": 1011.9,
-    "roof": true,
     "flag": "clear"
   }
 }
