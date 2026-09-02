@@ -124,31 +124,22 @@ jobs:
         if: steps.deployment.outcome == 'failure'
         uses: actions/deploy-pages@v4
   requeue:
-    # GitHub's event delivery for this repo went dark on 8/27: crons AND
-    # workflow_run completions silently stopped arriving (only direct API
-    # dispatches worked). So the chain lives INSIDE the run: after each
-    # refresh, this job sleeps to the next slot and dispatches the next run
-    # via the API - no GitHub event delivery involved anywhere. A cron that
-    # does get delivered cancels the sleeper (concurrency) and re-arms the
-    # chain itself; a dispatch failure retries 3x before giving up to the
-    # cron backup.
+    # Chain hand-off: dispatch the SLEEPER workflow (chain.yml) and exit in
+    # seconds. The sleep used to live in this job, which kept the whole run
+    # 'in progress' for 30 minutes and blocked newly dispatched runs in the
+    # onyx-build group (a merged fix waited out the nap on 9/2). The sleeper
+    # now holds only its own group; refresh runs finish in ~5 minutes.
     needs: refresh
     if: always()
     runs-on: ubuntu-latest
-    timeout-minutes: 135
+    timeout-minutes: 5
     steps:
-      - name: Wait for the next slot (30 min in slate hours, 2h overnight)
-        run: |
-          H=$(TZ=America/New_York date +%-H)
-          if [ "$H" -ge 11 ] || [ "$H" -eq 0 ]; then S=1800; else S=7200; fi
-          echo "ET hour $H -> sleeping $S seconds"
-          sleep $S
-      - name: Dispatch the next refresh
+      - name: Arm the chain sleeper
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           for i in 1 2 3; do
-            gh workflow run refresh_build.yml --repo ${{ github.repository }} --ref main && exit 0
-            sleep $((i * 20))
+            gh workflow run chain.yml --repo ${{ github.repository }} --ref main && exit 0
+            sleep $((i * 15))
           done
-          echo "::warning::could not dispatch next refresh; cron backup takes over"
+          echo "::warning::could not arm chain sleeper; cron backup takes over"
