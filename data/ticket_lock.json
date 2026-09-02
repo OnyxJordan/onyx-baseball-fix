@@ -1,57 +1,56 @@
 {
- "date": "2026-09-01",
- "locked": true,
+ "date": "2026-09-02",
+ "locked": false,
  "legs": [
   {
    "player": "Manny Machado",
    "mid": 592518,
    "team": "SD",
-   "odds": 338,
-   "prob": 21.1,
-   "score": 0.781,
+   "odds": 343,
+   "prob": 22.0,
+   "score": 0.908,
    "why": [
+    "pitcher matchup ×1.37",
     "park ×1.31",
-    "pitcher matchup ×1.18",
-    "soft bullpen"
+    "wind/heat ×1.12"
    ],
    "away": "SD",
    "home": "CIN",
-   "opp": "Nick Lodolo",
-   "time": "6:40 PM"
+   "opp": "Brandon Williamson",
+   "time": "12:40 PM"
   },
   {
    "player": "Fernando Tatis Jr.",
    "mid": 665487,
    "team": "SD",
-   "odds": 288,
-   "prob": 21.6,
-   "score": 0.706,
+   "odds": 310,
+   "prob": 22.5,
+   "score": 0.827,
    "why": [
+    "pitcher matchup ×1.37",
     "park ×1.31",
-    "pitcher matchup ×1.18",
-    "soft bullpen"
+    "wind/heat ×1.12"
    ],
    "away": "SD",
    "home": "CIN",
-   "opp": "Nick Lodolo",
-   "time": "6:40 PM"
+   "opp": "Brandon Williamson",
+   "time": "12:40 PM"
   },
   {
-   "player": "Yordan Alvarez",
-   "mid": 670541,
-   "team": "HOU",
-   "odds": 264,
-   "prob": 24.6,
-   "score": 0.66,
+   "player": "Hunter Goodman",
+   "mid": 696100,
+   "team": "COL",
+   "odds": 281,
+   "prob": 26.4,
+   "score": 0.65,
    "why": [
-    "park ×1.24",
-    "overdue",
-    "48% FB bat"
+    "park ×1.35",
+    "pitcher matchup ×1.12"
    ],
-   "away": "CWS",
-   "home": "HOU",
-   "opp": "Sean Burke",
-   "time": "8:10 PM"
+   "away": "BAL",
+   "home": "COL",
+   "opp": "Trevor Rogers",
+   "time": "3:10 PM"
   }
  ]
 }
