@@ -632,17 +632,17 @@ if _tlock.get("date") != stamp or not _slate_started:
         _tl_seen.add(k)
         _tl_pool.append(r)
     if len(_tl_pool) >= 2:
-        # v35 ticket discipline: 4 legs MAX (a 5th leg multiplies risk faster
-        # than payout at these probabilities) and no more than 2 bats from
-        # one team — a single opposing pitcher must never be able to kill
-        # three legs by himself.
+        # v35 ticket discipline: 4 legs MAX. 9/2 tune-up: ONE bat per team
+        # (was 2) — three of the last four tickets doubled Padres bats, so a
+        # single pitcher/park/lineup night was killing multiple legs at once;
+        # independent games keep the legs' fates uncorrelated.
         _legs_n = max(2, min(4, sum(1 for r in _tl_pool if (r.get("ticket_score") or 0) >= 0.65)))
         _tl_take, _team_ct = [], {}
         for r in _tl_pool:
             if len(_tl_take) >= _legs_n:
                 break
             tm = r.get("team") or ""
-            if _team_ct.get(tm, 0) >= 2:
+            if _team_ct.get(tm, 0) >= 1:
                 continue
             _team_ct[tm] = _team_ct.get(tm, 0) + 1
             _tl_take.append(r)

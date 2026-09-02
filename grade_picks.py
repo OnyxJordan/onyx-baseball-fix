@@ -262,6 +262,13 @@ def main():
                     p["hit"] = True; graded += 1
                 elif key in appeared:
                     p["hit"] = False; graded += 1
+                elif (cutoff - d).days >= 2:
+                    # two full days with no appearance = scratch. Mark it void
+                    # (excluded from the record by the strict true/false
+                    # checks) instead of leaving an eternal 'pending' row —
+                    # B. Rice 8/30 sat pending for 3 days.
+                    p["hit"] = "void"; graded += 1
+                    print(f"  {iso}: {p.get('player') or p.get('name')} scratched - voided")
                 else:
                     voided += 1
                     print(f"  {iso}: {p.get('player') or p.get('name')} never appeared - left pending")

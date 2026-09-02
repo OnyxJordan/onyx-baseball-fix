@@ -6046,7 +6046,7 @@ function buildSlamTicket() {
     for (const r of pool) {
       if (picks.length >= legCt) break;
       const tm = r.team || '';
-      if ((teamCt[tm] || 0) >= 2) continue;
+      if ((teamCt[tm] || 0) >= 1) continue;   // 9/2: one bat per team
       teamCt[tm] = (teamCt[tm] || 0) + 1;
       picks.push(r);
     }
@@ -6310,7 +6310,7 @@ function renderPower() {
     </div>
     <div style="display:flex;flex-wrap:wrap;gap:7px">${_tp.map(p => {
       const lp = livePlayerData[nkjs(p.player || '')] || {};
-      const st = p.hit === true || lp.hitHR ? ['HR ✓', '#61e970'] : p.hit === false ? ['miss', '#ef4444'] : ['pending', 'var(--text3)'];
+      const st = p.hit === true || lp.hitHR ? ['HR ✓', '#61e970'] : p.hit === false ? ['miss', '#ef4444'] : p.hit === 'void' ? ['scratch', 'var(--text3)'] : ['pending', 'var(--text3)'];
       return `<span data-p="${(p.player || '').replace(/"/g, '&quot;')}" onclick="openPlayerCard(this.dataset.p)" style="cursor:pointer;display:inline-flex;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:5px 9px;font-size:11px;font-weight:700">
         ${p.tier === 'ticket' ? '🎟 ' : ''}${p.player}${p.odds ? ` <i style="font-style:normal;color:var(--text3)">${fmtOdds(p.odds)}</i>` : ''}
         <i style="font-style:normal;font-size:9px;font-weight:800;color:${st[1]}">${st[0]}</i></span>`;
@@ -6537,9 +6537,9 @@ function renderRecord() {
     const pnlCol = isPending ? 'var(--text3)' : p.pnl >= 0 ? '#61e970' : '#ef4444';
     const cumStr = (p.cum >= 0 ? '+$' : '-$') + Math.abs(p.cum).toFixed(2);
     const cumCol = p.cum >= 0 ? '#61e970' : '#ef4444';
-    const stTxt = p.hit === true ? '✓ HR' : p.hit === false ? '✗ No' : '⏳ Pending';
-    const stBg  = p.hit === true ? 'rgba(97,233,112,.2)' : p.hit === false ? 'rgba(239,68,68,.15)' : 'rgba(215,149,255,.15)';
-    const stCol = p.hit === true ? '#4ade80' : p.hit === false ? '#f87171' : '#d795ff';
+    const stTxt = p.hit === true ? '✓ HR' : p.hit === false ? '✗ No' : p.hit === 'void' ? '− Scratch' : '⏳ Pending';
+    const stBg  = p.hit === true ? 'rgba(97,233,112,.2)' : p.hit === false ? 'rgba(239,68,68,.15)' : p.hit === 'void' ? 'rgba(148,163,184,.12)' : 'rgba(215,149,255,.15)';
+    const stCol = p.hit === true ? '#4ade80' : p.hit === false ? '#f87171' : p.hit === 'void' ? '#94a3b8' : '#d795ff';
     const impliedPct = ((mlToProb(p.odds) || 0) * 100).toFixed(0);
     tbodyHtml += `<tr style="background:${p.hit?'rgba(97,233,112,0.04)':'transparent'}">
       <td style="padding:7px 8px;border-bottom:1px solid rgba(26,37,53,.5);font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;font-size:11px;color:var(--text3);text-align:left">${p.date}</td>
