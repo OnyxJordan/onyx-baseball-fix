@@ -1,0 +1,35 @@
+name: Refresh chain sleeper
+# The self-driving loop's sleeper, in its OWN concurrency group so a napping
+# run never blocks a real refresh (the in-run sleeper did exactly that on
+# 9/2). Armed via API dispatch from every refresh's requeue job - no GitHub
+# event delivery in the loop (the 8/27 scheduler blackout dropped crons AND
+# workflow_run events; only API dispatches kept working). cancel-in-progress
+# keeps exactly one sleeper; delivered crons re-arm the chain through their
+# own requeue job.
+on:
+  workflow_dispatch:
+permissions:
+  actions: write
+concurrency:
+  group: onyx-chain
+  cancel-in-progress: true
+jobs:
+  sleeper:
+    runs-on: ubuntu-latest
+    timeout-minutes: 135
+    steps:
+      - name: Wait for the next slot (30 min in slate hours, 2h overnight)
+        run: |
+          H=$(TZ=America/New_York date +%-H)
+          if [ "$H" -ge 11 ] || [ "$H" -eq 0 ]; then S=1800; else S=7200; fi
+          echo "ET hour $H -> sleeping $S seconds"
+          sleep $S
+      - name: Dispatch the next refresh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for i in 1 2 3; do
+            gh workflow run refresh_build.yml --repo ${{ github.repository }} --ref main && exit 0
+            sleep $((i * 20))
+          done
+          echo "::warning::could not dispatch next refresh; cron backup takes over"
