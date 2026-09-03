@@ -1,4 +1,15 @@
 {
+  "BAL": {
+    "venue": "Camden Yards",
+    "temp": 86.1,
+    "precip": 0,
+    "wind_spd": 2.3,
+    "wind_dir": "SSW",
+    "humidity_pct": 55,
+    "pressure_mb": 1012.1,
+    "roof": false,
+    "flag": "clear"
+  },
   "KC": {
     "venue": "Kauffman Stadium",
     "temp": 97.4,
@@ -13,12 +24,23 @@
   "SEA": {
     "venue": "T-Mobile Park",
     "temp": 64.0,
-    "precip": 9,
+    "precip": 10,
     "wind_spd": 5.1,
     "wind_dir": "SW",
     "humidity_pct": 62,
     "pressure_mb": 1010.0,
     "roof": false,
+    "flag": "clear"
+  },
+  "TEX": {
+    "venue": "Globe Life Field",
+    "temp": 90.1,
+    "precip": 6,
+    "wind_spd": 12.6,
+    "wind_dir": "SE",
+    "humidity_pct": 53,
+    "pressure_mb": 1010.3,
+    "roof": true,
     "flag": "clear"
   },
   "LAD": {
@@ -30,28 +52,6 @@
     "humidity_pct": 63,
     "pressure_mb": 1010.7,
     "roof": false,
-    "flag": "clear"
-  },
-  "BAL": {
-    "venue": "Camden Yards",
-    "temp": 86.1,
-    "precip": 0,
-    "wind_spd": 2.3,
-    "wind_dir": "SSW",
-    "humidity_pct": 55,
-    "pressure_mb": 1012.1,
-    "roof": false,
-    "flag": "clear"
-  },
-  "TEX": {
-    "venue": "Globe Life Field",
-    "temp": 90.1,
-    "precip": 7,
-    "wind_spd": 12.6,
-    "wind_dir": "SE",
-    "humidity_pct": 53,
-    "pressure_mb": 1010.3,
-    "roof": true,
     "flag": "clear"
   },
   "CHC": {
