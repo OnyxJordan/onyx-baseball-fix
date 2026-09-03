@@ -1,46 +1,13 @@
 {
   "HOU": {
     "venue": "Daikin Park",
-    "temp": 86.8,
+    "temp": 88.8,
     "precip": 11,
-    "wind_spd": 9.7,
-    "wind_dir": "SSE",
-    "humidity_pct": 60,
-    "pressure_mb": 1011.7,
-    "roof": true,
-    "flag": "clear"
-  },
-  "CHC": {
-    "venue": "Wrigley Field",
-    "temp": 91.4,
-    "precip": 0,
-    "wind_spd": 9.3,
-    "wind_dir": "SW",
-    "humidity_pct": 53,
-    "pressure_mb": 1011.5,
-    "roof": false,
-    "flag": "clear"
-  },
-  "LAA": {
-    "venue": "Angel Stadium",
-    "temp": 76.8,
-    "precip": 0,
-    "wind_spd": 8.3,
-    "wind_dir": "WSW",
-    "humidity_pct": 47,
-    "pressure_mb": 1013.7,
-    "roof": false,
-    "flag": "clear"
-  },
-  "LAD": {
-    "venue": "Dodger Stadium",
-    "temp": 71.2,
-    "precip": 0,
-    "wind_spd": 5.8,
-    "wind_dir": "WSW",
+    "wind_spd": 14.6,
+    "wind_dir": "S",
     "humidity_pct": 55,
-    "pressure_mb": 1012.8,
-    "roof": false,
+    "pressure_mb": 1011.4,
+    "roof": true,
     "flag": "clear"
   },
   "KC": {
@@ -62,6 +29,39 @@
     "wind_dir": "ESE",
     "humidity_pct": 54,
     "pressure_mb": 1009.2,
+    "roof": false,
+    "flag": "clear"
+  },
+  "LAD": {
+    "venue": "Dodger Stadium",
+    "temp": 71.2,
+    "precip": 0,
+    "wind_spd": 6.4,
+    "wind_dir": "WSW",
+    "humidity_pct": 54,
+    "pressure_mb": 1013.6,
+    "roof": false,
+    "flag": "clear"
+  },
+  "CHC": {
+    "venue": "Wrigley Field",
+    "temp": 91.4,
+    "precip": 0,
+    "wind_spd": 9.3,
+    "wind_dir": "SW",
+    "humidity_pct": 53,
+    "pressure_mb": 1011.5,
+    "roof": false,
+    "flag": "clear"
+  },
+  "LAA": {
+    "venue": "Angel Stadium",
+    "temp": 76.8,
+    "precip": 0,
+    "wind_spd": 8.4,
+    "wind_dir": "WSW",
+    "humidity_pct": 46,
+    "pressure_mb": 1013.3,
     "roof": false,
     "flag": "clear"
   }
