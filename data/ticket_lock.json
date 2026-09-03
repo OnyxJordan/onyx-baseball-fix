@@ -1,32 +1,16 @@
 {
  "date": "2026-09-03",
- "locked": true,
+ "locked": false,
  "legs": [
-  {
-   "player": "Brandon Lowe",
-   "mid": 664040,
-   "team": "PIT",
-   "odds": 304,
-   "prob": 22.5,
-   "score": 0.598,
-   "why": [
-    "pitcher matchup ×1.19",
-    "wind/heat ×1.10"
-   ],
-   "away": "SF",
-   "home": "PIT",
-   "opp": "Blade Tidwell",
-   "time": "12:35 PM"
-  },
   {
    "player": "Kyle Stowers",
    "mid": 669065,
    "team": "MIA",
-   "odds": 312,
-   "prob": 21.4,
-   "score": 0.582,
+   "odds": 319,
+   "prob": 21.3,
+   "score": 0.58,
    "why": [
-    "wind/heat ×1.17",
+    "wind/heat ×1.15",
     "soft bullpen",
     "platoon edge"
    ],
@@ -34,6 +18,23 @@
    "home": "KC",
    "opp": "Michael Wacha",
    "time": "7:40 PM"
+  },
+  {
+   "player": "Jake Bauers",
+   "mid": 641343,
+   "team": "MIL",
+   "odds": 380,
+   "prob": 19.0,
+   "score": 0.572,
+   "why": [
+    "soft bullpen",
+    "wind/heat ×1.17",
+    "due"
+   ],
+   "away": "MIL",
+   "home": "CHC",
+   "opp": "Kevin Gausman",
+   "time": "7:15 PM"
   }
  ]
 }
