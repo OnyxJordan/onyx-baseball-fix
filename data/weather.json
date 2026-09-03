@@ -1,13 +1,13 @@
 {
-  "HOU": {
-    "venue": "Daikin Park",
-    "temp": 89.8,
-    "precip": 25,
-    "wind_spd": 5.2,
-    "wind_dir": "SE",
-    "humidity_pct": 65,
-    "pressure_mb": 1012.8,
-    "roof": true,
+  "CLE": {
+    "venue": "Progressive Field",
+    "temp": 88.6,
+    "precip": 4,
+    "wind_spd": 7.7,
+    "wind_dir": "WNW",
+    "humidity_pct": 66,
+    "pressure_mb": 1013.1,
+    "roof": false,
     "flag": "clear"
   },
   "SEA": {
@@ -21,14 +21,14 @@
     "roof": false,
     "flag": "clear"
   },
-  "PIT": {
-    "venue": "PNC Park",
-    "temp": 78.5,
-    "precip": 24,
-    "wind_spd": 7.7,
-    "wind_dir": "SSE",
-    "humidity_pct": 85,
-    "pressure_mb": 1016.6,
+  "BAL": {
+    "venue": "Camden Yards",
+    "temp": 87.2,
+    "precip": 3,
+    "wind_spd": 2.7,
+    "wind_dir": "NW",
+    "humidity_pct": 54,
+    "pressure_mb": 1013.3,
     "roof": false,
     "flag": "clear"
   },
@@ -43,26 +43,15 @@
     "roof": false,
     "flag": "clear"
   },
-  "TEX": {
-    "venue": "Globe Life Field",
-    "temp": 86.2,
-    "precip": 9,
-    "wind_spd": 9.4,
+  "HOU": {
+    "venue": "Daikin Park",
+    "temp": 89.8,
+    "precip": 15,
+    "wind_spd": 5.2,
     "wind_dir": "SE",
-    "humidity_pct": 64,
-    "pressure_mb": 1010.0,
+    "humidity_pct": 65,
+    "pressure_mb": 1012.8,
     "roof": true,
-    "flag": "clear"
-  },
-  "BAL": {
-    "venue": "Camden Yards",
-    "temp": 87.2,
-    "precip": 4,
-    "wind_spd": 2.7,
-    "wind_dir": "NW",
-    "humidity_pct": 54,
-    "pressure_mb": 1013.3,
-    "roof": false,
     "flag": "clear"
   },
   "LAD": {
@@ -76,25 +65,36 @@
     "roof": false,
     "flag": "clear"
   },
-  "CLE": {
-    "venue": "Progressive Field",
-    "temp": 88.6,
-    "precip": 4,
-    "wind_spd": 7.7,
-    "wind_dir": "WNW",
-    "humidity_pct": 66,
-    "pressure_mb": 1013.1,
-    "roof": false,
-    "flag": "clear"
-  },
   "CHC": {
     "venue": "Wrigley Field",
     "temp": 75.9,
-    "precip": 4,
+    "precip": 5,
     "wind_spd": 8.3,
     "wind_dir": "E",
     "humidity_pct": 84,
     "pressure_mb": 1012.1,
+    "roof": false,
+    "flag": "clear"
+  },
+  "TEX": {
+    "venue": "Globe Life Field",
+    "temp": 86.2,
+    "precip": 9,
+    "wind_spd": 9.4,
+    "wind_dir": "SE",
+    "humidity_pct": 64,
+    "pressure_mb": 1010.0,
+    "roof": true,
+    "flag": "clear"
+  },
+  "PIT": {
+    "venue": "PNC Park",
+    "temp": 78.5,
+    "precip": 24,
+    "wind_spd": 7.7,
+    "wind_dir": "SSE",
+    "humidity_pct": 85,
+    "pressure_mb": 1016.6,
     "roof": false,
     "flag": "clear"
   }
