@@ -10,14 +10,14 @@
     "roof": false,
     "flag": "clear"
   },
-  "BAL": {
-    "venue": "Camden Yards",
-    "temp": 86.4,
-    "precip": 2,
-    "wind_spd": 2.1,
-    "wind_dir": "WNW",
-    "humidity_pct": 60,
-    "pressure_mb": 1013.7,
+  "KC": {
+    "venue": "Kauffman Stadium",
+    "temp": 98.7,
+    "precip": 0,
+    "wind_spd": 9.0,
+    "wind_dir": "S",
+    "humidity_pct": 31,
+    "pressure_mb": 1009.6,
     "roof": false,
     "flag": "clear"
   },
@@ -32,37 +32,15 @@
     "roof": false,
     "flag": "clear"
   },
-  "KC": {
-    "venue": "Kauffman Stadium",
-    "temp": 98.7,
-    "precip": 0,
-    "wind_spd": 9.0,
-    "wind_dir": "S",
-    "humidity_pct": 31,
-    "pressure_mb": 1009.6,
+  "BAL": {
+    "venue": "Camden Yards",
+    "temp": 86.4,
+    "precip": 2,
+    "wind_spd": 2.1,
+    "wind_dir": "WNW",
+    "humidity_pct": 60,
+    "pressure_mb": 1013.7,
     "roof": false,
-    "flag": "clear"
-  },
-  "LAD": {
-    "venue": "Dodger Stadium",
-    "temp": 70.3,
-    "precip": 0,
-    "wind_spd": 6.2,
-    "wind_dir": "WSW",
-    "humidity_pct": 66,
-    "pressure_mb": 1010.2,
-    "roof": false,
-    "flag": "clear"
-  },
-  "HOU": {
-    "venue": "Daikin Park",
-    "temp": 87.6,
-    "precip": 15,
-    "wind_spd": 4.5,
-    "wind_dir": "E",
-    "humidity_pct": 77,
-    "pressure_mb": 1013.8,
-    "roof": true,
     "flag": "clear"
   },
   "TEX": {
@@ -76,6 +54,17 @@
     "roof": true,
     "flag": "clear"
   },
+  "LAD": {
+    "venue": "Dodger Stadium",
+    "temp": 70.3,
+    "precip": 0,
+    "wind_spd": 6.2,
+    "wind_dir": "WSW",
+    "humidity_pct": 66,
+    "pressure_mb": 1010.2,
+    "roof": false,
+    "flag": "clear"
+  },
   "SEA": {
     "venue": "T-Mobile Park",
     "temp": 63.8,
@@ -85,6 +74,17 @@
     "humidity_pct": 62,
     "pressure_mb": 1009.0,
     "roof": false,
+    "flag": "clear"
+  },
+  "HOU": {
+    "venue": "Daikin Park",
+    "temp": 87.6,
+    "precip": 15,
+    "wind_spd": 4.5,
+    "wind_dir": "E",
+    "humidity_pct": 77,
+    "pressure_mb": 1013.8,
+    "roof": true,
     "flag": "clear"
   }
 }
