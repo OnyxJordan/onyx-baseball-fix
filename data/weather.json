@@ -1,57 +1,24 @@
 {
   "KC": {
     "venue": "Kauffman Stadium",
-    "temp": 98.1,
+    "temp": 97.4,
     "precip": 0,
-    "wind_spd": 8.8,
+    "wind_spd": 8.6,
     "wind_dir": "S",
-    "humidity_pct": 34,
+    "humidity_pct": 35,
     "pressure_mb": 1008.2,
-    "roof": false,
-    "flag": "clear"
-  },
-  "BAL": {
-    "venue": "Camden Yards",
-    "temp": 86.3,
-    "precip": 0,
-    "wind_spd": 2.7,
-    "wind_dir": "S",
-    "humidity_pct": 61,
-    "pressure_mb": 1012.4,
     "roof": false,
     "flag": "clear"
   },
   "SEA": {
     "venue": "T-Mobile Park",
-    "temp": 63.6,
+    "temp": 64.0,
     "precip": 9,
-    "wind_spd": 3.8,
-    "wind_dir": "WSW",
-    "humidity_pct": 64,
-    "pressure_mb": 1009.7,
+    "wind_spd": 5.1,
+    "wind_dir": "SW",
+    "humidity_pct": 62,
+    "pressure_mb": 1010.0,
     "roof": false,
-    "flag": "clear"
-  },
-  "CHC": {
-    "venue": "Wrigley Field",
-    "temp": 78.7,
-    "precip": 4,
-    "wind_spd": 6.5,
-    "wind_dir": "SE",
-    "humidity_pct": 72,
-    "pressure_mb": 1012.0,
-    "roof": false,
-    "flag": "clear"
-  },
-  "TEX": {
-    "venue": "Globe Life Field",
-    "temp": 90.2,
-    "precip": 7,
-    "wind_spd": 11.9,
-    "wind_dir": "SE",
-    "humidity_pct": 54,
-    "pressure_mb": 1008.8,
-    "roof": true,
     "flag": "clear"
   },
   "LAD": {
@@ -61,7 +28,40 @@
     "wind_spd": 6.1,
     "wind_dir": "WSW",
     "humidity_pct": 63,
-    "pressure_mb": 1010.9,
+    "pressure_mb": 1010.7,
+    "roof": false,
+    "flag": "clear"
+  },
+  "BAL": {
+    "venue": "Camden Yards",
+    "temp": 86.1,
+    "precip": 0,
+    "wind_spd": 2.3,
+    "wind_dir": "SSW",
+    "humidity_pct": 55,
+    "pressure_mb": 1012.1,
+    "roof": false,
+    "flag": "clear"
+  },
+  "TEX": {
+    "venue": "Globe Life Field",
+    "temp": 90.1,
+    "precip": 7,
+    "wind_spd": 12.6,
+    "wind_dir": "SE",
+    "humidity_pct": 53,
+    "pressure_mb": 1010.3,
+    "roof": true,
+    "flag": "clear"
+  },
+  "CHC": {
+    "venue": "Wrigley Field",
+    "temp": 77.7,
+    "precip": 4,
+    "wind_spd": 6.9,
+    "wind_dir": "SE",
+    "humidity_pct": 80,
+    "pressure_mb": 1011.9,
     "roof": false,
     "flag": "clear"
   }
