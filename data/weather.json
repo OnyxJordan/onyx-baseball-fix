@@ -1,37 +1,34 @@
 {
-  "CHC": {
-    "venue": "Wrigley Field",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
-    "roof": false,
-    "flag": "clear"
-  },
   "LAA": {
     "venue": "Angel Stadium",
-    "temp": 72,
+    "temp": 77.4,
     "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
-    "roof": false,
-    "flag": "clear"
-  },
-  "LAD": {
-    "venue": "Dodger Stadium",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
+    "wind_spd": 7.3,
+    "wind_dir": "SW",
+    "humidity_pct": 47,
+    "pressure_mb": 1013.2,
     "roof": false,
     "flag": "clear"
   },
   "MIN": {
     "venue": "Target Field",
-    "temp": 72,
+    "temp": 85.9,
     "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
+    "wind_spd": 2.6,
+    "wind_dir": "ESE",
+    "humidity_pct": 54,
+    "pressure_mb": 1009.2,
+    "roof": false,
+    "flag": "clear"
+  },
+  "LAD": {
+    "venue": "Dodger Stadium",
+    "temp": 71.5,
+    "precip": 0,
+    "wind_spd": 7.4,
+    "wind_dir": "WSW",
+    "humidity_pct": 60,
+    "pressure_mb": 1013.7,
     "roof": false,
     "flag": "clear"
   }
