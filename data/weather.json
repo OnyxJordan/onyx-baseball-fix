@@ -1,56 +1,12 @@
 {
-  "HOU": {
-    "venue": "Daikin Park",
-    "temp": 86.8,
-    "precip": 11,
-    "wind_spd": 9.7,
-    "wind_dir": "SSE",
-    "humidity_pct": 60,
-    "pressure_mb": 1011.7,
-    "roof": true,
-    "flag": "clear"
-  },
-  "MIN": {
-    "venue": "Target Field",
-    "temp": 85.9,
+  "LAD": {
+    "venue": "Dodger Stadium",
+    "temp": 71.2,
     "precip": 0,
-    "wind_spd": 2.6,
-    "wind_dir": "ESE",
-    "humidity_pct": 54,
-    "pressure_mb": 1009.2,
-    "roof": false,
-    "flag": "clear"
-  },
-  "KC": {
-    "venue": "Kauffman Stadium",
-    "temp": 98.0,
-    "precip": 0,
-    "wind_spd": 9.1,
-    "wind_dir": "SSW",
-    "humidity_pct": 35,
-    "pressure_mb": 1010.7,
-    "roof": false,
-    "flag": "clear"
-  },
-  "LAA": {
-    "venue": "Angel Stadium",
-    "temp": 76.8,
-    "precip": 0,
-    "wind_spd": 8.3,
+    "wind_spd": 5.8,
     "wind_dir": "WSW",
-    "humidity_pct": 47,
-    "pressure_mb": 1013.7,
-    "roof": false,
-    "flag": "clear"
-  },
-  "CLE": {
-    "venue": "Progressive Field",
-    "temp": 95.9,
-    "precip": 4,
-    "wind_spd": 11.9,
-    "wind_dir": "SW",
-    "humidity_pct": 39,
-    "pressure_mb": 1012.4,
+    "humidity_pct": 55,
+    "pressure_mb": 1012.8,
     "roof": false,
     "flag": "clear"
   },
@@ -65,26 +21,37 @@
     "roof": false,
     "flag": "clear"
   },
-  "LAD": {
-    "venue": "Dodger Stadium",
-    "temp": 71.2,
-    "precip": 0,
-    "wind_spd": 5.8,
-    "wind_dir": "WSW",
-    "humidity_pct": 55,
-    "pressure_mb": 1012.8,
+  "CLE": {
+    "venue": "Progressive Field",
+    "temp": 95.9,
+    "precip": 4,
+    "wind_spd": 11.9,
+    "wind_dir": "SW",
+    "humidity_pct": 39,
+    "pressure_mb": 1012.4,
     "roof": false,
     "flag": "clear"
   },
-  "TB": {
-    "venue": "Tropicana Field",
-    "temp": 81.9,
-    "precip": 52,
-    "wind_spd": 6.8,
-    "wind_dir": "WNW",
-    "humidity_pct": 93,
-    "pressure_mb": 1013.6,
-    "roof": true,
+  "LAA": {
+    "venue": "Angel Stadium",
+    "temp": 76.8,
+    "precip": 0,
+    "wind_spd": 8.3,
+    "wind_dir": "WSW",
+    "humidity_pct": 47,
+    "pressure_mb": 1013.7,
+    "roof": false,
+    "flag": "clear"
+  },
+  "KC": {
+    "venue": "Kauffman Stadium",
+    "temp": 98.0,
+    "precip": 0,
+    "wind_spd": 9.1,
+    "wind_dir": "SSW",
+    "humidity_pct": 35,
+    "pressure_mb": 1010.7,
+    "roof": false,
     "flag": "clear"
   },
   "CHC": {
@@ -96,6 +63,39 @@
     "humidity_pct": 53,
     "pressure_mb": 1011.5,
     "roof": false,
+    "flag": "clear"
+  },
+  "MIN": {
+    "venue": "Target Field",
+    "temp": 85.9,
+    "precip": 0,
+    "wind_spd": 2.6,
+    "wind_dir": "ESE",
+    "humidity_pct": 54,
+    "pressure_mb": 1009.2,
+    "roof": false,
+    "flag": "clear"
+  },
+  "HOU": {
+    "venue": "Daikin Park",
+    "temp": 86.8,
+    "precip": 11,
+    "wind_spd": 9.7,
+    "wind_dir": "SSE",
+    "humidity_pct": 60,
+    "pressure_mb": 1011.7,
+    "roof": true,
+    "flag": "clear"
+  },
+  "TB": {
+    "venue": "Tropicana Field",
+    "temp": 81.9,
+    "precip": 52,
+    "wind_spd": 6.8,
+    "wind_dir": "WNW",
+    "humidity_pct": 93,
+    "pressure_mb": 1013.6,
+    "roof": true,
     "flag": "clear"
   }
 }
