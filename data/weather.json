@@ -1,24 +1,24 @@
 {
-  "BAL": {
-    "venue": "Camden Yards",
-    "temp": 88.6,
+  "LAD": {
+    "venue": "Dodger Stadium",
+    "temp": 70.4,
     "precip": 0,
-    "wind_spd": 1.6,
-    "wind_dir": "S",
-    "humidity_pct": 58,
-    "pressure_mb": 1013.4,
+    "wind_spd": 6.7,
+    "wind_dir": "WSW",
+    "humidity_pct": 68,
+    "pressure_mb": 1011.0,
     "roof": false,
     "flag": "clear"
   },
-  "LAD": {
-    "venue": "Dodger Stadium",
-    "temp": 70.7,
-    "precip": 0,
-    "wind_spd": 6.2,
-    "wind_dir": "WSW",
-    "humidity_pct": 68,
-    "pressure_mb": 1010.5,
-    "roof": false,
+  "TEX": {
+    "venue": "Globe Life Field",
+    "temp": 88.8,
+    "precip": 5,
+    "wind_spd": 12.1,
+    "wind_dir": "SSE",
+    "humidity_pct": 56,
+    "pressure_mb": 1009.9,
+    "roof": true,
     "flag": "clear"
   },
   "KC": {
@@ -34,24 +34,13 @@
   },
   "SEA": {
     "venue": "T-Mobile Park",
-    "temp": 63.8,
+    "temp": 64.6,
     "precip": 12,
-    "wind_spd": 2.6,
-    "wind_dir": "WSW",
-    "humidity_pct": 63,
-    "pressure_mb": 1009.4,
+    "wind_spd": 1.6,
+    "wind_dir": "NW",
+    "humidity_pct": 55,
+    "pressure_mb": 1009.1,
     "roof": false,
-    "flag": "clear"
-  },
-  "TEX": {
-    "venue": "Globe Life Field",
-    "temp": 89.6,
-    "precip": 5,
-    "wind_spd": 11.4,
-    "wind_dir": "SSE",
-    "humidity_pct": 52,
-    "pressure_mb": 1010.0,
-    "roof": true,
     "flag": "clear"
   }
 }
