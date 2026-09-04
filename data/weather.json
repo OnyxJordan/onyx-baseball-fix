@@ -1,15 +1,4 @@
 {
-  "LAD": {
-    "venue": "Dodger Stadium",
-    "temp": 70.6,
-    "precip": 0,
-    "wind_spd": 7.4,
-    "wind_dir": "WSW",
-    "humidity_pct": 68,
-    "pressure_mb": 1010.0,
-    "roof": false,
-    "flag": "clear"
-  },
   "SEA": {
     "venue": "T-Mobile Park",
     "temp": 64.3,
@@ -18,6 +7,17 @@
     "wind_dir": "W",
     "humidity_pct": 64,
     "pressure_mb": 1009.8,
+    "roof": false,
+    "flag": "clear"
+  },
+  "LAD": {
+    "venue": "Dodger Stadium",
+    "temp": 71.4,
+    "precip": 0,
+    "wind_spd": 6.4,
+    "wind_dir": "WSW",
+    "humidity_pct": 70,
+    "pressure_mb": 1010.4,
     "roof": false,
     "flag": "clear"
   }
