@@ -1,40 +1,39 @@
 {
- "date": "2026-09-03",
- "locked": true,
+ "date": "2026-09-04",
+ "locked": false,
  "legs": [
-  {
-   "player": "Kyle Stowers",
-   "mid": 669065,
-   "team": "MIA",
-   "odds": 329,
-   "prob": 21.0,
-   "score": 0.569,
-   "why": [
-    "wind/heat ×1.15",
-    "soft bullpen",
-    "platoon edge"
-   ],
-   "away": "MIA",
-   "home": "KC",
-   "opp": "Michael Wacha",
-   "time": "7:40 PM"
-  },
   {
    "player": "Jake Bauers",
    "mid": 641343,
    "team": "MIL",
-   "odds": 393,
-   "prob": 18.7,
-   "score": 0.553,
+   "odds": 303,
+   "prob": 22.3,
+   "score": 0.693,
    "why": [
-    "soft bullpen",
-    "wind/heat ×1.15",
-    "due"
+    "park ×1.31",
+    "pitcher matchup ×1.14",
+    "soft bullpen"
    ],
    "away": "MIL",
-   "home": "CHC",
-   "opp": "Kevin Gausman",
-   "time": "7:15 PM"
+   "home": "CIN",
+   "opp": "Rhett Lowder",
+   "time": "6:10 PM"
+  },
+  {
+   "player": "Jordan Walker",
+   "mid": 691023,
+   "team": "STL",
+   "odds": 321,
+   "prob": 21.7,
+   "score": 0.611,
+   "why": [
+    "park ×1.35",
+    "wind/heat ×1.25"
+   ],
+   "away": "STL",
+   "home": "COL",
+   "opp": "Ryan Feltner",
+   "time": "8:40 PM"
   }
  ]
 }
