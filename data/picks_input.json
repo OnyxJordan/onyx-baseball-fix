@@ -1585,7 +1585,7 @@
   "prob": 0.22,
   "edge": -0.5,
   "tier": "ticket",
-  "hit": null
+  "hit": "void"
  },
  {
   "date": "2026-09-02",
@@ -1630,7 +1630,7 @@
   "prob": 0.213,
   "edge": -0.3,
   "tier": "ticket",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-09-03",
@@ -1639,7 +1639,7 @@
   "prob": 0.206,
   "edge": -2.0,
   "tier": "ticket",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-09-03",
@@ -1648,7 +1648,7 @@
   "prob": 0.211,
   "edge": 0.3,
   "tier": "edge",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-09-03",
@@ -1657,6 +1657,6 @@
   "prob": 0.19,
   "edge": -1.8,
   "tier": "ticket",
-  "hit": null
+  "hit": false
  }
 ]
