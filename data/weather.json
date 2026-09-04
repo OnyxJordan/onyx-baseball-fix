@@ -1,4 +1,15 @@
 {
+  "LAD": {
+    "venue": "Dodger Stadium",
+    "temp": 71.2,
+    "precip": 0,
+    "wind_spd": 6.2,
+    "wind_dir": "WSW",
+    "humidity_pct": 64,
+    "pressure_mb": 1010.5,
+    "roof": false,
+    "flag": "clear"
+  },
   "CHC": {
     "venue": "Wrigley Field",
     "temp": 80.2,
@@ -7,6 +18,28 @@
     "wind_dir": "SSE",
     "humidity_pct": 73,
     "pressure_mb": 1011.7,
+    "roof": false,
+    "flag": "clear"
+  },
+  "TEX": {
+    "venue": "Globe Life Field",
+    "temp": 89.7,
+    "precip": 5,
+    "wind_spd": 10.1,
+    "wind_dir": "SE",
+    "humidity_pct": 54,
+    "pressure_mb": 1009.4,
+    "roof": true,
+    "flag": "clear"
+  },
+  "SEA": {
+    "venue": "T-Mobile Park",
+    "temp": 63.0,
+    "precip": 11,
+    "wind_spd": 7.1,
+    "wind_dir": "WSW",
+    "humidity_pct": 66,
+    "pressure_mb": 1010.0,
     "roof": false,
     "flag": "clear"
   },
@@ -21,17 +54,6 @@
     "roof": false,
     "flag": "clear"
   },
-  "TEX": {
-    "venue": "Globe Life Field",
-    "temp": 89.7,
-    "precip": 6,
-    "wind_spd": 10.1,
-    "wind_dir": "SE",
-    "humidity_pct": 54,
-    "pressure_mb": 1009.4,
-    "roof": true,
-    "flag": "clear"
-  },
   "BAL": {
     "venue": "Camden Yards",
     "temp": 87.4,
@@ -40,28 +62,6 @@
     "wind_dir": "SW",
     "humidity_pct": 59,
     "pressure_mb": 1013.0,
-    "roof": false,
-    "flag": "clear"
-  },
-  "LAD": {
-    "venue": "Dodger Stadium",
-    "temp": 71.2,
-    "precip": 0,
-    "wind_spd": 6.2,
-    "wind_dir": "WSW",
-    "humidity_pct": 64,
-    "pressure_mb": 1010.5,
-    "roof": false,
-    "flag": "clear"
-  },
-  "SEA": {
-    "venue": "T-Mobile Park",
-    "temp": 63.0,
-    "precip": 10,
-    "wind_spd": 7.1,
-    "wind_dir": "WSW",
-    "humidity_pct": 66,
-    "pressure_mb": 1010.0,
     "roof": false,
     "flag": "clear"
   }
