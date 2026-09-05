@@ -1,2 +1,5 @@
 __pycache__/
 *.pyc
+
+# Ad-hoc data exports — production betting records, never commit
+exports/*.csv
