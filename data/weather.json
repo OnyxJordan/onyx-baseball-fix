@@ -1,4 +1,81 @@
 {
+  "SEA": {
+    "venue": "T-Mobile Park",
+    "temp": 63.5,
+    "precip": 6,
+    "wind_spd": 0.5,
+    "wind_dir": "WNW",
+    "humidity_pct": 70,
+    "pressure_mb": 1016.6,
+    "roof": false,
+    "flag": "clear"
+  },
+  "BAL": {
+    "venue": "Camden Yards",
+    "temp": 80.1,
+    "precip": 0,
+    "wind_spd": 7.7,
+    "wind_dir": "N",
+    "humidity_pct": 45,
+    "pressure_mb": 1011.3,
+    "roof": false,
+    "flag": "clear"
+  },
+  "NYM": {
+    "venue": "Citi Field",
+    "temp": 78.8,
+    "precip": 1,
+    "wind_spd": 8.0,
+    "wind_dir": "N",
+    "humidity_pct": 51,
+    "pressure_mb": 1010.6,
+    "roof": false,
+    "flag": "clear"
+  },
+  "CLE": {
+    "venue": "Progressive Field",
+    "temp": 74.4,
+    "precip": 0,
+    "wind_spd": 11.7,
+    "wind_dir": "NNE",
+    "humidity_pct": 64,
+    "pressure_mb": 1012.8,
+    "roof": false,
+    "flag": "clear"
+  },
+  "KC": {
+    "venue": "Kauffman Stadium",
+    "temp": 101.1,
+    "precip": 0,
+    "wind_spd": 7.0,
+    "wind_dir": "SE",
+    "humidity_pct": 24,
+    "pressure_mb": 1010.0,
+    "roof": false,
+    "flag": "clear"
+  },
+  "PIT": {
+    "venue": "PNC Park",
+    "temp": 74.5,
+    "precip": 2,
+    "wind_spd": 3.8,
+    "wind_dir": "N",
+    "humidity_pct": 84,
+    "pressure_mb": 1011.5,
+    "roof": false,
+    "flag": "clear"
+  },
+  "HOU": {
+    "venue": "Daikin Park",
+    "temp": 82.9,
+    "precip": 32,
+    "wind_spd": 5.2,
+    "wind_dir": "SE",
+    "humidity_pct": 76,
+    "pressure_mb": 1012.3,
+    "roof": true,
+    "flag": "clear"
+  },
   "SD": {
     "venue": "Petco Park",
     "temp": 84.8,
@@ -10,80 +87,14 @@
     "roof": false,
     "flag": "clear"
   },
-  "CLE": {
-    "venue": "Progressive Field",
-    "temp": 74.4,
-    "precip": 0,
-    "wind_spd": 12.0,
-    "wind_dir": "NE",
-    "humidity_pct": 64,
-    "pressure_mb": 1012.8,
-    "roof": false,
-    "flag": "clear"
-  },
-  "HOU": {
-    "venue": "Daikin Park",
-    "temp": 82.9,
-    "precip": 32,
-    "wind_spd": 4.4,
-    "wind_dir": "SE",
-    "humidity_pct": 76,
-    "pressure_mb": 1012.3,
-    "roof": true,
-    "flag": "clear"
-  },
-  "MIA": {
-    "venue": "loanDepot Park",
-    "temp": 86.6,
-    "precip": 22,
-    "wind_spd": 6.7,
-    "wind_dir": "SE",
-    "humidity_pct": 71,
-    "pressure_mb": 1013.0,
-    "roof": true,
-    "flag": "clear"
-  },
-  "COL": {
-    "venue": "Coors Field",
-    "temp": 91.9,
-    "precip": 3,
-    "wind_spd": 4.8,
-    "wind_dir": "NE",
-    "humidity_pct": 15,
-    "pressure_mb": 1002.9,
-    "roof": false,
-    "flag": "clear"
-  },
   "PHI": {
     "venue": "Citizens Bank Park",
     "temp": 79.8,
     "precip": 0,
-    "wind_spd": 7.9,
-    "wind_dir": "NNW",
+    "wind_spd": 7.2,
+    "wind_dir": "N",
     "humidity_pct": 45,
     "pressure_mb": 1011.0,
-    "roof": false,
-    "flag": "clear"
-  },
-  "SEA": {
-    "venue": "T-Mobile Park",
-    "temp": 63.5,
-    "precip": 6,
-    "wind_spd": 1.6,
-    "wind_dir": "E",
-    "humidity_pct": 70,
-    "pressure_mb": 1016.6,
-    "roof": false,
-    "flag": "clear"
-  },
-  "PIT": {
-    "venue": "PNC Park",
-    "temp": 74.5,
-    "precip": 2,
-    "wind_spd": 4.0,
-    "wind_dir": "NNW",
-    "humidity_pct": 84,
-    "pressure_mb": 1011.5,
     "roof": false,
     "flag": "clear"
   },
@@ -91,22 +102,42 @@
     "venue": "Globe Life Field",
     "temp": 98.8,
     "precip": 1,
-    "wind_spd": 5.7,
-    "wind_dir": "S",
+    "wind_spd": 7.9,
+    "wind_dir": "SE",
     "humidity_pct": 33,
     "pressure_mb": 1010.3,
     "roof": true,
     "flag": "clear"
   },
-  "NYM": {
-    "venue": "Citi Field",
-    "temp": 78.8,
-    "precip": 1,
-    "wind_spd": 7.9,
-    "wind_dir": "N",
-    "humidity_pct": 51,
-    "pressure_mb": 1010.6,
+  "COL": {
+    "venue": "Coors Field",
+    "temp": 91.9,
+    "precip": 3,
+    "wind_spd": 5.4,
+    "wind_dir": "NE",
+    "humidity_pct": 15,
+    "pressure_mb": 1002.9,
     "roof": false,
+    "flag": "clear"
+  },
+  "LAD": {
+    "venue": "Dodger Stadium",
+    "temp": 80.8,
+    "precip": 0,
+    "wind_spd": 6.5,
+    "wind_dir": "WSW",
+    "humidity_pct": 42,
+    "pressure_mb": 1011.2,
+    "roof": false,
+    "flag": "clear"
+  },
+  "MIA": {
+    "venue": "loanDepot Park",
+    "temp": 72,
+    "precip": 0,
+    "wind_spd": 5,
+    "wind_dir": "N",
+    "roof": true,
     "flag": "clear"
   },
   "CIN": {
@@ -118,35 +149,8 @@
     "roof": false,
     "flag": "clear"
   },
-  "LAD": {
-    "venue": "Dodger Stadium",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
-    "roof": false,
-    "flag": "clear"
-  },
   "CWS": {
     "venue": "Rate Field",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
-    "roof": false,
-    "flag": "clear"
-  },
-  "KC": {
-    "venue": "Kauffman Stadium",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
-    "roof": false,
-    "flag": "clear"
-  },
-  "BAL": {
-    "venue": "Camden Yards",
     "temp": 72,
     "precip": 0,
     "wind_spd": 5,
