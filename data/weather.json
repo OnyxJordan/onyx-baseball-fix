@@ -1,114 +1,4 @@
 {
-  "COL": {
-    "venue": "Coors Field",
-    "temp": 86.7,
-    "precip": 0,
-    "wind_spd": 5.4,
-    "wind_dir": "ENE",
-    "humidity_pct": 35,
-    "pressure_mb": 1006.0,
-    "roof": false,
-    "flag": "clear"
-  },
-  "CWS": {
-    "venue": "Rate Field",
-    "temp": 73.7,
-    "precip": 0,
-    "wind_spd": 12.4,
-    "wind_dir": "NE",
-    "humidity_pct": 58,
-    "pressure_mb": 1018.1,
-    "roof": false,
-    "flag": "clear"
-  },
-  "LAD": {
-    "venue": "Dodger Stadium",
-    "temp": 75.7,
-    "precip": 5,
-    "wind_spd": 4.4,
-    "wind_dir": "NNW",
-    "humidity_pct": 90,
-    "pressure_mb": 1011.2,
-    "roof": false,
-    "flag": "clear"
-  },
-  "TEX": {
-    "venue": "Globe Life Field",
-    "temp": 97.1,
-    "precip": 0,
-    "wind_spd": 7.1,
-    "wind_dir": "ESE",
-    "humidity_pct": 43,
-    "pressure_mb": 1011.9,
-    "roof": true,
-    "flag": "clear"
-  },
-  "NYM": {
-    "venue": "Citi Field",
-    "temp": 71.7,
-    "precip": 4,
-    "wind_spd": 9.4,
-    "wind_dir": "NNE",
-    "humidity_pct": 67,
-    "pressure_mb": 1015.6,
-    "roof": false,
-    "flag": "clear"
-  },
-  "SD": {
-    "venue": "Petco Park",
-    "temp": 89.3,
-    "precip": 1,
-    "wind_spd": 13.0,
-    "wind_dir": "N",
-    "humidity_pct": 52,
-    "pressure_mb": 1011.9,
-    "roof": false,
-    "flag": "clear"
-  },
-  "CIN": {
-    "venue": "Great American Ball Park",
-    "temp": 77.0,
-    "precip": 0,
-    "wind_spd": 9.2,
-    "wind_dir": "ENE",
-    "humidity_pct": 57,
-    "pressure_mb": 1015.0,
-    "roof": false,
-    "flag": "clear"
-  },
-  "MIA": {
-    "venue": "loanDepot Park",
-    "temp": 87.5,
-    "precip": 14,
-    "wind_spd": 2.5,
-    "wind_dir": "SW",
-    "humidity_pct": 71,
-    "pressure_mb": 1013.6,
-    "roof": true,
-    "flag": "clear"
-  },
-  "PHI": {
-    "venue": "Citizens Bank Park",
-    "temp": 75.1,
-    "precip": 1,
-    "wind_spd": 6.3,
-    "wind_dir": "N",
-    "humidity_pct": 66,
-    "pressure_mb": 1014.8,
-    "roof": false,
-    "flag": "clear"
-  },
-  "HOU": {
-    "venue": "Daikin Park",
-    "temp": 89.1,
-    "precip": 26,
-    "wind_spd": 3.1,
-    "wind_dir": "NNE",
-    "humidity_pct": 67,
-    "pressure_mb": 1012.3,
-    "roof": true,
-    "flag": "clear"
-  },
   "PIT": {
     "venue": "PNC Park",
     "temp": 74.5,
@@ -142,10 +32,76 @@
     "roof": false,
     "flag": "clear"
   },
+  "COL": {
+    "venue": "Coors Field",
+    "temp": 86.7,
+    "precip": 0,
+    "wind_spd": 5.4,
+    "wind_dir": "ENE",
+    "humidity_pct": 35,
+    "pressure_mb": 1006.0,
+    "roof": false,
+    "flag": "clear"
+  },
+  "TEX": {
+    "venue": "Globe Life Field",
+    "temp": 97.1,
+    "precip": 0,
+    "wind_spd": 7.1,
+    "wind_dir": "ESE",
+    "humidity_pct": 43,
+    "pressure_mb": 1011.9,
+    "roof": true,
+    "flag": "clear"
+  },
+  "SD": {
+    "venue": "Petco Park",
+    "temp": 89.3,
+    "precip": 1,
+    "wind_spd": 13.0,
+    "wind_dir": "N",
+    "humidity_pct": 52,
+    "pressure_mb": 1011.9,
+    "roof": false,
+    "flag": "clear"
+  },
+  "CWS": {
+    "venue": "Rate Field",
+    "temp": 73.7,
+    "precip": 0,
+    "wind_spd": 12.4,
+    "wind_dir": "NE",
+    "humidity_pct": 58,
+    "pressure_mb": 1018.1,
+    "roof": false,
+    "flag": "clear"
+  },
+  "LAD": {
+    "venue": "Dodger Stadium",
+    "temp": 75.7,
+    "precip": 5,
+    "wind_spd": 4.4,
+    "wind_dir": "NNW",
+    "humidity_pct": 90,
+    "pressure_mb": 1011.2,
+    "roof": false,
+    "flag": "clear"
+  },
+  "NYM": {
+    "venue": "Citi Field",
+    "temp": 71.7,
+    "precip": 6,
+    "wind_spd": 9.4,
+    "wind_dir": "NNE",
+    "humidity_pct": 67,
+    "pressure_mb": 1015.6,
+    "roof": false,
+    "flag": "clear"
+  },
   "KC": {
     "venue": "Kauffman Stadium",
     "temp": 97.6,
-    "precip": 1,
+    "precip": 2,
     "wind_spd": 5.0,
     "wind_dir": "E",
     "humidity_pct": 40,
@@ -155,6 +111,42 @@
   },
   "BAL": {
     "venue": "Camden Yards",
+    "temp": 72,
+    "precip": 0,
+    "wind_spd": 5,
+    "wind_dir": "N",
+    "roof": false,
+    "flag": "clear"
+  },
+  "HOU": {
+    "venue": "Daikin Park",
+    "temp": 72,
+    "precip": 0,
+    "wind_spd": 5,
+    "wind_dir": "N",
+    "roof": true,
+    "flag": "clear"
+  },
+  "MIA": {
+    "venue": "loanDepot Park",
+    "temp": 72,
+    "precip": 0,
+    "wind_spd": 5,
+    "wind_dir": "N",
+    "roof": true,
+    "flag": "clear"
+  },
+  "CIN": {
+    "venue": "Great American Ball Park",
+    "temp": 72,
+    "precip": 0,
+    "wind_spd": 5,
+    "wind_dir": "N",
+    "roof": false,
+    "flag": "clear"
+  },
+  "PHI": {
+    "venue": "Citizens Bank Park",
     "temp": 72,
     "precip": 0,
     "wind_spd": 5,
