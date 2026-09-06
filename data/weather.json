@@ -1,15 +1,4 @@
 {
-  "COL": {
-    "venue": "Coors Field",
-    "temp": 88.5,
-    "precip": 0,
-    "wind_spd": 4.1,
-    "wind_dir": "ENE",
-    "humidity_pct": 29,
-    "pressure_mb": 1005.3,
-    "roof": false,
-    "flag": "clear"
-  },
   "CWS": {
     "venue": "Rate Field",
     "temp": 74.1,
@@ -18,17 +7,6 @@
     "wind_dir": "NNE",
     "humidity_pct": 58,
     "pressure_mb": 1018.0,
-    "roof": false,
-    "flag": "clear"
-  },
-  "LAD": {
-    "venue": "Dodger Stadium",
-    "temp": 72.6,
-    "precip": 11,
-    "wind_spd": 1.8,
-    "wind_dir": "N",
-    "humidity_pct": 89,
-    "pressure_mb": 1011.4,
     "roof": false,
     "flag": "clear"
   },
@@ -51,6 +29,17 @@
     "wind_dir": "NW",
     "humidity_pct": 64,
     "pressure_mb": 1015.4,
+    "roof": false,
+    "flag": "clear"
+  },
+  "LAD": {
+    "venue": "Dodger Stadium",
+    "temp": 72.6,
+    "precip": 11,
+    "wind_spd": 1.8,
+    "wind_dir": "N",
+    "humidity_pct": 89,
+    "pressure_mb": 1011.4,
     "roof": false,
     "flag": "clear"
   }
