@@ -1,5 +1,20 @@
 """
-model.py — Onyx Baseball v40 HR probability model + pitcher K projections
+model.py — Onyx Baseball v41 HR probability model + pitcher K projections
+
+v41: September study (7,055 player-games, 751 HR, 8/5-9/5, archived
+pregame boards joined to box scores). The v36-v39 arc WORKED below
+20%: every bucket calibrated within 0.6pp (6.5->6.7, 9.8->9.7,
+13.8->14.3, 17.7->17.1). Two residual fixes:
+(1) THE TAIL STILL LIES: the 20-26 bucket says 22.1, pays 16.8
+(x0.76, n=334) — exactly where picks and ticket legs shop.
+Compression knee 20 -> 19, slope 0.55 -> 0.40, cap 30 -> 26.
+(2) PLATOON WAS OVER-SOFTENED: v39 dampened it 40% alongside pf, but
+this window shows platoon is the ONE priced feature with real spread
+left — opposite-hand bats cash at 0.84 of implied vs 0.74 same-hand,
+and the high-platoon tercile is the best cell on the board (0.87).
+Full strength restored; pf stays dampened (its terciles are flat).
+League September rate is NOT colder (11.7% last week, highest of the
+window) — the 0-14 pick streak was variance on honest ~17% shots.
 
 v40: the VISIBLE board agrees with the record. The Plays pane (server
 composite + a duplicated client formula) still ranked edge-first with
@@ -867,11 +882,11 @@ def project_player(
     PA_BY_ORDER = {1: 4.68, 2: 4.57, 3: 4.46, 4: 4.36, 5: 4.26,
                    6: 4.15, 7: 4.04, 8: 3.93, 9: 3.82}
     pa_mult = PA_BY_ORDER.get(int(batting_order or 0), 4.23) / 4.23
-    # v39: pf and platoon are fully priced by the market (flat-to-inverted
-    # actual/implied across terciles) — they still shape the ranking but at
-    # 60% strength so they can no longer manufacture edge on their own.
-    pf   = 1.0 + (pf - 1.0) * 0.6
-    plat = 1.0 + (plat - 1.0) * 0.6
+    # v39: pf is fully priced by the market (flat terciles) — 60% strength.
+    # v41: platoon RESTORED to full strength — the September study shows it
+    # is the one feature with real spread left at price (opp-hand 0.84 vs
+    # same-hand 0.74 of implied; high-platoon tercile 0.87, best on board).
+    pf = 1.0 + (pf - 1.0) * 0.6
     raw_prob = base * sc * 3.5 * pa_mult * 100 * pf * env * park_f * due_mult * plat
     # v35 (study: 2,112 player-games, 210 HR, 7/25-8/2):
     # - ELITE hard-hit is nonlinear: bats over 50% HH homered at 18.7% vs a
@@ -898,9 +913,11 @@ def project_player(
     # v39: compression starts at 20 — every graded bucket above 20 paid
     # only ~0.75-0.79 of the model's number; the tail is where edge plays
     # (and the 11-103 record) lived.
-    if raw_prob > 20.0:
-        raw_prob = 20.0 + (raw_prob - 20.0) * 0.55
-    raw_prob = max(1.0, min(30.0, raw_prob))
+    # v41: knee 19, slope 0.40, cap 26 — the 20-26 band still paid only
+    # 0.76 of its claim (n=334) after the v39 compression.
+    if raw_prob > 19.0:
+        raw_prob = 19.0 + (raw_prob - 19.0) * 0.40
+    raw_prob = max(1.0, min(26.0, raw_prob))
 
     # 8. Market calibration — the market anchors, the MODEL decides. v31: the
     # old weights (model 0.30-0.38) meant a batter had to beat the LISTED
