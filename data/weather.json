@@ -1,1 +1,123 @@
-{}
+{
+  "MIL": {
+    "venue": "American Family Field",
+    "temp": 77.9,
+    "precip": 0,
+    "wind_spd": 9.9,
+    "wind_dir": "ESE",
+    "humidity_pct": 50,
+    "pressure_mb": 1021.3,
+    "roof": true,
+    "flag": "clear"
+  },
+  "BOS": {
+    "venue": "Fenway Park",
+    "temp": 77.4,
+    "precip": 0,
+    "wind_spd": 9.8,
+    "wind_dir": "NW",
+    "humidity_pct": 36,
+    "pressure_mb": 1017.8,
+    "roof": false,
+    "flag": "clear"
+  },
+  "SF": {
+    "venue": "Oracle Park",
+    "temp": 74.2,
+    "precip": 0,
+    "wind_spd": 13.3,
+    "wind_dir": "WNW",
+    "humidity_pct": 48,
+    "pressure_mb": 1013.0,
+    "roof": false,
+    "flag": "clear"
+  },
+  "ATH": {
+    "venue": "Sutter Health Park",
+    "temp": 83.8,
+    "precip": 0,
+    "wind_spd": 3.5,
+    "wind_dir": "NNW",
+    "humidity_pct": 19,
+    "pressure_mb": 1012.3,
+    "roof": false,
+    "flag": "clear"
+  },
+  "PHI": {
+    "venue": "Citizens Bank Park",
+    "temp": 76.3,
+    "precip": 0,
+    "wind_spd": 5.2,
+    "wind_dir": "N",
+    "humidity_pct": 44,
+    "pressure_mb": 1021.8,
+    "roof": false,
+    "flag": "clear"
+  },
+  "BAL": {
+    "venue": "Camden Yards",
+    "temp": 81.1,
+    "precip": 1,
+    "wind_spd": 6.4,
+    "wind_dir": "N",
+    "humidity_pct": 35,
+    "pressure_mb": 1021.7,
+    "roof": false,
+    "flag": "clear"
+  },
+  "MIA": {
+    "venue": "loanDepot Park",
+    "temp": 87.6,
+    "precip": 10,
+    "wind_spd": 3.5,
+    "wind_dir": "SW",
+    "humidity_pct": 71,
+    "pressure_mb": 1015.1,
+    "roof": true,
+    "flag": "clear"
+  },
+  "LAD": {
+    "venue": "Dodger Stadium",
+    "temp": 85.9,
+    "precip": 2,
+    "wind_spd": 8.0,
+    "wind_dir": "W",
+    "humidity_pct": 38,
+    "pressure_mb": 1011.2,
+    "roof": false,
+    "flag": "clear"
+  },
+  "SD": {
+    "venue": "Petco Park",
+    "temp": 94.1,
+    "precip": 2,
+    "wind_spd": 11.9,
+    "wind_dir": "NW",
+    "humidity_pct": 36,
+    "pressure_mb": 1011.1,
+    "roof": false,
+    "flag": "clear"
+  },
+  "KC": {
+    "venue": "Kauffman Stadium",
+    "temp": 89.8,
+    "precip": 1,
+    "wind_spd": 7.9,
+    "wind_dir": "SSE",
+    "humidity_pct": 54,
+    "pressure_mb": 1015.1,
+    "roof": false,
+    "flag": "clear"
+  },
+  "DET": {
+    "venue": "Comerica Park",
+    "temp": 77.5,
+    "precip": 0,
+    "wind_spd": 7.4,
+    "wind_dir": "ENE",
+    "humidity_pct": 40,
+    "pressure_mb": 1021.7,
+    "roof": false,
+    "flag": "clear"
+  }
+}
