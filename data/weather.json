@@ -1,26 +1,4 @@
 {
-  "SD": {
-    "venue": "Petco Park",
-    "temp": 94.1,
-    "precip": 1,
-    "wind_spd": 8.9,
-    "wind_dir": "NW",
-    "humidity_pct": 42,
-    "pressure_mb": 1010.0,
-    "roof": false,
-    "flag": "clear"
-  },
-  "KC": {
-    "venue": "Kauffman Stadium",
-    "temp": 88.0,
-    "precip": 1,
-    "wind_spd": 8.1,
-    "wind_dir": "SE",
-    "humidity_pct": 59,
-    "pressure_mb": 1015.0,
-    "roof": false,
-    "flag": "clear"
-  },
   "SF": {
     "venue": "Oracle Park",
     "temp": 74.6,
@@ -32,14 +10,14 @@
     "roof": false,
     "flag": "clear"
   },
-  "ATH": {
-    "venue": "Sutter Health Park",
-    "temp": 83.1,
+  "DET": {
+    "venue": "Comerica Park",
+    "temp": 78.2,
     "precip": 0,
-    "wind_spd": 3.6,
-    "wind_dir": "N",
-    "humidity_pct": 23,
-    "pressure_mb": 1012.4,
+    "wind_spd": 7.4,
+    "wind_dir": "E",
+    "humidity_pct": 51,
+    "pressure_mb": 1021.5,
     "roof": false,
     "flag": "clear"
   },
@@ -54,14 +32,25 @@
     "roof": false,
     "flag": "clear"
   },
-  "DET": {
-    "venue": "Comerica Park",
-    "temp": 78.2,
+  "ATH": {
+    "venue": "Sutter Health Park",
+    "temp": 83.1,
     "precip": 0,
-    "wind_spd": 7.4,
-    "wind_dir": "E",
-    "humidity_pct": 51,
-    "pressure_mb": 1021.5,
+    "wind_spd": 3.6,
+    "wind_dir": "N",
+    "humidity_pct": 23,
+    "pressure_mb": 1012.4,
+    "roof": false,
+    "flag": "clear"
+  },
+  "SD": {
+    "venue": "Petco Park",
+    "temp": 94.1,
+    "precip": 1,
+    "wind_spd": 8.9,
+    "wind_dir": "NW",
+    "humidity_pct": 42,
+    "pressure_mb": 1010.0,
     "roof": false,
     "flag": "clear"
   }
