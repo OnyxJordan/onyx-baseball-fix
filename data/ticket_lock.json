@@ -1,31 +1,14 @@
 {
  "date": "2026-09-07",
- "locked": true,
+ "locked": false,
  "legs": [
-  {
-   "player": "Ketel Marte",
-   "mid": 606466,
-   "team": "ARI",
-   "odds": 313,
-   "prob": 21.2,
-   "score": 0.63,
-   "why": [
-    "platoon edge",
-    "wind/heat ×1.14",
-    "soft bullpen"
-   ],
-   "away": "ARI",
-   "home": "KC",
-   "opp": "Noah Cameron",
-   "time": "2:10 PM"
-  },
   {
    "player": "Kazuma Okamoto",
    "mid": 672960,
    "team": "TOR",
-   "odds": 319,
-   "prob": 21.1,
-   "score": 0.58,
+   "odds": 321,
+   "prob": 21.0,
+   "score": 0.575,
    "why": [
     "pitcher matchup ×1.17",
     "fly-ball pitcher",
@@ -35,6 +18,23 @@
    "home": "ATH",
    "opp": "Jacob Lopez",
    "time": "10:05 PM"
+  },
+  {
+   "player": "Shohei Ohtani",
+   "mid": 660271,
+   "team": "LAD",
+   "odds": 267,
+   "prob": 21.4,
+   "score": 0.509,
+   "why": [
+    "soft bullpen",
+    "overdue",
+    "platoon edge"
+   ],
+   "away": "CIN",
+   "home": "LAD",
+   "opp": "Chase Burns",
+   "time": "9:10 PM"
   }
  ]
 }
