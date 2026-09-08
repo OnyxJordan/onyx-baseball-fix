@@ -1,15 +1,4 @@
 {
-  "SF": {
-    "venue": "Oracle Park",
-    "temp": 77.1,
-    "precip": 0,
-    "wind_spd": 10.7,
-    "wind_dir": "WNW",
-    "humidity_pct": 48,
-    "pressure_mb": 1013.5,
-    "roof": false,
-    "flag": "clear"
-  },
   "ATH": {
     "venue": "Sutter Health Park",
     "temp": 82.3,
@@ -18,6 +7,17 @@
     "wind_dir": "NNE",
     "humidity_pct": 24,
     "pressure_mb": 1012.6,
+    "roof": false,
+    "flag": "clear"
+  },
+  "SF": {
+    "venue": "Oracle Park",
+    "temp": 77.1,
+    "precip": 0,
+    "wind_spd": 10.7,
+    "wind_dir": "WNW",
+    "humidity_pct": 48,
+    "pressure_mb": 1013.5,
     "roof": false,
     "flag": "clear"
   },
