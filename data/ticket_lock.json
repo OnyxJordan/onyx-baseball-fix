@@ -3,29 +3,12 @@
  "locked": false,
  "legs": [
   {
-   "player": "Ben Rice",
-   "mid": 700250,
-   "team": "NYY",
-   "odds": 233,
-   "prob": 26.0,
-   "score": 0.832,
-   "why": [
-    "park ×1.33",
-    "pitcher matchup ×1.11",
-    "wind/heat ×1.11"
-   ],
-   "away": "COL",
-   "home": "NYY",
-   "opp": "Tomoyuki Sugano",
-   "time": "7:05 PM"
-  },
-  {
    "player": "Kyle Schwarber",
    "mid": 656941,
    "team": "PHI",
    "odds": 264,
    "prob": 25.1,
-   "score": 0.761,
+   "score": 0.76,
    "why": [
     "soft bullpen",
     "wind/heat ×1.13",
@@ -35,6 +18,23 @@
    "home": "PHI",
    "opp": "Hunter Brown",
    "time": "6:40 PM"
+  },
+  {
+   "player": "Ben Rice",
+   "mid": 700250,
+   "team": "NYY",
+   "odds": 239,
+   "prob": 24.8,
+   "score": 0.641,
+   "why": [
+    "park ×1.33",
+    "pitcher matchup ×1.11",
+    "overdue"
+   ],
+   "away": "COL",
+   "home": "NYY",
+   "opp": "Tomoyuki Sugano",
+   "time": "7:05 PM"
   }
  ]
 }
