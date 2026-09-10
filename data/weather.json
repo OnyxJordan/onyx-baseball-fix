@@ -1,15 +1,4 @@
 {
-  "NYY": {
-    "venue": "Yankee Stadium",
-    "temp": 83.2,
-    "precip": 0,
-    "wind_spd": 4.9,
-    "wind_dir": "W",
-    "humidity_pct": 44,
-    "pressure_mb": 1011.5,
-    "roof": false,
-    "flag": "clear"
-  },
   "SEA": {
     "venue": "T-Mobile Park",
     "temp": 67.0,
@@ -21,14 +10,14 @@
     "roof": false,
     "flag": "clear"
   },
-  "CWS": {
-    "venue": "Rate Field",
-    "temp": 71.9,
+  "NYY": {
+    "venue": "Yankee Stadium",
+    "temp": 83.2,
     "precip": 0,
-    "wind_spd": 7.5,
-    "wind_dir": "NE",
-    "humidity_pct": 70,
-    "pressure_mb": 1015.3,
+    "wind_spd": 4.9,
+    "wind_dir": "W",
+    "humidity_pct": 44,
+    "pressure_mb": 1011.5,
     "roof": false,
     "flag": "clear"
   },
@@ -40,6 +29,17 @@
     "wind_dir": "W",
     "humidity_pct": 57,
     "pressure_mb": 1012.4,
+    "roof": false,
+    "flag": "clear"
+  },
+  "CWS": {
+    "venue": "Rate Field",
+    "temp": 71.9,
+    "precip": 0,
+    "wind_spd": 7.5,
+    "wind_dir": "NE",
+    "humidity_pct": 70,
+    "pressure_mb": 1015.3,
     "roof": false,
     "flag": "clear"
   }
