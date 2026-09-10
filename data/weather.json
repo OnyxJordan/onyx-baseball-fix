@@ -1,37 +1,4 @@
 {
-  "ATL": {
-    "venue": "Truist Park",
-    "temp": 87.1,
-    "precip": 1,
-    "wind_spd": 2.9,
-    "wind_dir": "SSE",
-    "humidity_pct": 39,
-    "pressure_mb": 1018.5,
-    "roof": false,
-    "flag": "clear"
-  },
-  "BOS": {
-    "venue": "Fenway Park",
-    "temp": 75.9,
-    "precip": 21,
-    "wind_spd": 10.1,
-    "wind_dir": "S",
-    "humidity_pct": 67,
-    "pressure_mb": 1017.7,
-    "roof": false,
-    "flag": "clear"
-  },
-  "MIL": {
-    "venue": "American Family Field",
-    "temp": 81.0,
-    "precip": 0,
-    "wind_spd": 8.4,
-    "wind_dir": "WSW",
-    "humidity_pct": 62,
-    "pressure_mb": 1012.3,
-    "roof": true,
-    "flag": "clear"
-  },
   "BAL": {
     "venue": "Camden Yards",
     "temp": 87.5,
@@ -40,17 +7,6 @@
     "wind_dir": "S",
     "humidity_pct": 49,
     "pressure_mb": 1017.5,
-    "roof": false,
-    "flag": "clear"
-  },
-  "NYY": {
-    "venue": "Yankee Stadium",
-    "temp": 78.6,
-    "precip": 1,
-    "wind_spd": 9.2,
-    "wind_dir": "SSE",
-    "humidity_pct": 72,
-    "pressure_mb": 1015.9,
     "roof": false,
     "flag": "clear"
   },
@@ -65,6 +21,28 @@
     "roof": false,
     "flag": "clear"
   },
+  "MIA": {
+    "venue": "loanDepot Park",
+    "temp": 86.0,
+    "precip": 2,
+    "wind_spd": 5.1,
+    "wind_dir": "E",
+    "humidity_pct": 79,
+    "pressure_mb": 1017.4,
+    "roof": true,
+    "flag": "clear"
+  },
+  "MIL": {
+    "venue": "American Family Field",
+    "temp": 81.0,
+    "precip": 0,
+    "wind_spd": 8.4,
+    "wind_dir": "WSW",
+    "humidity_pct": 62,
+    "pressure_mb": 1012.3,
+    "roof": true,
+    "flag": "clear"
+  },
   "LAD": {
     "venue": "Dodger Stadium",
     "temp": 89.8,
@@ -76,15 +54,15 @@
     "roof": false,
     "flag": "clear"
   },
-  "MIA": {
-    "venue": "loanDepot Park",
-    "temp": 86.0,
-    "precip": 2,
-    "wind_spd": 5.1,
-    "wind_dir": "E",
-    "humidity_pct": 79,
-    "pressure_mb": 1017.4,
-    "roof": true,
+  "BOS": {
+    "venue": "Fenway Park",
+    "temp": 75.9,
+    "precip": 21,
+    "wind_spd": 10.1,
+    "wind_dir": "S",
+    "humidity_pct": 67,
+    "pressure_mb": 1017.7,
+    "roof": false,
     "flag": "clear"
   },
   "PHI": {
@@ -98,6 +76,17 @@
     "roof": false,
     "flag": "clear"
   },
+  "NYY": {
+    "venue": "Yankee Stadium",
+    "temp": 78.6,
+    "precip": 1,
+    "wind_spd": 9.2,
+    "wind_dir": "SSE",
+    "humidity_pct": 72,
+    "pressure_mb": 1015.9,
+    "roof": false,
+    "flag": "clear"
+  },
   "CWS": {
     "venue": "Rate Field",
     "temp": 76.5,
@@ -106,6 +95,17 @@
     "wind_dir": "WSW",
     "humidity_pct": 81,
     "pressure_mb": 1013.5,
+    "roof": false,
+    "flag": "clear"
+  },
+  "ATL": {
+    "venue": "Truist Park",
+    "temp": 87.1,
+    "precip": 1,
+    "wind_spd": 2.9,
+    "wind_dir": "SSE",
+    "humidity_pct": 39,
+    "pressure_mb": 1018.5,
     "roof": false,
     "flag": "clear"
   }
