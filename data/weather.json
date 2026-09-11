@@ -1,15 +1,4 @@
 {
-  "CWS": {
-    "venue": "Rate Field",
-    "temp": 71.4,
-    "precip": 0,
-    "wind_spd": 5.8,
-    "wind_dir": "ENE",
-    "humidity_pct": 65,
-    "pressure_mb": 1015.5,
-    "roof": false,
-    "flag": "clear"
-  },
   "NYY": {
     "venue": "Yankee Stadium",
     "temp": 82.5,
@@ -18,6 +7,17 @@
     "wind_dir": "WSW",
     "humidity_pct": 48,
     "pressure_mb": 1009.9,
+    "roof": false,
+    "flag": "clear"
+  },
+  "CWS": {
+    "venue": "Rate Field",
+    "temp": 71.4,
+    "precip": 0,
+    "wind_spd": 5.8,
+    "wind_dir": "ENE",
+    "humidity_pct": 65,
+    "pressure_mb": 1015.5,
     "roof": false,
     "flag": "clear"
   }
