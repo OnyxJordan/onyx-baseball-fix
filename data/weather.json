@@ -1,24 +1,13 @@
 {
-  "MIL": {
-    "venue": "American Family Field",
-    "temp": 78.8,
-    "precip": 1,
-    "wind_spd": 8.3,
-    "wind_dir": "WNW",
-    "humidity_pct": 67,
-    "pressure_mb": 1010.2,
+  "TB": {
+    "venue": "Tropicana Field",
+    "temp": 82.8,
+    "precip": 10,
+    "wind_spd": 4.3,
+    "wind_dir": "NW",
+    "humidity_pct": 83,
+    "pressure_mb": 1016.0,
     "roof": true,
-    "flag": "clear"
-  },
-  "STL": {
-    "venue": "Busch Stadium",
-    "temp": 88.6,
-    "precip": 0,
-    "wind_spd": 5.2,
-    "wind_dir": "WSW",
-    "humidity_pct": 49,
-    "pressure_mb": 1011.0,
-    "roof": false,
     "flag": "clear"
   },
   "ATH": {
@@ -32,21 +21,32 @@
     "roof": false,
     "flag": "clear"
   },
-  "TB": {
-    "venue": "Tropicana Field",
-    "temp": 82.8,
-    "precip": 10,
-    "wind_spd": 4.3,
-    "wind_dir": "NW",
-    "humidity_pct": 83,
-    "pressure_mb": 1016.0,
+  "STL": {
+    "venue": "Busch Stadium",
+    "temp": 88.6,
+    "precip": 0,
+    "wind_spd": 5.2,
+    "wind_dir": "WSW",
+    "humidity_pct": 49,
+    "pressure_mb": 1011.0,
+    "roof": false,
+    "flag": "clear"
+  },
+  "MIL": {
+    "venue": "American Family Field",
+    "temp": 78.8,
+    "precip": 2,
+    "wind_spd": 8.3,
+    "wind_dir": "WNW",
+    "humidity_pct": 67,
+    "pressure_mb": 1010.2,
     "roof": true,
     "flag": "clear"
   },
   "ATL": {
     "venue": "Truist Park",
     "temp": 81.0,
-    "precip": 4,
+    "precip": 2,
     "wind_spd": 1.4,
     "wind_dir": "SW",
     "humidity_pct": 84,
@@ -57,23 +57,12 @@
   "ARI": {
     "venue": "Chase Field",
     "temp": 101.9,
-    "precip": 5,
+    "precip": 2,
     "wind_spd": 6.1,
     "wind_dir": "WSW",
     "humidity_pct": 29,
     "pressure_mb": 1007.9,
     "roof": true,
-    "flag": "clear"
-  },
-  "WSH": {
-    "venue": "Nationals Park",
-    "temp": 79.9,
-    "precip": 11,
-    "wind_spd": 7.9,
-    "wind_dir": "ESE",
-    "humidity_pct": 82,
-    "pressure_mb": 1016.5,
-    "roof": false,
     "flag": "clear"
   }
 }
