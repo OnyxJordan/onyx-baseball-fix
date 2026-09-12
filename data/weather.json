@@ -1,37 +1,4 @@
 {
-  "MIN": {
-    "venue": "Target Field",
-    "temp": 80.2,
-    "precip": 0,
-    "wind_spd": 12.8,
-    "wind_dir": "S",
-    "humidity_pct": 39,
-    "pressure_mb": 1004.2,
-    "roof": false,
-    "flag": "clear"
-  },
-  "ATL": {
-    "venue": "Truist Park",
-    "temp": 72.5,
-    "precip": 72,
-    "wind_spd": 5.0,
-    "wind_dir": "W",
-    "humidity_pct": 94,
-    "pressure_mb": 1012.7,
-    "roof": false,
-    "flag": "clear"
-  },
-  "ARI": {
-    "venue": "Chase Field",
-    "temp": 101.7,
-    "precip": 1,
-    "wind_spd": 7.5,
-    "wind_dir": "W",
-    "humidity_pct": 28,
-    "pressure_mb": 1005.5,
-    "roof": true,
-    "flag": "clear"
-  },
   "WSH": {
     "venue": "Nationals Park",
     "temp": 79.7,
@@ -43,26 +10,26 @@
     "roof": false,
     "flag": "clear"
   },
-  "TB": {
-    "venue": "Tropicana Field",
-    "temp": 82.3,
-    "precip": 10,
-    "wind_spd": 3.4,
-    "wind_dir": "W",
-    "humidity_pct": 81,
-    "pressure_mb": 1014.8,
-    "roof": true,
+  "SF": {
+    "venue": "Oracle Park",
+    "temp": 61.9,
+    "precip": 1,
+    "wind_spd": 16.5,
+    "wind_dir": "WNW",
+    "humidity_pct": 84,
+    "pressure_mb": 1010.6,
+    "roof": false,
     "flag": "clear"
   },
-  "ATH": {
-    "venue": "Sutter Health Park",
-    "temp": 86.0,
+  "TOR": {
+    "venue": "Rogers Centre",
+    "temp": 68.3,
     "precip": 0,
-    "wind_spd": 8.9,
-    "wind_dir": "SW",
-    "humidity_pct": 35,
-    "pressure_mb": 1008.7,
-    "roof": false,
+    "wind_spd": 4.1,
+    "wind_dir": "ESE",
+    "humidity_pct": 58,
+    "pressure_mb": 1015.8,
+    "roof": true,
     "flag": "clear"
   },
   "DET": {
@@ -76,59 +43,63 @@
     "roof": false,
     "flag": "clear"
   },
-  "NYY": {
-    "venue": "Yankee Stadium",
-    "temp": 76.7,
-    "precip": 0,
-    "wind_spd": 3.1,
+  "TB": {
+    "venue": "Tropicana Field",
+    "temp": 83.0,
+    "precip": 10,
+    "wind_spd": 6.0,
     "wind_dir": "WSW",
-    "humidity_pct": 35,
-    "pressure_mb": 1015.3,
-    "roof": false,
-    "flag": "clear"
-  },
-  "MIL": {
-    "venue": "American Family Field",
-    "temp": 73.4,
-    "precip": 0,
-    "wind_spd": 9.8,
-    "wind_dir": "SE",
-    "humidity_pct": 53,
-    "pressure_mb": 1011.3,
-    "roof": true,
-    "flag": "clear"
-  },
-  "TOR": {
-    "venue": "Rogers Centre",
-    "temp": 67.3,
-    "precip": 0,
-    "wind_spd": 5.1,
-    "wind_dir": "ESE",
-    "humidity_pct": 64,
-    "pressure_mb": 1015.4,
-    "roof": true,
-    "flag": "clear"
-  },
-  "SF": {
-    "venue": "Oracle Park",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
-    "roof": false,
-    "flag": "clear"
-  },
-  "MIA": {
-    "venue": "loanDepot Park",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
+    "humidity_pct": 80,
+    "pressure_mb": 1015.2,
     "roof": true,
     "flag": "clear"
   },
   "STL": {
     "venue": "Busch Stadium",
+    "temp": 75.1,
+    "precip": 12,
+    "wind_spd": 3.8,
+    "wind_dir": "ESE",
+    "humidity_pct": 90,
+    "pressure_mb": 1010.1,
+    "roof": false,
+    "flag": "clear"
+  },
+  "BOS": {
+    "venue": "Fenway Park",
+    "temp": 71.3,
+    "precip": 0,
+    "wind_spd": 6.5,
+    "wind_dir": "NW",
+    "humidity_pct": 36,
+    "pressure_mb": 1014.6,
+    "roof": false,
+    "flag": "clear"
+  },
+  "ARI": {
+    "venue": "Chase Field",
+    "temp": 101.4,
+    "precip": 1,
+    "wind_spd": 10.2,
+    "wind_dir": "WSW",
+    "humidity_pct": 29,
+    "pressure_mb": 1004.3,
+    "roof": true,
+    "flag": "clear"
+  },
+  "MIA": {
+    "venue": "loanDepot Park",
+    "temp": 83.5,
+    "precip": 13,
+    "wind_spd": 3.5,
+    "wind_dir": "SE",
+    "humidity_pct": 83,
+    "pressure_mb": 1015.2,
+    "roof": true,
+    "flag": "clear"
+  },
+  "NYY": {
+    "venue": "Yankee Stadium",
     "temp": 72,
     "precip": 0,
     "wind_spd": 5,
@@ -136,13 +107,40 @@
     "roof": false,
     "flag": "clear"
   },
-  "BOS": {
-    "venue": "Fenway Park",
+  "ATH": {
+    "venue": "Sutter Health Park",
     "temp": 72,
     "precip": 0,
     "wind_spd": 5,
     "wind_dir": "N",
     "roof": false,
+    "flag": "clear"
+  },
+  "MIN": {
+    "venue": "Target Field",
+    "temp": 72,
+    "precip": 0,
+    "wind_spd": 5,
+    "wind_dir": "N",
+    "roof": false,
+    "flag": "clear"
+  },
+  "ATL": {
+    "venue": "Truist Park",
+    "temp": 72,
+    "precip": 0,
+    "wind_spd": 5,
+    "wind_dir": "N",
+    "roof": false,
+    "flag": "clear"
+  },
+  "MIL": {
+    "venue": "American Family Field",
+    "temp": 72,
+    "precip": 0,
+    "wind_spd": 5,
+    "wind_dir": "N",
+    "roof": true,
     "flag": "clear"
   }
 }
