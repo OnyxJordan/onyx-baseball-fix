@@ -1990,7 +1990,7 @@
   "prob": 0.265,
   "edge": -4.3,
   "tier": "ticket",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-09-12",
@@ -1999,7 +1999,7 @@
   "prob": 0.249,
   "edge": -1.5,
   "tier": "ticket",
-  "hit": null
+  "hit": true
  },
  {
   "date": "2026-09-12",
@@ -2008,7 +2008,7 @@
   "prob": 0.221,
   "edge": -8.2,
   "tier": "ticket",
-  "hit": null
+  "hit": false
  },
  {
   "date": "2026-09-12",
@@ -2016,6 +2016,24 @@
   "odds": 226,
   "prob": 0.238,
   "edge": -6.9,
+  "tier": "ticket",
+  "hit": false
+ },
+ {
+  "date": "2026-09-13",
+  "player": "Cal Raleigh",
+  "odds": 217,
+  "prob": 0.23,
+  "edge": -8.5,
+  "tier": "ticket",
+  "hit": null
+ },
+ {
+  "date": "2026-09-13",
+  "player": "Aaron Judge",
+  "odds": 232,
+  "prob": 0.26,
+  "edge": -4.1,
   "tier": "ticket",
   "hit": null
  }

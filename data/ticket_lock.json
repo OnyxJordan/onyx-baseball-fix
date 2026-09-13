@@ -1,57 +1,40 @@
 {
- "date": "2026-09-12",
- "locked": true,
+ "date": "2026-09-13",
+ "locked": false,
  "legs": [
+  {
+   "player": "Cal Raleigh",
+   "mid": 663728,
+   "team": "SEA",
+   "odds": 217,
+   "prob": 23.0,
+   "score": 0.731,
+   "why": [
+    "pitcher matchup ×1.20",
+    "56% FB bat",
+    "overdue"
+   ],
+   "away": "SEA",
+   "home": "ATH",
+   "opp": "Jacob Lopez",
+   "time": "4:05 PM"
+  },
   {
    "player": "Aaron Judge",
    "mid": 592450,
    "team": "NYY",
-   "odds": 214,
-   "prob": 27.0,
-   "score": 0.761,
+   "odds": 232,
+   "prob": 26.0,
+   "score": 0.611,
    "why": [
     "park ×1.33",
-    "wind/heat ×1.10",
-    "soft bullpen"
+    "46% FB bat",
+    "fly-ball pitcher"
    ],
    "away": "NYM",
    "home": "NYY",
-   "opp": "Zac Thornton",
+   "opp": "Christian Scott",
    "time": "1:35 PM"
-  },
-  {
-   "player": "Juan Soto",
-   "mid": 665742,
-   "team": "NYM",
-   "odds": 256,
-   "prob": 25.4,
-   "score": 0.716,
-   "why": [
-    "park ×1.33",
-    "wind/heat ×1.10",
-    "platoon edge"
-   ],
-   "away": "NYM",
-   "home": "NYY",
-   "opp": "Gerrit Cole",
-   "time": "1:35 PM"
-  },
-  {
-   "player": "Pete Crow-Armstrong",
-   "mid": 691718,
-   "team": "CHC",
-   "odds": 226,
-   "prob": 23.8,
-   "score": 0.614,
-   "why": [
-    "wind/heat ×1.20",
-    "soft bullpen",
-    "47% FB bat"
-   ],
-   "away": "PIT",
-   "home": "CHC",
-   "opp": "Paul Skenes",
-   "time": "2:20 PM"
   }
  ]
 }

@@ -1091,18 +1091,38 @@
     "player": "Aaron Judge",
     "odds": 214,
     "prob": 27.0,
-    "hit": null
+    "hit": false
    },
    {
     "player": "Juan Soto",
     "odds": 256,
     "prob": 25.4,
-    "hit": null
+    "hit": true
    },
    {
     "player": "Pete Crow-Armstrong",
     "odds": 226,
     "prob": 23.8,
+    "hit": false
+   }
+  ],
+  "result": "loss",
+  "pnl": -10.0
+ },
+ {
+  "date": "2026-09-13",
+  "stake": 10,
+  "legs": [
+   {
+    "player": "Cal Raleigh",
+    "odds": 217,
+    "prob": 23.0,
+    "hit": null
+   },
+   {
+    "player": "Aaron Judge",
+    "odds": 232,
+    "prob": 26.0,
     "hit": null
    }
   ],
