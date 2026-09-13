@@ -1,45 +1,12 @@
 {
-  "SF": {
-    "venue": "Oracle Park",
-    "temp": 70.2,
+  "ATH": {
+    "venue": "Sutter Health Park",
+    "temp": 75.7,
     "precip": 0,
-    "wind_spd": 16.9,
-    "wind_dir": "WNW",
-    "humidity_pct": 53,
-    "pressure_mb": 1015.7,
-    "roof": false,
-    "flag": "clear"
-  },
-  "MIN": {
-    "venue": "Target Field",
-    "temp": 68.5,
-    "precip": 0,
-    "wind_spd": 9.3,
+    "wind_spd": 8.5,
     "wind_dir": "NW",
-    "humidity_pct": 33,
-    "pressure_mb": 1020.2,
-    "roof": false,
-    "flag": "clear"
-  },
-  "ATL": {
-    "venue": "Truist Park",
-    "temp": 83.0,
-    "precip": 0,
-    "wind_spd": 6.0,
-    "wind_dir": "NW",
-    "humidity_pct": 66,
-    "pressure_mb": 1014.8,
-    "roof": false,
-    "flag": "clear"
-  },
-  "NYY": {
-    "venue": "Yankee Stadium",
-    "temp": 71.0,
-    "precip": 38,
-    "wind_spd": 7.8,
-    "wind_dir": "NNW",
-    "humidity_pct": 94,
-    "pressure_mb": 1012.3,
+    "humidity_pct": 35,
+    "pressure_mb": 1014.6,
     "roof": false,
     "flag": "clear"
   },
@@ -54,37 +21,37 @@
     "roof": false,
     "flag": "clear"
   },
-  "WSH": {
-    "venue": "Nationals Park",
-    "temp": 80.1,
-    "precip": 8,
-    "wind_spd": 2.1,
-    "wind_dir": "NW",
-    "humidity_pct": 80,
-    "pressure_mb": 1012.5,
-    "roof": false,
-    "flag": "clear"
-  },
-  "ATH": {
-    "venue": "Sutter Health Park",
-    "temp": 75.7,
+  "ATL": {
+    "venue": "Truist Park",
+    "temp": 83.0,
     "precip": 0,
-    "wind_spd": 8.5,
+    "wind_spd": 6.0,
     "wind_dir": "NW",
-    "humidity_pct": 35,
-    "pressure_mb": 1014.6,
+    "humidity_pct": 66,
+    "pressure_mb": 1014.8,
     "roof": false,
     "flag": "clear"
   },
-  "MIA": {
-    "venue": "loanDepot Park",
-    "temp": 88.4,
-    "precip": 6,
-    "wind_spd": 6.6,
-    "wind_dir": "SSE",
-    "humidity_pct": 66,
-    "pressure_mb": 1017.7,
-    "roof": true,
+  "SF": {
+    "venue": "Oracle Park",
+    "temp": 70.2,
+    "precip": 0,
+    "wind_spd": 16.9,
+    "wind_dir": "WNW",
+    "humidity_pct": 53,
+    "pressure_mb": 1015.7,
+    "roof": false,
+    "flag": "clear"
+  },
+  "NYY": {
+    "venue": "Yankee Stadium",
+    "temp": 71.0,
+    "precip": 38,
+    "wind_spd": 7.8,
+    "wind_dir": "NNW",
+    "humidity_pct": 94,
+    "pressure_mb": 1012.3,
+    "roof": false,
     "flag": "clear"
   },
   "DET": {
@@ -109,15 +76,15 @@
     "roof": true,
     "flag": "clear"
   },
-  "MIL": {
-    "venue": "American Family Field",
-    "temp": 64.6,
-    "precip": 15,
-    "wind_spd": 9.9,
-    "wind_dir": "WNW",
-    "humidity_pct": 60,
-    "pressure_mb": 1019.1,
-    "roof": true,
+  "BOS": {
+    "venue": "Fenway Park",
+    "temp": 66.5,
+    "precip": 90,
+    "wind_spd": 7.8,
+    "wind_dir": "E",
+    "humidity_pct": 97,
+    "pressure_mb": 1012.1,
+    "roof": false,
     "flag": "clear"
   },
   "CHC": {
@@ -131,15 +98,15 @@
     "roof": false,
     "flag": "clear"
   },
-  "BOS": {
-    "venue": "Fenway Park",
-    "temp": 66.5,
-    "precip": 88,
-    "wind_spd": 7.8,
-    "wind_dir": "E",
-    "humidity_pct": 97,
-    "pressure_mb": 1012.1,
-    "roof": false,
+  "MIL": {
+    "venue": "American Family Field",
+    "temp": 64.6,
+    "precip": 22,
+    "wind_spd": 9.9,
+    "wind_dir": "WNW",
+    "humidity_pct": 60,
+    "pressure_mb": 1019.1,
+    "roof": true,
     "flag": "clear"
   },
   "TB": {
@@ -153,15 +120,44 @@
     "roof": true,
     "flag": "clear"
   },
+  "MIA": {
+    "venue": "loanDepot Park",
+    "temp": 88.4,
+    "precip": 6,
+    "wind_spd": 6.6,
+    "wind_dir": "SSE",
+    "humidity_pct": 66,
+    "pressure_mb": 1017.7,
+    "roof": true,
+    "flag": "clear"
+  },
+  "WSH": {
+    "venue": "Nationals Park",
+    "temp": 80.1,
+    "precip": 8,
+    "wind_spd": 2.1,
+    "wind_dir": "NW",
+    "humidity_pct": 80,
+    "pressure_mb": 1012.5,
+    "roof": false,
+    "flag": "clear"
+  },
   "TOR": {
     "venue": "Rogers Centre",
-    "temp": 77.6,
-    "precip": 2,
-    "wind_spd": 5.0,
-    "wind_dir": "WNW",
-    "humidity_pct": 72,
-    "pressure_mb": 1011.0,
+    "temp": 72,
+    "precip": 0,
+    "wind_spd": 5,
+    "wind_dir": "N",
     "roof": true,
+    "flag": "clear"
+  },
+  "MIN": {
+    "venue": "Target Field",
+    "temp": 72,
+    "precip": 0,
+    "wind_spd": 5,
+    "wind_dir": "N",
+    "roof": false,
     "flag": "clear"
   }
 }
