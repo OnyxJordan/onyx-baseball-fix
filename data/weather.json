@@ -1,4 +1,15 @@
 {
+  "ARI": {
+    "venue": "Chase Field",
+    "temp": 100.0,
+    "precip": 1,
+    "wind_spd": 2.9,
+    "wind_dir": "S",
+    "humidity_pct": 38,
+    "pressure_mb": 1007.7,
+    "roof": true,
+    "flag": "clear"
+  },
   "ATH": {
     "venue": "Sutter Health Park",
     "temp": 74.9,
@@ -30,17 +41,6 @@
     "humidity_pct": 98,
     "pressure_mb": 1010.9,
     "roof": false,
-    "flag": "clear"
-  },
-  "ARI": {
-    "venue": "Chase Field",
-    "temp": 100.0,
-    "precip": 1,
-    "wind_spd": 2.9,
-    "wind_dir": "S",
-    "humidity_pct": 38,
-    "pressure_mb": 1007.7,
-    "roof": true,
     "flag": "clear"
   }
 }
