@@ -1,4 +1,15 @@
 {
+  "TB": {
+    "venue": "Tropicana Field",
+    "temp": 81.8,
+    "precip": 10,
+    "wind_spd": 3.6,
+    "wind_dir": "N",
+    "humidity_pct": 86,
+    "pressure_mb": 1015.4,
+    "roof": true,
+    "flag": "clear"
+  },
   "STL": {
     "venue": "Busch Stadium",
     "temp": 88.5,
@@ -7,6 +18,17 @@
     "wind_dir": "SW",
     "humidity_pct": 51,
     "pressure_mb": 1010.2,
+    "roof": false,
+    "flag": "clear"
+  },
+  "ATL": {
+    "venue": "Truist Park",
+    "temp": 81.3,
+    "precip": 2,
+    "wind_spd": 4.7,
+    "wind_dir": "S",
+    "humidity_pct": 80,
+    "pressure_mb": 1015.1,
     "roof": false,
     "flag": "clear"
   },
@@ -21,39 +43,6 @@
     "roof": true,
     "flag": "clear"
   },
-  "ATL": {
-    "venue": "Truist Park",
-    "temp": 81.3,
-    "precip": 2,
-    "wind_spd": 4.7,
-    "wind_dir": "S",
-    "humidity_pct": 80,
-    "pressure_mb": 1015.1,
-    "roof": false,
-    "flag": "clear"
-  },
-  "ARI": {
-    "venue": "Chase Field",
-    "temp": 101.6,
-    "precip": 1,
-    "wind_spd": 4.6,
-    "wind_dir": "SSW",
-    "humidity_pct": 29,
-    "pressure_mb": 1007.8,
-    "roof": true,
-    "flag": "clear"
-  },
-  "TB": {
-    "venue": "Tropicana Field",
-    "temp": 81.8,
-    "precip": 10,
-    "wind_spd": 3.6,
-    "wind_dir": "N",
-    "humidity_pct": 86,
-    "pressure_mb": 1015.4,
-    "roof": true,
-    "flag": "clear"
-  },
   "ATH": {
     "venue": "Sutter Health Park",
     "temp": 79.6,
@@ -63,6 +52,17 @@
     "humidity_pct": 33,
     "pressure_mb": 1010.9,
     "roof": false,
+    "flag": "clear"
+  },
+  "ARI": {
+    "venue": "Chase Field",
+    "temp": 101.6,
+    "precip": 2,
+    "wind_spd": 4.6,
+    "wind_dir": "SSW",
+    "humidity_pct": 29,
+    "pressure_mb": 1007.8,
+    "roof": true,
     "flag": "clear"
   }
 }
