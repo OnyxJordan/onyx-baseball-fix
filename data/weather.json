@@ -1,34 +1,12 @@
 {
   "SF": {
     "venue": "Oracle Park",
-    "temp": 69.9,
+    "temp": 70.2,
     "precip": 0,
-    "wind_spd": 16.3,
+    "wind_spd": 16.1,
     "wind_dir": "WNW",
-    "humidity_pct": 55,
+    "humidity_pct": 56,
     "pressure_mb": 1015.3,
-    "roof": false,
-    "flag": "clear"
-  },
-  "ARI": {
-    "venue": "Chase Field",
-    "temp": 100.0,
-    "precip": 1,
-    "wind_spd": 2.9,
-    "wind_dir": "S",
-    "humidity_pct": 38,
-    "pressure_mb": 1007.7,
-    "roof": true,
-    "flag": "clear"
-  },
-  "ATH": {
-    "venue": "Sutter Health Park",
-    "temp": 74.9,
-    "precip": 0,
-    "wind_spd": 5.1,
-    "wind_dir": "NNW",
-    "humidity_pct": 43,
-    "pressure_mb": 1015.6,
     "roof": false,
     "flag": "clear"
   },
@@ -40,6 +18,17 @@
     "wind_dir": "N",
     "humidity_pct": 98,
     "pressure_mb": 1010.9,
+    "roof": false,
+    "flag": "clear"
+  },
+  "ATH": {
+    "venue": "Sutter Health Park",
+    "temp": 74.9,
+    "precip": 0,
+    "wind_spd": 5.1,
+    "wind_dir": "NNW",
+    "humidity_pct": 43,
+    "pressure_mb": 1015.6,
     "roof": false,
     "flag": "clear"
   }
