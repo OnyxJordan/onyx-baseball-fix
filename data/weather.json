@@ -10,17 +10,6 @@
     "roof": false,
     "flag": "clear"
   },
-  "STL": {
-    "venue": "Busch Stadium",
-    "temp": 85.6,
-    "precip": 0,
-    "wind_spd": 10.7,
-    "wind_dir": "SE",
-    "humidity_pct": 39,
-    "pressure_mb": 1015.9,
-    "roof": false,
-    "flag": "clear"
-  },
   "NYM": {
     "venue": "Citi Field",
     "temp": 68.2,
@@ -29,17 +18,6 @@
     "wind_dir": "N",
     "humidity_pct": 48,
     "pressure_mb": 1021.6,
-    "roof": false,
-    "flag": "clear"
-  },
-  "MIN": {
-    "venue": "Target Field",
-    "temp": 59.0,
-    "precip": 62,
-    "wind_spd": 13.5,
-    "wind_dir": "S",
-    "humidity_pct": 91,
-    "pressure_mb": 1008.1,
     "roof": false,
     "flag": "clear"
   },
@@ -54,28 +32,6 @@
     "roof": true,
     "flag": "clear"
   },
-  "TOR": {
-    "venue": "Rogers Centre",
-    "temp": 63.8,
-    "precip": 0,
-    "wind_spd": 5.7,
-    "wind_dir": "SE",
-    "humidity_pct": 65,
-    "pressure_mb": 1022.6,
-    "roof": true,
-    "flag": "clear"
-  },
-  "LAA": {
-    "venue": "Angel Stadium",
-    "temp": 74.2,
-    "precip": 0,
-    "wind_spd": 7.2,
-    "wind_dir": "SW",
-    "humidity_pct": 75,
-    "pressure_mb": 1009.2,
-    "roof": false,
-    "flag": "clear"
-  },
   "CLE": {
     "venue": "Progressive Field",
     "temp": 67.5,
@@ -84,6 +40,17 @@
     "wind_dir": "NE",
     "humidity_pct": 46,
     "pressure_mb": 1022.5,
+    "roof": false,
+    "flag": "clear"
+  },
+  "MIN": {
+    "venue": "Target Field",
+    "temp": 59.0,
+    "precip": 60,
+    "wind_spd": 13.5,
+    "wind_dir": "S",
+    "humidity_pct": 91,
+    "pressure_mb": 1008.1,
     "roof": false,
     "flag": "clear"
   },
@@ -107,6 +74,35 @@
     "humidity_pct": 46,
     "pressure_mb": 1019.0,
     "roof": false,
+    "flag": "clear"
+  },
+  "LAA": {
+    "venue": "Angel Stadium",
+    "temp": 74.2,
+    "precip": 0,
+    "wind_spd": 7.2,
+    "wind_dir": "SW",
+    "humidity_pct": 75,
+    "pressure_mb": 1009.2,
+    "roof": false,
+    "flag": "clear"
+  },
+  "STL": {
+    "venue": "Busch Stadium",
+    "temp": 72,
+    "precip": 0,
+    "wind_spd": 5,
+    "wind_dir": "N",
+    "roof": false,
+    "flag": "clear"
+  },
+  "TOR": {
+    "venue": "Rogers Centre",
+    "temp": 72,
+    "precip": 0,
+    "wind_spd": 5,
+    "wind_dir": "N",
+    "roof": true,
     "flag": "clear"
   }
 }
