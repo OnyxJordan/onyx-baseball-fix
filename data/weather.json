@@ -1,24 +1,13 @@
 {
-  "NYM": {
-    "venue": "Citi Field",
-    "temp": 69.5,
+  "TOR": {
+    "venue": "Rogers Centre",
+    "temp": 63.7,
     "precip": 0,
-    "wind_spd": 6.5,
-    "wind_dir": "N",
-    "humidity_pct": 41,
-    "pressure_mb": 1021.1,
-    "roof": false,
-    "flag": "clear"
-  },
-  "COL": {
-    "venue": "Coors Field",
-    "temp": 85.0,
-    "precip": 3,
-    "wind_spd": 12.3,
-    "wind_dir": "WNW",
-    "humidity_pct": 20,
-    "pressure_mb": 1000.0,
-    "roof": false,
+    "wind_spd": 3.6,
+    "wind_dir": "SE",
+    "humidity_pct": 65,
+    "pressure_mb": 1022.4,
+    "roof": true,
     "flag": "clear"
   },
   "LAA": {
@@ -32,28 +21,6 @@
     "roof": false,
     "flag": "clear"
   },
-  "MIN": {
-    "venue": "Target Field",
-    "temp": 56.4,
-    "precip": 50,
-    "wind_spd": 12.3,
-    "wind_dir": "SSE",
-    "humidity_pct": 90,
-    "pressure_mb": 1008.5,
-    "roof": false,
-    "flag": "clear"
-  },
-  "ARI": {
-    "venue": "Chase Field",
-    "temp": 100.2,
-    "precip": 3,
-    "wind_spd": 3.4,
-    "wind_dir": "S",
-    "humidity_pct": 28,
-    "pressure_mb": 1003.1,
-    "roof": true,
-    "flag": "clear"
-  },
   "STL": {
     "venue": "Busch Stadium",
     "temp": 85.9,
@@ -62,28 +29,6 @@
     "wind_dir": "SE",
     "humidity_pct": 44,
     "pressure_mb": 1016.9,
-    "roof": false,
-    "flag": "clear"
-  },
-  "TOR": {
-    "venue": "Rogers Centre",
-    "temp": 63.7,
-    "precip": 0,
-    "wind_spd": 3.6,
-    "wind_dir": "SE",
-    "humidity_pct": 65,
-    "pressure_mb": 1022.4,
-    "roof": true,
-    "flag": "clear"
-  },
-  "CLE": {
-    "venue": "Progressive Field",
-    "temp": 67.1,
-    "precip": 0,
-    "wind_spd": 5.4,
-    "wind_dir": "NNW",
-    "humidity_pct": 50,
-    "pressure_mb": 1022.1,
     "roof": false,
     "flag": "clear"
   },
@@ -106,6 +51,61 @@
     "wind_dir": "SE",
     "humidity_pct": 48,
     "pressure_mb": 1019.7,
+    "roof": false,
+    "flag": "clear"
+  },
+  "COL": {
+    "venue": "Coors Field",
+    "temp": 85.0,
+    "precip": 3,
+    "wind_spd": 12.3,
+    "wind_dir": "WNW",
+    "humidity_pct": 20,
+    "pressure_mb": 1000.0,
+    "roof": false,
+    "flag": "clear"
+  },
+  "ARI": {
+    "venue": "Chase Field",
+    "temp": 100.2,
+    "precip": 3,
+    "wind_spd": 3.4,
+    "wind_dir": "S",
+    "humidity_pct": 28,
+    "pressure_mb": 1003.1,
+    "roof": true,
+    "flag": "clear"
+  },
+  "MIN": {
+    "venue": "Target Field",
+    "temp": 56.4,
+    "precip": 50,
+    "wind_spd": 12.3,
+    "wind_dir": "SSE",
+    "humidity_pct": 90,
+    "pressure_mb": 1008.5,
+    "roof": false,
+    "flag": "clear"
+  },
+  "CLE": {
+    "venue": "Progressive Field",
+    "temp": 67.1,
+    "precip": 0,
+    "wind_spd": 5.4,
+    "wind_dir": "NNW",
+    "humidity_pct": 50,
+    "pressure_mb": 1022.1,
+    "roof": false,
+    "flag": "clear"
+  },
+  "NYM": {
+    "venue": "Citi Field",
+    "temp": 69.5,
+    "precip": 0,
+    "wind_spd": 6.5,
+    "wind_dir": "N",
+    "humidity_pct": 41,
+    "pressure_mb": 1021.1,
     "roof": false,
     "flag": "clear"
   }
