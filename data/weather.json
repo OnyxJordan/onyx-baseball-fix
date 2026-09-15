@@ -1,26 +1,4 @@
 {
-  "STL": {
-    "venue": "Busch Stadium",
-    "temp": 86.7,
-    "precip": 0,
-    "wind_spd": 10.0,
-    "wind_dir": "SE",
-    "humidity_pct": 43,
-    "pressure_mb": 1015.4,
-    "roof": false,
-    "flag": "clear"
-  },
-  "CLE": {
-    "venue": "Progressive Field",
-    "temp": 68.0,
-    "precip": 0,
-    "wind_spd": 4.2,
-    "wind_dir": "NNW",
-    "humidity_pct": 50,
-    "pressure_mb": 1023.0,
-    "roof": false,
-    "flag": "clear"
-  },
   "NYM": {
     "venue": "Citi Field",
     "temp": 73.1,
@@ -29,6 +7,17 @@
     "wind_dir": "NNW",
     "humidity_pct": 31,
     "pressure_mb": 1020.7,
+    "roof": false,
+    "flag": "clear"
+  },
+  "CHC": {
+    "venue": "Wrigley Field",
+    "temp": 69.2,
+    "precip": 1,
+    "wind_spd": 10.4,
+    "wind_dir": "SSE",
+    "humidity_pct": 45,
+    "pressure_mb": 1018.4,
     "roof": false,
     "flag": "clear"
   },
@@ -43,6 +32,28 @@
     "roof": false,
     "flag": "clear"
   },
+  "STL": {
+    "venue": "Busch Stadium",
+    "temp": 86.7,
+    "precip": 0,
+    "wind_spd": 10.0,
+    "wind_dir": "SE",
+    "humidity_pct": 43,
+    "pressure_mb": 1015.4,
+    "roof": false,
+    "flag": "clear"
+  },
+  "TOR": {
+    "venue": "Rogers Centre",
+    "temp": 64.3,
+    "precip": 0,
+    "wind_spd": 2.5,
+    "wind_dir": "SE",
+    "humidity_pct": 63,
+    "pressure_mb": 1023.0,
+    "roof": true,
+    "flag": "clear"
+  },
   "MIN": {
     "venue": "Target Field",
     "temp": 57.2,
@@ -51,28 +62,6 @@
     "wind_dir": "SSE",
     "humidity_pct": 96,
     "pressure_mb": 1007.1,
-    "roof": false,
-    "flag": "clear"
-  },
-  "ARI": {
-    "venue": "Chase Field",
-    "temp": 95.5,
-    "precip": 3,
-    "wind_spd": 7.5,
-    "wind_dir": "E",
-    "humidity_pct": 38,
-    "pressure_mb": 1002.6,
-    "roof": true,
-    "flag": "clear"
-  },
-  "CHC": {
-    "venue": "Wrigley Field",
-    "temp": 69.2,
-    "precip": 1,
-    "wind_spd": 10.4,
-    "wind_dir": "SSE",
-    "humidity_pct": 45,
-    "pressure_mb": 1018.4,
     "roof": false,
     "flag": "clear"
   },
@@ -87,14 +76,25 @@
     "roof": false,
     "flag": "clear"
   },
-  "TOR": {
-    "venue": "Rogers Centre",
-    "temp": 64.3,
+  "CLE": {
+    "venue": "Progressive Field",
+    "temp": 68.0,
     "precip": 0,
-    "wind_spd": 2.5,
-    "wind_dir": "SE",
-    "humidity_pct": 63,
+    "wind_spd": 4.2,
+    "wind_dir": "NNW",
+    "humidity_pct": 50,
     "pressure_mb": 1023.0,
+    "roof": false,
+    "flag": "clear"
+  },
+  "ARI": {
+    "venue": "Chase Field",
+    "temp": 95.5,
+    "precip": 3,
+    "wind_spd": 7.5,
+    "wind_dir": "E",
+    "humidity_pct": 38,
+    "pressure_mb": 1002.6,
     "roof": true,
     "flag": "clear"
   }
