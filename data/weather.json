@@ -10,6 +10,61 @@
     "roof": false,
     "flag": "clear"
   },
+  "CLE": {
+    "venue": "Progressive Field",
+    "temp": 68.0,
+    "precip": 0,
+    "wind_spd": 4.2,
+    "wind_dir": "NNW",
+    "humidity_pct": 50,
+    "pressure_mb": 1023.0,
+    "roof": false,
+    "flag": "clear"
+  },
+  "LAA": {
+    "venue": "Angel Stadium",
+    "temp": 74.2,
+    "precip": 0,
+    "wind_spd": 7.2,
+    "wind_dir": "SW",
+    "humidity_pct": 67,
+    "pressure_mb": 1008.6,
+    "roof": false,
+    "flag": "clear"
+  },
+  "MIN": {
+    "venue": "Target Field",
+    "temp": 56.4,
+    "precip": 47,
+    "wind_spd": 13.4,
+    "wind_dir": "SSE",
+    "humidity_pct": 93,
+    "pressure_mb": 1007.8,
+    "roof": false,
+    "flag": "clear"
+  },
+  "CIN": {
+    "venue": "Great American Ball Park",
+    "temp": 77.3,
+    "precip": 0,
+    "wind_spd": 5.5,
+    "wind_dir": "ENE",
+    "humidity_pct": 39,
+    "pressure_mb": 1021.1,
+    "roof": false,
+    "flag": "clear"
+  },
+  "COL": {
+    "venue": "Coors Field",
+    "temp": 85.5,
+    "precip": 1,
+    "wind_spd": 13.4,
+    "wind_dir": "WNW",
+    "humidity_pct": 19,
+    "pressure_mb": 999.4,
+    "roof": false,
+    "flag": "clear"
+  },
   "CHC": {
     "venue": "Wrigley Field",
     "temp": 68.7,
@@ -32,17 +87,6 @@
     "roof": false,
     "flag": "clear"
   },
-  "ARI": {
-    "venue": "Chase Field",
-    "temp": 96.1,
-    "precip": 3,
-    "wind_spd": 10.4,
-    "wind_dir": "SSW",
-    "humidity_pct": 35,
-    "pressure_mb": 1003.3,
-    "roof": true,
-    "flag": "clear"
-  },
   "TOR": {
     "venue": "Rogers Centre",
     "temp": 64.3,
@@ -54,59 +98,15 @@
     "roof": true,
     "flag": "clear"
   },
-  "LAA": {
-    "venue": "Angel Stadium",
-    "temp": 74.2,
-    "precip": 0,
-    "wind_spd": 7.2,
-    "wind_dir": "SW",
-    "humidity_pct": 67,
-    "pressure_mb": 1008.6,
-    "roof": false,
-    "flag": "clear"
-  },
-  "CIN": {
-    "venue": "Great American Ball Park",
-    "temp": 77.3,
-    "precip": 0,
-    "wind_spd": 5.5,
-    "wind_dir": "ENE",
-    "humidity_pct": 39,
-    "pressure_mb": 1021.1,
-    "roof": false,
-    "flag": "clear"
-  },
-  "MIN": {
-    "venue": "Target Field",
-    "temp": 56.4,
-    "precip": 47,
-    "wind_spd": 13.4,
-    "wind_dir": "SSE",
-    "humidity_pct": 93,
-    "pressure_mb": 1007.8,
-    "roof": false,
-    "flag": "clear"
-  },
-  "COL": {
-    "venue": "Coors Field",
-    "temp": 85.5,
-    "precip": 2,
-    "wind_spd": 13.4,
-    "wind_dir": "WNW",
-    "humidity_pct": 19,
-    "pressure_mb": 999.4,
-    "roof": false,
-    "flag": "clear"
-  },
-  "CLE": {
-    "venue": "Progressive Field",
-    "temp": 68.0,
-    "precip": 0,
-    "wind_spd": 4.2,
-    "wind_dir": "NNW",
-    "humidity_pct": 50,
-    "pressure_mb": 1023.0,
-    "roof": false,
+  "ARI": {
+    "venue": "Chase Field",
+    "temp": 96.1,
+    "precip": 3,
+    "wind_spd": 10.4,
+    "wind_dir": "SSW",
+    "humidity_pct": 35,
+    "pressure_mb": 1003.3,
+    "roof": true,
     "flag": "clear"
   }
 }
