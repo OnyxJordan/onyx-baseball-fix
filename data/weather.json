@@ -1,15 +1,4 @@
 {
-  "ARI": {
-    "venue": "Chase Field",
-    "temp": 101.1,
-    "precip": 2,
-    "wind_spd": 11.2,
-    "wind_dir": "W",
-    "humidity_pct": 26,
-    "pressure_mb": 1003.3,
-    "roof": true,
-    "flag": "clear"
-  },
   "COL": {
     "venue": "Coors Field",
     "temp": 82.7,
@@ -30,6 +19,17 @@
     "humidity_pct": 69,
     "pressure_mb": 1007.8,
     "roof": false,
+    "flag": "clear"
+  },
+  "ARI": {
+    "venue": "Chase Field",
+    "temp": 101.1,
+    "precip": 2,
+    "wind_spd": 11.2,
+    "wind_dir": "W",
+    "humidity_pct": 26,
+    "pressure_mb": 1003.3,
+    "roof": true,
     "flag": "clear"
   }
 }
