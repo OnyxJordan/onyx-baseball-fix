@@ -10,6 +10,28 @@
     "roof": false,
     "flag": "clear"
   },
+  "CLE": {
+    "venue": "Progressive Field",
+    "temp": 68.0,
+    "precip": 0,
+    "wind_spd": 4.2,
+    "wind_dir": "NNW",
+    "humidity_pct": 50,
+    "pressure_mb": 1023.0,
+    "roof": false,
+    "flag": "clear"
+  },
+  "LAA": {
+    "venue": "Angel Stadium",
+    "temp": 75.4,
+    "precip": 0,
+    "wind_spd": 7.6,
+    "wind_dir": "SSW",
+    "humidity_pct": 62,
+    "pressure_mb": 1007.5,
+    "roof": false,
+    "flag": "clear"
+  },
   "CHC": {
     "venue": "Wrigley Field",
     "temp": 69.2,
@@ -54,6 +76,17 @@
     "roof": true,
     "flag": "clear"
   },
+  "ARI": {
+    "venue": "Chase Field",
+    "temp": 95.5,
+    "precip": 2,
+    "wind_spd": 7.5,
+    "wind_dir": "E",
+    "humidity_pct": 38,
+    "pressure_mb": 1002.6,
+    "roof": true,
+    "flag": "clear"
+  },
   "MIN": {
     "venue": "Target Field",
     "temp": 57.2,
@@ -63,39 +96,6 @@
     "humidity_pct": 96,
     "pressure_mb": 1007.1,
     "roof": false,
-    "flag": "clear"
-  },
-  "LAA": {
-    "venue": "Angel Stadium",
-    "temp": 75.4,
-    "precip": 0,
-    "wind_spd": 7.6,
-    "wind_dir": "SSW",
-    "humidity_pct": 62,
-    "pressure_mb": 1007.5,
-    "roof": false,
-    "flag": "clear"
-  },
-  "CLE": {
-    "venue": "Progressive Field",
-    "temp": 68.0,
-    "precip": 0,
-    "wind_spd": 4.2,
-    "wind_dir": "NNW",
-    "humidity_pct": 50,
-    "pressure_mb": 1023.0,
-    "roof": false,
-    "flag": "clear"
-  },
-  "ARI": {
-    "venue": "Chase Field",
-    "temp": 95.5,
-    "precip": 3,
-    "wind_spd": 7.5,
-    "wind_dir": "E",
-    "humidity_pct": 38,
-    "pressure_mb": 1002.6,
-    "roof": true,
     "flag": "clear"
   }
 }
