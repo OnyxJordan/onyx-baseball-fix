@@ -1,34 +1,23 @@
 {
-  "TEX": {
-    "venue": "Globe Life Field",
-    "temp": 96.6,
-    "precip": 0,
-    "wind_spd": 8.6,
-    "wind_dir": "SSE",
-    "humidity_pct": 34,
-    "pressure_mb": 1017.9,
-    "roof": true,
+  "CHC": {
+    "venue": "Wrigley Field",
+    "temp": 67.2,
+    "precip": 12,
+    "wind_spd": 8.8,
+    "wind_dir": "N",
+    "humidity_pct": 95,
+    "pressure_mb": 1024.2,
+    "roof": false,
     "flag": "clear"
   },
   "COL": {
     "venue": "Coors Field",
     "temp": 74.0,
-    "precip": 12,
+    "precip": 11,
     "wind_spd": 10.6,
     "wind_dir": "NW",
     "humidity_pct": 46,
     "pressure_mb": 1015.1,
-    "roof": false,
-    "flag": "clear"
-  },
-  "WSH": {
-    "venue": "Nationals Park",
-    "temp": 83.1,
-    "precip": 0,
-    "wind_spd": 4.9,
-    "wind_dir": "S",
-    "humidity_pct": 53,
-    "pressure_mb": 1024.8,
     "roof": false,
     "flag": "clear"
   },
@@ -43,37 +32,15 @@
     "roof": false,
     "flag": "clear"
   },
-  "TB": {
-    "venue": "Tropicana Field",
-    "temp": 86.2,
-    "precip": 7,
-    "wind_spd": 14.7,
-    "wind_dir": "ENE",
-    "humidity_pct": 59,
-    "pressure_mb": 1018.6,
+  "ARI": {
+    "venue": "Chase Field",
+    "temp": 81.5,
+    "precip": 51,
+    "wind_spd": 10.1,
+    "wind_dir": "NE",
+    "humidity_pct": 55,
+    "pressure_mb": 1013.9,
     "roof": true,
-    "flag": "clear"
-  },
-  "HOU": {
-    "venue": "Daikin Park",
-    "temp": 85.7,
-    "precip": 1,
-    "wind_spd": 7.7,
-    "wind_dir": "ESE",
-    "humidity_pct": 70,
-    "pressure_mb": 1019.8,
-    "roof": true,
-    "flag": "clear"
-  },
-  "CHC": {
-    "venue": "Wrigley Field",
-    "temp": 67.2,
-    "precip": 10,
-    "wind_spd": 8.8,
-    "wind_dir": "N",
-    "humidity_pct": 95,
-    "pressure_mb": 1024.2,
-    "roof": false,
     "flag": "clear"
   },
   "LAA": {
@@ -87,14 +54,14 @@
     "roof": false,
     "flag": "clear"
   },
-  "ARI": {
-    "venue": "Chase Field",
-    "temp": 81.5,
-    "precip": 47,
-    "wind_spd": 10.1,
-    "wind_dir": "NE",
-    "humidity_pct": 55,
-    "pressure_mb": 1013.9,
+  "TEX": {
+    "venue": "Globe Life Field",
+    "temp": 96.6,
+    "precip": 0,
+    "wind_spd": 8.6,
+    "wind_dir": "SSE",
+    "humidity_pct": 34,
+    "pressure_mb": 1017.9,
     "roof": true,
     "flag": "clear"
   },
@@ -109,15 +76,46 @@
     "roof": false,
     "flag": "clear"
   },
+  "WSH": {
+    "venue": "Nationals Park",
+    "temp": 83.1,
+    "precip": 0,
+    "wind_spd": 4.9,
+    "wind_dir": "S",
+    "humidity_pct": 53,
+    "pressure_mb": 1024.8,
+    "roof": false,
+    "flag": "clear"
+  },
+  "TB": {
+    "venue": "Tropicana Field",
+    "temp": 86.2,
+    "precip": 3,
+    "wind_spd": 14.7,
+    "wind_dir": "ENE",
+    "humidity_pct": 59,
+    "pressure_mb": 1018.6,
+    "roof": true,
+    "flag": "clear"
+  },
   "PIT": {
     "venue": "PNC Park",
     "temp": 83.8,
-    "precip": 22,
+    "precip": 20,
     "wind_spd": 1.4,
     "wind_dir": "WSW",
     "humidity_pct": 71,
     "pressure_mb": 1023.4,
     "roof": false,
+    "flag": "clear"
+  },
+  "HOU": {
+    "venue": "Daikin Park",
+    "temp": 72,
+    "precip": 0,
+    "wind_spd": 5,
+    "wind_dir": "N",
+    "roof": true,
     "flag": "clear"
   }
 }
