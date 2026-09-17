@@ -1,4 +1,26 @@
 {
+  "HOU": {
+    "venue": "Daikin Park",
+    "temp": 85.8,
+    "precip": 4,
+    "wind_spd": 5.3,
+    "wind_dir": "ESE",
+    "humidity_pct": 70,
+    "pressure_mb": 1019.1,
+    "roof": true,
+    "flag": "clear"
+  },
+  "ARI": {
+    "venue": "Chase Field",
+    "temp": 81.6,
+    "precip": 37,
+    "wind_spd": 4.3,
+    "wind_dir": "ESE",
+    "humidity_pct": 61,
+    "pressure_mb": 1012.6,
+    "roof": true,
+    "flag": "clear"
+  },
   "CIN": {
     "venue": "Great American Ball Park",
     "temp": 90.6,
@@ -7,6 +29,17 @@
     "wind_dir": "SW",
     "humidity_pct": 53,
     "pressure_mb": 1022.8,
+    "roof": false,
+    "flag": "clear"
+  },
+  "NYM": {
+    "venue": "Citi Field",
+    "temp": 72.9,
+    "precip": 1,
+    "wind_spd": 8.2,
+    "wind_dir": "SSE",
+    "humidity_pct": 75,
+    "pressure_mb": 1025.2,
     "roof": false,
     "flag": "clear"
   },
@@ -21,15 +54,26 @@
     "roof": false,
     "flag": "clear"
   },
-  "ARI": {
-    "venue": "Chase Field",
-    "temp": 81.6,
-    "precip": 42,
-    "wind_spd": 4.3,
-    "wind_dir": "ESE",
-    "humidity_pct": 61,
-    "pressure_mb": 1012.6,
-    "roof": true,
+  "PIT": {
+    "venue": "PNC Park",
+    "temp": 83.1,
+    "precip": 20,
+    "wind_spd": 1.2,
+    "wind_dir": "SSE",
+    "humidity_pct": 81,
+    "pressure_mb": 1023.4,
+    "roof": false,
+    "flag": "clear"
+  },
+  "COL": {
+    "venue": "Coors Field",
+    "temp": 74.0,
+    "precip": 24,
+    "wind_spd": 9.6,
+    "wind_dir": "WNW",
+    "humidity_pct": 44,
+    "pressure_mb": 1015.1,
+    "roof": false,
     "flag": "clear"
   },
   "TEX": {
@@ -62,59 +106,6 @@
     "wind_dir": "N",
     "humidity_pct": 95,
     "pressure_mb": 1024.1,
-    "roof": false,
-    "flag": "clear"
-  },
-  "HOU": {
-    "venue": "Daikin Park",
-    "temp": 85.8,
-    "precip": 4,
-    "wind_spd": 5.3,
-    "wind_dir": "ESE",
-    "humidity_pct": 70,
-    "pressure_mb": 1019.1,
-    "roof": true,
-    "flag": "clear"
-  },
-  "TB": {
-    "venue": "Tropicana Field",
-    "temp": 86.7,
-    "precip": 3,
-    "wind_spd": 13.7,
-    "wind_dir": "ENE",
-    "humidity_pct": 59,
-    "pressure_mb": 1019.2,
-    "roof": true,
-    "flag": "clear"
-  },
-  "NYM": {
-    "venue": "Citi Field",
-    "temp": 72.9,
-    "precip": 1,
-    "wind_spd": 8.2,
-    "wind_dir": "SSE",
-    "humidity_pct": 75,
-    "pressure_mb": 1025.2,
-    "roof": false,
-    "flag": "clear"
-  },
-  "COL": {
-    "venue": "Coors Field",
-    "temp": 74.0,
-    "precip": 24,
-    "wind_spd": 9.6,
-    "wind_dir": "WNW",
-    "humidity_pct": 44,
-    "pressure_mb": 1015.1,
-    "roof": false,
-    "flag": "clear"
-  },
-  "PIT": {
-    "venue": "PNC Park",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
     "roof": false,
     "flag": "clear"
   }
