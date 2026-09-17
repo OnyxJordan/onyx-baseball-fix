@@ -1,23 +1,12 @@
 {
-  "COL": {
-    "venue": "Coors Field",
-    "temp": 80.5,
-    "precip": 10,
-    "wind_spd": 2.3,
-    "wind_dir": "SSW",
-    "humidity_pct": 43,
-    "pressure_mb": 1013.6,
-    "roof": false,
-    "flag": "clear"
-  },
-  "CWS": {
-    "venue": "Rate Field",
-    "temp": 68.3,
-    "precip": 10,
-    "wind_spd": 7.4,
-    "wind_dir": "N",
-    "humidity_pct": 96,
-    "pressure_mb": 1021.5,
+  "LAA": {
+    "venue": "Angel Stadium",
+    "temp": 74.0,
+    "precip": 0,
+    "wind_spd": 8.6,
+    "wind_dir": "WSW",
+    "humidity_pct": 61,
+    "pressure_mb": 1016.3,
     "roof": false,
     "flag": "clear"
   },
@@ -32,6 +21,17 @@
     "roof": false,
     "flag": "clear"
   },
+  "CIN": {
+    "venue": "Great American Ball Park",
+    "temp": 89.9,
+    "precip": 1,
+    "wind_spd": 5.7,
+    "wind_dir": "W",
+    "humidity_pct": 53,
+    "pressure_mb": 1023.1,
+    "roof": false,
+    "flag": "clear"
+  },
   "TB": {
     "venue": "Tropicana Field",
     "temp": 86.7,
@@ -41,6 +41,17 @@
     "humidity_pct": 59,
     "pressure_mb": 1019.4,
     "roof": true,
+    "flag": "clear"
+  },
+  "COL": {
+    "venue": "Coors Field",
+    "temp": 80.5,
+    "precip": 10,
+    "wind_spd": 2.3,
+    "wind_dir": "SSW",
+    "humidity_pct": 43,
+    "pressure_mb": 1013.6,
+    "roof": false,
     "flag": "clear"
   },
   "NYM": {
@@ -54,15 +65,15 @@
     "roof": false,
     "flag": "clear"
   },
-  "LAA": {
-    "venue": "Angel Stadium",
-    "temp": 74.0,
-    "precip": 0,
-    "wind_spd": 8.6,
-    "wind_dir": "WSW",
-    "humidity_pct": 61,
-    "pressure_mb": 1016.3,
-    "roof": false,
+  "HOU": {
+    "venue": "Daikin Park",
+    "temp": 83.5,
+    "precip": 11,
+    "wind_spd": 3.8,
+    "wind_dir": "ESE",
+    "humidity_pct": 82,
+    "pressure_mb": 1019.3,
+    "roof": true,
     "flag": "clear"
   },
   "TEX": {
@@ -76,25 +87,14 @@
     "roof": true,
     "flag": "clear"
   },
-  "HOU": {
-    "venue": "Daikin Park",
-    "temp": 83.5,
-    "precip": 11,
-    "wind_spd": 3.8,
-    "wind_dir": "ESE",
-    "humidity_pct": 82,
-    "pressure_mb": 1019.3,
-    "roof": true,
-    "flag": "clear"
-  },
-  "CIN": {
-    "venue": "Great American Ball Park",
-    "temp": 89.9,
-    "precip": 1,
-    "wind_spd": 5.7,
-    "wind_dir": "W",
-    "humidity_pct": 53,
-    "pressure_mb": 1023.1,
+  "CWS": {
+    "venue": "Rate Field",
+    "temp": 68.3,
+    "precip": 10,
+    "wind_spd": 7.4,
+    "wind_dir": "N",
+    "humidity_pct": 96,
+    "pressure_mb": 1021.5,
     "roof": false,
     "flag": "clear"
   }
