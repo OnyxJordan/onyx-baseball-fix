@@ -10,28 +10,6 @@
     "roof": true,
     "flag": "clear"
   },
-  "TEX": {
-    "venue": "Globe Life Field",
-    "temp": 94.6,
-    "precip": 0,
-    "wind_spd": 8.3,
-    "wind_dir": "SSE",
-    "humidity_pct": 41,
-    "pressure_mb": 1018.3,
-    "roof": true,
-    "flag": "clear"
-  },
-  "COL": {
-    "venue": "Coors Field",
-    "temp": 74.1,
-    "precip": 24,
-    "wind_spd": 7.6,
-    "wind_dir": "NW",
-    "humidity_pct": 46,
-    "pressure_mb": 1015.9,
-    "roof": false,
-    "flag": "clear"
-  },
   "LAA": {
     "venue": "Angel Stadium",
     "temp": 75.2,
@@ -43,15 +21,15 @@
     "roof": false,
     "flag": "clear"
   },
-  "HOU": {
-    "venue": "Daikin Park",
-    "temp": 85.1,
-    "precip": 4,
-    "wind_spd": 3.9,
-    "wind_dir": "ESE",
-    "humidity_pct": 79,
-    "pressure_mb": 1019.3,
-    "roof": true,
+  "COL": {
+    "venue": "Coors Field",
+    "temp": 74.1,
+    "precip": 24,
+    "wind_spd": 7.6,
+    "wind_dir": "NW",
+    "humidity_pct": 46,
+    "pressure_mb": 1015.9,
+    "roof": false,
     "flag": "clear"
   }
 }
