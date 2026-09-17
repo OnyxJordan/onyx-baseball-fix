@@ -10,17 +10,6 @@
     "roof": false,
     "flag": "clear"
   },
-  "CWS": {
-    "venue": "Rate Field",
-    "temp": 67.7,
-    "precip": 9,
-    "wind_spd": 8.4,
-    "wind_dir": "N",
-    "humidity_pct": 97,
-    "pressure_mb": 1021.7,
-    "roof": false,
-    "flag": "clear"
-  },
   "TEX": {
     "venue": "Globe Life Field",
     "temp": 96.1,
@@ -32,17 +21,6 @@
     "roof": true,
     "flag": "clear"
   },
-  "COL": {
-    "venue": "Coors Field",
-    "temp": 82.2,
-    "precip": 9,
-    "wind_spd": 3.2,
-    "wind_dir": "SW",
-    "humidity_pct": 40,
-    "pressure_mb": 1012.5,
-    "roof": false,
-    "flag": "clear"
-  },
   "NYM": {
     "venue": "Citi Field",
     "temp": 73.3,
@@ -51,6 +29,17 @@
     "wind_dir": "SSE",
     "humidity_pct": 82,
     "pressure_mb": 1018.9,
+    "roof": false,
+    "flag": "clear"
+  },
+  "CIN": {
+    "venue": "Great American Ball Park",
+    "temp": 89.5,
+    "precip": 1,
+    "wind_spd": 5.8,
+    "wind_dir": "WSW",
+    "humidity_pct": 53,
+    "pressure_mb": 1023.7,
     "roof": false,
     "flag": "clear"
   },
@@ -65,25 +54,25 @@
     "roof": false,
     "flag": "clear"
   },
-  "TB": {
-    "venue": "Tropicana Field",
-    "temp": 86.6,
-    "precip": 0,
-    "wind_spd": 13.5,
-    "wind_dir": "ENE",
-    "humidity_pct": 58,
-    "pressure_mb": 1019.5,
-    "roof": true,
+  "CWS": {
+    "venue": "Rate Field",
+    "temp": 67.7,
+    "precip": 9,
+    "wind_spd": 8.4,
+    "wind_dir": "N",
+    "humidity_pct": 97,
+    "pressure_mb": 1021.7,
+    "roof": false,
     "flag": "clear"
   },
-  "CIN": {
-    "venue": "Great American Ball Park",
-    "temp": 89.5,
-    "precip": 1,
-    "wind_spd": 5.8,
-    "wind_dir": "WSW",
-    "humidity_pct": 53,
-    "pressure_mb": 1023.7,
+  "COL": {
+    "venue": "Coors Field",
+    "temp": 82.2,
+    "precip": 9,
+    "wind_spd": 3.2,
+    "wind_dir": "SW",
+    "humidity_pct": 40,
+    "pressure_mb": 1012.5,
     "roof": false,
     "flag": "clear"
   },
@@ -95,6 +84,17 @@
     "wind_dir": "ESE",
     "humidity_pct": 64,
     "pressure_mb": 1019.7,
+    "roof": true,
+    "flag": "clear"
+  },
+  "TB": {
+    "venue": "Tropicana Field",
+    "temp": 86.6,
+    "precip": 0,
+    "wind_spd": 13.5,
+    "wind_dir": "ENE",
+    "humidity_pct": 58,
+    "pressure_mb": 1019.5,
     "roof": true,
     "flag": "clear"
   }
