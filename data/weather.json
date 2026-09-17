@@ -10,6 +10,72 @@
     "roof": false,
     "flag": "clear"
   },
+  "TEX": {
+    "venue": "Globe Life Field",
+    "temp": 97.3,
+    "precip": 0,
+    "wind_spd": 9.2,
+    "wind_dir": "SE",
+    "humidity_pct": 38,
+    "pressure_mb": 1018.1,
+    "roof": true,
+    "flag": "clear"
+  },
+  "CIN": {
+    "venue": "Great American Ball Park",
+    "temp": 90.6,
+    "precip": 4,
+    "wind_spd": 6.5,
+    "wind_dir": "SW",
+    "humidity_pct": 53,
+    "pressure_mb": 1022.8,
+    "roof": false,
+    "flag": "clear"
+  },
+  "COL": {
+    "venue": "Coors Field",
+    "temp": 78.0,
+    "precip": 24,
+    "wind_spd": 8.5,
+    "wind_dir": "NNW",
+    "humidity_pct": 35,
+    "pressure_mb": 1015.8,
+    "roof": false,
+    "flag": "clear"
+  },
+  "ARI": {
+    "venue": "Chase Field",
+    "temp": 80.5,
+    "precip": 42,
+    "wind_spd": 4.7,
+    "wind_dir": "ENE",
+    "humidity_pct": 66,
+    "pressure_mb": 1014.2,
+    "roof": true,
+    "flag": "clear"
+  },
+  "WSH": {
+    "venue": "Nationals Park",
+    "temp": 82.6,
+    "precip": 0,
+    "wind_spd": 5.9,
+    "wind_dir": "S",
+    "humidity_pct": 59,
+    "pressure_mb": 1025.5,
+    "roof": false,
+    "flag": "clear"
+  },
+  "TB": {
+    "venue": "Tropicana Field",
+    "temp": 86.7,
+    "precip": 3,
+    "wind_spd": 13.7,
+    "wind_dir": "ENE",
+    "humidity_pct": 59,
+    "pressure_mb": 1019.2,
+    "roof": true,
+    "flag": "clear"
+  },
   "NYM": {
     "venue": "Citi Field",
     "temp": 72.2,
@@ -21,14 +87,14 @@
     "roof": false,
     "flag": "clear"
   },
-  "CIN": {
-    "venue": "Great American Ball Park",
-    "temp": 90.6,
-    "precip": 4,
-    "wind_spd": 6.5,
-    "wind_dir": "SW",
-    "humidity_pct": 53,
-    "pressure_mb": 1022.8,
+  "PIT": {
+    "venue": "PNC Park",
+    "temp": 83.1,
+    "precip": 20,
+    "wind_spd": 1.2,
+    "wind_dir": "SSE",
+    "humidity_pct": 81,
+    "pressure_mb": 1023.4,
     "roof": false,
     "flag": "clear"
   },
@@ -51,64 +117,6 @@
     "wind_dir": "N",
     "humidity_pct": 91,
     "pressure_mb": 1024.7,
-    "roof": false,
-    "flag": "clear"
-  },
-  "ARI": {
-    "venue": "Chase Field",
-    "temp": 80.5,
-    "precip": 42,
-    "wind_spd": 4.7,
-    "wind_dir": "ENE",
-    "humidity_pct": 66,
-    "pressure_mb": 1014.2,
-    "roof": true,
-    "flag": "clear"
-  },
-  "PIT": {
-    "venue": "PNC Park",
-    "temp": 83.1,
-    "precip": 20,
-    "wind_spd": 1.2,
-    "wind_dir": "SSE",
-    "humidity_pct": 81,
-    "pressure_mb": 1023.4,
-    "roof": false,
-    "flag": "clear"
-  },
-  "TB": {
-    "venue": "Tropicana Field",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
-    "roof": true,
-    "flag": "clear"
-  },
-  "WSH": {
-    "venue": "Nationals Park",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
-    "roof": false,
-    "flag": "clear"
-  },
-  "TEX": {
-    "venue": "Globe Life Field",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
-    "roof": true,
-    "flag": "clear"
-  },
-  "COL": {
-    "venue": "Coors Field",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
     "roof": false,
     "flag": "clear"
   }
