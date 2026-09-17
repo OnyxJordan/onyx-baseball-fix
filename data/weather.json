@@ -1,45 +1,12 @@
 {
-  "HOU": {
-    "venue": "Daikin Park",
-    "temp": 85.3,
-    "precip": 12,
-    "wind_spd": 8.1,
-    "wind_dir": "SE",
-    "humidity_pct": 70,
-    "pressure_mb": 1019.8,
-    "roof": true,
-    "flag": "clear"
-  },
-  "TEX": {
-    "venue": "Globe Life Field",
-    "temp": 96.1,
-    "precip": 0,
-    "wind_spd": 7.6,
-    "wind_dir": "ESE",
-    "humidity_pct": 33,
-    "pressure_mb": 1018.6,
-    "roof": true,
-    "flag": "clear"
-  },
-  "PIT": {
-    "venue": "PNC Park",
-    "temp": 78.5,
-    "precip": 11,
-    "wind_spd": 6.8,
+  "COL": {
+    "venue": "Coors Field",
+    "temp": 80.3,
+    "precip": 9,
+    "wind_spd": 1.4,
     "wind_dir": "SW",
-    "humidity_pct": 88,
-    "pressure_mb": 1022.9,
-    "roof": false,
-    "flag": "clear"
-  },
-  "LAA": {
-    "venue": "Angel Stadium",
-    "temp": 74.4,
-    "precip": 0,
-    "wind_spd": 8.0,
-    "wind_dir": "WSW",
-    "humidity_pct": 59,
-    "pressure_mb": 1016.1,
+    "humidity_pct": 43,
+    "pressure_mb": 1013.1,
     "roof": false,
     "flag": "clear"
   },
@@ -54,14 +21,14 @@
     "roof": false,
     "flag": "clear"
   },
-  "TB": {
-    "venue": "Tropicana Field",
-    "temp": 87.2,
-    "precip": 0,
-    "wind_spd": 11.7,
-    "wind_dir": "ENE",
-    "humidity_pct": 61,
-    "pressure_mb": 1020.2,
+  "HOU": {
+    "venue": "Daikin Park",
+    "temp": 85.3,
+    "precip": 12,
+    "wind_spd": 8.1,
+    "wind_dir": "SE",
+    "humidity_pct": 70,
+    "pressure_mb": 1019.8,
     "roof": true,
     "flag": "clear"
   },
@@ -76,26 +43,37 @@
     "roof": false,
     "flag": "clear"
   },
-  "CIN": {
-    "venue": "Great American Ball Park",
-    "temp": 89.5,
-    "precip": 1,
-    "wind_spd": 5.8,
+  "TB": {
+    "venue": "Tropicana Field",
+    "temp": 87.2,
+    "precip": 0,
+    "wind_spd": 11.7,
+    "wind_dir": "ENE",
+    "humidity_pct": 61,
+    "pressure_mb": 1020.2,
+    "roof": true,
+    "flag": "clear"
+  },
+  "LAA": {
+    "venue": "Angel Stadium",
+    "temp": 74.4,
+    "precip": 0,
+    "wind_spd": 8.0,
     "wind_dir": "WSW",
-    "humidity_pct": 53,
-    "pressure_mb": 1023.7,
+    "humidity_pct": 59,
+    "pressure_mb": 1016.1,
     "roof": false,
     "flag": "clear"
   },
-  "COL": {
-    "venue": "Coors Field",
-    "temp": 80.3,
-    "precip": 9,
-    "wind_spd": 1.4,
-    "wind_dir": "SW",
-    "humidity_pct": 43,
-    "pressure_mb": 1013.1,
-    "roof": false,
+  "TEX": {
+    "venue": "Globe Life Field",
+    "temp": 96.1,
+    "precip": 0,
+    "wind_spd": 7.6,
+    "wind_dir": "ESE",
+    "humidity_pct": 33,
+    "pressure_mb": 1018.6,
+    "roof": true,
     "flag": "clear"
   }
 }
