@@ -1,56 +1,34 @@
 {
-  "BAL": {
-    "venue": "Camden Yards",
-    "temp": 79.2,
+  "SD": {
+    "venue": "Petco Park",
+    "temp": 72.7,
     "precip": 0,
-    "wind_spd": 6.3,
-    "wind_dir": "N",
-    "humidity_pct": 49,
-    "pressure_mb": 1018.2,
+    "wind_spd": 7.8,
+    "wind_dir": "NW",
+    "humidity_pct": 65,
+    "pressure_mb": 1014.9,
     "roof": false,
     "flag": "clear"
   },
-  "CWS": {
-    "venue": "Rate Field",
-    "temp": 67.4,
-    "precip": 4,
-    "wind_spd": 2.9,
-    "wind_dir": "ENE",
-    "humidity_pct": 85,
-    "pressure_mb": 1020.6,
-    "roof": false,
-    "flag": "clear"
-  },
-  "TB": {
-    "venue": "Tropicana Field",
-    "temp": 81.3,
-    "precip": 17,
-    "wind_spd": 13.1,
-    "wind_dir": "ENE",
-    "humidity_pct": 74,
-    "pressure_mb": 1016.3,
-    "roof": true,
-    "flag": "clear"
-  },
-  "ARI": {
-    "venue": "Chase Field",
-    "temp": 98.2,
-    "precip": 1,
-    "wind_spd": 8.5,
-    "wind_dir": "W",
-    "humidity_pct": 25,
-    "pressure_mb": 1008.6,
-    "roof": true,
-    "flag": "clear"
-  },
-  "LAD": {
-    "venue": "Dodger Stadium",
-    "temp": 69.4,
+  "HOU": {
+    "venue": "Daikin Park",
+    "temp": 82.3,
     "precip": 0,
-    "wind_spd": 6.4,
+    "wind_spd": 7.1,
+    "wind_dir": "ESE",
+    "humidity_pct": 62,
+    "pressure_mb": 1016.6,
+    "roof": true,
+    "flag": "clear"
+  },
+  "LAA": {
+    "venue": "Angel Stadium",
+    "temp": 75.1,
+    "precip": 0,
+    "wind_spd": 8.1,
     "wind_dir": "WSW",
-    "humidity_pct": 68,
-    "pressure_mb": 1014.1,
+    "humidity_pct": 62,
+    "pressure_mb": 1014.5,
     "roof": false,
     "flag": "clear"
   },
@@ -76,14 +54,47 @@
     "roof": false,
     "flag": "clear"
   },
-  "STL": {
-    "venue": "Busch Stadium",
-    "temp": 92.8,
-    "precip": 4,
-    "wind_spd": 3.7,
+  "TB": {
+    "venue": "Tropicana Field",
+    "temp": 81.3,
+    "precip": 17,
+    "wind_spd": 13.1,
     "wind_dir": "ENE",
-    "humidity_pct": 39,
-    "pressure_mb": 1015.6,
+    "humidity_pct": 74,
+    "pressure_mb": 1016.3,
+    "roof": true,
+    "flag": "clear"
+  },
+  "CWS": {
+    "venue": "Rate Field",
+    "temp": 67.4,
+    "precip": 4,
+    "wind_spd": 2.9,
+    "wind_dir": "ENE",
+    "humidity_pct": 85,
+    "pressure_mb": 1020.6,
+    "roof": false,
+    "flag": "clear"
+  },
+  "ARI": {
+    "venue": "Chase Field",
+    "temp": 98.2,
+    "precip": 1,
+    "wind_spd": 8.5,
+    "wind_dir": "W",
+    "humidity_pct": 25,
+    "pressure_mb": 1008.6,
+    "roof": true,
+    "flag": "clear"
+  },
+  "BAL": {
+    "venue": "Camden Yards",
+    "temp": 79.2,
+    "precip": 0,
+    "wind_spd": 6.3,
+    "wind_dir": "N",
+    "humidity_pct": 49,
+    "pressure_mb": 1018.2,
     "roof": false,
     "flag": "clear"
   },
@@ -98,14 +109,14 @@
     "roof": true,
     "flag": "clear"
   },
-  "LAA": {
-    "venue": "Angel Stadium",
-    "temp": 75.1,
+  "PIT": {
+    "venue": "PNC Park",
+    "temp": 73.9,
     "precip": 0,
-    "wind_spd": 8.1,
-    "wind_dir": "WSW",
-    "humidity_pct": 62,
-    "pressure_mb": 1014.5,
+    "wind_spd": 5.0,
+    "wind_dir": "NNW",
+    "humidity_pct": 68,
+    "pressure_mb": 1019.9,
     "roof": false,
     "flag": "clear"
   },
@@ -120,15 +131,26 @@
     "roof": false,
     "flag": "clear"
   },
-  "HOU": {
-    "venue": "Daikin Park",
-    "temp": 82.3,
+  "STL": {
+    "venue": "Busch Stadium",
+    "temp": 92.8,
+    "precip": 4,
+    "wind_spd": 3.7,
+    "wind_dir": "ENE",
+    "humidity_pct": 39,
+    "pressure_mb": 1015.6,
+    "roof": false,
+    "flag": "clear"
+  },
+  "LAD": {
+    "venue": "Dodger Stadium",
+    "temp": 69.4,
     "precip": 0,
-    "wind_spd": 7.1,
-    "wind_dir": "ESE",
-    "humidity_pct": 62,
-    "pressure_mb": 1016.6,
-    "roof": true,
+    "wind_spd": 6.4,
+    "wind_dir": "WSW",
+    "humidity_pct": 68,
+    "pressure_mb": 1014.1,
+    "roof": false,
     "flag": "clear"
   },
   "CIN": {
@@ -139,28 +161,6 @@
     "wind_dir": "NNE",
     "humidity_pct": 71,
     "pressure_mb": 1019.9,
-    "roof": false,
-    "flag": "clear"
-  },
-  "PIT": {
-    "venue": "PNC Park",
-    "temp": 73.9,
-    "precip": 0,
-    "wind_spd": 5.0,
-    "wind_dir": "NNW",
-    "humidity_pct": 68,
-    "pressure_mb": 1019.9,
-    "roof": false,
-    "flag": "clear"
-  },
-  "SD": {
-    "venue": "Petco Park",
-    "temp": 72.7,
-    "precip": 0,
-    "wind_spd": 7.8,
-    "wind_dir": "NW",
-    "humidity_pct": 65,
-    "pressure_mb": 1014.9,
     "roof": false,
     "flag": "clear"
   }
