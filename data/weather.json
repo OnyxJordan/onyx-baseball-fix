@@ -1,23 +1,12 @@
 {
-  "HOU": {
-    "venue": "Daikin Park",
-    "temp": 82.7,
-    "precip": 11,
-    "wind_spd": 3.5,
-    "wind_dir": "SE",
-    "humidity_pct": 91,
-    "pressure_mb": 1019.7,
-    "roof": true,
-    "flag": "clear"
-  },
-  "LAA": {
-    "venue": "Angel Stadium",
-    "temp": 74.6,
-    "precip": 0,
-    "wind_spd": 8.4,
-    "wind_dir": "WSW",
-    "humidity_pct": 57,
-    "pressure_mb": 1015.8,
+  "CWS": {
+    "venue": "Rate Field",
+    "temp": 68.7,
+    "precip": 12,
+    "wind_spd": 9.7,
+    "wind_dir": "NNE",
+    "humidity_pct": 98,
+    "pressure_mb": 1021.2,
     "roof": false,
     "flag": "clear"
   },
@@ -32,14 +21,14 @@
     "roof": true,
     "flag": "clear"
   },
-  "CWS": {
-    "venue": "Rate Field",
-    "temp": 68.7,
-    "precip": 12,
-    "wind_spd": 9.7,
-    "wind_dir": "NNE",
-    "humidity_pct": 98,
-    "pressure_mb": 1021.2,
+  "LAA": {
+    "venue": "Angel Stadium",
+    "temp": 74.6,
+    "precip": 0,
+    "wind_spd": 8.4,
+    "wind_dir": "WSW",
+    "humidity_pct": 57,
+    "pressure_mb": 1015.8,
     "roof": false,
     "flag": "clear"
   },
