@@ -1,4 +1,15 @@
 {
+  "LAA": {
+    "venue": "Angel Stadium",
+    "temp": 75.4,
+    "precip": 0,
+    "wind_spd": 8.9,
+    "wind_dir": "WSW",
+    "humidity_pct": 60,
+    "pressure_mb": 1016.0,
+    "roof": false,
+    "flag": "clear"
+  },
   "TEX": {
     "venue": "Globe Life Field",
     "temp": 96.5,
@@ -8,17 +19,6 @@
     "humidity_pct": 35,
     "pressure_mb": 1018.4,
     "roof": true,
-    "flag": "clear"
-  },
-  "LAA": {
-    "venue": "Angel Stadium",
-    "temp": 75.1,
-    "precip": 0,
-    "wind_spd": 8.5,
-    "wind_dir": "WSW",
-    "humidity_pct": 56,
-    "pressure_mb": 1015.6,
-    "roof": false,
     "flag": "clear"
   }
 }
