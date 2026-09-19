@@ -1,40 +1,40 @@
 {
- "date": "2026-09-18",
- "locked": true,
+ "date": "2026-09-19",
+ "locked": false,
  "legs": [
-  {
-   "player": "Pete Crow-Armstrong",
-   "mid": 691718,
-   "team": "CHC",
-   "odds": 231,
-   "prob": 23.8,
-   "score": 0.683,
-   "why": [
-    "park ×1.31",
-    "soft bullpen",
-    "platoon edge"
-   ],
-   "away": "CHC",
-   "home": "CIN",
-   "opp": "Chase Burns",
-   "time": "6:40 PM"
-  },
   {
    "player": "Cal Raleigh",
    "mid": 663728,
    "team": "SEA",
-   "odds": 274,
-   "prob": 20.4,
-   "score": 0.552,
+   "odds": null,
+   "prob": 15.2,
+   "score": 0.599,
    "why": [
     "park ×1.35",
     "56% FB bat",
-    "soft bullpen"
+    "pitcher matchup ×1.14"
    ],
    "away": "SEA",
    "home": "COL",
-   "opp": "Gabriel Hughes",
+   "opp": "Jose Quintana",
    "time": "8:10 PM"
+  },
+  {
+   "player": "Kyle Schwarber",
+   "mid": 656941,
+   "team": "PHI",
+   "odds": 248,
+   "prob": 24.5,
+   "score": 0.578,
+   "why": [
+    "pitcher matchup ×1.13",
+    "platoon edge",
+    "fly-ball pitcher"
+   ],
+   "away": "PHI",
+   "home": "NYM",
+   "opp": "Christian Scott",
+   "time": "4:10 PM"
   }
  ]
 }
