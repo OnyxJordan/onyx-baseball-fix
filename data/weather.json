@@ -1,48 +1,4 @@
 {
-  "COL": {
-    "venue": "Coors Field",
-    "temp": 67.4,
-    "precip": 36,
-    "wind_spd": 9.5,
-    "wind_dir": "SE",
-    "humidity_pct": 54,
-    "pressure_mb": 1009.5,
-    "roof": false,
-    "flag": "clear"
-  },
-  "HOU": {
-    "venue": "Daikin Park",
-    "temp": 89.2,
-    "precip": 0,
-    "wind_spd": 9.4,
-    "wind_dir": "ESE",
-    "humidity_pct": 51,
-    "pressure_mb": 1013.3,
-    "roof": true,
-    "flag": "clear"
-  },
-  "SD": {
-    "venue": "Petco Park",
-    "temp": 75.0,
-    "precip": 0,
-    "wind_spd": 8.6,
-    "wind_dir": "NW",
-    "humidity_pct": 67,
-    "pressure_mb": 1011.5,
-    "roof": false,
-    "flag": "clear"
-  },
-  "ARI": {
-    "venue": "Chase Field",
-    "temp": 100.6,
-    "precip": 0,
-    "wind_spd": 8.5,
-    "wind_dir": "WNW",
-    "humidity_pct": 14,
-    "pressure_mb": 1006.7,
-    "roof": true,
-    "flag": "clear"
-  },
   "TEX": {
     "venue": "Globe Life Field",
     "temp": 94.4,
@@ -65,6 +21,17 @@
     "roof": false,
     "flag": "clear"
   },
+  "NYM": {
+    "venue": "Citi Field",
+    "temp": 71.9,
+    "precip": 0,
+    "wind_spd": 2.5,
+    "wind_dir": "ENE",
+    "humidity_pct": 50,
+    "pressure_mb": 1020.8,
+    "roof": false,
+    "flag": "clear"
+  },
   "STL": {
     "venue": "Busch Stadium",
     "temp": 95.2,
@@ -76,14 +43,14 @@
     "roof": false,
     "flag": "clear"
   },
-  "NYM": {
-    "venue": "Citi Field",
-    "temp": 71.9,
+  "SD": {
+    "venue": "Petco Park",
+    "temp": 75.0,
     "precip": 0,
-    "wind_spd": 2.5,
-    "wind_dir": "ENE",
-    "humidity_pct": 50,
-    "pressure_mb": 1020.8,
+    "wind_spd": 8.6,
+    "wind_dir": "NW",
+    "humidity_pct": 67,
+    "pressure_mb": 1011.5,
     "roof": false,
     "flag": "clear"
   },
@@ -98,14 +65,25 @@
     "roof": false,
     "flag": "clear"
   },
-  "CIN": {
-    "venue": "Great American Ball Park",
-    "temp": 91.2,
-    "precip": 9,
-    "wind_spd": 6.3,
-    "wind_dir": "NNW",
-    "humidity_pct": 43,
-    "pressure_mb": 1013.1,
+  "COL": {
+    "venue": "Coors Field",
+    "temp": 67.4,
+    "precip": 36,
+    "wind_spd": 9.5,
+    "wind_dir": "SE",
+    "humidity_pct": 54,
+    "pressure_mb": 1009.5,
+    "roof": false,
+    "flag": "clear"
+  },
+  "LAD": {
+    "venue": "Dodger Stadium",
+    "temp": 73.2,
+    "precip": 0,
+    "wind_spd": 7.4,
+    "wind_dir": "WSW",
+    "humidity_pct": 71,
+    "pressure_mb": 1011.8,
     "roof": false,
     "flag": "clear"
   },
@@ -120,15 +98,26 @@
     "roof": false,
     "flag": "clear"
   },
-  "TB": {
-    "venue": "Tropicana Field",
-    "temp": 88.7,
-    "precip": 10,
-    "wind_spd": 6.3,
-    "wind_dir": "E",
-    "humidity_pct": 52,
-    "pressure_mb": 1013.3,
+  "ARI": {
+    "venue": "Chase Field",
+    "temp": 100.6,
+    "precip": 0,
+    "wind_spd": 8.5,
+    "wind_dir": "WNW",
+    "humidity_pct": 14,
+    "pressure_mb": 1006.7,
     "roof": true,
+    "flag": "clear"
+  },
+  "CIN": {
+    "venue": "Great American Ball Park",
+    "temp": 91.2,
+    "precip": 9,
+    "wind_spd": 6.3,
+    "wind_dir": "NNW",
+    "humidity_pct": 43,
+    "pressure_mb": 1013.1,
+    "roof": false,
     "flag": "clear"
   },
   "LAA": {
@@ -142,21 +131,36 @@
     "roof": false,
     "flag": "clear"
   },
-  "LAD": {
-    "venue": "Dodger Stadium",
-    "temp": 72,
+  "TB": {
+    "venue": "Tropicana Field",
+    "temp": 88.7,
+    "precip": 10,
+    "wind_spd": 6.3,
+    "wind_dir": "E",
+    "humidity_pct": 52,
+    "pressure_mb": 1013.3,
+    "roof": true,
+    "flag": "clear"
+  },
+  "HOU": {
+    "venue": "Daikin Park",
+    "temp": 89.2,
     "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
-    "roof": false,
+    "wind_spd": 9.4,
+    "wind_dir": "ESE",
+    "humidity_pct": 51,
+    "pressure_mb": 1013.3,
+    "roof": true,
     "flag": "clear"
   },
   "BAL": {
     "venue": "Camden Yards",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
+    "temp": 79.9,
+    "precip": 2,
+    "wind_spd": 5.6,
+    "wind_dir": "SE",
+    "humidity_pct": 49,
+    "pressure_mb": 1018.7,
     "roof": false,
     "flag": "clear"
   }
