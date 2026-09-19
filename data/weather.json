@@ -1,13 +1,35 @@
 {
-  "TB": {
-    "venue": "Tropicana Field",
-    "temp": 88.6,
-    "precip": 10,
-    "wind_spd": 4.6,
-    "wind_dir": "ENE",
-    "humidity_pct": 55,
-    "pressure_mb": 1012.8,
-    "roof": true,
+  "COL": {
+    "venue": "Coors Field",
+    "temp": 68.4,
+    "precip": 52,
+    "wind_spd": 14.4,
+    "wind_dir": "NW",
+    "humidity_pct": 52,
+    "pressure_mb": 1010.7,
+    "roof": false,
+    "flag": "clear"
+  },
+  "LAD": {
+    "venue": "Dodger Stadium",
+    "temp": 73.9,
+    "precip": 0,
+    "wind_spd": 8.0,
+    "wind_dir": "W",
+    "humidity_pct": 61,
+    "pressure_mb": 1011.6,
+    "roof": false,
+    "flag": "clear"
+  },
+  "PIT": {
+    "venue": "PNC Park",
+    "temp": 73.9,
+    "precip": 14,
+    "wind_spd": 2.2,
+    "wind_dir": "E",
+    "humidity_pct": 78,
+    "pressure_mb": 1015.7,
+    "roof": false,
     "flag": "clear"
   },
   "CIN": {
@@ -21,48 +43,15 @@
     "roof": false,
     "flag": "clear"
   },
-  "SD": {
-    "venue": "Petco Park",
-    "temp": 75.0,
+  "TEX": {
+    "venue": "Globe Life Field",
+    "temp": 94.4,
     "precip": 0,
-    "wind_spd": 8.3,
-    "wind_dir": "NW",
-    "humidity_pct": 64,
-    "pressure_mb": 1012.5,
-    "roof": false,
-    "flag": "clear"
-  },
-  "LAA": {
-    "venue": "Angel Stadium",
-    "temp": 76.0,
-    "precip": 0,
-    "wind_spd": 7.5,
-    "wind_dir": "WSW",
-    "humidity_pct": 58,
-    "pressure_mb": 1012.0,
-    "roof": false,
-    "flag": "clear"
-  },
-  "CLE": {
-    "venue": "Progressive Field",
-    "temp": 70.0,
-    "precip": 35,
-    "wind_spd": 4.9,
-    "wind_dir": "SE",
-    "humidity_pct": 77,
-    "pressure_mb": 1014.7,
-    "roof": false,
-    "flag": "clear"
-  },
-  "COL": {
-    "venue": "Coors Field",
-    "temp": 68.4,
-    "precip": 52,
-    "wind_spd": 14.4,
-    "wind_dir": "NW",
-    "humidity_pct": 52,
-    "pressure_mb": 1010.7,
-    "roof": false,
+    "wind_spd": 8.5,
+    "wind_dir": "S",
+    "humidity_pct": 37,
+    "pressure_mb": 1011.4,
+    "roof": true,
     "flag": "clear"
   },
   "BAL": {
@@ -87,15 +76,59 @@
     "roof": true,
     "flag": "clear"
   },
-  "PIT": {
-    "venue": "PNC Park",
-    "temp": 73.9,
-    "precip": 14,
-    "wind_spd": 2.2,
-    "wind_dir": "E",
-    "humidity_pct": 78,
-    "pressure_mb": 1015.7,
+  "CLE": {
+    "venue": "Progressive Field",
+    "temp": 70.0,
+    "precip": 35,
+    "wind_spd": 4.9,
+    "wind_dir": "SE",
+    "humidity_pct": 77,
+    "pressure_mb": 1014.7,
     "roof": false,
+    "flag": "clear"
+  },
+  "ARI": {
+    "venue": "Chase Field",
+    "temp": 100.0,
+    "precip": 0,
+    "wind_spd": 1.8,
+    "wind_dir": "S",
+    "humidity_pct": 17,
+    "pressure_mb": 1008.1,
+    "roof": true,
+    "flag": "clear"
+  },
+  "SD": {
+    "venue": "Petco Park",
+    "temp": 75.0,
+    "precip": 0,
+    "wind_spd": 8.3,
+    "wind_dir": "NW",
+    "humidity_pct": 64,
+    "pressure_mb": 1012.5,
+    "roof": false,
+    "flag": "clear"
+  },
+  "LAA": {
+    "venue": "Angel Stadium",
+    "temp": 76.0,
+    "precip": 0,
+    "wind_spd": 7.5,
+    "wind_dir": "WSW",
+    "humidity_pct": 58,
+    "pressure_mb": 1012.0,
+    "roof": false,
+    "flag": "clear"
+  },
+  "TB": {
+    "venue": "Tropicana Field",
+    "temp": 88.6,
+    "precip": 10,
+    "wind_spd": 4.6,
+    "wind_dir": "ENE",
+    "humidity_pct": 55,
+    "pressure_mb": 1012.8,
+    "roof": true,
     "flag": "clear"
   },
   "NYM": {
@@ -109,39 +142,14 @@
     "roof": false,
     "flag": "clear"
   },
-  "TEX": {
-    "venue": "Globe Life Field",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
-    "roof": true,
-    "flag": "clear"
-  },
-  "ARI": {
-    "venue": "Chase Field",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
-    "roof": true,
-    "flag": "clear"
-  },
-  "LAD": {
-    "venue": "Dodger Stadium",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
-    "roof": false,
-    "flag": "clear"
-  },
   "STL": {
     "venue": "Busch Stadium",
-    "temp": 72,
+    "temp": 94.1,
     "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
+    "wind_spd": 2.1,
+    "wind_dir": "NNW",
+    "humidity_pct": 36,
+    "pressure_mb": 1011.1,
     "roof": false,
     "flag": "clear"
   }
