@@ -1,26 +1,4 @@
 {
-  "LAA": {
-    "venue": "Angel Stadium",
-    "temp": 76.0,
-    "precip": 0,
-    "wind_spd": 7.2,
-    "wind_dir": "SW",
-    "humidity_pct": 64,
-    "pressure_mb": 1011.5,
-    "roof": false,
-    "flag": "clear"
-  },
-  "SD": {
-    "venue": "Petco Park",
-    "temp": 75.1,
-    "precip": 0,
-    "wind_spd": 8.5,
-    "wind_dir": "WNW",
-    "humidity_pct": 64,
-    "pressure_mb": 1012.3,
-    "roof": false,
-    "flag": "clear"
-  },
   "LAD": {
     "venue": "Dodger Stadium",
     "temp": 74.4,
@@ -43,25 +21,25 @@
     "roof": true,
     "flag": "clear"
   },
-  "STL": {
-    "venue": "Busch Stadium",
-    "temp": 92.6,
+  "SD": {
+    "venue": "Petco Park",
+    "temp": 75.1,
     "precip": 0,
-    "wind_spd": 4.8,
-    "wind_dir": "SSE",
-    "humidity_pct": 41,
-    "pressure_mb": 1010.8,
+    "wind_spd": 8.5,
+    "wind_dir": "WNW",
+    "humidity_pct": 64,
+    "pressure_mb": 1012.3,
     "roof": false,
     "flag": "clear"
   },
-  "COL": {
-    "venue": "Coors Field",
-    "temp": 75.3,
-    "precip": 27,
-    "wind_spd": 11.7,
-    "wind_dir": "ENE",
-    "humidity_pct": 29,
-    "pressure_mb": 1010.2,
+  "LAA": {
+    "venue": "Angel Stadium",
+    "temp": 76.0,
+    "precip": 0,
+    "wind_spd": 7.2,
+    "wind_dir": "SW",
+    "humidity_pct": 64,
+    "pressure_mb": 1011.5,
     "roof": false,
     "flag": "clear"
   }
