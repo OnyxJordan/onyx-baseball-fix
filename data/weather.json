@@ -1,4 +1,15 @@
 {
+  "DET": {
+    "venue": "Comerica Park",
+    "temp": 60.5,
+    "precip": 3,
+    "wind_spd": 9.2,
+    "wind_dir": "NNE",
+    "humidity_pct": 70,
+    "pressure_mb": 1021.4,
+    "roof": false,
+    "flag": "clear"
+  },
   "BAL": {
     "venue": "Camden Yards",
     "temp": 68.6,
@@ -18,17 +29,6 @@
     "wind_dir": "W",
     "humidity_pct": 89,
     "pressure_mb": 1014.3,
-    "roof": false,
-    "flag": "clear"
-  },
-  "DET": {
-    "venue": "Comerica Park",
-    "temp": 60.5,
-    "precip": 5,
-    "wind_spd": 9.2,
-    "wind_dir": "NNE",
-    "humidity_pct": 70,
-    "pressure_mb": 1021.4,
     "roof": false,
     "flag": "clear"
   }
