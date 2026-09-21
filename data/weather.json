@@ -1,15 +1,4 @@
 {
-  "SF": {
-    "venue": "Oracle Park",
-    "temp": 59.4,
-    "precip": 1,
-    "wind_spd": 9.9,
-    "wind_dir": "W",
-    "humidity_pct": 95,
-    "pressure_mb": 1014.4,
-    "roof": false,
-    "flag": "clear"
-  },
   "DET": {
     "venue": "Comerica Park",
     "temp": 59.7,
@@ -24,11 +13,22 @@
   "BAL": {
     "venue": "Camden Yards",
     "temp": 67.0,
-    "precip": 43,
+    "precip": 42,
     "wind_spd": 6.4,
     "wind_dir": "NNE",
     "humidity_pct": 88,
     "pressure_mb": 1018.1,
+    "roof": false,
+    "flag": "clear"
+  },
+  "SF": {
+    "venue": "Oracle Park",
+    "temp": 59.4,
+    "precip": 1,
+    "wind_spd": 9.9,
+    "wind_dir": "W",
+    "humidity_pct": 95,
+    "pressure_mb": 1014.4,
     "roof": false,
     "flag": "clear"
   }
