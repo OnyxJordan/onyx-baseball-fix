@@ -1,15 +1,4 @@
 {
-  "CHC": {
-    "venue": "Wrigley Field",
-    "temp": 60.0,
-    "precip": 2,
-    "wind_spd": 10.8,
-    "wind_dir": "NE",
-    "humidity_pct": 62,
-    "pressure_mb": 1024.9,
-    "roof": false,
-    "flag": "clear"
-  },
   "ATH": {
     "venue": "Sutter Health Park",
     "temp": 81.0,
@@ -18,6 +7,17 @@
     "wind_dir": "SSW",
     "humidity_pct": 42,
     "pressure_mb": 1010.7,
+    "roof": false,
+    "flag": "clear"
+  },
+  "LAD": {
+    "venue": "Dodger Stadium",
+    "temp": 69.4,
+    "precip": 0,
+    "wind_spd": 6.8,
+    "wind_dir": "W",
+    "humidity_pct": 79,
+    "pressure_mb": 1009.7,
     "roof": false,
     "flag": "clear"
   },
@@ -43,14 +43,14 @@
     "roof": false,
     "flag": "clear"
   },
-  "LAD": {
-    "venue": "Dodger Stadium",
-    "temp": 68.5,
-    "precip": 0,
-    "wind_spd": 6.6,
-    "wind_dir": "WSW",
-    "humidity_pct": 81,
-    "pressure_mb": 1009.8,
+  "CHC": {
+    "venue": "Wrigley Field",
+    "temp": 60.0,
+    "precip": 2,
+    "wind_spd": 10.8,
+    "wind_dir": "NE",
+    "humidity_pct": 62,
+    "pressure_mb": 1024.9,
     "roof": false,
     "flag": "clear"
   }
