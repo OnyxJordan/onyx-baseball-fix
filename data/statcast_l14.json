@@ -83,19 +83,33 @@
     "l14_bb_pct": 0.0,
     "l14_k_pct": 0.1818
   },
-  "eduardo valencia": {
-    "l14_pa": 28,
+  "jace jung": {
+    "l14_pa": 2,
     "l14_hr": 0,
     "l14_rate": 0.0,
     "l14_avg_ev": 95.0,
     "l14_ev90": 95.0,
-    "l14_barrel_pct": 0.0374,
-    "l14_hh_pct": 0.2936,
+    "l14_barrel_pct": 0.0,
+    "l14_hh_pct": 0.2,
+    "l14_hit_rate": 0.352,
+    "l14_xwoba": 0.44,
+    "l14_iso": 0.0,
+    "l14_bb_pct": 0.0,
+    "l14_k_pct": 0.5
+  },
+  "eduardo valencia": {
+    "l14_pa": 29,
+    "l14_hr": 0,
+    "l14_rate": 0.0,
+    "l14_avg_ev": 95.0,
+    "l14_ev90": 95.0,
+    "l14_barrel_pct": 0.036,
+    "l14_hh_pct": 0.29,
     "l14_hit_rate": 0.384,
     "l14_xwoba": 0.48,
-    "l14_iso": 0.208,
-    "l14_bb_pct": 0.0714,
-    "l14_k_pct": 0.0714
+    "l14_iso": 0.2,
+    "l14_bb_pct": 0.069,
+    "l14_k_pct": 0.1034
   },
   "samad taylor": {
     "l14_pa": 38,
@@ -293,20 +307,6 @@
     "l14_bb_pct": 0.1064,
     "l14_k_pct": 0.1915
   },
-  "spencer torkelson": {
-    "l14_pa": 48,
-    "l14_hr": 3,
-    "l14_rate": 0.0625,
-    "l14_avg_ev": 105.6,
-    "l14_ev90": 105.6,
-    "l14_barrel_pct": 0.2,
-    "l14_hh_pct": 0.48,
-    "l14_hit_rate": 0.384,
-    "l14_xwoba": 0.3924,
-    "l14_iso": 0.353,
-    "l14_bb_pct": 0.25,
-    "l14_k_pct": 0.25
-  },
   "jos\u00e9 ferm\u00edn": {
     "l14_pa": 28,
     "l14_hr": 0,
@@ -419,6 +419,20 @@
     "l14_bb_pct": 0.0769,
     "l14_k_pct": 0.3077
   },
+  "max clark": {
+    "l14_pa": 55,
+    "l14_hr": 1,
+    "l14_rate": 0.0182,
+    "l14_avg_ev": 95.0,
+    "l14_ev90": 95.0,
+    "l14_barrel_pct": 0.0293,
+    "l14_hh_pct": 0.2734,
+    "l14_hit_rate": 0.3576,
+    "l14_xwoba": 0.447,
+    "l14_iso": 0.163,
+    "l14_bb_pct": 0.1455,
+    "l14_k_pct": 0.1091
+  },
   "jake cronenworth": {
     "l14_pa": 48,
     "l14_hr": 2,
@@ -474,20 +488,6 @@
     "l14_iso": 0.073,
     "l14_bb_pct": 0.1277,
     "l14_k_pct": 0.0426
-  },
-  "max clark": {
-    "l14_pa": 51,
-    "l14_hr": 1,
-    "l14_rate": 0.0196,
-    "l14_avg_ev": 95.0,
-    "l14_ev90": 95.0,
-    "l14_barrel_pct": 0.0263,
-    "l14_hh_pct": 0.2657,
-    "l14_hit_rate": 0.346,
-    "l14_xwoba": 0.4325,
-    "l14_iso": 0.146,
-    "l14_bb_pct": 0.1373,
-    "l14_k_pct": 0.1176
   },
   "connor norby": {
     "l14_pa": 47,
@@ -586,20 +586,6 @@
     "l14_iso": 0.111,
     "l14_bb_pct": 0.0588,
     "l14_k_pct": 0.1373
-  },
-  "riley greene": {
-    "l14_pa": 51,
-    "l14_hr": 2,
-    "l14_rate": 0.0392,
-    "l14_avg_ev": 109.8,
-    "l14_ev90": 109.8,
-    "l14_barrel_pct": 0.2059,
-    "l14_hh_pct": 0.5588,
-    "l14_hit_rate": 0.3552,
-    "l14_xwoba": 0.4222,
-    "l14_iso": 0.222,
-    "l14_bb_pct": 0.098,
-    "l14_k_pct": 0.2157
   },
   "brenton doyle": {
     "l14_pa": 31,
@@ -726,6 +712,20 @@
     "l14_iso": 0.263,
     "l14_bb_pct": 0.093,
     "l14_k_pct": 0.2558
+  },
+  "spencer torkelson": {
+    "l14_pa": 52,
+    "l14_hr": 3,
+    "l14_rate": 0.0577,
+    "l14_avg_ev": 105.6,
+    "l14_ev90": 105.6,
+    "l14_barrel_pct": 0.2,
+    "l14_hh_pct": 0.48,
+    "l14_hit_rate": 0.384,
+    "l14_xwoba": 0.3924,
+    "l14_iso": 0.316,
+    "l14_bb_pct": 0.2308,
+    "l14_k_pct": 0.3077
   },
   "elly de la cruz": {
     "l14_pa": 50,
@@ -867,6 +867,20 @@
     "l14_bb_pct": 0.1071,
     "l14_k_pct": 0.1786
   },
+  "riley greene": {
+    "l14_pa": 56,
+    "l14_hr": 2,
+    "l14_rate": 0.0357,
+    "l14_avg_ev": 109.8,
+    "l14_ev90": 109.8,
+    "l14_barrel_pct": 0.2059,
+    "l14_hh_pct": 0.5588,
+    "l14_hit_rate": 0.3418,
+    "l14_xwoba": 0.4222,
+    "l14_iso": 0.209,
+    "l14_bb_pct": 0.125,
+    "l14_k_pct": 0.1964
+  },
   "lourdes gurriel jr.": {
     "l14_pa": 6,
     "l14_hr": 0,
@@ -895,20 +909,6 @@
     "l14_bb_pct": 0.0938,
     "l14_k_pct": 0.0625
   },
-  "hao-yu lee": {
-    "l14_pa": 53,
-    "l14_hr": 2,
-    "l14_rate": 0.0377,
-    "l14_avg_ev": 95.0,
-    "l14_ev90": 95.0,
-    "l14_barrel_pct": 0.052,
-    "l14_hh_pct": 0.3301,
-    "l14_hit_rate": 0.365,
-    "l14_xwoba": 0.4563,
-    "l14_iso": 0.289,
-    "l14_bb_pct": 0.1321,
-    "l14_k_pct": 0.2264
-  },
   "luke maile": {
     "l14_pa": 7,
     "l14_hr": 0,
@@ -936,6 +936,20 @@
     "l14_iso": 0.0,
     "l14_bb_pct": 0.1429,
     "l14_k_pct": 0.4286
+  },
+  "kevin mcgonigle": {
+    "l14_pa": 64,
+    "l14_hr": 1,
+    "l14_rate": 0.0156,
+    "l14_avg_ev": 102.5,
+    "l14_ev90": 102.5,
+    "l14_barrel_pct": 0.0833,
+    "l14_hh_pct": 0.4722,
+    "l14_hit_rate": 0.3312,
+    "l14_xwoba": 0.398,
+    "l14_iso": 0.186,
+    "l14_bb_pct": 0.1406,
+    "l14_k_pct": 0.1719
   },
   "bo naylor": {
     "l14_pa": 4,
@@ -1118,6 +1132,20 @@
     "l14_iso": 0.179,
     "l14_bb_pct": 0.125,
     "l14_k_pct": 0.2812
+  },
+  "hao-yu lee": {
+    "l14_pa": 58,
+    "l14_hr": 2,
+    "l14_rate": 0.0345,
+    "l14_avg_ev": 95.0,
+    "l14_ev90": 95.0,
+    "l14_barrel_pct": 0.0468,
+    "l14_hh_pct": 0.317,
+    "l14_hit_rate": 0.3439,
+    "l14_xwoba": 0.4299,
+    "l14_iso": 0.26,
+    "l14_bb_pct": 0.1207,
+    "l14_k_pct": 0.2241
   },
   "fernando tatis jr.": {
     "l14_pa": 58,
@@ -1455,20 +1483,6 @@
     "l14_bb_pct": 0.0377,
     "l14_k_pct": 0.1887
   },
-  "kevin mcgonigle": {
-    "l14_pa": 59,
-    "l14_hr": 1,
-    "l14_rate": 0.0169,
-    "l14_avg_ev": 102.5,
-    "l14_ev90": 102.5,
-    "l14_barrel_pct": 0.0833,
-    "l14_hh_pct": 0.4722,
-    "l14_hit_rate": 0.3157,
-    "l14_xwoba": 0.398,
-    "l14_iso": 0.184,
-    "l14_bb_pct": 0.1525,
-    "l14_k_pct": 0.1695
-  },
   "ronald acu\u00f1a jr.": {
     "l14_pa": 51,
     "l14_hr": 4,
@@ -1552,20 +1566,6 @@
     "l14_iso": 0.044,
     "l14_bb_pct": 0.0417,
     "l14_k_pct": 0.1667
-  },
-  "jacob young": {
-    "l14_pa": 27,
-    "l14_hr": 0,
-    "l14_rate": 0.0,
-    "l14_avg_ev": 100.8,
-    "l14_ev90": 100.8,
-    "l14_barrel_pct": 0.0526,
-    "l14_hh_pct": 0.2632,
-    "l14_hit_rate": 0.2749,
-    "l14_xwoba": 0.2131,
-    "l14_iso": 0.131,
-    "l14_bb_pct": 0.037,
-    "l14_k_pct": 0.1481
   },
   "alex bregman": {
     "l14_pa": 40,
@@ -2085,6 +2085,20 @@
     "l14_bb_pct": 0.0385,
     "l14_k_pct": 0.0769
   },
+  "cj abrams": {
+    "l14_pa": 46,
+    "l14_hr": 3,
+    "l14_rate": 0.0652,
+    "l14_avg_ev": 104.3,
+    "l14_ev90": 104.3,
+    "l14_barrel_pct": 0.0741,
+    "l14_hh_pct": 0.3333,
+    "l14_hit_rate": 0.3193,
+    "l14_xwoba": 0.2322,
+    "l14_iso": 0.302,
+    "l14_bb_pct": 0.0652,
+    "l14_k_pct": 0.1957
+  },
   "griffin conine": {
     "l14_pa": 44,
     "l14_hr": 2,
@@ -2253,6 +2267,20 @@
     "l14_bb_pct": 0.0833,
     "l14_k_pct": 0.1944
   },
+  "ben malgeri": {
+    "l14_pa": 25,
+    "l14_hr": 2,
+    "l14_rate": 0.08,
+    "l14_avg_ev": 105.3,
+    "l14_ev90": 105.3,
+    "l14_barrel_pct": 0.0,
+    "l14_hh_pct": 0.5,
+    "l14_hit_rate": 0.3506,
+    "l14_xwoba": 0.3666,
+    "l14_iso": 0.363,
+    "l14_bb_pct": 0.08,
+    "l14_k_pct": 0.16
+  },
   "joc pederson": {
     "l14_pa": 13,
     "l14_hr": 1,
@@ -2294,20 +2322,6 @@
     "l14_iso": 0.154,
     "l14_bb_pct": 0.129,
     "l14_k_pct": 0.0645
-  },
-  "cj abrams": {
-    "l14_pa": 42,
-    "l14_hr": 3,
-    "l14_rate": 0.0714,
-    "l14_avg_ev": 104.3,
-    "l14_ev90": 104.3,
-    "l14_barrel_pct": 0.0741,
-    "l14_hh_pct": 0.3333,
-    "l14_hit_rate": 0.3066,
-    "l14_xwoba": 0.2322,
-    "l14_iso": 0.317,
-    "l14_bb_pct": 0.0238,
-    "l14_k_pct": 0.2143
   },
   "justin crawford": {
     "l14_pa": 34,
@@ -2533,6 +2547,34 @@
     "l14_bb_pct": 0.0196,
     "l14_k_pct": 0.0784
   },
+  "brady house": {
+    "l14_pa": 32,
+    "l14_hr": 0,
+    "l14_rate": 0.0,
+    "l14_avg_ev": 95.0,
+    "l14_ev90": 95.0,
+    "l14_barrel_pct": 0.0133,
+    "l14_hh_pct": 0.2333,
+    "l14_hit_rate": 0.2492,
+    "l14_xwoba": 0.3115,
+    "l14_iso": 0.074,
+    "l14_bb_pct": 0.1562,
+    "l14_k_pct": 0.1875
+  },
+  "jacob young": {
+    "l14_pa": 31,
+    "l14_hr": 0,
+    "l14_rate": 0.0,
+    "l14_avg_ev": 100.8,
+    "l14_ev90": 100.8,
+    "l14_barrel_pct": 0.0526,
+    "l14_hh_pct": 0.2632,
+    "l14_hit_rate": 0.2358,
+    "l14_xwoba": 0.2131,
+    "l14_iso": 0.111,
+    "l14_bb_pct": 0.0323,
+    "l14_k_pct": 0.1613
+  },
   "francisco alvarez": {
     "l14_pa": 32,
     "l14_hr": 1,
@@ -2588,20 +2630,6 @@
     "l14_iso": 0.026,
     "l14_bb_pct": 0.0909,
     "l14_k_pct": 0.1591
-  },
-  "james wood": {
-    "l14_pa": 44,
-    "l14_hr": 0,
-    "l14_rate": 0.0,
-    "l14_avg_ev": 109.8,
-    "l14_ev90": 109.8,
-    "l14_barrel_pct": 0.1515,
-    "l14_hh_pct": 0.5758,
-    "l14_hit_rate": 0.2193,
-    "l14_xwoba": 0.4114,
-    "l14_iso": 0.026,
-    "l14_bb_pct": 0.1136,
-    "l14_k_pct": 0.3409
   },
   "seiya suzuki": {
     "l14_pa": 48,
@@ -2869,20 +2897,6 @@
     "l14_bb_pct": 0.0,
     "l14_k_pct": 0.5
   },
-  "dylan crews": {
-    "l14_pa": 44,
-    "l14_hr": 1,
-    "l14_rate": 0.0227,
-    "l14_avg_ev": 107.0,
-    "l14_ev90": 107.0,
-    "l14_barrel_pct": 0.0556,
-    "l14_hh_pct": 0.4444,
-    "l14_hit_rate": 0.2077,
-    "l14_xwoba": 0.3155,
-    "l14_iso": 0.073,
-    "l14_bb_pct": 0.0455,
-    "l14_k_pct": 0.1818
-  },
   "jonathan aranda": {
     "l14_pa": 41,
     "l14_hr": 3,
@@ -2909,20 +2923,6 @@
     "l14_xwoba": 0.2288,
     "l14_iso": 0.298,
     "l14_bb_pct": 0.0714,
-    "l14_k_pct": 0.2857
-  },
-  "dillon dingler": {
-    "l14_pa": 35,
-    "l14_hr": 1,
-    "l14_rate": 0.0286,
-    "l14_avg_ev": 102.0,
-    "l14_ev90": 102.0,
-    "l14_barrel_pct": 0.075,
-    "l14_hh_pct": 0.375,
-    "l14_hit_rate": 0.2292,
-    "l14_xwoba": 0.3269,
-    "l14_iso": 0.152,
-    "l14_bb_pct": 0.0286,
     "l14_k_pct": 0.2857
   },
   "nick gonzales": {
@@ -2954,18 +2954,18 @@
     "l14_k_pct": 0.2059
   },
   "andr\u00e9s chaparro": {
-    "l14_pa": 29,
+    "l14_pa": 33,
     "l14_hr": 1,
-    "l14_rate": 0.0345,
+    "l14_rate": 0.0303,
     "l14_avg_ev": 106.1,
     "l14_ev90": 106.1,
     "l14_barrel_pct": 0.2222,
     "l14_hh_pct": 0.6667,
-    "l14_hit_rate": 0.2622,
+    "l14_hit_rate": 0.2506,
     "l14_xwoba": 0.2791,
-    "l14_iso": 0.16,
-    "l14_bb_pct": 0.1379,
-    "l14_k_pct": 0.2414
+    "l14_iso": 0.138,
+    "l14_bb_pct": 0.1212,
+    "l14_k_pct": 0.2727
   },
   "liam hicks": {
     "l14_pa": 28,
@@ -3078,20 +3078,6 @@
     "l14_iso": 0.184,
     "l14_bb_pct": 0.025,
     "l14_k_pct": 0.175
-  },
-  "ben malgeri": {
-    "l14_pa": 20,
-    "l14_hr": 1,
-    "l14_rate": 0.05,
-    "l14_avg_ev": 105.3,
-    "l14_ev90": 105.3,
-    "l14_barrel_pct": 0.0,
-    "l14_hh_pct": 0.5,
-    "l14_hit_rate": 0.3094,
-    "l14_xwoba": 0.3666,
-    "l14_iso": 0.294,
-    "l14_bb_pct": 0.1,
-    "l14_k_pct": 0.2
   },
   "jeff mcneil": {
     "l14_pa": 36,
@@ -3218,6 +3204,20 @@
     "l14_iso": 0.139,
     "l14_bb_pct": 0.0444,
     "l14_k_pct": 0.1556
+  },
+  "james wood": {
+    "l14_pa": 48,
+    "l14_hr": 0,
+    "l14_rate": 0.0,
+    "l14_avg_ev": 109.8,
+    "l14_ev90": 109.8,
+    "l14_barrel_pct": 0.1515,
+    "l14_hh_pct": 0.5758,
+    "l14_hit_rate": 0.2003,
+    "l14_xwoba": 0.4114,
+    "l14_iso": 0.023,
+    "l14_bb_pct": 0.1042,
+    "l14_k_pct": 0.3542
   },
   "victor bericoto": {
     "l14_pa": 15,
@@ -3471,6 +3471,34 @@
     "l14_bb_pct": 0.1,
     "l14_k_pct": 0.1
   },
+  "dylan crews": {
+    "l14_pa": 48,
+    "l14_hr": 1,
+    "l14_rate": 0.0208,
+    "l14_avg_ev": 107.0,
+    "l14_ev90": 107.0,
+    "l14_barrel_pct": 0.0556,
+    "l14_hh_pct": 0.4444,
+    "l14_hit_rate": 0.1897,
+    "l14_xwoba": 0.3155,
+    "l14_iso": 0.067,
+    "l14_bb_pct": 0.0417,
+    "l14_k_pct": 0.1667
+  },
+  "dillon dingler": {
+    "l14_pa": 39,
+    "l14_hr": 1,
+    "l14_rate": 0.0256,
+    "l14_avg_ev": 102.0,
+    "l14_ev90": 102.0,
+    "l14_barrel_pct": 0.075,
+    "l14_hh_pct": 0.375,
+    "l14_hit_rate": 0.2172,
+    "l14_xwoba": 0.3269,
+    "l14_iso": 0.139,
+    "l14_bb_pct": 0.0513,
+    "l14_k_pct": 0.2564
+  },
   "xavier edwards": {
     "l14_pa": 21,
     "l14_hr": 0,
@@ -3541,6 +3569,20 @@
     "l14_bb_pct": 0.0,
     "l14_k_pct": 0.4643
   },
+  "yohandy morales": {
+    "l14_pa": 27,
+    "l14_hr": 2,
+    "l14_rate": 0.0741,
+    "l14_avg_ev": 95.0,
+    "l14_ev90": 95.0,
+    "l14_barrel_pct": 0.0535,
+    "l14_hh_pct": 0.3337,
+    "l14_hit_rate": 0.2608,
+    "l14_xwoba": 0.326,
+    "l14_iso": 0.297,
+    "l14_bb_pct": 0.0,
+    "l14_k_pct": 0.1481
+  },
   "john rave": {
     "l14_pa": 32,
     "l14_hr": 1,
@@ -3582,34 +3624,6 @@
     "l14_iso": 0.087,
     "l14_bb_pct": 0.1071,
     "l14_k_pct": 0.2143
-  },
-  "brady house": {
-    "l14_pa": 28,
-    "l14_hr": 0,
-    "l14_rate": 0.0,
-    "l14_avg_ev": 95.0,
-    "l14_ev90": 95.0,
-    "l14_barrel_pct": 0.0157,
-    "l14_hh_pct": 0.2392,
-    "l14_hit_rate": 0.2327,
-    "l14_xwoba": 0.2908,
-    "l14_iso": 0.087,
-    "l14_bb_pct": 0.1786,
-    "l14_k_pct": 0.1786
-  },
-  "yohandy morales": {
-    "l14_pa": 23,
-    "l14_hr": 1,
-    "l14_rate": 0.0435,
-    "l14_avg_ev": 95.0,
-    "l14_ev90": 95.0,
-    "l14_barrel_pct": 0.0392,
-    "l14_hh_pct": 0.2981,
-    "l14_hit_rate": 0.2295,
-    "l14_xwoba": 0.2869,
-    "l14_iso": 0.218,
-    "l14_bb_pct": 0.0,
-    "l14_k_pct": 0.1304
   },
   "alec burleson": {
     "l14_pa": 41,
@@ -3695,20 +3709,6 @@
     "l14_bb_pct": 0.0833,
     "l14_k_pct": 0.2083
   },
-  "brett callahan": {
-    "l14_pa": 27,
-    "l14_hr": 0,
-    "l14_rate": 0.0,
-    "l14_avg_ev": 95.0,
-    "l14_ev90": 95.0,
-    "l14_barrel_pct": 0.0151,
-    "l14_hh_pct": 0.2378,
-    "l14_hit_rate": 0.207,
-    "l14_xwoba": 0.2587,
-    "l14_iso": 0.084,
-    "l14_bb_pct": 0.1111,
-    "l14_k_pct": 0.2593
-  },
   "ryan kreidler": {
     "l14_pa": 27,
     "l14_hr": 2,
@@ -3793,6 +3793,20 @@
     "l14_bb_pct": 0.0,
     "l14_k_pct": 0.2
   },
+  "brett callahan": {
+    "l14_pa": 28,
+    "l14_hr": 0,
+    "l14_rate": 0.0,
+    "l14_avg_ev": 95.0,
+    "l14_ev90": 95.0,
+    "l14_barrel_pct": 0.0144,
+    "l14_hh_pct": 0.236,
+    "l14_hit_rate": 0.1992,
+    "l14_xwoba": 0.249,
+    "l14_iso": 0.08,
+    "l14_bb_pct": 0.1071,
+    "l14_k_pct": 0.2857
+  },
   "junior caminero": {
     "l14_pa": 55,
     "l14_hr": 2,
@@ -3862,20 +3876,6 @@
     "l14_iso": 0.15,
     "l14_bb_pct": 0.0476,
     "l14_k_pct": 0.5238
-  },
-  "daylen lile": {
-    "l14_pa": 43,
-    "l14_hr": 2,
-    "l14_rate": 0.0465,
-    "l14_avg_ev": 105.7,
-    "l14_ev90": 105.7,
-    "l14_barrel_pct": 0.0789,
-    "l14_hh_pct": 0.3421,
-    "l14_hit_rate": 0.2316,
-    "l14_xwoba": 0.2831,
-    "l14_iso": 0.225,
-    "l14_bb_pct": 0.0465,
-    "l14_k_pct": 0.186
   },
   "josh rojas": {
     "l14_pa": 7,
@@ -4030,6 +4030,20 @@
     "l14_iso": 0.171,
     "l14_bb_pct": 0.08,
     "l14_k_pct": 0.18
+  },
+  "daylen lile": {
+    "l14_pa": 44,
+    "l14_hr": 2,
+    "l14_rate": 0.0455,
+    "l14_avg_ev": 105.7,
+    "l14_ev90": 105.7,
+    "l14_barrel_pct": 0.0789,
+    "l14_hh_pct": 0.3421,
+    "l14_hit_rate": 0.226,
+    "l14_xwoba": 0.2831,
+    "l14_iso": 0.22,
+    "l14_bb_pct": 0.0455,
+    "l14_k_pct": 0.1818
   },
   "nick sogard": {
     "l14_pa": 44,
@@ -4507,20 +4521,6 @@
     "l14_bb_pct": 0.2353,
     "l14_k_pct": 0.1176
   },
-  "harry ford": {
-    "l14_pa": 14,
-    "l14_hr": 0,
-    "l14_rate": 0.0,
-    "l14_avg_ev": 95.0,
-    "l14_ev90": 95.0,
-    "l14_barrel_pct": 0.0,
-    "l14_hh_pct": 0.2,
-    "l14_hit_rate": 0.16,
-    "l14_xwoba": 0.2,
-    "l14_iso": 0.0,
-    "l14_bb_pct": 0.1429,
-    "l14_k_pct": 0.2857
-  },
   "hunter goodman": {
     "l14_pa": 39,
     "l14_hr": 2,
@@ -4562,6 +4562,20 @@
     "l14_iso": 0.291,
     "l14_bb_pct": 0.1111,
     "l14_k_pct": 0.4444
+  },
+  "nasim nu\u00f1ez": {
+    "l14_pa": 23,
+    "l14_hr": 0,
+    "l14_rate": 0.0,
+    "l14_avg_ev": 101.5,
+    "l14_ev90": 101.5,
+    "l14_barrel_pct": 0.0526,
+    "l14_hh_pct": 0.3158,
+    "l14_hit_rate": 0.1707,
+    "l14_xwoba": 0.2517,
+    "l14_iso": 0.0,
+    "l14_bb_pct": 0.1739,
+    "l14_k_pct": 0.087
   },
   "matt shaw": {
     "l14_pa": 16,
@@ -4871,6 +4885,20 @@
     "l14_bb_pct": 0.3,
     "l14_k_pct": 0.1
   },
+  "harry ford": {
+    "l14_pa": 17,
+    "l14_hr": 0,
+    "l14_rate": 0.0,
+    "l14_avg_ev": 95.0,
+    "l14_ev90": 95.0,
+    "l14_barrel_pct": 0.0,
+    "l14_hh_pct": 0.2,
+    "l14_hit_rate": 0.16,
+    "l14_xwoba": 0.2,
+    "l14_iso": 0.0,
+    "l14_bb_pct": 0.1765,
+    "l14_k_pct": 0.2941
+  },
   "jackson holliday": {
     "l14_pa": 21,
     "l14_hr": 0,
@@ -5039,20 +5067,6 @@
     "l14_bb_pct": 0.2143,
     "l14_k_pct": 0.25
   },
-  "john peck": {
-    "l14_pa": 45,
-    "l14_hr": 0,
-    "l14_rate": 0.0,
-    "l14_avg_ev": 95.0,
-    "l14_ev90": 95.0,
-    "l14_barrel_pct": 0.0,
-    "l14_hh_pct": 0.2,
-    "l14_hit_rate": 0.16,
-    "l14_xwoba": 0.2,
-    "l14_iso": 0.0,
-    "l14_bb_pct": 0.1556,
-    "l14_k_pct": 0.2
-  },
   "tim tawa": {
     "l14_pa": 35,
     "l14_hr": 0,
@@ -5067,6 +5081,20 @@
     "l14_bb_pct": 0.0857,
     "l14_k_pct": 0.1714
   },
+  "john peck": {
+    "l14_pa": 48,
+    "l14_hr": 0,
+    "l14_rate": 0.0,
+    "l14_avg_ev": 95.0,
+    "l14_ev90": 95.0,
+    "l14_barrel_pct": 0.0,
+    "l14_hh_pct": 0.2,
+    "l14_hit_rate": 0.16,
+    "l14_xwoba": 0.2,
+    "l14_iso": 0.0,
+    "l14_bb_pct": 0.1667,
+    "l14_k_pct": 0.2083
+  },
   "manny machado": {
     "l14_pa": 55,
     "l14_hr": 2,
@@ -5080,20 +5108,6 @@
     "l14_iso": 0.125,
     "l14_bb_pct": 0.1091,
     "l14_k_pct": 0.2
-  },
-  "nasim nu\u00f1ez": {
-    "l14_pa": 20,
-    "l14_hr": 0,
-    "l14_rate": 0.0,
-    "l14_avg_ev": 101.5,
-    "l14_ev90": 101.5,
-    "l14_barrel_pct": 0.0526,
-    "l14_hh_pct": 0.3158,
-    "l14_hit_rate": 0.16,
-    "l14_xwoba": 0.2517,
-    "l14_iso": 0.0,
-    "l14_bb_pct": 0.15,
-    "l14_k_pct": 0.1
   },
   "kyle teel": {
     "l14_pa": 44,
@@ -5837,20 +5851,6 @@
     "l14_bb_pct": 0.0,
     "l14_k_pct": 0.0
   },
-  "jace jung": {
-    "l14_pa": 1,
-    "l14_hr": 0,
-    "l14_rate": 0.0,
-    "l14_avg_ev": 95.0,
-    "l14_ev90": 95.0,
-    "l14_barrel_pct": 0.0,
-    "l14_hh_pct": 0.2,
-    "l14_hit_rate": 0.256,
-    "l14_xwoba": 0.32,
-    "l14_iso": 0.0,
-    "l14_bb_pct": 0.0,
-    "l14_k_pct": 1.0
-  },
   "joshua kuroda-grauer": {
     "l14_pa": 2,
     "l14_hr": 0,
@@ -5964,7 +5964,7 @@
     "l14_k_pct": 0.2857
   },
   "zach mckinstry": {
-    "l14_pa": 21,
+    "l14_pa": 23,
     "l14_hr": 0,
     "l14_rate": 0.0,
     "l14_avg_ev": 98.0,
@@ -5974,8 +5974,8 @@
     "l14_hit_rate": 0.16,
     "l14_xwoba": 0.2841,
     "l14_iso": 0.0,
-    "l14_bb_pct": 0.1905,
-    "l14_k_pct": 0.1905
+    "l14_bb_pct": 0.2174,
+    "l14_k_pct": 0.1739
   },
   "andruw monasterio": {
     "l14_pa": 6,
