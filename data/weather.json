@@ -10,36 +10,25 @@
     "roof": false,
     "flag": "clear"
   },
-  "PHI": {
-    "venue": "Citizens Bank Park",
-    "temp": 64.4,
-    "precip": 0,
-    "wind_spd": 14.7,
+  "PIT": {
+    "venue": "PNC Park",
+    "temp": 63.5,
+    "precip": 1,
+    "wind_spd": 9.0,
     "wind_dir": "ENE",
-    "humidity_pct": 58,
-    "pressure_mb": 1029.5,
+    "humidity_pct": 67,
+    "pressure_mb": 1026.7,
     "roof": false,
     "flag": "clear"
   },
-  "DET": {
-    "venue": "Comerica Park",
-    "temp": 65.4,
-    "precip": 4,
-    "wind_spd": 16.4,
-    "wind_dir": "E",
-    "humidity_pct": 56,
-    "pressure_mb": 1027.5,
-    "roof": false,
-    "flag": "clear"
-  },
-  "NYY": {
-    "venue": "Yankee Stadium",
-    "temp": 62.5,
+  "BOS": {
+    "venue": "Fenway Park",
+    "temp": 55.3,
     "precip": 0,
-    "wind_spd": 11.0,
-    "wind_dir": "ENE",
-    "humidity_pct": 50,
-    "pressure_mb": 1031.5,
+    "wind_spd": 8.4,
+    "wind_dir": "NE",
+    "humidity_pct": 69,
+    "pressure_mb": 1034.4,
     "roof": false,
     "flag": "clear"
   },
@@ -54,17 +43,6 @@
     "roof": true,
     "flag": "clear"
   },
-  "ATL": {
-    "venue": "Truist Park",
-    "temp": 74.3,
-    "precip": 1,
-    "wind_spd": 9.7,
-    "wind_dir": "E",
-    "humidity_pct": 65,
-    "pressure_mb": 1019.3,
-    "roof": false,
-    "flag": "clear"
-  },
   "COL": {
     "venue": "Coors Field",
     "temp": 72.4,
@@ -76,14 +54,36 @@
     "roof": false,
     "flag": "clear"
   },
-  "BOS": {
-    "venue": "Fenway Park",
-    "temp": 55.3,
-    "precip": 0,
-    "wind_spd": 8.4,
+  "ATL": {
+    "venue": "Truist Park",
+    "temp": 74.3,
+    "precip": 1,
+    "wind_spd": 9.7,
+    "wind_dir": "E",
+    "humidity_pct": 65,
+    "pressure_mb": 1019.3,
+    "roof": false,
+    "flag": "clear"
+  },
+  "BAL": {
+    "venue": "Camden Yards",
+    "temp": 63.1,
+    "precip": 2,
+    "wind_spd": 11.7,
     "wind_dir": "NE",
-    "humidity_pct": 69,
-    "pressure_mb": 1034.4,
+    "humidity_pct": 75,
+    "pressure_mb": 1027.7,
+    "roof": false,
+    "flag": "clear"
+  },
+  "DET": {
+    "venue": "Comerica Park",
+    "temp": 65.4,
+    "precip": 4,
+    "wind_spd": 16.4,
+    "wind_dir": "E",
+    "humidity_pct": 56,
+    "pressure_mb": 1027.5,
     "roof": false,
     "flag": "clear"
   },
@@ -109,50 +109,6 @@
     "roof": false,
     "flag": "clear"
   },
-  "LAD": {
-    "venue": "Dodger Stadium",
-    "temp": 70.3,
-    "precip": 0,
-    "wind_spd": 4.6,
-    "wind_dir": "W",
-    "humidity_pct": 80,
-    "pressure_mb": 1010.4,
-    "roof": false,
-    "flag": "clear"
-  },
-  "BAL": {
-    "venue": "Camden Yards",
-    "temp": 63.1,
-    "precip": 2,
-    "wind_spd": 11.7,
-    "wind_dir": "NE",
-    "humidity_pct": 75,
-    "pressure_mb": 1027.7,
-    "roof": false,
-    "flag": "clear"
-  },
-  "PIT": {
-    "venue": "PNC Park",
-    "temp": 63.5,
-    "precip": 1,
-    "wind_spd": 9.0,
-    "wind_dir": "ENE",
-    "humidity_pct": 67,
-    "pressure_mb": 1026.7,
-    "roof": false,
-    "flag": "clear"
-  },
-  "ATH": {
-    "venue": "Sutter Health Park",
-    "temp": 89.2,
-    "precip": 0,
-    "wind_spd": 2.6,
-    "wind_dir": "WNW",
-    "humidity_pct": 21,
-    "pressure_mb": 1010.8,
-    "roof": false,
-    "flag": "clear"
-  },
   "SEA": {
     "venue": "T-Mobile Park",
     "temp": 55.6,
@@ -161,6 +117,42 @@
     "wind_dir": "NNE",
     "humidity_pct": 58,
     "pressure_mb": 1020.3,
+    "roof": false,
+    "flag": "clear"
+  },
+  "ATH": {
+    "venue": "Sutter Health Park",
+    "temp": 72,
+    "precip": 0,
+    "wind_spd": 5,
+    "wind_dir": "N",
+    "roof": false,
+    "flag": "clear"
+  },
+  "NYY": {
+    "venue": "Yankee Stadium",
+    "temp": 72,
+    "precip": 0,
+    "wind_spd": 5,
+    "wind_dir": "N",
+    "roof": false,
+    "flag": "clear"
+  },
+  "PHI": {
+    "venue": "Citizens Bank Park",
+    "temp": 72,
+    "precip": 0,
+    "wind_spd": 5,
+    "wind_dir": "N",
+    "roof": false,
+    "flag": "clear"
+  },
+  "LAD": {
+    "venue": "Dodger Stadium",
+    "temp": 72,
+    "precip": 0,
+    "wind_spd": 5,
+    "wind_dir": "N",
     "roof": false,
     "flag": "clear"
   }
