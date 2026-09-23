@@ -1297,16 +1297,16 @@
     "player": "Ketel Marte",
     "odds": 236,
     "prob": 23.8,
-    "hit": null
+    "hit": false
    },
    {
     "player": "Shea Langeliers",
     "odds": 277,
     "prob": 21.8,
-    "hit": null
+    "hit": "void"
    }
   ],
-  "result": null,
-  "pnl": null
+  "result": "loss",
+  "pnl": -10.0
  }
 ]
