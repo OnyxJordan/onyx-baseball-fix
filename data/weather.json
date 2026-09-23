@@ -1,23 +1,12 @@
 {
-  "BAL": {
-    "venue": "Camden Yards",
-    "temp": 60.9,
-    "precip": 1,
-    "wind_spd": 8.4,
-    "wind_dir": "NE",
-    "humidity_pct": 80,
-    "pressure_mb": 1029.1,
-    "roof": false,
-    "flag": "clear"
-  },
-  "SF": {
-    "venue": "Oracle Park",
-    "temp": 68.2,
+  "KC": {
+    "venue": "Kauffman Stadium",
+    "temp": 74.1,
     "precip": 0,
-    "wind_spd": 3.7,
-    "wind_dir": "NNE",
-    "humidity_pct": 74,
-    "pressure_mb": 1012.8,
+    "wind_spd": 9.4,
+    "wind_dir": "ENE",
+    "humidity_pct": 50,
+    "pressure_mb": 1023.0,
     "roof": false,
     "flag": "clear"
   },
@@ -32,28 +21,6 @@
     "roof": false,
     "flag": "clear"
   },
-  "SEA": {
-    "venue": "T-Mobile Park",
-    "temp": 56.3,
-    "precip": 0,
-    "wind_spd": 6.7,
-    "wind_dir": "NNE",
-    "humidity_pct": 63,
-    "pressure_mb": 1019.6,
-    "roof": false,
-    "flag": "clear"
-  },
-  "PIT": {
-    "venue": "PNC Park",
-    "temp": 63.0,
-    "precip": 3,
-    "wind_spd": 9.7,
-    "wind_dir": "E",
-    "humidity_pct": 66,
-    "pressure_mb": 1027.2,
-    "roof": false,
-    "flag": "clear"
-  },
   "NYY": {
     "venue": "Yankee Stadium",
     "temp": 62.5,
@@ -62,28 +29,6 @@
     "wind_dir": "NNE",
     "humidity_pct": 44,
     "pressure_mb": 1031.0,
-    "roof": false,
-    "flag": "clear"
-  },
-  "COL": {
-    "venue": "Coors Field",
-    "temp": 68.8,
-    "precip": 32,
-    "wind_spd": 11.1,
-    "wind_dir": "SSW",
-    "humidity_pct": 56,
-    "pressure_mb": 1013.6,
-    "roof": false,
-    "flag": "clear"
-  },
-  "ATL": {
-    "venue": "Truist Park",
-    "temp": 73.2,
-    "precip": 0,
-    "wind_spd": 10.4,
-    "wind_dir": "ENE",
-    "humidity_pct": 68,
-    "pressure_mb": 1019.4,
     "roof": false,
     "flag": "clear"
   },
@@ -109,37 +54,63 @@
     "roof": true,
     "flag": "clear"
   },
-  "BOS": {
-    "venue": "Fenway Park",
-    "temp": 55.2,
-    "precip": 0,
-    "wind_spd": 7.9,
-    "wind_dir": "NE",
-    "humidity_pct": 72,
-    "pressure_mb": 1033.7,
-    "roof": false,
-    "flag": "clear"
-  },
-  "KC": {
-    "venue": "Kauffman Stadium",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
-    "roof": false,
-    "flag": "clear"
-  },
-  "CHC": {
-    "venue": "Wrigley Field",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
+  "DET": {
+    "venue": "Comerica Park",
+    "temp": 63.3,
+    "precip": 2,
+    "wind_spd": 16.7,
+    "wind_dir": "E",
+    "humidity_pct": 64,
+    "pressure_mb": 1028.1,
     "roof": false,
     "flag": "clear"
   },
   "LAD": {
     "venue": "Dodger Stadium",
+    "temp": 70.2,
+    "precip": 0,
+    "wind_spd": 4.8,
+    "wind_dir": "W",
+    "humidity_pct": 85,
+    "pressure_mb": 1010.6,
+    "roof": false,
+    "flag": "clear"
+  },
+  "PIT": {
+    "venue": "PNC Park",
+    "temp": 63.0,
+    "precip": 3,
+    "wind_spd": 9.7,
+    "wind_dir": "E",
+    "humidity_pct": 66,
+    "pressure_mb": 1027.2,
+    "roof": false,
+    "flag": "clear"
+  },
+  "CHC": {
+    "venue": "Wrigley Field",
+    "temp": 61.4,
+    "precip": 0,
+    "wind_spd": 9.9,
+    "wind_dir": "ENE",
+    "humidity_pct": 79,
+    "pressure_mb": 1026.8,
+    "roof": false,
+    "flag": "clear"
+  },
+  "BAL": {
+    "venue": "Camden Yards",
+    "temp": 60.9,
+    "precip": 1,
+    "wind_spd": 8.4,
+    "wind_dir": "NE",
+    "humidity_pct": 80,
+    "pressure_mb": 1029.1,
+    "roof": false,
+    "flag": "clear"
+  },
+  "COL": {
+    "venue": "Coors Field",
     "temp": 72,
     "precip": 0,
     "wind_spd": 5,
@@ -147,12 +118,41 @@
     "roof": false,
     "flag": "clear"
   },
-  "DET": {
-    "venue": "Comerica Park",
+  "SF": {
+    "venue": "Oracle Park",
     "temp": 72,
     "precip": 0,
     "wind_spd": 5,
     "wind_dir": "N",
+    "roof": false,
+    "flag": "clear"
+  },
+  "ATL": {
+    "venue": "Truist Park",
+    "temp": 72,
+    "precip": 0,
+    "wind_spd": 5,
+    "wind_dir": "N",
+    "roof": false,
+    "flag": "clear"
+  },
+  "BOS": {
+    "venue": "Fenway Park",
+    "temp": 72,
+    "precip": 0,
+    "wind_spd": 5,
+    "wind_dir": "N",
+    "roof": false,
+    "flag": "clear"
+  },
+  "SEA": {
+    "venue": "T-Mobile Park",
+    "temp": 56.3,
+    "precip": 0,
+    "wind_spd": 6.7,
+    "wind_dir": "NNE",
+    "humidity_pct": 63,
+    "pressure_mb": 1019.6,
     "roof": false,
     "flag": "clear"
   }
