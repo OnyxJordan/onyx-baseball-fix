@@ -205,17 +205,23 @@ Current state:
 | `RESULTS`, `SUMMARIES` | const | 2438, 2442 | 3944, 2961 | safe (guard runs after declaration) |
 | `TEAM_LOGOS` | const | 2830 | 3638 | safe |
 | `PITCHER_PROJ` | const | 6370 | 6378 | safe |
-| **`LINE_HISTORY`** | **const** | **6369** | **5112** | **latent hazard** |
+| `LINE_HISTORY` | var | 6374 | 5112 | fixed, was the one violation |
 
-`LINE_HISTORY` is the one violation: `mktHist()` at line 5112 does
-`typeof LINE_HISTORY !== 'undefined' ? LINE_HISTORY : []`, which sits 1,257 lines *above*
-the `const` declaration — exactly the pattern that blanked the site on 8/8. It is not
-currently firing an outage because every reachable early caller (`gcBetBar`, line 3926)
-wraps the call in `try/catch`, so the TDZ `ReferenceError` is swallowed and the
-line-movement chip silently renders empty. The fix is one word in `shell.html`
-(`const LINE_HISTORY` → `var LINE_HISTORY`), and it should ship with the normal headless
-verification. Until then: **do not add an un-caught caller of `mktHist()` that can run
-before line 6369.**
+**Why the whole file is one scope:** `index.html` carries a single `<script>` block
+spanning roughly lines 2434-7004. Every global above shares it, so a `const` declared at
+6369 is in its temporal dead zone for everything that executes earlier in the same
+block — including the top-level render calls at ~6350. Cross-block references would be
+harmless (the binding would simply not exist yet, and `typeof` would return
+`"undefined"`); same-block references throw. That is why declaration order is the rule.
+
+`LINE_HISTORY` was the one violation and is now `var`. `mktHist()` at line 5112 does
+`typeof LINE_HISTORY !== 'undefined' ? LINE_HISTORY : []` more than 1,200 lines *above*
+the declaration. As a `const` that guard threw
+`ReferenceError: Cannot access 'LINE_HISTORY' before initialization` — the 8/8 pattern.
+It never blanked the site only because the one reachable early caller (`gcBetBar`, line
+3926) wraps it in `try/catch`, so the error was swallowed and the line-movement chip
+rendered blank instead. Standing rule: **any new typeof-guarded global goes in this
+table, and an un-caught early caller of one is a site-blanker.**
 
 ## Onyx integration
 
@@ -328,7 +334,7 @@ dispatch refresh_build.yml (also re-seeds the chain) → verify the DEPLOYED pag
 | phantom next-day ledger rows | a build ran on UTC "tomorrow" | 8/26 — purge rows, keep aggregates honest |
 | "model broken, no plays" | calibration buckets + league weekly HR rate first | 9/6 — it was variance; the model was calibrated |
 | published record ≠ the JSON | apply the conviction filter before concluding anything | see Tracked ledgers |
-| line-movement chip blank | `LINE_HISTORY` TDZ, swallowed by a try/catch | see Injected globals |
+| line-movement chip blank | a typeof-guarded global read before its declaration, swallowed by a try/catch | 9/23 — `LINE_HISTORY` was const; see Injected globals |
 
 ## Known gaps (open, tracked, not bugs to rediscover)
 
@@ -344,7 +350,8 @@ dispatch refresh_build.yml (also re-seeds the chain) → verify the DEPLOYED pag
   commit when `RESULTS`/`SUMMARIES` come out malformed. It was never built, so the only
   guard today is `auto_build.py` aborting on zero scored players. A structurally broken
   but non-empty build would still ship.
-- **`LINE_HISTORY` const/TDZ**, above. One-word shell fix, not yet shipped.
+- ~~`LINE_HISTORY` const/TDZ~~ — **fixed**; it is `var` now. The audit table in
+  [Injected globals](#injected-globals-the-tdz-rule-precisely) is the live record.
 
 ## Working with Jordan
 

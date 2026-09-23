@@ -19,9 +19,11 @@ gaps. This file is the short form that must never be violated.
 4. **No em dashes in site copy. No yellow anywhere** (Spark tones excluded). Applies to
    rendered copy, not repo docs.
 5. **Any injected JS global read before its declaration line must be `var`.** A `typeof`
-   guard does NOT protect a `const` in its temporal dead zone — this blanked the whole
-   site on 8/8. Check declaration order, not just the keyword. `LINE_HISTORY` is a known
-   outstanding violation (see README → Injected globals).
+   guard does NOT protect a `const` in its temporal dead zone — it throws
+   `Cannot access 'X' before initialization`, which blanked the whole site on 8/8.
+   `index.html` is a single `<script>` block (~2434-7004), so every global shares one
+   scope and declaration order is what decides. Check the audit table in
+   README → Injected globals, and add any new typeof-guarded global to it.
 6. **The ledgers are sacred.** `data/picks_input.json`, `ticket_history.json`,
    `k_history.json`, `hr_history.json` are the public graded record. Never regenerate
    them. During merges: `git checkout origin/main -- data/<ledger>`. Record odds at the
