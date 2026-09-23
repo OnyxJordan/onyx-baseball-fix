@@ -63,12 +63,24 @@ Verification before shipping shell or model changes:
 
 ```bash
 rm -rf __pycache__ && python3 -B auto_build.py && python3 -B update_stats.py
-# then headless: serve on :8901, load index.html at 390x844, capture pageerror,
-# walk all 8 tabs, grep rendered text for 'undefined'/'NaN', assert key DOM
+npm install playwright-core --no-save   # once per container
+node tools/verify_shell.js              # local build; exits non-zero on failure
+node tools/verify_shell.js --live       # the DEPLOYED page, after the deploy lands
 ```
 
-Abort external requests in headless probes or they hang on Google Fonts. The daily
-pipeline depends on `requests` only — do not add imports to it casually.
+Use that script rather than writing a probe from scratch — it encodes three things
+that are easy to get wrong: tabs must be switched with `gotoTab()` (there are **9**,
+and several are hidden in the hamburger drawer at 390px, so clicking nav silently
+skips them), every off-origin request must be aborted or it hangs on Google Fonts,
+and `--live` cannot navigate to `https://` from a cloud session (the agent proxy's
+CA is not trusted by Chromium — it curls the bytes and serves them locally; never
+disable certificate checking to work around this).
+
+A green build is not a shipped fix: verify the deployed page separately, because
+Pages deploys lag the commit.
+
+The daily pipeline depends on `requests` only — do not add imports to it casually.
+`tools/` is dev-only and never runs in the pipeline.
 
 ## Working with Jordan
 

@@ -301,17 +301,44 @@ why a local `auto_build.py` still produces a full board.
 ## Verification discipline (non-negotiable)
 
 Before shipping any shell/model change:
+
 ```bash
 rm -rf __pycache__ && python3 -B auto_build.py && python3 -B update_stats.py
-# then headless (playwright-core + /opt/pw-browsers/chromium in the cloud env):
-#   serve repo on :8901, load index.html at 390x844, capture pageerror,
-#   walk all 8 tabs, grep rendered text for 'undefined'/'NaN', assert key DOM
+npm install playwright-core --no-save        # once per container
+node tools/verify_shell.js                   # checks the local build
+node tools/verify_shell.js --live            # checks the DEPLOYED page
 ```
-Abort external requests in probes (`page.route`) or screenshots hang on Google Fonts.
 
-A local build touches only `index.html` when the committed data is current — if it also
-rewrites files under `data/`, something re-fetched or re-graded, and that belongs in its
-own commit, not bundled into a shell change.
+`tools/verify_shell.js` is the gate: it serves the repo on :8901, loads
+`index.html` at 390x844, reads every typeof-guarded global, calls `mktHist()`,
+walks all **nine** tabs, greps rendered text for `undefined` / `NaN` /
+`[object Object]`, and exits non-zero on any uncaught page error. Run it before
+you push and again with `--live` after the deploy lands.
+
+Three things the script handles that a hand-rolled probe gets wrong. Each one
+cost a cycle on 9/23:
+
+- **Switch tabs with `gotoTab()`, never by clicking `[data-tab=...]`.** At 390px
+  several tabs exist only in the hamburger drawer, so clicking the nav silently
+  skips them and the probe passes on tabs it never opened. There are **9** tabs
+  (home, gamecenter, board, power, pitchers, record, markets, rankings, model),
+  not 8 as this file said until 9/23.
+- **Abort every off-origin request** (`page.route`) or the probe hangs on Google
+  Fonts.
+- **`--live` cannot navigate to `https://` directly from a cloud session.** The
+  agent proxy terminates TLS with a CA Chromium does not trust, so `page.goto()`
+  fails `ERR_CERT_AUTHORITY_INVALID`. The script curls the deployed bytes (curl
+  *does* trust the proxy CA) and serves them locally. **Do not "fix" this by
+  disabling certificate checking.**
+
+Verifying the *deployed* page is a separate step from a green build, not a
+formality: on 9/23 the fix was committed to `main` and the site was still
+serving the old bundle while the Pages deploy job ran.
+
+A local build touches only `index.html` when the committed data is current — if
+it also rewrites files under `data/`, something re-fetched or re-graded, and
+that belongs in its own commit, not bundled into a shell change.
+
 
 ## Merge ritual (main moves constantly under you — the chain commits every ~35 min)
 
