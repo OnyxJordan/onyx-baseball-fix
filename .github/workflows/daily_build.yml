@@ -50,7 +50,7 @@ jobs:
         run: python3 generate_recap.py
       - name: Build index.html
         run: python3 auto_build.py
-      - name: Persist picks & DFS record
+      - name: Persist picks record
         run: python3 update_stats.py
       - name: Commit refreshed data & index
         run: |

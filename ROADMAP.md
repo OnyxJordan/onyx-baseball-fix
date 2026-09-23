@@ -4,6 +4,17 @@ Goal state: a fully autonomous daily pipeline (zero manual uploads on a normal d
 
 Ordered by priority. Each phase is shippable on its own.
 
+> **Status (9/23).** Phases 0 and 1 shipped, as did the Phase 3 live ticker and the
+> Gamecenter. The model is now **v41** — the version numbers quoted in the Phase 0/1
+> notes below are the historical ones from when each phase was written, and "this branch"
+> in those notes means the branch that shipped them, long since merged.
+>
+> Still open and worth knowing about: **Phase 2's `validate_build.py` schema gate was
+> never built**, so a structurally broken but non-empty build can still ship; and
+> **Phase 6's home/away split automation** is why `data/splits.json` is permanently `{}`.
+> Both are listed in the README's Known gaps section. See [README.md](README.md) for the
+> current architecture and [CLAUDE.md](CLAUDE.md) for the hard rules.
+
 ---
 
 ## Phase 0: Restore working condition (DONE, this branch)
