@@ -1,78 +1,12 @@
 {
-  "TEX": {
-    "venue": "Globe Life Field",
-    "temp": 91.3,
-    "precip": 0,
-    "wind_spd": 5.1,
-    "wind_dir": "ESE",
-    "humidity_pct": 46,
-    "pressure_mb": 1019.2,
-    "roof": true,
-    "flag": "clear"
-  },
-  "LAD": {
-    "venue": "Dodger Stadium",
-    "temp": 70.2,
-    "precip": 1,
-    "wind_spd": 4.2,
-    "wind_dir": "SW",
-    "humidity_pct": 87,
-    "pressure_mb": 1013.0,
-    "roof": false,
-    "flag": "clear"
-  },
-  "KC": {
-    "venue": "Kauffman Stadium",
-    "temp": 75.2,
-    "precip": 1,
-    "wind_spd": 6.1,
-    "wind_dir": "ESE",
-    "humidity_pct": 51,
-    "pressure_mb": 1024.0,
-    "roof": false,
-    "flag": "clear"
-  },
-  "ATL": {
-    "venue": "Truist Park",
-    "temp": 69.1,
-    "precip": 0,
-    "wind_spd": 8.6,
-    "wind_dir": "ENE",
-    "humidity_pct": 66,
-    "pressure_mb": 1021.2,
-    "roof": false,
-    "flag": "clear"
-  },
-  "ATH": {
-    "venue": "Sutter Health Park",
-    "temp": 84.9,
-    "precip": 0,
-    "wind_spd": 9.1,
-    "wind_dir": "SW",
-    "humidity_pct": 29,
-    "pressure_mb": 1010.2,
-    "roof": false,
-    "flag": "clear"
-  },
-  "PHI": {
-    "venue": "Citizens Bank Park",
-    "temp": 63.6,
-    "precip": 0,
-    "wind_spd": 9.8,
-    "wind_dir": "NE",
-    "humidity_pct": 59,
-    "pressure_mb": 1025.6,
-    "roof": false,
-    "flag": "clear"
-  },
-  "PIT": {
-    "venue": "PNC Park",
-    "temp": 60.3,
-    "precip": 0,
+  "COL": {
+    "venue": "Coors Field",
+    "temp": 74.2,
+    "precip": 2,
     "wind_spd": 8.5,
-    "wind_dir": "ENE",
-    "humidity_pct": 60,
-    "pressure_mb": 1027.6,
+    "wind_dir": "N",
+    "humidity_pct": 39,
+    "pressure_mb": 1017.1,
     "roof": false,
     "flag": "clear"
   },
@@ -87,17 +21,6 @@
     "roof": false,
     "flag": "clear"
   },
-  "CHC": {
-    "venue": "Wrigley Field",
-    "temp": 64.4,
-    "precip": 0,
-    "wind_spd": 9.5,
-    "wind_dir": "ENE",
-    "humidity_pct": 78,
-    "pressure_mb": 1026.5,
-    "roof": false,
-    "flag": "clear"
-  },
   "NYY": {
     "venue": "Yankee Stadium",
     "temp": 62.3,
@@ -109,26 +32,99 @@
     "roof": false,
     "flag": "clear"
   },
-  "COL": {
-    "venue": "Coors Field",
-    "temp": 74.2,
+  "ATL": {
+    "venue": "Truist Park",
+    "temp": 69.1,
+    "precip": 0,
+    "wind_spd": 8.6,
+    "wind_dir": "ENE",
+    "humidity_pct": 66,
+    "pressure_mb": 1021.2,
+    "roof": false,
+    "flag": "clear"
+  },
+  "LAD": {
+    "venue": "Dodger Stadium",
+    "temp": 70.2,
     "precip": 1,
-    "wind_spd": 8.5,
-    "wind_dir": "N",
-    "humidity_pct": 39,
-    "pressure_mb": 1017.1,
+    "wind_spd": 4.2,
+    "wind_dir": "SW",
+    "humidity_pct": 87,
+    "pressure_mb": 1013.0,
     "roof": false,
     "flag": "clear"
   },
   "SEA": {
     "venue": "T-Mobile Park",
     "temp": 57.5,
-    "precip": 14,
+    "precip": 16,
     "wind_spd": 4.2,
     "wind_dir": "NNW",
     "humidity_pct": 80,
     "pressure_mb": 1009.1,
     "roof": false,
+    "flag": "clear"
+  },
+  "KC": {
+    "venue": "Kauffman Stadium",
+    "temp": 75.2,
+    "precip": 1,
+    "wind_spd": 6.1,
+    "wind_dir": "ESE",
+    "humidity_pct": 51,
+    "pressure_mb": 1024.0,
+    "roof": false,
+    "flag": "clear"
+  },
+  "PHI": {
+    "venue": "Citizens Bank Park",
+    "temp": 63.6,
+    "precip": 0,
+    "wind_spd": 9.8,
+    "wind_dir": "NE",
+    "humidity_pct": 59,
+    "pressure_mb": 1025.6,
+    "roof": false,
+    "flag": "clear"
+  },
+  "ATH": {
+    "venue": "Sutter Health Park",
+    "temp": 84.9,
+    "precip": 0,
+    "wind_spd": 9.1,
+    "wind_dir": "SW",
+    "humidity_pct": 29,
+    "pressure_mb": 1010.2,
+    "roof": false,
+    "flag": "clear"
+  },
+  "CHC": {
+    "venue": "Wrigley Field",
+    "temp": 64.4,
+    "precip": 0,
+    "wind_spd": 9.5,
+    "wind_dir": "ENE",
+    "humidity_pct": 78,
+    "pressure_mb": 1026.5,
+    "roof": false,
+    "flag": "clear"
+  },
+  "PIT": {
+    "venue": "PNC Park",
+    "temp": 72,
+    "precip": 0,
+    "wind_spd": 5,
+    "wind_dir": "N",
+    "roof": false,
+    "flag": "clear"
+  },
+  "TEX": {
+    "venue": "Globe Life Field",
+    "temp": 72,
+    "precip": 0,
+    "wind_spd": 5,
+    "wind_dir": "N",
+    "roof": true,
     "flag": "clear"
   }
 }
