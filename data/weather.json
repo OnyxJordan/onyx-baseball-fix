@@ -1,4 +1,48 @@
 {
+  "TEX": {
+    "venue": "Globe Life Field",
+    "temp": 89.8,
+    "precip": 0,
+    "wind_spd": 3.7,
+    "wind_dir": "ESE",
+    "humidity_pct": 52,
+    "pressure_mb": 1018.1,
+    "roof": true,
+    "flag": "clear"
+  },
+  "ATH": {
+    "venue": "Sutter Health Park",
+    "temp": 86.3,
+    "precip": 0,
+    "wind_spd": 9.3,
+    "wind_dir": "SW",
+    "humidity_pct": 29,
+    "pressure_mb": 1010.1,
+    "roof": false,
+    "flag": "clear"
+  },
+  "BOS": {
+    "venue": "Fenway Park",
+    "temp": 59.8,
+    "precip": 0,
+    "wind_spd": 9.8,
+    "wind_dir": "NE",
+    "humidity_pct": 52,
+    "pressure_mb": 1028.6,
+    "roof": false,
+    "flag": "clear"
+  },
+  "CHC": {
+    "venue": "Wrigley Field",
+    "temp": 66.2,
+    "precip": 0,
+    "wind_spd": 8.4,
+    "wind_dir": "NE",
+    "humidity_pct": 66,
+    "pressure_mb": 1025.2,
+    "roof": false,
+    "flag": "clear"
+  },
   "PHI": {
     "venue": "Citizens Bank Park",
     "temp": 64.9,
@@ -7,6 +51,28 @@
     "wind_dir": "NE",
     "humidity_pct": 48,
     "pressure_mb": 1025.7,
+    "roof": false,
+    "flag": "clear"
+  },
+  "NYY": {
+    "venue": "Yankee Stadium",
+    "temp": 62.5,
+    "precip": 0,
+    "wind_spd": 8.8,
+    "wind_dir": "N",
+    "humidity_pct": 46,
+    "pressure_mb": 1026.4,
+    "roof": false,
+    "flag": "clear"
+  },
+  "COL": {
+    "venue": "Coors Field",
+    "temp": 71.6,
+    "precip": 3,
+    "wind_spd": 9.7,
+    "wind_dir": "NNE",
+    "humidity_pct": 47,
+    "pressure_mb": 1016.6,
     "roof": false,
     "flag": "clear"
   },
@@ -21,14 +87,14 @@
     "roof": false,
     "flag": "clear"
   },
-  "NYY": {
-    "venue": "Yankee Stadium",
-    "temp": 62.5,
-    "precip": 0,
-    "wind_spd": 8.8,
-    "wind_dir": "N",
-    "humidity_pct": 46,
-    "pressure_mb": 1026.4,
+  "LAD": {
+    "venue": "Dodger Stadium",
+    "temp": 69.7,
+    "precip": 1,
+    "wind_spd": 5.6,
+    "wind_dir": "WSW",
+    "humidity_pct": 87,
+    "pressure_mb": 1012.3,
     "roof": false,
     "flag": "clear"
   },
@@ -51,79 +117,6 @@
     "wind_dir": "NW",
     "humidity_pct": 82,
     "pressure_mb": 1007.9,
-    "roof": false,
-    "flag": "clear"
-  },
-  "BOS": {
-    "venue": "Fenway Park",
-    "temp": 59.8,
-    "precip": 0,
-    "wind_spd": 9.8,
-    "wind_dir": "NE",
-    "humidity_pct": 52,
-    "pressure_mb": 1028.6,
-    "roof": false,
-    "flag": "clear"
-  },
-  "TEX": {
-    "venue": "Globe Life Field",
-    "temp": 89.8,
-    "precip": 0,
-    "wind_spd": 3.7,
-    "wind_dir": "ESE",
-    "humidity_pct": 52,
-    "pressure_mb": 1018.1,
-    "roof": true,
-    "flag": "clear"
-  },
-  "COL": {
-    "venue": "Coors Field",
-    "temp": 71.6,
-    "precip": 3,
-    "wind_spd": 9.7,
-    "wind_dir": "NNE",
-    "humidity_pct": 47,
-    "pressure_mb": 1016.6,
-    "roof": false,
-    "flag": "clear"
-  },
-  "CHC": {
-    "venue": "Wrigley Field",
-    "temp": 66.2,
-    "precip": 0,
-    "wind_spd": 8.4,
-    "wind_dir": "NE",
-    "humidity_pct": 66,
-    "pressure_mb": 1025.2,
-    "roof": false,
-    "flag": "clear"
-  },
-  "ATH": {
-    "venue": "Sutter Health Park",
-    "temp": 86.3,
-    "precip": 0,
-    "wind_spd": 9.3,
-    "wind_dir": "SW",
-    "humidity_pct": 29,
-    "pressure_mb": 1010.1,
-    "roof": false,
-    "flag": "clear"
-  },
-  "PIT": {
-    "venue": "PNC Park",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
-    "roof": false,
-    "flag": "clear"
-  },
-  "LAD": {
-    "venue": "Dodger Stadium",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
     "roof": false,
     "flag": "clear"
   }
