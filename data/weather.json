@@ -1,15 +1,4 @@
 {
-  "LAD": {
-    "venue": "Dodger Stadium",
-    "temp": 71.3,
-    "precip": 0,
-    "wind_spd": 6.2,
-    "wind_dir": "WSW",
-    "humidity_pct": 84,
-    "pressure_mb": 1009.5,
-    "roof": false,
-    "flag": "clear"
-  },
   "SEA": {
     "venue": "T-Mobile Park",
     "temp": 57.2,
@@ -21,17 +10,6 @@
     "roof": false,
     "flag": "clear"
   },
-  "COL": {
-    "venue": "Coors Field",
-    "temp": 70.1,
-    "precip": 20,
-    "wind_spd": 7.1,
-    "wind_dir": "SSE",
-    "humidity_pct": 53,
-    "pressure_mb": 1013.3,
-    "roof": false,
-    "flag": "clear"
-  },
   "ATH": {
     "venue": "Sutter Health Park",
     "temp": 89.8,
@@ -40,6 +18,17 @@
     "wind_dir": "WNW",
     "humidity_pct": 24,
     "pressure_mb": 1009.8,
+    "roof": false,
+    "flag": "clear"
+  },
+  "LAD": {
+    "venue": "Dodger Stadium",
+    "temp": 71.3,
+    "precip": 0,
+    "wind_spd": 6.2,
+    "wind_dir": "WSW",
+    "humidity_pct": 84,
+    "pressure_mb": 1009.5,
     "roof": false,
     "flag": "clear"
   }
