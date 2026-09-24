@@ -10,14 +10,25 @@
     "roof": false,
     "flag": "clear"
   },
-  "CHC": {
-    "venue": "Wrigley Field",
-    "temp": 62.4,
-    "precip": 0,
-    "wind_spd": 8.1,
-    "wind_dir": "NE",
+  "ATL": {
+    "venue": "Truist Park",
+    "temp": 73.8,
+    "precip": 12,
+    "wind_spd": 9.1,
+    "wind_dir": "E",
     "humidity_pct": 75,
-    "pressure_mb": 1027.0,
+    "pressure_mb": 1018.4,
+    "roof": false,
+    "flag": "clear"
+  },
+  "PIT": {
+    "venue": "PNC Park",
+    "temp": 64.1,
+    "precip": 5,
+    "wind_spd": 7.0,
+    "wind_dir": "E",
+    "humidity_pct": 63,
+    "pressure_mb": 1026.4,
     "roof": false,
     "flag": "clear"
   },
@@ -32,61 +43,6 @@
     "roof": false,
     "flag": "clear"
   },
-  "BAL": {
-    "venue": "Camden Yards",
-    "temp": 63.7,
-    "precip": 0,
-    "wind_spd": 7.6,
-    "wind_dir": "NE",
-    "humidity_pct": 67,
-    "pressure_mb": 1028.6,
-    "roof": false,
-    "flag": "clear"
-  },
-  "LAD": {
-    "venue": "Dodger Stadium",
-    "temp": 70.4,
-    "precip": 0,
-    "wind_spd": 5.1,
-    "wind_dir": "WSW",
-    "humidity_pct": 87,
-    "pressure_mb": 1010.0,
-    "roof": false,
-    "flag": "clear"
-  },
-  "PHI": {
-    "venue": "Citizens Bank Park",
-    "temp": 67.8,
-    "precip": 0,
-    "wind_spd": 13.2,
-    "wind_dir": "NE",
-    "humidity_pct": 50,
-    "pressure_mb": 1029.0,
-    "roof": false,
-    "flag": "clear"
-  },
-  "ATL": {
-    "venue": "Truist Park",
-    "temp": 73.8,
-    "precip": 12,
-    "wind_spd": 9.1,
-    "wind_dir": "E",
-    "humidity_pct": 75,
-    "pressure_mb": 1018.4,
-    "roof": false,
-    "flag": "clear"
-  },
-  "BOS": {
-    "venue": "Fenway Park",
-    "temp": 55.1,
-    "precip": 0,
-    "wind_spd": 7.4,
-    "wind_dir": "NE",
-    "humidity_pct": 72,
-    "pressure_mb": 1034.0,
-    "roof": false,
-    "flag": "clear"
-  },
   "TEX": {
     "venue": "Globe Life Field",
     "temp": 91.3,
@@ -96,17 +52,6 @@
     "humidity_pct": 47,
     "pressure_mb": 1016.0,
     "roof": true,
-    "flag": "clear"
-  },
-  "PIT": {
-    "venue": "PNC Park",
-    "temp": 64.1,
-    "precip": 5,
-    "wind_spd": 7.0,
-    "wind_dir": "E",
-    "humidity_pct": 63,
-    "pressure_mb": 1026.4,
-    "roof": false,
     "flag": "clear"
   },
   "ATH": {
@@ -131,12 +76,47 @@
     "roof": false,
     "flag": "clear"
   },
+  "CHC": {
+    "venue": "Wrigley Field",
+    "temp": 62.4,
+    "precip": 0,
+    "wind_spd": 8.1,
+    "wind_dir": "NE",
+    "humidity_pct": 75,
+    "pressure_mb": 1027.0,
+    "roof": false,
+    "flag": "clear"
+  },
   "NYY": {
     "venue": "Yankee Stadium",
-    "temp": 72,
+    "temp": 63.9,
     "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
+    "wind_spd": 11.5,
+    "wind_dir": "NNE",
+    "humidity_pct": 44,
+    "pressure_mb": 1030.7,
+    "roof": false,
+    "flag": "clear"
+  },
+  "LAD": {
+    "venue": "Dodger Stadium",
+    "temp": 70.4,
+    "precip": 0,
+    "wind_spd": 5.1,
+    "wind_dir": "WSW",
+    "humidity_pct": 87,
+    "pressure_mb": 1010.0,
+    "roof": false,
+    "flag": "clear"
+  },
+  "BOS": {
+    "venue": "Fenway Park",
+    "temp": 55.1,
+    "precip": 0,
+    "wind_spd": 7.4,
+    "wind_dir": "NE",
+    "humidity_pct": 72,
+    "pressure_mb": 1034.0,
     "roof": false,
     "flag": "clear"
   }
