@@ -1,23 +1,23 @@
 {
-  "TOR": {
-    "venue": "Rogers Centre",
-    "temp": 62.8,
-    "precip": 0,
-    "wind_spd": 4.0,
-    "wind_dir": "SW",
-    "humidity_pct": 62,
-    "pressure_mb": 1023.9,
-    "roof": true,
+  "KC": {
+    "venue": "Kauffman Stadium",
+    "temp": 68.6,
+    "precip": 10,
+    "wind_spd": 6.1,
+    "wind_dir": "E",
+    "humidity_pct": 78,
+    "pressure_mb": 1018.5,
+    "roof": false,
     "flag": "clear"
   },
-  "SF": {
-    "venue": "Oracle Park",
-    "temp": 64.0,
-    "precip": 0,
-    "wind_spd": 13.6,
-    "wind_dir": "WNW",
-    "humidity_pct": 52,
-    "pressure_mb": 1014.3,
+  "SEA": {
+    "venue": "T-Mobile Park",
+    "temp": 52.7,
+    "precip": 6,
+    "wind_spd": 14.8,
+    "wind_dir": "WSW",
+    "humidity_pct": 69,
+    "pressure_mb": 1016.6,
     "roof": false,
     "flag": "clear"
   },
@@ -32,72 +32,6 @@
     "roof": false,
     "flag": "clear"
   },
-  "NYY": {
-    "venue": "Yankee Stadium",
-    "temp": 71.1,
-    "precip": 1,
-    "wind_spd": 17.5,
-    "wind_dir": "N",
-    "humidity_pct": 38,
-    "pressure_mb": 1016.1,
-    "roof": false,
-    "flag": "clear"
-  },
-  "BOS": {
-    "venue": "Fenway Park",
-    "temp": 66.8,
-    "precip": 0,
-    "wind_spd": 17.6,
-    "wind_dir": "NNE",
-    "humidity_pct": 47,
-    "pressure_mb": 1020.4,
-    "roof": false,
-    "flag": "clear"
-  },
-  "ATH": {
-    "venue": "Sutter Health Park",
-    "temp": 80.9,
-    "precip": 0,
-    "wind_spd": 10.1,
-    "wind_dir": "SW",
-    "humidity_pct": 33,
-    "pressure_mb": 1011.6,
-    "roof": false,
-    "flag": "clear"
-  },
-  "SD": {
-    "venue": "Petco Park",
-    "temp": 74.5,
-    "precip": 0,
-    "wind_spd": 7.4,
-    "wind_dir": "NNW",
-    "humidity_pct": 80,
-    "pressure_mb": 1011.0,
-    "roof": false,
-    "flag": "clear"
-  },
-  "SEA": {
-    "venue": "T-Mobile Park",
-    "temp": 52.7,
-    "precip": 5,
-    "wind_spd": 14.8,
-    "wind_dir": "WSW",
-    "humidity_pct": 69,
-    "pressure_mb": 1016.6,
-    "roof": false,
-    "flag": "clear"
-  },
-  "KC": {
-    "venue": "Kauffman Stadium",
-    "temp": 68.6,
-    "precip": 3,
-    "wind_spd": 6.1,
-    "wind_dir": "E",
-    "humidity_pct": 78,
-    "pressure_mb": 1018.5,
-    "roof": false,
-    "flag": "clear"
-  },
   "MIA": {
     "venue": "loanDepot Park",
     "temp": 78.5,
@@ -109,21 +43,10 @@
     "roof": true,
     "flag": "clear"
   },
-  "MIN": {
-    "venue": "Target Field",
-    "temp": 66.5,
-    "precip": 1,
-    "wind_spd": 3.7,
-    "wind_dir": "ESE",
-    "humidity_pct": 73,
-    "pressure_mb": 1022.2,
-    "roof": false,
-    "flag": "clear"
-  },
   "PHI": {
     "venue": "Citizens Bank Park",
     "temp": 71.5,
-    "precip": 1,
+    "precip": 0,
     "wind_spd": 14.1,
     "wind_dir": "N",
     "humidity_pct": 37,
@@ -142,6 +65,28 @@
     "roof": false,
     "flag": "clear"
   },
+  "BOS": {
+    "venue": "Fenway Park",
+    "temp": 66.8,
+    "precip": 0,
+    "wind_spd": 17.6,
+    "wind_dir": "NNE",
+    "humidity_pct": 47,
+    "pressure_mb": 1020.4,
+    "roof": false,
+    "flag": "clear"
+  },
+  "NYY": {
+    "venue": "Yankee Stadium",
+    "temp": 71.1,
+    "precip": 1,
+    "wind_spd": 17.5,
+    "wind_dir": "N",
+    "humidity_pct": 38,
+    "pressure_mb": 1016.1,
+    "roof": false,
+    "flag": "clear"
+  },
   "WSH": {
     "venue": "Nationals Park",
     "temp": 70.1,
@@ -153,6 +98,17 @@
     "roof": false,
     "flag": "clear"
   },
+  "TOR": {
+    "venue": "Rogers Centre",
+    "temp": 62.8,
+    "precip": 0,
+    "wind_spd": 4.0,
+    "wind_dir": "SW",
+    "humidity_pct": 62,
+    "pressure_mb": 1023.9,
+    "roof": true,
+    "flag": "clear"
+  },
   "MIL": {
     "venue": "American Family Field",
     "temp": 63.4,
@@ -162,6 +118,44 @@
     "humidity_pct": 56,
     "pressure_mb": 1024.8,
     "roof": true,
+    "flag": "clear"
+  },
+  "SD": {
+    "venue": "Petco Park",
+    "temp": 74.5,
+    "precip": 0,
+    "wind_spd": 7.4,
+    "wind_dir": "NNW",
+    "humidity_pct": 80,
+    "pressure_mb": 1011.0,
+    "roof": false,
+    "flag": "clear"
+  },
+  "SF": {
+    "venue": "Oracle Park",
+    "temp": 72,
+    "precip": 0,
+    "wind_spd": 5,
+    "wind_dir": "N",
+    "roof": false,
+    "flag": "clear"
+  },
+  "MIN": {
+    "venue": "Target Field",
+    "temp": 72,
+    "precip": 0,
+    "wind_spd": 5,
+    "wind_dir": "N",
+    "roof": false,
+    "flag": "clear"
+  },
+  "ATH": {
+    "venue": "Sutter Health Park",
+    "temp": 72,
+    "precip": 0,
+    "wind_spd": 5,
+    "wind_dir": "N",
+    "roof": false,
     "flag": "clear"
   }
 }
