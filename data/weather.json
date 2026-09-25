@@ -1,21 +1,12 @@
 {
   "LAD": {
     "venue": "Dodger Stadium",
-    "temp": 69.6,
+    "temp": 70.5,
     "precip": 0,
-    "wind_spd": 5.7,
-    "wind_dir": "W",
-    "humidity_pct": 86,
-    "pressure_mb": 1012.9,
-    "roof": false,
-    "flag": "clear"
-  },
-  "NYY": {
-    "venue": "Yankee Stadium",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
+    "wind_spd": 5.2,
+    "wind_dir": "WSW",
+    "humidity_pct": 84,
+    "pressure_mb": 1011.9,
     "roof": false,
     "flag": "clear"
   },
@@ -27,6 +18,39 @@
     "wind_dir": "N",
     "humidity_pct": 84,
     "pressure_mb": 1010.1,
+    "roof": false,
+    "flag": "clear"
+  },
+  "NYY": {
+    "venue": "Yankee Stadium",
+    "temp": 61.8,
+    "precip": 0,
+    "wind_spd": 5.4,
+    "wind_dir": "NNE",
+    "humidity_pct": 47,
+    "pressure_mb": 1025.6,
+    "roof": false,
+    "flag": "clear"
+  },
+  "ATH": {
+    "venue": "Sutter Health Park",
+    "temp": 89.3,
+    "precip": 0,
+    "wind_spd": 8.7,
+    "wind_dir": "WSW",
+    "humidity_pct": 24,
+    "pressure_mb": 1009.8,
+    "roof": false,
+    "flag": "clear"
+  },
+  "ATL": {
+    "venue": "Truist Park",
+    "temp": 68.6,
+    "precip": 0,
+    "wind_spd": 7.0,
+    "wind_dir": "ENE",
+    "humidity_pct": 70,
+    "pressure_mb": 1020.4,
     "roof": false,
     "flag": "clear"
   },
@@ -49,28 +73,6 @@
     "wind_dir": "NNE",
     "humidity_pct": 50,
     "pressure_mb": 1027.9,
-    "roof": false,
-    "flag": "clear"
-  },
-  "ATL": {
-    "venue": "Truist Park",
-    "temp": 68.6,
-    "precip": 0,
-    "wind_spd": 7.0,
-    "wind_dir": "ENE",
-    "humidity_pct": 70,
-    "pressure_mb": 1020.4,
-    "roof": false,
-    "flag": "clear"
-  },
-  "ATH": {
-    "venue": "Sutter Health Park",
-    "temp": 89.3,
-    "precip": 0,
-    "wind_spd": 8.7,
-    "wind_dir": "WSW",
-    "humidity_pct": 24,
-    "pressure_mb": 1009.8,
     "roof": false,
     "flag": "clear"
   }
