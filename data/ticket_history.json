@@ -1337,16 +1337,16 @@
     "player": "Yordan Alvarez",
     "odds": 210,
     "prob": 26.6,
-    "hit": null
+    "hit": "void"
    },
    {
     "player": "Hunter Goodman",
     "odds": 328,
     "prob": 22.5,
-    "hit": null
+    "hit": false
    }
   ],
-  "result": null,
-  "pnl": null
+  "result": "loss",
+  "pnl": -10.0
  }
 ]
