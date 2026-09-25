@@ -10,25 +10,36 @@
     "roof": false,
     "flag": "clear"
   },
-  "SEA": {
-    "venue": "T-Mobile Park",
-    "temp": 57.5,
-    "precip": 17,
-    "wind_spd": 5.2,
-    "wind_dir": "N",
-    "humidity_pct": 84,
-    "pressure_mb": 1010.1,
+  "NYY": {
+    "venue": "Yankee Stadium",
+    "temp": 63.1,
+    "precip": 0,
+    "wind_spd": 7.5,
+    "wind_dir": "NNE",
+    "humidity_pct": 44,
+    "pressure_mb": 1025.6,
     "roof": false,
     "flag": "clear"
   },
-  "NYY": {
-    "venue": "Yankee Stadium",
-    "temp": 61.8,
+  "SEA": {
+    "venue": "T-Mobile Park",
+    "temp": 56.6,
+    "precip": 17,
+    "wind_spd": 4.4,
+    "wind_dir": "NE",
+    "humidity_pct": 86,
+    "pressure_mb": 1009.7,
+    "roof": false,
+    "flag": "clear"
+  },
+  "ATL": {
+    "venue": "Truist Park",
+    "temp": 68.1,
     "precip": 0,
-    "wind_spd": 5.4,
-    "wind_dir": "NNE",
-    "humidity_pct": 47,
-    "pressure_mb": 1025.6,
+    "wind_spd": 4.5,
+    "wind_dir": "ENE",
+    "humidity_pct": 72,
+    "pressure_mb": 1019.6,
     "roof": false,
     "flag": "clear"
   },
@@ -36,43 +47,10 @@
     "venue": "Sutter Health Park",
     "temp": 89.3,
     "precip": 0,
-    "wind_spd": 8.7,
+    "wind_spd": 8.6,
     "wind_dir": "WSW",
-    "humidity_pct": 24,
-    "pressure_mb": 1009.8,
-    "roof": false,
-    "flag": "clear"
-  },
-  "ATL": {
-    "venue": "Truist Park",
-    "temp": 68.6,
-    "precip": 0,
-    "wind_spd": 7.0,
-    "wind_dir": "ENE",
-    "humidity_pct": 70,
-    "pressure_mb": 1020.4,
-    "roof": false,
-    "flag": "clear"
-  },
-  "PHI": {
-    "venue": "Citizens Bank Park",
-    "temp": 64.0,
-    "precip": 0,
-    "wind_spd": 8.0,
-    "wind_dir": "NE",
-    "humidity_pct": 55,
-    "pressure_mb": 1025.4,
-    "roof": false,
-    "flag": "clear"
-  },
-  "BOS": {
-    "venue": "Fenway Park",
-    "temp": 59.9,
-    "precip": 0,
-    "wind_spd": 9.5,
-    "wind_dir": "NNE",
-    "humidity_pct": 50,
-    "pressure_mb": 1027.9,
+    "humidity_pct": 20,
+    "pressure_mb": 1009.5,
     "roof": false,
     "flag": "clear"
   }
