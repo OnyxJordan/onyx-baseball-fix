@@ -1,12 +1,21 @@
 {
-  "ATL": {
-    "venue": "Truist Park",
-    "temp": 68.6,
+  "LAD": {
+    "venue": "Dodger Stadium",
+    "temp": 69.6,
     "precip": 0,
-    "wind_spd": 7.0,
-    "wind_dir": "ENE",
-    "humidity_pct": 70,
-    "pressure_mb": 1020.4,
+    "wind_spd": 5.7,
+    "wind_dir": "W",
+    "humidity_pct": 86,
+    "pressure_mb": 1012.9,
+    "roof": false,
+    "flag": "clear"
+  },
+  "NYY": {
+    "venue": "Yankee Stadium",
+    "temp": 72,
+    "precip": 0,
+    "wind_spd": 5,
+    "wind_dir": "N",
     "roof": false,
     "flag": "clear"
   },
@@ -21,6 +30,17 @@
     "roof": false,
     "flag": "clear"
   },
+  "PHI": {
+    "venue": "Citizens Bank Park",
+    "temp": 64.0,
+    "precip": 0,
+    "wind_spd": 8.0,
+    "wind_dir": "NE",
+    "humidity_pct": 55,
+    "pressure_mb": 1025.4,
+    "roof": false,
+    "flag": "clear"
+  },
   "BOS": {
     "venue": "Fenway Park",
     "temp": 59.9,
@@ -32,14 +52,14 @@
     "roof": false,
     "flag": "clear"
   },
-  "LAD": {
-    "venue": "Dodger Stadium",
-    "temp": 69.6,
+  "ATL": {
+    "venue": "Truist Park",
+    "temp": 68.6,
     "precip": 0,
-    "wind_spd": 5.7,
-    "wind_dir": "W",
-    "humidity_pct": 86,
-    "pressure_mb": 1012.9,
+    "wind_spd": 7.0,
+    "wind_dir": "ENE",
+    "humidity_pct": 70,
+    "pressure_mb": 1020.4,
     "roof": false,
     "flag": "clear"
   },
@@ -51,28 +71,6 @@
     "wind_dir": "WSW",
     "humidity_pct": 24,
     "pressure_mb": 1009.8,
-    "roof": false,
-    "flag": "clear"
-  },
-  "NYY": {
-    "venue": "Yankee Stadium",
-    "temp": 61.8,
-    "precip": 0,
-    "wind_spd": 5.4,
-    "wind_dir": "NNE",
-    "humidity_pct": 47,
-    "pressure_mb": 1025.6,
-    "roof": false,
-    "flag": "clear"
-  },
-  "PHI": {
-    "venue": "Citizens Bank Park",
-    "temp": 64.0,
-    "precip": 0,
-    "wind_spd": 8.0,
-    "wind_dir": "NE",
-    "humidity_pct": 55,
-    "pressure_mb": 1025.4,
     "roof": false,
     "flag": "clear"
   }
