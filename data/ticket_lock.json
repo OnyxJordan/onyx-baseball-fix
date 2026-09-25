@@ -1,39 +1,40 @@
 {
- "date": "2026-09-24",
- "locked": true,
+ "date": "2026-09-25",
+ "locked": false,
  "legs": [
   {
-   "player": "Yordan Alvarez",
-   "mid": 670541,
-   "team": "HOU",
-   "odds": 210,
-   "prob": 26.6,
-   "score": 0.708,
+   "player": "Pete Alonso",
+   "mid": 624413,
+   "team": "BAL",
+   "odds": 383,
+   "prob": 22.1,
+   "score": 0.535,
    "why": [
-    "pitcher matchup ×1.17",
-    "48% FB bat",
+    "pitcher matchup ×1.45",
+    "park ×1.33",
     "fly-ball pitcher"
    ],
-   "away": "HOU",
-   "home": "ATH",
-   "opp": "Mason Barnett",
-   "time": "9:40 PM"
+   "away": "BAL",
+   "home": "NYY",
+   "opp": "Brendan Beck",
+   "time": "4:10 PM"
   },
   {
-   "player": "Hunter Goodman",
-   "mid": 696100,
-   "team": "COL",
-   "odds": 328,
-   "prob": 22.5,
-   "score": 0.5,
+   "player": "Kazuma Okamoto",
+   "mid": 672960,
+   "team": "TOR",
+   "odds": 552,
+   "prob": 17.7,
+   "score": 0.485,
    "why": [
-    "park ×1.35",
-    "pitcher matchup ×1.15"
+    "soft bullpen",
+    "pitcher matchup ×1.12",
+    "platoon edge"
    ],
-   "away": "ARI",
-   "home": "COL",
-   "opp": "Eduardo Rodriguez",
-   "time": "3:10 PM"
+   "away": "CIN",
+   "home": "TOR",
+   "opp": "Nick Lodolo",
+   "time": "7:07 PM"
   }
  ]
 }
