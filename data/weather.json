@@ -1,67 +1,12 @@
 {
   "ATH": {
     "venue": "Sutter Health Park",
-    "temp": 79.6,
+    "temp": 80.9,
     "precip": 0,
-    "wind_spd": 10.1,
+    "wind_spd": 10.0,
     "wind_dir": "SW",
     "humidity_pct": 37,
-    "pressure_mb": 1012.0,
-    "roof": false,
-    "flag": "clear"
-  },
-  "KC": {
-    "venue": "Kauffman Stadium",
-    "temp": 65.0,
-    "precip": 23,
-    "wind_spd": 8.5,
-    "wind_dir": "ESE",
-    "humidity_pct": 91,
-    "pressure_mb": 1019.3,
-    "roof": false,
-    "flag": "clear"
-  },
-  "SD": {
-    "venue": "Petco Park",
-    "temp": 73.7,
-    "precip": 0,
-    "wind_spd": 7.1,
-    "wind_dir": "NNW",
-    "humidity_pct": 83,
-    "pressure_mb": 1010.6,
-    "roof": false,
-    "flag": "clear"
-  },
-  "SF": {
-    "venue": "Oracle Park",
-    "temp": 62.0,
-    "precip": 0,
-    "wind_spd": 14.5,
-    "wind_dir": "WNW",
-    "humidity_pct": 65,
-    "pressure_mb": 1013.7,
-    "roof": false,
-    "flag": "clear"
-  },
-  "MIL": {
-    "venue": "American Family Field",
-    "temp": 62.1,
-    "precip": 0,
-    "wind_spd": 4.7,
-    "wind_dir": "ENE",
-    "humidity_pct": 67,
-    "pressure_mb": 1024.4,
-    "roof": true,
-    "flag": "clear"
-  },
-  "CWS": {
-    "venue": "Rate Field",
-    "temp": 60.3,
-    "precip": 0,
-    "wind_spd": 4.9,
-    "wind_dir": "NE",
-    "humidity_pct": 69,
-    "pressure_mb": 1024.2,
+    "pressure_mb": 1011.2,
     "roof": false,
     "flag": "clear"
   },
@@ -76,59 +21,81 @@
     "roof": false,
     "flag": "clear"
   },
-  "SEA": {
-    "venue": "T-Mobile Park",
-    "temp": 54.0,
-    "precip": 10,
-    "wind_spd": 3.9,
-    "wind_dir": "WNW",
-    "humidity_pct": 86,
-    "pressure_mb": 1015.9,
-    "roof": false,
-    "flag": "clear"
-  },
-  "DET": {
-    "venue": "Comerica Park",
-    "temp": 63.6,
-    "precip": 1,
-    "wind_spd": 5.9,
-    "wind_dir": "NE",
-    "humidity_pct": 58,
-    "pressure_mb": 1024.1,
-    "roof": false,
-    "flag": "clear"
-  },
-  "TOR": {
-    "venue": "Rogers Centre",
-    "temp": 61.3,
-    "precip": 0,
-    "wind_spd": 3.9,
-    "wind_dir": "SSW",
-    "humidity_pct": 67,
-    "pressure_mb": 1023.7,
-    "roof": true,
-    "flag": "clear"
-  },
-  "WSH": {
-    "venue": "Nationals Park",
-    "temp": 73.0,
-    "precip": 0,
-    "wind_spd": 11.9,
-    "wind_dir": "NNW",
-    "humidity_pct": 31,
-    "pressure_mb": 1015.8,
-    "roof": false,
-    "flag": "clear"
-  },
   "MIN": {
     "venue": "Target Field",
-    "temp": 65.0,
+    "temp": 67.2,
     "precip": 0,
-    "wind_spd": 4.4,
+    "wind_spd": 5.0,
     "wind_dir": "ESE",
-    "humidity_pct": 78,
-    "pressure_mb": 1020.8,
+    "humidity_pct": 68,
+    "pressure_mb": 1022.0,
     "roof": false,
+    "flag": "clear"
+  },
+  "KC": {
+    "venue": "Kauffman Stadium",
+    "temp": 65.0,
+    "precip": 23,
+    "wind_spd": 8.5,
+    "wind_dir": "ESE",
+    "humidity_pct": 91,
+    "pressure_mb": 1019.3,
+    "roof": false,
+    "flag": "clear"
+  },
+  "SF": {
+    "venue": "Oracle Park",
+    "temp": 62.2,
+    "precip": 0,
+    "wind_spd": 13.7,
+    "wind_dir": "WNW",
+    "humidity_pct": 62,
+    "pressure_mb": 1013.8,
+    "roof": false,
+    "flag": "clear"
+  },
+  "CWS": {
+    "venue": "Rate Field",
+    "temp": 60.3,
+    "precip": 0,
+    "wind_spd": 4.9,
+    "wind_dir": "NE",
+    "humidity_pct": 69,
+    "pressure_mb": 1024.2,
+    "roof": false,
+    "flag": "clear"
+  },
+  "SEA": {
+    "venue": "T-Mobile Park",
+    "temp": 53.3,
+    "precip": 10,
+    "wind_spd": 5.3,
+    "wind_dir": "ENE",
+    "humidity_pct": 89,
+    "pressure_mb": 1016.3,
+    "roof": false,
+    "flag": "clear"
+  },
+  "SD": {
+    "venue": "Petco Park",
+    "temp": 73.2,
+    "precip": 0,
+    "wind_spd": 6.8,
+    "wind_dir": "NNW",
+    "humidity_pct": 86,
+    "pressure_mb": 1010.4,
+    "roof": false,
+    "flag": "clear"
+  },
+  "MIL": {
+    "venue": "American Family Field",
+    "temp": 62.1,
+    "precip": 0,
+    "wind_spd": 4.7,
+    "wind_dir": "ENE",
+    "humidity_pct": 67,
+    "pressure_mb": 1024.4,
+    "roof": true,
     "flag": "clear"
   }
 }
