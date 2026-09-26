@@ -1,35 +1,13 @@
 {
-  "SD": {
-    "venue": "Petco Park",
-    "temp": 78.9,
-    "precip": 0,
-    "wind_spd": 7.1,
-    "wind_dir": "WNW",
-    "humidity_pct": 62,
-    "pressure_mb": 1010.0,
+  "PHI": {
+    "venue": "Citizens Bank Park",
+    "temp": 58.0,
+    "precip": 26,
+    "wind_spd": 12.1,
+    "wind_dir": "N",
+    "humidity_pct": 85,
+    "pressure_mb": 1009.4,
     "roof": false,
-    "flag": "clear"
-  },
-  "SF": {
-    "venue": "Oracle Park",
-    "temp": 68.5,
-    "precip": 0,
-    "wind_spd": 2.2,
-    "wind_dir": "SW",
-    "humidity_pct": 59,
-    "pressure_mb": 1013.6,
-    "roof": false,
-    "flag": "clear"
-  },
-  "MIA": {
-    "venue": "loanDepot Park",
-    "temp": 83.3,
-    "precip": 4,
-    "wind_spd": 4.4,
-    "wind_dir": "NE",
-    "humidity_pct": 50,
-    "pressure_mb": 1011.6,
-    "roof": true,
     "flag": "clear"
   },
   "SEA": {
@@ -40,28 +18,6 @@
     "wind_dir": "N",
     "humidity_pct": 73,
     "pressure_mb": 1021.0,
-    "roof": false,
-    "flag": "clear"
-  },
-  "DET": {
-    "venue": "Comerica Park",
-    "temp": 68.7,
-    "precip": 0,
-    "wind_spd": 5.1,
-    "wind_dir": "N",
-    "humidity_pct": 48,
-    "pressure_mb": 1022.5,
-    "roof": false,
-    "flag": "clear"
-  },
-  "WSH": {
-    "venue": "Nationals Park",
-    "temp": 64.3,
-    "precip": 22,
-    "wind_spd": 12.3,
-    "wind_dir": "N",
-    "humidity_pct": 62,
-    "pressure_mb": 1011.4,
     "roof": false,
     "flag": "clear"
   },
@@ -76,6 +32,72 @@
     "roof": true,
     "flag": "clear"
   },
+  "ATH": {
+    "venue": "Sutter Health Park",
+    "temp": 79.4,
+    "precip": 0,
+    "wind_spd": 5.4,
+    "wind_dir": "SW",
+    "humidity_pct": 28,
+    "pressure_mb": 1010.4,
+    "roof": false,
+    "flag": "clear"
+  },
+  "SF": {
+    "venue": "Oracle Park",
+    "temp": 68.5,
+    "precip": 0,
+    "wind_spd": 2.2,
+    "wind_dir": "SW",
+    "humidity_pct": 59,
+    "pressure_mb": 1013.6,
+    "roof": false,
+    "flag": "clear"
+  },
+  "DET": {
+    "venue": "Comerica Park",
+    "temp": 68.7,
+    "precip": 0,
+    "wind_spd": 5.1,
+    "wind_dir": "N",
+    "humidity_pct": 48,
+    "pressure_mb": 1022.5,
+    "roof": false,
+    "flag": "clear"
+  },
+  "CWS": {
+    "venue": "Rate Field",
+    "temp": 59.2,
+    "precip": 0,
+    "wind_spd": 7.7,
+    "wind_dir": "NE",
+    "humidity_pct": 61,
+    "pressure_mb": 1020.7,
+    "roof": false,
+    "flag": "clear"
+  },
+  "SD": {
+    "venue": "Petco Park",
+    "temp": 78.9,
+    "precip": 0,
+    "wind_spd": 7.1,
+    "wind_dir": "WNW",
+    "humidity_pct": 62,
+    "pressure_mb": 1010.0,
+    "roof": false,
+    "flag": "clear"
+  },
+  "MIA": {
+    "venue": "loanDepot Park",
+    "temp": 83.3,
+    "precip": 4,
+    "wind_spd": 4.4,
+    "wind_dir": "NE",
+    "humidity_pct": 50,
+    "pressure_mb": 1011.6,
+    "roof": true,
+    "flag": "clear"
+  },
   "KC": {
     "venue": "Kauffman Stadium",
     "temp": 73.0,
@@ -87,28 +109,8 @@
     "roof": false,
     "flag": "clear"
   },
-  "PHI": {
-    "venue": "Citizens Bank Park",
-    "temp": 58.0,
-    "precip": 26,
-    "wind_spd": 12.1,
-    "wind_dir": "N",
-    "humidity_pct": 85,
-    "pressure_mb": 1009.4,
-    "roof": false,
-    "flag": "clear"
-  },
   "MIN": {
     "venue": "Target Field",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
-    "roof": false,
-    "flag": "clear"
-  },
-  "CWS": {
-    "venue": "Rate Field",
     "temp": 72,
     "precip": 0,
     "wind_spd": 5,
@@ -123,15 +125,6 @@
     "wind_spd": 5,
     "wind_dir": "N",
     "roof": true,
-    "flag": "clear"
-  },
-  "ATH": {
-    "venue": "Sutter Health Park",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
-    "roof": false,
     "flag": "clear"
   }
 }
