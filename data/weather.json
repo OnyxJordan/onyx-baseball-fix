@@ -1,45 +1,34 @@
 {
-  "ATH": {
-    "venue": "Sutter Health Park",
-    "temp": 79.4,
+  "CWS": {
+    "venue": "Rate Field",
+    "temp": 60.0,
     "precip": 0,
-    "wind_spd": 10.1,
-    "wind_dir": "SW",
-    "humidity_pct": 34,
-    "pressure_mb": 1012.1,
+    "wind_spd": 6.5,
+    "wind_dir": "NE",
+    "humidity_pct": 78,
+    "pressure_mb": 1023.2,
     "roof": false,
     "flag": "clear"
   },
-  "BOS": {
-    "venue": "Fenway Park",
-    "temp": 63.7,
-    "precip": 1,
-    "wind_spd": 15.5,
-    "wind_dir": "NNE",
-    "humidity_pct": 54,
-    "pressure_mb": 1018.8,
-    "roof": false,
-    "flag": "clear"
-  },
-  "MIL": {
-    "venue": "American Family Field",
-    "temp": 62.4,
-    "precip": 0,
-    "wind_spd": 5.4,
-    "wind_dir": "E",
-    "humidity_pct": 58,
-    "pressure_mb": 1022.7,
+  "MIA": {
+    "venue": "loanDepot Park",
+    "temp": 80.3,
+    "precip": 19,
+    "wind_spd": 2.2,
+    "wind_dir": "NE",
+    "humidity_pct": 84,
+    "pressure_mb": 1012.2,
     "roof": true,
     "flag": "clear"
   },
-  "SD": {
-    "venue": "Petco Park",
-    "temp": 74.8,
-    "precip": 0,
-    "wind_spd": 7.1,
-    "wind_dir": "NNW",
-    "humidity_pct": 79,
-    "pressure_mb": 1011.4,
+  "DET": {
+    "venue": "Comerica Park",
+    "temp": 63.6,
+    "precip": 1,
+    "wind_spd": 5.9,
+    "wind_dir": "NE",
+    "humidity_pct": 58,
+    "pressure_mb": 1024.1,
     "roof": false,
     "flag": "clear"
   },
@@ -54,47 +43,25 @@
     "roof": false,
     "flag": "clear"
   },
-  "DET": {
-    "venue": "Comerica Park",
-    "temp": 63.6,
-    "precip": 1,
-    "wind_spd": 5.9,
-    "wind_dir": "NE",
-    "humidity_pct": 58,
-    "pressure_mb": 1024.1,
-    "roof": false,
-    "flag": "clear"
-  },
-  "NYY": {
-    "venue": "Yankee Stadium",
-    "temp": 70.6,
-    "precip": 1,
-    "wind_spd": 15.2,
-    "wind_dir": "N",
-    "humidity_pct": 38,
-    "pressure_mb": 1015.6,
+  "WSH": {
+    "venue": "Nationals Park",
+    "temp": 73.0,
+    "precip": 0,
+    "wind_spd": 11.9,
+    "wind_dir": "NNW",
+    "humidity_pct": 31,
+    "pressure_mb": 1015.8,
     "roof": false,
     "flag": "clear"
   },
   "SEA": {
     "venue": "T-Mobile Park",
     "temp": 53.5,
-    "precip": 3,
+    "precip": 6,
     "wind_spd": 11.9,
     "wind_dir": "WSW",
     "humidity_pct": 75,
     "pressure_mb": 1017.4,
-    "roof": false,
-    "flag": "clear"
-  },
-  "KC": {
-    "venue": "Kauffman Stadium",
-    "temp": 65.9,
-    "precip": 23,
-    "wind_spd": 7.4,
-    "wind_dir": "ESE",
-    "humidity_pct": 90,
-    "pressure_mb": 1018.6,
     "roof": false,
     "flag": "clear"
   },
@@ -109,6 +76,39 @@
     "roof": true,
     "flag": "clear"
   },
+  "ATH": {
+    "venue": "Sutter Health Park",
+    "temp": 79.4,
+    "precip": 0,
+    "wind_spd": 10.1,
+    "wind_dir": "SW",
+    "humidity_pct": 34,
+    "pressure_mb": 1012.1,
+    "roof": false,
+    "flag": "clear"
+  },
+  "SD": {
+    "venue": "Petco Park",
+    "temp": 74.8,
+    "precip": 0,
+    "wind_spd": 7.1,
+    "wind_dir": "NNW",
+    "humidity_pct": 79,
+    "pressure_mb": 1011.4,
+    "roof": false,
+    "flag": "clear"
+  },
+  "KC": {
+    "venue": "Kauffman Stadium",
+    "temp": 65.9,
+    "precip": 23,
+    "wind_spd": 7.4,
+    "wind_dir": "ESE",
+    "humidity_pct": 90,
+    "pressure_mb": 1018.6,
+    "roof": false,
+    "flag": "clear"
+  },
   "PHI": {
     "venue": "Citizens Bank Park",
     "temp": 73.0,
@@ -120,23 +120,14 @@
     "roof": false,
     "flag": "clear"
   },
-  "CWS": {
-    "venue": "Rate Field",
-    "temp": 60.0,
+  "MIL": {
+    "venue": "American Family Field",
+    "temp": 62.4,
     "precip": 0,
-    "wind_spd": 6.5,
-    "wind_dir": "NE",
-    "humidity_pct": 78,
-    "pressure_mb": 1023.2,
-    "roof": false,
-    "flag": "clear"
-  },
-  "MIA": {
-    "venue": "loanDepot Park",
-    "temp": 72,
-    "precip": 0,
-    "wind_spd": 5,
-    "wind_dir": "N",
+    "wind_spd": 5.4,
+    "wind_dir": "E",
+    "humidity_pct": 58,
+    "pressure_mb": 1022.7,
     "roof": true,
     "flag": "clear"
   },
@@ -149,8 +140,8 @@
     "roof": false,
     "flag": "clear"
   },
-  "WSH": {
-    "venue": "Nationals Park",
+  "NYY": {
+    "venue": "Yankee Stadium",
     "temp": 72,
     "precip": 0,
     "wind_spd": 5,
