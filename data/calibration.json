@@ -1,8 +1,8 @@
 {
- "n": 269,
- "expected_hr": 59.33,
- "actual_hr": 52,
- "scale": 0.9014,
+ "n": 270,
+ "expected_hr": 59.49,
+ "actual_hr": 53,
+ "scale": 0.9128,
  "active": true,
  "buckets": [
   {
@@ -21,10 +21,10 @@
   },
   {
    "range": "15-20%",
-   "n": 56,
-   "hits": 11,
-   "hit_rate": 0.1964,
-   "model_avg": 0.1804
+   "n": 57,
+   "hits": 12,
+   "hit_rate": 0.2105,
+   "model_avg": 0.18
   },
   {
    "range": "20%+",
@@ -34,5 +34,5 @@
    "model_avg": 0.2369
   }
  ],
- "updated": "2026-09-26T04:19:49.821224+00:00"
+ "updated": "2026-09-26T04:50:44.278237+00:00"
 }
