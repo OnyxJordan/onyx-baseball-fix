@@ -1,40 +1,39 @@
 {
- "date": "2026-09-25",
- "locked": true,
+ "date": "2026-09-26",
+ "locked": false,
  "legs": [
   {
-   "player": "Pete Alonso",
-   "mid": 624413,
-   "team": "BAL",
-   "odds": 351,
-   "prob": 22.7,
-   "score": 0.539,
-   "why": [
-    "pitcher matchup ×1.45",
-    "park ×1.33",
-    "fly-ball pitcher"
-   ],
-   "away": "BAL",
-   "home": "NYY",
-   "opp": "Brendan Beck",
-   "time": "4:05 PM"
-  },
-  {
-   "player": "Cam Smith",
-   "mid": 701358,
+   "player": "Yordan Alvarez",
+   "mid": 670541,
    "team": "HOU",
-   "odds": 410,
-   "prob": 15.6,
-   "score": 0.529,
+   "odds": 256,
+   "prob": 23.5,
+   "score": 0.504,
    "why": [
-    "pitcher matchup ×1.28",
-    "platoon edge",
-    "fly-ball pitcher"
+    "48% FB bat",
+    "soft bullpen"
    ],
    "away": "HOU",
    "home": "ATH",
-   "opp": "Jacob Lopez",
+   "opp": "Jack Perkins",
    "time": "9:40 PM"
+  },
+  {
+   "player": "Kyle Schwarber",
+   "mid": 656941,
+   "team": "PHI",
+   "odds": 325,
+   "prob": 20.5,
+   "score": 0.468,
+   "why": [
+    "soft bullpen",
+    "park ×1.13",
+    "overdue"
+   ],
+   "away": "TB",
+   "home": "PHI",
+   "opp": "Griffin Jax",
+   "time": "7:15 PM"
   }
  ]
 }
