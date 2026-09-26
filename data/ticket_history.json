@@ -1357,16 +1357,16 @@
     "player": "Pete Alonso",
     "odds": 351,
     "prob": 22.7,
-    "hit": null
+    "hit": true
    },
    {
     "player": "Cam Smith",
     "odds": 410,
     "prob": 15.6,
-    "hit": null
+    "hit": "void"
    }
   ],
-  "result": null,
-  "pnl": null
+  "result": "win",
+  "pnl": 35.1
  }
 ]
