@@ -1,48 +1,4 @@
 {
-  "CWS": {
-    "venue": "Rate Field",
-    "temp": 60.4,
-    "precip": 0,
-    "wind_spd": 7.5,
-    "wind_dir": "ENE",
-    "humidity_pct": 69,
-    "pressure_mb": 1020.5,
-    "roof": false,
-    "flag": "clear"
-  },
-  "PHI": {
-    "venue": "Citizens Bank Park",
-    "temp": 58.8,
-    "precip": 37,
-    "wind_spd": 10.7,
-    "wind_dir": "NNW",
-    "humidity_pct": 83,
-    "pressure_mb": 1009.0,
-    "roof": false,
-    "flag": "clear"
-  },
-  "MIL": {
-    "venue": "American Family Field",
-    "temp": 60.7,
-    "precip": 0,
-    "wind_spd": 4.8,
-    "wind_dir": "E",
-    "humidity_pct": 61,
-    "pressure_mb": 1020.7,
-    "roof": true,
-    "flag": "clear"
-  },
-  "MIN": {
-    "venue": "Target Field",
-    "temp": 58.3,
-    "precip": 64,
-    "wind_spd": 7.5,
-    "wind_dir": "SE",
-    "humidity_pct": 92,
-    "pressure_mb": 1017.9,
-    "roof": false,
-    "flag": "clear"
-  },
   "SEA": {
     "venue": "T-Mobile Park",
     "temp": 55.4,
@@ -54,14 +10,25 @@
     "roof": false,
     "flag": "clear"
   },
-  "SD": {
-    "venue": "Petco Park",
-    "temp": 79.5,
+  "CWS": {
+    "venue": "Rate Field",
+    "temp": 60.4,
     "precip": 0,
-    "wind_spd": 5.0,
-    "wind_dir": "WNW",
-    "humidity_pct": 56,
-    "pressure_mb": 1010.6,
+    "wind_spd": 7.5,
+    "wind_dir": "ENE",
+    "humidity_pct": 69,
+    "pressure_mb": 1020.5,
+    "roof": false,
+    "flag": "clear"
+  },
+  "MIN": {
+    "venue": "Target Field",
+    "temp": 58.3,
+    "precip": 64,
+    "wind_spd": 7.5,
+    "wind_dir": "SE",
+    "humidity_pct": 92,
+    "pressure_mb": 1017.9,
     "roof": false,
     "flag": "clear"
   },
@@ -76,6 +43,17 @@
     "roof": false,
     "flag": "clear"
   },
+  "PHI": {
+    "venue": "Citizens Bank Park",
+    "temp": 58.8,
+    "precip": 37,
+    "wind_spd": 10.7,
+    "wind_dir": "NNW",
+    "humidity_pct": 83,
+    "pressure_mb": 1009.0,
+    "roof": false,
+    "flag": "clear"
+  },
   "ATH": {
     "venue": "Sutter Health Park",
     "temp": 79.2,
@@ -85,6 +63,28 @@
     "humidity_pct": 24,
     "pressure_mb": 1010.5,
     "roof": false,
+    "flag": "clear"
+  },
+  "SD": {
+    "venue": "Petco Park",
+    "temp": 79.5,
+    "precip": 0,
+    "wind_spd": 5.0,
+    "wind_dir": "WNW",
+    "humidity_pct": 56,
+    "pressure_mb": 1010.6,
+    "roof": false,
+    "flag": "clear"
+  },
+  "MIL": {
+    "venue": "American Family Field",
+    "temp": 60.7,
+    "precip": 0,
+    "wind_spd": 4.8,
+    "wind_dir": "E",
+    "humidity_pct": 61,
+    "pressure_mb": 1020.7,
+    "roof": true,
     "flag": "clear"
   }
 }
