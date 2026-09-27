@@ -1,26 +1,4 @@
 {
-  "MIL": {
-    "venue": "American Family Field",
-    "temp": 61.3,
-    "precip": 0,
-    "wind_spd": 4.7,
-    "wind_dir": "E",
-    "humidity_pct": 61,
-    "pressure_mb": 1019.3,
-    "roof": true,
-    "flag": "clear"
-  },
-  "MIN": {
-    "venue": "Target Field",
-    "temp": 58.3,
-    "precip": 64,
-    "wind_spd": 7.5,
-    "wind_dir": "SE",
-    "humidity_pct": 92,
-    "pressure_mb": 1017.9,
-    "roof": false,
-    "flag": "clear"
-  },
   "PHI": {
     "venue": "Citizens Bank Park",
     "temp": 59.1,
@@ -29,28 +7,6 @@
     "wind_dir": "NNW",
     "humidity_pct": 80,
     "pressure_mb": 1009.0,
-    "roof": false,
-    "flag": "clear"
-  },
-  "ATH": {
-    "venue": "Sutter Health Park",
-    "temp": 80.1,
-    "precip": 0,
-    "wind_spd": 4.5,
-    "wind_dir": "WSW",
-    "humidity_pct": 25,
-    "pressure_mb": 1009.8,
-    "roof": false,
-    "flag": "clear"
-  },
-  "SEA": {
-    "venue": "T-Mobile Park",
-    "temp": 55.7,
-    "precip": 0,
-    "wind_spd": 5.4,
-    "wind_dir": "NNE",
-    "humidity_pct": 62,
-    "pressure_mb": 1020.6,
     "roof": false,
     "flag": "clear"
   },
@@ -65,15 +21,37 @@
     "roof": false,
     "flag": "clear"
   },
-  "SD": {
-    "venue": "Petco Park",
-    "temp": 79.2,
-    "precip": 0,
-    "wind_spd": 5.1,
-    "wind_dir": "WNW",
-    "humidity_pct": 66,
-    "pressure_mb": 1010.2,
+  "MIN": {
+    "venue": "Target Field",
+    "temp": 58.3,
+    "precip": 64,
+    "wind_spd": 7.5,
+    "wind_dir": "SE",
+    "humidity_pct": 92,
+    "pressure_mb": 1017.9,
     "roof": false,
+    "flag": "clear"
+  },
+  "ATH": {
+    "venue": "Sutter Health Park",
+    "temp": 80.1,
+    "precip": 0,
+    "wind_spd": 4.5,
+    "wind_dir": "WSW",
+    "humidity_pct": 25,
+    "pressure_mb": 1009.8,
+    "roof": false,
+    "flag": "clear"
+  },
+  "MIL": {
+    "venue": "American Family Field",
+    "temp": 61.3,
+    "precip": 0,
+    "wind_spd": 4.7,
+    "wind_dir": "E",
+    "humidity_pct": 61,
+    "pressure_mb": 1019.3,
+    "roof": true,
     "flag": "clear"
   },
   "KC": {
@@ -84,6 +62,28 @@
     "wind_dir": "S",
     "humidity_pct": 84,
     "pressure_mb": 1014.8,
+    "roof": false,
+    "flag": "clear"
+  },
+  "SEA": {
+    "venue": "T-Mobile Park",
+    "temp": 55.7,
+    "precip": 0,
+    "wind_spd": 5.4,
+    "wind_dir": "NNE",
+    "humidity_pct": 62,
+    "pressure_mb": 1020.6,
+    "roof": false,
+    "flag": "clear"
+  },
+  "SD": {
+    "venue": "Petco Park",
+    "temp": 79.2,
+    "precip": 0,
+    "wind_spd": 5.1,
+    "wind_dir": "WNW",
+    "humidity_pct": 66,
+    "pressure_mb": 1010.2,
     "roof": false,
     "flag": "clear"
   }
