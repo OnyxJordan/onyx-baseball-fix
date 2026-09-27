@@ -1,26 +1,4 @@
 {
-  "MIL": {
-    "venue": "American Family Field",
-    "temp": 69.1,
-    "precip": 0,
-    "wind_spd": 6.1,
-    "wind_dir": "E",
-    "humidity_pct": 59,
-    "pressure_mb": 1018.5,
-    "roof": true,
-    "flag": "clear"
-  },
-  "SEA": {
-    "venue": "T-Mobile Park",
-    "temp": 59.6,
-    "precip": 0,
-    "wind_spd": 5.2,
-    "wind_dir": "NNE",
-    "humidity_pct": 67,
-    "pressure_mb": 1017.8,
-    "roof": false,
-    "flag": "clear"
-  },
   "ATH": {
     "venue": "Sutter Health Park",
     "temp": 68.9,
@@ -29,28 +7,6 @@
     "wind_dir": "SW",
     "humidity_pct": 63,
     "pressure_mb": 1011.8,
-    "roof": false,
-    "flag": "clear"
-  },
-  "MIN": {
-    "venue": "Target Field",
-    "temp": 65.5,
-    "precip": 0,
-    "wind_spd": 2.7,
-    "wind_dir": "NNE",
-    "humidity_pct": 90,
-    "pressure_mb": 1019.0,
-    "roof": false,
-    "flag": "clear"
-  },
-  "SD": {
-    "venue": "Petco Park",
-    "temp": 77.9,
-    "precip": 15,
-    "wind_spd": 4.4,
-    "wind_dir": "WSW",
-    "humidity_pct": 81,
-    "pressure_mb": 1012.0,
     "roof": false,
     "flag": "clear"
   },
@@ -65,17 +21,6 @@
     "roof": false,
     "flag": "clear"
   },
-  "DET": {
-    "venue": "Comerica Park",
-    "temp": 75.4,
-    "precip": 0,
-    "wind_spd": 9.6,
-    "wind_dir": "N",
-    "humidity_pct": 43,
-    "pressure_mb": 1015.2,
-    "roof": false,
-    "flag": "clear"
-  },
   "BOS": {
     "venue": "Fenway Park",
     "temp": 59.3,
@@ -87,26 +32,26 @@
     "roof": false,
     "flag": "clear"
   },
-  "TOR": {
-    "venue": "Rogers Centre",
-    "temp": 77.1,
+  "SEA": {
+    "venue": "T-Mobile Park",
+    "temp": 59.6,
     "precip": 0,
-    "wind_spd": 11.4,
-    "wind_dir": "N",
-    "humidity_pct": 37,
-    "pressure_mb": 1013.4,
-    "roof": true,
+    "wind_spd": 5.2,
+    "wind_dir": "NNE",
+    "humidity_pct": 67,
+    "pressure_mb": 1017.8,
+    "roof": false,
     "flag": "clear"
   },
-  "MIA": {
-    "venue": "loanDepot Park",
-    "temp": 85.9,
-    "precip": 2,
-    "wind_spd": 0.7,
-    "wind_dir": "NNE",
-    "humidity_pct": 55,
-    "pressure_mb": 1011.7,
-    "roof": true,
+  "SD": {
+    "venue": "Petco Park",
+    "temp": 77.9,
+    "precip": 15,
+    "wind_spd": 4.4,
+    "wind_dir": "WSW",
+    "humidity_pct": 81,
+    "pressure_mb": 1012.0,
+    "roof": false,
     "flag": "clear"
   }
 }
