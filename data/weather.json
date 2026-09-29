@@ -1,15 +1,4 @@
 {
-  "HOU": {
-    "venue": "Daikin Park",
-    "temp": 78.1,
-    "precip": 19,
-    "wind_spd": 14.6,
-    "wind_dir": "SW",
-    "humidity_pct": 95,
-    "pressure_mb": 1010.2,
-    "roof": true,
-    "flag": "clear"
-  },
   "SD": {
     "venue": "Petco Park",
     "temp": 72.6,
@@ -19,6 +8,17 @@
     "humidity_pct": 76,
     "pressure_mb": 1006.1,
     "roof": false,
+    "flag": "clear"
+  },
+  "HOU": {
+    "venue": "Daikin Park",
+    "temp": 78.1,
+    "precip": 42,
+    "wind_spd": 14.6,
+    "wind_dir": "SW",
+    "humidity_pct": 95,
+    "pressure_mb": 1010.2,
+    "roof": true,
     "flag": "clear"
   },
   "NYY": {
