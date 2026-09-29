@@ -1,6 +1,35 @@
 """
-model.py — Onyx Baseball v42 HR probability model + pitcher K projections
+model.py — Onyx Baseball v43 HR probability model + pitcher K projections
            + October Impact (playoff leverage) module
+
+v43: OPENERS. The board had AJ Blubaugh at 4.7 projected K against a listed
+line of 1.5, a +3.2 "edge" on a pitcher the market expects to face six batters.
+He has gs=0 on the season - 96 innings, all in relief - so IP/GS is undefined,
+the pre-existing opener guard flattened him to 4.7 innings, and the hard floor
+`max(4.0, ...)` meant NO starter could ever project shorter than four innings.
+The model was pricing a full start for a man being sent out to face the top of
+the order once.
+
+The split this version draws: THE MARKET IS AUTHORITATIVE ON WORKLOAD, WE KEEP
+OUR OWN VIEW ON RATE. Role is public - openers are announced, bullpen games are
+known - so a 1.5 K line is the market stating an expected outing length, not an
+opinion we can out-model. Strikeout rate per batter faced is where our edge has
+always lived and it is untouched. So: derive the innings the line implies at our
+own projected K rate, and when that is materially shorter than our IP/GS guess,
+defer to it (75% market / 25% model) and rebuild the projection from the
+reconciled innings. Floor drops 4.0 -> 1.0 so an opener can project honestly.
+A pitcher with gs=0 is treated as an opener outright, capped near 2.5 innings,
+because season IP spread over relief appearances says nothing about tonight.
+This is the same lesson as edge-first ranking: a huge edge is usually the model
+being wrong, not the market.
+
+The HITTER side had the identical blind spot. bullpen_mult only adjusted its
+starter/bullpen split when gs >= 3, so an opener fell back to a flat 40% bullpen
+share when the true figure is nearer 75%: the bats were being projected against
+a starter who will not face them. Both sides now read the same reconciled
+innings from expected_start_innings(), so a two-inning opener moves the K
+projection and the hitters' bullpen exposure together, as one fact about the
+game rather than two guesses.
 
 v42: ADDITIVE ONLY — the HR and K math is byte-for-byte unchanged, so every
 graded ledger stays continuous across this bump and no pick, ticket leg, K call
@@ -757,6 +786,10 @@ def project_player(
     pressure_mb: float = 1013.0,
     batter_hand: str = "R",
     opp_pitcher_hand: str = "R",
+    # v43 opener handling: how much of tonight's plate appearances go to the
+    # bullpen, and that bullpen's own HR factor. See the pitcher-factor block.
+    bullpen_share: float = None,
+    bullpen_pf: float = None,
 ) -> dict:
 
     player_key = name.lower()
@@ -870,9 +903,20 @@ def project_player(
     # 3. SC score (prefers live L14 Statcast)
     sc = sc_score(d, l14)
 
-    # 4. Pitcher factor
+    # 4. Pitcher factor — blended across who the bat ACTUALLY faces (v43).
+    # A hitter does not face the starter for four plate appearances; he faces
+    # him for however long the starter lasts and the bullpen for the rest. With
+    # an opener that is one PA against the starter and three against relief, so
+    # pricing the whole night off the starter is simply the wrong pitcher.
+    # bullpen_share is supplied by the caller from expected_start_innings(), the
+    # same reconciled number the K projection uses, so one fact about the game
+    # moves both sides together. Absent a share this is a no-op and the starter
+    # carries the projection exactly as before.
     pf = pitcher_factor(opp_pitcher, l14_pitchers, is_home_pitcher=not is_home,
                         trend_pitchers=trend_pitchers)
+    if bullpen_share and bullpen_pf:
+        _sh = max(0.0, min(0.85, float(bullpen_share)))
+        pf = (1.0 - _sh) * pf + _sh * float(bullpen_pf)
 
     # 5. Park + weather environment
     env = wind_env(park, wind_dir, wind_mph, temp, roof, humidity=humidity, pressure_mb=pressure_mb)
@@ -1076,6 +1120,60 @@ PARK_K_FACTOR = {
     "loanDepot park": 1.03, "American Family Field": 1.01,
 }
 
+# ─────────────────────────────────────────────────────────────────────────────
+# EXPECTED STARTER INNINGS (v43) — one number, read by BOTH sides.
+#
+# The K projection and the hitters' bullpen exposure are the same fact about a
+# game: how long does tonight's starter actually go. Before v43 they were two
+# separate guesses off IP/GS, and both broke on openers (see the v43 note at the
+# top of this file). Anything that needs "how deep does he go" calls this.
+# ─────────────────────────────────────────────────────────────────────────────
+def expected_start_innings(season: dict, k_line=None, k_per_ip=None):
+    """Return (innings, source) for tonight's starter.
+
+    season: the pitcher's season line ({"ip":, "gs":, ...}).
+    k_line: the listed strikeout prop line, when there is one.
+    k_per_ip: our own projected K rate per inning, used to read innings out of
+              the line. Falls back to a league-ish 1.05 K/IP when unknown.
+
+    The market sets the line knowing the announced role, so it is authoritative
+    on LENGTH. We keep our own view on RATE. Deferring only when the market is
+    SHORTER is deliberate: a long line is not licence to project a complete
+    game, but a short one is real information about a leash.
+    """
+    season = season or {}
+    try:
+        ip = float(season.get("ip") or 0)
+        gs = float(season.get("gs") or 0)
+    except (TypeError, ValueError):
+        ip, gs = 0.0, 0.0
+
+    # No starts all season: season IP is relief work and says nothing about
+    # tonight's leash. This is the opener case that produced the Blubaugh bug.
+    if gs <= 0:
+        base, source = 2.5, "opener (no starts)"
+    elif gs < 4:
+        base, source = min(4.7, ip / gs if gs else 4.7), "few starts"
+    else:
+        base, source = ip / gs, "season IP/GS"
+
+    base = max(1.0, min(7.0, base))
+
+    # Reconcile against the listed line, when one exists.
+    rate = k_per_ip if (k_per_ip and k_per_ip > 0) else 1.05
+    if k_line is not None:
+        try:
+            implied = float(k_line) / rate
+        except (TypeError, ValueError, ZeroDivisionError):
+            implied = None
+        if implied and implied < base * 0.75:
+            # market expects a materially shorter outing than our IP/GS guess
+            base = 0.25 * base + 0.75 * implied
+            source = "market line (short leash)"
+            base = max(1.0, min(7.0, base))
+    return round(base, 2), source
+
+
 def project_pitcher(name, pdb_entry=None, l14=None, season=None,
                     opp_k_pct=None, opp_team_k=None, park="", is_home=True,
                     ml_self=None, ml_opp=None, k_line=None, trend=None):
@@ -1118,19 +1216,26 @@ def project_pitcher(name, pdb_entry=None, l14=None, season=None,
         return None
     k_bf = max(0.10, min(0.42, k_bf))
 
-    # expected length: innings pace from season IP/GS, pitches from season
-    # pitches-per-start; sane fallbacks for debuts
+    # expected length (v43). k_bf above is a RATE and carries no innings in it,
+    # so K-per-inning is known before length is: that is what lets the listed
+    # line be read as an expected outing rather than an opinion on stuff.
+    # expected_start_innings() owns the whole decision and the hitters' bullpen
+    # exposure reads the same number, so an opener moves both together.
     gs = max(1, sea.get("gs") or 1)
-    ip_start = (sea.get("ip") or 0) / gs if sea.get("ip") else 5.3
-    # openers/relievers pressed into starts: season IP spread over relief
-    # appearances lies about tonight's leash
-    if (sea.get("gs") or 0) < 4 and ip_start > 6.0:
-        ip_start = 4.7
-    ip_start = max(4.0, min(7.0, ip_start or 5.3))
+    _k_per_ip = k_bf * 4.27
+    _line_val = None
+    if isinstance(k_line, dict):
+        _line_val = k_line.get("line")
+    elif isinstance(k_line, (int, float)):
+        _line_val = k_line
+    ip_start, ip_src = expected_start_innings(sea, _line_val, _k_per_ip)
+
     pitches = sea.get("pitches") and sea["pitches"] / gs
     if not pitches or pitches > 118 or pitches < 55:
         pitches = ip_start * 15.6
-    pitches = max(58, min(112, pitches))
+    # a two-inning opener does not throw 58 pitches; scale the floor with the
+    # projected outing instead of pinning every arm to a full start's workload
+    pitches = max(min(58, ip_start * 17.0), min(112, pitches))
     exp_bf = ip_start * 4.27
 
     # situational multipliers — home/away heaviest per spec, then the actual
@@ -1154,7 +1259,9 @@ def project_pitcher(name, pdb_entry=None, l14=None, season=None,
     K_LEVEL = 0.88   # global damp, consensus-anchored (was running +1.2 hot)
 
     k_proj = exp_bf * k_bf * m_ha * m_opp * m_park * m_stuff * K_LEVEL
-    k_proj = max(1.5, min(11.5, k_proj))
+    # floor was 1.5, which silently propped up every opener to a full-start
+    # minimum and is exactly how a 1.5 line produced a +3.2 edge
+    k_proj = max(0.3, min(11.5, k_proj))
 
     # HRs allowed over the expected outing — career 3-year HR/9 anchors,
     # season shrinks in by innings, L14 is a nudge; one bad fortnight can
@@ -1183,6 +1290,7 @@ def project_pitcher(name, pdb_entry=None, l14=None, season=None,
         "k_proj":     round(k_proj, 1),
         "k_bf":       round(k_bf, 4),
         "ip_proj":    round(ip_start, 1),
+        "ip_source":  ip_src,
         "pitches":    int(round(pitches)),
         "hr_allowed": round(hr_allowed, 2),
         "win_pct":    win_pct,

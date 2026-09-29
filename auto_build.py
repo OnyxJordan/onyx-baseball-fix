@@ -58,6 +58,10 @@ WEATHER  = jload(dpath("weather.json"), {})
 ODDS_RAW = jload(dpath("odds.json"), {})
 SEASONP  = jload(dpath("pitcher_season.json"), {})   # starter season + 3yr K history
 KLINES   = jload(dpath("k_lines.json"), {})          # listed K prop lines
+# normalised alongside its source: bullpen_mult() reads this during scoring,
+# long before the pitcher section, and a late definition would only surface
+# as a swallowed NameError and a silent fallback to the flat 40% share
+KLINES_NK = {nk(k): v for k, v in KLINES.items()} if isinstance(KLINES, dict) else {}
 TEAMK    = jload(dpath("team_k.json"), {})           # season team K% vs hand
 
 def _sp_hand(name):
@@ -186,17 +190,45 @@ def bullpen_mult(team_abbr, starter_e, starter_name=None):
     bp = BULLPEN.get(team_abbr)
     if not bp or not bp.get("hr9"):
         return 1.0
+    # v43: read the SAME reconciled innings the K projection uses, instead of
+    # re-deriving a share from IP/GS. The old `gs >= 3` guard meant an opener
+    # (gs=0) fell through to a flat 40% bullpen share when the true figure is
+    # nearer 75% - the bats were being projected against a starter who will not
+    # face them. The cap rises 0.55 -> 0.80 because a two-inning opener really
+    # does hand three quarters of the plate appearances to the pen.
     share = 0.40
     sp = SEASONP.get(nk(starter_name or "")) or {}
     try:
-        ip, gs = float(sp.get("ip") or 0), float(sp.get("gs") or 0)
-        if gs >= 3 and ip > 0:
-            share = min(0.55, max(0.25, 1.0 - (ip / gs) / 9.0))
-    except (TypeError, ValueError):
+        _kl = KLINES.get(starter_name or "") or KLINES_NK.get(nk(starter_name or "")) or {}
+        _ip, _src = model.expected_start_innings(sp, _kl.get("line"))
+        if _ip:
+            share = min(0.80, max(0.25, 1.0 - _ip / 9.0))
+    except Exception:
         pass
     bp_leg = min(max(float(bp["hr9"]) / 1.05, 0.7), 1.5)
     sp_leg = (starter_e or {}).get("pf_blend", 1.0)
     return round(((1.0 - share) * sp_leg + share * bp_leg) / max(sp_leg, 1e-6), 4)
+
+
+def bullpen_exposure(team_abbr, starter_name=None):
+    """(share, bullpen_pf) for project_player - v43.
+
+    The share is how much of tonight's plate appearances the BULLPEN takes,
+    derived from the same expected_start_innings() the K projection uses. The pf
+    is that bullpen's HR factor on the same scale as a starter's, so the model
+    can blend them into the pitcher the bat actually faces.
+    """
+    bp = BULLPEN.get(team_abbr)
+    if not bp or not bp.get("hr9"):
+        return None, None
+    sp = SEASONP.get(nk(starter_name or "")) or {}
+    kl = KLINES.get(starter_name or "") or KLINES_NK.get(nk(starter_name or "")) or {}
+    ip, _src = model.expected_start_innings(sp, kl.get("line"))
+    if not ip:
+        return None, None
+    share = min(0.80, max(0.25, 1.0 - ip / 9.0))
+    bp_pf = min(max(float(bp["hr9"]) / 1.05, 0.7), 1.5)
+    return round(share, 4), round(bp_pf, 4)
 
 def pull_air_mult(bat):
     if not bat or bat.get("pl") is None or bat.get("fb") is None:
@@ -304,6 +336,10 @@ for game in games_out:
         sp_e   = PITCHERS.get(nk(opp_sp or ""))
         p_hand = (sp_e or {}).get("hand") or HANDS.get(nk(opp_sp or "")) or "R"
 
+        # v43: who the bats actually face tonight - starter for as long as he
+        # lasts, bullpen for the rest. One call per side, not per batter.
+        _bp_share, _bp_pf = bullpen_exposure(opp_team, opp_sp)
+
         for spot, batter in enumerate(lineup, 1):
             bname = batter if isinstance(batter, str) else batter.get("name", "")
             if not bname:
@@ -348,6 +384,7 @@ for game in games_out:
                     pressure_mb=pressure,
                     batter_hand=b_hand or "R",
                     opp_pitcher_hand=p_hand,
+                    bullpen_share=_bp_share, bullpen_pf=_bp_pf,
                 )
             except Exception as ex:
                 _model_errs += 1
@@ -784,7 +821,6 @@ def _side_stats(rows):
     exp = round(sum((x.get("hr_prob") or 0) for x in rows) / 100.0, 2)
     return top["batter_name"], top.get("hr_prob") or 0, exp
 
-KLINES_NK = {nk(k): v for k, v in KLINES.items()} if isinstance(KLINES, dict) else {}
 
 def _opp_k_pct(opprows):
     vals = [(L14N.get(nk(x.get("batter_name") or "")) or {}).get("l14_k_pct") for x in opprows]
