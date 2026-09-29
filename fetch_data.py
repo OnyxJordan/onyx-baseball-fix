@@ -20,7 +20,7 @@ v8 fixes:
   - Abbr alignment: WAS->WSH, OAK->ATH so game_keys match the manual
     odds/game_lines/weather files (CWS_BAL, WSH_BOS, LAD_ATH, ...).
 """
-import json, time, requests, csv, datetime
+import json, time, requests, csv, datetime, re
 from pathlib import Path
 from collections import defaultdict
 
@@ -195,6 +195,114 @@ def fetch_roster(team_id):
     except Exception:
         return []
 
+# ── 3b. ROTOWIRE LINEUPS (fallback when MLB has not posted an official card) ──
+# The MLB API only exposes a lineup once the team files it, which on a playoff
+# night can be an hour before first pitch. Until then our own fallback is the
+# team's last final boxscore, which is stale by definition. Rotowire publishes
+# BEATWRITER-PROJECTED cards hours earlier and flips them to confirmed ahead of
+# the API (9/29: Rotowire had CWS and HOU confirmed while the API still said
+# projected). Batting slot drives expected PAs in the model, so a wrong slot is a
+# wrong projection on every prop for that bat.
+#
+# This is HTML scraping and it WILL break when Rotowire redesigns. Every failure
+# path returns {} and the caller falls straight back to the old behaviour, so the
+# worst case is exactly what we had before. Never let it raise.
+ROTOWIRE_URL = "https://www.rotowire.com/baseball/daily-lineups.php"
+_RW_CACHE = {}
+
+
+def fetch_rotowire_lineups():
+    """{TEAM_ABBR: {"status": confirmed|expected, "players": [{order,pos,name}]}}"""
+    if _RW_CACHE:
+        return _RW_CACHE
+    try:
+        r = requests.get(ROTOWIRE_URL, timeout=25,
+                         headers={"User-Agent": "Mozilla/5.0 (onyx-baseball)"})
+        if r.status_code != 200:
+            print(f"  rotowire: HTTP {r.status_code} - keeping API/boxscore lineups")
+            return {}
+        html = r.text
+    except Exception as e:
+        print(f"  rotowire: {type(e).__name__}: {e} - keeping API/boxscore lineups")
+        return {}
+
+    out = {}
+    try:
+        for blk in re.split(r'<div class="lineup__box', html)[1:]:
+            abbrs = re.findall(r'<div class="lineup__abbr">([A-Z]{2,3})</div>', blk)
+            if len(abbrs) < 2:
+                continue
+            for side, team in (("is-visit", abbrs[0]), ("is-home", abbrs[1])):
+                m = re.search(r'<ul class="lineup__list %s"(.*?)</ul>' % side, blk, re.S)
+                if not m:
+                    continue
+                body = m.group(1)
+                players = re.findall(
+                    r'<li class="lineup__player">\s*<div class="lineup__pos">([A-Z0-9]+)</div>\s*'
+                    r'<a[^>]*>([^<]+)</a>', body)
+                # a partial card is worse than none: a 4-man "lineup" would
+                # renumber everyone behind it and silently move every slot
+                if len(players) < 9:
+                    continue
+                out[team] = {
+                    "status": "confirmed" if "is-confirmed" in body else "expected",
+                    "players": [{"order": i + 1, "pos": p[0], "name": p[1].strip()}
+                                for i, p in enumerate(players[:9])],
+                }
+    except Exception as e:
+        print(f"  rotowire: parse failed ({type(e).__name__}: {e}) - keeping API lineups")
+        return {}
+
+    if out:
+        conf = sum(1 for v in out.values() if v["status"] == "confirmed")
+        print(f"  rotowire: {len(out)} team card(s), {conf} confirmed")
+    _RW_CACHE.update(out)
+    return out
+
+
+_SUFFIXES = {"jr", "sr", "ii", "iii", "iv", "v"}
+
+
+def _rw_norm(name):
+    """Fold a name to something two sources can agree on.
+
+    Rotowire writes "Luis Garcia", the MLB roster says "Luis García Jr." - an
+    accent and a suffix apart. Both had to go, or three Yankees went unmatched
+    and the whole card was discarded (measured: NYY matched 6/9 before this).
+    """
+    import unicodedata
+    n = unicodedata.normalize("NFKD", name or "")
+    n = "".join(c for c in n if not unicodedata.combining(c))
+    n = n.lower().replace(".", " ").replace("'", "").replace("-", " ")
+    parts = [p for p in n.split() if p not in _SUFFIXES]
+    return parts
+
+
+def _rw_match(rw_name, roster_names):
+    """Match Rotowire's abbreviated names ("K. Schwarber") to a full roster name.
+
+    Exact normalised match first, then last name plus first initial, which is the
+    form Rotowire actually publishes. Ambiguous matches are REFUSED rather than
+    guessed - putting the wrong Garcia in the 3-hole is worse than leaving the
+    slot to the boxscore fallback, because batting slot drives expected PAs.
+    """
+    n = _rw_norm(rw_name)
+    if not n:
+        return None
+    for full in roster_names:
+        if _rw_norm(full) == n:
+            return full
+    if len(n) < 2:
+        return None
+    last, init = n[-1], n[0][:1]
+    hits = []
+    for full in roster_names:
+        f = _rw_norm(full)
+        if len(f) >= 2 and f[-1] == last and f[0][:1] == init:
+            hits.append(full)
+    return hits[0] if len(hits) == 1 else None
+
+
 # ── 4. BUILD LINEUP ───────────────────────────────────────────────────────────
 def build_lineup(game, recent_orders, side):
     team_id   = game["teams"][side]["team"]["id"]
@@ -212,11 +320,36 @@ def build_lineup(game, recent_orders, side):
                 continue
             result.append({"name": name, "pos": pos, "batting_order": max(1, min(9, bo))})
         if result:
-            return result, team_abbr, True
+            return result, team_abbr, True, "mlb-confirmed"
 
-    # Roster fallback
     roster      = fetch_roster(team_id)
     team_recent = recent_orders.get(team_abbr, {})
+
+    # Rotowire sits between the official card and the stale-boxscore fallback:
+    # a beatwriter card for tonight beats last week's batting order every time.
+    rw = fetch_rotowire_lineups().get(team_abbr)
+    if rw and roster:
+        names = [p["name"] for p in roster]
+        by_name = {p["name"]: p for p in roster}
+        picked, seen = [], set()
+        for slot in rw["players"]:
+            full = _rw_match(slot["name"], names)
+            if not full or full in seen:
+                continue
+            seen.add(full)
+            picked.append({"name": full,
+                           "pos": by_name[full].get("pos") or slot["pos"],
+                           "batting_order": slot["order"]})
+        # only trust a card we could resolve almost completely; a half-matched
+        # card would renumber the slots it did match and move every bat
+        if len(picked) >= 8:
+            for i, p in enumerate(sorted(picked, key=lambda x: x["batting_order"])):
+                p["batting_order"] = i + 1
+            return picked, team_abbr, rw["status"] == "confirmed", f"rotowire-{rw['status']}"
+        print(f"  rotowire: {team_abbr} card matched only {len(picked)}/9 - falling back")
+
+    # Last resort: the team's most recent final boxscore order
+
     players = []
     for p in roster:
         nk = player_name_key(p["name"])
@@ -228,7 +361,7 @@ def build_lineup(game, recent_orders, side):
     lineup = (has_recent + no_recent)[:9]
     for i, p in enumerate(lineup):
         p["batting_order"] = i + 1
-    return lineup, team_abbr, False
+    return lineup, team_abbr, False, "recent-boxscore"
 
 # ── 5. FETCH LINEUPS — writes FLAT data/lineups.json for auto_build ────────────
 def fetch_lineups():
@@ -264,8 +397,8 @@ def fetch_lineups():
         away_pitcher = g["teams"]["away"].get("probablePitcher", {}).get("fullName", "TBD")
         home_pitcher = g["teams"]["home"].get("probablePitcher", {}).get("fullName", "TBD")
 
-        away_lineup, _, away_conf = build_lineup(g, recent_orders, "away")
-        home_lineup, _, home_conf = build_lineup(g, recent_orders, "home")
+        away_lineup, _, away_conf, away_src = build_lineup(g, recent_orders, "away")
+        home_lineup, _, home_conf, home_src = build_lineup(g, recent_orders, "home")
 
         games[game_key] = {
             "game_key":     game_key,
@@ -278,8 +411,8 @@ def fetch_lineups():
             "status":       g.get("status", {}).get("detailedState", ""),
         }
 
-        for team, lineup, conf in [(away_abbr, away_lineup, away_conf),
-                                   (home_abbr, home_lineup, home_conf)]:
+        for team, lineup, conf, src in [(away_abbr, away_lineup, away_conf, away_src),
+                                        (home_abbr, home_lineup, home_conf, home_src)]:
             for p in lineup:
                 pos = p["pos"]
                 flat.append({
@@ -292,6 +425,7 @@ def fetch_lineups():
                     "fd_pos":           pos,
                     "hand":             "R",   # MLB lineup feed omits bat side; display-only
                     "lineup_confirmed": conf,
+                    "lineup_source":    src,
                 })
 
         conf = "✓ confirmed" if (away_conf and home_conf) else "~ projected"
