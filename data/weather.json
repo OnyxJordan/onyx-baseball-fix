@@ -1,13 +1,13 @@
 {
-  "HOU": {
-    "venue": "Daikin Park",
-    "temp": 87.4,
-    "precip": 18,
-    "wind_spd": 7.6,
-    "wind_dir": "SE",
-    "humidity_pct": 61,
-    "pressure_mb": 1011.1,
-    "roof": true,
+  "NYY": {
+    "venue": "Yankee Stadium",
+    "temp": 64.1,
+    "precip": 1,
+    "wind_spd": 2.1,
+    "wind_dir": "SW",
+    "humidity_pct": 90,
+    "pressure_mb": 1016.7,
+    "roof": false,
     "flag": "clear"
   },
   "ATL": {
@@ -21,6 +21,17 @@
     "roof": false,
     "flag": "clear"
   },
+  "HOU": {
+    "venue": "Daikin Park",
+    "temp": 87.4,
+    "precip": 18,
+    "wind_spd": 7.6,
+    "wind_dir": "SE",
+    "humidity_pct": 61,
+    "pressure_mb": 1011.1,
+    "roof": true,
+    "flag": "clear"
+  },
   "SD": {
     "venue": "Petco Park",
     "temp": 73.1,
@@ -29,17 +40,6 @@
     "wind_dir": "NNE",
     "humidity_pct": 72,
     "pressure_mb": 1005.7,
-    "roof": false,
-    "flag": "clear"
-  },
-  "NYY": {
-    "venue": "Yankee Stadium",
-    "temp": 64.1,
-    "precip": 1,
-    "wind_spd": 2.1,
-    "wind_dir": "SW",
-    "humidity_pct": 90,
-    "pressure_mb": 1016.7,
     "roof": false,
     "flag": "clear"
   }
