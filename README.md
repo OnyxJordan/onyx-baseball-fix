@@ -62,6 +62,7 @@ Stats API.
 | `grade_picks.py` | grades everything pending against final box scores: picks, ticket legs, K calls, HR-edge plays. Scratches void after 2 days. One shared `day_hr_map()` per date serves all four ledgers |
 | `calibrate.py` | self-calibration from graded picks: `scale = (actual+15)/(expected+15)`, clamped 0.75–1.15, written to `data/calibration.json`, read by `model.py` |
 | `generate_recap.py` | daily recap blurb |
+| `validate_build.py` | the gate: blocks the commit when the page is structurally broken, a batting slot is duplicated or missing, or a graded ledger shrank. Runs in both pipeline workflows before the commit step, and on every pull request |
 | `auto_build.py` | scores ~290 batters via `model.project_player()`, builds the board/picks/ticket/ledger aggregates, injects the JSON globals into `shell.html` → `index.html` |
 | `update_stats.py` | persists the picks record (`PICKS`) into the page |
 
@@ -354,6 +355,26 @@ why a local `auto_build.py` still produces a full board.
 | `old/`, `onyx-rebuild/` | historical copies; nothing reads them |
 | `ROADMAP.md` | forward plan; Phases 0-1 and the ticker shipped, the rest is open |
 
+## CI and the build gate
+
+`validate_build.py` is the gate. It runs **after** `auto_build.py` + `update_stats.py`
+and **before** the commit step in both `refresh_build.yml` and `daily_build.yml`, and it
+is not `continue-on-error` — a non-zero exit blocks the commit, so the previously
+deployed page stays live rather than a broken one replacing it. It checks:
+
+1. **Structure** — the injected globals exist, parse, and carry the keys the shell reads.
+2. **Lineups** — nine bats a side, slots 1-9 exactly once, nobody batting twice. Batting
+   slot drives expected PAs, so a duplicated or missing slot silently misprices every
+   prop in that game. It also logs the lineup-source split each run.
+3. **Ledgers** — the graded record may grow, never shrink (hard rule 6, enforced by
+   diffing row counts against git HEAD instead of trusting everyone to remember).
+
+`ci.yml` runs on every pull request: it builds from the committed data (no secrets, no
+network fetches, so a flaky upstream API can never fail a PR), runs the validator, then
+runs `tools/verify_shell.js` headless across all ten tabs. Before this the repo had **no
+pull-request check at all** — every merge was verified only by whoever was careful that
+day.
+
 ## Verification discipline (non-negotiable)
 
 Before shipping any shell/model change:
@@ -429,10 +450,6 @@ dispatch refresh_build.yml (also re-seeds the chain) → verify the DEPLOYED pag
   PATH NOTE suggests checking the file path first — the path is fine, the inputs are gone.
   Tracked as ROADMAP Phase 6.
 - **`data/pitcher_l14.json` is 0 bytes and nothing reads it.** Safe to delete.
-- **No `validate_build.py`.** ROADMAP Phase 2 called for a schema gate that blocks the
-  commit when `RESULTS`/`SUMMARIES` come out malformed. It was never built, so the only
-  guard today is `auto_build.py` aborting on zero scored players. A structurally broken
-  but non-empty build would still ship.
 - ~~`LINE_HISTORY` const/TDZ~~ — **fixed**; it is `var` now. The audit table in
   [Injected globals](#injected-globals-the-tdz-rule-precisely) is the live record.
 

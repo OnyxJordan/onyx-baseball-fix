@@ -59,6 +59,12 @@ Work on a `claude/...` branch, PR to `main`, squash-merge. `main` moves under yo
 `--theirs` for `index.html`, `origin/main` for `data/`, keep your own source files, then
 rebuild. Full ritual in the README.
 
+Every pull request now runs `ci.yml`: build from committed data, `validate_build.py`,
+then `tools/verify_shell.js` across all ten tabs. `validate_build.py` also blocks the
+commit inside both pipeline workflows when the page is structurally broken, a batting
+slot is duplicated or missing, or a graded ledger shrank. Do not make it
+`continue-on-error` - stopping the commit is the entire point.
+
 Verification before shipping shell or model changes:
 
 ```bash

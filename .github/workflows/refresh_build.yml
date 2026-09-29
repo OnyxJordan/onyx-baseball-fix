@@ -79,6 +79,14 @@ jobs:
         run: python3 auto_build.py
       - name: Persist picks record
         run: python3 update_stats.py
+      # ROADMAP Phase 2, finally built. Blocks the commit when the page is
+      # structurally broken, a batting slot is duplicated or missing, or a
+      # graded ledger shrank. A non-zero exit here means yesterday's page stays
+      # live instead of a broken one replacing it. NOT continue-on-error: the
+      # whole point is that it stops the commit.
+      - name: Validate build (blocks commit on failure)
+        run: python3 validate_build.py
+
       - name: Commit refresh (only if something changed)
         id: commit
         run: |
