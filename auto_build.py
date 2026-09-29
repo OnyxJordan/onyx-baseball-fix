@@ -266,7 +266,12 @@ for gk, rows in _by_game.items():
         side = "away" if r.get("team") == away else "home"
         game[f"{side}_lineup"].append({"name": r.get("name", ""),
                                        "hand": r.get("hand", ""),
-                                       "pos": r.get("pos", "")})
+                                       "pos": r.get("pos", ""),
+                                       # carried so the page can say whether a
+                                       # batting slot is an official card or a
+                                       # projection; slot drives expected PAs
+                                       "lineup_confirmed": r.get("lineup_confirmed"),
+                                       "lineup_source": r.get("lineup_source")})
     games_out.append(game)
 
 # ---- score every batter via model.project_player ----
@@ -401,6 +406,14 @@ for game in games_out:
 
             rec = dict(r)
             rec.update({
+                # Where this batting slot came from, carried through to the page.
+                # Slot drives expected PAs, so a projected card and an official
+                # one are not the same confidence and the site should not
+                # present them as if they were.
+                "lineup_confirmed": (False if isinstance(batter, str)
+                                     else bool(batter.get("lineup_confirmed"))),
+                "lineup_source":    ("" if isinstance(batter, str)
+                                     else (batter.get("lineup_source") or "")),
                 "game":          game["label"],
                 "gamePk":        gl_pk_by_label.get(game["label"]),
                 "mid":           batd.get("mid"),   # MLB player id for game logs
@@ -1007,6 +1020,8 @@ for _gk, _meta in _po_slate.items():
             "implied": r.get("dk_hr_implied"), "edge": r.get("hr_edge"),
             "opp_p": r.get("opp_pitcher"), "opp_hand": r.get("opp_pitcher_hand"),
             "oct": (_o or {}).get("score"),
+            "lineup_confirmed": r.get("lineup_confirmed"),
+            "lineup_source": r.get("lineup_source"),
         })
     _arms = []
     for p in pitchers_out:
@@ -1019,15 +1034,27 @@ for _gk, _meta in _po_slate.items():
                               "ip_proj", "pitches", "hr_allowed", "win_pct")},
                           "oct": (_op or {}).get("score"),
                           "oct_role": (_op or {}).get("role")})
+    _rate_bats = [dict(_oct_h[nk(b["name"])], **{"game": _label})
+                  for b in _bats if nk(b["name"]) in _oct_h]
+    _rate_arms = [dict(_oct_p[nk(a["name"])], **{"game": _label})
+                  for a in _arms if nk(a["name"]) in _oct_p]
     _po_games.append({
+        "rate_hitters": sorted(_rate_bats, key=lambda r: -(r.get("score") or 0)),
+        "rate_pitchers": sorted(_rate_arms, key=lambda r: -(r.get("score") or 0)),
         "key": _label, "away": _meta["away"], "home": _meta["home"],
         "round": _meta.get("round"), "time": _rows[0].get("time"),
         "venue": _rows[0].get("venue"), "weather": _rows[0].get("weather_label"),
         "park_hr": _rows[0].get("park_hr"), "gamePk": _meta.get("gamePk"),
+        "start": _meta.get("start"),
         "series_game": _meta.get("series_game"), "series_len": _meta.get("series_len"),
         "hitters": _bats, "pitchers": _arms,
+        # lineup confidence for the whole card: official beats a beatwriter
+        # projection, and the page says which it is rather than implying both
+        # are the same read
+        "lineup_confirmed": all(b.get("lineup_confirmed") for b in _bats) if _bats else False,
+        "lineup_sources": sorted({b.get("lineup_source") for b in _bats if b.get("lineup_source")}),
     })
-_po_games.sort(key=lambda g: (g.get("key") or ""))
+_po_games.sort(key=lambda g: (g.get("start") or "", g.get("key") or ""))
 
 shell = replace_const(shell, "PLAYOFF_FIELD", _po_field)
 shell = replace_const(shell, "PLAYOFF_GAMES", _po_games)

@@ -365,7 +365,7 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
 .lineup-hdr{padding:12px 20px 8px;border-bottom:1px solid var(--border)}
 .lineup-body{padding:16px 20px 32px}
 .lu-game-btn{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:7px 10px;cursor:pointer;text-align:left;transition:border-color .15s,background .15s;width:100%}
-.lu-game-btn.active{border-color:var(--purple);background:rgba(176,56,249,.08)}
+.lu-game-btn.active{border-color:var(--logo-purple);background:rgba(176,56,249,.08)}
 .lu-game-btn:hover{border-color:var(--text3)}
 .lu-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:8px;display:flex;align-items:center;gap:14px}
 .lu-slot{font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--text3);text-transform:uppercase;width:36px;flex-shrink:0}
@@ -1236,6 +1236,9 @@ body.parlay-armed .mkt-chip, body.parlay-armed .mkt-ou, body.parlay-armed .gc-be
 .po-round { font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:.07em;
             color:var(--logo-purple); background:rgba(176,56,249,.14);
             border:1px solid rgba(176,56,249,.35); border-radius:5px; padding:2px 7px; }
+.po-lu { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.05em;
+          color:var(--text3); border:1px solid var(--border2); border-radius:5px; padding:2px 7px; }
+.po-lu.is-conf { color:var(--green); border-color:rgba(97,233,112,.35); background:rgba(97,233,112,.08); }
 .po-sub { padding:9px 15px 4px; font-size:9.5px; font-weight:700; color:var(--text3);
           text-transform:uppercase; letter-spacing:.06em; }
 .po-tbl { width:100%; border-collapse:collapse; font-size:11.5px; }
@@ -2733,7 +2736,7 @@ function openSwapPanel(outName, slot) {
   panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1000;background:var(--bg2);border:1px solid var(--border2);border-radius:14px;padding:16px;width:360px;max-height:72vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,.8)';
 
   let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">'
-    +'<div><div style="font-size:13px;font-weight:700">Swap out: <span style="color:var(--purple)">'+outName+'</span></div>'
+    +'<div><div style="font-size:13px;font-weight:700">Swap out: <span style="color:var(--logo-purple)">'+outName+'</span></div>'
     +'<div style="font-size:10px;color:var(--text3);margin-top:2px">Slot: '+slot+' · Salary room: $'+salRoom.toLocaleString()+'</div></div>'
     +'<button id="swap-close" style="background:none;border:none;color:var(--text3);font-size:22px;cursor:pointer;line-height:1">&times;</button>'
     +'</div>'
@@ -2762,7 +2765,7 @@ function openSwapPanel(outName, slot) {
           +'<div style="font-size:13px;font-weight:800;color:var(--green)">'+pts+'</div>'
           +'<div style="font-size:10px;color:var(--text3)">'+sal+'</div>'
         +'</div>'
-        +'<button class="do-swap-btn" data-out="'+safeOut+'" data-in="'+safeN+'" style="background:var(--purple);color:#fff;border:none;border-radius:7px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer">In</button>'
+        +'<button class="do-swap-btn" data-out="'+safeOut+'" data-in="'+safeN+'" style="background:var(--logo-purple);color:#fff;border:none;border-radius:7px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer">In</button>'
         +'</div>';
     }).join('');
   }
@@ -2852,10 +2855,10 @@ function renderLineup(result, stack) {
         '">' + (p.hr_edge > 0 ? '+' : '') + p.hr_edge + '% edge</span>'
       : '';
     const stackBadge = isStacked
-      ? '<span style="font-size:9px;font-weight:700;color:var(--purple);background:rgba(176,56,249,.15);padding:1px 5px;border-radius:4px;margin-left:6px;vertical-align:middle">STACK</span>'
+      ? '<span style="font-size:9px;font-weight:700;color:var(--logo-purple);background:rgba(176,56,249,.15);padding:1px 5px;border-radius:4px;margin-left:6px;vertical-align:middle">STACK</span>'
       : '';
 
-    return '<div class="lu-card" style="' + (isStacked ? 'border:2px solid var(--purple)' : 'border:1px solid var(--border)') + '">' +
+    return '<div class="lu-card" style="' + (isStacked ? 'border:2px solid var(--logo-purple)' : 'border:1px solid var(--border)') + '">' +
       '<div class="lu-slot" style="color:' + (isPit ? '#d795ff' : 'var(--text3)') + '">' + displaySlot + '</div>' +
       (p.mid ? '<span class="rk-hs" style="width:26px;height:26px;background-image:url(https://midfield.mlbstatic.com/v1/people/' + p.mid + '/spots/60)"></span>' : teamBadge(p.team||'', '26')) +
       '<div style="flex:1;min-width:0">' +
@@ -6487,6 +6490,16 @@ function poSwitch(v) {
   renderPlayoffs();
 }
 function poToggle(k) { poExpand[k] = !poExpand[k]; renderPlayoffs(); }
+// Batting slot drives expected plate appearances, so a projected card and an
+// official one are not the same confidence. Say which it is rather than letting
+// a beatwriter's guess read like a posted lineup.
+function poLineupBadge(g) {
+  if (g.lineup_confirmed) {
+    return '<span class="po-lu is-conf">Lineups official</span>';
+  }
+  const rw = (g.lineup_sources || []).some(s => (s || '').indexOf('rotowire') === 0);
+  return `<span class="po-lu">${rw ? 'Projected lineups (Rotowire)' : 'Projected lineups'}</span>`;
+}
 // Edge only means something against a price. An unpriced bat has no edge, and
 // printing "0.0" for it would read as "fairly priced" when it actually means
 // "no market" - the same honesty rule the board uses (no odds, no edge, no pick).
@@ -6514,7 +6527,7 @@ function poRenderBoard() {
     const bats = open ? g.hitters : (g.hitters || []).slice(0, 6);
     const rows = bats.map(b => `<tr class="${(b.odds != null && b.edge != null && b.edge >= 1.5) ? 'edge-play' : ''}">
         <td><span class="po-pname">${b.name}</span>
-            <span class="po-pmeta">${b.team}${b.order ? ' · ' + b.order : ''}${b.hand ? ' · ' + b.hand : ''}${b.opp_p ? ' vs ' + b.opp_p : ''}</span></td>
+            <span class="po-pmeta">${b.team}${b.order ? ' · bats ' + b.order : ''}${b.hand ? ' · ' + b.hand : ''}${b.opp_p ? ' vs ' + b.opp_p : ''}</span></td>
         <td><span class="po-prob">${b.hr_prob != null ? b.hr_prob.toFixed(1) + '%' : '—'}</span></td>
         <td>${b.odds != null ? fmtOdds(b.odds) : '—'}</td>
         <td>${b.implied != null ? b.implied.toFixed(1) + '%' : '—'}</td>
@@ -6536,7 +6549,10 @@ function poRenderBoard() {
           <div class="po-gmatch">${g.away} @ ${g.home}</div>
           <div class="po-gmeta">${g.time || ''}${g.venue ? ' · ' + g.venue : ''}${g.weather ? ' · ' + g.weather : ''}${g.park_hr != null ? ' · park ' + g.park_hr.toFixed(2) + 'x' : ''}</div>
         </div>
-        <span class="po-round">${g.round || 'Postseason'}${g.series_game ? ' G' + g.series_game : ''}</span>
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+          <span class="po-round">${g.round || 'Postseason'}${g.series_game ? ' G' + g.series_game : ''}</span>
+          ${poLineupBadge(g)}
+        </div>
       </div>
       <div class="po-sub">Home run projections</div>
       <table class="po-tbl">
@@ -6605,8 +6621,34 @@ function renderPlayoffs() {
     poRenderBoard();
     return;
   }
+  // leaving the ratings views: the game board must go, or it stays stacked
+  // above the rating cards
   if (board) board.innerHTML = '';
 
+  // Ratings are grouped BY GAME, not as one flat list of the whole field. A
+  // league-wide leaderboard does not help price a prop in tonight's game; the
+  // useful question is who in THIS matchup profiles best for October.
+  const pgames = (typeof PLAYOFF_GAMES !== 'undefined' ? PLAYOFF_GAMES : []) || [];
+  if (pgames.length) {
+    if (note) {
+      note.innerHTML = poView === 'hit'
+        ? 'Bats in tonight\'s games, rated on what October asks of them: power (35), contact against elite arms (25), the <b>weaker</b> side of the platoon split (20, because bullpens matchup hunt from the 6th), late/close (12) and runners in scoring position (8). Late/close samples are small, a median of about 49 plate appearances, so that component is regressed hard toward zero and the raw split and its sample are printed on every card.'
+        : 'Arms in tonight\'s games, rated on what October asks of them: strikeouts (35), home run suppression (22), how well he holds past 76 pitches (18), late/close (15) and runners in scoring position (10). Relievers have no 76+ pitch sample and score neutral there rather than being penalised for their role. Late/close samples are tiny, a median of about 27 batters faced, so that component is regressed hard toward zero.';
+    }
+    grid.innerHTML = pgames.map(g => {
+      const rows = (poView === 'hit' ? g.rate_hitters : g.rate_pitchers) || [];
+      if (!rows.length) return '';
+      return `<div style="grid-column:1/-1">
+          <div class="po-sub" style="padding-left:0">${g.away} @ ${g.home} · ${g.time || ''} · ${g.round || ''}</div>
+        </div>` + rows.map(r => poRateCard(r)).join('');
+    }).join('');
+    if (!grid.innerHTML) {
+      grid.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:20px">No rated players in tonight\'s games yet.</div>';
+    }
+    return;
+  }
+
+  // No playoff games today: fall back to the full clinched field.
   const rows = poView === 'hit' ? hitters : arms;
   if (note) {
     note.innerHTML = poView === 'hit'
@@ -6618,7 +6660,12 @@ function renderPlayoffs() {
     return;
   }
 
-  grid.innerHTML = rows.map(r => {
+  grid.innerHTML = rows.map(r => poRateCard(r)).join('');
+}
+
+// one card renderer, shared by the per-game view and the whole-field fallback
+function poRateCard(r) {
+  {
     const elite = (r.score || 0) >= 70;
     if (poView === 'hit') {
       return `<div class="po-card${elite ? ' elite' : ''}">
@@ -6666,7 +6713,7 @@ function renderPlayoffs() {
           : 'no 76+ pitch sample, scored neutral there'}
       </div>
     </div>`;
-  }).join('');
+  }
 }
 
 function renderPitchers() {
