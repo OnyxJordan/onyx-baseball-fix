@@ -31,7 +31,7 @@ ever be presented as a clean read on who is "clutch."
 Cheap by design: the league-wide statSplits endpoint returns every player for a
 situation in ONE call, so this is a couple of dozen requests, not one per player.
 """
-import json, sys, time
+import json, subprocess, sys, time
 from pathlib import Path
 
 import requests
@@ -251,28 +251,47 @@ def season_totals(group, who):
 
 
 def _fresh_enough(hours):
-    """True when playoffs.json was written within `hours`.
+    """True when playoffs.json was last COMMITTED within `hours`.
 
     The ratings are built from FINAL regular-season stats, so once the season
     ends they barely move — re-pulling ~25 league-wide calls every 30 minutes
     would be pure waste against an API we share with production. The refresh
     workflow therefore passes --if-stale and this becomes a cheap no-op, the
     same way grading is a no-op when nothing is pending.
+
+    AGE COMES FROM GIT, NOT FILE MTIME. `actions/checkout` writes every file
+    fresh, so in CI an mtime check reports "just written" forever and the guard
+    would skip on every single run — the ratings would never refresh again.
+    fetch_odds.py learned this exact lesson on odds.json ("year-old odds look
+    minutes old"); this mirrors its fix. mtime is only the local fallback for a
+    file git has never seen.
     """
     f = OUT / "playoffs.json"
     if not f.exists() or f.stat().st_size < 200:
         return False
-    age_h = (time.time() - f.stat().st_mtime) / 3600.0
+    ts = None
+    try:
+        out = subprocess.run(["git", "log", "-1", "--format=%ct", "--", str(f)],
+                             capture_output=True, text=True, timeout=15)
+        if out.returncode == 0 and out.stdout.strip():
+            ts = float(out.stdout.strip())
+    except Exception:
+        pass
+    if ts is None:
+        ts = f.stat().st_mtime          # never committed: fall back to mtime
+    age_h = (time.time() - ts) / 3600.0
     if age_h < hours:
-        print(f"playoffs.json is {age_h:.1f}h old (< {hours}h) — skipping fetch")
+        print(f"playoffs.json last changed {age_h:.1f}h ago (< {hours}h) — skipping fetch")
         return True
+    print(f"playoffs.json is {age_h:.1f}h old (>= {hours}h) — refreshing")
     return False
 
 
 def main():
-    # --if-stale N: only do the work when the payload is older than N hours
+    # --if-stale N: only do the work when the payload is older than N hours.
+    # --force overrides it, so a run can always be forced from the Actions tab.
     argv = sys.argv[1:]
-    if "--if-stale" in argv:
+    if "--if-stale" in argv and "--force" not in argv:
         try:
             hrs = float(argv[argv.index("--if-stale") + 1])
         except (IndexError, ValueError):
