@@ -35,14 +35,15 @@ const path = require('path');
 const { execFileSync } = require('child_process');
 
 const TABS = ['home', 'gamecenter', 'board', 'power', 'pitchers',
-              'record', 'markets', 'rankings', 'model'];
+              'record', 'markets', 'rankings', 'model', 'playoffs'];
 
 // Injected globals that are read through a `typeof` guard somewhere above their
 // declaration. A const here is a site-blanker: index.html is ONE <script> block,
 // so an early read lands in the temporal dead zone and throws. Keep this list in
 // sync with the audit table in README -> Injected globals.
 const GUARDED_GLOBALS = ['LINE_HISTORY', 'PICKS', 'TICKET_LOCK', 'DAILY_RECAP',
-                         'RESULTS', 'SUMMARIES', 'PITCHER_PROJ', 'ONYX_PLAYER_IDS'];
+                         'RESULTS', 'SUMMARIES', 'PITCHER_PROJ', 'ONYX_PLAYER_IDS',
+                         'PLAYOFF_FIELD', 'PLAYOFF_HITTERS', 'PLAYOFF_PITCHERS'];
 
 const LIVE_URL = 'https://onyxjordan.github.io/onyx-baseball-fix/index.html';
 const PORT = Number(process.env.PROBE_PORT || 8901);

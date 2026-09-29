@@ -1,5 +1,35 @@
 """
-model.py — Onyx Baseball v41 HR probability model + pitcher K projections
+model.py — Onyx Baseball v42 HR probability model + pitcher K projections
+           + October Impact (playoff leverage) module
+
+v42: ADDITIVE ONLY — the HR and K math is byte-for-byte unchanged, so every
+graded ledger stays continuous across this bump and no pick, ticket leg, K call
+or HR-edge row means anything different than it did under v41. What is new is
+`october_score_hitters()` / `october_score_pitchers()`, which rate the clinched
+field on the things that actually decide postseason games, for the Playoffs tab.
+It is a RATING, not a priced projection: nothing in it feeds the board, the
+picks, the ticket or any ledger, and it must never be graded as if it were.
+
+The evidence question for a new module is "what do you know, and how much of it
+is real?" — so, plainly:
+  - WHAT CHANGES IN OCTOBER is not in dispute. Bullpens shorten and managers
+    matchup-hunt from the 6th (so a weak platoon side gets attacked nightly),
+    starters get pulled at the first hint of a third time through (so how long
+    a starter holds matters more than his ERA), and runs get scarce (so the
+    late innings carry weight far beyond their share of PAs). Those three map
+    onto vl/vr, pi000-vs-pi076, and lc/risp/ig07.
+  - WHAT IS MOSTLY NOISE is "clutch." Measured on this field TODAY, the median
+    hitter has 49 late/close PA and the median pitcher 27 late/close batters
+    faced. A 49-PA split cannot separate skill from luck; Schwarber's 1.258 lc
+    OPS against his .857 season line is a +0.40 swing on 67 PA, which is a
+    story, not a finding. So the leverage term is regressed toward ZERO by its
+    own sample (K=250 PA hitters / 200 BF pitchers — at the median that keeps
+    ~16% and ~12% of the observed delta), it is capped, and it is only one
+    component of five. The raw split and its sample ship to the page so the
+    number can be checked rather than believed.
+The large-sample components (power, contact, strikeout ability, HR suppression)
+carry the weight, exactly as everywhere else in this model: large samples decide,
+recency advises, and a small sample gets regressed until it stops lying.
 
 v41: September study (7,055 player-games, 751 HR, 8/5-9/5, archived
 pregame boards joined to box scores). The v36-v39 arc WORKED below
@@ -1169,4 +1199,213 @@ def project_pitcher(name, pdb_entry=None, l14=None, season=None,
         out["k_over"]  = k_line.get("over")
         out["k_under"] = k_line.get("under")
         out["k_edge"]  = round(k_proj - float(k_line["line"]), 2)
+    return out
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# OCTOBER IMPACT (v42) — rating the clinched field for postseason leverage.
+#
+# Read the v42 note at the top of this file before touching any weight here.
+# The short version: the large-sample components decide, the leverage delta is
+# regressed toward zero by its own sample size because "clutch" measured on ~49
+# PA is noise, and NOTHING in here is priced, bet, or graded.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# regression constants for the leverage deltas. At this field's medians (49 lc
+# PA for hitters, 27 lc BF for pitchers) these keep ~16% and ~12% of the observed
+# delta. That is deliberately harsh: the alternative is a leaderboard of whoever
+# got hot in 50 plate appearances.
+LEV_REG_PA = 250.0
+LEV_REG_BF = 200.0
+
+# league reference points for 2026, used to put each component on a common scale.
+# These are anchors for a RELATIVE rating, not projections in their own right.
+OCT_REF = {
+    "iso": 0.150, "hr_pa": 0.0290, "k_pct": 0.222, "bb_pct": 0.085,
+    "k_bf": 0.222, "hr_bf": 0.0290, "oppavg": 0.245,
+}
+
+
+def _clamp(v, lo, hi):
+    return max(lo, min(hi, v))
+
+
+def _scale(value, ref, spread, invert=False):
+    """Map a rate onto a 0-100 scale centred at 50 for a league-average mark.
+
+    `spread` is the distance from the reference that should read as +25 points,
+    so a two-spread player lands near 100 and a two-spread-poor player near 0.
+    """
+    if value is None or ref is None or not spread:
+        return None
+    d = (value - ref) / spread
+    if invert:
+        d = -d
+    return _clamp(50.0 + 25.0 * d, 0.0, 100.0)
+
+
+def _regressed_delta(split, overall, key, sample_key, reg_const, cap=0.25):
+    """The honest form of a 'clutch' number.
+
+    Returns the observed (split - overall) difference shrunk toward zero by its
+    own sample: delta * n/(n+K). A 49-PA split keeps a sixth of what it claims.
+    Returns 0.0 when there is no split at all, never None, so a player without
+    the sample is treated as league-neutral rather than punished or rewarded.
+    """
+    if not split or not overall:
+        return 0.0, 0
+    n = split.get(sample_key) or 0
+    a, b = split.get(key), overall.get(key)
+    if a is None or b is None or n <= 0:
+        return 0.0, n
+    raw = a - b
+    shrunk = raw * (n / (n + reg_const))
+    return _clamp(shrunk, -cap, cap), n
+
+
+def october_score_hitters(hitters: list) -> list:
+    """Rate playoff-roster bats on what October actually asks of them.
+
+    Components (weight):
+      power 35 .......... ISO + HR/PA. Runs get scarce and rallies get shorter;
+                          the bat that can end an inning by itself keeps its
+                          value when singles stop stringing together.
+      contact 25 ........ strikeout rate. Postseason staffs are top-decile and
+                          bullpens are all high-leverage arms; a K-prone bat
+                          gets exposed far more than it does in July.
+      platoon 20 ........ the WEAKER side of vl/vr. Managers matchup-hunt from
+                          the 6th on, so a bat is worth roughly what its worst
+                          side is worth — this is scored on the weak side, not
+                          the average, and that is the point.
+      leverage 12 ....... regressed lc OPS delta (see LEV_REG_PA).
+      traffic 8 ......... regressed RISP OPS delta. Bigger sample than lc
+                          (median 115 PA), so it survives regression better.
+    """
+    out = []
+    for h in hitters or []:
+        s = h.get("season") or {}
+        sp = h.get("splits") or {}
+        if not s.get("pa"):
+            continue
+
+        power = _scale(s.get("iso"), OCT_REF["iso"], 0.060)
+        hrp = _scale(s.get("hr_pa"), OCT_REF["hr_pa"], 0.0150)
+        if power is not None and hrp is not None:
+            power = 0.6 * power + 0.4 * hrp
+        contact = _scale(s.get("k_pct"), OCT_REF["k_pct"], 0.055, invert=True)
+
+        # platoon: score the weak side. A bat with no soft side cannot be
+        # matchup-hunted out of the game in the 7th.
+        vl, vr = sp.get("vl") or {}, sp.get("vr") or {}
+        sides = [x.get("ops") for x in (vl, vr) if x.get("ops") is not None
+                 and (x.get("pa") or 0) >= 40]
+        platoon = _scale(min(sides), 0.720, 0.110) if sides else 50.0
+
+        lev_d, lev_n = _regressed_delta(sp.get("lc"), s, "ops", "pa", LEV_REG_PA)
+        risp_d, risp_n = _regressed_delta(sp.get("risp"), s, "ops", "pa", LEV_REG_PA)
+        leverage = _clamp(50.0 + 200.0 * lev_d, 0.0, 100.0)
+        traffic = _clamp(50.0 + 200.0 * risp_d, 0.0, 100.0)
+
+        parts = [(power, 35), (contact, 25), (platoon, 20),
+                 (leverage, 12), (traffic, 8)]
+        num = sum(v * w for v, w in parts if v is not None)
+        den = sum(w for v, w in parts if v is not None)
+        score = round(num / den, 1) if den else None
+
+        out.append({
+            "id": h.get("id"), "name": h.get("name"), "team": h.get("team"),
+            "league": h.get("league"), "seed": h.get("seed"), "pos": h.get("pos"),
+            "score": score,
+            "power": round(power, 1) if power is not None else None,
+            "contact": round(contact, 1) if contact is not None else None,
+            "platoon": round(platoon, 1) if platoon is not None else None,
+            "leverage": round(leverage, 1),
+            "traffic": round(traffic, 1),
+            "pa": s.get("pa"), "hr": s.get("hr"), "iso": s.get("iso"),
+            "k_pct": s.get("k_pct"), "ops": s.get("ops"),
+            # raw splits + samples ship so the rating can be checked, not believed
+            "lc_ops": (sp.get("lc") or {}).get("ops"), "lc_pa": lev_n,
+            "risp_ops": (sp.get("risp") or {}).get("ops"), "risp_pa": risp_n,
+            "vl_ops": vl.get("ops"), "vl_pa": vl.get("pa"),
+            "vr_ops": vr.get("ops"), "vr_pa": vr.get("pa"),
+        })
+    out.sort(key=lambda r: -(r["score"] or 0))
+    for i, r in enumerate(out):
+        r["rank"] = i + 1
+    return out
+
+
+def october_score_pitchers(pitchers: list) -> list:
+    """Rate playoff-roster arms on what October actually asks of them.
+
+    Components (weight):
+      strikeouts 35 ..... K/BF. The one outcome that needs no defense behind it
+                          and cannot be undone by a bad hop in a tight game.
+      hr_suppress 22 .... HR/BF. The postseason run that beats you is usually
+                          hit over a fence, not strung together.
+      stamina 18 ........ pitches 76+ vs the first 75 (opponent average). A
+                          starter who holds the third time through saves a
+                          bullpen across a series; one who collapses hands the
+                          game to it. Relievers have no pi076 sample and score
+                          neutral rather than being penalised for their role.
+      leverage 15 ....... regressed lc opponent-average delta (lower better).
+      traffic 10 ........ regressed RISP opponent-average delta.
+    """
+    out = []
+    for p in pitchers or []:
+        s = p.get("season") or {}
+        sp = p.get("splits") or {}
+        if not s.get("bf"):
+            continue
+
+        ks = _scale(s.get("k_bf"), OCT_REF["k_bf"], 0.055)
+        hrs = _scale(s.get("hr_bf"), OCT_REF["hr_bf"], 0.0130, invert=True)
+
+        # Role is games started, NOT whether a pi076 sample exists. An ace on an
+        # innings limit still starts Game 2, and labelling him a reliever because
+        # he rarely passed 76 pitches would be exactly backwards.
+        starter = (s.get("gs") or 0) >= 5
+
+        # stamina only means something for arms that actually reach 76 pitches;
+        # everyone else scores neutral rather than being punished for their role.
+        early, late = sp.get("pi000") or {}, sp.get("pi076") or {}
+        if (late.get("bf") or 0) >= 30 and early.get("oppavg") is not None:
+            decay = (late.get("oppavg") or 0) - (early.get("oppavg") or 0)
+            stamina = _clamp(50.0 - 500.0 * decay, 0.0, 100.0)
+            has_stamina = True
+        else:
+            stamina, has_stamina = 50.0, False
+
+        lev_d, lev_n = _regressed_delta(sp.get("lc"), s, "oppavg", "bf",
+                                        LEV_REG_BF, cap=0.12)
+        risp_d, risp_n = _regressed_delta(sp.get("risp"), s, "oppavg", "bf",
+                                          LEV_REG_BF, cap=0.12)
+        leverage = _clamp(50.0 - 400.0 * lev_d, 0.0, 100.0)   # lower opp avg = better
+        traffic = _clamp(50.0 - 400.0 * risp_d, 0.0, 100.0)
+
+        parts = [(ks, 35), (hrs, 22), (stamina, 18), (leverage, 15), (traffic, 10)]
+        num = sum(v * w for v, w in parts if v is not None)
+        den = sum(w for v, w in parts if v is not None)
+        score = round(num / den, 1) if den else None
+
+        out.append({
+            "id": p.get("id"), "name": p.get("name"), "team": p.get("team"),
+            "league": p.get("league"), "seed": p.get("seed"),
+            "role": "SP" if starter else "RP",
+            "score": score,
+            "ks": round(ks, 1) if ks is not None else None,
+            "hr_suppress": round(hrs, 1) if hrs is not None else None,
+            "stamina": round(stamina, 1), "has_stamina": has_stamina,
+            "gs": s.get("gs"),
+            "leverage": round(leverage, 1), "traffic": round(traffic, 1),
+            "bf": s.get("bf"), "ip": s.get("ip"), "k_bf": s.get("k_bf"),
+            "hr9": s.get("hr9"), "bb_bf": s.get("bb_bf"), "oppavg": s.get("oppavg"),
+            "lc_oppavg": (sp.get("lc") or {}).get("oppavg"), "lc_bf": lev_n,
+            "risp_oppavg": (sp.get("risp") or {}).get("oppavg"), "risp_bf": risp_n,
+            "early_oppavg": early.get("oppavg"), "late_oppavg": late.get("oppavg"),
+            "late_bf": late.get("bf"),
+        })
+    out.sort(key=lambda r: -(r["score"] or 0))
+    for i, r in enumerate(out):
+        r["rank"] = i + 1
     return out

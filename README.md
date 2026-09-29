@@ -9,7 +9,7 @@ one-tap bet buttons and the Parlay Builder. **Parlays are the product.**
 - **Live site:** https://onyxjordan.github.io/onyx-baseball-fix/ (GitHub Pages, PWA installable)
 - **Repo:** `OnyxJordan/onyx-baseball-fix` · owner: Jordan (marketing lead, jordan@onyxodds.com)
 - **Dev branch convention:** work on a `claude/...` feature branch, PR to `main`, squash-merge
-- **Current model:** v41 (see the changelog at the top of `model.py` — every version documents its evidence)
+- **Current model:** v42 (see the changelog at the top of `model.py` — every version documents its evidence)
 - **Agent rules:** [CLAUDE.md](CLAUDE.md) is the auto-loaded short form of the hard rules below. Keep the two in sync.
 
 ---
@@ -58,6 +58,7 @@ Stats API.
 | `fetch_odds.py` | The Odds API consensus HR props + game lines (`ODDS_API_KEY` secret). Respects `onyx_ts` freshness stamps so it never clobbers newer Onyx prices. Also appends market snapshots to `line_history.json` |
 | `fetch_onyx.py` | OpticOdds (`OPTICODDS_API_KEY` secret): Onyx book game links/fixture ids (`onyx_games.json`), full-board prices (ML/totals/HR props — **HR props MERGE over consensus, never replace**), player ids for share links (`onyx_players.json` — learned from prop rows, the `/players` pager alone is insufficient) |
 | `heal_hands.py` | pitcher handedness repair |
+| `fetch_playoffs.py` | the clinched field plus the high-leverage splits behind the Playoffs tab (`lc` late/close, `risp`, `vl`/`vr`, `pi000`/`pi076`). Takes `--if-stale N` so the 30-minute refresh no-ops instead of re-pulling final regular-season stats |
 | `grade_picks.py` | grades everything pending against final box scores: picks, ticket legs, K calls, HR-edge plays. Scratches void after 2 days. One shared `day_hr_map()` per date serves all four ledgers |
 | `calibrate.py` | self-calibration from graded picks: `scale = (actual+15)/(expected+15)`, clamped 0.75–1.15, written to `data/calibration.json`, read by `model.py` |
 | `generate_recap.py` | daily recap blurb |
@@ -104,7 +105,7 @@ rows in all four ledgers. Never date anything off UTC "today."
 
 ---
 
-## The model (`model.py`, v41)
+## The model (`model.py`, v42)
 
 Read the changelog at the top of the file first — it is the authoritative history, and
 each entry cites its evidence. Philosophy: **large samples decide, recency advises,
@@ -187,7 +188,7 @@ Grading conventions: never-appeared = void (`"void"`/`"dnp"`), client checks are
 ## Injected globals: the TDZ rule, precisely
 
 `auto_build.py` injects 12 globals via `replace_const()`; `update_stats.py` injects
-`PICKS` separately — 13 in total. `replace_const` rewrites the *value* and preserves
+`PICKS` separately — 16 in total. `replace_const` rewrites the *value* and preserves
 whatever keyword is already in `shell.html`, so the keyword is a property of the shell,
 not the builder. Changing a global's keyword means a surgical shell edit.
 
@@ -206,6 +207,7 @@ Current state:
 | `TEAM_LOGOS` | const | 2830 | 3638 | safe |
 | `PITCHER_PROJ` | const | 6370 | 6378 | safe |
 | `LINE_HISTORY` | var | 6374 | 5112 | fixed, was the one violation |
+| `PLAYOFF_FIELD`, `PLAYOFF_HITTERS`, `PLAYOFF_PITCHERS` | var | 6435-6437 | read in `renderPlayoffs()` | safe (var) |
 
 **Why the whole file is one scope:** `index.html` carries a single `<script>` block
 spanning roughly lines 2434-7004. Every global above shares it, so a `const` declared at
@@ -222,6 +224,48 @@ It never blanked the site only because the one reachable early caller (`gcBetBar
 3926) wraps it in `try/catch`, so the error was swallowed and the line-movement chip
 rendered blank instead. Standing rule: **any new typeof-guarded global goes in this
 table, and an un-caught early caller of one is a site-blanker.**
+
+## Playoffs tab: October Impact (v42)
+
+A rating of the clinched field for postseason baseball, on its own tab. **It is a
+rating, not a priced projection.** Nothing in it reaches the board, the picks, the
+ticket or any ledger, so it cannot move the graded record and must never be graded
+as if it were a bet.
+
+`fetch_playoffs.py` reads the API's `clinched` flag for the field (never inferred
+from win totals — tiebreakers are exactly how you end up publishing a wrong
+bracket), pulls the active roster of each clinched club, then pulls league-wide
+situational splits in single bulk calls and keeps the playoff-roster rows.
+
+Three things change in October, and each maps to a split:
+
+| what changes | split | used for |
+|---|---|---|
+| bullpens shorten, managers matchup-hunt from the 6th | `vl` / `vr` | a bat is scored on its **weaker** platoon side, not its average |
+| starters get pulled at the first hint of a third time through | `pi000` vs `pi076` | how well an arm holds past 76 pitches |
+| runs get scarce, late innings decide games | `lc`, `risp`, `ig07` | leverage and traffic components |
+
+`lc` (Late / Close) is the API's own high-leverage proxy: 7th inning or later with
+the tying run at least on deck.
+
+**The honesty problem, and what is done about it.** These split samples are small:
+on the current field the median hitter has **49** late/close PA and the median
+pitcher **27** late/close batters faced. "Clutch" measured on 49 PA is mostly noise.
+So the leverage and RISP components are regressed toward **zero** by their own
+sample (`delta × n/(n+K)`, K=250 PA hitters / 200 BF pitchers — at the median that
+keeps ~16% and ~12% of the observed delta), they are capped, and they are minority
+weights. The large-sample components carry the score:
+
+- **hitters** — power 35, contact vs elite arms 25, weaker platoon side 20, late/close 12, RISP 8
+- **pitchers** — strikeouts 35, HR suppression 22, past-76-pitches 18, late/close 15, RISP 10
+
+Every card prints the raw split **and its sample size**, and a rate with an empty
+sample renders as a dash rather than `.000`. Relievers have no 76+ pitch sample and
+score neutral there rather than being penalised for their role; role comes from
+games started, not from whether that sample exists.
+
+Before the first clinch the tab says so and shows nothing — it does not invent a
+bracket.
 
 ## Onyx integration
 
@@ -311,7 +355,7 @@ node tools/verify_shell.js --live            # checks the DEPLOYED page
 
 `tools/verify_shell.js` is the gate: it serves the repo on :8901, loads
 `index.html` at 390x844, reads every typeof-guarded global, calls `mktHist()`,
-walks all **nine** tabs, greps rendered text for `undefined` / `NaN` /
+walks all **ten** tabs, greps rendered text for `undefined` / `NaN` /
 `[object Object]`, and exits non-zero on any uncaught page error. Run it before
 you push and again with `--live` after the deploy lands.
 
@@ -320,9 +364,9 @@ cost a cycle on 9/23:
 
 - **Switch tabs with `gotoTab()`, never by clicking `[data-tab=...]`.** At 390px
   several tabs exist only in the hamburger drawer, so clicking the nav silently
-  skips them and the probe passes on tabs it never opened. There are **9** tabs
-  (home, gamecenter, board, power, pitchers, record, markets, rankings, model),
-  not 8 as this file said until 9/23.
+  skips them and the probe passes on tabs it never opened. There are **10** tabs
+  (home, gamecenter, board, power, pitchers, record, markets, rankings, model,
+  playoffs).
 - **Abort every off-origin request** (`page.route`) or the probe hangs on Google
   Fonts.
 - **`--live` cannot navigate to `https://` directly from a cloud session.** The

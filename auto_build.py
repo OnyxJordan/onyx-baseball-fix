@@ -964,6 +964,20 @@ shell = replace_const(shell, "K_HISTORY",
                       [p for p in _khist if isinstance(p, dict) and _k_conviction(p)])
 shell = replace_const(shell, "HR_RECORD", _hr_rec)
 
+# ---- Playoffs: October Impact ratings (v42) ----
+# A rating of the clinched field, NOT a priced projection: nothing here reaches
+# the board, the picks, the ticket or any ledger, so it can never move the graded
+# record. Empty until the first team clinches, and the tab says so itself.
+_po = jload(dpath("playoffs.json"), {}) or {}
+_po_field = _po.get("field") or []
+_po_hit = model.october_score_hitters(_po.get("hitters") or [])
+_po_pit = model.october_score_pitchers(_po.get("pitchers") or [])
+shell = replace_const(shell, "PLAYOFF_FIELD", _po_field)
+shell = replace_const(shell, "PLAYOFF_HITTERS", _po_hit)
+shell = replace_const(shell, "PLAYOFF_PITCHERS", _po_pit)
+print(f"playoffs: {len(_po_field)} clinched team(s), "
+      f"{len(_po_hit)} hitters, {len(_po_pit)} pitchers rated")
+
 # ---- Onyx game links: only today's harvested slugs ever ship ----
 from zoneinfo import ZoneInfo
 _onyx = jload(dpath("onyx_games.json"), {}) or {}

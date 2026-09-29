@@ -42,6 +42,10 @@ jobs:
           OPTICODDS_API_KEY: ${{ secrets.OPTICODDS_API_KEY }}
       - name: Heal pitcher hands
         run: python3 heal_hands.py
+      # unconditional here: the daily build is the one guaranteed full refresh
+      - name: Refresh playoff ratings
+        run: python3 fetch_playoffs.py
+        continue-on-error: true
       - name: Grade pending picks
         run: python3 grade_picks.py
       - name: Self-calibrate model
