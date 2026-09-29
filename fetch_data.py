@@ -817,6 +817,20 @@ def fetch_hand_splits():
     return out
 
 # ── 7d. STARTER SEASON STATS — K/BF, IP/GS, pitches/GS for K projections ─────
+def _ipf(v):
+    """MLB innings ("5.2" = five and two thirds) as a float.
+
+    Module level, not nested: _merge_recent_form() needs it too, and when it was
+    a local the recent-form pass raised NameError into a blanket except and
+    silently produced nothing.
+    """
+    try:
+        w, _, f = str(v or "0").partition(".")
+        return int(w) + {"1": 1 / 3, "2": 2 / 3}.get(f, 0.0)
+    except Exception:
+        return 0.0
+
+
 def fetch_starter_season():
     """Season pitching aggregates for today's probable starters, written to
     data/pitcher_season.json for model.project_pitcher(). Keyed by normalized
@@ -837,13 +851,6 @@ def fetch_starter_season():
         s = "".join(ch for ch in s if not unicodedata.combining(ch))
         s = _re.sub(r"[.’'\-]", " ", s)
         return _re.sub(r"\s+", " ", s).strip().lower()
-
-    def _ipf(v):
-        try:
-            w, _, f = str(v or "0").partition(".")
-            return int(w) + {"1": 1 / 3, "2": 2 / 3}.get(f, 0.0)
-        except Exception:
-            return 0.0
 
     names = set()
     games = gl if isinstance(gl, list) else list(gl.values())
@@ -900,9 +907,68 @@ def fetch_starter_season():
                             "wins":    int(stat.get("wins") or 0),
                             "era":     stat.get("era"),
                         })
+    _merge_recent_form(out, id_to_name, season)
     print(f"  Starter season: {len(out)} pitchers")
     (OUT / "pitcher_season.json").write_text(json.dumps(out, indent=2))
     return out
+
+
+def _merge_recent_form(out, id_to_name, season):
+    """Recent outing lengths per starter, so an OPENER WITH STARTS ON HIS RECORD
+    is caught (v44).
+
+    Season IP/GS averages the whole year and hides a role change. A pitcher who
+    made 20 normal starts and is now being used as an opener still shows ~5.5
+    IP/GS, so the model would price a full start for a two-inning outing - the
+    Blubaugh bug again, just wearing a starter's season line. v43 only caught
+    the gs=0 case.
+
+    Fix: read the last few appearances and use the length of his recent STARTS.
+    Only GS=1 entries count. That matters: Luzardo's most recent appearance on
+    9/27 was a one-inning relief cameo, and averaging it in would have branded a
+    genuine ace an opener.
+    """
+    print("Fetching recent starter form (opener detection)...")
+    flagged = 0
+    for pid, name in sorted(id_to_name.items()):
+        rec = out.get(name)
+        if rec is None:
+            continue
+        try:
+            r = requests.get(
+                f"https://statsapi.mlb.com/api/v1/people/{pid}/stats",
+                params={"stats": "gameLog", "group": "pitching",
+                        "season": season, "gameType": "R"},
+                timeout=25)
+            if r.status_code != 200:
+                continue
+            splits = ((r.json().get("stats") or [{}])[0]).get("splits") or []
+        except Exception as e:
+            # only the network call is tolerated quietly; a parse bug below must
+            # surface, because a silent except here is exactly how the first cut
+            # of this function produced nothing at all
+            print(f"  recent form: {name} fetch failed ({type(e).__name__}: {e})")
+            continue
+        if not splits:
+            continue
+        splits.sort(key=lambda e: e.get("date") or "")
+
+        starts = [e for e in splits if int((e.get("stat") or {}).get("gamesStarted") or 0) == 1]
+        recent = starts[-3:]
+        if recent:
+            ips = [_ipf((e.get("stat") or {}).get("inningsPitched")) for e in recent]
+            ips = [v for v in ips if v is not None]
+            if ips:
+                rec["r_ip"] = round(sum(ips) / len(ips), 2)
+                rec["r_n"] = len(ips)
+        # what he was used as last time out, regardless of starts
+        last = splits[-1]
+        rec["r_last_role"] = "SP" if int((last.get("stat") or {}).get("gamesStarted") or 0) == 1 else "RP"
+        if rec.get("r_ip") and rec.get("gs") and rec["r_ip"] < 3.5:
+            flagged += 1
+        time.sleep(0.15)      # shared API, do not hammer
+    print(f"  Recent form: {sum(1 for v in out.values() if v.get('r_ip'))} with recent starts, "
+          f"{flagged} short-outing flag(s)")
 
 # ── 7e. TEAM K% vs HAND — season-long, all 30 teams -> team_k.json ───────────
 def fetch_team_k():
