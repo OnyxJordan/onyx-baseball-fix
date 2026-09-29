@@ -1226,6 +1226,33 @@ body.parlay-armed .mkt-chip, body.parlay-armed .mkt-ou, body.parlay-armed .gc-be
           padding:6px 16px; font-size:12px; font-weight:700; cursor:pointer; }
 .po-tab.active { border-color:var(--logo-purple); color:#fff; background:rgba(176,56,249,.1); }
 .po-note { padding:0 20px 12px; font-size:10.5px; line-height:1.5; color:var(--text3); max-width:760px; }
+/* game-by-game playoff board */
+.po-game { background:var(--bg2); border:1px solid var(--border); border-radius:16px;
+           margin:0 20px 12px; overflow:hidden; }
+.po-ghead { display:flex; justify-content:space-between; align-items:center; gap:10px;
+            padding:12px 15px; border-bottom:1px solid var(--border); flex-wrap:wrap; }
+.po-gmatch { font-size:14px; font-weight:800; letter-spacing:.01em; }
+.po-gmeta { font-size:10.5px; color:var(--text3); margin-top:2px; }
+.po-round { font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:.07em;
+            color:var(--logo-purple); background:rgba(176,56,249,.14);
+            border:1px solid rgba(176,56,249,.35); border-radius:5px; padding:2px 7px; }
+.po-sub { padding:9px 15px 4px; font-size:9.5px; font-weight:700; color:var(--text3);
+          text-transform:uppercase; letter-spacing:.06em; }
+.po-tbl { width:100%; border-collapse:collapse; font-size:11.5px; }
+.po-tbl th { font-size:9px; text-transform:uppercase; letter-spacing:.05em; color:var(--text3);
+             font-weight:700; text-align:right; padding:5px 15px 5px 0; }
+.po-tbl th:first-child { text-align:left; padding-left:15px; }
+.po-tbl td { padding:6px 15px 6px 0; text-align:right; border-top:1px solid rgba(255,255,255,.04);
+             font-variant-numeric:tabular-nums; }
+.po-tbl td:first-child { text-align:left; padding-left:15px; }
+.po-tbl tr.edge-play td { background:rgba(176,56,249,.06); }
+.po-pname { font-weight:700; font-size:12px; }
+.po-pmeta { font-size:9.5px; color:var(--text3); }
+.po-prob { font-weight:800; color:var(--logo-purple); }
+.po-pos { color:var(--green); font-weight:700; }
+.po-neg { color:var(--text3); }
+.po-more { padding:8px 15px 13px; font-size:10.5px; color:var(--text3); cursor:pointer; }
+.po-more:hover { color:var(--text2); }
 .po-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(330px,1fr)); gap:10px; padding:0 20px 24px; }
 .po-card { background:var(--bg2); border:1px solid var(--border); border-radius:16px; padding:13px 15px; }
 .po-card.elite { border-color:rgba(176,56,249,.45); box-shadow:0 0 14px rgba(176,56,249,.07); }
@@ -2328,15 +2355,17 @@ body::after {
 <div class="pane" id="pane-playoffs">
   <div class="section" style="padding-top:18px">
     <div class="sec-head">
-      <span class="sec-title">October Impact: the clinched field, rated for playoff baseball
-        <span style="font-size:10px;font-weight:400;color:var(--text3);margin-left:8px">power · contact vs elite arms · platoon exposure · late/close · runners in scoring position</span></span>
+      <span class="sec-title">Playoffs: model probability vs the listed price, game by game
+        <span style="font-size:10px;font-weight:400;color:var(--text3);margin-left:8px">HR projections and starter Ks for every postseason game · edge measured vs the Onyx price</span></span>
     </div>
     <div id="poField" class="po-field"></div>
     <div class="po-tabs">
-      <button class="po-tab active" data-po="hit" onclick="poSwitch('hit')">Hitters</button>
-      <button class="po-tab" data-po="pit" onclick="poSwitch('pit')">Pitchers</button>
+      <button class="po-tab active" data-po="board" onclick="poSwitch('board')">Today's Games</button>
+      <button class="po-tab" data-po="hit" onclick="poSwitch('hit')">Bat Ratings</button>
+      <button class="po-tab" data-po="pit" onclick="poSwitch('pit')">Arm Ratings</button>
     </div>
     <div class="po-note" id="poNote"></div>
+    <div id="poBoard"></div>
     <div id="poGrid" class="po-grid"></div>
   </div>
 </div>
@@ -6435,6 +6464,7 @@ const PITCHER_PROJ = [];
 // Playoffs (v42 October Impact). var for the same reason as the block above:
 // renderPlayoffs() reads these and gotoTab() can fire before this line runs.
 var PLAYOFF_FIELD = [];
+var PLAYOFF_GAMES = [];
 var PLAYOFF_HITTERS = [];
 var PLAYOFF_PITCHERS = [];
 var DAILY_RECAP = {};
@@ -6449,11 +6479,81 @@ const BET_SIZE = 5;
 // on every card and the note above the grid says plainly that small-sample
 // "clutch" is mostly noise. Do not let this drift into a leaderboard of whoever
 // got hot in fifty plate appearances.
-var poView = 'hit';
+var poView = 'board';
+var poExpand = {};
 function poSwitch(v) {
   poView = v;
   document.querySelectorAll('.po-tab').forEach(b => b.classList.toggle('active', b.dataset.po === v));
   renderPlayoffs();
+}
+function poToggle(k) { poExpand[k] = !poExpand[k]; renderPlayoffs(); }
+// Edge only means something against a price. An unpriced bat has no edge, and
+// printing "0.0" for it would read as "fairly priced" when it actually means
+// "no market" - the same honesty rule the board uses (no odds, no edge, no pick).
+function poEdgeCell(e, odds) {
+  if (e == null || odds == null) return '<span class="po-neg">—</span>';
+  const cls = e >= 1.5 ? 'po-pos' : e > 0 ? '' : 'po-neg';
+  return `<span class="${cls}">${e > 0 ? '+' : ''}${e.toFixed(1)}</span>`;
+}
+// Game-by-game playoff board: the model's HR probability against the listed
+// Onyx price, with edge measured vs that price - the same thing the main board
+// does, scoped to the postseason slate. Rows are ordered by the server's
+// composite (calibrated probability first, positive edge breaking ties), NOT by
+// edge: the graded study that put top-5-by-edge at 0-36 applies here too. Edge
+// is what you are shopping for and it is on every row; it just does not sort.
+function poRenderBoard() {
+  const el = document.getElementById('poBoard');
+  if (!el) return;
+  const games = (typeof PLAYOFF_GAMES !== 'undefined' ? PLAYOFF_GAMES : []) || [];
+  if (!games.length) {
+    el.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:4px 20px 22px">No postseason games on today\'s slate. Projections appear here on each playoff game day, the same model the main board runs.</div>';
+    return;
+  }
+  el.innerHTML = games.map(g => {
+    const open = !!poExpand[g.key];
+    const bats = open ? g.hitters : (g.hitters || []).slice(0, 6);
+    const rows = bats.map(b => `<tr class="${(b.odds != null && b.edge != null && b.edge >= 1.5) ? 'edge-play' : ''}">
+        <td><span class="po-pname">${b.name}</span>
+            <span class="po-pmeta">${b.team}${b.order ? ' · ' + b.order : ''}${b.hand ? ' · ' + b.hand : ''}${b.opp_p ? ' vs ' + b.opp_p : ''}</span></td>
+        <td><span class="po-prob">${b.hr_prob != null ? b.hr_prob.toFixed(1) + '%' : '—'}</span></td>
+        <td>${b.odds != null ? fmtOdds(b.odds) : '—'}</td>
+        <td>${b.implied != null ? b.implied.toFixed(1) + '%' : '—'}</td>
+        <td>${poEdgeCell(b.edge, b.odds)}</td>
+        <td>${b.oct != null ? b.oct.toFixed(0) : '—'}</td>
+      </tr>`).join('');
+    const arms = (g.pitchers || []).map(p => `<tr>
+        <td><span class="po-pname">${p.name}</span>
+            <span class="po-pmeta">${p.team}${p.hand ? ' · ' + p.hand + 'HP' : ''} vs ${p.opp}</span></td>
+        <td><span class="po-prob">${p.k_proj != null ? p.k_proj.toFixed(1) : '—'}</span></td>
+        <td>${p.k_line != null ? p.k_line : '—'}</td>
+        <td>${p.k_edge != null ? (p.k_edge > 0 ? '+' : '') + p.k_edge.toFixed(1) : '—'}</td>
+        <td>${p.k_line != null && p.k_edge != null ? (p.k_edge >= 0.8 ? '<span class="po-pos">OVER</span>' : p.k_edge <= -0.8 ? '<span class="po-pos">UNDER</span>' : '<span class="po-neg">no lean</span>') : '<span class="po-neg">—</span>'}</td>
+        <td>${p.oct != null ? p.oct.toFixed(0) : '—'}</td>
+      </tr>`).join('');
+    return `<div class="po-game">
+      <div class="po-ghead">
+        <div>
+          <div class="po-gmatch">${g.away} @ ${g.home}</div>
+          <div class="po-gmeta">${g.time || ''}${g.venue ? ' · ' + g.venue : ''}${g.weather ? ' · ' + g.weather : ''}${g.park_hr != null ? ' · park ' + g.park_hr.toFixed(2) + 'x' : ''}</div>
+        </div>
+        <span class="po-round">${g.round || 'Postseason'}${g.series_game ? ' G' + g.series_game : ''}</span>
+      </div>
+      <div class="po-sub">Home run projections</div>
+      <table class="po-tbl">
+        <thead><tr><th>Batter</th><th>Model</th><th>Onyx</th><th>Implied</th><th>Edge</th><th>Oct</th></tr></thead>
+        <tbody>${rows || '<tr><td colspan="6" style="color:var(--text3)">No priced bats yet for this game.</td></tr>'}</tbody>
+      </table>
+      ${(g.hitters || []).length > 6
+        ? `<div class="po-more" onclick="poToggle('${(g.key || '').replace(/'/g, "\\'")}')">${open ? 'Show fewer' : 'Show all ' + g.hitters.length + ' bats'}</div>`
+        : '<div style="height:6px"></div>'}
+      <div class="po-sub">Starter strikeouts</div>
+      <table class="po-tbl">
+        <thead><tr><th>Pitcher</th><th>Proj K</th><th>Line</th><th>Edge</th><th>Lean</th><th>Oct</th></tr></thead>
+        <tbody>${arms || '<tr><td colspan="6" style="color:var(--text3)">Starters not announced yet.</td></tr>'}</tbody>
+      </table>
+      <div style="height:10px"></div>
+    </div>`;
+  }).join('');
 }
 function poBar(label, val) {
   const v = (val == null) ? 0 : val;
@@ -6488,11 +6588,24 @@ function renderPlayoffs() {
           <span class="w">${t.w}-${t.l}</span></span>`).join('');
   }
 
+  const board = document.getElementById('poBoard');
   if (!field.length) {
     if (note) note.textContent = '';
-    grid.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:20px">No team has clinched yet. The playoff field and its October ratings appear here as soon as berths are locked.</div>';
+    if (board) board.innerHTML = '';
+    grid.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:20px">No team has clinched yet. The playoff field and its projections appear here as soon as berths are locked.</div>';
     return;
   }
+
+  // game-by-game board is the default view: the model vs the price, per game
+  if (poView === 'board') {
+    grid.innerHTML = '';
+    if (note) {
+      note.innerHTML = 'Every postseason game, projected by the same model the main board runs: HR probability against the listed Onyx price, with <b>edge</b> measured against that price, plus each starter\'s projected strikeouts vs his line. Rows are ordered by calibrated probability with positive edge breaking ties, not by edge alone, because ranking by edge selects for model error (the graded study put top five by edge at 0-36). The <b>Oct</b> column is the playoff leverage rating, shown as context only.';
+    }
+    poRenderBoard();
+    return;
+  }
+  if (board) board.innerHTML = '';
 
   const rows = poView === 'hit' ? hitters : arms;
   if (note) {

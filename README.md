@@ -188,7 +188,7 @@ Grading conventions: never-appeared = void (`"void"`/`"dnp"`), client checks are
 ## Injected globals: the TDZ rule, precisely
 
 `auto_build.py` injects 12 globals via `replace_const()`; `update_stats.py` injects
-`PICKS` separately — 16 in total. `replace_const` rewrites the *value* and preserves
+`PICKS` separately — 17 in total. `replace_const` rewrites the *value* and preserves
 whatever keyword is already in `shell.html`, so the keyword is a property of the shell,
 not the builder. Changing a global's keyword means a surgical shell edit.
 
@@ -207,7 +207,7 @@ Current state:
 | `TEAM_LOGOS` | const | 2830 | 3638 | safe |
 | `PITCHER_PROJ` | const | 6370 | 6378 | safe |
 | `LINE_HISTORY` | var | 6374 | 5112 | fixed, was the one violation |
-| `PLAYOFF_FIELD`, `PLAYOFF_HITTERS`, `PLAYOFF_PITCHERS` | var | 6435-6437 | read in `renderPlayoffs()` | safe (var) |
+| `PLAYOFF_FIELD`, `PLAYOFF_GAMES`, `PLAYOFF_HITTERS`, `PLAYOFF_PITCHERS` | var | 6465-6468 | read in `renderPlayoffs()` | safe (var) |
 
 **Why the whole file is one scope:** `index.html` carries a single `<script>` block
 spanning roughly lines 2434-7004. Every global above shares it, so a `const` declared at
@@ -225,47 +225,59 @@ It never blanked the site only because the one reachable early caller (`gcBetBar
 rendered blank instead. Standing rule: **any new typeof-guarded global goes in this
 table, and an un-caught early caller of one is a site-blanker.**
 
-## Playoffs tab: October Impact (v42)
+## Playoffs tab (v42)
 
-A rating of the clinched field for postseason baseball, on its own tab. **It is a
-rating, not a priced projection.** Nothing in it reaches the board, the picks, the
-ticket or any ledger, so it cannot move the graded record and must never be graded
-as if it were a bet.
+**The tab is a game-by-game board, the same as the rest of the site.** For every
+postseason game it shows the model's HR probability against the listed Onyx
+price, the implied probability, and the **edge** measured vs that price, plus
+each starter's projected strikeouts against his K line. Intent is unchanged from
+the main board: model projection vs the market, and where the largest honest edge
+is.
 
-`fetch_playoffs.py` reads the API's `clinched` flag for the field (never inferred
-from win totals — tiebreakers are exactly how you end up publishing a wrong
-bracket), pulls the active roster of each clinched club, then pulls league-wide
-situational splits in single bulk calls and keeps the playoff-roster rows.
+It **re-uses `results_out` and `pitchers_out`** rather than projecting anything of
+its own, so a playoff row and a main-board row for the same bat are the same
+number by construction (verified: identical probability, odds and edge). During
+October today's slate simply *is* the playoff slate — `fetch_data.py` has no
+`gameType` filter, so postseason games flow through the pipeline like any other.
+`fetch_playoffs.py` supplies which games are postseason and what round they are.
 
-Three things change in October, and each maps to a split:
+**Ranking is composite (calibrated probability first, positive edge breaking
+ties), not edge-first.** The graded study that put top-five-by-edge at 0-36
+applies here exactly as on the board. Edge is what the user is shopping for and
+it appears on every row; it just is not what sorts them. A bat with **no price
+shows a dash, never `0.0`** — no market means no edge, not a fair one.
 
-| what changes | split | used for |
+Two supporting rating views sit behind the board (`Bat Ratings` / `Arm Ratings`),
+scoring the clinched field on what October asks of it:
+
+| what changes in October | split | how it is used |
 |---|---|---|
-| bullpens shorten, managers matchup-hunt from the 6th | `vl` / `vr` | a bat is scored on its **weaker** platoon side, not its average |
+| bullpens shorten, managers matchup-hunt from the 6th | `vl` / `vr` | a bat is scored on its **weaker** platoon side |
 | starters get pulled at the first hint of a third time through | `pi000` vs `pi076` | how well an arm holds past 76 pitches |
-| runs get scarce, late innings decide games | `lc`, `risp`, `ig07` | leverage and traffic components |
+| runs get scarce, late innings decide games | `lc`, `risp`, `ig07` | leverage and traffic |
 
-`lc` (Late / Close) is the API's own high-leverage proxy: 7th inning or later with
-the tying run at least on deck.
+`lc` (Late / Close) is the API's own high-leverage proxy: 7th or later with the
+tying run at least on deck.
 
-**The honesty problem, and what is done about it.** These split samples are small:
-on the current field the median hitter has **49** late/close PA and the median
-pitcher **27** late/close batters faced. "Clutch" measured on 49 PA is mostly noise.
-So the leverage and RISP components are regressed toward **zero** by their own
-sample (`delta × n/(n+K)`, K=250 PA hitters / 200 BF pitchers — at the median that
-keeps ~16% and ~12% of the observed delta), they are capped, and they are minority
-weights. The large-sample components carry the score:
+**These splits are small and are treated accordingly.** Median hitter has 49
+late/close PA, median pitcher 27 batters faced. Clutch on 49 PA is noise, so the
+leverage and RISP terms are regressed toward zero by their own sample
+(`delta × n/(n+K)`, K=250 PA / 200 BF, keeping ~16% and ~12% at the median),
+capped, and left as minority weights. Large samples carry the rating: hitters
+power 35 / contact 25 / weak platoon side 20 / late-close 12 / RISP 8; pitchers
+strikeouts 35 / HR suppression 22 / past-76 18 / late-close 15 / RISP 10. Every
+card prints the raw split **and its sample**; an empty sample renders as a dash.
+The rating appears on the board as the `Oct` column, context only.
 
-- **hitters** — power 35, contact vs elite arms 25, weaker platoon side 20, late/close 12, RISP 8
-- **pitchers** — strikeouts 35, HR suppression 22, past-76-pitches 18, late/close 15, RISP 10
+**Nothing on this tab is priced, bet or graded beyond what the board already
+does.** The ratings feed no ledger. `model.py` v42 is additive: HR and K math is
+byte-identical to v41, so every graded ledger stays continuous.
 
-Every card prints the raw split **and its sample size**, and a rate with an empty
-sample renders as a dash rather than `.000`. Relievers have no 76+ pitch sample and
-score neutral there rather than being penalised for their role; role comes from
-games started, not from whether that sample exists.
-
-Before the first clinch the tab says so and shows nothing — it does not invent a
-bracket.
+The field comes from the API's own `clinched` flag, never inferred from win
+totals. `fetch_playoffs.py --if-stale N` gates only the ~25 heavy split calls;
+**the slate is refetched every run** because it changes daily. `--force`
+overrides. Age is judged by git commit time, not file mtime, which
+`actions/checkout` resets (see `fetch_odds.py` for the same lesson).
 
 ## Onyx integration
 

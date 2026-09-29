@@ -43,7 +43,7 @@ const TABS = ['home', 'gamecenter', 'board', 'power', 'pitchers',
 // sync with the audit table in README -> Injected globals.
 const GUARDED_GLOBALS = ['LINE_HISTORY', 'PICKS', 'TICKET_LOCK', 'DAILY_RECAP',
                          'RESULTS', 'SUMMARIES', 'PITCHER_PROJ', 'ONYX_PLAYER_IDS',
-                         'PLAYOFF_FIELD', 'PLAYOFF_HITTERS', 'PLAYOFF_PITCHERS'];
+                         'PLAYOFF_FIELD', 'PLAYOFF_GAMES', 'PLAYOFF_HITTERS', 'PLAYOFF_PITCHERS'];
 
 const LIVE_URL = 'https://onyxjordan.github.io/onyx-baseball-fix/index.html';
 const PORT = Number(process.env.PROBE_PORT || 8901);

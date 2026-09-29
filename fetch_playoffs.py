@@ -114,6 +114,58 @@ def playoff_field():
     return teams
 
 
+# ── 1b. today's postseason slate ──────────────────────────────────────────────
+# MLB's gameType codes for the bracket. Anything else is not a playoff game.
+ROUNDS = {"F": "Wild Card", "D": "Division Series",
+          "L": "League Championship", "W": "World Series"}
+
+
+def _ball_today():
+    """The baseball day: ET minus 4 hours, matching fetch_data.ball_today() and
+    the shell's etGameDay(). Dating this off UTC is what seeded phantom next-day
+    rows across all four ledgers on 8/26; the playoff slate dates the same way."""
+    from datetime import datetime, timedelta
+    from zoneinfo import ZoneInfo
+    return (datetime.now(ZoneInfo("America/New_York")) - timedelta(hours=4)).date()
+
+
+def playoff_slate():
+    """Today's postseason games keyed AWAY_HOME, with the round each belongs to.
+
+    The board already projects whatever is on the schedule, so once October
+    starts today's slate IS the playoff slate — this exists to tell the Playoffs
+    tab WHICH games are postseason and what round they are, not to re-project
+    them. Empty on an off-day or before the bracket opens.
+    """
+    day = _ball_today().strftime("%Y-%m-%d")
+    j = _get("schedule", sportId=1, startDate=day, endDate=day,
+             gameTypes=",".join(ROUNDS), hydrate="probablePitcher,team")
+    out = {}
+    for d in j.get("dates", []):
+        for g in d.get("games", []):
+            a = (g["teams"]["away"]["team"].get("abbreviation") or "").upper()
+            h = (g["teams"]["home"]["team"].get("abbreviation") or "").upper()
+            if not a or not h:
+                continue
+            out[f"{a}_{h}"] = {
+                "away": a, "home": h,
+                "round": ROUNDS.get(g.get("gameType"), "Postseason"),
+                "round_code": g.get("gameType"),
+                "gamePk": g.get("gamePk"),
+                "start": g.get("gameDate"),
+                "series_game": (g.get("seriesGameNumber")),
+                "series_len": (g.get("gamesInSeries")),
+                "away_p": (g["teams"]["away"].get("probablePitcher") or {}).get("fullName"),
+                "home_p": (g["teams"]["home"].get("probablePitcher") or {}).get("fullName"),
+            }
+    if out:
+        rounds = sorted({v["round"] for v in out.values()})
+        print(f"playoff slate: {len(out)} game(s) today ({', '.join(rounds)})")
+    else:
+        print("playoff slate: no postseason games today")
+    return out
+
+
 # ── 2. who is actually on those rosters ───────────────────────────────────────
 def rosters(teams):
     """player id -> {team abbr, position type}. The league-wide splits endpoint
@@ -291,12 +343,27 @@ def main():
     # --if-stale N: only do the work when the payload is older than N hours.
     # --force overrides it, so a run can always be forced from the Actions tab.
     argv = sys.argv[1:]
+
+    # The SLATE is refetched every single run, no matter what --if-stale says.
+    # It is one cheap call and it changes daily, so gating it would leave the tab
+    # showing yesterday's games — the staleness guard exists for the ~25 heavy
+    # split calls, not for what is on today's schedule.
+    slate = playoff_slate()
+
     if "--if-stale" in argv and "--force" not in argv:
         try:
             hrs = float(argv[argv.index("--if-stale") + 1])
         except (IndexError, ValueError):
             hrs = 12.0
         if _fresh_enough(hrs):
+            # keep the existing ratings, but write today's slate over them
+            try:
+                prev = json.loads((OUT / "playoffs.json").read_text(encoding="utf-8"))
+            except Exception:
+                prev = {}
+            prev["slate"] = slate
+            (OUT / "playoffs.json").write_text(json.dumps(prev), encoding="utf-8")
+            print(f"kept cached ratings, refreshed slate ({len(slate)} game(s))")
             return 0
 
     field = playoff_field()
@@ -305,7 +372,7 @@ def main():
         OUT.mkdir(exist_ok=True)
         (OUT / "playoffs.json").write_text(json.dumps(
             {"season": SEASON, "field": [], "hitters": [], "pitchers": [],
-             "note": "no team has clinched yet"}), encoding="utf-8")
+             "slate": slate, "note": "no team has clinched yet"}), encoding="utf-8")
         print("no clinched teams yet — wrote empty playoff payload")
         return 0
 
@@ -337,11 +404,11 @@ def main():
                             "splits": hit_sp.get(pid, {})})
 
     OUT.mkdir(exist_ok=True)
-    payload = {"season": SEASON, "field": field,
+    payload = {"season": SEASON, "field": field, "slate": slate,
                "hitters": hitters, "pitchers": pitchers}
     (OUT / "playoffs.json").write_text(json.dumps(payload), encoding="utf-8")
-    print(f"playoffs.json: {len(field)} teams, {len(hitters)} hitters, "
-          f"{len(pitchers)} pitchers")
+    print(f"playoffs.json: {len(field)} teams, {len(slate)} game(s) today, "
+          f"{len(hitters)} hitters, {len(pitchers)} pitchers")
     return 0
 
 
