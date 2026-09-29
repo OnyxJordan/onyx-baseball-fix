@@ -59,6 +59,12 @@ jobs:
           OPTICODDS_API_KEY: ${{ secrets.OPTICODDS_API_KEY }}
       - name: Heal pitcher hands
         run: python3 heal_hands.py
+      # Playoff field + leverage splits for the Playoffs tab. Built from FINAL
+      # regular-season stats, so --if-stale makes this a cheap no-op on most
+      # ticks instead of ~25 league-wide calls every 30 minutes.
+      - name: Refresh playoff ratings (if stale)
+        run: python3 fetch_playoffs.py --if-stale 12
+        continue-on-error: true
       # grading rode ONLY the once-daily build; when that cron slipped
       # (8/2: no results on the site at noon), yesterday stayed ungraded
       # all day. Refresh runs now settle picks, tickets, calibration, and

@@ -69,7 +69,7 @@ node tools/verify_shell.js --live       # the DEPLOYED page, after the deploy la
 ```
 
 Use that script rather than writing a probe from scratch — it encodes three things
-that are easy to get wrong: tabs must be switched with `gotoTab()` (there are **9**,
+that are easy to get wrong: tabs must be switched with `gotoTab()` (there are **10**,
 and several are hidden in the hamburger drawer at 390px, so clicking nav silently
 skips them), every off-origin request must be aborted or it hangs on Google Fonts,
 and `--live` cannot navigate to `https://` from a cloud session (the agent proxy's
