@@ -964,19 +964,78 @@ shell = replace_const(shell, "K_HISTORY",
                       [p for p in _khist if isinstance(p, dict) and _k_conviction(p)])
 shell = replace_const(shell, "HR_RECORD", _hr_rec)
 
-# ---- Playoffs: October Impact ratings (v42) ----
-# A rating of the clinched field, NOT a priced projection: nothing here reaches
-# the board, the picks, the ticket or any ledger, so it can never move the graded
-# record. Empty until the first team clinches, and the tab says so itself.
+# ---- Playoffs ----
+# The tab is a GAME-BY-GAME BOARD, same as the rest of the site: the model's HR
+# probability against the listed Onyx price, edge measured vs that price, and the
+# starters' K projections against their lines. It re-uses results_out and
+# pitchers_out rather than projecting anything of its own, so a playoff row and a
+# main-board row for the same bat are the same number by construction.
+#
+# Ranking is composite (calibrated probability first, positive edge breaking
+# ties), NOT edge-first — the graded study that killed edge-first ranking
+# (top-5-by-edge went 0-36) applies here exactly as it does on the board. Edge is
+# what the user is shopping for and it is displayed on every row; it just is not
+# what sorts them.
+#
+# October Impact (v42) rides along as a supporting column per player. It is a
+# rating, never priced or graded.
 _po = jload(dpath("playoffs.json"), {}) or {}
 _po_field = _po.get("field") or []
-_po_hit = model.october_score_hitters(_po.get("hitters") or [])
-_po_pit = model.october_score_pitchers(_po.get("pitchers") or [])
+_po_slate = _po.get("slate") or {}
+_po_hit_rt = model.october_score_hitters(_po.get("hitters") or [])
+_po_pit_rt = model.october_score_pitchers(_po.get("pitchers") or [])
+_oct_h = {nk(r["name"]): r for r in _po_hit_rt if r.get("name")}
+_oct_p = {nk(r["name"]): r for r in _po_pit_rt if r.get("name")}
+
+# map the slate's AWAY_HOME keys onto the board's display game keys
+_po_games = []
+for _gk, _meta in _po_slate.items():
+    _rows = [r for r in results_out
+             if (r.get("away") or "").upper() == _meta["away"]
+             and (r.get("home") or "").upper() == _meta["home"]]
+    if not _rows:
+        continue
+    _label = _rows[0].get("game_key") or _rows[0].get("game")
+    _bats = []
+    for r in sorted(_rows, key=lambda x: -(x.get("composite") or 0)):
+        _o = _oct_h.get(nk(r.get("batter_name") or ""))
+        _bats.append({
+            "name": r.get("batter_name"), "team": r.get("team"),
+            "order": r.get("batting_order"), "hand": r.get("batter_hand"),
+            "mid": r.get("mid"), "pos": r.get("pos"),
+            "hr_prob": r.get("hr_prob"), "odds": r.get("dk_hr_odds"),
+            "implied": r.get("dk_hr_implied"), "edge": r.get("hr_edge"),
+            "opp_p": r.get("opp_pitcher"), "opp_hand": r.get("opp_pitcher_hand"),
+            "oct": (_o or {}).get("score"),
+        })
+    _arms = []
+    for p in pitchers_out:
+        if (p.get("team") or "").upper() in (_meta["away"], _meta["home"]) \
+           and (p.get("opp") or "").upper() in (_meta["away"], _meta["home"]):
+            _op = _oct_p.get(nk(p.get("name") or ""))
+            _arms.append({**{k: p.get(k) for k in
+                             ("name", "team", "opp", "hand", "mid", "is_home",
+                              "k_proj", "k_line", "k_edge", "k_over", "k_under",
+                              "ip_proj", "pitches", "hr_allowed", "win_pct")},
+                          "oct": (_op or {}).get("score"),
+                          "oct_role": (_op or {}).get("role")})
+    _po_games.append({
+        "key": _label, "away": _meta["away"], "home": _meta["home"],
+        "round": _meta.get("round"), "time": _rows[0].get("time"),
+        "venue": _rows[0].get("venue"), "weather": _rows[0].get("weather_label"),
+        "park_hr": _rows[0].get("park_hr"), "gamePk": _meta.get("gamePk"),
+        "series_game": _meta.get("series_game"), "series_len": _meta.get("series_len"),
+        "hitters": _bats, "pitchers": _arms,
+    })
+_po_games.sort(key=lambda g: (g.get("key") or ""))
+
 shell = replace_const(shell, "PLAYOFF_FIELD", _po_field)
-shell = replace_const(shell, "PLAYOFF_HITTERS", _po_hit)
-shell = replace_const(shell, "PLAYOFF_PITCHERS", _po_pit)
-print(f"playoffs: {len(_po_field)} clinched team(s), "
-      f"{len(_po_hit)} hitters, {len(_po_pit)} pitchers rated")
+shell = replace_const(shell, "PLAYOFF_GAMES", _po_games)
+shell = replace_const(shell, "PLAYOFF_HITTERS", _po_hit_rt)
+shell = replace_const(shell, "PLAYOFF_PITCHERS", _po_pit_rt)
+print(f"playoffs: {len(_po_field)} clinched, {len(_po_games)} playoff game(s) "
+      f"projected ({sum(len(g['hitters']) for g in _po_games)} bats, "
+      f"{sum(len(g['pitchers']) for g in _po_games)} arms)")
 
 # ---- Onyx game links: only today's harvested slugs ever ship ----
 from zoneinfo import ZoneInfo
