@@ -1,0 +1,70 @@
+name: CI (pull requests)
+
+# The repo had NO pull-request check at all: every merge was verified only by
+# whoever happened to be careful that day. This runs the same two gates the
+# pipeline runs, against the PR's code, before it can reach main.
+#
+# It needs no secrets. auto_build.py builds from the data already committed in
+# data/, which is why a local build works too - so a PR that breaks the build,
+# corrupts a lineup or shrinks a ledger fails here rather than on the live site.
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+# a new push to the PR supersedes the previous check
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@v4
+        with:
+          # full history: validate_build diffs ledger row counts against HEAD
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      # No network fetches here on purpose: this validates the BUILD, not the
+      # feeds. Using the committed data keeps the check fast and deterministic,
+      # and means a flaky upstream API can never fail a PR.
+      - name: Build index.html from committed data
+        run: |
+          python3 -B auto_build.py
+          python3 -B update_stats.py
+
+      - name: Validate build
+        run: python3 validate_build.py
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # full `playwright` here, not playwright-core: core cannot locate a
+      # browser on its own, and the runner has no pre-installed one
+      - name: Install headless browser
+        run: |
+          npm install playwright playwright-core --no-save
+          npx playwright install --with-deps chromium
+
+      # Same gate a human is told to run before shipping a shell change: walks
+      # every tab, reads every typeof-guarded global, fails on any uncaught page
+      # error or undefined/NaN in rendered text.
+      - name: Headless page check (all tabs)
+        run: node tools/verify_shell.js

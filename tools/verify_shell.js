@@ -29,6 +29,15 @@
  *    verdict, no TLS hole. See the --live branch below.
  */
 const { chromium } = require('playwright-core');
+
+// Where Chromium lives differs by environment. The cloud session has one at a
+// fixed path; a CI runner installs its own and lets playwright resolve it, in
+// which case passing an executablePath that does not exist is a hard failure.
+// PW_CHROMIUM overrides both.
+const CHROMIUM = process.env.PW_CHROMIUM
+  || (require('fs').existsSync('/opt/pw-browsers/chromium')
+        ? '/opt/pw-browsers/chromium'
+        : null);
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
@@ -83,7 +92,7 @@ function serve(rootDir) {
 
   const server = await serve(rootDir);
   const browser = await chromium.launch({
-    executablePath: '/opt/pw-browsers/chromium', args: ['--no-sandbox'],
+    ...(CHROMIUM ? { executablePath: CHROMIUM } : {}), args: ['--no-sandbox'],
   });
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
 
