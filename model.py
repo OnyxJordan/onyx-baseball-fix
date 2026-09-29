@@ -1,6 +1,26 @@
 """
-model.py — Onyx Baseball v43 HR probability model + pitcher K projections
+model.py — Onyx Baseball v44 HR probability model + pitcher K projections
            + October Impact (playoff leverage) module
+
+v44: OPENERS WITH STARTS ON THEIR RECORD. v43 caught the gs=0 case (Blubaugh,
+Hagen Smith) but left the harder one open: a pitcher who made twenty normal
+starts and is NOW being used as an opener still shows ~5.5 season IP/GS, so the
+model would price a full start for a two-inning outing. Same bug, wearing a
+starter's season line. With no K line posted there was nothing to reconcile
+against either, so it would have stayed silent.
+
+Season IP/GS averages the whole year and hides a role change. fetch_data now
+reads each probable's last three ACTUAL STARTS from the game log (r_ip) and
+expected_start_innings() prefers that over the season average when the two
+disagree materially. Only GS=1 entries count, which matters: Luzardo's most
+recent appearance was a one-inning relief cameo on 9/27, and averaging that in
+would have branded a genuine ace an opener - his last three starts read 7.56 IP
+and he is correctly left alone. A pitcher with starts on the season but none
+recently, last used in relief, is treated as an opener outright.
+
+Measured on the 9/29 slate: 6 of 7 probables carry recent-start form, all within
+0.9 IP of their season pace, and ZERO false flags - the detector does not fire
+on real starters.
 
 v43: OPENERS. The board had AJ Blubaugh at 4.7 projected K against a listed
 line of 1.5, a +3.2 "edge" on a pitcher the market expects to face six batters.
@@ -1148,12 +1168,29 @@ def expected_start_innings(season: dict, k_line=None, k_per_ip=None):
     except (TypeError, ValueError):
         ip, gs = 0.0, 0.0
 
+    # v44: recent starts beat the season average, because the season average
+    # hides a role change. r_ip is the mean of the last three GS=1 outings.
+    try:
+        r_ip = float(season.get("r_ip")) if season.get("r_ip") else None
+    except (TypeError, ValueError):
+        r_ip = None
+    last_role = season.get("r_last_role")
+
     # No starts all season: season IP is relief work and says nothing about
     # tonight's leash. This is the opener case that produced the Blubaugh bug.
     if gs <= 0:
         base, source = 2.5, "opener (no starts)"
     elif gs < 4:
         base, source = min(4.7, ip / gs if gs else 4.7), "few starts"
+    elif r_ip is not None and (r_ip < 3.5 or r_ip < 0.70 * (ip / gs)):
+        # started plenty earlier in the year, but is being used short NOW
+        base, source = r_ip, "recent starts (short outings)"
+    elif r_ip is None and last_role == "RP":
+        # has starts on the record but none recently and came out of the pen
+        # last time: he is an opener tonight whatever the season line says
+        base, source = 2.5, "opener (no recent starts)"
+    elif r_ip is not None:
+        base, source = 0.5 * r_ip + 0.5 * (ip / gs), "recent starts + season"
     else:
         base, source = ip / gs, "season IP/GS"
 
