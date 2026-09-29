@@ -1,1 +1,46 @@
-{}
+{
+  "ATL": {
+    "venue": "Truist Park",
+    "temp": 79.6,
+    "precip": 0,
+    "wind_spd": 1.7,
+    "wind_dir": "NE",
+    "humidity_pct": 40,
+    "pressure_mb": 1015.9,
+    "roof": false,
+    "flag": "clear"
+  },
+  "NYY": {
+    "venue": "Yankee Stadium",
+    "temp": 64.4,
+    "precip": 1,
+    "wind_spd": 1.9,
+    "wind_dir": "SW",
+    "humidity_pct": 92,
+    "pressure_mb": 1016.6,
+    "roof": false,
+    "flag": "clear"
+  },
+  "HOU": {
+    "venue": "Daikin Park",
+    "temp": 90.6,
+    "precip": 13,
+    "wind_spd": 10.9,
+    "wind_dir": "ESE",
+    "humidity_pct": 51,
+    "pressure_mb": 1010.4,
+    "roof": true,
+    "flag": "clear"
+  },
+  "SD": {
+    "venue": "Petco Park",
+    "temp": 74.1,
+    "precip": 0,
+    "wind_spd": 3.4,
+    "wind_dir": "S",
+    "humidity_pct": 67,
+    "pressure_mb": 1006.9,
+    "roof": false,
+    "flag": "clear"
+  }
+}
