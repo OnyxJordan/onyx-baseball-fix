@@ -21,17 +21,6 @@
     "roof": false,
     "flag": "clear"
   },
-  "HOU": {
-    "venue": "Daikin Park",
-    "temp": 87.4,
-    "precip": 18,
-    "wind_spd": 7.6,
-    "wind_dir": "SE",
-    "humidity_pct": 61,
-    "pressure_mb": 1011.1,
-    "roof": true,
-    "flag": "clear"
-  },
   "ATL": {
     "venue": "Truist Park",
     "temp": 80.8,
@@ -41,6 +30,17 @@
     "humidity_pct": 40,
     "pressure_mb": 1015.6,
     "roof": false,
+    "flag": "clear"
+  },
+  "HOU": {
+    "venue": "Daikin Park",
+    "temp": 87.4,
+    "precip": 18,
+    "wind_spd": 7.6,
+    "wind_dir": "SE",
+    "humidity_pct": 61,
+    "pressure_mb": 1011.1,
+    "roof": true,
     "flag": "clear"
   }
 }
