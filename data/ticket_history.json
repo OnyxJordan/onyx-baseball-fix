@@ -1417,16 +1417,16 @@
     "player": "Munetaka Murakami",
     "odds": 365,
     "prob": 22.6,
-    "hit": null
+    "hit": false
    },
    {
     "player": "Manny Machado",
     "odds": 421,
     "prob": 17.8,
-    "hit": null
+    "hit": "void"
    }
   ],
-  "result": null,
-  "pnl": null
+  "result": "loss",
+  "pnl": -10.0
  }
 ]
