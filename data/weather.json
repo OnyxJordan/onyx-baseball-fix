@@ -1,15 +1,4 @@
 {
-  "SD": {
-    "venue": "Petco Park",
-    "temp": 72.3,
-    "precip": 0,
-    "wind_spd": 3.7,
-    "wind_dir": "SSW",
-    "humidity_pct": 84,
-    "pressure_mb": 1005.9,
-    "roof": false,
-    "flag": "clear"
-  },
   "NYY": {
     "venue": "Yankee Stadium",
     "temp": 63.4,
@@ -18,6 +7,17 @@
     "wind_dir": "WNW",
     "humidity_pct": 77,
     "pressure_mb": 1016.6,
+    "roof": false,
+    "flag": "clear"
+  },
+  "SD": {
+    "venue": "Petco Park",
+    "temp": 72.8,
+    "precip": 0,
+    "wind_spd": 3.3,
+    "wind_dir": "SSW",
+    "humidity_pct": 78,
+    "pressure_mb": 1005.9,
     "roof": false,
     "flag": "clear"
   }
