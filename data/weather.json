@@ -5,19 +5,8 @@
     "precip": 1,
     "wind_spd": 5.2,
     "wind_dir": "SSE",
-    "humidity_pct": 83,
+    "humidity_pct": 81,
     "pressure_mb": 1021.3,
-    "roof": true,
-    "flag": "clear"
-  },
-  "TB": {
-    "venue": "Tropicana Field",
-    "temp": 87.4,
-    "precip": 16,
-    "wind_spd": 6.2,
-    "wind_dir": "SW",
-    "humidity_pct": 67,
-    "pressure_mb": 1014.6,
     "roof": true,
     "flag": "clear"
   },
@@ -27,9 +16,20 @@
     "precip": 0,
     "wind_spd": 2.6,
     "wind_dir": "SSW",
-    "humidity_pct": 19,
-    "pressure_mb": 1008.2,
+    "humidity_pct": 20,
+    "pressure_mb": 1008.5,
     "roof": false,
+    "flag": "clear"
+  },
+  "TB": {
+    "venue": "Tropicana Field",
+    "temp": 87.4,
+    "precip": 16,
+    "wind_spd": 6.2,
+    "wind_dir": "SW",
+    "humidity_pct": 65,
+    "pressure_mb": 1014.9,
+    "roof": true,
     "flag": "clear"
   }
 }
