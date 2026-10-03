@@ -1,15 +1,4 @@
 {
-  "TB": {
-    "venue": "Tropicana Field",
-    "temp": 86.6,
-    "precip": 12,
-    "wind_spd": 6.5,
-    "wind_dir": "SW",
-    "humidity_pct": 66,
-    "pressure_mb": 1015.2,
-    "roof": true,
-    "flag": "clear"
-  },
   "LAD": {
     "venue": "Dodger Stadium",
     "temp": 102.2,
@@ -18,17 +7,6 @@
     "wind_dir": "S",
     "humidity_pct": 17,
     "pressure_mb": 1010.5,
-    "roof": false,
-    "flag": "clear"
-  },
-  "CLE": {
-    "venue": "Progressive Field",
-    "temp": 63.9,
-    "precip": 0,
-    "wind_spd": 7.3,
-    "wind_dir": "ENE",
-    "humidity_pct": 61,
-    "pressure_mb": 1026.1,
     "roof": false,
     "flag": "clear"
   },
@@ -41,6 +19,28 @@
     "humidity_pct": 84,
     "pressure_mb": 1020.9,
     "roof": true,
+    "flag": "clear"
+  },
+  "TB": {
+    "venue": "Tropicana Field",
+    "temp": 86.6,
+    "precip": 12,
+    "wind_spd": 6.5,
+    "wind_dir": "SW",
+    "humidity_pct": 66,
+    "pressure_mb": 1015.2,
+    "roof": true,
+    "flag": "clear"
+  },
+  "CLE": {
+    "venue": "Progressive Field",
+    "temp": 63.9,
+    "precip": 0,
+    "wind_spd": 7.3,
+    "wind_dir": "ENE",
+    "humidity_pct": 61,
+    "pressure_mb": 1026.1,
+    "roof": false,
     "flag": "clear"
   }
 }
