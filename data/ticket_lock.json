@@ -1,34 +1,38 @@
 {
- "date": "2026-10-01",
- "locked": true,
+ "date": "2026-10-03",
+ "locked": false,
  "legs": [
   {
-   "player": "Matt Olson",
-   "mid": 621566,
-   "team": "ATL",
-   "odds": 354,
-   "prob": 19.3,
-   "score": 0.354,
-   "why": [],
-   "away": "PHI",
-   "home": "ATL",
-   "opp": "Aaron Nola",
-   "time": "8:00 PM"
+   "player": "Ben Rice",
+   "mid": 700250,
+   "team": "NYY",
+   "odds": 288,
+   "prob": 21.7,
+   "score": 0.456,
+   "why": [
+    "soft bullpen"
+   ],
+   "away": "NYY",
+   "home": "TB",
+   "opp": "Drew Rasmussen",
+   "time": "6:30 PM"
   },
   {
-   "player": "Kyle Schwarber",
-   "mid": 656941,
-   "team": "PHI",
-   "odds": 311,
-   "prob": 18.4,
-   "score": 0.239,
+   "player": "Shohei Ohtani",
+   "mid": 660271,
+   "team": "LAD",
+   "odds": 304,
+   "prob": 21.5,
+   "score": 0.4,
    "why": [
-    "overdue"
+    "overdue",
+    "platoon edge",
+    "wind/heat ×1.06"
    ],
-   "away": "PHI",
-   "home": "ATL",
-   "opp": "Ray Kerr",
-   "time": "8:00 PM"
+   "away": "ATL",
+   "home": "LAD",
+   "opp": "TBD",
+   "time": "4:00 PM"
   }
  ]
 }
