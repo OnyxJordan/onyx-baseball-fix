@@ -1,46 +1,46 @@
 {
-  "MIL": {
-    "venue": "American Family Field",
-    "temp": 55.5,
-    "precip": 1,
-    "wind_spd": 4.7,
-    "wind_dir": "S",
-    "humidity_pct": 83,
-    "pressure_mb": 1020.9,
+  "TB": {
+    "venue": "Tropicana Field",
+    "temp": 86.6,
+    "precip": 12,
+    "wind_spd": 6.5,
+    "wind_dir": "SW",
+    "humidity_pct": 66,
+    "pressure_mb": 1015.2,
     "roof": true,
     "flag": "clear"
   },
   "LAD": {
     "venue": "Dodger Stadium",
-    "temp": 101.8,
+    "temp": 102.2,
     "precip": 0,
-    "wind_spd": 5.5,
-    "wind_dir": "SSW",
-    "humidity_pct": 19,
-    "pressure_mb": 1009.1,
+    "wind_spd": 2.6,
+    "wind_dir": "S",
+    "humidity_pct": 17,
+    "pressure_mb": 1010.5,
     "roof": false,
-    "flag": "clear"
-  },
-  "TB": {
-    "venue": "Tropicana Field",
-    "temp": 82.5,
-    "precip": 12,
-    "wind_spd": 12.8,
-    "wind_dir": "E",
-    "humidity_pct": 81,
-    "pressure_mb": 1015.5,
-    "roof": true,
     "flag": "clear"
   },
   "CLE": {
     "venue": "Progressive Field",
-    "temp": 63.4,
+    "temp": 63.9,
     "precip": 0,
-    "wind_spd": 6.2,
-    "wind_dir": "NE",
-    "humidity_pct": 56,
-    "pressure_mb": 1024.9,
+    "wind_spd": 7.3,
+    "wind_dir": "ENE",
+    "humidity_pct": 61,
+    "pressure_mb": 1026.1,
     "roof": false,
+    "flag": "clear"
+  },
+  "MIL": {
+    "venue": "American Family Field",
+    "temp": 55.7,
+    "precip": 1,
+    "wind_spd": 5.0,
+    "wind_dir": "S",
+    "humidity_pct": 84,
+    "pressure_mb": 1020.9,
+    "roof": true,
     "flag": "clear"
   }
 }
