@@ -1,24 +1,24 @@
 {
-  "MIL": {
-    "venue": "American Family Field",
-    "temp": 69.2,
-    "precip": 0,
-    "wind_spd": 12.2,
-    "wind_dir": "NW",
-    "humidity_pct": 36,
-    "pressure_mb": 1019.8,
-    "roof": true,
-    "flag": "clear"
-  },
   "LAD": {
     "venue": "Dodger Stadium",
     "temp": 95.6,
-    "precip": 1,
+    "precip": 0,
     "wind_spd": 7.3,
     "wind_dir": "WSW",
     "humidity_pct": 21,
     "pressure_mb": 1010.2,
     "roof": false,
+    "flag": "clear"
+  },
+  "MIL": {
+    "venue": "American Family Field",
+    "temp": 69.2,
+    "precip": 0,
+    "wind_spd": 12.2,
+    "wind_dir": "WNW",
+    "humidity_pct": 36,
+    "pressure_mb": 1019.8,
+    "roof": true,
     "flag": "clear"
   }
 }
