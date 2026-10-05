@@ -1,4 +1,15 @@
 {
+  "TB": {
+    "venue": "Tropicana Field",
+    "temp": 80.2,
+    "precip": 16,
+    "wind_spd": 5.5,
+    "wind_dir": "N",
+    "humidity_pct": 85,
+    "pressure_mb": 1014.0,
+    "roof": true,
+    "flag": "clear"
+  },
   "CLE": {
     "venue": "Progressive Field",
     "temp": 61.6,
@@ -8,17 +19,6 @@
     "humidity_pct": 37,
     "pressure_mb": 1022.1,
     "roof": false,
-    "flag": "clear"
-  },
-  "TB": {
-    "venue": "Tropicana Field",
-    "temp": 80.2,
-    "precip": 18,
-    "wind_spd": 5.5,
-    "wind_dir": "N",
-    "humidity_pct": 85,
-    "pressure_mb": 1014.0,
-    "roof": true,
     "flag": "clear"
   }
 }
