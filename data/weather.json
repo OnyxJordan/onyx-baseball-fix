@@ -4,20 +4,9 @@
     "temp": 77.0,
     "precip": 0,
     "wind_spd": 3.4,
-    "wind_dir": "NNW",
+    "wind_dir": "N",
     "humidity_pct": 68,
     "pressure_mb": 1010.3,
-    "roof": false,
-    "flag": "clear"
-  },
-  "NYY": {
-    "venue": "Yankee Stadium",
-    "temp": 57.8,
-    "precip": 0,
-    "wind_spd": 5.4,
-    "wind_dir": "S",
-    "humidity_pct": 79,
-    "pressure_mb": 1012.4,
     "roof": false,
     "flag": "clear"
   },
@@ -29,6 +18,17 @@
     "wind_dir": "NNE",
     "humidity_pct": 45,
     "pressure_mb": 1013.6,
+    "roof": false,
+    "flag": "clear"
+  },
+  "NYY": {
+    "venue": "Yankee Stadium",
+    "temp": 57.8,
+    "precip": 0,
+    "wind_spd": 5.4,
+    "wind_dir": "SSE",
+    "humidity_pct": 79,
+    "pressure_mb": 1012.4,
     "roof": false,
     "flag": "clear"
   }
