@@ -1,23 +1,23 @@
 {
-  "MIL": {
-    "venue": "American Family Field",
-    "temp": 85.9,
-    "precip": 2,
-    "wind_spd": 11.8,
-    "wind_dir": "SSW",
-    "humidity_pct": 48,
-    "pressure_mb": 1005.8,
-    "roof": true,
-    "flag": "clear"
-  },
   "TB": {
     "venue": "Tropicana Field",
     "temp": 73.1,
     "precip": 0,
-    "wind_spd": 5.6,
+    "wind_spd": 6.0,
     "wind_dir": "NW",
-    "humidity_pct": 78,
-    "pressure_mb": 1015.0,
+    "humidity_pct": 74,
+    "pressure_mb": 1015.7,
+    "roof": true,
+    "flag": "clear"
+  },
+  "MIL": {
+    "venue": "American Family Field",
+    "temp": 85.9,
+    "precip": 2,
+    "wind_spd": 12.3,
+    "wind_dir": "SSW",
+    "humidity_pct": 52,
+    "pressure_mb": 1004.8,
     "roof": true,
     "flag": "clear"
   }
