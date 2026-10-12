@@ -1,34 +1,39 @@
 {
- "date": "2026-10-07",
- "locked": true,
+ "date": "2026-10-12",
+ "locked": false,
  "legs": [
+  {
+   "player": "Shohei Ohtani",
+   "mid": 660271,
+   "team": "LAD",
+   "odds": 332,
+   "prob": 21.0,
+   "score": 0.482,
+   "why": [
+    "park ×1.16",
+    "overdue",
+    "fly-ball pitcher"
+   ],
+   "away": "LAD",
+   "home": "MIL",
+   "opp": "Logan Henderson",
+   "time": "5:00 PM"
+  },
   {
    "player": "Jake Bauers",
    "mid": 641343,
    "team": "MIL",
-   "odds": 560,
-   "prob": 16.0,
-   "score": 0.27,
-   "why": [],
-   "away": "MIL",
-   "home": "SD",
-   "opp": "Walker Buehler",
-   "time": "10:00 PM"
-  },
-  {
-   "player": "Fernando Tatis Jr.",
-   "mid": 665487,
-   "team": "SD",
-   "odds": 398,
-   "prob": 16.1,
-   "score": 0.262,
+   "odds": 596,
+   "prob": 15.5,
+   "score": 0.295,
    "why": [
-    "fly-ball pitcher"
+    "park ×1.16",
+    "soft bullpen"
    ],
-   "away": "MIL",
-   "home": "SD",
-   "opp": "Robert Gasser",
-   "time": "10:00 PM"
+   "away": "LAD",
+   "home": "MIL",
+   "opp": "Yoshinobu Yamamoto",
+   "time": "5:00 PM"
   }
  ]
 }
