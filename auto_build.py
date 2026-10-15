@@ -937,26 +937,77 @@ if _kadd:
         json.dump(_khist, f, indent=1, ensure_ascii=False)
     print(f"k ledger: +{_kadd} lined projection(s) for {stamp}")
 
-# v35 HR EDGE LEDGER: every POSITIVE-EDGE bat is a graded call, straight up
+# v35 HR EDGE LEDGER: every QUALIFIED-EDGE bat is a graded call, straight up
 # (did he homer), priced at his listed odds so the record shows the edge we
 # actually realized — no unders, no base-rate padding. Same per-game
 # pregame freeze as the K ledger; grade_picks settles vs the box scores;
 # only per-day AGGREGATES ship to the page. Raw plays live in
 # data/hr_history.json, kept ALL-TIME (the 60-day prune was removed 10/15).
+#
+# v45 SELECTIVITY. Until now this lane had exactly one screen — edge > 1.5 —
+# while the PICKS lane (built on its own graded evidence back in v35, see the
+# comment above `board`) had three. The gap was never deliberate; the picks
+# screens simply never got propagated here. On 565 graded rows the lane was
+# 25-285, -$1,299, -41.9% ROI, and the three screens below cut away where the
+# money went:
+#
+#   PRICE CAP +400 — 279 of the 310 graded plays were priced above +400 and
+#   they went 20-259 for -43.1%. That is 90% of the volume and 93% of the
+#   losses. The picks lane found the same cliff on a different dataset
+#   (>+400 went 10-85 there, <=+400 was +1.6%), which is what makes this the
+#   one screen here that is actually corroborated rather than merely fitted.
+#
+#   EDGE CAP 2.5 — raising the edge bar makes this lane WORSE, not better:
+#   1.5-2.5 = -31.8%, 2.5-4 = -64.8%, 4-6 = -100% (n=11), 6+ = -100% (n=1).
+#   A big stated edge is the model being wrong, not the market. Same
+#   winner's-curse lesson as rank-by-probability in the picks lane and as the
+#   opener reconciliation in v43.
+#
+#   SIGNALS >= 2 — bats carrying fewer than two corroborating signals went
+#   1-28, -66.9% (n=29 of the rows that carry a sig value). Already the
+#   picks lane's floor; there was no reason it was not this lane's too.
+#
+# Honest accounting, because the record is the product: the surviving set is
+# 22 graded plays at -2.6% ROI, and a split-half by date reads -22.4% then
+# +17.1% on 11 each. That is NOT evidence of a profitable lane. The claim
+# this change makes is narrower and well supported: it stops the bleeding by
+# refusing the longshot tail, at a cost of volume — ~5.4 posted plays a day
+# becomes ~0.4, roughly one every two or three days. On a lot of slates this
+# lane will now post nothing, and that is the correct answer.
+#
+# The new rule is a strict SUBSET of edge > 1.5, so the display filter (_hrq,
+# below) stays where it is and every historical row keeps counting under the
+# regime it was posted in. The published record is not re-cut to flatter it.
+HR_PRICE_CAP = 400      # listed odds ceiling; above this the tail eats the lane
+HR_EDGE_CAP = 2.5       # stated edge ceiling; beyond it the edge is model error
+HR_MIN_SIGNALS = 2      # corroborating signals from _res_signals()
 HRH_PATH = dpath("hr_history.json")
 _hrh = jload(HRH_PATH, [])
 if not isinstance(_hrh, list):
     _hrh = []
 _hseen = {(str(p.get("date")), nk(p.get("player") or "")) for p in _hrh if isinstance(p, dict)}
 _hadd = 0
+_hskip = {}
+def _hno(reason):
+    _hskip[reason] = _hskip.get(reason, 0) + 1
 for r in results_out:
     if not r.get("dk_hr_odds") or not r.get("hr_prob"):
         continue
     _imp = round((r.get("dk_hr_implied") or (100.0 / (r["dk_hr_odds"] + 100.0) * 100 if r["dk_hr_odds"] > 0
                   else abs(r["dk_hr_odds"]) / (abs(r["dk_hr_odds"]) + 100.0) * 100)), 1)
-    if r["hr_prob"] - _imp <= 1.5:
+    _edge = r["hr_prob"] - _imp
+    if _edge <= 1.5:
         continue   # conviction filter (8/11): edge must exceed 1.5 points,
                    # not merely be positive — sub-1.5 edges were noise plays
+    if _edge > HR_EDGE_CAP:
+        _hno("over edge cap")      # v45: an edge this big is model error
+        continue
+    if r["dk_hr_odds"] > HR_PRICE_CAP:
+        _hno("over price cap")     # v45: the tail is 93% of the lane's losses
+        continue
+    if (r.get("res_sig") or 0) < HR_MIN_SIGNALS:
+        _hno("under signal floor")  # v45: under two signals the lane went 1-28
+        continue
     kk = (stamp, nk(r.get("matched_name") or ""))
     if kk in _hseen:
         continue
@@ -977,12 +1028,22 @@ if _hadd:
     # season is a few thousand rows of small JSON.
     with open(HRH_PATH, "w", encoding="utf-8") as f:
         json.dump(_hrh, f, ensure_ascii=False)
-    print(f"hr ledger: +{_hadd} positive-edge bat(s) for {stamp} "
+    print(f"hr ledger: +{_hadd} qualified-edge bat(s) for {stamp} "
           f"({len(_hrh)} rows all-time)")
+if _hskip:
+    # say what the v45 screens turned away, so a quiet night is visibly a
+    # screened night rather than a silently broken lane
+    print("hr ledger: screened out " +
+          ", ".join(f"{v} {k}" for k, v in sorted(_hskip.items())))
 
-# per-day aggregates for the page ($10 flat per play). The conviction filter
-# applies HERE too, so the displayed record retro-counts only edge > 1.5
-# plays — the raw ledger keeps every row in case the threshold moves later.
+# per-day aggregates for the page ($10 flat per play). The displayed record
+# filters at edge > 1.5 and DELIBERATELY NOT at the v45 screens: those screens
+# are a strict subset of this one, so leaving the display where it is keeps
+# every historical row counting under the regime it was actually posted under.
+# Tightening it here instead would retroactively delete 288 losing plays from
+# the public record, which is exactly the rolling-window dishonesty the 10/15
+# all-time change removed. Going forward the lane posts fewer, better plays and
+# the record converges on its own.
 _hrq = [p for p in _hrh if isinstance(p, dict)
         and ((p.get("prob") or 0) - (p.get("implied") or 0)) > 1.5]
 _hr_days = {}

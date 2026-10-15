@@ -38,6 +38,11 @@ gaps. This file is the short form that must never be violated.
 - **Published record ≠ raw JSON.** `k_history.json` and `hr_history.json` keep every row;
   the site displays only conviction-qualified rows (K: projection beats line by >10%;
   HR edge: >1.5pp). Apply the filter before reporting a discrepancy.
+- **"The HR edge lane posted nothing today" is usually correct, not broken.** Since
+  v45 (10/15) the lane also requires price ≤+400, edge ≤2.5pp and ≥2 signals, which
+  takes it from ~5.4 plays a day to ~0.4. The build logs what it turned away
+  (`hr ledger: screened out N over price cap`); a quiet night with that line is the
+  screens working. No line at all means no priced candidates reached the lane.
 - **`SEASON_SPLITS loaded (0 players)` is expected.** `data/splits.json` has been empty
   since the manual CSVs were retired; the model falls back to career splits. Not a bug.
 - **"Site is stale" is usually GitHub, not the model.** Check the Actions tab first.
