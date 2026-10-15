@@ -25,6 +25,7 @@ It checks three things, in rising order of how badly they bite:
 
 Every failure prints what broke and why it matters. Warnings do not block.
 """
+import datetime
 import json
 import re
 import subprocess
@@ -47,7 +48,21 @@ REQUIRED_GLOBALS = {
     "LINE_HISTORY":   (False, list),
 }
 RESULT_KEYS = ("batter_name", "team", "game", "hr_prob", "batting_order")
-LEDGERS = ("picks_input", "ticket_history", "k_history", "hr_history")
+# Ledgers, and the retention window each one is DESIGNED to keep.
+# None  = nothing is ever dropped, so any shrink is damage.
+# 60    = auto_build prunes hr_history to the last 60 days (see the comment above
+#         HRH_PATH). That prune is intentional and predates this gate, so the
+#         rule has to be "no row disappears from INSIDE the window", not "the
+#         total never falls" - the blanket version froze the site for 7 hours on
+#         10/15 when a 16-day gap with no qualifying play meant the prune ran for
+#         the first time since 9/29 and caught up all at once, 576 -> 219 rows.
+LEDGER_RETENTION_DAYS = {
+    "picks_input": None,
+    "ticket_history": None,
+    "k_history": None,
+    "hr_history": 60,
+}
+LEDGERS = tuple(LEDGER_RETENTION_DAYS)
 
 errors, warnings = [], []
 
@@ -191,10 +206,35 @@ def check_ledgers():
             fail(f"data/{name}.json is {type(now).__name__}, expected list")
             continue
         was = _git_json(f"data/{name}.json")
-        if isinstance(was, list) and len(now) < len(was):
-            fail(f"data/{name}.json SHRANK {len(was)} -> {len(now)} rows. "
-                 f"The ledgers are the public graded record and are never "
-                 f"regenerated (hard rule 6).")
+        if not isinstance(was, list):
+            continue
+
+        keep = LEDGER_RETENTION_DAYS.get(name)
+        if keep is None:
+            if len(now) < len(was):
+                fail(f"data/{name}.json SHRANK {len(was)} -> {len(now)} rows. "
+                     f"The ledgers are the public graded record and are never "
+                     f"regenerated (hard rule 6).")
+            continue
+
+        # Retention-aware: rows older than the window may be pruned by design,
+        # but losing a row INSIDE the window is still regeneration and still
+        # fails. That keeps the real protection while letting the prune happen.
+        cut = (datetime.date.today() - datetime.timedelta(days=keep)).isoformat()
+        def _in_window(rows):
+            return [r for r in rows
+                    if isinstance(r, dict) and str(r.get("date") or "") >= cut]
+        wn, ww = len(_in_window(now)), len(_in_window(was))
+        if wn < ww:
+            fail(f"data/{name}.json lost {ww - wn} row(s) from INSIDE its "
+                 f"{keep}-day retention window (>= {cut}): {ww} -> {wn}. "
+                 f"Rows inside the window are the live graded record and are "
+                 f"never regenerated (hard rule 6).")
+        elif len(now) < len(was):
+            # the designed prune: say so out loud rather than passing silently,
+            # because it changes the published denominator
+            print(f"  note: data/{name}.json pruned {len(was)} -> {len(now)} rows "
+                  f"({keep}-day retention, cutoff {cut}); in-window rows {ww} -> {wn}")
 
 
 def main():
