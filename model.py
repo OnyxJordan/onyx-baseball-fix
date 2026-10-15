@@ -1,6 +1,55 @@
 """
-model.py — Onyx Baseball v44 HR probability model + pitcher K projections
+model.py — Onyx Baseball v45 HR probability model + pitcher K projections
            + October Impact (playoff leverage) module
+
+v45: HR EDGE LANE SELECTIVITY. No math in this file changes — every
+probability, K projection and October rating is byte-for-byte what v44
+produced, so the board, the picks, the tickets and the K ledger are all
+continuous across this bump. What changes is WHICH edge plays get posted and
+graded, in auto_build's HR edge ledger.
+
+The lane had one screen (edge > 1.5) while the picks lane had three, and the
+difference was an oversight, not a decision: when v35 rebuilt the picks lane on
+its graded evidence, the HR edge lane never got the same treatment. Across 565
+graded rows it ran 25-285, -$1,299, -41.9% ROI. The 310 plays that cleared
+edge > 1.5 break down like this:
+
+  BY PRICE   <=+300 -2.0% (n=4) | +300-400 -23.9% | +400-500 -58.2%
+             +500-700 -51.7% | +700+ -30.0%
+             Plays above +400 are 279 of 310 — 90% of the volume and 93% of
+             the losses, 20-259 for -43.1%. The picks lane hit the identical
+             cliff on its own separate sample (>+400 went 10-85, <=+400 was
+             +1.6%). Two datasets, same break point.
+
+  BY EDGE    1.5-2.5 -31.8% | 2.5-4 -64.8% | 4-6 -100% (n=11) | 6+ -100% (n=1)
+             Raising the edge bar makes the lane WORSE. This is the winner's
+             curse again: ranking by stated edge selects for model error, the
+             same thing that put top-5-by-edge at 0-36 in v35 and that priced
+             Blubaugh at +3.2 in v43.
+
+  BY SIGNAL  sig < 2 went 1-28, -66.9% (n=29 of the rows carrying a sig).
+             Already the picks lane's floor.
+
+So v45 propagates all three: price <= +400, edge <= 2.5, signals >= 2.
+
+WHAT THIS DOES NOT CLAIM. The surviving set is 22 graded plays at -2.6% ROI,
+and split by date it reads -22.4% (n=11) then +17.1% (n=11). That is noise,
+not a profitable lane, and it must not be sold as one. The supported claim is
+narrower: the longshot tail was a reliable loser across two independent
+samples and we stop posting into it. Volume falls from ~5.4 posted plays a day
+to ~0.4. Many slates will now post nothing, which is the honest answer on a
+slate where nothing qualifies.
+
+The screens are a strict SUBSET of edge > 1.5, so the display filter stays at
+1.5 and no historical row is re-cut. Deleting 288 losing plays from the public
+record to make the number look better is the rolling-window dishonesty the
+10/15 all-time change just removed.
+
+Calibration note for whoever revisits this: the model's probability buckets
+are running roughly 2x hot on this lane (15-20% claimed -> 7.9% actual,
+20-25% -> 10.2%). The screens above are damage control on the symptom. The
+cure is recalibrating hr_prob itself, and it wants more graded rows under the
+tightened regime before anyone touches the weights.
 
 v44: OPENERS WITH STARTS ON THEIR RECORD. v43 caught the gs=0 case (Blubaugh,
 Hagen Smith) but left the harder one open: a pitcher who made twenty normal

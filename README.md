@@ -168,7 +168,7 @@ model: 288 scored, 0 errors
 | Top 5 Picks (`picks_input.json`) | ticket legs first, then +EV fills; locked by first pitch; $10 grading | 51-208 (19.7% — roughly what the model claims; the issue is price, not calibration) |
 | Model's Ticket (`ticket_history.json`) | one $10 parlay/day, 2–4 legs, **one bat per team**, frozen at slate first pitch (`ticket_lock.json`) | 5-53, +$114 |
 | K Projections (`k_history.json`) | model's side vs listed line, only when projection beats line by >10% | 436-380 (53.4%) |
-| HR Edge (`hr_history.json`) | every bat with >1.5pp edge, straight up at listed price. **All-time, no prune** (see below) | 25-285 @ 10/15 (the vig wall, displayed honestly) |
+| HR Edge (`hr_history.json`) | edge >1.5pp **and** price ≤+400 **and** edge ≤2.5pp **and** ≥2 signals (v45), straight up at listed price. **All-time, no prune** (see below) | 25-285 @ 10/15 (the vig wall, displayed honestly) |
 
 **The ledger files hold more rows than the site shows, and that is deliberate.**
 `k_history.json` and `hr_history.json` keep *every* row ever written; the conviction
@@ -181,6 +181,42 @@ without losing history. Counting the raw JSON will not reproduce the published r
 | `hr_history.json` | 612 (all-time) | 59-506 | `prob − implied > 1.5` | 25-285 |
 
 `picks_input.json` and `ticket_history.json` are unfiltered — raw equals displayed.
+
+**The HR edge lane got selective on 10/15 (v45), and the display filter did not move.**
+The lane had one screen (edge > 1.5) where the picks lane had three; that was an
+oversight from v35, not a decision. Across 565 graded rows it ran 25-285, −$1,299,
+−41.9% ROI, and the losses had a shape:
+
+| cut | n | W-L | ROI |
+|---|---|---|---|
+| edge > 1.5 (the old lane) | 310 | 25-285 | −41.9% |
+| …of which priced >+400 | 279 | 20-259 | −43.1% |
+| …of which priced ≤+400 | 31 | 5-26 | −30.9% |
+| + edge ≤ 2.5 | 22 | 5-17 | −2.6% |
+| + signals ≥ 2 (the v45 lane) | 10 | 3-7 | +28.8% |
+
+Three screens were propagated from the picks lane: **price ≤ +400** (279 of 310
+plays and 93% of the losses were above it; the picks lane hit the same cliff on
+a separate sample, >+400 going 10-85 there), **edge ≤ 2.5** (raising the edge bar
+makes the lane *worse* — 2.5-4 was −64.8%, 4-6 was −100% on n=11 — the winner's
+curse again), and **signals ≥ 2** (sig < 2 went 1-28, −66.9%).
+
+What this does **not** claim: the +28.8% bottom row is n=10 and must not be quoted
+as a profitable lane. A split-half by date on the 22-play cut reads −22.4% then
++17.1%, which is noise. The supported claim is that the longshot tail was a
+reliable loser across two independent samples and we stopped posting into it.
+Volume drops from ~5.4 posted plays a day to ~0.4; many slates now post nothing,
+and that is the correct answer on a slate where nothing qualifies.
+
+The screens are a strict **subset** of edge > 1.5, so the display filter stays at
+1.5 and no historical row is re-cut — tightening the display would retroactively
+delete 288 losing plays from the public record, which is the same rolling-window
+dishonesty the all-time change removed hours earlier.
+
+Open item for whoever revisits this: `hr_prob` is running about 2× hot on this
+lane (15-20% claimed → 7.9% actual, 20-25% → 10.2%). The v45 screens are damage
+control on the symptom; the cure is recalibrating the probability itself, and that
+wants more graded rows under the tightened regime first.
 
 **`hr_history.json` is all-time; the 60-day prune was removed on 10/15.** It used
 to drop rows older than 60 days, which made the published HR Edge record a
