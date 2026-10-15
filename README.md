@@ -168,7 +168,7 @@ model: 288 scored, 0 errors
 | Top 5 Picks (`picks_input.json`) | ticket legs first, then +EV fills; locked by first pitch; $10 grading | 51-208 (19.7% — roughly what the model claims; the issue is price, not calibration) |
 | Model's Ticket (`ticket_history.json`) | one $10 parlay/day, 2–4 legs, **one bat per team**, frozen at slate first pitch (`ticket_lock.json`) | 5-53, +$114 |
 | K Projections (`k_history.json`) | model's side vs listed line, only when projection beats line by >10% | 436-380 (53.4%) |
-| HR Edge (`hr_history.json`) | every bat with >1.5pp edge, straight up at listed price | 23-250 (the vig wall, displayed honestly) |
+| HR Edge (`hr_history.json`) | every bat with >1.5pp edge, straight up at listed price. **All-time, no prune** (see below) | 25-285 @ 10/15 (the vig wall, displayed honestly) |
 
 **The ledger files hold more rows than the site shows, and that is deliberate.**
 `k_history.json` and `hr_history.json` keep *every* row ever written; the conviction
@@ -177,10 +177,23 @@ without losing history. Counting the raw JSON will not reproduce the published r
 
 | ledger | raw rows | raw W-L | displayed filter | displayed W-L |
 |---|---|---|---|---|
-| `k_history.json` | 1,093 | 534-453 | `proj > line×1.10` or `proj < line×0.90` | 436-380 |
-| `hr_history.json` | 573 | 57-471 | `prob − implied > 1.5` | 23-250 |
+| `k_history.json` | 1,203 | 576-508 | `proj > line×1.10` or `proj < line×0.90` | 478-435 |
+| `hr_history.json` | 612 (all-time) | 59-506 | `prob − implied > 1.5` | 25-285 |
 
 `picks_input.json` and `ticket_history.json` are unfiltered — raw equals displayed.
+
+**`hr_history.json` is all-time; the 60-day prune was removed on 10/15.** It used
+to drop rows older than 60 days, which made the published HR Edge record a
+rolling window that quietly shed old losses — the number on the site was not what
+the model had actually posted since July. Going all-time moved it from 14-182
+(−$825, 42 days) to **25-285 (−$1,299, 57 days)**, i.e. it looks worse, which is
+the point. 393 rows were recovered out of git history when the prune was removed.
+
+That prune also caused an outage: it only ran when a new row was added, so a
+16-day gap with no qualifying play meant it fired all at once (576 → 219) and
+`validate_build`'s ledger rule read it as regeneration and blocked every commit
+for 7 hours on 10/15. With the prune gone, `hr_history` is back under the strict
+"never shrinks" rule along with the other three ledgers.
 Before reporting "the record on the site is wrong," apply the filter first.
 
 Grading conventions: never-appeared = void (`"void"`/`"dnp"`), client checks are strict

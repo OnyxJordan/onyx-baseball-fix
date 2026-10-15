@@ -60,7 +60,7 @@ LEDGER_RETENTION_DAYS = {
     "picks_input": None,
     "ticket_history": None,
     "k_history": None,
-    "hr_history": 60,
+    "hr_history": None,   # all-time since 10/15; the 60-day prune was removed
 }
 LEDGERS = tuple(LEDGER_RETENTION_DAYS)
 
