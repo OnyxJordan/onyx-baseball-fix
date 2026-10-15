@@ -942,7 +942,7 @@ if _kadd:
 # actually realized — no unders, no base-rate padding. Same per-game
 # pregame freeze as the K ledger; grade_picks settles vs the box scores;
 # only per-day AGGREGATES ship to the page. Raw plays live in
-# data/hr_history.json, pruned at 60 days.
+# data/hr_history.json, kept ALL-TIME (the 60-day prune was removed 10/15).
 HRH_PATH = dpath("hr_history.json")
 _hrh = jload(HRH_PATH, [])
 if not isinstance(_hrh, list):
@@ -969,11 +969,16 @@ for r in results_out:
     _hseen.add(kk)
     _hadd += 1
 if _hadd:
-    _cut = (now - __import__("datetime").timedelta(days=60)).strftime("%Y-%m-%d")
-    _hrh = [p for p in _hrh if str(p.get("date")) >= _cut]
+    # ALL-TIME, no prune (10/15). This used to drop rows older than 60 days,
+    # which made the published HR Edge record a rolling window: it quietly shed
+    # old losses, so the number on the site was not the number the model had
+    # actually posted since July. The record is the product here - honest public
+    # records always - so every graded row stays. Growth is trivial: a full
+    # season is a few thousand rows of small JSON.
     with open(HRH_PATH, "w", encoding="utf-8") as f:
         json.dump(_hrh, f, ensure_ascii=False)
-    print(f"hr ledger: +{_hadd} positive-edge bat(s) for {stamp}")
+    print(f"hr ledger: +{_hadd} positive-edge bat(s) for {stamp} "
+          f"({len(_hrh)} rows all-time)")
 
 # per-day aggregates for the page ($10 flat per play). The conviction filter
 # applies HERE too, so the displayed record retro-counts only edge > 1.5
