@@ -1,34 +1,38 @@
 {
- "date": "2026-10-15",
- "locked": true,
+ "date": "2026-10-23",
+ "locked": false,
  "legs": [
-  {
-   "player": "Shohei Ohtani",
-   "mid": 660271,
-   "team": "LAD",
-   "odds": 620,
-   "prob": 16.4,
-   "score": 0.29,
-   "why": [
-    "overdue",
-    "platoon edge"
-   ],
-   "away": "MIL",
-   "home": "LAD",
-   "opp": "TBD",
-   "time": "8:00 PM"
-  },
   {
    "player": "Jake Bauers",
    "mid": 641343,
    "team": "MIL",
-   "odds": 571,
-   "prob": 15.4,
-   "score": 0.283,
-   "why": [],
-   "away": "MIL",
-   "home": "LAD",
-   "opp": "Tyler Glasnow",
+   "odds": null,
+   "prob": 15.3,
+   "score": 0.487,
+   "why": [
+    "soft bullpen",
+    "park ×1.16",
+    "pitcher matchup ×1.14"
+   ],
+   "away": "TB",
+   "home": "MIL",
+   "opp": "Nick Martinez",
+   "time": "8:00 PM"
+  },
+  {
+   "player": "Junior Caminero",
+   "mid": 691406,
+   "team": "TB",
+   "odds": null,
+   "prob": 16.0,
+   "score": 0.294,
+   "why": [
+    "park ×1.16",
+    "soft bullpen"
+   ],
+   "away": "TB",
+   "home": "MIL",
+   "opp": "Jacob Misiorowski",
    "time": "8:00 PM"
   }
  ]
