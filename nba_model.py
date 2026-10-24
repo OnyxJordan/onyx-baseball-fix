@@ -43,6 +43,21 @@ RATE_PRIOR_MIN = 300.0
 POS_PRIOR_MIN = 150.0
 SD = {"pts": (0.30, 2.0), "reb": (0.35, 1.0), "ast": (0.40, 0.8)}
 MODEL_WEIGHT = 0.50
+# Tunables (nba_backtest.py walks these). Values here are the live model's.
+P = {
+    "min_recent_w": 0.30,    # weight on the last-N-games minutes average
+    "min_recent_n": 3,
+    "min_decay": 1.0,        # per-game weight decay for this season's minutes (1.0 = flat mean)
+    "rate_decay": 1.0,       # per-game weight decay for this season's per-minute rates
+    "l5_nudge": 0.25,        # share of the L5 rate gap applied
+    "l5_cap": 0.15,
+    "b2b_mult": 0.97,
+    "pace_exp": 0.5,
+    "opp_exp": 0.5,
+    "pts_fit_exp": 0.8,      # how hard team points are pulled to the target total
+    "home_pts": 0.01,
+    "blowout_k": 0.004,
+}
 OUT_STATUSES = {"OUT", "DOUBTFUL", "O", "D", "SUSPENSION"}
 RISK_STATUSES = {"QUESTIONABLE", "GTD", "Q", "DAY-TO-DAY", "DTD"}
 STATS = ("pts", "reb", "ast")
@@ -101,13 +116,16 @@ def base_minutes(prior, games, team, team_gp=0):
         return min(6.0, prior_mpg or 0.0)
     if prior_mpg is not None:
         k = PRIOR_GAMES_K if (not prior.get("t") or prior.get("t") == team) else PRIOR_GAMES_K / 2
-        base = (prior_mpg * k + sum(mins)) / (k + n)
+        w = [P["min_decay"] ** (n - 1 - i) for i in range(n)]
+        base = (prior_mpg * k + sum(wi * m for wi, m in zip(w, mins))) / (k + sum(w))
     elif n:
-        base = sum(mins) / n
+        w = [P["min_decay"] ** (n - 1 - i) for i in range(n)]
+        base = sum(wi * m for wi, m in zip(w, mins)) / sum(w)
     else:
         base = 4.0
     if n >= 3:
-        base = 0.7 * base + 0.3 * (sum(mins[-3:]) / 3)
+        k_n = int(P["min_recent_n"])
+        base = (1 - P["min_recent_w"]) * base + P["min_recent_w"] * (sum(mins[-k_n:]) / len(mins[-k_n:]))
     return base
 
 
@@ -148,8 +166,10 @@ def fit_team_minutes(mins, total=240.0):
 
 def per_minute(prior, games, stat, pos):
     played = [g for g in games if g[IDX["min"]] > 0]
-    cur_min = sum(g[IDX["min"]] for g in played)
-    cur_s = sum(g[IDX[stat]] for g in played)
+    n = len(played)
+    w = [P["rate_decay"] ** (n - 1 - i) for i in range(n)]
+    cur_min = sum(wi * g[IDX["min"]] for wi, g in zip(w, played))
+    cur_s = sum(wi * g[IDX[stat]] for wi, g in zip(w, played))
     if prior and prior.get("min", 0) > 0:
         r0, k = prior[stat] / prior["min"], RATE_PRIOR_MIN
     else:
@@ -159,7 +179,7 @@ def per_minute(prior, games, stat, pos):
     l5_min = sum(g[IDX["min"]] for g in last5)
     if l5_min >= 60:
         l5 = sum(g[IDX[stat]] for g in last5) / l5_min
-        nudge = max(-0.15, min(0.15, (l5 / rate - 1) * 0.25)) if rate > 0 else 0
+        nudge = max(-P["l5_cap"], min(P["l5_cap"], (l5 / rate - 1) * P["l5_nudge"])) if rate > 0 else 0
         rate *= 1 + nudge
     return rate
 
@@ -174,15 +194,15 @@ def env_factors(game, team, opp, is_home, tp, op, lg):
         home_imp = (total - spread) / 2.0
         implied = home_imp if is_home else total - home_imp
         target = implied
-        pace = (total / (2 * lg["ppg"])) ** 0.5
+        pace = (total / (2 * lg["ppg"])) ** P["pace_exp"]
     else:
         implied = None
         # no line: the team's scoring vs what this opponent allows, both regressed
         target = (tp["ppg"] * op["opp_ppg"]) / lg["ppg"]
-        pace = (((tp["poss"] + op["poss"]) / 2) / lg["poss"]) ** 0.5
-    f["pts"] = 1.01 if is_home else 0.99
-    f["reb"] = pace * (op["opp_reb"] / lg["reb"]) ** 0.5
-    f["ast"] = pace * (op["opp_ast"] / lg["ast"]) ** 0.5
+        pace = (((tp["poss"] + op["poss"]) / 2) / lg["poss"]) ** P["pace_exp"]
+    f["pts"] = 1 + P["home_pts"] if is_home else 1 - P["home_pts"]
+    f["reb"] = pace * (op["opp_reb"] / lg["reb"]) ** P["opp_exp"]
+    f["ast"] = pace * (op["opp_ast"] / lg["ast"]) ** P["opp_exp"]
     for k in ("reb", "ast"):
         f[k] = max(0.88, min(1.12, f[k]))
     f["implied"] = round(implied, 1) if implied else None
@@ -300,9 +320,9 @@ def project_slate(slate, prior, player_games, team_games):
         spread = abs(g.get("spread") or 0)
         for r, m in zip(rs, fitted):
             if b2b and m >= 30:
-                m *= 0.97
+                m *= P["b2b_mult"]
             if spread >= 10 and m >= 28:
-                m *= max(0.94, 1 - 0.004 * (spread - 8))
+                m *= max(0.94, 1 - P["blowout_k"] * (spread - 8))
             r["min"] = round(m, 1)
             r["b2b"] = b2b
 
@@ -339,7 +359,7 @@ def project_slate(slate, prior, player_games, team_games):
         tgt = next((r["_target_pts"] for r in rs if r.get("_target_pts")), None)
         tot = sum(r["proj"]["pts"] for r in rs)
         if tgt and tot > 0:
-            k = max(0.85, min(1.18, (tgt / tot) ** 0.8))
+            k = max(0.85, min(1.18, (tgt / tot) ** P["pts_fit_exp"]))
             for r in rs:
                 r["proj"]["pts"] = round(r["proj"]["pts"] * k, 2)
         for r in rs:
