@@ -2,19 +2,54 @@ name: NBA Optic probe (temporary, dev only)
 on:
   push:
     branches: [claude/trusting-cori-4upy6e]
-    paths: [tools/nba_optic_probe.py, .github/workflows/nba_probe.yml]
+    paths: [tools/nba_optic_probe.py, .github/workflows/nba_probe.yml, "nba_*.py", nba_shell.html]
 permissions:
   contents: read
 jobs:
   probe:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
       - run: pip install requests
-      - run: python3 tools/nba_optic_probe.py
+      - name: NBA fetch (live OpticOdds)
+        run: python3 nba_fetch.py
         env:
           OPTICODDS_API_KEY: ${{ secrets.OPTICODDS_API_KEY }}
+      - name: NBA odds (live Onyx book; consensus disabled to save MLB credits)
+        run: python3 nba_odds.py
+        env:
+          OPTICODDS_API_KEY: ${{ secrets.OPTICODDS_API_KEY }}
+      - name: NBA build
+        run: python3 nba_build.py
+      - name: Summaries
+        run: |
+          python3 - <<'PY'
+          import json
+          d = json.load(open('data/nba/slate.json')); print('slate', d['date'], d['source'], len(d['games']), 'games', len(d['players']), 'players')
+          pr = json.load(open('data/nba/props.json')); P = pr.get('players', {})
+          print('props players', len(P), 'games', json.dumps(pr.get('games'))[:900])
+          for k in list(P)[:3]: print(' ', json.dumps(P[k])[:400])
+          html = open('nba.html').read(); s = html.index('/*NBA_DATA*/') + 12; e = html.index('/*END_NBA_DATA*/')
+          D = json.loads(html[s:e]); print('meta', D['meta'], 'picks', [(k['name'], k['stat'], k['side'], k['line'], k['price'], k['edge'], bool(k['sel'])) for k in D['picks']])
+          top = sorted([p for p in D['players'] if not p['out']], key=lambda p: -p['proj']['pts'])[:12]
+          for p in top: print(f"  {p['name']:24s}{p['team']:5s}{p['min']:5.1f} pts {p['proj']['pts']:5.1f} line {(p['props'].get('pts') or {}).get('line')} reb {p['proj']['reb']:4.1f} ast {p['proj']['ast']:4.1f} gp {p['gp']} ls {p['last_season']}")
+          pg = json.load(open('data/nba/player_games.json')); print('player_games players', len(pg) - 1, 'games', len(pg['_games']))
+          pri = json.load(open('data/nba/prior.json')); print('prior entries', len(pri), 'with gp', sum(1 for k, v in pri.items() if not k.startswith('_') and v.get('gp')))
+          PY
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: |
+          npm install playwright playwright-core --no-save
+          npx playwright install --with-deps chromium
+      - run: node tools/verify_nba.js
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nba-preview
+          path: |
+            nba.html
+            data/nba/

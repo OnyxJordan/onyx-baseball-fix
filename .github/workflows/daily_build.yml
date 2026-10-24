@@ -56,6 +56,26 @@ jobs:
         run: python3 auto_build.py
       - name: Persist picks record
         run: python3 update_stats.py
+      # NBA sister site (nba.html). Fully isolated from MLB: its own scripts
+      # and data/nba/, and continue-on-error so an NBA failure can never block
+      # or change the MLB build. Its ledger is still guarded by validate_build.
+      - name: NBA fetch (OpticOdds first, ESPN backup)
+        run: python3 nba_fetch.py
+        continue-on-error: true
+        timeout-minutes: 8
+        env:
+          OPTICODDS_API_KEY: ${{ secrets.OPTICODDS_API_KEY }}
+      - name: NBA odds (Onyx book, consensus fills gaps)
+        run: python3 nba_odds.py
+        continue-on-error: true
+        timeout-minutes: 5
+        env:
+          OPTICODDS_API_KEY: ${{ secrets.OPTICODDS_API_KEY }}
+          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
+      - name: NBA build (projections, picks ledger, nba.html)
+        run: python3 nba_build.py
+        continue-on-error: true
+        timeout-minutes: 3
       # ROADMAP Phase 2, finally built. Blocks the commit when the page is
       # structurally broken, a batting slot is duplicated or missing, or a
       # graded ledger shrank. A non-zero exit here means yesterday's page stays
@@ -68,7 +88,7 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -A data index.html
+          git add -A data index.html nba.html
           git commit -m "Daily build $(date -u +%Y-%m-%d)" || echo "nothing to commit"
           # survive races with sibling runs/PR merges: rebase + retry,
           # preferring OUR freshly built files on any conflict

@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>ONYX BASKETBALL</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0c0c0c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Onyx">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<meta property="og:title" content="Onyx Basketball">
+<meta name="description" content="Daily NBA points, rebounds and assists projections against Onyx prices.">
+<style>
+/* Same brand system as the MLB shell: purple leads on Onyx black, Titanium
+   text, green ONLY for wins / positive money / live. No yellow anywhere. */
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0c0c0c; --bg2:#121214; --bg3:#17171a; --bg4:#1d1d21; --bg5:#25252a;
+  --border:#232328; --border2:#2e2e35; --border3:#3a3a43;
+  --text:#f2f2f5; --text2:#a3a3ad; --text3:#6b6b76;
+  --purple:#b038f9; --purple2:#8d16b8; --lilac:#d795ff; --blue:#635bff;
+  --purple-dim:rgba(176,56,249,.12);
+  --green:#22c55e; --green-dim:rgba(34,197,94,.12); --neon-green:#00ff88;
+  --red:#ef4444; --red-dim:rgba(239,68,68,.12);
+  --mono:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;
+}
+html{background:var(--bg);scroll-behavior:smooth}
+body{color:var(--text);font-family:Inter,'Space Grotesk',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:14px;min-height:100vh;overflow-x:hidden;background:var(--bg)}
+body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:radial-gradient(900px 500px at 85% -10%,rgba(64,96,240,.07),transparent 60%),
+             radial-gradient(700px 420px at 10% 110%,rgba(176,56,249,.06),transparent 60%)}
+.mono{font-family:var(--mono)}
+a{color:inherit}
+button{font-family:inherit}
+
+/* NAV */
+.nav{height:58px;padding:0 20px;display:flex;align-items:center;background:rgba(12,12,12,.92);
+  border-bottom:1px solid rgba(255,255,255,.06);position:sticky;top:0;z-index:200;
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;margin-right:28px;flex-shrink:0;cursor:pointer}
+.logo-svg{width:34px;height:34px}
+.logo-ball{animation:spin 9s linear infinite;transform-origin:50% 50%}
+@keyframes spin{from{transform:rotateY(0)}to{transform:rotateY(360deg)}}
+.logo-onyx{font-size:16px;font-weight:800;letter-spacing:.06em}
+.logo-sub{font-size:9px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--lilac);margin-top:1px}
+.nav-tabs{display:flex;flex:1;overflow-x:auto;scrollbar-width:none}
+.nav-tabs::-webkit-scrollbar{display:none}
+.nav-tab{height:58px;display:flex;align-items:center;gap:7px;padding:0 15px;font-size:13px;font-weight:500;
+  color:var(--text3);cursor:pointer;background:none;border:none;position:relative;white-space:nowrap;text-decoration:none}
+.nav-tab:hover{color:var(--text2)}
+.nav-tab.active{color:var(--text)}
+.nav-tab.active::after{content:'';position:absolute;left:10px;right:10px;bottom:-1px;height:2px;border-radius:2px;
+  background:linear-gradient(90deg,#b038f9,#d795ff);box-shadow:0 0 10px rgba(176,56,249,.55)}
+.nav-tab svg{width:15px;height:15px;opacity:.75}
+.nav-sport{border:1px solid var(--border2);border-radius:8px;height:30px;padding:0 11px;margin:auto 0 auto 6px;font-size:12px}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:12px;flex-shrink:0;padding-left:12px}
+.nav-badge{background:var(--purple-dim);border:1px solid rgba(176,56,249,.35);color:var(--lilac);padding:3px 10px;
+  border-radius:20px;font-size:10px;font-weight:700;font-family:var(--mono);letter-spacing:.04em}
+.nav-upd{font-size:11px;color:var(--text3);font-family:var(--mono)}
+.brand-line{height:1px;background:linear-gradient(90deg,transparent,#635bff 20%,#b038f9 50%,#d795ff 80%,transparent)}
+
+/* TICKER */
+.ticker{display:flex;gap:0;overflow-x:auto;border-bottom:1px solid var(--border);background:var(--bg2);scrollbar-width:none}
+.ticker::-webkit-scrollbar{display:none}
+.tk{flex:0 0 auto;padding:8px 16px;border-right:1px solid var(--border);font-family:var(--mono);font-size:11px;color:var(--text2);
+  display:flex;gap:10px;align-items:center;cursor:pointer}
+.tk b{color:var(--text);font-weight:700}
+.tk .st{color:var(--text3)}
+.tk .st.live{color:var(--green)}
+
+/* LAYOUT */
+.pane{display:none;animation:fadeUp .2s ease}
+.pane.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
+.wrap{max-width:1280px;margin:0 auto;padding:0 20px 120px}
+.sec-hdr{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:22px 0 10px;flex-wrap:wrap}
+.sec-title{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text2)}
+.sec-sub{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-left:10px}
+.sec-count{font-size:12px;color:var(--text3);font-family:var(--mono)}
+.empty{padding:28px;border:1px dashed var(--border2);border-radius:12px;color:var(--text3);text-align:center;line-height:1.6}
+
+/* HERO */
+.hero{padding:84px 0 56px;max-width:900px}
+.live-pill{display:inline-flex;align-items:center;gap:8px;padding:5px 12px;border-radius:20px;border:1px solid rgba(176,56,249,.35);
+  background:var(--purple-dim);color:var(--lilac);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.live-pill i{width:6px;height:6px;border-radius:50%;background:var(--lilac);box-shadow:0 0 6px var(--lilac)}
+.hero h1{font-size:clamp(44px,8vw,92px);line-height:.98;font-weight:800;letter-spacing:-.035em;margin:26px 0 22px}
+.hero h1 span{background:linear-gradient(90deg,#b038f9,#d795ff 60%,#635bff);-webkit-background-clip:text;background-clip:text;color:transparent;display:block}
+.hero p{font-size:18px;line-height:1.65;color:var(--text2);max-width:600px}
+.cta{display:flex;gap:12px;margin-top:34px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;
+  border:1px solid var(--border2);background:var(--bg3);color:var(--text)}
+.btn.primary{background:linear-gradient(135deg,#b038f9,#8d16b8);border-color:transparent;box-shadow:0 8px 28px rgba(176,56,249,.35)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin:0 -20px}
+.stat{padding:26px 32px;border-right:1px solid var(--border)}
+.stat:last-child{border-right:none}
+.stat .v{font-size:44px;font-weight:800;letter-spacing:-.02em;color:var(--lilac)}
+.stat .v.w{color:var(--text)}
+.stat .l{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-top:4px}
+
+/* CARDS */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px;transition:border-color .18s,box-shadow .18s}
+.card:hover{border-color:rgba(176,56,249,.35);box-shadow:0 6px 24px rgba(0,0,0,.35),0 0 0 1px rgba(176,56,249,.12)}
+.pk-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.pk-name{font-size:16px;font-weight:700}
+.pk-meta{font-size:12px;color:var(--text3);margin-top:3px}
+.pk-call{margin-top:14px;font-size:22px;font-weight:800;letter-spacing:-.01em}
+.pk-call small{font-size:12px;font-weight:600;color:var(--text3);margin-left:6px}
+.pk-row{display:flex;gap:16px;margin-top:12px;font-family:var(--mono);font-size:12px;color:var(--text2)}
+.pk-row b{color:var(--text)}
+.edge-pos{color:var(--green)!important}
+.edge-neg{color:var(--text3)!important}
+.tag{display:inline-block;padding:2px 7px;border-radius:5px;font-size:10px;font-weight:700;font-family:var(--mono);letter-spacing:.03em}
+.tag.p{background:var(--purple-dim);color:var(--lilac)}
+.tag.g{background:var(--green-dim);color:var(--green)}
+.tag.r{background:var(--red-dim);color:var(--red)}
+.tag.n{background:var(--bg4);color:var(--text2)}
+.team-badge{width:30px;height:30px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-family:var(--mono);
+  font-size:9px;font-weight:800;color:#fff;flex-shrink:0;background:var(--bg5)}
+
+/* ODDS CHIP (every bet button: single ticket, or a parlay leg when armed) */
+.chip{display:inline-flex;flex-direction:column;align-items:center;min-width:64px;padding:6px 10px;border-radius:9px;cursor:pointer;
+  border:1px solid var(--border2);background:var(--bg3);font-family:var(--mono);transition:all .15s}
+.chip:hover{border-color:var(--purple);background:var(--purple-dim)}
+.chip .o{font-size:13px;font-weight:800;color:var(--text)}
+.chip .s{font-size:9px;color:var(--text3);letter-spacing:.05em;text-transform:uppercase;margin-top:1px}
+.chip.in-slip{border-color:var(--lilac);background:rgba(215,149,255,.14)}
+.chip.dead{cursor:default;opacity:.45}
+body.parlay-armed .chip:not(.dead){box-shadow:0 0 0 1px rgba(176,56,249,.45)}
+
+/* TABLE */
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:6px 0 12px}
+.search{flex:1;min-width:200px;max-width:420px;display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);
+  border-radius:9px;padding:9px 12px}
+.search input{background:none;border:none;outline:none;color:var(--text);font-size:13px;width:100%}
+.seg{display:flex;border:1px solid var(--border2);border-radius:9px;overflow:hidden}
+.seg button{background:none;border:none;color:var(--text3);padding:8px 13px;font-size:12px;font-weight:600;cursor:pointer}
+.seg button.on{background:var(--purple-dim);color:var(--lilac)}
+select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--text2);border-radius:9px;padding:8px 10px;font-size:12px}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:14px;background:var(--bg2)}
+table{width:100%;border-collapse:collapse;min-width:760px}
+th{font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--text3);text-align:left;padding:11px 12px;
+  border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none}
+th.r,td.r{text-align:right}
+td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle;white-space:nowrap}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.015)}
+.pn{font-weight:700}
+.ps{font-size:11px;color:var(--text3);margin-top:2px}
+.num{font-family:var(--mono);font-size:13px}
+.big{font-family:var(--mono);font-size:15px;font-weight:800}
+.dim{color:var(--text3)}
+.bar{height:4px;border-radius:2px;background:var(--bg5);margin-top:5px;overflow:hidden}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,#8d16b8,#d795ff)}
+
+/* GAMES */
+.gc{padding:0;overflow:hidden}
+.gc-h{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-bottom:1px solid var(--border);
+  font-family:var(--mono);font-size:11px;color:var(--text3);background:var(--bg3)}
+.gc-t{display:flex;align-items:center;gap:12px;padding:12px 16px}
+.gc-t .nm{flex:1}
+.gc-t .nm b{font-size:15px}
+.gc-t .imp{font-family:var(--mono);font-size:12px;color:var(--text2);text-align:right;min-width:70px}
+.gc-lead{padding:10px 16px;border-top:1px solid var(--border);font-size:12px;color:var(--text2);line-height:1.7}
+.gc-btn{display:block;width:100%;padding:10px;background:none;border:none;border-top:1px solid var(--border);color:var(--text3);
+  font-size:12px;cursor:pointer;text-align:right;padding-right:16px}
+.gc-btn:hover{color:var(--lilac)}
+
+/* RECORD */
+.rec-big{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.rec-big .card .v{font-size:30px;font-weight:800;font-family:var(--mono)}
+.rec-big .card .l{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-top:4px}
+.res-W{color:var(--green);font-weight:800}
+.res-L{color:var(--red);font-weight:800}
+.res-P,.res-V{color:var(--text3);font-weight:800}
+
+/* MODEL */
+.prose{max-width:780px;line-height:1.75;color:var(--text2);font-size:15px}
+.prose h3{color:var(--text);font-size:17px;margin:26px 0 8px}
+.prose b{color:var(--text)}
+
+/* PLAYER DRAWER */
+.drawer-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:300;display:none}
+.drawer{position:fixed;right:0;top:0;bottom:0;width:min(460px,100vw);background:var(--bg2);border-left:1px solid var(--border2);
+  z-index:301;transform:translateX(100%);transition:transform .22s ease;overflow-y:auto;padding:22px}
+.drawer.open{transform:none}
+.drawer-bg.open{display:block}
+.dr-x{float:right;background:none;border:1px solid var(--border2);color:var(--text2);border-radius:8px;width:32px;height:32px;cursor:pointer}
+.dr-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0}
+.dr-grid .card{padding:12px;text-align:center}
+.dr-grid .v{font-size:24px;font-weight:800;font-family:var(--mono);color:var(--lilac)}
+.dr-grid .l{font-size:10px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase}
+
+/* PARLAY */
+#parlayFab{position:fixed;right:16px;bottom:16px;z-index:250}
+.pf-btn{background:linear-gradient(135deg,#b038f9,#8d16b8);color:#fff;border:none;border-radius:24px;padding:11px 18px;font-weight:800;
+  font-size:13px;cursor:pointer;box-shadow:0 8px 28px rgba(176,56,249,.45)}
+.pf-slip{width:min(340px,calc(100vw - 32px));background:var(--bg2);border:1px solid var(--border2);border-radius:14px;padding:14px;
+  margin-bottom:10px;box-shadow:0 12px 40px rgba(0,0,0,.6)}
+.pf-leg{display:flex;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px}
+.pf-leg button{background:none;border:none;color:var(--text3);cursor:pointer}
+.pf-foot{display:flex;justify-content:space-between;align-items:center;margin-top:10px;font-family:var(--mono);font-size:12px}
+
+@media (max-width:760px){
+  .nav{padding:0 12px}
+  .nav-logo{margin-right:10px}
+  .logo-words{display:none}
+  .nav-tab{padding:0 10px;font-size:12px}
+  .nav-upd{display:none}
+  .wrap{padding:0 16px 120px}
+  .hero{padding:48px 0 36px}
+  .hero p{font-size:16px}
+  .stats{grid-template-columns:repeat(2,1fr);margin:0 -16px}
+  .stat{padding:18px 16px}
+  .stat .v{font-size:32px}
+  .rec-big{grid-template-columns:repeat(2,1fr)}
+  .nav-right{display:none}
+  .hm{display:none}
+  table{min-width:0}
+  th,td{padding:9px 6px}
+  td:first-child{white-space:normal}
+  .team-badge{display:none}
+  .chip{min-width:52px;padding:5px 6px}
+  #pane-record table{min-width:640px}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="nav-logo" onclick="gotoTab('home')">
+    <!-- Onyx graphic mark on a basketball; same mark path as the MLB logo -->
+    <svg class="logo-svg logo-ball" viewBox="0 0 64 64" aria-label="Onyx Basketball">
+      <circle cx="32" cy="32" r="29" fill="#e8742a"/>
+      <path d="M3 32 H61" stroke="#3a1606" stroke-width="2.2"/>
+      <path d="M32 3 V61" stroke="#3a1606" stroke-width="2.2"/>
+      <path d="M12 9 C 24 21, 24 43, 12 55" stroke="#3a1606" stroke-width="2.2" fill="none"/>
+      <path d="M52 9 C 40 21, 40 43, 52 55" stroke="#3a1606" stroke-width="2.2" fill="none"/>
+      <g transform="translate(21.6,18.2) scale(0.0416)">
+        <path d="M195.205 545.89L287.671 595.205L117.808 684.931L0 621.918V201.37L195.205 99.3151V545.89ZM304.795 139.041L212.329 89.726L382.192 0L500 63.0137V484.247L304.795 586.301V139.041Z" fill="#fcfcfc"/>
+      </g>
+      <circle cx="32" cy="32" r="29" fill="none" stroke="rgba(12,12,12,.35)" stroke-width="1.5"/>
+    </svg>
+    <div class="logo-words"><div class="logo-onyx">ONYX</div><div class="logo-sub">Basketball</div></div>
+  </a>
+  <div class="nav-tabs">
+    <button class="nav-tab active" data-tab="home" onclick="gotoTab('home')">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 6.5L8 2l6 4.5V14a1 1 0 01-1 1H3a1 1 0 01-1-1V6.5z"/><path d="M6 15V9h4v6"/></svg>Home</button>
+    <button class="nav-tab" data-tab="board" onclick="gotoTab('board')">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12M2 8h12M2 12h8"/></svg>Props Board</button>
+    <button class="nav-tab" data-tab="scorers" onclick="gotoTab('scorers')">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 14V8M8 14V3M13 14V6"/></svg>Top Scorers</button>
+    <button class="nav-tab" data-tab="games" onclick="gotoTab('games')">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M2 8h12M8 2v12"/></svg>Games</button>
+    <button class="nav-tab" data-tab="record" onclick="gotoTab('record')">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 2h10v12H3z"/><path d="M5.5 6l1.5 1.5L10.5 4M5.5 11h5"/></svg>Record</button>
+    <button class="nav-tab" data-tab="model" onclick="gotoTab('model')">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 2"/></svg>Model</button>
+    <a class="nav-tab nav-sport" href="index.html">MLB</a>
+  </div>
+  <div class="nav-right">
+    <span class="nav-badge" id="navDate"></span>
+    <span class="nav-upd" id="navUpd"></span>
+  </div>
+</nav>
+<div class="brand-line"></div>
+<div class="ticker" id="ticker"></div>
+
+<!-- HOME -->
+<section class="pane active" id="pane-home"><div class="wrap">
+  <div class="hero">
+    <span class="live-pill"><i></i><span id="heroDate"></span></span>
+    <h1>Points. Boards. Dimes.<span>Projected nightly.</span></h1>
+    <p>Every rotation player on tonight's slate, projected from minutes, per-minute production, pace and the matchup, then priced against the Onyx line so you see exactly where the model and the market disagree.</p>
+    <div class="cta">
+      <button class="btn primary" onclick="gotoTab('board')">Today's Props Board</button>
+      <button class="btn" onclick="gotoTab('scorers')">Top Scorers</button>
+      <button class="btn" onclick="gotoTab('model')">How It Works</button>
+    </div>
+  </div>
+  <div class="stats" id="homeStats"></div>
+  <div class="sec-hdr"><div><span class="sec-title" id="picksTitle">Onyx Picks</span><span class="sec-sub">model + market blend, positive edge only</span></div><span class="sec-count" id="picksCount"></span></div>
+  <div class="grid" id="homePicks"></div>
+  <div class="sec-hdr"><div><span class="sec-title">Projected Top Scorers</span></div><a class="sec-count" href="#" onclick="gotoTab('scorers');return false">View all</a></div>
+  <div class="grid" id="homeScorers"></div>
+</div></section>
+
+<!-- BOARD -->
+<section class="pane" id="pane-board"><div class="wrap">
+  <div class="sec-hdr"><div><span class="sec-title">Props Board</span><span class="sec-sub">projection vs Onyx line</span></div><span class="sec-count" id="boardCount"></span></div>
+  <div class="toolbar">
+    <div class="search"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="7" cy="7" r="5"/><path d="M11 11l3 3"/></svg>
+      <input id="boardSearch" placeholder="Search players, teams..." oninput="renderBoard()"></div>
+    <div class="seg" id="statSeg">
+      <button class="on" data-s="pts" onclick="setStat('pts')">Points</button>
+      <button data-s="reb" onclick="setStat('reb')">Rebounds</button>
+      <button data-s="ast" onclick="setStat('ast')">Assists</button>
+    </div>
+    <select class="sel" id="gameSel" onchange="renderBoard()"></select>
+    <label class="dim" style="font-size:12px;display:flex;gap:6px;align-items:center"><input type="checkbox" id="pricedOnly" onchange="renderBoard()" checked> priced only</label>
+  </div>
+  <div class="tbl-wrap"><table>
+    <thead><tr>
+      <th onclick="sortBoard('name')">Player</th>
+      <th class="r hm" onclick="sortBoard('min')">Min</th>
+      <th class="r" onclick="sortBoard('proj')">Proj</th>
+      <th class="r" onclick="sortBoard('line')">Line</th>
+      <th class="r hm" onclick="sortBoard('diff')">Diff</th>
+      <th class="r hm" onclick="sortBoard('prob')">Model %</th>
+      <th class="r hm" onclick="sortBoard('edge')">Edge</th>
+      <th class="r">Over</th>
+      <th class="r">Under</th>
+      <th class="r hm">L5</th>
+    </tr></thead>
+    <tbody id="boardBody"></tbody>
+  </table></div>
+</div></section>
+
+<!-- SCORERS -->
+<section class="pane" id="pane-scorers"><div class="wrap">
+  <div class="sec-hdr"><div><span class="sec-title">Top Point Scorers</span><span class="sec-sub">projected points tonight</span></div><span class="sec-count" id="scorerCount"></span></div>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th class="hm">#</th><th>Player</th><th class="r hm">Min</th><th class="r">Proj PTS</th><th class="r">Line</th><th class="r">Over</th><th class="r hm">Season</th><th class="r hm">Last Season</th><th class="r hm">Team Total</th></tr></thead>
+    <tbody id="scorerBody"></tbody>
+  </table></div>
+</div></section>
+
+<!-- GAMES -->
+<section class="pane" id="pane-games"><div class="wrap">
+  <div class="sec-hdr"><div><span class="sec-title">Today's Games</span></div><span class="sec-count" id="gamesCount"></span></div>
+  <div class="grid" id="gamesGrid"></div>
+</div></section>
+
+<!-- RECORD -->
+<section class="pane" id="pane-record"><div class="wrap">
+  <div class="sec-hdr"><div><span class="sec-title">Onyx Picks Record</span><span class="sec-sub">every pick, graded against the final box score</span></div><span class="sec-count" id="recSince"></span></div>
+  <div class="rec-big" id="recBig"></div>
+  <div class="sec-hdr"><span class="sec-title">By Market</span></div>
+  <div class="rec-big" id="recByStat"></div>
+  <div class="sec-hdr"><span class="sec-title">Pick Log</span><span class="sec-count" id="recCount"></span></div>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Date</th><th>Player</th><th>Pick</th><th class="r">Odds</th><th class="r">Proj</th><th class="r">Edge</th><th class="r">Actual</th><th class="r">Result</th></tr></thead>
+    <tbody id="recBody"></tbody>
+  </table></div>
+</div></section>
+
+<!-- MODEL -->
+<section class="pane" id="pane-model"><div class="wrap"><div class="prose" id="modelProse">
+  <div class="sec-hdr"><span class="sec-title">How the model works</span><span class="sec-count" id="modelVer"></span></div>
+  <h3>1. Minutes first</h3>
+  <p>Every projection starts with how long a player will be on the floor. Last season's minutes per game act as a prior, and this season's games (including nights he did not play) pull it toward his current role, with extra weight on the last three games. Each team's minutes are then fitted to the 240 available: when a teammate is <b>OUT</b> or <b>Doubtful</b>, his minutes flow to the rest of the rotation, and deep benches are trimmed first when a roster over-counts. Back-to-backs and lopsided spreads shave heavy-minute players.</p>
+  <h3>2. Production per minute</h3>
+  <p>Points, rebounds and assists per minute blend last season (as a 300-minute prior) with what he is doing now, so a hot week moves the number but does not hijack it. Players with no NBA history start from a positional league rate.</p>
+  <h3>3. The game around him</h3>
+  <p>Each team's player points are fitted to the team total implied by the Onyx spread and total. Rebounds and assists scale with game pace and with what the opponent allows, regressed by how many games it has played.</p>
+  <h3>4. Priced against Onyx</h3>
+  <p>Projections become over and under probabilities, blended with the vig-free Onyx market, and edge is measured against the price you actually get. A pick needs real edge, a sane price and a player with no injury tag, and it is locked the moment it qualifies. Every pick is graded against the final box score and stays on the Record tab, wins and losses alike.</p>
+  <p class="dim" style="margin-top:22px;font-size:13px">Projections are estimates, not guarantees. Bet responsibly.</p>
+</div></div></section>
+
+<div class="drawer-bg" id="drawerBg" onclick="closeDrawer()"></div>
+<aside class="drawer" id="drawer"></aside>
+
+<script>
+// Injected by nba_build.py. var (not const) so any earlier read is safe.
+var NBA_DATA = /*NBA_DATA*/{"date":"2026-10-24","source":"espn","model_version":"v1","generated":"2026-10-24T22:35:33+00:00","league":{"ppg":114.1,"reb":44.28,"ast":26.21,"poss":102.06},"meta":{"players_projected":145,"priced":0,"picks":0},"games":[{"gid":"401909853","start":"2026-10-24T22:00Z","season_type":2,"slug":null,"state":"live","status":"STATUS_IN_PROGRESS","detail":"3:28 - 1st","away":"MIA","home":"CHA","away_id":"14","home_id":"30","away_score":"24","home_score":"21","away_rec":"0-2","home_rec":"1-1","spread":null,"total":null,"away_ml":null,"home_ml":null,"home_implied":null,"away_implied":null},{"gid":"401909854","start":"2026-10-24T23:30Z","season_type":2,"slug":null,"state":"pre","status":"STATUS_SCHEDULED","detail":"10/24 - 7:30 PM EDT","away":"BKN","home":"CLE","away_id":"17","home_id":"5","away_score":"0","home_score":"0","away_rec":"0-1","home_rec":"0-1","spread":-11.5,"total":228.5,"away_ml":null,"home_ml":null,"home_implied":120.0,"away_implied":108.5},{"gid":"401909855","start":"2026-10-24T23:30Z","season_type":2,"slug":null,"state":"pre","status":"STATUS_SCHEDULED","detail":"10/24 - 7:30 PM EDT","away":"MIL","home":"PHI","away_id":"15","home_id":"20","away_score":"0","home_score":"0","away_rec":"0-2","home_rec":"2-0","spread":-13.5,"total":234.5,"away_ml":null,"home_ml":null,"home_implied":124.0,"away_implied":110.5},{"gid":"401909857","start":"2026-10-25T00:00Z","season_type":2,"slug":null,"state":"pre","status":"STATUS_SCHEDULED","detail":"10/24 - 8:00 PM EDT","away":"WSH","home":"CHI","away_id":"27","home_id":"4","away_score":"0","home_score":"0","away_rec":"1-1","home_rec":"1-1","spread":-1.5,"total":244.5,"away_ml":null,"home_ml":null,"home_implied":123.0,"away_implied":121.5},{"gid":"401909858","start":"2026-10-25T00:00Z","season_type":2,"slug":null,"state":"pre","status":"STATUS_SCHEDULED","detail":"10/24 - 8:00 PM EDT","away":"SA","home":"DAL","away_id":"24","home_id":"6","away_score":"0","home_score":"0","away_rec":"0-2","home_rec":"1-1","spread":14.5,"total":229.5,"away_ml":null,"home_ml":null,"home_implied":107.5,"away_implied":122.0},{"gid":"401909856","start":"2026-10-25T00:30Z","season_type":2,"slug":null,"state":"pre","status":"STATUS_SCHEDULED","detail":"10/24 - 8:30 PM EDT","away":"HOU","home":"ATL","away_id":"10","home_id":"1","away_score":"0","home_score":"0","away_rec":"2-0","home_rec":"2-0","spread":1.5,"total":227.5,"away_ml":null,"home_ml":null,"home_implied":113.0,"away_implied":114.5},{"gid":"401909859","start":"2026-10-25T01:00Z","season_type":2,"slug":null,"state":"pre","status":"STATUS_SCHEDULED","detail":"10/24 - 9:00 PM EDT","away":"NO","home":"DEN","away_id":"3","home_id":"7","away_score":"0","home_score":"0","away_rec":"0-2","home_rec":"0-1","spread":-11.5,"total":239.5,"away_ml":null,"home_ml":null,"home_implied":125.5,"away_implied":114.0},{"gid":"401909860","start":"2026-10-25T02:00Z","season_type":2,"slug":null,"state":"pre","status":"STATUS_SCHEDULED","detail":"10/24 - 10:00 PM EDT","away":"GS","home":"PHX","away_id":"9","home_id":"21","away_score":"0","home_score":"0","away_rec":"0-2","home_rec":"0-1","spread":-9.5,"total":221.5,"away_ml":null,"home_ml":null,"home_implied":115.5,"away_implied":106.0}],"players":[{"pid":"4066261","name":"Bam Adebayo","team":"MIA","opp":"CHA","home":false,"gid":"401909853","pos":"C","inj":"","inj_detail":"","out":false,"gp":2,"min":29.7,"b2b":true,"team_implied":null,"env":{"pts":0.99,"reb":1.0,"ast":1.013},"proj":{"pts":15.69,"reb":8.88,"ast":3.1},"season":{"min":27.0,"pts":9.5,"reb":6.5,"ast":3.5},"last5":[{"d":"2026-10-21","opp":"MIN","min":31.0,"pts":15.0,"reb":7.0,"ast":4.0},{"d":"2026-10-23","opp":"DET","min":23.0,"pts":4.0,"reb":6.0,"ast":3.0}],"last_season":{"pts":20.1,"reb":10.0,"ast":3.2,"min":32.4,"gp":73},"props":{}},{"pid":"3032977","name":"Giannis Antetokounmpo","team":"MIA","opp":"CHA","home":false,"gid":"401909853","pos":"F","inj":"","inj_detail":"","out":false,"gp":2,"min":29.3,"b2b":true,"team_implied":null,"env":{"pts":0.99,"reb":1.0,"ast":1.013},"proj":{"pts":27.26,"reb":9.34,"ast":4.55},"season":{"min":31.5,"pts":35.5,"reb":9.0,"ast":3.0},"last5":[{"d":"2026-10-21","opp":"MIN","min":30.0,"pts":35.0,"reb":6.0,"ast":1.0},{"d":"2026-10-23","opp":"DET","min":33.0,"pts":36.0,"reb":12.0,"ast":5.0}],"last_season":{"pts":27.6,"reb":9.8,"ast":5.4,"min":28.9,"gp":36},"props":{}},{"pid":"3899664","name":"Simone Fontecchio","team":"MIA","opp":"CHA","home":false,"gid":"401909853","pos":"F","inj":"","inj_detail":"","out":false,"gp":2,"min":4.9,"b2b":true,"team_implied":null,"env":{"pts":0.99,"reb":1.0,"ast":1.013},"proj":{"pts":2.23,"reb":0.88,"ast":0.42},"season":{"min":3.0,"pts":0.0,"reb":0.5,"ast":0.0},"last5":[{"d":"2026-10-21","opp":"MIN","min":3.0,"pts":0.0,"reb":0.0,"ast":0.0},{"d":"2026-10-23","opp":"DET","min":3.0,"pts":0.0,"reb":1.0,"ast":0.0}],"last_season":{"pts":8.5,"reb":3.0,"ast":1.4,"min":16.7,"gp":70},"props":{}},{"pid":"2528210","name":"Tim Hardaway Jr.","team":"MIA","opp":"CHA","home":false,"gid":"401909853","pos":"G","inj":"","inj_detail":"","out":false,"gp":2,"min":19.8,"b2b":true,"team_implied":null,"env":{"pts":0.99,"reb":1.0,"ast":1.013},"proj":{"pts":8.69,"reb":2.16,"ast":1.02},"season":{"min":19.5,"pts":5.5,"reb":4.0,"ast":1.0},"last5":[{"d":"2026-10-21","opp":"MIN","min":18.0,"pts":3.0,"reb":4.0,"ast":1.0},{"d":"2026-10-23","opp":"DET","min":21.0,"pts":8.0,"reb":4.0,"ast":1.0}],"last_season":{"pts":13.5,"reb":2.6,"ast":1.4,"min":26.6,"gp":80},"props":{}},{"pid":"4997528","name":"Nikola Jovic","team":"MIA","opp":"CHA","home":false,"gid":"401909853","pos":"F","inj":"","inj_detail":"","out":false,"gp":2,"min":15.1,"b2b":true,"team_implied":null,"env":{"pts":0.99,"reb":1.0,"ast":1.013},"proj":{"pts":5.58,"reb":2.9,"ast":1.86},"season":{"min":18.5,"pts":4.5,"reb":4.0,"ast":1.5},"last5":[{"d":"2026-10-21","opp":"MIN","min":24.0,"pts":4.0,"reb":4.0,"ast":2.0},{"d":"2026-10-23","opp":"DET","min":13.0,"pts":5.0,"reb":4.0,"ast":1.0}],"last_season":{"pts":7.3,"reb":3.3,"ast":2.2,"min":17.2,"gp":47},"props":{}},{"pid":"4601025","name":"Pelle Larsson","team":"MIA","opp":"CHA","home":false,"gid":"401909853","pos":"G","inj":"","inj_detail":"","out":false,"gp":2,"min":26.4,"b2b":true,"team_implied":null,"env":{"pts":0.99,"reb":1.0,"ast":1.013},"proj":{"pts":9.46,"reb":3.34,"ast":3.28},"season":{"min":26.5,"pts":4.5,"reb":2.5,"ast":2.5},"last5":[{"d":"2026-10-21","opp":"MIN","min":24.0,"pts":2.0,"reb":3.0,"ast":4.0},{"d":"2026-10-23","opp":"DET","min":29.0,"pts":7.0,"reb":2.0,"ast":1.0}],"last_season":{"pts":11.4,"reb":3.5,"ast":3.4,"min":26.4,"gp":70},"props":{}},{"pid":"4278053","name":"Davion Mitchell","team":"MIA","opp":"CHA","home":false,"gid":"401909853","pos":"G","inj":"","inj_detail":"","out":false,"gp":2,"min":29.1,"b2b":true,"team_implied":null,"env":{"pts":0.99,"reb":1.0,"ast":1.013},"proj":{"pts":9.82,"reb":2.03,"ast":6.86},"season":{"min":33.0,"pts":14.5,"reb":1.0,"ast":8.0},"last5":[{"d":"2026-10-21","opp":"MIN","min":33.0,"pts":11.0,"reb":0.0,"ast":11.0},{"d":"2026-10-23","opp":"DET","min":33.0,"pts":18.0,"reb":2.0,"ast":5.0}],"last_season":{"pts":9.3,"reb":2.7,"ast":6.5,"min":28.6,"gp":70},"props":{}},{"pid":"3064482","name":"Bobby Portis","team":"MIA","opp":"CHA","home":false,"gid":"401909853","pos":"F","inj":"","inj_detail":"","out":false,"gp":2,"min":20.2,"b2b":true,"team_implied":null,"env":{"pts":0.99,"reb":1.0,"ast":1.013},"proj":{"pts":9.98,"reb":5.33,"ast":1.33},"season":{"min":23.0,"pts":9.0,"reb":6.0,"ast":1.5},"last5":[{"d":"2026-10-21","opp":"MIN","min":25.0,"pts":7.0,"reb":4.0,"ast":1.0},{"d":"2026-10-23","opp":"DET","min":21.0,"pts":11.0,"reb":8.0,"ast":2.0}],"last_season":{"pts":13.7,"reb":6.4,"ast":1.6,"min":24.2,"gp":67},"props":{}},{"pid":"4066993","name":"Dru Smith","team":"MIA","opp":"CHA","home":false,"gid":"401909853","pos":"G","inj":"","inj_detail":"","out":false,"gp":1,"min":4.7,"b2b":true,"team_implied":null,"env":{"pts":0.99,"reb":1.0,"ast":1.013},"proj":{"pts":1.49,"reb":0.7,"ast":0.75},"season":{"min":6.0,"pts":3.0,"reb":0.0,"ast":1.0},"last5":[{"d":"2026-10-21","opp":"MIN","min":0,"pts":0,"reb":0,"ast":0},{"d":"2026-10-23","opp":"DET","min":6.0,"pts":3.0,"reb":0.0,"ast":1.0}],"last_season":{"pts":5.6,"reb":2.5,"ast":2.6,"min":16.3,"gp":70},"props":{}},{"pid":"6475","name":"Klay Thompson","team":"MIA","opp":"CHA","home":false,"gid":"401909853","pos":"G","inj":"","inj_detail":"","out":false,"gp":2,"min":17.9,"b2b":true,"team_implied":null,"env":{"pts":0.99,"reb":1.0,"ast":1.013},"proj":{"pts":8.55,"reb":1.67,"ast":1.13},"season":{"min":20.0,"pts":8.0,"reb":1.5,"ast":1.0},"last5":[{"d":"2026-10-21","opp":"MIN","min":16.0,"pts":10.0,"reb":1.0,"ast":0.0},{"d":"2026-10-23","opp":"DET","min":24.0,"pts":6.0,"reb":2.0,"ast":2.0}],"last_season":{"pts":11.7,"reb":2.1,"ast":1.4,"min":21.7,"gp":69},"props":{}},{"pid":"3059319","name":"Andrew Wiggins","team":"MIA","opp":"CHA","home":false,"gid":"401909853","pos":"F","inj":"","inj_detail":"","out":false,"gp":2,"min":29.1,"b2b":true,"team_implied":null,"env":{"pts":0.99,"reb":1.0,"ast":1.013},"proj":{"pts":12.84,"reb":4.77,"ast":2.46},"season":{"min":26.5,"pts":9.5,"reb":5.0,"ast":1.5},"last5":[{"d":"2026-10-21","opp":"MIN","min":27.0,"pts":11.0,"reb":2.0,"ast":1.0},{"d":"2026-10-23","opp":"DET","min":26.0,"pts":8.0,"reb":8.0,"ast":2.0}],"last_season":{"pts":15.4,"reb":4.8,"ast":2.7,"min":30.3,"gp":68},"props":{}},{"pid":"3135045","name":"Grayson Allen","team":"CHA","opp":"MIA","home":true,"gid":"401909853","pos":"G","inj":"","inj_detail":"","out":false,"gp":2,"min":26.6,"b2b":true,"team_implied":null,"env":{"pts":1.01,"reb":1.018,"ast":1.005},"proj":{"pts":16.81,"reb":2.85,"ast":3.59},"season":{"min":24.5,"pts":16.0,"reb":2.5,"ast":3.5},"last5":[{"d":"2026-10-21","opp":"BKN","min":29.0,"pts":21.0,"reb":3.0,"ast":4.0},{"d":"2026-10-23","opp":"ATL","min":20.0,"pts":11.0,"reb":2.0,"ast":3.0}],"last_season":{"pts":16.5,"reb":3.0,"ast":3.8,"min":28.8,"gp":51},"props":{}},{"pid":"5060701","name":"Christian Anderson","team":"CHA","opp":"MIA","home":true,"gid":"401909853","pos":"G","inj":"","inj_detail":"","out":false,"gp":2,"min":10.0,"b2b":true,"team_implied":null,"env":{"pts":1.01,"reb":1.018,"ast":1.005},"proj":{"pts":4.29,"reb":1.31,"ast":1.66},"season":{"min":14.5,"pts":1.0,"reb":1.0,"ast":2.0},"last5":[{"d":"2026-10-21","opp":"BKN","min":13.0,"pts":0.0,"reb":2.0,"ast":2.0},{"d":"2026-10-23","opp":"ATL","min":16.0,"pts":2.0,"reb":0.0,"ast":2.0}],"last_season":null,"props":{}},{"pid":"4433249","name":"Moussa Diabate","team":"CHA","opp":"MIA","home":true,"gid":"401909853","pos":"F","inj":"","inj_detail":"","out":false,"gp":2,"min":26.5,"b2b":true,"team_implied":null,"env":{"pts":1.01,"reb":1.018,"ast":1.005},"proj":{"pts":9.11,"reb":8.84,"ast":1.97},"season":{"min":27.5,"pts":11.0,"reb":8.0,"ast":2.0},"last5":[{"d":"2026-10-21","opp":"BKN","min":34.0,"pts":17.0,"reb":8.0,"ast":3.0},{"d":"2026-10-23","opp":"ATL","min":21.0,"pts":5.0,"reb":8.0,"ast":1.0}],"last_season":{"pts":7.9,"reb":8.7,"ast":1.9,"min":26.0,"gp":73},"props":{}},{"pid":"4701225","name":"PJ Hall","team":"CHA","opp":"MIA","home":true,"gid":"401909853","pos":"C","inj":"","inj_detail":"","out":false,"gp":1,"min":6.3,"b2b":true,"team_implied":null,"env":{"pts":1.01,"reb":1.018,"ast":1.005},"proj":{"pts":2.67,"reb":2.21,"ast":0.35},"season":{"min":10.0,"pts":0.0,"reb":1.0,"ast":3.0},"last5":[{"d":"2026-10-21","opp":"BKN","min":0,"pts":0,"reb":0,"ast":0},{"d":"2026-10-23","opp":"ATL","min":10.0,"pts":0.0,"reb":1.0,"ast":3.0}],"last_season":{"pts":4.5,"reb":3.9,"ast":0.5,"min":11.2,"gp":19},"props":{}},{"pid":"4602025","name":"Sion James","team":"CHA","opp":"MIA","home":true,"gid":"401909853","pos":"G","inj":"","inj_detail":"","out":false,"gp":2,"min":23.5,"b2b":true,"team_implied":null,"env":{"pts":1.01,"reb":1.018,"ast":1.005},"proj":{"pts":5.63,"reb":3.53,"ast":2.12},"season":{"min":25.5,"pts":3.0,"reb":2.5,"ast":2.5},"last5":[{"d":"2026-10-21","opp":"BKN","min":27.0,"pts":3.0,"reb":3.0,"ast":0.0},{"d":"2026-10-23","opp":"ATL","min":24.0,"pts":3.0,"reb":2.0,"ast":5.0}],"last_season":{"pts":5.4,"reb":3.5,"ast":2.0,"min":22.5,"gp":82},"props":{}},{"pid":"4576060","name":"Ryan Kalkbrenner","team":"CHA","opp":"MIA","home":true,"gid":"401909853","pos":"C","inj":"","inj_detail":"","out":false,"gp":2,"min":19.8,"b2b":true,"team_implied":null,"env":{"pts":1.01,"reb":1.018,"ast":1.005},"proj":{"pts":7.44,"reb":5.36,"ast":0.89},"season":{"min":16.5,"pts":5.0,"reb":6.0,"ast":2.0},"last5":[{"d":"2026-10-21","opp":"BKN","min":14.0,"pts":4.0,"reb":5.0,"ast":3.0},{"d":"2026-10-23","opp":"ATL","min":19.0,"pts":6.0,"reb":7.0,"ast":1.0}],"last_season":{"pts":7.6,"reb":5.5,"ast":0.8,"min":21.4,"gp":69},"props":{}},{"pid":"5239590","name":"Liam McNeeley","team":"CHA","opp":"MIA","home":true,"gid":"401909853","pos":"G","inj":"","inj_detail":"","out":false,"gp":2,"min":7.2,"b2b":true,"team_implied":null,"env":{"pts":1.01,"reb":1.018,"ast":1.005},"proj":{"pts":2.76,"reb":1.5,"ast":0.45},"season":{"min":7.5,"pts":2.0,"reb":2.5,"ast":0.0},"last5":[{"d":"2026-10-21","opp":"BKN","min":3.0,"pts":0.0,"reb":1.0,"ast":0.0},{"d":"2026-10-23","opp":"ATL","min":12.0,"pts":4.0,"reb":4.0,"ast":0.0}],"last_season":{"pts":4.3,"reb":2.4,"ast":0.8,"min":11.9,"gp":31},"props":{}},{"pid":"4433287","name":"Brandon Miller","team":"CHA","opp":"MIA","home":true,"gid":"401909853","pos":"F","inj":"","inj_detail":"","out":false,"gp":2,"min":29.1,"b2b":true,"team_implied":null,"env":{"pts":1.01,"reb":1.018,"ast":1.005},"proj":{"pts":19.63,"reb":4.43,"ast":2.78},"season":{"min":29.5,"pts":12.0,"reb":2.5,"ast":0.5},"last5":[{"d":"2026-10-21","opp":"BKN","min":36.0,"pts":18.0,"reb":3.0,"ast":1.0},{"d":"2026-10-23","opp":"ATL","min":23.0,"pts":6.0,"reb":2.0,"ast":0.0}],"last_season":{"pts":20.2,"reb":4.9,"ast":3.3,"min":30.3,"gp":65},"props":{}},{"pid":"2583632","name":"Royce O'Neale","team":"CHA","opp":"MIA","home":true,"gid":"401909853","pos":"F","inj":"","inj_detail":"","out":false,"gp":2,"min":22.7,"b2b":true,"team_implied":null,"env":{"pts":1.01,"reb":1.018,"ast":1.005},"proj":{"pts":8.65,"reb":3.9,"ast":1.93},"season":{"min":17.0,"pts":7.0,"reb":3.0,"ast":0.0},"last5":[{"d":"2026-10-21","opp":"BKN","min":17.0,"pts":8.0,"reb":4.0,"ast":0.0},{"d":"2026-10-23","opp":"ATL","min":17.0,"pts":6.0,"reb":2.0,"ast":0.0}],"last_season":{"pts":9.8,"reb":4.8,"ast":2.7,"min":28.4,"gp":78},"props":{}},{"pid":"4396971","name":"Naz Reid","team":"CHA","opp":"MIA","home":true,"gid":"401909853","pos":"C","inj":"","inj_detail":"","out":false,"gp":2,"min":27.5,"b2b":true,"team_implied":null,"env":{"pts":1.01,"reb":1.018,"ast":1.005},"proj":{"pts":16.06,"reb":6.91,"ast":2.66},"season":{"min":29.0,"pts":18.5,"reb":8.5,"ast":4.5},"last5":[{"d":"2026-10-21","opp":"BKN","min":33.0,"pts":20.0,"reb":11.0,"ast":7.0},{"d":"2026-10-23","opp":"ATL","min":25.0,"pts":17.0,"reb":6.0,"ast":2.0}],"last_season":{"pts":13.6,"reb":6.2,"ast":2.2,"min":26.1,"gp":77},"props":{}},{"pid":"5211176","name":"Tidjane Salaun","team":"CHA","opp":"MIA","home":true,"gid":"401909853","pos":"F","inj":"","inj_detail":"","out":false,"gp":1,"min":9.8,"b2b":true,"team_implied":null,"env":{"pts":1.01,"reb":1.018,"ast":1.005},"proj":{"pts":4.17,"reb":2.56,"ast":0.46},"season":{"min":23.0,"pts":11.0,"reb":5.0,"ast":1.0},"last5":[{"d":"2026-10-21","opp":"BKN","min":0,"pts":0,"reb":0,"ast":0},{"d":"2026-10-23","opp":"ATL","min":23.0,"pts":11.0,"reb":5.0,"ast":1.0}],"last_season":{"pts":6.0,"reb":4.0,"ast":0.7,"min":15.5,"gp":37},"props":{}},{"pid":"3032979","name":"Dennis Schroder","team":"CHA","opp":"MIA","home":true,"gid":"401909853","pos":"G","inj":"","inj_detail":"","out":false,"gp":2,"min":25.9,"b2b":true,"team_implied":null,"env":{"pts":1.01,"reb":1.018,"ast":1.005},"proj":{"pts":12.37,"reb":3.09,"ast":5.08},"season":{"min":27.5,"pts":11.5,"reb":4.0,"ast":4.5},"last5":[{"d":"2026-10-21","opp":"BKN","min":35.0,"pts":19.0,"reb":4.0,"ast":6.0},{"d":"2026-10-23","opp":"ATL","min":20.0,"pts":4.0,"reb":4.0,"ast":3.0}],"last_season":{"pts":10.8,"reb":2.7,"ast":4.9,"min":24.2,"gp":70},"props":{}},{"pid":"5281370","name":"Hannes Steinbach","team":"CHA","opp":"MIA","home":true,"gid":"401909853","pos":"F","inj":"","inj_detail":"","out":false,"gp":1,"min":4.1,"b2b":true,"team_implied":null,"env":{"pts":1.01,"reb":1.018,"ast":1.005},"proj":{"pts":1.97,"reb":0.94,"ast":0.34},"season":{"min":12.0,"pts":6.0,"reb":5.0,"ast":0.0},"last5":[{"d":"2026-10-21","opp":"BKN","min":0,"pts":0,"reb":0,"ast":0},{"d":"2026-10-23","opp":"ATL","min":12.0,"pts":6.0,"reb":5.0,"ast":0.0}],"last_season":null,"props":{}},{"pid":"5101761","name":"Mikel Brown Jr.","team":"BKN","opp":"CLE","home":false,"gid":"401909854","pos":"G","inj":"","inj_detail":"","out":false,"gp":1,"min":13.9,"b2b":false,"team_implied":108.5,"env":{"pts":0.99,"reb":1.0,"ast":0.997},"proj":{"pts":5.84,"reb":1.96,"ast":2.32},"season":{"min":20.0,"pts":6.0,"reb":3.0,"ast":3.0},"last5":[{"d":"2026-10-21","opp":"CHA","min":20.0,"pts":6.0,"reb":3.0,"ast":3.0}],"last_season":null,"props":{}},{"pid":"4712896","name":"Noah Clowney","team":"BKN","opp":"CLE","home":false,"gid":"401909854","pos":"F","inj":"","inj_detail":"","out":false,"gp":1,"min":18.1,"b2b":false,"team_implied":108.5,"env":{"pts":0.99,"reb":1.0,"ast":0.997},"proj":{"pts":7.78,"reb":2.76,"ast":1.08},"season":{"min":22.0,"pts":9.0,"reb":3.0,"ast":1.0},"last5":[{"d":"2026-10-21","opp":"CHA","min":22.0,"pts":9.0,"reb":3.0,"ast":1.0}],"last_season":{"pts":12.3,"reb":4.1,"ast":1.6,"min":27.0,"gp":66},"props":{}},{"pid":"5175643","name":"Egor Demin","team":"BKN","opp":"CLE","home":false,"gid":"401909854","pos":"G","inj":"","inj_detail":"","out":false,"gp":1,"min":17.7,"b2b":false,"team_implied":108.5,"env":{"pts":0.99,"reb":1.0,"ast":0.997},"proj":{"pts":6.54,"reb":2.27,"ast":2.25},"season":{"min":27.0,"pts":4.0,"reb":4.0,"ast":2.0},"last5":[{"d":"2026-10-21","opp":"CHA","min":27.0,"pts":4.0,"reb":4.0,"ast":2.0}],"last_season":{"pts":10.3,"reb":3.2,"ast":3.3,"min":25.2,"gp":52},"props":{}},{"pid":"4702177","name":"Keon Ellis","team":"BKN","opp":"CLE","home":false,"gid":"401909854","pos":"G","inj":"","inj_detail":"","out":false,"gp":1,"min":17.4,"b2b":false,"team_implied":108.5,"env":{"pts":0.99,"reb":1.0,"ast":0.997},"proj":{"pts":5.17,"reb":1.53,"ast":0.97},"season":{"min":34.0,"pts":7.0,"reb":2.0,"ast":4.0},"last5":[{"d":"2026-10-21","opp":"CHA","min":34.0,"pts":7.0,"reb":2.0,"ast":4.0}],"last_season":{"pts":6.7,"reb":1.9,"ast":1.0,"min":20.5,"gp":72},"props":{}},{"pid":"5174655","name":"Chaney Johnson","team":"BKN","opp":"CLE","home":false,"gid":"401909854","pos":"F","inj":"","inj_detail":"","out":false,"gp":1,"min":12.1,"b2b":false,"team_implied":108.5,"env":{"pts":0.99,"reb":1.0,"ast":0.997},"proj":{"pts":4.53,"reb":2.74,"ast":1.23},"season":{"min":5.0,"pts":0.0,"reb":1.0,"ast":0.0},"last5":[{"d":"2026-10-21","opp":"CHA","min":5.0,"pts":0.0,"reb":1.0,"ast":0.0}],"last_season":{"pts":8.2,"reb":4.6,"ast":2.1,"min":20.5,"gp":17},"props":{}},{"pid":"3907823","name":"Terance Mann","team":"BKN","opp":"CLE","home":false,"gid":"401909854","pos":"G","inj":"","inj_detail":"","out":false,"gp":0,"min":13.5,"b2b":false,"team_implied":108.5,"env":{"pts":0.99,"reb":1.0,"ast":0.997},"proj":{"pts":3.83,"reb":1.77,"ast":1.67},"season":null,"last5":[{"d":"2026-10-21","opp":"CHA","min":0,"pts":0,"reb":0,"ast":0}],"last_season":{"pts":7.2,"reb":3.2,"ast":3.0,"min":24.3,"gp":63},"props":{}},{"pid":"4687718","name":"Josh Minott","team":"BKN","opp":"CLE","home":false,"gid":"401909854","pos":"F","inj":"","inj_detail":"","out":false,"gp":0,"min":5.4,"b2b":false,"team_implied":108.5,"env":{"pts":0.99,"reb":1.0,"ast":0.997},"proj":{"pts":2.24,"reb":1.02,"ast":0.3},"season":null,"last5":[{"d":"2026-10-21","opp":"CHA","min":0,"pts":0,"reb":0,"ast":0}],"last_season":{"pts":7.4,"reb":3.2,"ast":0.9,"min":17.0,"gp":49},"props":{}},{"pid":"4278104","name":"Michael Porter Jr.","team":"BKN","opp":"CLE","home":false,"gid":"401909854","pos":"F","inj":"","inj_detail":"","out":false,"gp":1,"min":32.3,"b2b":false,"team_implied":108.5,"env":{"pts":0.99,"reb":1.0,"ast":0.997},"proj":{"pts":22.99,"reb":6.98,"ast":2.8},"season":{"min":34.0,"pts":26.0,"reb":7.0,"ast":1.0},"last5":[{"d":"2026-10-21","opp":"CHA","min":34.0,"pts":26.0,"reb":7.0,"ast":1.0}],"last_season":{"pts":24.2,"reb":7.1,"ast":3.0,"min":32.5,"gp":52},"props":{}},{"pid":"5037873","name":"Drake Powell","team":"BKN","opp":"CLE","home":false,"gid":"401909854","pos":"G","inj":"","inj_detail":"","out":false,"gp":0,"min":11.7,"b2b":false,"team_implied":108.5,"env":{"pts":0.99,"reb":1.0,"ast":0.997},"proj":{"pts":3.44,"reb":0.98,"ast":0.8},"season":null,"last5":[{"d":"2026-10-21","opp":"CHA","min":0,"pts":0,"reb":0,"ast":0}],"last_season":{"pts":6.5,"reb":1.8,"ast":1.4,"min":21.0,"gp":63},"props":{}},{"pid":"3064514","name":"Julius Randle","team":"BKN","opp":"CLE","home":false,"gid":"401909854","pos":"F","inj":"","inj_detail":"","out":false,"gp":1,"min":34.2,"b2b":false,"team_implied":108.5,"env":{"pts":0.99,"reb":1.0,"ast":0.997},"proj":{"pts":21.64,"reb":7.0,"ast":5.32},"season":{"min":38.0,"pts":33.0,"reb":8.0,"ast":7.0},"last5":[{"d":"2026-10-21","opp":"CHA","min":38.0,"pts":33.0,"reb":8.0,"ast":7.0}],"last_season":{"pts":21.1,"reb":6.7,"ast":5.0,"min":33.0,"gp":79},"props":{}},{"pid":"5242502","name":"Ben Saraf","team":"BKN","opp":"CLE","home":false,"gid":"401909854","pos":"G","inj":"","inj_detail":"","out":false,"gp":0,"min":11.6,"b2b":false,"team_implied":108.5,"env":{"pts":0.99,"reb":1.0,"ast":0.997},"proj":{"pts":4.0,"reb":1.17,"ast":1.83},"season":null,"last5":[{"d":"2026-10-21","opp":"CHA","min":0,"pts":0,"reb":0,"ast":0}],"last_season":{"pts":7.5,"reb":2.1,"ast":3.3,"min":20.8,"gp":44},"props":{}},{"pid":"4432194","name":"Day'Ron Sharpe","team":"BKN","opp":"CLE","home":false,"gid":"401909854","pos":"C","inj":"","inj_detail":"","out":false,"gp":1,"min":14.6,"b2b":false,"team_implied":108.5,"env":{"pts":0.99,"reb":1.0,"ast":0.997},"proj":{"pts":6.22,"reb":5.08,"ast":1.79},"season":{"min":30.0,"pts":8.0,"reb":8.0,"ast":3.0},"last5":[{"d":"2026-10-21","opp":"CHA","min":30.0,"pts":8.0,"reb":8.0,"ast":3.0}],"last_season":{"pts":8.7,"reb":6.7,"ast":2.3,"min":18.7,"gp":62},"props":{}},{"pid":"5279130","name":"Nolan Traore","team":"BKN","opp":"CLE","home":false,"gid":"401909854","pos":"G","inj":"","inj_detail":"","out":false,"gp":1,"min":14.6,"b2b":false,"team_implied":108.5,"env":{"pts":0.99,"reb":1.0,"ast":0.997},"proj":{"pts":5.43,"reb":1.2,"ast":2.37},"season":{"min":16.0,"pts":3.0,"reb":2.0,"ast":0.0},"last5":[{"d":"2026-10-21","opp":"CHA","min":16.0,"pts":3.0,"reb":2.0,"ast":0.0}],"last_season":{"pts":8.9,"reb":1.8,"ast":3.8,"min":22.2,"gp":56},"props":{}},{"pid":"3150844","name":"Moritz Wagner","team":"BKN","opp":"CLE","home":false,"gid":"401909854","pos":"C","inj":"","inj_detail":"","out":false,"gp":1,"min":5.3,"b2b":false,"team_implied":108.5,"env":{"pts":0.99,"reb":1.0,"ast":0.997},"proj":{"pts":2.89,"reb":1.36,"ast":0.33},"season":{"min":16.0,"pts":7.0,"reb":0.0,"ast":1.0},"last5":[{"d":"2026-10-21","opp":"CHA","min":16.0,"pts":7.0,"reb":0.0,"ast":1.0}],"last_season":{"pts":6.9,"reb":3.2,"ast":0.8,"min":11.9,"gp":36},"props":{}},{"pid":"5107173","name":"Danny Wolf","team":"BKN","opp":"CLE","home":false,"gid":"401909854","pos":"F","inj":"","inj_detail":"","out":false,"gp":0,"min":11.6,"b2b":false,"team_implied":108.5,"env":{"pts":0.99,"reb":1.0,"ast":0.997},"proj":{"pts":4.72,"reb":2.75,"ast":1.24},"season":null,"last5":[{"d":"2026-10-21","opp":"CHA","min":0,"pts":0,"reb":0,"ast":0}],"last_season":{"pts":8.9,"reb":4.9,"ast":2.2,"min":20.8,"gp":57},"props":{}},{"pid":"4066328","name":"Jarrett Allen","team":"CLE","opp":"BKN","home":true,"gid":"401909854","pos":"C","inj":"","inj_detail":"","out":false,"gp":1,"min":27.3,"b2b":false,"team_implied":120.0,"env":{"pts":1.01,"reb":1.0,"ast":1.0},"proj":{"pts":14.08,"reb":8.41,"ast":1.64},"season":{"min":28.0,"pts":14.0,"reb":7.0,"ast":0.0},"last5":[{"d":"2026-10-22","opp":"PHI","min":28.0,"pts":14.0,"reb":7.0,"ast":0.0}],"last_season":{"pts":15.4,"reb":8.5,"ast":1.8,"min":27.1,"gp":56},"props":{}},{"pid":"3992","name":"James Harden","team":"CLE","opp":"BKN","home":true,"gid":"401909854","pos":"G","inj":"","inj_detail":"","out":false,"gp":1,"min":34.0,"b2b":false,"team_implied":120.0,"env":{"pts":1.01,"reb":1.0,"ast":1.0},"proj":{"pts":20.59,"reb":4.53,"ast":7.51},"season":{"min":33.0,"pts":16.0,"reb":3.0,"ast":5.0},"last5":[{"d":"2026-10-22","opp":"PHI","min":33.0,"pts":16.0,"reb":3.0,"ast":5.0}],"last_season":{"pts":23.6,"reb":4.8,"ast":8.0,"min":34.8,"gp":70},"props":{}},{"pid":"2995706","name":"Mario Hezonja","team":"CLE","opp":"BKN","home":true,"gid":"401909854","pos":"F","inj":"","inj_detail":"","out":false,"gp":1,"min":13.5,"b2b":false,"team_implied":120.0,"env":{"pts":1.01,"reb":1.0,"ast":1.0},"proj":{"pts":5.58,"reb":2.76,"ast":1.24},"season":{"min":19.0,"pts":10.0,"reb":3.0,"ast":2.0},"last5":[{"d":"2026-10-22","opp":"PHI","min":19.0,"pts":10.0,"reb":3.0,"ast":2.0}],"last_season":null,"props":{}},{"pid":"4066757","name":"Sam Merrill","team":"CLE","opp":"BKN","home":true,"gid":"401909854","pos":"G","inj":"","inj_detail":"","out":false,"gp":1,"min":18.4,"b2b":false,"team_implied":120.0,"env":{"pts":1.01,"reb":1.0,"ast":1.0},"proj":{"pts":7.8,"reb":1.93,"ast":1.66},"season":{"min":24.0,"pts":5.0,"reb":5.0,"ast":2.0},"last5":[{"d":"2026-10-22","opp":"PHI","min":24.0,"pts":5.0,"reb":5.0,"ast":2.0}],"last_season":{"pts":12.8,"reb":2.6,"ast":2.4,"min":26.5,"gp":52},"props":{}},{"pid":"3908809","name":"Donovan Mitchell","team":"CLE","opp":"BKN","home":true,"gid":"401909854","pos":"G","inj":"","inj_detail":"","out":false,"gp":1,"min":33.3,"b2b":false,"team_implied":120.0,"env":{"pts":1.01,"reb":1.0,"ast":1.0},"proj":{"pts":25.78,"reb":5.02,"ast":5.37},"season":{"min":35.0,"pts":32.0,"reb":10.0,"ast":3.0},"last5":[{"d":"2026-10-22","opp":"PHI","min":35.0,"pts":32.0,"reb":10.0,"ast":3.0}],"last_season":{"pts":27.9,"reb":4.5,"ast":5.7,"min":33.5,"gp":70},"props":{}},{"pid":"4432158","name":"Evan Mobley","team":"CLE","opp":"BKN","home":true,"gid":"401909854","pos":"C","inj":"","inj_detail":"","out":false,"gp":1,"min":31.9,"b2b":false,"team_implied":120.0,"env":{"pts":1.01,"reb":1.0,"ast":1.0},"proj":{"pts":16.57,"reb":8.86,"ast":3.42},"season":{"min":34.0,"pts":18.0,"reb":8.0,"ast":2.0},"last5":[{"d":"2026-10-22","opp":"PHI","min":34.0,"pts":18.0,"reb":8.0,"ast":2.0}],"last_season":{"pts":18.2,"reb":9.0,"ast":3.6,"min":31.9,"gp":65},"props":{}},{"pid":"4701233","name":"Craig Porter Jr.","team":"CLE","opp":"BKN","home":true,"gid":"401909854","pos":"G","inj":"","inj_detail":"","out":false,"gp":1,"min":11.3,"b2b":false,"team_implied":120.0,"env":{"pts":1.01,"reb":1.0,"ast":1.0},"proj":{"pts":2.55,"reb":2.22,"ast":1.97},"season":{"min":8.0,"pts":0.0,"reb":3.0,"ast":0.0},"last5":[{"d":"2026-10-22","opp":"PHI","min":8.0,"pts":0.0,"reb":3.0,"ast":0.0}],"last_season":{"pts":4.5,"reb":3.4,"ast":3.2,"min":17.9,"gp":64},"props":{}},{"pid":"4683747","name":"Jaylon Tyson","team":"CLE","opp":"BKN","home":true,"gid":"401909854","pos":"G","inj":"","inj_detail":"","out":false,"gp":1,"min":26.3,"b2b":false,"team_implied":120.0,"env":{"pts":1.01,"reb":1.0,"ast":1.0},"proj":{"pts":11.22,"reb":5.12,"ast":2.18},"season":{"min":24.0,"pts":3.0,"reb":6.0,"ast":2.0},"last5":[{"d":"2026-10-22","opp":"PHI","min":24.0,"pts":3.0,"reb":6.0,"ast":2.0}],"last_season":{"pts":13.2,"reb":5.1,"ast":2.2,"min":26.9,"gp":66},"props":{}},{"pid":"4576087","name":"Peyton Watson","team":"CLE","opp":"BKN","home":true,"gid":"401909854","pos":"G","inj":"","inj_detail":"","out":false,"gp":1,"min":29.3,"b2b":false,"team_implied":120.0,"env":{"pts":1.01,"reb":1.0,"ast":1.0},"proj":{"pts":12.75,"reb":4.49,"ast":2.03},"season":{"min":30.0,"pts":8.0,"reb":1.0,"ast":2.0},"last5":[{"d":"2026-10-22","opp":"PHI","min":30.0,"pts":8.0,"reb":1.0,"ast":2.0}],"last_season":{"pts":14.6,"reb":4.9,"ast":2.1,"min":29.6,"gp":54},"props":{}},{"pid":"5082206","name":"Brayden Burries","team":"MIL","opp":"PHI","home":false,"gid":"401909855","pos":"G","inj":"","inj_detail":"","out":false,"gp":2,"min":4.8,"b2b":true,"team_implied":110.5,"env":{"pts":0.99,"reb":1.024,"ast":0.992},"proj":{"pts":2.25,"reb":0.76,"ast":0.78},"season":{"min":12.0,"pts":7.5,"reb":3.0,"ast":1.5},"last5":[{"d":"2026-10-21","opp":"WSH","min":16.0,"pts":12.0,"reb":5.0,"ast":0.0},{"d":"2026-10-23","opp":"CHI","min":8.0,"pts":3.0,"reb":1.0,"ast":3.0}],"last_season":null,"props":{}},{"pid":"4997526","name":"Ousmane Dieng","team":"MIL","opp":"PHI","home":false,"gid":"401909855","pos":"F","inj":"","inj_detail":"","out":false,"gp":2,"min":14.7,"b2b":true,"team_implied":110.5,"env":{"pts":0.99,"reb":1.024,"ast":0.992},"proj":{"pts":5.33,"reb":2.42,"ast":1.78},"season":{"min":18.5,"pts":4.0,"reb":2.5,"ast":2.0},"last5":[{"d":"2026-10-21","opp":"WSH","min":21.0,"pts":5.0,"reb":4.0,"ast":3.0},{"d":"2026-10-23","opp":"CHI","min":16.0,"pts":3.0,"reb":1.0,"ast":1.0}],"last_season":{"pts":7.6,"reb":3.2,"ast":2.4,"min":19.3,"gp":57},"props":{}},{"pid":"4397475","name":"AJ Green","team":"MIL","opp":"PHI","home":false,"gid":"401909855","pos":"G","inj":"","inj_detail":"","out":false,"gp":2,"min":19.2,"b2b":true,"team_implied":110.5,"env":{"pts":0.99,"reb":1.024,"ast":0.992},"proj":{"pts":6.96,"reb":1.73,"ast":1.21},"season":{"min":16.0,"pts":8.5,"reb":0.5,"ast":0.5},"last5":[{"d":"2026-10-21","opp":"WSH","min":15.0,"pts":6.0,"reb":0.0,"ast":1.0},{"d":"2026-10-23","opp":"CHI","min":17.0,"pts":11.0,"reb":1.0,"ast":0.0}],"last_season":{"pts":10.4,"reb":2.7,"ast":1.9,"min":29.1,"gp":78},"props":{}},{"pid":"4395725","name":"Tyler Herro","team":"MIL","opp":"PHI","home":false,"gid":"401909855","pos":"G","inj":"","inj_detail":"","out":false,"gp":2,"min":30.0,"b2b":true,"team_implied":110.5,"env":{"pts":0.99,"reb":1.024,"ast":0.992},"proj":{"pts":21.89,"reb":4.19,"ast":4.73},"season":{"min":32.0,"pts":29.0,"reb":3.5,"ast":6.5},"last5":[{"d":"2026-10-21","opp":"WSH","min":32.0,"pts":24.0,"reb":2.0,"ast":9.0},{"d":"2026-10-23","opp":"CHI","min":32.0,"pts":34.0,"reb":5.0,"ast":4.0}],"last_season":{"pts":20.5,"reb":4.8,"ast":4.1,"min":31.3,"gp":33},"props":{}},{"pid":"5214640","name":"Kasparas Jakucionis","team":"MIL","opp":"PHI","home":false,"gid":"401909855","pos":"G","inj":"","inj_detail":"","out":false,"gp":2,"min":16.4,"b2b":true,"team_implied":110.5,"env":{"pts":0.99,"reb":1.024,"ast":0.992},"proj":{"pts":5.76,"reb":2.35,"ast":2.4},"season":{"min":24.5,"pts":11.0,"reb":2.5,"ast":4.0},"last5":[{"d":"2026-10-21","opp":"WSH","min":26.0,"pts":15.0,"reb":3.0,"ast":3.0},{"d":"2026-10-23","opp":"CHI","min":23.0,"pts":7.0,"reb":2.0,"ast":5.0}],"last_season":{"pts":6.2,"reb":2.6,"ast":2.6,"min":17.8,"gp":53},"props":{}},{"pid":"4432848","name":"Jaime Jaquez Jr.","team":"MIL","opp":"PHI","home":false,"gid":"401909855","pos":"F","inj":"","inj_detail":"","out":false,"gp":2,"min":29.1,"b2b":true,"team_implied":110.5,"env":{"pts":0.99,"reb":1.024,"ast":0.992},"proj":{"pts":16.2,"reb":6.37,"ast":4.12},"season":{"min":33.0,"pts":20.5,"reb":9.0,"ast":3.5},"last5":[{"d":"2026-10-21","opp":"WSH","min":31.0,"pts":22.0,"reb":7.0,"ast":2.0},{"d":"2026-10-23","opp":"CHI","min":35.0,"pts":19.0,"reb":11.0,"ast":5.0}],"last_season":{"pts":15.4,"reb":5.0,"ast":4.7,"min":28.3,"gp":75},"props":{}},{"pid":"3134907","name":"Kyle Kuzma","team":"MIL","opp":"PHI","home":false,"gid":"401909855","pos":"F","inj":"","inj_detail":"","out":false,"gp":2,"min":26.9,"b2b":true,"team_implied":110.5,"env":{"pts":0.99,"reb":1.024,"ast":0.992},"proj":{"pts":12.28,"reb":5.17,"ast":2.81},"season":{"min":28.5,"pts":9.5,"reb":7.5,"ast":3.5},"last5":[{"d":"2026-10-21","opp":"WSH","min":27.0,"pts":5.0,"reb":6.0,"ast":3.0},{"d":"2026-10-23","opp":"CHI","min":30.0,"pts":14.0,"reb":9.0,"ast":4.0}],"last_season":{"pts":13.0,"reb":4.5,"ast":2.7,"min":26.2,"gp":69},"props":{}},{"pid":"4591725","name":"Ryan Rollins","team":"MIL","opp":"PHI","home":false,"gid":"401909855","pos":"G","inj":"","inj_detail":"","out":false,"gp":2,"min":29.5,"b2b":true,"team_implied":110.5,"env":{"pts":0.99,"reb":1.024,"ast":0.992},"proj":{"pts":14.55,"reb":4.7,"ast":5.01},"season":{"min":29.0,"pts":10.0,"reb":6.5,"ast":4.5},"last5":[{"d":"2026-10-21","opp":"WSH","min":24.0,"pts":9.0,"reb":6.0,"ast":3.0},{"d":"2026-10-23","opp":"CHI","min":34.0,"pts":11.0,"reb":7.0,"ast":6.0}],"last_season":{"pts":17.3,"reb":4.6,"ast":5.6,"min":32.1,"gp":74},"props":{}},{"pid":"4277922","name":"Jericho Sims","team":"MIL","opp":"PHI","home":false,"gid":"401909855","pos":"C","inj":"","inj_detail":"","out":false,"gp":1,"min":5.4,"b2b":true,"team_implied":110.5,"env":{"pts":0.99,"reb":1.024,"ast":0.992},"proj":{"pts":1.32,"reb":1.54,"ast":0.42},"season":{"min":2.0,"pts":0.0,"reb":0.0,"ast":0.0},"last5":[{"d":"2026-10-21","opp":"WSH","min":2.0,"pts":0.0,"reb":0.0,"ast":0.0},{"d":"2026-10-23","opp":"CHI","min":0,"pts":0,"reb":0,"ast":0}],"last_season":{"pts":5.0,"reb":5.5,"ast":1.6,"min":19.7,"gp":67},"props":{}},{"pid":"4277843","name":"Gary Trent Jr.","team":"MIL","opp":"PHI","home":false,"gid":"401909855","pos":"G","inj":"","inj_detail":"","out":false,"gp":0,"min":5.6,"b2b":true,"team_implied":110.5,"env":{"pts":0.99,"reb":1.024,"ast":0.992},"proj":{"pts":2.09,"reb":0.28,"ast":0.32},"season":null,"last5":[{"d":"2026-10-21","opp":"WSH","min":0,"pts":0,"reb":0,"ast":0},{"d":"2026-10-23","opp":"CHI","min":0,"pts":0,"reb":0,"ast":0}],"last_season":{"pts":8.1,"reb":1.0,"ast":1.2,"min":21.2,"gp":65},"props":{}},{"pid":"3133628","name":"Myles Turner","team":"MIL","opp":"PHI","home":false,"gid":"401909855","pos":"C","inj":"","inj_detail":"","out":false,"gp":2,"min":27.7,"b2b":true,"team_implied":110.5,"env":{"pts":0.99,"reb":1.024,"ast":0.992},"proj":{"pts":11.18,"reb":4.87,"ast":1.59},"season":{"min":31.0,"pts":11.5,"reb":4.0,"ast":2.0},"last5":[{"d":"2026-10-21","opp":"WSH","min":32.0,"pts":11.0,"reb":5.0,"ast":3.0},{"d":"2026-10-23","opp":"CHI","min":30.0,"pts":12.0,"reb":3.0,"ast":1.0}],"last_season":{"pts":11.9,"reb":5.3,"ast":1.5,"min":26.9,"gp":71},"props":{}},{"pid":"5105623","name":"Kel'el Ware","team":"MIL","opp":"PHI","home":false,"gid":"401909855","pos":"C","inj":"","inj_detail":"","out":false,"gp":2,"min":14.2,"b2b":true,"team_implied":110.5,"env":{"pts":0.99,"reb":1.024,"ast":0.992},"proj":{"pts":7.04,"reb":5.71,"ast":0.46},"season":{"min":14.5,"pts":9.0,"reb":3.5,"ast":0.5},"last5":[{"d":"2026-10-21","opp":"WSH","min":14.0,"pts":7.0,"reb":3.0,"ast":1.0},{"d":"2026-10-23","opp":"CHI","min":15.0,"pts":11.0,"reb":4.0,"ast":0.0}],"last_season":{"pts":11.1,"reb":9.0,"ast":0.7,"min":22.1,"gp":77},"props":{}},{"pid":"5105637","name":"Adem Bona","team":"PHI","opp":"MIL","home":true,"gid":"401909855","pos":"C","inj":"","inj_detail":"","out":false,"gp":2,"min":15.6,"b2b":false,"team_implied":124.0,"env":{"pts":1.01,"reb":1.013,"ast":1.021},"proj":{"pts":4.03,"reb":3.88,"ast":0.43},"season":{"min":12.0,"pts":1.0,"reb":2.5,"ast":0.5},"last5":[{"d":"2026-10-20","opp":"NY","min":10.0,"pts":0.0,"reb":3.0,"ast":1.0},{"d":"2026-10-22","opp":"CLE","min":14.0,"pts":2.0,"reb":2.0,"ast":0.0}],"last_season":{"pts":4.8,"reb":4.3,"ast":0.5,"min":17.4,"gp":71},"props":{}},{"pid":"3917376","name":"Jaylen Brown","team":"PHI","opp":"MIL","home":true,"gid":"401909855","pos":"G","inj":"","inj_detail":"","out":false,"gp":2,"min":34.7,"b2b":false,"team_implied":124.0,"env":{"pts":1.01,"reb":1.013,"ast":1.021},"proj":{"pts":24.46,"reb":7.33,"ast":5.11},"season":{"min":36.5,"pts":20.0,"reb":8.0,"ast":5.0},"last5":[{"d":"2026-10-20","opp":"NY","min":35.0,"pts":19.0,"reb":8.0,"ast":6.0},{"d":"2026-10-22","opp":"CLE","min":38.0,"pts":21.0,"reb":8.0,"ast":4.0}],"last_season":{"pts":28.7,"reb":6.9,"ast":5.1,"min":34.4,"gp":71},"props":{}},{"pid":"2581018","name":"Kentavious Caldwell-Pope","team":"PHI","opp":"MIL","home":true,"gid":"401909855","pos":"G","inj":"","inj_detail":"","out":false,"gp":2,"min":23.4,"b2b":false,"team_implied":124.0,"env":{"pts":1.01,"reb":1.013,"ast":1.021},"proj":{"pts":8.54,"reb":2.8,"ast":2.81},"season":{"min":25.5,"pts":6.5,"reb":3.5,"ast":1.5},"last5":[{"d":"2026-10-20","opp":"NY","min":26.0,"pts":10.0,"reb":4.0,"ast":1.0},{"d":"2026-10-22","opp":"CLE","min":25.0,"pts":3.0,"reb":3.0,"ast":2.0}],"last_season":{"pts":8.4,"reb":2.5,"ast":2.7,"min":21.3,"gp":51},"props":{}},{"pid":"5124612","name":"VJ Edgecombe","team":"PHI","opp":"MIL","home":true,"gid":"401909855","pos":"G","inj":"","inj_detail":"","out":false,"gp":2,"min":33.9,"b2b":false,"team_implied":124.0,"env":{"pts":1.01,"reb":1.013,"ast":1.021},"proj":{"pts":13.05,"reb":5.55,"ast":3.93},"season":{"min":34.0,"pts":10.0,"reb":5.5,"ast":3.5},"last5":[{"d":"2026-10-20","opp":"NY","min":35.0,"pts":9.0,"reb":4.0,"ast":1.0},{"d":"2026-10-22","opp":"CLE","min":33.0,"pts":11.0,"reb":7.0,"ast":6.0}],"last_season":{"pts":16.0,"reb":5.6,"ast":4.2,"min":35.0,"gp":75},"props":{}},{"pid":"4711297","name":"Justin Edwards","team":"PHI","opp":"MIL","home":true,"gid":"401909855","pos":"F","inj":"","inj_detail":"","out":false,"gp":0,"min":6.3,"b2b":false,"team_implied":124.0,"env":{"pts":1.01,"reb":1.013,"ast":1.021},"proj":{"pts":2.43,"reb":0.61,"ast":0.53},"season":null,"last5":[{"d":"2026-10-20","opp":"NY","min":0,"pts":0,"reb":0,"ast":0},{"d":"2026-10-22","opp":"CLE","min":0,"pts":0,"reb":0,"ast":0}],"last_season":{"pts":6.0,"reb":1.5,"ast":1.2,"min":15.3,"gp":64},"props":{}},{"pid":"3059318","name":"Joel Embiid","team":"PHI","opp":"MIL","home":true,"gid":"401909855","pos":"C","inj":"","inj_detail":"","out":false,"gp":2,"min":31.5,"b2b":false,"team_implied":124.0,"env":{"pts":1.01,"reb":1.013,"ast":1.021},"proj":{"pts":22.64,"reb":8.09,"ast":3.76},"season":{"min":33.5,"pts":18.5,"reb":9.0,"ast":3.5},"last5":[{"d":"2026-10-20","opp":"NY","min":33.0,"pts":13.0,"reb":11.0,"ast":6.0},{"d":"2026-10-22","opp":"CLE","min":34.0,"pts":24.0,"reb":7.0,"ast":1.0}],"last_season":{"pts":26.9,"reb":7.7,"ast":3.9,"min":31.6,"gp":38},"props":{}},{"pid":"4433144","name":"Caleb Love","team":"PHI","opp":"MIL","home":true,"gid":"401909855","pos":"G","inj":"","inj_detail":"","out":false,"gp":0,"min":6.4,"b2b":false,"team_implied":124.0,"env":{"pts":1.01,"reb":1.013,"ast":1.021},"proj":{"pts":3.15,"reb":0.73,"ast":0.79},"season":null,"last5":[{"d":"2026-10-20","opp":"NY","min":0,"pts":0,"reb":0,"ast":0},{"d":"2026-10-22","opp":"CLE","min":0,"pts":0,"reb":0,"ast":0}],"last_season":{"pts":10.4,"reb":2.3,"ast":2.5,"min":20.7,"gp":49},"props":{}},{"pid":"4431678","name":"Tyrese Maxey","team":"PHI","opp":"MIL","home":true,"gid":"401909855","pos":"G","inj":"","inj_detail":"","out":false,"gp":2,"min":38.2,"b2b":false,"team_implied":124.0,"env":{"pts":1.01,"reb":1.013,"ast":1.021},"proj":{"pts":27.61,"reb":3.84,"ast":6.13},"season":{"min":41.0,"pts":30.0,"reb":3.5,"ast":5.5},"last5":[{"d":"2026-10-20","opp":"NY","min":40.0,"pts":28.0,"reb":4.0,"ast":5.0},{"d":"2026-10-22","opp":"CLE","min":42.0,"pts":32.0,"reb":3.0,"ast":6.0}],"last_season":{"pts":28.3,"reb":4.1,"ast":6.6,"min":38.0,"gp":70},"props":{}},{"pid":"5099752","name":"Rayan Rupert","team":"PHI","opp":"MIL","home":true,"gid":"401909855","pos":"G","inj":"","inj_detail":"","out":false,"gp":0,"min":5.2,"b2b":false,"team_implied":124.0,"env":{"pts":1.01,"reb":1.013,"ast":1.021},"proj":{"pts":1.58,"reb":0.92,"ast":0.34},"season":null,"last5":[{"d":"2026-10-20","opp":"NY","min":0,"pts":0,"reb":0,"ast":0},{"d":"2026-10-22","opp":"CLE","min":0,"pts":0,"reb":0,"ast":0}],"last_season":{"pts":5.2,"reb":2.9,"ast":1.1,"min":16.8,"gp":64},"props":{}},{"pid":"4351851","name":"Anfernee Simons","team":"PHI","opp":"MIL","home":true,"gid":"401909855","pos":"G","inj":"","inj_detail":"","out":false,"gp":2,"min":23.0,"b2b":false,"team_implied":124.0,"env":{"pts":1.01,"reb":1.013,"ast":1.021},"proj":{"pts":12.28,"reb":2.35,"ast":2.01},"season":{"min":21.0,"pts":7.5,"reb":2.5,"ast":0.0},"last5":[{"d":"2026-10-20","opp":"NY","min":25.0,"pts":13.0,"reb":2.0,"ast":0.0},{"d":"2026-10-22","opp":"CLE","min":17.0,"pts":2.0,"reb":3.0,"ast":0.0}],"last_season":{"pts":14.3,"reb":2.5,"ast":2.4,"min":24.9,"gp":55},"props":{}},{"pid":"3912848","name":"Dean Wade","team":"PHI","opp":"MIL","home":true,"gid":"401909855","pos":"F","inj":"GTD","inj_detail":"Ankle Sprain","out":false,"gp":0,"min":9.3,"b2b":false,"team_implied":124.0,"env":{"pts":1.01,"reb":1.013,"ast":1.021},"proj":{"pts":2.36,"reb":1.77,"ast":0.63},"season":null,"last5":[{"d":"2026-10-22","opp":"CLE","min":0,"pts":0,"reb":0,"ast":0}],"last_season":{"pts":5.8,"reb":4.2,"ast":1.5,"min":22.3,"gp":59},"props":{}},{"pid":"4432446","name":"Jabari Walker","team":"PHI","opp":"MIL","home":true,"gid":"401909855","pos":"F","inj":"","inj_detail":"","out":false,"gp":2,"min":5.7,"b2b":false,"team_implied":124.0,"env":{"pts":1.01,"reb":1.013,"ast":1.021},"proj":{"pts":2.01,"reb":1.44,"ast":0.27},"season":{"min":3.5,"pts":1.0,"reb":0.5,"ast":0.5},"last5":[{"d":"2026-10-20","opp":"NY","min":3.0,"pts":0.0,"reb":0.0,"ast":1.0},{"d":"2026-10-22","opp":"CLE","min":4.0,"pts":2.0,"reb":1.0,"ast":0.0}],"last_season":{"pts":4.3,"reb":3.0,"ast":0.5,"min":11.9,"gp":64},"props":{}},{"pid":"4278129","name":"Deandre Ayton","team":"WSH","opp":"CHI","home":false,"gid":"401909857","pos":"C","inj":"","inj_detail":"","out":false,"gp":2,"min":16.2,"b2b":true,"team_implied":121.5,"env":{"pts":0.99,"reb":1.041,"ast":1.047},"proj":{"pts":7.41,"reb":5.03,"ast":0.52},"season":{"min":14.5,"pts":7.5,"reb":5.0,"ast":0.5},"last5":[{"d":"2026-10-21","opp":"MIL","min":15.0,"pts":11.0,"reb":4.0,"ast":0.0},{"d":"2026-10-23","opp":"TOR","min":14.0,"pts":4.0,"reb":6.0,"ast":1.0}],"last_season":{"pts":12.5,"reb":8.0,"ast":0.8,"min":27.2,"gp":72},"props":{}},{"pid":"4845374","name":"Bub Carrington","team":"WSH","opp":"CHI","home":false,"gid":"401909857","pos":"G","inj":"","inj_detail":"","out":false,"gp":2,"min":18.3,"b2b":true,"team_implied":121.5,"env":{"pts":0.99,"reb":1.041,"ast":1.047},"proj":{"pts":7.06,"reb":2.22,"ast":3.16},"season":{"min":15.0,"pts":6.5,"reb":1.0,"ast":2.0},"last5":[{"d":"2026-10-21","opp":"MIL","min":19.0,"pts":10.0,"reb":1.0,"ast":4.0},{"d":"2026-10-23","opp":"TOR","min":11.0,"pts":3.0,"reb":1.0,"ast":0.0}],"last_season":{"pts":10.7,"reb":3.4,"ast":4.6,"min":27.7,"gp":82},"props":{}},{"pid":"4432907","name":"Justin Champagnie","team":"WSH","opp":"CHI","home":false,"gid":"401909857","pos":"F","inj":"","inj_detail":"","out":false,"gp":2,"min":16.1,"b2b":true,"team_implied":121.5,"env":{"pts":0.99,"reb":1.041,"ast":1.047},"proj":{"pts":6.75,"reb":4.76,"ast":0.95},"season":{"min":22.0,"pts":8.0,"reb":7.0,"ast":0.5},"last5":[{"d":"2026-10-21","opp":"MIL","min":21.0,"pts":8.0,"reb":8.0,"ast":1.0},{"d":"2026-10-23","opp":"TOR","min":23.0,"pts":8.0,"reb":6.0,"ast":0.0}],"last_season":{"pts":8.7,"reb":5.6,"ast":1.2,"min":20.0,"gp":69},"props":{}},{"pid":"5104155","name":"Bilal Coulibaly","team":"WSH","opp":"CHI","home":false,"gid":"401909857","pos":"G","inj":"","inj_detail":"","out":false,"gp":2,"min":26.6,"b2b":true,"team_implied":121.5,"env":{"pts":0.99,"reb":1.041,"ast":1.047},"proj":{"pts":11.56,"reb":4.5,"ast":2.4},"season":{"min":27.5,"pts":11.0,"reb":4.0,"ast":0.5},"last5":[{"d":"2026-10-21","opp":"MIL","min":29.0,"pts":11.0,"reb":2.0,"ast":1.0},{"d":"2026-10-23","opp":"TOR","min":26.0,"pts":11.0,"reb":6.0,"ast":0.0}],"last_season":{"pts":11.7,"reb":4.3,"ast":2.6,"min":26.2,"gp":56},"props":{}},{"pid":"6583","name":"Anthony Davis","team":"WSH","opp":"CHI","home":false,"gid":"401909857","pos":"F","inj":"","inj_detail":"","out":false,"gp":2,"min":31.2,"b2b":true,"team_implied":121.5,"env":{"pts":0.99,"reb":1.041,"ast":1.047},"proj":{"pts":20.05,"reb":11.03,"ast":2.56},"season":{"min":33.0,"pts":21.5,"reb":10.5,"ast":2.0},"last5":[{"d":"2026-10-21","opp":"MIL","min":34.0,"pts":34.0,"reb":12.0,"ast":4.0},{"d":"2026-10-23","opp":"TOR","min":32.0,"pts":9.0,"reb":9.0,"ast":0.0}],"last_season":{"pts":20.4,"reb":11.1,"ast":2.8,"min":31.3,"gp":20},"props":{}},{"pid":"5174563","name":"Kyshawn George","team":"WSH","opp":"CHI","home":false,"gid":"401909857","pos":"F","inj":"","inj_detail":"","out":false,"gp":2,"min":28.5,"b2b":true,"team_implied":121.5,"env":{"pts":0.99,"reb":1.041,"ast":1.047},"proj":{"pts":14.44,"reb":5.09,"ast":4.39},"season":{"min":27.5,"pts":14.5,"reb":4.0,"ast":3.0},"last5":[{"d":"2026-10-21","opp":"MIL","min":29.0,"pts":18.0,"reb":5.0,"ast":3.0},{"d":"2026-10-23","opp":"TOR","min":26.0,"pts":11.0,"reb":3.0,"ast":3.0}],"last_season":{"pts":14.8,"reb":5.1,"ast":4.5,"min":29.0,"gp":48},"props":{}},{"pid":"2581184","name":"Anthony Gill","team":"WSH","opp":"CHI","home":false,"gid":"401909857","pos":"F","inj":"","inj_detail":"","out":false,"gp":1,"min":4.7,"b2b":true,"team_implied":121.5,"env":{"pts":0.99,"reb":1.041,"ast":1.047},"proj":{"pts":1.57,"reb":0.81,"ast":0.36},"season":{"min":1.0,"pts":0.0,"reb":0.0,"ast":0.0},"last5":[{"d":"2026-10-21","opp":"MIL","min":0,"pts":0,"reb":0,"ast":0},{"d":"2026-10-23","opp":"TOR","min":1.0,"pts":0.0,"reb":0.0,"ast":0.0}],"last_season":{"pts":5.8,"reb":2.9,"ast":1.3,"min":17.3,"gp":55},"props":{}},{"pid":"5238230","name":"Tre Johnson","team":"WSH","opp":"CHI","home":false,"gid":"401909857","pos":"G","inj":"","inj_detail":"","out":false,"gp":2,"min":18.3,"b2b":true,"team_implied":121.5,"env":{"pts":0.99,"reb":1.041,"ast":1.047},"proj":{"pts":9.45,"reb":2.12,"ast":1.41},"season":{"min":22.5,"pts":14.0,"reb":1.5,"ast":0.0},"last5":[{"d":"2026-10-21","opp":"MIL","min":19.0,"pts":8.0,"reb":1.0,"ast":0.0},{"d":"2026-10-23","opp":"TOR","min":26.0,"pts":20.0,"reb":2.0,"ast":0.0}],"last_season":{"pts":12.2,"reb":2.8,"ast":2.0,"min":24.1,"gp":60},"props":{}},{"pid":"6609","name":"Khris Middleton","team":"WSH","opp":"CHI","home":false,"gid":"401909857","pos":"F","inj":"","inj_detail":"","out":false,"gp":2,"min":14.3,"b2b":true,"team_implied":121.5,"env":{"pts":0.99,"reb":1.041,"ast":1.047},"proj":{"pts":6.08,"reb":2.37,"ast":1.68},"season":{"min":14.0,"pts":4.0,"reb":2.0,"ast":0.0},"last5":[{"d":"2026-10-21","opp":"MIL","min":12.0,"pts":2.0,"reb":2.0,"ast":0.0},{"d":"2026-10-23","opp":"TOR","min":16.0,"pts":6.0,"reb":2.0,"ast":0.0}],"last_season":{"pts":10.2,"reb":3.7,"ast":2.8,"min":22.8,"gp":63},"props":{}},{"pid":"5144126","name":"Will Riley","team":"WSH","opp":"CHI","home":false,"gid":"401909857","pos":"G","inj":"","inj_detail":"","out":false,"gp":1,"min":5.9,"b2b":true,"team_implied":121.5,"env":{"pts":0.99,"reb":1.041,"ast":1.047},"proj":{"pts":2.72,"reb":0.8,"ast":0.55},"season":{"min":1.0,"pts":0.0,"reb":0.0,"ast":0.0},"last5":[{"d":"2026-10-21","opp":"MIL","min":0,"pts":0,"reb":0,"ast":0},{"d":"2026-10-23","opp":"TOR","min":1.0,"pts":0.0,"reb":0.0,"ast":0.0}],"last_season":{"pts":10.3,"reb":2.9,"ast":2.0,"min":22.1,"gp":74},"props":{}},{"pid":"5160992","name":"Alex Sarr","team":"WSH","opp":"CHI","home":false,"gid":"401909857","pos":"C","inj":"","inj_detail":"","out":false,"gp":2,"min":26.3,"b2b":true,"team_implied":121.5,"env":{"pts":0.99,"reb":1.041,"ast":1.047},"proj":{"pts":14.36,"reb":7.42,"ast":2.91},"season":{"min":24.5,"pts":6.5,"reb":6.5,"ast":3.5},"last5":[{"d":"2026-10-21","opp":"MIL","min":24.0,"pts":6.0,"reb":9.0,"ast":2.0},{"d":"2026-10-23","opp":"TOR","min":25.0,"pts":7.0,"reb":4.0,"ast":5.0}],"last_season":{"pts":16.3,"reb":7.4,"ast":2.7,"min":27.2,"gp":48},"props":{}},{"pid":"4277905","name":"Trae Young","team":"WSH","opp":"CHI","home":false,"gid":"401909857","pos":"G","inj":"","inj_detail":"","out":false,"gp":2,"min":29.6,"b2b":true,"team_implied":121.5,"env":{"pts":0.99,"reb":1.041,"ast":1.047},"proj":{"pts":18.83,"reb":1.71,"ast":9.95},"season":{"min":37.5,"pts":21.0,"reb":0.5,"ast":12.5},"last5":[{"d":"2026-10-21","opp":"MIL","min":38.0,"pts":20.0,"reb":0.0,"ast":13.0},{"d":"2026-10-23","opp":"TOR","min":37.0,"pts":22.0,"reb":1.0,"ast":12.0}],"last_season":{"pts":17.9,"reb":2.0,"ast":8.0,"min":25.6,"gp":15},"props":{}},{"pid":"4711294","name":"Matas Buzelis","team":"CHI","opp":"WSH","home":true,"gid":"401909857","pos":"F","inj":"","inj_detail":"","out":false,"gp":2,"min":26.5,"b2b":true,"team_implied":123.0,"env":{"pts":1.01,"reb":1.04,"ast":1.036},"proj":{"pts":14.83,"reb":5.71,"ast":1.93},"season":{"min":21.0,"pts":12.0,"reb":5.5,"ast":1.5},"last5":[{"d":"2026-10-21","opp":"TOR","min":25.0,"pts":17.0,"reb":6.0,"ast":0.0},{"d":"2026-10-23","opp":"MIL","min":17.0,"pts":7.0,"reb":5.0,"ast":3.0}],"last_season":{"pts":16.3,"reb":5.8,"ast":2.1,"min":29.2,"gp":77},"props":{}},{"pid":"4066650","name":"Zach Collins","team":"CHI","opp":"WSH","home":true,"gid":"401909857","pos":"F","inj":"","inj_detail":"","out":false,"gp":1,"min":7.4,"b2b":true,"team_implied":123.0,"env":{"pts":1.01,"reb":1.04,"ast":1.036},"proj":{"pts":3.8,"reb":2.4,"ast":0.61},"season":{"min":9.0,"pts":0.0,"reb":5.0,"ast":0.0},"last5":[{"d":"2026-10-21","opp":"TOR","min":9.0,"pts":0.0,"reb":5.0,"ast":0.0},{"d":"2026-10-23","opp":"MIL","min":0,"pts":0,"reb":0,"ast":0}],"last_season":{"pts":9.7,"reb":5.6,"ast":1.5,"min":18.4,"gp":10},"props":{}},{"pid":"4871145","name":"Josh Giddey","team":"CHI","opp":"WSH","home":true,"gid":"401909857","pos":"G","inj":"","inj_detail":"","out":false,"gp":2,"min":29.5,"b2b":true,"team_implied":123.0,"env":{"pts":1.01,"reb":1.04,"ast":1.036},"proj":{"pts":14.16,"reb":7.8,"ast":8.81},"season":{"min":24.5,"pts":4.0,"reb":5.5,"ast":7.5},"last5":[{"d":"2026-10-21","opp":"TOR","min":24.0,"pts":2.0,"reb":7.0,"ast":6.0},{"d":"2026-10-23","opp":"MIL","min":25.0,"pts":6.0,"reb":4.0,"ast":9.0}],"last_season":{"pts":17.0,"reb":8.3,"ast":9.1,"min":32.1,"gp":54},"props":{}},{"pid":"2990984","name":"Buddy Hield","team":"CHI","opp":"WSH","home":true,"gid":"401909857","pos":"G","inj":"","inj_detail":"","out":false,"gp":2,"min":15.3,"b2b":true,"team_implied":123.0,"env":{"pts":1.01,"reb":1.04,"ast":1.036},"proj":{"pts":7.26,"reb":2.25,"ast":1.45},"season":{"min":14.5,"pts":6.5,"reb":2.0,"ast":2.0},"last5":[{"d":"2026-10-21","opp":"TOR","min":14.0,"pts":0.0,"reb":2.0,"ast":2.0},{"d":"2026-10-23","opp":"MIL","min":15.0,"pts":13.0,"reb":2.0,"ast":2.0}],"last_season":{"pts":7.6,"reb":2.3,"ast":1.4,"min":16.1,"gp":51},"props":{}},{"pid":"4395626","name":"Tre Jones","team":"CHI","opp":"WSH","home":true,"gid":"401909857","pos":"G","inj":"","inj_detail":"","out":false,"gp":2,"min":24.1,"b2b":true,"team_implied":123.0,"env":{"pts":1.01,"reb":1.04,"ast":1.036},"proj":{"pts":12.93,"reb":3.05,"ast":5.03},"season":{"min":18.5,"pts":12.0,"reb":3.0,"ast":4.0},"last5":[{"d":"2026-10-21","opp":"TOR","min":13.0,"pts":13.0,"reb":3.0,"ast":0.0},{"d":"2026-10-23","opp":"MIL","min":24.0,"pts":11.0,"reb":3.0,"ast":8.0}],"last_season":{"pts":14.1,"reb":3.1,"ast":5.4,"min":27.0,"gp":65},"props":{}},{"pid":"5044385","name":"Leonard Miller","team":"CHI","opp":"WSH","home":true,"gid":"401909857","pos":"F","inj":"","inj_detail":"","out":false,"gp":2,"min":18.8,"b2b":true,"team_implied":123.0,"env":{"pts":1.01,"reb":1.04,"ast":1.036},"proj":{"pts":9.34,"reb":4.72,"ast":1.1},"season":{"min":25.0,"pts":11.5,"reb":4.5,"ast":1.5},"last5":[{"d":"2026-10-21","opp":"TOR","min":26.0,"pts":4.0,"reb":6.0,"ast":1.0},{"d":"2026-10-23","opp":"MIL","min":24.0,"pts":19.0,"reb":3.0,"ast":2.0}],"last_season":{"pts":7.8,"reb":3.9,"ast":0.9,"min":15.6,"gp":46},"props":{}},{"pid":"4432822","name":"Isaac Okoro","team":"CHI","opp":"WSH","home":true,"gid":"401909857","pos":"F","inj":"","inj_detail":"","out":false,"gp":2,"min":25.6,"b2b":true,"team_implied":123.0,"env":{"pts":1.01,"reb":1.04,"ast":1.036},"proj":{"pts":8.85,"reb":2.59,"ast":1.51},"season":{"min":23.0,"pts":8.0,"reb":1.5,"ast":1.0},"last5":[{"d":"2026-10-21","opp":"TOR","min":18.0,"pts":4.0,"reb":0.0,"ast":1.0},{"d":"2026-10-23","opp":"MIL","min":28.0,"pts":12.0,"reb":3.0,"ast":1.0}],"last_season":{"pts":9.3,"reb":2.7,"ast":1.6,"min":26.9,"gp":63},"props":{}},{"pid":"2595516","name":"Norman Powell","team":"CHI","opp":"WSH","home":true,"gid":"401909857","pos":"G","inj":"","inj_detail":"","out":false,"gp":2,"min":28.6,"b2b":true,"team_implied":123.0,"env":{"pts":1.01,"reb":1.04,"ast":1.036},"proj":{"pts":21.01,"reb":3.71,"ast":2.25},"season":{"min":27.5,"pts":20.0,"reb":4.5,"ast":1.0},"last5":[{"d":"2026-10-21","opp":"TOR","min":22.0,"pts":15.0,"reb":5.0,"ast":1.0},{"d":"2026-10-23","opp":"MIL","min":33.0,"pts":25.0,"reb":4.0,"ast":1.0}],"last_season":{"pts":21.7,"reb":3.5,"ast":2.5,"min":29.6,"gp":58},"props":{}},{"pid":"4397189","name":"Jalen Smith","team":"CHI","opp":"WSH","home":true,"gid":"401909857","pos":"F","inj":"","inj_detail":"","out":false,"gp":2,"min":20.9,"b2b":true,"team_implied":123.0,"env":{"pts":1.01,"reb":1.04,"ast":1.036},"proj":{"pts":10.82,"reb":7.5,"ast":1.25},"season":{"min":21.5,"pts":14.5,"reb":10.5,"ast":1.0},"last5":[{"d":"2026-10-21","opp":"TOR","min":19.0,"pts":15.0,"reb":8.0,"ast":1.0},{"d":"2026-10-23","opp":"MIL","min":24.0,"pts":14.0,"reb":13.0,"ast":1.0}],"last_season":{"pts":10.2,"reb":6.7,"ast":1.2,"min":20.7,"gp":53},"props":{}},{"pid":"5095151","name":"Caleb Wilson","team":"CHI","opp":"WSH","home":true,"gid":"401909857","pos":"F","inj":"","inj_detail":"","out":false,"gp":2,"min":31.5,"b2b":true,"team_implied":123.0,"env":{"pts":1.01,"reb":1.04,"ast":1.036},"proj":{"pts":15.83,"reb":6.0,"ast":1.87},"season":{"min":32.5,"pts":18.5,"reb":5.0,"ast":0.5},"last5":[{"d":"2026-10-21","opp":"TOR","min":32.0,"pts":16.0,"reb":4.0,"ast":0.0},{"d":"2026-10-23","opp":"MIL","min":33.0,"pts":21.0,"reb":6.0,"ast":1.0}],"last_season":null,"props":{}},{"pid":"6578","name":"Harrison Barnes","team":"SA","opp":"DAL","home":false,"gid":"401909858","pos":"F","inj":"","inj_detail":"","out":false,"gp":2,"min":17.4,"b2b":true,"team_implied":122.0,"env":{"pts":0.99,"reb":0.999,"ast":1.013},"proj":{"pts":6.78,"reb":1.78,"ast":1.26},"season":{"min":7.0,"pts":1.5,"reb":0.0,"ast":0.0},"last5":[{"d":"2026-10-20","opp":"OKC","min":9.0,"pts":3.0,"reb":0.0,"ast":0.0},{"d":"2026-10-23","opp":"HOU","min":5.0,"pts":0.0,"reb":0.0,"ast":0.0}],"last_season":{"pts":9.9,"reb":2.8,"ast":1.9,"min":25.8,"gp":77},"props":{}},{"pid":"4845367","name":"Stephon Castle","team":"SA","opp":"DAL","home":false,"gid":"401909858","pos":"G","inj":"","inj_detail":"","out":false,"gp":2,"min":28.5,"b2b":true,"team_implied":122.0,"env":{"pts":0.99,"reb":0.999,"ast":1.013},"proj":{"pts":17.3,"reb":5.61,"ast":5.5},"season":{"min":30.5,"pts":19.5,"reb":7.0,"ast":3.0},"last5":[{"d":"2026-10-20","opp":"OKC","min":28.0,"pts":24.0,"reb":7.0,"ast":1.0},{"d":"2026-10-23","opp":"HOU","min":33.0,"pts":15.0,"reb":7.0,"ast":5.0}],"last_season":{"pts":16.7,"reb":5.3,"ast":7.4,"min":30.0,"gp":68},"props":{}},{"pid":"4592479","name":"Julian Champagnie","team":"SA","opp":"DAL","home":false,"gid":"401909858","pos":"F","inj":"","inj_detail":"","out":false,"gp":2,"min":27.6,"b2b":true,"team_implied":122.0,"env":{"pts":0.99,"reb":0.999,"ast":1.013},"proj":{"pts":10.81,"reb":5.09,"ast":1.4},"season":{"min":27.5,"pts":7.0,"reb":1.5,"ast":0.5},"last5":[{"d":"2026-10-20","opp":"OKC","min":30.0,"pts":8.0,"reb":3.0,"ast":1.0},{"d":"2026-10-23","opp":"HOU","min":25.0,"pts":6.0,"reb":0.0,"ast":0.0}],"last_season":{"pts":11.1,"reb":5.8,"ast":1.5,"min":27.6,"gp":82},"props":{}},{"pid":"4066259","name":"De'Aaron Fox","team":"SA","opp":"DAL","home":false,"gid":"401909858","pos":"G","inj":"","inj_detail":"","out":false,"gp":2,"min":29.9,"b2b":true,"team_implied":122.0,"env":{"pts":0.99,"reb":0.999,"ast":1.013},"proj":{"pts":17.33,"reb":4.14,"ast":6.54},"season":{"min":33.0,"pts":16.5,"reb":5.5,"ast":8.0},"last5":[{"d":"2026-10-20","opp":"OKC","min":32.0,"pts":14.0,"reb":7.0,"ast":7.0},{"d":"2026-10-23","opp":"HOU","min":34.0,"pts":19.0,"reb":4.0,"ast":9.0}],"last_season":{"pts":18.6,"reb":3.8,"ast":6.2,"min":31.0,"gp":72},"props":{}},{"pid":"5037871","name":"Dylan Harper","team":"SA","opp":"DAL","home":false,"gid":"401909858","pos":"G","inj":"","inj_detail":"","out":false,"gp":2,"min":26.4,"b2b":true,"team_implied":122.0,"env":{"pts":0.99,"reb":0.999,"ast":1.013},"proj":{"pts":14.62,"reb":3.93,"ast":3.86},"season":{"min":34.0,"pts":19.0,"reb":5.0,"ast":3.5},"last5":[{"d":"2026-10-20","opp":"OKC","min":32.0,"pts":18.0,"reb":7.0,"ast":5.0},{"d":"2026-10-23","opp":"HOU","min":36.0,"pts":20.0,"reb":3.0,"ast":2.0}],"last_season":{"pts":11.8,"reb":3.4,"ast":3.9,"min":22.6,"gp":69},"props":{}},{"pid":"4395723","name":"Keldon Johnson","team":"SA","opp":"DAL","home":false,"gid":"401909858","pos":"F","inj":"","inj_detail":"","out":false,"gp":2,"min":19.6,"b2b":true,"team_implied":122.0,"env":{"pts":0.99,"reb":0.999,"ast":1.013},"proj":{"pts":11.21,"reb":4.57,"ast":1.14},"season":{"min":19.5,"pts":9.0,"reb":5.0,"ast":1.0},"last5":[{"d":"2026-10-20","opp":"OKC","min":20.0,"pts":10.0,"reb":4.0,"ast":1.0},{"d":"2026-10-23","opp":"HOU","min":19.0,"pts":8.0,"reb":6.0,"ast":1.0}],"last_season":{"pts":13.2,"reb":5.4,"ast":1.4,"min":23.3,"gp":82},"props":{}},{"pid":"3064560","name":"Luke Kornet","team":"SA","opp":"DAL","home":false,"gid":"401909858","pos":"C","inj":"","inj_detail":"","out":false,"gp":2,"min":16.8,"b2b":true,"team_implied":122.0,"env":{"pts":0.99,"reb":0.999,"ast":1.013},"proj":{"pts":5.49,"reb":4.63,"ast":1.37},"season":{"min":14.5,"pts":5.5,"reb":2.0,"ast":0.0},"last5":[{"d":"2026-10-20","opp":"OKC","min":13.0,"pts":4.0,"reb":1.0,"ast":0.0},{"d":"2026-10-23","opp":"HOU","min":16.0,"pts":7.0,"reb":3.0,"ast":0.0}],"last_season":{"pts":6.5,"reb":6.1,"ast":1.9,"min":21.0,"gp":68},"props":{}},{"pid":"4395630","name":"Devin Vassell","team":"SA","opp":"DAL","home":false,"gid":"401909858","pos":"G","inj":"","inj_detail":"","out":false,"gp":2,"min":29.8,"b2b":true,"team_implied":122.0,"env":{"pts":0.99,"reb":0.999,"ast":1.013},"proj":{"pts":11.63,"reb":3.6,"ast":2.04},"season":{"min":33.5,"pts":8.5,"reb":3.5,"ast":1.5},"last5":[{"d":"2026-10-20","opp":"OKC","min":31.0,"pts":7.0,"reb":3.0,"ast":1.0},{"d":"2026-10-23","opp":"HOU","min":36.0,"pts":10.0,"reb":4.0,"ast":2.0}],"last_season":{"pts":13.9,"reb":4.0,"ast":2.5,"min":30.5,"gp":67},"props":{}},{"pid":"5104157","name":"Victor Wembanyama","team":"SA","opp":"DAL","home":false,"gid":"401909858","pos":"F","inj":"","inj_detail":"","out":false,"gp":2,"min":28.8,"b2b":true,"team_implied":122.0,"env":{"pts":0.99,"reb":0.999,"ast":1.013},"proj":{"pts":22.12,"reb":11.34,"ast":2.76},"season":{"min":33.0,"pts":18.5,"reb":13.0,"ast":2.5},"last5":[{"d":"2026-10-20","opp":"OKC","min":34.0,"pts":12.0,"reb":13.0,"ast":3.0},{"d":"2026-10-23","opp":"HOU","min":32.0,"pts":25.0,"reb":13.0,"ast":2.0}],"last_season":{"pts":25.0,"reb":11.5,"ast":3.1,"min":29.2,"gp":64},"props":{}},{"pid":"4432582","name":"Max Christie","team":"DAL","opp":"SA","home":true,"gid":"401909858","pos":"G","inj":"GTD","inj_detail":"Leg","out":false,"gp":2,"min":35.7,"b2b":true,"team_implied":107.5,"env":{"pts":1.01,"reb":1.005,"ast":0.997},"proj":{"pts":14.44,"reb":3.89,"ast":2.7},"season":{"min":33.5,"pts":10.5,"reb":3.5,"ast":3.0},"last5":[{"d":"2026-10-21","opp":"HOU","min":29.0,"pts":5.0,"reb":3.0,"ast":2.0},{"d":"2026-10-23","opp":"IND","min":38.0,"pts":16.0,"reb":4.0,"ast":4.0}],"last_season":{"pts":12.3,"reb":3.2,"ast":2.0,"min":29.1,"gp":77},"props":{}},{"pid":"4701208","name":"Moussa Cisse","team":"DAL","opp":"SA","home":true,"gid":"401909858","pos":"C","inj":"","inj_detail":"","out":false,"gp":2,"min":10.0,"b2b":true,"team_implied":107.5,"env":{"pts":1.01,"reb":1.005,"ast":0.997},"proj":{"pts":3.59,"reb":4.08,"ast":0.17},"season":{"min":2.0,"pts":3.0,"reb":0.5,"ast":0.0},"last5":[{"d":"2026-10-21","opp":"HOU","min":3.0,"pts":3.0,"reb":0.0,"ast":0.0},{"d":"2026-10-23","opp":"IND","min":1.0,"pts":3.0,"reb":1.0,"ast":0.0}],"last_season":{"pts":4.5,"reb":5.7,"ast":0.2,"min":13.9,"gp":38},"props":{}},{"pid":"4896372","name":"Walter Clayton Jr.","team":"DAL","opp":"SA","home":true,"gid":"401909858","pos":"G","inj":"","inj_detail":"","out":false,"gp":1,"min":6.0,"b2b":true,"team_implied":107.5,"env":{"pts":1.01,"reb":1.005,"ast":0.997},"proj":{"pts":2.43,"reb":0.61,"ast":1.18},"season":{"min":1.0,"pts":0.0,"reb":1.0,"ast":0.0},"last5":[{"d":"2026-10-21","opp":"HOU","min":0,"pts":0,"reb":0,"ast":0},{"d":"2026-10-23","opp":"IND","min":1.0,"pts":0.0,"reb":1.0,"ast":0.0},{"d":"2026-10-23","opp":"GS","min":0,"pts":0,"reb":0,"ast":0}],"last_season":{"pts":7.8,"reb":2.0,"ast":4.0,"min":20.4,"gp":69},"props":{}},{"pid":"5279129","name":"Sergio de Larrea","team":"DAL","opp":"SA","home":true,"gid":"401909858","pos":"F","inj":"","inj_detail":"","out":false,"gp":2,"min":4.0,"b2b":true,"team_implied":107.5,"env":{"pts":1.01,"reb":1.005,"ast":0.997},"proj":{"pts":1.78,"reb":0.85,"ast":0.37},"season":{"min":4.0,"pts":0.0,"reb":1.0,"ast":0.5},"last5":[{"d":"2026-10-21","opp":"HOU","min":7.0,"pts":0.0,"reb":2.0,"ast":1.0},{"d":"2026-10-23","opp":"IND","min":1.0,"pts":0.0,"reb":0.0,"ast":0.0}],"last_season":null,"props":{}},{"pid":"4278049","name":"Daniel Gafford","team":"DAL","opp":"SA","home":true,"gid":"401909858","pos":"F","inj":"","inj_detail":"","out":false,"gp":2,"min":25.5,"b2b":true,"team_implied":107.5,"env":{"pts":1.01,"reb":1.005,"ast":0.997},"proj":{"pts":11.11,"reb":7.68,"ast":1.55},"season":{"min":18.5,"pts":3.0,"reb":3.0,"ast":3.0},"last5":[{"d":"2026-10-21","opp":"HOU","min":22.0,"pts":2.0,"reb":3.0,"ast":1.0},{"d":"2026-10-23","opp":"IND","min":15.0,"pts":4.0,"reb":3.0,"ast":5.0}],"last_season":{"pts":9.5,"reb":6.9,"ast":1.1,"min":21.7,"gp":55},"props":{}},{"pid":"5105806","name":"Jett Howard","team":"DAL","opp":"SA","home":true,"gid":"401909858","pos":"G","inj":"GTD","inj_detail":"Calf Soreness","out":false,"gp":0,"min":6.0,"b2b":true,"team_implied":107.5,"env":{"pts":1.01,"reb":1.005,"ast":0.997},"proj":{"pts":2.77,"reb":0.75,"ast":0.39},"season":null,"last5":[],"last_season":{"pts":5.5,"reb":1.6,"ast":0.8,"min":12.6,"gp":55},"props":{}},{"pid":"4873153","name":"Morez Johnson Jr.","team":"DAL","opp":"SA","home":true,"gid":"401909858","pos":"F","inj":"DAY-TO-DAY","inj_detail":"","out":false,"gp":2,"min":19.2,"b2b":true,"team_implied":107.5,"env":{"pts":1.01,"reb":1.005,"ast":0.997},"proj":{"pts":9.05,"reb":4.32,"ast":1.53},"season":{"min":15.5,"pts":7.0,"reb":4.5,"ast":0.5},"last5":[{"d":"2026-10-21","opp":"HOU","min":14.0,"pts":6.0,"reb":3.0,"ast":1.0},{"d":"2026-10-23","opp":"IND","min":17.0,"pts":8.0,"reb":6.0,"ast":0.0}],"last_season":null,"props":{}},{"pid":"4278594","name":"Naji Marshall","team":"DAL","opp":"SA","home":true,"gid":"401909858","pos":"F","inj":"","inj_detail":"","out":false,"gp":2,"min":35.0,"b2b":true,"team_implied":107.5,"env":{"pts":1.01,"reb":1.005,"ast":0.997},"proj":{"pts":19.05,"reb":4.77,"ast":4.95},"season":{"min":31.0,"pts":15.5,"reb":3.0,"ast":6.0},"last5":[{"d":"2026-10-21","opp":"HOU","min":29.0,"pts":16.0,"reb":2.0,"ast":6.0},{"d":"2026-10-23","opp":"IND","min":33.0,"pts":15.0,"reb":4.0,"ast":6.0}],"last_season":{"pts":15.2,"reb":4.7,"ast":3.3,"min":29.5,"gp":74},"props":{}},{"pid":"5211175","name":"Zaccharie Risacher","team":"DAL","opp":"SA","home":true,"gid":"401909858","pos":"F","inj":"GTD","inj_detail":"Hip Soreness","out":false,"gp":2,"min":30.3,"b2b":true,"team_implied":107.5,"env":{"pts":1.01,"reb":1.005,"ast":0.997},"proj":{"pts":12.87,"reb":5.37,"ast":1.53},"season":{"min":29.5,"pts":7.5,"reb":6.0,"ast":1.5},"last5":[{"d":"2026-10-21","opp":"HOU","min":27.0,"pts":4.0,"reb":6.0,"ast":2.0},{"d":"2026-10-23","opp":"IND","min":32.0,"pts":11.0,"reb":6.0,"ast":1.0}],"last_season":{"pts":9.6,"reb":3.8,"ast":1.1,"min":22.4,"gp":67},"props":{}},{"pid":"4432107","name":"Marcus Sasser","team":"DAL","opp":"SA","home":true,"gid":"401909858","pos":"G","inj":"","inj_detail":"","out":false,"gp":2,"min":23.2,"b2b":true,"team_implied":107.5,"env":{"pts":1.01,"reb":1.005,"ast":0.997},"proj":{"pts":10.74,"reb":1.9,"ast":3.51},"season":{"min":25.5,"pts":11.5,"reb":1.5,"ast":2.0},"last5":[{"d":"2026-10-21","opp":"HOU","min":24.0,"pts":17.0,"reb":1.0,"ast":1.0},{"d":"2026-10-23","opp":"IND","min":27.0,"pts":6.0,"reb":2.0,"ast":3.0}],"last_season":{"pts":5.2,"reb":1.0,"ast":2.0,"min":12.0,"gp":38},"props":{}},{"pid":"4278078","name":"P.J. Washington","team":"DAL","opp":"SA","home":true,"gid":"401909858","pos":"F","inj":"","inj_detail":"","out":false,"gp":2,"min":36.6,"b2b":true,"team_implied":107.5,"env":{"pts":1.01,"reb":1.005,"ast":0.997},"proj":{"pts":18.0,"reb":8.89,"ast":1.71},"season":{"min":32.0,"pts":15.0,"reb":8.5,"ast":1.0},"last5":[{"d":"2026-10-21","opp":"HOU","min":31.0,"pts":10.0,"reb":4.0,"ast":2.0},{"d":"2026-10-23","opp":"IND","min":33.0,"pts":20.0,"reb":13.0,"ast":0.0}],"last_season":{"pts":14.2,"reb":7.0,"ast":1.8,"min":31.0,"gp":56},"props":{}},{"pid":"3037789","name":"Bogdan Bogdanovic","team":"HOU","opp":"ATL","home":false,"gid":"401909856","pos":"G","inj":"","inj_detail":"","out":false,"gp":2,"min":14.7,"b2b":true,"team_implied":114.5,"env":{"pts":0.99,"reb":0.997,"ast":0.996},"proj":{"pts":5.34,"reb":1.87,"ast":1.63},"season":{"min":11.0,"pts":4.0,"reb":1.0,"ast":1.0},"last5":[{"d":"2026-10-21","opp":"DAL","min":13.0,"pts":5.0,"reb":1.0,"ast":2.0},{"d":"2026-10-23","opp":"SA","min":9.0,"pts":3.0,"reb":1.0,"ast":0.0}],"last_season":{"pts":7.4,"reb":2.6,"ast":2.2,"min":19.7,"gp":23},"props":{}},{"pid":"3202","name":"Kevin Durant","team":"HOU","opp":"ATL","home":false,"gid":"401909856","pos":"F","inj":"","inj_detail":"","out":false,"gp":2,"min":35.5,"b2b":true,"team_implied":114.5,"env":{"pts":0.99,"reb":0.997,"ast":0.996},"proj":{"pts":23.87,"reb":5.67,"ast":4.5},"season":{"min":37.0,"pts":25.0,"reb":6.5,"ast":4.5},"last5":[{"d":"2026-10-21","opp":"DAL","min":37.0,"pts":30.0,"reb":6.0,"ast":3.0},{"d":"2026-10-23","opp":"SA","min":37.0,"pts":20.0,"reb":7.0,"ast":6.0}],"last_season":{"pts":26.0,"reb":5.5,"ast":4.8,"min":36.4,"gp":78},"props":{}},{"pid":"4433192","name":"Tari Eason","team":"HOU","opp":"ATL","home":false,"gid":"401909856","pos":"F","inj":"","inj_detail":"","out":false,"gp":2,"min":21.2,"b2b":true,"team_implied":114.5,"env":{"pts":0.99,"reb":0.997,"ast":0.996},"proj":{"pts":8.38,"reb":5.11,"ast":1.12},"season":{"min":15.0,"pts":7.0,"reb":3.5,"ast":0.0},"last5":[{"d":"2026-10-21","opp":"DAL","min":3.0,"pts":2.0,"reb":1.0,"ast":0.0},{"d":"2026-10-23","opp":"SA","min":27.0,"pts":12.0,"reb":6.0,"ast":0.0}],"last_season":{"pts":10.4,"reb":6.3,"ast":1.5,"min":25.8,"gp":60},"props":{}},{"pid":"4871144","name":"Alperen Sengun","team":"HOU","opp":"ATL","home":false,"gid":"401909856","pos":"C","inj":"","inj_detail":"","out":false,"gp":2,"min":32.2,"b2b":true,"team_implied":114.5,"env":{"pts":0.99,"reb":0.997,"ast":0.996},"proj":{"pts":21.07,"reb":8.45,"ast":5.91},"season":{"min":33.0,"pts":26.0,"reb":8.5,"ast":6.0},"last5":[{"d":"2026-10-21","opp":"DAL","min":30.0,"pts":23.0,"reb":10.0,"ast":5.0},{"d":"2026-10-23","opp":"SA","min":36.0,"pts":29.0,"reb":7.0,"ast":7.0}],"last_season":{"pts":20.4,"reb":8.9,"ast":6.2,"min":33.3,"gp":72},"props":{}},{"pid":"4711272","name":"Reed Sheppard","team":"HOU","opp":"ATL","home":false,"gid":"401909856","pos":"G","inj":"GTD","inj_detail":"Knee Bruise","out":false,"gp":1,"min":23.1,"b2b":true,"team_implied":114.5,"env":{"pts":0.99,"reb":0.997,"ast":0.996},"proj":{"pts":11.13,"reb":2.57,"ast":3.11},"season":{"min":16.0,"pts":3.0,"reb":2.0,"ast":4.0},"last5":[{"d":"2026-10-21","opp":"DAL","min":16.0,"pts":3.0,"reb":2.0,"ast":4.0}],"last_season":{"pts":13.5,"reb":2.9,"ast":3.4,"min":26.2,"gp":82},"props":{}},{"pid":"2990992","name":"Marcus Smart","team":"HOU","opp":"ATL","home":false,"gid":"401909856","pos":"G","inj":"GTD","inj_detail":"Forearm Strain","out":false,"gp":2,"min":26.0,"b2b":true,"team_implied":114.5,"env":{"pts":0.99,"reb":0.997,"ast":0.996},"proj":{"pts":8.17,"reb":2.55,"ast":2.57},"season":{"min":23.5,"pts":7.5,"reb":2.5,"ast":1.5},"last5":[{"d":"2026-10-21","opp":"DAL","min":26.0,"pts":10.0,"reb":2.0,"ast":2.0},{"d":"2026-10-23","opp":"SA","min":21.0,"pts":5.0,"reb":3.0,"ast":1.0}],"last_season":{"pts":9.3,"reb":2.8,"ast":3.0,"min":28.5,"gp":62},"props":{}},{"pid":"4432639","name":"Jabari Smith Jr.","team":"HOU","opp":"ATL","home":false,"gid":"401909856","pos":"F","inj":"","inj_detail":"","out":false,"gp":2,"min":34.0,"b2b":true,"team_implied":114.5,"env":{"pts":0.99,"reb":0.997,"ast":0.996},"proj":{"pts":15.73,"reb":5.93,"ast":1.47},"season":{"min":35.0,"pts":18.5,"reb":5.0,"ast":1.0},"last5":[{"d":"2026-10-21","opp":"DAL","min":36.0,"pts":30.0,"reb":5.0,"ast":1.0},{"d":"2026-10-23","opp":"SA","min":34.0,"pts":7.0,"reb":5.0,"ast":1.0}],"last_season":{"pts":15.8,"reb":6.9,"ast":1.9,"min":35.1,"gp":77},"props":{}},{"pid":"4684740","name":"Amen Thompson","team":"HOU","opp":"ATL","home":false,"gid":"401909856","pos":"G","inj":"","inj_detail":"","out":false,"gp":2,"min":35.3,"b2b":true,"team_implied":114.5,"env":{"pts":0.99,"reb":0.997,"ast":0.996},"proj":{"pts":17.05,"reb":8.44,"ast":4.64},"season":{"min":34.5,"pts":18.0,"reb":10.0,"ast":4.0},"last5":[{"d":"2026-10-21","opp":"DAL","min":33.0,"pts":16.0,"reb":10.0,"ast":4.0},{"d":"2026-10-23","opp":"SA","min":36.0,"pts":20.0,"reb":10.0,"ast":4.0}],"last_season":{"pts":18.3,"reb":7.8,"ast":5.3,"min":37.4,"gp":79},"props":{}},{"pid":"4278039","name":"Nickeil Alexander-Walker","team":"ATL","opp":"HOU","home":true,"gid":"401909856","pos":"G","inj":"","inj_detail":"","out":false,"gp":2,"min":30.8,"b2b":true,"team_implied":113.0,"env":{"pts":1.01,"reb":0.984,"ast":0.98},"proj":{"pts":19.27,"reb":3.22,"ast":3.46},"season":{"min":28.5,"pts":22.5,"reb":3.5,"ast":4.0},"last5":[{"d":"2026-10-21","opp":"ORL","min":30.0,"pts":31.0,"reb":4.0,"ast":3.0},{"d":"2026-10-23","opp":"CHA","min":27.0,"pts":14.0,"reb":3.0,"ast":5.0}],"last_season":{"pts":20.8,"reb":3.4,"ast":3.7,"min":33.4,"gp":78},"props":{}},{"pid":"4869342","name":"Dyson Daniels","team":"ATL","opp":"HOU","home":true,"gid":"401909856","pos":"G","inj":"","inj_detail":"","out":false,"gp":2,"min":30.8,"b2b":true,"team_implied":113.0,"env":{"pts":1.01,"reb":0.984,"ast":0.98},"proj":{"pts":11.44,"reb":6.34,"ast":5.1},"season":{"min":29.0,"pts":15.5,"reb":6.5,"ast":3.5},"last5":[{"d":"2026-10-21","opp":"ORL","min":35.0,"pts":20.0,"reb":4.0,"ast":3.0},{"d":"2026-10-23","opp":"CHA","min":23.0,"pts":11.0,"reb":9.0,"ast":4.0}],"last_season":{"pts":11.9,"reb":6.8,"ast":5.9,"min":33.2,"gp":76},"props":{}},{"pid":"4397020","name":"Luguentz Dort","team":"ATL","opp":"HOU","home":true,"gid":"401909856","pos":"G","inj":"","inj_detail":"","out":false,"gp":2,"min":17.9,"b2b":true,"team_implied":113.0,"env":{"pts":1.01,"reb":0.984,"ast":0.98},"proj":{"pts":5.48,"reb":2.47,"ast":0.8},"season":{"min":23.5,"pts":8.5,"reb":4.5,"ast":1.0},"last5":[{"d":"2026-10-21","opp":"ORL","min":28.0,"pts":8.0,"reb":4.0,"ast":0.0},{"d":"2026-10-23","opp":"CHA","min":19.0,"pts":9.0,"reb":5.0,"ast":2.0}],"last_season":{"pts":8.3,"reb":3.6,"ast":1.2,"min":26.8,"gp":69},"props":{}},{"pid":"2578185","name":"Dorian Finney-Smith","team":"ATL","opp":"HOU","home":true,"gid":"401909856","pos":"F","inj":"","inj_detail":"","out":false,"gp":1,"min":4.2,"b2b":true,"team_implied":113.0,"env":{"pts":1.01,"reb":0.984,"ast":0.98},"proj":{"pts":0.82,"reb":0.63,"ast":0.25},"season":{"min":8.0,"pts":3.0,"reb":2.0,"ast":1.0},"last5":[{"d":"2026-10-21","opp":"ORL","min":0,"pts":0,"reb":0,"ast":0},{"d":"2026-10-23","opp":"CHA","min":8.0,"pts":3.0,"reb":2.0,"ast":1.0}],"last_season":{"pts":3.3,"reb":2.5,"ast":1.0,"min":16.8,"gp":37},"props":{}},{"pid":"5149077","name":"Kingston Flemings","team":"ATL","opp":"HOU","home":true,"gid":"401909856","pos":"G","inj":"","inj_detail":"","out":false,"gp":2,"min":14.3,"b2b":true,"team_implied":113.0,"env":{"pts":1.01,"reb":0.984,"ast":0.98},"proj":{"pts":5.36,"reb":2.3,"ast":2.69},"season":{"min":20.0,"pts":2.5,"reb":5.0,"ast":5.5},"last5":[{"d":"2026-10-21","opp":"ORL","min":15.0,"pts":0.0,"reb":4.0,"ast":3.0},{"d":"2026-10-23","opp":"CHA","min":25.0,"pts":5.0,"reb":6.0,"ast":8.0}],"last_season":null,"props":{}},{"pid":"4701230","name":"Jalen Johnson","team":"ATL","opp":"HOU","home":true,"gid":"401909856","pos":"F","inj":"","inj_detail":"","out":false,"gp":2,"min":32.0,"b2b":true,"team_implied":113.0,"env":{"pts":1.01,"reb":0.984,"ast":0.98},"proj":{"pts":19.93,"reb":9.58,"ast":7.12},"season":{"min":28.5,"pts":19.5,"reb":10.5,"ast":7.0},"last5":[{"d":"2026-10-21","opp":"ORL","min":28.0,"pts":20.0,"reb":14.0,"ast":6.0},{"d":"2026-10-23","opp":"CHA","min":29.0,"pts":19.0,"reb":7.0,"ast":8.0}],"last_season":{"pts":22.5,"reb":10.3,"ast":7.9,"min":35.2,"gp":72},"props":{}},{"pid":"4280151","name":"Corey Kispert","team":"ATL","opp":"HOU","home":true,"gid":"401909856","pos":"F","inj":"","inj_detail":"","out":false,"gp":1,"min":5.6,"b2b":true,"team_implied":113.0,"env":{"pts":1.01,"reb":0.984,"ast":0.98},"proj":{"pts":2.76,"reb":0.67,"ast":0.47},"season":{"min":10.0,"pts":11.0,"reb":1.0,"ast":1.0},"last5":[{"d":"2026-10-21","opp":"ORL","min":0,"pts":0,"reb":0,"ast":0},{"d":"2026-10-23","opp":"CHA","min":10.0,"pts":11.0,"reb":1.0,"ast":1.0}],"last_season":{"pts":9.2,"reb":2.3,"ast":1.6,"min":18.6,"gp":58},"props":{}},{"pid":"3146557","name":"Jock Landale","team":"ATL","opp":"HOU","home":true,"gid":"401909856","pos":"C","inj":"","inj_detail":"","out":false,"gp":2,"min":14.9,"b2b":true,"team_implied":113.0,"env":{"pts":1.01,"reb":0.984,"ast":0.98},"proj":{"pts":6.85,"reb":3.7,"ast":1.3},"season":{"min":18.5,"pts":9.0,"reb":4.0,"ast":3.5},"last5":[{"d":"2026-10-21","opp":"ORL","min":19.0,"pts":10.0,"reb":2.0,"ast":3.0},{"d":"2026-10-23","opp":"CHA","min":18.0,"pts":8.0,"reb":6.0,"ast":4.0}],"last_season":{"pts":10.6,"reb":5.7,"ast":1.7,"min":22.1,"gp":68},"props":{}},{"pid":"2490149","name":"CJ McCollum","team":"ATL","opp":"HOU","home":true,"gid":"401909856","pos":"G","inj":"","inj_detail":"","out":false,"gp":2,"min":27.7,"b2b":true,"team_implied":113.0,"env":{"pts":1.01,"reb":0.984,"ast":0.98},"proj":{"pts":16.96,"reb":2.86,"ast":3.43},"season":{"min":23.5,"pts":16.0,"reb":1.5,"ast":2.5},"last5":[{"d":"2026-10-21","opp":"ORL","min":25.0,"pts":19.0,"reb":2.0,"ast":3.0},{"d":"2026-10-23","opp":"CHA","min":22.0,"pts":13.0,"reb":1.0,"ast":2.0}],"last_season":{"pts":18.7,"reb":3.3,"ast":3.9,"min":29.8,"gp":76},"props":{}},{"pid":"4431680","name":"Onyeka Okongwu","team":"ATL","opp":"HOU","home":true,"gid":"401909856","pos":"F","inj":"","inj_detail":"","out":false,"gp":2,"min":29.2,"b2b":true,"team_implied":113.0,"env":{"pts":1.01,"reb":0.984,"ast":0.98},"proj":{"pts":13.19,"reb":6.74,"ast":3.11},"season":{"min":25.5,"pts":9.0,"reb":4.5,"ast":4.0},"last5":[{"d":"2026-10-21","opp":"ORL","min":29.0,"pts":8.0,"reb":5.0,"ast":7.0},{"d":"2026-10-23","opp":"CHA","min":22.0,"pts":10.0,"reb":4.0,"ast":1.0}],"last_season":{"pts":15.2,"reb":7.6,"ast":3.1,"min":31.0,"gp":74},"props":{}},{"pid":"4397183","name":"Aaron Wiggins","team":"ATL","opp":"HOU","home":true,"gid":"401909856","pos":"G","inj":"","inj_detail":"","out":false,"gp":2,"min":17.4,"b2b":true,"team_implied":113.0,"env":{"pts":1.01,"reb":0.984,"ast":0.98},"proj":{"pts":7.78,"reb":2.23,"ast":1.16},"season":{"min":27.0,"pts":17.5,"reb":2.0,"ast":0.5},"last5":[{"d":"2026-10-21","opp":"ORL","min":32.0,"pts":16.0,"reb":3.0,"ast":0.0},{"d":"2026-10-23","opp":"CHA","min":22.0,"pts":19.0,"reb":1.0,"ast":1.0}],"last_season":{"pts":9.4,"reb":3.1,"ast":1.7,"min":21.8,"gp":65},"props":{}},{"pid":"4397136","name":"Saddiq Bey","team":"NO","opp":"DEN","home":false,"gid":"401909859","pos":"G","inj":"","inj_detail":"","out":false,"gp":2,"min":28.1,"b2b":true,"team_implied":114.0,"env":{"pts":0.99,"reb":1.026,"ast":1.017},"proj":{"pts":15.29,"reb":5.12,"ast":2.09},"season":{"min":23.0,"pts":16.5,"reb":4.0,"ast":0.5},"last5":[{"d":"2026-10-21","opp":"IND","min":24.0,"pts":13.0,"reb":5.0,"ast":0.0},{"d":"2026-10-23","opp":"UTAH","min":22.0,"pts":20.0,"reb":3.0,"ast":1.0}],"last_season":{"pts":17.7,"reb":5.6,"ast":2.5,"min":31.2,"gp":72},"props":{}},{"pid":"5144091","name":"Jeremiah Fears","team":"NO","opp":"DEN","home":false,"gid":"401909859","pos":"G","inj":"","inj_detail":"","out":false,"gp":2,"min":19.8,"b2b":true,"team_implied":114.0,"env":{"pts":0.99,"reb":1.026,"ast":1.017},"proj":{"pts":9.66,"reb":2.69,"ast":2.43},"season":{"min":22.5,"pts":7.5,"reb":1.5,"ast":1.0},"last5":[{"d":"2026-10-21","opp":"IND","min":21.0,"pts":8.0,"reb":3.0,"ast":1.0},{"d":"2026-10-23","opp":"UTAH","min":24.0,"pts":7.0,"reb":0.0,"ast":1.0}],"last_season":{"pts":14.3,"reb":3.7,"ast":3.4,"min":25.8,"gp":82},"props":{}},{"pid":"4277813","name":"Herbert Jones","team":"NO","opp":"DEN","home":false,"gid":"401909859","pos":"F","inj":"","inj_detail":"","out":false,"gp":2,"min":19.9,"b2b":true,"team_implied":114.0,"env":{"pts":0.99,"reb":1.026,"ast":1.017},"proj":{"pts":5.61,"reb":2.37,"ast":1.77},"season":{"min":17.5,"pts":4.0,"reb":1.5,"ast":0.0},"last5":[{"d":"2026-10-21","opp":"IND","min":17.0,"pts":5.0,"reb":2.0,"ast":0.0},{"d":"2026-10-23","opp":"UTAH","min":18.0,"pts":3.0,"reb":1.0,"ast":0.0}],"last_season":{"pts":8.9,"reb":3.4,"ast":2.8,"min":28.4,"gp":56},"props":{}},{"pid":"3442","name":"DeAndre Jordan","team":"NO","opp":"DEN","home":false,"gid":"401909859","pos":"C","inj":"","inj_detail":"","out":false,"gp":0,"min":4.4,"b2b":true,"team_implied":114.0,"env":{"pts":0.99,"reb":1.026,"ast":1.017},"proj":{"pts":1.09,"reb":1.72,"ast":0.25},"season":null,"last5":[{"d":"2026-10-21","opp":"IND","min":0,"pts":0,"reb":0,"ast":0},{"d":"2026-10-23","opp":"UTAH","min":0,"pts":0,"reb":0,"ast":0}],"last_season":{"pts":4.4,"reb":6.3,"ast":0.9,"min":16.6,"gp":12},"props":{}},{"pid":"4683634","name":"Bennedict Mathurin","team":"NO","opp":"DEN","home":false,"gid":"401909859","pos":"G","inj":"","inj_detail":"","out":false,"gp":2,"min":18.7,"b2b":true,"team_implied":114.0,"env":{"pts":0.99,"reb":1.026,"ast":1.017},"proj":{"pts":9.95,"reb":3.42,"ast":1.48},"season":{"min":16.5,"pts":7.5,"reb":2.5,"ast":1.0},"last5":[{"d":"2026-10-21","opp":"IND","min":18.0,"pts":11.0,"reb":3.0,"ast":2.0},{"d":"2026-10-23","opp":"UTAH","min":15.0,"pts":4.0,"reb":2.0,"ast":0.0}],"last_season":{"pts":17.6,"reb":5.4,"ast":2.4,"min":30.0,"gp":54},"props":{}},{"pid":"4997538","name":"Karlo Matkovic","team":"NO","opp":"DEN","home":false,"gid":"401909859","pos":"F","inj":"","inj_detail":"","out":false,"gp":1,"min":4.5,"b2b":true,"team_implied":114.0,"env":{"pts":0.99,"reb":1.026,"ast":1.017},"proj":{"pts":1.66,"reb":1.19,"ast":0.26},"season":{"min":9.0,"pts":7.0,"reb":4.0,"ast":1.0},"last5":[{"d":"2026-10-21","opp":"IND","min":0,"pts":0,"reb":0,"ast":0},{"d":"2026-10-23","opp":"UTAH","min":9.0,"pts":7.0,"reb":4.0,"ast":1.0}],"last_season":{"pts":5.7,"reb":3.7,"ast":0.8,"min":14.7,"gp":62},"props":{}},{"pid":"4576086","name":"Bryce McGowens","team":"NO","opp":"DEN","home":false,"gid":"401909859","pos":"G","inj":"","inj_detail":"","out":false,"gp":0,"min":5.6,"b2b":true,"team_implied":114.0,"env":{"pts":0.99,"reb":1.026,"ast":1.017},"proj":{"pts":2.01,"reb":0.57,"ast":0.4},"season":null,"last5":[{"d":"2026-10-21","opp":"IND","min":0,"pts":0,"reb":0,"ast":0},{"d":"2026-10-23","opp":"UTAH","min":0,"pts":0,"reb":0,"ast":0}],"last_season":{"pts":8.1,"reb":2.1,"ast":1.5,"min":21.0,"gp":42},"props":{}},{"pid":"4397688","name":"Trey Murphy III","team":"NO","opp":"DEN","home":false,"gid":"401909859","pos":"F","inj":"","inj_detail":"","out":false,"gp":2,"min":32.7,"b2b":true,"team_implied":114.0,"env":{"pts":0.99,"reb":1.026,"ast":1.017},"proj":{"pts":15.09,"reb":5.37,"ast":3.0},"season":{"min":31.5,"pts":10.0,"reb":5.0,"ast":2.0},"last5":[{"d":"2026-10-21","opp":"IND","min":32.0,"pts":11.0,"reb":4.0,"ast":1.0},{"d":"2026-10-23","opp":"UTAH","min":31.0,"pts":9.0,"reb":6.0,"ast":3.0}],"last_season":{"pts":21.5,"reb":5.7,"ast":3.8,"min":35.5,"gp":66},"props":{}},{"pid":"3907497","name":"Dejounte Murray","team":"NO","opp":"DEN","home":false,"gid":"401909859","pos":"G","inj":"","inj_detail":"","out":false,"gp":2,"min":28.8,"b2b":true,"team_implied":114.0,"env":{"pts":0.99,"reb":1.026,"ast":1.017},"proj":{"pts":16.18,"reb":5.11,"ast":6.41},"season":{"min":32.0,"pts":19.5,"reb":4.5,"ast":6.5},"last5":[{"d":"2026-10-21","opp":"IND","min":34.0,"pts":23.0,"reb":3.0,"ast":7.0},{"d":"2026-10-23","opp":"UTAH","min":30.0,"pts":16.0,"reb":6.0,"ast":6.0}],"last_season":{"pts":16.7,"reb":5.4,"ast":6.4,"min":27.8,"gp":14},"props":{}},{"pid":"4277956","name":"Jordan Poole","team":"NO","opp":"DEN","home":false,"gid":"401909859","pos":"G","inj":"","inj_detail":"","out":false,"gp":2,"min":17.4,"b2b":true,"team_implied":114.0,"env":{"pts":0.99,"reb":1.026,"ast":1.017},"proj":{"pts":8.92,"reb":1.54,"ast":2.29},"season":{"min":17.0,"pts":8.0,"reb":2.0,"ast":2.5},"last5":[{"d":"2026-10-21","opp":"IND","min":15.0,"pts":4.0,"reb":2.0,"ast":3.0},{"d":"2026-10-23","opp":"UTAH","min":19.0,"pts":12.0,"reb":2.0,"ast":2.0}],"last_season":{"pts":13.4,"reb":2.0,"ast":3.1,"min":23.9,"gp":39},"props":{}},{"pid":"4869780","name":"Derik Queen","team":"NO","opp":"DEN","home":false,"gid":"401909859","pos":"C","inj":"","inj_detail":"","out":false,"gp":2,"min":19.7,"b2b":true,"team_implied":114.0,"env":{"pts":0.99,"reb":1.026,"ast":1.017},"proj":{"pts":8.58,"reb":5.93,"ast":2.72},"season":{"min":23.5,"pts":11.0,"reb":8.5,"ast":1.5},"last5":[{"d":"2026-10-21","opp":"IND","min":18.0,"pts":10.0,"reb":10.0,"ast":1.0},{"d":"2026-10-23","opp":"UTAH","min":29.0,"pts":12.0,"reb":7.0,"ast":2.0}],"last_season":{"pts":11.7,"reb":7.1,"ast":3.7,"min":25.0,"gp":81},"props":{}},{"pid":"4395628","name":"Zion Williamson","team":"NO","opp":"DEN","home":false,"gid":"401909859","pos":"F","inj":"","inj_detail":"","out":false,"gp":2,"min":29.3,"b2b":true,"team_implied":114.0,"env":{"pts":0.99,"reb":1.026,"ast":1.017},"proj":{"pts":19.1,"reb":4.97,"ast":2.86},"season":{"min":32.5,"pts":22.5,"reb":4.0,"ast":2.5},"last5":[{"d":"2026-10-21","opp":"IND","min":32.0,"pts":22.0,"reb":3.0,"ast":3.0},{"d":"2026-10-23","opp":"UTAH","min":33.0,"pts":23.0,"reb":5.0,"ast":2.0}],"last_season":{"pts":21.0,"reb":5.7,"ast":3.2,"min":29.7,"gp":62},"props":{}},{"pid":"4277848","name":"Marvin Bagley III","team":"DEN","opp":"NO","home":true,"gid":"401909859","pos":"F","inj":"","inj_detail":"","out":false,"gp":1,"min":14.0,"b2b":false,"team_implied":125.5,"env":{"pts":1.01,"reb":1.021,"ast":1.037},"proj":{"pts":7.05,"reb":4.34,"ast":1.04},"season":{"min":11.0,"pts":2.0,"reb":3.0,"ast":1.0},"last5":[{"d":"2026-10-22","opp":"OKC","min":11.0,"pts":2.0,"reb":3.0,"ast":1.0}],"last_season":{"pts":10.4,"reb":6.1,"ast":1.4,"min":20.0,"gp":60},"props":{}},{"pid":"4431767","name":"Christian Braun","team":"DEN","opp":"NO","home":true,"gid":"401909859","pos":"G","inj":"","inj_detail":"","out":false,"gp":1,"min":31.6,"b2b":false,"team_implied":125.5,"env":{"pts":1.01,"reb":1.021,"ast":1.037},"proj":{"pts":11.22,"reb":4.97,"ast":2.63},"season":{"min":33.0,"pts":7.0,"reb":6.0,"ast":1.0},"last5":[{"d":"2026-10-22","opp":"OKC","min":33.0,"pts":7.0,"reb":6.0,"ast":1.0}],"last_season":{"pts":12.0,"reb":4.8,"ast":2.7,"min":31.8,"gp":44},"props":{}},{"pid":"4698719","name":"Trevon Brazile","team":"DEN","opp":"NO","home":true,"gid":"401909859","pos":"F","inj":"","inj_detail":"","out":false,"gp":1,"min":14.8,"b2b":false,"team_implied":125.5,"env":{"pts":1.01,"reb":1.021,"ast":1.037},"proj":{"pts":6.09,"reb":3.91,"ast":1.23},"season":{"min":18.0,"pts":4.0,"reb":12.0,"ast":0.0},"last5":[{"d":"2026-10-22","opp":"OKC","min":18.0,"pts":4.0,"reb":12.0,"ast":0.0}],"last_season":null,"props":{}},{"pid":"3978","name":"DeMar DeRozan","team":"DEN","opp":"NO","home":true,"gid":"401909859","pos":"G","inj":"","inj_detail":"","out":false,"gp":1,"min":29.7,"b2b":false,"team_implied":125.5,"env":{"pts":1.01,"reb":1.021,"ast":1.037},"proj":{"pts":16.98,"reb":2.79,"ast":3.7},"season":{"min":28.0,"pts":13.0,"reb":2.0,"ast":0.0},"last5":[{"d":"2026-10-22","opp":"OKC","min":28.0,"pts":13.0,"reb":2.0,"ast":0.0}],"last_season":{"pts":18.4,"reb":2.9,"ast":4.1,"min":31.2,"gp":77},"props":{}},{"pid":"4065813","name":"Alpha Diallo","team":"DEN","opp":"NO","home":true,"gid":"401909859","pos":"F","inj":"GTD","inj_detail":"Wrist","out":false,"gp":1,"min":18.1,"b2b":false,"team_implied":125.5,"env":{"pts":1.01,"reb":1.021,"ast":1.037},"proj":{"pts":7.27,"reb":3.6,"ast":1.8},"season":{"min":22.0,"pts":4.0,"reb":2.0,"ast":3.0},"last5":[{"d":"2026-10-22","opp":"OKC","min":22.0,"pts":4.0,"reb":2.0,"ast":3.0}],"last_season":null,"props":{}},{"pid":"3064290","name":"Aaron Gordon","team":"DEN","opp":"NO","home":true,"gid":"401909859","pos":"F","inj":"","inj_detail":"","out":false,"gp":1,"min":27.7,"b2b":false,"team_implied":125.5,"env":{"pts":1.01,"reb":1.021,"ast":1.037},"proj":{"pts":16.1,"reb":5.88,"ast":2.59},"season":{"min":29.0,"pts":20.0,"reb":6.0,"ast":1.0},"last5":[{"d":"2026-10-22","opp":"OKC","min":29.0,"pts":20.0,"reb":6.0,"ast":1.0}],"last_season":{"pts":16.2,"reb":5.8,"ast":2.7,"min":27.9,"gp":36},"props":{}},{"pid":"3112335","name":"Nikola Jokic","team":"DEN","opp":"NO","home":true,"gid":"401909859","pos":"C","inj":"","inj_detail":"","out":false,"gp":1,"min":34.4,"b2b":false,"team_implied":125.5,"env":{"pts":1.01,"reb":1.021,"ast":1.037},"proj":{"pts":25.47,"reb":12.34,"ast":10.36},"season":{"min":35.0,"pts":13.0,"reb":7.0,"ast":5.0},"last5":[{"d":"2026-10-22","opp":"OKC","min":35.0,"pts":13.0,"reb":7.0,"ast":5.0}],"last_season":{"pts":27.7,"reb":12.9,"ast":10.7,"min":34.8,"gp":65},"props":{}},{"pid":"3135046","name":"Tyus Jones","team":"DEN","opp":"NO","home":true,"gid":"401909859","pos":"G","inj":"","inj_detail":"","out":false,"gp":1,"min":5.5,"b2b":false,"team_implied":125.5,"env":{"pts":1.01,"reb":1.021,"ast":1.037},"proj":{"pts":1.1,"reb":0.42,"ast":0.9},"season":{"min":10.0,"pts":2.0,"reb":0.0,"ast":0.0},"last5":[{"d":"2026-10-22","opp":"OKC","min":10.0,"pts":2.0,"reb":0.0,"ast":0.0}],"last_season":{"pts":3.0,"reb":1.1,"ast":2.4,"min":14.6,"gp":67},"props":{}},{"pid":"3936299","name":"Jamal Murray","team":"DEN","opp":"NO","home":true,"gid":"401909859","pos":"G","inj":"","inj_detail":"","out":false,"gp":1,"min":35.2,"b2b":false,"team_implied":125.5,"env":{"pts":1.01,"reb":1.021,"ast":1.037},"proj":{"pts":22.84,"reb":5.05,"ast":6.88},"season":{"min":37.0,"pts":6.0,"reb":10.0,"ast":3.0},"last5":[{"d":"2026-10-22","opp":"OKC","min":37.0,"pts":6.0,"reb":10.0,"ast":3.0}],"last_season":{"pts":25.4,"reb":4.4,"ast":7.1,"min":35.4,"gp":75},"props":{}},{"pid":"4433629","name":"Ryan Nembhard","team":"DEN","opp":"NO","home":true,"gid":"401909859","pos":"G","inj":"","inj_detail":"","out":false,"gp":1,"min":5.5,"b2b":false,"team_implied":125.5,"env":{"pts":1.01,"reb":1.021,"ast":1.037},"proj":{"pts":1.92,"reb":0.65,"ast":1.55},"season":{"min":2.0,"pts":5.0,"reb":1.0,"ast":1.0},"last5":[{"d":"2026-10-22","opp":"OKC","min":2.0,"pts":5.0,"reb":1.0,"ast":1.0}],"last_season":{"pts":6.6,"reb":2.2,"ast":5.3,"min":19.5,"gp":60},"props":{}},{"pid":"5105592","name":"Cam Whitmore","team":"DEN","opp":"NO","home":true,"gid":"401909859","pos":"F","inj":"","inj_detail":"","out":false,"gp":0,"min":13.8,"b2b":false,"team_implied":125.5,"env":{"pts":1.01,"reb":1.021,"ast":1.037},"proj":{"pts":7.43,"reb":2.31,"ast":0.61},"season":null,"last5":[],"last_season":{"pts":9.2,"reb":2.8,"ast":0.7,"min":16.9,"gp":21},"props":{}},{"pid":"4397886","name":"Charles Bassey","team":"GS","opp":"PHX","home":false,"gid":"401909860","pos":"C","inj":"GTD","inj_detail":"Knee","out":false,"gp":0,"min":6.0,"b2b":true,"team_implied":106.0,"env":{"pts":0.99,"reb":0.997,"ast":0.995},"proj":{"pts":3.03,"reb":2.23,"ast":0.27},"season":null,"last5":[],"last_season":{"pts":5.8,"reb":4.4,"ast":0.5,"min":11.8,"gp":13},"props":{}},{"pid":"4433149","name":"LJ Cryer","team":"GS","opp":"PHX","home":false,"gid":"401909860","pos":"G","inj":"","inj_detail":"","out":false,"gp":1,"min":12.3,"b2b":true,"team_implied":106.0,"env":{"pts":0.99,"reb":0.997,"ast":0.995},"proj":{"pts":6.53,"reb":1.18,"ast":0.85},"season":{"min":9.0,"pts":9.0,"reb":1.0,"ast":3.0},"last5":[{"d":"2026-10-21","opp":"LAL","min":9.0,"pts":9.0,"reb":1.0,"ast":3.0},{"d":"2026-10-23","opp":"MEM","min":0,"pts":0,"reb":0,"ast":0}],"last_season":{"pts":8.2,"reb":1.6,"ast":1.0,"min":16.2,"gp":18},"props":{}},{"pid":"6589","name":"Draymond Green","team":"GS","opp":"PHX","home":false,"gid":"401909860","pos":"F","inj":"GTD","inj_detail":"Back","out":false,"gp":2,"min":30.9,"b2b":true,"team_implied":106.0,"env":{"pts":0.99,"reb":0.997,"ast":0.995},"proj":{"pts":8.8,"reb":6.06,"ast":6.49},"season":{"min":26.0,"pts":3.5,"reb":4.5,"ast":7.0},"last5":[{"d":"2026-10-21","opp":"LAL","min":21.0,"pts":2.0,"reb":4.0,"ast":8.0},{"d":"2026-10-23","opp":"MEM","min":31.0,"pts":5.0,"reb":5.0,"ast":6.0}],"last_season":{"pts":8.4,"reb":5.5,"ast":5.5,"min":27.5,"gp":68},"props":{}},{"pid":"4703396","name":"Graham Ike","team":"GS","opp":"PHX","home":false,"gid":"401909860","pos":"F","inj":"","inj_detail":"","out":false,"gp":2,"min":12.0,"b2b":true,"team_implied":106.0,"env":{"pts":0.99,"reb":0.997,"ast":0.995},"proj":{"pts":5.9,"reb":2.44,"ast":1.06},"season":{"min":12.0,"pts":9.0,"reb":2.0,"ast":1.0},"last5":[{"d":"2026-10-21","opp":"LAL","min":12.0,"pts":8.0,"reb":2.0,"ast":1.0},{"d":"2026-10-23","opp":"MEM","min":12.0,"pts":10.0,"reb":2.0,"ast":1.0}],"last_season":null,"props":{}},{"pid":"5175737","name":"Yaxel Lendeborg","team":"GS","opp":"PHX","home":false,"gid":"401909860","pos":"F","inj":"","inj_detail":"","out":false,"gp":2,"min":37.8,"b2b":true,"team_implied":106.0,"env":{"pts":0.99,"reb":0.997,"ast":0.995},"proj":{"pts":17.21,"reb":8.5,"ast":3.95},"season":{"min":33.0,"pts":15.0,"reb":8.0,"ast":4.0},"last5":[{"d":"2026-10-21","opp":"LAL","min":29.0,"pts":12.0,"reb":3.0,"ast":2.0},{"d":"2026-10-23","opp":"MEM","min":37.0,"pts":18.0,"reb":13.0,"ast":6.0}],"last_season":null,"props":{}},{"pid":"4897449","name":"Malevy Leons","team":"GS","opp":"PHX","home":false,"gid":"401909860","pos":"F","inj":"","inj_detail":"","out":false,"gp":1,"min":8.9,"b2b":true,"team_implied":106.0,"env":{"pts":0.99,"reb":0.997,"ast":0.995},"proj":{"pts":2.64,"reb":1.68,"ast":0.72},"season":{"min":9.0,"pts":0.0,"reb":1.0,"ast":0.0},"last5":[{"d":"2026-10-21","opp":"LAL","min":9.0,"pts":0.0,"reb":1.0,"ast":0.0},{"d":"2026-10-23","opp":"MEM","min":0,"pts":0,"reb":0,"ast":0}],"last_season":{"pts":3.3,"reb":2.1,"ast":0.9,"min":11.0,"gp":25},"props":{}},{"pid":"4066436","name":"De'Anthony Melton","team":"GS","opp":"PHX","home":false,"gid":"401909860","pos":"G","inj":"","inj_detail":"","out":false,"gp":2,"min":26.1,"b2b":true,"team_implied":106.0,"env":{"pts":0.99,"reb":0.997,"ast":0.995},"proj":{"pts":13.29,"reb":3.44,"ast":2.69},"season":{"min":20.5,"pts":5.0,"reb":1.5,"ast":1.0},"last5":[{"d":"2026-10-21","opp":"LAL","min":21.0,"pts":0.0,"reb":2.0,"ast":2.0},{"d":"2026-10-23","opp":"MEM","min":20.0,"pts":10.0,"reb":1.0,"ast":0.0}],"last_season":{"pts":12.3,"reb":3.2,"ast":2.6,"min":23.0,"gp":49},"props":{}},{"pid":"2990969","name":"Georges Niang","team":"GS","opp":"PHX","home":false,"gid":"401909860","pos":"F","inj":"","inj_detail":"","out":false,"gp":2,"min":19.5,"b2b":true,"team_implied":106.0,"env":{"pts":0.99,"reb":0.997,"ast":0.995},"proj":{"pts":8.35,"reb":3.88,"ast":1.64},"season":{"min":16.5,"pts":5.5,"reb":2.5,"ast":1.0},"last5":[{"d":"2026-10-21","opp":"LAL","min":20.0,"pts":7.0,"reb":2.0,"ast":2.0},{"d":"2026-10-23","opp":"MEM","min":13.0,"pts":4.0,"reb":3.0,"ast":0.0}],"last_season":null,"props":{}},{"pid":"3134903","name":"Gary Payton II","team":"GS","opp":"PHX","home":false,"gid":"401909860","pos":"G","inj":"","inj_detail":"","out":false,"gp":2,"min":18.0,"b2b":true,"team_implied":106.0,"env":{"pts":0.99,"reb":0.997,"ast":0.995},"proj":{"pts":8.95,"reb":3.96,"ast":1.76},"season":{"min":14.5,"pts":8.5,"reb":1.5,"ast":0.0},"last5":[{"d":"2026-10-21","opp":"LAL","min":18.0,"pts":10.0,"reb":1.0,"ast":0.0},{"d":"2026-10-23","opp":"MEM","min":11.0,"pts":7.0,"reb":2.0,"ast":0.0}],"last_season":{"pts":7.5,"reb":3.6,"ast":1.7,"min":15.6,"gp":73},"props":{}},{"pid":"4897262","name":"Will Richard","team":"GS","opp":"PHX","home":false,"gid":"401909860","pos":"G","inj":"","inj_detail":"","out":false,"gp":2,"min":20.2,"b2b":true,"team_implied":106.0,"env":{"pts":0.99,"reb":0.997,"ast":0.995},"proj":{"pts":6.62,"reb":2.65,"ast":1.32},"season":{"min":11.5,"pts":4.0,"reb":2.5,"ast":0.5},"last5":[{"d":"2026-10-21","opp":"LAL","min":20.0,"pts":8.0,"reb":5.0,"ast":1.0},{"d":"2026-10-23","opp":"MEM","min":3.0,"pts":0.0,"reb":0.0,"ast":0.0}],"last_season":{"pts":6.4,"reb":2.5,"ast":1.3,"min":20.0,"gp":69},"props":{}},{"pid":"4997536","name":"Gui Santos","team":"GS","opp":"PHX","home":false,"gid":"401909860","pos":"F","inj":"","inj_detail":"","out":false,"gp":2,"min":25.0,"b2b":true,"team_implied":106.0,"env":{"pts":0.99,"reb":0.997,"ast":0.995},"proj":{"pts":11.17,"reb":4.78,"ast":2.61},"season":{"min":22.5,"pts":8.5,"reb":4.5,"ast":1.0},"last5":[{"d":"2026-10-21","opp":"LAL","min":25.0,"pts":12.0,"reb":5.0,"ast":0.0},{"d":"2026-10-23","opp":"MEM","min":20.0,"pts":5.0,"reb":4.0,"ast":2.0}],"last_season":{"pts":9.2,"reb":3.9,"ast":2.3,"min":20.5,"gp":68},"props":{}},{"pid":"4397040","name":"Brandon Williams","team":"GS","opp":"PHX","home":false,"gid":"401909860","pos":"G","inj":"","inj_detail":"","out":false,"gp":2,"min":21.1,"b2b":true,"team_implied":106.0,"env":{"pts":0.99,"reb":0.997,"ast":0.995},"proj":{"pts":12.75,"reb":2.91,"ast":3.63},"season":{"min":13.5,"pts":9.0,"reb":3.0,"ast":2.0},"last5":[{"d":"2026-10-21","opp":"LAL","min":18.0,"pts":14.0,"reb":4.0,"ast":3.0},{"d":"2026-10-23","opp":"MEM","min":9.0,"pts":4.0,"reb":2.0,"ast":1.0}],"last_season":{"pts":13.0,"reb":2.9,"ast":3.9,"min":22.2,"gp":66},"props":{}},{"pid":"3136193","name":"Devin Booker","team":"PHX","opp":"GS","home":true,"gid":"401909860","pos":"G","inj":"","inj_detail":"","out":false,"gp":1,"min":32.6,"b2b":false,"team_implied":115.5,"env":{"pts":1.01,"reb":0.987,"ast":0.989},"proj":{"pts":24.19,"reb":3.78,"ast":5.49},"season":{"min":29.0,"pts":23.0,"reb":4.0,"ast":2.0},"last5":[{"d":"2026-10-21","opp":"POR","min":29.0,"pts":23.0,"reb":4.0,"ast":2.0}],"last_season":{"pts":26.1,"reb":3.9,"ast":6.0,"min":33.5,"gp":64},"props":{}},{"pid":"4280245","name":"Jamaree Bouyea","team":"PHX","opp":"GS","home":true,"gid":"401909860","pos":"G","inj":"","inj_detail":"","out":false,"gp":1,"min":5.5,"b2b":false,"team_implied":115.5,"env":{"pts":1.01,"reb":0.987,"ast":0.989},"proj":{"pts":2.14,"reb":0.71,"ast":0.71},"season":{"min":7.0,"pts":3.0,"reb":2.0,"ast":2.0},"last5":[{"d":"2026-10-21","opp":"POR","min":7.0,"pts":3.0,"reb":2.0,"ast":2.0}],"last_season":{"pts":5.7,"reb":1.8,"ast":1.8,"min":14.0,"gp":46},"props":{}},{"pid":"4066383","name":"Miles Bridges","team":"PHX","opp":"GS","home":true,"gid":"401909860","pos":"F","inj":"","inj_detail":"","out":false,"gp":1,"min":30.3,"b2b":false,"team_implied":115.5,"env":{"pts":1.01,"reb":0.987,"ast":0.989},"proj":{"pts":15.2,"reb":5.5,"ast":2.82},"season":{"min":29.0,"pts":8.0,"reb":4.0,"ast":0.0},"last5":[{"d":"2026-10-21","opp":"POR","min":29.0,"pts":8.0,"reb":4.0,"ast":0.0}],"last_season":{"pts":17.1,"reb":5.8,"ast":3.2,"min":31.0,"gp":77},"props":{}},{"pid":"3155526","name":"Dillon Brooks","team":"PHX","opp":"GS","home":true,"gid":"401909860","pos":"F","inj":"","inj_detail":"","out":false,"gp":1,"min":29.7,"b2b":false,"team_implied":115.5,"env":{"pts":1.01,"reb":0.987,"ast":0.989},"proj":{"pts":18.12,"reb":3.56,"ast":1.57},"season":{"min":27.0,"pts":10.0,"reb":4.0,"ast":0.0},"last5":[{"d":"2026-10-21","opp":"POR","min":27.0,"pts":10.0,"reb":4.0,"ast":0.0}],"last_season":{"pts":20.2,"reb":3.6,"ast":1.8,"min":30.4,"gp":56},"props":{}},{"pid":"4888725","name":"Ryan Dunn","team":"PHX","opp":"GS","home":true,"gid":"401909860","pos":"F","inj":"","inj_detail":"","out":false,"gp":1,"min":18.3,"b2b":false,"team_implied":115.5,"env":{"pts":1.01,"reb":0.987,"ast":0.989},"proj":{"pts":5.17,"reb":3.9,"ast":1.3},"season":{"min":14.0,"pts":3.0,"reb":2.0,"ast":0.0},"last5":[{"d":"2026-10-21","opp":"POR","min":14.0,"pts":3.0,"reb":2.0,"ast":0.0}],"last_season":{"pts":5.8,"reb":4.2,"ast":1.5,"min":19.4,"gp":70},"props":{}},{"pid":"5105977","name":"Rasheer Fleming","team":"PHX","opp":"GS","home":true,"gid":"401909860","pos":"F","inj":"","inj_detail":"","out":false,"gp":1,"min":5.3,"b2b":false,"team_implied":115.5,"env":{"pts":1.01,"reb":0.987,"ast":0.989},"proj":{"pts":1.74,"reb":0.96,"ast":0.12},"season":{"min":12.0,"pts":1.0,"reb":2.0,"ast":0.0},"last5":[{"d":"2026-10-21","opp":"POR","min":12.0,"pts":1.0,"reb":2.0,"ast":0.0}],"last_season":{"pts":4.3,"reb":2.3,"ast":0.3,"min":12.2,"gp":55},"props":{}},{"pid":"4278585","name":"Collin Gillespie","team":"PHX","opp":"GS","home":true,"gid":"401909860","pos":"G","inj":"","inj_detail":"","out":false,"gp":1,"min":27.0,"b2b":false,"team_implied":115.5,"env":{"pts":1.01,"reb":0.987,"ast":0.989},"proj":{"pts":10.66,"reb":3.65,"ast":4.22},"season":{"min":21.0,"pts":0.0,"reb":1.0,"ast":2.0},"last5":[{"d":"2026-10-21","opp":"POR","min":21.0,"pts":0.0,"reb":1.0,"ast":2.0}],"last_season":{"pts":12.7,"reb":4.1,"ast":4.6,"min":28.5,"gp":80},"props":{}},{"pid":"4278402","name":"Jordan Goodwin","team":"PHX","opp":"GS","home":true,"gid":"401909860","pos":"G","inj":"","inj_detail":"","out":false,"gp":1,"min":22.4,"b2b":false,"team_implied":115.5,"env":{"pts":1.01,"reb":0.987,"ast":0.989},"proj":{"pts":7.91,"reb":4.74,"ast":1.98},"season":{"min":22.0,"pts":3.0,"reb":4.0,"ast":0.0},"last5":[{"d":"2026-10-21","opp":"POR","min":22.0,"pts":3.0,"reb":4.0,"ast":0.0}],"last_season":{"pts":8.7,"reb":4.9,"ast":2.2,"min":22.5,"gp":70},"props":{}},{"pid":"4437244","name":"Jalen Green","team":"PHX","opp":"GS","home":true,"gid":"401909860","pos":"G","inj":"","inj_detail":"","out":false,"gp":1,"min":25.7,"b2b":false,"team_implied":115.5,"env":{"pts":1.01,"reb":0.987,"ast":0.989},"proj":{"pts":16.27,"reb":3.43,"ast":2.81},"season":{"min":25.0,"pts":10.0,"reb":2.0,"ast":3.0},"last5":[{"d":"2026-10-21","opp":"POR","min":25.0,"pts":10.0,"reb":2.0,"ast":3.0}],"last_season":{"pts":17.8,"reb":3.6,"ast":2.8,"min":25.9,"gp":32},"props":{}},{"pid":"3913174","name":"Luke Kennard","team":"PHX","opp":"GS","home":true,"gid":"401909860","pos":"G","inj":"GTD","inj_detail":"Knee Strain","out":false,"gp":0,"min":21.5,"b2b":false,"team_implied":115.5,"env":{"pts":1.01,"reb":0.987,"ast":0.989},"proj":{"pts":7.95,"reb":2.3,"ast":2.2},"season":null,"last5":[],"last_season":{"pts":8.4,"reb":2.3,"ast":2.2,"min":21.5,"gp":78},"props":{}},{"pid":"5203685","name":"Khaman Maluach","team":"PHX","opp":"GS","home":true,"gid":"401909860","pos":"C","inj":"","inj_detail":"","out":false,"gp":1,"min":4.6,"b2b":false,"team_implied":115.5,"env":{"pts":1.01,"reb":0.987,"ast":0.989},"proj":{"pts":1.43,"reb":1.48,"ast":0.08},"season":{"min":17.0,"pts":2.0,"reb":6.0,"ast":1.0},"last5":[{"d":"2026-10-21","opp":"POR","min":17.0,"pts":2.0,"reb":6.0,"ast":1.0}],"last_season":{"pts":3.0,"reb":2.9,"ast":0.1,"min":8.9,"gp":46},"props":{}},{"pid":"4592714","name":"Pat Spencer","team":"PHX","opp":"GS","home":true,"gid":"401909860","pos":"G","inj":"","inj_detail":"","out":false,"gp":1,"min":6.4,"b2b":false,"team_implied":115.5,"env":{"pts":1.01,"reb":0.987,"ast":0.989},"proj":{"pts":2.37,"reb":0.85,"ast":1.19},"season":{"min":7.0,"pts":3.0,"reb":3.0,"ast":1.0},"last5":[{"d":"2026-10-21","opp":"POR","min":7.0,"pts":3.0,"reb":3.0,"ast":1.0}],"last_season":{"pts":7.2,"reb":2.4,"ast":3.5,"min":18.6,"gp":66},"props":{}}],"picks":[],"record":{"w":0,"l":0,"p":0,"v":0,"pending":0,"units":0.0,"by_stat":{"pts":{"w":0,"l":0,"units":0.0},"reb":{"w":0,"l":0,"units":0.0},"ast":{"w":0,"l":0,"units":0.0}},"started":null,"rows":[]}}/*END_NBA_DATA*/;
+var ONYX_REFERRER = 'KR680261';
+var ONYX_FALLBACK_URL = 'https://app.onyxodds.com/leagues/NBA';
+var GA_MEASUREMENT_ID = 'G-03T8V1N52E';
+
+var D = NBA_DATA || {games: [], players: [], picks: [], record: {rows: []}, meta: {}};
+var STAT_NAME = {pts: 'Points', reb: 'Rebounds', ast: 'Assists'};
+var STAT_ABBR = {pts: 'PTS', reb: 'REB', ast: 'AST'};
+var TEAM_COLORS = {ATL:'#e03a3e',BOS:'#007a33',BKN:'#2a2a2a',CHA:'#1d1160',CHI:'#ce1141',CLE:'#860038',DAL:'#00538c',DEN:'#0e2240',
+  DET:'#c8102e',GS:'#1d428a',HOU:'#ce1141',IND:'#002d62',LAC:'#c8102e',LAL:'#552583',MEM:'#5d76a9',MIA:'#98002e',MIL:'#00471b',
+  MIN:'#0c2340',NO:'#0c2340',NY:'#006bb6',OKC:'#007ac1',ORL:'#0077c0',PHI:'#006bb6',PHX:'#1d1160',POR:'#e03a3e',SAC:'#5a2d81',
+  SA:'#2b2b2b',TOR:'#ce1141',UTAH:'#002b5c',WSH:'#002b5c'};
+
+// ── helpers ────────────────────────────────────────────────────────
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function fmtOdds(o) { if (o == null || o === '') return '-'; o = +o; return o > 0 ? '+' + o : String(o); }
+function pct(p, d) { return p == null ? '-' : (p * 100).toFixed(d == null ? 1 : d) + '%'; }
+function pp(e) { if (e == null) return '-'; const v = e * 100; return (v > 0 ? '+' : '') + v.toFixed(1); }
+function num(v, d) { return v == null ? '-' : (+v).toFixed(d == null ? 1 : d); }
+function badge(t, sm) {
+  const c = TEAM_COLORS[t] || '#25252a';
+  return `<span class="team-badge" style="background:${c};${sm ? 'width:24px;height:24px;font-size:8px' : ''}">${esc(t)}</span>`;
+}
+function gameOf(gid) { return (D.games || []).find(g => g.gid === gid) || null; }
+function tipTime(iso) {
+  try { return new Date(iso).toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York'}) + ' ET'; }
+  catch (e) { return ''; }
+}
+function track(name, params) { try { if (GA_MEASUREMENT_ID && window.gtag) gtag('event', name, params || {}); } catch (e) {} }
+function initAnalytics() {
+  if (!GA_MEASUREMENT_ID || location.protocol !== 'https:') return;
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = window.gtag || function () { dataLayer.push(arguments); };
+  gtag('js', new Date()); gtag('config', GA_MEASUREMENT_ID);
+  const s = document.createElement('script'); s.async = true;
+  s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_MEASUREMENT_ID;
+  document.head.appendChild(s);
+}
+
+// ── Onyx tickets + parlay builder ─────────────────────────────────
+// Each priced side carries Onyx's own share selection id (from the Onyx
+// book's deep link), so a tap opens that exact ticket; several ids in one
+// URL build a parlay. A side without an id falls back to the game page.
+var parlayMode = false;
+var parlaySlip = [];
+try { parlaySlip = JSON.parse(localStorage.getItem('onyxNbaSlip') || '[]') || []; } catch (e) {}
+function slipSave() { try { localStorage.setItem('onyxNbaSlip', JSON.stringify(parlaySlip)); } catch (e) {} }
+function shareUrl(sels) {
+  return 'https://app.onyxodds.com/share?' + sels.map(s => 'selection=' + encodeURIComponent(s)).join('&')
+    + (ONYX_REFERRER ? '&referrer=' + encodeURIComponent(ONYX_REFERRER) : '');
+}
+// legs registry: chips reference a leg by index so no JSON lands in markup
+var LEGS = [];
+function legChip(leg, label) {
+  if (!leg || leg.price == null) return '<span class="chip dead"><span class="o">-</span><span class="s">' + esc(label || '') + '</span></span>';
+  const i = LEGS.push(leg) - 1;
+  const on = leg.sel && parlaySlip.some(x => x.sel === leg.sel) ? ' in-slip' : '';
+  return `<span class="chip${on}" onclick="betLeg(${i})"><span class="o">${fmtOdds(leg.price)}</span><span class="s">${esc(label || '')}</span></span>`;
+}
+function betLeg(i) {
+  const leg = LEGS[i];
+  if (!leg) return;
+  if (parlayMode) { parlayAdd(leg); return; }
+  if (leg.sel) {
+    track('onyx_click', {link_type: 'single', market: leg.market || '', selection: leg.label, odds: String(leg.price)});
+    window.open(shareUrl([leg.sel]), '_blank', 'noopener');
+  } else {
+    const g = gameOf(leg.gid);
+    track('onyx_click', {link_type: 'fallback', market: leg.market || ''});
+    window.open(g && g.slug ? 'https://app.onyxodds.com/game/' + g.slug : ONYX_FALLBACK_URL, '_blank', 'noopener');
+  }
+}
+function parlayToggle() { parlayMode = !parlayMode; document.body.classList.toggle('parlay-armed', parlayMode); renderSlip(); }
+function parlayAdd(leg) {
+  if (!leg.sel) return;
+  if (parlaySlip.some(x => x.sel === leg.sel)) { parlaySlip = parlaySlip.filter(x => x.sel !== leg.sel); }
+  else if (parlaySlip.length < 10) { parlaySlip.push({sel: leg.sel, label: leg.label, price: leg.price}); track('parlay_add', {selection: leg.label, legs: parlaySlip.length}); }
+  slipSave(); renderSlip(); rerender();
+}
+function parlayRemove(i) { parlaySlip.splice(i, 1); slipSave(); renderSlip(); rerender(); }
+function parlayBuild() {
+  if (!parlaySlip.length) return;
+  track('onyx_click', {link_type: 'parlay', legs: parlaySlip.length});
+  window.open(shareUrl(parlaySlip.map(x => x.sel)), '_blank', 'noopener');
+}
+function renderSlip() {
+  let el = document.getElementById('parlayFab');
+  if (!el) { el = document.createElement('div'); el.id = 'parlayFab'; document.body.appendChild(el); }
+  let dec = 1;
+  parlaySlip.forEach(x => { const o = +x.price; dec *= o > 0 ? 1 + o / 100 : 1 + 100 / -o; });
+  const am = parlaySlip.length ? (dec >= 2 ? '+' + Math.round((dec - 1) * 100) : String(Math.round(-100 / (dec - 1)))) : '';
+  const slip = parlayMode ? `<div class="pf-slip">
+      <div style="font-weight:800;margin-bottom:6px">Parlay Builder <span class="dim" style="font-weight:500;font-size:12px">tap any odds to add</span></div>
+      ${parlaySlip.map((x, i) => `<div class="pf-leg"><span>${esc(x.label)}</span><span class="mono">${fmtOdds(x.price)} <button onclick="parlayRemove(${i})">x</button></span></div>`).join('') || '<div class="dim" style="font-size:12px;padding:8px 0">No legs yet.</div>'}
+      <div class="pf-foot"><span>${parlaySlip.length} legs ${am ? '· ' + am : ''}${am ? ' · $10 pays $' + (10 * dec).toFixed(2) : ''}</span>
+        <button class="btn primary" style="padding:8px 14px;font-size:12px" onclick="parlayBuild()" ${parlaySlip.length ? '' : 'disabled'}>Bet on Onyx</button></div>
+    </div>` : '';
+  el.innerHTML = slip + `<div style="text-align:right"><button class="pf-btn" onclick="parlayToggle()">${parlayMode ? 'Close Builder' : 'Parlay Builder'}${parlaySlip.length ? ' (' + parlaySlip.length + ')' : ''}</button></div>`;
+}
+
+// ── data shaping ───────────────────────────────────────────────────
+function propLeg(p, stat, side) {
+  const pr = (p.props || {})[stat];
+  if (!pr || !pr.all || !pr.all[side]) return null;
+  const s = pr.all[side];
+  return {sel: s.sel || null, price: s.price, gid: p.gid, market: 'player_' + STAT_NAME[stat].toLowerCase(),
+          label: `${p.name} ${side === 'over' ? 'Over' : 'Under'} ${pr.line} ${STAT_ABBR[stat]}`};
+}
+function last5(p, stat) { return (p.last5 || []).map(g => g[stat]).join(' '); }
+
+// ── renderers ──────────────────────────────────────────────────────
+var boardStat = 'pts', boardSort = {k: 'proj', dir: -1};
+function setStat(s) {
+  boardStat = s;
+  document.querySelectorAll('#statSeg button').forEach(b => b.classList.toggle('on', b.dataset.s === s));
+  renderBoard();
+}
+function sortBoard(k) { boardSort = {k, dir: boardSort.k === k ? -boardSort.dir : -1}; renderBoard(); }
+
+function renderHeader() {
+  const d = D.date ? new Date(D.date + 'T12:00:00') : null;
+  const ds = d ? d.toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'}).toUpperCase() : '';
+  document.getElementById('navDate').textContent = ds;
+  document.getElementById('heroDate').textContent = (D.games || []).length ? 'Live · ' + ds : 'No games today';
+  if (D.generated) {
+    const t = new Date(D.generated);
+    document.getElementById('navUpd').textContent = 'updated ' + t.toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York'}).toLowerCase() + ' et';
+  }
+  const m = D.meta || {};
+  const rec = D.record || {};
+  document.getElementById('homeStats').innerHTML = [
+    [m.players_projected || 0, 'Players projected', ''],
+    [(D.games || []).length, 'Games today', 'w'],
+    [m.priced || 0, 'Priced props', ''],
+    [rec.w != null ? `${rec.w}-${rec.l}` : '0-0', 'Picks record', 'w'],
+  ].map(([v, l, c]) => `<div class="stat"><div class="v ${c}">${esc(v)}</div><div class="l">${esc(l)}</div></div>`).join('');
+}
+
+function renderTicker() {
+  document.getElementById('ticker').innerHTML = (D.games || []).map(g => {
+    const live = g.state === 'live' || g.state === 'in';
+    const fin = g.state === 'post' || g.state === 'completed';
+    const sc = (live || fin) && g.away_score != null ? `<b>${esc(g.away)} ${esc(g.away_score)}</b> <b>${esc(g.home)} ${esc(g.home_score)}</b>` : `<b>${esc(g.away)}</b> @ <b>${esc(g.home)}</b>`;
+    const st = fin ? 'FINAL' : live ? (g.detail || 'LIVE') : tipTime(g.start);
+    return `<div class="tk" onclick="gotoTab('games')">${sc}<span class="st ${live ? 'live' : ''}">${esc(st)}</span></div>`;
+  }).join('');
+}
+
+function pickCard(k) {
+  const p = (D.players || []).find(x => x.pid === k.pid) || {name: k.name, team: k.team, opp: k.opp, gid: k.gid};
+  const g = gameOf(k.gid);
+  const leg = {sel: k.sel, price: k.price, gid: k.gid, market: 'player_' + STAT_NAME[k.stat].toLowerCase(),
+               label: `${k.name} ${k.side === 'over' ? 'Over' : 'Under'} ${k.line} ${STAT_ABBR[k.stat]}`};
+  return `<div class="card">
+    <div class="pk-top"><div style="display:flex;gap:10px;align-items:center">${badge(k.team)}<div>
+      <div class="pk-name" style="cursor:pointer" onclick="openPlayer('${esc(k.pid)}')">${esc(k.name)}</div>
+      <div class="pk-meta">${esc(k.team)} ${p.home ? 'vs' : '@'} ${esc(k.opp)}${g ? ' · ' + tipTime(g.start) : ''}</div></div></div>
+      ${legChip(leg, k.side)}</div>
+    <div class="pk-call">${k.side === 'over' ? 'Over' : 'Under'} ${k.line} ${STAT_NAME[k.stat]}<small>proj ${num(k.proj)}</small></div>
+    <div class="pk-row"><span>model <b>${pct(k.prob)}</b></span><span>implied <b>${pct(k.implied)}</b></span><span>edge <b class="edge-pos">${pp(k.edge)}</b></span></div>
+  </div>`;
+}
+
+function renderHome() {
+  const picks = D.picks || [];
+  document.getElementById('picksCount').textContent = picks.length + ' picks today';
+  document.getElementById('homePicks').innerHTML = picks.length ? picks.map(pickCard).join('')
+    : `<div class="empty" style="grid-column:1/-1">${(D.meta || {}).priced ? 'No play clears the bar tonight. An honest edge lane is a quiet one on most nights.' : 'Onyx prices are not posted yet for tonight. Picks appear once lines are up.'}</div>`;
+  const top = (D.players || []).filter(p => !p.out).sort((a, b) => b.proj.pts - a.proj.pts).slice(0, 6);
+  document.getElementById('homeScorers').innerHTML = top.map((p, i) => {
+    const pr = (p.props || {}).pts;
+    return `<div class="card" style="cursor:pointer" onclick="openPlayer('${esc(p.pid)}')">
+      <div class="pk-top"><div style="display:flex;gap:10px;align-items:center">${badge(p.team)}<div>
+        <div class="pk-name">${i + 1}. ${esc(p.name)}</div><div class="pk-meta">${esc(p.team)} ${p.home ? 'vs' : '@'} ${esc(p.opp)} · ${num(p.min)} min</div></div></div>
+        <div class="big" style="color:var(--lilac)">${num(p.proj.pts)}</div></div>
+      <div class="pk-row"><span>line <b>${pr ? pr.line : '-'}</b></span><span>REB <b>${num(p.proj.reb)}</b></span><span>AST <b>${num(p.proj.ast)}</b></span></div>
+    </div>`;
+  }).join('') || '<div class="empty" style="grid-column:1/-1">No slate today.</div>';
+}
+
+function renderBoard() {
+  const sel = document.getElementById('gameSel');
+  if (!sel.options.length) {
+    sel.innerHTML = '<option value="">All games</option>' + (D.games || []).map(g => `<option value="${esc(g.gid)}">${esc(g.away)} @ ${esc(g.home)}</option>`).join('');
+  }
+  const q = (document.getElementById('boardSearch').value || '').toLowerCase().trim();
+  const gid = sel.value, s = boardStat, pricedOnly = document.getElementById('pricedOnly').checked;
+  let rows = (D.players || []).filter(p => !p.out && p.min >= 8)
+    .filter(p => !gid || p.gid === gid)
+    .filter(p => !q || (p.name + ' ' + p.team + ' ' + p.opp).toLowerCase().includes(q))
+    .filter(p => !pricedOnly || (p.props || {})[s]);
+  const val = (p) => {
+    const pr = (p.props || {})[s];
+    switch (boardSort.k) {
+      case 'name': return p.name;
+      case 'min': return p.min;
+      case 'proj': return p.proj[s];
+      case 'line': return pr ? pr.line : -1;
+      case 'diff': return pr ? p.proj[s] - pr.line : -99;
+      case 'prob': return pr ? pr.prob : -1;
+      default: return pr ? pr.edge : -9;
+    }
+  };
+  rows.sort((a, b) => { const x = val(a), y = val(b); return (x > y ? 1 : x < y ? -1 : 0) * boardSort.dir; });
+  document.getElementById('boardCount').textContent = rows.length + ' players';
+  document.getElementById('boardBody').innerHTML = rows.map(p => {
+    const pr = (p.props || {})[s];
+    const diff = pr ? p.proj[s] - pr.line : null;
+    const inj = p.inj ? ` <span class="tag r">${esc(p.inj)}</span>` : '';
+    return `<tr>
+      <td><div style="display:flex;gap:10px;align-items:center">${badge(p.team, 1)}<div>
+        <div class="pn" style="cursor:pointer" onclick="openPlayer('${esc(p.pid)}')">${esc(p.name)}${inj}</div>
+        <div class="ps">${esc(p.team)} ${p.home ? 'vs' : '@'} ${esc(p.opp)}${p.b2b ? ' · B2B' : ''}</div></div></div></td>
+      <td class="r num dim hm">${num(p.min)}</td>
+      <td class="r big">${num(p.proj[s])}</td>
+      <td class="r num">${pr ? pr.line : '-'}</td>
+      <td class="r num hm ${diff > 0 ? 'edge-pos' : ''}">${diff == null ? '-' : (diff > 0 ? '+' : '') + diff.toFixed(1)}</td>
+      <td class="r num hm">${pr ? (pr.side === 'over' ? 'O ' : 'U ') + pct(pr.prob, 0) : '-'}</td>
+      <td class="r num hm ${pr && pr.edge > 0 ? 'edge-pos' : 'edge-neg'}">${pr ? pp(pr.edge) : '-'}</td>
+      <td class="r">${legChip(propLeg(p, s, 'over'), 'over')}</td>
+      <td class="r">${legChip(propLeg(p, s, 'under'), 'under')}</td>
+      <td class="r num dim hm">${esc(last5(p, s)) || '-'}</td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="10"><div class="empty" style="border:none">No players match. Untick "priced only" to see every projection.</div></td></tr>';
+}
+
+function renderScorers() {
+  const rows = (D.players || []).filter(p => !p.out).sort((a, b) => b.proj.pts - a.proj.pts).slice(0, 40);
+  document.getElementById('scorerCount').textContent = 'top ' + rows.length;
+  const max = rows.length ? rows[0].proj.pts : 1;
+  document.getElementById('scorerBody').innerHTML = rows.map((p, i) => {
+    const pr = (p.props || {}).pts;
+    const g = gameOf(p.gid) || {};
+    const tt = p.home ? g.home_implied : g.away_implied;
+    return `<tr>
+      <td class="num dim hm">${i + 1}</td>
+      <td><div style="display:flex;gap:10px;align-items:center">${badge(p.team, 1)}<div>
+        <div class="pn" style="cursor:pointer" onclick="openPlayer('${esc(p.pid)}')">${esc(p.name)}${p.inj ? ` <span class="tag r">${esc(p.inj)}</span>` : ''}</div>
+        <div class="ps">${esc(p.team)} ${p.home ? 'vs' : '@'} ${esc(p.opp)}</div></div></div></td>
+      <td class="r num dim hm">${num(p.min)}</td>
+      <td class="r" style="min-width:90px"><span class="big" style="color:var(--lilac)">${num(p.proj.pts)}</span><div class="bar"><i style="width:${(100 * p.proj.pts / max).toFixed(0)}%"></i></div></td>
+      <td class="r num">${pr ? pr.line : '-'}</td>
+      <td class="r">${legChip(propLeg(p, 'pts', 'over'), 'over')}</td>
+      <td class="r num dim hm">${p.season ? num(p.season.pts) : '-'}</td>
+      <td class="r num dim hm">${p.last_season ? num(p.last_season.pts) : '-'}</td>
+      <td class="r num dim hm">${tt != null ? num(tt) : '-'}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderGames() {
+  const gs = D.games || [];
+  document.getElementById('gamesCount').textContent = gs.length + ' games';
+  document.getElementById('gamesGrid').innerHTML = gs.map(g => {
+    const side = (t, ab) => {
+      const lead = (D.players || []).filter(p => p.team === ab && !p.out).sort((a, b) => b.proj.pts - a.proj.pts)[0];
+      const ml = t === 'away' ? g.away_ml : g.home_ml;
+      const imp = t === 'away' ? g.away_implied : g.home_implied;
+      const mlLeg = ml != null ? {sel: g[t + '_ml_sel'] || null, price: ml, gid: g.gid, market: 'moneyline', label: `${ab} ML`} : null;
+      return `<div class="gc-t">${badge(ab)}<div class="nm"><b>${esc(ab)}</b> <span class="dim" style="font-size:12px">${esc(g[t + '_rec'] || '')}</span>
+        <div class="ps">${lead ? 'Top: ' + esc(lead.name) + ' <b style="color:var(--lilac)">' + num(lead.proj.pts) + '</b>' : ''}</div></div>
+        <div class="imp">${imp != null ? num(imp) + ' pts' : ''}${g.state === 'post' || g.state === 'live' ? '<div class="big">' + esc(t === 'away' ? g.away_score : g.home_score) + '</div>' : ''}</div>
+        ${legChip(mlLeg, 'ML')}</div>`;
+    };
+    const spread = g.spread != null ? `${esc(g.home)} ${g.spread > 0 ? '+' : ''}${g.spread}` : '';
+    return `<div class="card gc">
+      <div class="gc-h"><span>${g.state === 'post' ? 'FINAL' : g.state === 'live' ? esc(g.detail || 'LIVE') : tipTime(g.start)}</span>
+        <span>${spread ? '<span class="tag p">' + spread + '</span> ' : ''}${g.total != null ? '<span class="tag n">O/U ' + g.total + '</span>' : ''}</span></div>
+      ${side('away', g.away)}${side('home', g.home)}
+      <button class="gc-btn" onclick="boardForGame('${esc(g.gid)}')">View all props for this game</button>
+    </div>`;
+  }).join('') || '<div class="empty" style="grid-column:1/-1">No NBA games today.</div>';
+}
+function boardForGame(gid) { document.getElementById('gameSel').value = gid; gotoTab('board'); }
+
+function renderRecord() {
+  const r = D.record || {rows: []};
+  const units = r.units || 0;
+  document.getElementById('recSince').textContent = r.started ? 'since ' + r.started : '';
+  document.getElementById('recBig').innerHTML = [
+    [`${r.w || 0}-${r.l || 0}${r.p ? '-' + r.p : ''}`, 'Record', ''],
+    [r.w + r.l ? pct(r.w / (r.w + r.l)) : '-', 'Hit rate', ''],
+    [(units >= 0 ? '+' : '') + units.toFixed(2) + 'u', 'Units (1u flat)', units > 0 ? 'edge-pos' : ''],
+    [r.pending || 0, 'Pending', ''],
+  ].map(([v, l, c]) => `<div class="card"><div class="v ${c}">${esc(v)}</div><div class="l">${esc(l)}</div></div>`).join('');
+  const bs = r.by_stat || {};
+  document.getElementById('recByStat').innerHTML = ['pts', 'reb', 'ast'].map(s => {
+    const b = bs[s] || {w: 0, l: 0, units: 0};
+    return `<div class="card"><div class="v">${b.w}-${b.l}</div><div class="l">${STAT_NAME[s]} · ${(b.units >= 0 ? '+' : '') + (b.units || 0).toFixed(2)}u</div></div>`;
+  }).join('');
+  const rows = r.rows || [];
+  document.getElementById('recCount').textContent = rows.length + ' picks';
+  document.getElementById('recBody').innerHTML = rows.map(k => `<tr>
+    <td class="num dim">${esc(k.date)}</td>
+    <td><div class="pn">${esc(k.name)}</div><div class="ps">${esc(k.team)} vs ${esc(k.opp)}</div></td>
+    <td>${k.side === 'over' ? 'Over' : 'Under'} ${k.line} ${STAT_ABBR[k.stat]}</td>
+    <td class="r num">${fmtOdds(k.price)}</td>
+    <td class="r num">${num(k.proj)}</td>
+    <td class="r num edge-pos">${pp(k.edge)}</td>
+    <td class="r num">${k.actual != null ? k.actual : '-'}</td>
+    <td class="r">${k.result ? `<span class="res-${esc(k.result[0])}">${esc(k.result === 'V' ? 'VOID' : k.result)}</span>` : '<span class="dim">pending</span>'}</td>
+  </tr>`).join('') || '<tr><td colspan="8"><div class="empty" style="border:none">The record starts with the first qualified pick.</div></td></tr>';
+}
+
+function openPlayer(pid) {
+  const p = (D.players || []).find(x => x.pid === pid);
+  if (!p) return;
+  const g = gameOf(p.gid) || {};
+  const cells = ['pts', 'reb', 'ast'].map(s => {
+    const pr = (p.props || {})[s];
+    return `<div class="card"><div class="v">${num(p.proj[s])}</div><div class="l">${STAT_ABBR[s]}</div>
+      <div class="ps">${pr ? 'line ' + pr.line + ' · ' + (pr.side === 'over' ? 'O ' : 'U ') + pct(pr.prob, 0) : 'no line'}</div>
+      <div style="margin-top:8px;display:flex;gap:6px;justify-content:center">${pr ? legChip(propLeg(p, s, 'over'), 'o') + legChip(propLeg(p, s, 'under'), 'u') : ''}</div></div>`;
+  }).join('');
+  const l5 = (p.last5 || []).slice().reverse().map(x => `<tr><td class="num dim">${esc(x.d)}</td><td>${esc(x.opp)}</td><td class="r num">${x.min}</td><td class="r num">${x.pts}</td><td class="r num">${x.reb}</td><td class="r num">${x.ast}</td></tr>`).join('');
+  document.getElementById('drawer').innerHTML = `<button class="dr-x" onclick="closeDrawer()">x</button>
+    <div style="display:flex;gap:12px;align-items:center">${badge(p.team)}<div><div class="pk-name" style="font-size:20px">${esc(p.name)}</div>
+    <div class="pk-meta">${esc(p.pos || '')} · ${esc(p.team)} ${p.home ? 'vs' : '@'} ${esc(p.opp)} · ${tipTime(g.start)}</div></div></div>
+    ${p.inj ? `<div style="margin-top:12px"><span class="tag r">${esc(p.inj)}</span> <span class="dim" style="font-size:12px">${esc(p.inj_detail || '')}</span></div>` : ''}
+    <div class="dr-grid">${cells}</div>
+    <div class="pk-row" style="flex-wrap:wrap"><span>proj min <b>${num(p.min)}</b></span>
+      <span>season <b>${p.season ? num(p.season.pts) + ' / ' + num(p.season.reb) + ' / ' + num(p.season.ast) : '-'}</b></span>
+      <span>last season <b>${p.last_season ? num(p.last_season.pts) + ' / ' + num(p.last_season.reb) + ' / ' + num(p.last_season.ast) : '-'}</b></span>
+      ${p.b2b ? '<span class="tag n">back-to-back</span>' : ''}</div>
+    <div class="sec-hdr"><span class="sec-title">Last 5</span></div>
+    <div class="tbl-wrap"><table style="min-width:0"><thead><tr><th>Date</th><th>Opp</th><th class="r">Min</th><th class="r">Pts</th><th class="r">Reb</th><th class="r">Ast</th></tr></thead>
+    <tbody>${l5 || '<tr><td colspan="6" class="dim">No games this season yet.</td></tr>'}</tbody></table></div>`;
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('drawerBg').classList.add('open');
+}
+function closeDrawer() {
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawerBg').classList.remove('open');
+}
+
+// ── tabs ───────────────────────────────────────────────────────────
+var currentTab = 'home';
+var RENDER = {home: renderHome, board: renderBoard, scorers: renderScorers, games: renderGames, record: renderRecord, model: function () {
+  document.getElementById('modelVer').textContent = 'model ' + (D.model_version || '');
+}};
+function gotoTab(t) {
+  if (!RENDER[t]) t = 'home';
+  currentTab = t;
+  document.querySelectorAll('.pane').forEach(p => p.classList.toggle('active', p.id === 'pane-' + t));
+  document.querySelectorAll('.nav-tab[data-tab]').forEach(b => b.classList.toggle('active', b.dataset.tab === t));
+  LEGS = [];
+  RENDER[t]();
+  try { history.replaceState(null, '', '#' + t); } catch (e) {}
+  track('tab_view', {tab: t, sport: 'nba'});
+  window.scrollTo(0, 0);
+}
+function rerender() { LEGS = []; RENDER[currentTab](); }
+
+// ── live scores (client side, ESPN public scoreboard; CORS open) ───
+var ESPN_ABBR = {GSW: 'GS', NOP: 'NO', NYK: 'NY', SAS: 'SA', UTA: 'UTAH', WAS: 'WSH', PHO: 'PHX', BRK: 'BKN'};
+function pollLive() {
+  if (!(D.games || []).length || location.protocol === 'file:') return;
+  const ymd = (D.date || '').replace(/-/g, '');
+  fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=' + ymd)
+    .then(r => r.json()).then(j => {
+      let changed = false;
+      (j.events || []).forEach(e => {
+        const c = (e.competitions || [])[0] || {};
+        const side = {};
+        (c.competitors || []).forEach(t => { const a = t.team.abbreviation; side[t.homeAway] = {ab: ESPN_ABBR[a] || a, score: t.score}; });
+        if (!side.home || !side.away) return;
+        const g = D.games.find(x => x.home === side.home.ab && x.away === side.away.ab);
+        if (!g) return;
+        const st = (e.status || {}).type || {};
+        const state = st.state === 'in' ? 'live' : st.state === 'post' ? 'post' : g.state;
+        if (g.away_score !== side.away.score || g.home_score !== side.home.score || g.state !== state) changed = true;
+        g.away_score = side.away.score; g.home_score = side.home.score; g.state = state; g.detail = st.shortDetail || g.detail;
+      });
+      if (changed) { renderTicker(); if (currentTab === 'games') rerender(); }
+    }).catch(() => {});
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+  initAnalytics();
+  renderHeader();
+  renderTicker();
+  renderSlip();
+  const h = (location.hash || '').slice(1);
+  gotoTab(RENDER[h] ? h : 'home');
+  pollLive();
+  setInterval(pollLive, 30000);
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
+</script>
+</body>
+</html>

@@ -68,3 +68,10 @@ jobs:
       # error or undefined/NaN in rendered text.
       - name: Headless page check (all tabs)
         run: node tools/verify_shell.js
+
+      # NBA page: build from committed data/nba and walk its six tabs
+      - name: Build nba.html from committed data
+        run: python3 -B nba_build.py
+
+      - name: Headless NBA page check
+        run: node tools/verify_nba.js
