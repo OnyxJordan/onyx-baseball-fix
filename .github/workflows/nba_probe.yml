@@ -1,0 +1,20 @@
+name: NBA Optic probe (temporary, dev only)
+on:
+  push:
+    branches: [claude/trusting-cori-4upy6e]
+    paths: [tools/nba_optic_probe.py, .github/workflows/nba_probe.yml]
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests
+      - run: python3 tools/nba_optic_probe.py
+        env:
+          OPTICODDS_API_KEY: ${{ secrets.OPTICODDS_API_KEY }}
