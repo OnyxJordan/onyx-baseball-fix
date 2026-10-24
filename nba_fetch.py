@@ -33,7 +33,7 @@ Q = "sport=basketball&league=nba"
 SEASON_START = date(2026, 10, 20)        # 2026-27 opener; earlier games are preseason
 PRIOR_START = date(2025, 10, 21)         # 2025-26 opener (playoffs included in the prior)
 LOOKBACK_DAYS = 4
-PRIOR_REFETCH_PER_RUN = 160              # first run seeds ~450 players over three runs
+PRIOR_REFETCH_PER_RUN = 400              # the first run seeds the whole slate (~3 min); later runs fetch only new names
 
 _KEY = ""
 

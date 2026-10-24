@@ -271,6 +271,8 @@ def project_slate(slate, prior, player_games, team_games):
         if not g:
             continue
         pr = prior.get(p["pid"])
+        if pr and not pr.get("gp"):
+            pr = None   # cached "no last-season games" (rookies): no prior
         pg = (player_games.get(p["pid"]) or {}).get("g", [])
         status = (p.get("inj") or "").upper()
         out = status in OUT_STATUSES
