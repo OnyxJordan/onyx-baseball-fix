@@ -372,6 +372,39 @@ to OneSignal tags (`hr`, `final`). iPhone users must install the PWA first (iOS 
 an installed PWA for web push). To turn it off for good, delete `notify_watch.yml` and
 `push_watch.py` — leaving it half-wired is what makes it look broken.
 
+## NBA sister site (`nba.html`)
+
+Points / rebounds / assists projections against Onyx prices, plus a projected
+top-scorers board. Lives in this repo so it shares the Actions secrets
+(`OPTICODDS_API_KEY`, `ODDS_API_KEY`) and the Pages deploy, but it is
+**fully isolated from MLB**: its own scripts (`nba_*.py`), its own template
+(`nba_shell.html` -> `nba.html`), its own data (`data/nba/`). It never reads
+or writes `index.html` or any MLB data file. MLB's nav links to it, and it links back.
+
+| script | job |
+|---|---|
+| `nba_fetch.py` | OpticOdds: fixtures (Onyx slug = `game_id`), box scores (`/fixtures/player-results`, several fixture ids per call; DNPs are absent), last season per player from `/fixtures/player-results/last-x` (cached in `prior.json`, ~160 new players per run), injuries (`out` / `gtd`), rosters (`/players`, cached daily). Falls back to `nba_espn.py` when the key is missing or `/fixtures` fails |
+| `nba_espn.py` | ESPN public API backup, writes `data/nba/espn/` (ESPN ids, never mixed with OpticOdds ids). `cdn.nba.com` and `stats.nba.com` refuse datacenter IPs; ESPN does not |
+| `nba_odds.py` | Onyx book (`onyx_odds`) via `/fixtures/odds` filtered to `player_points` / `player_rebounds` / `player_assists` / `moneyline` / `point_spread` / `total_points`. Main line = the pair flagged `is_main` (props carry an alternate ladder). Each side keeps Onyx's share selection uuid from `deep_link`, which is what bet buttons and the parlay builder open. The Odds API fills only player-markets Onyx did not price, throttled (90 min) because the key also feeds MLB |
+| `nba_model.py` | v1 projection, changelog at the top. Minutes (prior + this season, fitted to 240 per team so OUT minutes flow to the rotation) x per-minute rates (300-minute prior) x environment (team points fitted to the implied team total; rebounds / assists by pace and opponent). Normal-approximation over/under probability blended 60/40 with the vig-free Onyx market; edge vs the listed price |
+| `nba_build.py` | prices projections, grades and extends the picks ledger, injects one `var NBA_DATA` into `nba_shell.html` |
+
+**Picks ledger** `data/nba/picks_history.json`: append-only, odds and Onyx
+selection frozen at the moment a play qualifies, graded from box scores
+(W / L / P, void if the player never logs a minute or the game never goes
+final within 3 days). Lane v1: Onyx price only, edge 4-12pp, price -180 to
++150, projected minutes >= 24, no injury tag, max 2 per game / 8 per slate,
+one per player. `validate_build.py` guards it with the same never-shrinks
+rule as the MLB ledgers.
+
+**Pipelines:** `refresh_build.yml` and `daily_build.yml` run the three NBA
+steps after the MLB build, each `continue-on-error` with its own timeout, so
+an NBA problem can never block or delay MLB. CI builds `nba.html` from
+committed data and runs `node tools/verify_nba.js` (six tabs at 390px and
+1280px, plus the player drawer).
+
+**Dates:** the NBA slate uses the same game day as MLB (ET minus 4h).
+
 ## Secrets and configuration
 
 | name | where | used by | if missing |
