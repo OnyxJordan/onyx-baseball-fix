@@ -20,7 +20,9 @@ CHANGELOG (the lab notebook: every change bumps VERSION and cites evidence)
      - Probability: normal approximation with per-stat spread
        (pts 0.30*mean+2.0, reb 0.35*mean+1.0, ast 0.40*mean+0.8), discrete
        correction for whole-number lines (push mass removed), then blended
-       60/40 with the vig-stripped market. Edge is measured vs the LISTED
+       50/50 with the vig-stripped market (first live slate, 10/24: at 60/40
+       64 of 236 Onyx props showed >4pp edge, far more than a sharp market
+       leaves; the MLB studies found the market the better-calibrated side). Edge is measured vs the LISTED
        price, the price a user actually gets.
      Open items once graded rows exist: calibrate the 60/40 blend and the
      spread constants by bucket, as the MLB side did with its studies.
@@ -40,7 +42,7 @@ PRIOR_GAMES_K = 4
 RATE_PRIOR_MIN = 300.0
 POS_PRIOR_MIN = 150.0
 SD = {"pts": (0.30, 2.0), "reb": (0.35, 1.0), "ast": (0.40, 0.8)}
-MODEL_WEIGHT = 0.60
+MODEL_WEIGHT = 0.50
 OUT_STATUSES = {"OUT", "DOUBTFUL", "O", "D", "SUSPENSION"}
 RISK_STATUSES = {"QUESTIONABLE", "GTD", "Q", "DAY-TO-DAY", "DTD"}
 STATS = ("pts", "reb", "ast")

@@ -29,12 +29,13 @@ SHELL, OUT = "nba_shell.html", "nba.html"
 LEDGER = "picks_history.json"
 
 # Picks lane (v1). Deliberately strict: an honest lane is a quiet lane.
-PICK_MIN_EDGE = 0.04          # blended prob minus listed implied
-PICK_MAX_EDGE = 0.12          # bigger "edges" are usually the model missing news
+PICK_MIN_EDGE = 0.05          # blended prob minus listed implied
+PICK_MAX_EDGE = 0.10          # bigger "edges" are usually the model missing news
+PICK_MIN_SIGNALS = 2          # of last season / this season / last 5 on the pick's side
 PICK_PRICE = (-180, 150)
 PICK_MIN_MIN = 24.0           # projected minutes
 PICK_MAX_PER_GAME = 2
-PICK_MAX_PER_SLATE = 8
+PICK_MAX_PER_SLATE = 6
 VOID_AFTER_DAYS = 3
 
 
@@ -92,7 +93,25 @@ def qualifies(r, s, pr, game):
         return False
     if not (PICK_PRICE[0] <= pr["price"] <= PICK_PRICE[1]):
         return False
-    return PICK_MIN_EDGE <= pr["edge"] <= PICK_MAX_EDGE and pr["ev"] > 0
+    if not (PICK_MIN_EDGE <= pr["edge"] <= PICK_MAX_EDGE and pr["ev"] > 0):
+        return False
+    return signals(r, s, pr) >= PICK_MIN_SIGNALS
+
+
+def signals(r, s, pr):
+    """How many independent form reads sit on the pick's side of the line:
+    last season's average, this season's (2+ games), the last five games.
+    The MLB lane's sig >= 2 screen, ported: a projection alone is not enough."""
+    over = pr["side"] == "over"
+    reads = []
+    if r.get("last_season"):
+        reads.append(r["last_season"][s])
+    if r.get("season") and r["gp"] >= 2:
+        reads.append(r["season"][s])
+    l5 = [g[s] for g in r.get("last5") or [] if g.get("min", 0) > 0]
+    if len(l5) >= 3:
+        reads.append(sum(l5) / len(l5))
+    return sum(1 for v in reads if (v > pr["line"]) == over and v != pr["line"])
 
 
 def payout(price):
@@ -193,7 +212,7 @@ def main():
                "side": pr["side"], "line": pr["line"], "price": pr["price"],
                "sel": pr["all"][pr["side"]].get("sel"),
                "proj": r["proj"][s], "prob": pr["prob"], "implied": pr["implied"],
-               "edge": pr["edge"], "model": VERSION,
+               "edge": pr["edge"], "signals": signals(r, s, pr), "model": VERSION,
                "logged_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
                "result": None, "actual": None}
         ledger.append(row)
