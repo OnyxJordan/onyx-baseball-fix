@@ -8,18 +8,22 @@ scores from earlier days, team pace / defense from earlier days. It then
 projects every player who suited up that night and is scored against the
 real box score.
 
-Data: bt/games.json + bt/box.json from tools/nba_backtest_pull.py (OpticOdds).
+Data: bt/games.json + bt/box.json + bt/lines.json from tools/nba_backtest_pull.py
+(OpticOdds box scores and historical Onyx main lines, open + close).
 
 What it can and cannot see (read before quoting numbers):
   - Who played is taken from the box score, i.e. it assumes the final
     injury report is known at tip. Production has that too (OUT / GTD).
-  - No historical game lines: the points environment uses the no-line path
-    (team scoring vs what the opponent allows). Production fits team points
-    to the Onyx implied total, which should only help.
+  - Game environment uses the CLOSING Onyx total / spread (production
+    refreshes up to tip). Props are scored at both opening and closing
+    prices; real picks land in between.
 
-Usage:
-  python3 tools/nba_backtest.py bt/                 # score the live params
+Usage (data: run the "NBA backtest data" workflow, download its artifact to bt/):
+  python3 tools/nba_backtest.py bt/                 # score the live model + picks lane
   python3 tools/nba_backtest.py bt/ --tune          # tune on Oct-Jan, test Feb-Apr
+
+Run it after ANY nba_model.py / picks-lane change and quote the test-window
+numbers in the changelog entry.
 """
 
 import json, math, sys, time
@@ -29,7 +33,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import nba_model as M
-from nba_common import team_abbr
+from nba_common import team_abbr, nk
+
+NAMEMAP = {}   # gid -> {nk(name): props}, filled when lines load
 
 STATS = ("pts", "reb", "ast")
 SPLIT = "2026-02-01"          # tune before, test on/after
@@ -82,8 +88,10 @@ def build_prior(G, lines, before):
     return pr
 
 
-def walk(G, lines, season_start, season_end, prior):
-    """Yield one record per player-game: projection, baselines, actual."""
+def walk(G, lines, season_start, season_end, prior, mkt=None):
+    """One record per player-game: projection, baselines, actual, and the
+    Onyx main line (open + close) when the historical pull has one."""
+    mkt = mkt or {}
     by_day = defaultdict(list)
     for fid, g in G.items():
         if season_start <= g["d"] <= season_end:
@@ -94,8 +102,12 @@ def walk(G, lines, season_start, season_end, prior):
         slate = {"date": d, "games": [], "players": []}
         for fid in fids:
             g = G[fid]
+            gl = mkt.get(fid) or {}
+            # closing Onyx total / home spread: production refreshes up to tip
+            tot = (gl.get("total") or [None, None])[1]
+            spr = (gl.get("spread_home") or [None, None])[1]
             slate["games"].append({"gid": fid, "away": g["away"], "home": g["home"], "state": "pre",
-                                   "spread": None, "total": None})
+                                   "spread": spr, "total": tot})
             for l in lines[fid]:
                 if l["min"] <= 0 or l["team"] not in (g["home"], g["away"]):
                     continue
@@ -115,11 +127,15 @@ def walk(G, lines, season_start, season_end, prior):
                 i = M.IDX[s]
                 szn = sum(x[i] for x in hist) / len(hist) if len(hist) >= 3 else None
                 l10 = sum(x[i] for x in hist[-10:]) / len(hist[-10:]) if hist else None
+                l5 = sum(x[i] for x in hist[-5:]) / len(hist[-5:]) if len(hist) >= 3 else None
                 pv = pri[s] / pri["gp"] if pri and pri.get("gp") else None
-                base[s] = {"szn": szn if szn is not None else pv, "l10": l10 if l10 is not None else pv, "prior": pv}
-            out.append({"d": d, "pid": r["pid"], "name": r["name"], "pmin": r["min"], "amin": a["min"],
-                        "proj": dict(r["proj"]), "act": {s: a[s] for s in STATS}, "base": base,
-                        "gp": len(hist)})
+                base[s] = {"szn": szn if szn is not None else pv, "l10": l10 if l10 is not None else pv,
+                           "prior": pv, "szn_raw": szn if len(hist) >= 2 else None, "l5": l5}
+            props = ((mkt.get(r["gid"]) or {}).get("props") or {}).get(r["name"]) or \
+                    NAMEMAP.get(r["gid"], {}).get(nk(r["name"])) or {}
+            out.append({"d": d, "pid": r["pid"], "name": r["name"], "gid": r["gid"], "pmin": r["min"],
+                        "amin": a["min"], "proj": dict(r["proj"]), "act": {s: a[s] for s in STATS},
+                        "base": base, "gp": len(hist), "props": props})
         # the day is over: its box scores join the history
         for fid in fids:
             g = G[fid]
@@ -169,33 +185,123 @@ def fmt(res, title):
         print(f"  {s:5s} {r['mae']:9.3f} {r['rmse']:6.2f} {r['bias']:+6.2f} | {r['szn']:7.3f} {r['l10']:7.3f} {r['prior']:6.3f}")
 
 
-def calibration(recs, lo, hi):
-    """Distribution check: for a market-like line (season average to date,
-    rounded to x.5), does P(over) from prob_over match how often it went over?
-    Also fits the per-stat spread (sd = a*mean + b) from residuals."""
-    sel = [r for r in recs if lo <= r["d"] < hi and r["pmin"] >= MIN_PROJ]
+def fit_sd(recs, lo, hi):
+    """Per-stat spread sd = a*proj + b from the residuals in a window
+    (E|resid| = sd * sqrt(2/pi) for a roughly normal error)."""
+    sel = [r for r in recs if lo <= r["d"] < hi and r["pmin"] >= 10]
     out = {}
     for s in STATS:
-        buckets = defaultdict(lambda: [0, 0, 0.0])
-        for r in sel:
-            b = r["base"][s]["szn"]
-            if b is None:
-                continue
-            line = math.floor(b) + 0.5
-            p, _ = M.prob_over(r["proj"][s], line, s)
-            k = min(9, int(p * 10))
-            buckets[k][0] += 1
-            buckets[k][1] += r["act"][s] > line
-            buckets[k][2] += p
-        rows = [(k, v[0], v[2] / v[0], v[1] / v[0]) for k, v in sorted(buckets.items()) if v[0] >= 30]
-        brier_gap = sum(n * abs(pp - aa) for _, n, pp, aa in rows) / max(1, sum(n for _, n, _, _ in rows))
-        # least squares |resid| ~ a*mean + b, converted to sd (E|x| = sd*sqrt(2/pi))
         xs = [r["proj"][s] for r in sel]
         ys = [abs(r["proj"][s] - r["act"][s]) / math.sqrt(2 / math.pi) for r in sel]
         n = len(xs); mx, my = sum(xs) / n, sum(ys) / n
         a = sum((x - mx) * (y - my) for x, y in zip(xs, ys)) / sum((x - mx) ** 2 for x in xs)
-        out[s] = {"rows": rows, "gap": brier_gap, "sd_fit": (round(a, 3), round(my - a * mx, 2))}
+        out[s] = (round(a, 3), round(my - a * mx, 3))
     return out
+
+
+def implied(a):
+    if a is None:
+        return None
+    a = float(a)
+    return 100 / (a + 100) if a > 0 else -a / (-a + 100)
+
+
+def market_rows(recs, lo, hi, which="c"):
+    """Every player-game with a two-sided Onyx main line: model P(over),
+    vig-free market P(over), outcome."""
+    out = []
+    for r in recs:
+        if not (lo <= r["d"] < hi):
+            continue
+        for s in STATS:
+            m = (r["props"] or {}).get(s)
+            if not m:
+                continue
+            line, po, pu = m[which]
+            io, iu = implied(po), implied(pu)
+            if line is None or not io or not iu:
+                continue
+            if not (1.0 <= io + iu <= 1.15):
+                continue                      # sides posted at different lines (open/close race): no market
+            act = r["act"][s]
+            if act == line:
+                continue                      # push: no outcome
+            p_over, p_push = M.prob_over(r["proj"][s], float(line), s)
+            p_model = p_over / (1 - p_push) if p_push < 1 else p_over
+            out.append({"r": r, "s": s, "line": float(line), "po": int(po), "pu": int(pu),
+                        "p_model": p_model, "p_mkt": io / (io + iu), "over": act > line,
+                        "io": io, "iu": iu})
+    return out
+
+
+def brier(rows, key):
+    return sum((x[key] - x["over"]) ** 2 for x in rows) / len(rows)
+
+
+def logloss(rows, key):
+    e = 1e-6
+    return -sum(math.log(max(e, x[key])) if x["over"] else math.log(max(e, 1 - x[key])) for x in rows) / len(rows)
+
+
+def payout(price):
+    return price / 100 if price > 0 else 100 / -price
+
+
+def simulate_picks(rows, w, min_edge, max_edge, price_lo=-180, price_hi=150, min_min=24.0,
+                   min_sig=2, per_game=2, per_slate=6):
+    """Replay the nba_build.py picks lane at the listed Onyx prices."""
+    cands = []
+    for x in rows:
+        r, s = x["r"], x["s"]
+        if r["pmin"] < min_min:
+            continue
+        pb = w * x["p_model"] + (1 - w) * x["p_mkt"]
+        for side, p, price, imp in (("over", pb, x["po"], x["io"]), ("under", 1 - pb, x["pu"], x["iu"])):
+            edge = p - imp
+            if not (min_edge <= edge <= max_edge and price_lo <= price <= price_hi):
+                continue
+            if p * (1 + payout(price)) - 1 <= 0:
+                continue
+            b = r["base"][s]
+            reads = [v for v in (b["prior"], b["szn_raw"], b["l5"]) if v is not None]
+            sig = sum(1 for v in reads if (v > x["line"]) == (side == "over") and v != x["line"])
+            if sig < min_sig:
+                continue
+            win = x["over"] if side == "over" else not x["over"]
+            cands.append((r["d"], edge, r["gid"], r["pid"], s, side, price, win, p))
+    by_day = defaultdict(list)
+    for c in cands:
+        by_day[c[0]].append(c)
+    picks = []
+    for d, cs in by_day.items():
+        cs.sort(key=lambda c: -c[1])
+        used, pg_n = set(), defaultdict(int)
+        for c in cs:
+            if len([p for p in picks if p[0] == d]) >= per_slate:
+                break
+            if c[3] in used or pg_n[c[2]] >= per_game:
+                continue
+            used.add(c[3]); pg_n[c[2]] += 1
+            picks.append(c)
+    w_, l_ = sum(1 for p in picks if p[7]), sum(1 for p in picks if not p[7])
+    units = sum(payout(p[6]) if p[7] else -1 for p in picks)
+    exp = sum(p[8] for p in picks)
+    return {"n": len(picks), "w": w_, "l": l_, "units": round(units, 2),
+            "roi": round(units / len(picks), 4) if picks else 0.0,
+            "claimed": round(exp / len(picks), 4) if picks else 0.0,
+            "hit": round(w_ / len(picks), 4) if picks else 0.0,
+            "by_stat": {s: (sum(1 for p in picks if p[4] == s and p[7]), sum(1 for p in picks if p[4] == s and not p[7]))
+                        for s in STATS},
+            "by_side": {sd: (sum(1 for p in picks if p[5] == sd and p[7]), sum(1 for p in picks if p[5] == sd and not p[7]))
+                        for sd in ("over", "under")}}
+
+
+def calib_table(rows, key):
+    b = defaultdict(lambda: [0, 0, 0.0])
+    for x in rows:
+        k = min(9, int(x[key] * 10))
+        b[k][0] += 1; b[k][1] += x["over"]; b[k][2] += x[key]
+    return [(k, v[0], v[2] / v[0], v[1] / v[0]) for k, v in sorted(b.items()) if v[0] >= 40]
 
 
 GRID = {
@@ -209,8 +315,11 @@ GRID = {
     "b2b_mult": [0.95, 0.97, 1.0],
     "opp_exp": [0.0, 0.25, 0.5, 0.75],
     "pace_exp": [0.0, 0.5, 1.0],
-    "pts_fit_exp": [0.0, 0.4, 0.8],
+    "pts_fit_exp": [0.0, 0.4, 0.8, 1.0],
     "home_pts": [0.0, 0.01, 0.02],
+    "scale_pts": [0.94, 0.96, 0.98, 1.0],
+    "scale_reb": [0.94, 0.96, 0.98, 1.0],
+    "scale_ast": [0.96, 0.98, 1.0, 1.02],
 }
 
 
@@ -225,46 +334,101 @@ def getp(k):
     return getattr(M, k) if k in ("PRIOR_GAMES_K", "RATE_PRIOR_MIN") else M.P[k]
 
 
+def report_market(recs, lo, hi, title, w):
+    rows = market_rows(recs, lo, hi)
+    if not rows:
+        print(f"\n{title}: no Onyx lines in window")
+        return None
+    for x in rows:
+        x["p_blend"] = w * x["p_model"] + (1 - w) * x["p_mkt"]
+    with_line = [x for x in rows]
+    mae_m = sum(abs(x["r"]["proj"][x["s"]] - x["r"]["act"][x["s"]]) for x in with_line) / len(with_line)
+    mae_l = sum(abs(x["line"] - x["r"]["act"][x["s"]]) for x in with_line) / len(with_line)
+    print(f"\n{title}: {len(rows)} Onyx closing lines (two-sided, no pushes)")
+    print(f"  projection MAE {mae_m:.3f} vs Onyx line MAE {mae_l:.3f} (same player-games)")
+    for key, lab in (("p_model", "model"), ("p_mkt", "Onyx no-vig"), ("p_blend", f"blend w={w}")):
+        print(f"  {lab:14s} Brier {brier(rows, key):.4f}  logloss {logloss(rows, key):.4f}")
+    print("  calibration of the BLEND (P(over) bucket: n, predicted, actual):")
+    for k, n, pp, aa in calib_table(rows, "p_blend"):
+        print(f"    {k / 10:.1f}-{(k + 1) / 10:.1f}: {n:5d}  {pp:.3f}  {aa:.3f}")
+    return rows
+
+
 def main():
     bt = sys.argv[1] if len(sys.argv) > 1 and not sys.argv[1].startswith("--") else "bt"
     G, lines = load(bt)
     prior = build_prior(G, lines, "2025-08-01")
-    print(f"loaded {len(G)} games, prior for {len(prior)} players (2024-25)")
-    run = lambda: walk(G, lines, "2025-10-01", "2026-04-30", prior)
+    mkt = {}
+    lp = Path(bt) / "lines.json"
+    if lp.exists() and "--no-lines" not in sys.argv:
+        mkt = json.load(open(lp))
+        for gid, g in mkt.items():
+            NAMEMAP[gid] = {nk(n): v for n, v in (g.get("props") or {}).items()}
+    print(f"loaded {len(G)} games, prior for {len(prior)} players (2024-25), Onyx lines for {len(mkt)} games")
+    run = lambda: walk(G, lines, "2025-10-01", "2026-04-30", prior, mkt)
     t0 = time.time()
     recs = run()
     print(f"walk-forward: {len(recs)} player-games in {time.time() - t0:.1f}s")
-    fmt(score(recs, hi=SPLIT), "LIVE params, train window (Oct-Jan)")
-    fmt(score(recs, lo=SPLIT), "LIVE params, test window (Feb-Apr)")
+    fmt(score(recs, hi=SPLIT), "CURRENT params, train window (Oct-Jan)")
+    fmt(score(recs, lo=SPLIT), "CURRENT params, test window (Feb-Apr)")
+    if mkt:
+        report_market(recs, SPLIT, "9999", "CURRENT model vs Onyx, test window", M.MODEL_WEIGHT)
+        import nba_build
+        for which, lab in (("o", "opening"), ("c", "closing")):
+            rows = market_rows(recs, SPLIT, "9999", which)
+            print(f"  picks lane (nba_build.py rules) at Onyx {lab} prices:",
+                  simulate_picks(rows, M.MODEL_WEIGHT, nba_build.PICK_MIN_EDGE, nba_build.PICK_MAX_EDGE,
+                                 min_min=nba_build.PICK_MIN_MIN, min_sig=nba_build.PICK_MIN_SIGNALS,
+                                 per_game=nba_build.PICK_MAX_PER_GAME, per_slate=nba_build.PICK_MAX_PER_SLATE))
     if "--tune" not in sys.argv:
         return
-    base_obj = score(recs, hi=SPLIT)["obj"]
+
+    # 1) projection params: minimize normalized MAE on the train window
     best = {k: getp(k) for k in GRID}
     for sweep in range(2):
         for k, vals in GRID.items():
-            scores = {}
+            sc = {}
             for v in vals:
                 setp(k, v)
-                scores[v] = score(run(), hi=SPLIT)["obj"]
-            v_best = min(scores, key=scores.get)
-            setp(k, v_best)
-            best[k] = v_best
-            print(f"  sweep {sweep + 1} {k:15s} -> {v_best}  (" +
-                  ", ".join(f"{v}:{o:.4f}" for v, o in scores.items()) + ")")
+                sc[v] = score(run(), hi=SPLIT)["obj"]
+            setp(k, min(sc, key=sc.get)); best[k] = getp(k)
+            print(f"  sweep {sweep + 1} {k:15s} -> {best[k]}  (" + ", ".join(f"{v}:{o:.4f}" for v, o in sc.items()) + ")")
     recs = run()
     tr, te = score(recs, hi=SPLIT), score(recs, lo=SPLIT)
-    print(f"\nTRAIN objective {base_obj:.4f} -> {tr['obj']:.4f}")
     fmt(tr, "TUNED params, train window (Oct-Jan)")
     fmt(te, "TUNED params, TEST window (Feb-Apr, never seen by the tuner)")
-    print("\nbest params:", json.dumps(best))
-    cal = calibration(recs, SPLIT, "9999")
-    for s, c in cal.items():
-        print(f"\ncalibration {s} (test window): mean |pred - actual| per bucket {c['gap']:.3f}; sd fit {c['sd_fit']}")
-        for k, n, p, a in c["rows"]:
-            print(f"   P(over) {k / 10:.1f}-{(k + 1) / 10:.1f}: n={n:5d} predicted {p:.3f} actual {a:.3f}")
-    json.dump({"best": best, "train": tr, "test": te,
-               "calibration": {s: {"gap": c["gap"], "sd_fit": c["sd_fit"]} for s, c in cal.items()}},
-              open(Path(bt) / "tuned.json", "w"), indent=1)
+
+    # 2) distribution spread, fitted on train only
+    sd = fit_sd(recs, "0000", SPLIT)
+    M.SD.update(sd)
+    print("\nSD fitted on train:", sd)
+
+    out = {"best": best, "sd": sd, "train": tr, "test": te}
+    if mkt:
+        # 3) model / market blend weight: best train logloss
+        tr_rows = market_rows(recs, "0000", SPLIT)
+        ws = {}
+        for w in (0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 1.0):
+            for x in tr_rows:
+                x["p_blend"] = w * x["p_model"] + (1 - w) * x["p_mkt"]
+            ws[w] = logloss(tr_rows, "p_blend")
+        w_best = min(ws, key=ws.get)
+        print("blend weight (train logloss):", {k: round(v, 4) for k, v in ws.items()}, "->", w_best)
+        report_market(recs, "0000", SPLIT, "TUNED model vs Onyx, train window", w_best)
+        te_rows = report_market(recs, SPLIT, "9999", "TUNED model vs Onyx, TEST window", w_best)
+        # 4) picks lane: choose the edge band on train, report test
+        grid = [(lo_, hi_) for lo_ in (0.02, 0.03, 0.04, 0.05, 0.06) for hi_ in (0.08, 0.10, 0.15)]
+        res = {g: simulate_picks(tr_rows, w_best, *g) for g in grid}
+        ok = {g: r for g, r in res.items() if r["n"] >= 40}
+        g_best = max(ok, key=lambda g: ok[g]["roi"]) if ok else (0.05, 0.10)
+        print("\npicks lane on TRAIN by edge band (n, W-L, ROI):")
+        for g, r in res.items():
+            print(f"   edge {g[0]:.2f}-{g[1]:.2f}: n={r['n']:4d} {r['w']}-{r['l']} roi {r['roi']:+.3f}")
+        te_pick = simulate_picks(te_rows, w_best, *g_best)
+        print(f"\nchosen band {g_best} -> TEST picks: {te_pick}")
+        out.update({"blend_w": w_best, "edge_band": g_best, "test_picks": te_pick,
+                    "train_picks": res.get(g_best)})
+    json.dump(out, open(Path(bt) / "tuned.json", "w"), indent=1, default=str)
 
 
 if __name__ == "__main__":

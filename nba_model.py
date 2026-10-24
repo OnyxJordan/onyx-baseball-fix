@@ -2,6 +2,36 @@
 nba_model.py - Onyx NBA points / rebounds / assists projection model.
 
 CHANGELOG (the lab notebook: every change bumps VERSION and cites evidence)
+  v2 (2026-10-24) BACKTESTED. tools/nba_backtest.py replays the 2025-26
+     regular season walk-forward (2024-25 as prior, no look-ahead), 26,352
+     player-games, with OpticOdds box scores and the historical Onyx main
+     lines (17,668 props, open + close). Tuned on Oct-Jan, judged on Feb-Apr
+     only (the tuner never saw it). Test-window results, players projected
+     20+ min:
+       projection MAE      v1 -> v2: pts 5.21 -> 5.15, reb 2.03 -> 1.99,
+                           ast 1.59 -> 1.57 (season-average baseline 5.48 /
+                           2.05 / 1.63; last-10 baseline 5.38 / 2.07 / 1.63)
+       bias                pts +0.42 -> -0.16, reb +0.24 -> -0.08
+       v1 picks lane       131-128, -3.4% ROI at Onyx closing prices,
+                           claimed 59.8% vs hit 50.6%: overconfident
+       v2 picks lane       74-63 (+5.6%) at Onyx opening prices, 53-48 (+3.3%)
+                           at closing; claimed 54.2% vs hit 54.0% (open).
+                           n is ~100-140: calibrated, profit NOT yet proven.
+     Changes, each chosen on the train window:
+     - final per-stat scale pts 0.96 / reb 0.94 / ast 0.96 (v1 ran high)
+     - minutes prior 2 games (was 4); back-to-back 0.95 (was 0.97);
+       opponent-allowed exponent 0.75 (was 0.5); home points +/-2% (was 1%)
+     - probability: negative binomial (right-skewed) replaces the normal,
+       sd = a*mean + b fitted on train residuals: pts (0.181, 3.732),
+       reb (0.257, 1.304), ast (0.299, 0.947). The normal put P(over)
+       5-9pp too high in every middle bucket.
+     - market blend 20% model / 80% Onyx no-vig (was 50/50): best train
+       logloss; test logloss 0.6893 vs Onyx alone 0.6898 vs model alone
+       0.7179. The Onyx closing line itself has MAE 3.05 vs our projection
+       3.12 on the same props: the market is the sharper single read, the
+       model adds a little on top.
+     Recency decay on minutes / rates, pace exponent and the L5 nudge were
+     tested and left as they were (no train gain).
   v1 (2026-10-24) initial model, no graded evidence yet. Structure:
      projection = expected minutes x per-minute rate x game environment.
      - Minutes: last season's MPG as a 4-game prior (2 if the player changed
@@ -30,7 +60,7 @@ CHANGELOG (the lab notebook: every change bumps VERSION and cites evidence)
 
 import math
 
-VERSION = "v1"
+VERSION = "v2"
 
 LEAGUE = {"ppg": 115.0, "reb": 44.0, "ast": 27.0, "poss": 99.5}
 POS_RATE = {   # per-minute league rates by listed position, used only without a prior
@@ -38,11 +68,11 @@ POS_RATE = {   # per-minute league rates by listed position, used only without a
     "F": {"pts": 0.44, "reb": 0.21, "ast": 0.09},
     "C": {"pts": 0.45, "reb": 0.30, "ast": 0.08},
 }
-PRIOR_GAMES_K = 4
+PRIOR_GAMES_K = 2
 RATE_PRIOR_MIN = 300.0
 POS_PRIOR_MIN = 150.0
-SD = {"pts": (0.30, 2.0), "reb": (0.35, 1.0), "ast": (0.40, 0.8)}
-MODEL_WEIGHT = 0.50
+SD = {"pts": (0.181, 3.732), "reb": (0.257, 1.304), "ast": (0.299, 0.947)}   # v2: fitted, see changelog
+MODEL_WEIGHT = 0.20                 # v2: 20% model / 80% Onyx no-vig
 # Tunables (nba_backtest.py walks these). Values here are the live model's.
 P = {
     "min_recent_w": 0.30,    # weight on the last-N-games minutes average
@@ -51,12 +81,15 @@ P = {
     "rate_decay": 1.0,       # per-game weight decay for this season's per-minute rates
     "l5_nudge": 0.25,        # share of the L5 rate gap applied
     "l5_cap": 0.15,
-    "b2b_mult": 0.97,
+    "b2b_mult": 0.95,
     "pace_exp": 0.5,
-    "opp_exp": 0.5,
+    "opp_exp": 0.75,
     "pts_fit_exp": 0.8,      # how hard team points are pulled to the target total
-    "home_pts": 0.01,
+    "home_pts": 0.02,
     "blowout_k": 0.004,
+    "scale_pts": 0.96,        # final per-stat scale (bias correction from the backtest)
+    "scale_reb": 0.94,
+    "scale_ast": 0.96,
 }
 OUT_STATUSES = {"OUT", "DOUBTFUL", "O", "D", "SUSPENSION"}
 RISK_STATUSES = {"QUESTIONABLE", "GTD", "Q", "DAY-TO-DAY", "DTD"}
@@ -214,15 +247,45 @@ def _phi(z):
     return 0.5 * (1 + math.erf(z / math.sqrt(2)))
 
 
+def _nb_cdf(k, mean, var):
+    """P(X <= k) for a negative binomial with this mean and variance
+    (Poisson when the variance does not exceed the mean)."""
+    if k < 0:
+        return 0.0
+    mean = max(mean, 0.05)
+    if var <= mean * 1.0001:
+        term = math.exp(-mean)
+        tot = term
+        for i in range(1, int(k) + 1):
+            term *= mean / i
+            tot += term
+        return min(1.0, tot)
+    r = mean * mean / (var - mean)
+    q = mean / (r + mean)              # success prob of the "count" side
+    term = (1 - q) ** r                # P(X = 0)
+    tot = term
+    for i in range(1, int(k) + 1):
+        term *= (r + i - 1) / i * q
+        tot += term
+    return min(1.0, tot)
+
+
 def prob_over(mean, line, stat):
-    """P(over), P(push) for a prop line under the normal approximation."""
+    """P(over), P(push) for a prop line.
+
+    v2: negative binomial with sd = a*mean + b (SD, fitted on the 2025-26
+    backtest). Stat lines are right-skewed (the median night sits below the
+    average), which a symmetric normal ignores: in the backtest it put P(over)
+    5-9pp too high in every middle bucket."""
     a, b = SD[stat]
     sd = max(0.8, a * mean + b)
+    var = sd * sd
     if abs(line - round(line)) < 1e-9:   # whole number: a push is possible
-        p_over = 1 - _phi((line + 0.5 - mean) / sd)
-        p_push = _phi((line + 0.5 - mean) / sd) - _phi((line - 0.5 - mean) / sd)
-        return p_over, p_push
-    return 1 - _phi((line - mean) / sd), 0.0
+        k = int(round(line))
+        p_le_minus = _nb_cdf(k - 1, mean, var)
+        p_le = _nb_cdf(k, mean, var)
+        return 1 - p_le, p_le - p_le_minus
+    return 1 - _nb_cdf(math.floor(line), mean, var), 0.0
 
 
 def implied(american):
@@ -364,4 +427,6 @@ def project_slate(slate, prior, player_games, team_games):
                 r["proj"]["pts"] = round(r["proj"]["pts"] * k, 2)
         for r in rs:
             r.pop("_target_pts", None)
+            for s in STATS:
+                r["proj"][s] = round(r["proj"][s] * P["scale_" + s], 2)
     return rows, lg

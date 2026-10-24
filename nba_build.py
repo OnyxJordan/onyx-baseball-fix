@@ -29,8 +29,11 @@ SHELL, OUT = "nba_shell.html", "nba.html"
 LEDGER = "picks_history.json"
 
 # Picks lane (v1). Deliberately strict: an honest lane is a quiet lane.
-PICK_MIN_EDGE = 0.05          # blended prob minus listed implied
-PICK_MAX_EDGE = 0.10          # bigger "edges" are usually the model missing news
+# v2 band from the backtest (tools/nba_backtest.py): chosen on Oct-Jan 2025-26,
+# test Feb-Apr 74-63 +5.6% at Onyx opening prices. With the 20/80 blend a
+# real edge is small; 5pp+ almost never happens and was not profitable.
+PICK_MIN_EDGE = 0.02          # blended prob minus listed implied
+PICK_MAX_EDGE = 0.08          # bigger "edges" are usually the model missing news
 PICK_MIN_SIGNALS = 2          # of last season / this season / last 5 on the pick's side
 PICK_PRICE = (-180, 150)
 PICK_MIN_MIN = 24.0           # projected minutes

@@ -1,8 +1,11 @@
-name: NBA backtest data pull (temporary, dev only)
+name: NBA backtest data (manual)
+# Pulls two seasons of NBA box scores and the historical Onyx main lines from
+# OpticOdds into an artifact for tools/nba_backtest.py. Manual only: run it,
+# download the "nba-backtest-data" artifact into bt/, then
+#   python3 tools/nba_backtest.py bt/ [--tune]
+# Read-only: commits nothing, deploys nothing.
 on:
-  push:
-    branches: [claude/trusting-cori-4upy6e]
-    paths: [tools/nba_backtest_pull.py, .github/workflows/nba_backtest_pull.yml]
+  workflow_dispatch:
 permissions:
   contents: read
 jobs:
