@@ -2,78 +2,63 @@
 """Dev-only probe (temporary): log the SHAPE of OpticOdds NBA responses so
 the NBA parsers are built against real payloads. Never prints the key."""
 import json, os, sys, time, urllib.parse
-from datetime import datetime, timedelta
-from zoneinfo import ZoneInfo
 sys.path.insert(0, ".")
 from fetch_onyx import http_json, OPTIC
 
-KEY = os.environ.get("OPTICODDS_API_KEY", "").strip()
-H = {"X-Api-Key": KEY}
-
-def show(label, url, n=1500):
-    print(f"\n===== {label}: {url}")
-    try:
-        d = http_json(url, headers=H)
-    except Exception as e:
-        print("ERROR", str(e)[:400]); return None
-    rows = d.get("data") if isinstance(d, dict) else d
-    if isinstance(d, dict):
-        print("top keys:", list(d.keys())[:12], {k: d[k] for k in ("page", "total_pages") if k in d})
-    if isinstance(rows, list):
-        print("rows:", len(rows))
-        if rows:
-            print(json.dumps(rows[0], default=str)[:n])
-    else:
-        print(json.dumps(d, default=str)[:n])
-    time.sleep(2)
-    return rows
-
-if not KEY:
-    print("no key"); sys.exit(0)
-et = datetime.now(ZoneInfo("America/New_York")) - timedelta(hours=4)
-today, yday = et.strftime("%Y-%m-%d"), (et - timedelta(days=1)).strftime("%Y-%m-%d")
+H = {"X-Api-Key": os.environ.get("OPTICODDS_API_KEY", "").strip()}
 q = "sport=basketball&league=nba"
-fx_today = show("fixtures today", f"{OPTIC}/fixtures?{q}&start_date={today}", 2500) or []
-fx_y = show("fixtures yesterday", f"{OPTIC}/fixtures?{q}&start_date={yday}") or []
-done = [f for f in fx_y if isinstance(f, dict) and str(f.get("status", "")).lower() in ("completed", "final", "finished")] or fx_y
-fid = done[0]["id"] if done else None
-print("status values:", sorted({str(f.get('status')) for f in fx_today + fx_y if isinstance(f, dict)}))
-if fid:
-    show("results", f"{OPTIC}/fixtures/results?fixture_id={urllib.parse.quote(fid)}", 2500)
-    pr = show("player-results", f"{OPTIC}/fixtures/player-results?fixture_id={urllib.parse.quote(fid)}", 4000)
-    pid = None
+def get(url):
     try:
-        blob = json.dumps(pr)
-        import re
-        m = re.search(r'"player"\s*:\s*\{[^{}]*"id"\s*:\s*"([^"]+)"', blob)
-        pid = m.group(1) if m else None
-    except Exception:
-        pass
-    if pid:
-        show("player-results last-x", f"{OPTIC}/fixtures/player-results/last-x?{q}&player_id={urllib.parse.quote(pid)}&last_x=5", 3000)
-show("injuries", f"{OPTIC}/injuries?{q}", 1500)
-show("players", f"{OPTIC}/players?{q}&page=1", 1200)
-show("markets", f"{OPTIC}/markets?{q}", 600)
-try:
-    book = json.load(open("data/onyx_games.json")).get("book") or "onyx"
-except Exception:
-    book = "onyx"
-print("book:", book)
-up = [f for f in fx_today if isinstance(f, dict) and str(f.get("status", "")).lower() in ("unplayed", "scheduled", "not_started", "")] or fx_today
+        return http_json(url, headers=H)
+    except Exception as e:
+        print("ERROR", url.split("?")[0], str(e)[:300]); return {}
+    finally:
+        time.sleep(1.5)
+
+lx = get(f"{OPTIC}/fixtures/player-results/last-x?{q}&player_id=B1E5A70A859B")
+r = (lx.get("data") or [{}])[0]
+st = r.get("stats") or {}
+print("LASTX keys:", sorted(st.keys()))
+for k in ("minutes", "points", "total_rebounds", "assists", "three_point_field_goals_made", "fixture_ids", "start_dates", "dates", "status"):
+    if k in st: print("  ", k, len(st[k]), st[k][:6])
+print("LASTX other top-level:", [k for k in r if k != "stats"])
+lx2 = get(f"{OPTIC}/fixtures/player-results/last-x?{q}&player_id=B1E5A70A859B&last_x=82")
+print("last_x=82 len:", len(((lx2.get('data') or [{}])[0].get('stats') or {}).get('points', [])))
+
+d = get(f"{OPTIC}/fixtures?{q}&start_date=2026-10-23")
+fids = [f["id"] for f in d.get("data", [])]
+print("abbr/name pairs:", sorted({(c["abbreviation"], c["name"]) for f in d.get("data", []) for s in ("home_competitors", "away_competitors") for c in f[s]}))
+multi = get(f"{OPTIC}/fixtures/player-results?" + "&".join(f"fixture_id={x}" for x in fids[:3]))
+rows = multi.get("data") or []
+print("multi fixture player-results rows:", len(rows))
+if rows:
+    res = rows[0].get("results") or []
+    print("players in fixture 0:", len(res), "statuses:", sorted({str(x.get('status')) for x in res}))
+    low = [x for x in res if not x.get("stats") or all((s.get("stats") or {}).get("minutes", 0) in (0, None) for s in x.get("stats") or [] if s.get("period") == "all")]
+    print("no-minute rows:", len(low), json.dumps(low[:1])[:600])
+    print("result keys:", list(res[0].keys()) if res else None)
+inj = get(f"{OPTIC}/injuries?{q}&page=2")
+print("injuries page2:", len(inj.get("data") or []), inj.get("has_more"))
+allinj = (get(f"{OPTIC}/injuries?{q}").get("data") or [])
+print("injury statuses:", sorted({str(i.get('status')) for i in allinj}))
+pl = get(f"{OPTIC}/players?{q}&page=7")
+print("players page7:", len(pl.get("data") or []), pl.get("has_more"))
+fx = get(f"{OPTIC}/fixtures?{q}&start_date=2026-10-24")
+up = [f for f in fx.get("data", []) if f.get("status") == "unplayed"]
 if up:
     f0 = up[-1]["id"]
-    d = None
-    try:
-        d = http_json(f"{OPTIC}/fixtures/odds?{q}&sportsbook={urllib.parse.quote(book)}&odds_format=AMERICAN&fixture_id={urllib.parse.quote(f0)}", headers=H)
-    except Exception as e:
-        print("odds ERROR", str(e)[:300])
-    rows = (d or {}).get("data") or []
-    for r in rows[:1]:
-        print("\n===== odds row keys:", [k for k in r if k != "odds"], "n odds:", len(r.get("odds") or []))
-        mk = {}
-        for od in r.get("odds") or []:
-            mk.setdefault(od.get("market_id") or od.get("market"), od)
-        print("markets:", sorted(map(str, mk))[:120])
-        for m, od in mk.items():
-            if "point" in str(m).lower() or "rebound" in str(m).lower() or "assist" in str(m).lower():
-                print("  sample", m, json.dumps(od, default=str)[:700])
+    mk = "".join(f"&market={m}" for m in ("moneyline", "point_spread", "total_points", "player_points", "player_rebounds", "player_assists"))
+    o = get(f"{OPTIC}/fixtures/odds?{q}&sportsbook=onyx_odds&odds_format=AMERICAN&fixture_id={f0}{mk}")
+    od = ((o.get("data") or [{}])[0].get("odds")) or []
+    print("filtered odds:", len(od), sorted({x["market_id"] for x in od}))
+    mains = [x for x in od if x.get("is_main")]
+    print("main rows:", len(mains))
+    for m in ("moneyline", "point_spread", "total_points", "player_points"):
+        for x in [y for y in od if y["market_id"] == m and (y.get("is_main") or m == "moneyline")][:2]:
+            print("  ", m, x["name"], x["price"], x.get("points"), x.get("selection_line"), x.get("is_main"), x.get("player_id"), (x.get("deep_link") or {}).get("desktop"))
+    pp = [x for x in od if x["market_id"] == "player_points"]
+    per = {}
+    for x in pp: per.setdefault(x["selection"], []).append((x["points"], x["selection_line"], x["price"], x["is_main"]))
+    k0 = next(iter(per)) if per else None
+    print("player_points ladder sample:", k0, sorted(per.get(k0, [])))
+    print("players with a main pts line:", sum(1 for v in per.values() if any(m for *_, m in v)), "of", len(per))
