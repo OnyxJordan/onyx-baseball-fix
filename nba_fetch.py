@@ -176,7 +176,10 @@ def ingest_box_scores(today):
     start = SEASON_START if not done else max(SEASON_START, today - timedelta(days=LOOKBACK_DAYS))
     todo, meta = [], {}
     d = start - timedelta(days=1)
-    while d <= today:
+    # through today's UTC date + 1: evening tips (7 PM ET on) are filed under
+    # the next UTC date, so stopping at `today` left a finished night's late
+    # games unread (and their picks ungraded) until the 4 AM ET rollover
+    while d <= today + timedelta(days=1):
         r = get("/fixtures", f"&start_date={d.isoformat()}") or {}
         for f in r.get("data") or []:
             if str(f.get("status")).lower() != "completed" or f["id"] in done:
