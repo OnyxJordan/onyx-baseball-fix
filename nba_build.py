@@ -225,8 +225,14 @@ def main():
         added += 1
     save(LEDGER, ledger, indent=1)
 
-    players_out = [{k: v for k, v in r.items() if k not in ("prior_gp",)}
-                   for r in rows if r["min"] >= 4 or r["props"]]
+    media = {p["pid"]: (p.get("hs"), p.get("logo")) for p in slate.get("players", [])}
+    players_out = []
+    for r in rows:
+        if r["min"] < 4 and not r["props"]:
+            continue
+        out = {k: v for k, v in r.items() if k not in ("prior_gp",)}
+        out["hs"], out["img"] = media.get(r["pid"], (None, None))
+        players_out.append(out)
     data = {
         "date": today, "source": source, "model_version": VERSION,
         "generated": datetime.now(timezone.utc).isoformat(timespec="seconds"),
@@ -235,8 +241,19 @@ def main():
                  "priced": priced, "picks": len(today_rows)},
         "games": slate["games"], "players": players_out,
         "picks": today_rows, "record": summarize(ledger),
+        # 80px team logos baked in (tools/nba_make_logos.py): no third-party
+        # host needed at page load
+        "logos": load("team_logos.json", {}),
     }
     shell = open(SHELL, encoding="utf-8").read()
+    # one design system: the MLB stylesheet is copied out of shell.html on
+    # every build, so a styling change on the MLB site carries to NBA
+    mlb = open("shell.html", encoding="utf-8").read()
+    i, j = mlb.find("<style>"), mlb.find("</style>")
+    if i < 0 or j < i or shell.count("/*MLB_CSS*/") != 1:
+        print("ERROR: MLB stylesheet or its NBA placeholder not found")
+        return 1
+    shell = shell.replace("/*MLB_CSS*/", mlb[i + len("<style>"):j])
     blob = json.dumps(data, separators=(",", ":"), ensure_ascii=False).replace("</", "<\\/")
     html, n = re.subn(r"/\*NBA_DATA\*/.*?/\*END_NBA_DATA\*/",
                       lambda m: "/*NBA_DATA*/" + blob + "/*END_NBA_DATA*/", shell, flags=re.S)

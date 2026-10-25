@@ -12,229 +12,125 @@
 <meta name="apple-mobile-web-app-title" content="Onyx">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="preconnect" href="https://site.api.espn.com" crossorigin>
+<link rel="preconnect" href="https://a.espncdn.com" crossorigin>
 <meta property="og:title" content="Onyx Basketball">
 <meta name="description" content="Daily NBA points, rebounds and assists projections against Onyx prices.">
+<!-- The MLB site's stylesheet, injected verbatim by nba_build.py from
+     shell.html, so both sports share one design system. -->
+<style>/*MLB_CSS*/</style>
 <style>
-/* Same brand system as the MLB shell: purple leads on Onyx black, Titanium
-   text, green ONLY for wins / positive money / live. No yellow anywhere. */
-*{margin:0;padding:0;box-sizing:border-box}
-:root{
-  --bg:#0c0c0c; --bg2:#121214; --bg3:#17171a; --bg4:#1d1d21; --bg5:#25252a;
-  --border:#232328; --border2:#2e2e35; --border3:#3a3a43;
-  --text:#f2f2f5; --text2:#a3a3ad; --text3:#6b6b76;
-  --purple:#b038f9; --purple2:#8d16b8; --lilac:#d795ff; --blue:#635bff;
-  --purple-dim:rgba(176,56,249,.12);
-  --green:#22c55e; --green-dim:rgba(34,197,94,.12); --neon-green:#00ff88;
-  --red:#ef4444; --red-dim:rgba(239,68,68,.12);
-  --mono:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;
-}
-html{background:var(--bg);scroll-behavior:smooth}
-body{color:var(--text);font-family:Inter,'Space Grotesk',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:14px;min-height:100vh;overflow-x:hidden;background:var(--bg)}
-body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
-  background:radial-gradient(900px 500px at 85% -10%,rgba(64,96,240,.07),transparent 60%),
-             radial-gradient(700px 420px at 10% 110%,rgba(176,56,249,.06),transparent 60%)}
-.mono{font-family:var(--mono)}
-a{color:inherit}
-button{font-family:inherit}
-
-/* NAV */
-.nav{height:58px;padding:0 20px;display:flex;align-items:center;background:rgba(12,12,12,.92);
-  border-bottom:1px solid rgba(255,255,255,.06);position:sticky;top:0;z-index:200;
-  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
-.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;margin-right:28px;flex-shrink:0;cursor:pointer}
-.logo-svg{width:34px;height:34px}
-.logo-ball{animation:spin 9s linear infinite;transform-origin:50% 50%}
-@keyframes spin{from{transform:rotateY(0)}to{transform:rotateY(360deg)}}
-.logo-onyx{font-size:16px;font-weight:800;letter-spacing:.06em}
-.logo-sub{font-size:9px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--lilac);margin-top:1px}
-.nav-tabs{display:flex;flex:1;overflow-x:auto;scrollbar-width:none}
-.nav-tabs::-webkit-scrollbar{display:none}
-.nav-tab{height:58px;display:flex;align-items:center;gap:7px;padding:0 15px;font-size:13px;font-weight:500;
-  color:var(--text3);cursor:pointer;background:none;border:none;position:relative;white-space:nowrap;text-decoration:none}
-.nav-tab:hover{color:var(--text2)}
-.nav-tab.active{color:var(--text)}
-.nav-tab.active::after{content:'';position:absolute;left:10px;right:10px;bottom:-1px;height:2px;border-radius:2px;
-  background:linear-gradient(90deg,#b038f9,#d795ff);box-shadow:0 0 10px rgba(176,56,249,.55)}
-.nav-tab svg{width:15px;height:15px;opacity:.75}
-.nav-sport{border:1px solid var(--border2);border-radius:8px;height:30px;padding:0 11px;margin:auto 0 auto 6px;font-size:12px}
-.nav-right{margin-left:auto;display:flex;align-items:center;gap:12px;flex-shrink:0;padding-left:12px}
-.nav-badge{background:var(--purple-dim);border:1px solid rgba(176,56,249,.35);color:var(--lilac);padding:3px 10px;
-  border-radius:20px;font-size:10px;font-weight:700;font-family:var(--mono);letter-spacing:.04em}
-.nav-upd{font-size:11px;color:var(--text3);font-family:var(--mono)}
-.brand-line{height:1px;background:linear-gradient(90deg,transparent,#635bff 20%,#b038f9 50%,#d795ff 80%,transparent)}
-
-/* TICKER */
-.ticker{display:flex;gap:0;overflow-x:auto;border-bottom:1px solid var(--border);background:var(--bg2);scrollbar-width:none}
-.ticker::-webkit-scrollbar{display:none}
-.tk{flex:0 0 auto;padding:8px 16px;border-right:1px solid var(--border);font-family:var(--mono);font-size:11px;color:var(--text2);
-  display:flex;gap:10px;align-items:center;cursor:pointer}
-.tk b{color:var(--text);font-weight:700}
-.tk .st{color:var(--text3)}
-.tk .st.live{color:var(--green)}
-
-/* LAYOUT */
-.pane{display:none;animation:fadeUp .2s ease}
-.pane.active{display:block}
-@keyframes fadeUp{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
-.wrap{max-width:1280px;margin:0 auto;padding:0 20px 120px}
-.sec-hdr{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:22px 0 10px;flex-wrap:wrap}
-.sec-title{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text2)}
-.sec-sub{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-left:10px}
-.sec-count{font-size:12px;color:var(--text3);font-family:var(--mono)}
-.empty{padding:28px;border:1px dashed var(--border2);border-radius:12px;color:var(--text3);text-align:center;line-height:1.6}
-
-/* HERO */
-.hero{padding:84px 0 56px;max-width:900px}
-.live-pill{display:inline-flex;align-items:center;gap:8px;padding:5px 12px;border-radius:20px;border:1px solid rgba(176,56,249,.35);
-  background:var(--purple-dim);color:var(--lilac);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
-.live-pill i{width:6px;height:6px;border-radius:50%;background:var(--lilac);box-shadow:0 0 6px var(--lilac)}
-.hero h1{font-size:clamp(44px,8vw,92px);line-height:.98;font-weight:800;letter-spacing:-.035em;margin:26px 0 22px}
-.hero h1 span{background:linear-gradient(90deg,#b038f9,#d795ff 60%,#635bff);-webkit-background-clip:text;background-clip:text;color:transparent;display:block}
-.hero p{font-size:18px;line-height:1.65;color:var(--text2);max-width:600px}
-.cta{display:flex;gap:12px;margin-top:34px;flex-wrap:wrap}
-.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;
-  border:1px solid var(--border2);background:var(--bg3);color:var(--text)}
-.btn.primary{background:linear-gradient(135deg,#b038f9,#8d16b8);border-color:transparent;box-shadow:0 8px 28px rgba(176,56,249,.35)}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin:0 -20px}
-.stat{padding:26px 32px;border-right:1px solid var(--border)}
-.stat:last-child{border-right:none}
-.stat .v{font-size:44px;font-weight:800;letter-spacing:-.02em;color:var(--lilac)}
-.stat .v.w{color:var(--text)}
-.stat .l{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-top:4px}
-
-/* CARDS */
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px;transition:border-color .18s,box-shadow .18s}
-.card:hover{border-color:rgba(176,56,249,.35);box-shadow:0 6px 24px rgba(0,0,0,.35),0 0 0 1px rgba(176,56,249,.12)}
-.pk-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
-.pk-name{font-size:16px;font-weight:700}
-.pk-meta{font-size:12px;color:var(--text3);margin-top:3px}
-.pk-call{margin-top:14px;font-size:22px;font-weight:800;letter-spacing:-.01em}
+/* ── NBA additions, built on the MLB tokens and components ─────── */
+.nba-wrap{max-width:1180px;margin:0 auto;padding:16px 16px 120px}
+.logo-ball{animation:nbaSpin 9s linear infinite;transform-origin:50% 50%}
+@keyframes nbaSpin{from{transform:rotateY(0)}to{transform:rotateY(360deg)}}
+.nav-sport{border:1px solid var(--border2);border-radius:8px;height:30px;margin:auto 0 auto 6px;padding:0 11px;text-decoration:none}
+.tlogo{width:24px;height:24px;object-fit:contain;flex-shrink:0;vertical-align:middle}
+.tlogo.lg{width:30px;height:30px}
+.hs{border-radius:50%;object-fit:cover;object-position:50% 20%;background:radial-gradient(circle at 50% 42%,rgba(176,56,249,.16),rgba(18,18,18,.9) 78%);
+  box-shadow:inset 0 0 0 2px rgba(176,56,249,.55);flex-shrink:0;display:inline-block}
+.hs.s{width:34px;height:34px}.hs.m{width:46px;height:46px}.hs.l{width:64px;height:64px}
+.hs-ph{display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--text2);background:var(--bg3)}
+.who{display:flex;align-items:center;gap:10px;min-width:0}
+.who .nm{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.who .sub{font-size:11px;color:var(--text3);margin-top:2px;white-space:nowrap}
+/* score ticker: MLB's .score-ticker-* ; a pre-game slot shows the tip time */
+.score-game .tip{font-family:monospace;font-size:10px;color:var(--text3)}
+/* cards */
+.nba-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.nba-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px 16px;transition:border-color .18s,box-shadow .18s}
+.nba-card:hover{border-color:rgba(176,56,249,.35);box-shadow:0 6px 24px rgba(0,0,0,.35),0 0 0 1px rgba(176,56,249,.12)}
+.pk-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.pk-call{margin-top:12px;font-size:20px;font-weight:800;letter-spacing:-.01em}
 .pk-call small{font-size:12px;font-weight:600;color:var(--text3);margin-left:6px}
-.pk-row{display:flex;gap:16px;margin-top:12px;font-family:var(--mono);font-size:12px;color:var(--text2)}
+.pk-row{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;font-family:monospace;font-size:12px;color:var(--text2)}
 .pk-row b{color:var(--text)}
-.edge-pos{color:var(--green)!important}
-.edge-neg{color:var(--text3)!important}
-.tag{display:inline-block;padding:2px 7px;border-radius:5px;font-size:10px;font-weight:700;font-family:var(--mono);letter-spacing:.03em}
-.tag.p{background:var(--purple-dim);color:var(--lilac)}
-.tag.g{background:var(--green-dim);color:var(--green)}
-.tag.r{background:var(--red-dim);color:var(--red)}
-.tag.n{background:var(--bg4);color:var(--text2)}
-.team-badge{width:30px;height:30px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-family:var(--mono);
-  font-size:9px;font-weight:800;color:#fff;flex-shrink:0;background:var(--bg5)}
-
-/* ODDS CHIP (every bet button: single ticket, or a parlay leg when armed) */
-.chip{display:inline-flex;flex-direction:column;align-items:center;min-width:64px;padding:6px 10px;border-radius:9px;cursor:pointer;
-  border:1px solid var(--border2);background:var(--bg3);font-family:var(--mono);transition:all .15s}
-.chip:hover{border-color:var(--purple);background:var(--purple-dim)}
-.chip .o{font-size:13px;font-weight:800;color:var(--text)}
+.edge-pos{color:#61e970!important}.edge-neg{color:var(--text3)!important}
+.tagx{display:inline-block;padding:2px 7px;border-radius:5px;font-size:10px;font-weight:700;font-family:monospace}
+.tagx.r{background:rgba(239,68,68,.12);color:#f87171}.tagx.n{background:var(--bg4);color:var(--text2)}.tagx.p{background:rgba(176,56,249,.12);color:#d795ff}
+.empty{padding:28px;border:1px dashed var(--border2);border-radius:12px;color:var(--text3);text-align:center;line-height:1.6;grid-column:1/-1}
+/* odds chip: every bet button (single ticket, or a parlay leg when armed) */
+.chip{display:inline-flex;flex-direction:column;align-items:center;min-width:60px;padding:6px 9px;border-radius:9px;cursor:pointer;
+  border:1px solid var(--border2);background:var(--bg3);font-family:monospace;transition:all .15s;user-select:none}
+.chip:hover{border-color:rgba(176,56,249,.65);box-shadow:0 0 8px rgba(176,56,249,.3)}
+.chip .o{font-size:12px;font-weight:800;color:var(--text)}
 .chip .s{font-size:9px;color:var(--text3);letter-spacing:.05em;text-transform:uppercase;margin-top:1px}
-.chip.in-slip{border-color:var(--lilac);background:rgba(215,149,255,.14)}
-.chip.dead{cursor:default;opacity:.45}
+.chip.in-slip{border-color:#d795ff;background:rgba(215,149,255,.14)}
+.chip.dead{cursor:default;opacity:.4;box-shadow:none}
 body.parlay-armed .chip:not(.dead){box-shadow:0 0 0 1px rgba(176,56,249,.45)}
-
-/* TABLE */
-.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:6px 0 12px}
-.search{flex:1;min-width:200px;max-width:420px;display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);
-  border-radius:9px;padding:9px 12px}
-.search input{background:none;border:none;outline:none;color:var(--text);font-size:13px;width:100%}
+.addleg{width:28px;height:28px;border-radius:8px;border:1px solid rgba(176,56,249,.5);background:rgba(176,56,249,.12);color:#d795ff;
+  font-weight:900;font-size:15px;line-height:1;cursor:pointer}
+.addleg.on{background:linear-gradient(135deg,#7a2ce0,#b038f9);color:#fff;border-color:transparent}
+/* top scorer parlay */
+.tsp{background:linear-gradient(135deg,rgba(176,56,249,.12),rgba(99,91,255,.08));border:1px solid rgba(176,56,249,.4);border-radius:16px;padding:16px}
+.tsp-legs{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;margin:12px 0}
+.tsp-leg{display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:10px}
+.tsp-leg .ln{font-size:12px;color:var(--text2);font-family:monospace;margin-top:2px}
+.tsp-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.tsp-pay{font-family:monospace;font-size:13px;color:var(--text2)}.tsp-pay b{color:#61e970}
+.tsp-btns{display:flex;gap:8px;flex-wrap:wrap}
+/* tables */
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:4px 0 12px}
+.nsearch{flex:1;min-width:200px;max-width:420px;display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:9px 12px}
+.nsearch input{background:none;border:none;outline:none;color:var(--text);font-size:13px;width:100%}
 .seg{display:flex;border:1px solid var(--border2);border-radius:9px;overflow:hidden}
 .seg button{background:none;border:none;color:var(--text3);padding:8px 13px;font-size:12px;font-weight:600;cursor:pointer}
-.seg button.on{background:var(--purple-dim);color:var(--lilac)}
+.seg button.on{background:rgba(176,56,249,.14);color:#d795ff}
 select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--text2);border-radius:9px;padding:8px 10px;font-size:12px}
-.tbl-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:14px;background:var(--bg2)}
-table{width:100%;border-collapse:collapse;min-width:760px}
-th{font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--text3);text-align:left;padding:11px 12px;
-  border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none}
-th.r,td.r{text-align:right}
-td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle;white-space:nowrap}
-tr:last-child td{border-bottom:none}
-tr:hover td{background:rgba(255,255,255,.015)}
-.pn{font-weight:700}
-.ps{font-size:11px;color:var(--text3);margin-top:2px}
-.num{font-family:var(--mono);font-size:13px}
-.big{font-family:var(--mono);font-size:15px;font-weight:800}
-.dim{color:var(--text3)}
-.bar{height:4px;border-radius:2px;background:var(--bg5);margin-top:5px;overflow:hidden}
-.bar i{display:block;height:100%;background:linear-gradient(90deg,#8d16b8,#d795ff)}
-
-/* GAMES */
-.gc{padding:0;overflow:hidden}
-.gc-h{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-bottom:1px solid var(--border);
-  font-family:var(--mono);font-size:11px;color:var(--text3);background:var(--bg3)}
-.gc-t{display:flex;align-items:center;gap:12px;padding:12px 16px}
-.gc-t .nm{flex:1}
-.gc-t .nm b{font-size:15px}
-.gc-t .imp{font-family:var(--mono);font-size:12px;color:var(--text2);text-align:right;min-width:70px}
-.gc-lead{padding:10px 16px;border-top:1px solid var(--border);font-size:12px;color:var(--text2);line-height:1.7}
-.gc-btn{display:block;width:100%;padding:10px;background:none;border:none;border-top:1px solid var(--border);color:var(--text3);
-  font-size:12px;cursor:pointer;text-align:right;padding-right:16px}
-.gc-btn:hover{color:var(--lilac)}
-
-/* RECORD */
-.rec-big{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-.rec-big .card .v{font-size:30px;font-weight:800;font-family:var(--mono)}
-.rec-big .card .l{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-top:4px}
-.res-W{color:var(--green);font-weight:800}
-.res-L{color:var(--red);font-weight:800}
-.res-P,.res-V{color:var(--text3);font-weight:800}
-
-/* MODEL */
+.tbl{overflow-x:auto;border:1px solid var(--border);border-radius:14px;background:var(--bg2)}
+.tbl table{width:100%;border-collapse:collapse;min-width:760px}
+.tbl th{font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--text3);text-align:left;padding:11px 12px;border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none}
+.tbl td{padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:middle;white-space:nowrap}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:rgba(255,255,255,.015)}
+.tbl .r{text-align:right}
+.mono{font-family:monospace}.big{font-family:monospace;font-size:15px;font-weight:800}.dim{color:var(--text3)}
+.pbar{height:4px;border-radius:2px;background:var(--bg5);margin-top:5px;overflow:hidden}.pbar i{display:block;height:100%;background:linear-gradient(90deg,#8d16b8,#d795ff)}
+/* gamecenter (MLB .gc-* / .sb-*), NBA bits */
+.gc-hs-img{overflow:hidden}
+.gc-hs-img img{width:100%;height:100%;object-fit:cover;object-position:50% 15%}
+.gc-hs.over .gc-hs-img{box-shadow:inset 0 0 0 2px #61e970,0 0 16px rgba(97,233,112,.45)}
+.gc-hs.over .gc-hs-pct{color:#61e970}
+.gc-line td.prj{color:#d795ff}
+.box-team{font-size:12px;font-weight:800;letter-spacing:.06em;margin:4px 0 8px;display:flex;align-items:center;gap:8px}
+.box-cell-hit{color:#61e970;font-weight:800}
+.prop-trk{font-size:10px;color:var(--text3);font-family:monospace}
+/* record */
+.rec-big{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.rec-big .v{font-size:28px;font-weight:800;font-family:monospace}
+.rec-big .l{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-top:4px}
+.res-W{color:#61e970;font-weight:800}.res-L{color:#f87171;font-weight:800}.res-P,.res-V{color:var(--text3);font-weight:800}
 .prose{max-width:780px;line-height:1.75;color:var(--text2);font-size:15px}
-.prose h3{color:var(--text);font-size:17px;margin:26px 0 8px}
-.prose b{color:var(--text)}
-
-/* PLAYER DRAWER */
-.drawer-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:300;display:none}
-.drawer{position:fixed;right:0;top:0;bottom:0;width:min(460px,100vw);background:var(--bg2);border-left:1px solid var(--border2);
-  z-index:301;transform:translateX(100%);transition:transform .22s ease;overflow-y:auto;padding:22px}
-.drawer.open{transform:none}
-.drawer-bg.open{display:block}
-.dr-x{float:right;background:none;border:1px solid var(--border2);color:var(--text2);border-radius:8px;width:32px;height:32px;cursor:pointer}
-.dr-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0}
-.dr-grid .card{padding:12px;text-align:center}
-.dr-grid .v{font-size:24px;font-weight:800;font-family:var(--mono);color:var(--lilac)}
-.dr-grid .l{font-size:10px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase}
-
-/* PARLAY */
-#parlayFab{position:fixed;right:16px;bottom:16px;z-index:250}
-.pf-btn{background:linear-gradient(135deg,#b038f9,#8d16b8);color:#fff;border:none;border-radius:24px;padding:11px 18px;font-weight:800;
-  font-size:13px;cursor:pointer;box-shadow:0 8px 28px rgba(176,56,249,.45)}
-.pf-slip{width:min(340px,calc(100vw - 32px));background:var(--bg2);border:1px solid var(--border2);border-radius:14px;padding:14px;
-  margin-bottom:10px;box-shadow:0 12px 40px rgba(0,0,0,.6)}
-.pf-leg{display:flex;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px}
-.pf-leg button{background:none;border:none;color:var(--text3);cursor:pointer}
-.pf-foot{display:flex;justify-content:space-between;align-items:center;margin-top:10px;font-family:var(--mono);font-size:12px}
-
+.prose h3{color:var(--text);font-size:17px;margin:26px 0 8px}.prose b{color:var(--text)}
+/* player drawer */
+.pdr-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9995;display:none}
+.pdr{position:fixed;right:0;top:0;bottom:0;width:min(460px,100vw);background:var(--bg2);border-left:1px solid var(--border2);z-index:9996;
+  transform:translateX(100%);transition:transform .22s ease;overflow-y:auto;padding:22px}
+.pdr.open{transform:none}.pdr-bg.open{display:block}
+.pdr-x{float:right;background:none;border:1px solid var(--border2);color:var(--text2);border-radius:8px;width:32px;height:32px;cursor:pointer}
+.pdr-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0}
+.pdr-grid .nba-card{padding:12px;text-align:center}
+.pdr-grid .v{font-size:24px;font-weight:800;font-family:monospace;color:#d795ff}
+.pdr-grid .l{font-size:10px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase}
 @media (max-width:760px){
-  .nav{padding:0 12px}
-  .nav-logo{margin-right:10px}
-  .logo-words{display:none}
-  .nav-tab{padding:0 10px;font-size:12px}
-  .nav-upd{display:none}
-  .wrap{padding:0 16px 120px}
-  .hero{padding:48px 0 36px}
-  .hero p{font-size:16px}
-  .stats{grid-template-columns:repeat(2,1fr);margin:0 -16px}
-  .stat{padding:18px 16px}
-  .stat .v{font-size:32px}
-  .rec-big{grid-template-columns:repeat(2,1fr)}
-  .nav-right{display:none}
+  .nba-wrap{padding:12px 12px 140px}
   .hm{display:none}
-  table{min-width:0}
-  th,td{padding:9px 6px}
-  td:first-child{white-space:normal}
-  .team-badge{display:none}
-  .chip{min-width:52px;padding:5px 6px}
-  #pane-record table{min-width:640px}
+  .tbl table{min-width:0}
+  .tbl th,.tbl td{padding:9px 6px}
+  .tbl td:first-child{white-space:normal}
+  .chip{min-width:50px;padding:5px 6px}
+  .rec-big{grid-template-columns:repeat(2,1fr)}
+  #pane-record .tbl table{min-width:640px}
+  .hs.m{width:38px;height:38px}
 }
 </style>
 </head>
 <body>
 
+<!-- ═══ NAV (MLB markup) ═══════════════════════════════════════ -->
 <nav class="nav">
-  <a class="nav-logo" onclick="gotoTab('home')">
-    <!-- Onyx graphic mark on a basketball; same mark path as the MLB logo -->
+  <a class="nav-logo" href="#" onclick="gotoTab('home');return false">
+    <!-- the Onyx mark on a basketball; same mark path as the MLB logo -->
     <svg class="logo-svg logo-ball" viewBox="0 0 64 64" aria-label="Onyx Basketball">
       <circle cx="32" cy="32" r="29" fill="#e8742a"/>
       <path d="M3 32 H61" stroke="#3a1606" stroke-width="2.2"/>
@@ -251,50 +147,110 @@ tr:hover td{background:rgba(255,255,255,.015)}
   <div class="nav-tabs">
     <button class="nav-tab active" data-tab="home" onclick="gotoTab('home')">
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 6.5L8 2l6 4.5V14a1 1 0 01-1 1H3a1 1 0 01-1-1V6.5z"/><path d="M6 15V9h4v6"/></svg>Home</button>
+    <button class="nav-tab" data-tab="games" onclick="gotoTab('games')">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><circle cx="8" cy="8" r="2"/></svg>Games</button>
     <button class="nav-tab" data-tab="board" onclick="gotoTab('board')">
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12M2 8h12M2 12h8"/></svg>Props Board</button>
     <button class="nav-tab" data-tab="scorers" onclick="gotoTab('scorers')">
-      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 14V8M8 14V3M13 14V6"/></svg>Top Scorers</button>
-    <button class="nav-tab" data-tab="games" onclick="gotoTab('games')">
-      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M2 8h12M8 2v12"/></svg>Games</button>
+      <svg viewBox="0 0 16 16" fill="currentColor"><rect x="2" y="10" width="3" height="5" rx="1"/><rect x="6.5" y="6" width="3" height="9" rx="1"/><rect x="11" y="2" width="3" height="13" rx="1"/></svg>Top Scorers</button>
     <button class="nav-tab" data-tab="record" onclick="gotoTab('record')">
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 2h10v12H3z"/><path d="M5.5 6l1.5 1.5L10.5 4M5.5 11h5"/></svg>Record</button>
     <button class="nav-tab" data-tab="model" onclick="gotoTab('model')">
-      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 2"/></svg>Model</button>
-    <a class="nav-tab nav-sport" href="index.html">MLB</a>
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12M2 7h8M2 10h10M2 13h6"/><circle cx="13" cy="11" r="2.5"/></svg>Model</button>
+    <a class="nav-tab nav-sport" href="index.html">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M4 3.5c2 2.5 2 6.5 0 9M12 3.5c-2 2.5-2 6.5 0 9"/></svg>MLB</a>
   </div>
+  <button class="nav-hamburger" id="navHamburger" onclick="openNav()" aria-label="Menu">
+    <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 4.5h14M2 9h14M2 13.5h14"/></svg>
+  </button>
   <div class="nav-right">
     <span class="nav-badge" id="navDate"></span>
-    <span class="nav-upd" id="navUpd"></span>
+    <span class="nav-date" id="navUpd"></span>
+    <span class="nav-date" id="liveCount"></span>
   </div>
 </nav>
-<div class="brand-line"></div>
-<div class="ticker" id="ticker"></div>
 
-<!-- HOME -->
-<section class="pane active" id="pane-home"><div class="wrap">
-  <div class="hero">
-    <span class="live-pill"><i></i><span id="heroDate"></span></span>
-    <h1>Points. Boards. Dimes.<span>Projected nightly.</span></h1>
-    <p>Every rotation player on tonight's slate, projected from minutes, per-minute production, pace and the matchup, then priced against the Onyx line so you see exactly where the model and the market disagree.</p>
-    <div class="cta">
-      <button class="btn primary" onclick="gotoTab('board')">Today's Props Board</button>
-      <button class="btn" onclick="gotoTab('scorers')">Top Scorers</button>
-      <button class="btn" onclick="gotoTab('model')">How It Works</button>
+<!-- ═══ MOBILE NAV DRAWER (MLB markup) ════════════════════════ -->
+<div class="nav-drawer" id="navDrawer">
+  <div class="nav-drawer-header">
+    <div style="line-height:1">
+      <div style="font-size:15px;font-weight:800;letter-spacing:.06em;color:var(--text)">ONYX</div>
+      <div style="font-size:9px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:#d795ff">Basketball</div>
+    </div>
+    <button class="nav-drawer-close" onclick="closeNav()" aria-label="Close">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 3l10 10M13 3L3 13"/></svg>
+    </button>
+  </div>
+  <div class="nav-drawer-body">
+    <div class="drawer-section">
+      <button class="drawer-item" data-tab="home" onclick="gotoTab('home');closeNav()">Home</button>
+      <button class="drawer-item" data-tab="games" onclick="gotoTab('games');closeNav()">Games</button>
+      <button class="drawer-item" data-tab="board" onclick="gotoTab('board');closeNav()">Props Board</button>
+      <button class="drawer-item" data-tab="scorers" onclick="gotoTab('scorers');closeNav()">Top Scorers</button>
+      <button class="drawer-item" data-tab="record" onclick="gotoTab('record');closeNav()">Record</button>
+      <button class="drawer-item" data-tab="model" onclick="gotoTab('model');closeNav()">Model</button>
+      <div class="drawer-divider"></div>
+      <a class="drawer-item" href="index.html" style="text-decoration:none">MLB</a>
     </div>
   </div>
-  <div class="stats" id="homeStats"></div>
-  <div class="sec-hdr"><div><span class="sec-title" id="picksTitle">Onyx Picks</span><span class="sec-sub">model + market blend, positive edge only</span></div><span class="sec-count" id="picksCount"></span></div>
-  <div class="grid" id="homePicks"></div>
-  <div class="sec-hdr"><div><span class="sec-title">Projected Top Scorers</span></div><a class="sec-count" href="#" onclick="gotoTab('scorers');return false">View all</a></div>
-  <div class="grid" id="homeScorers"></div>
-</div></section>
+</div>
+<div class="brand-line"></div>
 
-<!-- BOARD -->
-<section class="pane" id="pane-board"><div class="wrap">
-  <div class="sec-hdr"><div><span class="sec-title">Props Board</span><span class="sec-sub">projection vs Onyx line</span></div><span class="sec-count" id="boardCount"></span></div>
+<!-- ═══ LIVE SCORE TICKER (MLB markup; ESPN live scores) ═══════ -->
+<div class="score-ticker-bar" id="scoreTickerBar">
+  <div class="score-ticker-track" id="scoreTickerTrack"></div>
+</div>
+
+<!-- ═══ HOME ═══════════════════════════════════════════════════ -->
+<div class="pane active" id="pane-home">
+  <div class="home-hero">
+    <div class="home-hero-inner">
+      <div class="hero-live-badge"><span class="hero-live-dot"></span><span id="heroDate"></span></div>
+      <h1 class="home-hero-title"><span class="line1">Points. Boards. Dimes.</span><span class="line2">Projected nightly.</span></h1>
+      <p class="home-hero-sub">Every rotation player on tonight's slate, projected from minutes, per-minute production, pace and the matchup, then priced against the Onyx line so you see where the model and the market disagree.</p>
+      <div class="home-cta-row">
+        <button class="btn-primary" onclick="gotoTab('board')">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3h10v10H3z"/><path d="M7 6l2 2-2 2"/></svg>Props Board</button>
+        <button class="btn-secondary" onclick="gotoTab('games')">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="5.5"/><circle cx="8" cy="8" r="1.5"/></svg>Live Games</button>
+        <button class="btn-secondary" onclick="gotoTab('scorers')">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="2,12 5,7 8,9 11,4 14,6"/></svg>Top Scorers</button>
+      </div>
+    </div>
+  </div>
+  <div class="home-stats-grid" id="homeStats"></div>
+  <div class="home-body">
+    <div class="home-section">
+      <div class="home-section-tag">Top Scorer Parlay</div>
+      <h2 class="home-section-title">Tonight's biggest scorers, one tap to Onyx</h2>
+      <div id="homeTSP"></div>
+    </div>
+    <div class="home-section">
+      <div class="home-section-tag" id="picksTag">Onyx Picks</div>
+      <h2 class="home-section-title">Where the model beats the line</h2>
+      <div class="nba-grid" id="homePicks"></div>
+    </div>
+    <div class="home-section" style="margin-bottom:0">
+      <div class="home-section-tag">Projected Top Scorers</div>
+      <h2 class="home-section-title">Points leaders tonight</h2>
+      <div class="nba-grid" id="homeScorers"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ GAMES (gamecenter, MLB components) ═════════════════════ -->
+<div class="pane" id="pane-games">
+  <div class="gc-wrap">
+    <div id="gcGrid"></div>
+    <div id="gcBody"></div>
+  </div>
+</div>
+
+<!-- ═══ PROPS BOARD ════════════════════════════════════════════ -->
+<div class="pane" id="pane-board"><div class="nba-wrap">
+  <div class="sec-hdr"><div><span class="sec-title">Props Board · projection vs Onyx line</span></div><span class="sec-count" id="boardCount"></span></div>
   <div class="toolbar">
-    <div class="search"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="7" cy="7" r="5"/><path d="M11 11l3 3"/></svg>
+    <div class="nsearch"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="7" cy="7" r="5"/><path d="M11 11l3 3"/></svg>
       <input id="boardSearch" placeholder="Search players, teams..." oninput="renderBoard()"></div>
     <div class="seg" id="statSeg">
       <button class="on" data-s="pts" onclick="setStat('pts')">Points</button>
@@ -304,7 +260,7 @@ tr:hover td{background:rgba(255,255,255,.015)}
     <select class="sel" id="gameSel" onchange="renderBoard()"></select>
     <label class="dim" style="font-size:12px;display:flex;gap:6px;align-items:center"><input type="checkbox" id="pricedOnly" onchange="renderBoard()" checked> priced only</label>
   </div>
-  <div class="tbl-wrap"><table>
+  <div class="tbl"><table>
     <thead><tr>
       <th onclick="sortBoard('name')">Player</th>
       <th class="r hm" onclick="sortBoard('min')">Min</th>
@@ -319,41 +275,36 @@ tr:hover td{background:rgba(255,255,255,.015)}
     </tr></thead>
     <tbody id="boardBody"></tbody>
   </table></div>
-</div></section>
+</div></div>
 
-<!-- SCORERS -->
-<section class="pane" id="pane-scorers"><div class="wrap">
-  <div class="sec-hdr"><div><span class="sec-title">Top Point Scorers</span><span class="sec-sub">projected points tonight</span></div><span class="sec-count" id="scorerCount"></span></div>
-  <div class="tbl-wrap"><table>
-    <thead><tr><th class="hm">#</th><th>Player</th><th class="r hm">Min</th><th class="r">Proj PTS</th><th class="r">Line</th><th class="r">Over</th><th class="r hm">Season</th><th class="r hm">Last Season</th><th class="r hm">Team Total</th></tr></thead>
+<!-- ═══ TOP SCORERS ════════════════════════════════════════════ -->
+<div class="pane" id="pane-scorers"><div class="nba-wrap">
+  <div class="sec-hdr"><div><span class="sec-title">Top Point Scorers · projected points tonight</span></div><span class="sec-count" id="scorerCount"></span></div>
+  <div id="scorerTSP" style="margin-bottom:14px"></div>
+  <div class="tbl"><table>
+    <thead><tr><th class="hm">#</th><th>Player</th><th class="r hm">Min</th><th class="r">Proj PTS</th><th class="r">Line</th><th class="r">Over</th><th class="r hm">Under</th><th class="r">Parlay</th><th class="r hm">Season</th><th class="r hm">Last Season</th></tr></thead>
     <tbody id="scorerBody"></tbody>
   </table></div>
-</div></section>
+</div></div>
 
-<!-- GAMES -->
-<section class="pane" id="pane-games"><div class="wrap">
-  <div class="sec-hdr"><div><span class="sec-title">Today's Games</span></div><span class="sec-count" id="gamesCount"></span></div>
-  <div class="grid" id="gamesGrid"></div>
-</div></section>
-
-<!-- RECORD -->
-<section class="pane" id="pane-record"><div class="wrap">
-  <div class="sec-hdr"><div><span class="sec-title">Onyx Picks Record</span><span class="sec-sub">every pick, graded against the final box score</span></div><span class="sec-count" id="recSince"></span></div>
+<!-- ═══ RECORD ═════════════════════════════════════════════════ -->
+<div class="pane" id="pane-record"><div class="nba-wrap">
+  <div class="sec-hdr"><div><span class="sec-title">Onyx Picks Record · every pick graded against the final box score</span></div><span class="sec-count" id="recSince"></span></div>
   <div class="rec-big" id="recBig"></div>
   <div class="sec-hdr"><span class="sec-title">By Market</span></div>
   <div class="rec-big" id="recByStat"></div>
   <div class="sec-hdr"><span class="sec-title">Pick Log</span><span class="sec-count" id="recCount"></span></div>
-  <div class="tbl-wrap"><table>
+  <div class="tbl"><table>
     <thead><tr><th>Date</th><th>Player</th><th>Pick</th><th class="r">Odds</th><th class="r">Proj</th><th class="r">Edge</th><th class="r">Actual</th><th class="r">Result</th></tr></thead>
     <tbody id="recBody"></tbody>
   </table></div>
-</div></section>
+</div></div>
 
-<!-- MODEL -->
-<section class="pane" id="pane-model"><div class="wrap"><div class="prose" id="modelProse">
+<!-- ═══ MODEL ══════════════════════════════════════════════════ -->
+<div class="pane" id="pane-model"><div class="nba-wrap"><div class="prose">
   <div class="sec-hdr"><span class="sec-title">How the model works</span><span class="sec-count" id="modelVer"></span></div>
   <h3>1. Minutes first</h3>
-  <p>Every projection starts with how long a player will be on the floor. Last season's minutes per game act as a prior, and this season's games (including nights he did not play) pull it toward his current role, with extra weight on the last three games. Each team's minutes are then fitted to the 240 available: when a teammate is <b>OUT</b> or <b>Doubtful</b>, his minutes flow to the rest of the rotation, and deep benches are trimmed first when a roster over-counts. Back-to-backs and lopsided spreads shave heavy-minute players.</p>
+  <p>Every projection starts with how long a player will be on the floor. Last season's minutes per game act as a prior, and this season's games pull it toward his current role, with extra weight on the last three games. Each team's minutes are then fitted to the 240 available: when a teammate is <b>OUT</b> or <b>Doubtful</b>, his minutes flow to the rest of the rotation, and deep benches are trimmed first when a roster over-counts. Back-to-backs and lopsided spreads shave heavy-minute players.</p>
   <h3>2. Production per minute</h3>
   <p>Points, rebounds and assists per minute blend last season (as a 300-minute prior) with what he is doing now, so a hot week moves the number but does not hijack it. Players with no NBA history start from a positional league rate.</p>
   <h3>3. The game around him</h3>
@@ -363,10 +314,10 @@ tr:hover td{background:rgba(255,255,255,.015)}
   <h3>5. Backtested before it shipped</h3>
   <p>The model was replayed over the full 2025-26 season one night at a time, seeing only what was known before tip: <b>26,352 player-games</b> and <b>17,668 real Onyx prop lines</b>. Settings were tuned on October through January and judged only on February through April. On those unseen games it beat every simple baseline (points miss 5.15 vs 5.48 for the season average), its probabilities matched reality (it claimed 54.2% on its picks and they hit 54.0%), and the picks lane went 74-63 at Onyx opening prices. That is a small sample, so the live Record tab is the scoreboard that counts.</p>
   <p class="dim" style="margin-top:22px;font-size:13px">Projections are estimates, not guarantees. Bet responsibly.</p>
-</div></div></section>
+</div></div></div>
 
-<div class="drawer-bg" id="drawerBg" onclick="closeDrawer()"></div>
-<aside class="drawer" id="drawer"></aside>
+<div class="pdr-bg" id="pdrBg" onclick="closePlayer()"></div>
+<aside class="pdr" id="pdr"></aside>
 
 <script>
 // Injected by nba_build.py. var (not const) so any earlier read is safe.
@@ -375,13 +326,12 @@ var ONYX_REFERRER = 'KR680261';
 var ONYX_FALLBACK_URL = 'https://app.onyxodds.com/leagues/NBA';
 var GA_MEASUREMENT_ID = 'G-03T8V1N52E';
 
-var D = NBA_DATA || {games: [], players: [], picks: [], record: {rows: []}, meta: {}};
+var D = NBA_DATA || {games: [], players: [], picks: [], record: {rows: []}, meta: {}, logos: {}};
 var STAT_NAME = {pts: 'Points', reb: 'Rebounds', ast: 'Assists'};
 var STAT_ABBR = {pts: 'PTS', reb: 'REB', ast: 'AST'};
-var TEAM_COLORS = {ATL:'#e03a3e',BOS:'#007a33',BKN:'#2a2a2a',CHA:'#1d1160',CHI:'#ce1141',CLE:'#860038',DAL:'#00538c',DEN:'#0e2240',
-  DET:'#c8102e',GS:'#1d428a',HOU:'#ce1141',IND:'#002d62',LAC:'#c8102e',LAL:'#552583',MEM:'#5d76a9',MIA:'#98002e',MIL:'#00471b',
-  MIN:'#0c2340',NO:'#0c2340',NY:'#006bb6',OKC:'#007ac1',ORL:'#0077c0',PHI:'#006bb6',PHX:'#1d1160',POR:'#e03a3e',SAC:'#5a2d81',
-  SA:'#2b2b2b',TOR:'#ce1141',UTAH:'#002b5c',WSH:'#002b5c'};
+var TEAM_NICK = {ATL:'Hawks',BOS:'Celtics',BKN:'Nets',CHA:'Hornets',CHI:'Bulls',CLE:'Cavaliers',DAL:'Mavericks',DEN:'Nuggets',DET:'Pistons',
+  GS:'Warriors',HOU:'Rockets',IND:'Pacers',LAC:'Clippers',LAL:'Lakers',MEM:'Grizzlies',MIA:'Heat',MIL:'Bucks',MIN:'Timberwolves',NO:'Pelicans',
+  NY:'Knicks',OKC:'Thunder',ORL:'Magic',PHI:'76ers',PHX:'Suns',POR:'Trail Blazers',SAC:'Kings',SA:'Spurs',TOR:'Raptors',UTAH:'Jazz',WSH:'Wizards'};
 
 // ── helpers ────────────────────────────────────────────────────────
 function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
@@ -389,15 +339,36 @@ function fmtOdds(o) { if (o == null || o === '') return '-'; o = +o; return o > 
 function pct(p, d) { return p == null ? '-' : (p * 100).toFixed(d == null ? 1 : d) + '%'; }
 function pp(e) { if (e == null) return '-'; const v = e * 100; return (v > 0 ? '+' : '') + v.toFixed(1); }
 function num(v, d) { return v == null ? '-' : (+v).toFixed(d == null ? 1 : d); }
-function badge(t, sm) {
-  const c = TEAM_COLORS[t] || '#25252a';
-  return `<span class="team-badge" style="background:${c};${sm ? 'width:24px;height:24px;font-size:8px' : ''}">${esc(t)}</span>`;
+function logo(ab, cls) {
+  const src = (D.logos || {})[ab];
+  return src ? `<img class="tlogo ${cls || ''}" src="${src}" alt="${esc(ab)}">` : `<span class="tagx n">${esc(ab)}</span>`;
+}
+function hsUrl(p) {
+  if (p && p.hs) return 'https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/' + encodeURIComponent(p.hs)
+    + '.png&w=120&h=88&scale=crop&cquality=50&location=origin';
+  return (p && p.img) || '';
+}
+// headshot <img>: ESPN resized first, OpticOdds image second, initials last
+function hs(p, size) {
+  const ini = String(p.name || '').split(' ').map(w => w[0] || '').slice(0, 2).join('');
+  const src = hsUrl(p);
+  if (!src) return `<span class="hs ${size} hs-ph">${esc(ini)}</span>`;
+  return `<img class="hs ${size}" loading="lazy" src="${esc(src)}" alt="" data-alt="${esc(p.img || '')}" data-ini="${esc(ini)}" onerror="hsFail(this)">`;
+}
+function hsFail(img) {
+  const alt = img.dataset.alt;
+  if (alt && img.src !== alt) { img.src = alt; img.dataset.alt = ''; return; }
+  const s = document.createElement('span');
+  s.className = img.className + ' hs-ph'; s.textContent = img.dataset.ini || '';
+  img.replaceWith(s);
 }
 function gameOf(gid) { return (D.games || []).find(g => g.gid === gid) || null; }
+function playerOf(pid) { return (D.players || []).find(x => x.pid === pid) || null; }
 function tipTime(iso) {
   try { return new Date(iso).toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York'}) + ' ET'; }
   catch (e) { return ''; }
 }
+function started(g) { return !!g && (g.state === 'live' || g.state === 'post'); }
 function track(name, params) { try { if (GA_MEASUREMENT_ID && window.gtag) gtag('event', name, params || {}); } catch (e) {} }
 function initAnalytics() {
   if (!GA_MEASUREMENT_ID || location.protocol !== 'https:') return;
@@ -408,11 +379,12 @@ function initAnalytics() {
   s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_MEASUREMENT_ID;
   document.head.appendChild(s);
 }
+function openNav() { document.getElementById('navDrawer').classList.add('open'); }
+function closeNav() { document.getElementById('navDrawer').classList.remove('open'); }
 
-// ── Onyx tickets + parlay builder ─────────────────────────────────
+// ── Onyx tickets + parlay builder (MLB .pb-* slip) ─────────────────
 // Each priced side carries Onyx's own share selection id (from the Onyx
-// book's deep link), so a tap opens that exact ticket; several ids in one
-// URL build a parlay. A side without an id falls back to the game page.
+// book's deep link): one id opens that ticket, several build a parlay.
 var parlayMode = false;
 var parlaySlip = [];
 try { parlaySlip = JSON.parse(localStorage.getItem('onyxNbaSlip') || '[]') || []; } catch (e) {}
@@ -421,18 +393,25 @@ function shareUrl(sels) {
   return 'https://app.onyxodds.com/share?' + sels.map(s => 'selection=' + encodeURIComponent(s)).join('&')
     + (ONYX_REFERRER ? '&referrer=' + encodeURIComponent(ONYX_REFERRER) : '');
 }
-// legs registry: chips reference a leg by index so no JSON lands in markup
+function inSlip(sel) { return !!sel && parlaySlip.some(x => x.sel === sel); }
+// legs registry: buttons reference a leg by index so no JSON lands in markup
 var LEGS = [];
+function regLeg(leg) { return LEGS.push(leg) - 1; }
 function legChip(leg, label) {
   if (!leg || leg.price == null) return '<span class="chip dead"><span class="o">-</span><span class="s">' + esc(label || '') + '</span></span>';
-  const i = LEGS.push(leg) - 1;
-  const on = leg.sel && parlaySlip.some(x => x.sel === leg.sel) ? ' in-slip' : '';
-  return `<span class="chip${on}" onclick="betLeg(${i})"><span class="o">${fmtOdds(leg.price)}</span><span class="s">${esc(label || '')}</span></span>`;
+  const i = regLeg(leg);
+  return `<span class="chip${inSlip(leg.sel) ? ' in-slip' : ''}" onclick="betLeg(${i})"><span class="o">${fmtOdds(leg.price)}</span><span class="s">${esc(label || '')}</span></span>`;
+}
+// explicit "+": always a parlay leg, armed or not
+function addBtn(leg) {
+  if (!leg || !leg.sel) return '<span class="dim">-</span>';
+  const i = regLeg(leg);
+  return `<button class="addleg${inSlip(leg.sel) ? ' on' : ''}" title="Add to parlay" onclick="event.stopPropagation();slipToggle(${i})">${inSlip(leg.sel) ? '✓' : '+'}</button>`;
 }
 function betLeg(i) {
   const leg = LEGS[i];
   if (!leg) return;
-  if (parlayMode) { parlayAdd(leg); return; }
+  if (parlayMode) { slipToggle(i); return; }
   if (leg.sel) {
     track('onyx_click', {link_type: 'single', market: leg.market || '', selection: leg.label, odds: String(leg.price)});
     window.open(shareUrl([leg.sel]), '_blank', 'noopener');
@@ -442,32 +421,48 @@ function betLeg(i) {
     window.open(g && g.slug ? 'https://app.onyxodds.com/game/' + g.slug : ONYX_FALLBACK_URL, '_blank', 'noopener');
   }
 }
-function parlayToggle() { parlayMode = !parlayMode; document.body.classList.toggle('parlay-armed', parlayMode); renderSlip(); }
-function parlayAdd(leg) {
-  if (!leg.sel) return;
-  if (parlaySlip.some(x => x.sel === leg.sel)) { parlaySlip = parlaySlip.filter(x => x.sel !== leg.sel); }
-  else if (parlaySlip.length < 10) { parlaySlip.push({sel: leg.sel, label: leg.label, price: leg.price}); track('parlay_add', {selection: leg.label, legs: parlaySlip.length}); }
-  slipSave(); renderSlip(); rerender();
+function slipAdd(leg) {
+  if (!leg || !leg.sel || inSlip(leg.sel) || parlaySlip.length >= 10) return false;
+  parlaySlip.push({sel: leg.sel, label: leg.label, odds: leg.price});
+  track('parlay_add', {selection: leg.label, legs: parlaySlip.length});
+  return true;
 }
-function parlayRemove(i) { parlaySlip.splice(i, 1); slipSave(); renderSlip(); rerender(); }
+function slipToggle(i) {
+  const leg = LEGS[i];
+  if (!leg || !leg.sel) return;
+  if (inSlip(leg.sel)) parlaySlip = parlaySlip.filter(x => x.sel !== leg.sel);
+  else slipAdd(leg);
+  parlayMode = true;
+  document.body.classList.add('parlay-armed');
+  slipSave(); renderParlaySlip(); rerender();
+}
+function parlayToggle() { parlayMode = !parlayMode; document.body.classList.toggle('parlay-armed', parlayMode); renderParlaySlip(); }
+function parlayRemove(sel) { parlaySlip = parlaySlip.filter(x => x.sel !== sel); slipSave(); renderParlaySlip(); rerender(); }
+function parlayClear() { parlaySlip = []; slipSave(); renderParlaySlip(); rerender(); }
 function parlayBuild() {
   if (!parlaySlip.length) return;
   track('onyx_click', {link_type: 'parlay', legs: parlaySlip.length});
   window.open(shareUrl(parlaySlip.map(x => x.sel)), '_blank', 'noopener');
 }
-function renderSlip() {
+function decOf(o) { o = +o; return o > 0 ? 1 + o / 100 : 1 + 100 / -o; }
+function amerOf(dec) { return dec >= 2 ? '+' + Math.round((dec - 1) * 100) : '-' + Math.round(100 / (dec - 1)); }
+function renderParlaySlip() {
   let el = document.getElementById('parlayFab');
   if (!el) { el = document.createElement('div'); el.id = 'parlayFab'; document.body.appendChild(el); }
+  const n = parlaySlip.length;
   let dec = 1;
-  parlaySlip.forEach(x => { const o = +x.price; dec *= o > 0 ? 1 + o / 100 : 1 + 100 / -o; });
-  const am = parlaySlip.length ? (dec >= 2 ? '+' + Math.round((dec - 1) * 100) : String(Math.round(-100 / (dec - 1)))) : '';
-  const slip = parlayMode ? `<div class="pf-slip">
-      <div style="font-weight:800;margin-bottom:6px">Parlay Builder <span class="dim" style="font-weight:500;font-size:12px">tap any odds to add</span></div>
-      ${parlaySlip.map((x, i) => `<div class="pf-leg"><span>${esc(x.label)}</span><span class="mono">${fmtOdds(x.price)} <button onclick="parlayRemove(${i})">x</button></span></div>`).join('') || '<div class="dim" style="font-size:12px;padding:8px 0">No legs yet.</div>'}
-      <div class="pf-foot"><span>${parlaySlip.length} legs ${am ? '· ' + am : ''}${am ? ' · $10 pays $' + (10 * dec).toFixed(2) : ''}</span>
-        <button class="btn primary" style="padding:8px 14px;font-size:12px" onclick="parlayBuild()" ${parlaySlip.length ? '' : 'disabled'}>Bet on Onyx</button></div>
-    </div>` : '';
-  el.innerHTML = slip + `<div style="text-align:right"><button class="pf-btn" onclick="parlayToggle()">${parlayMode ? 'Close Builder' : 'Parlay Builder'}${parlaySlip.length ? ' (' + parlaySlip.length + ')' : ''}</button></div>`;
+  parlaySlip.forEach(x => { dec *= decOf(x.odds); });
+  const amer = n && dec > 1 ? amerOf(dec) : null;
+  const legRows = parlaySlip.map(x => `<div class="pb-leg"><span class="pb-lbl">${esc(x.label)}</span>
+      <span class="pb-odds">${fmtOdds(x.odds)}</span>
+      <span class="pb-x" data-sel="${esc(x.sel)}" onclick="parlayRemove(this.dataset.sel)">×</span></div>`).join('');
+  el.innerHTML = `${parlayMode && n ? `<div class="pb-panel">
+      <div class="pb-head">🧾 PARLAY SLIP · ${n} leg${n === 1 ? '' : 's'} <span class="pb-clear" onclick="parlayClear()">clear</span></div>
+      ${legRows}
+      <div class="pb-foot">${amer ? `<span class="pb-pay">${amer} · $10 pays <b>$${(10 * dec).toFixed(0)}</b></span>` : ''}
+        <span class="pb-go" onclick="parlayBuild()">⚡ Build on Onyx</span></div>
+    </div>` : ''}
+    <div class="pb-fab${parlayMode ? ' on' : ''}" onclick="parlayToggle()">🧾 ${parlayMode ? 'Building · tap odds to add' : 'Parlay Builder'}${n ? ` <b>${n}</b>` : ''}</div>`;
 }
 
 // ── data shaping ───────────────────────────────────────────────────
@@ -478,9 +473,147 @@ function propLeg(p, stat, side) {
   return {sel: s.sel || null, price: s.price, gid: p.gid, market: 'player_' + STAT_NAME[stat].toLowerCase(),
           label: `${p.name} ${side === 'over' ? 'Over' : 'Under'} ${pr.line} ${STAT_ABBR[stat]}`};
 }
+function overProb(p) { const pr = (p.props || {}).pts; return pr && pr.all && pr.all.over ? pr.all.over.prob : null; }
 function last5(p, stat) { return (p.last5 || []).map(g => g[stat]).join(' '); }
 
-// ── renderers ──────────────────────────────────────────────────────
+// Top Scorer Parlay: tonight's highest projected scorers, one per game, whose
+// Onyx points-over is priced and not leaned against by the model+market blend.
+function topScorerLegs(n) {
+  const used = new Set(), out = [];
+  (D.players || []).filter(p => !p.out && !p.inj && p.min >= 26 && !started(gameOf(p.gid)))
+    .filter(p => { const l = propLeg(p, 'pts', 'over'); const pr = overProb(p); return l && l.sel && (pr == null || pr >= 0.47); })
+    .sort((a, b) => b.proj.pts - a.proj.pts)
+    .forEach(p => { if (out.length < n && !used.has(p.gid)) { used.add(p.gid); out.push(p); } });
+  return out;
+}
+var TSP_N = 3;
+function tspHtml() {
+  const ps = topScorerLegs(TSP_N);
+  if (ps.length < 2) return `<div class="empty">The top scorer parlay builds once Onyx posts points lines for games that have not tipped.</div>`;
+  const legs = ps.map(p => propLeg(p, 'pts', 'over'));
+  let dec = 1; legs.forEach(l => { dec *= decOf(l.price); });
+  const ids = legs.map(regLeg);
+  const allIn = legs.every(l => inSlip(l.sel));
+  return `<div class="tsp">
+    <div class="tsp-legs">${ps.map((p, k) => `<div class="tsp-leg">${hs(p, 'm')}<div style="min-width:0;flex:1">
+        <div class="who"><span class="nm" style="cursor:pointer" onclick="openPlayer('${esc(p.pid)}')">${esc(p.name)}</span></div>
+        <div class="ln">Over ${p.props.pts.line} PTS · proj <b style="color:#d795ff">${num(p.proj.pts)}</b></div></div>
+        ${legChip(legs[k], 'over')}</div>`).join('')}</div>
+    <div class="tsp-foot">
+      <span class="tsp-pay">${ps.length}-leg parlay <b>${amerOf(dec)}</b> · $10 pays <b>$${(10 * dec).toFixed(0)}</b></span>
+      <div class="tsp-btns">
+        <button class="btn-secondary" onclick="tspAdd([${ids.join(',')}])">${allIn ? '✓ In your slip' : '+ Add to Parlay Builder'}</button>
+        <button class="btn-primary" onclick="tspBet([${ids.join(',')}])">⚡ Bet it on Onyx</button>
+      </div>
+    </div>
+  </div>`;
+}
+function tspAdd(ids) {
+  ids.forEach(i => slipAdd(LEGS[i]));
+  parlayMode = true; document.body.classList.add('parlay-armed');
+  slipSave(); renderParlaySlip(); rerender();
+}
+function tspBet(ids) {
+  const sels = ids.map(i => LEGS[i] && LEGS[i].sel).filter(Boolean);
+  if (!sels.length) return;
+  track('onyx_click', {link_type: 'parlay', legs: sels.length, source: 'top_scorer_parlay'});
+  window.open(shareUrl(sels), '_blank', 'noopener');
+}
+
+// ── header / ticker ────────────────────────────────────────────────
+function renderHeader() {
+  const d = D.date ? new Date(D.date + 'T12:00:00') : null;
+  const ds = d ? d.toLocaleDateString('en-US', {month: 'short', day: 'numeric'}).toUpperCase() + ' · ' + d.getFullYear() : '';
+  document.getElementById('navDate').textContent = ds;
+  document.getElementById('heroDate').textContent = (D.games || []).length
+    ? 'Live · ' + (d ? d.toLocaleDateString('en-US', {month: 'long', day: 'numeric', year: 'numeric'}) : '') : 'No games today';
+  if (D.generated) {
+    const t = new Date(D.generated);
+    document.getElementById('navUpd').textContent = 'updated ' + t.toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York'}).toLowerCase() + ' et';
+  }
+  const m = D.meta || {}, rec = D.record || {};
+  document.getElementById('homeStats').innerHTML = [
+    [m.players_projected || 0, 'Players Projected', 'green'],
+    [(D.games || []).length, 'Games Today', ''],
+    [m.priced || 0, 'Onyx Props Priced', 'purple'],
+    [rec.w != null ? `${rec.w}-${rec.l}` : '0-0', 'Picks Record', 'green'],
+  ].map(([v, l, c]) => `<div class="home-stat"><div class="home-stat-val ${c}">${esc(v)}</div><div class="home-stat-label">${esc(l)}</div></div>`).join('');
+}
+var _tickPrev = {};
+function renderTicker() {
+  const el = document.getElementById('scoreTickerTrack');
+  const gs = (D.games || []).slice().sort((a, b) => {
+    const k = g => g.state === 'live' ? 0 : g.state === 'pre' ? 1 : 2;
+    return k(a) - k(b) || String(a.start).localeCompare(String(b.start));
+  });
+  const next = {};
+  const one = g => {
+    const live = g.state === 'live', fin = g.state === 'post';
+    const has = (live || fin) && g.away_score != null && g.home_score != null;
+    const a = +g.away_score, h = +g.home_score;
+    let bump = '';
+    if (has) { const k = a + '-' + h; if (_tickPrev[g.gid] && _tickPrev[g.gid] !== k) bump = ' bump'; next[g.gid] = k; }
+    const st = live ? (g.detail || 'LIVE') : fin ? 'F' : tipTime(g.start).replace(' ET', '');
+    return `<div class="score-game" onclick="openGame('${esc(g.gid)}')">
+      <span class="sticker-logo" style="background-image:url(${(D.logos || {})[g.away] || ''})"></span>
+      ${has ? `<span class="score-num ${a > h ? 'winning' : 'losing'}${bump}">${a}</span><span class="score-sep">–</span><span class="score-num ${h > a ? 'winning' : 'losing'}${bump}">${h}</span>`
+            : `<span class="score-team">${esc(g.away)}</span><span class="score-sep">@</span><span class="score-team">${esc(g.home)}</span>`}
+      <span class="sticker-logo" style="background-image:url(${(D.logos || {})[g.home] || ''})"></span>
+      <span class="score-state ${live ? 'live' : fin ? 'final' : 'sched'}">${esc(st)}</span>
+    </div>`;
+  };
+  if (!gs.length) {
+    el.innerHTML = '<div class="score-game"><span class="score-state sched">No NBA games today</span></div>';
+    el.style.animation = 'none';
+    return;
+  }
+  // MLB keyframes slide the track -50%: two identical halves loop seamlessly.
+  // A short slate is repeated inside each half so the bar never shows a gap.
+  const half = gs.map(one).join('').repeat(Math.max(1, Math.ceil(10 / gs.length)));
+  el.innerHTML = half + half;
+  el.style.animationDuration = Math.max(30, Math.ceil(10 / gs.length) * gs.length * 6) + 's';
+  _tickPrev = next;
+  const nLive = gs.filter(g => g.state === 'live').length;
+  document.getElementById('liveCount').innerHTML = nLive ? `<span class="nav-live-dot"></span>${nLive} live` : '';
+}
+
+// ── home ───────────────────────────────────────────────────────────
+function pickCard(k) {
+  const p = playerOf(k.pid) || {name: k.name, team: k.team, opp: k.opp, gid: k.gid};
+  const g = gameOf(k.gid);
+  const leg = {sel: k.sel, price: k.price, gid: k.gid, market: 'player_' + STAT_NAME[k.stat].toLowerCase(),
+               label: `${k.name} ${k.side === 'over' ? 'Over' : 'Under'} ${k.line} ${STAT_ABBR[k.stat]}`};
+  return `<div class="nba-card">
+    <div class="pk-top"><div class="who">${hs(p, 'm')}<div style="min-width:0">
+      <div class="nm" style="cursor:pointer" onclick="openPlayer('${esc(k.pid)}')">${esc(k.name)}</div>
+      <div class="sub">${logo(k.team)} ${esc(k.team)} ${p.home ? 'vs' : '@'} ${esc(k.opp)}${g ? ' · ' + tipTime(g.start) : ''}</div></div></div>
+      ${legChip(leg, k.side)}</div>
+    <div class="pk-call">${k.side === 'over' ? 'Over' : 'Under'} ${k.line} ${STAT_NAME[k.stat]}<small>proj ${num(k.proj)}</small></div>
+    <div class="pk-row"><span>model <b>${pct(k.prob)}</b></span><span>implied <b>${pct(k.implied)}</b></span><span>edge <b class="edge-pos">${pp(k.edge)}</b></span>
+      ${k.result ? `<span class="res-${esc(k.result)}">${k.result === 'V' ? 'VOID' : esc(k.result)}${k.actual != null ? ' · ' + k.actual : ''}</span>` : ''}</div>
+  </div>`;
+}
+function renderHome() {
+  document.getElementById('homeTSP').innerHTML = tspHtml();
+  const picks = D.picks || [];
+  document.getElementById('picksTag').textContent = 'Onyx Picks · ' + picks.length + ' today';
+  document.getElementById('homePicks').innerHTML = picks.length ? picks.map(pickCard).join('')
+    : `<div class="empty">${(D.meta || {}).priced ? 'No play clears the bar tonight. An honest edge lane is a quiet one on most nights.' : 'Onyx prices are not posted yet for tonight. Picks appear once lines are up.'}</div>`;
+  const top = (D.players || []).filter(p => !p.out).sort((a, b) => b.proj.pts - a.proj.pts).slice(0, 6);
+  document.getElementById('homeScorers').innerHTML = top.map((p, i) => {
+    const pr = (p.props || {}).pts;
+    return `<div class="nba-card">
+      <div class="pk-top"><div class="who">${hs(p, 'm')}<div style="min-width:0">
+        <div class="nm" style="cursor:pointer" onclick="openPlayer('${esc(p.pid)}')">${i + 1}. ${esc(p.name)}</div>
+        <div class="sub">${logo(p.team)} ${esc(p.team)} ${p.home ? 'vs' : '@'} ${esc(p.opp)} · ${num(p.min)} min</div></div></div>
+        <div class="big" style="color:#d795ff;font-size:22px">${num(p.proj.pts)}</div></div>
+      <div class="pk-row" style="align-items:center"><span>line <b>${pr ? pr.line : '-'}</b></span><span>REB <b>${num(p.proj.reb)}</b></span><span>AST <b>${num(p.proj.ast)}</b></span>
+        <span style="margin-left:auto;display:flex;gap:6px;align-items:center">${legChip(propLeg(p, 'pts', 'over'), 'over')}${addBtn(propLeg(p, 'pts', 'over'))}</span></div>
+    </div>`;
+  }).join('') || '<div class="empty">No slate today.</div>';
+}
+
+// ── board ──────────────────────────────────────────────────────────
 var boardStat = 'pts', boardSort = {k: 'proj', dir: -1};
 function setStat(s) {
   boardStat = s;
@@ -488,68 +621,6 @@ function setStat(s) {
   renderBoard();
 }
 function sortBoard(k) { boardSort = {k, dir: boardSort.k === k ? -boardSort.dir : -1}; renderBoard(); }
-
-function renderHeader() {
-  const d = D.date ? new Date(D.date + 'T12:00:00') : null;
-  const ds = d ? d.toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'}).toUpperCase() : '';
-  document.getElementById('navDate').textContent = ds;
-  document.getElementById('heroDate').textContent = (D.games || []).length ? 'Live · ' + ds : 'No games today';
-  if (D.generated) {
-    const t = new Date(D.generated);
-    document.getElementById('navUpd').textContent = 'updated ' + t.toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York'}).toLowerCase() + ' et';
-  }
-  const m = D.meta || {};
-  const rec = D.record || {};
-  document.getElementById('homeStats').innerHTML = [
-    [m.players_projected || 0, 'Players projected', ''],
-    [(D.games || []).length, 'Games today', 'w'],
-    [m.priced || 0, 'Priced props', ''],
-    [rec.w != null ? `${rec.w}-${rec.l}` : '0-0', 'Picks record', 'w'],
-  ].map(([v, l, c]) => `<div class="stat"><div class="v ${c}">${esc(v)}</div><div class="l">${esc(l)}</div></div>`).join('');
-}
-
-function renderTicker() {
-  document.getElementById('ticker').innerHTML = (D.games || []).map(g => {
-    const live = g.state === 'live' || g.state === 'in';
-    const fin = g.state === 'post' || g.state === 'completed';
-    const sc = (live || fin) && g.away_score != null ? `<b>${esc(g.away)} ${esc(g.away_score)}</b> <b>${esc(g.home)} ${esc(g.home_score)}</b>` : `<b>${esc(g.away)}</b> @ <b>${esc(g.home)}</b>`;
-    const st = fin ? 'FINAL' : live ? (g.detail || 'LIVE') : tipTime(g.start);
-    return `<div class="tk" onclick="gotoTab('games')">${sc}<span class="st ${live ? 'live' : ''}">${esc(st)}</span></div>`;
-  }).join('');
-}
-
-function pickCard(k) {
-  const p = (D.players || []).find(x => x.pid === k.pid) || {name: k.name, team: k.team, opp: k.opp, gid: k.gid};
-  const g = gameOf(k.gid);
-  const leg = {sel: k.sel, price: k.price, gid: k.gid, market: 'player_' + STAT_NAME[k.stat].toLowerCase(),
-               label: `${k.name} ${k.side === 'over' ? 'Over' : 'Under'} ${k.line} ${STAT_ABBR[k.stat]}`};
-  return `<div class="card">
-    <div class="pk-top"><div style="display:flex;gap:10px;align-items:center">${badge(k.team)}<div>
-      <div class="pk-name" style="cursor:pointer" onclick="openPlayer('${esc(k.pid)}')">${esc(k.name)}</div>
-      <div class="pk-meta">${esc(k.team)} ${p.home ? 'vs' : '@'} ${esc(k.opp)}${g ? ' · ' + tipTime(g.start) : ''}</div></div></div>
-      ${legChip(leg, k.side)}</div>
-    <div class="pk-call">${k.side === 'over' ? 'Over' : 'Under'} ${k.line} ${STAT_NAME[k.stat]}<small>proj ${num(k.proj)}</small></div>
-    <div class="pk-row"><span>model <b>${pct(k.prob)}</b></span><span>implied <b>${pct(k.implied)}</b></span><span>edge <b class="edge-pos">${pp(k.edge)}</b></span></div>
-  </div>`;
-}
-
-function renderHome() {
-  const picks = D.picks || [];
-  document.getElementById('picksCount').textContent = picks.length + ' picks today';
-  document.getElementById('homePicks').innerHTML = picks.length ? picks.map(pickCard).join('')
-    : `<div class="empty" style="grid-column:1/-1">${(D.meta || {}).priced ? 'No play clears the bar tonight. An honest edge lane is a quiet one on most nights.' : 'Onyx prices are not posted yet for tonight. Picks appear once lines are up.'}</div>`;
-  const top = (D.players || []).filter(p => !p.out).sort((a, b) => b.proj.pts - a.proj.pts).slice(0, 6);
-  document.getElementById('homeScorers').innerHTML = top.map((p, i) => {
-    const pr = (p.props || {}).pts;
-    return `<div class="card" style="cursor:pointer" onclick="openPlayer('${esc(p.pid)}')">
-      <div class="pk-top"><div style="display:flex;gap:10px;align-items:center">${badge(p.team)}<div>
-        <div class="pk-name">${i + 1}. ${esc(p.name)}</div><div class="pk-meta">${esc(p.team)} ${p.home ? 'vs' : '@'} ${esc(p.opp)} · ${num(p.min)} min</div></div></div>
-        <div class="big" style="color:var(--lilac)">${num(p.proj.pts)}</div></div>
-      <div class="pk-row"><span>line <b>${pr ? pr.line : '-'}</b></span><span>REB <b>${num(p.proj.reb)}</b></span><span>AST <b>${num(p.proj.ast)}</b></span></div>
-    </div>`;
-  }).join('') || '<div class="empty" style="grid-column:1/-1">No slate today.</div>';
-}
-
 function renderBoard() {
   const sel = document.getElementById('gameSel');
   if (!sel.options.length) {
@@ -557,11 +628,11 @@ function renderBoard() {
   }
   const q = (document.getElementById('boardSearch').value || '').toLowerCase().trim();
   const gid = sel.value, s = boardStat, pricedOnly = document.getElementById('pricedOnly').checked;
-  let rows = (D.players || []).filter(p => !p.out && p.min >= 8)
+  const rows = (D.players || []).filter(p => !p.out && p.min >= 8)
     .filter(p => !gid || p.gid === gid)
     .filter(p => !q || (p.name + ' ' + p.team + ' ' + p.opp).toLowerCase().includes(q))
     .filter(p => !pricedOnly || (p.props || {})[s]);
-  const val = (p) => {
+  const val = p => {
     const pr = (p.props || {})[s];
     switch (boardSort.k) {
       case 'name': return p.name;
@@ -578,143 +649,297 @@ function renderBoard() {
   document.getElementById('boardBody').innerHTML = rows.map(p => {
     const pr = (p.props || {})[s];
     const diff = pr ? p.proj[s] - pr.line : null;
-    const inj = p.inj ? ` <span class="tag r">${esc(p.inj)}</span>` : '';
     return `<tr>
-      <td><div style="display:flex;gap:10px;align-items:center">${badge(p.team, 1)}<div>
-        <div class="pn" style="cursor:pointer" onclick="openPlayer('${esc(p.pid)}')">${esc(p.name)}${inj}</div>
-        <div class="ps">${esc(p.team)} ${p.home ? 'vs' : '@'} ${esc(p.opp)}${p.b2b ? ' · B2B' : ''}</div></div></div></td>
-      <td class="r num dim hm">${num(p.min)}</td>
+      <td><div class="who">${hs(p, 's')}<div style="min-width:0">
+        <div class="nm" style="cursor:pointer" onclick="openPlayer('${esc(p.pid)}')">${esc(p.name)}${p.inj ? ` <span class="tagx r">${esc(p.inj)}</span>` : ''}</div>
+        <div class="sub">${logo(p.team)} ${esc(p.team)} ${p.home ? 'vs' : '@'} ${esc(p.opp)}${p.b2b ? ' · B2B' : ''}</div></div></div></td>
+      <td class="r mono dim hm">${num(p.min)}</td>
       <td class="r big">${num(p.proj[s])}</td>
-      <td class="r num">${pr ? pr.line : '-'}</td>
-      <td class="r num hm ${diff > 0 ? 'edge-pos' : ''}">${diff == null ? '-' : (diff > 0 ? '+' : '') + diff.toFixed(1)}</td>
-      <td class="r num hm">${pr ? (pr.side === 'over' ? 'O ' : 'U ') + pct(pr.prob, 0) : '-'}</td>
-      <td class="r num hm ${pr && pr.edge > 0 ? 'edge-pos' : 'edge-neg'}">${pr ? pp(pr.edge) : '-'}</td>
+      <td class="r mono">${pr ? pr.line : '-'}</td>
+      <td class="r mono hm ${diff > 0 ? 'edge-pos' : ''}">${diff == null ? '-' : (diff > 0 ? '+' : '') + diff.toFixed(1)}</td>
+      <td class="r mono hm">${pr ? (pr.side === 'over' ? 'O ' : 'U ') + pct(pr.prob, 0) : '-'}</td>
+      <td class="r mono hm ${pr && pr.edge > 0 ? 'edge-pos' : 'edge-neg'}">${pr ? pp(pr.edge) : '-'}</td>
       <td class="r">${legChip(propLeg(p, s, 'over'), 'over')}</td>
       <td class="r">${legChip(propLeg(p, s, 'under'), 'under')}</td>
-      <td class="r num dim hm">${esc(last5(p, s)) || '-'}</td>
+      <td class="r mono dim hm">${esc(last5(p, s)) || '-'}</td>
     </tr>`;
   }).join('') || '<tr><td colspan="10"><div class="empty" style="border:none">No players match. Untick "priced only" to see every projection.</div></td></tr>';
 }
 
+// ── top scorers ────────────────────────────────────────────────────
 function renderScorers() {
+  document.getElementById('scorerTSP').innerHTML = tspHtml();
   const rows = (D.players || []).filter(p => !p.out).sort((a, b) => b.proj.pts - a.proj.pts).slice(0, 40);
   document.getElementById('scorerCount').textContent = 'top ' + rows.length;
   const max = rows.length ? rows[0].proj.pts : 1;
   document.getElementById('scorerBody').innerHTML = rows.map((p, i) => {
     const pr = (p.props || {}).pts;
-    const g = gameOf(p.gid) || {};
-    const tt = p.home ? g.home_implied : g.away_implied;
     return `<tr>
-      <td class="num dim hm">${i + 1}</td>
-      <td><div style="display:flex;gap:10px;align-items:center">${badge(p.team, 1)}<div>
-        <div class="pn" style="cursor:pointer" onclick="openPlayer('${esc(p.pid)}')">${esc(p.name)}${p.inj ? ` <span class="tag r">${esc(p.inj)}</span>` : ''}</div>
-        <div class="ps">${esc(p.team)} ${p.home ? 'vs' : '@'} ${esc(p.opp)}</div></div></div></td>
-      <td class="r num dim hm">${num(p.min)}</td>
-      <td class="r" style="min-width:90px"><span class="big" style="color:var(--lilac)">${num(p.proj.pts)}</span><div class="bar"><i style="width:${(100 * p.proj.pts / max).toFixed(0)}%"></i></div></td>
-      <td class="r num">${pr ? pr.line : '-'}</td>
+      <td class="mono dim hm">${i + 1}</td>
+      <td><div class="who">${hs(p, 's')}<div style="min-width:0">
+        <div class="nm" style="cursor:pointer" onclick="openPlayer('${esc(p.pid)}')">${esc(p.name)}${p.inj ? ` <span class="tagx r">${esc(p.inj)}</span>` : ''}</div>
+        <div class="sub">${logo(p.team)} ${esc(p.team)} ${p.home ? 'vs' : '@'} ${esc(p.opp)}</div></div></div></td>
+      <td class="r mono dim hm">${num(p.min)}</td>
+      <td class="r" style="min-width:86px"><span class="big" style="color:#d795ff">${num(p.proj.pts)}</span><div class="pbar"><i style="width:${(100 * p.proj.pts / max).toFixed(0)}%"></i></div></td>
+      <td class="r mono">${pr ? pr.line : '-'}</td>
       <td class="r">${legChip(propLeg(p, 'pts', 'over'), 'over')}</td>
-      <td class="r num dim hm">${p.season ? num(p.season.pts) : '-'}</td>
-      <td class="r num dim hm">${p.last_season ? num(p.last_season.pts) : '-'}</td>
-      <td class="r num dim hm">${tt != null ? num(tt) : '-'}</td>
+      <td class="r hm">${legChip(propLeg(p, 'pts', 'under'), 'under')}</td>
+      <td class="r">${addBtn(propLeg(p, 'pts', 'over'))}</td>
+      <td class="r mono dim hm">${p.season ? num(p.season.pts) : '-'}</td>
+      <td class="r mono dim hm">${p.last_season ? num(p.last_season.pts) : '-'}</td>
     </tr>`;
   }).join('');
 }
 
-function renderGames() {
+// ── games: gamecenter (MLB .sb-* / .gc-* components) ───────────────
+var gcSel = null, gcView = 'overview';
+var LIVE = {};          // gid -> {espn event id, linescores, clock}
+var SUMMARY = {};       // gid -> ESPN summary (box + win probability)
+function openGame(gid) { gcSel = gid; gotoTab('games'); }
+function gcPick() {
   const gs = D.games || [];
-  document.getElementById('gamesCount').textContent = gs.length + ' games';
-  document.getElementById('gamesGrid').innerHTML = gs.map(g => {
-    const side = (t, ab) => {
-      const lead = (D.players || []).filter(p => p.team === ab && !p.out).sort((a, b) => b.proj.pts - a.proj.pts)[0];
-      const ml = t === 'away' ? g.away_ml : g.home_ml;
-      const imp = t === 'away' ? g.away_implied : g.home_implied;
-      const mlLeg = ml != null ? {sel: g[t + '_ml_sel'] || null, price: ml, gid: g.gid, market: 'moneyline', label: `${ab} ML`} : null;
-      return `<div class="gc-t">${badge(ab)}<div class="nm"><b>${esc(ab)}</b> <span class="dim" style="font-size:12px">${esc(g[t + '_rec'] || '')}</span>
-        <div class="ps">${lead ? 'Top: ' + esc(lead.name) + ' <b style="color:var(--lilac)">' + num(lead.proj.pts) + '</b>' : ''}</div></div>
-        <div class="imp">${imp != null ? num(imp) + ' pts' : ''}${g.state === 'post' || g.state === 'live' ? '<div class="big">' + esc(t === 'away' ? g.away_score : g.home_score) + '</div>' : ''}</div>
-        ${legChip(mlLeg, 'ML')}</div>`;
-    };
-    const spread = g.spread != null ? `${esc(g.home)} ${g.spread > 0 ? '+' : ''}${g.spread}` : '';
-    return `<div class="card gc">
-      <div class="gc-h"><span>${g.state === 'post' ? 'FINAL' : g.state === 'live' ? esc(g.detail || 'LIVE') : tipTime(g.start)}</span>
-        <span>${spread ? '<span class="tag p">' + spread + '</span> ' : ''}${g.total != null ? '<span class="tag n">O/U ' + g.total + '</span>' : ''}</span></div>
-      ${side('away', g.away)}${side('home', g.home)}
-      <button class="gc-btn" onclick="boardForGame('${esc(g.gid)}')">View all props for this game</button>
-    </div>`;
-  }).join('') || '<div class="empty" style="grid-column:1/-1">No NBA games today.</div>';
+  if (gcSel && gameOf(gcSel)) return gameOf(gcSel);
+  return gs.find(g => g.state === 'live') || gs.find(g => g.state === 'pre') || gs[0] || null;
 }
-function boardForGame(gid) { document.getElementById('gameSel').value = gid; gotoTab('board'); }
+function sbCard(g, sel) {
+  const live = g.state === 'live', fin = g.state === 'post';
+  const a = +g.away_score, h = +g.home_score;
+  const team = (ab, sc, lose, side) => {
+    const ml = g[side + '_ml'];
+    const mlLeg = ml != null ? {sel: g[side + '_ml_sel'] || null, price: ml, gid: g.gid, market: 'moneyline', label: `${TEAM_NICK[ab] || ab} ML`} : null;
+    return `<div class="sb-team"><span class="sticker-logo" style="background-image:url(${(D.logos || {})[ab] || ''})"></span><span class="sb-ab">${esc(ab)}</span>
+      ${(live || fin) ? `<span class="sb-score${lose ? ' lose' : ''}">${sc ?? ''}</span>`
+        : (mlLeg ? `<span class="sb-ml" onclick="event.stopPropagation();betLeg(${regLeg(mlLeg)})">${fmtOdds(ml)}</span>` : '')}</div>`;
+  };
+  const cls = `sb-card${sel ? ' sel' : ''}${live ? ' live' : ''}${!live && !fin ? ' sched' : ''}`;
+  const open = `onclick="gcSel='${esc(g.gid)}';rerender();document.getElementById('gcBody').scrollIntoView({behavior:'smooth',block:'start'})"`;
+  if (!live && !fin) {
+    return `<div class="${cls}" ${open}>
+      <div class="sb-toprow"><span class="sb-state sched">${tipTime(g.start)}</span>${g.total != null ? `<span class="sb-ou">O/U ${g.total}</span>` : ''}</div>
+      <div class="sb-teams">${team(g.away, null, false, 'away')}${team(g.home, null, false, 'home')}</div></div>`;
+  }
+  const side = live ? `<div class="sb-state live"><span class="sb-dot"></span>${esc(g.detail || 'LIVE')}</div>` : `<div class="sb-state fin">FINAL</div>`;
+  return `<div class="${cls}" ${open}>
+    <div class="sb-teams">${team(g.away, g.away_score, fin && a < h, 'away')}${team(g.home, g.home_score, fin && h < a, 'home')}</div>
+    <div class="sb-side">${side}</div></div>`;
+}
+function liveLine(p, box) {
+  // live box line for one of our players: match the ESPN athlete id (hs), then the name
+  if (!box) return null;
+  return box[p.hs] || box['n:' + String(p.name).toLowerCase()] || null;
+}
+function boxIndex(sum) {
+  const out = {};
+  ((sum && sum.boxscore && sum.boxscore.players) || []).forEach(t => (t.statistics || []).forEach(blk => {
+    const idx = {}; (blk.labels || []).forEach((l, i) => { idx[l] = i; });
+    (blk.athletes || []).forEach(a => {
+      const st = a.stats || [];
+      const v = l => { const i = idx[l]; return i != null && st[i] != null ? parseFloat(String(st[i]).split('-')[0]) || 0 : 0; };
+      const row = {min: v('MIN'), pts: v('PTS'), reb: v('REB'), ast: v('AST'), dnp: !!a.didNotPlay || !st.length,
+                   team: (t.team || {}).abbreviation};
+      const ath = a.athlete || {};
+      if (ath.id) out[String(ath.id)] = row;
+      if (ath.displayName) out['n:' + ath.displayName.toLowerCase()] = row;
+    });
+  }));
+  return out;
+}
+function renderGames() {
+  const g = gcPick();
+  const gs = (D.games || []).slice().sort((a, b) => {
+    const k = x => x.state === 'live' ? 0 : x.state === 'pre' ? 1 : 2;
+    return k(a) - k(b) || String(a.start).localeCompare(String(b.start));
+  });
+  document.getElementById('gcGrid').innerHTML = gs.length ? '<div class="sb-grid">' + gs.map(x => sbCard(x, g && x.gid === g.gid)).join('') + '</div>' : '';
+  const body = document.getElementById('gcBody');
+  if (!g) { body.innerHTML = '<div class="gc-empty">No NBA games on the slate today.</div>'; return; }
+  gcSel = g.gid;
+  const live = g.state === 'live', fin = g.state === 'post';
+  const a = +g.away_score, h = +g.home_score;
+  const sum = SUMMARY[g.gid];
+  const box = boxIndex(sum);
+  const stateHtml = live ? `<div class="gc-state live">${esc(g.detail || 'LIVE')}</div>`
+    : fin ? '<div class="gc-state final">FINAL</div>'
+    : `<div class="gc-state">${tipTime(g.start)}</div><div class="gc-outs">${g.spread != null ? esc(g.home) + ' ' + (g.spread > 0 ? '+' : '') + g.spread : ''}${g.total != null ? ' · O/U ' + g.total : ''}</div>`;
+  const side = (ab, rec, sc, lose, home) => home
+    ? `<div class="gc-side home"><div class="gc-tscore ${lose ? 'losing' : ''}">${(live || fin) ? esc(sc) : ''}</div>
+        <div style="text-align:right"><div class="gc-tname">${esc(TEAM_NICK[ab] || ab)}</div><div class="gc-trec">${esc(rec || '')}</div></div>
+        <span class="gc-logo" style="background-image:url(${(D.logos || {})[ab] || ''})"></span></div>`
+    : `<div class="gc-side"><span class="gc-logo" style="background-image:url(${(D.logos || {})[ab] || ''})"></span>
+        <div><div class="gc-tname">${esc(TEAM_NICK[ab] || ab)}</div><div class="gc-trec">${esc(rec || '')}</div></div>
+        <div class="gc-tscore ${lose ? 'losing' : ''}">${(live || fin) ? esc(sc) : ''}</div></div>`;
+  const header = `<div class="gc-header">${side(g.away, g.away_rec, g.away_score, fin && a < h, false)}<div class="gc-mid">${stateHtml}</div>${side(g.home, g.home_rec, g.home_score, fin && h < a, true)}</div>`;
 
+  // bet bar: the game on Onyx + its ML / spread / total
+  const chips = [];
+  [['away', g.away], ['home', g.home]].forEach(([sd, ab]) => {
+    if (g[sd + '_ml'] != null) chips.push({sel: g[sd + '_ml_sel'] || null, price: g[sd + '_ml'], gid: g.gid, market: 'moneyline', label: `${ab} ML`});
+  });
+  const betbar = `<div class="gc-betbar">
+    <div class="gc-bet-cta" onclick="window.open('${g.slug ? 'https://app.onyxodds.com/game/' + esc(g.slug) : ONYX_FALLBACK_URL}','_blank','noopener');track('onyx_click',{link_type:'game'})">⚡ Bet this game on Onyx${live ? ' · LIVE' : ''}</div>
+    <div class="gc-bet-chips">${chips.map(c => `<span class="gc-bet-chip" onclick="betLeg(${regLeg(c)})">${esc(c.label)} ${fmtOdds(c.price)}</span>`).join('')}
+      ${g.spread != null ? `<span class="gc-bet-chip" style="cursor:default">${esc(g.home)} ${g.spread > 0 ? '+' : ''}${g.spread}</span>` : ''}
+      ${g.total != null ? `<span class="gc-bet-chip" style="cursor:default">O/U ${g.total}</span>` : ''}</div></div>`;
+
+  // points watch: headshots, projected points pregame, live points (vs the line) once tipped
+  const roster = (D.players || []).filter(p => p.gid === g.gid && !p.out && p.min >= 12).sort((x, y) => y.proj.pts - x.proj.pts).slice(0, 12);
+  const cells = roster.map(p => {
+    const pr = (p.props || {}).pts, b = liveLine(p, box);
+    const over = b && pr && b.pts > pr.line;
+    const top = b ? `${b.pts} PTS` : num(p.proj.pts);
+    const sub = pr ? (b ? `line ${pr.line}` : `${fmtOdds((pr.all.over || {}).price)} o${pr.line}`) : '';
+    return `<div class="gc-hs${over ? ' over' : ''}" onclick="openPlayer('${esc(p.pid)}')">
+      <div class="gc-hs-img">${hsUrl(p) ? `<img loading="lazy" src="${esc(hsUrl(p))}" alt="" data-alt="${esc(p.img || '')}" onerror="if(this.dataset.alt&&this.src!==this.dataset.alt){this.src=this.dataset.alt;this.dataset.alt=''}else{this.remove()}">` : ''}</div>
+      <div class="gc-hs-pct">${over ? '✓ ' : ''}${esc(top)}</div>
+      <div class="gc-hs-name">${esc(String(p.name).split(' ').slice(-1)[0])}</div>
+      ${sub ? `<div class="gc-hs-odds">${esc(sub)}</div>` : ''}</div>`;
+  }).join('');
+  const watch = `<div class="gc-card" style="padding-bottom:8px"><div class="gc-card-title">Points watch · ${started(g) ? 'live points vs the Onyx line' : 'projected points'} · tap a player to see the case & bet it</div>
+    <div class="gc-hs-row">${cells || '<div class="dim">No projections for this game.</div>'}</div></div>`;
+
+  const sub = `<div class="gc-subnav"><button class="${gcView === 'overview' ? 'on' : ''}" onclick="gcView='overview';rerender()">Overview</button>
+    <button class="${gcView === 'box' ? 'on' : ''}" onclick="gcView='box';rerender()">Box Score</button></div>`;
+  body.innerHTML = header + betbar + watch + sub + (gcView === 'box' ? boxView(g, box) : overview(g, sum));
+  if (started(g) && !sum) loadSummary(g);
+}
+function overview(g, sum) {
+  let html = '';
+  // win probability (ESPN), MLB strip markup
+  const wp = ((sum && sum.winprobability) || []).map(x => 100 * (+x.homeWinPercentage || 0));
+  if (wp.length > 1) {
+    const W2 = 600, H2 = 60, X2 = i => (i / (wp.length - 1)) * W2, Y2 = v => H2 - (v / 100) * H2;
+    const pts = wp.map((v, i) => `${X2(i).toFixed(1)},${Y2(v).toFixed(1)}`).join(' ');
+    const last = wp[wp.length - 1];
+    html += `<div class="gc-card"><div class="gc-card-title">Win probability · ${esc(TEAM_NICK[g.home] || g.home)}</div>
+      <div class="gc-wp-wrap"><svg viewBox="0 0 ${W2} ${H2}" preserveAspectRatio="none">
+        <line x1="0" y1="${H2 / 2}" x2="${W2}" y2="${H2 / 2}" stroke="rgba(255,255,255,.08)" stroke-dasharray="4,4"/>
+        <polygon points="0,${H2} ${pts} ${W2},${H2}" fill="rgba(176,56,249,.12)"/>
+        <polyline points="${pts}" fill="none" stroke="#b038f9" stroke-width="2" stroke-linejoin="round"/>
+        <circle cx="${W2}" cy="${Y2(last)}" r="3.5" fill="#b038f9"/></svg>
+        <div class="gc-wp-lbl" style="top:${Math.min(80, Math.max(2, (Y2(last) / H2) * 100 - 10)).toFixed(0)}%;color:#b038f9">${esc(g.home)} ${Math.round(last)}%</div></div></div>`;
+  }
+  // line score by quarter
+  const lv = LIVE[g.gid] || {};
+  const la = lv.away_ls || [], lh = lv.home_ls || [];
+  if (la.length || lh.length) {
+    const n = Math.max(4, la.length, lh.length);
+    const cols = Array.from({length: n}, (_, i) => i < 4 ? String(i + 1) : 'OT' + (n > 5 ? i - 3 : ''));
+    const row = (ab, ls, tot) => `<tr><td>${esc(ab)}</td>${cols.map((_, i) => `<td class="${g.state === 'live' && i === Math.max(la.length, lh.length) - 1 ? 'cur' : ''}">${ls[i] != null ? ls[i] : ''}</td>`).join('')}<td class="rhe">${esc(tot ?? '')}</td></tr>`;
+    html += `<div class="gc-card"><table class="gc-line"><thead><tr><th></th>${cols.map(c => `<th>${c}</th>`).join('')}<th class="rhe">T</th></tr></thead>
+      <tbody>${row(g.away, la, g.away_score)}${row(g.home, lh, g.home_score)}</tbody></table></div>`;
+  }
+  // matchup: implied totals + each side's top projected scorer
+  const top = ab => (D.players || []).filter(p => p.team === ab && !p.out).sort((x, y) => y.proj.pts - x.proj.pts)[0];
+  html += `<div class="gc-card"><div class="gc-card-title">Matchup</div><div class="gc-matchup">
+    ${[g.away, g.home].map(ab => { const t = top(ab); const imp = ab === g.home ? g.home_implied : g.away_implied;
+      return `<div><div class="gc-mu-role">${esc(ab)} · implied ${imp != null ? num(imp) : '-'}</div><div class="gc-mu-name">${t ? esc(t.name) : '-'}</div>
+        <div class="gc-mu-line">${t ? `${num(t.proj.pts)} pts · ${num(t.proj.reb)} reb · ${num(t.proj.ast)} ast` : ''}</div></div>`; }).join('')}
+    <div class="gc-count">${g.spread != null ? 'spread ' + esc(g.home) + ' ' + (g.spread > 0 ? '+' : '') + g.spread : ''}</div>
+    <div class="gc-count">${g.total != null ? 'total ' + g.total : ''}</div></div></div>`;
+  if (!html && !started(g)) html = '<div class="gc-empty">Live line score and win probability appear at tip.</div>';
+  return html;
+}
+function boxView(g, box) {
+  const team = ab => {
+    const ps = (D.players || []).filter(p => p.team === ab && p.gid === g.gid && (p.min >= 4 || liveLine(p, box)))
+      .sort((x, y) => (liveLine(y, box) || {min: 0}).min - (liveLine(x, box) || {min: 0}).min || y.proj.pts - x.proj.pts);
+    const cell = (p, b, s) => {
+      const pr = (p.props || {})[s];
+      const v = b ? b[s] : null;
+      const hit = pr && v != null && v > pr.line;
+      return `<td class="${hit ? 'box-cell-hit' : ''}">${v != null ? v : '-'}<div class="prop-trk">${num(p.proj[s])}${pr ? ' / ' + pr.line : ''}</div></td>`;
+    };
+    return `<div class="gc-card"><div class="box-team">${logo(ab)} ${esc(TEAM_NICK[ab] || ab)}</div>
+      <table class="gc-line"><thead><tr><th>Player</th><th>MIN</th><th>PTS</th><th>REB</th><th>AST</th></tr></thead><tbody>
+      ${ps.map(p => { const b = liveLine(p, box);
+        return `<tr><td style="cursor:pointer" onclick="openPlayer('${esc(p.pid)}')">${esc(p.name)}${p.inj ? ` <span class="tagx r">${esc(p.inj)}</span>` : ''}</td>
+          <td>${b ? b.min : '-'}<div class="prop-trk">${num(p.min, 0)}</div></td>${cell(p, b, 'pts')}${cell(p, b, 'reb')}${cell(p, b, 'ast')}</tr>`; }).join('')}
+      </tbody></table></div>`;
+  };
+  return `<div class="dim" style="font-size:11px;margin:-4px 0 10px">Live stat on top; projection / Onyx line underneath. Green = over the line.</div>` + team(g.away) + team(g.home);
+}
+function loadSummary(g) {
+  const lv = LIVE[g.gid];
+  if (!lv || !lv.eid || location.protocol === 'file:') return;
+  fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/summary?event=' + lv.eid)
+    .then(r => r.json()).then(j => { SUMMARY[g.gid] = j; if (currentTab === 'games' && gcSel === g.gid) rerender(); })
+    .catch(() => {});
+}
+
+// ── record ─────────────────────────────────────────────────────────
 function renderRecord() {
   const r = D.record || {rows: []};
   const units = r.units || 0;
   document.getElementById('recSince').textContent = r.started ? 'since ' + r.started : '';
   document.getElementById('recBig').innerHTML = [
     [`${r.w || 0}-${r.l || 0}${r.p ? '-' + r.p : ''}`, 'Record', ''],
-    [r.w + r.l ? pct(r.w / (r.w + r.l)) : '-', 'Hit rate', ''],
+    [(r.w + r.l) ? pct(r.w / (r.w + r.l)) : '-', 'Hit rate', ''],
     [(units >= 0 ? '+' : '') + units.toFixed(2) + 'u', 'Units (1u flat)', units > 0 ? 'edge-pos' : ''],
     [r.pending || 0, 'Pending', ''],
-  ].map(([v, l, c]) => `<div class="card"><div class="v ${c}">${esc(v)}</div><div class="l">${esc(l)}</div></div>`).join('');
+  ].map(([v, l, c]) => `<div class="nba-card"><div class="v ${c}">${esc(v)}</div><div class="l">${esc(l)}</div></div>`).join('');
   const bs = r.by_stat || {};
   document.getElementById('recByStat').innerHTML = ['pts', 'reb', 'ast'].map(s => {
     const b = bs[s] || {w: 0, l: 0, units: 0};
-    return `<div class="card"><div class="v">${b.w}-${b.l}</div><div class="l">${STAT_NAME[s]} · ${(b.units >= 0 ? '+' : '') + (b.units || 0).toFixed(2)}u</div></div>`;
+    return `<div class="nba-card"><div class="v">${b.w}-${b.l}</div><div class="l">${STAT_NAME[s]} · ${(b.units >= 0 ? '+' : '') + (b.units || 0).toFixed(2)}u</div></div>`;
   }).join('');
   const rows = r.rows || [];
   document.getElementById('recCount').textContent = rows.length + ' picks';
-  document.getElementById('recBody').innerHTML = rows.map(k => `<tr>
-    <td class="num dim">${esc(k.date)}</td>
-    <td><div class="pn">${esc(k.name)}</div><div class="ps">${esc(k.team)} vs ${esc(k.opp)}</div></td>
+  document.getElementById('recBody').innerHTML = rows.map(k => {
+    const p = playerOf(k.pid) || {name: k.name, hs: null};
+    return `<tr>
+    <td class="mono dim">${esc(k.date)}</td>
+    <td><div class="who">${hs(p, 's')}<div><div class="nm">${esc(k.name)}</div><div class="sub">${logo(k.team)} ${esc(k.team)} vs ${esc(k.opp)}</div></div></div></td>
     <td>${k.side === 'over' ? 'Over' : 'Under'} ${k.line} ${STAT_ABBR[k.stat]}</td>
-    <td class="r num">${fmtOdds(k.price)}</td>
-    <td class="r num">${num(k.proj)}</td>
-    <td class="r num edge-pos">${pp(k.edge)}</td>
-    <td class="r num">${k.actual != null ? k.actual : '-'}</td>
-    <td class="r">${k.result ? `<span class="res-${esc(k.result[0])}">${esc(k.result === 'V' ? 'VOID' : k.result)}</span>` : '<span class="dim">pending</span>'}</td>
-  </tr>`).join('') || '<tr><td colspan="8"><div class="empty" style="border:none">The record starts with the first qualified pick.</div></td></tr>';
+    <td class="r mono">${fmtOdds(k.price)}</td>
+    <td class="r mono">${num(k.proj)}</td>
+    <td class="r mono edge-pos">${pp(k.edge)}</td>
+    <td class="r mono">${k.actual != null ? k.actual : '-'}</td>
+    <td class="r">${k.result ? `<span class="res-${esc(k.result)}">${esc(k.result === 'V' ? 'VOID' : k.result)}</span>` : '<span class="dim">pending</span>'}</td>
+  </tr>`; }).join('') || '<tr><td colspan="8"><div class="empty" style="border:none">The record starts with the first qualified pick.</div></td></tr>';
 }
 
+// ── player drawer ──────────────────────────────────────────────────
 function openPlayer(pid) {
-  const p = (D.players || []).find(x => x.pid === pid);
+  const p = playerOf(pid);
   if (!p) return;
   const g = gameOf(p.gid) || {};
   const cells = ['pts', 'reb', 'ast'].map(s => {
     const pr = (p.props || {})[s];
-    return `<div class="card"><div class="v">${num(p.proj[s])}</div><div class="l">${STAT_ABBR[s]}</div>
-      <div class="ps">${pr ? 'line ' + pr.line + ' · ' + (pr.side === 'over' ? 'O ' : 'U ') + pct(pr.prob, 0) : 'no line'}</div>
+    return `<div class="nba-card"><div class="v">${num(p.proj[s])}</div><div class="l">${STAT_ABBR[s]}</div>
+      <div class="sub dim" style="font-size:11px;margin-top:4px">${pr ? 'line ' + pr.line + ' · ' + (pr.side === 'over' ? 'O ' : 'U ') + pct(pr.prob, 0) : 'no line'}</div>
       <div style="margin-top:8px;display:flex;gap:6px;justify-content:center">${pr ? legChip(propLeg(p, s, 'over'), 'o') + legChip(propLeg(p, s, 'under'), 'u') : ''}</div></div>`;
   }).join('');
-  const l5 = (p.last5 || []).slice().reverse().map(x => `<tr><td class="num dim">${esc(x.d)}</td><td>${esc(x.opp)}</td><td class="r num">${x.min}</td><td class="r num">${x.pts}</td><td class="r num">${x.reb}</td><td class="r num">${x.ast}</td></tr>`).join('');
-  document.getElementById('drawer').innerHTML = `<button class="dr-x" onclick="closeDrawer()">x</button>
-    <div style="display:flex;gap:12px;align-items:center">${badge(p.team)}<div><div class="pk-name" style="font-size:20px">${esc(p.name)}</div>
-    <div class="pk-meta">${esc(p.pos || '')} · ${esc(p.team)} ${p.home ? 'vs' : '@'} ${esc(p.opp)} · ${tipTime(g.start)}</div></div></div>
-    ${p.inj ? `<div style="margin-top:12px"><span class="tag r">${esc(p.inj)}</span> <span class="dim" style="font-size:12px">${esc(p.inj_detail || '')}</span></div>` : ''}
-    <div class="dr-grid">${cells}</div>
-    <div class="pk-row" style="flex-wrap:wrap"><span>proj min <b>${num(p.min)}</b></span>
+  const l5 = (p.last5 || []).slice().reverse().map(x => `<tr><td class="mono dim">${esc(x.d)}</td><td>${esc(x.opp)}</td><td class="r mono">${x.min}</td><td class="r mono">${x.pts}</td><td class="r mono">${x.reb}</td><td class="r mono">${x.ast}</td></tr>`).join('');
+  document.getElementById('pdr').innerHTML = `<button class="pdr-x" onclick="closePlayer()">×</button>
+    <div class="who">${hs(p, 'l')}<div><div style="font-size:20px;font-weight:800">${esc(p.name)}</div>
+    <div class="sub">${logo(p.team)} ${esc(p.pos || '')} · ${esc(p.team)} ${p.home ? 'vs' : '@'} ${esc(p.opp)} · ${tipTime(g.start)}</div></div></div>
+    ${p.inj ? `<div style="margin-top:12px"><span class="tagx r">${esc(p.inj)}</span> <span class="dim" style="font-size:12px">${esc(p.inj_detail || '')}</span></div>` : ''}
+    <div class="pdr-grid">${cells}</div>
+    <div class="pk-row"><span>proj min <b>${num(p.min)}</b></span>
       <span>season <b>${p.season ? num(p.season.pts) + ' / ' + num(p.season.reb) + ' / ' + num(p.season.ast) : '-'}</b></span>
       <span>last season <b>${p.last_season ? num(p.last_season.pts) + ' / ' + num(p.last_season.reb) + ' / ' + num(p.last_season.ast) : '-'}</b></span>
-      ${p.b2b ? '<span class="tag n">back-to-back</span>' : ''}</div>
+      ${p.b2b ? '<span class="tagx n">back-to-back</span>' : ''}</div>
     <div class="sec-hdr"><span class="sec-title">Last 5</span></div>
-    <div class="tbl-wrap"><table style="min-width:0"><thead><tr><th>Date</th><th>Opp</th><th class="r">Min</th><th class="r">Pts</th><th class="r">Reb</th><th class="r">Ast</th></tr></thead>
+    <div class="tbl"><table style="min-width:0"><thead><tr><th>Date</th><th>Opp</th><th class="r">Min</th><th class="r">Pts</th><th class="r">Reb</th><th class="r">Ast</th></tr></thead>
     <tbody>${l5 || '<tr><td colspan="6" class="dim">No games this season yet.</td></tr>'}</tbody></table></div>`;
-  document.getElementById('drawer').classList.add('open');
-  document.getElementById('drawerBg').classList.add('open');
+  document.getElementById('pdr').classList.add('open');
+  document.getElementById('pdrBg').classList.add('open');
 }
-function closeDrawer() {
-  document.getElementById('drawer').classList.remove('open');
-  document.getElementById('drawerBg').classList.remove('open');
+function closePlayer() {
+  document.getElementById('pdr').classList.remove('open');
+  document.getElementById('pdrBg').classList.remove('open');
 }
 
 // ── tabs ───────────────────────────────────────────────────────────
 var currentTab = 'home';
-var RENDER = {home: renderHome, board: renderBoard, scorers: renderScorers, games: renderGames, record: renderRecord, model: function () {
+var RENDER = {home: renderHome, games: renderGames, board: renderBoard, scorers: renderScorers, record: renderRecord, model: function () {
   document.getElementById('modelVer').textContent = 'model ' + (D.model_version || '');
 }};
 function gotoTab(t) {
   if (!RENDER[t]) t = 'home';
   currentTab = t;
   document.querySelectorAll('.pane').forEach(p => p.classList.toggle('active', p.id === 'pane-' + t));
-  document.querySelectorAll('.nav-tab[data-tab]').forEach(b => b.classList.toggle('active', b.dataset.tab === t));
+  document.querySelectorAll('.nav-tab[data-tab], .drawer-item[data-tab]').forEach(b => b.classList.toggle('active', b.dataset.tab === t));
   LEGS = [];
   RENDER[t]();
   try { history.replaceState(null, '', '#' + t); } catch (e) {}
@@ -723,41 +948,52 @@ function gotoTab(t) {
 }
 function rerender() { LEGS = []; RENDER[currentTab](); }
 
-// ── live scores (client side, ESPN public scoreboard; CORS open) ───
+// ── live scores: ESPN public scoreboard (CORS open), every 30s; 15s while a game is live
 var ESPN_ABBR = {GSW: 'GS', NOP: 'NO', NYK: 'NY', SAS: 'SA', UTA: 'UTAH', WAS: 'WSH', PHO: 'PHX', BRK: 'BKN'};
+var _pollTimer = null;
 function pollLive() {
   if (!(D.games || []).length || location.protocol === 'file:') return;
   const ymd = (D.date || '').replace(/-/g, '');
   fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=' + ymd)
     .then(r => r.json()).then(j => {
-      let changed = false;
+      let changed = false, anyLive = false;
       (j.events || []).forEach(e => {
         const c = (e.competitions || [])[0] || {};
         const side = {};
-        (c.competitors || []).forEach(t => { const a = t.team.abbreviation; side[t.homeAway] = {ab: ESPN_ABBR[a] || a, score: t.score}; });
+        (c.competitors || []).forEach(t => {
+          const ab = ESPN_ABBR[t.team.abbreviation] || t.team.abbreviation;
+          side[t.homeAway] = {ab, score: t.score, ls: (t.linescores || []).map(x => x.value)};
+        });
         if (!side.home || !side.away) return;
         const g = D.games.find(x => x.home === side.home.ab && x.away === side.away.ab);
         if (!g) return;
         const st = (e.status || {}).type || {};
-        const state = st.state === 'in' ? 'live' : st.state === 'post' ? 'post' : g.state;
-        if (g.away_score !== side.away.score || g.home_score !== side.home.score || g.state !== state) changed = true;
-        g.away_score = side.away.score; g.home_score = side.home.score; g.state = state; g.detail = st.shortDetail || g.detail;
+        const state = st.state === 'in' ? 'live' : st.state === 'post' ? 'post' : 'pre';
+        if (state === 'live') anyLive = true;
+        const detail = state === 'live' ? (st.shortDetail || 'LIVE') : g.detail;
+        if (g.away_score !== side.away.score || g.home_score !== side.home.score || g.state !== state || g.detail !== detail) changed = true;
+        g.away_score = side.away.score; g.home_score = side.home.score; g.state = state; g.detail = detail;
+        LIVE[g.gid] = {eid: e.id, away_ls: side.away.ls, home_ls: side.home.ls};
       });
-      if (changed) { renderTicker(); if (currentTab === 'games') rerender(); }
-    }).catch(() => {});
+      // the open game's box score / win probability refresh with the scores
+      const sel = currentTab === 'games' ? gcPick() : null;
+      if (sel && started(sel)) loadSummary(sel);
+      if (changed) { renderTicker(); if (currentTab === 'games' || currentTab === 'home') rerender(); }
+      clearTimeout(_pollTimer);
+      _pollTimer = setTimeout(pollLive, anyLive ? 15000 : 30000);
+    }).catch(() => { clearTimeout(_pollTimer); _pollTimer = setTimeout(pollLive, 30000); });
 }
 
 document.addEventListener('DOMContentLoaded', function () {
   initAnalytics();
   renderHeader();
   renderTicker();
-  renderSlip();
+  renderParlaySlip();
   const h = (location.hash || '').slice(1);
   gotoTab(RENDER[h] ? h : 'home');
   pollLive();
-  setInterval(pollLive, 30000);
 });
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closePlayer(); closeNav(); } });
 </script>
 </body>
 </html>

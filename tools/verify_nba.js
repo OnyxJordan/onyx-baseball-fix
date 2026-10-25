@@ -15,7 +15,7 @@ const path = require('path');
 
 const CHROMIUM = process.env.PW_CHROMIUM
   || (fs.existsSync('/opt/pw-browsers/chromium') ? '/opt/pw-browsers/chromium' : null);
-const TABS = ['home', 'board', 'scorers', 'games', 'record', 'model'];
+const TABS = ['home', 'games', 'board', 'scorers', 'record', 'model'];
 const PORT = Number(process.env.PROBE_PORT || 8902);
 const ROOT = process.argv[2] || process.cwd();
 
@@ -67,7 +67,7 @@ function serve(rootDir) {
       const p = (NBA_DATA.players || []).find(x => !x.out);
       if (!p) return 'no players';
       try { openPlayer(p.pid); } catch (e) { return e.message; }
-      const t = document.getElementById('drawer').innerText;
+      const t = document.getElementById('pdr').innerText;
       return /\bundefined\b|\bNaN\b/.test(t) ? 'bad drawer text' : 'ok';
     });
     console.log(`  ${dr === 'ok' || dr === 'no players' ? 'ok  ' : 'FAIL'} drawer   ${dr}`);

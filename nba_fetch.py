@@ -26,7 +26,7 @@ preferring OpticOdds.
 import json, os, subprocess, sys, time, urllib.parse
 from datetime import date, datetime, timedelta, timezone
 
-from nba_common import ET, game_day, load, save, team_abbr, nk
+from nba_common import ESPN, ET, espn_get, game_day, load, save, team_abbr, nk
 from fetch_onyx import http_json, OPTIC
 
 Q = "sport=basketball&league=nba"
@@ -139,13 +139,14 @@ def fetch_slate(today):
         if rows:
             roster = {"date": today.isoformat(), "players": [
                 {"pid": p["id"], "name": p.get("name", ""), "pos": p.get("position", ""),
-                 "team": team_abbr((p.get("team") or {}).get("name"))}
+                 "team": team_abbr((p.get("team") or {}).get("name")), "logo": p.get("logo") or ""}
                 for p in rows if p.get("is_active", True)]}
             save("roster.json", roster)
     inj_rows = paged("/injuries")
     inj = {str((i.get("player") or {}).get("id")): i for i in inj_rows}
     inj_by_name = {nk((i.get("player") or {}).get("name")): i for i in inj_rows}
 
+    heads = espn_headshot_ids(today, sorted(teams))
     players = []
     for p in roster.get("players", []):
         g = teams.get(p["team"])
@@ -158,6 +159,7 @@ def fetch_slate(today):
             "opp": g["home"] if p["team"] == g["away"] else g["away"],
             "home": p["team"] == g["home"], "gid": g["gid"], "pos": p["pos"],
             "inj": status, "inj_detail": (i or {}).get("type") or "",
+            "hs": heads.get(f"{p['team']}|{nk(p['name'])}"), "logo": p.get("logo") or "",
         })
     slate = {"date": today.isoformat(), "source": "optic",
              "fetched": datetime.now(timezone.utc).isoformat(timespec="seconds"),
@@ -166,6 +168,41 @@ def fetch_slate(today):
     print(f"  slate {today}: {len(games)} games, {len(players)} rostered players, "
           f"{sum(1 for p in players if p['inj'])} on the injury report")
     return slate
+
+
+# ── HEADSHOTS ───────────────────────────────────────────────────────────────
+def espn_headshot_ids(today, teams):
+    """{TEAM|name key: ESPN athlete id} for tonight's teams. ESPN serves small
+    resized headshots by its own id (OpticOdds' player images are 600px,
+    ~250 KB each), so tonight's rosters are matched by team + name once a
+    day and cached in headshots.json. Failure only means no headshot."""
+    cache = load("headshots.json", {})
+    have = set(cache.get("_teams", {}).get(today.isoformat(), []))
+    todo = [t for t in teams if t not in have]
+    if todo:
+        idx = espn_get(f"{ESPN}/teams")
+        ids = {}
+        for sp in idx.get("sports", []):
+            for lg in sp.get("leagues", []):
+                for t in lg.get("teams", []):
+                    tt = t.get("team") or {}
+                    ab = team_abbr(tt.get("abbreviation"))
+                    if ab:
+                        ids[ab] = tt.get("id")
+        done = []
+        for ab in todo:
+            if not ids.get(ab):
+                continue
+            ro = espn_get(f"{ESPN}/teams/{ids[ab]}/roster")
+            for a in ro.get("athletes", []):
+                if a.get("id") and a.get("displayName"):
+                    cache[f"{ab}|{nk(a['displayName'])}"] = str(a["id"])
+            done.append(ab)
+            time.sleep(0.2)
+        cache["_teams"] = {today.isoformat(): sorted(have | set(done))}
+        save("headshots.json", cache)
+        print(f"  headshots: ESPN rosters read for {len(done)} teams")
+    return cache
 
 
 # ── BOX SCORES ──────────────────────────────────────────────────────────────
