@@ -89,8 +89,57 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
 /* gamecenter (MLB .gc-* / .sb-*), NBA bits */
 .gc-hs-img{overflow:hidden}
 .gc-hs-img img{width:100%;height:100%;object-fit:cover;object-position:50% 15%}
-.gc-hs.over .gc-hs-img{box-shadow:inset 0 0 0 2px #61e970,0 0 16px rgba(97,233,112,.45)}
-.gc-hs.over .gc-hs-pct{color:#61e970}
+/* headshot rings judged against the model's LEAN, not just "went over":
+   lean (pregame) purple; pending lilac (Onyx's amber stand-in, no yellow);
+   cashed green; dead red */
+.gc-hs.st-lean .gc-hs-img{box-shadow:inset 0 0 0 2px rgba(176,56,249,.7)}
+.gc-hs.st-pend .gc-hs-img{box-shadow:inset 0 0 0 2px #d795ff,0 0 12px rgba(215,149,255,.35)}
+.gc-hs.st-pend .gc-hs-pct{color:#d795ff}
+.gc-hs.st-win .gc-hs-img{box-shadow:inset 0 0 0 2px #61e970,0 0 16px rgba(97,233,112,.45)}
+.gc-hs.st-win .gc-hs-pct{color:#61e970}
+.gc-hs.st-loss .gc-hs-img{box-shadow:inset 0 0 0 2px #f87171;opacity:.75}
+.gc-hs.st-loss .gc-hs-pct{color:#f87171}
+.gc-hs-lean{font-family:monospace;font-size:9px;font-weight:700;letter-spacing:.04em}
+.lean-o{color:#b038f9}.lean-u{color:#635bff}
+.cell-win{color:#61e970;font-weight:800}.cell-pend{color:#d795ff;font-weight:800}.cell-loss{color:#f87171;font-weight:800}
+.pdr-why{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:6px}
+.pdr-why>div{background:var(--bg3);border:1px solid var(--border2);border-radius:9px;padding:9px 11px;display:flex;flex-direction:column;gap:2px}
+.pdr-why span{font-family:monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3)}
+.pdr-why b{font-size:17px;font-weight:800;color:var(--text)}
+.pdr-why em{font-style:normal;font-size:11px;color:var(--text3)}
+/* model tab */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+#engTeams td:first-child,#engUsage td:first-child{width:auto}
+#engTeams .tlogo{width:18px;height:18px;vertical-align:-4px;margin-right:4px}
+.wblock{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px 18px;margin-top:12px}
+.wtitle{font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px}
+.wbar{display:flex;height:26px;border-radius:7px;overflow:hidden;gap:2px}
+.wseg{display:flex;align-items:center;justify-content:center;min-width:34px;font-family:monospace;font-size:11px;font-weight:800;color:#fff}
+.wleg{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;font-size:11px;color:var(--text3)}
+.wleg i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.wnote{font-size:12px;line-height:1.6;color:var(--text3);margin-top:10px}
+.wrow{display:grid;grid-template-columns:150px 1fr;gap:10px;font-size:12px;line-height:1.6;color:var(--text3);padding:6px 0;border-top:1px solid var(--border)}
+.wrow:first-of-type{border-top:none}.wrow b{color:var(--text)}
+@media (max-width:600px){.wrow{grid-template-columns:1fr;gap:2px}}
+/* live court */
+.court-wrap{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:14px;align-items:start}
+.court-svg{width:100%;height:auto;display:block;background:radial-gradient(ellipse at 50% 10%,rgba(176,56,249,.10),transparent 70%),var(--bg3);border-radius:10px;border:1px solid var(--border2)}
+.court-svg .ln{fill:none;stroke:rgba(255,255,255,.16);stroke-width:.25}
+.court-svg .made{stroke-width:.25}
+.court-svg .miss{fill:none;stroke-width:.35}
+.court-svg .pulse{fill:none;stroke-width:.4;animation:courtPulse 1.6s ease-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes courtPulse{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(3.2)}}
+.poss{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:rgba(176,56,249,.10);border:1px solid rgba(176,56,249,.35);margin-bottom:10px}
+.poss .dot{width:9px;height:9px;border-radius:50%;background:#61e970;box-shadow:0 0 8px #61e970;animation:dotBlink 1.4s ease-in-out infinite}
+.poss .lbl{font-family:monospace;font-size:10px;letter-spacing:.12em;color:var(--text3);text-transform:uppercase}
+.poss .tm{font-weight:800;font-size:14px}
+.poss .clk{margin-left:auto;font-family:monospace;font-size:13px;font-weight:800}
+.lastplay{font-size:13px;line-height:1.5;color:var(--text);padding:10px 12px;border-radius:10px;background:var(--bg3);border:1px solid var(--border2);margin-bottom:10px}
+.lastplay .when{display:block;font-family:monospace;font-size:10px;color:var(--text3);letter-spacing:.06em;margin-bottom:3px}
+.court-legend{display:flex;gap:12px;flex-wrap:wrap;font-size:10px;font-family:monospace;color:var(--text3);margin-top:8px}
+.court-legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;vertical-align:middle}
+.mini-pbp .gc-pbp-row{padding:8px 10px;margin-bottom:6px;cursor:default}
+@media (max-width:760px){.court-wrap{grid-template-columns:1fr}}
 .gc-line td.prj{color:#d795ff}
 .box-team{font-size:12px;font-weight:800;letter-spacing:.06em;margin:4px 0 8px;display:flex;align-items:center;gap:8px}
 .box-cell-hit{color:#61e970;font-weight:800}
@@ -301,20 +350,77 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
 </div></div>
 
 <!-- ═══ MODEL ══════════════════════════════════════════════════ -->
-<div class="pane" id="pane-model"><div class="nba-wrap"><div class="prose">
-  <div class="sec-hdr"><span class="sec-title">How the model works</span><span class="sec-count" id="modelVer"></span></div>
-  <h3>1. Minutes first</h3>
-  <p>Every projection starts with how long a player will be on the floor. Last season's minutes per game act as a prior, and this season's games pull it toward his current role, with extra weight on the last three games. Each team's minutes are then fitted to the 240 available: when a teammate is <b>OUT</b> or <b>Doubtful</b>, his minutes flow to the rest of the rotation, and deep benches are trimmed first when a roster over-counts. Back-to-backs and lopsided spreads shave heavy-minute players.</p>
-  <h3>2. Production per minute</h3>
-  <p>Points, rebounds and assists per minute blend last season (as a 300-minute prior) with what he is doing now, so a hot week moves the number but does not hijack it. Players with no NBA history start from a positional league rate.</p>
-  <h3>3. The game around him</h3>
-  <p>Each team's player points are fitted to the team total implied by the Onyx spread and total. Rebounds and assists scale with game pace and with what the opponent allows, regressed by how many games it has played.</p>
-  <h3>4. Priced against Onyx</h3>
-  <p>Projections become over and under probabilities with a right-skewed distribution (a typical night lands a little under a player's average, a big night pulls the average up). Those are blended with the vig-free Onyx market, which carries most of the weight because it is the sharper single read, and edge is measured against the price you actually get. A pick needs real edge, a sane price, recent form on its side and a player with no injury tag, and it is locked the moment it qualifies. Every pick is graded against the final box score and stays on the Record tab, wins and losses alike.</p>
-  <h3>5. Backtested before it shipped</h3>
-  <p>The model was replayed over the full 2025-26 season one night at a time, seeing only what was known before tip: <b>26,352 player-games</b> and <b>17,668 real Onyx prop lines</b>. Settings were tuned on October through January and judged only on February through April. On those unseen games it beat every simple baseline (points miss 5.15 vs 5.48 for the season average), its probabilities matched reality (it claimed 54.2% on its picks and they hit 54.0%), and the picks lane went 74-63 at Onyx opening prices. That is a small sample, so the live Record tab is the scoreboard that counts.</p>
-  <p class="dim" style="margin-top:22px;font-size:13px">Projections are estimates, not guarantees. Bet responsibly.</p>
-</div></div></div>
+<div class="pane" id="pane-model">
+  <div class="home-hero" style="padding:48px 40px 44px">
+    <div class="home-hero-inner">
+      <div class="home-hero-eyebrow">The Engine</div>
+      <h1 class="home-hero-title" style="font-size:clamp(28px,4vw,46px)"><span class="line1">How Onyx projects</span><span class="line2">every stat line.</span></h1>
+      <p class="home-hero-sub" style="font-size:14px">Every factor that moves a projection, how much weight it carries, what the backtest said about it, and tonight's live inputs. <span id="modelVer" class="mono"></span></p>
+    </div>
+  </div>
+  <div class="home-body">
+    <div class="home-section">
+      <div class="home-section-tag">The Origin</div>
+      <h2 class="home-section-title">Why the NBA model starts with minutes</h2>
+      <div class="home-section-body">
+        <p>Baseball props live and die on one plate appearance. Basketball props are different: a player's points, rebounds and assists are mostly a function of <b>how long he is on the floor</b>, <b>how much of the offense runs through him while he is there</b>, and <b>how many possessions the game has</b>. Get those three right and the stat line follows.</p>
+        <p>So the model is built as a chain: <b>minutes &times; production per minute &times; the game environment</b>, then turned into an over or under probability and checked against the Onyx line. Every link was replayed over the full 2025-26 season, one night at a time, before it was allowed to ship.</p>
+      </div>
+    </div>
+
+    <div class="home-section">
+      <div class="home-section-tag">The Weights</div>
+      <h2 class="home-section-title">Where a projection's weight comes from</h2>
+      <div class="home-section-body"><p>These bars read straight from the live model, so they always match what is running tonight.</p></div>
+      <div id="engWeights"></div>
+    </div>
+
+    <div class="home-section">
+      <div class="home-section-tag">The Model</div>
+      <h2 class="home-section-title">What goes into every projection</h2>
+      <div class="factor-grid" id="engFactors"></div>
+    </div>
+
+    <div class="home-section">
+      <div class="home-section-tag">Pace &amp; Possessions</div>
+      <h2 class="home-section-title">Tonight's game environment</h2>
+      <div class="home-section-body"><p>Possessions per game, offense and defense per 100 possessions, and net rating for every team on the slate. <b>Game poss</b> is what the model expects tonight: a fast team facing a slow one lands in between (team pace &times; opponent pace &divide; league pace). Ratings are regressed toward league average until a team has played about ten games, so early-season numbers stay sane.</p></div>
+      <div class="tbl-wrap"><table class="spec-table" id="engTeams"></table></div>
+    </div>
+
+    <div class="home-section">
+      <div class="home-section-tag">Usage &amp; Utilization</div>
+      <h2 class="home-section-title">Who the offense runs through tonight</h2>
+      <div class="home-section-body"><p><b>Usage rate</b> is the share of his team's plays a player finishes while he is on the floor: shots, trips to the line and turnovers (FGA + 0.44 FTA + TOV per minute, scaled to a 48-minute team game). <b>Utilization</b> is his projected share of the game's minutes. <b>+/-</b> is his season average on-court point differential, a read on how well his lineups are playing.</p></div>
+      <div class="tbl-wrap"><table class="spec-table" id="engUsage"></table></div>
+    </div>
+
+    <div class="home-section">
+      <div class="home-section-tag">The Evidence</div>
+      <h2 class="home-section-title">Backtested before it shipped</h2>
+      <div class="home-section-body" id="engEvidence"></div>
+    </div>
+
+    <div class="home-section">
+      <div class="home-section-tag">Build History</div>
+      <h2 class="home-section-title">How the model has evolved</h2>
+      <div class="timeline" id="engTimeline"></div>
+    </div>
+
+    <div class="home-section">
+      <div class="home-section-tag">On the Roadmap</div>
+      <h2 class="home-section-title">What we are building next</h2>
+      <div class="factor-grid" id="engRoadmap"></div>
+    </div>
+
+    <div class="home-section">
+      <div class="home-section-tag">Specification</div>
+      <h2 class="home-section-title">Every live setting</h2>
+      <div class="tbl-wrap"><table class="spec-table" id="engSpec"></table></div>
+      <p class="dim" style="margin-top:22px;font-size:13px">Projections are estimates, not guarantees. Bet responsibly.</p>
+    </div>
+  </div>
+</div>
 
 <div class="pdr-bg" id="pdrBg" onclick="closePlayer()"></div>
 <aside class="pdr" id="pdr"></aside>
@@ -641,7 +747,7 @@ function renderBoard() {
       case 'line': return pr ? pr.line : -1;
       case 'diff': return pr ? p.proj[s] - pr.line : -99;
       case 'prob': return pr ? pr.prob : -1;
-      default: return pr ? pr.edge : -9;
+      default: return pr && !pr.role_flag ? pr.edge : -9;
     }
   };
   rows.sort((a, b) => { const x = val(a), y = val(b); return (x > y ? 1 : x < y ? -1 : 0) * boardSort.dir; });
@@ -658,7 +764,7 @@ function renderBoard() {
       <td class="r mono">${pr ? pr.line : '-'}</td>
       <td class="r mono hm ${diff > 0 ? 'edge-pos' : ''}">${diff == null ? '-' : (diff > 0 ? '+' : '') + diff.toFixed(1)}</td>
       <td class="r mono hm">${pr ? (pr.side === 'over' ? 'O ' : 'U ') + pct(pr.prob, 0) : '-'}</td>
-      <td class="r mono hm ${pr && pr.edge > 0 ? 'edge-pos' : 'edge-neg'}">${pr ? pp(pr.edge) : '-'}</td>
+      <td class="r mono hm ${pr && pr.edge > 0 && !pr.role_flag ? 'edge-pos' : 'edge-neg'}">${!pr ? '-' : pr.role_flag ? `<span class="tagx p" title="Projection and line are ${pr.gap} SD apart: the market knows something about this player's role that box scores do not. No edge is claimed.">role check</span>` : pp(pr.edge)}</td>
       <td class="r">${legChip(propLeg(p, s, 'over'), 'over')}</td>
       <td class="r">${legChip(propLeg(p, s, 'under'), 'under')}</td>
       <td class="r mono dim hm">${esc(last5(p, s)) || '-'}</td>
@@ -784,22 +890,25 @@ function renderGames() {
   // points watch: headshots, projected points pregame, live points (vs the line) once tipped
   const roster = (D.players || []).filter(p => p.gid === g.gid && !p.out && p.min >= 12).sort((x, y) => y.proj.pts - x.proj.pts).slice(0, 12);
   const cells = roster.map(p => {
-    const pr = (p.props || {}).pts, b = liveLine(p, box);
-    const over = b && pr && b.pts > pr.line;
+    const b = liveLine(p, box);
+    const st = leanStatus(p, 'pts', b ? b.pts : null, g);
     const top = b ? `${b.pts} PTS` : num(p.proj.pts);
-    const sub = pr ? (b ? `line ${pr.line}` : `${fmtOdds((pr.all.over || {}).price)} o${pr.line}`) : '';
-    return `<div class="gc-hs${over ? ' over' : ''}" onclick="openPlayer('${esc(p.pid)}')">
+    const mark = st && st.cls === 'st-win' ? '✓ ' : st && st.cls === 'st-loss' ? '✗ ' : '';
+    return `<div class="gc-hs ${st ? st.cls : ''}" onclick="openPlayer('${esc(p.pid)}')">
       <div class="gc-hs-img">${hsUrl(p) ? `<img loading="lazy" src="${esc(hsUrl(p))}" alt="" data-alt="${esc(p.img || '')}" onerror="if(this.dataset.alt&&this.src!==this.dataset.alt){this.src=this.dataset.alt;this.dataset.alt=''}else{this.remove()}">` : ''}</div>
-      <div class="gc-hs-pct">${over ? '✓ ' : ''}${esc(top)}</div>
+      <div class="gc-hs-pct">${mark}${esc(top)}</div>
       <div class="gc-hs-name">${esc(String(p.name).split(' ').slice(-1)[0])}</div>
-      ${sub ? `<div class="gc-hs-odds">${esc(sub)}</div>` : ''}</div>`;
+      ${st ? `<div class="gc-hs-lean ${st.side === 'over' ? 'lean-o' : 'lean-u'}">${esc(st.label)}</div>` : ''}</div>`;
   }).join('');
-  const watch = `<div class="gc-card" style="padding-bottom:8px"><div class="gc-card-title">Points watch · ${started(g) ? 'live points vs the Onyx line' : 'projected points'} · tap a player to see the case & bet it</div>
+  const watch = `<div class="gc-card" style="padding-bottom:8px"><div class="gc-card-title">Points watch · ${started(g) ? 'live points vs the model\'s lean' : 'projected points and the model\'s lean'} · tap a player to see the case & bet it</div>
     <div class="gc-hs-row">${cells || '<div class="dim">No projections for this game.</div>'}</div></div>`;
 
   const sub = `<div class="gc-subnav"><button class="${gcView === 'overview' ? 'on' : ''}" onclick="gcView='overview';rerender()">Overview</button>
+    <button class="${gcView === 'pbp' ? 'on' : ''}" onclick="gcView='pbp';rerender()">Play By Play</button>
     <button class="${gcView === 'box' ? 'on' : ''}" onclick="gcView='box';rerender()">Box Score</button></div>`;
-  body.innerHTML = header + betbar + watch + sub + (gcView === 'box' ? boxView(g, box) : overview(g, sum));
+  const court = started(g) ? liveCourt(g, sum) : '';
+  body.innerHTML = header + court + betbar + watch + sub
+    + (gcView === 'box' ? boxView(g, box) : gcView === 'pbp' ? pbpView(g, sum) : overview(g, sum));
   if (started(g) && !sum) loadSummary(g);
 }
 function overview(g, sum) {
@@ -833,9 +942,10 @@ function overview(g, sum) {
   html += `<div class="gc-card"><div class="gc-card-title">Matchup</div><div class="gc-matchup">
     ${[g.away, g.home].map(ab => { const t = top(ab); const imp = ab === g.home ? g.home_implied : g.away_implied;
       return `<div><div class="gc-mu-role">${esc(ab)} · implied ${imp != null ? num(imp) : '-'}</div><div class="gc-mu-name">${t ? esc(t.name) : '-'}</div>
-        <div class="gc-mu-line">${t ? `${num(t.proj.pts)} pts · ${num(t.proj.reb)} reb · ${num(t.proj.ast)} ast` : ''}</div></div>`; }).join('')}
+        <div class="gc-mu-line">${t ? `${num(t.proj.pts)} pts · ${num(t.proj.reb)} reb · ${num(t.proj.ast)} ast` : ''}</div>
+        ${(() => { const e = ((D.engine || {}).teams || []).find(x => x.team === ab); return e ? `<div class="gc-mu-line dim">pace ${num(e.pace)} poss · net ${e.net > 0 ? '+' : ''}${num(e.net)} · ORtg ${num(e.ortg)} / DRtg ${num(e.drtg)}</div>` : ''; })()}</div>`; }).join('')}
     <div class="gc-count">${g.spread != null ? 'spread ' + esc(g.home) + ' ' + (g.spread > 0 ? '+' : '') + g.spread : ''}</div>
-    <div class="gc-count">${g.total != null ? 'total ' + g.total : ''}</div></div></div>`;
+    <div class="gc-count">${g.total != null ? 'total ' + g.total : ''}${(() => { const e = ((D.engine || {}).teams || []).find(x => x.team === g.home); return e ? ' · ' + num(e.game_poss) + ' expected possessions' : ''; })()}</div></div></div>`;
   if (!html && !started(g)) html = '<div class="gc-empty">Live line score and win probability appear at tip.</div>';
   return html;
 }
@@ -846,8 +956,9 @@ function boxView(g, box) {
     const cell = (p, b, s) => {
       const pr = (p.props || {})[s];
       const v = b ? b[s] : null;
-      const hit = pr && v != null && v > pr.line;
-      return `<td class="${hit ? 'box-cell-hit' : ''}">${v != null ? v : '-'}<div class="prop-trk">${num(p.proj[s])}${pr ? ' / ' + pr.line : ''}</div></td>`;
+      const st = leanStatus(p, s, v, g);
+      const cls = st && v != null ? {'st-win': 'cell-win', 'st-pend': 'cell-pend', 'st-loss': 'cell-loss'}[st.cls] || '' : '';
+      return `<td class="${cls}">${v != null ? v : '-'}<div class="prop-trk">${num(p.proj[s])}${pr ? ' · ' + (pr.side === 'over' ? 'O' : 'U') + ' ' + pr.line : ''}</div></td>`;
     };
     return `<div class="gc-card"><div class="box-team">${logo(ab)} ${esc(TEAM_NICK[ab] || ab)}</div>
       <table class="gc-line"><thead><tr><th>Player</th><th>MIN</th><th>PTS</th><th>REB</th><th>AST</th></tr></thead><tbody>
@@ -856,14 +967,127 @@ function boxView(g, box) {
           <td>${b ? b.min : '-'}<div class="prop-trk">${num(p.min, 0)}</div></td>${cell(p, b, 'pts')}${cell(p, b, 'reb')}${cell(p, b, 'ast')}</tr>`; }).join('')}
       </tbody></table></div>`;
   };
-  return `<div class="dim" style="font-size:11px;margin:-4px 0 10px">Live stat on top; projection / Onyx line underneath. Green = over the line.</div>` + team(g.away) + team(g.home);
+  return `<div class="dim" style="font-size:11px;margin:-4px 0 10px">Live stat on top; projection and the model's lean on the Onyx line underneath. Green = the lean has cashed (an over once it clears, an under at the final buzzer), lilac = on track, red = dead.</div>` + team(g.away) + team(g.home);
 }
+var _sumTimer = null;
 function loadSummary(g) {
   const lv = LIVE[g.gid];
   if (!lv || !lv.eid || location.protocol === 'file:') return;
+  clearTimeout(_sumTimer);
   fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/summary?event=' + lv.eid)
-    .then(r => r.json()).then(j => { SUMMARY[g.gid] = j; if (currentTab === 'games' && gcSel === g.gid) rerender(); })
+    .then(r => r.json()).then(j => {
+      SUMMARY[g.gid] = j;
+      if (currentTab === 'games' && gcSel === g.gid) rerender();
+      // the open live game refreshes every 8s: play-by-play, court, box
+      if (g.state === 'live' && currentTab === 'games' && gcSel === g.gid)
+        _sumTimer = setTimeout(() => { const x = gameOf(g.gid); if (x) loadSummary(x); }, 8000);
+    })
     .catch(() => {});
+}
+
+// The model's lean on a prop and where it stands. Over: green the moment it
+// clears the line. Under: on track (lilac) until the final buzzer, green if
+// it held, red the moment it goes over. Pregame: just the lean.
+function leanStatus(p, s, v, g) {
+  const pr = (p.props || {})[s];
+  if (!pr) return null;
+  const side = pr.side, line = pr.line;
+  const label = (side === 'over' ? 'O ' : 'U ') + line;
+  if (v == null || !started(g)) return {cls: 'st-lean', side, label};
+  const fin = g.state === 'post';
+  if (side === 'over') {
+    if (v > line) return {cls: 'st-win', side, label};
+    return {cls: fin ? 'st-loss' : 'st-pend', side, label};
+  }
+  if (v > line) return {cls: 'st-loss', side, label};
+  return {cls: fin ? 'st-win' : 'st-pend', side, label};
+}
+
+// ── live court: shot chart, possession, last play (ESPN play-by-play) ──
+function playsOf(sum) { return ((sum && sum.plays) || []).slice().sort((a, b) => (+a.sequenceNumber || 0) - (+b.sequenceNumber || 0)); }
+function teamOfPlay(pl, g) { const lv = LIVE[g.gid] || {}; return pl.team && lv.ids ? lv.ids[String(pl.team.id)] : null; }
+// ESPN does not publish NBA possession; read it off the last decisive play
+function possession(g, plays) {
+  const other = t => t === g.home ? g.away : t === g.away ? g.home : null;
+  for (let i = plays.length - 1; i >= 0 && i >= plays.length - 12; i--) {
+    const pl = plays[i], t = teamOfPlay(pl, g), ty = String((pl.type || {}).text || '').toLowerCase();
+    const txt = String(pl.text || '').toLowerCase();
+    if (/end (of )?(game|period|quarter|half)/.test(txt) || ty.includes('end ')) return {team: null, why: 'Between periods'};
+    if (!t) continue;
+    if (ty.includes('defensive rebound') || ty.includes('offensive rebound') || ty === 'rebound') return {team: t, why: 'Rebound'};
+    if (ty.includes('turnover')) return {team: other(t), why: 'Turnover'};
+    if (ty.includes('free throw')) {
+      const m = ty.match(/(\d) of (\d)/);
+      if (m && m[1] === m[2]) return pl.scoringPlay ? {team: other(t), why: 'Free throw made'} : {team: null, why: 'Free throw missed, rebound'};
+      return {team: t, why: 'At the line'};
+    }
+    if (pl.shootingPlay) return pl.scoringPlay ? {team: other(t), why: 'Made basket'} : {team: null, why: 'Shot missed, ball loose'};
+    if (ty.includes('offensive foul')) return {team: other(t), why: 'Offensive foul'};
+    if (ty.includes('foul')) return {team: other(t), why: 'Foul'};
+    if (ty.includes('jump ball')) continue;
+  }
+  return {team: null, why: ''};
+}
+function courtSvg(g, plays) {
+  // ESPN shot coordinates: x 0-50 ft sideline to sideline, y feet from the baseline
+  const shots = plays.filter(p => p.shootingPlay && p.coordinate && p.coordinate.x >= 0 && p.coordinate.x <= 50
+                               && p.coordinate.y >= 0 && p.coordinate.y <= 47 && !/free throw/i.test((p.type || {}).text || ''));
+  const col = t => t === g.home ? '#b038f9' : '#635bff';
+  const last = shots[shots.length - 1];
+  const marks = shots.map((p, i) => {
+    const t = teamOfPlay(p, g), x = p.coordinate.x, y = p.coordinate.y;
+    const op = i >= shots.length - 10 ? 1 : .45;
+    return p.scoringPlay ? `<circle class="made" cx="${x}" cy="${y}" r=".75" fill="${col(t)}" stroke="#0c0c0c" opacity="${op}"/>`
+                         : `<circle class="miss" cx="${x}" cy="${y}" r=".65" stroke="${col(t)}" opacity="${op * .85}"/>`;
+  }).join('');
+  const pulse = last ? `<circle class="pulse" cx="${last.coordinate.x}" cy="${last.coordinate.y}" r="1" stroke="${col(teamOfPlay(last, g))}"/>` : '';
+  return `<svg class="court-svg" viewBox="-1 -1 52 37" aria-label="Live shot chart">
+    <rect class="ln" x="0" y="0" width="50" height="35"/>
+    <rect class="ln" x="17" y="0" width="16" height="19"/><rect class="ln" x="19" y="0" width="12" height="19"/>
+    <circle class="ln" cx="25" cy="19" r="6"/>
+    <path class="ln" d="M3 0 V14 A23.75 23.75 0 0 0 47 14 V0"/>
+    <path class="ln" d="M21 5.25 A4 4 0 0 0 29 5.25"/>
+    <line class="ln" x1="22" y1="4" x2="28" y2="4" style="stroke:rgba(255,255,255,.35)"/>
+    <circle cx="25" cy="5.25" r=".75" fill="none" stroke="#d795ff" stroke-width=".3"/>
+    ${marks}${pulse}</svg>`;
+}
+function liveCourt(g, sum) {
+  const plays = playsOf(sum);
+  if (!plays.length) return `<div class="gc-card"><div class="gc-card-title">Live court</div><div class="dim" style="font-size:12px">Waiting for the play-by-play feed...</div></div>`;
+  const last = plays[plays.length - 1];
+  const pos = g.state === 'live' ? possession(g, plays) : {team: null, why: 'Final'};
+  const clock = `${(last.period || {}).displayValue || ''} · ${(last.clock || {}).displayValue || ''}`;
+  const recent = plays.filter(p => p.text).slice(-6).reverse();
+  return `<div class="gc-card"><div class="gc-card-title">Live court · ball tracking from the play-by-play${g.state === 'live' ? ' · refreshes every 8s' : ''}</div>
+    <div class="court-wrap"><div>${courtSvg(g, plays)}
+      <div class="court-legend"><span><i style="background:#635bff"></i>${esc(g.away)} made</span><span><i style="border:1px solid #635bff"></i>${esc(g.away)} miss</span>
+        <span><i style="background:#b038f9"></i>${esc(g.home)} made</span><span><i style="border:1px solid #b038f9"></i>${esc(g.home)} miss</span><span>latest shot pulses</span></div></div>
+    <div>
+      <div class="poss">${g.state === 'live' ? '<span class="dot"></span>' : ''}
+        <div><div class="lbl">${g.state === 'live' ? 'Possession' : 'Game over'}</div>
+          <div class="tm">${pos.team ? logo(pos.team) + ' ' + esc(TEAM_NICK[pos.team] || pos.team) : esc(pos.why || '-')}</div>
+          ${pos.team && pos.why ? `<div class="dim" style="font-size:11px">${esc(pos.why)}</div>` : ''}</div>
+        <div class="clk">${esc(clock)}</div></div>
+      <div class="lastplay"><span class="when">LAST PLAY · ${esc(clock)} · ${esc(g.away)} ${last.awayScore ?? ''} - ${esc(g.home)} ${last.homeScore ?? ''}</span>${esc(last.text || '')}</div>
+      <div class="mini-pbp">${recent.slice(1).map(p => pbpRow(g, p)).join('')}</div>
+    </div></div></div>`;
+}
+function pbpRow(g, p) {
+  const t = teamOfPlay(p, g);
+  return `<div class="gc-pbp-row${p.scoringPlay ? ' scoring' : ''}"><span class="sc">${p.awayScore ?? ''}-${p.homeScore ?? ''}</span>
+    <div class="ev">${t ? esc(t) + ' · ' : ''}${esc((p.period || {}).number ? 'Q' + p.period.number : '')} ${esc((p.clock || {}).displayValue || '')}</div>
+    <div style="font-size:12px;color:var(--text2);margin-top:3px">${esc(p.text || '')}</div></div>`;
+}
+function pbpView(g, sum) {
+  const plays = playsOf(sum).filter(p => p.text);
+  if (!plays.length) return `<div class="gc-empty">${started(g) ? 'Loading play-by-play...' : 'Play-by-play starts at tip.'}</div>`;
+  let html = '', cur = null;
+  plays.slice().reverse().slice(0, 150).forEach(p => {
+    const per = (p.period || {}).displayValue || '';
+    if (per !== cur) { cur = per; html += `<div class="gc-pbp-inn">${esc(per)}</div>`; }
+    html += pbpRow(g, p);
+  });
+  return html;
 }
 
 // ── record ─────────────────────────────────────────────────────────
@@ -919,6 +1143,15 @@ function openPlayer(pid) {
       <span>season <b>${p.season ? num(p.season.pts) + ' / ' + num(p.season.reb) + ' / ' + num(p.season.ast) : '-'}</b></span>
       <span>last season <b>${p.last_season ? num(p.last_season.pts) + ' / ' + num(p.last_season.reb) + ' / ' + num(p.last_season.ast) : '-'}</b></span>
       ${p.b2b ? '<span class="tagx n">back-to-back</span>' : ''}</div>
+    <div class="sec-hdr"><span class="sec-title">Why this number</span></div>
+    <div class="pdr-why">
+      <div><span>Usage rate</span><b>${p.usg != null ? num(p.usg) + '%' : '-'}</b><em>share of team plays he finishes</em></div>
+      <div><span>Utilization</span><b>${p.util != null ? num(p.util) + '%' : '-'}</b><em>of the game's minutes${p.season && p.season.gp ? ` · started ${p.season.starts} of ${p.season.gp}` : ''}</em></div>
+      <div><span>Plus-minus</span><b>${p.season && p.season.pm != null ? (p.season.pm > 0 ? '+' : '') + num(p.season.pm) : '-'}</b><em>per game, his lineups</em></div>
+      <div><span>Game pace</span><b>${p.game_poss != null ? num(p.game_poss) : '-'}</b><em>expected poss · ${esc(p.team)} ${num(p.team_pace)}, ${esc(p.opp)} ${num(p.opp_pace)}</em></div>
+      <div><span>Net rating</span><b>${p.team_net != null ? (p.team_net > 0 ? '+' : '') + num(p.team_net) : '-'}</b><em>${esc(p.team)} per 100 · ${esc(p.opp)} ${p.opp_net != null ? (p.opp_net > 0 ? '+' : '') + num(p.opp_net) : '-'}</em></div>
+      <div><span>Team total</span><b>${p.team_implied != null ? num(p.team_implied) : '-'}</b><em>implied by Onyx${p.margin != null ? ` · margin ${p.margin > 0 ? '+' : ''}${num(p.margin)}` : ''}</em></div>
+    </div>
     <div class="sec-hdr"><span class="sec-title">Last 5</span></div>
     <div class="tbl"><table style="min-width:0"><thead><tr><th>Date</th><th>Opp</th><th class="r">Min</th><th class="r">Pts</th><th class="r">Reb</th><th class="r">Ast</th></tr></thead>
     <tbody>${l5 || '<tr><td colspan="6" class="dim">No games this season yet.</td></tr>'}</tbody></table></div>`;
@@ -932,9 +1165,147 @@ function closePlayer() {
 
 // ── tabs ───────────────────────────────────────────────────────────
 var currentTab = 'home';
-var RENDER = {home: renderHome, games: renderGames, board: renderBoard, scorers: renderScorers, record: renderRecord, model: function () {
-  document.getElementById('modelVer').textContent = 'model ' + (D.model_version || '');
-}};
+var RENDER = {home: renderHome, games: renderGames, board: renderBoard, scorers: renderScorers, record: renderRecord, model: renderModel};
+
+// ── Model tab: reads the live weights from D.engine (nba_build.engine_card) ──
+// Evidence and history are the lab notebook (nba_model.py CHANGELOG) in plain
+// language. Update both together.
+var ENGINE_NOTES = {
+  evidence: {
+    intro: 'The model was replayed over the full 2025-26 season one night at a time, seeing only what was known before tip: <b>26,352 player-games</b> and <b>17,668 real Onyx prop lines</b> (opening and closing). Settings were chosen on October through January and judged only on February through April, months the tuner never saw. Error is the average miss in stat units for players projected 20+ minutes; lower is better.',
+    rows: [
+      ['Onyx model', '<b>5.15</b>', '<b>1.99</b>', '<b>1.57</b>'],
+      ['Season average so far', '5.48', '2.05', '1.63'],
+      ['Last 10 games', '5.38', '2.07', '1.63'],
+      ['Last season average', '6.23', '2.22', '1.78'],
+      ['Nights a teammate was out', '5.12', '2.00', '1.55'],
+    ],
+    after: [
+      'Against the market: on 12,821 closing Onyx lines the line itself missed by 3.05 on average and the projection by 3.12. The market is sharper on its own, which is why it carries 80% of the probability. Blended, the two beat either alone (log loss 0.6893 vs 0.6898 market, 0.7179 model).',
+      'Calibration is the honest test: in the test months the picks lane claimed a 54.2% hit rate and hit 54.0%, going 74-63 at opening prices. That sample is too small to call profit proven, and we say so.',
+      'Not everything we tried made the cut, and that is the point. A full retune with usage, utilization, pace and plus-minus added scored better on the training months and worse on the test months, the textbook sign of overfitting. Tested one at a time, usage redistribution made projections worse in both windows (the minutes fit already hands an injured player\'s minutes to his teammates), and the starter pull and pace mix moved the error by less than a hundredth. So they are tracked and shown on every player, and the weights stay where the evidence put them.',
+      'The role check did earn its place: when projection and line sit more than 1.5 standard deviations apart, the model\'s side won only 47 to 50%. Taking those props out improved the picks lane in both windows (test months at opening prices 74-63 to 75-60, return +5.6% to +8.4%).',
+    ],
+  },
+  history: [
+    ['Oct 25 · current', 'v3: role check, plus usage, utilization, pace and net rating on every player', 'Usage rate, utilization, plus-minus, possessions and offense / defense / net ratings are now tracked for every player and team and shown on the board, the gamecenter and this page. Each was backtested as a weight; none beat v2 on the held-out months, so the projection weights did not change. The role check takes props where projection and line disagree by more than 1.5 standard deviations out of the picks lane (the model\'s side won 47 to 50% there). Live gamecenter with shot chart and possession.'],
+    ['Oct 24', 'v2: backtested', 'Full-season walk-forward replay against real Onyx lines. Negative binomial replaced the normal curve (it was 5 to 9 points too high on overs), the market blend moved to 20/80, and the picks lane was rebuilt after v1 went 131-128 in the replay.'],
+    ['Oct 24', 'v1: launch', 'Minutes &times; per-minute rate &times; environment, priced against Onyx lines from OpticOdds with ESPN as backup.'],
+  ],
+  roadmap: [
+    ['eye', 'Lineup-aware minutes', 'Starting lineups post about 30 minutes before tip. Reading them would catch role changes the box scores have not shown yet, the main source of role-check props.', 'Next', 'blue'],
+    ['bolt', 'On/off usage', 'Measure how each player\'s usage actually moves when a specific teammate sits, instead of sharing the missing usage by formula. Needs a season of lineup data.', 'Planned', 'gold'],
+    ['pm', 'Plus-minus, this season', 'Tested on the 2025-26 replay as a minutes signal: no gain on the held-out months, and the picks got worse. It gets re-tested on this season\'s data once a few weeks of it accumulate, since coaches\' rotations change year to year.', 'Re-test', 'purple'],
+    ['scale', 'Live calibration', 'Graded picks feed a per-bucket calibration check, the same way the MLB model tunes its blend.', 'Planned', 'gold'],
+  ],
+};
+var ENGINE_ICON = {
+  clock: '<circle cx="8" cy="8" r="5.5"/><path d="M8 5v3l2 1.5"/>',
+  ball: '<circle cx="8" cy="8" r="5.5"/><path d="M2.5 8h11M8 2.5v11M4 4c2 2 2 6 0 8M12 4c-2 2-2 6 0 8"/>',
+  bolt: '<path d="M9 1.5L3.5 9H8l-1 5.5L12.5 7H8z"/>',
+  pace: '<path d="M2 12a6 6 0 0 1 12 0"/><path d="M8 12l3-4"/>',
+  shield: '<path d="M8 1.5l5 2v4c0 3.5-2.5 5.8-5 7-2.5-1.2-5-3.5-5-7v-4z"/>',
+  chart: '<path d="M2 13h12M4 10l3-3 2 2 4-5"/>',
+  pm: '<path d="M4 6h4M6 4v4M9 11h4"/><rect x="1.5" y="1.5" width="13" height="13" rx="2"/>',
+  bed: '<path d="M2 12V5M2 9h12v3M5 9V7h4a2 2 0 0 1 2 2"/>',
+  cross: '<path d="M6 2h4v4h4v4h-4v4H6v-4H2V6h4z"/>',
+  scale: '<path d="M8 2v12M3 14h10M3 5h10M3 5l-1.5 4h3zM13 5l-1.5 4h3z"/>',
+  bell: '<path d="M2 13c2 0 3-10 6-10s4 10 6 10"/>',
+  eye: '<path d="M1.5 8s2.5-4.5 6.5-4.5S14.5 8 14.5 8 12 12.5 8 12.5 1.5 8 1.5 8z"/><circle cx="8" cy="8" r="2"/>',
+};
+function factorCard(icon, title, desc, tag, tone) {
+  return `<div class="factor-card"><div class="factor-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">${ENGINE_ICON[icon] || ''}</svg></div>
+    <div class="factor-title">${title}</div><div class="factor-desc">${desc}</div><span class="factor-tag ${tone || ''}">${tag}</span></div>`;
+}
+function wbar(parts) {
+  return `<div class="wbar">${parts.map(([lab, v, c]) => `<div class="wseg" style="flex:${v};background:${c}" title="${esc(lab)} ${Math.round(v)}%"><span>${Math.round(v)}%</span></div>`).join('')}</div>
+    <div class="wleg">${parts.map(([lab, v, c]) => `<span><i style="background:${c}"></i>${esc(lab)}</span>`).join('')}</div>`;
+}
+function renderModel() {
+  const E = D.engine || {}, P = E.P || {}, L = E.lane || {};
+  document.getElementById('modelVer').textContent = 'Live model ' + (E.version || D.model_version || '');
+  const pctv = x => Math.round(x * 100);
+  const C1 = '#b038f9', C2 = '#635bff', C3 = '#d795ff', C4 = '#3a3a4a';
+  // minutes: a 10-game sample, what share each source carries
+  const k = E.prior_games || 2, n = 10, recent = P.min_recent_w || 0;
+  const priorShare = (1 - recent) * k / (k + n), seasonShare = (1 - recent) * n / (k + n);
+  // rates: a 10-game, 320-minute sample vs the 300-minute prior
+  const rp = E.rate_prior || 300, cur = 320;
+  const w = E.w == null ? 0.2 : E.w;
+  document.getElementById('engWeights').innerHTML = `
+    <div class="wblock"><div class="wtitle">1 · Minutes <span class="dim">(a player 10 games into the season)</span></div>
+      ${wbar([['Last season MPG', priorShare * 100, C4], ['This season', seasonShare * 100, C2], ['Last ' + (P.min_recent_n || 3) + ' games', recent * 100, C1]])}
+      <div class="wnote">Then: ${P.start_w ? `starters' minutes pull ${pctv(P.start_w)}% of the way to their starting role once they start 2 of the last 3, ` : ''}the team is fitted to exactly 240 minutes (an injured teammate's minutes go to who is left), back-to-backs trim ${pctv(1 - (P.b2b_mult || 1))}% for 30+ minute players, and big spreads trim stars for blowouts.</div></div>
+    <div class="wblock"><div class="wtitle">2 · Production per minute <span class="dim">(after ~${cur} minutes this season)</span></div>
+      ${wbar([['Last season rate', rp / (rp + cur) * 100, C4], ['This season rate', cur / (rp + cur) * 100, C2]])}
+      <div class="wnote">The last five games then nudge the rate ${pctv(P.l5_nudge || 0)}% of the way toward recent form, capped at &plusmn;${pctv(P.l5_cap || 0)}%. Rookies start from a positional league rate.</div></div>
+    <div class="wblock"><div class="wtitle">3 · Game environment</div>
+      <div class="wrow"><b>Points</b><span>each team's player points are fitted to its implied team total from the Onyx spread and total, at strength ${P.pts_fit_exp} (1.0 = exactly to the total); home &plusmn;${pctv(P.home_pts || 0)}%</span></div>
+      <div class="wrow"><b>Rebounds, assists</b><span>(game pace &divide; league)<sup>${P.pace_exp}</sup> &times; (opponent allowed &divide; league)<sup>${P.opp_exp}</sup>, held to &plusmn;12%</span></div>
+      <div class="wrow"><b>Final scale</b><span>pts &times;${P.scale_pts} · reb &times;${P.scale_reb} · ast &times;${P.scale_ast} (bias correction the backtest asked for)</span></div></div>
+    <div class="wblock"><div class="wtitle">4 · Probability vs the Onyx line</div>
+      ${wbar([['Onyx market (no vig)', (1 - w) * 100, C4], ['Onyx model', w * 100, C1]])}
+      <div class="wnote">The market is the sharper single read (its line misses by less than any model we tested), so it carries most of the weight and the model moves the number where it sees something. Edge is measured against the price you actually get.</div></div>`;
+
+  const f = [
+    ['clock', 'Minutes', `The foundation. Last season's minutes per game count as ${k} games of evidence, this season's games pull toward the current role, and the last ${P.min_recent_n} games carry ${pctv(recent)}% on top. DNPs count as zero.`, 'Foundation', ''],
+    ['eye', 'Utilization', `Projected share of the game's 48 minutes. A new starter shows up in the starting lineup before he shows up in a season average, so ${P.start_w ? `2 starts in the last 3 pull his minutes ${pctv(P.start_w)}% toward his minutes as a starter.` : 'we tested pulling minutes toward a starter role after 2 starts in 3: on the held-out months it was a wash, because the last-3-games minutes weight already catches it. Shown on every player, not double counted.'}`, P.start_w ? 'Live' : 'Tested', ''],
+    ['bolt', 'Usage rate', `Share of team plays a player finishes on the floor (FGA + 0.44 FTA + TOV). Tracked for every player and shown on the board. When a teammate is out, the minutes fit already hands his minutes to the rotation; adding a usage bump on top ${P.usg_alpha ? 'is applied at strength ' + P.usg_alpha : 'double counted it and made projections worse in the backtest, so it is measured but not applied'}.`, P.usg_alpha ? 'Live' : 'Tested', 'blue'],
+    ['ball', 'Per-minute production', `Points, rebounds and assists per minute: last season as a ${rp}-minute prior blended with this season, so a hot week moves the number without hijacking it. Last-five-games form nudges ${pctv(P.l5_nudge || 0)}%, capped at ${pctv(P.l5_cap || 0)}%.`, 'Foundation', ''],
+    ['pace', 'Pace and possessions', `Every possession is another chance at a stat. Expected game possessions = team pace &times; opponent pace &divide; league pace, so a run-and-gun team facing a grinder lands in between. Rebounds and assists scale with it at exponent ${P.pace_exp}.`, 'Environment', 'purple'],
+    ['shield', 'Opponent defense', `What the opponent allows in rebounds and assists versus the league, regressed by games played and applied at exponent ${P.opp_exp}. Points use the team total instead (below).`, 'Matchup', 'purple'],
+    ['chart', 'Team total and net rating', `Player points add up to the team's implied score from the Onyx spread and total. Before lines post, offense and defense ratings per 100 possessions set the target and net rating sets the expected margin (home court ${P.home_court} pts).`, 'Environment', 'purple'],
+    ['pm', 'Plus-minus', `Each player's on-court point differential, shown on the board as a read on how his lineups are playing. ${P.pm_k ? 'It nudges minutes at strength ' + P.pm_k + '.' : 'Backtested as a minutes signal across a full season: it did not improve projections, so it informs rather than moves the number.'}`, P.pm_k ? 'Live' : 'Context', 'gold'],
+    ['bed', 'Rest and game script', `Back-to-backs trim ${pctv(1 - (P.b2b_mult || 1))}% for 30+ minute players. Spreads of 10+ trim heavy-minute players for blowout risk (up to 6%).`, 'Timing', 'gold'],
+    ['cross', 'Injuries', `OUT and DOUBTFUL players are projected at zero and their minutes go to the healthy rotation. Questionable players are projected but can never be a pick.`, 'News', 'gold'],
+    ['scale', 'Market blend', `${pctv(w)}% model, ${pctv(1 - w)}% Onyx no-vig market. Chosen by the backtest on log loss: the blend beat both the model alone and the market alone.`, 'Market', 'blue'],
+    ['bell', 'Distribution', `Stat lines are right-skewed: a typical night lands a little under the average and big nights pull it up. A negative binomial with a fitted spread per stat turns the projection into over and under probabilities.`, 'Output', ''],
+    ['eye', 'Role check', `When the projection sits more than ${L.max_gap} standard deviations from the line, the market almost always knows something about the role that box scores do not. Those props show "role check" on the board and can never be a pick.`, 'Guardrail', 'blue'],
+  ];
+  document.getElementById('engFactors').innerHTML = f.map(x => factorCard(...x)).join('');
+
+  const T = (E.teams || []).slice().sort((a, b) => b.pace - a.pace);
+  const sgn = v => (v > 0 ? '+' : '') + num(v);
+  document.getElementById('engTeams').innerHTML = T.length ? `<thead><tr><th>Team</th><th>Poss/G</th><th>ORtg</th><th>DRtg</th><th>Net</th><th>Tonight</th><th>Game poss</th></tr></thead><tbody>`
+    + T.map(t => `<tr><td>${logo(t.team)} ${esc(TEAM_NICK[t.team] || t.team)} <span class="dim">${t.gp} GP</span></td><td class="mono">${num(t.pace)}</td><td class="mono">${num(t.ortg)}</td><td class="mono">${num(t.drtg)}</td>
+      <td class="mono ${t.net > 0 ? 'edge-pos' : ''}">${sgn(t.net)}</td><td>vs ${esc(t.opp)}</td><td class="mono"><b>${num(t.game_poss)}</b></td></tr>`).join('') + '</tbody>'
+    : '<tbody><tr><td>No games on tonight\'s slate.</td></tr></tbody>';
+
+  const U = (D.players || []).filter(p => !p.out && p.usg && p.min >= 20).sort((a, b) => b.usg - a.usg).slice(0, 15);
+  document.getElementById('engUsage').innerHTML = U.length ? `<thead><tr><th>Player</th><th>USG%</th><th>Util%</th><th>Proj min</th><th>+/- per game</th><th>Proj PTS</th></tr></thead><tbody>`
+    + U.map(p => `<tr><td style="cursor:pointer" onclick="openPlayer('${esc(p.pid)}')">${esc(p.name)} <span class="dim">${esc(p.team)}</span></td><td class="mono"><b>${num(p.usg)}</b></td><td class="mono">${num(p.util)}</td>
+      <td class="mono">${num(p.min)}</td><td class="mono">${p.season && p.season.pm != null ? sgn(p.season.pm) : '-'}</td><td class="mono">${num(p.proj.pts)}</td></tr>`).join('') + '</tbody>'
+    : '<tbody><tr><td>Usage appears once players have box scores this season.</td></tr></tbody>';
+
+  const EV = ENGINE_NOTES.evidence;
+  document.getElementById('engEvidence').innerHTML = `<p>${EV.intro}</p>
+    <div class="tbl-wrap"><table class="spec-table"><thead><tr><th>Test window (Feb to Apr 2026)</th><th>Points</th><th>Rebounds</th><th>Assists</th></tr></thead><tbody>
+    ${EV.rows.map(r => `<tr><td>${r[0]}</td><td class="mono">${r[1]}</td><td class="mono">${r[2]}</td><td class="mono">${r[3]}</td></tr>`).join('')}</tbody></table></div>
+    ${EV.after.map(x => `<p>${x}</p>`).join('')}`;
+  document.getElementById('engTimeline').innerHTML = ENGINE_NOTES.history.map((h, i) =>
+    `<div class="tl-item"><div class="tl-dot${i ? '' : ' active'}"></div><div class="tl-date">${h[0]}</div><div class="tl-title">${h[1]}</div><div class="tl-body">${h[2]}</div></div>`).join('');
+  document.getElementById('engRoadmap').innerHTML = ENGINE_NOTES.roadmap.map(x => factorCard(...x)).join('');
+
+  const sd = E.sd || {};
+  const spec = [
+    ['Projection', 'minutes &times; per-minute rate &times; environment, team points fitted to the implied total'],
+    ['Minutes prior', `${k} games of last season's MPG (half that after a team change)`],
+    ['Recent minutes', `${pctv(recent)}% on the last ${P.min_recent_n} games`],
+    ['Utilization', P.start_w ? `${pctv(P.start_w)}% pull to starter minutes after 2 of 3 starts` : 'tracked and shown; starter pull tested, not applied'],
+    ['Usage redistribution', P.usg_alpha ? `strength ${P.usg_alpha}` : 'tracked and shown; tested, not applied (worse on held-out months)'],
+    ['Rate prior', `${rp} minutes of last season`],
+    ['Usage prior', `${E.use_prior} minutes of last season (FGA + 0.44 FTA + TOV)`],
+    ['Form nudge', `${pctv(P.l5_nudge || 0)}% of the last-5 gap, capped &plusmn;${pctv(P.l5_cap || 0)}%`],
+    ['Pace / opponent exponents', `${P.pace_exp} / ${P.opp_exp}`],
+    ['Points fit strength', `${P.pts_fit_exp}`],
+    ['Back-to-back', `&times;${P.b2b_mult} for 30+ minutes`],
+    ['Distribution spread', Object.keys(sd).map(s => `${STAT_ABBR[s]} sd = ${sd[s][0]}&times;mean + ${sd[s][1]}`).join(' · ')],
+    ['Blend', `${pctv(w)}% model / ${pctv(1 - w)}% Onyx no-vig`],
+    ['Pick lane', `edge ${pctv(L.min_edge || 0)} to ${pctv(L.max_edge || 0)}pp, price ${fmtOdds((L.price || [])[0])} to ${fmtOdds((L.price || [])[1])}, ${L.min_min}+ projected minutes, ${L.signals}+ form reads agree, role gap under ${L.max_gap} sd, ${L.per_game} per game, ${L.per_slate} per night`],
+    ['Data', 'OpticOdds box scores, injuries and Onyx lines; ESPN as backup and for live play-by-play'],
+  ];
+  document.getElementById('engSpec').innerHTML = '<tbody>' + spec.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('') + '</tbody>';
+}
 function gotoTab(t) {
   if (!RENDER[t]) t = 'home';
   currentTab = t;
@@ -962,7 +1333,7 @@ function pollLive() {
         const side = {};
         (c.competitors || []).forEach(t => {
           const ab = ESPN_ABBR[t.team.abbreviation] || t.team.abbreviation;
-          side[t.homeAway] = {ab, score: t.score, ls: (t.linescores || []).map(x => x.value)};
+          side[t.homeAway] = {ab, id: String(t.team.id), score: t.score, ls: (t.linescores || []).map(x => x.value)};
         });
         if (!side.home || !side.away) return;
         const g = D.games.find(x => x.home === side.home.ab && x.away === side.away.ab);
@@ -973,7 +1344,8 @@ function pollLive() {
         const detail = state === 'live' ? (st.shortDetail || 'LIVE') : g.detail;
         if (g.away_score !== side.away.score || g.home_score !== side.home.score || g.state !== state || g.detail !== detail) changed = true;
         g.away_score = side.away.score; g.home_score = side.home.score; g.state = state; g.detail = detail;
-        LIVE[g.gid] = {eid: e.id, away_ls: side.away.ls, home_ls: side.home.ls};
+        LIVE[g.gid] = {eid: e.id, away_ls: side.away.ls, home_ls: side.home.ls,
+                       ids: {[side.away.id]: g.away, [side.home.id]: g.home}};
       });
       // the open game's box score / win probability refresh with the scores
       const sel = currentTab === 'games' ? gcPick() : null;

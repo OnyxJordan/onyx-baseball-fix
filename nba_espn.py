@@ -29,6 +29,7 @@ from nba_common import (ESPN, ESPN_WEB, ET, espn_get, game_day, load, save,
 nba_common.DATA = Path("data/nba/espn")
 nba_common.DATA.mkdir(parents=True, exist_ok=True)
 
+BOX_VER = 2     # 2: rows carry fga/fta/tov/plus-minus (usage rate); a bump re-ingests the season
 BACKFILL_FROM = date(2026, 10, 15)   # before the 2026-27 opener; preseason is filtered out
 LOOKBACK_DAYS = 4
 PRIOR_MAX_AGE_DAYS = 7
@@ -41,16 +42,16 @@ def fetch_prior(season_year):
     the prior is season_year - 1."""
     cur = load("prior.json", {})
     built = cur.get("_built")
-    if built and cur.get("_season") == season_year - 1:
+    if built and cur.get("_season") == season_year - 1 and cur.get("_ver") == BOX_VER:
         try:
             age = (date.today() - date.fromisoformat(built)).days
             if age < PRIOR_MAX_AGE_DAYS and len(cur) > 300:
-                print(f"  prior: cached ({len(cur) - 2} players, {age}d old)")
+                print(f"  prior: cached ({len(cur) - 3} players, {age}d old)")
                 return cur
         except ValueError:
             pass
     print(f"  prior: fetching {season_year - 1} regular-season averages...")
-    out = {"_built": date.today().isoformat(), "_season": season_year - 1}
+    out = {"_built": date.today().isoformat(), "_season": season_year - 1, "_ver": BOX_VER}
     page, pages = 1, 1
     while page <= pages and page <= 30:
         d = espn_get(f"{ESPN_WEB}/statistics/byathlete",
@@ -86,14 +87,19 @@ def fetch_prior(season_year):
                 "gp": gp, "min": round(mins, 1),
                 "pts": tot("points"), "reb": tot("rebounds"), "ast": tot("assists"),
                 "fg3": tot("threePointFieldGoalsMade"),
+                # usage inputs; None (not 0) when ESPN omits them, so the model
+                # falls back to this season's box scores instead of a zero usage
+                "fga": tot("fieldGoalsAttempted") if "fieldGoalsAttempted" in vals else None,
+                "fta": tot("freeThrowsAttempted") if "freeThrowsAttempted" in vals else None,
+                "tov": tot("turnovers") if "turnovers" in vals else None,
             }
         page += 1
         time.sleep(0.3)
     if len(out) > 300:
         save("prior.json", out)
-        print(f"  prior: {len(out) - 2} players")
+        print(f"  prior: {len(out) - 3} players")
         return out
-    print(f"  prior: fetch came back thin ({len(out) - 2}); keeping cached copy")
+    print(f"  prior: fetch came back thin ({len(out) - 3}); keeping cached copy")
     return cur
 
 
@@ -103,6 +109,13 @@ def _num(s):
         return float(str(s).split("-")[0])
     except (TypeError, ValueError):
         return 0.0
+
+
+def _pm(s):
+    try:
+        return float(str(s).replace("+", ""))
+    except (TypeError, ValueError):
+        return None
 
 
 def _made_att(s):
@@ -181,8 +194,14 @@ def ingest_game(gid, pg, tg):
                 def v(lbl):
                     i = idx.get(lbl)
                     return _num(stats[i]) if i is not None and i < len(stats) else 0.0
+                def att(lbl):
+                    i = idx.get(lbl)
+                    return _made_att(stats[i])[1] if i is not None and i < len(stats) else 0.0
+                pm_i = idx.get("+/-")
                 rec["g"].append([gdate, gid, opp, int(ha == "home"), v("MIN"), v("PTS"),
-                                 v("REB"), v("AST"), v("3PT"), int(bool(a.get("starter")))])
+                                 v("REB"), v("AST"), v("3PT"), int(bool(a.get("starter"))),
+                                 att("FG"), att("FT"), v("TO"),
+                                 _pm(stats[pm_i]) if pm_i is not None and pm_i < len(stats) else None])
                 n += 1
     return n > 0
 
@@ -190,6 +209,9 @@ def ingest_game(gid, pg, tg):
 def ingest_box_scores(today):
     pg = load("player_games.json", {})
     tg = load("team_games.json", {})
+    if pg.get("_ver") != BOX_VER:
+        print(f"  box scores: format v{pg.get('_ver', 1)} -> v{BOX_VER}, re-ingesting the season")
+        pg, tg = {}, {}
     done = set(pg.get("_games", []))
     start = BACKFILL_FROM if not done else max(BACKFILL_FROM, today - timedelta(days=LOOKBACK_DAYS))
     added, day = 0, start
@@ -206,10 +228,11 @@ def ingest_box_scores(today):
             time.sleep(0.25)
         day += timedelta(days=1)
     pg["_games"] = sorted(done)
+    pg["_ver"] = BOX_VER
     save("player_games.json", pg)
     save("team_games.json", tg)
     print(f"  box scores: +{added} games this run, {len(done)} season games, "
-          f"{len(pg) - 1} players")
+          f"{sum(1 for k in pg if not k.startswith("_"))} players")
     return pg, tg
 
 

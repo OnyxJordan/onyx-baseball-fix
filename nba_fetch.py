@@ -33,6 +33,8 @@ Q = "sport=basketball&league=nba"
 SEASON_START = date(2026, 10, 20)        # 2026-27 opener; earlier games are preseason
 PRIOR_START = date(2025, 10, 21)         # 2025-26 opener (playoffs included in the prior)
 LOOKBACK_DAYS = 4
+BOX_VER = 2     # 2: rows carry fga/fta/tov/plus-minus (usage rate); a bump re-ingests the season
+PRIOR_VER = 2   # 2: priors carry fga/fta/tov; a bump refetches every prior
 PRIOR_REFETCH_PER_RUN = 400              # the first run seeds the whole slate (~3 min); later runs fetch only new names
 
 _KEY = ""
@@ -209,6 +211,9 @@ def espn_headshot_ids(today, teams):
 def ingest_box_scores(today):
     pg = load("player_games.json", {})
     tg = load("team_games.json", {})
+    if pg.get("_ver") != BOX_VER:
+        print(f"  box scores: format v{pg.get('_ver', 1)} -> v{BOX_VER}, re-ingesting the season")
+        pg, tg = {}, {}
     done = set(pg.get("_games", []))
     start = SEASON_START if not done else max(SEASON_START, today - timedelta(days=LOOKBACK_DAYS))
     todo, meta = [], {}
@@ -251,6 +256,7 @@ def ingest_box_scores(today):
                         "ast": _stat(st, "assists"), "fg3": _stat(st, "three_point_field_goals_made"),
                         "fga": _stat(st, "field_goals_attempted"), "fta": _stat(st, "free_throws_attempted"),
                         "oreb": _stat(st, "offensive_rebounds"), "tov": _stat(st, "turnovers"),
+                        "pm": _stat(st, "plus_minus") if st.get("plus_minus") is not None else None,
                         "starter": int(bool(res.get("is_starter")))}
                 box[team].append(line)
             if not box[away] or not box[home]:
@@ -261,7 +267,8 @@ def ingest_box_scores(today):
                     rec["n"], rec["t"] = ln["name"], team
                     if not any(x[1] == fid for x in rec["g"]):
                         rec["g"].append([gd, fid, opp, int(team == home), ln["min"], ln["pts"],
-                                         ln["reb"], ln["ast"], ln["fg3"], ln["starter"]])
+                                         ln["reb"], ln["ast"], ln["fg3"], ln["starter"],
+                                         ln["fga"], ln["fta"], ln["tov"], ln["pm"]])
                         rec["g"].sort(key=lambda x: x[0])
                 t = {k: sum(x[k] for x in box[team]) for k in ("pts", "reb", "ast", "fga", "fta", "oreb", "tov")}
                 o = {k: sum(x[k] for x in box[opp]) for k in ("pts", "reb", "ast")}
@@ -275,15 +282,18 @@ def ingest_box_scores(today):
             done.add(fid)
             added += 1
     pg["_games"] = sorted(done)
+    pg["_ver"] = BOX_VER
     save("player_games.json", pg)
     save("team_games.json", tg)
     print(f"  box scores: +{added} games this run ({len(todo)} new finals found), "
-          f"{len(done)} season games, {len(pg) - 1} players")
+          f"{len(done)} season games, {sum(1 for k in pg if not k.startswith("_"))} players")
 
 
 # ── PRIOR (last season, from each player's last-x log) ─────────────────────
 def fetch_priors(slate):
     prior = load("prior.json", {})
+    if prior.get("_ver") != PRIOR_VER:
+        prior = {}
     want = [p for p in slate.get("players", []) if p["pid"] not in prior]
     # fetch for the players most likely to matter first: anyone with a game this season
     pg = load("player_games.json", {})
@@ -298,7 +308,8 @@ def fetch_priors(slate):
         fids = st.get("fixture_ids") or []
         mins = st.get("minutes") or [round((s or 0) / 60.0) for s in (st.get("seconds") or [])]
         agg = {"n": p["name"], "t": team_abbr((row.get("team") or {}).get("name")) or "",
-               "pos": p.get("pos", ""), "gp": 0, "min": 0.0, "pts": 0.0, "reb": 0.0, "ast": 0.0, "fg3": 0.0}
+               "pos": p.get("pos", ""), "gp": 0, "min": 0.0, "pts": 0.0, "reb": 0.0, "ast": 0.0, "fg3": 0.0,
+               "fga": 0.0, "fta": 0.0, "tov": 0.0}
         for i, fid in enumerate(fids):
             try:
                 d = date(int(fid[0:4]), int(fid[4:6]), int(fid[6:8]))
@@ -312,12 +323,14 @@ def fetch_priors(slate):
             agg["gp"] += 1
             agg["min"] += m
             for k, src in (("pts", "points"), ("reb", "total_rebounds"), ("ast", "assists"),
-                           ("fg3", "three_point_field_goals_made")):
+                           ("fg3", "three_point_field_goals_made"), ("fga", "field_goals_attempted"),
+                           ("fta", "free_throws_attempted"), ("tov", "turnovers")):
                 arr = st.get(src) or []
                 agg[k] += float(arr[i] or 0) if i < len(arr) else 0.0
         prior[p["pid"]] = agg   # gp 0 is cached too: a rookie is not re-fetched every run
         got += 1
     prior["_built"] = date.today().isoformat()
+    prior["_ver"] = PRIOR_VER
     save("prior.json", prior)
     have = sum(1 for k, v in prior.items() if not k.startswith("_") and v.get("gp"))
     print(f"  priors: +{got} fetched, {have} players with last-season games, "

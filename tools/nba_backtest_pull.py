@@ -68,7 +68,8 @@ for i in range(0, len(ids), 4):
                         int(bool(res.get("is_starter"))), st.get("minutes"), st.get("seconds"),
                         st.get("points"), st.get("total_rebounds"), st.get("assists"),
                         st.get("three_point_field_goals_made"), st.get("field_goals_attempted"),
-                        st.get("free_throws_attempted"), st.get("offensive_rebounds"), st.get("turnovers")])
+                        st.get("free_throws_attempted"), st.get("offensive_rebounds"), st.get("turnovers"),
+                        st.get("plus_minus"), st.get("defensive_rebounds")])
 print("box rows", len(box))
 json.dump(box, open("bt/box.json", "w"))
 
