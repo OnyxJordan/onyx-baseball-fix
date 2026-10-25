@@ -359,7 +359,9 @@ tr:hover td{background:rgba(255,255,255,.015)}
   <h3>3. The game around him</h3>
   <p>Each team's player points are fitted to the team total implied by the Onyx spread and total. Rebounds and assists scale with game pace and with what the opponent allows, regressed by how many games it has played.</p>
   <h3>4. Priced against Onyx</h3>
-  <p>Projections become over and under probabilities, blended with the vig-free Onyx market, and edge is measured against the price you actually get. A pick needs real edge, a sane price and a player with no injury tag, and it is locked the moment it qualifies. Every pick is graded against the final box score and stays on the Record tab, wins and losses alike.</p>
+  <p>Projections become over and under probabilities with a right-skewed distribution (a typical night lands a little under a player's average, a big night pulls the average up). Those are blended with the vig-free Onyx market, which carries most of the weight because it is the sharper single read, and edge is measured against the price you actually get. A pick needs real edge, a sane price, recent form on its side and a player with no injury tag, and it is locked the moment it qualifies. Every pick is graded against the final box score and stays on the Record tab, wins and losses alike.</p>
+  <h3>5. Backtested before it shipped</h3>
+  <p>The model was replayed over the full 2025-26 season one night at a time, seeing only what was known before tip: <b>26,352 player-games</b> and <b>17,668 real Onyx prop lines</b>. Settings were tuned on October through January and judged only on February through April. On those unseen games it beat every simple baseline (points miss 5.15 vs 5.48 for the season average), its probabilities matched reality (it claimed 54.2% on its picks and they hit 54.0%), and the picks lane went 74-63 at Onyx opening prices. That is a small sample, so the live Record tab is the scoreboard that counts.</p>
   <p class="dim" style="margin-top:22px;font-size:13px">Projections are estimates, not guarantees. Bet responsibly.</p>
 </div></div></section>
 

@@ -1,0 +1,27 @@
+name: NBA backtest data (manual)
+# Pulls two seasons of NBA box scores and the historical Onyx main lines from
+# OpticOdds into an artifact for tools/nba_backtest.py. Manual only: run it,
+# download the "nba-backtest-data" artifact into bt/, then
+#   python3 tools/nba_backtest.py bt/ [--tune]
+# Read-only: commits nothing, deploys nothing.
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  pull:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests
+      - run: python3 tools/nba_backtest_pull.py
+        env:
+          OPTICODDS_API_KEY: ${{ secrets.OPTICODDS_API_KEY }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nba-backtest-data
+          path: bt/

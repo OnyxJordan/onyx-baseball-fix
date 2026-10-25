@@ -386,17 +386,43 @@ or writes `index.html` or any MLB data file. MLB's nav links to it, and it links
 | `nba_fetch.py` | OpticOdds: fixtures (Onyx slug = `game_id`), box scores (`/fixtures/player-results`, several fixture ids per call; DNPs are absent), last season per player from `/fixtures/player-results/last-x` (cached in `prior.json`, ~160 new players per run), injuries (`out` / `gtd`), rosters (`/players`, cached daily). Falls back to `nba_espn.py` when the key is missing or `/fixtures` fails |
 | `nba_espn.py` | ESPN public API backup, writes `data/nba/espn/` (ESPN ids, never mixed with OpticOdds ids). `cdn.nba.com` and `stats.nba.com` refuse datacenter IPs; ESPN does not |
 | `nba_odds.py` | Onyx book (`onyx_odds`) via `/fixtures/odds` filtered to `player_points` / `player_rebounds` / `player_assists` / `moneyline` / `point_spread` / `total_points`. Main line = the pair flagged `is_main` (props carry an alternate ladder). Each side keeps Onyx's share selection uuid from `deep_link`, which is what bet buttons and the parlay builder open. The Odds API fills only player-markets Onyx did not price, throttled (90 min) because the key also feeds MLB |
-| `nba_model.py` | v1 projection, changelog at the top. Minutes (prior + this season, fitted to 240 per team so OUT minutes flow to the rotation) x per-minute rates (300-minute prior) x environment (team points fitted to the implied team total; rebounds / assists by pace and opponent). Normal-approximation over/under probability blended 50/50 with the vig-free Onyx market; edge vs the listed price |
+| `nba_model.py` | v2 projection, changelog at the top (every change cites the backtest). Minutes (prior + this season, fitted to 240 per team so OUT minutes flow to the rotation) x per-minute rates (300-minute prior) x environment (team points fitted to the implied team total; rebounds / assists by pace and opponent) x a fitted bias scale. Negative-binomial over/under probability blended 20% model / 80% vig-free Onyx; edge vs the listed price |
 | `nba_build.py` | prices projections, grades and extends the picks ledger, injects one `var NBA_DATA` into `nba_shell.html` |
 
 **Picks ledger** `data/nba/picks_history.json`: append-only, odds and Onyx
 selection frozen at the moment a play qualifies, graded from box scores
 (W / L / P, void if the player never logs a minute or the game never goes
-final within 3 days). Lane v1: Onyx price only, edge 5-10pp (model blended
-50/50 with the vig-free market), price -180 to +150, projected minutes >= 24,
-no injury tag, at least 2 of {last season, this season, last 5} on the pick's
-side of the line, max 2 per game / 6 per slate, one per player. On the first
-live slate (10/24) that produced 3 picks from 236 Onyx props. `validate_build.py` guards it with the same never-shrinks
+final within 3 days). Lane v2: Onyx price only, edge 2-8pp (20/80 blend),
+price -180 to +150, projected minutes >= 24, no injury tag, at least 2 of
+{last season, this season, last 5} on the pick's side of the line, max 2 per
+game / 6 per slate, one per player.
+
+**Backtest (the evidence for every NBA setting).** `tools/nba_backtest.py`
+replays the 2025-26 regular season walk-forward through the live
+`nba_model.project_slate` (2024-25 as the prior, no look-ahead; who played
+comes from the box score, i.e. a known final injury report), scored against
+OpticOdds box scores and the historical Onyx main lines (open + close). Data:
+run the manual **NBA backtest data** workflow and download its artifact into
+`bt/`. Tune on Oct-Jan, judge on Feb-Apr only. v2 on the test window
+(players projected 20+ min, 6,437 player-games; 12,821 two-sided Onyx lines):
+
+| | v1 | v2 | season-avg baseline | Onyx line |
+|---|---|---|---|---|
+| points MAE | 5.21 | 5.15 | 5.48 | |
+| rebounds MAE | 2.03 | 1.99 | 2.05 | |
+| assists MAE | 1.59 | 1.57 | 1.63 | |
+| prop MAE (same props) | | 3.12 | | 3.05 |
+| logloss on over/under | | 0.6893 (blend) | | 0.6898 |
+| picks lane | 131-128, -3.4% | 74-63 +5.6% open / 53-48 +3.3% close | | |
+| picks claimed vs hit | 59.8% / 50.6% | 54.2% / 54.0% | | |
+
+Read it honestly: the Onyx line alone is a better single predictor than our
+projection; the value is in the blend, which is calibrated within ~0-3pp
+where 95% of props sit. ~100-140 test picks is not proof of profit (95%
+interval on hit rate ~ +/-10pp); the live ledger decides. v1's 50/50 lane
+was overconfident and lost money in the replay, which is why it was replaced
+before it posted a second night. Re-run the backtest after any model or lane
+change and quote its test-window numbers in the `nba_model.py` changelog. `validate_build.py` guards it with the same never-shrinks
 rule as the MLB ledgers.
 
 **Pipelines:** `refresh_build.yml` and `daily_build.yml` run the three NBA
