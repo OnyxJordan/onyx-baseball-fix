@@ -92,16 +92,20 @@
     probe.remove();
     var standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
     var ios = /iPhone|iPod/.test(navigator.userAgent);
-    if (standalone && ios && sat < 1) {
-      // the inset came back 0: use the phone's real status bar (notch /
-      // Dynamic Island phones are 812pt+ tall) so nothing sits under the clock
-      var tall = Math.max(screen.height, screen.width) >= 812;
-      root.style.setProperty('--sat', (tall ? 47 : 20) + 'px');
-      if (sab < 1) root.style.setProperty('--sab', (tall ? 34 : 0) + 'px');
-    } else {
-      root.style.removeProperty('--sat');
-      root.style.removeProperty('--sab');
-    }
+    // the pages use the solid "black" status bar, so the app starts below it
+    // and the top inset is 0 by design. Only a translucent bar draws the page
+    // underneath; then a 0 inset is iOS misreporting, and the real height is
+    // used: 59pt on Dynamic Island phones (852pt+ tall), 47pt on notch phones,
+    // 20pt on the rest.
+    var meta = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
+    var translucent = meta && meta.content === 'black-translucent';
+    var h = Math.max(screen.height, screen.width);
+    root.style.removeProperty('--sat');
+    root.style.removeProperty('--sab');
+    if (standalone && ios && translucent && sat < 1)
+      root.style.setProperty('--sat', (h >= 852 ? 59 : h >= 812 ? 47 : 20) + 'px');
+    if (standalone && ios && sab < 1 && h >= 812)
+      root.style.setProperty('--sab', '34px');   // home indicator
   }
 
   // ── 2. styles ─────────────────────────────────────────────────────────

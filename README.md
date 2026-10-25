@@ -466,7 +466,10 @@ wraps `gotoTab` and `renderParlaySlip` (active state, parlay toasts), and
 owns the status-bar fix: `--sat` / `--sab` carry the safe-area inset
 everywhere, and when an installed iPhone app reports 0 it measures that and
 sets the real height (the 10/25 "menu cut off, nothing clickable" bug, plus
-two old phone rules that zeroed the header's top padding). Off-season the
+two old phone rules that zeroed the header's top padding). The status bar is
+the solid `black` style: with `black-translucent` the page draws under the
+bar, where iOS blurs and dims a band that faded the header on Dynamic Island
+phones; the translucent fallback (59 / 47 / 20pt) stays for safety. Off-season the
 MLB build leaves `index.html` untouched, so shell edits there must be
 applied to `index.html` too. Gate: `tools/verify_pwa.js` (CI).
 
