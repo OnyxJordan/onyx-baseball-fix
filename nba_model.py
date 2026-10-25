@@ -2,6 +2,38 @@
 nba_model.py - Onyx NBA points / rebounds / assists projection model.
 
 CHANGELOG (the lab notebook: every change bumps VERSION and cites evidence)
+  v4 (2026-10-25) THREE SEASONS OF HISTORY, AGED, REGRESSED TO ROLE.
+     The prior was one season of box scores: a player who missed last season
+     (Haliburton, Achilles) projected like a near-rookie, and early-season
+     numbers leaned on two games. Now (history_prior / slate_history):
+     - ESPN season totals for the last 3 seasons, weighted 6/3/1 by recency
+       (tested 5/4/3, 4/3/2, 3/2/0, last-season-only), per-minute rates
+       weighted by minutes; a missed season simply leans on the earlier ones.
+     - Age curve fitted on every consecutive-season pair before the season
+       being projected (2018-19 on), per-minute rates and MPG by age, 3-age
+       smoothed, applied at half strength (age_k 0.5; 1.0 and 1.5 overshot).
+     - Rates regressed toward ROLE (position x minutes band) by 250 minutes;
+       rookies start from their role's production at the minutes they are
+       actually playing, not a generic position rate.
+     - Team pace / scoring / allowed regressed toward last season's team at
+       80% (team_carry), not toward a blank league average.
+     - RATE_PRIOR_MIN 300 -> 500 (history earns more weight on rates).
+       PRIOR_GAMES_K stays 2: weighting history more on MINUTES (4 / 6 / 10
+       games) was worse in BOTH seasons; rotations really do move fast.
+     Evidence (tools/nba_backtest_hist.py: tuned on all of 2024-25 with a
+     2021-24 prior, judged on 2025-26, never seen). Same player-games, v3 ->
+     v4 MAE:
+       all 26,353          pts 4.439 -> 4.439  reb 1.844 -> 1.840  ast 1.309 -> 1.307  min 4.87 -> 4.86
+       first 10 team games pts 4.396 -> 4.388  reb 1.827 -> 1.819  ast 1.304 -> 1.297  min 4.76 -> 4.72
+       missed last season  pts 4.231 -> 3.932  reb 1.749 -> 1.695  ast 1.125 -> 1.074  min 5.37 -> 5.00
+       team switchers      pts 4.356 -> 4.350  reb 1.762 -> 1.757  min 5.07 -> 5.04
+       age 31 and over     pts 4.314 -> 4.303
+       no NBA history      ast 1.195 -> 1.176; pts / reb / min flat
+       age 23 and under    pts 4.408 -> 4.415 (slightly worse), min 5.04 -> 5.02
+     Picks lane (same rules), Feb-Apr 2026: open 75-60 -> 73-59, close 53-47
+     (+4.3%) -> 53-45 (+5.6%); Oct-Jan close 39-31 -> 39-38. ~170-275 picks:
+     within noise either way (Oct-Jan was also the lane's own tuning window).
+     Projection vs Onyx closing line, full season: 3.088 -> 3.087 (line 3.030).
   v3 (2026-10-25) ROLE CHECK + usage / utilization / pace / net rating /
      plus-minus tracked. Same walk-forward replay as v2 (2025-26, tuned
      Oct-Jan, judged Feb-Apr), with OUT teammates simulated (3 of the team's
@@ -88,8 +120,9 @@ CHANGELOG (the lab notebook: every change bumps VERSION and cites evidence)
 """
 
 import math
+from collections import defaultdict
 
-VERSION = "v3"
+VERSION = "v4"
 
 LEAGUE = {"ppg": 115.0, "reb": 44.0, "ast": 27.0, "poss": 99.5}
 POS_RATE = {   # per-minute league rates by listed position, used only without a prior
@@ -98,7 +131,7 @@ POS_RATE = {   # per-minute league rates by listed position, used only without a
     "C": {"pts": 0.45, "reb": 0.30, "ast": 0.08},
 }
 PRIOR_GAMES_K = 2
-RATE_PRIOR_MIN = 300.0
+RATE_PRIOR_MIN = 500.0   # v4: with a 3-season prior, history earns more weight on rates
 POS_PRIOR_MIN = 150.0
 SD = {"pts": (0.181, 3.732), "reb": (0.257, 1.304), "ast": (0.299, 0.947)}   # v2: fitted, see changelog
 MODEL_WEIGHT = 0.20                 # v2: 20% model / 80% Onyx no-vig
@@ -166,18 +199,238 @@ def league_from_teams(team_games):
     return out
 
 
-def team_profile(team_games, team, lg):
-    """Regressed scoring for the team and what its opponents get against it."""
+# ── multi-season history: weighted seasons, aging, role baselines ───────────
+# H holds the history knobs (nba_backtest.py tunes them). Seasons are weighted
+# most-recent first; every season is aged forward to this season with an age
+# curve fitted on past year-to-year changes, then regressed toward what
+# players in the same ROLE (position x minutes band) produce, by REG_MIN
+# minutes. A player who missed last season simply leans on the two before.
+H = {
+    # v4 values: tuned on 2024-25, judged on 2025-26 (tools/nba_backtest_hist.py)
+    "w": (6.0, 3.0, 1.0),     # weights for 1 / 2 / 3 seasons back
+    "reg_min": 250.0,         # minutes of role-average production mixed into the rates
+    "min_reg_gp": 0.0,        # games of role-average minutes mixed into MPG (tested 4-16: no gain)
+    "age_k": 0.5,             # strength of the fitted age curve (0 = no aging; 1.0+ overshot)
+    "team_carry": 0.8,        # share of last season's team pace / ratings carried into the regression target
+}
+MIN_BANDS = ((0, 14), (14, 22), (22, 30), (30, 99))
+HIST_STATS = ("pts", "reb", "ast", "fg3", "fga", "fta", "tov")
+
+
+def min_band(mpg):
+    for i, (lo, hi) in enumerate(MIN_BANDS):
+        if lo <= mpg < hi:
+            return i
+    return len(MIN_BANDS) - 1
+
+
+def role_table(season_rows):
+    """Per-minute production by (position, minutes band) from one season of
+    league-wide totals: {"G|2": {"pts": .., ..., "mpg": ..}}. Rookies and
+    thin histories regress toward their ROLE, not a generic position mean."""
+    acc = {}
+    for r in season_rows.values():
+        if not r.get("gp") or not r.get("min") or r["gp"] < 10:
+            continue
+        mpg = r["min"] / r["gp"]
+        key = f"{_pos_key(r.get('pos'))}|{min_band(mpg)}"
+        a = acc.setdefault(key, {"min": 0.0, "gp": 0.0, **{k: 0.0 for k in HIST_STATS}})
+        a["min"] += r["min"]; a["gp"] += r["gp"]
+        for k in HIST_STATS:
+            a[k] += r.get(k) or 0.0
+    out = {}
+    for key, a in acc.items():
+        out[key] = {k: a[k] / a["min"] for k in HIST_STATS}
+        out[key]["mpg"] = a["min"] / a["gp"]
+    return out
+
+
+def role_rates(table, pos, mpg):
+    key = f"{_pos_key(pos)}|{min_band(mpg)}"
+    if key in table:
+        return table[key]
+    base = POS_RATE[_pos_key(pos)]
+    return {**{k: 0.0 for k in HIST_STATS}, **base, "mpg": mpg}
+
+
+def fit_aging(seasons, last_season, ref_season):
+    """Year-over-year change by age, fitted on consecutive seasons up to
+    `last_season` (never the season being projected). Returns
+    {"min": {age: delta mpg}, stat: {age: log ratio of per-minute rate}}.
+    seasons = {season: {espn_id: row}}; ages are as of ref_season."""
+    pairs = defaultdict(lambda: defaultdict(lambda: [0.0, 0.0]))   # kind -> age -> [sum w*x, sum w]
+    for s in sorted(int(x) for x in seasons):
+        nxt = str(s + 1)
+        if s + 1 > last_season or nxt not in seasons:
+            continue
+        a_rows, b_rows = seasons[str(s)], seasons[nxt]
+        for pid, a in a_rows.items():
+            b = b_rows.get(pid)
+            if not b or a.get("age") is None or not a.get("min") or not b.get("min"):
+                continue
+            if a["gp"] < 20 or b["gp"] < 20:
+                continue
+            age = int(a["age"]) - (ref_season - s)          # age during season s
+            w = 1.0 / (1.0 / a["min"] + 1.0 / b["min"])      # harmonic minutes
+            pairs["min"][age][0] += w * (b["min"] / b["gp"] - a["min"] / a["gp"])
+            pairs["min"][age][1] += w
+            for k in ("pts", "reb", "ast", "fga"):
+                ra, rb = (a.get(k) or 0) / a["min"], (b.get(k) or 0) / b["min"]
+                if ra > 0 and rb > 0:
+                    pairs[k][age][0] += w * math.log(rb / ra)
+                    pairs[k][age][1] += w
+    out = {}
+    for kind, by_age in pairs.items():
+        raw = {age: v[0] / v[1] for age, v in by_age.items() if v[1] > 0}
+        sm = {}
+        for age in range(19, 40):     # 3-age smoothing, ends clamped
+            near = [(raw[x], by_age[x][1]) for x in (age - 1, age, age + 1) if x in raw]
+            if near:
+                sm[age] = sum(v * w for v, w in near) / sum(w for _, w in near)
+        out[kind] = sm
+    out["fta"] = out["tov"] = out.get("fga", {})
+    out["fg3"] = out.get("pts", {})
+    return out
+
+
+def _age_shift(aging, kind, age_from, age_to):
+    tot = 0.0
+    tab = aging.get(kind) or {}
+    for a in range(int(age_from), int(age_to)):
+        tot += tab.get(max(19, min(39, a)), 0.0)
+    return tot
+
+
+def history_prior(rows, age_now, aging, roles, cur_team=None):
+    """One player's prior from up to three past seasons.
+    rows = [(seasons_back, row)], seasons_back 1 = last season. age_now = age
+    this season. Returns the prior dict project_slate expects (gp / min /
+    stat totals; rate = stat/min, MPG = min/gp) or None without history."""
+    W = H["w"]
+    rows = [(k, r) for k, r in rows if r and r.get("gp") and r.get("min") and 1 <= k <= len(W) and W[k - 1] > 0]
+    if not rows:
+        return None
+    wmin = sum(W[k - 1] * r["min"] for k, r in rows)
+    wgp = sum(W[k - 1] * r["gp"] for k, r in rows)
+    # minutes per game, each season aged forward to this season
+    mpg_parts = []
+    for k, r in rows:
+        mpg = r["min"] / r["gp"]
+        if age_now is not None and aging:
+            mpg += H["age_k"] * _age_shift(aging, "min", age_now - k, age_now)
+        mpg_parts.append((W[k - 1] * r["gp"], mpg))
+    mpg = sum(w * m for w, m in mpg_parts) / wgp
+    role = role_rates(roles, rows[0][1].get("pos"), mpg)
+    mpg = (mpg * wgp / sum(W[k - 1] for k, _ in rows) + role.get("mpg", mpg) * H["min_reg_gp"]) \
+        / (wgp / sum(W[k - 1] for k, _ in rows) + H["min_reg_gp"])
+    rates = {}
+    for st in HIST_STATS:
+        num = 0.0
+        for k, r in rows:
+            v = (r.get(st) or 0.0)
+            if age_now is not None and aging and v > 0:
+                v *= math.exp(H["age_k"] * _age_shift(aging, st, age_now - k, age_now))
+            num += W[k - 1] * v
+        rates[st] = (num + H["reg_min"] * role.get(st, 0.0)) / (wmin + H["reg_min"])
+    last = min(rows, key=lambda x: x[0])
+    gp = int(last[1]["gp"])
+    tot_min = mpg * gp
+    out = {"gp": gp, "min": tot_min, "pos": last[1].get("pos", ""),
+           "t": last[1].get("t", ""), "seasons": len(rows), "back": last[0],
+           "hist_min": round(sum(r["min"] for _, r in rows)), "age": age_now}
+    for st in HIST_STATS:
+        out[st] = rates[st] * tot_min
+    if cur_team and out["t"] and out["t"] != cur_team:
+        out["switched"] = True
+    # what actually happened, for the page: the most recent season played,
+    # and each season in the window per game
+    lr = last[1]
+    out["ls"] = {"pts": round((lr.get("pts") or 0) / lr["gp"], 1), "reb": round((lr.get("reb") or 0) / lr["gp"], 1),
+                 "ast": round((lr.get("ast") or 0) / lr["gp"], 1), "min": round(lr["min"] / lr["gp"], 1),
+                 "gp": int(lr["gp"]), "back": last[0]}
+    out["hist"] = [{"back": k, "t": r.get("t", ""), "gp": int(r["gp"]), "min": round(r["min"] / r["gp"], 1),
+                    "pts": round((r.get("pts") or 0) / r["gp"], 1), "reb": round((r.get("reb") or 0) / r["gp"], 1),
+                    "ast": round((r.get("ast") or 0) / r["gp"], 1),
+                    "usg": usg_pct(((r.get("fga") or 0) + 0.44 * (r.get("fta") or 0) + (r.get("tov") or 0)) / r["min"])}
+                   for k, r in sorted(rows, key=lambda x: x[0])]
+    return out
+
+
+def slate_history(slate, hist, cur_season):
+    """Priors for tonight's players from data/nba/history.json (ESPN season
+    totals, nba_fetch.fetch_history), plus last season's team baselines and
+    role table. Players are matched by ESPN id (the slate's `hs`), then name.
+    Returns (priors by pid, team_hist, roles, n_matched)."""
+    from nba_common import nk as _nk
+    P = (hist or {}).get("players") or {}
+    if not P:
+        return {}, {}, {}, 0
+    ref = int(hist.get("_ref") or cur_season)
+    aging = fit_aging(P, cur_season - 1, ref)
+    roles = role_table(P.get(str(cur_season - 1), {}))
+    th = team_history(((hist.get("teams") or {}).get(str(cur_season - 1))))
+    by_name = {}
+    for k in (1, 2, 3):
+        m = {}
+        for r in P.get(str(cur_season - k), {}).values():
+            key = _nk(r["n"])
+            if key not in m or r["min"] > m[key]["min"]:
+                m[key] = r
+        by_name[k] = m
+    out = {}
+    for p in slate.get("players", []):
+        eid = str(p.get("hs") or "")
+        rows, age = [], None
+        for k in (1, 2, 3):
+            season = P.get(str(cur_season - k), {})
+            r = season.get(eid) if eid else None
+            r = r or by_name[k].get(_nk(p.get("name", "")))
+            rows.append((k, r))
+            if r and age is None and r.get("age") is not None:
+                age = int(r["age"]) - (ref - cur_season)
+        pr = history_prior(rows, age, aging, roles, p.get("team"))
+        if pr:
+            pr["n"] = p.get("name", "")
+            out[p["pid"]] = pr
+    return out, th, roles, len(out)
+
+
+
+def team_history(season_teams):
+    """Each team's last-season pace / scoring / what it allowed, as ratios to
+    that season's league average (so a league-wide pace drift does not leak
+    into one team): {team: {"poss": 1.03, ...}}."""
+    rows = {t: r for t, r in (season_teams or {}).items() if r.get("gp") and r.get("poss")}
+    if not rows:
+        return {}
+    def per_g(r, k):
+        return (r.get(k) or 0.0) / r["gp"]
+    lg = {k: sum(per_g(r, k) if k not in ("poss", "ppg", "opp_ppg") else r[k] for r in rows.values()) / len(rows)
+          for k in ("poss", "ppg", "opp_ppg", "opp_reb", "opp_ast")}
+    out = {}
+    for t, r in rows.items():
+        out[t] = {"poss": r["poss"] / lg["poss"], "ppg": r["ppg"] / lg["ppg"], "opp_ppg": r["opp_ppg"] / lg["opp_ppg"],
+                  "opp_reb": per_g(r, "opp_reb") / lg["opp_reb"], "opp_ast": per_g(r, "opp_ast") / lg["opp_ast"]}
+    return out
+
+
+def team_profile(team_games, team, lg, th=None):
+    """Regressed scoring for the team and what its opponents get against it.
+    This season's games are regressed toward last season's team (th, ratios
+    to league) by H["team_carry"], not toward a blank league average."""
     rows = team_games.get(team, [])
     n = len(rows)
     w = n / (n + 10.0)
+    th = (th or {}).get(team) or {}
+    def tgt(k, base):
+        return base * (1 + H["team_carry"] * (th[k] - 1)) if k in th else base
     def avg(col, base):
         return (w * (sum(r.get(col, 0) for r in rows) / n) + (1 - w) * base) if n else base
     out = {
         "n": n,
-        "ppg": avg("pts", lg["ppg"]), "opp_ppg": avg("opp_pts", lg["ppg"]),
-        "opp_reb": avg("opp_reb", lg["reb"]), "opp_ast": avg("opp_ast", lg["ast"]),
-        "poss": avg("poss", lg["poss"]),
+        "ppg": avg("pts", tgt("ppg", lg["ppg"])), "opp_ppg": avg("opp_pts", tgt("opp_ppg", lg["ppg"])),
+        "opp_reb": avg("opp_reb", tgt("opp_reb", lg["reb"])), "opp_ast": avg("opp_ast", tgt("opp_ast", lg["ast"])),
+        "poss": avg("poss", tgt("poss", lg["poss"])),
         "dates": {r["d"] for r in rows},
     }
     # ratings per 100 possessions (regressed the same way): offense, defense, net
@@ -291,7 +544,11 @@ def per_minute(prior, games, stat, pos):
     if prior and prior.get("min", 0) > 0:
         r0, k = prior[stat] / prior["min"], RATE_PRIOR_MIN
     else:
-        r0, k = POS_RATE[_pos_key(pos)][stat], POS_PRIOR_MIN
+        # no NBA history: start from what players in his ROLE produce (his
+        # minutes so far this season pick the band), not a generic position rate
+        mpg_now = (sum(g[IDX["min"]] for g in played) / n) if n else 0.0
+        rr = role_rates(ROLES, pos, mpg_now) if ROLES else POS_RATE[_pos_key(pos)]
+        r0, k = rr.get(stat, POS_RATE[_pos_key(pos)][stat]) or POS_RATE[_pos_key(pos)][stat], POS_PRIOR_MIN
     rate = (r0 * k + cur_s) / (k + cur_min)
     last5 = played[-5:]
     l5_min = sum(g[IDX["min"]] for g in last5)
@@ -445,14 +702,19 @@ def price_side(mean, stat, mkt):
     return best
 
 
-def project_slate(slate, prior, player_games, team_games):
+ROLES = {}    # role_table of last season, set per slate (project_slate roles=)
+
+
+def project_slate(slate, prior, player_games, team_games, team_hist=None, roles=None):
     """One projection row per rostered player on today's slate."""
+    global ROLES
+    ROLES = roles or {}
     lg = league_from_teams(team_games)
     games = {g["gid"]: g for g in slate.get("games", [])}
     profiles = {}
     def prof(t):
         if t not in profiles:
-            profiles[t] = team_profile(team_games, t, lg)
+            profiles[t] = team_profile(team_games, t, lg, team_hist)
         return profiles[t]
     from datetime import date, timedelta
     yday = (date.fromisoformat(slate["date"]) - timedelta(days=1)).isoformat()
@@ -553,8 +815,14 @@ def project_slate(slate, prior, player_games, team_games):
         r["last5"] = [{"d": x[0], "opp": x[2], "min": x[4], "pts": x[5], "reb": x[6], "ast": x[7]}
                       for x in r["_games"][-5:]]
         pr = r["_prior"]
-        r["last_season"] = ({s: round(pr[s] / pr["gp"], 1) for s in STATS} |
-                            {"min": round(pr["min"] / pr["gp"], 1), "gp": pr["gp"]}) if pr else None
+        if pr and pr.get("ls"):
+            r["last_season"] = dict(pr["ls"])
+            r["history"] = pr.get("hist")
+            r["baseline"] = {s: round(pr[s] / pr["gp"], 1) for s in STATS} | {"min": round(pr["min"] / pr["gp"], 1)}
+            r["age"] = pr.get("age")
+        else:
+            r["last_season"] = ({s: round(pr[s] / pr["gp"], 1) for s in STATS} |
+                                {"min": round(pr["min"] / pr["gp"], 1), "gp": pr["gp"]}) if pr else None
         del r["_prior"], r["_games"], r["min_base"], r["min_full"], r["upm"]
 
     # a team's player points must add up to the team's expected score: pull

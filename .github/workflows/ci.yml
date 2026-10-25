@@ -40,6 +40,13 @@ jobs:
       - name: Install dependencies
         run: pip install requests
 
+      # Every pipeline script must at least parse on the pipeline's Python.
+      # The build steps below never import the fetchers, so a syntax error
+      # in one (an f-string that only newer Pythons accept took the NBA fetch
+      # down on 10/25 behind continue-on-error) would otherwise pass CI.
+      - name: Compile every Python file
+        run: python3 -m py_compile *.py tools/*.py
+
       # No network fetches here on purpose: this validates the BUILD, not the
       # feeds. Using the committed data keeps the check fast and deterministic,
       # and means a flaky upstream API can never fail a PR.

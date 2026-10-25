@@ -386,7 +386,7 @@ or writes `index.html` or any MLB data file. MLB's nav links to it, and it links
 | `nba_fetch.py` | OpticOdds: fixtures (Onyx slug = `game_id`), box scores (`/fixtures/player-results`, several fixture ids per call; DNPs are absent), last season per player from `/fixtures/player-results/last-x` (cached in `prior.json`, ~160 new players per run), injuries (`out` / `gtd`), rosters (`/players`, cached daily). Falls back to `nba_espn.py` when the key is missing or `/fixtures` fails |
 | `nba_espn.py` | ESPN public API backup, writes `data/nba/espn/` (ESPN ids, never mixed with OpticOdds ids). `cdn.nba.com` and `stats.nba.com` refuse datacenter IPs; ESPN does not |
 | `nba_odds.py` | Onyx book (`onyx_odds`) via `/fixtures/odds` filtered to `player_points` / `player_rebounds` / `player_assists` / `moneyline` / `point_spread` / `total_points`. Main line = the pair flagged `is_main` (props carry an alternate ladder). Each side keeps Onyx's share selection uuid from `deep_link`, which is what bet buttons and the parlay builder open. The Odds API fills only player-markets Onyx did not price, throttled (90 min) because the key also feeds MLB |
-| `nba_model.py` | v3 projection, changelog at the top (every change cites the backtest). Minutes (prior + this season, fitted to 240 per team so OUT minutes flow to the rotation) x per-minute rates (300-minute prior) x environment (team points fitted to the implied team total; rebounds / assists by pace and opponent) x a fitted bias scale. Negative-binomial over/under probability blended 20% model / 80% vig-free Onyx; edge vs the listed price |
+| `nba_model.py` | v4 projection, changelog at the top (every change cites the backtest). Minutes (prior + this season, fitted to 240 per team so OUT minutes flow to the rotation) x per-minute rates (300-minute prior) x environment (team points fitted to the implied team total; rebounds / assists by pace and opponent) x a fitted bias scale. Negative-binomial over/under probability blended 20% model / 80% vig-free Onyx; edge vs the listed price |
 | `nba_build.py` | prices projections, grades and extends the picks ledger, injects one `var NBA_DATA` into `nba_shell.html` |
 
 **Picks ledger** `data/nba/picks_history.json`: append-only, odds and Onyx
@@ -424,6 +424,20 @@ was overconfident and lost money in the replay, which is why it was replaced
 before it posted a second night. Re-run the backtest after any model or lane
 change and quote its test-window numbers in the `nba_model.py` changelog. `validate_build.py` guards it with the same never-shrinks
 rule as the MLB ledgers.
+
+**v4 (three seasons of history).** Every player's prior is his last three
+seasons of ESPN season totals (`data/nba/history.json`, 8 seasons kept for
+the age-curve fit; `nba_common.refresh_history` pulls each past season once
+and re-reads only on a new season), weighted 6/3/1, aged on a curve fitted
+from consecutive seasons (`nba_model.fit_aging`, applied at half strength),
+regressed 250 minutes toward his role (position x minutes band,
+`role_table`). Rookies start from their role. Team pace / ratings start 80%
+from last season's team (`team_history`). Matched to OpticOdds players by
+ESPN id (the headshot map), then name; the one-season box-score prior is the
+fallback. Tune / judge with `tools/nba_history_pull.py` then
+`tools/nba_backtest_hist.py` (tunes on 2024-25, judges on 2025-26, reports
+the first 10 team games, switchers, young, missed-season and rookie groups).
+The drawer shows each player's seasons and the weighted baseline.
 
 **v3 (role check + tracked context).** Props where projection and line are
 more than 1.5 sd apart (`nba_model.role_gap`) are a role disagreement, not an

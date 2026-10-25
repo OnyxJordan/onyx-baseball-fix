@@ -26,7 +26,7 @@ preferring OpticOdds.
 import json, os, subprocess, sys, time, urllib.parse
 from datetime import date, datetime, timedelta, timezone
 
-from nba_common import ESPN, ET, espn_get, game_day, load, save, team_abbr, nk
+from nba_common import ESPN, ET, espn_get, game_day, load, save, team_abbr, nk, refresh_history
 from fetch_onyx import http_json, OPTIC
 
 Q = "sport=basketball&league=nba"
@@ -286,7 +286,7 @@ def ingest_box_scores(today):
     save("player_games.json", pg)
     save("team_games.json", tg)
     print(f"  box scores: +{added} games this run ({len(todo)} new finals found), "
-          f"{len(done)} season games, {sum(1 for k in pg if not k.startswith("_"))} players")
+          f"{len(done)} season games, {sum(1 for k in pg if not k.startswith('_'))} players")
 
 
 # ── PRIOR (last season, from each player's last-x log) ─────────────────────
@@ -354,6 +354,7 @@ def main():
         return run_espn_backup("OpticOdds fixtures call failed")
     ingest_box_scores(today)
     fetch_priors(slate)
+    refresh_history(today)   # 3-season priors + age curve (ESPN season totals; past seasons pulled once)
     print("=== NBA fetch done (OpticOdds) ===")
     return 0
 

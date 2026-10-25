@@ -107,6 +107,8 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
 .pdr-why span{font-family:monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3)}
 .pdr-why b{font-size:17px;font-weight:800;color:var(--text)}
 .pdr-why em{font-style:normal;font-size:11px;color:var(--text3)}
+.hist-tbl th,.hist-tbl td{padding:7px 6px!important;font-size:12px}
+.hist-base td{border-top:1px solid var(--border2);color:var(--text);font-weight:700}
 /* model tab */
 .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
 #engTeams td:first-child,#engUsage td:first-child{width:auto}
@@ -157,7 +159,8 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
   transform:translateX(100%);transition:transform .22s ease;overflow-y:auto;padding:22px}
 .pdr.open{transform:none}.pdr-bg.open{display:block}
 .pdr-x{float:right;background:none;border:1px solid var(--border2);color:var(--text2);border-radius:8px;width:32px;height:32px;cursor:pointer}
-.pdr-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0}
+.pdr-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:16px 0}
+@media (max-width:480px){.pdr-grid .nba-card{padding:10px 6px}.pdr-grid .nba-card .sub{font-size:10px!important}}
 .pdr-grid .nba-card{padding:12px;text-align:center}
 .pdr-grid .v{font-size:24px;font-weight:800;font-family:monospace;color:#d795ff}
 .pdr-grid .l{font-size:10px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase}
@@ -441,6 +444,13 @@ var TEAM_NICK = {ATL:'Hawks',BOS:'Celtics',BKN:'Nets',CHA:'Hornets',CHI:'Bulls',
 
 // ── helpers ────────────────────────────────────────────────────────
 function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+// "Michael Porter Jr." -> "Porter", "Kelly Oubre Jr." -> "Oubre": a suffix is not a name
+var NAME_SUFFIX = /^(jr\.?|sr\.?|ii|iii|iv|v)$/i;
+function lastName(name) {
+  const w = String(name || '').trim().split(/\s+/);
+  while (w.length > 1 && NAME_SUFFIX.test(w[w.length - 1])) w.pop();
+  return w[w.length - 1] || '';
+}
 function fmtOdds(o) { if (o == null || o === '') return '-'; o = +o; return o > 0 ? '+' + o : String(o); }
 function pct(p, d) { return p == null ? '-' : (p * 100).toFixed(d == null ? 1 : d) + '%'; }
 function pp(e) { if (e == null) return '-'; const v = e * 100; return (v > 0 ? '+' : '') + v.toFixed(1); }
@@ -897,8 +907,8 @@ function renderGames() {
     return `<div class="gc-hs ${st ? st.cls : ''}" onclick="openPlayer('${esc(p.pid)}')">
       <div class="gc-hs-img">${hsUrl(p) ? `<img loading="lazy" src="${esc(hsUrl(p))}" alt="" data-alt="${esc(p.img || '')}" onerror="if(this.dataset.alt&&this.src!==this.dataset.alt){this.src=this.dataset.alt;this.dataset.alt=''}else{this.remove()}">` : ''}</div>
       <div class="gc-hs-pct">${mark}${esc(top)}</div>
-      <div class="gc-hs-name">${esc(String(p.name).split(' ').slice(-1)[0])}</div>
-      ${st ? `<div class="gc-hs-lean ${st.side === 'over' ? 'lean-o' : 'lean-u'}">${esc(st.label)}</div>` : ''}</div>`;
+      <div class="gc-hs-name">${esc(lastName(p.name))}</div>
+      ${st ? `<div class="gc-hs-lean ${st.side === 'over' ? 'lean-o' : 'lean-u'}">${esc(st.label)}</div>` : '<div class="gc-hs-lean dim">no line</div>'}</div>`;
   }).join('');
   const watch = `<div class="gc-card" style="padding-bottom:8px"><div class="gc-card-title">Points watch · ${started(g) ? 'live points vs the model\'s lean' : 'projected points and the model\'s lean'} · tap a player to see the case & bet it</div>
     <div class="gc-hs-row">${cells || '<div class="dim">No projections for this game.</div>'}</div></div>`;
@@ -1141,7 +1151,7 @@ function openPlayer(pid) {
     <div class="pdr-grid">${cells}</div>
     <div class="pk-row"><span>proj min <b>${num(p.min)}</b></span>
       <span>season <b>${p.season ? num(p.season.pts) + ' / ' + num(p.season.reb) + ' / ' + num(p.season.ast) : '-'}</b></span>
-      <span>last season <b>${p.last_season ? num(p.last_season.pts) + ' / ' + num(p.last_season.reb) + ' / ' + num(p.last_season.ast) : '-'}</b></span>
+      <span>${p.last_season && p.last_season.back > 1 ? seasonLabel(p.last_season.back) : 'last season'} <b>${p.last_season ? num(p.last_season.pts) + ' / ' + num(p.last_season.reb) + ' / ' + num(p.last_season.ast) : '-'}</b></span>
       ${p.b2b ? '<span class="tagx n">back-to-back</span>' : ''}</div>
     <div class="sec-hdr"><span class="sec-title">Why this number</span></div>
     <div class="pdr-why">
@@ -1152,11 +1162,30 @@ function openPlayer(pid) {
       <div><span>Net rating</span><b>${p.team_net != null ? (p.team_net > 0 ? '+' : '') + num(p.team_net) : '-'}</b><em>${esc(p.team)} per 100 · ${esc(p.opp)} ${p.opp_net != null ? (p.opp_net > 0 ? '+' : '') + num(p.opp_net) : '-'}</em></div>
       <div><span>Team total</span><b>${p.team_implied != null ? num(p.team_implied) : '-'}</b><em>implied by Onyx${p.margin != null ? ` · margin ${p.margin > 0 ? '+' : ''}${num(p.margin)}` : ''}</em></div>
     </div>
+    ${histTable(p)}
     <div class="sec-hdr"><span class="sec-title">Last 5</span></div>
     <div class="tbl"><table style="min-width:0"><thead><tr><th>Date</th><th>Opp</th><th class="r">Min</th><th class="r">Pts</th><th class="r">Reb</th><th class="r">Ast</th></tr></thead>
     <tbody>${l5 || '<tr><td colspan="6" class="dim">No games this season yet.</td></tr>'}</tbody></table></div>`;
   document.getElementById('pdr').classList.add('open');
   document.getElementById('pdrBg').classList.add('open');
+}
+// "2025-26" for a season `back` seasons before the one on the slate
+function seasonLabel(back) {
+  const d = new Date((D.date || '2026-10-25') + 'T12:00:00');
+  const cur = d.getMonth() >= 7 ? d.getFullYear() + 1 : d.getFullYear();
+  const end = cur - back;
+  return `${end - 1}-${String(end).slice(2)}`;
+}
+function histTable(p) {
+  const h = p.history || [];
+  if (!h.length) return `<div class="sec-hdr"><span class="sec-title">History</span></div>
+    <div class="dim" style="font-size:12px;margin-bottom:8px">No NBA seasons yet: projected from what players in his role (position and minutes) produce, then from his own games as they come in.</div>`;
+  const b = p.baseline || {};
+  return `<div class="sec-hdr"><span class="sec-title">Last ${h.length} season${h.length > 1 ? 's' : ''}</span>${p.age ? `<span class="sec-count">age ${esc(p.age)}</span>` : ''}</div>
+    <div class="tbl"><table class="hist-tbl" style="min-width:0"><thead><tr><th>Season</th><th class="hm">Team</th><th class="r">GP</th><th class="r">Min</th><th class="r">Pts</th><th class="r">Reb</th><th class="r">Ast</th><th class="r">USG%</th></tr></thead><tbody>
+    ${h.map(x => `<tr><td class="mono dim">${seasonLabel(x.back)}</td><td class="hm">${esc(x.t)}</td><td class="r mono">${x.gp}</td><td class="r mono">${num(x.min)}</td><td class="r mono">${num(x.pts)}</td><td class="r mono">${num(x.reb)}</td><td class="r mono">${num(x.ast)}</td><td class="r mono">${x.usg != null ? num(x.usg) : '-'}</td></tr>`).join('')}
+    <tr class="hist-base"><td colspan="2">Baseline <span class="dim">(weighted, aged, regressed)</span></td><td class="hm"></td><td class="r mono">${num(b.min)}</td><td class="r mono">${num(b.pts)}</td><td class="r mono">${num(b.reb)}</td><td class="r mono">${num(b.ast)}</td><td></td></tr>
+    </tbody></table></div>`;
 }
 function closePlayer() {
   document.getElementById('pdr').classList.remove('open');
@@ -1184,11 +1213,13 @@ var ENGINE_NOTES = {
       'Against the market: on 12,821 closing Onyx lines the line itself missed by 3.05 on average and the projection by 3.12. The market is sharper on its own, which is why it carries 80% of the probability. Blended, the two beat either alone (log loss 0.6893 vs 0.6898 market, 0.7179 model).',
       'Calibration is the honest test: in the test months the picks lane claimed a 54.2% hit rate and hit 54.0%, going 74-63 at opening prices. That sample is too small to call profit proven, and we say so.',
       'Not everything we tried made the cut, and that is the point. A full retune with usage, utilization, pace and plus-minus added scored better on the training months and worse on the test months, the textbook sign of overfitting. Tested one at a time, usage redistribution made projections worse in both windows (the minutes fit already hands an injured player\'s minutes to his teammates), and the starter pull and pace mix moved the error by less than a hundredth. So they are tracked and shown on every player, and the weights stay where the evidence put them.',
+      'History earned its place too. Tuned on the whole 2024-25 season and judged on 2025-26, the three-season prior improved the first ten games of the season on every stat (points error 4.40 to 4.39, minutes 4.76 to 4.72) and cut the points error for players coming back from a missed season from 4.23 to 3.93. One honest limit: for minutes, this season\'s games should still take over fast. Leaning harder on history for minutes was worse in both seasons, because rotations really do change. History earns its weight on production per minute instead.',
       'The role check did earn its place: when projection and line sit more than 1.5 standard deviations apart, the model\'s side won only 47 to 50%. Taking those props out improved the picks lane in both windows (test months at opening prices 74-63 to 75-60, return +5.6% to +8.4%).',
     ],
   },
   history: [
-    ['Oct 25 · current', 'v3: role check, plus usage, utilization, pace and net rating on every player', 'Usage rate, utilization, plus-minus, possessions and offense / defense / net ratings are now tracked for every player and team and shown on the board, the gamecenter and this page. Each was backtested as a weight; none beat v2 on the held-out months, so the projection weights did not change. The role check takes props where projection and line disagree by more than 1.5 standard deviations out of the picks lane (the model\'s side won 47 to 50% there). Live gamecenter with shot chart and possession.'],
+    ['Oct 25 · current', 'v4: three seasons of history, aged, regressed to role', 'The prior was one season of box scores, so a player who missed last season projected like a rookie and early-season numbers leaned on a couple of games. Now every player starts from his last three seasons, aged on a fitted curve and regressed toward his role; rookies start from their role; team pace starts from last season. Tuned on 2024-25 and judged on 2025-26: better in the first ten games of the season, and points error for players back from a missed season fell from 4.23 to 3.93.'],
+    ['Oct 25', 'v3: role check, plus usage, utilization, pace and net rating on every player', 'Usage rate, utilization, plus-minus, possessions and offense / defense / net ratings are now tracked for every player and team and shown on the board, the gamecenter and this page. Each was backtested as a weight; none beat v2 on the held-out months, so the projection weights did not change. The role check takes props where projection and line disagree by more than 1.5 standard deviations out of the picks lane (the model\'s side won 47 to 50% there). Live gamecenter with shot chart and possession.'],
     ['Oct 24', 'v2: backtested', 'Full-season walk-forward replay against real Onyx lines. Negative binomial replaced the normal curve (it was 5 to 9 points too high on overs), the market blend moved to 20/80, and the picks lane was rebuilt after v1 went 131-128 in the replay.'],
     ['Oct 24', 'v1: launch', 'Minutes &times; per-minute rate &times; environment, priced against Onyx lines from OpticOdds with ESPN as backup.'],
   ],
@@ -1232,13 +1263,20 @@ function renderModel() {
   // rates: a 10-game, 320-minute sample vs the 300-minute prior
   const rp = E.rate_prior || 300, cur = 320;
   const w = E.w == null ? 0.2 : E.w;
+  const H = E.H || {reg_min: 250, w: [6, 3, 1], age_k: 0.5, team_carry: 0.8}, HW = H.w || [6, 3, 1], AG = E.aging || [];
   document.getElementById('engWeights').innerHTML = `
+    <div class="wblock"><div class="wtitle">Start · The history behind every player</div>
+      ${wbar(HW.map((x, i) => [seasonLabel(i + 1), x / HW.reduce((a, b) => a + b, 0) * 100, [C1, C2, C4][i]]))}
+      <div class="wnote">The last three seasons, weighted ${HW.join(' / ')} toward the most recent. Each season is aged forward to this one on a curve fitted from every player's year-to-year change since 2018-19, then mixed with ${H.reg_min} minutes of what players in the same role (position and minutes band) produce. A season missed to injury just leans on the ones before it.</div>
+      ${AG.length ? `<div class="tbl-wrap"><table class="spec-table" style="margin-top:10px"><thead><tr><th>Age</th>${AG.map(a => `<th>${a.age}</th>`).join('')}</tr></thead><tbody>
+        <tr><td>Scoring per minute, next year</td>${AG.map(a => `<td class="mono ${a.pts > 0 ? 'edge-pos' : ''}">${a.pts > 0 ? '+' : ''}${num(a.pts)}%</td>`).join('')}</tr>
+        <tr><td>Minutes per game, next year</td>${AG.map(a => `<td class="mono">${a.min > 0 ? '+' : ''}${num(a.min)}</td>`).join('')}</tr></tbody></table></div>` : ''}</div>
     <div class="wblock"><div class="wtitle">1 · Minutes <span class="dim">(a player 10 games into the season)</span></div>
-      ${wbar([['Last season MPG', priorShare * 100, C4], ['This season', seasonShare * 100, C2], ['Last ' + (P.min_recent_n || 3) + ' games', recent * 100, C1]])}
+      ${wbar([['History MPG (3 seasons, aged)', priorShare * 100, C4], ['This season', seasonShare * 100, C2], ['Last ' + (P.min_recent_n || 3) + ' games', recent * 100, C1]])}
       <div class="wnote">Then: ${P.start_w ? `starters' minutes pull ${pctv(P.start_w)}% of the way to their starting role once they start 2 of the last 3, ` : ''}the team is fitted to exactly 240 minutes (an injured teammate's minutes go to who is left), back-to-backs trim ${pctv(1 - (P.b2b_mult || 1))}% for 30+ minute players, and big spreads trim stars for blowouts.</div></div>
     <div class="wblock"><div class="wtitle">2 · Production per minute <span class="dim">(after ~${cur} minutes this season)</span></div>
-      ${wbar([['Last season rate', rp / (rp + cur) * 100, C4], ['This season rate', cur / (rp + cur) * 100, C2]])}
-      <div class="wnote">The last five games then nudge the rate ${pctv(P.l5_nudge || 0)}% of the way toward recent form, capped at &plusmn;${pctv(P.l5_cap || 0)}%. Rookies start from a positional league rate.</div></div>
+      ${wbar([['History rate (3 seasons)', rp / (rp + cur) * 100, C4], ['This season rate', cur / (rp + cur) * 100, C2]])}
+      <div class="wnote">The last five games then nudge the rate ${pctv(P.l5_nudge || 0)}% of the way toward recent form, capped at &plusmn;${pctv(P.l5_cap || 0)}%. Rookies start from what players in their role (position and minutes band) produced last season.</div></div>
     <div class="wblock"><div class="wtitle">3 · Game environment</div>
       <div class="wrow"><b>Points</b><span>each team's player points are fitted to its implied team total from the Onyx spread and total, at strength ${P.pts_fit_exp} (1.0 = exactly to the total); home &plusmn;${pctv(P.home_pts || 0)}%</span></div>
       <div class="wrow"><b>Rebounds, assists</b><span>(game pace &divide; league)<sup>${P.pace_exp}</sup> &times; (opponent allowed &divide; league)<sup>${P.opp_exp}</sup>, held to &plusmn;12%</span></div>
@@ -1248,13 +1286,16 @@ function renderModel() {
       <div class="wnote">The market is the sharper single read (its line misses by less than any model we tested), so it carries most of the weight and the model moves the number where it sees something. Edge is measured against the price you actually get.</div></div>`;
 
   const f = [
-    ['clock', 'Minutes', `The foundation. Last season's minutes per game count as ${k} games of evidence, this season's games pull toward the current role, and the last ${P.min_recent_n} games carry ${pctv(recent)}% on top. DNPs count as zero.`, 'Foundation', ''],
+    ['chart', 'Three seasons of history', `Every player starts from his last three seasons (weighted ${HW.join('/')}), not just last year: a player who missed a season to injury projects from his healthy years instead of like a rookie. Each season is aged to this one and regressed toward his role.`, 'Foundation', ''],
+    ['pace', 'Age curve', `Young players progress and veterans regress, measured: every player's season-to-season change since 2018-19, by age. Applied at ${pctv(H.age_k || 0)}% strength because full strength over-shot in the backtest.`, 'Progression', 'purple'],
+    ['eye', 'Role baseline', `Rookies and thin histories start from what players in the same role produce (position and minutes band from last season), so a rookie starting 32 minutes is not projected like a bench guard.`, 'Role', 'blue'],
+    ['clock', 'Minutes', `The foundation. History minutes per game count as ${k} games of evidence, this season's games pull toward the current role, and the last ${P.min_recent_n} games carry ${pctv(recent)}% on top. DNPs count as zero.`, 'Foundation', ''],
     ['eye', 'Utilization', `Projected share of the game's 48 minutes. A new starter shows up in the starting lineup before he shows up in a season average, so ${P.start_w ? `2 starts in the last 3 pull his minutes ${pctv(P.start_w)}% toward his minutes as a starter.` : 'we tested pulling minutes toward a starter role after 2 starts in 3: on the held-out months it was a wash, because the last-3-games minutes weight already catches it. Shown on every player, not double counted.'}`, P.start_w ? 'Live' : 'Tested', ''],
     ['bolt', 'Usage rate', `Share of team plays a player finishes on the floor (FGA + 0.44 FTA + TOV). Tracked for every player and shown on the board. When a teammate is out, the minutes fit already hands his minutes to the rotation; adding a usage bump on top ${P.usg_alpha ? 'is applied at strength ' + P.usg_alpha : 'double counted it and made projections worse in the backtest, so it is measured but not applied'}.`, P.usg_alpha ? 'Live' : 'Tested', 'blue'],
-    ['ball', 'Per-minute production', `Points, rebounds and assists per minute: last season as a ${rp}-minute prior blended with this season, so a hot week moves the number without hijacking it. Last-five-games form nudges ${pctv(P.l5_nudge || 0)}%, capped at ${pctv(P.l5_cap || 0)}%.`, 'Foundation', ''],
+    ['ball', 'Per-minute production', `Points, rebounds and assists per minute: the three-season history as a ${rp}-minute prior blended with this season, so a hot week moves the number without hijacking it. Last-five-games form nudges ${pctv(P.l5_nudge || 0)}%, capped at ${pctv(P.l5_cap || 0)}%.`, 'Foundation', ''],
     ['pace', 'Pace and possessions', `Every possession is another chance at a stat. Expected game possessions = team pace &times; opponent pace &divide; league pace, so a run-and-gun team facing a grinder lands in between. Rebounds and assists scale with it at exponent ${P.pace_exp}.`, 'Environment', 'purple'],
     ['shield', 'Opponent defense', `What the opponent allows in rebounds and assists versus the league, regressed by games played and applied at exponent ${P.opp_exp}. Points use the team total instead (below).`, 'Matchup', 'purple'],
-    ['chart', 'Team total and net rating', `Player points add up to the team's implied score from the Onyx spread and total. Before lines post, offense and defense ratings per 100 possessions set the target and net rating sets the expected margin (home court ${P.home_court} pts).`, 'Environment', 'purple'],
+    ['chart', 'Team total and net rating', `Player points add up to the team's implied score from the Onyx spread and total. Before lines post, offense and defense ratings per 100 possessions set the target and net rating sets the expected margin (home court ${P.home_court} pts). Early in a season, team pace and ratings start from ${pctv(H.team_carry || 0)}% of last season's team, not a blank league average.`, 'Environment', 'purple'],
     ['pm', 'Plus-minus', `Each player's on-court point differential, shown on the board as a read on how his lineups are playing. ${P.pm_k ? 'It nudges minutes at strength ' + P.pm_k + '.' : 'Backtested as a minutes signal across a full season: it did not improve projections, so it informs rather than moves the number.'}`, P.pm_k ? 'Live' : 'Context', 'gold'],
     ['bed', 'Rest and game script', `Back-to-backs trim ${pctv(1 - (P.b2b_mult || 1))}% for 30+ minute players. Spreads of 10+ trim heavy-minute players for blowout risk (up to 6%).`, 'Timing', 'gold'],
     ['cross', 'Injuries', `OUT and DOUBTFUL players are projected at zero and their minutes go to the healthy rotation. Questionable players are projected but can never be a pick.`, 'News', 'gold'],
@@ -1289,12 +1330,13 @@ function renderModel() {
   const sd = E.sd || {};
   const spec = [
     ['Projection', 'minutes &times; per-minute rate &times; environment, team points fitted to the implied total'],
-    ['Minutes prior', `${k} games of last season's MPG (half that after a team change)`],
+    ['History', `last 3 seasons weighted ${HW.join(' / ')}, aged at ${H.age_k} strength, regressed ${H.reg_min} minutes toward role; team pace and ratings start ${pctv(H.team_carry || 0)}% from last season`],
+    ['Minutes prior', `${k} games of history MPG (half that after a team change)`],
     ['Recent minutes', `${pctv(recent)}% on the last ${P.min_recent_n} games`],
     ['Utilization', P.start_w ? `${pctv(P.start_w)}% pull to starter minutes after 2 of 3 starts` : 'tracked and shown; starter pull tested, not applied'],
     ['Usage redistribution', P.usg_alpha ? `strength ${P.usg_alpha}` : 'tracked and shown; tested, not applied (worse on held-out months)'],
-    ['Rate prior', `${rp} minutes of last season`],
-    ['Usage prior', `${E.use_prior} minutes of last season (FGA + 0.44 FTA + TOV)`],
+    ['Rate prior', `${rp} minutes of the three-season history`],
+    ['Usage prior', `${E.use_prior} minutes of the three-season history (FGA + 0.44 FTA + TOV)`],
     ['Form nudge', `${pctv(P.l5_nudge || 0)}% of the last-5 gap, capped &plusmn;${pctv(P.l5_cap || 0)}%`],
     ['Pace / opponent exponents', `${P.pace_exp} / ${P.opp_exp}`],
     ['Points fit strength', `${P.pts_fit_exp}`],

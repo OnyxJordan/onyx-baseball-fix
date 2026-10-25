@@ -92,6 +92,48 @@ def build_prior(G, lines, before):
     return pr
 
 
+def build_hist_prior(lines, hist, target=2026, ref=2027):
+    """The production prior, rebuilt for the backtest season: up to three
+    seasons before `target` from ESPN season totals (tools/nba_history_pull.py),
+    aged with a curve fitted only on seasons before `target`, regressed to
+    last season's role table. Matched to OpticOdds players by name."""
+    P = hist["players"]
+    aging = M.fit_aging(P, target - 1, ref)
+    roles = M.role_table(P[str(target - 1)])
+    th = M.team_history(hist["teams"].get(str(target - 1)))
+    idx = {}
+    for k in (1, 2, 3):
+        by = {}
+        for r in P.get(str(target - k), {}).values():
+            key = nk(r["n"])
+            if key not in by or r["min"] > by[key]["min"]:
+                by[key] = r
+        idx[k] = by
+    ages = {}
+    for season in sorted(P, reverse=True):
+        for r in P[season].values():
+            ages.setdefault(nk(r["n"]), r.get("age"))
+    names = {}
+    for ls in lines.values():
+        for l in ls:
+            names[l["pid"]] = (l["name"], l["team"], l["pos"])
+    prior, hit = {}, 0
+    for pid, (name, team, pos) in names.items():
+        key = nk(name)
+        rows = [(k, idx[k].get(key)) for k in (1, 2, 3)]
+        age = ages.get(key)
+        age_now = age - (ref - target) if age is not None else None
+        pr = M.history_prior(rows, age_now, aging, roles, team)
+        if pr:
+            pr["n"] = name
+            prior[pid] = pr
+            hit += 1
+    return prior, th, roles, aging, hit, len(names)
+
+
+HIST_CTX = {"team_hist": None, "roles": None}
+
+
 def walk(G, lines, season_start, season_end, prior, mkt=None):
     """One record per player-game: projection, baselines, actual, and the
     Onyx main line (open + close) when the historical pull has one."""
@@ -136,7 +178,7 @@ def walk(G, lines, season_start, season_end, prior, mkt=None):
                         slate["players"].append({"pid": pid, "name": apps[-1][0], "team": team, "opp": opp,
                                                  "home": team == g["home"], "gid": fid, "pos": apps[-1][1],
                                                  "inj": "OUT"})
-        rows, _ = M.project_slate(slate, prior, pg, tg)
+        rows, _ = M.project_slate(slate, prior, pg, tg, HIST_CTX["team_hist"], HIST_CTX["roles"])
         n_out = defaultdict(int)
         for p in slate["players"]:
             if p["inj"] == "OUT":
@@ -159,7 +201,11 @@ def walk(G, lines, season_start, season_end, prior, mkt=None):
                            "prior": pv, "szn_raw": szn if len(hist) >= 2 else None, "l5": l5}
             props = ((mkt.get(r["gid"]) or {}).get("props") or {}).get(r["name"]) or \
                     NAMEMAP.get(r["gid"], {}).get(nk(r["name"])) or {}
+            pri_ = prior.get(r["pid"]) or {}
             out.append({"d": d, "pid": r["pid"], "name": r["name"], "gid": r["gid"], "pmin": r["min"],
+                        "tgp": len(tg.get(r["team"], [])), "age": pri_.get("age"),
+                        "switched": bool(pri_.get("switched")) or bool(pri_ and pri_.get("t") and pri_.get("t") != r["team"]),
+                        "missed_last": bool(pri_) and pri_.get("back", 1) >= 2, "no_prior": not pri_,
                         "team_out": n_out[(r["gid"], r["team"])],
                         "amin": a["min"], "proj": dict(r["proj"]), "act": {s: a[s] for s in STATS},
                         "base": base, "gp": len(hist), "props": props})
@@ -190,8 +236,9 @@ def walk(G, lines, season_start, season_end, prior, mkt=None):
     return out
 
 
-def score(recs, lo="0000", hi="9999", min_proj=MIN_PROJ, only_out=False):
-    sel = [r for r in recs if lo <= r["d"] < hi and r["pmin"] >= min_proj and (not only_out or r.get("team_out"))]
+def score(recs, lo="0000", hi="9999", min_proj=MIN_PROJ, only_out=False, where=None):
+    sel = [r for r in recs if lo <= r["d"] < hi and r["pmin"] >= min_proj and (not only_out or r.get("team_out"))
+           and (where is None or where(r))]
     res = {"n": len(sel)}
     if not sel:
         return res
