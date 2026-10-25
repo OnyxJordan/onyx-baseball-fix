@@ -458,6 +458,18 @@ play (ESPN publishes no NBA possession field), last play and play-by-play.
 Headshot rings judge the model's lean: overs go green once they clear, unders
 stay lilac until the final then go green, red the moment an under is beaten.
 
+**App shell (`ui.js`, both sites).** Loaded `defer` by `shell.html` /
+`index.html` and `nba_shell.html`, after each page's own script. It builds
+the phone bottom bar and the More sheet (every page as a tile, search over
+pages and players, MLB / NBA switch, parlay builder, share, What's new),
+wraps `gotoTab` and `renderParlaySlip` (active state, parlay toasts), and
+owns the status-bar fix: `--sat` / `--sab` carry the safe-area inset
+everywhere, and when an installed iPhone app reports 0 it measures that and
+sets the real height (the 10/25 "menu cut off, nothing clickable" bug, plus
+two old phone rules that zeroed the header's top padding). Off-season the
+MLB build leaves `index.html` untouched, so shell edits there must be
+applied to `index.html` too. Gate: `tools/verify_pwa.js` (CI).
+
 **Design:** `nba_build.py` copies the MLB stylesheet out of `shell.html`
 into `nba.html` on every build (the `/*MLB_CSS*/` placeholder), so both sports
 share one design system and the NBA page uses the MLB components as-is:

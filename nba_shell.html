@@ -10,6 +10,8 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Onyx">
+<!-- shared app shell: bottom menu, search, toasts, status-bar fix (ui.js) -->
+<script src="ui.js" defer></script>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="preconnect" href="https://site.api.espn.com" crossorigin>
@@ -158,6 +160,14 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
 .pdr{position:fixed;right:0;top:0;bottom:0;width:min(460px,100vw);background:var(--bg2);border-left:1px solid var(--border2);z-index:9996;
   transform:translateX(100%);transition:transform .22s ease;overflow-y:auto;padding:22px}
 .pdr.open{transform:none}.pdr-bg.open{display:block}
+.pdr{padding-top:calc(18px + var(--sat))}
+/* phones: the player drawer is a bottom sheet (thumb reach, never under the status bar) */
+@media (max-width:760px){
+  .pdr{top:auto;left:0;right:0;width:100vw;height:auto;max-height:calc(100vh - var(--sat) - 28px);border-left:0;border-top:1px solid rgba(176,56,249,.35);
+       border-radius:22px 22px 0 0;padding-top:26px;padding-bottom:calc(24px + var(--sab));transform:translateY(105%);transition:transform .32s cubic-bezier(.2,.9,.25,1)}
+  .pdr::before{content:"";position:absolute;top:9px;left:50%;width:40px;height:5px;margin-left:-20px;border-radius:3px;background:rgba(255,255,255,.22)}
+  .pdr.open{transform:none}
+}
 .pdr-x{float:right;background:none;border:1px solid var(--border2);color:var(--text2);border-radius:8px;width:32px;height:32px;cursor:pointer}
 .pdr-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:16px 0}
 @media (max-width:480px){.pdr-grid .nba-card{padding:10px 6px}.pdr-grid .nba-card .sub{font-size:10px!important}}

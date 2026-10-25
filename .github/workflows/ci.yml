@@ -82,3 +82,9 @@ jobs:
 
       - name: Headless NBA page check
         run: node tools/verify_nba.js
+
+      # Installed-iPhone gate for both pages: a 0 safe-area inset (what iOS
+      # sometimes reports) must not put the header or menu under the status
+      # bar, and the bottom menu must open, navigate and close.
+      - name: Installed app (PWA) check
+        run: node tools/verify_pwa.js

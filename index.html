@@ -13,6 +13,8 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Onyx">
+<!-- shared app shell: bottom menu, search, toasts, status-bar fix (ui.js) -->
+<script src="ui.js" defer></script>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <script>
@@ -24,7 +26,7 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{overflow-x:hidden}
-:root{
+:root{--sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px);
   /* Onyx brand hub palette: Onyx 800 ground, neutral surfaces, Titanium
      text, Purple 400 leads, Seed greens, Blue 400 + Purple 200 accents.
      Spark (yellow) is deliberately absent - not used on this site. */
@@ -68,8 +70,8 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
 .nav{
   /* installed PWA draws under the status bar / Dynamic Island: the
      safe-area inset pushes the header (and its tap targets) below it */
-  height:calc(58px + env(safe-area-inset-top, 0px));
-  padding:env(safe-area-inset-top, 0px) 20px 0;
+  height:calc(58px + var(--sat));
+  padding:var(--sat) 20px 0;
   display:flex;align-items:center;gap:0;
   background:rgba(12,12,12,.92);
   border-bottom:1px solid rgba(255,255,255,.06);
@@ -386,7 +388,7 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
 
 /* Mobile */
 @media(max-width:600px){
-  .nav{padding:0 12px}
+  .nav{padding:var(--sat) 12px 0}
   .nav-tab{padding:0 11px;font-size:12px}
   .targets-grid{grid-template-columns:1fr;padding:0 12px 12px}
   .sec-hdr,.search-bar,.games-wrap,.rank-wrap,.dfs-wrap,.power-wrap,.rank-filters,.power-note,.dfs-hdr{padding-left:12px;padding-right:12px}
@@ -432,8 +434,8 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
 .nav-drawer.open{display:flex}
 .nav-drawer-header{
   display:flex;align-items:center;justify-content:space-between;
-  padding:env(safe-area-inset-top, 0px) 20px 0;
-  height:calc(58px + env(safe-area-inset-top, 0px));
+  padding:var(--sat) 20px 0;
+  height:calc(58px + var(--sat));
   border-bottom:1px solid var(--border);flex-shrink:0;
 }
 .nav-drawer-close{
@@ -463,7 +465,7 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
 
 @media(max-width:700px){
   /* Nav */
-  .nav{padding:0 16px}
+  .nav{padding:var(--sat) 16px 0}
   .nav-tabs{display:none}
   .nav-hamburger{display:flex}
   .nav-right .nav-badge{display:none}
@@ -1084,14 +1086,14 @@ body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemF
 .gc-parks.scrape { background:rgba(96,165,250,.12); color:#93c5fd; border-color:rgba(96,165,250,.35); }
 /* ── NO DOUBTER popup ── */
 /* parlay builder: floating slip + armed-mode glow on every odds button */
-#parlayFab { position:fixed; right:14px; bottom:calc(14px + env(safe-area-inset-bottom)); z-index:9990;
+#parlayFab { position:fixed; right:14px; bottom:calc(14px + var(--sab)); z-index:9990;
   display:flex; flex-direction:column; align-items:flex-end; gap:8px;
   width:min(320px, calc(100vw - 28px)); pointer-events:none; }
 #parlayFab > * { pointer-events:auto; }
 /* phones / installed PWA: the bottom app nav owns the bottom edge — dock
    the parlay pill ABOVE it so it never covers Markets/Rankings taps */
 @media (max-width:760px) {
-  #parlayFab { bottom:calc(86px + env(safe-area-inset-bottom)); right:10px; }
+  #parlayFab { bottom:calc(86px + var(--sab)); right:10px; }
 }
 .pb-fab { background:linear-gradient(135deg,#7a2ce0,#b038f9); color:#fff; font-size:12px; font-weight:800;
   padding:10px 15px; border-radius:22px; cursor:pointer; box-shadow:0 4px 18px rgba(122,44,224,.45);
@@ -1140,7 +1142,7 @@ body.parlay-armed .mkt-chip, body.parlay-armed .mkt-ou, body.parlay-armed .gc-be
   84% { transform:scale(1.22) translate(60px,42px); }
   100% { transform:none; }
 }
-.gc-hrpop { position:fixed; left:50%; top:calc(84px + env(safe-area-inset-top)); transform:translateX(-50%);
+.gc-hrpop { position:fixed; left:50%; top:calc(84px + var(--sat)); transform:translateX(-50%);
   z-index:9000; width:min(400px, calc(100vw - 32px)); background:linear-gradient(160deg,#191129,#0b0f1c 70%);
   border:1px solid rgba(215,149,255,.5); border-radius:18px; padding:16px 18px 14px; cursor:pointer;
   box-shadow:0 12px 50px rgba(0,0,0,.7), 0 0 34px rgba(215,149,255,.22);
@@ -1307,10 +1309,10 @@ body.parlay-armed .mkt-chip, body.parlay-armed .mkt-ou, body.parlay-armed .gc-be
 @media (max-width:760px) {
   .bnav { display:flex; position:fixed; bottom:0; left:0; right:0; z-index:900;
     background:rgba(12,12,12,.92); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
-    border-top:1px solid var(--border2); padding:6px 4px calc(6px + env(safe-area-inset-bottom)); }
+    border-top:1px solid var(--border2); padding:6px 4px calc(6px + var(--sab)); }
   body { padding-bottom:76px; }
   /* header: compact single row on phones, no wrapped meta text */
-  .nav { height:calc(50px + env(safe-area-inset-top, 0px)); padding-left:14px; padding-right:14px; }
+  .nav { height:calc(50px + var(--sat)); padding-left:14px; padding-right:14px; }
   .nav-date { display:none !important; }
   .nav-badge { display:none !important; }
   .nav-right { gap:6px; flex-shrink:0; }
@@ -1338,7 +1340,7 @@ body.parlay-armed .mkt-chip, body.parlay-armed .mkt-ou, body.parlay-armed .gc-be
 .bnav-item.big.active { color:#c9a6ff; }
 .bnav-item.big.active .bi { box-shadow:0 6px 24px rgba(176,56,249,.75), 0 0 0 4px rgba(12,12,12,.95); }
 /* notification preferences menu */
-.notif-menu { position:fixed; top:calc(60px + env(safe-area-inset-top, 0px)); right:12px; z-index:1200;
+.notif-menu { position:fixed; top:calc(60px + var(--sat)); right:12px; z-index:1200;
   width:270px; background:rgba(10,14,24,.98); border:1px solid var(--border2); border-radius:14px;
   box-shadow:0 12px 40px rgba(0,0,0,.6); padding:12px; backdrop-filter:blur(16px); }
 .notif-hd { font-family:monospace; font-size:10px; font-weight:700; letter-spacing:.12em;
@@ -1447,7 +1449,7 @@ body.parlay-armed .mkt-chip, body.parlay-armed .mkt-ou, body.parlay-armed .gc-be
 tr.row-done td, .tcard.card-done { opacity:.5; }
 
 /* player drill-down modal */
-.pmodal-back { position:fixed; inset:0; padding-top:env(safe-area-inset-top, 0px); background:rgba(5,6,10,.75); backdrop-filter:blur(6px);
+.pmodal-back { position:fixed; inset:0; padding-top:var(--sat); background:rgba(5,6,10,.75); backdrop-filter:blur(6px);
   z-index:100000; display:none; align-items:flex-start; justify-content:center; padding:60px 16px; overflow-y:auto; }
 .pmodal-back.open { display:flex; }
 .pmodal { background:var(--bg2); border:1px solid var(--border2); border-radius:16px;
@@ -3028,15 +3030,7 @@ function gotoTab(tab) {
 }
 // App-shell landing: the game experience is the front door
 function bootAppShell() {
-  const nav = document.createElement('nav');
-  nav.className = 'bnav';
-  nav.innerHTML = `
-    <button class="bnav-item" data-tab="board" onclick="gotoTab('board')"><span class="bi">📋</span>Board</button>
-    <button class="bnav-item" data-tab="power" onclick="gotoTab('power')"><span class="bi">🎯</span>Plays</button>
-    <button class="bnav-item big" data-tab="gamecenter" onclick="gotoTab('gamecenter')"><span class="bi">⚾</span>Games</button>
-    <button class="bnav-item" data-tab="markets" onclick="gotoTab('markets')"><span class="bi">📈</span>Markets</button>
-    <button class="bnav-item" data-tab="rankings" onclick="gotoTab('rankings')"><span class="bi">📊</span>Ranks</button>`;
-  document.body.appendChild(nav);
+  // the phone bottom bar and More menu are built by ui.js (shared with nba.html)
   gotoTab('home');
 }
 if (document.readyState === 'loading') {
