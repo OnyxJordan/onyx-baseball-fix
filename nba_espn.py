@@ -322,6 +322,8 @@ def main():
     year = slate.get("season_year") or (today.year + (1 if today.month >= 8 else 0))
     fetch_prior(year)
     ingest_box_scores(today)
+    if not Path("data/nba/history.json").exists():   # the OpticOdds path keeps the shared copy
+        nba_common.refresh_history(today)
     print("=== NBA ESPN backup done ===")
 
 

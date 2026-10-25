@@ -130,3 +130,128 @@ def american_from_any(v):
     if f > 1.01:
         return -int(round(100.0 / (f - 1.0)))
     return None
+
+
+# ── multi-season history (ESPN season totals) ───────────────────────────────
+# OpticOdds has game logs, not season totals; three past seasons from it would
+# be thousands of calls. ESPN's byathlete / byteam endpoints give a whole
+# season in ~6 pages, with age and debut year, so the history comes from here.
+# `season` is ESPN's label: the year the season ENDS (2026 = 2025-26).
+HIST_KEYS = ("min", "pts", "reb", "ast", "fg3", "fga", "fta", "tov", "oreb")
+
+
+def _cat_values(row, cats, split=None):
+    vals = {}
+    for c in row.get("categories", []):
+        if split is not None and str(c.get("splitId", "0")) != split:
+            continue
+        for n, v in zip(cats.get(c.get("name"), []), c.get("totals") or c.get("values") or []):
+            vals.setdefault(n, v)
+    return vals
+
+
+def _f(v):
+    try:
+        return float(str(v).replace(",", ""))
+    except (TypeError, ValueError):
+        return None
+
+
+def espn_season_players(season):
+    """{espn_id: {n, t, pos, age, debut, gp, min, pts, ...}} season totals, or {}."""
+    out, page, pages = {}, 1, 1
+    while page <= pages and page <= 30:
+        d = espn_get(f"{ESPN_WEB}/statistics/byathlete",
+                     {"season": season, "seasontype": 2, "limit": 100, "page": page})
+        if not d:
+            return {}
+        pages = (d.get("pagination") or {}).get("pages", 1)
+        cats = {c["name"]: c["names"] for c in d.get("categories", []) if c.get("names")}
+        for row in d.get("athletes", []):
+            a = row.get("athlete") or {}
+            v = _cat_values(row, cats)
+            gp, mins = _f(v.get("gamesPlayed")), _f(v.get("minutes"))
+            if not a.get("id") or not gp or not mins:
+                continue
+            rec = {"n": a.get("displayName", ""), "t": team_abbr(a.get("teamShortName")) or a.get("teamShortName", ""),
+                   "pos": (a.get("position") or {}).get("abbreviation", ""),
+                   "age": a.get("age"), "debut": a.get("debutYear"), "gp": int(gp)}
+            names = {"min": "minutes", "pts": "points", "reb": "rebounds", "ast": "assists",
+                     "fg3": "threePointFieldGoalsMade", "fga": "fieldGoalsAttempted",
+                     "fta": "freeThrowsAttempted", "tov": "turnovers", "oreb": "offensiveRebounds"}
+            for k, src in names.items():
+                rec[k] = _f(v.get(src))
+            out[str(a["id"])] = rec
+        page += 1
+        time.sleep(0.25)
+    return out
+
+
+def espn_season_teams(season):
+    """{team: {gp, pts, opp_pts, poss, ...}} season totals, or {}."""
+    d = espn_get(f"{ESPN_WEB}/statistics/byteam", {"season": season, "seasontype": 2, "limit": 40})
+    if not d:
+        return {}
+    cats = {c["name"]: c["names"] for c in d.get("categories", []) if c.get("names")}
+    out = {}
+    for row in d.get("teams", []):
+        t = team_abbr((row.get("team") or {}).get("abbreviation"))
+        if not t:
+            continue
+        rec = {}
+        for side, split in (("", "0"), ("opp_", "900")):
+            v = _cat_values(row, cats, split)
+            for k, src in (("gp", "gamesPlayed"), ("pts", "points"), ("fga", "fieldGoalsAttempted"),
+                           ("fta", "freeThrowsAttempted"), ("tov", "turnovers"),
+                           ("oreb", "offensiveRebounds"), ("reb", "rebounds"), ("ast", "assists")):
+                rec[side + k] = _f(v.get(src))
+        gp = rec.get("gp") or 0
+        if gp and rec.get("fga") is not None:
+            # possessions per game: FGA - OREB + TOV + 0.44 FTA, own and
+            # opponent averaged (the standard estimate)
+            own = rec["fga"] - (rec["oreb"] or 0) + (rec["tov"] or 0) + 0.44 * (rec["fta"] or 0)
+            opp = (rec["opp_fga"] or 0) - (rec["opp_oreb"] or 0) + (rec["opp_tov"] or 0) + 0.44 * (rec["opp_fta"] or 0)
+            rec["poss"] = round((own + opp) / 2 / gp, 2) if opp else round(own / gp, 2)
+            rec["ppg"] = round(rec["pts"] / gp, 2)
+            rec["opp_ppg"] = round((rec["opp_pts"] or 0) / gp, 2)
+        out[t] = rec
+    return out
+
+
+HISTORY_SEASONS = 8      # 3 feed each player's prior; all 8 fit the age curve
+
+
+def current_season(day):
+    """ESPN's label for the season `day` falls in (2027 = 2026-27)."""
+    return day.year + 1 if day.month >= 8 else day.year
+
+
+def refresh_history(day):
+    """data/nba/history.json: ESPN season totals for the last HISTORY_SEASONS
+    seasons, players and teams. Past seasons never change, so each is pulled
+    once; a new season (or a missing one) triggers only what is missing.
+    Ages are stored as of `_ref` (the season they were read in)."""
+    cur = current_season(day)
+    h = load("history.json", {})
+    if h.get("_ref") != cur:
+        h = {"_ref": cur, "players": {}, "teams": {}}   # ages are relative to _ref: re-read on a new season
+    want = [str(cur - k) for k in range(1, HISTORY_SEASONS + 1)]
+    got = 0
+    for season in want:
+        if h["players"].get(season) and h["teams"].get(season):
+            continue
+        pl, tm = espn_season_players(int(season)), espn_season_teams(int(season))
+        if len(pl) < 300 or len(tm) < 30:
+            print(f"  history: season {season} came back thin ({len(pl)} players, {len(tm)} teams); retry next run")
+            continue
+        # compact rows: only what the model reads
+        h["players"][season] = {pid: {k: (round(v, 1) if isinstance(v, float) else v) for k, v in r.items()}
+                                for pid, r in pl.items()}
+        h["teams"][season] = tm
+        got += 1
+    if got:
+        h["_built"] = day.isoformat()
+        save("history.json", h)
+    have = sum(1 for s in want if h["players"].get(s))
+    print(f"  history: {have}/{len(want)} seasons on file (+{got} this run)")
+    return h

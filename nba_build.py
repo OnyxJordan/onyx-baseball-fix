@@ -22,7 +22,7 @@ import json, re, sys
 from datetime import date, datetime, timedelta, timezone
 
 import nba_common
-from nba_common import DATA, game_day, load, save, nk
+from nba_common import DATA, current_season, game_day, load, save, nk
 import nba_model as M
 from nba_model import role_gap, VERSION, project_slate, price_side, STATS
 
@@ -125,14 +125,14 @@ def signals(r, s, pr):
     return sum(1 for v in reads if (v > pr["line"]) == over and v != pr["line"])
 
 
-def engine_card(slate, tg, lg):
+def engine_card(slate, tg, lg, hist=None, th=None):
     """The live model's own weights and tonight's team environment, for the
     Model tab: the page reads these instead of restating them in copy, so
     what it says can never drift from what the model does."""
     teams = []
     for g in slate.get("games", []):
         for t, o in ((g["away"], g["home"]), (g["home"], g["away"])):
-            tp, op = M.team_profile(tg, t, lg), M.team_profile(tg, o, lg)
+            tp, op = M.team_profile(tg, t, lg, th), M.team_profile(tg, o, lg, th)
             teams.append({"team": t, "opp": o, "gp": tp["n"], "pace": round(tp["poss"], 1),
                           "ortg": round(tp["ortg"], 1), "drtg": round(tp["drtg"], 1), "net": round(tp["net"], 1),
                           "game_poss": round(tp["poss"] * op["poss"] / lg["poss"], 1)})
@@ -142,7 +142,28 @@ def engine_card(slate, tg, lg):
             "lane": {"min_edge": PICK_MIN_EDGE, "max_edge": PICK_MAX_EDGE, "signals": PICK_MIN_SIGNALS,
                      "price": list(PICK_PRICE), "min_min": PICK_MIN_MIN, "max_gap": PICK_MAX_GAP,
                      "per_game": PICK_MAX_PER_GAME, "per_slate": PICK_MAX_PER_SLATE},
-            "teams": teams}
+            "teams": teams, "H": {k: (list(v) if isinstance(v, tuple) else v) for k, v in M.H.items()},
+            "aging": aging_card(hist)}
+
+
+def aging_card(hist):
+    """The fitted age curve as the Model tab shows it: per-year change in
+    points per minute and in minutes per game at a few ages, at the strength
+    the model applies (H["age_k"])."""
+    P = (hist or {}).get("players") or {}
+    if not P:
+        return []
+    cur = int(hist.get("_ref") or 0)
+    ag = M.fit_aging(P, cur - 1, cur)
+    k = M.H["age_k"]
+    out = []
+    for age in (20, 22, 24, 26, 28, 30, 32, 34):
+        pts = ag.get("pts", {}).get(age)
+        mn = ag.get("min", {}).get(age)
+        if pts is None or mn is None:
+            continue
+        out.append({"age": age, "pts": round(100 * (pow(2.718281828, k * pts) - 1), 1), "min": round(k * mn, 1)})
+    return out
 
 
 def payout(price):
@@ -213,7 +234,13 @@ def main():
     if props.get("date") != today:
         props = {}
     merge_lines(slate, props)
-    rows, lg = project_slate(slate, prior, pg, tg)
+    # three past seasons, aged and regressed to role (nba_model.history_prior);
+    # last season's box-score prior stays as the fallback for anyone unmatched
+    hist = load(sub + "history.json", {}) or load("history.json", {})
+    hp, th, roles, n_hist = M.slate_history(slate, hist, current_season(date.fromisoformat(today)))
+    prior = {**prior, **hp}
+    print(f"  history priors: {n_hist} of {len(slate.get('players', []))} players")
+    rows, lg = project_slate(slate, prior, pg, tg, th, roles)
     priced = attach_props(rows, props, source)
 
     ledger = load(LEDGER, [])
@@ -272,7 +299,7 @@ def main():
         # 80px team logos baked in (tools/nba_make_logos.py): no third-party
         # host needed at page load
         "logos": load("team_logos.json", {}),
-        "engine": engine_card(slate, tg, lg),
+        "engine": engine_card(slate, tg, lg, hist, th),
     }
     shell = open(SHELL, encoding="utf-8").read()
     # one design system: the MLB stylesheet is copied out of shell.html on
