@@ -26,7 +26,7 @@ function serve(rootDir) {
     if (!file.startsWith(path.resolve(rootDir))) { res.writeHead(403).end(); return; }
     fs.readFile(file, (err, buf) => {
       if (err) { res.writeHead(404).end(); return; }
-      res.writeHead(200, { 'content-type': file.endsWith('.html') ? 'text/html' : 'application/octet-stream' }).end(buf);
+      res.writeHead(200, { 'content-type': file.endsWith('.html') ? 'text/html' : file.endsWith('.js') ? 'text/javascript' : 'application/octet-stream' }).end(buf);
     });
   });
   return new Promise(r => server.listen(PORT, '127.0.0.1', () => r(server)));

@@ -77,6 +77,7 @@ rm -rf __pycache__ && python3 -B auto_build.py && python3 -B update_stats.py
 npm install playwright-core --no-save   # once per container
 node tools/verify_shell.js              # local build; exits non-zero on failure
 node tools/verify_shell.js --live       # the DEPLOYED page, after the deploy lands
+node tools/verify_pwa.js                # installed-iPhone gate: header/menu clear the status bar
 ```
 
 Use that script rather than writing a probe from scratch — it encodes three things
