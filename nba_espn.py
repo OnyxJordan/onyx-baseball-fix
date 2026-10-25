@@ -280,6 +280,7 @@ def fetch_slate(today):
                     "team": ab, "opp": opp, "home": ha == "home", "gid": g["gid"],
                     "pos": (a.get("position") or {}).get("abbreviation", ""),
                     "inj": (i or {}).get("status", ""), "inj_detail": (i or {}).get("detail", ""),
+                    "hs": str(a.get("id") or "") or None, "logo": "",
                 })
             time.sleep(0.2)
     slate = {"date": today.isoformat(), "season_year": season_year, "source": "espn",

@@ -425,6 +425,21 @@ before it posted a second night. Re-run the backtest after any model or lane
 change and quote its test-window numbers in the `nba_model.py` changelog. `validate_build.py` guards it with the same never-shrinks
 rule as the MLB ledgers.
 
+**Design:** `nba_build.py` copies the MLB stylesheet out of `shell.html`
+into `nba.html` on every build (the `/*MLB_CSS*/` placeholder), so both sports
+share one design system and the NBA page uses the MLB components as-is:
+score ticker, home hero and stat cards, gamecenter (`.sb-*` game cards,
+`.gc-header`, `.gc-hs` headshot row, `.gc-line` line score, `.gc-betbar`),
+and the `.pb-*` parlay slip. Team logos are 80px PNGs baked into
+`data/nba/team_logos.json` (`tools/nba_make_logos.py`); headshots come from
+ESPN's resizing CDN, matched to OpticOdds players by team + name once a day
+(`data/nba/headshots.json`), with the OpticOdds image as a fallback. Live
+scores, quarter line scores, box scores and win probability are polled
+client-side from ESPN's public scoreboard / summary (15s while a game is
+live). The **Top Scorer Parlay** (home + Top Scorers tab) takes tonight's
+highest projected scorers, one per untipped game, whose Onyx points-over is
+priced and not leaned against by the blend, and opens them as one Onyx slip.
+
 **Pipelines:** `refresh_build.yml` and `daily_build.yml` run the three NBA
 steps after the MLB build, each `continue-on-error` with its own timeout, so
 an NBA problem can never block or delay MLB. CI builds `nba.html` from
