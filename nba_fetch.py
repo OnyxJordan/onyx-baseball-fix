@@ -286,7 +286,7 @@ def ingest_box_scores(today):
     save("player_games.json", pg)
     save("team_games.json", tg)
     print(f"  box scores: +{added} games this run ({len(todo)} new finals found), "
-          f"{len(done)} season games, {sum(1 for k in pg if not k.startswith("_"))} players")
+          f"{len(done)} season games, {sum(1 for k in pg if not k.startswith('_'))} players")
 
 
 # ── PRIOR (last season, from each player's last-x log) ─────────────────────

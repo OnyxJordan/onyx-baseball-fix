@@ -232,7 +232,7 @@ def ingest_box_scores(today):
     save("player_games.json", pg)
     save("team_games.json", tg)
     print(f"  box scores: +{added} games this run, {len(done)} season games, "
-          f"{sum(1 for k in pg if not k.startswith("_"))} players")
+          f"{sum(1 for k in pg if not k.startswith('_'))} players")
     return pg, tg
 
 
