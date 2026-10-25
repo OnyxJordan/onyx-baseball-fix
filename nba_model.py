@@ -90,11 +90,23 @@ P = {
     "scale_pts": 0.96,        # final per-stat scale (bias correction from the backtest)
     "scale_reb": 0.94,
     "scale_ast": 0.96,
+    # usage redistribution (teammates OUT): share of the missing usage that
+    # is re-absorbed, how strongly it tilts to high-usage players, and how a
+    # usage bump converts into per-minute points / assists / rebounds
+    "usg_alpha": 0.0,
+    "usg_gamma": 1.0,
+    "usg_beta_pts": 0.8,
+    "usg_beta_ast": 0.5,
+    "usg_beta_reb": 0.0,
 }
 OUT_STATUSES = {"OUT", "DOUBTFUL", "O", "D", "SUSPENSION"}
 RISK_STATUSES = {"QUESTIONABLE", "GTD", "Q", "DAY-TO-DAY", "DTD"}
 STATS = ("pts", "reb", "ast")
-IDX = {"min": 4, "pts": 5, "reb": 6, "ast": 7}
+IDX = {"min": 4, "pts": 5, "reb": 6, "ast": 7, "fga": 10, "fta": 11, "tov": 12}
+# league plays used (FGA + 0.44 FTA + TOV) per team game; a player's USG% is
+# his plays-used per minute over the team's per-player-minute share of these
+LEAGUE_TEAM_PLAYS = 112.0
+USE_PRIOR_MIN = 300.0
 
 
 def _pos_key(pos):
@@ -195,6 +207,26 @@ def fit_team_minutes(mins, total=240.0):
             for i in rot:
                 m[i] = min(40.0, m[i] + short * m[i] / rs)
     return m
+
+
+def usage_per_min(prior, games):
+    """Plays used (FGA + 0.44 FTA + TOV) per minute: last season as a
+    300-minute prior, this season's box scores on top. None without data."""
+    played = [g for g in games if g[IDX["min"]] > 0 and len(g) > IDX["tov"]]
+    cur_min = sum(g[IDX["min"]] for g in played)
+    cur_use = sum(g[IDX["fga"]] + 0.44 * g[IDX["fta"]] + g[IDX["tov"]] for g in played)
+    if prior and prior.get("min", 0) > 0 and prior.get("fga") is not None:
+        r0 = (prior["fga"] + 0.44 * prior.get("fta", 0) + prior.get("tov", 0)) / prior["min"]
+        k = USE_PRIOR_MIN
+    elif cur_min >= 30:
+        return cur_use / cur_min
+    else:
+        return None
+    return (r0 * k + cur_use) / (k + cur_min)
+
+
+def usg_pct(u):
+    return round(100.0 * u * 48.0 / LEAGUE_TEAM_PLAYS, 1) if u else None
 
 
 def per_minute(prior, games, stat, pos):
@@ -366,8 +398,8 @@ def project_slate(slate, prior, player_games, team_games):
             "home": p["home"], "gid": p["gid"], "pos": p.get("pos", ""),
             "inj": status, "inj_detail": p.get("inj_detail", ""), "out": out,
             "_prior": pr, "_games": pg,
-            "min_base": 0.0 if out else base_minutes(
-                pr, pg, p["team"], len(team_games.get(p["team"], []))),
+            "min_full": base_minutes(pr, pg, p["team"], len(team_games.get(p["team"], []))),
+            "upm": usage_per_min(pr, pg),
             "gp": len([x for x in pg if x[IDX["min"]] > 0]),
             "prior_gp": (pr or {}).get("gp", 0),
         })
@@ -376,6 +408,8 @@ def project_slate(slate, prior, player_games, team_games):
     by_team = {}
     for r in rows:
         by_team.setdefault((r["gid"], r["team"]), []).append(r)
+    for r in rows:
+        r["min_base"] = 0.0 if r["out"] else r["min_full"]
     for (gid, team), rs in by_team.items():
         fitted = fit_team_minutes([r["min_base"] for r in rs])
         g = games[gid]
@@ -388,6 +422,22 @@ def project_slate(slate, prior, player_games, team_games):
                 m *= max(0.94, 1 - P["blowout_k"] * (spread - 8))
             r["min"] = round(m, 1)
             r["b2b"] = b2b
+        # usage redistribution: the plays an OUT teammate would have used are
+        # re-absorbed by who is left, tilted toward high-usage players
+        # (share ~ upm^(1+gamma) x minutes); a usage bump lifts per-minute
+        # points / assists by (boost)^beta, efficiency slipping as it rises
+        lost = sum((r["upm"] or 0) * min(r["min_full"], 36.0) for r in rs if r["out"])
+        avail = [r for r in rs if not r["out"] and r["upm"] and r["min"] > 0]
+        wsum = sum(r["upm"] ** (1 + P["usg_gamma"]) * r["min"] for r in avail)
+        for r in rs:
+            r["usg"] = usg_pct(r["upm"])
+            r["usg_boost"] = 1.0
+        if lost > 0 and wsum > 0 and P["usg_alpha"] > 0:
+            for r in avail:
+                extra = P["usg_alpha"] * lost * (r["upm"] ** (1 + P["usg_gamma"]) * r["min"]) / wsum
+                r["usg_boost"] = round(min(1.35, 1 + extra / r["min"] / r["upm"]), 4)
+        for r in rs:
+            r["usg_adj"] = usg_pct((r["upm"] or 0) * r["usg_boost"]) if r["upm"] else None
 
     for r in rows:
         g = games[r["gid"]]
@@ -400,6 +450,7 @@ def project_slate(slate, prior, player_games, team_games):
         proj = {}
         for s in STATS:
             rate = per_minute(r["_prior"], r["_games"], s, r["pos"])
+            rate *= r["usg_boost"] ** P["usg_beta_" + s]
             proj[s] = round(r["min"] * rate * f[s], 2) if not r["out"] else 0.0
         r["proj"] = proj
         r["_target_pts"] = f.get("target_pts")
@@ -411,7 +462,7 @@ def project_slate(slate, prior, player_games, team_games):
         pr = r["_prior"]
         r["last_season"] = ({s: round(pr[s] / pr["gp"], 1) for s in STATS} |
                             {"min": round(pr["min"] / pr["gp"], 1), "gp": pr["gp"]}) if pr else None
-        del r["_prior"], r["_games"], r["min_base"]
+        del r["_prior"], r["_games"], r["min_base"], r["min_full"], r["upm"]
 
     # a team's player points must add up to the team's expected score: pull
     # each team's sum toward the implied team total (exponent 0.8, partial

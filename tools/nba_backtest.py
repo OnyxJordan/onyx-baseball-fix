@@ -58,7 +58,9 @@ def load(bt):
         G[g["id"]] = {"gid": g["id"], "d": gday(g["start"]), "home": h, "away": a,
                       "hs": g.get("hs"), "as": g.get("as")}
     lines = defaultdict(list)
-    for (fid, pid, name, pos, team, starter, mins, secs, pts, reb, ast, fg3, fga, fta, oreb, tov) in box:
+    for row in box:
+        (fid, pid, name, pos, team, starter, mins, secs, pts, reb, ast, fg3, fga, fta, oreb, tov) = row[:16]
+        pm = row[16] if len(row) > 16 else None
         if fid not in G:
             continue
         m = mins if mins is not None else (secs or 0) / 60.0
@@ -66,7 +68,7 @@ def load(bt):
                            "starter": starter, "min": float(m or 0), "pts": float(pts or 0),
                            "reb": float(reb or 0), "ast": float(ast or 0), "fg3": float(fg3 or 0),
                            "fga": float(fga or 0), "fta": float(fta or 0), "oreb": float(oreb or 0),
-                           "tov": float(tov or 0)})
+                           "tov": float(tov or 0), "pm": float(pm) if pm is not None else None})
     return G, lines
 
 
