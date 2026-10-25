@@ -38,6 +38,7 @@ from nba_common import team_abbr, nk
 NAMEMAP = {}   # gid -> {nk(name): props}, filled when lines load
 
 STATS = ("pts", "reb", "ast")
+SIM_OUT = True                # reconstruct the injury report (see walk)
 SPLIT = "2026-02-01"          # tune before, test on/after
 MIN_PROJ = 20.0               # prop-relevant players for the headline numbers
 
@@ -81,9 +82,10 @@ def build_prior(G, lines, before):
             if l["min"] <= 0:
                 continue
             a = pr.setdefault(l["pid"], {"n": l["name"], "t": l["team"], "pos": l["pos"], "gp": 0,
-                                         "min": 0.0, "pts": 0.0, "reb": 0.0, "ast": 0.0, "fg3": 0.0, "_last": ""})
+                                         "min": 0.0, "pts": 0.0, "reb": 0.0, "ast": 0.0, "fg3": 0.0,
+                                         "fga": 0.0, "fta": 0.0, "tov": 0.0, "_last": ""})
             a["gp"] += 1
-            for k in ("min", "pts", "reb", "ast", "fg3"):
+            for k in ("min", "pts", "reb", "ast", "fg3", "fga", "fta", "tov"):
                 a[k] += l[k]
             if G[fid]["d"] >= a["_last"]:
                 a["_last"], a["t"] = G[fid]["d"], l["team"]
@@ -99,6 +101,7 @@ def walk(G, lines, season_start, season_end, prior, mkt=None):
         if season_start <= g["d"] <= season_end:
             by_day[g["d"]].append(fid)
     pg, tg, out = {}, {}, []
+    recent = defaultdict(list)    # team -> last 5 games' {pid: (name, pos, min)}
     for d in sorted(by_day):
         fids = by_day[d]
         slate = {"date": d, "games": [], "players": []}
@@ -110,13 +113,34 @@ def walk(G, lines, season_start, season_end, prior, mkt=None):
             spr = (gl.get("spread_home") or [None, None])[1]
             slate["games"].append({"gid": fid, "away": g["away"], "home": g["home"], "state": "pre",
                                    "spread": spr, "total": tot})
+            here = set()
             for l in lines[fid]:
                 if l["min"] <= 0 or l["team"] not in (g["home"], g["away"]):
                     continue
+                here.add(l["pid"])
                 opp = g["away"] if l["team"] == g["home"] else g["home"]
                 slate["players"].append({"pid": l["pid"], "name": l["name"], "team": l["team"], "opp": opp,
                                          "home": l["team"] == g["home"], "gid": fid, "pos": l["pos"], "inj": ""})
+            # the injury report, reconstructed: a recent rotation player (3 of
+            # the team's last 5 games, 15+ min there) absent tonight is OUT
+            if SIM_OUT:
+                for team in (g["home"], g["away"]):
+                    seen = defaultdict(list)
+                    for gm in recent[team][-5:]:
+                        for pid, (nm, pos, mn) in gm.items():
+                            seen[pid].append((nm, pos, mn))
+                    for pid, apps in seen.items():
+                        if pid in here or len(apps) < 3 or sum(a[2] for a in apps) / len(apps) < 15:
+                            continue
+                        opp = g["away"] if team == g["home"] else g["home"]
+                        slate["players"].append({"pid": pid, "name": apps[-1][0], "team": team, "opp": opp,
+                                                 "home": team == g["home"], "gid": fid, "pos": apps[-1][1],
+                                                 "inj": "OUT"})
         rows, _ = M.project_slate(slate, prior, pg, tg)
+        n_out = defaultdict(int)
+        for p in slate["players"]:
+            if p["inj"] == "OUT":
+                n_out[(p["gid"], p["team"])] += 1
         actual = {(fid, l["pid"]): l for fid in fids for l in lines[fid]}
         for r in rows:
             a = actual.get((r["gid"], r["pid"]))
@@ -136,6 +160,7 @@ def walk(G, lines, season_start, season_end, prior, mkt=None):
             props = ((mkt.get(r["gid"]) or {}).get("props") or {}).get(r["name"]) or \
                     NAMEMAP.get(r["gid"], {}).get(nk(r["name"])) or {}
             out.append({"d": d, "pid": r["pid"], "name": r["name"], "gid": r["gid"], "pmin": r["min"],
+                        "team_out": n_out[(r["gid"], r["team"])],
                         "amin": a["min"], "proj": dict(r["proj"]), "act": {s: a[s] for s in STATS},
                         "base": base, "gp": len(hist), "props": props})
         # the day is over: its box scores join the history
@@ -148,10 +173,13 @@ def walk(G, lines, season_start, season_end, prior, mkt=None):
                 opp = g["away"] if l["team"] == g["home"] else g["home"]
                 rec = pg.setdefault(l["pid"], {"n": l["name"], "t": l["team"], "g": []})
                 rec["g"].append([d, fid, opp, int(l["team"] == g["home"]), l["min"], l["pts"], l["reb"],
-                                 l["ast"], l["fg3"], l["starter"]])
+                                 l["ast"], l["fg3"], l["starter"], l["fga"], l["fta"], l["tov"], l.get("pm")])
                 for k in ("pts", "reb", "ast", "fga", "fta", "oreb", "tov"):
                     team_tot[l["team"]][k] += l[k]
             for team in (g["home"], g["away"]):
+                recent[team].append({l["pid"]: (l["name"], l["pos"], l["min"]) for l in lines[fid]
+                                     if l["team"] == team and l["min"] > 0})
+                recent[team] = recent[team][-5:]
                 opp = g["away"] if team == g["home"] else g["home"]
                 t, o = team_tot[team], team_tot[opp]
                 tg.setdefault(team, []).append({
@@ -162,8 +190,8 @@ def walk(G, lines, season_start, season_end, prior, mkt=None):
     return out
 
 
-def score(recs, lo="0000", hi="9999", min_proj=MIN_PROJ):
-    sel = [r for r in recs if lo <= r["d"] < hi and r["pmin"] >= min_proj]
+def score(recs, lo="0000", hi="9999", min_proj=MIN_PROJ, only_out=False):
+    sel = [r for r in recs if lo <= r["d"] < hi and r["pmin"] >= min_proj and (not only_out or r.get("team_out"))]
     res = {"n": len(sel)}
     if not sel:
         return res
@@ -250,13 +278,15 @@ def payout(price):
 
 
 def simulate_picks(rows, w, min_edge, max_edge, price_lo=-180, price_hi=150, min_min=24.0,
-                   min_sig=2, per_game=2, per_slate=6):
+                   min_sig=2, per_game=2, per_slate=6, max_gap=None):
     """Replay the nba_build.py picks lane at the listed Onyx prices."""
     cands = []
     for x in rows:
         r, s = x["r"], x["s"]
         if r["pmin"] < min_min:
             continue
+        if max_gap is not None and M.role_gap(r["proj"][s], x["line"], s) > max_gap:
+            continue                          # projection and line describe different roles
         pb = w * x["p_model"] + (1 - w) * x["p_mkt"]
         for side, p, price, imp in (("over", pb, x["po"], x["io"]), ("under", 1 - pb, x["pu"], x["iu"])):
             edge = p - imp
@@ -307,6 +337,15 @@ def calib_table(rows, key):
 
 
 GRID = {
+    "usg_alpha": [0.0, 0.3, 0.6, 0.9],
+    "usg_gamma": [0.0, 1.0, 2.0],
+    "usg_beta_pts": [0.5, 0.8, 1.0],
+    "usg_beta_ast": [0.3, 0.6, 1.0],
+    "usg_beta_reb": [0.0, 0.3],
+    "pace_mix": [0.0, 0.25, 0.5],
+    "start_w": [0.0, 0.3, 0.6],
+    "pm_k": [0.0, 0.01, 0.02, 0.04],
+    "home_court": [0.0, 1.5, 3.0],
     "PRIOR_GAMES_K": [2, 4, 6, 10],
     "RATE_PRIOR_MIN": [150.0, 300.0, 500.0, 800.0],
     "min_recent_w": [0.0, 0.15, 0.30, 0.45],
@@ -373,6 +412,7 @@ def main():
     print(f"walk-forward: {len(recs)} player-games in {time.time() - t0:.1f}s")
     fmt(score(recs, hi=SPLIT), "CURRENT params, train window (Oct-Jan)")
     fmt(score(recs, lo=SPLIT), "CURRENT params, test window (Feb-Apr)")
+    fmt(score(recs, lo=SPLIT, only_out=True), "CURRENT params, test window, team missing a rotation player")
     if mkt:
         report_market(recs, SPLIT, "9999", "CURRENT model vs Onyx, test window", M.MODEL_WEIGHT)
         import nba_build
@@ -381,7 +421,8 @@ def main():
             print(f"  picks lane (nba_build.py rules) at Onyx {lab} prices:",
                   simulate_picks(rows, M.MODEL_WEIGHT, nba_build.PICK_MIN_EDGE, nba_build.PICK_MAX_EDGE,
                                  min_min=nba_build.PICK_MIN_MIN, min_sig=nba_build.PICK_MIN_SIGNALS,
-                                 per_game=nba_build.PICK_MAX_PER_GAME, per_slate=nba_build.PICK_MAX_PER_SLATE))
+                                 per_game=nba_build.PICK_MAX_PER_GAME, per_slate=nba_build.PICK_MAX_PER_SLATE,
+                                 max_gap=nba_build.PICK_MAX_GAP))
     if "--tune" not in sys.argv:
         return
 
@@ -399,6 +440,7 @@ def main():
     tr, te = score(recs, hi=SPLIT), score(recs, lo=SPLIT)
     fmt(tr, "TUNED params, train window (Oct-Jan)")
     fmt(te, "TUNED params, TEST window (Feb-Apr, never seen by the tuner)")
+    fmt(score(recs, lo=SPLIT, only_out=True), "TUNED params, TEST window, team missing a rotation player")
 
     # 2) distribution spread, fitted on train only
     sd = fit_sd(recs, "0000", SPLIT)

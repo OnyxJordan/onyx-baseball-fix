@@ -23,7 +23,8 @@ from datetime import date, datetime, timedelta, timezone
 
 import nba_common
 from nba_common import DATA, game_day, load, save, nk
-from nba_model import VERSION, project_slate, price_side, STATS
+import nba_model as M
+from nba_model import role_gap, VERSION, project_slate, price_side, STATS
 
 SHELL, OUT = "nba_shell.html", "nba.html"
 LEDGER = "picks_history.json"
@@ -37,6 +38,8 @@ PICK_MAX_EDGE = 0.08          # bigger "edges" are usually the model missing new
 PICK_MIN_SIGNALS = 2          # of last season / this season / last 5 on the pick's side
 PICK_PRICE = (-180, 150)
 PICK_MIN_MIN = 24.0           # projected minutes
+PICK_MAX_GAP = 1.5           # role-mismatch guard: projection >1.5 SD off the line is a role
+                             # disagreement, not an edge (backtest: model side 47-50% there)
 PICK_MAX_PER_GAME = 2
 PICK_MAX_PER_SLATE = 6
 VOID_AFTER_DAYS = 3
@@ -82,6 +85,9 @@ def attach_props(rows, props, source):
             for side in ("over", "under"):
                 if side in best["all"]:
                     best["all"][side]["sel"] = mkt.get(side + "_sel")
+            # projection and line describe different roles: show it, never call it an edge
+            best["gap"] = round(role_gap(r["proj"][s], best["line"], s), 2)
+            best["role_flag"] = best["gap"] > PICK_MAX_GAP
             r["props"][s] = best
             priced += 1
     return priced
@@ -93,6 +99,8 @@ def qualifies(r, s, pr, game):
     if r["out"] or r["inj"] or r["min"] < PICK_MIN_MIN:
         return False
     if not (r["gp"] >= 2 or r["prior_gp"] >= 20):
+        return False
+    if pr.get("role_flag"):
         return False
     if not (PICK_PRICE[0] <= pr["price"] <= PICK_PRICE[1]):
         return False
@@ -115,6 +123,26 @@ def signals(r, s, pr):
     if len(l5) >= 3:
         reads.append(sum(l5) / len(l5))
     return sum(1 for v in reads if (v > pr["line"]) == over and v != pr["line"])
+
+
+def engine_card(slate, tg, lg):
+    """The live model's own weights and tonight's team environment, for the
+    Model tab: the page reads these instead of restating them in copy, so
+    what it says can never drift from what the model does."""
+    teams = []
+    for g in slate.get("games", []):
+        for t, o in ((g["away"], g["home"]), (g["home"], g["away"])):
+            tp, op = M.team_profile(tg, t, lg), M.team_profile(tg, o, lg)
+            teams.append({"team": t, "opp": o, "gp": tp["n"], "pace": round(tp["poss"], 1),
+                          "ortg": round(tp["ortg"], 1), "drtg": round(tp["drtg"], 1), "net": round(tp["net"], 1),
+                          "game_poss": round(tp["poss"] * op["poss"] / lg["poss"], 1)})
+    return {"version": M.VERSION, "P": dict(M.P), "sd": {k: list(v) for k, v in M.SD.items()},
+            "w": M.MODEL_WEIGHT, "prior_games": M.PRIOR_GAMES_K, "rate_prior": M.RATE_PRIOR_MIN,
+            "use_prior": M.USE_PRIOR_MIN,
+            "lane": {"min_edge": PICK_MIN_EDGE, "max_edge": PICK_MAX_EDGE, "signals": PICK_MIN_SIGNALS,
+                     "price": list(PICK_PRICE), "min_min": PICK_MIN_MIN, "max_gap": PICK_MAX_GAP,
+                     "per_game": PICK_MAX_PER_GAME, "per_slate": PICK_MAX_PER_SLATE},
+            "teams": teams}
 
 
 def payout(price):
@@ -244,6 +272,7 @@ def main():
         # 80px team logos baked in (tools/nba_make_logos.py): no third-party
         # host needed at page load
         "logos": load("team_logos.json", {}),
+        "engine": engine_card(slate, tg, lg),
     }
     shell = open(SHELL, encoding="utf-8").read()
     # one design system: the MLB stylesheet is copied out of shell.html on

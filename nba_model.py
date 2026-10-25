@@ -2,6 +2,34 @@
 nba_model.py - Onyx NBA points / rebounds / assists projection model.
 
 CHANGELOG (the lab notebook: every change bumps VERSION and cites evidence)
+  v3 (2026-10-25) ROLE CHECK + usage / utilization / pace / net rating /
+     plus-minus tracked. Same walk-forward replay as v2 (2025-26, tuned
+     Oct-Jan, judged Feb-Apr), with OUT teammates simulated (3 of the team's
+     last 5 games at 15+ min, absent tonight).
+     - Role check (role_gap): when |projection - line| exceeds 1.5 sd of the
+       stat, the model's side won 47.4% (train, n=38) and 50.0% (test, n=10)
+       and its MAE was ~2x the line's. Those props are kept off the picks
+       lane (nba_build.PICK_MAX_GAP). Picks lane, test window: open 74-63
+       (+5.6%) -> 75-60 (+8.4%); close 53-48 (+3.3%) -> 53-47 (+4.3%).
+       Train: open +24.6% -> +26.7%.
+     - Tested as weights and NOT applied (P values stay neutral). Test-window
+       objective (MAE / mean, all projected players), v2 = 0.4722:
+         usage redistribution alpha 0.3   0.4730 (worse; train worse too: the
+                                          240-minute fit already re-homes an
+                                          OUT player's minutes)
+         starter pull start_w 0.3 / 0.6   0.4721 / 0.4730 (train tie / worse)
+         pace_mix 0.25                    0.4722 (no change)
+         recent minutes 15% over 5 games  0.4764 (worse)
+         prior 4 games                    0.4721 (train worse)
+         plus-minus pm_k                  no plus-minus in the 2025-26 pull
+                                          yet; re-test once rows carry it
+       A full joint retune scored train 0.3981 vs 0.3989 but test pts MAE
+       5.15 -> 5.17 and test picks 74-63 -> 47-47: overfit, rejected.
+     - Data: box rows now carry fga / fta / tov / plus-minus (rows 10-13)
+       and priors carry fga / fta / tov, so usage rate (FGA + 0.44 FTA + TOV
+       per minute) and utilization (projected minutes / 48) are reported per
+       player; team pace and ORtg / DRtg / net per 100 feed the no-line game
+       script and the Model tab.
   v2 (2026-10-24) BACKTESTED. tools/nba_backtest.py replays the 2025-26
      regular season walk-forward (2024-25 as prior, no look-ahead), 26,352
      player-games, with OpticOdds box scores and the historical Onyx main
@@ -60,7 +88,7 @@ CHANGELOG (the lab notebook: every change bumps VERSION and cites evidence)
 
 import math
 
-VERSION = "v2"
+VERSION = "v3"
 
 LEAGUE = {"ppg": 115.0, "reb": 44.0, "ast": 27.0, "poss": 99.5}
 POS_RATE = {   # per-minute league rates by listed position, used only without a prior
@@ -93,6 +121,10 @@ P = {
     # usage redistribution (teammates OUT): share of the missing usage that
     # is re-absorbed, how strongly it tilts to high-usage players, and how a
     # usage bump converts into per-minute points / assists / rebounds
+    "pace_mix": 0.0,         # share of matchup possessions vs the posted total in the pace read
+    "home_court": 1.5,       # points of home edge in the no-line margin
+    "start_w": 0.0,          # utilization: pull toward starter minutes after 2 of the last 3 starts
+    "pm_k": 0.0,             # minutes nudge per +10 plus-minus per 36 (recent)
     "usg_alpha": 0.0,
     "usg_gamma": 1.0,
     "usg_beta_pts": 0.8,
@@ -140,13 +172,18 @@ def team_profile(team_games, team, lg):
     w = n / (n + 10.0)
     def avg(col, base):
         return (w * (sum(r.get(col, 0) for r in rows) / n) + (1 - w) * base) if n else base
-    return {
+    out = {
         "n": n,
         "ppg": avg("pts", lg["ppg"]), "opp_ppg": avg("opp_pts", lg["ppg"]),
         "opp_reb": avg("opp_reb", lg["reb"]), "opp_ast": avg("opp_ast", lg["ast"]),
         "poss": avg("poss", lg["poss"]),
         "dates": {r["d"] for r in rows},
     }
+    # ratings per 100 possessions (regressed the same way): offense, defense, net
+    out["ortg"] = 100.0 * out["ppg"] / out["poss"]
+    out["drtg"] = 100.0 * out["opp_ppg"] / out["poss"]
+    out["net"] = out["ortg"] - out["drtg"]
+    return out
 
 
 def base_minutes(prior, games, team, team_gp=0):
@@ -168,9 +205,24 @@ def base_minutes(prior, games, team, team_gp=0):
         base = sum(wi * m for wi, m in zip(w, mins)) / sum(w)
     else:
         base = 4.0
+    # utilization: a new starter's role shows up in the starter flag before
+    # it shows up in a season average
+    if n >= 3 and P["start_w"] > 0:
+        last3 = games[-3:]
+        starts = [g for g in last3 if len(g) > 9 and g[9]]
+        if len(starts) >= 2:
+            smin = sum(g[IDX["min"]] for g in starts) / len(starts)
+            if smin > base:
+                base = (1 - P["start_w"]) * base + P["start_w"] * smin
     if n >= 3:
         k_n = int(P["min_recent_n"])
         base = (1 - P["min_recent_w"]) * base + P["min_recent_w"] * (sum(mins[-k_n:]) / len(mins[-k_n:]))
+    # plus-minus: recent on-court results nudge minutes (coaches play winners)
+    pm_games = [g for g in games[-10:] if len(g) > 13 and g[13] is not None and g[IDX["min"]] > 0]
+    pm_min = sum(g[IDX["min"]] for g in pm_games)
+    if P["pm_k"] and pm_min >= 60:
+        pm36 = 36.0 * sum(g[13] for g in pm_games) / pm_min
+        base *= 1 + P["pm_k"] * max(-1.5, min(1.5, pm36 / 10.0))
     return base
 
 
@@ -255,16 +307,22 @@ def env_factors(game, team, opp, is_home, tp, op, lg):
     apart from home/away)."""
     total, spread = game.get("total"), game.get("spread")
     f = {}
+    # matchup pace: expected possessions = team pace x opponent pace / league
+    # pace (a fast team facing a slow one lands in between)
+    game_poss = tp["poss"] * op["poss"] / lg["poss"]
+    pace_poss = game_poss / lg["poss"]
     if total and spread is not None:
         home_imp = (total - spread) / 2.0
         implied = home_imp if is_home else total - home_imp
         target = implied
-        pace = (total / (2 * lg["ppg"])) ** P["pace_exp"]
+        pace_raw = (1 - P["pace_mix"]) * (total / (2 * lg["ppg"])) + P["pace_mix"] * pace_poss
     else:
         implied = None
         # no line: the team's scoring vs what this opponent allows, both regressed
         target = (tp["ppg"] * op["opp_ppg"]) / lg["ppg"]
-        pace = (((tp["poss"] + op["poss"]) / 2) / lg["poss"]) ** P["pace_exp"]
+        pace_raw = pace_poss
+    pace = pace_raw ** P["pace_exp"]
+    f["game_poss"] = round(game_poss, 1)
     f["pts"] = 1 + P["home_pts"] if is_home else 1 - P["home_pts"]
     f["reb"] = pace * (op["opp_reb"] / lg["reb"]) ** P["opp_exp"]
     f["ast"] = pace * (op["opp_ast"] / lg["ast"]) ** P["opp_exp"]
@@ -272,6 +330,13 @@ def env_factors(game, team, opp, is_home, tp, op, lg):
         f[k] = max(0.88, min(1.12, f[k]))
     f["implied"] = round(implied, 1) if implied else None
     f["target_pts"] = round(target, 1)
+    # expected margin for game script: the spread when posted, else net
+    # ratings over the expected possessions plus home court
+    if spread is not None:
+        f["margin"] = (-spread if is_home else spread)
+    else:
+        net_diff = (tp["net"] - op["net"]) * game_poss / 100.0
+        f["margin"] = net_diff + (P["home_court"] if is_home else -P["home_court"])
     return f
 
 
@@ -318,6 +383,15 @@ def prob_over(mean, line, stat):
         p_le = _nb_cdf(k, mean, var)
         return 1 - p_le, p_le - p_le_minus
     return 1 - _nb_cdf(math.floor(line), mean, var), 0.0
+
+
+def role_gap(mean, line, stat):
+    """How far the projection sits from the line, in standard deviations of
+    the stat. A big gap almost never means the book is asleep: it means the
+    model and the market disagree about the player's ROLE (minutes, a return
+    from injury, a new starter), which box-score history cannot see."""
+    a, b = SD[stat]
+    return abs(mean - line) / max(0.8, a * line + b)
 
 
 def implied(american):
@@ -414,7 +488,13 @@ def project_slate(slate, prior, player_games, team_games):
         fitted = fit_team_minutes([r["min_base"] for r in rs])
         g = games[gid]
         b2b = yday in prof(team)["dates"]
-        spread = abs(g.get("spread") or 0)
+        if g.get("spread") is not None:
+            spread = abs(g["spread"])
+        else:   # no line: game script from net ratings over the expected possessions
+            op_t = g["home"] if team == g["away"] else g["away"]
+            tp_, op_ = prof(team), prof(op_t)
+            gp_ = tp_["poss"] * op_["poss"] / lg["poss"]
+            spread = abs((tp_["net"] - op_["net"]) * gp_ / 100.0 + (P["home_court"] if team == g["home"] else -P["home_court"]))
         for r, m in zip(rs, fitted):
             if b2b and m >= 30:
                 m *= P["b2b_mult"]
@@ -444,6 +524,12 @@ def project_slate(slate, prior, player_games, team_games):
         tp, op = prof(r["team"]), prof(r["opp"])
         f = env_factors(g, r["team"], r["opp"], r["home"], tp, op, lg)
         r["team_implied"] = f.pop("implied")
+        r["game_poss"] = f.pop("game_poss")
+        r["margin"] = round(f.pop("margin"), 1)
+        r["team_pace"] = round(tp["poss"], 1)
+        r["opp_pace"] = round(op["poss"], 1)
+        r["team_net"] = round(tp["net"], 1)
+        r["opp_net"] = round(op["net"], 1)
         tgt = f.pop("target_pts")
         r["env"] = {k: round(v, 3) for k, v in f.items()}
         f["target_pts"] = tgt
@@ -457,6 +543,12 @@ def project_slate(slate, prior, player_games, team_games):
         played = [x for x in r["_games"] if x[IDX["min"]] > 0]
         r["season"] = {s: round(sum(x[IDX[s]] for x in played) / len(played), 1)
                        for s in ("min",) + STATS} if played else None
+        if played:
+            pmv = [x[13] for x in played if len(x) > 13 and x[13] is not None]
+            r["season"]["pm"] = round(sum(pmv) / len(pmv), 1) if pmv else None
+            r["season"]["starts"] = sum(1 for x in played if len(x) > 9 and x[9])
+            r["season"]["gp"] = len(played)
+        r["util"] = round(100.0 * r["min"] / 48.0, 1)
         r["last5"] = [{"d": x[0], "opp": x[2], "min": x[4], "pts": x[5], "reb": x[6], "ast": x[7]}
                       for x in r["_games"][-5:]]
         pr = r["_prior"]
