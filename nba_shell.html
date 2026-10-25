@@ -1195,7 +1195,7 @@ var ENGINE_NOTES = {
   roadmap: [
     ['eye', 'Lineup-aware minutes', 'Starting lineups post about 30 minutes before tip. Reading them would catch role changes the box scores have not shown yet, the main source of role-check props.', 'Next', 'blue'],
     ['bolt', 'On/off usage', 'Measure how each player\'s usage actually moves when a specific teammate sits, instead of sharing the missing usage by formula. Needs a season of lineup data.', 'Planned', 'gold'],
-    ['pm', 'Plus-minus as a minutes signal', 'Plus-minus is tracked now. Once a few weeks of it accumulate it gets re-tested as a minutes signal against the held-out months.', 'Testing', 'purple'],
+    ['pm', 'Plus-minus, this season', 'Tested on the 2025-26 replay as a minutes signal: no gain on the held-out months, and the picks got worse. It gets re-tested on this season\'s data once a few weeks of it accumulate, since coaches\' rotations change year to year.', 'Re-test', 'purple'],
     ['scale', 'Live calibration', 'Graded picks feed a per-bucket calibration check, the same way the MLB model tunes its blend.', 'Planned', 'gold'],
   ],
 };
@@ -1255,7 +1255,7 @@ function renderModel() {
     ['pace', 'Pace and possessions', `Every possession is another chance at a stat. Expected game possessions = team pace &times; opponent pace &divide; league pace, so a run-and-gun team facing a grinder lands in between. Rebounds and assists scale with it at exponent ${P.pace_exp}.`, 'Environment', 'purple'],
     ['shield', 'Opponent defense', `What the opponent allows in rebounds and assists versus the league, regressed by games played and applied at exponent ${P.opp_exp}. Points use the team total instead (below).`, 'Matchup', 'purple'],
     ['chart', 'Team total and net rating', `Player points add up to the team's implied score from the Onyx spread and total. Before lines post, offense and defense ratings per 100 possessions set the target and net rating sets the expected margin (home court ${P.home_court} pts).`, 'Environment', 'purple'],
-    ['pm', 'Plus-minus', `Each player's on-court point differential, shown on the board as a read on how his lineups are playing. ${P.pm_k ? 'It nudges minutes at strength ' + P.pm_k + '.' : 'Tested as a minutes signal; it did not improve projections, so it informs rather than moves the number.'}`, P.pm_k ? 'Live' : 'Context', 'gold'],
+    ['pm', 'Plus-minus', `Each player's on-court point differential, shown on the board as a read on how his lineups are playing. ${P.pm_k ? 'It nudges minutes at strength ' + P.pm_k + '.' : 'Backtested as a minutes signal across a full season: it did not improve projections, so it informs rather than moves the number.'}`, P.pm_k ? 'Live' : 'Context', 'gold'],
     ['bed', 'Rest and game script', `Back-to-backs trim ${pctv(1 - (P.b2b_mult || 1))}% for 30+ minute players. Spreads of 10+ trim heavy-minute players for blowout risk (up to 6%).`, 'Timing', 'gold'],
     ['cross', 'Injuries', `OUT and DOUBTFUL players are projected at zero and their minutes go to the healthy rotation. Questionable players are projected but can never be a pick.`, 'News', 'gold'],
     ['scale', 'Market blend', `${pctv(w)}% model, ${pctv(1 - w)}% Onyx no-vig market. Chosen by the backtest on log loss: the blend beat both the model alone and the market alone.`, 'Market', 'blue'],

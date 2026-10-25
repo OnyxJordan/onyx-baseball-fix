@@ -21,8 +21,9 @@ CHANGELOG (the lab notebook: every change bumps VERSION and cites evidence)
          pace_mix 0.25                    0.4722 (no change)
          recent minutes 15% over 5 games  0.4764 (worse)
          prior 4 games                    0.4721 (train worse)
-         plus-minus pm_k                  no plus-minus in the 2025-26 pull
-                                          yet; re-test once rows carry it
+         plus-minus pm_k .01 / .02 / .04  0.4722 / 0.4722 / 0.4726 (no gain;
+                                          test picks open 75-60 -> 73-59 /
+                                          70-59 / 67-58, worse)
        A full joint retune scored train 0.3981 vs 0.3989 but test pts MAE
        5.15 -> 5.17 and test picks 74-63 -> 47-47: overfit, rejected.
      - Data: box rows now carry fga / fta / tov / plus-minus (rows 10-13)
