@@ -344,6 +344,39 @@ overrides. Age is judged by git commit time, not file mtime, which
 - Parlay Builder (client): arm mode turns every odds chip into add-leg; slip caps 10;
   flags id-less legs; docks above the mobile bottom nav.
 
+## Onyx Sports (the hub and the design layer, 10/26)
+
+The installed app is **Onyx Sports** (`manifest.json`: name, `start_url: home.html`,
+`id: ./` so existing installs update in place). `index.html` stays MLB at the root URL,
+so old links and the pipeline are unchanged.
+
+- **`home.html`** is the hub, a static page you edit by hand. No build step reads or writes it.
+  - Sections: mint announcement bar, hero, a "tonight" strip, the seven sports (Basketball
+    and Baseball live; NFL, College Football, NHL, Tennis and Golf marked coming soon),
+    "what this is", gamecenter, the public record, the Model's Parlay, and the footer.
+  - Live numbers come from same-origin data files: `data/nba/slate.json`,
+    `ticket_lock.json`, `ticket_history.json` and `picks_history.json`. Each fetch fails
+    soft.
+  - Adding a sport means one entry in the `SPORTS` array.
+- **`onyx.css`** is the onyxodds.com design system: tokens, bracket buttons, dot rules,
+  pills, marquee, the hub layout, and a restyle of the sport sites.
+  - It is linked **last** in each page head, so it wins ties without editing the sites'
+    rules.
+  - Fonts: onyxodds.com licenses ABC Schengen and FK Raster. We use free stand-ins in the
+    same roles: Archivo at 125% width for display, Geist Mono for labels, Doto for raster
+    numerals. Do not copy the licensed `.woff2` files into this public repo.
+  - It also fixes the 761-1279px desktop header, which used to run 406px off-screen at
+    768px.
+- **`onyx.js`** draws the raster art (shapes filled with ramp characters that ripple
+  around the pointer) on any `<canvas data-ox-art="…">`.
+  - Shapes: the real Onyx wordmark and mark, plus the sport balls, court, diamond and field.
+  - It animates only while on screen and draws one still frame for reduced motion.
+- **`ui.js`** adds three things to each sport site: the Onyx mark in the header (links to
+  the hub), "All Onyx sports" in the More menu, and the Onyx footer (sport links plus the
+  giant raster ONYX).
+- **`verify_pwa.js`** also checks the hub at 320px and 393px: manifest, status bar,
+  header, all seven sports, no sideways scroll, and that the wordmark draws.
+
 ## Frontend (`shell.html`, ~7,000 lines)
 
 Brand: purple leads (hub palette — Purple 400 `#B038F9` on Onyx `#0C0C0C`, Titanium
@@ -472,6 +505,10 @@ and a drag moved one rung. The slider and the chart both scrub in 0.1 steps;
 between Onyx lines they show the model chance and "not offered", release
 snaps to the nearest line you can bet, with a haptic tick on each Onyx line.
 The side you pick (default: the model's lean) sticks across over-only rungs.
+The slider is a custom rail on the **chart's own scale** (`bcScale`). The thumb, chart
+marker and a tick per Onyx line share one mapping, and the line chips scroll with the
+finger. Before 10/26 the native slider used the ladder's scale, so its thumb sat up to
+60px from the line it showed. `verify_nba.js` fails if they drift more than 2px apart.
 The Bets face lists every market Onyx prices on him (points, rebounds, assists, made threes,
 double-double, triple-double; verified 10/26), search, and a slider over
 Onyx's alternate ladder. `nba_odds.py` keeps the ladders
@@ -543,6 +580,8 @@ why a local `auto_build.py` still produces a full board.
 |---|---|
 | `shell.html` | hand-tuned template — **never regenerate** |
 | `index.html` | the built page (generated every run; never hand-edit) |
+| `home.html` | Onyx Sports hub, the PWA start page (static, hand-edited) |
+| `onyx.css`, `onyx.js` | Onyx design layer and raster art, shared by every page |
 | `model.py` | v41 HR model + pitcher K projections; changelog at top is the lab notebook |
 | `career_db.json`, `pitcher_db.json` | canonical hitter/pitcher DBs — **never regenerate** outside `rebuild.yml` |
 | `bullpen_db.json` | team bullpen HR/9, consumed by `auto_build.py` |

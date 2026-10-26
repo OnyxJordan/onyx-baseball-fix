@@ -26,7 +26,7 @@ function serve(rootDir) {
     if (!file.startsWith(path.resolve(rootDir))) { res.writeHead(403).end(); return; }
     fs.readFile(file, (err, buf) => {
       if (err) { res.writeHead(404).end(); return; }
-      res.writeHead(200, { 'content-type': file.endsWith('.html') ? 'text/html' : file.endsWith('.js') ? 'text/javascript' : 'application/octet-stream' }).end(buf);
+      res.writeHead(200, { 'content-type': file.endsWith('.html') ? 'text/html' : file.endsWith('.js') ? 'text/javascript' : file.endsWith('.css') ? 'text/css' : 'application/octet-stream' }).end(buf);
     });
   });
   return new Promise(r => server.listen(PORT, '127.0.0.1', () => r(server)));
@@ -97,6 +97,14 @@ function serve(rootDir) {
         // 10/26: a re-render replaced the slider mid-drag, so a drag moved one rung
         if (back.querySelector('.bc-slide input[type=range]') !== r) return 'slider rebuilt mid-drag';
         if (back.querySelector('.bc-big').innerText === before) return 'slider did not move the line';
+        // 10/26: the slider ran on the ladder's scale and the chart on its own,
+        // so the thumb sat up to 60px from the line it was showing
+        const th = back.querySelector('.bc-thumb'), mk = back.querySelector('.bc-mark');
+        if (th && mk) {
+          const a = th.getBoundingClientRect(), m = mk.getBoundingClientRect();
+          const gap = Math.abs((a.left + a.width / 2) - (m.left + m.width / 2));
+          if (gap > 2) return `slider thumb ${gap.toFixed(0)}px from the chart line`;
+        }
         // fine steps between offered lines, then a snap on release
         const rungs = [...back.querySelectorAll('.bc-rungs button b')].map(b => +b.innerText);
         if (rungs.length > 1 && rungs[1] - rungs[0] >= 1) {

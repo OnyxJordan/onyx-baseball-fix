@@ -51,6 +51,13 @@ gaps. This file is the short form that must never be violated.
 - **"Model is broken, no plays"** — check calibration buckets and the league weekly HR
   rate before touching weights. On 9/6 it was variance; the model was calibrated.
 
+## Onyx Sports
+
+The PWA is **Onyx Sports**: `home.html` is the start page (the hub), and `index.html`
+stays MLB at the root URL. `onyx.css` (the onyxodds.com design layer) and `onyx.js` (the
+raster art) load last on every page. Restyle the sites there, not by rewriting
+`shell.html`. Never commit Onyx's licensed font files; the free stand-ins are deliberate.
+
 ## Dates
 
 Everything runs on the **baseball day = ET − 4h** (rolls at 4 AM ET). Never date anything
@@ -77,7 +84,7 @@ rm -rf __pycache__ && python3 -B auto_build.py && python3 -B update_stats.py
 npm install playwright-core --no-save   # once per container
 node tools/verify_shell.js              # local build; exits non-zero on failure
 node tools/verify_shell.js --live       # the DEPLOYED page, after the deploy lands
-node tools/verify_pwa.js                # installed-iPhone gate: header/menu clear the status bar
+node tools/verify_pwa.js                # installed-iPhone gate: status bar, menus, and the home.html hub
 ```
 
 Use that script rather than writing a probe from scratch — it encodes three things
