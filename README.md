@@ -492,6 +492,21 @@ play (ESPN publishes no NBA possession field), last play and play-by-play.
 Headshot rings judge the model's lean: overs go green once they clear, unders
 stay lilac until the final then go green, red the moment an under is beaten.
 
+**Plays tab (NBA).** The recommended plays, built like MLB's Edge Plays. Tracked picks
+(`D.picks`, logged by `nba_build`) are ranked cards with:
+- a conviction badge. It ranks the screens a pick cleared (edge, form reads, win chance)
+  and is not a backtested hit rate.
+- the logged price, plus Onyx's current price when it has moved;
+- win chance, implied, edge and EV per $10;
+- the form reads with ✓/✗, and the last games charted against the line;
+- Add to parlay and Bet on Onyx buttons.
+
+Tapping a card opens the player's bet card on that market. Below a divider, the watchlist
+re-runs `qualifies()`'s screens in the page (`plMisses`) on every other priced line for
+rotation players. It ranks them by fewest failed screens and names the screen each one
+missed. They are never picks and never graded. Home pick cards, scorer cards, and Props
+Board, Top Scorers and box rows are all tappable through to the player.
+
 **Player card (NBA).** One card with two faces that flips like a video-game
 sports card (`pcOpen` / `pcFlip` in `nba_shell.html`; Player | Bets toggle,
 sideways swipe, or F). A name opens the **Player** face (projection, why

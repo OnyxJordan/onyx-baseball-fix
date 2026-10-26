@@ -65,9 +65,10 @@
     },
     nba: {
       name: 'Basketball', other: {label: 'MLB', href: './'},
-      bar: [['home', 'Home', 'home'], ['board', 'Props', 'board'], ['games', 'Games', 'games', 1], ['scorers', 'Scorers', 'star']],
+      bar: [['home', 'Home', 'home'], ['plays', 'Plays', 'plays'], ['games', 'Games', 'games', 1], ['board', 'Props', 'board']],
       tabs: [
-        ['home', 'Home', 'home', 'Picks and the top scorer parlay'],
+        ['home', 'Home', 'home', "Tonight's picks and the Model's Parlay"],
+        ['plays', 'Plays', 'plays', 'Recommended plays, ranked, with the why'],
         ['games', 'Games', 'games', 'Live court, possession, box'],
         ['board', 'Props Board', 'board', 'Points, boards, dimes vs Onyx'],
         ['scorers', 'Top Scorers', 'star', "Tonight's biggest scorers"],
