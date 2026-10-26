@@ -72,6 +72,29 @@ function serve(rootDir) {
     });
     console.log(`  ${dr === 'ok' || dr === 'no players' ? 'ok  ' : 'FAIL'} drawer   ${dr}`);
     if (dr !== 'ok' && dr !== 'no players') failures++;
+    // the player bet card: opens from a prop, shows his markets, moves the
+    // line when the ladder has more than one rung, closes cleanly
+    const bc = await page.evaluate(async () => {
+      const p = (NBA_DATA.players || []).find(x => x.bets && Object.keys(x.bets).length);
+      if (!p) return 'no priced players';
+      try { openBetCard(p.pid, Object.keys(p.bets)[0]); } catch (e) { return e.message; }
+      await new Promise(r => setTimeout(r, 350));
+      const el = document.getElementById('bc');
+      if (!el || !el.classList.contains('open')) return 'did not open';
+      const t = el.innerText;
+      if (/\bundefined\b|\bNaN\b/.test(t)) return 'bad card text';
+      if (!el.querySelector('.bc-mkts button')) return 'no markets';
+      const r = el.querySelector('.bc-slide input[type=range]');
+      if (r && +r.max > 0) {
+        const before = el.querySelector('.bc-big').innerText;
+        r.value = +r.value === +r.max ? 0 : +r.max; r.dispatchEvent(new Event('input', {bubbles: true}));
+        if (document.querySelector('#bc .bc-big').innerText === before) return 'slider did not move the line';
+      }
+      closeBetCard();
+      return document.getElementById('bc').classList.contains('open') ? 'did not close' : 'ok';
+    });
+    console.log(`  ${bc === 'ok' || bc === 'no priced players' ? 'ok  ' : 'FAIL'} bet card ${bc}`);
+    if (bc !== 'ok' && bc !== 'no priced players') failures++;
     console.log(`  page errors: ${errs.length}`); errs.forEach(e => console.log('   ' + e));
     failures += errs.length;
     await page.close();

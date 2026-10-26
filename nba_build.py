@@ -79,6 +79,7 @@ def attach_props(rows, props, source):
         r["props"] = {}
         if not rec or r["out"]:
             continue
+        r["bets"] = bet_ladders(r, rec)
         for s in STATS:
             mkt = rec.get(s)
             if not mkt:
@@ -95,6 +96,51 @@ def attach_props(rows, props, source):
             r["props"][s] = best
             priced += 1
     return priced
+
+
+BET_STATS = ("pts", "reb", "ast", "fg3")
+
+
+def bet_ladders(r, rec):
+    """Every Onyx line on this player for the bet card. Per stat, rows of
+    [line, over, over_sel, under, under_sel, p_model, p_blend] (P of the
+    OVER), low to high. p_blend = 20% model / 80% Onyx fair, the main lane's
+    blend: the fair chance is the listed price with the margin measured on
+    this player's two-sided main line taken out (alternates are over-only).
+    Threes use an unfitted shape (labelled on the card, never recommended);
+    double-double / triple-double carry the price only."""
+    out = {}
+    for s in BET_STATS:
+        mk = (rec or {}).get(s)
+        if not mk:
+            continue
+        io, iu = M.implied(mk.get("over")), M.implied(mk.get("under"))
+        vig = (io + iu) if io and iu and 1.0 <= io + iu <= 1.2 else 1.05
+        lad = mk.get("ladder") or [[mk["line"], mk.get("over"), mk.get("over_sel"), mk.get("under"), mk.get("under_sel")]]
+        mean = r["proj"].get(s, 0.0)
+        rows = []
+        for line, op, osel, up, usel in lad:
+            if op is None and up is None:
+                continue
+            if s == "fg3":
+                pm = M.prob_over_fg3(mean, line)
+            else:
+                po, pp_ = M.prob_over(mean, float(line), s)
+                pm = po / (1 - pp_) if pp_ < 1 else po
+            if op is not None and up is not None:
+                ia, ib = M.implied(op), M.implied(up)
+                fair = ia / (ia + ib)
+            else:
+                fair = min(0.985, M.implied(op) / vig) if op is not None else 1 - min(0.985, M.implied(up) / vig)
+            pb = M.MODEL_WEIGHT * pm + (1 - M.MODEL_WEIGHT) * fair
+            rows.append([line, op, osel, up, usel, round(pm, 4), round(pb, 4)])
+        if rows:
+            out[s] = rows
+    for s in ("dd", "td"):
+        mk = (rec or {}).get(s)
+        if mk and mk.get("over") is not None:
+            out[s] = [[0.5, mk.get("over"), mk.get("over_sel"), mk.get("under"), mk.get("under_sel"), None, None]]
+    return out
 
 
 def qualifies(r, s, pr, game):

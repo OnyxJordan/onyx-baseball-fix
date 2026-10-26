@@ -31,6 +31,9 @@ from fetch_onyx import http_json, OPTIC
 
 STATS = {"player_points": "pts", "player_rebounds": "reb", "player_assists": "ast"}
 GAME_MKTS = ("moneyline", "point_spread", "total_points")
+# priced by Onyx but not modeled for picks: shown on the player bet card
+# (verified 10/26: Onyx's NBA player markets are exactly these six)
+EXTRA = {"player_made_threes": "fg3", "player_double_double": "dd", "player_triple_double": "td"}
 OAPI = "https://api.the-odds-api.com/v4/sports/basketball_nba"
 BOOK_PREF = ["draftkings", "fanduel", "betmgm", "caesars"]
 PROPS_MIN_AGE_MIN = int(os.environ.get("NBA_PROPS_MIN_AGE_MIN", "90"))
@@ -97,7 +100,7 @@ def onyx_pull(key, slate):
         print("nba onyx: no fixtures to price")
         return {}, {}
     by_fid = {v: k for k, v in fids.items()}
-    mk = "".join(f"&market={m}" for m in list(STATS) + list(GAME_MKTS))
+    mk = "".join(f"&market={m}" for m in list(STATS) + list(EXTRA) + list(GAME_MKTS))
 
     players, games = {}, {}
     order = list(fids.items())
@@ -112,18 +115,30 @@ def onyx_pull(key, slate):
                 continue
             away, home = gk.split("_")
             gl = {"gid": row.get("id"), "slug": slugs.get(gk) or row.get("game_id"), "src": "onyx"}
-            ladders = {}
+            ladders, ladders_all, extras = {}, {}, {}
             for od in row.get("odds") or []:
                 m = od.get("market_id")
                 price = american_from_any(od.get("price"))
                 if price is None:
                     continue
-                if m in STATS:
-                    if not od.get("is_main"):
-                        continue   # alternates (the 9.5 ... 39.5 ladder) never set the main line
+                if m in STATS or m in EXTRA:
                     side = str(od.get("selection_line") or "").lower()
                     name = od.get("selection") or ""
-                    if side not in ("over", "under") or not name or od.get("points") is None:
+                    stat = STATS.get(m) or EXTRA[m]
+                    if side not in ("over", "under", "yes", "no") or not name:
+                        continue
+                    side = {"yes": "over", "no": "under"}.get(side, side)
+                    pts_ = float(od["points"]) if od.get("points") is not None else 0.5
+                    # the whole ladder (alternates are over-only), for the bet card
+                    lad = ladders_all.setdefault((name, stat), {})
+                    rung = lad.setdefault(pts_, {})
+                    rung[side], rung[side + "_sel"] = price, _sel(od)
+                    if m in EXTRA or not od.get("is_main"):
+                        if m in EXTRA and od.get("is_main"):
+                            ex = extras.setdefault((name, stat), {"line": pts_, "pid": od.get("player_id")})
+                            ex[side], ex[side + "_sel"] = price, _sel(od)
+                        continue   # alternates (the 9.5 ... 39.5 ladder) never set the main line
+                    if od.get("points") is None:
                         continue
                     e = ladders.setdefault((name, STATS[m]), {"line": float(od["points"]),
                                                              "pid": od.get("player_id")})
@@ -141,7 +156,7 @@ def onyx_pull(key, slate):
                         gl["spread"] = float(od["points"])
                 elif m == "total_points" and od.get("is_main") and od.get("points") is not None:
                     gl["total"] = float(od["points"])
-            for (name, stat), e in ladders.items():
+            for (name, stat), e in list(ladders.items()) + list(extras.items()):
                 if e.get("over") is None and e.get("under") is None:
                     continue
                 rec = players.setdefault(nk(name), {"name": name})
@@ -149,6 +164,13 @@ def onyx_pull(key, slate):
                     rec["optic_pid"] = e["pid"]
                 rec[stat] = {"line": e["line"], "over": e.get("over"), "under": e.get("under"),
                              "over_sel": e.get("over_sel"), "under_sel": e.get("under_sel"), "src": "onyx"}
+            # ladder rows: [line, over, over_sel, under, under_sel], low to high
+            for (name, stat), lad in ladders_all.items():
+                rec = players.get(nk(name))
+                if rec is None or stat not in rec:
+                    continue
+                rec[stat]["ladder"] = [[ln, r.get("over"), r.get("over_sel"), r.get("under"), r.get("under_sel")]
+                                       for ln, r in sorted(lad.items())]
             games[gk] = gl
     n = sum(1 for r in players.values() for s in STATS.values() if s in r)
     print(f"nba onyx: book '{book}' priced {n} player-markets ({len(players)} players) "

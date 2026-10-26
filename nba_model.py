@@ -126,9 +126,9 @@ VERSION = "v4"
 
 LEAGUE = {"ppg": 115.0, "reb": 44.0, "ast": 27.0, "poss": 99.5}
 POS_RATE = {   # per-minute league rates by listed position, used only without a prior
-    "G": {"pts": 0.46, "reb": 0.14, "ast": 0.17},
-    "F": {"pts": 0.44, "reb": 0.21, "ast": 0.09},
-    "C": {"pts": 0.45, "reb": 0.30, "ast": 0.08},
+    "G": {"pts": 0.46, "reb": 0.14, "ast": 0.17, "fg3": 0.070},
+    "F": {"pts": 0.44, "reb": 0.21, "ast": 0.09, "fg3": 0.050},
+    "C": {"pts": 0.45, "reb": 0.30, "ast": 0.08, "fg3": 0.015},
 }
 PRIOR_GAMES_K = 2
 RATE_PRIOR_MIN = 500.0   # v4: with a 3-season prior, history earns more weight on rates
@@ -168,7 +168,7 @@ P = {
 OUT_STATUSES = {"OUT", "DOUBTFUL", "O", "D", "SUSPENSION"}
 RISK_STATUSES = {"QUESTIONABLE", "GTD", "Q", "DAY-TO-DAY", "DTD"}
 STATS = ("pts", "reb", "ast")
-IDX = {"min": 4, "pts": 5, "reb": 6, "ast": 7, "fga": 10, "fta": 11, "tov": 12}
+IDX = {"min": 4, "pts": 5, "reb": 6, "ast": 7, "fg3": 8, "fga": 10, "fta": 11, "tov": 12}
 # league plays used (FGA + 0.44 FTA + TOV) per team game; a player's USG% is
 # his plays-used per minute over the team's per-player-minute share of these
 LEAGUE_TEAM_PLAYS = 112.0
@@ -542,7 +542,7 @@ def per_minute(prior, games, stat, pos):
     cur_min = sum(wi * g[IDX["min"]] for wi, g in zip(w, played))
     cur_s = sum(wi * g[IDX[stat]] for wi, g in zip(w, played))
     if prior and prior.get("min", 0) > 0:
-        r0, k = prior[stat] / prior["min"], RATE_PRIOR_MIN
+        r0, k = (prior.get(stat) or 0.0) / prior["min"], RATE_PRIOR_MIN
     else:
         # no NBA history: start from what players in his ROLE produce (his
         # minutes so far this season pick the band), not a generic position rate
@@ -650,6 +650,14 @@ def role_gap(mean, line, stat):
     from injury, a new starter), which box-score history cannot see."""
     a, b = SD[stat]
     return abs(mean - line) / max(0.8, a * line + b)
+
+
+def prob_over_fg3(mean, line):
+    """P(over) for made threes: negative binomial with variance 1.35 x mean.
+    A reasonable shape for a rare-count stat, NOT fitted or backtested; the
+    bet card labels it that way and never recommends from it."""
+    mean = max(mean, 0.05)
+    return 1 - _nb_cdf(math.floor(line), mean, 1.35 * mean)
 
 
 def implied(american):
@@ -801,6 +809,10 @@ def project_slate(slate, prior, player_games, team_games, team_hist=None, roles=
             rate = per_minute(r["_prior"], r["_games"], s, r["pos"])
             rate *= r["usg_boost"] ** P["usg_beta_" + s]
             proj[s] = round(r["min"] * rate * f[s], 2) if not r["out"] else 0.0
+        # made threes, for the player bet card only: minutes x per-minute rate
+        # from the same 3-season history, no environment terms. NOT backtested
+        # and never used by the picks lane.
+        proj["fg3"] = round(r["min"] * per_minute(r["_prior"], r["_games"], "fg3", r["pos"]), 2) if not r["out"] else 0.0
         r["proj"] = proj
         r["_target_pts"] = f.get("target_pts")
         played = [x for x in r["_games"] if x[IDX["min"]] > 0]
