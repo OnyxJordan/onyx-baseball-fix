@@ -30,6 +30,7 @@ def _team(c):
     t = c.get("team") or {}
     rec = (c.get("records") or [{}])[0].get("summary") if c.get("records") else None
     return {"abbr": t.get("abbreviation"), "name": t.get("displayName"), "short": t.get("shortDisplayName"),
+            "loc": t.get("location"),
             "logo": t.get("logo"), "color": t.get("color"), "rec": rec,
             "rank": (c.get("curatedRank") or {}).get("current"),
             "score": c.get("score")}
@@ -48,7 +49,8 @@ def team_games(sb):
             "gid": e.get("id"), "start": e.get("date"), "state": st.get("state"), "status": st.get("name"),
             "detail": st.get("shortDetail") or st.get("detail"), "name": e.get("shortName"),
             "away": a["abbr"], "home": h["abbr"], "away_name": a["name"], "home_name": h["name"],
-            "away_short": a["short"], "home_short": h["short"], "away_logo": a["logo"], "home_logo": h["logo"],
+            "away_short": a["short"], "home_short": h["short"], "away_loc": a["loc"], "home_loc": h["loc"],
+            "away_logo": a["logo"], "home_logo": h["logo"],
             "away_color": a["color"], "home_color": h["color"], "away_rec": a["rec"], "home_rec": h["rec"],
             "away_rank": a["rank"] if a["rank"] and a["rank"] < 99 else None,
             "home_rank": h["rank"] if h["rank"] and h["rank"] < 99 else None,
