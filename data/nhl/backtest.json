@@ -1,0 +1,99 @@
+{
+ "version": "v1",
+ "sport": "nhl",
+ "label": "Team ratings against real Onyx game lines",
+ "split": "2026-01-15",
+ "w": 0.5,
+ "per_market_test": {
+  "ml": {
+   "n": 694,
+   "blend_ll": 0.6649,
+   "onyx_ll": 0.6582,
+   "model_only_ll": 0.6763
+  },
+  "spread": {
+   "n": 696,
+   "blend_ll": 0.6327,
+   "onyx_ll": 0.6295,
+   "model_only_ll": 0.6458
+  },
+  "total": {
+   "n": 670,
+   "blend_ll": 0.6887,
+   "onyx_ll": 0.6865,
+   "model_only_ll": 0.6924
+  }
+ },
+ "n_samples": 7943,
+ "lane_ll": {
+  "blend": 0.6649,
+  "onyx": 0.6582
+ },
+ "lane": {
+  "markets": [
+   "ml"
+  ],
+  "w": 0.5,
+  "edge_min": 0.05,
+  "edge_max": 0.15,
+  "price_min": -250,
+  "price_max": 250,
+  "max_per_slate": 6
+ },
+ "tune": {
+  "n": 43,
+  "w": 19,
+  "roi": 0.2895
+ },
+ "test_open": {
+  "n": 38,
+  "w": 5,
+  "roi": -0.6292,
+  "claimed": 0.3976,
+  "hit": 0.1316
+ },
+ "test_close": {
+  "n": 46,
+  "w": 8,
+  "roi": -0.4674
+ },
+ "passed": false,
+ "page": {
+  "passed": false,
+  "version": "v1",
+  "run": "2026-10-26",
+  "title": "Team ratings against real Onyx game lines",
+  "summary": [
+   "Every game priced only from results before it, against Onyx's real opening and closing lines. The rule was chosen on games before 2026-01-15 and judged on 2026-01-15 on, which it never saw.",
+   "The model's weight in the blend is 50%.",
+   "Not passed: the lane lost money at opening prices; the lane lost money at closing prices. Leans only until it does."
+  ],
+  "stats": [
+   {
+    "k": "Moneyline log loss",
+    "v": "0.6649",
+    "d": "vs Onyx 0.6582 · model alone 0.6763 · 694 lines"
+   },
+   {
+    "k": "Spread log loss",
+    "v": "0.6327",
+    "d": "vs Onyx 0.6295 · model alone 0.6458 · 696 lines"
+   },
+   {
+    "k": "Total log loss",
+    "v": "0.6887",
+    "d": "vs Onyx 0.6865 · model alone 0.6924 · 670 lines"
+   },
+   {
+    "k": "Lane at opening prices",
+    "v": "5-33",
+    "d": "ROI -62.9% · claimed 39.8% vs hit 13.2%"
+   },
+   {
+    "k": "Lane at closing prices",
+    "v": "8-38",
+    "d": "ROI -46.7%"
+   }
+  ]
+ }
+}
