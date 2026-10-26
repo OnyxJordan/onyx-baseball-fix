@@ -1,8 +1,8 @@
 {
-  "name": "Onyx Baseball",
-  "short_name": "Onyx",
-  "description": "Daily MLB home run model, live gamecasts, and market tracking. Powered by Onyx.",
-  "start_url": "./",
+  "name": "Onyx Sports",
+  "short_name": "Onyx Sports",
+  "description": "Onyx Sports Data: models, matchups and live gamecenters for every sport, priced against Onyx. Basketball and baseball live, more on the way.",
+  "start_url": "home.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
@@ -21,5 +21,6 @@
       "type": "image/png",
       "purpose": "any maskable"
     }
-  ]
+  ],
+  "id": "./"
 }

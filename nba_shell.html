@@ -11,7 +11,7 @@
 <!-- solid "black": the installed app starts BELOW the status bar. "black-translucent" drew the page
      under it, where iOS blurs and dims a band that faded and cut off the header (10/25) -->
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
-<meta name="apple-mobile-web-app-title" content="Onyx">
+<meta name="apple-mobile-web-app-title" content="Onyx Sports">
 <!-- shared app shell: bottom menu, search, toasts, status-bar fix (ui.js) -->
 <script src="ui.js" defer></script>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -204,14 +204,24 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
 .bc-bars i{flex:1;background:rgba(255,255,255,.12);border-radius:2px 2px 0 0;transition:background .15s,height .2s}
 .bc-bars i.ov{background:linear-gradient(180deg,#b038f9,#635bff)}
 .bc-bars i.un{background:linear-gradient(180deg,#635bff,#3d37b3)}
-.bc-mark{position:absolute;top:0;bottom:0;width:2px;margin-left:-1px;background:#fff;box-shadow:0 0 10px rgba(255,255,255,.7);transition:left .12s ease-out}
+.bc-mark{position:absolute;top:0;bottom:0;width:2px;margin-left:-1px;background:#fff;box-shadow:0 0 10px rgba(255,255,255,.7)}
 .bc-mark span{position:absolute;top:-2px;left:50%;transform:translateX(-50%);font:800 10px monospace;background:#fff;color:#111;padding:1px 5px;border-radius:5px;white-space:nowrap}
 .bc-axis{display:flex;justify-content:space-between;font:700 9px monospace;color:var(--text3);margin-top:4px}
-.bc-slide{margin:12px 0 4px}
-.bc-slide input[type=range]{width:100%;-webkit-appearance:none;appearance:none;height:6px;border-radius:3px;outline:0;
-  background:linear-gradient(90deg,#b038f9 0,#635bff var(--pct),rgba(255,255,255,.12) var(--pct))}
-.bc-slide input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:#fff;border:3px solid #b038f9;box-shadow:0 2px 12px rgba(176,56,249,.6);cursor:grab}
-.bc-slide input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#fff;border:3px solid #b038f9;cursor:grab}
+.bc-slide{margin:4px 0 4px}
+/* the rail sits on the chart's scale (bcScale): thumb, marker and ticks line up */
+.bc-rail{position:relative;height:34px;touch-action:none;cursor:ew-resize;user-select:none;-webkit-user-select:none}
+.bc-rail::before{content:"";position:absolute;left:0;right:0;top:14px;height:6px;border-radius:3px;background:rgba(255,255,255,.1)}
+.bc-rail-fill{position:absolute;top:14px;height:6px;border-radius:3px;background:linear-gradient(90deg,#b038f9,#635bff)}
+.bc-rail i{position:absolute;top:9px;width:2px;height:16px;margin-left:-1px;border-radius:1px;background:rgba(255,255,255,.4);pointer-events:none}
+.bc-rail i.main{background:#d795ff;height:20px;top:7px}
+.bc-rail i.on{background:#fff}
+.bc-thumb{position:absolute;top:4px;width:26px;height:26px;margin-left:-13px;border-radius:50%;background:#fff;border:3px solid #b038f9;box-shadow:0 2px 12px rgba(176,56,249,.6);pointer-events:none;z-index:2}
+.bc-thumb.ghost{border-color:#d795ff;transform:scale(.85)}
+.bc-rail.drag .bc-thumb{transform:scale(1.12)}
+.bc-rail input[type=range]{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;pointer-events:none}
+.bc-rail:has(input:focus-visible) .bc-thumb{outline:2px solid #fff;outline-offset:3px}
+.bc-main.snap .bc-thumb,.bc-main.snap .bc-mark{transition:left .22s cubic-bezier(.2,.9,.25,1)}
+.bc-main.snap .bc-rail-fill{transition:width .22s cubic-bezier(.2,.9,.25,1)}
 .bc-rungs{display:flex;gap:6px;overflow-x:auto;padding:10px 2px 4px;scroll-snap-type:x proximity;scrollbar-width:none}.bc-rungs::-webkit-scrollbar{display:none}
 .bc-rungs button{flex-shrink:0;scroll-snap-align:center;min-width:56px;padding:6px 8px;border-radius:10px;border:1px solid var(--border2);background:rgba(255,255,255,.03);color:var(--text2);cursor:pointer;text-align:center}
 .bc-rungs button b{display:block;font:800 13px monospace;color:var(--text)}.bc-rungs button span{font:700 10px monospace}
@@ -300,6 +310,10 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
 .prose h3{color:var(--text);font-size:17px;margin:26px 0 8px}.prose b{color:var(--text)}
 .pdr-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:16px 0}
 @media (max-width:480px){.pdr-grid .nba-card{padding:10px 6px}.pdr-grid .nba-card .sub{font-size:10px!important}}
+/* 320-400px: the over/under chips share the cell instead of spilling past it */
+@media (max-width:400px){.pdr-grid{gap:6px}.pdr-grid .nba-card{padding:10px 4px}
+  .pdr-grid .nba-card>div[style*="display:flex"]{gap:4px!important}
+  .pdr-grid .chip{flex:1 1 0;min-width:0;padding:6px 2px}.pdr-grid .chip .o{font-size:11.5px}}
 .pdr-grid .nba-card{padding:12px;text-align:center}
 .pdr-grid .v{font-size:24px;font-weight:800;font-family:monospace;color:#d795ff}
 .pdr-grid .l{font-size:10px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase}
@@ -315,7 +329,7 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
   .hs.m{width:38px;height:38px}
 }
 </style>
-</head>
+<link rel="stylesheet" href="onyx.css"><script src="onyx.js" defer></script></head>
 <body>
 
 <!-- ═══ NAV (MLB markup) ═══════════════════════════════════════ -->
@@ -1721,14 +1735,16 @@ function bcRender() {
         <span class="bw">Across his points, rebounds and assists lines priced ${BC_REC_PRICE[0]} to +${BC_REC_PRICE[1]}, where the model is calibrated</span></button>` : ''}
     <label class="bc-search"><input type="search" placeholder="Search his markets: points, threes, double..." value="${esc(BC.q)}" oninput="BC.q=this.value;bcMkts()" aria-label="Search markets"></label>
     <div class="bc-mkts" id="bcMkts"></div>
-    ${rows.length ? `<div class="bc-main">
+    ${rows.length ? `<div class="bc-main" id="bcMainBox">
       <div class="bc-line"><div><div class="bc-big" id="bcBig"></div>
         <div class="bc-side" id="bcSide"><button data-s="over" onclick="BC.side='over';bcUpdate()">Over</button><button data-s="under" onclick="BC.side='under';bcUpdate()">Under</button></div>
         <div class="bc-note" id="bcSideNote"></div></div>
         <div class="bc-price" id="bcPrice"></div></div>
       <div class="bc-stats" id="bcStats"></div>
       ${yesNo ? '' : `<div class="bc-dist" id="bcDist"></div>`}
-      ${rows.length > 1 ? `<div class="bc-slide"><input id="bcRange" type="range" min="${lo}" max="${hi}" step="0.1" value="${BC.x}" aria-label="Line">
+      ${rows.length > 1 ? `<div class="bc-slide"><div class="bc-rail" id="bcRail"><div class="bc-rail-fill"></div>
+          ${rows.map((r, j) => `<i data-j="${j}" class="${r[3] != null ? 'main' : ''}"></i>`).join('')}<b class="bc-thumb"></b>
+          <input id="bcRange" type="range" min="${lo}" max="${hi}" step="0.1" value="${BC.x}" aria-label="Line"></div>
         <div class="bc-rungs" id="bcRungs">${rows.map((r, j) => `<button data-j="${j}" class="${r[3] != null ? 'main' : ''}" onclick="bcGo(${j})">
           <b>${r[0]}</b><span></span></button>`).join('')}</div></div>` : ''}
       <div class="bc-note">${BC_MODELED[BC.s] ? 'Blended = 20% model, 80% Onyx price with the margin removed: the same math as the board. Drag the slider or the chart: between Onyx lines you see the model chance, release to snap to a line you can bet.'
@@ -1746,6 +1762,21 @@ function bcRender() {
   }
   bcChartBind();
   bcUpdate(true);
+}
+// one scale for the chart, the rail and the ticks: value x sits at
+// (x - k0 + 0.5) / n of the width, n = number of bars (one per count)
+function bcScale() {
+  const dist = document.getElementById('bcDist'), bars = dist && dist.querySelector('.bc-bars');
+  if (bars) return {k0: +dist.dataset.k0, n: bars.children.length - 1};
+  const rows = bcRows(), lo = rows[0][0], hi = rows[rows.length - 1][0];
+  return {k0: Math.floor(lo) - 1, n: Math.ceil(hi) - Math.floor(lo) + 3};
+}
+function bcPctOf(x) { const sc = bcScale(); return Math.min(100, Math.max(0, (x - sc.k0 + 0.5) / sc.n * 100)); }
+function bcSnapAnim() {
+  const box = document.getElementById('bcMainBox');
+  if (!box) return;
+  box.classList.add('snap'); clearTimeout(bcSnapAnim.t);
+  bcSnapAnim.t = setTimeout(() => box.classList.remove('snap'), 260);
 }
 function bcMkts() {
   const p = playerOf(BC.pid), box = document.getElementById('bcMkts');
@@ -1769,6 +1800,7 @@ function bcGo(j, s) {
   }
   if (j == null) j = bcMain(p, BC.s);
   BC.i = j; BC.x = bcRows()[j][0];
+  bcSnapAnim();
   bcUpdate(true);
 }
 function bcTake(s, i, side) {
@@ -1786,25 +1818,25 @@ function bcScrub(x) {
 function bcSnap() {
   const j = bcNearest(BC.x);
   BC.i = j; BC.x = bcRows()[j][0];
+  bcSnapAnim();
   bcUpdate(true);
 }
 function bcChartBind() {
-  const dist = document.getElementById('bcDist');
-  if (!dist) return;
-  let drag = false;
-  const at = e => {
-    const bars = dist.querySelector('.bc-bars');
-    if (!bars) return;
-    const r = bars.getBoundingClientRect(), n = bars.children.length - 1;   // last child is the marker
-    const rows = bcRows();
-    const x = Math.min(rows[rows.length - 1][0], Math.max(rows[0][0], +dist.dataset.k0 + (e.clientX - r.left) / r.width * n - 0.5));
-    const rg = document.getElementById('bcRange'); if (rg) rg.value = x;
-    bcScrub(x);
-  };
-  dist.addEventListener('pointerdown', e => { drag = true; dist.setPointerCapture(e.pointerId); at(e); });
-  dist.addEventListener('pointermove', e => { if (drag) at(e); });
-  const end = () => { if (drag) { drag = false; bcSnap(); } };
-  dist.addEventListener('pointerup', end); dist.addEventListener('pointercancel', end);
+  ['bcDist', 'bcRail'].forEach(id => {
+    const surf = document.getElementById(id);
+    if (!surf) return;
+    let drag = false;
+    const at = e => {
+      const r = surf.getBoundingClientRect(), sc = bcScale(), rows = bcRows();
+      const x = Math.min(rows[rows.length - 1][0], Math.max(rows[0][0], sc.k0 + (e.clientX - r.left) / r.width * sc.n - 0.5));
+      const rg = document.getElementById('bcRange'); if (rg) rg.value = x;
+      bcScrub(x);
+    };
+    surf.addEventListener('pointerdown', e => { drag = true; surf.setPointerCapture(e.pointerId); surf.classList.add('drag'); at(e); });
+    surf.addEventListener('pointermove', e => { if (drag) at(e); });
+    const end = () => { if (drag) { drag = false; surf.classList.remove('drag'); bcSnap(); } };
+    surf.addEventListener('pointerup', end); surf.addEventListener('pointercancel', end);
+  });
 }
 function bcUpdate(scrollRung) {
   const p = playerOf(BC.pid), rows = bcRows();
@@ -1844,15 +1876,21 @@ function bcUpdate(scrollRung) {
     const n = bars.children.length - 1, L = k.line, k0 = +dist.dataset.k0;
     [...bars.children].forEach((b, i) => { if (b.tagName === 'I') b.className = k.side === 'over' ? (i + k0 > L ? 'ov' : '') : (i + k0 < L ? 'un' : ''); });
     const mark = bars.querySelector('.bc-mark');
-    mark.style.left = Math.min(100, Math.max(0, (BC.x - k0 + 0.5) / n * 100)) + '%';
+    mark.style.left = bcPctOf(BC.x) + '%';
     mark.classList.toggle('ghost', !k.exact);
     mark.querySelector('span').textContent = k.exact ? k.line : (Math.round(BC.x * 2) / 2).toFixed(1);
   } else if (dist) dist.innerHTML = '';
   const rg = $('bcRange');
-  if (rg) {
-    if (document.activeElement !== rg || scrollRung) rg.value = BC.x;
-    const lo = rows[0][0], hi = rows[rows.length - 1][0];
-    rg.style.setProperty('--pct', ((BC.x - lo) / Math.max(1e-9, hi - lo) * 100) + '%');
+  if (rg && (document.activeElement !== rg || scrollRung)) rg.value = BC.x;
+  // the rail: thumb, fill and a tick per Onyx line, all on the chart's scale
+  const rail = $('bcRail');
+  if (rail) {
+    const at = bcPctOf(BC.x), from = bcPctOf(rows[0][0]);
+    rail.querySelector('.bc-thumb').style.left = at + '%';
+    rail.querySelector('.bc-thumb').classList.toggle('ghost', !k.exact);
+    const fill = rail.querySelector('.bc-rail-fill');
+    fill.style.left = from + '%'; fill.style.width = Math.max(0, at - from) + '%';
+    rail.querySelectorAll('i').forEach(t => { const j = +t.dataset.j; t.style.left = bcPctOf(rows[j][0]) + '%'; t.classList.toggle('on', k.exact && j === BC.i); });
   }
   const rungs = $('bcRungs');
   if (rungs) {
@@ -1862,7 +1900,12 @@ function bcUpdate(scrollRung) {
       b.classList.toggle('on', k.exact && j === BC.i); b.classList.toggle('near', !k.exact && j === near);
       b.querySelector('span').textContent = (u ? 'U ' : r[3] != null ? 'O ' : '') + fmtOdds(u ? r[3] : r[1] != null ? r[1] : r[3]);
     });
-    if (scrollRung) { const on = rungs.querySelector('.on'); if (on) on.scrollIntoView({block: 'nearest', inline: 'center', behavior: 'smooth'}); }
+    // the chips follow the finger: the nearest line stays centred while scrubbing
+    const cur = rungs.querySelector('.on') || rungs.querySelector('.near');
+    if (cur) {
+      const left = cur.offsetLeft - (rungs.clientWidth - cur.offsetWidth) / 2;
+      if (scrollRung) rungs.scrollTo({left, behavior: 'smooth'}); else rungs.scrollLeft = left;
+    }
   }
   const best = $('bcBest'), b0 = bcBest(p);
   if (best && b0) best.classList.toggle('on', k.exact && b0.s === BC.s && b0.i === BC.i && b0.side === k.side);

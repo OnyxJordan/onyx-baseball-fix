@@ -15,6 +15,9 @@
  *                59pt bar
  * and in both: More opens the menu, a tile navigates and closes it, the
  * hamburger opens the same menu, search finds something, no page errors.
+ * Then the Onyx Sports hub (home.html, the manifest's start page) at 320
+ * and 393px: solid status bar, header in place, all seven sports with the
+ * live ones linked, no sideways scroll, the raster ONYX drawn.
  *
  *   python3 -B nba_build.py && node tools/verify_pwa.js
  */
@@ -39,7 +42,7 @@ function serve() {
     if (!file.startsWith(path.resolve(ROOT))) { res.writeHead(403).end(); return; }
     fs.readFile(file, (err, buf) => {
       if (err) { res.writeHead(404).end(); return; }
-      const type = file.endsWith('.html') ? 'text/html' : file.endsWith('.js') ? 'text/javascript'
+      const type = file.endsWith('.html') ? 'text/html' : file.endsWith('.js') ? 'text/javascript' : file.endsWith('.css') ? 'text/css'
         : file.endsWith('.json') ? 'application/json' : 'application/octet-stream';
       if (translucent && type === 'text/html')
         buf = Buffer.from(String(buf).replace('content="black"', 'content="black-translucent"'));
@@ -120,6 +123,52 @@ function serve() {
     }
     bad.push(...errs);
     console.log(`  ${bad.length ? 'FAIL' : 'ok  '} ${page.padEnd(10)} ${mode.padEnd(11)} bar ${bar}, --sat ${sat || '0'}, header top ${Math.round(navTop)}px${bad.length ? '  <- ' + bad.join('; ') : ''}`);
+    failures += bad.length;
+    await ctx.close();
+  }
+  // the hub (home.html): the installed app's start page since 10/26
+  const man = JSON.parse(fs.readFileSync(path.join(ROOT, 'manifest.json'), 'utf8'));
+  for (const w of [320, 393]) {
+    const ctx = await browser.newContext({ viewport: { width: w, height: 852 }, isMobile: true, hasTouch: true, userAgent: UA });
+    await ctx.addInitScript(() => { Object.defineProperty(navigator, 'standalone', { get: () => true }); });
+    const p = await ctx.newPage();
+    const errs = [];
+    p.on('pageerror', e => errs.push(e.constructor.name + ': ' + e.message));
+    await p.route('**/*', r => {
+      const u = r.request().url();
+      return (u.startsWith(`http://127.0.0.1:${PORT}`) || u.startsWith('data:')) ? r.continue() : r.abort();
+    });
+    await p.goto(`http://127.0.0.1:${PORT}/home.html`, { waitUntil: 'domcontentloaded' });
+    await p.waitForTimeout(1500);
+    const bad = [];
+    if (man.start_url !== 'home.html') bad.push(`manifest start_url ${man.start_url}, want home.html`);
+    if (!/Onyx Sports/.test(man.name || '')) bad.push(`manifest name "${man.name}"`);
+    const st = await p.evaluate(() => {
+      const bar = (document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]') || {}).content;
+      const head = document.querySelector('.ox-head-in').getBoundingClientRect();
+      const barEl = document.getElementById('oxBar'), barH = barEl ? barEl.getBoundingClientRect().height : 0;
+      const cards = [...document.querySelectorAll('.ox-sport')];
+      const live = cards.filter(c => c.tagName === 'A').map(c => c.getAttribute('href'));
+      const cv = document.querySelector('.ox-giant canvas');
+      if (cv) { cv.scrollIntoView(); }
+      return { bar, headTop: head.top - barH, cards: cards.length, live, sw: document.documentElement.scrollWidth, vw: document.documentElement.clientWidth };
+    });
+    await p.waitForTimeout(400);
+    const inked = await p.evaluate(() => {
+      const cv = document.querySelector('.ox-giant canvas');
+      if (!cv || !cv.width) return false;
+      const d = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data;
+      for (let i = 3; i < d.length; i += 40) if (d[i] > 0) return true;
+      return false;
+    });
+    if (st.bar !== 'black') bad.push(`status bar style "${st.bar}"`);
+    if (st.headTop < 0 || st.headTop > 40) bad.push(`header at ${Math.round(st.headTop)}px`);
+    if (st.cards !== 7) bad.push(`${st.cards} sport cards, want 7`);
+    if (!st.live.includes('nba.html') || !st.live.includes('index.html')) bad.push(`live sports link to ${st.live.join(', ')}`);
+    if (st.sw > st.vw) bad.push(`page scrolls sideways (${st.sw}px > ${st.vw}px)`);
+    if (!inked) bad.push('ONYX raster wordmark did not draw');
+    bad.push(...errs);
+    console.log(`  ${bad.length ? 'FAIL' : 'ok  '} home.html  ${String(w).padEnd(11)} ${st.cards} sports, live: ${st.live.join(' ')}${bad.length ? '  <- ' + bad.join('; ') : ''}`);
     failures += bad.length;
     await ctx.close();
   }

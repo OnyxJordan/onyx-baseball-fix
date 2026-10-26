@@ -21,7 +21,9 @@
   var IS_NBA = /nba\.html/.test(location.pathname) || typeof NBA_DATA !== 'undefined';
   var root = document.documentElement;
   var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var WHATS_NEW = 'onyx-new-2026-10-25';
+  var WHATS_NEW = 'onyx-new-2026-10-26';
+  // the Onyx logo mark (onyxodds.com), for the Onyx Sports links
+  var OX_MARK = '<svg viewBox="0 0 100 137" fill="currentColor" aria-hidden="true"><path d="m39.041 109.178 18.493 9.863-33.972 17.945L0 124.384v-84.11l39.041-20.411zm21.918-81.37-18.493-9.863L76.438 0 100 12.603v84.246L60.959 117.26z"/></svg>';
 
   var I = {   // 16px stroke icons
     home: '<path d="M2 6.5L8 2l6 4.5V14H2z"/><path d="M6 14V9h4v5"/>',
@@ -168,6 +170,7 @@
     '.otile b{display:block;font-size:13.5px;font-weight:700;margin-bottom:2px}',
     '.otile span{display:block;font-size:11px;line-height:1.35;color:var(--text3,#8a8a99)}',
     '.oacts{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}',
+    'a.oact{text-decoration:none}.oact.ox-all{flex-basis:100%;color:#d795ff;border-color:rgba(176,56,249,.45)}.oact.ox-all svg{width:11px;height:auto}',
     '.oact{flex:1;min-width:130px;display:flex;align-items:center;justify-content:center;gap:7px;padding:12px;border-radius:13px;border:1px solid rgba(255,255,255,.1);',
     'background:rgba(255,255,255,.04);color:var(--text,#fff);font:700 12.5px "Space Grotesk",system-ui,sans-serif;cursor:pointer;text-decoration:none}',
     '.oact.pri{background:linear-gradient(135deg,#b038f9,#635bff);border-color:transparent;box-shadow:0 6px 20px rgba(176,56,249,.35)}',
@@ -272,6 +275,7 @@
           '<div><b>' + esc(t[1]) + '</b><span>' + esc(t[3]) + '</span></div></button>';
       }).join('') + '</div>' +
       '<div class="oacts">' +
+      '<a class="oact ox-all" href="home.html">' + OX_MARK + 'All Onyx sports</a>' +
       '<button class="oact pri" data-act="slip">' + svg('slip') + 'Parlay builder</button>' +
       '<button class="oact" data-act="share">' + svg('share') + 'Share Onyx</button>' +
       '<button class="oact" data-act="new">' + svg('spark') + "What's new</button></div>";
@@ -294,7 +298,7 @@
       } catch (e) { console.error(e); }
     });
     sheet.querySelector('[data-act="share"]').addEventListener('click', function () {
-      var data = {title: 'Onyx ' + S.name, text: IS_NBA ? 'NBA points, rebounds and assists projected nightly vs Onyx lines' : 'Daily MLB home run model vs Onyx lines', url: location.href.split('#')[0]};
+      var data = {title: 'Onyx Sports · ' + S.name, text: IS_NBA ? 'NBA points, rebounds and assists projected nightly vs Onyx lines' : 'Daily MLB home run model vs Onyx lines', url: location.href.split('#')[0]};
       if (navigator.share) navigator.share(data).catch(function () {});
       else if (navigator.clipboard) navigator.clipboard.writeText(data.url).then(function () { toast('Link copied'); }).catch(function () {});
     });
@@ -441,6 +445,10 @@
         IS_NBA ? '<a href="./">MLB</a><a class="on" href="nba.html" aria-current="page">NBA</a>'
                : '<a class="on" href="./" aria-current="page">MLB</a><a href="nba.html">NBA</a>');
       right.insertBefore(pill, right.firstChild);
+      // the Onyx mark: back to Onyx Sports, every sport in one place
+      var hub = el('a', 'ox-hub', OX_MARK);
+      hub.href = 'home.html'; hub.setAttribute('aria-label', 'Onyx Sports: all sports'); hub.title = 'Onyx Sports';
+      right.insertBefore(hub, right.firstChild);
       var sb = el('button', 'osbtn', svg('search') + 'Search <kbd>' + (/Mac/.test(navigator.platform) ? '⌘K' : '/') + '</kbd>');
       sb.setAttribute('aria-label', 'Search pages and players');
       sb.addEventListener('click', function () { openSheet(true); });
@@ -459,6 +467,21 @@
     });
   }
 
+  // ── 6b. the Onyx footer: the giant raster ONYX (onyx.js) and every sport ─
+  function siteFooter() {
+    if (document.querySelector('.ox-sitefoot')) return;
+    var sports = [['Basketball', 'nba.html', IS_NBA], ['Baseball', './', !IS_NBA], ['NFL'], ['College Football'], ['NHL'], ['Tennis'], ['Golf']];
+    var f = el('footer', 'ox-sitefoot',
+      '<div class="row"><div class="links">' + sports.map(function (x) {
+        return x[1] ? '<a href="' + x[1] + '"' + (x[2] ? ' class="on" aria-current="page"' : '') + '>Onyx ' + x[0] + '</a>'
+                    : '<a class="soon" aria-disabled="true">Onyx ' + x[0] + ' · soon</a>';
+      }).join('') + '</div><a class="ox-btn sm" href="home.html">Onyx Sports</a></div>' +
+      '<div class="ox-giant" data-ox-host><canvas data-ox-art="wordmark" data-ox-tone="purple" aria-label="Onyx"></canvas></div>' +
+      '<small>Onyx Sports Data is research: projections are estimates, not guarantees. All prices are Onyx prices. Must be of legal age in your state to play; if you or someone you know has a gambling problem, call 1-800-GAMBLER.</small>');
+    document.body.appendChild(f);
+    if (window.OnyxArt) OnyxArt.scan(f);
+  }
+
   // ── 7. what's new (once per release, never for automation) ───────────
   function showWhatsNew(force) {
     var seen = false;
@@ -473,8 +496,9 @@
       ['model', IS_NBA ? 'The NBA model now builds from three seasons of history, aged and regressed to role.'
                        : 'Onyx Basketball is live: points, rebounds and assists vs Onyx lines.'],
     ];
+    items.unshift(['home', 'Onyx Sports: every sport in one place. Tap the Onyx mark up top for the new home, with NFL, NHL, tennis and golf on the way.']);
     var w = el('div', 'onew', '<div class="onew-card" role="dialog" aria-modal="true" aria-label="What\'s new">' +
-      '<div class="eb">What\'s new</div><h3>Onyx, upgraded</h3><ul>' +
+      '<div class="eb">What\'s new</div><h3>Onyx Sports</h3><ul>' +
       items.map(function (i) { return '<li>' + svg(i[0]) + '<span>' + esc(i[1]) + '</span></li>'; }).join('') +
       '</ul><button class="oact pri" style="width:100%">Let\'s go</button></div>');
     function done() { try { localStorage.setItem(WHATS_NEW, '1'); } catch (e) {} w.remove(); }
@@ -490,6 +514,7 @@
     window.addEventListener('orientationchange', function () { setTimeout(fixSafeArea, 300); });
     buildBar();
     buildSheet();
+    siteFooter();
     hook();
     var t0 = (location.hash || '').slice(1);
     syncActive(typeof currentTab !== 'undefined' ? currentTab : (typeof curTab !== 'undefined' ? curTab : (t0 || 'home')));

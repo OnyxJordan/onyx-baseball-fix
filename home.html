@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>ONYX SPORTS DATA</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0c0c0c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<!-- solid "black": the installed app starts below the status bar (see shell.html, 10/25) -->
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Onyx Sports">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<meta property="og:title" content="Onyx Sports Data">
+<meta name="description" content="Onyx Sports Data: models, matchups and live gamecenters for every sport, priced against Onyx. The research desk for your picks.">
+<link rel="stylesheet" href="onyx.css">
+<script src="onyx.js" defer></script>
+<script>
+if ('serviceWorker' in navigator && location.protocol === 'https:') {
+  addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+}
+</script>
+</head>
+<body class="ox-page">
+
+<div class="ox-bar" id="oxBar">
+  <span>Onyx Sports Data · NBA and MLB models live · NFL, NHL and more on the way</span>
+  <button onclick="this.parentNode.remove()" aria-label="Dismiss">×</button>
+</div>
+
+<header class="ox-head">
+  <div class="ox-wrap ox-head-in">
+    <a class="ox-brand" href="#top" aria-label="Onyx Sports Data">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 218 47" aria-hidden="true"><path id="oxWord"></path></svg>
+      <span>Sports Data</span>
+    </a>
+    <a class="ox-markc" href="#sports" aria-label="All sports"><svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 100 137" aria-hidden="true"><path class="oxMark"></path></svg></a>
+    <nav class="ox-acts">
+      <a class="ox-link" href="#sports">Sports</a>
+      <a class="ox-link" href="#record">Record</a>
+      <a class="ox-btn sm" data-onyx="header" href="#" target="_blank" rel="noopener">Bet on Onyx</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- ── hero ─────────────────────────────────────────────────── -->
+  <section class="ox-hero" data-ox-host>
+    <canvas class="ox-hero-art" data-ox-art="field" data-ox-tone="purple" data-ox-fade="0" data-ox-calm=".6" aria-hidden="true"></canvas>
+    <div class="ox-marquee" aria-hidden="true"><div id="oxMarq"></div></div>
+    <div class="ox-hero-side l">Models, matchups and live gamecenters.</div>
+    <div class="ox-hero-side r">Basketball. Football. Baseball. Hockey. Tennis. Golf.</div>
+    <div class="ox-wrap ox-hero-in">
+      <span class="ox-eyebrow">The research desk for your picks</span>
+      <h1>Research<br><em>on</em> everything</h1>
+      <p>Onyx Sports Data compiles the best numbers across the industry, runs them through models we test in public and prices every one against the live Onyx line.</p>
+      <div class="ox-hero-cta">
+        <a class="ox-btn fill" href="#sports">Choose a sport</a>
+        <a class="ox-btn" href="#parlay">Tonight's parlay</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="ox-wrap">
+    <div class="ox-tonight" id="oxTonight" aria-live="polite">
+      <div><b class="p" id="tGames">-</b><span>NBA games tonight</span></div>
+      <div><b id="tPlayers">-</b><span>Players projected</span></div>
+      <div><b class="g" id="tTip">-</b><span>First tip (ET)</span></div>
+      <div><b id="tLive">2</b><span>Sports live, 5 on the way</span></div>
+    </div>
+  </div>
+
+  <!-- ── the sports ───────────────────────────────────────────── -->
+  <section class="ox-sec" id="sports">
+    <div class="ox-wrap">
+      <div class="ox-sec-h">
+        <h2>Pick your<br>sport.</h2>
+        <p>One desk, every league. Each sport gets its own model, its own gamecenter and its own public record.</p>
+      </div>
+      <div class="ox-sports" id="oxSports"></div>
+    </div>
+  </section>
+
+  <!-- ── what this is ─────────────────────────────────────────── -->
+  <section class="ox-sec" id="about" style="padding-top:0">
+    <div class="ox-wrap ox-about">
+      <div>
+        <span class="ox-eyebrow" style="margin-bottom:18px">What this is</span>
+        <h2>The best data<br>in sports, <em>in one place.</em></h2>
+        <p class="lead"><b>Onyx Sports Data is where you do the research before you build a slip.</b>
+          We pull the best public data across the industry, from pitch tracking to box scores to injury reports,
+          run it through models built from scratch for each sport, and lay it out game by game.</p>
+        <p class="lead">Every projection sits next to the live Onyx price, so you see exactly where the model and the market disagree.
+          Every pick is graded in public, wins and losses alike, so you can judge the model before you trust it.</p>
+        <div class="ox-sources" aria-label="Data sources">
+          <span class="ox-pill"><i></i>MLB Stats API</span><span class="ox-pill"><i></i>Statcast</span>
+          <span class="ox-pill"><i></i>ESPN</span><span class="ox-pill"><i></i>Onyx prices</span>
+        </div>
+      </div>
+      <div class="ox-pillars">
+        <div class="ox-pillar"><div class="k">01</div><div><h4>Models</h4><p>Built from scratch for each sport and backtested against real prices. Every change is logged with the evidence behind it.</p></div></div>
+        <div class="ox-pillar"><div class="k">02</div><div><h4>Gamecenter</h4><p>Live scoreboards, shot charts, pitch tracking and play-by-play, made for following your picks while they play out.</p></div></div>
+        <div class="ox-pillar"><div class="k">03</div><div><h4>Honest record</h4><p>Every pick graded in public, with what $10 a bet would have returned. No deleted losses, no cherry picking.</p></div></div>
+        <div class="ox-pillar"><div class="k">04</div><div><h4>Priced on Onyx</h4><p>Every line, every alternate, every price comes straight from Onyx, so a play you find is a play you can bet.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── gamecenter ───────────────────────────────────────────── -->
+  <section class="ox-wrap" id="gamecenter">
+    <div class="ox-feature">
+      <div class="ox-feature-art" data-ox-host>
+        <canvas data-ox-art="court" data-ox-tone="purple" data-ox-fade="0" aria-hidden="true"></canvas>
+        <div class="ox-feature-card" aria-hidden="true">
+          <div class="h"><span>Gamecenter</span><em>● Live</em></div>
+          <div class="row"><span>Shot chart</span><b>every make and miss</b></div>
+          <div class="row"><span>Possession</span><b>play by play</b></div>
+          <div class="row"><span>Your picks</span><span class="pr">tracked live</span></div>
+          <div class="tot">Bet this game on Onyx<small>every line, priced live</small></div>
+        </div>
+      </div>
+      <div class="ox-feature-mid"></div>
+      <div class="ox-feature-copy">
+        <span class="ox-count">01 <i></i> 02</span>
+        <span class="t">Now live: gamecenter</span>
+        <h2>Watch while<br>you research.</h2>
+        <p>Follow every game as it happens: live court and shot charts for the NBA, pitch-by-pitch gamecasts for MLB, with your picks lit up as they cash.</p>
+        <div class="ox-hero-cta">
+          <a class="ox-btn" href="nba.html#games">NBA gamecenter</a>
+          <a class="ox-btn" href="index.html#games">MLB gamecast</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── the record ───────────────────────────────────────────── -->
+  <section class="ox-sec" id="record">
+    <div class="ox-wrap">
+      <div class="ox-sec-h">
+        <h2>The record,<br>in public.</h2>
+        <p>Graded every morning, never edited. Open a sport to see every pick behind these numbers.</p>
+      </div>
+      <div class="ox-records">
+        <a class="ox-rec" href="nba.html#record"><span class="ox-pill live">NBA</span><div class="v g" id="rNba">-</div><div class="l">Model picks, won / lost</div><p id="rNbaTxt">Points, rebounds and assists picks graded nightly.</p></a>
+        <a class="ox-rec" href="nba.html#home"><span class="ox-pill live">NBA</span><div class="v p" id="rTk">-</div><div class="l">The Model's Parlay</div><p id="rTkTxt">Three legs a night, locked at first tip and graded leg by leg.</p></a>
+        <a class="ox-rec" href="index.html#record"><span class="ox-pill live">MLB</span><div class="v">HR</div><div class="l">Home run model, K and edge plays</div><p>Every play graded in the public ledger, by price and by conviction.</p></a>
+      </div>
+    </div>
+  </section>
+
+  <div class="ox-band"><div class="ox-marquee" aria-hidden="true"><div id="oxBand"></div></div></div>
+
+  <!-- ── parlay CTA ───────────────────────────────────────────── -->
+  <section class="ox-cta" id="parlay" data-ox-host>
+    <canvas data-ox-art="field" data-ox-tone="green" data-ox-fade="0" data-ox-calm=".7" aria-hidden="true"></canvas>
+    <div class="ox-wrap ox-cta-in">
+      <span class="ox-eyebrow">Parlays</span>
+      <h2>Stack your<br>picks.</h2>
+      <p id="pDesc">Tonight's Model's Parlay: the three Onyx lines with the best chance to win, picked by the NBA model.</p>
+      <div class="ox-legs" id="oxLegs" hidden></div>
+      <div class="ox-hero-cta">
+        <a class="ox-btn fill" id="pBet" data-onyx="parlay" href="#" target="_blank" rel="noopener">Bet it on Onyx</a>
+        <a class="ox-btn" href="nba.html">Build your own</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="ox-foot">
+  <div class="ox-wrap">
+    <div class="ox-foot-cols">
+      <div class="ox-foot-col"><div class="ox-rule"></div><h5>Live now</h5><a href="nba.html">Onyx Basketball</a><a href="index.html">Onyx Baseball</a></div>
+      <div class="ox-foot-col"><div class="ox-rule"></div><h5>On the way</h5><span>Onyx NFL</span><span>Onyx College Football</span><span>Onyx NHL</span><span>Onyx Tennis</span><span>Onyx Golf</span></div>
+      <div class="ox-foot-col"><div class="ox-rule"></div><h5>The desk</h5><a href="#about">What this is</a><a href="#gamecenter">Gamecenter</a><a href="#record">The record</a></div>
+      <div class="ox-foot-col"><div class="ox-rule"></div><h5>Onyx</h5><a data-onyx="footer" href="#" target="_blank" rel="noopener">Bet on Onyx</a><a href="https://onyxodds.com" target="_blank" rel="noopener">onyxodds.com</a></div>
+    </div>
+    <div class="ox-legal">
+      <a href="nba.html#model">How the NBA model works</a><a href="index.html#model">How the MLB model works</a>
+      <a href="#record">Public record</a><a href="https://onyxodds.com" target="_blank" rel="noopener">Play responsibly</a>
+    </div>
+    <div class="ox-giant" data-ox-host><canvas data-ox-art="wordmark" data-ox-tone="purple" aria-label="Onyx"></canvas></div>
+    <div class="ox-fine">
+      <div><p>Onyx Sports Data is research. Projections are estimates, not guarantees, and past results do not predict future ones. Prices shown are Onyx prices at the time of the build and can move.</p>
+        <p>Must be of legal age in your state to play. Offerings vary by state. If you or someone you know has a gambling problem, call 1-800-GAMBLER.</p></div>
+      <div><p>Data from the MLB Stats API, Statcast and ESPN, used for research and commentary. Team names and logos belong to their owners and do not imply endorsement.</p>
+        <p>Every graded pick stays in the public record, wins and losses alike.</p></div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ── Onyx Sports hub ─────────────────────────────────────────────
+var ONYX_REFERRER = 'KR680261';
+var ONYX_HOME = 'https://app.onyxodds.com/leagues/NBA?utm_source=onyxsports&referrer=' + ONYX_REFERRER;
+var SPORTS = [
+  {k: 'basketball', name: 'Basketball', lg: 'NBA', live: true, href: 'nba.html', tone: 'purple', big: true,
+   d: 'Points, rebounds and assists projected for every rotation player, priced against Onyx. Live court gamecenter.'},
+  {k: 'football', name: 'NFL', lg: 'NFL', tone: 'green', mid: true, d: 'Player props, team totals and a drive-by-drive gamecenter.'},
+  {k: 'baseball', name: 'Baseball', lg: 'MLB', live: true, href: 'index.html', tone: 'blue', big: true,
+   d: 'The daily home run model, strikeout and edge plays, pitch-by-pitch gamecasts.'},
+  {k: 'cfb', name: 'College Football', lg: 'NCAAF', tone: 'lilac', mid: true, d: 'Saturday slates, team totals and player props.'},
+  {k: 'hockey', name: 'NHL', lg: 'NHL', tone: 'blue', d: 'Shots on goal, points and goalie saves.'},
+  {k: 'tennis', name: 'Tennis', lg: 'ATP · WTA', tone: 'green', d: 'Match winners, set and game lines, serve stats.'},
+  {k: 'golf', name: 'Golf', lg: 'PGA', tone: 'purple', d: 'Outrights, matchups and round leaders, built on strokes gained.'}
+];
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'})[c]); }
+function track(name, params) { try { if (window.gtag) gtag('event', name, params || {}); } catch (e) {} }
+function fmtOdds(o) { return o == null ? '-' : (o > 0 ? '+' : '') + o; }
+function decOf(o) { return o > 0 ? 1 + o / 100 : 1 + 100 / -o; }
+function amOf(d) { return d >= 2 ? Math.round((d - 1) * 100) : Math.round(-100 / (d - 1)); }
+
+// brand marks from onyx.js (the real Onyx paths)
+function marks() {
+  if (!window.OnyxArt) return;
+  document.getElementById('oxWord').setAttribute('d', OnyxArt.word);
+  document.querySelectorAll('.oxMark').forEach(p => p.setAttribute('d', OnyxArt.mark));
+}
+
+function marquees() {
+  const names = SPORTS.map(s => 'Onyx ' + s.name);
+  const run = arr => arr.map(n => `<b>${esc(n)}</b><i></i>`).join('');
+  const twice = html => `<span>${html}</span><span>${html}</span>`;
+  document.getElementById('oxMarq').innerHTML = twice(run(['Models', 'Matchups', 'Gamecenter', 'Live markets', 'Player props', 'Parlays', 'Honest records']));
+  document.getElementById('oxBand').innerHTML = twice(run(names));
+}
+
+function sports() {
+  document.getElementById('oxSports').innerHTML = SPORTS.map((s, i) => {
+    const tag = s.live ? '<span class="ox-pill live">Live</span>' : '<span class="ox-pill soon">Coming soon</span>';
+    const inner = `<div class="ox-sport-top"><span class="n">${String(i + 1).padStart(2, '0')} / ${String(SPORTS.length).padStart(2, '0')}</span>${tag}</div>
+      <canvas data-ox-art="${s.k}" data-ox-tone="${s.tone}" data-ox-fade="0" aria-hidden="true"></canvas>
+      <div class="ox-sport-bot"><h3><small>${esc(s.lg)}</small>Onyx ${esc(s.name)}</h3><p>${esc(s.d)}</p>
+        <div class="go">${s.live ? `<em id="live-${s.k}">Open</em><span>Enter</span>` : '<span style="color:var(--ox-400)">In the lab</span>'}</div></div>`;
+    return s.live
+      ? `<a class="ox-sport${s.big ? ' big' : s.mid ? ' mid' : ''}" href="${s.href}" data-ox-host onclick="track('hub_sport',{sport:'${s.k}'})">${inner}</a>`
+      : `<div class="ox-sport soon${s.mid ? ' mid' : ''}" data-ox-host aria-label="Onyx ${esc(s.name)}, coming soon">${inner}</div>`;
+  }).join('');
+  if (window.OnyxArt) OnyxArt.scan(document.getElementById('oxSports'));
+}
+
+// tonight: read the NBA build's own data files (same origin, no API keys)
+function etTime(iso) {
+  try { return new Date(iso).toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York'}).replace(' ', '').toLowerCase(); }
+  catch (e) { return '-'; }
+}
+async function getJSON(u) { const r = await fetch(u, {cache: 'no-cache'}); if (!r.ok) throw new Error(u); return r.json(); }
+async function tonight() {
+  try {
+    const sl = await getJSON('data/nba/slate.json');
+    const games = sl.games || [];
+    document.getElementById('tGames').textContent = games.length;
+    document.getElementById('tPlayers').textContent = (sl.players || []).length || '-';
+    const first = games.map(g => g.start).filter(Boolean).sort()[0];
+    document.getElementById('tTip').textContent = games.length ? etTime(first) : 'off';
+    const live = games.filter(g => g.state === 'in').length;
+    const el = document.getElementById('live-basketball');
+    if (el) el.textContent = live ? `${live} live now` : games.length ? `${games.length} games tonight` : 'Open';
+  } catch (e) {}
+  try {
+    const tk = await getJSON('data/nba/ticket_lock.json');
+    const legs = tk.legs || [];
+    if (legs.length) {
+      const S = {pts: 'PTS', reb: 'REB', ast: 'AST'};
+      const dec = legs.reduce((a, l) => a * decOf(l.odds), 1), p = legs.reduce((a, l) => a * (l.prob || 0), 1);
+      const box = document.getElementById('oxLegs');
+      box.innerHTML = legs.map(l => `<div class="row"><div class="who">${esc(l.player)}<small>${l.side === 'over' ? 'Over' : 'Under'} ${l.line} ${S[l.stat] || l.stat} · ${esc(l.team)} vs ${esc(l.opp)}</small></div>
+          <span class="pc">${Math.round(l.prob * 100)}%</span><span class="od">${fmtOdds(l.odds)}</span></div>`).join('')
+        + `<div class="sum"><span>${legs.length} legs · ${Math.round(p * 100)}% to win</span><b>${fmtOdds(amOf(dec))} · $10 pays $${(10 * dec).toFixed(2)}</b></div>`;
+      box.hidden = false;
+      const sels = legs.map(l => l.sel).filter(Boolean);
+      if (sels.length === legs.length) {
+        document.getElementById('pBet').href = 'https://app.onyxodds.com/share?' + sels.map(s => 'selection=' + encodeURIComponent(s)).join('&') + '&referrer=' + ONYX_REFERRER;
+        document.getElementById('pBet').dataset.onyx = 'parlay_slip';
+      }
+      document.getElementById('pDesc').textContent = (tk.locked ? 'Locked at first tip. ' : 'Locks at first tip. ')
+        + "Tonight's Model's Parlay: the three Onyx lines with the best chance to win, picked by the NBA model.";
+    }
+  } catch (e) {}
+  try {
+    const h = await getJSON('data/nba/ticket_history.json');
+    const g = h.filter(r => r.hit === true || r.hit === false);
+    const w = g.filter(r => r.hit).length;
+    document.getElementById('rTk').textContent = g.length ? `${w}-${g.length - w}` : 'New';
+    if (!g.length) document.getElementById('rTkTxt').textContent = 'The first ticket locks at tonight\'s first tip. Graded leg by leg, every night.';
+  } catch (e) {}
+  try {
+    const ph = await getJSON('data/nba/picks_history.json');
+    const g = ph.filter(r => r.result === 'W' || r.result === 'L' || r.hit === true || r.hit === false);
+    const w = g.filter(r => r.result === 'W' || r.hit === true).length;
+    document.getElementById('rNba').textContent = g.length ? `${w}-${g.length - w}` : '-';
+  } catch (e) {}
+}
+
+document.querySelectorAll('[data-onyx]').forEach(a => {
+  if (a.getAttribute('href') === '#') a.href = ONYX_HOME;
+  a.addEventListener('click', () => track('onyx_click', {link_type: a.dataset.onyx, source: 'hub'}));
+});
+// analytics, same property as the sport sites, only on the real site
+(function () {
+  if (location.protocol !== 'https:') return;
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = function () { dataLayer.push(arguments); };
+  gtag('js', new Date()); gtag('config', 'G-03T8V1N52E');
+  const s = document.createElement('script'); s.async = true; s.src = 'https://www.googletagmanager.com/gtag/js?id=G-03T8V1N52E'; document.head.appendChild(s);
+})();
+marquees(); sports(); tonight();
+if (window.OnyxArt) marks(); else addEventListener('DOMContentLoaded', marks);
+</script>
+</body>
+</html>
