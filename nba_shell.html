@@ -114,6 +114,10 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
 .hist-tbl th,.hist-tbl td{padding:7px 6px!important;font-size:12px}
 .hist-base td{border-top:1px solid var(--border2);color:var(--text);font-weight:700}
 /* player bet card */
+/* the side the model projects, lit; an offered side we project against, muted */
+.chip.lean{border-color:rgba(176,56,249,.75)!important;box-shadow:0 0 0 1px rgba(176,56,249,.35),0 0 12px rgba(176,56,249,.25)}
+.chip.lean .s{color:#d795ff!important}
+.chip.against{opacity:.5}
 .bc-bg{position:fixed;inset:0;z-index:10070;background:rgba(4,4,8,.6);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .25s}
 .bc-bg.open{opacity:1;pointer-events:auto}
 .bc{position:fixed;left:50%;top:50%;z-index:10080;width:min(560px,calc(100vw - 32px));max-height:calc(100vh - 60px);overflow-y:auto;overscroll-behavior:contain;
@@ -613,10 +617,34 @@ function inSlip(sel) { return !!sel && parlaySlip.some(x => x.sel === sel); }
 // legs registry: buttons reference a leg by index so no JSON lands in markup
 var LEGS = [];
 function regLeg(leg) { return LEGS.push(leg) - 1; }
-function legChip(leg, label) {
+function legChip(leg, label, cls) {
   if (!leg || leg.price == null) return '<span class="chip dead"><span class="o">-</span><span class="s">' + esc(label || '') + '</span></span>';
   const i = regLeg(leg);
-  return `<span class="chip${inSlip(leg.sel) ? ' in-slip' : ''}" onclick="betLeg(${i})"><span class="o">${fmtOdds(leg.price)}</span><span class="s">${esc(label || '')}</span></span>`;
+  return `<span class="chip${inSlip(leg.sel) ? ' in-slip' : ''}${cls ? ' ' + cls : ''}" onclick="betLeg(${i})"><span class="o">${fmtOdds(leg.price)}</span><span class="s">${esc(label || '')}</span></span>`;
+}
+// the side the model projects on Onyx's main line: under when the projection
+// is below it. Chips show and add THAT side, not a default over.
+function leanSide(p, s) {
+  const pr = (p.props || {})[s];
+  return pr && p.proj && p.proj[s] != null && p.proj[s] < pr.line ? 'under' : 'over';
+}
+// one chip for one player-market: our side; if Onyx does not offer it, the
+// offered side muted and marked, so it never reads as a recommendation
+function leanChip(p, s) {
+  const side = leanSide(p, s), leg = propLeg(p, s, side);
+  if (leg && leg.price != null) return legChip(leg, side, 'lean');
+  const other = side === 'over' ? 'under' : 'over';
+  return legChip(propLeg(p, s, other), 'proj ' + (side === 'under' ? 'U' : 'O'), 'against');
+}
+function leanLeg(p, s) {
+  const leg = propLeg(p, s, leanSide(p, s));
+  return leg && leg.price != null ? leg : null;
+}
+// paired over / under chips: the projected side lit
+function pairChips(p, s, lo, lu) {
+  const side = leanSide(p, s);
+  return [legChip(propLeg(p, s, 'over'), lo || 'over', side === 'over' ? 'lean' : ''),
+          legChip(propLeg(p, s, 'under'), lu || 'under', side === 'under' ? 'lean' : '')];
 }
 // explicit "+": always a parlay leg, armed or not
 function addBtn(leg) {
@@ -834,7 +862,7 @@ function renderHome() {
         <div class="sub">${logo(p.team)} ${esc(p.team)} ${p.home ? 'vs' : '@'} ${esc(p.opp)} · ${num(p.min)} min</div></div></div>
         <div class="big" style="color:#d795ff;font-size:22px">${num(p.proj.pts)}</div></div>
       <div class="pk-row" style="align-items:center"><span>line <b>${pr ? pr.line : '-'}</b></span><span>REB <b>${num(p.proj.reb)}</b></span><span>AST <b>${num(p.proj.ast)}</b></span>
-        <span style="margin-left:auto;display:flex;gap:6px;align-items:center">${legChip(propLeg(p, 'pts', 'over'), 'over')}${addBtn(propLeg(p, 'pts', 'over'))}</span></div>
+        <span style="margin-left:auto;display:flex;gap:6px;align-items:center">${leanChip(p, 'pts')}${addBtn(leanLeg(p, 'pts'))}</span></div>
     </div>`;
   }).join('') || '<div class="empty">No slate today.</div>';
 }
@@ -885,8 +913,8 @@ function renderBoard() {
       <td class="r mono hm ${diff > 0 ? 'edge-pos' : ''}">${diff == null ? '-' : (diff > 0 ? '+' : '') + diff.toFixed(1)}</td>
       <td class="r mono hm">${pr ? (pr.side === 'over' ? 'O ' : 'U ') + pct(pr.prob, 0) : '-'}</td>
       <td class="r mono hm ${pr && pr.edge > 0 && !pr.role_flag ? 'edge-pos' : 'edge-neg'}">${!pr ? '-' : pr.role_flag ? `<span class="tagx p" title="Projection and line are ${pr.gap} SD apart: the market knows something about this player's role that box scores do not. No edge is claimed.">role check</span>` : pp(pr.edge)}</td>
-      <td class="r">${legChip(propLeg(p, s, 'over'), 'over')}</td>
-      <td class="r">${legChip(propLeg(p, s, 'under'), 'under')}</td>
+      <td class="r">${pairChips(p, s)[0]}</td>
+      <td class="r">${pairChips(p, s)[1]}</td>
       <td class="r mono dim hm">${esc(last5(p, s)) || '-'}</td>
     </tr>`;
   }).join('') || '<tr><td colspan="10"><div class="empty" style="border:none">No players match. Untick "priced only" to see every projection.</div></td></tr>';
@@ -908,9 +936,9 @@ function renderScorers() {
       <td class="r mono dim hm">${num(p.min)}</td>
       <td class="r" style="min-width:86px"><span class="big" style="color:#d795ff">${num(p.proj.pts)}</span><div class="pbar"><i style="width:${(100 * p.proj.pts / max).toFixed(0)}%"></i></div></td>
       <td class="r mono">${pr ? pr.line : '-'}</td>
-      <td class="r">${legChip(propLeg(p, 'pts', 'over'), 'over')}</td>
-      <td class="r hm">${legChip(propLeg(p, 'pts', 'under'), 'under')}</td>
-      <td class="r">${addBtn(propLeg(p, 'pts', 'over'))}</td>
+      <td class="r">${pairChips(p, 'pts')[0]}</td>
+      <td class="r hm">${pairChips(p, 'pts')[1]}</td>
+      <td class="r">${addBtn(leanLeg(p, 'pts'))}</td>
       <td class="r mono dim hm">${p.season ? num(p.season.pts) : '-'}</td>
       <td class="r mono dim hm">${p.last_season ? num(p.last_season.pts) : '-'}</td>
     </tr>`;
@@ -1317,7 +1345,7 @@ function openPlayer(pid) {
     const pr = (p.props || {})[s];
     return `<div class="nba-card"><div class="v">${num(p.proj[s])}</div><div class="l">${STAT_ABBR[s]}</div>
       <div class="sub dim" style="font-size:11px;margin-top:4px">${pr ? 'line ' + pr.line + ' · ' + (pr.side === 'over' ? 'O ' : 'U ') + pct(pr.prob, 0) : 'no line'}</div>
-      <div style="margin-top:8px;display:flex;gap:6px;justify-content:center">${pr ? legChip(propLeg(p, s, 'over'), 'o') + legChip(propLeg(p, s, 'under'), 'u') : ''}</div></div>`;
+      <div style="margin-top:8px;display:flex;gap:6px;justify-content:center">${pr ? pairChips(p, s, 'o', 'u').join('') : ''}</div></div>`;
   }).join('');
   const l5 = (p.last5 || []).slice().reverse().map(x => `<tr><td class="mono dim">${esc(x.d)}</td><td>${esc(x.opp)}</td><td class="r mono">${x.min}</td><td class="r mono">${x.pts}</td><td class="r mono">${x.reb}</td><td class="r mono">${x.ast}</td></tr>`).join('');
   document.getElementById('pdr').innerHTML = `<button class="pdr-x" onclick="closePlayer()">×</button>
