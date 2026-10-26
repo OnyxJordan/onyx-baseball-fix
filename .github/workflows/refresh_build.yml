@@ -108,8 +108,11 @@ jobs:
         run: |
           for s in nfl cfb nhl tennis golf; do
             python3 sports_espn.py $s || echo "::warning::$s slate failed"
+            python3 sports_odds.py $s || echo "::warning::$s Onyx prices failed"
             python3 sports_build.py $s || echo "::warning::$s build failed"
           done
+        env:
+          OPTICODDS_API_KEY: ${{ secrets.OPTICODDS_API_KEY }}
         continue-on-error: true
         timeout-minutes: 12
       # ROADMAP Phase 2, finally built. Blocks the commit when the page is

@@ -236,6 +236,7 @@ def main():
                         gl[side + "_price"], gl[side + "_sel"] = price, _sel(od)
                 out["props"] += [e for e in props.values() if e["over"] is not None or e["under"] is not None]
     out["games"] = {k: v for k, v in out["games"].items() if v}
+    out["matches"] = {k: v for k, v in out["matches"].items() if len(v) > 1}   # drop matches Onyx has not priced
     lane.save("odds.json", out, indent=None)
     print(f"{key} odds: book '{book}' · {len(fixtures)} fixtures, {len(targets)} matched to the slate · "
           f"{len(out['games'])} games with lines, {len(out['props'])} player lines, {len(out['matches'])} matches")

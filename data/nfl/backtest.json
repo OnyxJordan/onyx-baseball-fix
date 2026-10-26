@@ -1,0 +1,209 @@
+{
+ "version": "v1",
+ "sport": "nfl",
+ "label": "Team ratings against real Onyx game lines",
+ "split": "2026-03-01",
+ "w": 0.2,
+ "per_market_test": {
+  "ml": {
+   "n": 103,
+   "blend_ll": 0.6549,
+   "onyx_ll": 0.6577,
+   "model_only_ll": 0.661
+  },
+  "spread": {
+   "n": 104,
+   "blend_ll": 0.6949,
+   "onyx_ll": 0.6936,
+   "model_only_ll": 0.7136
+  },
+  "total": {
+   "n": 106,
+   "blend_ll": 0.692,
+   "onyx_ll": 0.6903,
+   "model_only_ll": 0.7119
+  }
+ },
+ "n_samples": 1948,
+ "lane_ll": {
+  "blend": 0.6933,
+  "onyx": 0.6903
+ },
+ "lane": {
+  "markets": [
+   "total"
+  ],
+  "w": 0.3,
+  "edge_min": 0.02,
+  "edge_max": 0.1,
+  "price_min": -200,
+  "price_max": 150,
+  "max_per_slate": 6
+ },
+ "tune": {
+  "n": 17,
+  "w": 8,
+  "roi": -0.103
+ },
+ "test_open": {
+  "n": 9,
+  "w": 4,
+  "roi": -0.1515,
+  "claimed": 0.5538,
+  "hit": 0.4444
+ },
+ "test_close": {
+  "n": 11,
+  "w": 4,
+  "roi": -0.3072
+ },
+ "passed": false,
+ "page": {
+  "passed": false,
+  "version": "v1",
+  "run": "2026-10-26",
+  "title": "Team ratings against real Onyx game lines",
+  "summary": [
+   "Every game priced only from results before it, against Onyx's real opening and closing lines. The rule was chosen on games before 2026-03-01 and judged on 2026-03-01 on, which it never saw.",
+   "The model's weight in the blend is 20%.",
+   "Not passed: only 9 test picks (needs 30); the lane lost money at opening prices; the lane lost money at closing prices. Leans only until it does."
+  ],
+  "stats": [
+   {
+    "k": "Moneyline log loss",
+    "v": "0.6549",
+    "d": "vs Onyx 0.6577 · model alone 0.6610 · 103 lines"
+   },
+   {
+    "k": "Spread log loss",
+    "v": "0.6949",
+    "d": "vs Onyx 0.6936 · model alone 0.7136 · 104 lines"
+   },
+   {
+    "k": "Total log loss",
+    "v": "0.6920",
+    "d": "vs Onyx 0.6903 · model alone 0.7119 · 106 lines"
+   },
+   {
+    "k": "Lane at opening prices",
+    "v": "4-5",
+    "d": "ROI -15.2% · claimed 55.4% vs hit 44.4%"
+   },
+   {
+    "k": "Lane at closing prices",
+    "v": "4-7",
+    "d": "ROI -30.7%"
+   }
+  ]
+ },
+ "props": {
+  "version": "v1",
+  "sport": "nfl",
+  "label": "Player projections against real Onyx prop lines",
+  "split": "2026-03-01",
+  "w": 0.1,
+  "per_market_test": {
+   "pass_yds": {
+    "n": 187,
+    "blend_ll": 0.6939,
+    "onyx_ll": 0.6934,
+    "model_only_ll": 0.7066
+   },
+   "rec": {
+    "n": 788,
+    "blend_ll": 0.6866,
+    "onyx_ll": 0.6871,
+    "model_only_ll": 0.7113
+   },
+   "rec_yds": {
+    "n": 807,
+    "blend_ll": 0.6935,
+    "onyx_ll": 0.6934,
+    "model_only_ll": 0.705
+   },
+   "rush_yds": {
+    "n": 303,
+    "blend_ll": 0.6928,
+    "onyx_ll": 0.6921,
+    "model_only_ll": 0.7105
+   }
+  },
+  "n_samples": 14032,
+  "lane_ll": {
+   "blend": 0.6945,
+   "onyx": 0.6934
+  },
+  "lane": {
+   "markets": [
+    "rec_yds"
+   ],
+   "w": 0.3,
+   "edge_min": 0.04,
+   "edge_max": 0.12,
+   "price_min": -200,
+   "price_max": 150,
+   "max_per_slate": 6
+  },
+  "tune": {
+   "n": 22,
+   "w": 14,
+   "roi": 0.2263
+  },
+  "test_open": {
+   "n": 3,
+   "w": 1,
+   "roi": -0.358,
+   "claimed": 0.5587,
+   "hit": 0.3333
+  },
+  "test_close": {
+   "n": 1,
+   "w": 1,
+   "roi": 0.9091
+  },
+  "passed": false,
+  "page": {
+   "passed": false,
+   "version": "v1",
+   "run": "2026-10-26",
+   "title": "Player projections against real Onyx prop lines",
+   "summary": [
+    "Every game priced only from results before it, against Onyx's real opening and closing lines. The rule was chosen on games before 2026-03-01 and judged on 2026-03-01 on, which it never saw.",
+    "The model's weight in the blend is 10%.",
+    "Not passed: only 3 test picks (needs 30); the lane lost money at opening prices. Leans only until it does."
+   ],
+   "stats": [
+    {
+     "k": "Passing yards log loss",
+     "v": "0.6939",
+     "d": "vs Onyx 0.6934 · model alone 0.7066 · 187 lines"
+    },
+    {
+     "k": "Receptions log loss",
+     "v": "0.6866",
+     "d": "vs Onyx 0.6871 · model alone 0.7113 · 788 lines"
+    },
+    {
+     "k": "Receiving yards log loss",
+     "v": "0.6935",
+     "d": "vs Onyx 0.6934 · model alone 0.7050 · 807 lines"
+    },
+    {
+     "k": "Rushing yards log loss",
+     "v": "0.6928",
+     "d": "vs Onyx 0.6921 · model alone 0.7105 · 303 lines"
+    },
+    {
+     "k": "Lane at opening prices",
+     "v": "1-2",
+     "d": "ROI -35.8% · claimed 55.9% vs hit 33.3%"
+    },
+    {
+     "k": "Lane at closing prices",
+     "v": "1-0",
+     "d": "ROI +90.9%"
+    }
+   ]
+  }
+ }
+}

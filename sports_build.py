@@ -15,23 +15,23 @@ import json, re, sys
 from datetime import datetime, timezone
 
 from sports_common import Lane, SPORTS, nk
+import sports_lab as L
 
 ONYX_LEAGUE = {"nfl": "NFL", "cfb": "NCAAF", "nhl": "NHL"}
 
 ROADMAP = {
-    "nfl": ["Onyx NFL player prices next to every projection (the Onyx feed for the NFL is being wired)",
-            "Backtest the projections against a full season of real Onyx lines; tracked picks switch on only if they beat the price",
+    "nfl": ["Backtest the projections and the game ratings against a full season of real Onyx lines; tracked picks switch on only where they beat the price",
             "Injury and inactive feed, so a scratched player never gets a lean",
             "Touchdown scorer and passing touchdown markets"],
-    "cfb": ["Onyx college football game lines and player markets",
-            "Team ratings from drive efficiency, tested against the closing Onyx spread before any pick",
+    "cfb": ["Backtest the team ratings against a season of real Onyx spreads and moneylines before any pick",
+            "Drive efficiency and tempo in the ratings, so totals beat the league average",
             "Player projections, built on the NFL engine"],
-    "nhl": ["Onyx NHL lines: moneyline, puck line, totals and player shots and points",
-            "Skater shot and point projections from time on ice and shot rates, backtested before any pick",
-            "Goalie confirmations and save projections"],
-    "tennis": ["Onyx match prices for every ATP and WTA singles match",
-               "Serve and return point model by surface, tested against Onyx match prices before any pick",
-               "Live point-by-point momentum in the match center"],
+    "nhl": ["Backtest the team ratings against a season of real Onyx moneylines, puck lines and totals before any pick",
+            "Goalie confirmations: the starter moves an NHL price more than anything else",
+            "Skater point and assist projections from time on ice, for the player lines Onyx prices"],
+    "tennis": ["Backtest the Elo ratings against real Onyx match prices before any pick",
+               "Surface-specific ratings (hard, clay, grass)",
+               "Total games and game spread from a serve and return point model"],
     "golf": ["Onyx outrights, top 5, 10 and 20, and head-to-head matchups",
              "Strokes-gained projections by course fit, tested against Onyx prices before any pick",
              "Live round-by-round leaderboard with each player's Onyx price"],
@@ -49,7 +49,7 @@ def nfl_block(lane, slate, odds):
     pg = lane.load("player_games.json", {}) or {}
     rows = pg.get("rows") or []
     season = slate.get("season") or max((r["season"] for r in rows), default=None)
-    block = {"status": "lab", "version": M.VERSION, "title": "Player projections, tested in the open",
+    block = {"status": "lab", "version": M.VERSION, "title": "Player projections and team ratings, tested in the open",
              "note": ("Projections for passing, rushing and receiving yards and receptions, built from every box score this season "
                       "with last season as the prior and the opponent's defense, and tested every build on games the model never saw. "
                       "They are leans, not picks: tracked picks switch on only after the model is backtested against real Onyx prices."),
@@ -58,7 +58,7 @@ def nfl_block(lane, slate, odds):
                         "The test below re-runs on every build: for every player-game this season from week 3 on, the model's projection against two simple baselines a bettor would use, the season average and the last-3 average. Lower error is better."],
              "roadmap": ROADMAP["nfl"], "tests": [], "rows": [], "top": []}
     if not rows or not season:
-        return block
+        return L.model_block(**block)
     t = M.test(rows, season)
     names = {"pass_yds": "Passing yards", "rush_yds": "Rushing yards", "rec_yds": "Receiving yards", "rec": "Receptions"}
     for s in M.STATS:
@@ -98,15 +98,252 @@ def nfl_block(lane, slate, odds):
                                 "line": ln.get("line") if ln else None,
                                 "over": ln.get("over") if ln else None, "under": ln.get("under") if ln else None,
                                 "over_sel": ln.get("over_sel") if ln else None, "under_sel": ln.get("under_sel") if ln else None})
+    # price every two-sided Onyx line: the model's chance, the blend, the edge
+    bt = lane.load("backtest.json", None) or {}
+    w = ((bt.get("lane") or {}).get("w_props")) or DEFAULT_W
+    for r in out:
+        if r["line"] is None or r["over"] is None or r["under"] is None:
+            continue
+        po = M.prob_over(r["mkt"], r["proj"], r["line"])
+        ps = L.price_side(po, r["over"], r["under"], w)
+        if ps:
+            r.update(side=ps["side"], price=ps["price"], sel=r["over_sel"] if ps["side"] == "over" else r["under_sel"],
+                     prob=ps["prob"], implied=ps["implied"], edge=ps["edge"], ev=ps["ev"], model_p=ps["model_p"],
+                     matchup=f"{r['team']} {'vs' if r['home'] else '@'} {r['opp']}")
     # lines Onyx prices first, largest gap between projection and line first
     out.sort(key=lambda r: (r["line"] is None, -abs(r["proj"] - r["line"]) / max(1.0, r["line"]) if r["line"] is not None else -r["proj"]))
-    block["rows"] = out
     # the slate's headline numbers: best projection per market
     top = []
     for s in M.STATS:
         top += [r for r in out if r["mkt"] == s][:2]
     block["top"] = top
+    # game lines on the same frame as college football and the NHL
+    import team_model as T
+    games = (lane.load("results.json", {}) or {}).get("games") or []
+    gw = ((bt.get("lane") or {}).get("w")) or DEFAULT_W
+    R = T.fit(games, slate.get("date") or "9999", M.GAME_P)
+    grows, proj = game_rows("nfl", M, slate, odds, R, gw)
+    block["tests"].append({"k": "Game win log loss", "v": f"{M.GAME_TEST['logloss']:.3f}",
+                           "d": f"vs {M.GAME_TEST['base_logloss']:.3f} home base rate · {M.GAME_TEST['n']} games"})
+    block["method"].append("Game lines: every team carries an offense and a defense rating in points, fitted on every final this season and "
+                           "last, and each Onyx moneyline, spread and total is priced from them, then blended with Onyx's no-vig price.")
+    by_gid = {}
+    for r in rows:
+        by_gid.setdefault(r["gid"], {})[nk(r["name"])] = r
+
+    team_res = grade_team(lane)
+
+    def resolve(r):
+        if r.get("kind"):
+            return team_res(r)
+        game = by_gid.get(r.get("gid"))
+        if not game:
+            return None
+        row = game.get(nk(r["name"]))
+        return (row.get(r["mkt"]) or 0.0) if row else "void"
+    block = model_frame("nfl", lane, slate, odds, M, grows + out, block, resolve)
+    block["proj"] = proj
     return block
+
+TEAM_MODELS = {"nfl": "nfl_model", "cfb": "cfb_model", "nhl": "nhl_model"}
+DEFAULT_W = 0.3        # model share of the blend until a backtest sets it
+
+
+def _row(g, kind, name, line, line_txt, _side, model_p_over, over, under, over_sel, under_sel, w, detail):
+    """One game lean: the better side of a two-sided Onyx price after the
+    blend. 'over' is the first side passed (home, the home spread, the over)."""
+    ps = L.price_side(model_p_over, over, under, w)
+    if not ps:
+        return None
+    first = ps["side"] == "over"
+    fo, fu = L.fair_pair(over, under)
+    r = {"gid": g["gid"], "start": g.get("start"), "matchup": f"{g['away']} @ {g['home']}", "kind": kind, "mkt": kind,
+         "price": ps["price"], "sel": over_sel if first else under_sel, "prob": ps["prob"], "implied": ps["implied"],
+         "edge": ps["edge"], "ev": ps["ev"], "model_p": ps["model_p"], "fair": round(fo if first else fu, 4), "detail": detail}
+    if kind == "total":
+        r.update(name="Total", side=ps["side"], line=line)
+    else:
+        team, opp_line = name if first else name_other(g, name), line if first else -line
+        r.update(name=team, side="over", line=-opp_line if kind == "spread" else 0.0,
+                 line_txt=(f"{opp_line:+g}" if kind == "spread" else ""), team_side=("home" if team == g["home"] else "away"))
+    return r
+
+
+def name_other(g, team):
+    return g["away"] if team == g["home"] else g["home"]
+
+
+def game_rows(key, M, slate, odds, R, w):
+    import team_model as T
+    GP = M.GAME_P if key == "nfl" else M.P
+    kind = M.KIND if hasattr(M, "KIND") else "football"
+    out, proj = [], {}
+    for g in slate.get("games") or []:
+        if g.get("state") != "pre":
+            continue
+        if R["n"].get(g["home"], 0) < GP.get("min_games", 3) or R["n"].get(g["away"], 0) < GP.get("min_games", 3):
+            continue
+        eh, ea = T.expect(R, g["home"], g["away"], g.get("neutral"))
+        pr = (T.fb_probs if kind == "football" else T.hk_probs)(eh, ea, GP)
+        unit = "goals" if kind == "hockey" else "pts"
+        detail = f"model {g['away']} {ea:.1f} {g['home']} {eh:.1f}"
+        proj[g["gid"]] = {"home": round(eh, 2), "away": round(ea, 2), "home_win": round(pr["home_win"], 4), "unit": unit}
+        o = ((odds or {}).get("games") or {}).get(g["gid"]) or {}
+        if o.get("home_ml") is not None and o.get("away_ml") is not None:
+            out.append(_row(g, "ml", g["home"], 0.0, "", None, pr["home_win"], o["home_ml"], o["away_ml"],
+                            o.get("home_ml_sel"), o.get("away_ml_sel"), w, detail))
+        if o.get("home_spread") is not None and o.get("home_spread_price") is not None and o.get("away_spread_price") is not None:
+            sp = o["home_spread"]
+            out.append(_row(g, "spread", g["home"], sp, f"{sp:+g}", None, pr["home_cover"](sp), o["home_spread_price"],
+                            o["away_spread_price"], o.get("home_spread_sel"), o.get("away_spread_sel"), w, detail))
+        if o.get("total") is not None and o.get("over_price") is not None and o.get("under_price") is not None and not getattr(M, "NO_TOTALS", False):
+            out.append(_row(g, "total", "Total", o["total"], "", None, pr["over"](o["total"]), o["over_price"], o["under_price"],
+                            o.get("over_sel"), o.get("under_sel"), w, detail + f" · total {eh + ea:.1f}"))
+    out = [r for r in out if r]
+    out.sort(key=lambda r: -r["edge"])
+    return out, proj
+
+
+def tennis_rows(lane, slate, odds, w):
+    import tennis_model as TM
+    E = TM.load(lane)
+    out = []
+    mo = (odds or {}).get("matches") or {}
+    for e in slate.get("events") or []:
+        for m in e.get("matches") or []:
+            if m.get("state") != "pre":
+                continue
+            o = mo.get(m["id"]) or {}
+            a, b = m["p"][0]["name"], m["p"][1]["name"]
+            if not (E.known(nk(a)) and E.known(nk(b))):
+                continue
+            p0 = E.p(nk(a), nk(b))
+            g = {"gid": m["id"], "start": m.get("start"), "away": b, "home": a}
+            if o.get("ml0") is not None and o.get("ml1") is not None:
+                r = _row(g, "ml", a, 0.0, "", None, p0, o["ml0"], o["ml1"], o.get("ml0_sel"), o.get("ml1_sel"), w,
+                         f"Elo {E.r.get(nk(a), 1500):.0f} vs {E.r.get(nk(b), 1500):.0f} · {e.get('name')}")
+                if r:
+                    r["matchup"] = f"{a} vs {b}"
+                    out.append(r)
+    out.sort(key=lambda r: -r["edge"])
+    return out
+
+
+def lane_picks(rows, bt, date):
+    """The tracked lane, only when the backtest for this version passed:
+    its markets, edge band, price band and cap, best edge first."""
+    rule = (bt or {}).get("lane") or {}
+    picks = []
+    used = set()
+    for r in rows:
+        if r["mkt"] not in rule.get("markets", ()):
+            continue
+        if not (rule.get("edge_min", 1) <= r["edge"] <= rule.get("edge_max", 0)):
+            continue
+        if not (rule.get("price_min", -200) <= r["price"] <= rule.get("price_max", 200)):
+            continue
+        if r["gid"] in used:
+            continue
+        used.add(r["gid"])
+        picks.append(dict(r, date=date))
+        if len(picks) >= rule.get("max_per_slate", 4):
+            break
+    return picks
+
+
+def grade_team(lane):
+    res = {g["id"]: g for g in (lane.load("results.json", {}) or {}).get("games") or []}
+
+    def resolve(r):
+        g = res.get(r.get("gid"))
+        if not g:
+            return None
+        if r["kind"] == "total":
+            return g["hs"] + g["as"]
+        m = g["hs"] - g["as"]
+        return m if r.get("team_side") == "home" else -m
+    return resolve
+
+
+def grade_tennis(lane):
+    res = {m["id"]: m for m in (lane.load("results.json", {}) or {}).get("matches") or []}
+
+    def resolve(r):
+        m = res.get(r.get("gid"))
+        if not m:
+            return None
+        return 1.0 if nk(m["w"]) == nk(r["name"]) else -1.0
+    return resolve
+
+
+def model_frame(key, lane, slate, odds, M, rows, base, resolve):
+    """Gate, lane, ledger and record around a sport's rows."""
+    bt, live = L.gate(lane, M.VERSION)
+    led = L.Ledger(lane)
+    led.grade(resolve)
+    picks = []
+    if live:
+        picks = lane_picks(rows, bt, slate.get("date"))
+        for p in picks:
+            led.add({k: p.get(k) for k in ("date", "gid", "start", "matchup", "kind", "mkt", "name", "side", "line", "line_txt",
+                                           "team_side", "price", "sel", "prob", "implied", "edge", "ev", "model_p", "proj", "hs")})
+    led.save()
+    rec = led.record()
+    base.update(status="live" if live else "lab", version=M.VERSION, backtest=(bt or {}).get("page"),
+                changelog=L.changelog(M.__doc__), rows=rows, picks=picks, record=rec if led.rows else None)
+    return base
+
+
+def team_block(key, lane, slate, odds):
+    import importlib
+    import team_model as T
+    M = importlib.import_module(TEAM_MODELS[key])
+    GP = M.GAME_P if key == "nfl" else M.P
+    TEST = M.GAME_TEST if key == "nfl" else M.TEST
+    bt = lane.load("backtest.json", None) or {}
+    w = ((bt.get("lane") or {}).get("w")) or DEFAULT_W
+    games = (lane.load("results.json", {}) or {}).get("games") or []
+    R = T.fit(games, slate.get("date") or "9999", GP)
+    rows, proj = game_rows(key, M, slate, odds, R, w)
+    cfg = lane.cfg
+    unit = "goals" if cfg["kind"] == "hockey" else "points"
+    base = L.model_block(
+        title="Team ratings against every Onyx game line",
+        note=(f"Every team carries an offense and a defense rating in {unit}, fitted on every final this season and last, "
+              f"recent games weighing more. Each Onyx moneyline, spread and total is priced from them and blended with Onyx's own "
+              f"no-vig price. Tracked picks switch on only after the ratings beat real Onyx prices in a backtest."),
+        method=[METHOD[cfg["kind"]],
+                f"Ratings: {unit} scored = league average + home edge + the team's offense - the opponent's defense, fitted by weighted "
+                f"least squares with a pull toward average so a team with three games is not rated off three games.",
+                ("Hockey prices: each side's goals are Poisson; a regulation tie goes to overtime. " if cfg["kind"] == "hockey" else
+                 "Football prices: the margin and the total are normal around the ratings' projection. ") +
+                f"The blend gives the model {round(w * 100)}% and Onyx's no-vig price the rest; edge is the blended chance minus the price's implied chance."],
+        tests=[{"k": "Win log loss", "v": f"{TEST['logloss']:.3f}", "d": f"vs {TEST['base_logloss']:.3f} home base rate · {TEST['n']} games from {TEST['window']}"},
+               {"k": f"Total error ({unit})", "v": f"{TEST['mae_total']:.2f}", "d": f"vs {TEST['base_mae_total']:.2f} league average"}],
+        roadmap=ROADMAP.get(key, []))
+    base = model_frame(key, lane, slate, odds, M, rows, base, grade_team(lane))
+    base["proj"] = proj
+    return base
+
+
+def tennis_block(lane, slate, odds):
+    import tennis_model as TM
+    bt = lane.load("backtest.json", None) or {}
+    w = ((bt.get("lane") or {}).get("w")) or DEFAULT_W
+    rows = tennis_rows(lane, slate, odds, w)
+    base = L.model_block(
+        title="Elo ratings against every Onyx match price",
+        note=("Every ATP and WTA singles player carries an Elo rating built from every completed match since 2023. Each Onyx match "
+              "price is set against it and blended with Onyx's own no-vig price. Tracked picks switch on only after the ratings "
+              "beat real Onyx prices in a backtest."),
+        method=[METHOD["tennis"],
+                "Elo: a win moves a rating by K x (1 - expected), K = 150 / (matches + 5)^0.4, so new players move fast and veterans slowly. "
+                "Retirements and walkovers are dropped. A player needs 10 matches before the model prices them.",
+                f"The blend gives the model {round(w * 100)}% and Onyx's no-vig price the rest."],
+        tests=[{"k": "Match log loss", "v": "0.627", "d": "7,875 matches in 2026 the ratings never saw"},
+               {"k": "Favourite won", "v": "64.0%", "d": "same matches"}],
+        roadmap=ROADMAP["tennis"])
+    return model_frame("tennis", lane, slate, odds, TM, rows, base, grade_tennis(lane))
 
 
 def lab_block(key, cfg):
@@ -125,7 +362,14 @@ def main():
     odds = lane.load("odds.json", None)
     if odds and odds.get("date") != slate.get("date") and cfg["slate"] == "day":
         odds = None   # yesterday's prices never sit on today's slate
-    model = nfl_block(lane, slate, odds) if key == "nfl" else lab_block(key, cfg)
+    if key == "nfl":
+        model = nfl_block(lane, slate, odds)
+    elif key in TEAM_MODELS:
+        model = team_block(key, lane, slate, odds)
+    elif key == "tennis":
+        model = tennis_block(lane, slate, odds)
+    else:
+        model = lab_block(key, cfg)
     page_cfg = {"name": cfg["name"], "full": cfg["full"], "kind": cfg["kind"], "espn": cfg["espn"],
                 "espn_q": cfg.get("espn_q", ""), "tone": cfg["tone"], "art": cfg["art"],
                 "onyx_league": ONYX_LEAGUE.get(key)}

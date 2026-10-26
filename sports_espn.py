@@ -9,6 +9,8 @@ Writes under data/<sport>/:
                      {date, sport, label, games: [...], events: [...]}
                      team sports fill games, tennis fills events (each with
                      its matches), golf fills events (each with a leaderboard)
+  results.json       final scores (tennis: recent matches, older ones folded
+                     into elo.json): the model's history, sports_history.py
   player_games.json  NFL only: one row per player-game, box scores read
                      once and remembered in ["_games"]; the first run
                      backfills last season (the model's prior) and this one
@@ -232,6 +234,11 @@ def main():
         slate["events"] = golf_events(cfg["espn"])
         slate["label"] = " · ".join(e["name"] for e in slate["events"][:2])
     lane.save("slate.json", slate, indent=1)
+    try:
+        import sports_history
+        sports_history.ingest(lane, slate)
+    except Exception as e:   # history feeds the model; the slate above already saved
+        print(f"  results: {str(e)[:160]}")
     n = len(slate["games"]) or sum(len(e.get("matches") or e.get("board") or []) for e in slate["events"])
     print(f"=== {cfg['full']} slate {today}: {slate['label']} · {len(slate['games'])} games, "
           f"{len(slate['events'])} events, {n} rows")
