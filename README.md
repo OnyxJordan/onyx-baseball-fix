@@ -459,6 +459,20 @@ play (ESPN publishes no NBA possession field), last play and play-by-play.
 Headshot rings judge the model's lean: overs go green once they clear, unders
 stay lilac until the final then go green, red the moment an under is beaten.
 
+**Player bet card (NBA).** Tapping any player prop chip opens his card:
+every market Onyx prices on him (points, rebounds, assists, made threes,
+double-double, triple-double; verified 10/26), search, and a slider over
+Onyx's alternate ladder. `nba_odds.py` keeps the ladders
+(`props.json` → `ladder: [[line, over, over_sel, under, under_sel]]`,
+alternates are over-only); `nba_build.bet_ladders` adds per rung the model
+P(over) and the blend (20% model / 80% Onyx fair, margin measured on the
+two-sided main line). The card opens on the **main line, on the side the
+model projects**; if Onyx offers only the over and we project under, it says
+so. The "best value" banner only recommends points / rebounds / assists
+lines priced -200 to +200 (the calibrated zone); threes use an unfitted
+shape (`prob_over_fg3`) and DD / TD are price-only, never recommended.
+`verify_nba.js` opens a card and moves the slider.
+
 **App shell (`ui.js`, both sites).** Loaded `defer` by `shell.html` /
 `index.html` and `nba_shell.html`, after each page's own script. It builds
 the phone bottom bar and the More sheet (every page as a tile, search over

@@ -495,7 +495,7 @@
     var t0 = (location.hash || '').slice(1);
     syncActive(typeof currentTab !== 'undefined' ? currentTab : (typeof curTab !== 'undefined' ? curTab : (t0 || 'home')));
     setTimeout(function () { showWhatsNew(false); }, 1200);
-    window.OnyxUI = {toast: toast, openMenu: openSheet, closeMenu: closeSheet};
+    window.OnyxUI = {toast: toast, openMenu: openSheet, closeMenu: closeSheet, swipeDown: swipeDown, buzz: buzz};
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
