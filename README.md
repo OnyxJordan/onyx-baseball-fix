@@ -168,7 +168,7 @@ model: 288 scored, 0 errors
 | Top 5 Picks (`picks_input.json`) | ticket legs first, then +EV fills; locked by first pitch; $10 grading | 51-208 (19.7% — roughly what the model claims; the issue is price, not calibration) |
 | Model's Ticket (`ticket_history.json`) | one $10 parlay/day, 2–4 legs, **one bat per team**, frozen at slate first pitch (`ticket_lock.json`) | 5-53, +$114 |
 | K Projections (`k_history.json`) | model's side vs listed line, only when projection beats line by >10% | 436-380 (53.4%) |
-| NBA Top Scorer Parlay (`nba/ticket_history.json`) | the home page's Top Scorer Parlay, frozen at the slate's first tip (`nba/ticket_lock.json` refreshes until then); 3 legs, one per game, points overs; graded leg by leg, a DNP leg is void and drops from the payout; one $10 ticket per slate | starts 10/26 |
+| NBA Model's Parlay (`nba/ticket_history.json`) | the algorithm's best look to win: the 3 Onyx main-line legs with the highest blended win chance (pts / reb / ast, over or under, -400..+150, 24+ min, one per game and player), frozen at the slate's first tip (`nba/ticket_lock.json` refreshes until then); graded leg by leg, a DNP or push is void and drops from the payout; one $10 ticket per slate. Chosen by replaying 2025-26 at Onyx prices: Feb-Apr hit 28.6% open / 22.4% close vs 12.2% / 4.1% for top-scorer overs | starts 10/26 |
 | HR Edge (`hr_history.json`) | edge >1.5pp **and** price ≤+400 **and** edge ≤2.5pp **and** ≥2 signals (v45), straight up at listed price. **All-time, no prune** (see below) | 25-285 @ 10/15 (the vig wall, displayed honestly) |
 
 **The ledger files hold more rows than the site shows, and that is deliberate.**

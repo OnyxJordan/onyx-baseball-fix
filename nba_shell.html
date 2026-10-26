@@ -225,6 +225,15 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
 .rec-big .l{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-top:4px}
 .rec-big.rec-3{grid-template-columns:repeat(3,1fr)}.rec-big.rec-5{grid-template-columns:repeat(5,1fr)}
 .rec-big .l b{color:var(--text2);font-weight:700}
+.mp-hd{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.mp-tag{font:800 9px monospace;letter-spacing:.14em;padding:3px 9px;border-radius:12px;background:rgba(176,56,249,.18);color:#d795ff}
+.mp-why{font-size:12px;color:var(--text3)}
+.mp-track{display:grid;grid-template-columns:auto auto auto 1fr auto;align-items:center;gap:16px;margin-top:14px;padding-top:12px;border-top:1px solid rgba(176,56,249,.22);cursor:pointer}
+.mp-track span{display:block;font:700 9px monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--text3)}
+.mp-track b{font:800 15px monospace}
+.mp-track a{font-size:12px;color:#d795ff;white-space:nowrap}
+.mp-spark{height:44px;min-width:0}.mp-spark em{font-size:11px;color:var(--text3);font-style:normal}
+@media (max-width:600px){.mp-track{grid-template-columns:repeat(3,1fr)}.mp-spark{grid-column:1/-1}.mp-track a{grid-column:1/-1}}
 .tsp-rec{display:block;margin-top:4px;font-size:11px;color:#d795ff;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 .money-pos{color:#61e970!important}.money-neg{color:#f87171!important}
 .tk-chart{position:relative;height:150px;margin:12px 0 4px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden}
@@ -373,9 +382,9 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
   <div class="home-stats-grid" id="homeStats"></div>
   <div class="home-body">
     <div class="home-section">
-      <div class="home-section-tag">Top Scorer Parlay</div>
-      <h2 class="home-section-title">Tonight's biggest scorers, one tap to Onyx</h2>
-      <div id="homeTSP"></div>
+      <div class="home-section-tag">The Model's Parlay</div>
+      <h2 class="home-section-title">Tonight's best look to win</h2>
+      <div id="homeMP"></div>
     </div>
     <div class="home-section">
       <div class="home-section-tag" id="picksTag">Onyx Picks</div>
@@ -445,7 +454,7 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
   <div class="rec-big" id="recBig"></div>
   <div class="sec-hdr"><span class="sec-title">By Market · $10 on every pick</span></div>
   <div class="rec-big rec-3" id="recByStat"></div>
-  <div class="sec-hdr"><div><span class="sec-title">Daily Top Scorer Parlay · one $10 ticket per slate, locked at first tip, auto-graded</span></div><span class="sec-count" id="tkCount"></span></div>
+  <div class="sec-hdr"><div><span class="sec-title">The Model's Parlay · the algorithm's best look to win, one $10 ticket per slate, locked at first tip, auto-graded</span></div><span class="sec-count" id="tkCount"></span></div>
   <div class="rec-big rec-5" id="tkBig"></div>
   <div class="tk-chart" id="tkChart"></div>
   <div id="tkList"></div>
@@ -734,11 +743,56 @@ function topScorerLegs(n) {
   return out;
 }
 var TSP_N = 3;
-// the parlay's own public record, so the pitch carries its receipts
-function tspRecord() {
+// ── The Model's Parlay: the algorithm's best look to win, tracked ──
+// The legs come from the build (nba_build.ticket_legs), the exact ticket that
+// locks at the first tip and is graded on the Record tab.
+function legText(l) { return `${l.side === 'over' ? 'Over' : 'Under'} ${l.line} ${STAT_ABBR[l.stat || 'pts']}`; }
+function tkSpark(rows, W, H) {
+  const chrono = rows.slice().reverse().filter(t => t.result === 'win' || t.result === 'loss');
+  if (chrono.length < 2) return '';
+  let cum = 0;
+  const vals = [0, ...chrono.map(t => (cum += +t.pnl || 0))];
+  const pad = 6, lo = Math.min(...vals), hi = Math.max(...vals), rg = Math.max(hi - lo, 10);
+  const x = i => pad + i / (vals.length - 1) * (W - 2 * pad), y = v => H - pad - (v - lo) / rg * (H - 2 * pad);
+  const pts = vals.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+  const col = cum >= 0 ? '#61e970' : '#f87171';
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="width:100%;height:100%">
+    <line x1="${pad}" x2="${W - pad}" y1="${y(0)}" y2="${y(0)}" stroke="rgba(255,255,255,.15)" stroke-dasharray="3 3"/>
+    <polygon points="${x(0)},${y(lo)} ${pts} ${x(vals.length - 1)},${y(lo)}" fill="${col}" fill-opacity=".15"/>
+    <polyline points="${pts}" fill="none" stroke="${col}" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>`;
+}
+function mpHtml() {
   const T = D.tickets || {};
-  if (!(T.w || T.l)) return 'Tracked daily on the Record tab, locked at first tip';
-  return `Tracked: ${T.w}-${T.l} · ${money(T.pnl || 0)} on $10 tickets`;
+  const t = T.today && (T.today.legs || []).length ? T.today : null;
+  const track = `<div class="mp-track" onclick="gotoTab('record')">
+      <div><span>Record</span><b>${T.w || 0}-${T.l || 0}</b></div>
+      <div><span>P&amp;L</span><b class="${moneyCls(T.pnl || 0)}">${money(T.pnl || 0)}</b></div>
+      <div><span>ROI</span><b class="${moneyCls(T.roi || 0)}">${((T.roi || 0) >= 0 ? '+' : '') + ((T.roi || 0) * 100).toFixed(1)}%</b></div>
+      <div class="mp-spark">${tkSpark(T.rows || [], 220, 44) || '<em>chart draws from the 2nd graded ticket</em>'}</div>
+      <a>Full record &rsaquo;</a></div>`;
+  if (!t) return `<div class="tsp"><div class="empty" style="border:none">The Model's Parlay builds once Onyx posts lines for games that have not tipped.</div>${track}</div>`;
+  const legs = t.legs;
+  let dec = 1, chance = 1;
+  legs.forEach(l => { dec *= decOf(l.odds); chance *= l.prob || 0; });
+  const bet = legs.map(l => ({sel: l.sel, price: l.odds, gid: l.gid, market: 'player_' + (l.stat || 'pts'), label: `${l.player} ${legText(l)}`}));
+  const ids = bet.map(regLeg);
+  const allIn = bet.every(l => inSlip(l.sel));
+  return `<div class="tsp mp">
+    <div class="mp-hd"><span class="mp-tag">${t.locked ? 'LOCKED · LIVE' : 'LOCKS AT FIRST TIP'}</span>
+      <span class="mp-why">The ${legs.length} legs on tonight's Onyx board the model is most likely to cash, one per game, any stat, either side.</span></div>
+    <div class="tsp-legs">${legs.map((l, k) => { const p = playerOf(l.pid) || {name: l.player, hs: l.hs};
+      return `<div class="tsp-leg">${hs(p, 'm')}<div style="min-width:0;flex:1">
+        <div class="who"><span class="nm" style="cursor:pointer" onclick="openPlayer('${esc(l.pid)}')">${esc(l.player)}</span></div>
+        <div class="ln"><b style="color:var(--text)">${legText(l)}</b> · ${esc(l.team)} vs ${esc(l.opp)}</div>
+        <div class="ln">win chance <b style="color:#d795ff">${pct(l.prob, 0)}</b> · proj ${num(l.proj)}</div></div>
+        ${legChip(bet[k], l.side)}</div>`; }).join('')}</div>
+    <div class="tsp-foot">
+      <span class="tsp-pay">${legs.length}-leg <b>${amerOf(dec)}</b> · win chance <b>${pct(chance, 0)}</b> · $10 pays <b>$${(10 * dec).toFixed(2)}</b></span>
+      <div class="tsp-btns">
+        <button class="btn-secondary" onclick="tspAdd([${ids.join(',')}])">${allIn ? '✓ In your slip' : '+ Add to Parlay Builder'}</button>
+        <button class="btn-primary" onclick="tspBet([${ids.join(',')}])">⚡ Bet it on Onyx</button>
+      </div></div>
+    ${track}</div>`;
 }
 function tspHtml() {
   const ps = topScorerLegs(TSP_N);
@@ -753,8 +807,7 @@ function tspHtml() {
         <div class="ln">Over ${p.props.pts.line} PTS · proj <b style="color:#d795ff">${num(p.proj.pts)}</b></div></div>
         ${legChip(legs[k], 'over')}</div>`).join('')}</div>
     <div class="tsp-foot">
-      <span class="tsp-pay">${ps.length}-leg parlay <b>${amerOf(dec)}</b> · $10 pays <b>$${(10 * dec).toFixed(0)}</b>
-        <a class="tsp-rec" onclick="gotoTab('record')">${tspRecord()}</a></span>
+      <span class="tsp-pay">${ps.length}-leg parlay <b>${amerOf(dec)}</b> · $10 pays <b>$${(10 * dec).toFixed(0)}</b></span>
       <div class="tsp-btns">
         <button class="btn-secondary" onclick="tspAdd([${ids.join(',')}])">${allIn ? '✓ In your slip' : '+ Add to Parlay Builder'}</button>
         <button class="btn-primary" onclick="tspBet([${ids.join(',')}])">⚡ Bet it on Onyx</button>
@@ -848,7 +901,7 @@ function pickCard(k) {
   </div>`;
 }
 function renderHome() {
-  document.getElementById('homeTSP').innerHTML = tspHtml();
+  document.getElementById('homeMP').innerHTML = mpHtml();
   const picks = D.picks || [];
   document.getElementById('picksTag').textContent = 'Onyx Picks · ' + picks.length + ' today';
   document.getElementById('homePicks').innerHTML = picks.length ? picks.map(pickCard).join('')
@@ -1280,8 +1333,8 @@ function renderRecord() {
   </tr>`; }).join('') || '<tr><td colspan="9"><div class="empty" style="border:none">The record starts with the first qualified pick.</div></td></tr>';
 }
 
-// Daily Top Scorer Parlay record: the MLB Model's Ticket, for NBA. The build
-// (nba_build.update_ticket) freezes the home page's Top Scorer Parlay at the
+// The Model's Parlay record: the MLB Model's Ticket, for NBA. The build
+// (nba_build.update_ticket) freezes the home page's Model's Parlay at the
 // slate's first tip into data/nba/ticket_history.json and grades it leg by
 // leg; a leg whose player never played is void and drops out of the payout.
 function renderTickets() {
@@ -1319,7 +1372,7 @@ function renderTickets() {
     const mk = l.hit === true ? ['hit', '✓ ' + l.actual] : l.hit === false ? ['miss', '✗ ' + l.actual] : l.hit === 'void' ? ['void', 'VOID'] : ['pend', live ? 'live' : '-'];
     return `<div class="tk-leg">${hs(recPlayer(l), 's')}<div style="min-width:0">
       <div class="nm">${esc(l.player)}</div>
-      <div class="sub">${logo(l.team)} ${esc(l.team)} vs ${esc(l.opp)} · Over ${l.line} PTS ${fmtOdds(l.odds)} · proj ${num(l.proj)}</div></div>
+      <div class="sub">${logo(l.team)} ${esc(l.team)} vs ${esc(l.opp)} · ${legText(l)} ${fmtOdds(l.odds)} · proj ${num(l.proj)}${l.prob != null ? ' · ' + pct(l.prob, 0) : ''}</div></div>
       <span class="mk ${mk[0]}">${esc(mk[1])}</span></div>`;
   };
   const card = (t, today) => {
