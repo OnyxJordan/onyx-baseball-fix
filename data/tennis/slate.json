@@ -616,8 +616,8 @@
     {
      "id": "185175",
      "start": "2026-10-26T19:15Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 1",
      "draw": "Men's Singles",
      "court": "Centre Court",
@@ -627,10 +627,10 @@
        "short": "L. Tien",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        5
+        6
        ],
        "serve": false
       },
@@ -644,7 +644,7 @@
         3,
         1
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -1131,9 +1131,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Learner Tien",
+       "short": "L. Tien",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -1971,9 +1971,9 @@
        "win": false,
        "sets": [
         4,
-        0
+        2
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Dominic Stricker",
@@ -1983,7 +1983,7 @@
        "win": false,
        "sets": [
         6,
-        0
+        1
        ],
        "serve": false
       }
@@ -6189,7 +6189,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        6
+        7
        ],
        "serve": false
       }
@@ -8372,9 +8372,9 @@
        "win": false,
        "sets": [
         6,
-        1
+        2
        ],
-       "serve": false
+       "serve": true
       },
       {
        "name": "Sophie Llewellyn",
@@ -8394,7 +8394,7 @@
      "id": "187291",
      "start": "2026-10-26T20:05Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Qualifying Final",
      "draw": "Women's Singles",
      "court": "Estadio Mexcovery",
@@ -8406,9 +8406,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        2,
+        0
        ],
-       "serve": false
+       "serve": true
       },
       {
        "name": "Carmen Andreea Herea",
@@ -8417,7 +8418,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        6
+        6,
+        1
        ],
        "serve": false
       }
@@ -9412,5 +9414,5 @@
    ]
   }
  ],
- "fetched": "2026-10-26T20:42:17+00:00"
+ "fetched": "2026-10-26T20:48:11+00:00"
 }
