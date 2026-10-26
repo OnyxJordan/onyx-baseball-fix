@@ -145,8 +145,25 @@ function serve(rootDir) {
     if (/\bundefined\b/.test(text)) bad.push('undefined');
     if (/\bNaN\b/.test(text)) bad.push('NaN');
     if (/\[object Object\]/.test(text)) bad.push('[object Object]');
-    if (text.length < 200) bad.push('empty pane');
-    console.log(`  ${bad.length ? 'FAIL' : 'ok  '} ${t.padEnd(11)} ${String(text.length).padStart(6)} chars${bad.length ? '  <- ' + bad.join(', ') : ''}`);
+    // Gamecenter needs MLB's live feed, which this probe aborts: on a one-game
+    // night the page is a single scoreboard card plus "Live feed unavailable",
+    // under 200 chars and correct (10/26, World Series). The length rule
+    // measures the whole page, so it could never see a blank Gamecenter; the
+    // pane itself must show a game card with both teams or its empty state.
+    let cards = 0;
+    if (t === 'gamecenter') {
+      const gc = await page.evaluate(() => {
+        const pane = document.getElementById('pane-gamecenter');
+        if (!pane) return {cards: 0, empty: ''};
+        const cards = [...pane.querySelectorAll('.sb-card')]
+          .filter(c => [...c.querySelectorAll('.sb-team')].filter(x => x.innerText.trim()).length === 2).length;
+        const e = pane.querySelector('.gc-empty');
+        return {cards, empty: e ? e.innerText.trim() : ''};
+      });
+      cards = gc.cards;
+      if (!gc.cards && !gc.empty) bad.push('no game cards and no empty-state message');
+    } else if (text.length < 200) bad.push('empty pane');
+    console.log(`  ${bad.length ? 'FAIL' : 'ok  '} ${t.padEnd(11)} ${String(text.length).padStart(6)} chars${cards ? ` (${cards} game card${cards > 1 ? 's' : ''})` : ''}${bad.length ? '  <- ' + bad.join(', ') : ''}`);
     if (bad.length) failures++;
   }
 
