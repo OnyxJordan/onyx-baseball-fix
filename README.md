@@ -459,8 +459,20 @@ play (ESPN publishes no NBA possession field), last play and play-by-play.
 Headshot rings judge the model's lean: overs go green once they clear, unders
 stay lilac until the final then go green, red the moment an under is beaten.
 
-**Player bet card (NBA).** Tapping any player prop chip opens his card:
-every market Onyx prices on him (points, rebounds, assists, made threes,
+**Player card (NBA).** One card with two faces that flips like a video-game
+sports card (`pcOpen` / `pcFlip` in `nba_shell.html`; Player | Bets toggle,
+sideways swipe, or F). A name opens the **Player** face (projection, why
+this number, seasons, last 5); a prop chip opens the **Bets** face. Phones get
+a full-height bottom sheet (pull down to close), desktop a centered card that
+tilts with the pointer; reduced-motion users get a crossfade. The face turned
+away is `inert` (3D backfaces still hit-test, which swallowed clicks on
+desktop). The Bets face is rendered once per market and then only patched
+(`bcUpdate`): on 10/26 a full re-render replaced the slider under the finger
+and a drag moved one rung. The slider and the chart both scrub in 0.1 steps;
+between Onyx lines they show the model chance and "not offered", release
+snaps to the nearest line you can bet, with a haptic tick on each Onyx line.
+The side you pick (default: the model's lean) sticks across over-only rungs.
+The Bets face lists every market Onyx prices on him (points, rebounds, assists, made threes,
 double-double, triple-double; verified 10/26), search, and a slider over
 Onyx's alternate ladder. `nba_odds.py` keeps the ladders
 (`props.json` → `ladder: [[line, over, over_sel, under, under_sel]]`,
@@ -471,7 +483,8 @@ model projects**; if Onyx offers only the over and we project under, it says
 so. The "best value" banner only recommends points / rebounds / assists
 lines priced -200 to +200 (the calibrated zone); threes use an unfitted
 shape (`prob_over_fg3`) and DD / TD are price-only, never recommended.
-`verify_nba.js` opens a card and moves the slider.
+`verify_nba.js` opens both faces, flips, checks the slider survives an input
+event, shows "not offered" between lines and snaps on release.
 
 **App shell (`ui.js`, both sites).** Loaded `defer` by `shell.html` /
 `index.html` and `nba_shell.html`, after each page's own script. It builds
@@ -507,7 +520,7 @@ priced and not leaned against by the blend, and opens them as one Onyx slip.
 steps after the MLB build, each `continue-on-error` with its own timeout, so
 an NBA problem can never block or delay MLB. CI builds `nba.html` from
 committed data and runs `node tools/verify_nba.js` (six tabs at 390px and
-1280px, plus the player drawer).
+1280px, plus both faces of the player card).
 
 **Dates:** the NBA slate uses the same game day as MLB (ET minus 4h).
 
