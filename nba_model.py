@@ -652,6 +652,22 @@ def role_gap(mean, line, stat):
     return abs(mean - line) / max(0.8, a * line + b)
 
 
+COMBOS = {"pra": ("pts", "reb", "ast"), "pr": ("pts", "reb"), "pa": ("pts", "ast")}
+
+
+def combo_var(proj, combo):
+    """Variance of a combined stat: the fitted per-stat spreads, summed as if
+    independent. Points, rebounds and assists rise together with minutes, so
+    the true spread is wider; NOT backtested, the bet card labels combos that
+    way and never recommends from them."""
+    return sum(max(0.8, SD[s][0] * proj.get(s, 0.0) + SD[s][1]) ** 2 for s in COMBOS[combo])
+
+
+def prob_over_combo(proj, combo, line):
+    mean = sum(proj.get(s, 0.0) for s in COMBOS[combo])
+    return 1 - _nb_cdf(math.floor(line), mean, max(combo_var(proj, combo), mean * 1.0001))
+
+
 def prob_over_fg3(mean, line):
     """P(over) for made threes: negative binomial with variance 1.35 x mean.
     A reasonable shape for a rare-count stat, NOT fitted or backtested; the

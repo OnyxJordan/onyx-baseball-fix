@@ -65,6 +65,12 @@ LEDGER_RETENTION_DAYS = {
     "nba/picks_history": None,
     # NBA daily Top Scorer Parlay ledger: one ticket per slate, locked at first tip
     "nba/ticket_history": None,
+    # Onyx Sports ledgers (sports_lab.Ledger): empty until a sport's Onyx price
+    # backtest passes, then append-only like every other record
+    "nfl/picks_history": None,
+    "cfb/picks_history": None,
+    "nhl/picks_history": None,
+    "tennis/picks_history": None,
 }
 LEDGERS = tuple(LEDGER_RETENTION_DAYS)
 

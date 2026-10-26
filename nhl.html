@@ -1735,6 +1735,7 @@ body::after {
 .empty{padding:26px 18px;border:1px dashed var(--border2);border-radius:14px;text-align:center;color:var(--text3);font-size:13px;line-height:1.6}
 .tbl{overflow-x:auto;border:1px solid var(--border2);border-radius:14px;background:var(--bg2)}
 .tbl table{width:100%;border-collapse:collapse;font-size:13px;min-width:520px}
+.gc .tbl table{min-width:440px}
 .tbl th{padding:9px 10px;text-align:left;font:700 10px monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border2);white-space:nowrap}
 .tbl td{padding:9px 10px;border-bottom:1px solid var(--border);vertical-align:middle}
 .tbl tr:last-child td{border-bottom:0}
@@ -1791,6 +1792,21 @@ body::after {
 .lines-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
 .ld{background:var(--bg3);border:1px solid var(--border2);border-radius:12px;padding:9px 11px;display:flex;flex-direction:column;gap:2px}
 .ld span{font:700 9px monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--text3)}.ld b{font-size:14px}.ld em{font-style:normal;font-size:11px;color:var(--text2)}
+.l5-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:8px}
+.l5,.inj{background:var(--bg3);border:1px solid var(--border2);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+.l5-h{display:flex;align-items:center;gap:6px;font-size:13px}
+.l5-r,.inj-r{display:grid;grid-template-columns:auto auto auto 1fr auto;gap:8px;align-items:center;font-size:12.5px}
+.inj-r{grid-template-columns:auto auto 1fr}
+.l5-r .res{font:800 11px monospace;width:18px;text-align:center}.l5-r .res.w{color:#61e970}.l5-r .res.l{color:#f87171}
+.inj-r .st{font:800 9px monospace;letter-spacing:.06em;text-transform:uppercase;padding:2px 6px;border-radius:6px;background:rgba(255,255,255,.06);color:var(--text2);white-space:nowrap}
+.inj-r .st.o{background:rgba(248,113,113,.14);color:#f87171}.inj-r .st.d{background:rgba(215,149,255,.14);color:#d795ff}
+.pk-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:10px}
+.pk{display:flex;flex-direction:column;gap:10px;padding:14px;border-radius:14px;border:1px solid rgba(176,56,249,.45);background:linear-gradient(160deg,rgba(176,56,249,.12),var(--bg2) 60%)}
+.pk-top{display:flex;justify-content:space-between;gap:8px;font:700 10px monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--text3)}
+.pk-main{display:flex;align-items:center;gap:10px}.pk-main b{font-size:16px;line-height:1.3}
+.pk-nums{display:grid;grid-template-columns:repeat(auto-fit,minmax(70px,1fr));gap:6px}
+.pk-nums div{background:var(--bg3);border-radius:10px;padding:6px 8px}.pk-nums span{display:block;font:700 9px monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--text3)}.pk-nums b{font:800 14px monospace}
+.pk-res{font:800 13px monospace;text-transform:uppercase;letter-spacing:.06em}.pk-res.w{color:#61e970}.pk-res.l{color:#f87171}
 /* tennis + golf */
 .tn-ev{margin-bottom:18px}
 .tn-m{display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:center;padding:10px 12px;border-radius:12px;border:1px solid var(--border2);background:var(--bg2)}
@@ -1812,8 +1828,8 @@ body::after {
 .lab p{margin:0 0 8px;font-size:13px;line-height:1.6;color:var(--text2)}
 .lab ul{margin:6px 0 0;padding-left:18px;font-size:13px;line-height:1.7;color:var(--text2)}
 .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:10px 0}
-.stat-grid div{background:var(--bg3);border:1px solid var(--border2);border-radius:12px;padding:10px 12px}
-.stat-grid span{display:block;font:700 9px monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)}
+.stat-grid>div{background:var(--bg3);border:1px solid var(--border2);border-radius:12px;padding:10px 12px}
+.stat-grid>div>span{display:block;font:700 9px monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)}
 .stat-grid b{font:800 18px monospace}
 .lean-o{color:#b038f9}.lean-u{color:#9b96ff}
 .edge-pos{color:#61e970}.edge-neg{color:var(--text3)}
@@ -1858,7 +1874,7 @@ body::after {
 
 <script>
 // Injected by sports_build.py. `var`, read before any other script line (CLAUDE.md rule 5).
-var SD = /*SPORT_DATA*/{"sport":"nhl","cfg":{"name":"NHL","full":"Onyx NHL","kind":"hockey","espn":["hockey/nhl"],"espn_q":"","tone":"blue","art":"hockey","onyx_league":"NHL"},"date":"2026-10-26","label":"Mon Oct 26","season":null,"games":[{"gid":"401892582","start":"2026-10-26T23:00Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/26 - 7:00 PM EDT","name":"LA @ NYR","away":"LA","home":"NYR","away_name":"Los Angeles Kings","home_name":"New York Rangers","away_short":"Kings","home_short":"Rangers","away_logo":"https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/la.png","home_logo":"https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/nyr.png","away_color":"121212","home_color":"0056ae","away_rec":"2-5-2","home_rec":"7-5-1","away_rank":null,"home_rank":null,"away_score":"0","home_score":"0","venue":"Madison Square Garden","neutral":false,"tv":"NHL Net, MSG, ABTV","week":null},{"gid":"401892583","start":"2026-10-27T00:30Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/26 - 8:30 PM EDT","name":"TOR @ CGY","away":"TOR","home":"CGY","away_name":"Toronto Maple Leafs","home_name":"Calgary Flames","away_short":"Maple Leafs","home_short":"Flames","away_logo":"https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/tor.png","home_logo":"https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/cgy.png","away_color":"003e7e","home_color":"dd1a32","away_rec":"7-4-2","home_rec":"4-6-0","away_rank":null,"home_rank":null,"away_score":"0","home_score":"0","venue":"Scotiabank Saddledome","neutral":false,"tv":"ESPN+","week":null},{"gid":"401892584","start":"2026-10-27T01:30Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/26 - 9:30 PM EDT","name":"DET @ EDM","away":"DET","home":"EDM","away_name":"Detroit Red Wings","home_name":"Edmonton Oilers","away_short":"Red Wings","home_short":"Oilers","away_logo":"https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/det.png","home_logo":"https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/edm.png","away_color":"e30526","home_color":"00205b","away_rec":"4-4-3","home_rec":"8-2-1","away_rank":null,"home_rank":null,"away_score":"0","home_score":"0","venue":"Rogers Place","neutral":false,"tv":"ESPN+, DSN","week":null}],"events":[],"odds":{},"model":{"status":"lab","version":null,"title":"What is live, and what the model will be","note":"Onyx NHL is live for scores, the gamecenter and Onyx prices as they post. The NHL model is in the lab: nothing here is a pick until it has been backtested against real Onyx prices.","method":["Scores, periods, goals and team stats come from ESPN's public feed, polled live on this page every 15 to 30 seconds.","Every price on this page is an Onyx price."],"roadmap":["Onyx NHL lines: moneyline, puck line, totals and player shots and points","Skater shot and point projections from time on ice and shot rates, backtested before any pick","Goalie confirmations and save projections"],"tests":[],"rows":[],"top":[]},"generated":"2026-10-26T20:48:11+00:00"}/*END_SPORT_DATA*/;
+var SD = /*SPORT_DATA*/{"sport":"nhl","cfg":{"name":"NHL","full":"Onyx NHL","kind":"hockey","espn":["hockey/nhl"],"espn_q":"","tone":"blue","art":"hockey","onyx_league":"NHL"},"date":"2026-10-26","label":"Mon Oct 26","season":null,"games":[{"gid":"401892582","start":"2026-10-26T23:00Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/26 - 7:00 PM EDT","name":"LA @ NYR","away":"LA","home":"NYR","away_name":"Los Angeles Kings","home_name":"New York Rangers","away_short":"Kings","home_short":"Rangers","away_logo":"https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/la.png","home_logo":"https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/nyr.png","away_color":"121212","home_color":"0056ae","away_rec":"2-5-2","home_rec":"7-5-1","away_rank":null,"home_rank":null,"away_score":"0","home_score":"0","venue":"Madison Square Garden","neutral":false,"tv":"NHL Net, MSG, ABTV","week":null},{"gid":"401892583","start":"2026-10-27T00:30Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/26 - 8:30 PM EDT","name":"TOR @ CGY","away":"TOR","home":"CGY","away_name":"Toronto Maple Leafs","home_name":"Calgary Flames","away_short":"Maple Leafs","home_short":"Flames","away_logo":"https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/tor.png","home_logo":"https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/cgy.png","away_color":"003e7e","home_color":"dd1a32","away_rec":"7-4-2","home_rec":"4-6-0","away_rank":null,"home_rank":null,"away_score":"0","home_score":"0","venue":"Scotiabank Saddledome","neutral":false,"tv":"ESPN+","week":null},{"gid":"401892584","start":"2026-10-27T01:30Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/26 - 9:30 PM EDT","name":"DET @ EDM","away":"DET","home":"EDM","away_name":"Detroit Red Wings","home_name":"Edmonton Oilers","away_short":"Red Wings","home_short":"Oilers","away_logo":"https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/det.png","home_logo":"https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/edm.png","away_color":"e30526","home_color":"00205b","away_rec":"4-4-3","home_rec":"8-2-1","away_rank":null,"home_rank":null,"away_score":"0","home_score":"0","venue":"Rogers Place","neutral":false,"tv":"ESPN+, DSN","week":null}],"events":[],"odds":{},"model":{"status":"lab","version":"v1","title":"Team ratings against every Onyx game line","note":"Every team carries an offense and a defense rating in goals, fitted on every final this season and last, recent games weighing more. Each Onyx moneyline, spread and total is priced from them and blended with Onyx's own no-vig price. Tracked picks switch on only after the ratings beat real Onyx prices in a backtest.","method":["Scores, periods, goals and team stats come from ESPN's public feed, polled live on this page every 15 to 30 seconds.","Ratings: goals scored = league average + home edge + the team's offense - the opponent's defense, fitted by weighted least squares with a pull toward average so a team with three games is not rated off three games.","Hockey prices: each side's goals are Poisson; a regulation tie goes to overtime. The blend gives the model 30% and Onyx's no-vig price the rest; edge is the blended chance minus the price's implied chance."],"tests":[{"k":"Win log loss","v":"0.678","d":"vs 0.690 home base rate · 909 games from 1/15/2026 on"},{"k":"Total error (goals)","v":"1.83","d":"vs 1.84 league average"}],"backtest":null,"changelog":["v1 10/26 Ratings from 1,671 NHL finals since 10/2025 (ESPN), half-life 45 days, ridge 40, home edge 0.2 goals, a regulation tie goes to the home side 52% of the time. Tuned on 10/20/2025-1/14/2026, judged on 909 later games it never saw: win log loss 0.678 against 0.690 for the home-team base rate; total goals error 1.83 against 1.84 for the league average (totals barely beat a constant). A heavier ridge (80, 160) fit the tuning window better and the test window worse, so it was not taken. Leans only until the Onyx price backtest passes."],"roadmap":["Backtest the team ratings against a season of real Onyx moneylines, puck lines and totals before any pick","Goalie confirmations: the starter moves an NHL price more than anything else","Skater point and assist projections from time on ice, for the player lines Onyx prices"],"rows":[],"picks":[],"record":null,"top":[],"proj":{"401892582":{"home":3.28,"away":2.82,"home_win":0.5753,"unit":"goals"},"401892583":{"home":3.02,"away":3.27,"home_win":0.4651,"unit":"goals"},"401892584":{"home":3.41,"away":2.89,"home_win":0.583,"unit":"goals"}}},"generated":"2026-10-26T20:53:59+00:00"}/*END_SPORT_DATA*/;
 var ONYX_REFERRER = 'KR680261';
 var GA_MEASUREMENT_ID = 'G-03T8V1N52E';
 var C = SD.cfg || {};
@@ -1920,9 +1936,20 @@ function gotoTab(t) {
   window.scrollTo(0, 0);
 }
 function ticker() {
-  const items = KIND === 'tennis' ? (SD.events || []).flatMap(e => e.matches.filter(m => m.state === 'in').slice(0, 6).map(m => `<span class="tk"><b>${esc(m.p[0].short || m.p[0].name)}</b> ${m.p[0].sets.join(' ')} · <b>${esc(m.p[1].short || m.p[1].name)}</b> ${m.p[1].sets.join(' ')}</span>`))
-    : KIND === 'golf' ? (SD.events || []).flatMap(e => e.board.slice(0, 8).map(r => `<span class="tk"><b>${esc(r.pos)}</b> ${esc(r.name)} <b>${esc(r.to_par)}</b></span>`))
-    : (SD.games || []).map(g0 => { const g = live(g0); return `<span class="tk" onclick="openGame('${g.gid}')" style="cursor:pointer">${lg(g.away_logo)} <b>${esc(g.away)}</b> ${g.state !== 'pre' ? esc(g.away_score) : ''} · ${lg(g.home_logo)} <b>${esc(g.home)}</b> ${g.state !== 'pre' ? esc(g.home_score) : ''} <span class="dim">${g.state === 'pre' ? esc(tipTime(g.start)) : esc(g.detail || '')}</span></span>`; });
+  const sg = (inner, click, cls) => `<span class="score-game ${cls || ''}"${click ? ` onclick="${click}"` : ''}>${inner}</span>`;
+  const st = (cls, txt) => `<span class="score-state ${cls}">${esc(txt)}</span>`;
+  const items = KIND === 'tennis' ? (SD.events || []).flatMap(e => e.matches.filter(m => m.state === 'in').slice(0, 6).map(m =>
+      sg(`${st('live', 'LIVE')}<span class="score-team">${esc(m.p[0].short || m.p[0].name)}</span><span class="score-num">${m.p[0].sets.join(' ')}</span><span class="score-sep">|</span><span class="score-team">${esc(m.p[1].short || m.p[1].name)}</span><span class="score-num">${m.p[1].sets.join(' ')}</span>`, "gotoTab('games')")))
+    : KIND === 'golf' ? (SD.events || []).flatMap(e => e.board.slice(0, 8).map(r =>
+      sg(`<span class="score-state">${esc(r.pos)}</span><span class="score-team">${esc(r.name)}</span><span class="score-num">${esc(r.to_par)}</span>`, "gotoTab('games')")))
+    : (SD.games || []).map(g0 => {
+      const g = live(g0), pre = g.state === 'pre';
+      const as = +g.away_score, hs = +g.home_score;
+      const cls = (mine, other) => pre ? '' : mine > other ? 'winning' : mine < other ? 'losing' : '';
+      const state = g.state === 'in' ? st('live', g.detail || 'LIVE') : g.state === 'post' ? st('final', 'FINAL') : st('sched', tipTime(g.start));
+      const logo = u => u ? `<span class="sticker-logo" style="background-image:url('${esc(u)}')"></span>` : '';
+      return sg(`${state}${logo(g.away_logo)}<span class="score-team">${esc(g.away)}</span>${pre ? '' : `<span class="score-num ${cls(as, hs)}">${esc(g.away_score)}</span>`}<span class="score-sep">${pre ? '@' : '|'}</span>${logo(g.home_logo)}<span class="score-team">${esc(g.home)}</span>${pre ? '' : `<span class="score-num ${cls(hs, as)}">${esc(g.home_score)}</span>`}`, `openGame('${g.gid}')`);
+    });
   const t = document.getElementById('ticker');
   t.innerHTML = items.length ? items.join('') + items.join('') : '';
   t.parentNode.style.display = items.length ? '' : 'none';
@@ -2034,18 +2061,19 @@ function loadSummary(gid) {
 function teamStatsCmp(s, g) {
   const T = (s.boxscore || {}).teams || [];
   if (T.length !== 2) return '';
-  const byHA = {}; T.forEach(t => { byHA[(t.homeAway || (t.team || {}).abbreviation === g.home ? 'home' : 'away')] = t; });
+  const byHA = {}; T.forEach(t => { byHA[t.homeAway || ((t.team || {}).abbreviation === g.home ? 'home' : 'away')] = t; });
   const a = byHA.away || T[0], h = byHA.home || T[1];
   const keys = (a.statistics || []).map(x => x.name);
   const pick = KIND === 'hockey' ? ['shotsTotal', 'powerPlayGoals', 'faceoffsWon', 'hits', 'blockedShots', 'takeaways', 'giveaways', 'penaltyMinutes']
     : ['totalYards', 'netPassingYards', 'rushingYards', 'firstDowns', 'thirdDownEff', 'turnovers', 'totalPenaltiesYards', 'possessionTime'];
-  const rows = pick.filter(k => keys.includes(k)).map(k => {
+  const pre = g.state === 'pre';   // before the game ESPN's team box is season per-game averages
+  const rows = (pre ? keys : pick.filter(k => keys.includes(k))).map(k => {
     const av = (a.statistics.find(x => x.name === k) || {}), hv = (h.statistics.find(x => x.name === k) || {});
     const an = parseFloat(av.displayValue) || 0, hn = parseFloat(hv.displayValue) || 0, tot = an + hn || 1;
     return `<span class="v">${esc(av.displayValue)}</span><span class="k">${esc(av.label || k)}</span><span class="v h">${esc(hv.displayValue)}</span>
       <div class="bar"><i style="width:${an / tot * 100}%"></i><i style="width:${hn / tot * 100}%"></i></div>`;
   }).join('');
-  return rows ? `<div class="gc-sec"><h4>Team stats · ${esc(g.away)} vs ${esc(g.home)}</h4><div class="cmp">${rows}</div></div>` : '';
+  return rows ? `<div class="gc-sec"><h4>${pre ? 'Season per game' : 'Team stats'} · ${esc(g.away)} vs ${esc(g.home)}</h4><div class="cmp">${rows}</div></div>` : '';
 }
 function wpChart(s, g) {
   const wp = s.winprobability || [];
@@ -2078,6 +2106,50 @@ function fieldView(g) {
     <div class="sit">${sit.downDistanceText ? `<b>${esc(sit.downDistanceText)}</b>` : ''}${sit.isRedZone ? '<span class="tagx r">Red zone</span>' : ''}
       ${sit.lastPlay && sit.lastPlay.text ? `<span class="dim">${esc(sit.lastPlay.text)}</span>` : ''}</div></div>`;
 }
+// pre-game: the model's leans and Onyx player lines for this game, injuries, last five
+function gameLeans(g) {
+  const rows = ((SD.model || {}).rows || []).filter(r => r.gid === g.gid);
+  const picks = ((SD.model || {}).picks || []).filter(r => r.gid === g.gid);
+  const props = ((SD.odds || {}).props || []).filter(p => p.gid === g.gid && !rows.some(r => r.line != null && r.name === p.name && r.mkt === p.mkt));
+  let out = '';
+  if (picks.length) out += `<div class="gc-sec"><h4>Tracked picks · this game</h4>${playCards(picks)}</div>`;
+  const lab = (SD.model || {}).status === 'live' ? '' : ' · leans, not picks';
+  const pj = ((SD.model || {}).proj || {})[g.gid];
+  if (pj) out += `<div class="gc-sec"><h4>Model projection</h4><div class="stat-grid"><div><span>${esc(g.away)}</span><b>${num(pj.away)}</b></div><div><span>${esc(g.home)}</span><b>${num(pj.home)}</b></div>
+    <div><span>${esc(g.home)} win</span><b>${pct(pj.home_win)}</b></div><div><span>Total</span><b>${num(pj.home + pj.away)}</b></div></div></div>`;
+  const gr = rows.filter(r => r.kind), pr = rows.filter(r => !r.kind);
+  if (gr.length) out += `<div class="gc-sec"><h4>Model vs Onyx game lines${lab}</h4>${gameLeanTable(gr, true)}</div>`;
+  if (pr.length) out += `<div class="gc-sec"><h4>Player projections${lab}</h4>${projTable(pr.slice(0, 12))}</div>`;
+  if (props.length) out += `<div class="gc-sec"><h4>More Onyx player lines${props.length > 12 ? ` · top 12 of ${props.length}, all on the <a href="#" onclick="gotoTab('board');return false" style="color:#d795ff">Onyx Board</a>` : ''}</h4><div class="tbl"><table><thead><tr><th>Player</th><th>Market</th><th class="r">Line</th><th class="r">Over</th><th class="r">Under</th></tr></thead><tbody>
+    ${props.slice(0, 12).map(p => `<tr><td><b>${esc(p.name)}</b></td><td class="dim">${esc(MKT_NAME[p.mkt] || p.mkt)}</td><td class="r mono">${p.mkt === 'anytime_td' ? '' : esc(p.line)}</td>
+      <td class="r">${chip(p.over, p.name + (p.mkt === 'anytime_td' ? ' anytime TD' : ' Over ' + p.line), p.over_sel, p.mkt === 'anytime_td' ? 'Yes' : 'Over')}</td>
+      <td class="r">${p.under != null ? chip(p.under, p.name + ' Under ' + p.line, p.under_sel, 'Under') : '<span class="dim">-</span>'}</td></tr>`).join('')}</tbody></table></div></div>`;
+  return out;
+}
+function lastFive(s, g) {
+  const L = s.lastFiveGames || [];
+  if (!L.length) return '';
+  const side = ab => L.find(t => (t.team || {}).abbreviation === ab);
+  const col = t => !t ? '' : `<div class="l5"><div class="l5-h">${lg((t.team || {}).logo)} <b>${esc((t.team || {}).abbreviation)}</b> <span class="dim">last ${(t.events || []).length}</span></div>
+    ${(t.events || []).map(e => `<div class="l5-r"><span class="res ${e.gameResult === 'W' ? 'w' : e.gameResult === 'L' ? 'l' : ''}">${esc(e.gameResult || '-')}</span>
+      <span class="dim">${esc(e.atVs || '')}</span>${lg(((e.opponent || {}).logo))}<b>${esc((e.opponent || {}).abbreviation || '')}</b><span class="mono">${esc(e.score || '')}</span></div>`).join('')}</div>`;
+  return `<div class="gc-sec"><h4>Last five</h4><div class="l5-grid">${col(side(g.away))}${col(side(g.home))}</div></div>`;
+}
+function injuries(s, g) {
+  const I = (s.injuries || []).filter(t => (t.injuries || []).length);
+  if (!I.length) return '';
+  const order = {Out: 0, 'Injured Reserve': 0, Doubtful: 1, Questionable: 2};
+  const col = t => `<div class="inj"><div class="l5-h">${lg((t.team || {}).logo)} <b>${esc((t.team || {}).abbreviation)}</b></div>
+    ${(t.injuries || []).slice().sort((a, b) => (order[a.status] ?? 3) - (order[b.status] ?? 3)).slice(0, 10).map(i => { const a = i.athlete || {}, d = i.details || {};
+      return `<div class="inj-r"><span class="st ${/out|reserve/i.test(i.status) ? 'o' : /doubt/i.test(i.status) ? 'd' : 'q'}">${esc(i.status || '')}</span>
+        <b>${esc(a.shortName || a.displayName || '')}</b><span class="dim">${esc(((a.position || {}).abbreviation) || '')}${d.type ? ' · ' + esc(d.type) : ''}</span></div>`; }).join('')}</div>`;
+  const side = ab => I.find(t => (t.team || {}).abbreviation === ab);
+  return `<div class="gc-sec"><h4>Injury report</h4><div class="l5-grid">${[side(g.away), side(g.home)].filter(Boolean).map(col).join('')}</div></div>`;
+}
+function preview(s, g) {
+  if (g.state !== 'pre') return '';
+  return `${gameLeans(g)}${injuries(s, g)}${lastFive(s, g)}`;
+}
 function footballDetail(s, g) {
   const drives = ((s.drives || {}).previous || []).slice().reverse();
   const cur = (s.drives || {}).current;
@@ -2093,6 +2165,7 @@ function footballDetail(s, g) {
     ${(s.leaders || []).length ? `<div class="gc-sec"><h4>Leaders</h4><div class="lines-row">${(s.leaders || []).flatMap(t => (t.leaders || []).slice(0, 3).map(c => {
       const l = (c.leaders || [])[0] || {}; return `<div class="ld"><span>${esc((t.team || {}).abbreviation)} · ${esc(c.displayName)}</span><b>${esc((l.athlete || {}).shortName || '')}</b><em>${esc(l.displayValue || '')}</em></div>`;
     })).join('')}</div></div>` : ''}
+    ${preview(s, g)}
     ${!sp.length && !drives.length && g.state === 'pre' ? `<div class="empty">Kickoff ${esc(tipTime(g.start))}${g.venue ? ' · ' + esc(g.venue) : ''}. Drives, the field view and win probability appear here live.</div>` : ''}`;
 }
 function hockeyDetail(s, g) {
@@ -2105,6 +2178,7 @@ function hockeyDetail(s, g) {
     ${sp.length ? `<div class="gc-sec"><h4>Goals</h4><div class="plays">${sp.map(p => `<div class="play"><span class="t">P${esc((p.period || {}).number)} ${esc((p.clock || {}).displayValue || '')}</span>
       <span>${lg((p.team || {}).logo)} ${esc(p.text || '')}</span><span class="r td">${esc(p.awayScore)}-${esc(p.homeScore)}</span></div>`).join('')}</div></div>` : ''}
     ${teamStatsCmp(s, g)}
+    ${preview(s, g)}
     ${!sp.length && g.state === 'pre' ? `<div class="empty">Puck drop ${esc(tipTime(g.start))}${g.venue ? ' · ' + esc(g.venue) : ''}. Goals and shots appear here live.</div>` : ''}`;
 }
 
@@ -2113,7 +2187,9 @@ var TFILTER = 'live';
 function tnMatch(e, m) {
   const p = (x, i) => `<div class="tn-p${x.win ? ' w' : ''}">${x.flag ? `<img src="${esc(x.flag)}" alt="" loading="lazy">` : ''}<b>${esc(x.name)}</b>${x.seed ? ` <span class="dim">(${esc(x.seed)})</span>` : ''}${m.state === 'in' && x.serve ? '<i class="sv" title="Serving"></i>' : ''}</div>
     <div class="tn-sets">${x.sets.map((v, j) => `<span style="${(m.p[1 - i].sets[j] || 0) < v ? '' : 'opacity:.55'}">${v}</span>`).join('')}</div>`;
-  return `<div class="tn-m">${p(m.p[0], 0)}${p(m.p[1], 1)}<div class="tn-meta">${m.state === 'in' ? '<span style="color:#61e970">● Live</span> · ' : ''}${esc(e.tour)} · ${esc(m.round || '')}${m.state === 'pre' ? ' · ' + esc(tipTime(m.start)) : m.state === 'post' ? ' · ' + esc(m.detail || 'Final') : ''}</div></div>`;
+  const mo = ((SD.odds || {}).matches || {})[m.id];
+  const odds = mo && m.state !== 'post' ? `<div class="gm-lines" style="grid-column:1/-1">${chip(mo.ml0, m.p[0].name + ' to win', mo.ml0_sel, (m.p[0].short || m.p[0].name).split(' ').pop())}${chip(mo.ml1, m.p[1].name + ' to win', mo.ml1_sel, (m.p[1].short || m.p[1].name).split(' ').pop())}${mo.total != null ? chip(mo.over, 'Over ' + mo.total + ' games', mo.over_sel, 'O ' + mo.total + ' gms') + chip(mo.under, 'Under ' + mo.total + ' games', mo.under_sel, 'U ' + mo.total + ' gms') : ''}</div>` : '';
+  return `<div class="tn-m">${p(m.p[0], 0)}${p(m.p[1], 1)}${odds}<div class="tn-meta">${m.state === 'in' ? '<span style="color:#61e970">● Live</span> · ' : ''}${esc(e.tour)} · ${esc(m.round || '')}${m.state === 'pre' ? ' · ' + esc(tipTime(m.start)) : m.state === 'post' ? ' · ' + esc(m.detail || 'Final') : ''}</div></div>`;
 }
 function tnAll() {
   const segs = [['live', 'Live'], ['pre', 'Upcoming'], ['post', 'Results']];
@@ -2148,24 +2224,29 @@ function renderBoard() {
   const games = (SD.games || []).map(live);
   const props = O.props || [];
   const out = [`<div class="sec-hdr"><span class="sec-title">Onyx board · every Onyx line on the slate</span><span class="sec-count">${O.fetched ? 'prices ' + esc(new Date(O.fetched).toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York'})) + ' ET' : ''}</span></div>`];
-  if (!O.games && !props.length && !(O.outrights || []).length) {
+  if (!Object.keys(O.games || {}).length && !props.length && !Object.keys(O.matches || {}).length && !(O.outrights || []).length) {
     out.push(`<div class="lab"><div class="eb">Onyx prices</div><h3>The Onyx feed for ${esc(C.name)} is being wired</h3>
       <p>Every price on this site comes straight from Onyx, never another book. The Onyx lines for ${esc(C.name)} switch on here as soon as the feed is connected, game lines first, then player markets.</p>
       <button class="btn-primary" onclick="bet(null,'board')">⚡ See ${esc(C.name)} on Onyx</button></div>`);
   }
-  if (O.games) {
+  if (KIND === 'tennis' && Object.keys(O.matches || {}).length) {
+    const ms = (SD.events || []).flatMap(e => e.matches.filter(m => m.state !== 'post' && (O.matches || {})[m.id]).map(m => [e, m]));
+    out.push(`<div class="tn-grid">${ms.map(([e, m]) => tnMatch(e, m)).join('') || '<div class="empty">No open Onyx match prices right now.</div>'}</div>`);
+  }
+  if (O.games && Object.keys(O.games).length) {
     out.push(`<div class="gm-grid">${games.filter(g => g.state !== 'post' && gameOdds(g.gid)).map(gameCard).join('') || '<div class="empty">No open game lines right now.</div>'}</div>`);
   }
   if (props.length) {
     const mk = [...new Set(props.map(p => p.mkt))];
+    const lineOf = p => p.mkt === 'anytime_td' ? 'TD' : p.line;
     const P = props.filter(p => (BMKT === 'all' || p.mkt === BMKT) && (!BQ || (p.name + ' ' + (p.team || '')).toLowerCase().includes(BQ)));
     out.push(`<div class="sec-hdr"><span class="sec-title">Player markets</span><span class="sec-count">${P.length} lines</span></div>
       <input placeholder="Search players, teams" value="${esc(BQ)}" oninput="BQ=this.value.toLowerCase();renderBoard();this.focus();this.setSelectionRange(this.value.length,this.value.length)" style="width:100%;padding:10px 12px;margin-bottom:10px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid var(--border2);color:var(--text);font:500 14px 'Space Grotesk',sans-serif">
       <div class="sp-tabs-seg"><button class="${BMKT === 'all' ? 'on' : ''}" onclick="BMKT='all';renderBoard()">All</button>${mk.map(m => `<button class="${BMKT === m ? 'on' : ''}" onclick="BMKT='${esc(m)}';renderBoard()">${esc(MKT_NAME[m] || m)}</button>`).join('')}</div>
       <div class="tbl"><table><thead><tr><th>Player</th><th>Market</th><th class="r">Line</th>${(SD.model || {}).status ? '<th class="r">Proj</th>' : ''}<th class="r">Over</th><th class="r">Under</th></tr></thead><tbody>
-      ${P.slice(0, 400).map(p => `<tr><td><b>${esc(p.name)}</b> <span class="dim">${esc(p.team || '')}</span></td><td class="dim">${esc(MKT_NAME[p.mkt] || p.mkt)}</td><td class="r mono">${esc(p.line)}</td>
+      ${P.slice(0, 400).map(p => { const g = game(p.gid) || {}; return `<tr><td><b>${esc(p.name)}</b> <span class="dim">${esc(g.away ? g.away + ' @ ' + g.home : '')}</span></td><td class="dim">${esc(MKT_NAME[p.mkt] || p.mkt)}</td><td class="r mono">${esc(lineOf(p))}</td>
         ${(SD.model || {}).status ? `<td class="r mono ${p.proj != null ? (p.proj > p.line ? 'lean-o' : 'lean-u') : 'dim'}">${p.proj != null ? num(p.proj) : '-'}</td>` : ''}
-        <td class="r">${chip(p.over, p.name + ' Over ' + p.line, p.over_sel, 'Over')}</td><td class="r">${p.under != null ? chip(p.under, p.name + ' Under ' + p.line, p.under_sel, 'Under') : '<span class="dim">-</span>'}</td></tr>`).join('')}
+        <td class="r">${chip(p.over, p.name + (p.mkt === 'anytime_td' ? ' anytime TD' : ' Over ' + p.line), p.over_sel, p.mkt === 'anytime_td' ? 'Yes' : 'Over')}</td><td class="r">${p.under != null ? chip(p.under, p.name + ' Under ' + p.line, p.under_sel, 'Under') : '<span class="dim">-</span>'}</td></tr>`; }).join('')}
       </tbody></table></div>`);
   }
   if ((O.outrights || []).length) {
@@ -2179,13 +2260,61 @@ var MKT_NAME = {pass_yds: 'Passing yards', rush_yds: 'Rushing yards', rec_yds: '
 
 // ── plays (model) ───────────────────────────────────────────────────
 function projTable(rows) {
-  return `<div class="tbl"><table><thead><tr><th>Player</th><th>Market</th><th class="r">Proj</th><th class="r">Last 3</th><th class="r">Season</th><th class="r">Onyx line</th><th class="r">Lean</th></tr></thead><tbody>
+  return `<div class="tbl"><table><thead><tr><th>Player</th><th>Market</th><th class="r">Proj</th><th class="r">Last 3</th><th class="r">Season</th><th class="r">Onyx line</th><th class="r">Lean · Onyx</th></tr></thead><tbody>
     ${rows.map(r => `<tr><td>${r.hs ? `<img class="lg" style="border-radius:50%" src="${esc(r.hs)}" alt="" loading="lazy">` : ''} <b>${esc(r.name)}</b> <span class="dim">${esc(r.team)} ${r.home ? 'vs' : '@'} ${esc(r.opp)}</span></td>
       <td class="dim">${esc(MKT_NAME[r.mkt] || r.mkt)}</td><td class="r mono"><b>${num(r.proj)}</b></td><td class="r mono dim">${esc((r.l3 || []).join(' '))}</td><td class="r mono dim">${num(r.season)}</td>
-      <td class="r mono">${r.line != null ? esc(r.line) : '-'}</td><td class="r mono ${r.line != null ? (r.proj > r.line ? 'lean-o' : 'lean-u') : 'dim'}">${r.line != null ? (r.proj > r.line ? 'Over' : 'Under') : '-'}</td></tr>`).join('')}
+      <td class="r mono">${r.line != null ? esc(r.line) : '-'}</td><td class="r">${r.line == null ? '<span class="dim">-</span>' : r.proj > r.line
+        ? chip(r.over, r.name + ' Over ' + r.line, r.over_sel, 'Over') : chip(r.under, r.name + ' Under ' + r.line, r.under_sel, 'Under')}</td></tr>`).join('')}
   </tbody></table></div>`;
 }
+function pickLabel(r) {
+  if (r.kind === 'ml') return `${r.name} to win`;
+  if (r.kind === 'spread') return `${r.name} ${r.line_txt || ''}`;
+  if (r.kind === 'total') return `${r.name} ${r.side === 'over' ? 'Over' : 'Under'} ${r.line}`;
+  return `${r.name} ${r.side === 'over' ? 'Over' : 'Under'} ${r.line} ${MKT_NAME[r.mkt] || r.mkt}`;
+}
+function playCards(rows) {
+  return `<div class="pk-grid">${rows.map(r => `<div class="pk">
+    <div class="pk-top"><span>${esc(MKT_NAME[r.mkt] || r.mkt)}</span><span>${esc(r.matchup || '')}</span></div>
+    <div class="pk-main">${r.hs ? `<img class="lg m" style="border-radius:50%" src="${esc(r.hs)}" alt="" loading="lazy">` : ''}<b>${esc(pickLabel(r))}</b></div>
+    <div class="pk-nums"><div><span>Onyx</span><b>${fmtOdds(r.price)}</b></div><div><span>Win chance</span><b>${pct(r.prob)}</b></div>
+      <div><span>Implied</span><b>${pct(r.implied)}</b></div><div><span>Edge</span><b class="edge-pos">${r.edge != null ? '+' + (r.edge * 100).toFixed(1) + 'pp' : '-'}</b></div>
+      ${r.proj != null ? `<div><span>Projection</span><b>${num(r.proj)}</b></div>` : ''}</div>
+    ${r.result ? `<div class="pk-res ${r.result === 'W' ? 'w' : r.result === 'L' ? 'l' : ''}">${r.result === 'W' ? 'Won' : r.result === 'L' ? 'Lost' : r.result === 'P' ? 'Push' : 'Void'}${r.actual != null ? ' · ' + esc(r.actual) : ''}</div>`
+      : `<button class="btn-primary" onclick="bet('${esc(r.sel || '')}','${esc(pickLabel(r)).replace(/'/g, '')}')">⚡ Bet on Onyx</button>`}
+  </div>`).join('')}</div>`;
+}
+function recordBlock(R) {
+  if (!R || !(R.w + R.l + R.p + R.pending)) return '';
+  const by = Object.entries(R.by_mkt || {});
+  return `<div class="sec-hdr"><span class="sec-title">Public record · $10 a pick</span><span class="sec-count">${R.w}-${R.l}${R.p ? '-' + R.p : ''}</span></div>
+    <div class="stat-grid"><div><span>Record</span><b>${R.w}-${R.l}</b></div><div><span>P&amp;L</span><b class="${R.dollars >= 0 ? 'edge-pos' : ''}">${R.dollars >= 0 ? '+' : '-'}$${Math.abs(R.dollars).toFixed(2)}</b></div>
+      <div><span>ROI</span><b>${R.roi == null ? '-' : (R.roi * 100).toFixed(1) + '%'}</b></div><div><span>Pending</span><b>${R.pending}</b></div></div>
+    ${by.length ? `<div class="stat-grid">${by.map(([k, b]) => `<div><span>${esc(MKT_NAME[k] || k)}</span><b>${b.w}-${b.l}</b><div class="dim" style="font-size:11px">${b.units >= 0 ? '+' : ''}${(b.units * 10).toFixed(2)} $</div></div>`).join('')}</div>` : ''}
+    <div class="tbl"><table><thead><tr><th>Date</th><th>Pick</th><th class="r">Onyx</th><th class="r">Chance</th><th class="r">Result</th><th class="r">$10</th></tr></thead><tbody>
+    ${(R.rows || []).map(r => { const pl = r.result === 'W' ? (r.price > 0 ? r.price / 10 : 1000 / -r.price) : r.result === 'L' ? -10 : 0;
+      return `<tr><td class="mono dim">${esc((r.date || '').slice(5))}</td><td><b>${esc(pickLabel(r))}</b> <span class="dim">${esc(r.matchup || '')}</span></td><td class="r mono">${fmtOdds(r.price)}</td><td class="r mono">${pct(r.prob)}</td>
+        <td class="r mono ${r.result === 'W' ? 'edge-pos' : ''}">${esc(r.result || 'pending')}${r.actual != null ? ' <span class="dim">' + esc(r.actual) + '</span>' : ''}</td><td class="r mono">${r.result ? (pl >= 0 ? '+' : '') + pl.toFixed(2) : '-'}</td></tr>`; }).join('')}
+    </tbody></table></div>`;
+}
+function backtestBlock(B) {
+  if (!B) return '';
+  return `<div class="lab"><div class="eb">Backtest against real Onyx prices · ${B.passed ? 'passed' : 'not passed yet'}</div>
+    <h3>${esc(B.title || 'How the model did against Onyx lines it never saw')}</h3>
+    ${(B.summary || []).map(p => `<p>${esc(p)}</p>`).join('')}
+    ${(B.stats || []).length ? `<div class="stat-grid">${B.stats.map(t => `<div><span>${esc(t.k)}</span><b>${esc(t.v)}</b><div class="dim" style="font-size:11px">${esc(t.d || '')}</div></div>`).join('')}</div>` : ''}
+    <p class="dim" style="font-size:12px">Model ${esc(B.version || '')} · run ${esc(B.run || '')}</p></div>`;
+}
 var PMKT = 'all';
+function gameLeanTable(rows, inGame) {
+  return `<div class="tbl"><table><thead><tr>${inGame ? '' : '<th>Game</th>'}<th>Lean</th><th class="r">Model</th><th class="r">Onyx no-vig</th><th class="r">Blend</th><th class="r">Edge</th><th class="r">Onyx</th></tr></thead><tbody>
+    ${rows.map(r => `<tr class="tap" onclick="${r.gid && !inGame ? `openGame('${esc(r.gid)}')` : ''}">${inGame ? '' : `<td><b>${esc(r.matchup || '')}</b>${r.start ? ` <span class="dim">${esc(tipTime(r.start))}</span>` : ''}</td>`}
+      <td><b class="${r.edge > 0 ? 'lean-o' : ''}">${esc(pickLabel(r))}</b>${r.detail && !inGame ? ` <span class="dim">${esc(r.detail)}</span>` : ''}</td>
+      <td class="r mono">${pct(r.model_p, 1)}</td><td class="r mono dim">${pct(r.fair, 1)}</td><td class="r mono">${pct(r.prob, 1)}</td>
+      <td class="r mono ${r.edge > 0 ? 'edge-pos' : 'edge-neg'}">${r.edge != null ? (r.edge > 0 ? '+' : '') + (r.edge * 100).toFixed(1) + 'pp' : '-'}</td>
+      <td class="r" onclick="event.stopPropagation()">${r.price != null ? chip(r.price, pickLabel(r), r.sel, 'Onyx') : '<span class="dim">no line</span>'}</td></tr>`).join('')}
+  </tbody></table></div>`;
+}
 function renderPlays() {
   const M = SD.model || {};
   const el = document.getElementById('playsBody');
@@ -2193,22 +2322,33 @@ function renderPlays() {
     <h3>${M.status === 'live' ? 'Where the model beats the Onyx line' : 'Picks switch on when the model earns them'}</h3>
     <p>${esc(M.note || `The ${C.name} model is being built and tested. Nothing here is a pick until it has been backtested against real Onyx prices, the same bar the NBA and MLB models had to clear.`)}</p>
     ${(M.tests || []).length ? `<div class="stat-grid">${M.tests.map(t => `<div><span>${esc(t.k)}</span><b>${esc(t.v)}</b><div class="dim" style="font-size:11px">${esc(t.d || '')}</div></div>`).join('')}</div>` : ''}
-    ${(M.roadmap || []).length ? `<ul>${M.roadmap.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}</div>`;
+    ${M.status !== 'live' && (M.roadmap || []).length ? `<ul>${M.roadmap.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}</div>`;
+  const picks = M.picks || [];
+  const pickHtml = M.status === 'live' ? `<div class="sec-hdr"><span class="sec-title">Today's plays</span><span class="sec-count">${picks.length}</span></div>
+    ${picks.length ? playCards(picks) : '<div class="empty">No play clears the bar on this slate. A quiet slate is the screens working.</div>'}` : '';
   const rows = M.rows || [];
-  if (!rows.length) { el.innerHTML = lab; return; }
-  const mk = [...new Set(rows.map(r => r.mkt))];
-  const shown = rows.filter(r => PMKT === 'all' || r.mkt === PMKT);
-  el.innerHTML = lab + `<div class="sec-hdr"><span class="sec-title">${M.status === 'live' ? 'Plays' : 'Model leans · projections, not picks, not graded'}</span><span class="sec-count">${shown.length}</span></div>
+  const gameRows = rows.filter(r => r.kind), propRows = rows.filter(r => !r.kind);
+  let body = '';
+  if (gameRows.length) body += `<div class="sec-hdr"><span class="sec-title">Model vs Onyx · ${M.status === 'live' ? 'every game' : 'leans, not picks, not graded'}</span><span class="sec-count">${gameRows.length}</span></div>${gameLeanTable(gameRows.slice(0, 150))}`;
+  if (propRows.length) {
+    const mk = [...new Set(propRows.map(r => r.mkt))];
+    const shown = propRows.filter(r => PMKT === 'all' || r.mkt === PMKT);
+    body += `<div class="sec-hdr"><span class="sec-title">${M.status === 'live' ? 'Player projections' : 'Model leans · projections, not picks, not graded'}</span><span class="sec-count">${shown.length}</span></div>
     <div class="sp-tabs-seg"><button class="${PMKT === 'all' ? 'on' : ''}" onclick="PMKT='all';renderPlays()">All</button>${mk.map(m => `<button class="${PMKT === m ? 'on' : ''}" onclick="PMKT='${esc(m)}';renderPlays()">${esc(MKT_NAME[m] || m)}</button>`).join('')}</div>
     ${projTable(shown.slice(0, 120))}`;
+  }
+  el.innerHTML = lab + pickHtml + body + recordBlock(M.record) + (!rows.length && M.status !== 'live' ? '' : '');
 }
 function renderModel() {
   const M = SD.model || {};
   document.getElementById('modelBody').innerHTML = `<div class="lab"><div class="eb">How Onyx ${esc(C.name)} works</div><h3>${esc(M.title || 'The data, the model and what is tested')}</h3>
     ${(M.method || []).map(p => `<p>${esc(p)}</p>`).join('') || `<p>Live scores, the gamecenter and the schedule come from ESPN's public feed, refreshed through the day and polled live on this page. Every price is an Onyx price.</p>`}
     ${(M.tests || []).length ? `<div class="stat-grid">${M.tests.map(t => `<div><span>${esc(t.k)}</span><b>${esc(t.v)}</b><div class="dim" style="font-size:11px">${esc(t.d || '')}</div></div>`).join('')}</div>` : ''}
-    <p class="dim" style="font-size:12px">Model ${esc(M.version || 'not live yet')} · data built ${esc(SD.generated ? new Date(SD.generated).toLocaleString('en-US', {timeZone: 'America/New_York'}) + ' ET' : '')}</p></div>
-    ${(M.roadmap || []).length ? `<div class="lab"><div class="eb">Next</div><ul>${M.roadmap.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>` : ''}`;
+    <p class="dim" style="font-size:12px">Model ${esc(M.version || 'not live yet')} · ${M.status === 'live' ? 'picks live' : 'leans only'} · data built ${esc(SD.generated ? new Date(SD.generated).toLocaleString('en-US', {timeZone: 'America/New_York'}) + ' ET' : '')}</p></div>
+    ${backtestBlock(M.backtest)}
+    ${(M.changelog || []).length ? `<div class="lab"><div class="eb">Changelog · the lab notebook</div><ul>${M.changelog.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>` : ''}
+    ${(M.roadmap || []).length ? `<div class="lab"><div class="eb">Next</div><ul>${M.roadmap.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>` : ''}
+    ${recordBlock(M.record)}`;
 }
 
 // ── live: ESPN scoreboard every 30s (15s while anything is live) ────

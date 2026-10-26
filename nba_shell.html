@@ -1731,8 +1731,13 @@ function histTable(p) {
 // chip lands on the back; from a name, the front. Toggle, swipe sideways or
 // press F to flip. Phones: a full-height bottom sheet (swipe down closes);
 // desktop: a centered card that tilts with the pointer.
-var BC_MKTS = {pts: ['Points', 'PTS'], reb: ['Rebounds', 'REB'], ast: ['Assists', 'AST'], fg3: ['Threes made', '3PM'],
-               dd: ['Double-double', 'DD'], td: ['Triple-double', 'TD']};
+var BC_MKTS = {pts: ['Points', 'PTS'], reb: ['Rebounds', 'REB'], ast: ['Assists', 'AST'],
+               pra: ['Pts + Reb + Ast', 'PRA'], pr: ['Pts + Reb', 'PR'], pa: ['Pts + Ast', 'PA'],
+               fg3: ['Threes made', '3PM'], dd: ['Double-double', 'DD'], td: ['Triple-double', 'TD']};
+// combined stats: projection = the sum, spread = the fitted per-stat spreads
+// summed (nba_model.combo_var). Not backtested: shown, labelled, never recommended
+var BC_COMBO = {pra: ['pts', 'reb', 'ast'], pr: ['pts', 'reb'], pa: ['pts', 'ast']};
+var BC_SHAPED = {fg3: 1, pra: 1, pr: 1, pa: 1};
 var BC_MODELED = {pts: 1, reb: 1, ast: 1};
 // recommend only where the model is calibrated: the backtest scored main-line
 // prices near even money. Far out on the ladder a small tail disagreement
@@ -1907,8 +1912,11 @@ function bcNearest(x) {
 }
 // negative binomial pmf with the model's fitted spread (threes: unfitted 1.35x mean)
 function bcPmf(mean, s) {
-  const sdp = ((D.engine || {}).sd || {})[s];
-  let v = s === 'fg3' ? 1.35 * mean : sdp ? Math.pow(Math.max(0.8, sdp[0] * mean + sdp[1]), 2) : mean * 1.5;
+  const SDs = (D.engine || {}).sd || {}, sdp = SDs[s];
+  const p = BC && playerOf(BC.pid);
+  let v = s === 'fg3' ? 1.35 * mean
+    : BC_COMBO[s] && p ? BC_COMBO[s].reduce((a, x) => { const q = SDs[x] || [0, 1]; return a + Math.pow(Math.max(0.8, q[0] * ((p.proj || {})[x] || 0) + q[1]), 2); }, 0)
+    : sdp ? Math.pow(Math.max(0.8, sdp[0] * mean + sdp[1]), 2) : mean * 1.5;
   mean = Math.max(mean, 0.05); v = Math.max(v, mean * 1.0001);
   const r = mean * mean / (v - mean), q = mean / (r + mean);
   const kMax = Math.max(6, Math.ceil(mean + 4 * Math.sqrt(v)));
@@ -1939,7 +1947,7 @@ function bcPick() {
   }
   const mean = (p.proj || {})[BC.s];
   let pOver = null;
-  if (mean != null && (BC_MODELED[BC.s] || BC.s === 'fg3')) {
+  if (mean != null && (BC_MODELED[BC.s] || BC_SHAPED[BC.s])) {
     const pmf = bcPmf(mean, BC.s); pOver = 0;
     pmf.forEach((v, k) => { if (k > L) pOver += v; });
   }
@@ -1984,6 +1992,7 @@ function bcRender() {
           <b>${r[0]}</b><span></span></button>`).join('')}</div></div>` : ''}
       <div class="bc-note">${BC_MODELED[BC.s] ? 'Blended = 20% model, 80% Onyx price with the margin removed: the same math as the board. Drag the slider or the chart: between Onyx lines you see the model chance, release to snap to a line you can bet.'
           : BC.s === 'fg3' ? 'Threes: model shape not backtested yet, so no recommendation is made from it.'
+          : BC_COMBO[BC.s] ? 'Combined stat: projection is the sum of his points, rebounds and assists projections. Its spread is not backtested yet, so no recommendation is made from it.'
           : 'Not modeled: the Onyx price only, no recommendation.'}</div>
       <div class="bc-acts"><button class="btn-secondary" id="bcAdd">+ Add to parlay</button><button class="btn-primary" id="bcBet">⚡ Bet on Onyx</button></div>
     </div>` : '<div class="empty">No Onyx line on this market.</div>'}
@@ -2094,7 +2103,7 @@ function bcUpdate(scrollRung) {
     <div><span>EV per $10</span>${k.exact && k.ev != null ? `<b class="${moneyCls(k.ev)}">${money(10 * k.ev)}</b>` : '<b class="dim">-</b>'}</div>`;
   // the distribution: built once per market, then only the marker and colours move
   const dist = $('bcDist');
-  if (dist && proj != null && (BC_MODELED[BC.s] || BC.s === 'fg3')) {
+  if (dist && proj != null && (BC_MODELED[BC.s] || BC_SHAPED[BC.s])) {
     let bars = dist.querySelector('.bc-bars');
     if (!bars || dist.dataset.s !== BC.s) {
       // only the stretch that matters (his ladder plus the model's likely

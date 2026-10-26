@@ -2,6 +2,8 @@ name: Onyx markets probe (manual)
 # Which markets does the Onyx book price, per sport? Run before building a
 # sport's odds fetcher: tools/onyx_markets_probe.py prints a per-market
 # summary to this job's log and uploads probe/markets.json.
+# job=lines instead pulls historical Onyx main lines for a backtest with
+# tools/onyx_lines_pull.py (args: sport league from to markets out).
 # Read-only: commits nothing, deploys nothing.
 on:
   workflow_dispatch:
@@ -10,22 +12,50 @@ on:
         description: "Sports to probe (space separated); blank = football hockey tennis golf basketball baseball"
         required: false
         default: ""
+      job:
+        description: "probe (markets), lines (historical Onyx lines for a backtest) or odds (dry run of sports_odds.py)"
+        required: false
+        default: "probe"
+      args:
+        description: "lines only: sport league from to markets out"
+        required: false
+        default: ""
 permissions:
   contents: read
 jobs:
   probe:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 150
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
       - run: pip install requests
-      - run: python3 tools/onyx_markets_probe.py ${{ inputs.sports }}
+      - if: ${{ inputs.job != 'lines' }}
+        run: python3 tools/onyx_markets_probe.py ${{ inputs.sports }}
+        env:
+          OPTICODDS_API_KEY: ${{ secrets.OPTICODDS_API_KEY }}
+      - if: ${{ inputs.job == 'lines' }}
+        run: python3 tools/onyx_lines_pull.py ${{ inputs.args }}
+        env:
+          OPTICODDS_API_KEY: ${{ secrets.OPTICODDS_API_KEY }}
+      # job=odds: a dry run of the live Onyx fetcher (sports_odds.py) for each
+      # sport against today's slate; the odds files go to the artifact only
+      - if: ${{ inputs.job == 'odds' }}
+        run: |
+          mkdir -p probe
+          for s in ${{ inputs.sports || 'nfl cfb nhl tennis' }}; do
+            python3 sports_espn.py $s
+            ODDS_DEBUG=1 python3 sports_odds.py $s
+            cp data/$s/odds.json probe/$s-odds.json 2>/dev/null || true
+          done
         env:
           OPTICODDS_API_KEY: ${{ secrets.OPTICODDS_API_KEY }}
       - uses: actions/upload-artifact@v4
         with:
-          name: onyx-markets
-          path: probe/
+          name: onyx-${{ inputs.job || 'probe' }}
+          path: |
+            probe/
+            bt/
+          if-no-files-found: warn

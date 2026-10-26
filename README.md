@@ -402,19 +402,78 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
   - **Tennis:** live and finished singles matches by tournament, set scores and who is
     serving.
   - **Golf:** a searchable leaderboard with every round.
-- **Onyx prices:** `odds.json` per sport, written by the coming `sports_odds.py`. The
-  Board says the feed is being wired until then, and never shows another book.
-  `tools/onyx_markets_probe.py` (the manual `odds_probe.yml` workflow) reports what
-  the Onyx book prices per sport, so each fetcher is built against real markets.
-- **NFL model (`nfl_model.py`, v0):**
-  - **Covers:** passing, rushing and receiving yards, and receptions.
-  - **Projection:** a recency-weighted season mean, shrunk toward last season, times a
-    regressed opponent factor.
-  - **Test:** `test()` re-runs on every build against the season average and the last-3
-    average, on games the model never saw. The page shows the numbers.
-  - **Status:** leans only. No tracked picks until a backtest against real Onyx NFL
-    prices passes, and until there is an injury feed.
-- **Other sports:** "model in the lab", with the plan on the page.
+- **History:** `sports_history.py`, called by `sports_espn.py`, keeps final results in
+  `data/<sport>/results.json` (NHL by day, NFL and college football by week, read once
+  and remembered, with the last few days or a week re-read). Tennis keeps only the last
+  45 days of matches. Older ones are folded into the Elo state `data/tennis/elo.json`,
+  seeded once from 36,666 ATP and WTA singles matches since 2023, so the committed
+  file stays small.
+- **Onyx prices:** `sports_odds.py <sport>` runs in both pipelines between the slate and
+  the build. It writes `odds.json` with Onyx main lines and share selections:
+  - NFL and college football: moneyline, spread, total, player yards and receptions,
+    anytime TD.
+  - NHL: moneyline, puck line, total, player points and assists.
+  - Tennis: ATP and WTA moneyline, game spread, total games. Unpriced matches are
+    dropped; on 10/26, 57 of 66 matches were priced.
+  - Golf: Onyx prices nothing, so there is no fetch.
+
+  `tools/onyx_markets_probe.py` (the manual `odds_probe.yml` workflow, `job=probe`)
+  reports what the Onyx book prices.
+- **The model frame (`sports_lab.py`):** shared by every sport. It holds:
+  - probabilities: normal, Poisson, negative binomial, no-vig fair price, the
+    model/Onyx blend, EV;
+  - the backtest gate: picks are live only when `data/<sport>/backtest.json` says
+    `passed` for the model's current `VERSION`;
+  - an append-only ledger, `data/<sport>/picks_history.json`, where odds are recorded
+    when a play qualifies, graded off `results.json` (props off the box scores), with a
+    $10-a-pick record. `validate_build.py` guards it never-shrink, like every other
+    ledger.
+
+  Each model module carries `VERSION` and a changelog citing its evidence, and the Model
+  tab shows it.
+- **Models:**
+  - **Team sports, game lines (`team_model.py`):** offense and defense ratings by
+    weighted least squares on final scores, with a recency half-life and a ridge pull
+    to average.
+    - Football: a normal margin and total.
+    - Hockey: Poisson goals per side, with an overtime split; whole-number totals
+      handle the push.
+    - Parameters and tests live in `nfl_model.GAME_P`, `cfb_model.P` and `nhl_model.P`.
+      Each was tuned on early-season games and judged on later games it never saw.
+  - **NFL player props (`nfl_model.py` v1):** projections as before. The chances come
+    from spreads fitted to real Onyx lines.
+  - **Tennis (`tennis_model.py` v1):** Elo, K = 150/(n+5)^0.4. On 7,875 matches in
+    2026 it never saw, log loss is 0.627 and the favourite won 64.0%.
+  - **Golf:** stays "model in the lab". Onyx prices no golf market, so there is
+    nothing to test a golf model against.
+- **Backtests (`tools/sports_backtest.py`, dev only):**
+  - **Data:** historical Onyx opening and closing lines come from
+    `tools/onyx_lines_pull.py` (`odds_probe.yml`, `job=lines`) into `bt/`.
+  - **Method:** every game is priced only from results before it. The blend weight and
+    the lane (markets, edge band, price band) are chosen on the tune window and judged
+    on the test window.
+  - **Pass bar:** the blend's log loss must beat Onyx's no-vig price on the lane's
+    markets, the lane must win money at opening AND closing prices, and it needs at
+    least 30 test picks.
+  - **Output:** the result writes `backtest.json`, which the Model tab shows in plain
+    words.
+- **NFL backtest (10/26, 440 games, 14,032 player lines, 2025 tune, 2026 test):** not
+  passed.
+  - The moneyline blend beats Onyx's price (0.6549 vs 0.6577 log loss), but spreads,
+    totals and every prop market do not.
+  - No lane made money on the tune window.
+  - The NFL stays leans only, and the page says why.
+- **NBA combos:** the historical Onyx feed has no points, rebounds and assists combo
+  lines for 2025-26 (0 of 1,223 games). Combos stay on the bet card labelled "not
+  backtested" and stay out of picks and the Model's Parlay until there is a season of
+  their prices to test.
+- **Pregame gamecenter:** for football and hockey it shows:
+  - Onyx lines, plus the model's projected score and win chance;
+  - the model against every Onyx game line;
+  - player projections and more Onyx player lines (top 12; the rest are on the Board);
+  - season per-game team stats, the injury report and each team's last five.
+
+  The score ticker uses MLB's `score-game` marquee styles.
 - **Gate:** `tools/verify_sports.js` checks every page and tab at 390px and 1280px, and
   opens a gamecenter. CI runs it.
 

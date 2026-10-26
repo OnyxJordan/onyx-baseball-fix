@@ -1,8 +1,27 @@
 """
 nfl_model.py - Onyx NFL player projections.
 
-VERSION v0 (10/26). The lab notebook: every change bumps VERSION and adds an
+VERSION v1 (10/26). The lab notebook: every change bumps VERSION and adds an
 entry here citing its evidence (CLAUDE.md rule 2 applies to this model too).
+
+  v1  10/26  Game lines: team offense and defense ratings in points from
+             392 NFL finals (2025 and 2026, team_model.py), half-life 240
+             days, ridge 5, home field 2 points, margin spread 13.5 and total
+             spread 13. Tuned on 9/25-11/30/2025, judged on 199 later games
+             it never saw: win log loss 0.648 against 0.698 for the home-team
+             base rate, margin error 9.98 points, total error 10.90 against
+             11.71 for the league average.
+             Onyx price backtest (tools/sports_backtest.py, 440 games and
+             14,032 player lines, 2025 tune / 2026 test, opening prices):
+             moneyline blend log loss 0.6549 vs Onyx 0.6577 (103 games), but
+             spreads (0.6949 vs 0.6936) and totals (0.6920 vs 0.6903) lose to
+             Onyx's own price and no lane made money on the tune window. Props:
+             the projections alone lose to Onyx's line in every market even
+             with their spread widened to the best fit (2x for yards, 1.6x
+             for receptions; passing 0.707 vs 0.693, receiving 0.702 vs
+             0.693), so the projections carry no edge over the line yet. Prop
+             spreads are widened to that fit so the page's chances are honest.
+             NFL stays leans only.
 
   v0  10/26  Passing, rushing and receiving yards and receptions per player.
              proj = shrink(recency-weighted this-season mean, toward last
@@ -28,12 +47,33 @@ player-game: pass_yds, rush_yds, rec_yds, rec, tgt, att, rush_att...).
 
 from collections import defaultdict
 
-VERSION = "v0"
+VERSION = "v1"
+# game lines (team_model.py), tuned 10/26: see v1
+GAME_P = {"half_life": 240, "ridge": 5, "home": 2.0, "sd_margin": 13.5, "sd_total": 13.0, "min_games": 3}
+GAME_TEST = {"n": 199, "logloss": 0.648, "base_logloss": 0.698, "mae_total": 10.90, "base_mae_total": 11.71,
+             "window": "12/1/2025 on"}
 STATS = ("pass_yds", "rush_yds", "rec_yds", "rec")
 # who counts as having a role in a stat (per-game volume in the window used)
 ROLE = {"pass_yds": ("att", 15), "rush_yds": ("rush_att", 6), "rec_yds": ("tgt", 3), "rec": ("tgt", 3)}
 # tuned on 2025 weeks 4-18 (tune()); see the changelog for the test
 P = {"decay": 0.95, "k_prior": 1.5, "opp_w": 0.5, "opp_k": 4.0}
+
+
+# spread of the outcome around the projection, fitted 10/26 on 2025 weeks
+# 4-18 residuals by projection quartile: yards ~ Normal(proj, a + b * proj),
+# receptions ~ negative binomial with variance 1.25 x mean
+# v1: widened to the spread that fits real Onyx lines best (2x yards, 1.6x
+# receptions sd): narrower, the model was confidently wrong against the line
+PROP_SD = {"pass_yds": (160.0, 0.0), "rush_yds": (40.0, 0.54), "rec_yds": (30.0, 0.66)}
+REC_VAR = 3.2
+
+
+def prob_over(s, proj, line):
+    import sports_lab as L
+    if s == "rec":
+        return L.count_over(proj, line, REC_VAR * proj)
+    a, b = PROP_SD[s]
+    return L.normal_over(proj, a + b * proj, line)
 
 
 def _games_by_player(rows):

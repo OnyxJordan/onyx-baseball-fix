@@ -62,6 +62,10 @@ NFL, college football, NHL, tennis and golf share one engine (`sports_espn.py`,
 `sports_build.py`, `sport_shell.html`; config in `sports_common.SPORTS`). A sport shows
 **leans or "model in the lab", never tracked picks**, until its model is backtested
 against real Onyx prices, the same bar NBA and MLB cleared. Gate: `node tools/verify_sports.js`.
+That bar is code: `sports_lab.gate` turns picks on only when `data/<sport>/backtest.json`
+(written by `tools/sports_backtest.py` against historical Onyx lines) says `passed` for the
+model's current `VERSION`, so bumping a model's version sends it back to leans until it
+is re-tested. Sport ledgers (`data/<sport>/picks_history.json`) are sacred like the rest.
 
 ## Dates
 
