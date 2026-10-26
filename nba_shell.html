@@ -118,6 +118,70 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
 .chip.lean{border-color:rgba(176,56,249,.75)!important;box-shadow:0 0 0 1px rgba(176,56,249,.35),0 0 12px rgba(176,56,249,.25)}
 .chip.lean .s{color:#d795ff!important}
 .chip.against{opacity:.5}
+/* plays (recommended plays) */
+.pl-banner{background:linear-gradient(135deg,rgba(176,56,249,.16),rgba(99,91,255,.1));border:1px solid rgba(176,56,249,.35);border-radius:16px;padding:18px 20px;margin-bottom:14px}
+.pl-banner .pl-eb{font:700 11px monospace;letter-spacing:.14em;text-transform:uppercase;color:#d795ff;margin-bottom:6px}
+.pl-banner h2{margin:0 0 6px;font-size:clamp(20px,3vw,28px);font-weight:800;line-height:1.05}
+.pl-banner p{margin:0;font-size:13px;line-height:1.6;color:var(--text2);max-width:880px}
+.pl-rec-in{width:100%;display:flex;flex-wrap:wrap;align-items:center;gap:8px 26px;padding:12px 16px;margin-bottom:14px;border-radius:14px;border:1px solid var(--border2);background:var(--bg2);color:var(--text);cursor:pointer;text-align:left}
+.pl-rec-in:hover{border-color:rgba(176,56,249,.5)}
+.pl-rec-in span{display:flex;flex-direction:column}.pl-rec-in b{font:800 18px monospace}.pl-rec-in i{font-style:normal;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)}
+.pl-rec-in em{margin-left:auto;font-style:normal;font-size:12px;color:#d795ff}
+.pl-tools{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px}
+.pl-tools .seg{overflow-x:auto;max-width:100%;scrollbar-width:none}.pl-tools .seg::-webkit-scrollbar{display:none}
+.pl-top3{margin-left:auto}
+#plCards{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,520px),1fr));gap:12px}
+.pl-card{position:relative;background:var(--bg2);border:1.5px solid var(--border2);border-radius:16px;padding:14px 16px;cursor:pointer;transition:transform .2s,border-color .2s,box-shadow .2s;outline:0}
+.pl-card:hover,.pl-card:focus-visible{transform:translateY(-2px);border-color:rgba(176,56,249,.6);box-shadow:0 12px 30px rgba(0,0,0,.4)}
+.pl-card.c-g{border-color:rgba(97,233,112,.55)}.pl-card.c-b{border-color:rgba(99,91,255,.55)}
+.pl-head{display:flex;align-items:center;gap:10px}
+.pl-head .who{flex:1;min-width:0}
+.pl-rank{flex-shrink:0;width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;font:800 13px monospace;background:linear-gradient(135deg,#b038f9,#635bff);color:#fff}
+.pl-conv{flex-shrink:0;font:800 10px monospace;letter-spacing:.08em;text-transform:uppercase;padding:5px 9px;border-radius:999px;border:1px solid}
+.c-g .pl-conv{color:#61e970;border-color:rgba(97,233,112,.6);background:rgba(97,233,112,.12)}
+.c-b .pl-conv{color:#9b96ff;border-color:rgba(99,91,255,.6);background:rgba(99,91,255,.14)}
+.c-p .pl-conv{color:#d795ff;border-color:rgba(215,149,255,.5);background:rgba(215,149,255,.1)}
+.pl-call{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:12px 0 4px}
+.pl-call>div{font-size:15px;color:var(--text2)}.pl-call b{font-size:22px;font-weight:800;color:var(--text)}.pl-call small{font:700 12px monospace;color:#d795ff;margin-left:4px}
+.pl-price{flex-shrink:0;display:inline-flex;flex-direction:column;align-items:center;padding:7px 12px;border-radius:12px;border:1.5px solid #b038f9;background:rgba(176,56,249,.14);font:800 16px monospace;color:#fff;cursor:pointer}
+.pl-price i{font:700 8px monospace;font-style:normal;letter-spacing:.12em;text-transform:uppercase;color:#d795ff}
+.pl-price:hover{background:rgba(176,56,249,.28)}
+.pl-price.sm{padding:5px 9px;font-size:13px}
+.pl-moved{font-size:11px;color:var(--text3);margin-bottom:4px}
+.pl-nums{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:10px 0}
+.pl-nums div{background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:7px 9px}
+.pl-nums span{display:block;font:700 9px monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)}.pl-nums b{font:800 15px monospace}
+.pl-why{display:grid;grid-template-columns:minmax(0,1fr) 150px;gap:14px;align-items:end}
+.pl-wl{display:grid;grid-template-columns:96px 52px minmax(0,1fr);gap:8px;align-items:baseline;padding:4px 0;border-bottom:1px dashed var(--border2);font-size:12px}
+.pl-wl span{color:var(--text3)}.pl-wl b{font-family:monospace;text-align:right}.pl-wl em{font-style:normal;color:var(--text3);font-size:11px}
+.pl-wl.ok em{color:#61e970}.pl-wl.no em{color:#f87171}
+.pl-bars{position:relative;height:86px;display:flex;align-items:flex-end;gap:5px;padding-top:14px}
+.pl-bars i{flex:1;position:relative;background:rgba(255,255,255,.14);border-radius:3px 3px 0 0}
+.pl-bars i.hit{background:linear-gradient(180deg,#b038f9,#635bff)}
+.pl-bars i em{position:absolute;top:-14px;left:0;right:0;text-align:center;font:700 9px monospace;font-style:normal;color:var(--text2)}
+.pl-bars b{position:absolute;left:0;right:0;border-top:1.5px dashed #d795ff}
+.pl-bars b span{position:absolute;right:0;top:-15px;font:700 9px monospace;color:#d795ff}
+.pl-l5{margin-top:4px;text-align:center;font:700 11px monospace;color:var(--text2)}
+.pl-acts{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}.pl-acts .btn-primary,.pl-acts .btn-secondary{flex:1;min-width:140px;justify-content:center}
+.pl-res{font:800 11px monospace;letter-spacing:.06em;text-transform:uppercase;padding:6px 10px;border-radius:8px;border:1px solid var(--border2)}
+.pl-res.W{color:#61e970;border-color:rgba(97,233,112,.6)}.pl-res.L{color:#f87171;border-color:rgba(248,113,113,.6)}.pl-res.live{color:#d795ff;border-color:rgba(215,149,255,.5)}
+.pl-div{display:flex;align-items:center;gap:12px;margin:26px 0 12px}.pl-div i{flex:1;height:1px;background:var(--border2)}
+.pl-div span{font:800 10px monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);text-align:center}
+.pl-watch{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,430px),1fr));gap:8px}
+.pl-w{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;border:1px solid var(--border2);background:var(--bg2);cursor:pointer;opacity:.86;transition:opacity .2s,border-color .2s}
+.pl-w:hover{opacity:1;border-color:rgba(176,56,249,.45)}
+.pl-w .who{flex:1;min-width:0}.pl-w .sub{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pl-miss{flex-shrink:1;min-width:0;max-width:44%;font-size:11px;line-height:1.35;color:#d795ff;text-align:right}
+@media (max-width:560px){
+  .pl-nums{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .pl-why{grid-template-columns:1fr}.pl-bars{height:70px}
+  .pl-top3{margin-left:0;width:100%;justify-content:center}
+  .pl-w{flex-wrap:wrap}.pl-miss{max-width:100%;text-align:left;order:3;flex-basis:100%}
+}
+/* every pick, row and card opens the player: say so */
+.nba-card.pk-click{cursor:pointer;transition:border-color .2s,transform .2s}.nba-card.pk-click:hover{border-color:rgba(176,56,249,.55);transform:translateY(-2px)}
+#boardBody tr,tr.tr-tap{cursor:pointer}
+.pk-all{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:6px;text-align:left;color:var(--text);font:inherit;min-height:120px;border-style:dashed}.pk-all b{font-size:17px}.pk-all span{font-size:12px;color:#d795ff}#boardBody tr:hover td,tr.tr-tap:hover td{background:rgba(176,56,249,.06)}
 /* the player card: one card, two faces, flipped like a sports card */
 .pc-bg{position:fixed;inset:0;z-index:10070;background:radial-gradient(120% 80% at 50% 40%,rgba(60,20,90,.55),rgba(4,4,8,.82));backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:opacity .25s}
 .pc-bg.open{opacity:1;pointer-events:auto}
@@ -352,6 +416,8 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
   <div class="nav-tabs">
     <button class="nav-tab active" data-tab="home" onclick="gotoTab('home')">
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 6.5L8 2l6 4.5V14a1 1 0 01-1 1H3a1 1 0 01-1-1V6.5z"/><path d="M6 15V9h4v6"/></svg>Home</button>
+    <button class="nav-tab" data-tab="plays" onclick="gotoTab('plays')">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><circle cx="8" cy="8" r="3"/><circle cx="8" cy="8" r=".8" fill="currentColor"/></svg>Plays</button>
     <button class="nav-tab" data-tab="games" onclick="gotoTab('games')">
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><circle cx="8" cy="8" r="2"/></svg>Games</button>
     <button class="nav-tab" data-tab="board" onclick="gotoTab('board')">
@@ -389,6 +455,7 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
   <div class="nav-drawer-body">
     <div class="drawer-section">
       <button class="drawer-item" data-tab="home" onclick="gotoTab('home');closeNav()">Home</button>
+      <button class="drawer-item" data-tab="plays" onclick="gotoTab('plays');closeNav()">Plays</button>
       <button class="drawer-item" data-tab="games" onclick="gotoTab('games');closeNav()">Games</button>
       <button class="drawer-item" data-tab="board" onclick="gotoTab('board');closeNav()">Props Board</button>
       <button class="drawer-item" data-tab="scorers" onclick="gotoTab('scorers');closeNav()">Top Scorers</button>
@@ -442,6 +509,19 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
     </div>
   </div>
 </div>
+
+<!-- ═══ PLAYS: recommended plays, MLB Edge Plays style ═══════════ -->
+<div class="pane" id="pane-plays"><div class="nba-wrap">
+  <div class="pl-banner" id="plBanner"></div>
+  <div class="pl-rec" id="plRec"></div>
+  <div class="pl-tools">
+    <div class="seg" id="plStat"></div>
+    <div class="seg" id="plSort"></div>
+    <button class="btn-primary pl-top3" id="plTop3"></button>
+  </div>
+  <div id="plCards"></div>
+  <div id="plWatch"></div>
+</div></div>
 
 <!-- ═══ GAMES (gamecenter, MLB components) ═════════════════════ -->
 <div class="pane" id="pane-games">
@@ -928,12 +1008,13 @@ function renderTicker() {
 }
 
 // ── home ───────────────────────────────────────────────────────────
+function cardTap(e) { return !e.target.closest('.chip,.addleg,button,a,input,select,.nm[onclick]'); }
 function pickCard(k) {
   const p = playerOf(k.pid) || {name: k.name, team: k.team, opp: k.opp, gid: k.gid};
   const g = gameOf(k.gid);
   const leg = {sel: k.sel, price: k.price, gid: k.gid, market: 'player_' + STAT_NAME[k.stat].toLowerCase(),
                label: `${k.name} ${k.side === 'over' ? 'Over' : 'Under'} ${k.line} ${STAT_ABBR[k.stat]}`};
-  return `<div class="nba-card">
+  return `<div class="nba-card pk-click" onclick="if(cardTap(event))openBetCard('${esc(k.pid)}','${k.stat}')" title="Every Onyx line on ${esc(k.name)}">
     <div class="pk-top"><div class="who">${hs(p, 'm')}<div style="min-width:0">
       <div class="nm" style="cursor:pointer" onclick="openPlayer('${esc(k.pid)}')">${esc(k.name)}</div>
       <div class="sub">${logo(k.team)} ${esc(k.team)} ${p.home ? 'vs' : '@'} ${esc(k.opp)}${g ? ' · ' + tipTime(g.start) : ''}</div></div></div>
@@ -948,11 +1029,12 @@ function renderHome() {
   const picks = D.picks || [];
   document.getElementById('picksTag').textContent = 'Onyx Picks · ' + picks.length + ' today';
   document.getElementById('homePicks').innerHTML = picks.length ? picks.map(pickCard).join('')
+      + `<button class="nba-card pk-click pk-all" onclick="gotoTab('plays')"><b>See every play</b><span>Conviction, the reasons behind each pick, and the near misses ›</span></button>`
     : `<div class="empty">${(D.meta || {}).priced ? 'No play clears the bar tonight. An honest edge lane is a quiet one on most nights.' : 'Onyx prices are not posted yet for tonight. Picks appear once lines are up.'}</div>`;
   const top = (D.players || []).filter(p => !p.out).sort((a, b) => b.proj.pts - a.proj.pts).slice(0, 6);
   document.getElementById('homeScorers').innerHTML = top.map((p, i) => {
     const pr = (p.props || {}).pts;
-    return `<div class="nba-card">
+    return `<div class="nba-card pk-click" onclick="if(cardTap(event))openPlayer('${esc(p.pid)}')">
       <div class="pk-top"><div class="who">${hs(p, 'm')}<div style="min-width:0">
         <div class="nm" style="cursor:pointer" onclick="openPlayer('${esc(p.pid)}')">${i + 1}. ${esc(p.name)}</div>
         <div class="sub">${logo(p.team)} ${esc(p.team)} ${p.home ? 'vs' : '@'} ${esc(p.opp)} · ${num(p.min)} min</div></div></div>
@@ -963,6 +1045,159 @@ function renderHome() {
   }).join('') || '<div class="empty">No slate today.</div>';
 }
 
+// ── plays: the recommended plays, MLB Edge Plays style ──────────────
+// The tracked picks are the ones nba_build logged (D.picks: the lane in
+// nba_build.qualifies, odds recorded the moment a play qualified). The page
+// re-runs the same screens on every other priced line so the watchlist can
+// say exactly which screen each near miss failed. Never graded, never a pick.
+var PL = {stat: 'all', sort: 'conv'};
+function plLane() { return (D.engine || {}).lane || {min_edge: .02, max_edge: .08, signals: 2, price: [-180, 150], min_min: 24, max_gap: 1.5}; }
+// nba_build.signals, ported: form reads on the pick's side of the line
+function plReads(p, s, side, line) {
+  const over = side === 'over', out = [];
+  if (p.last_season && p.last_season[s] != null) out.push(['last season', p.last_season[s]]);
+  if (p.season && p.gp >= 2) out.push(['this season', p.season[s]]);
+  const l5 = (p.last5 || []).filter(g => (g.min || 0) > 0).map(g => g[s]);
+  if (l5.length >= 3) out.push(['last ' + l5.length, l5.reduce((a, b) => a + b, 0) / l5.length]);
+  return out.map(([k, v]) => ({k, v, ok: v !== line && (v > line) === over}));
+}
+// every screen the lane applies, in order; [] means it would qualify
+function plMisses(p, s, pr) {
+  const L = plLane(), g = gameOf(p.gid) || {}, m = [];
+  if (!pr || pr.src !== 'onyx') return ['not an Onyx line'];
+  if (g.state && g.state !== 'pre') m.push('game started');
+  if (p.out || p.inj) m.push(p.out ? 'ruled out' : 'injury tag: ' + p.inj + (p.inj_detail ? ' (' + p.inj_detail + ')' : ''));
+  if (p.min < L.min_min) m.push(`${num(p.min)} projected min, needs ${L.min_min}`);
+  if (pr.role_flag) m.push('role check: line and projection disagree on his role');
+  if (pr.price < L.price[0] || pr.price > L.price[1]) m.push(`price ${fmtOdds(pr.price)} outside ${L.price[0]} to +${L.price[1]}`);
+  if (pr.edge < L.min_edge) m.push(`edge ${pp(pr.edge)} pts, needs +${(L.min_edge * 100).toFixed(1)}`);
+  else if (pr.edge > L.max_edge) m.push(`edge ${pp(pr.edge)} pts: too big, usually news the model has not seen`);
+  if (!(pr.ev > 0)) m.push('no positive EV');
+  const n = plReads(p, s, pr.side, pr.line).filter(r => r.ok).length;
+  if (n < L.signals) m.push(`${n} of 3 form reads agree, needs ${L.signals}`);
+  return m;
+}
+// conviction ranks the screens a pick cleared; it is not a backtested hit rate
+function plConv(edge, sig, prob) {
+  const c = x => Math.max(0, Math.min(1, x));
+  const sc = .45 * c((edge - .02) / .06) + .35 * c(sig / 3) + .2 * c((prob - .5) / .15);
+  return sc >= .62 ? {t: 'Strong', i: '★', c: 'g', sc} : sc >= .45 ? {t: 'High', i: '◆', c: 'b', sc} : {t: 'Lean', i: '▲', c: 'p', sc};
+}
+function plLeg(k) {
+  return {sel: k.sel, price: k.price, gid: k.gid, pid: k.pid, stat: k.stat, side: k.side, line: k.line,
+          market: 'player_' + STAT_NAME[k.stat].toLowerCase(),
+          label: `${k.name} ${k.side === 'over' ? 'Over' : 'Under'} ${k.line} ${STAT_ABBR[k.stat]}`};
+}
+function plBars(p, s, line, side) {
+  const l5 = (p.last5 || []).slice().reverse();
+  if (!l5.length) return '';
+  const mx = Math.max(line * 1.6, ...l5.map(g => g[s]), 1);
+  return `<div class="pl-bars" title="Last ${l5.length} games vs the line">${l5.map(g => {
+    const hit = side === 'over' ? g[s] > line : g[s] < line;
+    return `<i class="${hit ? 'hit' : ''}" style="height:${Math.max(6, g[s] / mx * 100)}%"><em>${g[s]}</em></i>`;
+  }).join('')}<b style="bottom:${line / mx * 100}%"><span>${line}</span></b></div>`;
+}
+function plCard(k, i) {
+  const p = playerOf(k.pid) || {name: k.name, team: k.team, opp: k.opp, gid: k.gid, proj: {}, last5: []};
+  const g = gameOf(k.gid) || {};
+  const s = k.stat, over = k.side === 'over';
+  const reads = plReads(p, s, k.side, k.line);
+  const sig = k.signals != null ? k.signals : reads.filter(r => r.ok).length;
+  const cv = plConv(k.edge, sig, k.prob);
+  const ev = k.prob * decOf(k.price) - 1;
+  const cur = (((p.props || {})[s] || {}).all || {})[k.side];
+  const moved = cur && ((p.props || {})[s] || {}).line === k.line && cur.price !== k.price ? cur.price : null;
+  const l5 = (p.last5 || []).filter(x => (x.min || 0) > 0).map(x => x[s]);
+  const l5hit = l5.filter(v => over ? v > k.line : v < k.line).length;
+  const proj = k.proj != null ? k.proj : (p.proj || {})[s];
+  const leg = plLeg(k), li = regLeg(leg);
+  const res = k.result ? `<span class="pl-res ${esc(k.result)}">${k.result === 'W' ? 'Won' : k.result === 'L' ? 'Lost' : k.result === 'P' ? 'Push' : 'Void'}${k.actual != null ? ' · ' + k.actual : ''}</span>`
+    : g.state === 'in' ? '<span class="pl-res live">Live</span>' : g.state === 'post' ? '<span class="pl-res live">Final, grading</span>' : '';
+  return `<article class="pl-card c-${cv.c}" onclick="openBetCard('${esc(k.pid)}','${s}')" tabindex="0" onkeydown="if(event.key==='Enter')openBetCard('${esc(k.pid)}','${s}')">
+    <div class="pl-head">
+      <span class="pl-rank">${i + 1}</span>
+      <div class="who">${hs(p, 'm')}<div style="min-width:0"><div class="nm">${esc(k.name)}</div>
+        <div class="sub">${logo(k.team)} ${esc(k.team)} ${p.home ? 'vs' : '@'} ${esc(k.opp)}${g.start ? ' · ' + tipTime(g.start) : ''}</div></div></div>
+      <span class="pl-conv">${cv.i} ${cv.t}</span>
+    </div>
+    <div class="pl-call"><div><b>${over ? 'Over' : 'Under'} ${k.line}</b> ${STAT_NAME[s]} <small>proj ${num(proj)}</small></div>
+      <span class="pl-price" onclick="event.stopPropagation();betLeg(${li})">${fmtOdds(k.price)}<i>Onyx</i></span></div>
+    ${moved != null ? `<div class="pl-moved">Logged at ${fmtOdds(k.price)} when it qualified · Onyx now ${fmtOdds(moved)}</div>` : ''}
+    <div class="pl-nums">
+      <div><span>Win chance</span><b>${pct(k.prob, 1)}</b></div>
+      <div><span>Onyx implied</span><b>${pct(k.implied, 1)}</b></div>
+      <div><span>Edge</span><b class="edge-pos">${pp(k.edge)}</b></div>
+      <div><span>EV per $10</span><b class="${moneyCls(ev)}">${money(10 * ev)}</b></div>
+    </div>
+    <div class="pl-why">
+      <div class="pl-why-l">
+        <div class="pl-wl"><span>Projection</span><b>${num(proj)}</b><em>${proj != null ? (Math.abs(proj - k.line)).toFixed(1) + (proj > k.line ? ' over' : ' under') + ' the line' : ''}</em></div>
+        ${reads.map(r => `<div class="pl-wl ${r.ok ? 'ok' : 'no'}"><span>${esc(r.k)}</span><b>${num(r.v)}</b><em>${r.ok ? '✓ ' + (over ? 'over' : 'under') : '✗ other side'}</em></div>`).join('')}
+        <div class="pl-wl"><span>Minutes</span><b>${num(p.min)}</b><em>${p.usg != null ? 'usage ' + num(p.usg) + '%' : ''}${p.b2b ? ' · back-to-back' : ''}</em></div>
+      </div>
+      <div class="pl-why-r">${plBars(p, s, k.line, k.side)}<div class="pl-l5">${l5.length ? `${l5hit} of ${l5.length} ${over ? 'over' : 'under'} ${k.line}` : 'no games yet'}</div></div>
+    </div>
+    <div class="pl-acts">
+      <button class="btn-secondary" onclick="event.stopPropagation();slipToggle(${li})">${inSlip(k.sel) ? '✓ In your parlay' : '+ Add to parlay'}</button>
+      <button class="btn-primary" onclick="event.stopPropagation();track('onyx_click',{link_type:'single',source:'plays',selection:LEGS[${li}].label});window.open(shareUrl([LEGS[${li}].sel]),'_blank','noopener')">⚡ Bet on Onyx</button>
+      ${res}
+    </div>
+  </article>`;
+}
+function renderPlays() {
+  const L = plLane(), picks = (D.picks || []).slice();
+  const date = D.date ? new Date(D.date + 'T12:00:00').toLocaleDateString('en-US', {month: 'short', day: 'numeric'}) : '';
+  document.getElementById('plBanner').innerHTML = `<div class="pl-eb">Onyx Picks · ${esc(date)}</div>
+    <h2>Where the model beats the Onyx line</h2>
+    <p>Tracked picks clear every screen: an edge of +${(L.min_edge * 100).toFixed(0)} to +${(L.max_edge * 100).toFixed(0)} points over the Onyx price, priced ${L.price[0]} to +${L.price[1]},
+      ${L.min_min}+ projected minutes, at least ${L.signals} of 3 form reads on the same side, and no role mismatch. Odds are logged the moment a play qualifies, locked at tip and graded off the box score. Tap any play for every line on him.</p>`;
+  const R = D.record || {};
+  document.getElementById('plRec').innerHTML = `<button class="pl-rec-in" onclick="gotoTab('record')">
+    <span><b>${R.w || 0}-${R.l || 0}${R.p ? '-' + R.p : ''}</b><i>Record</i></span>
+    <span><b class="${moneyCls(R.dollars || 0)}">${money(R.dollars || 0)}</b><i>$10 on every pick</i></span>
+    <span><b class="${moneyCls(R.roi || 0)}">${R.roi != null ? (R.roi > 0 ? '+' : '') + (R.roi * 100).toFixed(1) + '%' : '-'}</b><i>ROI</i></span>
+    <span><b>${R.pending || 0}</b><i>Pending</i></span><em>Full record ›</em></button>`;
+  const stats = [['all', 'All'], ['pts', 'Points'], ['reb', 'Rebounds'], ['ast', 'Assists']];
+  document.getElementById('plStat').innerHTML = stats.map(([k, t]) => `<button class="${PL.stat === k ? 'on' : ''}" onclick="PL.stat='${k}';renderPlays()">${t}</button>`).join('');
+  const sorts = [['conv', 'Conviction'], ['edge', 'Edge'], ['ev', 'EV'], ['tip', 'Tip time']];
+  document.getElementById('plSort').innerHTML = sorts.map(([k, t]) => `<button class="${PL.sort === k ? 'on' : ''}" onclick="PL.sort='${k}';renderPlays()">${t}</button>`).join('');
+  const conv = k => plConv(k.edge, k.signals != null ? k.signals : 2, k.prob).sc;
+  const key = {conv: k => -conv(k), edge: k => -k.edge, ev: k => -(k.prob * decOf(k.price) - 1),
+               tip: k => ((gameOf(k.gid) || {}).start || '')};
+  const shown = picks.filter(k => PL.stat === 'all' || k.stat === PL.stat)
+    .sort((a, b) => { const x = key[PL.sort](a), y = key[PL.sort](b); return x > y ? 1 : x < y ? -1 : 0; });
+  const open = shown.filter(k => !k.result && (gameOf(k.gid) || {}).state !== 'post');
+  const top3 = open.slice(0, 3);
+  const t3 = document.getElementById('plTop3');
+  t3.style.display = top3.length >= 2 ? '' : 'none';
+  t3.textContent = `+ Add top ${top3.length} to parlay`;
+  t3.onclick = () => { top3.forEach(k => slipAdd(plLeg(k))); parlayMode = true; document.body.classList.add('parlay-armed'); slipSave(); renderParlaySlip(); renderPlays(); };
+  document.getElementById('plCards').innerHTML = shown.length ? shown.map(plCard).join('')
+    : `<div class="empty">${picks.length ? 'No picks in this market tonight.' : (D.meta || {}).priced
+        ? 'No play clears every screen tonight. An honest edge lane is a quiet one on most nights: the near misses are below.'
+        : 'Onyx prices are not posted yet for tonight. Plays appear once lines are up.'}</div>`;
+  // the watchlist: the best other priced lines, and the screen each one missed
+  const have = new Set(picks.map(k => k.pid + ':' + k.stat));
+  const near = [];
+  (D.players || []).forEach(p => Object.entries(p.props || {}).forEach(([st, pr]) => {
+    // rotation players only: a 12-minute bench line is not a near miss
+    if (have.has(p.pid + ':' + st) || (PL.stat !== 'all' && st !== PL.stat) || !pr || pr.edge <= 0 || p.out || p.min < 18) return;
+    near.push({p, st, pr, miss: plMisses(p, st, pr)});
+  }));
+  // closest to qualifying first: fewest failed screens, then the bigger edge
+  near.sort((a, b) => a.miss.length - b.miss.length || b.pr.edge - a.pr.edge);
+  const W = near.slice(0, 8);
+  document.getElementById('plWatch').innerHTML = W.length ? `<div class="pl-div"><i></i><span>Watchlist · near misses · not picks · not graded</span><i></i></div>
+    <div class="pl-watch">${W.map(w => {
+      const leg = propLeg(w.p, w.st, w.pr.side), li = leg ? regLeg(leg) : -1;
+      return `<div class="pl-w" onclick="openBetCard('${esc(w.p.pid)}','${w.st}')" tabindex="0">
+        <div class="who">${hs(w.p, 's')}<div style="min-width:0"><div class="nm">${esc(w.p.name)}</div>
+          <div class="sub">${w.pr.side === 'over' ? 'Over' : 'Under'} ${w.pr.line} ${STAT_ABBR[w.st]} · proj ${num(w.p.proj[w.st])} · edge ${pp(w.pr.edge)}</div></div></div>
+        <span class="pl-miss">${esc(w.miss[0] || 'clears the screens; slate or game cap reached')}</span>
+        ${li >= 0 ? `<span class="pl-price sm" onclick="event.stopPropagation();betLeg(${li})">${fmtOdds(w.pr.price)}</span>` : ''}
+      </div>`;
+    }).join('')}</div>` : '';
+}
 // ── board ──────────────────────────────────────────────────────────
 var boardStat = 'pts', boardSort = {k: 'proj', dir: -1};
 function setStat(s) {
@@ -999,7 +1234,7 @@ function renderBoard() {
   document.getElementById('boardBody').innerHTML = rows.map(p => {
     const pr = (p.props || {})[s];
     const diff = pr ? p.proj[s] - pr.line : null;
-    return `<tr>
+    return `<tr onclick="if(cardTap(event))${pr ? `openBetCard('${esc(p.pid)}','${s}')` : `openPlayer('${esc(p.pid)}')`}">
       <td><div class="who">${hs(p, 's')}<div style="min-width:0">
         <div class="nm" style="cursor:pointer" onclick="openPlayer('${esc(p.pid)}')">${esc(p.name)}${p.inj ? ` <span class="tagx r">${esc(p.inj)}</span>` : ''}</div>
         <div class="sub">${logo(p.team)} ${esc(p.team)} ${p.home ? 'vs' : '@'} ${esc(p.opp)}${p.b2b ? ' · B2B' : ''}</div></div></div></td>
@@ -1024,7 +1259,7 @@ function renderScorers() {
   const max = rows.length ? rows[0].proj.pts : 1;
   document.getElementById('scorerBody').innerHTML = rows.map((p, i) => {
     const pr = (p.props || {}).pts;
-    return `<tr>
+    return `<tr class="tr-tap" onclick="if(cardTap(event))${pr ? `openBetCard('${esc(p.pid)}','pts')` : `openPlayer('${esc(p.pid)}')`}">
       <td class="mono dim hm">${i + 1}</td>
       <td><div class="who">${hs(p, 's')}<div style="min-width:0">
         <div class="nm" style="cursor:pointer" onclick="openPlayer('${esc(p.pid)}')">${esc(p.name)}${p.inj ? ` <span class="tagx r">${esc(p.inj)}</span>` : ''}</div>
@@ -1207,7 +1442,7 @@ function boxView(g, box) {
     return `<div class="gc-card"><div class="box-team">${logo(ab)} ${esc(TEAM_NICK[ab] || ab)}</div>
       <table class="gc-line"><thead><tr><th>Player</th><th>MIN</th><th>PTS</th><th>REB</th><th>AST</th></tr></thead><tbody>
       ${ps.map(p => { const b = liveLine(p, box);
-        return `<tr><td style="cursor:pointer" onclick="openPlayer('${esc(p.pid)}')">${esc(p.name)}${p.inj ? ` <span class="tagx r">${esc(p.inj)}</span>` : ''}</td>
+        return `<tr class="tr-tap" onclick="if(cardTap(event))openPlayer('${esc(p.pid)}')"><td>${esc(p.name)}${p.inj ? ` <span class="tagx r">${esc(p.inj)}</span>` : ''}</td>
           <td>${b ? b.min : '-'}<div class="prop-trk">${num(p.min, 0)}</div></td>${cell(p, b, 'pts')}${cell(p, b, 'reb')}${cell(p, b, 'ast')}</tr>`; }).join('')}
       </tbody></table></div>`;
   };
@@ -1920,7 +2155,7 @@ function bcUpdate(scrollRung) {
 }
 // ── tabs ───────────────────────────────────────────────────────────
 var currentTab = 'home';
-var RENDER = {home: renderHome, games: renderGames, board: renderBoard, scorers: renderScorers, record: renderRecord, model: renderModel};
+var RENDER = {home: renderHome, plays: renderPlays, games: renderGames, board: renderBoard, scorers: renderScorers, record: renderRecord, model: renderModel};
 
 // ── Model tab: reads the live weights from D.engine (nba_build.engine_card) ──
 // Evidence and history are the lab notebook (nba_model.py CHANGELOG) in plain
@@ -2040,7 +2275,7 @@ function renderModel() {
 
   const U = (D.players || []).filter(p => !p.out && p.usg && p.min >= 20).sort((a, b) => b.usg - a.usg).slice(0, 15);
   document.getElementById('engUsage').innerHTML = U.length ? `<thead><tr><th>Player</th><th>USG%</th><th>Util%</th><th>Proj min</th><th>+/- per game</th><th>Proj PTS</th></tr></thead><tbody>`
-    + U.map(p => `<tr><td style="cursor:pointer" onclick="openPlayer('${esc(p.pid)}')">${esc(p.name)} <span class="dim">${esc(p.team)}</span></td><td class="mono"><b>${num(p.usg)}</b></td><td class="mono">${num(p.util)}</td>
+    + U.map(p => `<tr class="tr-tap" onclick="if(cardTap(event))openPlayer('${esc(p.pid)}')"><td>${esc(p.name)} <span class="dim">${esc(p.team)}</span></td><td class="mono"><b>${num(p.usg)}</b></td><td class="mono">${num(p.util)}</td>
       <td class="mono">${num(p.min)}</td><td class="mono">${p.season && p.season.pm != null ? sgn(p.season.pm) : '-'}</td><td class="mono">${num(p.proj.pts)}</td></tr>`).join('') + '</tbody>'
     : '<tbody><tr><td>Usage appears once players have box scores this season.</td></tr></tbody>';
 

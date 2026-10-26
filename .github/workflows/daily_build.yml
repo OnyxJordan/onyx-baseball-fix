@@ -76,6 +76,19 @@ jobs:
         run: python3 nba_build.py
         continue-on-error: true
         timeout-minutes: 3
+      # Onyx Sports pages beyond MLB and NBA (sport_shell.html, one engine):
+      # each sport reads and writes only data/<sport>/ and <sport>.html, and
+      # the step is continue-on-error, so no sport can block MLB, NBA or
+      # another sport. sports_espn.py refreshes the slate (and the NFL box
+      # scores the model reads); sports_build.py builds the page.
+      - name: Sports pages (NFL, college football, NHL, tennis, golf)
+        run: |
+          for s in nfl cfb nhl tennis golf; do
+            python3 sports_espn.py $s || echo "::warning::$s slate failed"
+            python3 sports_build.py $s || echo "::warning::$s build failed"
+          done
+        continue-on-error: true
+        timeout-minutes: 12
       # ROADMAP Phase 2, finally built. Blocks the commit when the page is
       # structurally broken, a batting slot is duplicated or missing, or a
       # graded ledger shrank. A non-zero exit here means yesterday's page stays
@@ -88,7 +101,7 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -A data index.html nba.html
+          git add -A data index.html nba.html nfl.html cfb.html nhl.html tennis.html golf.html
           git commit -m "Daily build $(date -u +%Y-%m-%d)" || echo "nothing to commit"
           # survive races with sibling runs/PR merges: rebase + retry,
           # preferring OUR freshly built files on any conflict

@@ -377,6 +377,47 @@ so old links and the pipeline are unchanged.
 - **`verify_pwa.js`** also checks the hub at 320px and 393px: manifest, status bar,
   header, all seven sports, no sideways scroll, and that the wordmark draws.
 
+## Onyx Sports pages: NFL, college football, NHL, tennis, golf (10/26)
+
+One engine, one template, one config per sport (`sports_common.SPORTS`). Each sport reads
+and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
+`continue-on-error`, so no sport can block MLB, NBA or another sport.
+
+- **Pipeline:**
+  - `sports_espn.py <sport>` writes `slate.json` in one shape for every sport. Team
+    sports fill `games`; tennis fills `events` with their singles matches; golf fills
+    `events` with the leaderboard.
+  - For the NFL it also reads every final box score once into `player_games.json`. The
+    first run backfills last season, which is the model's prior.
+  - `sports_build.py <sport>` builds the page from `sport_shell.html`. It injects the MLB
+    stylesheet (like `nba_build.py`), the sport key (`window.OX_SITE`, which `ui.js`
+    reads for the bar, menu, search and footer) and `SD`.
+- **Template:** Home, Games, Onyx Board, Plays and Model tabs. The page polls ESPN's
+  scoreboard live: every 15s while anything is live, otherwise every 30s. Gamecenters
+  by kind:
+  - **Football:** the field with the ball spot, line of scrimmage and first-down marker,
+    down and distance, win probability, scoring plays, drives, team stats and leaders.
+    All from ESPN's `summary`.
+  - **Hockey:** by-period scores, goals and team stats.
+  - **Tennis:** live and finished singles matches by tournament, set scores and who is
+    serving.
+  - **Golf:** a searchable leaderboard with every round.
+- **Onyx prices:** `odds.json` per sport, written by the coming `sports_odds.py`. The
+  Board says the feed is being wired until then, and never shows another book.
+  `tools/onyx_markets_probe.py` (the manual `odds_probe.yml` workflow) reports what
+  the Onyx book prices per sport, so each fetcher is built against real markets.
+- **NFL model (`nfl_model.py`, v0):**
+  - **Covers:** passing, rushing and receiving yards, and receptions.
+  - **Projection:** a recency-weighted season mean, shrunk toward last season, times a
+    regressed opponent factor.
+  - **Test:** `test()` re-runs on every build against the season average and the last-3
+    average, on games the model never saw. The page shows the numbers.
+  - **Status:** leans only. No tracked picks until a backtest against real Onyx NFL
+    prices passes, and until there is an injury feed.
+- **Other sports:** "model in the lab", with the plan on the page.
+- **Gate:** `tools/verify_sports.js` checks every page and tab at 390px and 1280px, and
+  opens a gamecenter. CI runs it.
+
 ## Frontend (`shell.html`, ~7,000 lines)
 
 Brand: purple leads (hub palette — Purple 400 `#B038F9` on Onyx `#0C0C0C`, Titanium
@@ -492,6 +533,21 @@ play (ESPN publishes no NBA possession field), last play and play-by-play.
 Headshot rings judge the model's lean: overs go green once they clear, unders
 stay lilac until the final then go green, red the moment an under is beaten.
 
+**Plays tab (NBA).** The recommended plays, built like MLB's Edge Plays. Tracked picks
+(`D.picks`, logged by `nba_build`) are ranked cards with:
+- a conviction badge. It ranks the screens a pick cleared (edge, form reads, win chance)
+  and is not a backtested hit rate.
+- the logged price, plus Onyx's current price when it has moved;
+- win chance, implied, edge and EV per $10;
+- the form reads with ✓/✗, and the last games charted against the line;
+- Add to parlay and Bet on Onyx buttons.
+
+Tapping a card opens the player's bet card on that market. Below a divider, the watchlist
+re-runs `qualifies()`'s screens in the page (`plMisses`) on every other priced line for
+rotation players. It ranks them by fewest failed screens and names the screen each one
+missed. They are never picks and never graded. Home pick cards, scorer cards, and Props
+Board, Top Scorers and box rows are all tappable through to the player.
+
 **Player card (NBA).** One card with two faces that flips like a video-game
 sports card (`pcOpen` / `pcFlip` in `nba_shell.html`; Player | Bets toggle,
 sideways swipe, or F). A name opens the **Player** face (projection, why
@@ -581,6 +637,8 @@ why a local `auto_build.py` still produces a full board.
 | `shell.html` | hand-tuned template — **never regenerate** |
 | `index.html` | the built page (generated every run; never hand-edit) |
 | `home.html` | Onyx Sports hub, the PWA start page (static, hand-edited) |
+| `sport_shell.html`, `sports_*.py`, `nfl_model.py` | NFL, college football, NHL, tennis and golf pages: one template, one engine; `data/<sport>/` |
+| `nfl.html` … `golf.html` | built sport pages (generated every run; never hand-edit) |
 | `onyx.css`, `onyx.js` | Onyx design layer and raster art, shared by every page |
 | `model.py` | v41 HR model + pitcher K projections; changelog at top is the lab notebook |
 | `career_db.json`, `pitcher_db.json` | canonical hitter/pitcher DBs — **never regenerate** outside `rebuild.yml` |

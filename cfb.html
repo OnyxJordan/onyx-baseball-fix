@@ -1,0 +1,2288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>ONYX COLLEGE FOOTBALL</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0c0c0c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<!-- solid "black": the installed app starts below the status bar (see shell.html, 10/25) -->
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Onyx Sports">
+<script>window.OX_SITE = 'cfb';</script>
+<!-- shared app shell: bottom menu, search, toasts, status-bar fix (ui.js) -->
+<script src="ui.js" defer></script>
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="preconnect" href="https://site.api.espn.com" crossorigin>
+<meta property="og:title" content="Onyx COLLEGE FOOTBALL">
+<!-- sport_shell.html: one template for every Onyx Sports page beyond MLB and
+     NBA (NFL, college football, NHL, tennis, golf). sports_build.py injects
+     the MLB stylesheet (one design system), the sport's data and its key. -->
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{overflow-x:hidden}
+:root{--sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px);
+  /* Onyx brand hub palette: Onyx 800 ground, neutral surfaces, Titanium
+     text, Purple 400 leads, Seed greens, Blue 400 + Purple 200 accents.
+     Spark (yellow) is deliberately absent - not used on this site. */
+  --bg:        #0c0c0c;
+  --bg2:       #121212;
+  --bg3:       #151515;
+  --bg4:       #191919;
+  --bg5:       #1f1f1f;
+  --border:    #222225;
+  --border2:   #2c2c30;
+  --border3:   #38383c;
+  --text:      #fcfcfc;
+  --text2:     #9b9b9b;
+  --text3:     #6e6e72;
+  /* Real logo colors */
+  --logo-purple: #b038f9;
+  --logo-blue:   #635bff;
+  /* Seed accent — the brand green */
+  --green:     #61e970;
+  --green2:    #00b000;
+  --green3:    #00b000;
+  --green-dim: rgba(97,233,112,.12);
+  --green-glow:rgba(97,233,112,.06);
+  /* Other semantic */
+  --red:       #ef4444;
+  --red-dim:   rgba(239,68,68,.12);
+  --gold:      #d795ff;   /* Purple 200 carries every old amber accent */
+  --gold-dim:  rgba(215,149,255,.14);
+  --blue-acc:  #635bff;
+  --blue-dim:  rgba(99,91,255,.12);
+  /* Brand gradient - Purple 400 to Blue 400 to Seed 400 */
+  --brand-grad: linear-gradient(90deg, #b038f9 0%, #635bff 50%, #61e970 100%);
+  --brand-grad-diag: linear-gradient(135deg, #b038f9 0%, #635bff 60%, #61e970 100%);
+}
+
+html{scroll-behavior:smooth;background:var(--bg)}
+body{color:var(--text);font-family:'Space Grotesk',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:14px;min-height:100vh;overflow-x:hidden;max-width:100vw}
+.mono{font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace}
+
+/* ── NAV ─────────────────────────────────────────────────────── */
+.nav{
+  /* installed PWA draws under the status bar / Dynamic Island: the
+     safe-area inset pushes the header (and its tap targets) below it */
+  height:calc(58px + var(--sat));
+  padding:var(--sat) 20px 0;
+  display:flex;align-items:center;gap:0;
+  background:rgba(12,12,12,.92);
+  border-bottom:1px solid rgba(255,255,255,.06);
+  position:sticky;top:0;z-index:200;
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  box-shadow:0 1px 0 rgba(255,255,255,.03),0 4px 32px rgba(0,0,0,.5);
+}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0;margin-right:28px}
+.logo-svg{width:34px;height:34px;flex-shrink:0}
+.logo-words{line-height:1}
+.logo-onyx{font-size:16px;font-weight:800;letter-spacing:.06em;color:var(--text)}
+.logo-sub{font-size:9px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:#d795ff;margin-top:1px}
+.nav-tabs{display:flex;gap:0;flex:1}
+.nav-tab{
+  height:58px;display:flex;align-items:center;gap:7px;
+  padding:0 16px;font-size:13px;font-weight:500;
+  color:var(--text3);cursor:pointer;
+  border-bottom:2px solid transparent;
+  transition:all .15s;white-space:nowrap;background:none;border-top:none;border-left:none;border-right:none;
+}
+.nav-tab:hover{color:var(--text2)}
+.nav-tab.active{color:var(--text);border-bottom-color:var(--neon-green);text-shadow:0 0 12px rgba(0,255,136,.3)}
+.nav-tab svg{width:15px;height:15px;opacity:.7}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:12px}
+.nav-date{font-size:11px;font-weight:500;letter-spacing:.06em;color:var(--text3);font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace}
+.nav-badge{
+  background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.2);
+  color:var(--neon-green);padding:3px 10px;border-radius:20px;
+  font-size:10px;font-weight:700;font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;
+  letter-spacing:.04em;
+  box-shadow:0 0 12px rgba(0,255,136,.12);
+  text-shadow:0 0 8px rgba(0,255,136,.4);
+}
+
+/* ── BRAND LINE ───────────────────────────────────────────────── */
+.brand-line{height:1px;background:linear-gradient(90deg,transparent 0%,#635bff 20%,#61e970 50%,#b038f9 80%,transparent 100%);opacity:.9}
+
+/* ── SEARCH ───────────────────────────────────────────────────── */
+.search-bar{
+  padding:10px 20px;background:var(--bg2);
+  border-bottom:1px solid var(--border);
+}
+.search-inner{
+  display:flex;align-items:center;gap:10px;
+  background:var(--bg3);border:1px solid var(--border);border-radius:8px;
+  padding:9px 14px;transition:border-color .15s;max-width:520px;
+}
+.search-inner:focus-within{border-color:var(--border3)}
+.search-inner svg{width:14px;height:14px;color:var(--text3);flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2}
+.search-inner input{
+  background:none;border:none;outline:none;
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:13px;color:var(--text);width:100%;
+}
+.search-inner input::placeholder{color:var(--text3)}
+
+/* ── PANE SYSTEM ─────────────────────────────────────────────── */
+.pane{display:none;animation:fadeUp .2s ease}
+.pane.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── SECTION HEADER ──────────────────────────────────────────── */
+.sec-hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 20px 10px;
+}
+.sec-title{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)}
+.sec-count{font-size:12px;font-weight:400;color:var(--text3);font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace}
+
+/* ── TEAM LOGO BADGE ─────────────────────────────────────────── */
+.team-badge{
+  width:32px;height:32px;border-radius:8px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;font-size:9px;font-weight:700;
+  overflow:hidden;position:relative;
+}
+.team-badge-sm{width:24px;height:24px;border-radius:6px;font-size:8px}
+.team-badge-lg{width:38px;height:38px;border-radius:9px;font-size:10px}
+
+/* ── HR TARGET CARDS ─────────────────────────────────────────── */
+.targets-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(296px,1fr));
+  gap:8px;padding:0 20px 12px;
+}
+.tcard{
+  background:var(--bg2);border:1px solid var(--border);border-radius:10px;
+  padding:13px 14px;cursor:pointer;transition:border-color .15s, box-shadow .15s;
+  position:relative;overflow:hidden;
+}
+.tcard::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:var(--brand-grad);opacity:0;transition:opacity .2s;
+}
+.tcard:hover{border-color:var(--border3);box-shadow:0 0 0 1px rgba(97,233,112,.08)}
+.tcard:hover::after{opacity:1}
+
+.tc-row1{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
+.tc-badge{
+  display:flex;align-items:center;justify-content:center;
+  width:38px;height:38px;border-radius:9px;flex-shrink:0;
+  font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;font-size:10px;font-weight:700;
+  overflow:hidden;
+}
+.tc-meta{flex:1;min-width:0}
+.tc-name{font-size:14px;font-weight:700;line-height:1.2;color:var(--text)}
+.tc-sub{font-size:11px;color:var(--text3);margin-top:2px}
+.tc-pct-wrap{text-align:right;flex-shrink:0}
+.tc-pct{font-size:24px;font-weight:800;line-height:1;font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace}
+.tc-grade{font-size:9px;font-weight:700;letter-spacing:.08em;text-align:right;margin-top:2px;text-transform:uppercase}
+
+/* Pitcher strip */
+.tc-pitcher{
+  display:flex;align-items:center;gap:7px;
+  background:var(--bg4);border:1px solid var(--border);border-radius:7px;
+  padding:7px 10px;margin-bottom:8px;
+}
+.tc-p-name{font-size:12px;font-weight:600;color:var(--text2);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hand-pill{
+  padding:1px 6px;border-radius:4px;
+  font-size:10px;font-weight:700;font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;flex-shrink:0;
+}
+.lhp{background:rgba(99,91,255,.2);color:#9d96ff}
+.rhp{background:rgba(176,56,249,.2);color:#d070ff}
+.tc-p-hr9{font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;font-size:11px;flex-shrink:0}
+.tc-p-era{font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;font-size:10px;color:var(--text3);flex-shrink:0}
+
+/* Stats row */
+.tc-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:8px}
+.tc-s{background:var(--bg4);border-radius:6px;padding:6px 8px;text-align:center}
+.tc-s-val{font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;font-size:13px;font-weight:700;line-height:1}
+.tc-s-lbl{font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-top:2px}
+
+/* Bottom row */
+.tc-bot{display:flex;align-items:center;justify-content:space-between;padding-top:8px;border-top:1px solid var(--border)}
+.tc-dfs{display:flex;gap:5px}
+.dfs-chip{
+  padding:2px 7px;border-radius:4px;
+  font-size:10px;font-weight:700;font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;
+}
+.dk{background:rgba(99,91,255,.15);color:#60a5fa}
+.ap{background:var(--green-dim);color:var(--green)}
+.tc-env{display:flex;align-items:center;gap:5px}
+.wind-chip{
+  padding:1px 7px;border-radius:4px;
+  font-size:10px;font-weight:700;font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;
+}
+.wout{background:rgba(97,233,112,.15);color:#4ade80}
+.win{background:rgba(239,68,68,.15);color:#f87171}
+.wcross{background:rgba(255,255,255,.07);color:var(--text3)}
+.wdome{background:rgba(255,255,255,.05);color:var(--text3)}
+.env-mult{font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;font-size:10px;font-weight:600}
+
+/* ── GAME CARD (Onyx odds layout) ────────────────────────────── */
+.games-wrap{padding:0 20px 24px}
+.odds-col-hdr{
+  display:grid;grid-template-columns:1fr 100px 110px 90px;
+  padding:6px 14px;
+  font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--text3);border-bottom:1px solid var(--border);
+}
+.game-card{
+  border:1px solid var(--border);border-radius:10px;
+  overflow:hidden;margin-bottom:8px;
+  transition:border-color .15s;
+}
+.game-card:hover{border-color:var(--border2)}
+
+.game-hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 14px;background:var(--bg3);border-bottom:1px solid var(--border);
+}
+.game-time{font-size:11px;font-weight:600;letter-spacing:.04em;color:var(--text3);font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace}
+.game-pills{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.gpill{
+  padding:2px 8px;border-radius:4px;
+  font-size:10px;font-weight:700;font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;
+}
+.gpill-ou{background:rgba(99,91,255,.15);color:#60a5fa}
+.gpill-venue{background:rgba(255,255,255,.06);color:var(--text3);font-weight:500}
+.gpill-env{font-weight:700}
+
+.team-row{
+  display:grid;grid-template-columns:1fr 120px 130px 110px;
+  padding:11px 14px;border-bottom:1px solid rgba(26,37,53,.7);
+  align-items:center;cursor:pointer;transition:background .12s;
+}
+.team-row:last-of-type{border-bottom:none}
+.team-row:hover{background:rgba(255,255,255,.02)}
+.team-row.home{background:rgba(255,255,255,.01)}
+
+.tr-info{display:flex;align-items:center;gap:10px;min-width:0}
+.tr-text{min-width:0;overflow:hidden}
+.tr-name,.tr-pitcher,.tr-top{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tr-text{min-width:0}
+.tr-name{font-size:13px;font-weight:700;line-height:1.2}
+.tr-pitcher{font-size:11px;color:var(--text3);margin-top:2px}
+.tr-top{font-size:11px;color:var(--text3);margin-top:2px}
+.tr-top strong{color:var(--text2)}
+
+.odds-val{text-align:center}
+.odds-main{font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;font-size:13px;font-weight:700;color:var(--text)}
+.odds-sub{font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;font-size:11px;color:var(--text3);margin-top:1px}
+
+.ml-pill{
+  padding:6px 0;border-radius:7px;text-align:center;
+  font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;font-size:13px;font-weight:800;
+  min-width:72px;display:inline-block;
+}
+.ml-fav{background:rgba(97,233,112,.12);border:1px solid rgba(97,233,112,.2);color:#4ade80}
+.ml-dog{background:var(--bg4);border:1px solid var(--border);color:var(--text2)}
+
+.game-more{
+  padding:7px 14px;text-align:right;font-size:11px;color:var(--text3);
+  background:var(--bg3);border-top:1px solid var(--border);cursor:pointer;
+  transition:color .12s;
+}
+.game-more:hover{color:var(--green)}
+
+/* ── RANKINGS TABLE ──────────────────────────────────────────── */
+.rank-filters{display:flex;gap:6px;padding:10px 20px;flex-wrap:wrap}
+.rfchip{
+  padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;
+  background:var(--bg3);border:1px solid var(--border);color:var(--text3);
+  cursor:pointer;transition:all .15s;white-space:nowrap;
+}
+.rfchip:hover{color:var(--text2)}
+.rfchip.active{background:var(--green-dim);border-color:rgba(97,233,112,.3);color:var(--green)}
+.rfchip.game-active{background:rgba(99,91,255,.1);border-color:rgba(99,91,255,.25);color:#60a5fa}
+
+.rank-wrap{padding:0 20px 24px}
+.rank-scroll{overflow:auto;max-height:calc(100vh - 220px);border-radius:8px;border:1px solid var(--border)}
+.rank-table{width:100%;border-collapse:collapse;table-layout:fixed}
+.rank-table th{
+  padding:7px 8px;text-align:right;
+  font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--text3);border-bottom:1px solid var(--border);
+  cursor:pointer;user-select:none;white-space:nowrap;overflow:hidden;
+  background:var(--bg2);position:sticky;top:0;z-index:5;
+}
+.rank-table th:first-child,.rank-table th:nth-child(2),.rank-table th:nth-child(4){text-align:left}
+.rank-table th:hover{color:var(--text2)}
+.rank-table th.asc::after{content:' ↑';color:var(--green)}
+.rank-table th.desc::after{content:' ↓';color:var(--green)}
+.rank-table td{padding:7px 8px;border-bottom:1px solid rgba(26,37,53,.5);vertical-align:middle;text-align:right;overflow:hidden;white-space:nowrap}
+.rank-table tr:hover td{background:rgba(255,255,255,.025)!important}
+.rn{font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;font-size:11px;color:var(--text3);width:28px}
+.rprob{font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;font-size:14px;font-weight:800;text-align:right;white-space:nowrap}
+.rmono{font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;font-size:12px;color:var(--text2)}
+.env-cell{font-size:10px;font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;line-height:1.7}
+
+/* ── DFS ─────────────────────────────────────────────────────── */
+.dfs-hdr{padding:14px 20px 10px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.dfs-toggle{display:flex;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:3px}
+.dfs-btn{
+  padding:5px 18px;border-radius:6px;font-size:12px;font-weight:700;
+  cursor:pointer;transition:all .15s;color:var(--text3);border:none;background:none;
+}
+.dfs-btn.active{background:var(--green);color:#000}
+.dfs-note{font-size:11px;color:var(--text3);font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace}
+
+.dfs-wrap{padding:0 20px 24px}
+.dfs-scroll{overflow:auto;max-height:calc(100vh - 220px);border-radius:8px;border:1px solid var(--border)}
+.dfs-table{width:100%;border-collapse:collapse;table-layout:fixed}
+.dfs-table th{
+  padding:7px 8px;text-align:right;
+  font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--text3);border-bottom:1px solid var(--border);
+  white-space:nowrap;overflow:hidden;
+  background:var(--bg2);position:sticky;top:0;z-index:5;
+}
+.dfs-table th:first-child,.dfs-table th:nth-child(2),.dfs-table th:nth-child(3){text-align:left}
+.dfs-table td{padding:7px 8px;border-bottom:1px solid rgba(26,37,53,.5);vertical-align:middle;text-align:right;overflow:hidden;white-space:nowrap}
+.dfs-table tr:hover td{background:rgba(255,255,255,.025)!important}
+.dfs-score{font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;font-size:17px;font-weight:800;text-align:right}
+.bar-wrap{width:64px;height:4px;background:var(--bg4);border-radius:2px;display:inline-block;vertical-align:middle}
+.bar-fill{height:4px;border-radius:2px;background:var(--brand-grad)}
+
+/* ── POWER ───────────────────────────────────────────────────── */
+.power-table{width:100%;border-collapse:collapse;table-layout:fixed}
+.power-table th{
+  padding:7px 8px;text-align:right;
+  font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--text3);border-bottom:1px solid var(--border);
+  cursor:pointer;user-select:none;white-space:nowrap;overflow:hidden;
+  background:var(--bg2);position:sticky;top:0;z-index:5;
+}
+.power-table th:first-child,.power-table th:nth-child(2){text-align:left}
+.power-table th:hover{color:var(--text2)}
+.power-table th.asc::after{content:' ↑';color:var(--green)}
+.power-table th.desc::after{content:' ↓';color:var(--green)}
+.power-table td{padding:7px 8px;border-bottom:1px solid rgba(26,37,53,.5);vertical-align:middle;text-align:right;overflow:hidden;white-space:nowrap}
+.power-table td:first-child,.power-table td:nth-child(2){text-align:left}
+.power-table tr:hover td{background:rgba(255,255,255,.025)!important}
+.lineup-hdr{padding:12px 20px 8px;border-bottom:1px solid var(--border)}
+.lineup-body{padding:16px 20px 32px}
+.lu-game-btn{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:7px 10px;cursor:pointer;text-align:left;transition:border-color .15s,background .15s;width:100%}
+.lu-game-btn.active{border-color:var(--logo-purple);background:rgba(176,56,249,.08)}
+.lu-game-btn:hover{border-color:var(--text3)}
+.lu-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:8px;display:flex;align-items:center;gap:14px}
+.lu-slot{font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--text3);text-transform:uppercase;width:36px;flex-shrink:0}
+.lu-name{font-size:14px;font-weight:700;flex:1;min-width:0}
+.lu-sub{font-size:10px;color:var(--text3);margin-top:1px}
+.lu-pts{font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;font-size:18px;font-weight:800;color:var(--green);min-width:40px;text-align:right}
+.lu-sal{font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;font-size:12px;color:var(--text2);min-width:68px;text-align:right}
+.lu-val{font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;font-size:11px;color:var(--text3);min-width:44px;text-align:right}
+.lu-totals{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-top:4px;display:flex;justify-content:space-between;align-items:center}
+.power-note{padding:10px 20px;font-size:11px;color:var(--text3)}
+.power-wrap{padding:0 20px 24px}
+.power-scroll{overflow:auto;max-height:calc(100vh - 180px);border-radius:8px;border:1px solid var(--border)}
+
+/* ── SCROLLBAR ───────────────────────────────────────────────── */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* Mobile */
+@media(max-width:600px){
+  .nav{padding:var(--sat) 12px 0}
+  .nav-tab{padding:0 11px;font-size:12px}
+  .targets-grid{grid-template-columns:1fr;padding:0 12px 12px}
+  .sec-hdr,.search-bar,.games-wrap,.rank-wrap,.dfs-wrap,.power-wrap,.rank-filters,.power-note,.dfs-hdr{padding-left:12px;padding-right:12px}
+  .odds-col-hdr,.team-row{grid-template-columns:1fr 80px 90px}
+  .odds-col-hdr .col-ml,.team-row .col-ml{display:none}
+}
+
+/* ── NAV DROPDOWNS ───────────────────────────────────────────── */
+.nav-tabs{display:flex;gap:0;align-items:center;flex:1}
+.nav-dropdown{position:relative;isolation:isolate}
+.nav-dropdown-btn{display:flex;align-items:center;gap:6px;height:58px;padding:0 14px;font-size:13px;font-weight:500;background:none;border:none;border-bottom:2px solid transparent;color:var(--text3);cursor:pointer;transition:all .15s;white-space:nowrap}
+.nav-dropdown-btn:hover{color:var(--text2)}
+.nav-dropdown-btn.dd-active{color:var(--text);border-bottom-color:var(--neon-green)}
+.dd-arrow{font-size:9px;transition:transform .2s;margin-left:2px;opacity:.6}
+.nav-dropdown.dd-open .dd-arrow{transform:rotate(180deg)}
+.nav-dropdown-menu{display:none;position:absolute;top:calc(100% + 4px);left:0;background:rgba(18,18,18,.97);border:1px solid var(--border2);border-radius:10px;padding:4px;min-width:175px;z-index:99999;box-shadow:0 12px 40px rgba(0,0,0,.9);flex-direction:column;gap:2px;backdrop-filter:blur(20px)}
+.nav-dropdown.dd-open .nav-dropdown-menu{display:flex}
+.dd-item{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:7px;font-size:13px;font-weight:500;color:var(--text2);background:transparent;border:none;cursor:pointer;transition:all .12s;text-align:left;width:100%;height:auto;border-bottom:none}
+.dd-item:hover{background:var(--bg4);color:var(--text)}
+.dd-item.active{color:var(--neon-green)}
+.dd-item svg,.nav-dropdown-btn svg{width:14px;height:14px;flex-shrink:0;opacity:.7}
+
+/* ── MOBILE HAMBURGER ────────────────────────────────────────── */
+.nav-hamburger{
+  display:none;
+  align-items:center;justify-content:center;
+  width:40px;height:40px;border-radius:8px;
+  background:none;border:1px solid var(--border2);
+  color:var(--text2);cursor:pointer;flex-shrink:0;margin-left:auto;
+}
+.nav-hamburger svg{width:18px;height:18px}
+
+/* Mobile full-screen nav drawer */
+.nav-drawer{
+  display:none;
+  position:fixed;inset:0;z-index:10000;
+  background:rgba(12,12,12,.98);
+  backdrop-filter:blur(20px);
+  flex-direction:column;
+  padding:0;
+  overflow-y:auto;
+}
+.nav-drawer.open{display:flex}
+.nav-drawer-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:var(--sat) 20px 0;
+  height:calc(58px + var(--sat));
+  border-bottom:1px solid var(--border);flex-shrink:0;
+}
+.nav-drawer-close{
+  display:flex;align-items:center;justify-content:center;
+  width:36px;height:36px;border-radius:8px;
+  background:var(--bg3);border:1px solid var(--border2);
+  color:var(--text2);cursor:pointer;
+}
+.nav-drawer-close svg{width:16px;height:16px}
+.nav-drawer-body{padding:12px 16px;flex:1}
+.drawer-section{margin-bottom:8px}
+.drawer-section-label{
+  font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--text3);padding:8px 12px 4px;
+}
+.drawer-item{
+  display:flex;align-items:center;gap:12px;
+  padding:13px 14px;border-radius:10px;
+  font-size:14px;font-weight:500;color:var(--text2);
+  background:none;border:none;cursor:pointer;width:100%;text-align:left;
+  transition:background .12s,color .12s;
+}
+.drawer-item:hover,.drawer-item.active{background:var(--bg3);color:var(--text)}
+.drawer-item.active{color:var(--neon-green)}
+.drawer-item svg{width:16px;height:16px;flex-shrink:0;opacity:.7}
+.drawer-divider{height:1px;background:var(--border);margin:8px 0}
+
+@media(max-width:700px){
+  /* Nav */
+  .nav{padding:var(--sat) 16px 0}
+  .nav-tabs{display:none}
+  .nav-hamburger{display:flex}
+  .nav-right .nav-badge{display:none}
+  .nav-logo{margin-right:0}
+  /* Hero */
+  .home-hero{padding:44px 20px 0;min-height:auto}
+  .hero-ticker-wrap{margin:28px -20px 0 -20px;width:calc(100% + 40px);max-width:100vw}
+  .score-ticker-bar{height:36px}
+  .score-game{padding:0 14px;height:36px}
+  .sticker-logo{width:18px;height:18px}
+  .home-hero-title{font-size:clamp(38px,10vw,54px)}
+  .home-hero-sub{font-size:14px}
+  .hero-live-badge{margin-bottom:16px}
+  /* Stats */
+  .home-stats-grid{grid-template-columns:1fr 1fr}
+  /* Content */
+  .home-body{padding:28px 16px}
+  .flag-grid{grid-template-columns:1fr 1fr}
+  .model-notes-grid{grid-template-columns:1fr}
+  /* Board */
+  .targets-grid{grid-template-columns:1fr;padding:0 12px 12px}
+  .games-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  /* Search */
+  .search-bar{padding:8px 12px}
+  /* Model page */
+  .factor-grid{grid-template-columns:1fr}
+  .spec-table td:first-child{width:140px;white-space:normal}
+  .home-body{padding:24px 16px}
+  /* DFS record */
+  .pane[id="pane-dfsrecord"]{padding:12px 8px}
+}
+@media(max-width:400px){
+  .home-stats-grid{grid-template-columns:1fr 1fr}
+  .flag-grid{grid-template-columns:1fr}
+  .home-hero-title{font-size:36px}
+  .targets-grid{grid-template-columns:1fr;padding:0 8px 8px}
+}
+
+
+/* ── HOME / LANDING PAGE ────────────────────────────────────── */
+#pane-home{padding:0}
+
+/* ════════════════════════════════════════════════════════════════
+   HOME — 2026 REDESIGN
+   ════════════════════════════════════════════════════════════════ */
+
+/* Google Font — sharp, futuristic display */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap');
+
+:root {
+  --font-display: 'Syne', -apple-system, sans-serif;
+  --font-body:    'Space Grotesk', -apple-system, sans-serif;
+  /* Extended palette */
+  --neon-green:   #61e970;
+  --neon-purple:  #b038f9;
+  --neon-blue:    #635bff;
+  --glass-bg:     rgba(18,18,18,.7);
+  --glass-border: rgba(255,255,255,.06);
+}
+
+/* ── NOISE TEXTURE overlay ── */
+#pane-home::after {
+  content:'';pointer-events:none;
+  position:fixed;inset:0;z-index:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  background-size:200px 200px;opacity:.4;
+}
+#pane-home > * { position:relative;z-index:1; }
+
+/* ── HERO ── */
+.home-hero {
+  position:relative;overflow:hidden;
+  padding:clamp(64px,8vw,110px) clamp(20px,5vw,72px) clamp(56px,7vw,96px);
+  min-height:clamp(480px,55vh,680px);
+  display:flex;flex-direction:column;justify-content:flex-end;
+  background:var(--bg);
+}
+
+/* Animated mesh gradient */
+.home-hero::before {
+  content:'';position:absolute;inset:-60px;z-index:0;
+  background:
+    radial-gradient(ellipse 55% 55% at 75% 30%, rgba(99,91,255,.14) 0%, transparent 65%),
+    radial-gradient(ellipse 45% 45% at 25% 70%, rgba(176,56,249,.10) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 50% 10%,  rgba(0,255,136,.06) 0%, transparent 55%),
+    radial-gradient(ellipse 35% 35% at 85% 85%, rgba(10,132,255,.08) 0%, transparent 50%);
+  animation:meshShift 12s ease-in-out infinite alternate;
+  pointer-events:none;
+}
+@keyframes meshShift {
+  0%   { transform:translate(0,0) scale(1); }
+  33%  { transform:translate(-20px,10px) scale(1.03); }
+  66%  { transform:translate(15px,-8px) scale(.98); }
+  100% { transform:translate(-8px,18px) scale(1.02); }
+}
+
+/* Grid lines */
+.home-hero::after {
+  content:'';position:absolute;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+  background-size:60px 60px;
+  mask-image:radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 80%);
+}
+
+.home-hero-inner {
+  position:relative;z-index:2;max-width:860px;
+}
+
+/* Live badge */
+.hero-live-badge {
+  display:inline-flex;align-items:center;gap:7px;
+  padding:5px 12px 5px 8px;border-radius:100px;margin-bottom:28px;
+  background:rgba(0,255,136,.07);border:1px solid rgba(0,255,136,.18);
+  font-family:var(--font-body);font-size:11px;font-weight:600;letter-spacing:.06em;
+  color:var(--neon-green);text-transform:uppercase;
+  animation:badgePulse 3s ease-in-out infinite;
+}
+@keyframes badgePulse {
+  0%,100% { box-shadow:0 0 0 0 rgba(0,255,136,.15); }
+  50%      { box-shadow:0 0 0 6px rgba(0,255,136,.0); }
+}
+.hero-live-dot {
+  width:7px;height:7px;border-radius:50%;background:var(--neon-green);
+  box-shadow:0 0 6px var(--neon-green);
+  animation:dotBlink 1.4s ease-in-out infinite;
+}
+@keyframes dotBlink {
+  0%,100%{opacity:1} 50%{opacity:.3}
+}
+
+/* Giant title */
+.home-hero-title {
+  font-family:var(--font-display);
+  font-size:clamp(48px,8vw,96px);
+  font-weight:800;line-height:.95;letter-spacing:-.03em;
+  color:var(--text);margin-bottom:0;
+}
+.home-hero-title .line1 { display:block; }
+.home-hero-title .line2 {
+  display:block;
+  background:linear-gradient(90deg, #b038f9 0%, #d795ff 55%, #635bff 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+  background-size:200% auto;
+  animation:gradientShift 6s linear infinite;
+}
+@keyframes gradientShift {
+  0%{background-position:0% center}
+  100%{background-position:200% center}
+}
+
+/* Sub */
+.home-hero-sub {
+  font-family:var(--font-body);
+  font-size:clamp(14px,1.8vw,18px);line-height:1.65;
+  color:var(--text2);max-width:540px;
+  margin-top:clamp(20px,2.5vw,32px);margin-bottom:clamp(28px,3.5vw,44px);
+}
+
+/* CTA buttons */
+.home-cta-row { display:flex;gap:14px;flex-wrap:wrap; }
+.btn-primary {
+  display:inline-flex;align-items:center;gap:9px;
+  padding:13px 26px;border-radius:10px;
+  font-family:var(--font-body);font-size:13px;font-weight:600;letter-spacing:.02em;
+  background:linear-gradient(135deg,#b038f9,#8d16b8);color:#fff;
+  border:none;cursor:pointer;
+  box-shadow:0 0 24px rgba(176,56,249,.3),inset 0 1px 0 rgba(255,255,255,.2);
+  transition:all .2s;text-decoration:none;
+}
+.btn-primary:hover {
+  transform:translateY(-2px);
+  box-shadow:0 0 40px rgba(176,56,249,.45),0 8px 24px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.25);
+}
+.btn-primary svg{width:15px;height:15px}
+.btn-secondary {
+  display:inline-flex;align-items:center;gap:9px;
+  padding:13px 26px;border-radius:10px;
+  font-family:var(--font-body);font-size:13px;font-weight:600;letter-spacing:.02em;
+  background:rgba(255,255,255,.04);color:var(--text);
+  border:1px solid var(--glass-border);cursor:pointer;
+  backdrop-filter:blur(12px);
+  transition:all .2s;text-decoration:none;
+}
+.btn-secondary:hover {
+  background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.12);
+  transform:translateY(-2px);
+}
+.btn-secondary svg{width:15px;height:15px}
+
+/* Scrolling ticker */
+.hero-ticker-wrap {
+  position:relative;z-index:2;
+  border-top:1px solid var(--glass-border);
+  background:rgba(12,12,12,.85);backdrop-filter:blur(8px);
+  overflow:hidden;height:36px;display:flex;align-items:center;
+  /* Full-bleed out of hero padding */
+  margin:auto -72px -96px -72px;
+  margin-top:clamp(28px,4vw,44px);
+}
+.hero-ticker {
+  display:flex;gap:0;white-space:nowrap;
+  animation:tickerScroll 40s linear infinite;
+  will-change:transform;
+}
+.hero-ticker:hover { animation-play-state:paused; }
+@keyframes tickerScroll {
+  0%   { transform:translateX(0); }
+  100% { transform:translateX(-50%); }
+}
+.ticker-item {
+  display:inline-flex;align-items:center;gap:8px;
+  padding:0 24px;font-family:var(--font-body);font-size:11px;font-weight:500;
+  color:var(--text3);border-right:1px solid var(--glass-border);
+}
+.ticker-item .ticker-name { color:var(--text2);font-weight:600; }
+.ticker-item .ticker-pct  { color:var(--neon-green);font-weight:700;font-family:monospace; }
+.ticker-item .ticker-odds { color:var(--text3); }
+.ticker-sep { color:var(--border2);padding:0 4px; }
+
+/* ── STAT CARDS GRID ── */
+.home-stats-grid {
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:1px;background:var(--border);
+  border-bottom:1px solid var(--border);
+}
+.home-stat {
+  padding:clamp(16px,2.5vw,28px) clamp(16px,3vw,32px);
+  background:var(--bg2);
+  position:relative;overflow:hidden;
+  transition:background .2s;
+}
+.home-stat:hover { background:var(--bg3); }
+.home-stat::after {
+  content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
+  background:var(--brand-grad);transform:scaleX(0);transform-origin:left;
+  transition:transform .3s ease;
+}
+.home-stat:hover::after { transform:scaleX(1); }
+.home-stat-val {
+  font-family:var(--font-display);
+  font-size:clamp(28px,4vw,44px);font-weight:800;line-height:1;
+  color:var(--text);
+  transition:transform .3s;
+}
+.home-stat:hover .home-stat-val { transform:scale(1.04); }
+.home-stat-val.green  { color:#b038f9; text-shadow:0 0 20px rgba(176,56,249,.3); }
+.home-stat-val.purple { color:#d795ff; text-shadow:0 0 20px rgba(215,149,255,.3); }
+.home-stat-val.blue   { color:#9b96ff; text-shadow:0 0 20px rgba(155,150,255,.3); }
+.home-stat-label {
+  font-family:var(--font-body);
+  font-size:10px;font-weight:600;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--text3);margin-top:6px;
+}
+
+/* ── TODAY SECTION ── */
+.home-body { padding:clamp(24px,4vw,52px) clamp(16px,4vw,40px); }
+.home-section { margin-bottom:clamp(40px,5vw,64px); }
+
+.home-section-tag {
+  font-family:var(--font-body);
+  font-size:9px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--neon-green);margin-bottom:10px;
+  display:inline-flex;align-items:center;gap:8px;
+}
+.home-section-tag::before {
+  content:'';display:block;width:18px;height:1px;
+  background:var(--neon-green);opacity:.5;
+}
+.home-section-title {
+  font-family:var(--font-display);
+  font-size:clamp(20px,3vw,28px);font-weight:700;
+  color:var(--text);margin-bottom:18px;line-height:1.2;
+}
+
+/* Game flags grid */
+.flag-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+  gap:10px;margin-top:20px;
+}
+.flag-card {
+  background:var(--bg2);border:1px solid var(--border);border-radius:12px;
+  padding:16px 18px;display:flex;flex-direction:column;gap:6px;
+  transition:border-color .15s,transform .15s;
+  position:relative;overflow:hidden;
+}
+.flag-card::before {
+  content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+  border-radius:0;
+}
+.flag-card.danger::before  { background:var(--red); }
+.flag-card.warn::before    { background:var(--gold); }
+.flag-card.good::before    { background:var(--neon-green); }
+.flag-card.neutral::before { background:var(--border3); }
+.flag-card:hover { border-color:var(--border3);transform:translateY(-1px); }
+.flag-matchup {
+  font-family:var(--font-body);
+  font-size:11px;font-weight:700;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--text3);
+}
+.flag-status { font-size:13px;font-weight:600; }
+.flag-status.danger { color:var(--red); }
+.flag-status.warn   { color:var(--gold); }
+.flag-status.good   { color:var(--neon-green); }
+.flag-status.neutral{ color:var(--text2); }
+
+/* Model notes */
+.model-notes-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:10px;margin-top:20px;
+}
+.model-note {
+  background:var(--bg2);border:1px solid var(--border);border-radius:12px;
+  padding:18px 20px;
+}
+.model-note-label {
+  font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--text3);margin-bottom:7px;
+  font-family:var(--font-body);
+}
+.model-note-val {
+  font-size:13px;line-height:1.55;color:var(--text2);
+  font-family:var(--font-body);
+}
+.model-note-val.danger { color:var(--red); }
+.model-note-val.warn   { color:var(--gold); }
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px) {
+  .home-stats-grid { grid-template-columns:repeat(2,1fr); }
+}
+
+
+/* ── FACTOR CARDS (Model page) ───────────────────────────────── */
+.factor-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-top:24px}
+.factor-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:18px 18px 16px;transition:border-color .15s;position:relative;overflow:hidden}
+.factor-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--brand-grad);transform:scaleX(0);transform-origin:left;transition:transform .25s ease}
+.factor-card:hover{border-color:var(--border3)}
+.factor-card:hover::before{transform:scaleX(1)}
+.factor-icon{width:36px;height:36px;border-radius:8px;margin-bottom:12px;display:flex;align-items:center;justify-content:center;background:var(--bg3);border:1px solid var(--border2);flex-shrink:0}
+.factor-icon svg{width:17px;height:17px;color:var(--green);flex-shrink:0}
+.factor-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px}
+.factor-desc{font-size:12px;line-height:1.6;color:var(--text3)}
+.factor-tag{display:inline-block;margin-top:10px;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border-radius:4px;background:var(--green-dim);color:var(--green);border:1px solid rgba(97,233,112,.2)}
+.factor-tag.blue{background:var(--blue-dim);color:var(--blue-acc);border-color:rgba(99,91,255,.2)}
+.factor-tag.purple{background:rgba(176,56,249,.1);color:var(--logo-purple);border-color:rgba(176,56,249,.2)}
+.factor-tag.gold{background:var(--gold-dim);color:var(--gold);border-color:rgba(215,149,255,.2)}
+
+/* ── TIMELINE (Model page) ───────────────────────────────────── */
+.timeline{margin-top:20px;position:relative;padding-left:28px}
+.timeline::before{content:'';position:absolute;left:7px;top:6px;bottom:6px;width:1px;background:var(--border2)}
+.tl-item{position:relative;margin-bottom:24px}
+.tl-item:last-child{margin-bottom:0}
+.tl-dot{position:absolute;left:-28px;top:3px;width:15px;height:15px;border-radius:50%;background:var(--bg3);border:2px solid var(--border2);display:flex;align-items:center;justify-content:center}
+.tl-dot.active{border-color:var(--green);background:rgba(97,233,112,.1)}
+.tl-dot.active::after{content:'';width:5px;height:5px;border-radius:50%;background:var(--green)}
+.tl-date{font-size:10px;font-weight:600;letter-spacing:.05em;color:var(--text3);font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;margin-bottom:4px}
+.tl-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px}
+.tl-body{font-size:12px;line-height:1.6;color:var(--text3)}
+
+/* ── SPEC TABLE (Model page) ─────────────────────────────────── */
+.spec-table{width:100%;border-collapse:collapse;margin-top:16px;font-size:12px}
+.spec-table th{padding:8px 12px;text-align:left;font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border)}
+.spec-table td{padding:9px 12px;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:top}
+.spec-table td:first-child{color:var(--text);font-weight:600;white-space:nowrap;width:200px}
+.spec-table tr:last-child td{border-bottom:none}
+.spec-table tr:hover td{background:var(--bg3)}
+.mono-val{font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;color:var(--green);font-size:11px}
+
+/* ── SHARED SECTION PROSE (home + model) ────────────────────── */
+.home-section-body{font-size:14px;line-height:1.75;color:var(--text2)}
+.home-section-body p{margin-bottom:14px}
+.home-section-body p:last-child{margin-bottom:0}
+
+/* ── LIVE SCORE TICKER ───────────────────────────────────────── */
+.ticker-item.live-hr {
+  background:rgba(0,255,136,.08);
+  border-right-color:rgba(0,255,136,.2);
+}
+.ticker-item.live-hr .ticker-name { color:var(--neon-green); }
+.ticker-item.live-hr .ticker-pct  { color:var(--neon-green); text-shadow:0 0 8px rgba(0,255,136,.5); }
+.ticker-item.live-loss {
+  background:rgba(239,68,68,.07);
+  border-right-color:rgba(239,68,68,.2);
+}
+.ticker-item.live-loss .ticker-name { color:#f87171; }
+.ticker-item.live-loss .ticker-odds { color:#f87171; }
+.ticker-pulse {
+  display:inline-block;width:6px;height:6px;border-radius:50%;
+  background:var(--neon-green);box-shadow:0 0 5px var(--neon-green);
+  animation:dotBlink 1.2s ease-in-out infinite;margin-right:2px;flex-shrink:0;
+}
+.ticker-item.live-loss .ticker-pulse { background:#f87171;box-shadow:0 0 5px #f87171; }
+.ticker-score {
+  font-family:monospace;font-size:10px;color:var(--text3);
+  background:var(--bg3);padding:1px 5px;border-radius:3px;
+}
+.ticker-item.live-hr .ticker-score { background:rgba(0,255,136,.1);color:var(--neon-green); }
+.ticker-item.live-loss .ticker-score { background:rgba(239,68,68,.1);color:#f87171; }
+
+/* ── SCORE TICKER BAR ────────────────────────────────────────── */
+.score-ticker-bar {
+  background:var(--bg2);
+  border-bottom:1px solid var(--border);
+  height:38px;overflow:hidden;display:flex;align-items:center;
+  position:relative;
+}
+.score-ticker-bar::before,
+.score-ticker-bar::after {
+  content:'';position:absolute;top:0;bottom:0;width:32px;z-index:2;
+  pointer-events:none;
+}
+.score-ticker-bar::before { left:0;  background:linear-gradient(90deg,var(--bg2),transparent); }
+.score-ticker-bar::after  { right:0; background:linear-gradient(270deg,var(--bg2),transparent); }
+.score-ticker-track {
+  display:flex;white-space:nowrap;gap:0;
+  animation:scoreTicker 60s linear infinite;
+  will-change:transform;
+  -webkit-transform:translateZ(0);
+  transform:translateZ(0);
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+}
+.score-ticker-track:hover { animation-play-state:paused; }
+@keyframes scoreTicker {
+  0%   { transform:translateX(0); }
+  100% { transform:translateX(-50%); }
+}
+.score-game {
+  display:inline-flex;align-items:center;gap:7px;
+  padding:0 20px;height:38px;cursor:default;
+  border-right:1px solid var(--border);
+  font-size:11px;transition:background .15s;
+  flex-shrink:0;
+}
+.score-game:hover { background:var(--bg3); }
+.score-team { font-weight:700;font-size:11px;color:var(--text2);font-family:monospace; }
+.score-num  { font-weight:800;font-size:13px;font-family:monospace;min-width:14px;text-align:center; }
+.score-num.winning { color:var(--text); }
+.score-num.losing  { color:var(--text3); }
+.score-sep  { color:var(--border3);font-size:10px; }
+.score-state {
+  font-size:9px;font-weight:700;letter-spacing:.04em;
+  font-family:monospace;color:var(--text3);min-width:28px;text-align:center;
+  white-space:nowrap;
+}
+.score-state.live   { color:var(--neon-green);animation:dotBlink 1.4s ease-in-out infinite; }
+.score-state.final  { color:var(--text3); }
+.score-state.sched  { color:var(--text3);opacity:.6; }
+
+.sticker-logo {
+  width:22px;height:22px;border-radius:5px;flex-shrink:0;
+  background-size:contain;background-repeat:no-repeat;background-position:center;
+  background-color:var(--bg3);
+  display:inline-block;
+}
+
+/* Worst edge plays in ticker */
+.ticker-item.ticker-bad .ticker-name { color:var(--text2); }
+.ticker-item.ticker-bad .ticker-pct  { color:#f87171; }
+.ticker-item.ticker-bad { background:rgba(239,68,68,.05); border-right-color:rgba(239,68,68,.15); }
+.ticker-section-sep { padding:0 8px; border-right:none; }
+
+/* ── GAMECENTER ──────────────────────────────────────────────── */
+.score-game { cursor:pointer; }
+.gc-wrap { padding:14px 16px 40px; max-width:1100px; margin:0 auto; }
+.gc-strip { display:block; padding:4px 0 12px; }
+.gc-chip {
+  display:inline-flex; align-items:center; gap:7px; padding:7px 12px;
+  background:var(--bg2); border:1px solid var(--border); border-radius:9px;
+  font-size:11px; font-family:monospace; font-weight:700; color:var(--text2);
+  cursor:pointer; white-space:nowrap; flex-shrink:0; transition:all .15s;
+}
+.gc-chip:hover { background:var(--bg3); }
+.gc-chip.active {
+  border-color:transparent; color:var(--text);
+  background:linear-gradient(var(--bg3),var(--bg3)) padding-box,
+             linear-gradient(90deg,#b038f9,#635bff) border-box;
+}
+.gc-chip .gcc-state { font-size:9px; color:var(--text3); }
+.gc-chip .gcc-state.live { color:var(--neon-green); animation:dotBlink 1.4s ease-in-out infinite; }
+.gc-header {
+  display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:12px;
+  background:var(--bg2); border:1px solid var(--border); border-radius:14px;
+  padding:22px 24px; margin-bottom:14px; position:relative; overflow:hidden;
+}
+.gc-header::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background:linear-gradient(90deg,transparent,#b038f9,#635bff,transparent);
+}
+.gc-side { display:flex; align-items:center; gap:14px; }
+.gc-side.home { justify-content:flex-end; }
+.gc-logo { width:52px; height:52px; border-radius:10px; background-size:contain; background-repeat:no-repeat; background-position:center; background-color:var(--bg3); flex-shrink:0; }
+.gc-tname { font-size:15px; font-weight:800; }
+.gc-trec  { font-size:10px; color:var(--text3); font-family:monospace; margin-top:2px; }
+.gc-tscore { font-size:44px; font-weight:800; font-family:monospace; line-height:1; }
+.gc-tscore.losing { color:var(--text3); }
+.gc-mid { text-align:center; min-width:130px; }
+.gc-state { font-size:12px; font-weight:800; font-family:monospace; letter-spacing:.05em; }
+.gc-state.live { color:var(--neon-green); }
+.gc-state.final { color:var(--text2); }
+.gc-outs { font-size:10px; color:var(--text3); font-family:monospace; margin-top:3px; }
+.gc-diamond { margin:8px auto 0; display:block; }
+.gc-diamond rect { fill:var(--bg4); stroke:var(--border2); stroke-width:1; }
+.gc-diamond rect.on { fill:var(--neon-green); stroke:var(--neon-green); filter:drop-shadow(0 0 4px rgba(0,255,136,.6)); }
+.gc-card {
+  background:var(--bg2); border:1px solid var(--border); border-radius:12px;
+  padding:14px 16px; margin-bottom:14px; overflow-x:auto;
+}
+.gc-card-title { font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text3); margin-bottom:10px; }
+.gc-line { width:100%; border-collapse:collapse; font-family:monospace; font-size:12px; }
+.gc-line th, .gc-line td { padding:5px 7px; text-align:center; border-bottom:1px solid rgba(26,37,53,.5); }
+.gc-line th { font-size:9px; color:var(--text3); font-weight:700; }
+.gc-line td:first-child, .gc-line th:first-child { text-align:left; font-weight:800; }
+.gc-line td.cur { background:rgba(176,56,249,.12); }
+.gc-line .rhe { font-weight:800; border-left:1px solid var(--border2); }
+.gc-matchup { display:grid; grid-template-columns:1fr 1fr auto auto; gap:16px; align-items:center; }
+.gc-mu-role { font-size:9px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text3); }
+.gc-mu-name { font-size:14px; font-weight:800; margin:3px 0 2px; background:linear-gradient(90deg,#b038f9,#635bff); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+.gc-mu-line { font-size:11px; color:var(--text2); font-family:monospace; }
+.gc-count { text-align:right; font-family:monospace; font-size:10px; color:var(--text3); }
+.gc-dots { display:flex; gap:4px; justify-content:flex-end; margin:2px 0; align-items:center; }
+.gc-dot { width:9px; height:9px; border-radius:50%; background:var(--bg4); border:1px solid var(--border2); }
+.gc-dot.on-b { background:#635bff; border-color:#635bff; }
+.gc-dot.on-s { background:#b038f9; border-color:#b038f9; }
+.gc-dot.on-o { background:#f87171; border-color:#f87171; }
+/* ── app-style scoreboard grid ── */
+.sb-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:10px; margin-bottom:16px; }
+@media (max-width:760px) {
+  .sb-grid { grid-template-columns:repeat(2,1fr); gap:8px; }
+  .sb-card { padding:10px 10px; gap:6px; }
+  .sb-score { font-size:18px; }
+  .sb-ml { font-size:9px; padding:2px 5px; }
+  .sb-side { min-width:40px; }
+  .sb-state { font-size:10px; }
+  .sb-state.sched { font-size:9px; }
+  .sb-ab { font-size:12px; }
+}
+.sb-card { background:var(--card); border:1px solid var(--border2); border-radius:14px; padding:12px 13px; display:flex; justify-content:space-between; gap:8px; cursor:pointer; transition:border-color .15s, transform .12s; min-width:0; overflow:hidden; }
+.sb-card.sched { flex-direction:column; gap:9px; }
+/* live/final cards: teams center against the taller state column */
+.sb-card:not(.sched) { align-items:center; }
+.sb-card:not(.sched) .sb-teams { justify-content:center; }
+.sb-card:not(.sched) .sb-side { gap:4px; }
+.sb-toprow { display:flex; justify-content:space-between; align-items:center; gap:8px; border-bottom:1px solid rgba(26,37,53,.55); padding-bottom:7px; }
+.sb-toprow .sb-state.sched { min-width:0; overflow:hidden; text-overflow:ellipsis; }
+.sb-toprow .sb-ou { flex-shrink:0; }
+.sb-team .sticker-logo, .sb-team .sb-ab, .sb-team .sb-ml { flex-shrink:0; }
+.sb-card.sched .sb-ml { min-width:64px; text-align:center; }
+.sb-card:hover { border-color:rgba(176,56,249,.4); transform:translateY(-2px); }
+.sb-card:active { transform:scale(.97); }
+.sb-card.sel { border-color:rgba(176,56,249,.65); box-shadow:0 0 14px rgba(176,56,249,.15); }
+.sb-card.live { border-color:rgba(176,56,249,.4); animation:sbGlow 3.2s ease-in-out infinite; }
+@keyframes sbGlow { 0%,100% { box-shadow:0 0 0 rgba(176,56,249,0); } 50% { box-shadow:0 0 18px rgba(176,56,249,.2); } }
+.sb-in { animation:sbIn .45s cubic-bezier(.2,.9,.3,1.3) backwards; }
+@keyframes sbIn { from { opacity:0; transform:translateY(12px) scale(.96); } }
+.sb-score { display:inline-block; }
+.sb-score.bump { animation:sbBump 1s ease; }
+@keyframes sbBump { 0% { transform:scale(1); } 30% { transform:scale(1.4); color:#4ade80; } 100% { transform:scale(1); } }
+.sb-teams { flex:1; display:flex; flex-direction:column; gap:9px; min-width:0; }
+.sb-team { display:flex; align-items:center; gap:8px; min-width:0; }
+.sb-ab { font-weight:800; font-size:13px; letter-spacing:.02em; }
+.sb-score { margin-left:auto; font-family:monospace; font-size:20px; font-weight:900; line-height:1; }
+.sb-score.lose { color:var(--text3); }
+.sb-ml { margin-left:auto; font-family:monospace; font-size:10px; font-weight:700; color:var(--text2); background:var(--bg3); border:1px solid var(--border2); border-radius:6px; padding:3px 7px; transition:all .15s; }
+.sb-ml:hover { border-color:rgba(176,56,249,.65); color:#fff; box-shadow:0 0 8px rgba(176,56,249,.3); }
+.sb-side { display:flex; flex-direction:column; align-items:flex-end; justify-content:center; gap:5px; min-width:58px; flex-shrink:0; }
+.sb-state { font-family:monospace; font-size:11px; font-weight:700; letter-spacing:.03em; white-space:nowrap; }
+.sb-state.live { color:#4ade80; display:flex; align-items:center; gap:5px; }
+.sb-state.fin { color:var(--text3); }
+.sb-state.sched { color:var(--text2); }
+.sb-ou { font-family:monospace; font-size:9px; color:var(--text3); }
+.sb-dot { width:7px; height:7px; border-radius:50%; background:#4ade80; animation:sbPulse 1.6s ease-in-out infinite; }
+@keyframes sbPulse { 50% { opacity:.3; } }
+.sb-dia rect { fill:var(--bg4); stroke:var(--border2); stroke-width:1; }
+.sb-dia rect.on { fill:#b038f9; stroke:#b038f9; }
+.sb-oc { display:flex; align-items:center; gap:6px; }
+.sb-outs { display:flex; gap:3px; }
+.sb-outs span { width:6px; height:6px; border-radius:50%; background:var(--bg4); border:1px solid var(--border2); }
+.sb-outs span.on { background:#f87171; border-color:#f87171; }
+.sb-count { font-family:monospace; font-size:10px; font-weight:800; color:var(--text2); }
+/* ── Onyx bet bar (the funnel) ── */
+.gc-betbar { display:flex; align-items:center; gap:10px; flex-wrap:wrap; background:linear-gradient(90deg, rgba(176,56,249,.12), rgba(64,96,240,.10)); border:1px solid rgba(176,56,249,.4); border-radius:14px; padding:10px 12px; margin-bottom:14px; }
+.gc-bet-cta { font-family:monospace; font-size:12px; font-weight:800; letter-spacing:.04em; color:#fff; background:linear-gradient(90deg,#b038f9,#635bff); border-radius:9px; padding:10px 16px; cursor:pointer; white-space:nowrap; transition:all .15s; }
+.gc-bet-cta:hover { box-shadow:0 0 16px rgba(176,56,249,.55); transform:translateY(-1px); }
+.gc-bet-chips { display:flex; gap:6px; flex-wrap:wrap; }
+.gc-bet-chip { font-family:monospace; font-size:11px; font-weight:700; color:var(--text2); background:var(--bg3); border:1px solid var(--border2); border-radius:8px; padding:7px 11px; cursor:pointer; transition:all .15s; white-space:nowrap; }
+.gc-bet-chip:hover { border-color:rgba(176,56,249,.65); color:#fff; box-shadow:0 0 8px rgba(176,56,249,.3); }
+/* ── HR watch headshot strip ── */
+.gc-hs-row { display:flex; gap:12px; overflow-x:auto; padding:4px 2px 10px; scrollbar-width:thin; }
+.gc-hs { flex:none; width:74px; text-align:center; cursor:pointer; transition:transform .12s; }
+.gc-hs:active { transform:scale(.94); }
+.gc-hs-img { width:58px; height:58px; margin:0 auto; border-radius:50%;
+  background-repeat:no-repeat; background-position:center;
+  box-shadow:inset 0 0 0 2px rgba(176,56,249,.65), 0 0 14px rgba(176,56,249,.25); }
+.gc-hs.hit .gc-hs-img { box-shadow:inset 0 0 0 2px #d795ff, 0 0 16px rgba(215,149,255,.55); }
+/* small ringed headshot for tables (rankings). The ring is drawn INSET so
+   the ring + full spot disc live entirely inside this element's own box;
+   tight overflow:hidden ancestors (table cells, tc-badge) can never slice
+   the circle. Disc at 86% clears the 1.5px inset ring at every size. */
+.rk-hs { width:30px; height:30px; border-radius:50%; flex-shrink:0; display:inline-block;
+  background-color:#12101d; background-size:86%; background-position:center; background-repeat:no-repeat;
+  box-shadow:inset 0 0 0 1.5px rgba(176,56,249,.65); margin:0 3px 0 2px; align-self:center; vertical-align:middle; }
+.gc-hs-pct { font-family:monospace; font-size:11px; font-weight:800; color:#c9a6ff; margin-top:5px; }
+.gc-hs.hit .gc-hs-pct { color:#d795ff; }
+.gc-hs-name { font-size:10px; font-weight:700; color:var(--text2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.gc-hs-odds { font-family:monospace; font-size:9px; color:var(--text3); }
+/* ── HR-in-N-parks chips ── */
+.gc-parks { display:inline-flex; align-items:center; gap:4px; font-family:monospace; font-size:9px; font-weight:800;
+  padding:2px 7px; border-radius:20px; background:rgba(176,56,249,.14); color:#c9a6ff; border:1px solid rgba(176,56,249,.35); white-space:nowrap; }
+.gc-parks.nd { background:linear-gradient(90deg,rgba(215,149,255,.22),rgba(251,113,36,.18)); color:#d795ff; border-color:rgba(215,149,255,.55);
+  box-shadow:0 0 10px rgba(215,149,255,.25); }
+.gc-parks.scrape { background:rgba(96,165,250,.12); color:#93c5fd; border-color:rgba(96,165,250,.35); }
+/* ── NO DOUBTER popup ── */
+/* parlay builder: floating slip + armed-mode glow on every odds button */
+#parlayFab { position:fixed; right:14px; bottom:calc(14px + var(--sab)); z-index:9990;
+  display:flex; flex-direction:column; align-items:flex-end; gap:8px;
+  width:min(320px, calc(100vw - 28px)); pointer-events:none; }
+#parlayFab > * { pointer-events:auto; }
+/* phones / installed PWA: the bottom app nav owns the bottom edge — dock
+   the parlay pill ABOVE it so it never covers Markets/Rankings taps */
+@media (max-width:760px) {
+  #parlayFab { bottom:calc(86px + var(--sab)); right:10px; }
+}
+.pb-fab { background:linear-gradient(135deg,#7a2ce0,#b038f9); color:#fff; font-size:12px; font-weight:800;
+  padding:10px 15px; border-radius:22px; cursor:pointer; box-shadow:0 4px 18px rgba(122,44,224,.45);
+  user-select:none; letter-spacing:.02em; }
+.pb-fab.on { background:linear-gradient(135deg,#00b000,#61e970); box-shadow:0 4px 18px rgba(97,233,112,.4); }
+.pb-fab b { background:rgba(0,0,0,.25); border-radius:10px; padding:1px 7px; margin-left:4px; }
+.pb-panel { background:#151515; border:1.5px solid rgba(176,56,249,.5); border-radius:14px;
+  padding:10px 12px; width:100%; box-shadow:0 8px 30px rgba(0,0,0,.65);
+  max-height:min(55vh, 420px); overflow-y:auto; }
+.pb-head { font-size:10px; font-weight:900; letter-spacing:.12em; color:#b038f9; margin-bottom:7px;
+  display:flex; justify-content:space-between; align-items:center; }
+.pb-clear { color:var(--text3); font-weight:700; cursor:pointer; letter-spacing:0; font-size:10px; }
+.pb-leg { display:flex; align-items:center; gap:8px; padding:5px 0; border-bottom:1px solid var(--border);
+  font-size:12px; }
+.pb-lbl { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:700; }
+.pb-odds { font-family:monospace; font-size:11px; font-weight:700; color:var(--text2); flex-shrink:0; }
+.pb-x { color:#ef4444; font-weight:900; cursor:pointer; padding:0 3px; flex-shrink:0; }
+.pb-foot { display:flex; justify-content:space-between; align-items:center; gap:8px; padding-top:8px;
+  flex-wrap:wrap; }
+.pb-warn { font-size:10px; font-weight:700; color:#d795ff; padding-top:5px; width:100%; }
+.pb-pay { font-size:11px; font-weight:700; color:var(--text2); }
+.pb-pay b { color:#61e970; }
+.pb-go { background:linear-gradient(135deg,#7a2ce0,#b038f9); color:#fff; font-size:11px; font-weight:800;
+  padding:7px 12px; border-radius:9px; cursor:pointer; white-space:nowrap; }
+body.parlay-armed .onyx-bet-btn, body.parlay-armed .sb-ml, body.parlay-armed .slam-odds,
+body.parlay-armed .mkt-chip, body.parlay-armed .mkt-ou, body.parlay-armed .gc-bet-chip {
+  box-shadow:0 0 0 1.5px rgba(97,233,112,.75), 0 0 9px rgba(97,233,112,.3) !important; }
+
+/* broadcast camera for the live at-bat scene: punch in on contact, pan
+   with the flight; the HR shot tracks longer and hands off to the modal */
+.gc-scene .gc-cam { transform-box:view-box; transform-origin:166px 82px; }
+.gc-scene.cam-inplay .gc-cam { animation:gcCamPlay 1.9s cubic-bezier(.3,.08,.25,1) both; }
+.gc-scene.cam-hr .gc-cam { animation:gcCamHR 2.7s cubic-bezier(.3,.08,.25,1) both; }
+@keyframes gcCamPlay {
+  0% { transform:none; }
+  22% { transform:scale(1.32); }
+  34% { transform:scale(1.34); }
+  72% { transform:scale(1.1) translate(26px,14px); }
+  100% { transform:none; }
+}
+@keyframes gcCamHR {
+  0% { transform:none; }
+  17% { transform:scale(1.45); }
+  27% { transform:scale(1.48); }
+  62% { transform:scale(1.22) translate(58px,40px); }
+  84% { transform:scale(1.22) translate(60px,42px); }
+  100% { transform:none; }
+}
+.gc-hrpop { position:fixed; left:50%; top:calc(84px + var(--sat)); transform:translateX(-50%);
+  z-index:9000; width:min(400px, calc(100vw - 32px)); background:linear-gradient(160deg,#191129,#0b0f1c 70%);
+  border:1px solid rgba(215,149,255,.5); border-radius:18px; padding:16px 18px 14px; cursor:pointer;
+  box-shadow:0 12px 50px rgba(0,0,0,.7), 0 0 34px rgba(215,149,255,.22);
+  animation:gcPopIn .5s cubic-bezier(.2,1.4,.4,1) both; }
+.gc-hrpop.bye { animation:gcPopOut .35s ease-in both; }
+.gc-hrpop .ring { position:absolute; inset:-1px; border-radius:18px; border:2px solid rgba(215,149,255,.8); pointer-events:none;
+  animation:gcShock 1.2s ease-out .15s 2; opacity:0; }
+.gc-hrpop .tag { font-size:10px; font-weight:900; letter-spacing:.24em; text-transform:uppercase;
+  background:linear-gradient(90deg,#d795ff,#8d16b8); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+.gc-hrpop .who { display:flex; align-items:center; gap:12px; margin-top:8px; }
+.gc-hrpop .nm { font-size:17px; font-weight:800; color:#fff; line-height:1.15; }
+.gc-hrpop .ln { font-family:monospace; font-size:11px; color:var(--text2); margin-top:3px; }
+.gc-hrpop .parksline { margin-top:10px; display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+@keyframes gcPopIn { 0% { transform:translateX(-50%) translateY(-26px) scale(.7); opacity:0; }
+  60% { transform:translateX(-50%) translateY(4px) scale(1.04); opacity:1; }
+  100% { transform:translateX(-50%) translateY(0) scale(1); opacity:1; } }
+@keyframes gcPopOut { to { transform:translateX(-50%) translateY(-18px) scale(.85); opacity:0; } }
+@keyframes gcShock { 0% { transform:scale(1); opacity:.85; } 100% { transform:scale(1.28); opacity:0; } }
+/* ── backyard-ball zone scene: big-head kids, swing, throw, pitch track ── */
+.gc-kid .bat { transition:transform .1s; }
+/* level swing through the zone, timed so the barrel arrives with the ball
+   (incoming track = 0.5s): small load back, whip through contact, hold the
+   follow-through, reset. Batter always faces screen-left (the mound). */
+.gc-kid.swingnow .bat { animation:gcSwing .7s cubic-bezier(.45,0,.2,1) .18s 1; }
+@keyframes gcSwing { 0% { transform:rotate(0deg); } 22% { transform:rotate(16deg); }
+  48% { transform:rotate(-118deg); } 66% { transform:rotate(-165deg); }
+  86% { transform:rotate(-165deg); } 100% { transform:rotate(0deg); } }
+.gc-kid .parm { }
+.gc-kid.throwing .parm { animation:gcThrow .6s cubic-bezier(.4,0,.3,1) 1; }
+@keyframes gcThrow { 0% { transform:rotate(0deg); } 30% { transform:rotate(-28deg); }
+  60% { transform:rotate(118deg); } 100% { transform:rotate(0deg); } }
+.gc-kid.swingnow { animation:gcHips .7s ease-out .18s 1; }
+@keyframes gcHips { 0% { transform:translateX(0); } 40% { transform:translateX(3px); }
+  60% { transform:translateX(-4px); } 100% { transform:translateX(0); } }
+.gc-inplay-streak { stroke-dasharray:60; stroke-dashoffset:60; animation:gcStreak .6s ease-out .25s forwards; }
+@keyframes gcStreak { to { stroke-dashoffset:0; } }
+.gc-pitch-trail { opacity:0; animation:gcTrail .8s ease-out forwards; }
+@keyframes gcTrail { 0% { opacity:0; } 35% { opacity:.5; } 100% { opacity:0; } }
+/* ── The Model's Ticket (HR parlay) ── */
+.slam-wrap { margin:16px 12px 4px; padding:15px 16px 13px; border-radius:14px; position:relative;
+  background:linear-gradient(155deg, rgba(176,56,249,.13), var(--bg2) 55%); border:1px solid rgba(176,56,249,.4);
+  box-shadow:0 0 24px rgba(176,56,249,.10); }
+.slam-head { display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; }
+.slam-tag { font-size:12px; font-weight:900; letter-spacing:.14em; color:#fff; }
+.slam-conf { font-size:9px; font-weight:800; letter-spacing:.12em; padding:3px 9px; border-radius:14px;
+  background:linear-gradient(90deg,#d795ff,#8d16b8); color:#151005; }
+.slam-note { font-size:10px; color:var(--text3); margin:5px 0 10px; line-height:1.4; }
+.slam-leg { display:flex; align-items:center; gap:10px; padding:8px 6px; border-radius:10px; cursor:pointer; transition:background .12s; }
+.slam-leg:hover { background:rgba(255,255,255,.03); }
+.slam-leg + .slam-leg { border-top:1px dashed rgba(176,56,249,.18); }
+.slam-n { width:17px; height:17px; border-radius:50%; background:var(--bg4); border:1px solid var(--border2);
+  display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:800; color:var(--text3); flex-shrink:0;
+  font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace; }
+.slam-meta { flex:1; min-width:0; }
+.slam-name { font-size:13px; font-weight:800; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.slam-sub { font-size:9.5px; color:var(--text3); margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.slam-why { display:flex; gap:4px; flex-wrap:wrap; margin-top:3px; }
+.slam-why span { font-size:8px; font-weight:700; font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace;
+  padding:1.5px 6px; border-radius:10px; background:rgba(52,211,153,.10); color:#6ee7b7; border:1px solid rgba(52,211,153,.25); }
+.slam-prob { font-size:16px; font-weight:800; color:#c9a6ff; font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace; flex-shrink:0; }
+.slam-odds { font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace; font-size:11px; font-weight:700; color:var(--text2);
+  background:var(--bg3); border:1px solid var(--border2); border-radius:7px; padding:4px 8px; cursor:pointer; flex-shrink:0;
+  display:inline-flex; align-items:center; gap:5px; transition:all .13s; }
+.slam-odds i { font-style:normal; font-size:8px; font-weight:800; color:#60a5fa; background:rgba(96,165,250,.15); padding:1px 5px; border-radius:4px; }
+.slam-odds:hover { border-color:rgba(176,56,249,.6); color:#fff; box-shadow:0 0 8px rgba(176,56,249,.3); }
+.slam-foot { display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-top:11px; padding-top:10px; border-top:1px solid rgba(176,56,249,.22); }
+.slam-pay, .slam-all { font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace; font-size:11px; color:var(--text2); }
+.slam-pay b { color:#34d399; font-size:13px; } .slam-all b { color:#c9a6ff; }
+.slam-cta { margin-left:auto; font-size:11px; font-weight:800; padding:7px 14px; border-radius:9px; cursor:pointer;
+  background:linear-gradient(90deg,#7a2ce0,#a020f0); color:#fff; box-shadow:0 0 12px rgba(176,56,249,.35); transition:all .15s; }
+.slam-cta:hover { box-shadow:0 0 18px rgba(176,56,249,.6); transform:translateY(-1px); }
+/* ── Pitchers & Ks tab ── */
+/* ─── PLAYOFFS (v42 October Impact) ─────────────────────────────────────── */
+.po-field { display:flex; flex-wrap:wrap; gap:6px; padding:0 20px 14px; }
+.po-seed { display:flex; align-items:center; gap:6px; background:var(--bg2); border:1px solid var(--border);
+           border-radius:9px; padding:5px 9px; font-size:11px; }
+.po-seed .n { color:var(--logo-purple); font-weight:800; font-size:10px; }
+.po-seed .t { font-weight:700; letter-spacing:.02em; }
+.po-seed .w { color:var(--text3); font-size:10px; }
+.po-seed.div { border-color:rgba(176,56,249,.45); }
+.po-tabs { display:flex; gap:8px; padding:0 20px 12px; }
+.po-tab { background:var(--bg2); border:1px solid var(--border); color:var(--text3); border-radius:9px;
+          padding:6px 16px; font-size:12px; font-weight:700; cursor:pointer; }
+.po-tab.active { border-color:var(--logo-purple); color:#fff; background:rgba(176,56,249,.1); }
+.po-note { padding:0 20px 12px; font-size:10.5px; line-height:1.5; color:var(--text3); max-width:760px; }
+/* game-by-game playoff board */
+.po-game { background:var(--bg2); border:1px solid var(--border); border-radius:16px;
+           margin:0 20px 12px; overflow:hidden; }
+.po-ghead { display:flex; justify-content:space-between; align-items:center; gap:10px;
+            padding:12px 15px; border-bottom:1px solid var(--border); flex-wrap:wrap; }
+.po-gmatch { font-size:14px; font-weight:800; letter-spacing:.01em; }
+.po-gmeta { font-size:10.5px; color:var(--text3); margin-top:2px; }
+.po-round { font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:.07em;
+            color:var(--logo-purple); background:rgba(176,56,249,.14);
+            border:1px solid rgba(176,56,249,.35); border-radius:5px; padding:2px 7px; }
+.po-lu { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.05em;
+          color:var(--text3); border:1px solid var(--border2); border-radius:5px; padding:2px 7px; }
+.po-lu.is-conf { color:var(--green); border-color:rgba(97,233,112,.35); background:rgba(97,233,112,.08); }
+.po-sub { padding:9px 15px 4px; font-size:9.5px; font-weight:700; color:var(--text3);
+          text-transform:uppercase; letter-spacing:.06em; }
+.po-tbl { width:100%; border-collapse:collapse; font-size:11.5px; }
+.po-tbl th { font-size:9px; text-transform:uppercase; letter-spacing:.05em; color:var(--text3);
+             font-weight:700; text-align:right; padding:5px 15px 5px 0; }
+.po-tbl th:first-child { text-align:left; padding-left:15px; }
+.po-tbl td { padding:6px 15px 6px 0; text-align:right; border-top:1px solid rgba(255,255,255,.04);
+             font-variant-numeric:tabular-nums; }
+.po-tbl td:first-child { text-align:left; padding-left:15px; }
+.po-tbl tr.edge-play td { background:rgba(176,56,249,.06); }
+.po-pname { font-weight:700; font-size:12px; }
+.po-pmeta { font-size:9.5px; color:var(--text3); }
+.po-prob { font-weight:800; color:var(--logo-purple); }
+.po-pos { color:var(--green); font-weight:700; }
+.po-neg { color:var(--text3); }
+.po-more { padding:8px 15px 13px; font-size:10.5px; color:var(--text3); cursor:pointer; }
+.po-more:hover { color:var(--text2); }
+.po-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(330px,1fr)); gap:10px; padding:0 20px 24px; }
+.po-card { background:var(--bg2); border:1px solid var(--border); border-radius:16px; padding:13px 15px; }
+.po-card.elite { border-color:rgba(176,56,249,.45); box-shadow:0 0 14px rgba(176,56,249,.07); }
+.po-top { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
+.po-name { font-size:13.5px; font-weight:700; }
+.po-sub { font-size:10.5px; color:var(--text3); margin-top:2px; }
+.po-score { text-align:right; flex-shrink:0; }
+.po-score .v { font-size:21px; font-weight:800; color:var(--logo-purple); line-height:1; }
+.po-score .l { font-size:8.5px; color:var(--text3); text-transform:uppercase; letter-spacing:.06em; margin-top:2px; }
+.po-bars { margin-top:10px; display:grid; gap:4px; }
+.po-bar { display:grid; grid-template-columns:74px 1fr 26px; align-items:center; gap:7px; font-size:9.5px; }
+.po-bar .lbl { color:var(--text3); text-transform:uppercase; letter-spacing:.03em; white-space:nowrap; }
+/* display:block matters — these are spans, and height/overflow do not apply to
+   a non-replaced inline element, so without it the bars render as nothing */
+.po-bar .trk { display:block; height:5px; background:rgba(255,255,255,.09); border-radius:3px; overflow:hidden; }
+.po-bar .fil { display:block; height:100%; border-radius:3px; background:var(--logo-purple); }
+.po-bar .num { text-align:right; color:var(--text2); font-variant-numeric:tabular-nums; }
+.po-line { margin-top:9px; padding-top:8px; border-top:1px solid var(--border); font-size:10px;
+           color:var(--text3); line-height:1.6; font-variant-numeric:tabular-nums; }
+.po-line b { color:var(--text2); font-weight:700; }
+.po-samp { color:#8b5cf6; }
+.pt-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(310px,1fr)); gap:10px; padding:0 20px 24px; }
+.pt-card { background:var(--bg2); border:1px solid var(--border); border-radius:16px; padding:14px 16px; position:relative; overflow:hidden; }
+.pt-card.kplay { border-color:rgba(97,233,112,.4); box-shadow:0 0 14px rgba(97,233,112,.08); }
+/* min-width:0 lets long names (Yoshinobu Yamamoto) ellipsize instead of
+   cramming the K number and stat tiles into each other */
+.pt-top { display:flex; align-items:center; gap:11px; margin-bottom:10px; min-width:0; }
+.pt-top > div:not(.pt-k) { min-width:0; flex:1; }
+.pt-name { font-size:15px; font-weight:800; color:var(--text); line-height:1.15;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.pt-sub { font-size:10px; color:var(--text3); margin-top:2px; }
+.pt-k { margin-left:auto; text-align:right; flex-shrink:0; }
+.pt-k .v { font-size:24px; font-weight:800; font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace; color:#c9a6ff; line-height:1; }
+.pt-k .l { font-size:9px; color:var(--text3); letter-spacing:.1em; text-transform:uppercase; margin-top:2px; }
+.pt-line { display:flex; align-items:center; gap:7px; font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace; font-size:11px; margin:8px 0; flex-wrap:wrap; }
+.pt-line .kln { background:var(--bg3); border:1px solid var(--border2); border-radius:7px; padding:3px 8px; color:var(--text2); }
+.pt-line .ke { font-weight:800; }
+.pt-tiles { display:grid; grid-template-columns:repeat(auto-fit,minmax(62px,1fr)); gap:6px; margin-top:8px; }
+.pt-tile { background:var(--bg3); border-radius:10px; padding:7px 4px; text-align:center; min-width:0; }
+.pt-tile .v { font-size:13px; font-weight:800; font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace; color:var(--text); }
+.pt-tile .k { font-size:8px; color:var(--text3); letter-spacing:.06em; text-transform:uppercase; margin-top:2px;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.pt-facts { display:flex; gap:6px; flex-wrap:wrap; margin-top:9px; }
+.pt-fact { font-size:9px; font-weight:700; font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace; padding:2px 7px; border-radius:12px; background:rgba(176,56,249,.10); color:#c9a6ff; border:1px solid rgba(176,56,249,.25); }
+.gc-linemv { font-family:'SF Mono','Fira Code','Fira Mono','Roboto Mono',monospace; font-size:9.5px; color:var(--text3); margin-top:6px; }
+.gc-linemv b { color:var(--text2); }
+/* ── bottom app nav (mobile) ── */
+.bnav { display:none; }
+@media (max-width:760px) {
+  .bnav { display:flex; position:fixed; bottom:0; left:0; right:0; z-index:900;
+    background:rgba(12,12,12,.92); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+    border-top:1px solid var(--border2); padding:6px 4px calc(6px + var(--sab)); }
+  body { padding-bottom:76px; }
+  /* header: compact single row on phones, no wrapped meta text */
+  .nav { height:calc(50px + var(--sat)); padding-left:14px; padding-right:14px; }
+  .nav-date { display:none !important; }
+  .nav-badge { display:none !important; }
+  .nav-right { gap:6px; flex-shrink:0; }
+  .logo-svg { width:28px !important; height:28px !important; }
+  .logo-onyx { font-size:14px; }
+  .nav-hamburger { width:36px; height:36px; }
+  .notif-bell { width:36px; height:36px; }
+  /* gamecast funnel fits edge-to-edge */
+  .gc-betbar { flex-direction:column; align-items:stretch; gap:8px; }
+  .gc-bet-cta { text-align:center; }
+  .gc-bet-chips { display:grid; grid-template-columns:repeat(2,1fr); }
+  .gc-bet-chip { text-align:center; }
+}
+.bnav-item { flex:1; background:none; border:none; color:var(--text3); font-family:monospace; font-size:9px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; display:flex; flex-direction:column; align-items:center; gap:3px; padding:4px 0; cursor:pointer; }
+.bnav-item .bi { font-size:18px; filter:grayscale(1); opacity:.65; transition:all .15s; }
+.bnav-item.active { color:#c9a6ff; }
+.bnav-item.active .bi { filter:none; opacity:1; }
+/* big raised center action: Games is the app's flagship button */
+.bnav-item.big .bi { width:52px; height:52px; margin-top:-28px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center; font-size:24px;
+  background:linear-gradient(135deg,#b038f9,#635bff);
+  box-shadow:0 6px 18px rgba(176,56,249,.45), 0 0 0 4px rgba(12,12,12,.95);
+  filter:none; opacity:1; }
+.bnav-item.big { color:var(--text2); }
+.bnav-item.big.active { color:#c9a6ff; }
+.bnav-item.big.active .bi { box-shadow:0 6px 24px rgba(176,56,249,.75), 0 0 0 4px rgba(12,12,12,.95); }
+/* notification preferences menu */
+.notif-menu { position:fixed; top:calc(60px + var(--sat)); right:12px; z-index:1200;
+  width:270px; background:rgba(10,14,24,.98); border:1px solid var(--border2); border-radius:14px;
+  box-shadow:0 12px 40px rgba(0,0,0,.6); padding:12px; backdrop-filter:blur(16px); }
+.notif-hd { font-family:monospace; font-size:10px; font-weight:700; letter-spacing:.12em;
+  text-transform:uppercase; color:var(--text3); padding:2px 4px 10px; }
+.notif-row { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:9px 4px;
+  border-top:1px solid rgba(26,37,53,.5); }
+.notif-row.dis { opacity:.45; }
+.nr-l { font-size:12px; font-weight:700; }
+.nr-s { font-size:10px; color:var(--text3); margin-top:1px; }
+.notif-tog { width:40px; height:22px; border-radius:12px; border:1px solid var(--border2);
+  background:var(--bg3); cursor:pointer; position:relative; flex-shrink:0; transition:all .15s; }
+.notif-tog span { position:absolute; top:2px; left:2px; width:16px; height:16px; border-radius:50%;
+  background:var(--text3); transition:all .18s; }
+.notif-tog.on { background:linear-gradient(90deg,#b038f9,#635bff); border-color:rgba(176,56,249,.6); }
+.notif-tog.on span { left:20px; background:#fff; }
+.notif-enable { width:100%; font-family:monospace; font-size:11px; font-weight:800; color:#fff;
+  background:linear-gradient(90deg,#b038f9,#635bff); border:none; border-radius:9px;
+  padding:10px; cursor:pointer; margin-bottom:4px; }
+.gc-subnav { display:flex; gap:8px; margin:0 0 14px; }
+.gc-subnav button { background:var(--card); border:1px solid var(--border2); color:var(--text3); font-family:monospace; font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; padding:8px 14px; border-radius:8px; cursor:pointer; transition:all .15s; }
+.gc-subnav button.on { color:#fff; border-color:rgba(176,56,249,.6); background:rgba(176,56,249,.14); }
+.gc-zonewrap { display:flex; flex-direction:column; align-items:center; gap:3px; }
+.gc-zonewrap .zl { font-size:8px; font-weight:700; letter-spacing:.12em; color:var(--text3); text-transform:uppercase; }
+.gc-pitchrow { display:flex; align-items:center; gap:8px; padding:4px 0; font-size:11px; color:var(--text2); border-top:1px solid rgba(26,37,53,.5); font-family:monospace; }
+.gc-pitchrow .pn { width:16px; height:16px; border-radius:50%; color:#0a0a14; font-weight:800; font-size:9px; display:inline-flex; align-items:center; justify-content:center; flex:none; }
+.gc-pitchrow .pc { min-width:120px; font-weight:700; }
+.gc-pitchrow .pt { color:var(--text3); }
+.gc-pbp-inn { font-family:monospace; font-size:10px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--text3); padding:14px 2px 6px; }
+.gc-pbp-row { background:var(--card); border:1px solid var(--border2); border-radius:10px; padding:10px 12px; margin-bottom:8px; cursor:pointer; transition:border-color .15s; }
+.gc-pbp-row:hover { border-color:rgba(176,56,249,.45); }
+.gc-pbp-row.scoring { border-color:rgba(52,211,153,.45); }
+.gc-pbp-row .ev { font-family:monospace; font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#b038f9; }
+.gc-pbp-row.scoring .ev { color:#34d399; }
+.gc-pbp-row .sc { float:right; font-family:monospace; font-size:11px; font-weight:800; color:var(--text2); }
+.gc-pbp-row .ds { font-size:12px; color:var(--text2); line-height:1.5; margin-top:3px; }
+.gc-pbp-x { display:flex; gap:16px; margin-top:10px; padding-top:10px; border-top:1px solid rgba(26,37,53,.5); flex-wrap:wrap; align-items:flex-start; }
+.gc-pbp-x .pl { flex:1; min-width:220px; }
+.gc-ars { display:grid; grid-template-columns:auto 1fr; gap:20px; align-items:start; }
+.gc-ars-chips { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+.gc-ars-chip { font-family:monospace; font-size:9px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--text3); background:var(--bg4); border:1px solid var(--border2); border-radius:20px; padding:5px 11px; cursor:pointer; transition:all .15s; }
+.gc-ars-chip:hover { color:var(--text2); border-color:rgba(176,56,249,.4); }
+.gc-ars-chip.on { color:#fff; border-color:rgba(176,56,249,.65); background:rgba(176,56,249,.16); box-shadow:0 0 12px rgba(176,56,249,.25); }
+.gc-ars-tiles { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:12px; }
+.gc-ars-tile { background:var(--bg4); border:1px solid var(--border2); border-radius:10px; padding:9px 10px 7px; text-align:center; }
+.gc-ars-tile .v { font-family:monospace; font-size:19px; font-weight:800; background:linear-gradient(90deg,#b038f9,#635bff); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+.gc-ars-tile .k { font-size:8px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--text3); margin-top:2px; }
+.gc-ars-typerow { display:flex; align-items:center; gap:9px; padding:6px 9px; border-radius:8px; cursor:pointer; border:1px solid transparent; transition:all .12s; }
+.gc-ars-typerow:hover { background:var(--bg4); }
+.gc-ars-typerow.on { border-color:rgba(176,56,249,.5); background:rgba(176,56,249,.1); }
+.gc-ars-typerow .sw { width:10px; height:10px; border-radius:3px; flex:none; }
+.gc-ars-typerow .nm { font-size:11px; font-weight:700; min-width:112px; }
+.gc-ars-typerow .bar { flex:1; height:5px; background:var(--bg4); border-radius:3px; overflow:hidden; }
+.gc-ars-typerow .bar i { display:block; height:5px; border-radius:3px; }
+.gc-ars-typerow .st { font-family:monospace; font-size:10px; color:var(--text3); min-width:118px; text-align:right; }
+.gc-hr-row { display:flex; gap:10px; align-items:center; padding:7px 10px; border-radius:8px; background:rgba(215,149,255,.06); border:1px solid rgba(215,149,255,.28); margin-bottom:6px; }
+.gc-hr-row .hb { font-size:11px; font-weight:800; flex:1; }
+.gc-hr-row .hd { font-family:monospace; font-size:12px; font-weight:800; color:#d795ff; }
+.gc-hr-row .hm { font-family:monospace; font-size:10px; color:var(--text3); }
+.gc-ev-row { display:flex; gap:10px; align-items:center; padding:5px 8px; font-size:11px; color:var(--text2); border-top:1px solid rgba(26,37,53,.5); }
+.gc-ev-row .eb { flex:1; font-weight:700; }
+.gc-ev-row .ee { font-family:monospace; font-size:11px; font-weight:800; }
+.gc-ev-row .er { font-family:monospace; font-size:10px; color:var(--text3); min-width:80px; text-align:right; }
+.gc-ev-leg { display:flex; gap:8px; align-items:center; margin-top:8px; flex-wrap:wrap; }
+.gc-ev-leg span { display:inline-flex; align-items:center; gap:4px; font-family:monospace; font-size:8px; letter-spacing:.06em; text-transform:uppercase; color:var(--text3); }
+.gc-ev-leg i { width:8px; height:8px; border-radius:50%; display:inline-block; }
+@keyframes gcDotIn { from { opacity:0; transform:scale(.2); } to { opacity:1; transform:scale(1); } }
+.gc-dotin { animation:gcDotIn .45s cubic-bezier(.34,1.56,.64,1) backwards; transform-box:fill-box; transform-origin:center; }
+@media (max-width:760px) { .gc-ars { grid-template-columns:1fr; justify-items:center; } .gc-ars-tiles { width:100%; } }
+.gc-boxes { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.gc-box-table { width:100%; border-collapse:collapse; font-size:11px; }
+.gc-box-table th { padding:5px 6px; font-size:9px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--text3); border-bottom:1px solid var(--border); text-align:right; }
+.gc-box-table th:first-child { text-align:left; }
+.gc-box-table td { padding:5px 6px; border-bottom:1px solid rgba(26,37,53,.5); text-align:right; font-family:monospace; }
+.gc-box-table td:first-child { text-align:left; font-family:inherit; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:150px; }
+.gc-box-table tr.sub td:first-child { padding-left:16px; color:var(--text3); font-weight:400; }
+.gc-hrprob { font-size:9px; font-weight:700; font-family:monospace; color:#b38cff; margin-left:5px; }
+.gc-hitbadge { font-size:8px; font-weight:800; padding:1px 5px; border-radius:3px; background:rgba(0,255,136,.15); color:var(--neon-green); margin-left:5px; }
+.gc-empty { text-align:center; color:var(--text3); padding:60px 20px; font-size:13px; }
+
+/* ── REVAMP: SPACING RHYTHM ─────────────────────────────────── */
+.home-section { margin-bottom:64px; }
+.home-section-title { margin:6px 0 22px; }
+.flag-grid { gap:12px; margin-top:18px; }
+.model-notes-grid { gap:14px; margin-top:18px; }
+.model-note { padding:18px 20px; }
+.sec-hdr { padding:20px 20px 14px; }
+.rank-table th { padding:10px 8px; }
+.rank-table td { padding:9px 8px; }
+.tcard { padding:16px 18px; }
+.gc-card { padding:16px 18px; margin-bottom:16px; }
+.mkt-card { margin-bottom:18px; }
+.mkt-row { padding:13px 18px; }
+#record-summary { gap:10px; padding:14px 20px; }
+@media(max-width:700px){
+  .rank-table th { padding:8px 5px; }
+  .rank-table td { padding:7px 5px; font-size:11px; }
+  .home-section { margin-bottom:44px; }
+}
+
+/* live board badges */
+.hit-flag { font-size:9px; font-weight:800; padding:2px 6px; border-radius:4px;
+  background:rgba(0,255,136,.15); color:var(--neon-green); margin-left:6px; white-space:nowrap; }
+.done-flag { font-size:9px; font-weight:700; padding:2px 6px; border-radius:4px;
+  background:rgba(255,255,255,.06); color:var(--text3); margin-left:6px; white-space:nowrap; }
+.pa-flag { font-size:9px; font-weight:600; color:var(--text3); font-family:monospace; margin-left:6px; white-space:nowrap; }
+tr.row-done td, .tcard.card-done { opacity:.5; }
+
+/* player drill-down modal */
+.pmodal-back { position:fixed; inset:0; padding-top:var(--sat); background:rgba(5,6,10,.75); backdrop-filter:blur(6px);
+  z-index:100000; display:none; align-items:flex-start; justify-content:center; padding:60px 16px; overflow-y:auto; }
+.pmodal-back.open { display:flex; }
+.pmodal { background:var(--bg2); border:1px solid var(--border2); border-radius:16px;
+  width:100%; max-width:520px; overflow:hidden; position:relative; }
+.pmodal::before { content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background:linear-gradient(90deg,#b038f9,#635bff); }
+.pmodal-head { display:flex; align-items:center; gap:12px; padding:20px 22px 14px; }
+.pmodal-close { margin-left:auto; background:none; border:none; color:var(--text3); font-size:20px; cursor:pointer; }
+.pmodal-name { font-size:18px; font-weight:800; }
+.pmodal-sub { font-size:11px; color:var(--text3); font-family:monospace; margin-top:2px; }
+.pmodal-prob { text-align:center; padding:6px 0 16px; }
+.pmodal-prob .big { font-size:40px; font-weight:800; font-family:monospace;
+  background:linear-gradient(90deg,#b038f9,#635bff); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+.pmodal-prob .cap { font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--text3); }
+.pmodal-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; padding:0 22px 16px; }
+.pmodal-stat { background:var(--bg3); border:1px solid var(--border); border-radius:9px; padding:9px 6px; text-align:center; }
+.pmodal-stat .v { font-size:14px; font-weight:800; font-family:monospace; }
+.pmodal-stat .k { font-size:8px; letter-spacing:.08em; text-transform:uppercase; color:var(--text3); margin-top:2px; }
+.pmodal-l5 { padding:0 22px 8px; }
+.pmodal-l5-title { font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text3); margin-bottom:8px; }
+.pml5-row { display:flex; gap:7px; }
+.pml5-g { flex:1; text-align:center; background:var(--bg3); border:1px solid var(--border); border-radius:9px; padding:8px 4px; }
+.pml5-g.hr { background:rgba(0,255,136,.08); border-color:rgba(0,255,136,.3); }
+.pml5-g .d { font-size:8px; color:var(--text3); font-family:monospace; }
+.pml5-g .o { font-size:9px; color:var(--text2); font-weight:700; margin:2px 0; }
+.pml5-g .h { font-size:13px; font-weight:800; font-family:monospace; }
+.pml5-g.hr .h { color:var(--neon-green); }
+.pml5-g .h.zero { color:var(--text3); }
+.pmodal-fac { padding:0 22px 22px; }
+.pmodal-fac-title { font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text3); margin-bottom:10px; }
+.pfac-row { display:flex; align-items:center; gap:10px; margin-bottom:7px; }
+.pfac-name { flex:0 0 110px; font-size:11px; color:var(--text2); }
+.pfac-bar { flex:1; height:6px; background:var(--bg4); border-radius:3px; position:relative; overflow:hidden; }
+.pfac-fill { position:absolute; top:0; bottom:0; border-radius:3px; }
+.pfac-val { flex:0 0 52px; text-align:right; font-size:11px; font-weight:700; font-family:monospace; }
+
+/* calibration buckets */
+.cal-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; padding:4px 20px 18px; }
+.cal-cell { background:var(--bg2); border:1px solid var(--border); border-radius:10px; padding:12px 12px 10px; text-align:center; }
+.cal-cell .rng { font-size:10px; font-weight:700; color:var(--text3); font-family:monospace; }
+.cal-cell .rate { font-size:19px; font-weight:800; font-family:monospace; margin:4px 0 1px; }
+.cal-cell .n { font-size:9px; color:var(--text3); }
+
+/* notification bell */
+.notif-bell { background:none; border:1px solid var(--border2); border-radius:8px; color:var(--text3);
+  width:30px; height:30px; cursor:pointer; font-size:14px; line-height:1; transition:all .15s; }
+.notif-bell.on { color:var(--neon-green); border-color:rgba(0,255,136,.4); box-shadow:0 0 8px rgba(0,255,136,.15); }
+
+/* ── MODERNIZATION PASS ─────────────────────────────────────── */
+/* ambient depth behind everything */
+body::after {
+  content:''; position:fixed; inset:0; z-index:-1; pointer-events:none;
+  background:
+    radial-gradient(900px 500px at 85% -10%, rgba(64,96,240,.07), transparent 60%),
+    radial-gradient(700px 420px at 10% 110%, rgba(176,56,249,.06), transparent 60%);
+}
+/* nav identity: gradient underline on the active tab */
+.nav-tab { position:relative; }
+.nav-tab.active { border-bottom-color:transparent; text-shadow:none; }
+.nav-tab.active::after {
+  content:''; position:absolute; left:10px; right:10px; bottom:-1px; height:2px;
+  border-radius:2px; background:linear-gradient(90deg,#b038f9,#635bff);
+  box-shadow:0 0 10px rgba(176,56,249,.55);
+}
+#liveCount .nav-live-dot {
+  display:inline-block; width:6px; height:6px; border-radius:50%;
+  background:var(--neon-green); box-shadow:0 0 6px var(--neon-green);
+  margin-right:5px; animation:dotBlink 1.4s ease-in-out infinite;
+}
+/* one card language everywhere */
+.model-note, .flag-card, .cal-cell, .tcard, .gc-card, .mkt-card, .gc-header {
+  transition:border-color .18s, transform .18s, box-shadow .18s;
+}
+.model-note:hover, .flag-card:hover, .cal-cell:hover {
+  border-color:var(--border2); transform:translateY(-1px);
+}
+.tcard:hover, .mkt-card:hover, .gc-card:hover {
+  border-color:rgba(176,56,249,.35);
+  box-shadow:0 6px 24px rgba(0,0,0,.35), 0 0 0 1px rgba(176,56,249,.12);
+}
+/* number motion when live data changes */
+@keyframes bumpNum { 0%{transform:scale(1)} 35%{transform:scale(1.3);color:var(--neon-green)} 100%{transform:scale(1)} }
+.bump { animation:bumpNum .7s ease; display:inline-block; }
+/* skeleton loading */
+@keyframes skshine { 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
+.skel { position:relative; overflow:hidden; background:var(--bg3); border:1px solid var(--border); border-radius:12px; }
+.skel::after { content:''; position:absolute; inset:0;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.06),transparent);
+  animation:skshine 1.2s infinite; }
+/* mobile: rankings collapses to the columns that matter */
+@media(max-width:700px){
+  .rank-table th:nth-child(5), .rank-table td:nth-child(5),
+  .rank-table th:nth-child(6), .rank-table td:nth-child(6),
+  .rank-table th:nth-child(8), .rank-table td:nth-child(8),
+  .rank-table th:nth-child(9), .rank-table td:nth-child(9),
+  .rank-table th:nth-child(10), .rank-table td:nth-child(10),
+  .rank-table th:nth-child(11), .rank-table td:nth-child(11),
+  .rank-table th:nth-child(12), .rank-table td:nth-child(12) { display:none; }
+  .rank-table { table-layout:auto; }
+}
+/* daily recap */
+.recap-card {
+  position:relative; overflow:hidden; cursor:pointer;
+  background:var(--bg2); border:1px solid var(--border); border-radius:14px;
+  padding:20px 22px; margin-bottom:26px; transition:border-color .18s, box-shadow .18s;
+}
+.recap-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background:linear-gradient(90deg,#b038f9,#635bff); }
+.recap-card:hover { border-color:rgba(176,56,249,.4); box-shadow:0 6px 24px rgba(0,0,0,.35); }
+.recap-tag { font-size:10px; font-weight:700; letter-spacing:.12em; text-transform:uppercase;
+  background:linear-gradient(90deg,#b038f9,#635bff); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+.recap-head { font-size:20px; font-weight:800; margin:6px 0 4px; }
+.recap-sub { font-size:12px; color:var(--text2); font-family:monospace; }
+.recap-cta { font-size:12px; font-weight:700; color:#b38cff; margin-top:10px; }
+.rc-entry { padding:14px 0; border-bottom:1px solid rgba(26,37,53,.6); }
+.rc-entry:last-child { border-bottom:none; }
+.rc-title { font-size:14px; font-weight:800; display:flex; align-items:center; gap:8px; }
+.rc-badge { font-size:9px; font-weight:800; padding:2px 8px; border-radius:4px; }
+.rc-badge.hit  { background:rgba(0,255,136,.15); color:var(--neon-green); }
+.rc-badge.miss { background:rgba(239,68,68,.14); color:#f87171; }
+.rc-badge.void { background:rgba(255,255,255,.07); color:var(--text3); }
+.rc-story { font-size:12.5px; line-height:1.75; color:var(--text2); margin-top:6px; }
+/* gamecenter: win probability strip + scoring plays */
+.gc-wp-wrap { position:relative; height:64px; }
+.gc-wp-wrap svg { position:absolute; inset:0; width:100%; height:100%; }
+.gc-wp-lbl { position:absolute; right:4px; font-size:10px; font-weight:800; font-family:monospace; background:rgba(12,12,12,.75); padding:1px 6px; border-radius:5px; }
+.gc-play { display:flex; gap:10px; padding:8px 0; border-bottom:1px solid rgba(26,37,53,.5); font-size:12px; line-height:1.6; }
+.gc-play:last-child { border-bottom:none; }
+.gc-play .inn { flex:0 0 44px; font-family:monospace; font-size:10px; font-weight:700; color:var(--text3); padding-top:2px; }
+.gc-play .sc { flex:0 0 52px; font-family:monospace; font-size:11px; font-weight:800; text-align:right; padding-top:1px; }
+.gc-play .tx { flex:1; color:var(--text2); }
+
+/* ── MARKETS (Kalshi-style win probability) ─────────────────── */
+.mkt-wrap { padding:14px 16px 40px; max-width:900px; margin:0 auto; }
+.mkt-card {
+  background:var(--bg2); border:1px solid var(--border); border-radius:14px;
+  margin-bottom:16px; overflow:hidden;
+}
+.mkt-head { display:flex; align-items:center; justify-content:space-between; padding:14px 18px 6px; }
+.mkt-title { font-size:14px; font-weight:800; }
+.mkt-sub { font-size:11px; color:var(--text3); font-family:monospace; margin-top:2px; }
+.mkt-sub .live { color:var(--neon-green); animation:dotBlink 1.4s ease-in-out infinite; font-weight:700; }
+.mkt-chart { position:relative; height:150px; padding:8px 64px 8px 10px; }
+.mkt-chart svg { position:absolute; inset:8px 64px 8px 10px; width:calc(100% - 74px); height:calc(100% - 16px); overflow:visible; }
+.mkt-endlbl { position:absolute; right:8px; transform:translateY(-50%); text-align:left; font-family:monospace; line-height:1.1; }
+.mkt-endlbl .t { font-size:9px; font-weight:700; color:var(--text3); }
+.mkt-endlbl .p { font-size:15px; font-weight:800; }
+.mkt-grid { position:absolute; inset:8px 64px 8px 10px; pointer-events:none; }
+.mkt-grid div { position:absolute; left:0; right:0; border-top:1px dashed rgba(255,255,255,.06); font-size:8px; color:var(--text3); font-family:monospace; }
+.mkt-grid div span { position:absolute; left:4px; top:-11px; opacity:.55; }
+.mkt-rows { border-top:1px solid var(--border); }
+.mkt-row { display:flex; align-items:center; gap:12px; padding:11px 18px; border-bottom:1px solid rgba(26,37,53,.5); }
+.mkt-row:last-child { border-bottom:none; }
+.mkt-row .sticker-logo { width:26px; height:26px; }
+.mkt-team { flex:1; font-size:13px; font-weight:700; }
+.mkt-team .ml { font-size:10px; color:var(--text3); font-family:monospace; font-weight:400; margin-left:7px; }
+.mkt-pct { font-size:17px; font-weight:800; font-family:monospace; min-width:58px; text-align:right; }
+.mkt-delta { font-size:10px; font-family:monospace; min-width:34px; text-align:left; }
+.mkt-delta.up { color:#4ade80; } .mkt-delta.dn { color:#f87171; } .mkt-delta.fl { color:var(--text3); }
+.mkt-chip {
+  min-width:86px; text-align:center; padding:8px 0; border-radius:9px;
+  font-size:12px; font-weight:700; font-family:monospace;
+  background:var(--bg3); border:1px solid var(--border2);
+  cursor:pointer; transition:all .15s;
+}
+.mkt-chip:hover { border-color:rgba(176,56,249,.6); box-shadow:0 0 10px rgba(176,56,249,.25); transform:translateY(-1px); }
+.onyx-bet-btn { display:inline-flex; align-items:center; gap:5px; margin-left:auto;
+  font-size:10px; font-weight:800; font-family:monospace; letter-spacing:.04em;
+  color:#fff; background:linear-gradient(90deg,#b038f9,#635bff);
+  border:1px solid rgba(176,56,249,.7); border-radius:6px; padding:5px 11px;
+  cursor:pointer; transition:all .15s; white-space:nowrap; }
+.onyx-bet-btn:hover { box-shadow:0 0 14px rgba(176,56,249,.5); transform:translateY(-1px); filter:brightness(1.12); }
+.mkt-chip.yes { color:#4ade80; } .mkt-chip.no { color:#f87171; }
+.mkt-chip.rl { color:#c084fc; min-width:70px; }
+.mkt-ou { font-family:monospace; font-size:10px; font-weight:700; color:var(--text2);
+  background:var(--bg3); border:1px solid var(--border2); border-radius:6px;
+  padding:4px 8px; cursor:pointer; transition:all .15s; }
+.mkt-ou:hover { border-color:rgba(176,56,249,.6); color:#fff; box-shadow:0 0 8px rgba(176,56,249,.25); }
+.mkt-note { padding:8px 18px 12px; font-size:9px; color:var(--text3); font-family:monospace; letter-spacing:.04em; }
+.mkt-head { cursor:pointer; }
+.mkt-histbtn { display:inline-flex; align-items:center; gap:5px; background:var(--bg3);
+  border:1px solid var(--border2); border-radius:8px; color:var(--text2); font-size:11px;
+  font-weight:700; padding:6px 11px; cursor:pointer; white-space:nowrap; transition:all .15s; }
+.mkt-histbtn:hover { color:var(--text); border-color:rgba(176,56,249,.5); }
+.mkt-card.open .mkt-histbtn { color:#b38cff; border-color:rgba(176,56,249,.5); }
+.mkt-chev { font-size:11px; color:inherit; transition:transform .2s; display:inline-block; }
+.mkt-card.open .mkt-chev { transform:rotate(180deg); }
+.mkt-chart.big { height:230px; }
+.mkt-axis { position:relative; height:18px; margin:0 64px 4px 10px; }
+.mkt-axis span { position:absolute; transform:translateX(-50%); font-size:9px; color:var(--text3); font-family:monospace; white-space:nowrap; }
+.mkt-hist { border-top:1px solid var(--border); max-height:240px; overflow-y:auto; }
+.mkt-hist table { width:100%; border-collapse:collapse; font-family:monospace; font-size:11px; }
+.mkt-hist th { position:sticky; top:0; background:var(--bg2); padding:7px 18px; font-size:9px; font-weight:700;
+  letter-spacing:.08em; text-transform:uppercase; color:var(--text3); text-align:right; border-bottom:1px solid var(--border); }
+.mkt-hist th:first-child { text-align:left; }
+.mkt-hist td { padding:6px 18px; text-align:right; border-bottom:1px solid rgba(26,37,53,.4); color:var(--text2); }
+.mkt-hist td:first-child { text-align:left; color:var(--text3); }
+.mkt-hist .mv-up { color:#4ade80; } .mkt-hist .mv-dn { color:#f87171; }
+@media(max-width:640px){
+  .mkt-chip { min-width:58px; font-size:11px; padding:7px 0; }
+  .mkt-chart { height:120px; }
+  .mkt-pct { font-size:14px; min-width:42px; }
+  /* market rows wrap on phones: team+price line, chips drop to their own line */
+  .mkt-row { flex-wrap:wrap; row-gap:7px; gap:8px; padding:11px 12px; }
+  .mkt-chip { flex:1; }
+  .mkt-chip.rl { flex:0 0 74px; }
+  .mkt-delta { min-width:26px; }
+}
+@media(max-width:760px){
+  .gc-boxes { grid-template-columns:1fr; }
+  /* game header: both teams always fully on screen */
+  .gc-header { padding:14px 10px; gap:6px; }
+  .gc-side { gap:7px; flex:1; min-width:0; }
+  .gc-tscore { font-size:28px; }
+  .gc-logo { width:32px; height:32px; }
+  .gc-tname { font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:62px; }
+  .gc-trec { font-size:9px; }
+  .gc-mid { min-width:92px; }
+  .gc-matchup { grid-template-columns:1fr; }
+  .gc-count { text-align:left; }
+  .gc-dots { justify-content:flex-start; }
+  /* board game table: drop the duplicate O/U column (it lives in the
+     header pill) so team + xHR + moneyline all fit */
+  .team-row { grid-template-columns:1fr 82px 84px; padding:10px 10px; }
+  .team-row > div:nth-child(3) { display:none; }
+  .tr-name { font-size:12px; }
+  .tr-pitcher, .tr-top { font-size:10px; }
+  .odds-main { font-size:12px; }
+  .game-pills .gpill-venue { display:none; }
+}
+
+/* ── ONYX BRAND SKIN (8/14): clean, sleek pass per the brand hub.
+   Purple 400 leads on interactive, Seed only for live/positive, neutral
+   Onyx surfaces, sentence-case labels instead of tracked-out mono caps.
+   Overrides live at the end of the sheet on purpose - the base rules
+   above keep working, this layer only calms them down. ── */
+.gc-card { border-radius:16px; background:var(--bg2); border-color:var(--border); }
+.gc-card-title { font-size:12px; font-weight:700; letter-spacing:0; text-transform:none;
+  color:var(--text2); margin-bottom:10px; }
+.gc-mu-role { font-size:10px; letter-spacing:.02em; text-transform:none; color:var(--text3); font-weight:600; }
+.zl { letter-spacing:0 !important; text-transform:none !important; }
+.gc-subnav button { border-radius:999px; padding:7px 16px; font-size:12px; }
+.sb-card { border-radius:16px; }
+.sb-card:hover { border-color:rgba(176,56,249,.45); }
+/* the last play is the story of the game right now - give it the lead */
+.gc-lastplay { border-left:3px solid var(--logo-purple); background:linear-gradient(90deg, rgba(176,56,249,.08), transparent 60%), var(--bg2); }
+.gc-lastplay .gc-card-title { color:#d795ff; }
+.gc-lastplay .lp-txt { font-size:13.5px; color:var(--text); line-height:1.55; }
+/* ── PURPLE LEADS (8/14 pass 2): the brand guide is the direction.
+   Purple 400 owns identity + every active/interactive state; Seed is
+   reserved for wins, live pulses, and positive money. ── */
+.logo-ball { animation:onyxSpin 4s linear infinite; will-change:transform; border-radius:50%; }
+@keyframes onyxSpin { from { transform:perspective(220px) rotateY(0deg); }
+                      to   { transform:perspective(220px) rotateY(360deg); } }
+@media (prefers-reduced-motion: reduce) { .logo-ball { animation:none; } }
+/* ONE active indicator: the ::after pill. The old border-bottom (green,
+   then purple) stacked under it and read as a doubled/dashed line. */
+.nav-tab.active { border-bottom-color:transparent !important; text-shadow:none; }
+.nav-tab.active::after { background:linear-gradient(90deg,#b038f9,#d795ff);
+  box-shadow:0 2px 8px rgba(176,56,249,.35); bottom:0; }
+.dd-item.active, .drawer-item.active { color:#d795ff; }
+.rfchip.active { background:rgba(176,56,249,.12); border-color:rgba(176,56,249,.35); color:#d795ff; }
+.dfs-btn.active { background:var(--logo-purple); color:#fff; }
+.tl-dot.active { border-color:var(--logo-purple); background:rgba(176,56,249,.1); }
+.tl-dot.active::after { background:var(--logo-purple); }
+.gc-subnav button.on { background:rgba(176,56,249,.14); border-color:rgba(176,56,249,.4); color:#d795ff; }
+/* headline gradients lean purple-first: Purple 400 -> Purple 200 -> Blue 400 */
+:root { --brand-grad: linear-gradient(90deg,#b038f9 0%,#d795ff 55%,#635bff 100%);
+        --brand-grad-diag: linear-gradient(135deg,#b038f9 0%,#8d16b8 50%,#635bff 100%); }
+/* one geometry: 16px cards, pill chips, consistent gutters */
+.mkt-card, .power-card, .rk-card, .money-card, .gc-chip, .home-card { border-radius:16px; }
+.rfchip, .lu-game-btn, .dfs-btn { border-radius:999px; }
+/* thumb-friendly odds everywhere - every one of these taps feeds a bet */
+.sb-ml, .gc-bet-chip, .mkt-ou, .mkt-chip { min-height:38px; display:inline-flex; align-items:center; justify-content:center; }
+.onyx-bet-btn { min-height:40px; }
+@media (max-width:760px) {
+  .sb-ml, .gc-bet-chip { min-height:42px; }
+  .pb-fab { padding:12px 18px; font-size:13px; border-radius:26px; }
+}
+</style>
+<style>
+.sp-wrap{max-width:1180px;margin:0 auto;padding:16px 16px 120px}
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:22px 0 12px}
+.sec-count{font-size:12px;color:var(--text3);font-family:monospace}
+.empty{padding:26px 18px;border:1px dashed var(--border2);border-radius:14px;text-align:center;color:var(--text3);font-size:13px;line-height:1.6}
+.tbl{overflow-x:auto;border:1px solid var(--border2);border-radius:14px;background:var(--bg2)}
+.tbl table{width:100%;border-collapse:collapse;font-size:13px;min-width:520px}
+.tbl th{padding:9px 10px;text-align:left;font:700 10px monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border2);white-space:nowrap}
+.tbl td{padding:9px 10px;border-bottom:1px solid var(--border);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:0}
+.tbl .r{text-align:right}.mono{font-family:monospace}.dim{color:var(--text3)}
+.tbl tr.tap{cursor:pointer}.tbl tr.tap:hover td{background:rgba(176,56,249,.06)}
+.lg{width:22px;height:22px;object-fit:contain;vertical-align:middle;flex-shrink:0}
+.lg.l{width:46px;height:46px}.lg.m{width:30px;height:30px}
+.sp-tabs-seg{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-bottom:12px}.sp-tabs-seg::-webkit-scrollbar{display:none}
+.sp-tabs-seg button{flex-shrink:0;padding:8px 13px;border-radius:999px;border:1px solid var(--border2);background:rgba(255,255,255,.04);color:var(--text2);font:700 12px 'Space Grotesk',system-ui,sans-serif;cursor:pointer;white-space:nowrap}
+.sp-tabs-seg button.on{background:linear-gradient(135deg,#b038f9,#635bff);color:#fff;border-color:transparent}
+/* game cards */
+.gm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:10px}
+.gm{display:flex;flex-direction:column;gap:8px;padding:12px 14px;border-radius:14px;border:1px solid var(--border2);background:var(--bg2);cursor:pointer;color:var(--text);text-align:left;font:inherit;transition:border-color .2s,transform .2s}
+.gm:hover,.gm.sel{border-color:rgba(176,56,249,.6)}.gm:hover{transform:translateY(-2px)}
+.gm-top{display:flex;justify-content:space-between;align-items:center;gap:8px;font:700 11px monospace;color:var(--text3);text-transform:uppercase;letter-spacing:.05em}
+.gm-top .live{color:#61e970}.gm-top .live::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:#61e970;margin-right:6px;animation:oxBlink 1.4s infinite}
+.gm-t{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px}
+.gm-t b{font-size:15px}.gm-t .rec{font:500 11px monospace;color:var(--text3);margin-left:6px}
+.gm-t .sc{font:800 20px monospace}.gm-t.lose{opacity:.55}
+.gm-t .rk{font:700 10px monospace;color:#d795ff;margin-right:4px}
+.gm-lines{display:flex;gap:6px;flex-wrap:wrap}
+.chipx{display:inline-flex;flex-direction:column;align-items:center;min-width:64px;padding:5px 8px;border-radius:10px;border:1px solid var(--border2);background:rgba(255,255,255,.03);cursor:pointer;color:var(--text);font:inherit}
+.chipx b{font:800 13px monospace}.chipx span{font:700 9px monospace;letter-spacing:.06em;color:var(--text3);text-transform:uppercase}
+.chipx:hover{border-color:#b038f9}
+.chipx.dead{opacity:.4;cursor:default}
+/* gamecenter */
+.gc{margin-top:14px;border:1px solid var(--border2);border-radius:18px;background:linear-gradient(180deg,rgba(33,27,37,.6),var(--bg2));padding:16px;scroll-margin-top:120px}
+.gc-hd{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px}
+.gc-side{display:flex;align-items:center;gap:10px;min-width:0}.gc-side.h{justify-content:flex-end;text-align:right}
+.gc-side b{display:block;font-size:17px}.gc-side span{font:500 11px monospace;color:var(--text3)}
+.gc-mid{text-align:center}.gc-mid .sc{font:800 34px monospace;letter-spacing:.02em}
+.gc-mid .st{font:700 11px monospace;color:var(--text3);text-transform:uppercase}
+.gc-mid .st.live{color:#61e970}
+.gc-sec{margin-top:16px}.gc-sec h4{margin:0 0 8px;font:800 11px monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--text3)}
+.field{position:relative;height:96px;border-radius:12px;overflow:hidden;background:repeating-linear-gradient(90deg,#123d22 0 10%,#14462a 10% 20%);border:1px solid rgba(97,233,112,.25)}
+.field .ez{position:absolute;top:0;bottom:0;width:8%;display:flex;align-items:center;justify-content:center;font:800 10px monospace;color:rgba(255,255,255,.75);writing-mode:vertical-rl;text-orientation:mixed;letter-spacing:.2em}
+.field .ez.a{left:0}.field .ez.h{right:0}
+.field .yl{position:absolute;top:0;bottom:0;width:1px;background:rgba(255,255,255,.18)}
+.field .yl span{position:absolute;bottom:4px;left:3px;font:700 9px monospace;color:rgba(255,255,255,.55)}
+.field .los{position:absolute;top:0;bottom:0;width:3px;margin-left:-1.5px;background:#635bff;box-shadow:0 0 10px #635bff}
+.field .fd{position:absolute;top:0;bottom:0;width:3px;margin-left:-1.5px;background:#d795ff}
+.field .ball{position:absolute;top:50%;width:18px;height:11px;margin:-5.5px 0 0 -9px;border-radius:50%;background:#8a4b22;box-shadow:0 0 0 2px #fff,0 0 16px rgba(255,255,255,.7);transition:left .6s cubic-bezier(.2,.9,.25,1)}
+.sit{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;margin-top:8px;font-size:13px}
+.sit b{font:800 14px monospace;color:#d795ff}
+.plays{display:flex;flex-direction:column;gap:6px;max-height:420px;overflow-y:auto}
+.play{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:8px 10px;border-radius:10px;background:var(--bg3);border:1px solid var(--border2);font-size:12.5px}
+.play .t{font:700 10px monospace;color:var(--text3);white-space:nowrap}
+.play .r{font:800 11px monospace;white-space:nowrap}.play .r.td{color:#61e970}.play .r.to{color:#f87171}
+.wp{width:100%;height:110px;display:block}
+.cmp{display:grid;grid-template-columns:1fr auto 1fr;gap:6px 10px;align-items:center;font-size:12.5px}
+.cmp .v{font:700 13px monospace}.cmp .v.h{text-align:right}.cmp .k{text-align:center;font:700 10px monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--text3)}
+.cmp .bar{grid-column:1/-1;height:4px;border-radius:2px;background:rgba(255,255,255,.08);display:flex;overflow:hidden;margin-bottom:6px}
+.cmp .bar i{background:#635bff}.cmp .bar i+i{background:#b038f9}
+.lines-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.ld{background:var(--bg3);border:1px solid var(--border2);border-radius:12px;padding:9px 11px;display:flex;flex-direction:column;gap:2px}
+.ld span{font:700 9px monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--text3)}.ld b{font-size:14px}.ld em{font-style:normal;font-size:11px;color:var(--text2)}
+/* tennis + golf */
+.tn-ev{margin-bottom:18px}
+.tn-m{display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:center;padding:10px 12px;border-radius:12px;border:1px solid var(--border2);background:var(--bg2)}
+.tn-p{display:flex;align-items:center;gap:8px;min-width:0;font-size:14px}.tn-p.w b{color:#61e970}
+.tn-p img{width:18px;height:12px;object-fit:cover;border-radius:2px}
+.tn-p .sv{width:7px;height:7px;border-radius:50%;background:#61e970;box-shadow:0 0 6px #61e970}
+.tn-sets{display:flex;gap:4px;justify-content:flex-end;font:800 14px monospace}.tn-sets span{min-width:16px;text-align:center}
+.tn-meta{grid-column:1/-1;font:600 10px monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--text3)}
+.tn-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:8px}
+.gf-flag{width:18px;height:12px;object-fit:cover;border-radius:2px;vertical-align:middle;margin-right:6px}
+.gf-pos{font:800 13px monospace;color:var(--text3)}
+.gf-par{font:800 14px monospace}.gf-par.u{color:#61e970}.gf-par.o{color:#f87171}
+/* hero art */
+.sp-art{position:absolute;right:-2%;top:6%;width:min(46vw,520px);height:min(46vw,520px);opacity:.55;pointer-events:none}
+@media (max-width:760px){.sp-art{width:72vw;height:72vw;right:-18%;top:0;opacity:.28}}
+.lab{border:1px solid rgba(176,56,249,.35);background:linear-gradient(135deg,rgba(176,56,249,.12),rgba(99,91,255,.08));border-radius:16px;padding:16px 18px;margin-bottom:14px}
+.lab .eb{font:700 11px monospace;letter-spacing:.14em;text-transform:uppercase;color:#d795ff;margin-bottom:6px}
+.lab h3{margin:0 0 6px;font-size:20px}
+.lab p{margin:0 0 8px;font-size:13px;line-height:1.6;color:var(--text2)}
+.lab ul{margin:6px 0 0;padding-left:18px;font-size:13px;line-height:1.7;color:var(--text2)}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:10px 0}
+.stat-grid div{background:var(--bg3);border:1px solid var(--border2);border-radius:12px;padding:10px 12px}
+.stat-grid span{display:block;font:700 9px monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)}
+.stat-grid b{font:800 18px monospace}
+.lean-o{color:#b038f9}.lean-u{color:#9b96ff}
+.edge-pos{color:#61e970}.edge-neg{color:var(--text3)}
+@media (max-width:560px){.gc-mid .sc{font-size:26px}.gc-side b{font-size:14px}.gc-hd .lg.l{width:34px;height:34px}}
+</style>
+<link rel="stylesheet" href="onyx.css"><script src="onyx.js" defer></script>
+</head>
+<body>
+<nav class="nav">
+  <a class="nav-logo" href="#" onclick="gotoTab('home');return false">
+    <svg class="logo-svg" viewBox="0 0 64 64" aria-label="Onyx"><rect x="2" y="2" width="60" height="60" rx="16" fill="#151018" stroke="rgba(176,56,249,.6)" stroke-width="2"/>
+      <g transform="translate(19,13) scale(0.26)"><path fill="#b038f9" d="m39.041 109.178 18.493 9.863-33.972 17.945L0 124.384v-84.11l39.041-20.411zm21.918-81.37-18.493-9.863L76.438 0 100 12.603v84.246L60.959 117.26z"/></g></svg>
+    <div class="logo-words"><div class="logo-onyx">ONYX</div><div class="logo-sub" id="logoSub"></div></div>
+  </a>
+  <div class="nav-tabs" id="navTabs"></div>
+  <div class="nav-right"><div class="nav-badge" id="navBadge"></div><button class="nav-hamburger" id="navHamburger" aria-label="Menu">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button></div>
+</nav>
+<div class="score-ticker-bar"><div class="score-ticker-track" id="ticker"></div></div>
+
+<div class="pane active" id="pane-home">
+  <div class="home-hero" data-ox-host>
+    <canvas class="sp-art" id="heroArt" aria-hidden="true"></canvas>
+    <div class="home-hero-inner">
+      <div class="hero-live-badge"><span class="hero-live-dot"></span><span id="heroDate"></span></div>
+      <h1 class="home-hero-title"><span class="line1" id="heroL1"></span><span class="line2" id="heroL2"></span></h1>
+      <p class="home-hero-sub" id="heroSub"></p>
+      <div class="home-cta-row">
+        <button class="btn-primary" onclick="gotoTab('games')">Live games</button>
+        <button class="btn-secondary" onclick="gotoTab('board')">Onyx board</button>
+        <button class="btn-secondary" onclick="gotoTab('plays')">Plays</button>
+      </div>
+    </div>
+  </div>
+  <div class="home-stats-grid" id="homeStats"></div>
+  <div class="sp-wrap" id="homeBody"></div>
+</div>
+<div class="pane" id="pane-games"><div class="sp-wrap" id="gamesBody"></div></div>
+<div class="pane" id="pane-board"><div class="sp-wrap" id="boardBody"></div></div>
+<div class="pane" id="pane-plays"><div class="sp-wrap" id="playsBody"></div></div>
+<div class="pane" id="pane-model"><div class="sp-wrap" id="modelBody"></div></div>
+
+<script>
+// Injected by sports_build.py. `var`, read before any other script line (CLAUDE.md rule 5).
+var SD = /*SPORT_DATA*/{"sport":"cfb","cfg":{"name":"College Football","full":"Onyx College Football","kind":"football","espn":["football/college-football"],"espn_q":"groups=80&limit=300","tone":"lilac","art":"cfb","onyx_league":"NCAAF"},"date":"2026-10-26","label":"Week 9","season":2026,"games":[{"gid":"401871071","start":"2026-10-27T23:00Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/27 - 7:00 PM EDT","name":"DEL @ WKU","away":"DEL","home":"WKU","away_name":"Delaware Blue Hens","home_name":"Western Kentucky Hilltoppers","away_short":"Delaware","home_short":"Western KY","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/48.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/98.png","away_color":"00539f","home_color":"e13a3e","away_rec":"3-4","home_rec":"3-4","away_rank":null,"home_rank":null,"away_score":"0","home_score":"0","venue":"Houchens Industries-L.T. Smith Stadium","neutral":false,"tv":"CBSSN","week":9},{"gid":"401871072","start":"2026-10-28T00:00Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/27 - 8:00 PM EDT","name":"SHSU @ MOST","away":"SHSU","home":"MOST","away_name":"Sam Houston Bearkats","home_name":"Missouri State Bears","away_short":"Sam Houston","home_short":"Missouri St","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/2534.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/2623.png","away_color":"f56423","home_color":"5e0009","away_rec":"1-6","home_rec":"2-5","away_rank":null,"home_rank":null,"away_score":"0","home_score":"0","venue":"Robert W. Plaster Stadium","neutral":false,"tv":"ESPN2","week":9},{"gid":"401871058","start":"2026-10-28T23:00Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/28 - 7:00 PM EDT","name":"KENN @ MTSU","away":"KENN","home":"MTSU","away_name":"Kennesaw State Owls","home_name":"Middle Tennessee Blue Raiders","away_short":"Kennesaw St","home_short":"MTSU","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/338.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/2393.png","away_color":"fdbb30","home_color":"036eb7","away_rec":"1-6","home_rec":"4-3","away_rank":null,"home_rank":null,"away_score":"0","home_score":"0","venue":"Johnny \"Red\" Floyd Stadium","neutral":false,"tv":"CBSSN","week":9},{"gid":"401871057","start":"2026-10-29T00:00Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/28 - 8:00 PM EDT","name":"JXST @ NMSU","away":"JXST","home":"NMSU","away_name":"Jacksonville State Gamecocks","home_name":"New Mexico State Aggies","away_short":"Jax State","home_short":"New Mexico St","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/55.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/166.png","away_color":"cc0000","home_color":"7e141b","away_rec":"5-2","home_rec":"3-4","away_rank":null,"home_rank":null,"away_score":"0","home_score":"0","venue":"Aggie Memorial Stadium","neutral":false,"tv":"ESPN2","week":9},{"gid":"401862812","start":"2026-10-29T23:30Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/29 - 7:30 PM EDT","name":"FAU @ UNT","away":"FAU","home":"UNT","away_name":"Florida Atlantic Owls","home_name":"North Texas Mean Green","away_short":"FAU","home_short":"North Texas","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/2226.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/249.png","away_color":"003366","home_color":"068f33","away_rec":"5-2","home_rec":"5-2","away_rank":null,"home_rank":null,"away_score":"0","home_score":"0","venue":"DATCU Stadium","neutral":false,"tv":"ESPN","week":9},{"gid":"401869963","start":"2026-10-29T23:30Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/29 - 7:30 PM EDT","name":"TROY @ JMU","away":"TROY","home":"JMU","away_name":"Troy Trojans","home_name":"James Madison Dukes","away_short":"Troy","home_short":"James Madison","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/2653.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/256.png","away_color":"862633","home_color":"450084","away_rec":"3-4","home_rec":"7-1","away_rank":null,"home_rank":null,"away_score":"0","home_score":"0","venue":"Bridgeforth Stadium","neutral":false,"tv":"ESPN2","week":9},{"gid":"401862813","start":"2026-10-30T23:00Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/30 - 7:00 PM EDT","name":"TULN @ CLT","away":"TULN","home":"CLT","away_name":"Tulane Green Wave","home_name":"Charlotte 49ers","away_short":"Tulane","home_short":"Charlotte","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/2655.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/2429.png","away_color":"006747","home_color":"005035","away_rec":"3-4","home_rec":"1-6","away_rank":null,"home_rank":null,"away_score":"0","home_score":"0","venue":"Jerry Richardson Stadium","neutral":false,"tv":"ESPN2","week":9},{"gid":"401856844","start":"2026-10-30T23:30Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/30 - 7:30 PM EDT","name":"BAY @ UCF","away":"BAY","home":"UCF","away_name":"Baylor Bears","home_name":"UCF Knights","away_short":"Baylor","home_short":"UCF","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/239.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/2116.png","away_color":"154734","home_color":"000000","away_rec":"4-3","home_rec":"4-3","away_rank":null,"home_rank":null,"away_score":"0","home_score":"0","venue":"Acrisure Bounce House","neutral":false,"tv":"ESPN","week":9},{"gid":"401866451","start":"2026-10-31T02:30Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/30 - 10:30 PM EDT","name":"KENT @ SAC","away":"KENT","home":"SAC","away_name":"Kent State Golden Flashes","home_name":"Sacramento State Hornets","away_short":"Kent State","home_short":"Sacramento St","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/2309.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/16.png","away_color":"002664","home_color":"00573C","away_rec":"3-5","home_rec":"1-7","away_rank":null,"home_rank":null,"away_score":"0","home_score":"0","venue":"Hornet Stadium","neutral":false,"tv":"ESPN2","week":9},{"gid":"401856842","start":"2026-10-31T16:00Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/31 - 12:00 PM EDT","name":"ARIZ @ TTU","away":"ARIZ","home":"TTU","away_name":"Arizona Wildcats","home_name":"Texas Tech Red Raiders","away_short":"Arizona","home_short":"Texas Tech","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/12.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/2641.png","away_color":"cc0033","home_color":"da291c","away_rec":"6-1","home_rec":"6-1","away_rank":22,"home_rank":13,"away_score":"0","home_score":"0","venue":"Galaxy Stadium","neutral":false,"tv":"ESPN","week":9},{"gid":"401858277","start":"2026-10-31T16:00Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/31 - 12:00 PM EDT","name":"CAL @ NCSU","away":"CAL","home":"NCSU","away_name":"California Golden Bears","home_name":"NC State Wolfpack","away_short":"California","home_short":"NC State","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/25.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/152.png","away_color":"041e42","home_color":"cc0000","away_rec":"3-5","home_rec":"3-4","away_rank":null,"home_rank":null,"away_score":"0","home_score":"0","venue":"Carter-Finley Stadium","neutral":false,"tv":"ACC Network","week":9},{"gid":"401858278","start":"2026-10-31T16:00Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/31 - 12:00 PM EDT","name":"SMU @ SYR","away":"SMU","home":"SYR","away_name":"SMU Mustangs","home_name":"Syracuse Orange","away_short":"SMU","home_short":"Syracuse","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/2567.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/183.png","away_color":"a80000","home_color":"000e54","away_rec":"6-1","home_rec":"3-4","away_rank":19,"home_rank":null,"away_score":"0","home_score":"0","venue":"JMA Wireless Dome","neutral":false,"tv":"ESPN2","week":9},{"gid":"401858279","start":"2026-10-31T16:00Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/31 - 12:00 PM EDT","name":"BC @ DUKE","away":"BC","home":"DUKE","away_name":"Boston College Eagles","home_name":"Duke Blue Devils","away_short":"Boston College","home_short":"Duke","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/103.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/150.png","away_color":"8c2232","home_color":"00539b","away_rec":"4-3","home_rec":"5-2","away_rank":null,"home_rank":null,"away_score":"0","home_score":"0","venue":"Wallace Wade Stadium","neutral":false,"tv":"CW","week":9},{"gid":"401858502","start":"2026-10-31T16:00Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/31 - 12:00 PM EDT","name":"WIS @ IOWA","away":"WIS","home":"IOWA","away_name":"Wisconsin Badgers","home_name":"Iowa Hawkeyes","away_short":"Wisconsin","home_short":"Iowa","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/275.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/2294.png","away_color":"a00000","home_color":"231f20","away_rec":"5-2","home_rec":"5-2","away_rank":25,"home_rank":null,"away_score":"0","home_score":"0","venue":"Kinnick Stadium","neutral":false,"tv":"Fox","week":9},{"gid":"401858503","start":"2026-10-31T16:00Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/31 - 12:00 PM EDT","name":"ILL @ MD","away":"ILL","home":"MD","away_name":"Illinois Fighting Illini","home_name":"Maryland Terrapins","away_short":"Illinois","home_short":"Maryland","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/356.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/120.png","away_color":"ff5f05","home_color":"ce1126","away_rec":"4-3","home_rec":"2-5","away_rank":null,"home_rank":null,"away_score":"0","home_score":"0","venue":"SECU Stadium","neutral":false,"tv":"FS1","week":9},{"gid":"401859185","start":"2026-10-31T16:00Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/31 - 12:00 PM EDT","name":"ND VS NAVY","away":"ND","home":"NAVY","away_name":"Notre Dame Fighting Irish","home_name":"Navy Midshipmen","away_short":"Notre Dame","home_short":"Navy","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/87.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/2426.png","away_color":"062340","home_color":"00225b","away_rec":"6-1","home_rec":"2-5","away_rank":5,"home_rank":null,"away_score":"0","home_score":"0","venue":"Gillette Stadium","neutral":true,"tv":"ABC","week":9},{"gid":"401862816","start":"2026-10-31T16:00Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/31 - 12:00 PM EDT","name":"UAB @ USF","away":"UAB","home":"USF","away_name":"UAB Blazers","home_name":"South Florida Bulls","away_short":"UAB","home_short":"South Florida","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/5.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/58.png","away_color":"1a5632","home_color":"006747","away_rec":"4-3","home_rec":"5-2","away_rank":null,"home_rank":null,"away_score":"0","home_score":"0","venue":"Raymond James Stadium","neutral":false,"tv":"ESPNU","week":9},{"gid":"401866452","start":"2026-10-31T16:00Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/31 - 12:00 PM EDT","name":"BGSU @ WMU","away":"BGSU","home":"WMU","away_name":"Bowling Green Falcons","home_name":"Western Michigan Broncos","away_short":"Bowling Green","home_short":"W Michigan","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/189.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/2711.png","away_color":"fd5000","home_color":"532e1f","away_rec":"2-6","home_rec":"5-3","away_rank":null,"home_rank":null,"away_score":"0","home_score":"0","venue":"Waldo Stadium","neutral":false,"tv":"CBSSN","week":9},{"gid":"401858507","start":"2026-10-31T16:30Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/31 - 12:30 PM EDT","name":"MICH @ RUTG","away":"MICH","home":"RUTG","away_name":"Michigan Wolverines","home_name":"Rutgers Scarlet Knights","away_short":"Michigan","home_short":"Rutgers","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/130.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/164.png","away_color":"00274c","home_color":"ce0e2d","away_rec":"4-3","home_rec":"2-5","away_rank":null,"home_rank":null,"away_score":"0","home_score":"0","venue":"SHI Stadium","neutral":false,"tv":"BTN","week":9},{"gid":"401856735","start":"2026-10-31T16:45Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/31 - 12:45 PM EDT","name":"AUB @ MISS","away":"AUB","home":"MISS","away_name":"Auburn Tigers","home_name":"Ole Miss Rebels","away_short":"Auburn","home_short":"Ole Miss","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/2.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/145.png","away_color":"002b5c","home_color":"13294b","away_rec":"4-3","home_rec":"5-2","away_rank":null,"home_rank":12,"away_score":"0","home_score":"0","venue":"Vaught-Hemingway Stadium","neutral":false,"tv":"SEC Network","week":9},{"gid":"401871096","start":"2026-10-31T17:00Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/31 - 1:00 PM EDT","name":"MRSH @ ODU","away":"MRSH","home":"ODU","away_name":"Marshall Thundering Herd","home_name":"Old Dominion Monarchs","away_short":"Marshall","home_short":"Old Dominion","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/276.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/295.png","away_color":"00b140","home_color":"003768","away_rec":"4-3","home_rec":"2-6","away_rank":null,"home_rank":null,"away_score":"0","home_score":"0","venue":"S.B. Ballard Stadium","neutral":false,"tv":"ESPN+","week":9},{"gid":"401856846","start":"2026-10-31T18:00Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/31 - 2:00 PM EDT","name":"KSU @ COLO","away":"KSU","home":"COLO","away_name":"Kansas State Wildcats","home_name":"Colorado Buffaloes","away_short":"Kansas St","home_short":"Colorado","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/2306.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/38.png","away_color":"330a57","home_color":"cfb87c","away_rec":"4-3","home_rec":"2-5","away_rank":null,"home_rank":null,"away_score":"0","home_score":"0","venue":"Folsom Field","neutral":false,"tv":"TNT","week":9},{"gid":"401869944","start":"2026-10-31T18:00Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/31 - 2:00 PM EDT","name":"CCU @ GAST","away":"CCU","home":"GAST","away_name":"Coastal Carolina Chanticleers","home_name":"Georgia State Panthers","away_short":"Coastal","home_short":"Georgia St","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/324.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/2247.png","away_color":"006f71","home_color":"0039a6","away_rec":"2-5","home_rec":"4-3","away_rank":null,"home_rank":null,"away_score":"0","home_score":"0","venue":"Center Parc Stadium","neutral":false,"tv":"ESPN+","week":9},{"gid":"401861966","start":"2026-10-31T19:00Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/31 - 3:00 PM EDT","name":"CONN @ AFA","away":"CONN","home":"AFA","away_name":"UConn Huskies","home_name":"Air Force Falcons","away_short":"UConn","home_short":"Air Force","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/41.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/2005.png","away_color":"0c2340","home_color":"003594","away_rec":"4-3","home_rec":"5-2","away_rank":null,"home_rank":null,"away_score":"0","home_score":"0","venue":"Falcon Stadium","neutral":false,"tv":"MW+","week":9},{"gid":"401862815","start":"2026-10-31T19:00Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/31 - 3:00 PM EDT","name":"TEM @ ECU","away":"TEM","home":"ECU","away_name":"Temple Owls","home_name":"East Carolina Pirates","away_short":"Temple","home_short":"East Carolina","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/218.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/151.png","away_color":"a41e35","home_color":"582c83","away_rec":"2-5","home_rec":"3-4","away_rank":null,"home_rank":null,"away_score":"0","home_score":"0","venue":"Dowdy-Ficklen Stadium","neutral":false,"tv":"ESPN+","week":9},{"gid":"401871097","start":"2026-10-31T19:00Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/31 - 3:00 PM EDT","name":"LT @ USA","away":"LT","home":"USA","away_name":"Louisiana Tech Bulldogs","home_name":"South Alabama Jaguars","away_short":"Louisiana Tech","home_short":"South Alabama","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/2348.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/6.png","away_color":"003087","home_color":"00205b","away_rec":"5-2","home_rec":"4-3","away_rank":null,"home_rank":null,"away_score":"0","home_score":"0","venue":"Hancock Whitney Stadium","neutral":false,"tv":"ESPN+","week":9},{"gid":"401858283","start":"2026-10-31T19:15Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/31 - 3:15 PM EDT","name":"STAN @ LOU","away":"STAN","home":"LOU","away_name":"Stanford Cardinal","home_name":"Louisville Cardinals","away_short":"Stanford","home_short":"Louisville","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/24.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/97.png","away_color":"8c1515","home_color":"c9001f","away_rec":"4-4","home_rec":"4-3","away_rank":null,"home_rank":null,"away_score":"0","home_score":"0","venue":"L&N Federal Credit Union Stadium","neutral":false,"tv":"ACC Network","week":9},{"gid":"401856734","start":"2026-10-31T19:30Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/31 - 3:30 PM EDT","name":"FLA VS UGA","away":"FLA","home":"UGA","away_name":"Florida Gators","home_name":"Georgia Bulldogs","away_short":"Florida","home_short":"Georgia","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/57.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/61.png","away_color":"0021a5","home_color":"ba0c2f","away_rec":"5-2","home_rec":"6-1","away_rank":17,"home_rank":3,"away_score":"0","home_score":"0","venue":"Mercedes-Benz Stadium","neutral":true,"tv":"ABC","week":9},{"gid":"401856843","start":"2026-10-31T19:30Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/31 - 3:30 PM EDT","name":"ASU @ BYU","away":"ASU","home":"BYU","away_name":"Arizona State Sun Devils","home_name":"BYU Cougars","away_short":"Arizona St","home_short":"BYU","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/9.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/252.png","away_color":"ffc627","home_color":"0047ba","away_rec":"4-3","home_rec":"6-1","away_rank":null,"home_rank":8,"away_score":"0","home_score":"0","venue":"LaVell Edwards Stadium","neutral":false,"tv":"Fox","week":9},{"gid":"401856845","start":"2026-10-31T19:30Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/31 - 3:30 PM EDT","name":"KU @ TCU","away":"KU","home":"TCU","away_name":"Kansas Jayhawks","home_name":"TCU Horned Frogs","away_short":"Kansas","home_short":"TCU","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/2305.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/2628.png","away_color":"0051ba","home_color":"4d1979","away_rec":"3-4","home_rec":"3-4","away_rank":null,"home_rank":null,"away_score":"0","home_score":"0","venue":"Amon G. Carter Stadium","neutral":false,"tv":"FS1","week":9},{"gid":"401858501","start":"2026-10-31T19:30Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/31 - 3:30 PM EDT","name":"MINN @ IU","away":"MINN","home":"IU","away_name":"Minnesota Golden Gophers","home_name":"Indiana Hoosiers","away_short":"Minnesota","home_short":"Indiana","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/135.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/84.png","away_color":"5e0a2f","home_color":"970310","away_rec":"5-2","home_rec":"7-1","away_rank":null,"home_rank":4,"away_score":"0","home_score":"0","venue":"Memorial Stadium (Bloomington, IN)","neutral":false,"tv":"CBS","week":9},{"gid":"401858505","start":"2026-10-31T19:30Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/31 - 3:30 PM EDT","name":"NU @ ORE","away":"NU","home":"ORE","away_name":"Northwestern Wildcats","home_name":"Oregon Ducks","away_short":"Northwestern","home_short":"Oregon","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/77.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/2483.png","away_color":"492f92","home_color":"00934b","away_rec":"6-1","home_rec":"4-3","away_rank":20,"home_rank":null,"away_score":"0","home_score":"0","venue":"Autzen Stadium","neutral":false,"tv":"Peacock","week":9},{"gid":"401860910","start":"2026-10-31T19:30Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/31 - 3:30 PM EDT","name":"CSU @ USU","away":"CSU","home":"USU","away_name":"Colorado State Rams","home_name":"Utah State Aggies","away_short":"Colorado St","home_short":"Utah State","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/36.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/328.png","away_color":"004c23","home_color":"0f2439","away_rec":"3-4","home_rec":"2-5","away_rank":null,"home_rank":null,"away_score":"0","home_score":"0","venue":"Maverik Stadium","neutral":false,"tv":"USA Net","week":9},{"gid":"401864531","start":"2026-10-31T19:30Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/31 - 3:30 PM EDT","name":"UTEP @ NDSU","away":"UTEP","home":"NDSU","away_name":"UTEP Miners","home_name":"North Dakota State Bison","away_short":"UTEP","home_short":"N Dakota St","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/2638.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/2449.png","away_color":"ff8200","home_color":"01402A","away_rec":"1-6","home_rec":"6-2","away_rank":null,"home_rank":null,"away_score":"0","home_score":"0","venue":"Fargodome","neutral":false,"tv":"MW+","week":9},{"gid":"401871059","start":"2026-10-31T19:30Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/31 - 3:30 PM EDT","name":"FIU @ LIB","away":"FIU","home":"LIB","away_name":"Florida International Panthers","home_name":"Liberty Flames","away_short":"FIU","home_short":"Liberty","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/2229.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/2335.png","away_color":"091f3f","home_color":"0a254e","away_rec":"3-4","home_rec":"6-1","away_rank":null,"home_rank":null,"away_score":"0","home_score":"0","venue":"Williams Stadium (VA)","neutral":false,"tv":"CBSSN","week":9},{"gid":"401871095","start":"2026-10-31T19:30Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/31 - 3:30 PM EDT","name":"USM @ ULM","away":"USM","home":"ULM","away_name":"Southern Miss Golden Eagles","home_name":"UL Monroe Warhawks","away_short":"Southern Miss","home_short":"UL Monroe","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/2572.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/2433.png","away_color":"ffc72c","home_color":"840029","away_rec":"2-5","home_rec":"1-6","away_rank":null,"home_rank":null,"away_score":"0","home_score":"0","venue":"Malone Stadium","neutral":false,"tv":"ESPN+","week":9},{"gid":"401856848","start":"2026-10-31T19:45Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/31 - 3:45 PM EDT","name":"UTAH @ CIN","away":"UTAH","home":"CIN","away_name":"Utah Utes","home_name":"Cincinnati Bearcats","away_short":"Utah","home_short":"Cincinnati","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/254.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/2132.png","away_color":"be0000","home_color":"000000","away_rec":"7-0","home_rec":"5-2","away_rank":6,"home_rank":null,"away_score":"0","home_score":"0","venue":"Nippert Stadium","neutral":false,"tv":"ESPN","week":9},{"gid":"401858284","start":"2026-10-31T19:45Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/31 - 3:45 PM EDT","name":"UVA @ WAKE","away":"UVA","home":"WAKE","away_name":"Virginia Cavaliers","home_name":"Wake Forest Demon Deacons","away_short":"Virginia","home_short":"Wake Forest","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/258.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/154.png","away_color":"232d4b","home_color":"ceb888","away_rec":"4-4","home_rec":"6-1","away_rank":null,"home_rank":14,"away_score":"0","home_score":"0","venue":"Allegacy Federal Credit Union Stadium","neutral":false,"tv":"ESPN2","week":9},{"gid":"401864529","start":"2026-10-31T20:00Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/31 - 4:00 PM EDT","name":"UNM @ SJSU","away":"UNM","home":"SJSU","away_name":"New Mexico Lobos","home_name":"San José State Spartans","away_short":"New Mexico","home_short":"San José St","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/167.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/23.png","away_color":"ba0c2f","home_color":"0038a8","away_rec":"6-1","home_rec":"4-4","away_rank":null,"home_rank":null,"away_score":"0","home_score":"0","venue":"CEFCU Stadium","neutral":false,"tv":"MW+","week":9},{"gid":"401856736","start":"2026-10-31T20:15Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/31 - 4:15 PM EDT","name":"SC @ OU","away":"SC","home":"OU","away_name":"South Carolina Gamecocks","home_name":"Oklahoma Sooners","away_short":"South Carolina","home_short":"Oklahoma","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/2579.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/201.png","away_color":"73000a","home_color":"990000","away_rec":"4-3","home_rec":"4-3","away_rank":null,"home_rank":null,"away_score":"0","home_score":"0","venue":"Memorial Stadium (Norman, OK)","neutral":false,"tv":"SEC Network","week":9},{"gid":"401858506","start":"2026-10-31T20:15Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/31 - 4:15 PM EDT","name":"PUR @ PSU","away":"PUR","home":"PSU","away_name":"Purdue Boilermakers","home_name":"Penn State Nittany Lions","away_short":"Purdue","home_short":"Penn State","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/2509.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/213.png","away_color":"ceb888","home_color":"061440","away_rec":"3-4","home_rec":"3-4","away_rank":null,"home_rank":null,"away_score":"0","home_score":"0","venue":"Beaver Stadium","neutral":false,"tv":"BTN","week":9},{"gid":"401858508","start":"2026-10-31T20:15Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/31 - 4:15 PM EDT","name":"NEV @ UCLA","away":"NEV","home":"UCLA","away_name":"Nevada Wolf Pack","home_name":"UCLA Bruins","away_short":"Nevada","home_short":"UCLA","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/2440.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/26.png","away_color":"041e42","home_color":"2774ae","away_rec":"3-4","home_rec":"7-0","away_rank":null,"home_rank":7,"away_score":"0","home_score":"0","venue":"Rose Bowl","neutral":false,"tv":"BTN","week":9},{"gid":"401869846","start":"2026-10-31T22:30Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/31 - 6:30 PM EDT","name":"APP @ GASO","away":"APP","home":"GASO","away_name":"App State Mountaineers","home_name":"Georgia Southern Eagles","away_short":"App State","home_short":"GA Southern","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/2026.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/290.png","away_color":"000000","home_color":"041e42","away_rec":"5-2","home_rec":"3-4","away_rank":null,"home_rank":null,"away_score":"0","home_score":"0","venue":"Allen E. Paulson Stadium","neutral":false,"tv":"ESPN+","week":9},{"gid":"401856847","start":"2026-10-31T23:00Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/31 - 7:00 PM EDT","name":"OKST @ ISU","away":"OKST","home":"ISU","away_name":"Oklahoma State Cowboys","home_name":"Iowa State Cyclones","away_short":"Oklahoma St","home_short":"Iowa State","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/197.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/66.png","away_color":"fe5c00","home_color":"ae192d","away_rec":"5-2","home_rec":"3-4","away_rank":24,"home_rank":null,"away_score":"0","home_score":"0","venue":"Jack Trice Stadium","neutral":false,"tv":"FS1","week":9},{"gid":"401858280","start":"2026-10-31T23:00Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/31 - 7:00 PM EDT","name":"CLEM @ FSU","away":"CLEM","home":"FSU","away_name":"Clemson Tigers","home_name":"Florida State Seminoles","away_short":"Clemson","home_short":"Florida St","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/228.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/52.png","away_color":"f56600","home_color":"782f40","away_rec":"4-3","home_rec":"3-4","away_rank":null,"home_rank":null,"away_score":"0","home_score":"0","venue":"Doak Campbell Stadium","neutral":false,"tv":"ACC Network","week":9},{"gid":"401860909","start":"2026-10-31T23:00Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/31 - 7:00 PM EDT","name":"WSU @ SDSU","away":"WSU","home":"SDSU","away_name":"Washington State Cougars","home_name":"San Diego State Aztecs","away_short":"Washington St","home_short":"San Diego St","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/265.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/21.png","away_color":"a60f2d","home_color":"a6192e","away_rec":"1-7","home_rec":"3-5","away_rank":null,"home_rank":null,"away_score":"0","home_score":"0","venue":"Snapdragon Stadium","neutral":false,"tv":"CBSSN","week":9},{"gid":"401856737","start":"2026-10-31T23:30Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/31 - 7:30 PM EDT","name":"MSST @ TEX","away":"MSST","home":"TEX","away_name":"Mississippi State Bulldogs","home_name":"Texas Longhorns","away_short":"Mississippi St","home_short":"Texas","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/344.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/251.png","away_color":"5d1725","home_color":"af5c37","away_rec":"4-3","home_rec":"5-2","away_rank":null,"home_rank":11,"away_score":"0","home_score":"0","venue":"DKR-Texas Memorial Stadium","neutral":false,"tv":"ESPN","week":9},{"gid":"401858281","start":"2026-10-31T23:30Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/31 - 7:30 PM EDT","name":"GT @ PITT","away":"GT","home":"PITT","away_name":"Georgia Tech Yellow Jackets","home_name":"Pittsburgh Panthers","away_short":"Georgia Tech","home_short":"Pitt","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/59.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/221.png","away_color":"b3a369","home_color":"003594","away_rec":"2-5","home_rec":"5-3","away_rank":null,"home_rank":null,"away_score":"0","home_score":"0","venue":"Acrisure Stadium","neutral":false,"tv":"ESPN2","week":9},{"gid":"401858282","start":"2026-10-31T23:30Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/31 - 7:30 PM EDT","name":"MIA @ UNC","away":"MIA","home":"UNC","away_name":"Miami Hurricanes","home_name":"North Carolina Tar Heels","away_short":"Miami","home_short":"North Carolina","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/2390.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/153.png","away_color":"f47423","home_color":"7bafd4","away_rec":"7-0","home_rec":"4-3","away_rank":1,"home_rank":null,"away_score":"0","home_score":"0","venue":"Kenan Stadium","neutral":false,"tv":"ABC","week":9},{"gid":"401858509","start":"2026-10-31T23:30Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/31 - 7:30 PM EDT","name":"OSU @ USC","away":"OSU","home":"USC","away_name":"Ohio State Buckeyes","home_name":"USC Trojans","away_short":"Ohio State","home_short":"USC","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/194.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/30.png","away_color":"ba0c2f","home_color":"9d2235","away_rec":"6-1","home_rec":"6-2","away_rank":2,"home_rank":null,"away_score":"0","home_score":"0","venue":"Los Angeles Memorial Coliseum","neutral":false,"tv":"NBC","week":9},{"gid":"401856733","start":"2026-10-31T23:45Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/31 - 7:45 PM EDT","name":"MIZ @ ARK","away":"MIZ","home":"ARK","away_name":"Missouri Tigers","home_name":"Arkansas Razorbacks","away_short":"Missouri","home_short":"Arkansas","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/142.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/8.png","away_color":"f1b82d","home_color":"a32136","away_rec":"5-2","home_rec":"3-4","away_rank":23,"home_rank":null,"away_score":"0","home_score":"0","venue":"Donald W. Reynolds Razorback Stadium","neutral":false,"tv":"SEC Network","week":9},{"gid":"401858504","start":"2026-11-01T00:00Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/31 - 8:00 PM EDT","name":"WASH @ NEB","away":"WASH","home":"NEB","away_name":"Washington Huskies","home_name":"Nebraska Cornhuskers","away_short":"Washington","home_short":"Nebraska","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/264.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/158.png","away_color":"33006f","home_color":"e31937","away_rec":"4-3","home_rec":"5-2","away_rank":null,"home_rank":null,"away_score":"0","home_score":"0","venue":"Memorial Stadium (Lincoln, NE)","neutral":false,"tv":"BTN","week":9},{"gid":"401862814","start":"2026-11-01T00:00Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/31 - 8:00 PM EDT","name":"ARMY @ MEM","away":"ARMY","home":"MEM","away_name":"Army Black Knights","home_name":"Memphis Tigers","away_short":"Army","home_short":"Memphis","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/349.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/235.png","away_color":"000000","home_color":"004991","away_rec":"5-2","home_rec":"6-2","away_rank":null,"home_rank":null,"away_score":"0","home_score":"0","venue":"Simmons Bank Liberty Stadium","neutral":false,"tv":"ESPNU","week":9},{"gid":"401860908","start":"2026-11-01T02:00Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/31 - 10:00 PM EDT","name":"TXST @ BOIS","away":"TXST","home":"BOIS","away_name":"Texas State Bobcats","home_name":"Boise State Broncos","away_short":"Texas St","home_short":"Boise St","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/326.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/68.png","away_color":"501214","home_color":"0033a0","away_rec":"4-3","home_rec":"6-1","away_rank":null,"home_rank":20,"away_score":"0","home_score":"0","venue":"Albertsons Stadium","neutral":false,"tv":"CW","week":9},{"gid":"401864530","start":"2026-11-01T02:30Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/31 - 10:30 PM EDT","name":"NIU @ UNLV","away":"NIU","home":"UNLV","away_name":"Northern Illinois Huskies","home_name":"UNLV Rebels","away_short":"N Illinois","home_short":"UNLV","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/2459.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/2439.png","away_color":"c8102e","home_color":"cf0a2c","away_rec":"0-7","home_rec":"4-3","away_rank":null,"home_rank":null,"away_score":"0","home_score":"0","venue":"Allegiant Stadium","neutral":false,"tv":"CBSSN","week":9},{"gid":"401860924","start":"2026-11-01T03:00Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/31 - 11:00 PM EDT","name":"ORST @ FRES","away":"ORST","home":"FRES","away_name":"Oregon State Beavers","home_name":"Fresno State Bulldogs","away_short":"Oregon St","home_short":"Fresno St","away_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/204.png","home_logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/278.png","away_color":"dc4405","home_color":"b1102b","away_rec":"5-2","home_rec":"4-3","away_rank":null,"home_rank":null,"away_score":"0","home_score":"0","venue":"Valley Children's Stadium","neutral":false,"tv":"USA Net","week":9}],"events":[],"odds":{},"model":{"status":"lab","version":null,"title":"What is live, and what the model will be","note":"Onyx College Football is live for scores, the gamecenter and Onyx prices as they post. The College Football model is in the lab: nothing here is a pick until it has been backtested against real Onyx prices.","method":["Scores, drives, down and distance, win probability and team stats come from ESPN's public feed, refreshed through the day and polled live on this page every 15 to 30 seconds.","Every price on this page is an Onyx price."],"roadmap":["Onyx college football game lines and player markets","Team ratings from drive efficiency, tested against the closing Onyx spread before any pick","Player projections, built on the NFL engine"],"tests":[],"rows":[],"top":[]},"generated":"2026-10-26T19:09:34+00:00"}/*END_SPORT_DATA*/;
+var ONYX_REFERRER = 'KR680261';
+var GA_MEASUREMENT_ID = 'G-03T8V1N52E';
+var C = SD.cfg || {};
+var KIND = C.kind || 'football';
+var TABS = [['home', 'Home'], ['games', 'Games'], ['board', 'Onyx Board'], ['plays', 'Plays'], ['model', 'Model']];
+var currentTab = 'home', OPEN_GAME = null, LIVE = {}, LIVE_EV = null;
+
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'})[c]); }
+function fmtOdds(o) { return o == null ? '-' : (o > 0 ? '+' : '') + o; }
+function pct(p, d) { return p == null ? '-' : (p * 100).toFixed(d == null ? 0 : d) + '%'; }
+function num(v, d) { return v == null || isNaN(v) ? '-' : (+v).toFixed(d == null ? 1 : d); }
+function tipTime(iso) { try { return new Date(iso).toLocaleString('en-US', {weekday: 'short', hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York'}) + ' ET'; } catch (e) { return ''; } }
+function track(name, params) { try { if (window.gtag) gtag('event', name, Object.assign({sport: SD.sport}, params || {})); } catch (e) {} }
+function lg(url, cls) { return url ? `<img class="lg ${cls || ''}" src="${esc(url)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">` : ''; }
+function onyxUrl(sel) {
+  if (sel) return 'https://app.onyxodds.com/share?selection=' + encodeURIComponent(sel) + '&referrer=' + ONYX_REFERRER;
+  return 'https://app.onyxodds.com/' + (C.onyx_league ? 'leagues/' + C.onyx_league : '') + '?utm_source=onyxsports&referrer=' + ONYX_REFERRER;
+}
+function bet(sel, label) { track('onyx_click', {link_type: sel ? 'single' : 'fallback', selection: label || ''}); window.open(onyxUrl(sel), '_blank', 'noopener'); }
+function game(gid) { return (SD.games || []).find(g => g.gid === gid); }
+function live(g) { return Object.assign({}, g, LIVE[g.gid] || {}); }
+function stateTxt(g) { return g.state === 'in' ? `<span class="live">${esc(g.detail || 'Live')}</span>` : g.state === 'post' ? esc(g.detail || 'Final') : esc(tipTime(g.start)); }
+
+// ── odds chips (SD.odds from sports_odds.py: Onyx prices, labelled Onyx) ──
+function gameOdds(gid) { return ((SD.odds || {}).games || {})[gid] || null; }
+function chip(price, label, sel, sub) {
+  if (price == null) return `<span class="chipx dead"><b>-</b><span>${esc(sub || label)}</span></span>`;
+  return `<button class="chipx" onclick="event.stopPropagation();bet(${sel ? `'${esc(sel)}'` : 'null'},'${esc(label)}')"><b>${fmtOdds(price)}</b><span>${esc(sub || label)}</span></button>`;
+}
+function lineChips(g) {
+  const o = gameOdds(g.gid);
+  if (!o) return '';
+  const sp = v => v == null ? '' : (v > 0 ? '+' : '') + v;
+  return `<div class="gm-lines">
+    ${o.away_ml != null ? chip(o.away_ml, g.away + ' ML', o.away_ml_sel, g.away + ' ML') : ''}
+    ${o.home_ml != null ? chip(o.home_ml, g.home + ' ML', o.home_ml_sel, g.home + ' ML') : ''}
+    ${o.home_spread != null ? chip(o.home_spread_price, g.home + ' ' + sp(o.home_spread), o.home_spread_sel, g.home + ' ' + sp(o.home_spread)) : ''}
+    ${o.total != null ? chip(o.over_price, 'Over ' + o.total, o.over_sel, 'O ' + o.total) : ''}
+    ${o.total != null ? chip(o.under_price, 'Under ' + o.total, o.under_sel, 'U ' + o.total) : ''}
+  </div>`;
+}
+
+// ── shell ───────────────────────────────────────────────────────────
+function buildNav() {
+  document.getElementById('logoSub').textContent = C.name || '';
+  document.getElementById('navTabs').innerHTML = TABS.map(([k, t]) => `<button class="nav-tab${k === 'home' ? ' active' : ''}" data-tab="${k}" onclick="gotoTab('${k}')">${t}</button>`).join('');
+  const d = SD.date ? new Date(SD.date + 'T12:00:00') : null;
+  document.getElementById('navBadge').textContent = (SD.label || '') + (d ? ' · ' + d.toLocaleDateString('en-US', {month: 'short', day: 'numeric'}) : '');
+}
+var RENDER = {};
+function gotoTab(t) {
+  if (!RENDER[t]) t = 'home';
+  currentTab = t;
+  document.querySelectorAll('.pane').forEach(p => p.classList.toggle('active', p.id === 'pane-' + t));
+  document.querySelectorAll('.nav-tab[data-tab]').forEach(b => b.classList.toggle('active', b.dataset.tab === t));
+  RENDER[t]();
+  try { history.replaceState(null, '', '#' + t + (t === 'games' && OPEN_GAME ? ':' + OPEN_GAME : '')); } catch (e) {}
+  track('tab_view', {tab: t});
+  window.scrollTo(0, 0);
+}
+function ticker() {
+  const items = KIND === 'tennis' ? (SD.events || []).flatMap(e => e.matches.filter(m => m.state === 'in').slice(0, 6).map(m => `<span class="tk"><b>${esc(m.p[0].short || m.p[0].name)}</b> ${m.p[0].sets.join(' ')} · <b>${esc(m.p[1].short || m.p[1].name)}</b> ${m.p[1].sets.join(' ')}</span>`))
+    : KIND === 'golf' ? (SD.events || []).flatMap(e => e.board.slice(0, 8).map(r => `<span class="tk"><b>${esc(r.pos)}</b> ${esc(r.name)} <b>${esc(r.to_par)}</b></span>`))
+    : (SD.games || []).map(g0 => { const g = live(g0); return `<span class="tk" onclick="openGame('${g.gid}')" style="cursor:pointer">${lg(g.away_logo)} <b>${esc(g.away)}</b> ${g.state !== 'pre' ? esc(g.away_score) : ''} · ${lg(g.home_logo)} <b>${esc(g.home)}</b> ${g.state !== 'pre' ? esc(g.home_score) : ''} <span class="dim">${g.state === 'pre' ? esc(tipTime(g.start)) : esc(g.detail || '')}</span></span>`; });
+  const t = document.getElementById('ticker');
+  t.innerHTML = items.length ? items.join('') + items.join('') : '';
+  t.parentNode.style.display = items.length ? '' : 'none';
+}
+
+// ── home ────────────────────────────────────────────────────────────
+var HERO = {
+  football: ['Every snap.', 'Every Onyx line.', 'Live drives, down and distance, win probability and every Onyx line on the slate, with player projections built from the box scores.'],
+  hockey: ['Every shift.', 'Every Onyx line.', 'Live scores, period by period, shots and scoring plays, with every Onyx line on the slate.'],
+  tennis: ['Every set.', 'Every Onyx line.', 'Every ATP and WTA singles match on the tour this week, live set by set, with every Onyx line as it posts.'],
+  golf: ['Every round.', 'Every Onyx line.', "This week's leaderboard, round by round, with every Onyx outright and matchup as it posts."],
+};
+function renderHome() {
+  const h = HERO[KIND] || HERO.football;
+  const d = SD.date ? new Date(SD.date + 'T12:00:00').toLocaleDateString('en-US', {month: 'long', day: 'numeric', year: 'numeric'}) : '';
+  document.getElementById('heroDate').textContent = (SD.label ? SD.label + ' · ' : '') + d;
+  document.getElementById('heroL1').textContent = h[0];
+  document.getElementById('heroL2').textContent = h[1];
+  document.getElementById('heroSub').textContent = h[2];
+  const games = (SD.games || []).map(live);
+  const nLive = games.filter(g => g.state === 'in').length + (SD.events || []).reduce((a, e) => a + (e.matches || []).filter(m => m.state === 'in').length, 0);
+  const priced = Object.keys((SD.odds || {}).games || {}).length + ((SD.odds || {}).props || []).length;
+  const stat = (v, l, c) => `<div class="home-stat"><div class="home-stat-val ${c || ''}">${v}</div><div class="home-stat-label">${l}</div></div>`;
+  const n = KIND === 'tennis' ? (SD.events || []).reduce((a, e) => a + e.matches.length, 0) : KIND === 'golf' ? (SD.events || []).reduce((a, e) => a + e.board.length, 0) : games.length;
+  document.getElementById('homeStats').innerHTML = stat(n, KIND === 'tennis' ? 'Matches' : KIND === 'golf' ? 'Players' : 'Games', 'purple')
+    + stat(nLive, 'Live now', 'green') + stat(priced || '-', 'Onyx lines') + stat((SD.model || {}).status === 'live' ? 'Live' : 'Lab', 'Model');
+  let body = '';
+  if (KIND === 'tennis') {
+    const lv = (SD.events || []).flatMap(e => e.matches.filter(m => m.state === 'in').map(m => [e, m]));
+    const nx = (SD.events || []).flatMap(e => e.matches.filter(m => m.state === 'pre').map(m => [e, m])).slice(0, 6);
+    body = `<div class="sec-hdr"><span class="sec-title">${lv.length ? 'Live now' : 'Up next'}</span></div><div class="tn-grid">${(lv.length ? lv : nx).slice(0, 12).map(([e, m]) => tnMatch(e, m)).join('') || '<div class="empty">No singles matches on the board right now.</div>'}</div>`;
+  } else if (KIND === 'golf') {
+    const e = (SD.events || [])[0];
+    body = e ? `<div class="sec-hdr"><span class="sec-title">${esc(e.name)} · top 10</span><span class="sec-count">${esc(e.detail || '')}</span></div>${gfBoard(e, 10)}
+      <button class="btn-secondary" style="margin-top:12px" onclick="gotoTab('games')">Full leaderboard</button>` : '<div class="empty">No tournament on the board this week.</div>';
+  } else {
+    const order = g => g.state === 'in' ? 0 : g.state === 'pre' ? 1 : 2;
+    const up = games.slice().sort((a, b) => order(a) - order(b) || (a.start || '').localeCompare(b.start || '')).slice(0, 6);
+    body = `<div class="sec-hdr"><span class="sec-title">${games.some(g => g.state === 'in') ? 'Live now and up next' : 'Up next'}</span><span class="sec-count">${games.length} games</span></div>
+      <div class="gm-grid">${up.map(gameCard).join('') || '<div class="empty">No games on the slate.</div>'}</div>`;
+    const top = (SD.model || {}).top || [];
+    if (top.length) body += `<div class="sec-hdr"><span class="sec-title">Model projections · top of the slate</span></div>${projTable(top.slice(0, 8))}`;
+  }
+  document.getElementById('homeBody').innerHTML = body;
+}
+
+// ── games + gamecenter ─────────────────────────────────────────────
+function gameCard(g0) {
+  const g = live(g0);
+  const fin = g.state === 'post', aw = +g.away_score > +g.home_score;
+  const rk = r => r ? `<span class="rk">#${r}</span>` : '';
+  return `<div class="gm${OPEN_GAME === g.gid ? ' sel' : ''}" onclick="openGame('${g.gid}')" tabindex="0" onkeydown="if(event.key==='Enter')openGame('${g.gid}')">
+    <div class="gm-top"><span>${stateTxt(g)}</span><span>${esc(g.tv || '')}</span></div>
+    <div class="gm-t${fin && !aw ? ' lose' : ''}">${lg(g.away_logo, 'm')}<div>${rk(g.away_rank)}<b>${esc(g.away_short || g.away)}</b><span class="rec">${esc(g.away_rec || '')}</span></div><span class="sc">${g.state !== 'pre' ? esc(g.away_score) : ''}</span></div>
+    <div class="gm-t${fin && aw ? ' lose' : ''}">${lg(g.home_logo, 'm')}<div>${rk(g.home_rank)}<b>${esc(g.home_short || g.home)}</b><span class="rec">${esc(g.home_rec || '')}</span></div><span class="sc">${g.state !== 'pre' ? esc(g.home_score) : ''}</span></div>
+    ${lineChips(g)}
+  </div>`;
+}
+var GFILTER = 'all';
+function renderGames() {
+  const el = document.getElementById('gamesBody');
+  if (KIND === 'tennis') { el.innerHTML = tnAll(); return; }
+  if (KIND === 'golf') { el.innerHTML = gfAll(); return; }
+  const games = (SD.games || []).map(live);
+  const segs = [['all', 'All'], ['in', 'Live'], ['pre', 'Upcoming'], ['post', 'Final']];
+  const shown = games.filter(g => GFILTER === 'all' || g.state === GFILTER);
+  el.innerHTML = `<div class="sec-hdr"><span class="sec-title">${esc(SD.label || 'Games')} · tap a game for the gamecenter</span><span class="sec-count">${games.length} games</span></div>
+    <div class="sp-tabs-seg">${segs.map(([k, t]) => `<button class="${GFILTER === k ? 'on' : ''}" onclick="GFILTER='${k}';renderGames()">${t} ${k === 'all' ? '' : games.filter(g => g.state === k).length}</button>`).join('')}</div>
+    <div id="gcBox"></div>
+    <div class="gm-grid">${shown.map(gameCard).join('') || '<div class="empty">Nothing here right now.</div>'}</div>`;
+  if (OPEN_GAME) drawGame(OPEN_GAME);
+}
+function openGame(gid) {
+  OPEN_GAME = gid;
+  if (currentTab !== 'games') gotoTab('games'); else renderGames();
+  const box = document.getElementById('gcBox');
+  if (box) box.scrollIntoView({behavior: 'smooth', block: 'start'});
+  track('gamecenter_open', {gid});
+}
+var GC_CACHE = {};
+function drawGame(gid) {
+  const box = document.getElementById('gcBox');
+  if (!box) return;
+  const g = live(game(gid) || {});
+  const head = `<div class="gc-hd">
+    <div class="gc-side">${lg(g.away_logo, 'l')}<div><b>${esc(g.away_name || g.away)}</b><span>${esc(g.away_rec || '')}</span></div></div>
+    <div class="gc-mid"><div class="sc">${g.state === 'pre' ? 'vs' : esc(g.away_score) + ' - ' + esc(g.home_score)}</div><div class="st ${g.state === 'in' ? 'live' : ''}">${stateTxt(g)}</div></div>
+    <div class="gc-side h"><div><b>${esc(g.home_name || g.home)}</b><span>${esc(g.home_rec || '')}</span></div>${lg(g.home_logo, 'l')}</div></div>`;
+  const s = GC_CACHE[gid];
+  box.innerHTML = `<div class="gc" id="gc">${head}
+    ${lineChips(g) ? `<div class="gc-sec"><h4>Onyx lines</h4>${lineChips(g)}</div>` : ''}
+    <div class="gc-sec" style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-primary" onclick="bet(null,'game ${esc(g.away)} @ ${esc(g.home)}')">⚡ Bet this game on Onyx</button>
+      <button class="btn-secondary" onclick="OPEN_GAME=null;renderGames()">Close</button></div>
+    <div id="gcDetail">${s ? (KIND === 'hockey' ? hockeyDetail(s, g) : footballDetail(s, g)) : '<div class="empty">Loading the gamecenter…</div>'}</div></div>`;
+  if (!s || g.state === 'in') loadSummary(gid);
+}
+function loadSummary(gid) {
+  if (location.protocol === 'file:') return;
+  fetch('https://site.api.espn.com/apis/site/v2/sports/' + C.espn[0] + '/summary?event=' + gid)
+    .then(r => r.json()).then(j => {
+      GC_CACHE[gid] = j;
+      const el = document.getElementById('gcDetail');
+      if (el && OPEN_GAME === gid) el.innerHTML = KIND === 'hockey' ? hockeyDetail(j, live(game(gid))) : footballDetail(j, live(game(gid)));
+    }).catch(() => {
+      const el = document.getElementById('gcDetail');
+      if (el && OPEN_GAME === gid) el.innerHTML = '<div class="empty">Live feed unavailable, retrying shortly.</div>';
+    });
+}
+function teamStatsCmp(s, g) {
+  const T = (s.boxscore || {}).teams || [];
+  if (T.length !== 2) return '';
+  const byHA = {}; T.forEach(t => { byHA[(t.homeAway || (t.team || {}).abbreviation === g.home ? 'home' : 'away')] = t; });
+  const a = byHA.away || T[0], h = byHA.home || T[1];
+  const keys = (a.statistics || []).map(x => x.name);
+  const pick = KIND === 'hockey' ? ['shotsTotal', 'powerPlayGoals', 'faceoffsWon', 'hits', 'blockedShots', 'takeaways', 'giveaways', 'penaltyMinutes']
+    : ['totalYards', 'netPassingYards', 'rushingYards', 'firstDowns', 'thirdDownEff', 'turnovers', 'totalPenaltiesYards', 'possessionTime'];
+  const rows = pick.filter(k => keys.includes(k)).map(k => {
+    const av = (a.statistics.find(x => x.name === k) || {}), hv = (h.statistics.find(x => x.name === k) || {});
+    const an = parseFloat(av.displayValue) || 0, hn = parseFloat(hv.displayValue) || 0, tot = an + hn || 1;
+    return `<span class="v">${esc(av.displayValue)}</span><span class="k">${esc(av.label || k)}</span><span class="v h">${esc(hv.displayValue)}</span>
+      <div class="bar"><i style="width:${an / tot * 100}%"></i><i style="width:${hn / tot * 100}%"></i></div>`;
+  }).join('');
+  return rows ? `<div class="gc-sec"><h4>Team stats · ${esc(g.away)} vs ${esc(g.home)}</h4><div class="cmp">${rows}</div></div>` : '';
+}
+function wpChart(s, g) {
+  const wp = s.winprobability || [];
+  if (wp.length < 3) return '';
+  const W = 600, H = 110, n = wp.length;
+  const pts = wp.map((p, i) => `${(i / (n - 1) * W).toFixed(1)},${((1 - p.homeWinPercentage) * H).toFixed(1)}`).join(' ');
+  const last = wp[n - 1].homeWinPercentage;
+  return `<div class="gc-sec"><h4>Win probability · ${esc(g.home)} ${pct(last)} · ${esc(g.away)} ${pct(1 - last)}</h4>
+    <svg class="wp" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><line x1="0" y1="${H / 2}" x2="${W}" y2="${H / 2}" stroke="rgba(255,255,255,.15)" stroke-dasharray="4 4"/>
+      <polyline points="${pts}" fill="none" stroke="#b038f9" stroke-width="2.5" vector-effect="non-scaling-stroke"/>
+      <text x="4" y="12" fill="rgba(255,255,255,.5)" font-size="10" font-family="monospace">${esc(g.home)}</text>
+      <text x="4" y="${H - 4}" fill="rgba(255,255,255,.5)" font-size="10" font-family="monospace">${esc(g.away)}</text></svg></div>`;
+}
+function fieldView(g) {
+  const L = LIVE[g.gid] || {}, sit = L.situation;
+  if (!sit || g.state !== 'in') return '';
+  // absolute yard: 0 = the away goal line (left), 100 = the home goal line
+  const m = String(sit.possessionText || '').match(/([A-Z]+)\s+(\d+)/);
+  let x = null;
+  if (m) x = m[1] === g.away ? +m[2] : m[1] === g.home ? 100 - +m[2] : null;
+  if (x == null && sit.yardLine != null) x = +sit.yardLine;
+  const offHome = String(sit.possession || '') === String(L.home_id || '');
+  const fd = x != null && sit.distance ? Math.max(0, Math.min(100, x + (offHome ? -1 : 1) * sit.distance)) : null;
+  const pos = v => 8 + v * .84;
+  return `<div class="gc-sec"><h4>On the field</h4><div class="field">
+      <div class="ez a">${esc(g.away)}</div><div class="ez h">${esc(g.home)}</div>
+      ${[10, 20, 30, 40, 50, 60, 70, 80, 90].map(y => `<div class="yl" style="left:${pos(y)}%"><span>${y > 50 ? 100 - y : y}</span></div>`).join('')}
+      ${x != null ? `<div class="los" style="left:${pos(x)}%"></div>${fd != null ? `<div class="fd" style="left:${pos(fd)}%"></div>` : ''}<div class="ball" style="left:${pos(x)}%"></div>` : ''}
+    </div>
+    <div class="sit">${sit.downDistanceText ? `<b>${esc(sit.downDistanceText)}</b>` : ''}${sit.isRedZone ? '<span class="tagx r">Red zone</span>' : ''}
+      ${sit.lastPlay && sit.lastPlay.text ? `<span class="dim">${esc(sit.lastPlay.text)}</span>` : ''}</div></div>`;
+}
+function footballDetail(s, g) {
+  const drives = ((s.drives || {}).previous || []).slice().reverse();
+  const cur = (s.drives || {}).current;
+  const sp = (s.scoringPlays || []).slice().reverse();
+  const res = d => /touchdown/i.test(d.result || d.displayResult || '') ? 'td' : /interception|fumble|downs/i.test(d.result || d.displayResult || '') ? 'to' : '';
+  return `${fieldView(g)}${wpChart(s, g)}
+    ${sp.length ? `<div class="gc-sec"><h4>Scoring plays</h4><div class="plays">${sp.map(p => `<div class="play"><span class="t">Q${esc((p.period || {}).number)} ${esc((p.clock || {}).displayValue || '')}</span>
+      <span>${lg((p.team || {}).logo)} ${esc(p.text || '')}</span><span class="r td">${esc(p.awayScore)}-${esc(p.homeScore)}</span></div>`).join('')}</div></div>` : ''}
+    ${drives.length || cur ? `<div class="gc-sec"><h4>Drives</h4><div class="plays">${(cur ? [cur] : []).concat(drives).slice(0, 24).map((d, i) => `<div class="play">
+      <span class="t">${i === 0 && cur ? 'NOW' : 'Q' + esc(((d.start || {}).period || {}).number || '')}</span>
+      <span>${lg(((d.team || {}).logos || [{}])[0].href)} ${esc(d.description || '')}</span><span class="r ${res(d)}">${esc(d.displayResult || d.result || '')}</span></div>`).join('')}</div></div>` : ''}
+    ${teamStatsCmp(s, g)}
+    ${(s.leaders || []).length ? `<div class="gc-sec"><h4>Leaders</h4><div class="lines-row">${(s.leaders || []).flatMap(t => (t.leaders || []).slice(0, 3).map(c => {
+      const l = (c.leaders || [])[0] || {}; return `<div class="ld"><span>${esc((t.team || {}).abbreviation)} · ${esc(c.displayName)}</span><b>${esc((l.athlete || {}).shortName || '')}</b><em>${esc(l.displayValue || '')}</em></div>`;
+    })).join('')}</div></div>` : ''}
+    ${!sp.length && !drives.length && g.state === 'pre' ? `<div class="empty">Kickoff ${esc(tipTime(g.start))}${g.venue ? ' · ' + esc(g.venue) : ''}. Drives, the field view and win probability appear here live.</div>` : ''}`;
+}
+function hockeyDetail(s, g) {
+  const comp = ((s.header || {}).competitions || [{}])[0];
+  const ls = (comp.competitors || []).map(c => ({abbr: (c.team || {}).abbreviation, logo: ((c.team || {}).logos || [{}])[0].href, ls: (c.linescores || []).map(x => x.displayValue), sc: c.score}));
+  const per = Math.max(3, ...ls.map(x => x.ls.length));
+  const sp = (s.scoringPlays || (s.plays || []).filter(p => p.scoringPlay)).slice().reverse();
+  return `${ls.length === 2 ? `<div class="gc-sec"><h4>By period</h4><div class="tbl"><table style="min-width:0"><thead><tr><th></th>${Array.from({length: per}, (_, i) => `<th class="r">${i < 3 ? i + 1 : i === 3 ? 'OT' : 'SO'}</th>`).join('')}<th class="r">T</th></tr></thead>
+      <tbody>${ls.map(x => `<tr><td>${lg(x.logo)} <b>${esc(x.abbr)}</b></td>${Array.from({length: per}, (_, i) => `<td class="r mono">${esc(x.ls[i] == null ? '-' : x.ls[i])}</td>`).join('')}<td class="r mono"><b>${esc(x.sc)}</b></td></tr>`).join('')}</tbody></table></div></div>` : ''}
+    ${sp.length ? `<div class="gc-sec"><h4>Goals</h4><div class="plays">${sp.map(p => `<div class="play"><span class="t">P${esc((p.period || {}).number)} ${esc((p.clock || {}).displayValue || '')}</span>
+      <span>${lg((p.team || {}).logo)} ${esc(p.text || '')}</span><span class="r td">${esc(p.awayScore)}-${esc(p.homeScore)}</span></div>`).join('')}</div></div>` : ''}
+    ${teamStatsCmp(s, g)}
+    ${!sp.length && g.state === 'pre' ? `<div class="empty">Puck drop ${esc(tipTime(g.start))}${g.venue ? ' · ' + esc(g.venue) : ''}. Goals and shots appear here live.</div>` : ''}`;
+}
+
+// tennis
+var TFILTER = 'live';
+function tnMatch(e, m) {
+  const p = (x, i) => `<div class="tn-p${x.win ? ' w' : ''}">${x.flag ? `<img src="${esc(x.flag)}" alt="" loading="lazy">` : ''}<b>${esc(x.name)}</b>${x.seed ? ` <span class="dim">(${esc(x.seed)})</span>` : ''}${m.state === 'in' && x.serve ? '<i class="sv" title="Serving"></i>' : ''}</div>
+    <div class="tn-sets">${x.sets.map((v, j) => `<span style="${(m.p[1 - i].sets[j] || 0) < v ? '' : 'opacity:.55'}">${v}</span>`).join('')}</div>`;
+  return `<div class="tn-m">${p(m.p[0], 0)}${p(m.p[1], 1)}<div class="tn-meta">${m.state === 'in' ? '<span style="color:#61e970">● Live</span> · ' : ''}${esc(e.tour)} · ${esc(m.round || '')}${m.state === 'pre' ? ' · ' + esc(tipTime(m.start)) : m.state === 'post' ? ' · ' + esc(m.detail || 'Final') : ''}</div></div>`;
+}
+function tnAll() {
+  const segs = [['live', 'Live'], ['pre', 'Upcoming'], ['post', 'Results']];
+  const st = TFILTER === 'live' ? 'in' : TFILTER;
+  return `<div class="sec-hdr"><span class="sec-title">ATP and WTA singles this week</span></div>
+    <div class="sp-tabs-seg">${segs.map(([k, t]) => `<button class="${TFILTER === k ? 'on' : ''}" onclick="TFILTER='${k}';renderGames()">${t}</button>`).join('')}</div>
+    ${(SD.events || []).map(e => { const ms = e.matches.filter(m => m.state === st); return ms.length ? `<div class="tn-ev"><div class="sec-hdr" style="margin-top:8px"><span class="sec-title">${esc(e.tour)} · ${esc(e.name)}</span><span class="sec-count">${ms.length} matches</span></div><div class="tn-grid">${ms.slice(0, 40).map(m => tnMatch(e, m)).join('')}</div></div>` : ''; }).join('')
+      || `<div class="empty">No ${TFILTER === 'live' ? 'live' : TFILTER === 'pre' ? 'upcoming' : 'finished'} singles matches right now.</div>`}`;
+}
+// golf
+var GQ = '';
+function gfBoard(e, n) {
+  const rows = e.board.filter(r => !GQ || String(r.name).toLowerCase().includes(GQ)).slice(0, n || 200);
+  const par = v => { const s = String(v || ''); return s.startsWith('-') ? 'u' : s.startsWith('+') ? 'o' : ''; };
+  const R = Math.max(4, ...e.board.map(r => r.rounds.length));
+  return `<div class="tbl"><table><thead><tr><th>Pos</th><th>Player</th><th class="r">To par</th>${Array.from({length: R}, (_, i) => `<th class="r">R${i + 1}</th>`).join('')}</tr></thead>
+    <tbody>${rows.map(r => `<tr><td class="gf-pos">${esc(r.pos)}</td><td>${r.flag ? `<img class="gf-flag" src="${esc(r.flag)}" alt="" loading="lazy">` : ''}<b>${esc(r.name)}</b></td>
+      <td class="r gf-par ${par(r.to_par)}">${esc(r.to_par)}</td>${Array.from({length: R}, (_, i) => `<td class="r mono dim">${esc((r.rounds[i] || {}).s == null ? '-' : r.rounds[i].s)}</td>`).join('')}</tr>`).join('')
+      || `<tr><td colspan="${3 + R}"><div class="empty" style="border:0">No player matches.</div></td></tr>`}</tbody></table></div>`;
+}
+function gfAll() {
+  return (SD.events || []).map(e => `<div class="sec-hdr"><span class="sec-title">${esc(e.name)}${e.venue ? ' · ' + esc(e.venue) : ''}</span><span class="sec-count">${esc(e.detail || '')}</span></div>
+    <div class="nsearch" style="margin-bottom:10px"><input placeholder="Find a player" value="${esc(GQ)}" oninput="GQ=this.value.toLowerCase();document.getElementById('gfB').innerHTML=gfBoard((SD.events||[])[0])" style="width:100%;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid var(--border2);color:var(--text);font:500 14px 'Space Grotesk',sans-serif"></div>
+    <div id="gfB">${gfBoard(e)}</div>`).join('') || '<div class="empty">No tournament on the board this week.</div>';
+}
+
+// ── the Onyx board ─────────────────────────────────────────────────
+var BQ = '', BMKT = 'all';
+function renderBoard() {
+  const el = document.getElementById('boardBody');
+  const O = SD.odds || {};
+  const games = (SD.games || []).map(live);
+  const props = O.props || [];
+  const out = [`<div class="sec-hdr"><span class="sec-title">Onyx board · every Onyx line on the slate</span><span class="sec-count">${O.fetched ? 'prices ' + esc(new Date(O.fetched).toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York'})) + ' ET' : ''}</span></div>`];
+  if (!O.games && !props.length && !(O.outrights || []).length) {
+    out.push(`<div class="lab"><div class="eb">Onyx prices</div><h3>The Onyx feed for ${esc(C.name)} is being wired</h3>
+      <p>Every price on this site comes straight from Onyx, never another book. The Onyx lines for ${esc(C.name)} switch on here as soon as the feed is connected, game lines first, then player markets.</p>
+      <button class="btn-primary" onclick="bet(null,'board')">⚡ See ${esc(C.name)} on Onyx</button></div>`);
+  }
+  if (O.games) {
+    out.push(`<div class="gm-grid">${games.filter(g => g.state !== 'post' && gameOdds(g.gid)).map(gameCard).join('') || '<div class="empty">No open game lines right now.</div>'}</div>`);
+  }
+  if (props.length) {
+    const mk = [...new Set(props.map(p => p.mkt))];
+    const P = props.filter(p => (BMKT === 'all' || p.mkt === BMKT) && (!BQ || (p.name + ' ' + (p.team || '')).toLowerCase().includes(BQ)));
+    out.push(`<div class="sec-hdr"><span class="sec-title">Player markets</span><span class="sec-count">${P.length} lines</span></div>
+      <input placeholder="Search players, teams" value="${esc(BQ)}" oninput="BQ=this.value.toLowerCase();renderBoard();this.focus();this.setSelectionRange(this.value.length,this.value.length)" style="width:100%;padding:10px 12px;margin-bottom:10px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid var(--border2);color:var(--text);font:500 14px 'Space Grotesk',sans-serif">
+      <div class="sp-tabs-seg"><button class="${BMKT === 'all' ? 'on' : ''}" onclick="BMKT='all';renderBoard()">All</button>${mk.map(m => `<button class="${BMKT === m ? 'on' : ''}" onclick="BMKT='${esc(m)}';renderBoard()">${esc(MKT_NAME[m] || m)}</button>`).join('')}</div>
+      <div class="tbl"><table><thead><tr><th>Player</th><th>Market</th><th class="r">Line</th>${(SD.model || {}).status ? '<th class="r">Proj</th>' : ''}<th class="r">Over</th><th class="r">Under</th></tr></thead><tbody>
+      ${P.slice(0, 400).map(p => `<tr><td><b>${esc(p.name)}</b> <span class="dim">${esc(p.team || '')}</span></td><td class="dim">${esc(MKT_NAME[p.mkt] || p.mkt)}</td><td class="r mono">${esc(p.line)}</td>
+        ${(SD.model || {}).status ? `<td class="r mono ${p.proj != null ? (p.proj > p.line ? 'lean-o' : 'lean-u') : 'dim'}">${p.proj != null ? num(p.proj) : '-'}</td>` : ''}
+        <td class="r">${chip(p.over, p.name + ' Over ' + p.line, p.over_sel, 'Over')}</td><td class="r">${p.under != null ? chip(p.under, p.name + ' Under ' + p.line, p.under_sel, 'Under') : '<span class="dim">-</span>'}</td></tr>`).join('')}
+      </tbody></table></div>`);
+  }
+  if ((O.outrights || []).length) {
+    out.push(`<div class="sec-hdr"><span class="sec-title">Outrights</span></div><div class="tbl"><table><thead><tr><th>Player</th><th>Market</th><th class="r">Onyx</th></tr></thead><tbody>
+      ${O.outrights.slice(0, 300).map(o => `<tr><td><b>${esc(o.name)}</b></td><td class="dim">${esc(o.mkt)}</td><td class="r">${chip(o.price, o.name + ' ' + o.mkt, o.sel, 'Onyx')}</td></tr>`).join('')}</tbody></table></div>`);
+  }
+  el.innerHTML = out.join('');
+}
+var MKT_NAME = {pass_yds: 'Passing yards', rush_yds: 'Rushing yards', rec_yds: 'Receiving yards', rec: 'Receptions',
+                pass_td: 'Passing TDs', anytime_td: 'Anytime TD', goals: 'Goals', shots: 'Shots on goal', points: 'Points', assists: 'Assists', saves: 'Saves'};
+
+// ── plays (model) ───────────────────────────────────────────────────
+function projTable(rows) {
+  return `<div class="tbl"><table><thead><tr><th>Player</th><th>Market</th><th class="r">Proj</th><th class="r">Last 3</th><th class="r">Season</th><th class="r">Onyx line</th><th class="r">Lean</th></tr></thead><tbody>
+    ${rows.map(r => `<tr><td>${r.hs ? `<img class="lg" style="border-radius:50%" src="${esc(r.hs)}" alt="" loading="lazy">` : ''} <b>${esc(r.name)}</b> <span class="dim">${esc(r.team)} ${r.home ? 'vs' : '@'} ${esc(r.opp)}</span></td>
+      <td class="dim">${esc(MKT_NAME[r.mkt] || r.mkt)}</td><td class="r mono"><b>${num(r.proj)}</b></td><td class="r mono dim">${esc((r.l3 || []).join(' '))}</td><td class="r mono dim">${num(r.season)}</td>
+      <td class="r mono">${r.line != null ? esc(r.line) : '-'}</td><td class="r mono ${r.line != null ? (r.proj > r.line ? 'lean-o' : 'lean-u') : 'dim'}">${r.line != null ? (r.proj > r.line ? 'Over' : 'Under') : '-'}</td></tr>`).join('')}
+  </tbody></table></div>`;
+}
+var PMKT = 'all';
+function renderPlays() {
+  const M = SD.model || {};
+  const el = document.getElementById('playsBody');
+  const lab = `<div class="lab"><div class="eb">${M.status === 'live' ? 'Tracked picks' : 'Model in the lab'}</div>
+    <h3>${M.status === 'live' ? 'Where the model beats the Onyx line' : 'Picks switch on when the model earns them'}</h3>
+    <p>${esc(M.note || `The ${C.name} model is being built and tested. Nothing here is a pick until it has been backtested against real Onyx prices, the same bar the NBA and MLB models had to clear.`)}</p>
+    ${(M.tests || []).length ? `<div class="stat-grid">${M.tests.map(t => `<div><span>${esc(t.k)}</span><b>${esc(t.v)}</b><div class="dim" style="font-size:11px">${esc(t.d || '')}</div></div>`).join('')}</div>` : ''}
+    ${(M.roadmap || []).length ? `<ul>${M.roadmap.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}</div>`;
+  const rows = M.rows || [];
+  if (!rows.length) { el.innerHTML = lab; return; }
+  const mk = [...new Set(rows.map(r => r.mkt))];
+  const shown = rows.filter(r => PMKT === 'all' || r.mkt === PMKT);
+  el.innerHTML = lab + `<div class="sec-hdr"><span class="sec-title">${M.status === 'live' ? 'Plays' : 'Model leans · projections, not picks, not graded'}</span><span class="sec-count">${shown.length}</span></div>
+    <div class="sp-tabs-seg"><button class="${PMKT === 'all' ? 'on' : ''}" onclick="PMKT='all';renderPlays()">All</button>${mk.map(m => `<button class="${PMKT === m ? 'on' : ''}" onclick="PMKT='${esc(m)}';renderPlays()">${esc(MKT_NAME[m] || m)}</button>`).join('')}</div>
+    ${projTable(shown.slice(0, 120))}`;
+}
+function renderModel() {
+  const M = SD.model || {};
+  document.getElementById('modelBody').innerHTML = `<div class="lab"><div class="eb">How Onyx ${esc(C.name)} works</div><h3>${esc(M.title || 'The data, the model and what is tested')}</h3>
+    ${(M.method || []).map(p => `<p>${esc(p)}</p>`).join('') || `<p>Live scores, the gamecenter and the schedule come from ESPN's public feed, refreshed through the day and polled live on this page. Every price is an Onyx price.</p>`}
+    ${(M.tests || []).length ? `<div class="stat-grid">${M.tests.map(t => `<div><span>${esc(t.k)}</span><b>${esc(t.v)}</b><div class="dim" style="font-size:11px">${esc(t.d || '')}</div></div>`).join('')}</div>` : ''}
+    <p class="dim" style="font-size:12px">Model ${esc(M.version || 'not live yet')} · data built ${esc(SD.generated ? new Date(SD.generated).toLocaleString('en-US', {timeZone: 'America/New_York'}) + ' ET' : '')}</p></div>
+    ${(M.roadmap || []).length ? `<div class="lab"><div class="eb">Next</div><ul>${M.roadmap.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>` : ''}`;
+}
+
+// ── live: ESPN scoreboard every 30s (15s while anything is live) ────
+var _poll = null;
+function pollLive() {
+  if (location.protocol === 'file:' || !(C.espn || []).length) return;
+  const paths = C.espn;
+  Promise.all(paths.map(p => fetch('https://site.api.espn.com/apis/site/v2/sports/' + p + '/scoreboard' + (C.espn_q ? '?' + C.espn_q : '')).then(r => r.json()).catch(() => null))).then(js => {
+    let anyLive = false;
+    js.forEach((j, pi) => {
+      if (!j) return;
+      if (KIND === 'football' || KIND === 'hockey') {
+        (j.events || []).forEach(e => {
+          const c = (e.competitions || [{}])[0], st = (e.status || {}).type || {};
+          const t = {}; (c.competitors || []).forEach(x => { t[x.homeAway] = x; });
+          LIVE[e.id] = {state: st.state, detail: st.shortDetail || st.detail, away_score: (t.away || {}).score, home_score: (t.home || {}).score,
+                        situation: c.situation || null, home_id: ((t.home || {}).team || {}).id};
+          if (st.state === 'in') anyLive = true;
+        });
+      } else if (KIND === 'tennis') {
+        (j.events || []).forEach(e => (e.groupings || []).forEach(gr => (gr.competitions || []).forEach(c => {
+          (SD.events || []).forEach(ev => ev.matches.forEach(m => {
+            if (m.id !== c.id) return;
+            const st = (c.status || {}).type || {};
+            m.state = st.state; m.detail = st.shortDetail || st.detail;
+            (c.competitors || []).forEach((p, i) => { if (m.p[i]) { m.p[i].sets = (p.linescores || []).map(l => +l.value || 0); m.p[i].win = !!p.winner; m.p[i].serve = !!p.possession; } });
+            if (m.state === 'in') anyLive = true;
+          }));
+        })));
+      } else if (KIND === 'golf') {
+        (j.events || []).forEach(e => {
+          const ev = (SD.events || []).find(x => x.id === e.id); if (!ev) return;
+          const c = (e.competitions || [{}])[0];
+          ev.board = (c.competitors || []).map(p => ({pos: p.order, name: (p.athlete || {}).displayName, flag: ((p.athlete || {}).flag || {}).href, to_par: p.score,
+            rounds: (p.linescores || []).map(l => ({s: l.value, d: l.displayValue}))})).sort((a, b) => (a.pos || 999) - (b.pos || 999));
+          ev.state = ((e.status || {}).type || {}).state; ev.detail = ((e.status || {}).type || {}).shortDetail;
+          if (ev.state === 'in') anyLive = true;
+        });
+      }
+    });
+    ticker();
+    if (currentTab === 'games' && !(document.activeElement && document.activeElement.tagName === 'INPUT')) {
+      if (KIND === 'football' || KIND === 'hockey') { if (OPEN_GAME) { drawGame(OPEN_GAME); } else renderGames(); } else renderGames();
+    } else if (currentTab === 'home') renderHome();
+    clearTimeout(_poll); _poll = setTimeout(pollLive, anyLive ? 15000 : 30000);
+  });
+}
+// search (ui.js): teams and players on this page
+window.OX_SEARCH = function (go) {
+  const out = [];
+  (SD.games || []).forEach(g => out.push({label: `${g.away_name || g.away} @ ${g.home_name || g.home}`, sub: tipTime(g.start), run: () => openGame(g.gid)}));
+  ((SD.model || {}).rows || []).slice(0, 300).forEach(r => out.push({label: r.name, sub: `${r.team} · ${MKT_NAME[r.mkt] || r.mkt} ${num(r.proj)}`, run: () => { go('plays'); }}));
+  (SD.events || []).forEach(e => (e.board || []).slice(0, 150).forEach(r => out.push({label: r.name, sub: `${e.name} · ${r.pos} · ${r.to_par}`, run: () => { GQ = String(r.name).toLowerCase(); go('games'); }})));
+  return out;
+};
+
+function initAnalytics() {
+  if (!GA_MEASUREMENT_ID || location.protocol !== 'https:') return;
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = function () { dataLayer.push(arguments); };
+  gtag('js', new Date()); gtag('config', GA_MEASUREMENT_ID);
+  const s = document.createElement('script'); s.async = true; s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_MEASUREMENT_ID; document.head.appendChild(s);
+}
+RENDER = {home: renderHome, games: renderGames, board: renderBoard, plays: renderPlays, model: renderModel};
+(function boot() {
+  buildNav(); ticker(); initAnalytics();
+  const art = document.getElementById('heroArt');
+  if (art) { art.dataset.oxArt = C.art || 'field'; art.dataset.oxTone = C.tone || 'purple'; art.dataset.oxFade = '0'; }
+  const h = (location.hash || '').replace('#', '').split(':');
+  if (h[0] === 'games' && h[1]) OPEN_GAME = h[1];
+  gotoTab(RENDER[h[0]] ? h[0] : 'home');
+  pollLive();
+  if ('serviceWorker' in navigator && location.protocol === 'https:') addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+})();
+</script>
+</body>
+</html>

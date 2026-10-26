@@ -15,7 +15,7 @@ const path = require('path');
 
 const CHROMIUM = process.env.PW_CHROMIUM
   || (fs.existsSync('/opt/pw-browsers/chromium') ? '/opt/pw-browsers/chromium' : null);
-const TABS = ['home', 'games', 'board', 'scorers', 'record', 'model'];
+const TABS = ['home', 'plays', 'games', 'board', 'scorers', 'record', 'model'];
 const PORT = Number(process.env.PROBE_PORT || 8902);
 const ROOT = process.argv[2] || process.cwd();
 

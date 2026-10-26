@@ -19,9 +19,20 @@
 (function () {
   'use strict';
   var IS_NBA = /nba\.html/.test(location.pathname) || typeof NBA_DATA !== 'undefined';
+  // every Onyx Sports page: the sport pages built from sport_shell.html set
+  // window.OX_SITE before this script runs; MLB and NBA are detected
+  var SITE = window.OX_SITE || (IS_NBA ? 'nba' : 'mlb');
+  var ALL = [['mlb', 'MLB', './', 'Baseball'], ['nba', 'NBA', 'nba.html', 'Basketball'], ['nfl', 'NFL', 'nfl.html', 'NFL'],
+             ['cfb', 'CFB', 'cfb.html', 'College Football'], ['nhl', 'NHL', 'nhl.html', 'NHL'],
+             ['tennis', 'Tennis', 'tennis.html', 'Tennis'], ['golf', 'Golf', 'golf.html', 'Golf']];
+  function sportSeg(cls) {
+    return '<div class="oseg ' + (cls || '') + '" role="tablist" aria-label="Sport">' + ALL.map(function (a) {
+      return '<a href="' + a[2] + '"' + (a[0] === SITE ? ' class="on" aria-current="page"' : '') + '>' + a[1] + '</a>';
+    }).join('') + '</div>';
+  }
   var root = document.documentElement;
   var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var WHATS_NEW = 'onyx-new-2026-10-26';
+  var WHATS_NEW = 'onyx-new-2026-10-26b';
   // the Onyx logo mark (onyxodds.com), for the Onyx Sports links
   var OX_MARK = '<svg viewBox="0 0 100 137" fill="currentColor" aria-hidden="true"><path d="m39.041 109.178 18.493 9.863-33.972 17.945L0 124.384v-84.11l39.041-20.411zm21.918-81.37-18.493-9.863L76.438 0 100 12.603v84.246L60.959 117.26z"/></svg>';
 
@@ -65,9 +76,10 @@
     },
     nba: {
       name: 'Basketball', other: {label: 'MLB', href: './'},
-      bar: [['home', 'Home', 'home'], ['board', 'Props', 'board'], ['games', 'Games', 'games', 1], ['scorers', 'Scorers', 'star']],
+      bar: [['home', 'Home', 'home'], ['plays', 'Plays', 'plays'], ['games', 'Games', 'games', 1], ['board', 'Props', 'board']],
       tabs: [
-        ['home', 'Home', 'home', 'Picks and the top scorer parlay'],
+        ['home', 'Home', 'home', "Tonight's picks and the Model's Parlay"],
+        ['plays', 'Plays', 'plays', 'Recommended plays, ranked, with the why'],
         ['games', 'Games', 'games', 'Live court, possession, box'],
         ['board', 'Props Board', 'board', 'Points, boards, dimes vs Onyx'],
         ['scorers', 'Top Scorers', 'star', "Tonight's biggest scorers"],
@@ -76,7 +88,15 @@
       ],
     },
   };
-  var S = IS_NBA ? SITES.nba : SITES.mlb;
+  // the sport pages: one shape, tabs from sport_shell.html
+  ALL.slice(2).forEach(function (a) {
+    SITES[a[0]] = {name: a[3],
+      bar: [['home', 'Home', 'home'], ['plays', 'Plays', 'plays'], ['games', 'Games', 'games', 1], ['board', 'Board', 'board']],
+      tabs: [['home', 'Home', 'home', 'Tonight at a glance'], ['games', 'Games', 'games', 'Live scores and the gamecenter'],
+             ['board', 'Onyx Board', 'board', 'Every Onyx line'], ['plays', 'Plays', 'plays', 'Model leans and picks'],
+             ['model', 'Model', 'model', 'How it works, what is tested']]};
+  });
+  var S = SITES[SITE] || SITES.mlb;
 
   function el(tag, cls, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
   function buzz() { try { navigator.vibrate && navigator.vibrate(8); } catch (e) {} }
@@ -170,6 +190,7 @@
     '.otile b{display:block;font-size:13.5px;font-weight:700;margin-bottom:2px}',
     '.otile span{display:block;font-size:11px;line-height:1.35;color:var(--text3,#8a8a99)}',
     '.oacts{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}',
+    '.oseg-all{max-width:100%;overflow-x:auto;scrollbar-width:none;flex-wrap:nowrap}.oseg-all::-webkit-scrollbar{display:none}.oseg-all a{flex-shrink:0}',
     'a.oact{text-decoration:none}.oact.ox-all{flex-basis:100%;color:#d795ff;border-color:rgba(176,56,249,.45)}.oact.ox-all svg{width:11px;height:auto}',
     '.oact{flex:1;min-width:130px;display:flex;align-items:center;justify-content:center;gap:7px;padding:12px;border-radius:13px;border:1px solid rgba(255,255,255,.1);',
     'background:rgba(255,255,255,.04);color:var(--text,#fff);font:700 12.5px "Space Grotesk",system-ui,sans-serif;cursor:pointer;text-decoration:none}',
@@ -261,14 +282,12 @@
     sheet.setAttribute('role', 'dialog');
     sheet.setAttribute('aria-modal', 'true');
     sheet.setAttribute('aria-label', 'Menu');
-    var seg = '<div class="oseg" role="tablist" aria-label="Sport">' +
-      (IS_NBA ? '<a href="./">MLB</a><a class="on" href="nba.html" aria-current="page">NBA</a>'
-              : '<a class="on" href="./" aria-current="page">MLB</a><a href="nba.html">NBA</a>') + '</div>';
+    var seg = sportSeg('oseg-all');
     sheet.innerHTML =
       '<div class="osheet-grip"></div>' +
       '<div class="osheet-head"><div class="osheet-title">Onyx ' + S.name + '</div>' + seg +
       '<button class="osheet-x" aria-label="Close menu">' + svg('x') + '</button></div>' +
-      '<label class="osearch">' + svg('search') + '<input type="search" placeholder="Search pages' + (IS_NBA ? ', players' : ', hitters') + '" aria-label="Search" autocomplete="off"><kbd>/</kbd></label>' +
+      '<label class="osearch">' + svg('search') + '<input type="search" placeholder="Search pages' + (SITE === 'nba' ? ', players' : SITE === 'mlb' ? ', hitters' : ', teams, players') + '" aria-label="Search" autocomplete="off"><kbd>/</kbd></label>' +
       '<div class="ores" hidden></div>' +
       '<div class="ogrid">' + S.tabs.map(function (t, i) {
         return '<button class="otile" data-tab="' + t[0] + '" style="transition-delay:' + (reduce ? 0 : 25 * i) + 'ms">' + svg(t[2]) +
@@ -298,7 +317,8 @@
       } catch (e) { console.error(e); }
     });
     sheet.querySelector('[data-act="share"]').addEventListener('click', function () {
-      var data = {title: 'Onyx Sports · ' + S.name, text: IS_NBA ? 'NBA points, rebounds and assists projected nightly vs Onyx lines' : 'Daily MLB home run model vs Onyx lines', url: location.href.split('#')[0]};
+      var data = {title: 'Onyx Sports · ' + S.name, text: SITE === 'nba' ? 'NBA points, rebounds and assists projected nightly vs Onyx lines'
+        : SITE === 'mlb' ? 'Daily MLB home run model vs Onyx lines' : 'Onyx ' + S.name + ': live games, Onyx lines and the model', url: location.href.split('#')[0]};
       if (navigator.share) navigator.share(data).catch(function () {});
       else if (navigator.clipboard) navigator.clipboard.writeText(data.url).then(function () { toast('Link copied'); }).catch(function () {});
     });
@@ -352,7 +372,9 @@
   function playerIndex() {
     var out = [];
     try {
-      if (IS_NBA && typeof D !== 'undefined' && D.players) {
+      if (typeof window.OX_SEARCH === 'function') {
+        out = window.OX_SEARCH(go) || [];
+      } else if (IS_NBA && typeof D !== 'undefined' && D.players) {
         D.players.forEach(function (p) {
           if (p.out || !p.proj) return;
           out.push({label: p.name, sub: p.team + ' · ' + (p.proj.pts != null ? p.proj.pts.toFixed(1) + ' pts' : ''), run: function () { go('board'); if (typeof openPlayer === 'function') openPlayer(p.pid); }});
@@ -441,10 +463,14 @@
     // MLB / NBA switch in the phone header
     var right = document.querySelector('.nav-right');
     if (right) {
-      var pill = el('div', 'oseg opill',
-        IS_NBA ? '<a href="./">MLB</a><a class="on" href="nba.html" aria-current="page">NBA</a>'
-               : '<a class="on" href="./" aria-current="page">MLB</a><a href="nba.html">NBA</a>');
-      right.insertBefore(pill, right.firstChild);
+      // the phone header pill: this sport and its closest sibling
+      var pair = SITE === 'nba' || SITE === 'mlb' ? ['mlb', 'nba'] : SITE === 'nfl' || SITE === 'cfb' ? ['nfl', 'cfb'] : null;
+      if (pair) {
+        var pill = el('div', 'oseg opill', ALL.filter(function (a) { return pair.indexOf(a[0]) > -1; }).map(function (a) {
+          return '<a href="' + a[2] + '"' + (a[0] === SITE ? ' class="on" aria-current="page"' : '') + '>' + a[1] + '</a>';
+        }).join(''));
+        right.insertBefore(pill, right.firstChild);
+      }
       // the Onyx mark: back to Onyx Sports, every sport in one place
       var hub = el('a', 'ox-hub', OX_MARK);
       hub.href = 'home.html'; hub.setAttribute('aria-label', 'Onyx Sports: all sports'); hub.title = 'Onyx Sports';
@@ -470,7 +496,7 @@
   // ── 6b. the Onyx footer: the giant raster ONYX (onyx.js) and every sport ─
   function siteFooter() {
     if (document.querySelector('.ox-sitefoot')) return;
-    var sports = [['Basketball', 'nba.html', IS_NBA], ['Baseball', './', !IS_NBA], ['NFL'], ['College Football'], ['NHL'], ['Tennis'], ['Golf']];
+    var sports = ALL.map(function (a) { return [a[3], a[2], a[0] === SITE]; });
     var f = el('footer', 'ox-sitefoot',
       '<div class="row"><div class="links">' + sports.map(function (x) {
         return x[1] ? '<a href="' + x[1] + '"' + (x[2] ? ' class="on" aria-current="page"' : '') + '>Onyx ' + x[0] + '</a>'
@@ -496,6 +522,7 @@
       ['model', IS_NBA ? 'The NBA model now builds from three seasons of history, aged and regressed to role.'
                        : 'Onyx Basketball is live: points, rebounds and assists vs Onyx lines.'],
     ];
+    items.unshift(['plays', 'New: Onyx NFL, College Football, NHL, Tennis and Golf. Live games, every Onyx line, and models switching on as they pass their tests.']);
     items.unshift(['home', 'Onyx Sports: every sport in one place. Tap the Onyx mark up top for the new home, with NFL, NHL, tennis and golf on the way.']);
     var w = el('div', 'onew', '<div class="onew-card" role="dialog" aria-modal="true" aria-label="What\'s new">' +
       '<div class="eb">What\'s new</div><h3>Onyx Sports</h3><ul>' +
