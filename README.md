@@ -168,6 +168,7 @@ model: 288 scored, 0 errors
 | Top 5 Picks (`picks_input.json`) | ticket legs first, then +EV fills; locked by first pitch; $10 grading | 51-208 (19.7% — roughly what the model claims; the issue is price, not calibration) |
 | Model's Ticket (`ticket_history.json`) | one $10 parlay/day, 2–4 legs, **one bat per team**, frozen at slate first pitch (`ticket_lock.json`) | 5-53, +$114 |
 | K Projections (`k_history.json`) | model's side vs listed line, only when projection beats line by >10% | 436-380 (53.4%) |
+| NBA Top Scorer Parlay (`nba/ticket_history.json`) | the home page's Top Scorer Parlay, frozen at the slate's first tip (`nba/ticket_lock.json` refreshes until then); 3 legs, one per game, points overs; graded leg by leg, a DNP leg is void and drops from the payout; one $10 ticket per slate | starts 10/26 |
 | HR Edge (`hr_history.json`) | edge >1.5pp **and** price ≤+400 **and** edge ≤2.5pp **and** ≥2 signals (v45), straight up at listed price. **All-time, no prune** (see below) | 25-285 @ 10/15 (the vig wall, displayed honestly) |
 
 **The ledger files hold more rows than the site shows, and that is deliberate.**

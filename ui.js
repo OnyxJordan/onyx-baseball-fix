@@ -140,6 +140,10 @@
     'background:linear-gradient(180deg,rgba(28,22,40,.98),rgba(14,14,18,.99));border:1px solid rgba(176,56,249,.28);border-bottom:0;border-radius:22px 22px 0 0;',
     'padding:8px 16px calc(18px + var(--sab));transform:translateY(105%);transition:transform .32s cubic-bezier(.2,.9,.25,1);box-shadow:0 -20px 60px rgba(0,0,0,.55)}',
     '.osheet.open{transform:translateY(0)}',
+    /* closed = hidden from view, taps, Tab and screen readers; visibility flips
+       after the slide-out so the closing animation still plays */
+    '.osheet{visibility:hidden;transition:transform .32s cubic-bezier(.2,.9,.25,1),opacity .2s,visibility 0s linear .32s}',
+    '.osheet.open{visibility:visible;transition:transform .32s cubic-bezier(.2,.9,.25,1),opacity .2s,visibility 0s}',
     '@media (min-width:761px){.osheet{left:50%;right:auto;width:560px;margin-left:-280px;bottom:auto;top:calc(80px + var(--sat));border-radius:18px;border-bottom:1px solid rgba(176,56,249,.28);transform:translateY(-12px) scale(.98);opacity:0;pointer-events:none;transition:transform .2s,opacity .2s}',
     '.osheet.open{transform:none;opacity:1;pointer-events:auto}.osheet-grip{display:none}}',
     '.osheet-grip{width:40px;height:5px;border-radius:3px;background:rgba(255,255,255,.22);margin:2px auto 12px}',

@@ -28,6 +28,10 @@ from nba_model import role_gap, VERSION, project_slate, price_side, STATS
 
 SHELL, OUT = "nba_shell.html", "nba.html"
 LEDGER = "picks_history.json"
+TICKETS = "ticket_history.json"     # the daily Top Scorer Parlay, one $10 ticket per slate
+TICKET_LOCK = "ticket_lock.json"     # today's ticket, refreshed until the first tip, then frozen
+TICKET_LEGS, TICKET_MIN_LEGS, TICKET_MIN_MIN, TICKET_MIN_PROB = 3, 2, 26.0, 0.47
+STAKE = 10.0
 
 # Picks lane (v1). Deliberately strict: an honest lane is a quiet lane.
 # v2 band from the backtest (tools/nba_backtest.py): chosen on Oct-Jan 2025-26,
@@ -202,8 +206,155 @@ def grade(ledger, today):
     return n
 
 
+# ── the daily Top Scorer Parlay, tracked like the MLB Model's Ticket ─────────
+def ticket_legs(rows, games):
+    """Exactly the ticket the home page shows (nba_shell.html topScorerLegs):
+    tonight's highest projected scorers, one per untipped game, healthy, 26+
+    projected minutes, with an Onyx points-over the blend does not lean
+    against (P(over) >= 47%)."""
+    out, used = [], set()
+    pool = []
+    for r in rows:
+        pr = (r.get("props") or {}).get("pts")
+        over = ((pr or {}).get("all") or {}).get("over") or {}
+        if r["out"] or r["inj"] or r["min"] < TICKET_MIN_MIN or not pr or not over.get("sel"):
+            continue
+        if (games.get(r["gid"]) or {}).get("state") != "pre":
+            continue
+        if over.get("prob") is not None and over["prob"] < TICKET_MIN_PROB:
+            continue
+        pool.append((r, pr, over))
+    pool.sort(key=lambda x: -x[0]["proj"]["pts"])
+    for r, pr, over in pool:
+        if len(out) >= TICKET_LEGS or r["gid"] in used:
+            continue
+        used.add(r["gid"])
+        out.append({"pid": r["pid"], "player": r["name"], "team": r["team"], "opp": r["opp"], "gid": r["gid"],
+                    "stat": "pts", "side": "over", "line": pr["line"], "odds": over["price"],
+                    "prob": over.get("prob"), "proj": r["proj"]["pts"], "sel": over.get("sel"), "hit": None})
+    return out
+
+
+def slate_started(slate, now=None):
+    """The first tip: any game no longer 'pre', or the earliest start time passed."""
+    now = now or datetime.now(timezone.utc)
+    for g in slate.get("games", []):
+        if g.get("state") in ("live", "post"):
+            return True
+        try:
+            if g.get("start") and datetime.fromisoformat(str(g["start"]).replace("Z", "+00:00")) <= now:
+                return True
+        except ValueError:
+            pass
+    return False
+
+
+def update_ticket(rows, games, slate, today, source):
+    """Refresh today's ticket until the first tip, then freeze it into the
+    ledger exactly once (the MLB rule: locked at first pitch, never edited)."""
+    lock = load(TICKET_LOCK, {})
+    if lock.get("date") != today:
+        lock = {"date": today, "locked": False, "legs": []}
+    if not lock.get("locked"):
+        if slate_started(slate):
+            lock["locked"] = True
+            if len(lock["legs"]) >= TICKET_MIN_LEGS:
+                hist = load(TICKETS, [])
+                if not any(t.get("date") == today for t in hist):
+                    hist.append({"date": today, "stake": STAKE, "data_src": source, "legs": lock["legs"],
+                                 "result": None, "pnl": None,
+                                 "locked_at": datetime.now(timezone.utc).isoformat(timespec="seconds")})
+                    save(TICKETS, hist, indent=1)
+                    print(f"  ticket: locked {len(lock['legs'])}-leg parlay for {today}")
+        else:
+            legs = ticket_legs(rows, games)
+            lock["legs"] = legs if len(legs) >= TICKET_MIN_LEGS else []
+        save(TICKET_LOCK, lock, indent=1)
+    return lock
+
+
+def dec_odds(price):
+    return 1 + payout(price)
+
+
+def grade_tickets(today):
+    """Settle each ticket leg off the box score: over the line = hit, under =
+    miss, never played = void (drops out of the payout, as on MLB). The
+    ticket wins only if every live leg hits; all legs void = void."""
+    hist = load(TICKETS, [])
+    stores, n = {}, 0
+    for t in hist:
+        if t.get("result"):
+            continue
+        sub = "espn/" if t.get("data_src") == "espn" else ""
+        if sub not in stores:
+            stores[sub] = load(sub + "player_games.json", {})
+        pg = stores[sub]
+        done = set(pg.get("_games", []))
+        stale = date.fromisoformat(t["date"]) < date.fromisoformat(today) - timedelta(days=VOID_AFTER_DAYS)
+        for leg in t["legs"]:
+            if leg.get("hit") is not None:
+                continue
+            if leg["gid"] in done:
+                g = next((x for x in (pg.get(leg["pid"]) or {}).get("g", []) if x[1] == leg["gid"]), None)
+                if not g or g[4] <= 0:
+                    leg["hit"], leg["actual"] = "void", None
+                else:
+                    leg["actual"] = g[5]
+                    leg["hit"] = g[5] > leg["line"]
+            elif stale:
+                leg["hit"], leg["actual"] = "void", None
+        if any(l.get("hit") is None for l in t["legs"]):
+            continue
+        live = [l for l in t["legs"] if l["hit"] != "void"]
+        if not live:
+            t["result"], t["pnl"] = "void", 0.0
+        elif all(l["hit"] is True for l in live):
+            d = 1.0
+            for l in live:
+                d *= dec_odds(l["odds"])
+            t["result"], t["pnl"] = "win", round(t["stake"] * (d - 1), 2)
+        else:
+            t["result"], t["pnl"] = "loss", -t["stake"]
+        t["graded_at"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
+        n += 1
+    if n:
+        save(TICKETS, hist, indent=1)
+    return hist, n
+
+
+def summarize_tickets(hist, lock):
+    settled = [t for t in hist if t.get("result") in ("win", "loss")]
+    w = sum(1 for t in settled if t["result"] == "win")
+    pnl = round(sum(t["pnl"] for t in settled), 2)
+    staked = sum(t["stake"] for t in settled)
+    return {"w": w, "l": len(settled) - w, "pending": sum(1 for t in hist if not t.get("result")),
+            "void": sum(1 for t in hist if t.get("result") == "void"),
+            "pnl": pnl, "roi": round(pnl / staked, 4) if staked else 0.0,
+            "rows": [{**t, "legs": [dict(l) for l in t["legs"]]} for t in reversed(hist)],
+            "today": {**lock, "legs": [dict(l) for l in lock["legs"]]} if lock.get("legs") else None}
+
+
+def headshot_index(slate, hist):
+    """name key -> ESPN headshot id for anyone the record mentions: tonight's
+    slate first, then the daily ESPN roster map, then every season of
+    history.json (which knows every player of the last 8 seasons)."""
+    idx = {}
+    P = (hist or {}).get("players") or {}
+    for season in sorted(P):                      # oldest first, newest wins
+        for eid, r in P[season].items():
+            idx[nk(r.get("n", ""))] = eid
+    for k, eid in load("headshots.json", {}).items():
+        if "|" in k:
+            idx[k.split("|", 1)[1]] = eid
+    for p in slate.get("players", []):
+        if p.get("hs"):
+            idx[nk(p.get("name", ""))] = str(p["hs"])
+    return idx
+
+
 def summarize(ledger):
-    rec = {"w": 0, "l": 0, "p": 0, "v": 0, "pending": 0, "units": 0.0,
+    rec = {"w": 0, "l": 0, "p": 0, "v": 0, "pending": 0, "units": 0.0, "dollars": 0.0, "stake": STAKE,
            "by_stat": {s: {"w": 0, "l": 0, "units": 0.0} for s in STATS},
            "started": ledger[0]["date"] if ledger else None}
     for k in ledger:
@@ -214,12 +365,18 @@ def summarize(ledger):
         u = payout(k["price"]) if res == "W" else -1.0 if res == "L" else 0.0
         rec[res.lower()] += 1
         rec["units"] += u
+        rec["dollars"] += u * STAKE
         if res in ("W", "L"):
             b = rec["by_stat"][k["stat"]]
             b[res.lower()] += 1
             b["units"] = round(b["units"] + u, 2)
     rec["units"] = round(rec["units"], 2)
-    rec["rows"] = list(reversed(ledger[-200:]))
+    rec["dollars"] = round(rec["dollars"], 2)
+    staked = (rec["w"] + rec["l"]) * STAKE
+    rec["roi"] = round(rec["dollars"] / staked, 4) if staked else 0.0
+    for b in rec["by_stat"].values():
+        b["dollars"] = round(b["units"] * STAKE, 2)
+    rec["rows"] = [dict(k) for k in reversed(ledger[-200:])]   # copies: the page gets extras, the ledger never does
     return rec
 
 
@@ -280,6 +437,16 @@ def main():
         added += 1
     save(LEDGER, ledger, indent=1)
 
+    # the daily Top Scorer Parlay: grade past tickets, refresh / lock today's
+    th_hist, n_tk = grade_tickets(today)
+    lock = update_ticket(rows, games, slate, today, source)
+    th_hist = load(TICKETS, [])
+    tickets = summarize_tickets(th_hist, lock)
+    # every record row gets a headshot, not only players on tonight's slate
+    hsx = headshot_index(slate, hist)
+    record = summarize(ledger)
+    for rr in record["rows"] + [l for t in tickets["rows"] for l in t["legs"]] + ((tickets["today"] or {}).get("legs") or []):
+        rr["hs"] = hsx.get(nk(rr.get("name") or rr.get("player") or ""))
     media = {p["pid"]: (p.get("hs"), p.get("logo")) for p in slate.get("players", [])}
     players_out = []
     for r in rows:
@@ -295,7 +462,7 @@ def main():
         "meta": {"players_projected": sum(1 for r in rows if not r["out"] and r["min"] >= 10),
                  "priced": priced, "picks": len(today_rows)},
         "games": slate["games"], "players": players_out,
-        "picks": today_rows, "record": summarize(ledger),
+        "picks": today_rows, "record": record, "tickets": tickets,
         # 80px team logos baked in (tools/nba_make_logos.py): no third-party
         # host needed at page load
         "logos": load("team_logos.json", {}),
