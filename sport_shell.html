@@ -407,7 +407,9 @@ var TFILTER = 'live';
 function tnMatch(e, m) {
   const p = (x, i) => `<div class="tn-p${x.win ? ' w' : ''}">${x.flag ? `<img src="${esc(x.flag)}" alt="" loading="lazy">` : ''}<b>${esc(x.name)}</b>${x.seed ? ` <span class="dim">(${esc(x.seed)})</span>` : ''}${m.state === 'in' && x.serve ? '<i class="sv" title="Serving"></i>' : ''}</div>
     <div class="tn-sets">${x.sets.map((v, j) => `<span style="${(m.p[1 - i].sets[j] || 0) < v ? '' : 'opacity:.55'}">${v}</span>`).join('')}</div>`;
-  return `<div class="tn-m">${p(m.p[0], 0)}${p(m.p[1], 1)}<div class="tn-meta">${m.state === 'in' ? '<span style="color:#61e970">● Live</span> · ' : ''}${esc(e.tour)} · ${esc(m.round || '')}${m.state === 'pre' ? ' · ' + esc(tipTime(m.start)) : m.state === 'post' ? ' · ' + esc(m.detail || 'Final') : ''}</div></div>`;
+  const mo = ((SD.odds || {}).matches || {})[m.id];
+  const odds = mo && m.state !== 'post' ? `<div class="gm-lines" style="grid-column:1/-1">${chip(mo.ml0, m.p[0].name + ' to win', mo.ml0_sel, (m.p[0].short || m.p[0].name).split(' ').pop())}${chip(mo.ml1, m.p[1].name + ' to win', mo.ml1_sel, (m.p[1].short || m.p[1].name).split(' ').pop())}${mo.total != null ? chip(mo.over, 'Over ' + mo.total + ' games', mo.over_sel, 'O ' + mo.total + ' gms') + chip(mo.under, 'Under ' + mo.total + ' games', mo.under_sel, 'U ' + mo.total + ' gms') : ''}</div>` : '';
+  return `<div class="tn-m">${p(m.p[0], 0)}${p(m.p[1], 1)}${odds}<div class="tn-meta">${m.state === 'in' ? '<span style="color:#61e970">● Live</span> · ' : ''}${esc(e.tour)} · ${esc(m.round || '')}${m.state === 'pre' ? ' · ' + esc(tipTime(m.start)) : m.state === 'post' ? ' · ' + esc(m.detail || 'Final') : ''}</div></div>`;
 }
 function tnAll() {
   const segs = [['live', 'Live'], ['pre', 'Upcoming'], ['post', 'Results']];
@@ -442,24 +444,29 @@ function renderBoard() {
   const games = (SD.games || []).map(live);
   const props = O.props || [];
   const out = [`<div class="sec-hdr"><span class="sec-title">Onyx board · every Onyx line on the slate</span><span class="sec-count">${O.fetched ? 'prices ' + esc(new Date(O.fetched).toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York'})) + ' ET' : ''}</span></div>`];
-  if (!O.games && !props.length && !(O.outrights || []).length) {
+  if (!Object.keys(O.games || {}).length && !props.length && !Object.keys(O.matches || {}).length && !(O.outrights || []).length) {
     out.push(`<div class="lab"><div class="eb">Onyx prices</div><h3>The Onyx feed for ${esc(C.name)} is being wired</h3>
       <p>Every price on this site comes straight from Onyx, never another book. The Onyx lines for ${esc(C.name)} switch on here as soon as the feed is connected, game lines first, then player markets.</p>
       <button class="btn-primary" onclick="bet(null,'board')">⚡ See ${esc(C.name)} on Onyx</button></div>`);
   }
-  if (O.games) {
+  if (KIND === 'tennis' && Object.keys(O.matches || {}).length) {
+    const ms = (SD.events || []).flatMap(e => e.matches.filter(m => m.state !== 'post' && (O.matches || {})[m.id]).map(m => [e, m]));
+    out.push(`<div class="tn-grid">${ms.map(([e, m]) => tnMatch(e, m)).join('') || '<div class="empty">No open Onyx match prices right now.</div>'}</div>`);
+  }
+  if (O.games && Object.keys(O.games).length) {
     out.push(`<div class="gm-grid">${games.filter(g => g.state !== 'post' && gameOdds(g.gid)).map(gameCard).join('') || '<div class="empty">No open game lines right now.</div>'}</div>`);
   }
   if (props.length) {
     const mk = [...new Set(props.map(p => p.mkt))];
+    const lineOf = p => p.mkt === 'anytime_td' ? 'TD' : p.line;
     const P = props.filter(p => (BMKT === 'all' || p.mkt === BMKT) && (!BQ || (p.name + ' ' + (p.team || '')).toLowerCase().includes(BQ)));
     out.push(`<div class="sec-hdr"><span class="sec-title">Player markets</span><span class="sec-count">${P.length} lines</span></div>
       <input placeholder="Search players, teams" value="${esc(BQ)}" oninput="BQ=this.value.toLowerCase();renderBoard();this.focus();this.setSelectionRange(this.value.length,this.value.length)" style="width:100%;padding:10px 12px;margin-bottom:10px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid var(--border2);color:var(--text);font:500 14px 'Space Grotesk',sans-serif">
       <div class="sp-tabs-seg"><button class="${BMKT === 'all' ? 'on' : ''}" onclick="BMKT='all';renderBoard()">All</button>${mk.map(m => `<button class="${BMKT === m ? 'on' : ''}" onclick="BMKT='${esc(m)}';renderBoard()">${esc(MKT_NAME[m] || m)}</button>`).join('')}</div>
       <div class="tbl"><table><thead><tr><th>Player</th><th>Market</th><th class="r">Line</th>${(SD.model || {}).status ? '<th class="r">Proj</th>' : ''}<th class="r">Over</th><th class="r">Under</th></tr></thead><tbody>
-      ${P.slice(0, 400).map(p => `<tr><td><b>${esc(p.name)}</b> <span class="dim">${esc(p.team || '')}</span></td><td class="dim">${esc(MKT_NAME[p.mkt] || p.mkt)}</td><td class="r mono">${esc(p.line)}</td>
+      ${P.slice(0, 400).map(p => { const g = game(p.gid) || {}; return `<tr><td><b>${esc(p.name)}</b> <span class="dim">${esc(g.away ? g.away + ' @ ' + g.home : '')}</span></td><td class="dim">${esc(MKT_NAME[p.mkt] || p.mkt)}</td><td class="r mono">${esc(lineOf(p))}</td>
         ${(SD.model || {}).status ? `<td class="r mono ${p.proj != null ? (p.proj > p.line ? 'lean-o' : 'lean-u') : 'dim'}">${p.proj != null ? num(p.proj) : '-'}</td>` : ''}
-        <td class="r">${chip(p.over, p.name + ' Over ' + p.line, p.over_sel, 'Over')}</td><td class="r">${p.under != null ? chip(p.under, p.name + ' Under ' + p.line, p.under_sel, 'Under') : '<span class="dim">-</span>'}</td></tr>`).join('')}
+        <td class="r">${chip(p.over, p.name + (p.mkt === 'anytime_td' ? ' anytime TD' : ' Over ' + p.line), p.over_sel, p.mkt === 'anytime_td' ? 'Yes' : 'Over')}</td><td class="r">${p.under != null ? chip(p.under, p.name + ' Under ' + p.line, p.under_sel, 'Under') : '<span class="dim">-</span>'}</td></tr>`; }).join('')}
       </tbody></table></div>`);
   }
   if ((O.outrights || []).length) {
@@ -473,10 +480,11 @@ var MKT_NAME = {pass_yds: 'Passing yards', rush_yds: 'Rushing yards', rec_yds: '
 
 // ── plays (model) ───────────────────────────────────────────────────
 function projTable(rows) {
-  return `<div class="tbl"><table><thead><tr><th>Player</th><th>Market</th><th class="r">Proj</th><th class="r">Last 3</th><th class="r">Season</th><th class="r">Onyx line</th><th class="r">Lean</th></tr></thead><tbody>
+  return `<div class="tbl"><table><thead><tr><th>Player</th><th>Market</th><th class="r">Proj</th><th class="r">Last 3</th><th class="r">Season</th><th class="r">Onyx line</th><th class="r">Lean · Onyx</th></tr></thead><tbody>
     ${rows.map(r => `<tr><td>${r.hs ? `<img class="lg" style="border-radius:50%" src="${esc(r.hs)}" alt="" loading="lazy">` : ''} <b>${esc(r.name)}</b> <span class="dim">${esc(r.team)} ${r.home ? 'vs' : '@'} ${esc(r.opp)}</span></td>
       <td class="dim">${esc(MKT_NAME[r.mkt] || r.mkt)}</td><td class="r mono"><b>${num(r.proj)}</b></td><td class="r mono dim">${esc((r.l3 || []).join(' '))}</td><td class="r mono dim">${num(r.season)}</td>
-      <td class="r mono">${r.line != null ? esc(r.line) : '-'}</td><td class="r mono ${r.line != null ? (r.proj > r.line ? 'lean-o' : 'lean-u') : 'dim'}">${r.line != null ? (r.proj > r.line ? 'Over' : 'Under') : '-'}</td></tr>`).join('')}
+      <td class="r mono">${r.line != null ? esc(r.line) : '-'}</td><td class="r">${r.line == null ? '<span class="dim">-</span>' : r.proj > r.line
+        ? chip(r.over, r.name + ' Over ' + r.line, r.over_sel, 'Over') : chip(r.under, r.name + ' Under ' + r.line, r.under_sel, 'Under')}</td></tr>`).join('')}
   </tbody></table></div>`;
 }
 var PMKT = 'all';

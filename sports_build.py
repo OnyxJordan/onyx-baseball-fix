@@ -95,8 +95,11 @@ def nfl_block(lane, slate, odds):
                                 "home": home, "gid": g["gid"], "mkt": s, "proj": round(pr, 1),
                                 "season": round(info["season"], 1) if info["season"] is not None else None,
                                 "l3": [int(v) for v in info["l3"]], "opp_f": round(info["opp"], 3),
-                                "line": ln.get("line") if ln else None})
-    out.sort(key=lambda r: -r["proj"])
+                                "line": ln.get("line") if ln else None,
+                                "over": ln.get("over") if ln else None, "under": ln.get("under") if ln else None,
+                                "over_sel": ln.get("over_sel") if ln else None, "under_sel": ln.get("under_sel") if ln else None})
+    # lines Onyx prices first, largest gap between projection and line first
+    out.sort(key=lambda r: (r["line"] is None, -abs(r["proj"] - r["line"]) / max(1.0, r["line"]) if r["line"] is not None else -r["proj"]))
     block["rows"] = out
     # the slate's headline numbers: best projection per market
     top = []

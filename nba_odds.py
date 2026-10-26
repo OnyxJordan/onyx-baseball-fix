@@ -32,8 +32,12 @@ from fetch_onyx import http_json, OPTIC
 STATS = {"player_points": "pts", "player_rebounds": "reb", "player_assists": "ast"}
 GAME_MKTS = ("moneyline", "point_spread", "total_points")
 # priced by Onyx but not modeled for picks: shown on the player bet card
-# (verified 10/26: Onyx's NBA player markets are exactly these six)
-EXTRA = {"player_made_threes": "fg3", "player_double_double": "dd", "player_triple_double": "td"}
+# The 10/26 markets probe (tools/onyx_markets_probe.py) found Onyx also
+# prices points + rebounds + assists, points + rebounds and points + assists;
+# an earlier check that asked only for named markets had missed them.
+EXTRA = {"player_made_threes": "fg3", "player_double_double": "dd", "player_triple_double": "td",
+         "player_points_+_rebounds_+_assists": "pra", "player_points_+_rebounds": "pr",
+         "player_points_+_assists": "pa"}
 OAPI = "https://api.the-odds-api.com/v4/sports/basketball_nba"
 BOOK_PREF = ["draftkings", "fanduel", "betmgm", "caesars"]
 PROPS_MIN_AGE_MIN = int(os.environ.get("NBA_PROPS_MIN_AGE_MIN", "90"))

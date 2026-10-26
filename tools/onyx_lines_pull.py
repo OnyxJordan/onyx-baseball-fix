@@ -10,6 +10,9 @@ OpticOdds key). Never prints the key.
 For every completed fixture in the window: start, teams, final score, and per
 player and market the Onyx main line at open and at close,
   {"o": [line, over, under], "c": [line, over, under]}
+Game markets (moneyline, spreads, totals) land in "game":
+  {market: {selection: {"o": [points, price], "c": [points, price]}}}
+with totals keyed "over" / "under".
 from /fixtures/odds/historical (olv / clv), the endpoint tools/nba_backtest_pull.py
 uses for the NBA backtest.
 """
@@ -20,6 +23,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from fetch_onyx import http_json, OPTIC   # noqa: E402
 
 H = {"X-Api-Key": os.environ.get("OPTICODDS_API_KEY", "").strip()}
+GAME = {"moneyline", "point_spread", "puck_line", "game_spread", "run_line",
+        "total_points", "total_goals", "total_games", "total_runs"}
 
 
 def main():
@@ -61,11 +66,17 @@ def main():
         r = get("/fixtures/odds/historical", f"&fixture_id={urllib.parse.quote(fid)}&sportsbook=onyx_odds"
                                              f"&odds_format=AMERICAN{mk}")
         rows = (r or {}).get("data") or []
-        props = {}
+        props, game = {}, {}
         for od in (rows[0].get("odds") if rows else None) or []:
             if not od.get("is_main"):
                 continue
             m, side, who = od.get("market_id"), str(od.get("selection_line") or "").lower(), od.get("selection")
+            if m in GAME:
+                key = side if side in ("over", "under") else (who or od.get("name"))
+                if key:
+                    o, c = od.get("olv") or {}, od.get("clv") or {}
+                    game.setdefault(m, {})[key] = {"o": [o.get("points"), o.get("price")], "c": [c.get("points"), c.get("price")]}
+                continue
             if m not in markets or side not in ("over", "under") or not who:
                 continue
             e = props.setdefault(who, {}).setdefault(m, {"o": [None, None, None], "c": [None, None, None]})
@@ -75,10 +86,12 @@ def main():
                     e[key][0] = v["points"]
                 e[key][j] = v.get("price")
         g["props"] = props
+        g["game"] = game
         n_props += sum(len(v) for v in props.values())
     os.makedirs(os.path.dirname(out) or ".", exist_ok=True)
     json.dump(games, open(out, "w"))
-    print(f"wrote {out}: {len(games)} fixtures, {sum(1 for g in games.values() if g['props'])} with Onyx lines, {n_props} player-market lines")
+    print(f"wrote {out}: {len(games)} fixtures, {sum(1 for g in games.values() if g['props'] or g['game'])} with Onyx lines, "
+          f"{n_props} player-market lines, {sum(1 for g in games.values() if g['game'])} with game lines")
     return 0
 
 

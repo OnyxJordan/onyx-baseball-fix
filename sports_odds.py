@@ -172,6 +172,8 @@ def main():
                 kind = t[1]
                 if kind[0] == "match":
                     m = kind[1]
+                    if os.environ.get("ODDS_DEBUG") and not out["matches"]:
+                        print("  debug tennis row:", json.dumps((row.get("odds") or [])[:3])[:900])
                     names = [_norm(p.get("name")).split(" ")[-1] for p in m["p"]]
                     mo = out["matches"].setdefault(m["id"], {"p": [p["name"] for p in m["p"]]})
                     for od in row.get("odds") or []:

@@ -25,7 +25,7 @@ permissions:
 jobs:
   probe:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 150
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -47,7 +47,7 @@ jobs:
           mkdir -p probe
           for s in ${{ inputs.sports || 'nfl cfb nhl tennis' }}; do
             python3 sports_espn.py $s
-            python3 sports_odds.py $s
+            ODDS_DEBUG=1 python3 sports_odds.py $s
             cp data/$s/odds.json probe/$s-odds.json 2>/dev/null || true
           done
         env:

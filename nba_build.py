@@ -105,7 +105,7 @@ def attach_props(rows, props, source):
     return priced
 
 
-BET_STATS = ("pts", "reb", "ast", "fg3")
+BET_STATS = ("pts", "reb", "ast", "fg3", "pra", "pr", "pa")
 
 
 def bet_ladders(r, rec):
@@ -124,13 +124,15 @@ def bet_ladders(r, rec):
         io, iu = M.implied(mk.get("over")), M.implied(mk.get("under"))
         vig = (io + iu) if io and iu and 1.0 <= io + iu <= 1.2 else 1.05
         lad = mk.get("ladder") or [[mk["line"], mk.get("over"), mk.get("over_sel"), mk.get("under"), mk.get("under_sel")]]
-        mean = r["proj"].get(s, 0.0)
+        mean = r["proj"].get(s, 0.0) if s not in M.COMBOS else sum(r["proj"].get(x, 0.0) for x in M.COMBOS[s])
         rows = []
         for line, op, osel, up, usel in lad:
             if op is None and up is None:
                 continue
             if s == "fg3":
                 pm = M.prob_over_fg3(mean, line)
+            elif s in M.COMBOS:
+                pm = M.prob_over_combo(r["proj"], s, line)
             else:
                 po, pp_ = M.prob_over(mean, float(line), s)
                 pm = po / (1 - pp_) if pp_ < 1 else po
@@ -517,6 +519,8 @@ def main():
             continue
         out = {k: v for k, v in r.items() if k not in ("prior_gp",)}
         out["hs"], out["img"] = media.get(r["pid"], (None, None))
+        # combined-stat projections for the bet card: sums of the three (card only)
+        out["proj"] = {**r["proj"], **{c: round(sum(r["proj"].get(x, 0.0) for x in xs), 2) for c, xs in M.COMBOS.items()}}
         players_out.append(out)
     data = {
         "date": today, "source": source, "model_version": VERSION,
