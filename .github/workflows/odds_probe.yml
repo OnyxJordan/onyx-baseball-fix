@@ -2,12 +2,22 @@ name: Onyx markets probe (manual)
 # Which markets does the Onyx book price, per sport? Run before building a
 # sport's odds fetcher: tools/onyx_markets_probe.py prints a per-market
 # summary to this job's log and uploads probe/markets.json.
+# job=lines instead pulls historical Onyx main lines for a backtest with
+# tools/onyx_lines_pull.py (args: sport league from to markets out).
 # Read-only: commits nothing, deploys nothing.
 on:
   workflow_dispatch:
     inputs:
       sports:
         description: "Sports to probe (space separated); blank = football hockey tennis golf basketball baseball"
+        required: false
+        default: ""
+      job:
+        description: "probe (markets) or lines (historical Onyx lines for a backtest)"
+        required: false
+        default: "probe"
+      args:
+        description: "lines only: sport league from to markets out"
         required: false
         default: ""
 permissions:
@@ -22,10 +32,18 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install requests
-      - run: python3 tools/onyx_markets_probe.py ${{ inputs.sports }}
+      - if: ${{ inputs.job != 'lines' }}
+        run: python3 tools/onyx_markets_probe.py ${{ inputs.sports }}
+        env:
+          OPTICODDS_API_KEY: ${{ secrets.OPTICODDS_API_KEY }}
+      - if: ${{ inputs.job == 'lines' }}
+        run: python3 tools/onyx_lines_pull.py ${{ inputs.args }}
         env:
           OPTICODDS_API_KEY: ${{ secrets.OPTICODDS_API_KEY }}
       - uses: actions/upload-artifact@v4
         with:
-          name: onyx-markets
-          path: probe/
+          name: ${{ inputs.job == 'lines' && 'onyx-lines' || 'onyx-markets' }}
+          path: |
+            probe/
+            bt/
+          if-no-files-found: warn
