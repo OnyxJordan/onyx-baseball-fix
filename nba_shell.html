@@ -118,22 +118,62 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
 .chip.lean{border-color:rgba(176,56,249,.75)!important;box-shadow:0 0 0 1px rgba(176,56,249,.35),0 0 12px rgba(176,56,249,.25)}
 .chip.lean .s{color:#d795ff!important}
 .chip.against{opacity:.5}
-.bc-bg{position:fixed;inset:0;z-index:10070;background:rgba(4,4,8,.6);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .25s}
-.bc-bg.open{opacity:1;pointer-events:auto}
-.bc{position:fixed;left:50%;top:50%;z-index:10080;width:min(560px,calc(100vw - 32px));max-height:calc(100vh - 60px);overflow-y:auto;overscroll-behavior:contain;
-  background:linear-gradient(180deg,rgba(30,22,44,.99),rgba(14,14,18,.99));border:1px solid rgba(176,56,249,.35);border-radius:20px;padding:16px 18px 18px;
-  box-shadow:0 30px 80px rgba(0,0,0,.6);opacity:0;visibility:hidden;transform:translate(-50%,-48%) scale(.97);transition:opacity .2s,transform .2s,visibility 0s .2s}
-.bc.open{opacity:1;visibility:visible;transform:translate(-50%,-50%);transition:opacity .2s,transform .2s,visibility 0s}
-.bc-grip{display:none}
+/* the player card: one card, two faces, flipped like a sports card */
+.pc-bg{position:fixed;inset:0;z-index:10070;background:radial-gradient(120% 80% at 50% 40%,rgba(60,20,90,.55),rgba(4,4,8,.82));backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:opacity .25s}
+.pc-bg.open{opacity:1;pointer-events:auto}
+.pc{position:fixed;left:50%;top:50%;z-index:10080;width:min(580px,calc(100vw - 32px));height:min(800px,calc(100vh - 48px));
+  opacity:0;visibility:hidden;transform:translate(-50%,-46%) scale(.94);transition:opacity .22s,transform .3s cubic-bezier(.2,.9,.25,1),visibility 0s .3s;--gx:50%}
+.pc.open{opacity:1;visibility:visible;transform:translate(-50%,-50%);transition:opacity .22s,transform .3s cubic-bezier(.2,.9,.25,1),visibility 0s}
+.pc-grip{display:none}
+.pc-stage{position:absolute;inset:0;perspective:1600px;--rx:0deg;--ry:0deg}
+.pc-flip{position:absolute;inset:0;transform-style:preserve-3d;-webkit-transform-style:preserve-3d;
+  transform:rotateX(var(--rx)) rotateY(var(--ry));transition:transform .7s cubic-bezier(.3,1.35,.45,1)}
+.pc-flip.flipped{transform:rotateX(var(--rx)) rotateY(calc(180deg + var(--ry)))}
+.pc-face{position:absolute;inset:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
+  backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:22px;
+  background:linear-gradient(180deg,rgba(32,22,48,.995),rgba(13,13,18,.995) 46%);
+  box-shadow:0 0 0 1px rgba(176,56,249,.4),0 30px 90px rgba(0,0,0,.65),inset 0 1px 0 rgba(255,255,255,.08)}
+.pc[data-face=back] .pc-front,.pc[data-face=front] .pc-back{pointer-events:none}
+.pc-back{transform:rotateY(180deg);background:linear-gradient(180deg,rgba(22,20,52,.995),rgba(12,12,18,.995) 46%)}
+/* holographic foil along the edge; follows the pointer on desktop */
+.pc-face::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;padding:1.5px;
+  background:conic-gradient(from 210deg at var(--gx) 0%,rgba(176,56,249,.9),rgba(99,91,255,.7),rgba(97,233,233,.35),rgba(215,149,255,.85),rgba(176,56,249,.9));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:.75}
+.pc-head{position:relative;display:grid;grid-template-columns:auto 1fr auto auto;align-items:center;gap:12px;padding:18px 18px 12px;overflow:hidden}
+.pc-logo{position:absolute;right:-30px;top:-34px;opacity:.09;pointer-events:none;transform:rotate(-12deg)}
+.pc-logo img,.pc-logo svg{width:170px!important;height:170px!important}
+.pc-hs .hs{width:64px;height:64px;border-radius:50%;box-shadow:0 0 0 2px rgba(176,56,249,.7),0 0 22px rgba(176,56,249,.35);background:var(--bg3)}
+.pc-id{min-width:0}.pc-name{font-size:20px;font-weight:800;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pc-id .sub{font-size:12px;color:var(--text3);margin-top:3px;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.pc-id .sub img,.pc-id .sub svg{width:16px!important;height:16px!important}
+.pc-rate{text-align:center;padding:6px 10px;border-radius:12px;background:linear-gradient(135deg,rgba(176,56,249,.28),rgba(99,91,255,.18));border:1px solid rgba(176,56,249,.45)}
+.pc-rate b{display:block;font:800 22px monospace;color:#fff;line-height:1}.pc-rate span{font:800 8px monospace;letter-spacing:.12em;color:#d795ff}
+.pc-x{width:36px;height:36px;border-radius:11px;border:1px solid var(--border2);background:rgba(255,255,255,.05);color:var(--text2);font-size:20px;cursor:pointer;align-self:start}
+.pc-seg{position:sticky;top:0;z-index:2;display:grid;grid-template-columns:1fr 1fr;gap:4px;margin:0 18px;padding:4px;border-radius:14px;
+  background:rgba(14,12,22,.86);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--border2)}
+.pc-seg button{padding:9px 0;border:0;border-radius:10px;background:none;color:var(--text3);font:800 13px 'Space Grotesk',system-ui,sans-serif;letter-spacing:.02em;cursor:pointer;transition:color .2s,background .2s}
+.pc-seg button.on{background:linear-gradient(135deg,#b038f9,#635bff);color:#fff;box-shadow:0 4px 16px rgba(176,56,249,.35)}
+.pc-seg i{font-style:normal;font:800 10px monospace;padding:1px 6px;border-radius:999px;background:rgba(255,255,255,.18);margin-left:4px}
+.pc-body{padding:14px 18px 22px}
+.pc-cta{width:100%;margin-top:16px;padding:14px;border-radius:14px;border:1px solid rgba(176,56,249,.5);cursor:pointer;
+  background:linear-gradient(135deg,rgba(176,56,249,.22),rgba(99,91,255,.16));color:#fff;font:800 14px 'Space Grotesk',system-ui,sans-serif}
+.pc-face .tbl{overflow-x:auto}
 @media (max-width:760px){
-  .bc{left:0;right:0;top:auto;bottom:0;width:100vw;max-height:calc(100vh - var(--sat) - 24px);border-radius:22px 22px 0 0;border-bottom:0;padding-bottom:calc(18px + var(--sab));
-      opacity:1;transform:translateY(105%);transition:transform .32s cubic-bezier(.2,.9,.25,1),visibility 0s .32s}
-  .bc.open{transform:none;transition:transform .32s cubic-bezier(.2,.9,.25,1),visibility 0s}
-  .bc-grip{display:block;width:40px;height:5px;border-radius:3px;background:rgba(255,255,255,.22);margin:-4px auto 10px}
+  .pc{left:0;right:0;top:auto;bottom:0;width:100vw;height:calc(100vh - var(--sat) - 14px);height:calc(100dvh - var(--sat) - 14px);
+      opacity:1;transform:translateY(105%);transition:transform .34s cubic-bezier(.2,.9,.25,1),visibility 0s .34s}
+  .pc.open{transform:none;transition:transform .34s cubic-bezier(.2,.9,.25,1),visibility 0s}
+  .pc-face{border-radius:24px 24px 0 0}
+  .pc-body{padding-bottom:calc(22px + var(--sab))}
+  .pc-grip{display:block;position:absolute;top:7px;left:50%;z-index:5;width:40px;height:5px;margin-left:-20px;border-radius:3px;background:rgba(255,255,255,.28);pointer-events:none}
+  .pc-head{padding:22px 14px 10px;gap:10px}.pc-seg{margin:0 14px}.pc-body{padding-left:14px;padding-right:14px}
+  .pc-hs .hs{width:54px;height:54px}.pc-name{font-size:18px}.pc-rate b{font-size:19px}
 }
-.bc-hd{display:flex;align-items:center;gap:12px;margin-bottom:12px}
-.bc-name{font-size:18px;font-weight:800}
-.bc-x{width:34px;height:34px;border-radius:10px;border:1px solid var(--border2);background:rgba(255,255,255,.04);color:var(--text2);font-size:20px;cursor:pointer}
+@media (prefers-reduced-motion: reduce){
+  .pc-flip,.pc-flip.flipped{transform:none!important;transition:none}
+  .pc-face{backface-visibility:visible;-webkit-backface-visibility:visible;transition:opacity .2s}
+  .pc-back{transform:none}
+  .pc[data-face=front] .pc-back,.pc[data-face=back] .pc-front{opacity:0;pointer-events:none}
+}
 .bc-best{width:100%;display:grid;grid-template-columns:1fr auto;grid-template-rows:auto auto;gap:2px 10px;text-align:left;padding:11px 14px;margin-bottom:12px;border-radius:14px;cursor:pointer;
   background:linear-gradient(135deg,rgba(176,56,249,.22),rgba(99,91,255,.14));border:1px solid rgba(176,56,249,.5);color:var(--text)}
 .bc-best.on{box-shadow:0 0 0 2px rgba(215,149,255,.55)}
@@ -159,12 +199,12 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
 .bc-stats div{background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:8px}
 .bc-stats span{display:block;font:700 9px monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)}
 .bc-stats b{font:800 15px monospace}
-.bc-dist{margin:6px 0 4px}
+.bc-dist{margin:6px 0 4px;touch-action:none;cursor:ew-resize;user-select:none;-webkit-user-select:none}
 .bc-bars{position:relative;height:74px;display:flex;align-items:flex-end;gap:2px;padding-top:16px}
 .bc-bars i{flex:1;background:rgba(255,255,255,.12);border-radius:2px 2px 0 0;transition:background .15s,height .2s}
 .bc-bars i.ov{background:linear-gradient(180deg,#b038f9,#635bff)}
 .bc-bars i.un{background:linear-gradient(180deg,#635bff,#3d37b3)}
-.bc-mark{position:absolute;top:0;bottom:0;width:2px;margin-left:-1px;background:#fff;box-shadow:0 0 10px rgba(255,255,255,.7);transition:left .2s cubic-bezier(.2,.9,.25,1)}
+.bc-mark{position:absolute;top:0;bottom:0;width:2px;margin-left:-1px;background:#fff;box-shadow:0 0 10px rgba(255,255,255,.7);transition:left .12s ease-out}
 .bc-mark span{position:absolute;top:-2px;left:50%;transform:translateX(-50%);font:800 10px monospace;background:#fff;color:#111;padding:1px 5px;border-radius:5px;white-space:nowrap}
 .bc-axis{display:flex;justify-content:space-between;font:700 9px monospace;color:var(--text3);margin-top:4px}
 .bc-slide{margin:12px 0 4px}
@@ -177,6 +217,10 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
 .bc-rungs button b{display:block;font:800 13px monospace;color:var(--text)}.bc-rungs button span{font:700 10px monospace}
 .bc-rungs button.main{border-style:dashed}
 .bc-rungs button.on{border-color:#b038f9;background:rgba(176,56,249,.18);box-shadow:0 0 12px rgba(176,56,249,.35)}
+.bc-rungs button.near{border-color:rgba(215,149,255,.55);border-style:dashed}
+.bc-mark.ghost{background:#d795ff;transition:none}.bc-mark.ghost span{background:#d795ff}
+.bc-price.ghost .na{font:800 13px monospace;font-style:normal;color:#d795ff}
+.bc-big{font-variant-numeric:tabular-nums}
 .bc-note.bc-warn{color:#d795ff;font-weight:700}
 .bc-note{font-size:11px;color:var(--text3);margin-top:8px;line-height:1.45}
 .bc-acts{display:flex;gap:8px;margin-top:12px}.bc-acts button{flex:1}
@@ -225,6 +269,15 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
 .rec-big .l{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-top:4px}
 .rec-big.rec-3{grid-template-columns:repeat(3,1fr)}.rec-big.rec-5{grid-template-columns:repeat(5,1fr)}
 .rec-big .l b{color:var(--text2);font-weight:700}
+.mp-hd{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.mp-tag{font:800 9px monospace;letter-spacing:.14em;padding:3px 9px;border-radius:12px;background:rgba(176,56,249,.18);color:#d795ff}
+.mp-why{font-size:12px;color:var(--text3)}
+.mp-track{display:grid;grid-template-columns:auto auto auto 1fr auto;align-items:center;gap:16px;margin-top:14px;padding-top:12px;border-top:1px solid rgba(176,56,249,.22);cursor:pointer}
+.mp-track span{display:block;font:700 9px monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--text3)}
+.mp-track b{font:800 15px monospace}
+.mp-track a{font-size:12px;color:#d795ff;white-space:nowrap}
+.mp-spark{height:44px;min-width:0}.mp-spark em{font-size:11px;color:var(--text3);font-style:normal}
+@media (max-width:600px){.mp-track{grid-template-columns:repeat(3,1fr)}.mp-spark{grid-column:1/-1}.mp-track a{grid-column:1/-1}}
 .tsp-rec{display:block;margin-top:4px;font-size:11px;color:#d795ff;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 .money-pos{color:#61e970!important}.money-neg{color:#f87171!important}
 .tk-chart{position:relative;height:150px;margin:12px 0 4px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden}
@@ -245,20 +298,6 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
 .res-W{color:#61e970;font-weight:800}.res-L{color:#f87171;font-weight:800}.res-P,.res-V{color:var(--text3);font-weight:800}
 .prose{max-width:780px;line-height:1.75;color:var(--text2);font-size:15px}
 .prose h3{color:var(--text);font-size:17px;margin:26px 0 8px}.prose b{color:var(--text)}
-/* player drawer */
-.pdr-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9995;display:none}
-.pdr{position:fixed;right:0;top:0;bottom:0;width:min(460px,100vw);background:var(--bg2);border-left:1px solid var(--border2);z-index:9996;
-  transform:translateX(100%);transition:transform .22s ease;overflow-y:auto;padding:22px}
-.pdr.open{transform:none}.pdr-bg.open{display:block}
-.pdr{padding-top:calc(18px + var(--sat))}
-/* phones: the player drawer is a bottom sheet (thumb reach, never under the status bar) */
-@media (max-width:760px){
-  .pdr{top:auto;left:0;right:0;width:100vw;height:auto;max-height:calc(100vh - var(--sat) - 28px);border-left:0;border-top:1px solid rgba(176,56,249,.35);
-       border-radius:22px 22px 0 0;padding-top:26px;padding-bottom:calc(24px + var(--sab));transform:translateY(105%);transition:transform .32s cubic-bezier(.2,.9,.25,1)}
-  .pdr::before{content:"";position:absolute;top:9px;left:50%;width:40px;height:5px;margin-left:-20px;border-radius:3px;background:rgba(255,255,255,.22)}
-  .pdr.open{transform:none}
-}
-.pdr-x{float:right;background:none;border:1px solid var(--border2);color:var(--text2);border-radius:8px;width:32px;height:32px;cursor:pointer}
 .pdr-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:16px 0}
 @media (max-width:480px){.pdr-grid .nba-card{padding:10px 6px}.pdr-grid .nba-card .sub{font-size:10px!important}}
 .pdr-grid .nba-card{padding:12px;text-align:center}
@@ -373,9 +412,9 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
   <div class="home-stats-grid" id="homeStats"></div>
   <div class="home-body">
     <div class="home-section">
-      <div class="home-section-tag">Top Scorer Parlay</div>
-      <h2 class="home-section-title">Tonight's biggest scorers, one tap to Onyx</h2>
-      <div id="homeTSP"></div>
+      <div class="home-section-tag">The Model's Parlay</div>
+      <h2 class="home-section-title">Tonight's best look to win</h2>
+      <div id="homeMP"></div>
     </div>
     <div class="home-section">
       <div class="home-section-tag" id="picksTag">Onyx Picks</div>
@@ -445,7 +484,7 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
   <div class="rec-big" id="recBig"></div>
   <div class="sec-hdr"><span class="sec-title">By Market · $10 on every pick</span></div>
   <div class="rec-big rec-3" id="recByStat"></div>
-  <div class="sec-hdr"><div><span class="sec-title">Daily Top Scorer Parlay · one $10 ticket per slate, locked at first tip, auto-graded</span></div><span class="sec-count" id="tkCount"></span></div>
+  <div class="sec-hdr"><div><span class="sec-title">The Model's Parlay · the algorithm's best look to win, one $10 ticket per slate, locked at first tip, auto-graded</span></div><span class="sec-count" id="tkCount"></span></div>
   <div class="rec-big rec-5" id="tkBig"></div>
   <div class="tk-chart" id="tkChart"></div>
   <div id="tkList"></div>
@@ -529,8 +568,7 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
   </div>
 </div>
 
-<div class="pdr-bg" id="pdrBg" onclick="closePlayer()"></div>
-<aside class="pdr" id="pdr"></aside>
+
 
 <script>
 // Injected by nba_build.py. var (not const) so any earlier read is safe.
@@ -734,11 +772,56 @@ function topScorerLegs(n) {
   return out;
 }
 var TSP_N = 3;
-// the parlay's own public record, so the pitch carries its receipts
-function tspRecord() {
+// ── The Model's Parlay: the algorithm's best look to win, tracked ──
+// The legs come from the build (nba_build.ticket_legs), the exact ticket that
+// locks at the first tip and is graded on the Record tab.
+function legText(l) { return `${l.side === 'over' ? 'Over' : 'Under'} ${l.line} ${STAT_ABBR[l.stat || 'pts']}`; }
+function tkSpark(rows, W, H) {
+  const chrono = rows.slice().reverse().filter(t => t.result === 'win' || t.result === 'loss');
+  if (chrono.length < 2) return '';
+  let cum = 0;
+  const vals = [0, ...chrono.map(t => (cum += +t.pnl || 0))];
+  const pad = 6, lo = Math.min(...vals), hi = Math.max(...vals), rg = Math.max(hi - lo, 10);
+  const x = i => pad + i / (vals.length - 1) * (W - 2 * pad), y = v => H - pad - (v - lo) / rg * (H - 2 * pad);
+  const pts = vals.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+  const col = cum >= 0 ? '#61e970' : '#f87171';
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="width:100%;height:100%">
+    <line x1="${pad}" x2="${W - pad}" y1="${y(0)}" y2="${y(0)}" stroke="rgba(255,255,255,.15)" stroke-dasharray="3 3"/>
+    <polygon points="${x(0)},${y(lo)} ${pts} ${x(vals.length - 1)},${y(lo)}" fill="${col}" fill-opacity=".15"/>
+    <polyline points="${pts}" fill="none" stroke="${col}" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>`;
+}
+function mpHtml() {
   const T = D.tickets || {};
-  if (!(T.w || T.l)) return 'Tracked daily on the Record tab, locked at first tip';
-  return `Tracked: ${T.w}-${T.l} · ${money(T.pnl || 0)} on $10 tickets`;
+  const t = T.today && (T.today.legs || []).length ? T.today : null;
+  const track = `<div class="mp-track" onclick="gotoTab('record')">
+      <div><span>Record</span><b>${T.w || 0}-${T.l || 0}</b></div>
+      <div><span>P&amp;L</span><b class="${moneyCls(T.pnl || 0)}">${money(T.pnl || 0)}</b></div>
+      <div><span>ROI</span><b class="${moneyCls(T.roi || 0)}">${((T.roi || 0) >= 0 ? '+' : '') + ((T.roi || 0) * 100).toFixed(1)}%</b></div>
+      <div class="mp-spark">${tkSpark(T.rows || [], 220, 44) || '<em>chart draws from the 2nd graded ticket</em>'}</div>
+      <a>Full record &rsaquo;</a></div>`;
+  if (!t) return `<div class="tsp"><div class="empty" style="border:none">The Model's Parlay builds once Onyx posts lines for games that have not tipped.</div>${track}</div>`;
+  const legs = t.legs;
+  let dec = 1, chance = 1;
+  legs.forEach(l => { dec *= decOf(l.odds); chance *= l.prob || 0; });
+  const bet = legs.map(l => ({sel: l.sel, price: l.odds, gid: l.gid, market: 'player_' + (l.stat || 'pts'), label: `${l.player} ${legText(l)}`}));
+  const ids = bet.map(regLeg);
+  const allIn = bet.every(l => inSlip(l.sel));
+  return `<div class="tsp mp">
+    <div class="mp-hd"><span class="mp-tag">${t.locked ? 'LOCKED · LIVE' : 'LOCKS AT FIRST TIP'}</span>
+      <span class="mp-why">The ${legs.length} legs on tonight's Onyx board the model is most likely to cash, one per game, any stat, either side.</span></div>
+    <div class="tsp-legs">${legs.map((l, k) => { const p = playerOf(l.pid) || {name: l.player, hs: l.hs};
+      return `<div class="tsp-leg">${hs(p, 'm')}<div style="min-width:0;flex:1">
+        <div class="who"><span class="nm" style="cursor:pointer" onclick="openPlayer('${esc(l.pid)}')">${esc(l.player)}</span></div>
+        <div class="ln"><b style="color:var(--text)">${legText(l)}</b> · ${esc(l.team)} vs ${esc(l.opp)}</div>
+        <div class="ln">win chance <b style="color:#d795ff">${pct(l.prob, 0)}</b> · proj ${num(l.proj)}</div></div>
+        ${legChip(bet[k], l.side)}</div>`; }).join('')}</div>
+    <div class="tsp-foot">
+      <span class="tsp-pay">${legs.length}-leg <b>${amerOf(dec)}</b> · win chance <b>${pct(chance, 0)}</b> · $10 pays <b>$${(10 * dec).toFixed(2)}</b></span>
+      <div class="tsp-btns">
+        <button class="btn-secondary" onclick="tspAdd([${ids.join(',')}])">${allIn ? '✓ In your slip' : '+ Add to Parlay Builder'}</button>
+        <button class="btn-primary" onclick="tspBet([${ids.join(',')}])">⚡ Bet it on Onyx</button>
+      </div></div>
+    ${track}</div>`;
 }
 function tspHtml() {
   const ps = topScorerLegs(TSP_N);
@@ -753,8 +836,7 @@ function tspHtml() {
         <div class="ln">Over ${p.props.pts.line} PTS · proj <b style="color:#d795ff">${num(p.proj.pts)}</b></div></div>
         ${legChip(legs[k], 'over')}</div>`).join('')}</div>
     <div class="tsp-foot">
-      <span class="tsp-pay">${ps.length}-leg parlay <b>${amerOf(dec)}</b> · $10 pays <b>$${(10 * dec).toFixed(0)}</b>
-        <a class="tsp-rec" onclick="gotoTab('record')">${tspRecord()}</a></span>
+      <span class="tsp-pay">${ps.length}-leg parlay <b>${amerOf(dec)}</b> · $10 pays <b>$${(10 * dec).toFixed(0)}</b></span>
       <div class="tsp-btns">
         <button class="btn-secondary" onclick="tspAdd([${ids.join(',')}])">${allIn ? '✓ In your slip' : '+ Add to Parlay Builder'}</button>
         <button class="btn-primary" onclick="tspBet([${ids.join(',')}])">⚡ Bet it on Onyx</button>
@@ -848,7 +930,7 @@ function pickCard(k) {
   </div>`;
 }
 function renderHome() {
-  document.getElementById('homeTSP').innerHTML = tspHtml();
+  document.getElementById('homeMP').innerHTML = mpHtml();
   const picks = D.picks || [];
   document.getElementById('picksTag').textContent = 'Onyx Picks · ' + picks.length + ' today';
   document.getElementById('homePicks').innerHTML = picks.length ? picks.map(pickCard).join('')
@@ -1280,8 +1362,8 @@ function renderRecord() {
   </tr>`; }).join('') || '<tr><td colspan="9"><div class="empty" style="border:none">The record starts with the first qualified pick.</div></td></tr>';
 }
 
-// Daily Top Scorer Parlay record: the MLB Model's Ticket, for NBA. The build
-// (nba_build.update_ticket) freezes the home page's Top Scorer Parlay at the
+// The Model's Parlay record: the MLB Model's Ticket, for NBA. The build
+// (nba_build.update_ticket) freezes the home page's Model's Parlay at the
 // slate's first tip into data/nba/ticket_history.json and grades it leg by
 // leg; a leg whose player never played is void and drops out of the payout.
 function renderTickets() {
@@ -1319,7 +1401,7 @@ function renderTickets() {
     const mk = l.hit === true ? ['hit', '✓ ' + l.actual] : l.hit === false ? ['miss', '✗ ' + l.actual] : l.hit === 'void' ? ['void', 'VOID'] : ['pend', live ? 'live' : '-'];
     return `<div class="tk-leg">${hs(recPlayer(l), 's')}<div style="min-width:0">
       <div class="nm">${esc(l.player)}</div>
-      <div class="sub">${logo(l.team)} ${esc(l.team)} vs ${esc(l.opp)} · Over ${l.line} PTS ${fmtOdds(l.odds)} · proj ${num(l.proj)}</div></div>
+      <div class="sub">${logo(l.team)} ${esc(l.team)} vs ${esc(l.opp)} · ${legText(l)} ${fmtOdds(l.odds)} · proj ${num(l.proj)}${l.prob != null ? ' · ' + pct(l.prob, 0) : ''}</div></div>
       <span class="mk ${mk[0]}">${esc(mk[1])}</span></div>`;
   };
   const card = (t, today) => {
@@ -1337,21 +1419,17 @@ function renderTickets() {
 }
 
 // ── player drawer ──────────────────────────────────────────────────
-function openPlayer(pid) {
-  const p = playerOf(pid);
-  if (!p) return;
-  const g = gameOf(p.gid) || {};
+function pcFrontHtml(p) {
   const cells = ['pts', 'reb', 'ast'].map(s => {
     const pr = (p.props || {})[s];
     return `<div class="nba-card"><div class="v">${num(p.proj[s])}</div><div class="l">${STAT_ABBR[s]}</div>
-      <div class="sub dim" style="font-size:11px;margin-top:4px">${pr ? 'line ' + pr.line + ' · ' + (pr.side === 'over' ? 'O ' : 'U ') + pct(pr.prob, 0) : 'no line'}</div>
+      <div class="sub dim" style="font-size:11px;margin-top:4px">${pr ? 'line ' + pr.line + ' · ' + (leanSide(p, s) === 'over' ? 'O ' : 'U ') + pct(((pr.all || {})[leanSide(p, s)] || {}).prob, 0) : 'no line'}</div>
       <div style="margin-top:8px;display:flex;gap:6px;justify-content:center">${pr ? pairChips(p, s, 'o', 'u').join('') : ''}</div></div>`;
   }).join('');
   const l5 = (p.last5 || []).slice().reverse().map(x => `<tr><td class="mono dim">${esc(x.d)}</td><td>${esc(x.opp)}</td><td class="r mono">${x.min}</td><td class="r mono">${x.pts}</td><td class="r mono">${x.reb}</td><td class="r mono">${x.ast}</td></tr>`).join('');
-  document.getElementById('pdr').innerHTML = `<button class="pdr-x" onclick="closePlayer()">×</button>
-    <div class="who">${hs(p, 'l')}<div><div style="font-size:20px;font-weight:800">${esc(p.name)}</div>
-    <div class="sub">${logo(p.team)} ${esc(p.pos || '')} · ${esc(p.team)} ${p.home ? 'vs' : '@'} ${esc(p.opp)} · ${tipTime(g.start)}</div></div></div>
-    ${p.inj ? `<div style="margin-top:12px"><span class="tagx r">${esc(p.inj)}</span> <span class="dim" style="font-size:12px">${esc(p.inj_detail || '')}</span></div>` : ''}
+  return `${pcHead(p, 'front')}
+    <div class="pc-body">
+    ${p.inj ? `<div style="margin:0 0 10px"><span class="tagx r">${esc(p.inj)}</span> <span class="dim" style="font-size:12px">${esc(p.inj_detail || '')}</span></div>` : ''}
     <div class="pdr-grid">${cells}</div>
     <div class="pk-row"><span>proj min <b>${num(p.min)}</b></span>
       <span>season <b>${p.season ? num(p.season.pts) + ' / ' + num(p.season.reb) + ' / ' + num(p.season.ast) : '-'}</b></span>
@@ -1369,9 +1447,14 @@ function openPlayer(pid) {
     ${histTable(p)}
     <div class="sec-hdr"><span class="sec-title">Last 5</span></div>
     <div class="tbl"><table style="min-width:0"><thead><tr><th>Date</th><th>Opp</th><th class="r">Min</th><th class="r">Pts</th><th class="r">Reb</th><th class="r">Ast</th></tr></thead>
-    <tbody>${l5 || '<tr><td colspan="6" class="dim">No games this season yet.</td></tr>'}</tbody></table></div>`;
-  document.getElementById('pdr').classList.add('open');
-  document.getElementById('pdrBg').classList.add('open');
+    <tbody>${l5 || '<tr><td colspan="6" class="dim">No games this season yet.</td></tr>'}</tbody></table></div>
+    ${p.bets && Object.keys(p.bets).length ? `<button class="pc-cta" onclick="pcFlip('back')">See all ${Object.keys(p.bets).length} of his Onyx markets &rsaquo;</button>` : ''}
+    </div>`;
+}
+function openPlayer(pid) {
+  const p = playerOf(pid);
+  if (!p) return;
+  pcOpen(p, 'front');
 }
 // "2025-26" for a season `back` seasons before the one on the slate
 function seasonLabel(back) {
@@ -1391,13 +1474,14 @@ function histTable(p) {
     <tr class="hist-base"><td colspan="2">Baseline <span class="dim">(weighted, aged, regressed)</span></td><td class="hm"></td><td class="r mono">${num(b.min)}</td><td class="r mono">${num(b.pts)}</td><td class="r mono">${num(b.reb)}</td><td class="r mono">${num(b.ast)}</td><td></td></tr>
     </tbody></table></div>`;
 }
-// ── player bet card ────────────────────────────────────────────────
-// Every Onyx line on one player (nba_build.bet_ladders): market chips with
-// search, a slider that walks the alternate ladder (price, model chance,
-// Onyx implied, blended chance and EV move with it), the model's
-// distribution with the line marked, and the best-value play across his
-// markets. Recommendations come only from the backtested markets (points,
-// rebounds, assists); threes / double-double / triple-double show prices.
+// ── the player card ────────────────────────────────────────────────
+// One card, two sides, flipped like a video-game sports card. Front: the
+// player (projection, why this number, seasons, last 5). Back: every Onyx
+// line on him (nba_build.bet_ladders) with search, a scrub slider and the
+// model distribution, the best-value play, add / bet. Opening from a bet
+// chip lands on the back; from a name, the front. Toggle, swipe sideways or
+// press F to flip. Phones: a full-height bottom sheet (swipe down closes);
+// desktop: a centered card that tilts with the pointer.
 var BC_MKTS = {pts: ['Points', 'PTS'], reb: ['Rebounds', 'REB'], ast: ['Assists', 'AST'], fg3: ['Threes made', '3PM'],
                dd: ['Double-double', 'DD'], td: ['Triple-double', 'TD']};
 var BC_MODELED = {pts: 1, reb: 1, ast: 1};
@@ -1406,9 +1490,131 @@ var BC_MODELED = {pts: 1, reb: 1, ast: 1};
 // becomes a big paper EV (a +2400 "best value" in testing), so long shots are
 // shown and bettable but never recommended.
 var BC_REC_PRICE = [-200, 200];
-var BC = null;
+var BC = null, PC = null;
+function pcHead(p, face) {
+  const g = gameOf(p.gid) || {};
+  const nMk = Object.keys(p.bets || {}).length;
+  return `<div class="pc-head">
+    <div class="pc-logo">${logo(p.team)}</div>
+    <div class="pc-hs">${hs(p, 'l')}</div>
+    <div class="pc-id"><div class="pc-name">${esc(p.name)}</div>
+      <div class="sub">${logo(p.team)} ${esc(p.pos || '')}${p.pos ? ' · ' : ''}${esc(p.team)} ${p.home ? 'vs' : '@'} ${esc(p.opp)} · ${tipTime(g.start)}</div></div>
+    <div class="pc-rate"><b>${num((p.proj || {}).pts)}</b><span>PROJ PTS</span></div>
+    <button class="pc-x" onclick="pcClose()" aria-label="Close">×</button>
+  </div>
+  <div class="pc-seg" role="tablist">
+    <button role="tab" class="${face === 'front' ? 'on' : ''}" onclick="pcFlip('front')">Player</button>
+    <button role="tab" class="${face === 'back' ? 'on' : ''}" onclick="pcFlip('back')">Bets${nMk ? ` <i>${nMk}</i>` : ''}</button>
+  </div>`;
+}
+function pcEnsure() {
+  if (document.getElementById('pc')) return;
+  const bg = document.createElement('div'); bg.id = 'pcBg'; bg.className = 'pc-bg'; bg.onclick = pcClose;
+  const el = document.createElement('section'); el.id = 'pc'; el.className = 'pc';
+  el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-label', 'Player card');
+  el.innerHTML = `<div class="pc-grip"></div><div class="pc-stage" id="pcStage"><div class="pc-flip" id="pcFlip">
+    <div class="pc-face pc-front" id="pcFront"></div><div class="pc-face pc-back" id="pcBack"></div></div></div>`;
+  document.body.appendChild(bg); document.body.appendChild(el);
+  const phone = matchMedia('(max-width:760px)').matches;
+  ['pcFront', 'pcBack'].forEach(id => {
+    const f = document.getElementById(id);
+    // sideways swipe flips; on phones, pulling down from the top closes. Both
+    // skip the controls that scrub sideways themselves. (The sheet moves as a
+    // whole: a transform on the face would undo the back face's rotation.)
+    let x0 = null, y0 = 0, pull = false, dy = 0;
+    f.addEventListener('touchstart', e => {
+      if (e.target.closest('.bc-slide,.bc-dist,.bc-mkts,.bc-rungs,.tbl,input,.tbl-wrap')) { x0 = null; return; }
+      x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; pull = phone && f.scrollTop <= 0; dy = 0;
+    }, {passive: true});
+    f.addEventListener('touchmove', e => {
+      if (x0 == null || !pull) return;
+      const ddx = e.touches[0].clientX - x0;
+      dy = e.touches[0].clientY - y0;
+      if (dy < 0 || Math.abs(ddx) > dy) { dy = 0; el.style.transform = ''; return; }
+      el.style.transition = 'none'; el.style.transform = `translateY(${dy}px)`;
+    }, {passive: true});
+    f.addEventListener('touchend', e => {
+      if (x0 == null) return;
+      el.style.transition = ''; el.style.transform = '';
+      const dx = e.changedTouches[0].clientX - x0, ddy = e.changedTouches[0].clientY - y0;
+      if (pull && dy > 110) pcClose();
+      else if (Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(ddy) * 1.6) pcFlip(id === 'pcFront' ? 'back' : 'front');
+      x0 = null;
+    });
+  });
+  // desktop: the card tilts toward the pointer, like holding it
+  const stage = document.getElementById('pcStage');
+  if (matchMedia('(hover:hover) and (prefers-reduced-motion: no-preference)').matches) {
+    let down = false;
+    el.addEventListener('pointerdown', () => { down = true; });
+    window.addEventListener('pointerup', () => { down = false; });
+    el.addEventListener('pointermove', e => {
+      if (down) return;
+      const r = el.getBoundingClientRect();
+      const rx = ((e.clientY - r.top) / r.height - .5) * -4, ry = ((e.clientX - r.left) / r.width - .5) * 5;
+      stage.style.setProperty('--rx', rx.toFixed(2) + 'deg'); stage.style.setProperty('--ry', ry.toFixed(2) + 'deg');
+      el.style.setProperty('--gx', ((e.clientX - r.left) / r.width * 100).toFixed(1) + '%');
+    });
+    el.addEventListener('pointerleave', () => { stage.style.setProperty('--rx', '0deg'); stage.style.setProperty('--ry', '0deg'); });
+  }
+  document.addEventListener('keydown', e => {
+    if (!el.classList.contains('open')) return;
+    if (e.key === 'Escape') pcClose();
+    const typing = /INPUT|TEXTAREA/.test((document.activeElement || {}).tagName || '') && document.activeElement.type !== 'range';
+    if (!typing && (e.key === 'f' || e.key === 'F')) pcFlip(PC.face === 'front' ? 'back' : 'front');
+  });
+}
+function pcOpen(p, face) {
+  pcEnsure();
+  if (!BC || BC.pid !== p.pid) bcInit(p);
+  PC = {pid: p.pid, face};
+  document.getElementById('pcFront').innerHTML = pcFrontHtml(p);
+  bcRender();
+  const el = document.getElementById('pc');
+  document.getElementById('pcFlip').classList.toggle('flipped', face === 'back');
+  el.dataset.face = face;
+  pcFaces(face);
+  document.getElementById('pcBg').classList.add('open');
+  el.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  ['pcFront', 'pcBack'].forEach(id => { document.getElementById(id).scrollTop = 0; });
+  track(face === 'back' ? 'bet_card_open' : 'player_card_open', {player: p.name});
+}
+// the face turned away takes no taps or keyboard focus (3D backfaces still hit-test)
+function pcFaces(face) {
+  document.getElementById('pcFront').inert = face !== 'front';
+  document.getElementById('pcBack').inert = face !== 'back';
+}
+function pcFlip(face) {
+  if (!PC) return;
+  PC.face = face;
+  const el = document.getElementById('pc');
+  el.dataset.face = face;
+  pcFaces(face);
+  document.getElementById('pcFlip').classList.toggle('flipped', face === 'back');
+  el.querySelectorAll('.pc-seg button').forEach(b => b.classList.toggle('on', (b.textContent.trim().startsWith('Bets') ? 'back' : 'front') === face));
+  if (window.OnyxUI && OnyxUI.buzz) OnyxUI.buzz();
+}
+function pcClose() {
+  const el = document.getElementById('pc'), bg = document.getElementById('pcBg');
+  if (el) el.classList.remove('open');
+  if (bg) bg.classList.remove('open');
+  document.body.style.overflow = '';
+}
+function closePlayer() { pcClose(); }
+function closeBetCard() { pcClose(); }
+// a prop chip: the card, back side, on that market's main line and the model's side
+function openBetCard(pid, stat) {
+  const p = playerOf(pid);
+  if (!p) return;
+  if (!p.bets || !Object.keys(p.bets).length) { openPlayer(pid); return; }
+  bcInit(p, stat);
+  const open = document.getElementById('pc') && document.getElementById('pc').classList.contains('open') && PC && PC.pid === pid;
+  if (open) { bcRender(); pcFlip('back'); } else pcOpen(p, 'back');
+}
+
+// ── back face: the bets ────────────────────────────────────────────
 function bcOptions(p) {
-  // every bettable (market, rung, side) with its blended chance and EV per $1
   const out = [];
   Object.entries(p.bets || {}).forEach(([s, rows]) => rows.forEach((r, i) => {
     const [line, op, osel, up, usel, pm, pb] = r;
@@ -1423,61 +1629,32 @@ function bcBest(p) {
     && o.price >= BC_REC_PRICE[0] && o.price <= BC_REC_PRICE[1]);
   return opts.length ? opts.reduce((a, b) => (b.ev > a.ev ? b : a)) : null;
 }
-function openBetCard(pid, stat, side, line) {
-  const p = playerOf(pid);
-  if (!p) return;
-  const bets = p.bets || {};
-  let s = bets[stat] ? stat : Object.keys(bets)[0];
-  if (!s) { openPlayer(pid); return; }
-  // always open on Onyx's main line, on the side the model projects: a
-  // projection under the line opens the Under, whichever chip was tapped
-  const i = bcMain(p, s), sd = bcLean(p, s, i);
-  BC = {pid, s, i: Math.max(0, i), side: sd, q: ''};
-  let bg = document.getElementById('bcBg'), el = document.getElementById('bc');
-  if (!el) {
-    bg = document.createElement('div'); bg.id = 'bcBg'; bg.className = 'bc-bg'; bg.onclick = closeBetCard;
-    el = document.createElement('section'); el.id = 'bc'; el.className = 'bc';
-    el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-label', 'Player bets');
-    document.body.appendChild(bg); document.body.appendChild(el);
-    if (window.OnyxUI && OnyxUI.swipeDown && matchMedia('(max-width:760px)').matches) OnyxUI.swipeDown(el, closeBetCard);
-    document.addEventListener('keydown', e => { if (e.key === 'Escape' && el.classList.contains('open')) closeBetCard(); });
-  }
-  bcRender(true);
-  bg.classList.add('open'); el.classList.add('open');
-  document.body.style.overflow = 'hidden';
-  track('bet_card_open', {player: p.name, stat: s});
-}
 function bcMain(p, s) {
   const rows = (p.bets || {})[s] || [];
   const mainLine = ((p.props || {})[s] || {}).line;
   let i = mainLine != null ? rows.findIndex(r => r[0] === mainLine) : -1;
-  if (i < 0) i = rows.findIndex(r => r[3] != null);             // the two-sided rung
+  if (i < 0) i = rows.findIndex(r => r[3] != null);
   return Math.max(0, i);
 }
 function bcLean(p, s, i) {
   const r = ((p.bets || {})[s] || [])[i];
   const proj = (p.proj || {})[s];
-  if (!r || proj == null || r[3] == null) return 'over';        // over-only rung (or yes/no market)
+  if (!r || proj == null || r[3] == null) return 'over';
   return proj < r[0] ? 'under' : 'over';
 }
-function closeBetCard() {
-  const el = document.getElementById('bc'), bg = document.getElementById('bcBg');
-  if (el) el.classList.remove('open');
-  if (bg) bg.classList.remove('open');
-  document.body.style.overflow = '';
+// always start on Onyx's main line, on the side the model projects
+function bcInit(p, stat) {
+  const bets = p.bets || {};
+  const s = bets[stat] ? stat : bets.pts ? 'pts' : Object.keys(bets)[0];
+  const i = s ? bcMain(p, s) : 0;
+  BC = {pid: p.pid, s, i, side: s ? bcLean(p, s, i) : 'over', q: '', x: s && bets[s][i] ? bets[s][i][0] : 0};
 }
-function bcRow() { const p = playerOf(BC.pid); return ((p.bets || {})[BC.s] || [])[BC.i] || null; }
-function bcPick() {
-  const r = bcRow();
-  if (!r) return null;
-  const [line, op, osel, up, usel, pm, pb] = r;
-  if (BC.side === 'under' && up == null) BC.side = 'over';
-  if (BC.side === 'over' && op == null && up != null) BC.side = 'under';
-  const over = BC.side === 'over';
-  const price = over ? op : up, sel = over ? osel : usel;
-  const pMod = pm == null ? null : over ? pm : 1 - pm, pBl = pb == null ? null : over ? pb : 1 - pb;
-  return {line, price, sel, pMod, pBl, imp: price != null ? 1 / decOf(price) : null,
-          ev: pBl != null && price != null ? pBl * decOf(price) - 1 : null, under: up != null};
+function bcRows() { const p = playerOf(BC.pid); return ((p && p.bets) || {})[BC.s] || []; }
+function bcNearest(x) {
+  const rows = bcRows();
+  let j = 0;
+  rows.forEach((r, k) => { if (Math.abs(r[0] - x) < Math.abs(rows[j][0] - x)) j = k; });
+  return j;
 }
 // negative binomial pmf with the model's fitted spread (threes: unfitted 1.35x mean)
 function bcPmf(mean, s) {
@@ -1490,79 +1667,214 @@ function bcPmf(mean, s) {
   for (let k = 0; k <= kMax; k++) { out.push(t); t *= (r + k) / (k + 1) * q; }
   return out;
 }
-function bcChart(p, line) {
-  if (!BC_MODELED[BC.s] && BC.s !== 'fg3') return '';
+// the reading at the current scrub position: an Onyx line, or a line between
+// two of them (model chance only, never a price that does not exist)
+function bcPick() {
+  const p = playerOf(BC.pid), rows = bcRows();
+  if (!rows.length) return null;
+  const L = Math.round(BC.x * 2) / 2;
+  const j = bcNearest(BC.x);
+  const exact = Math.abs(rows[j][0] - L) < 1e-9;
+  if (exact) {
+    BC.i = j;
+    const [line, op, osel, up, usel, pm, pb] = rows[j];
+    // BC.side is the side you chose (or the model's lean); a rung that does
+    // not offer it shows the other one without forgetting the choice
+    const side = BC.side === 'under' && up == null ? 'over' : BC.side === 'over' && op == null && up != null ? 'under' : BC.side;
+    const over = side === 'over';
+    const price = over ? op : up;
+    return {exact: true, side, line, price, sel: over ? osel : usel,
+            pMod: pm == null ? null : over ? pm : 1 - pm, pBl: pb == null ? null : over ? pb : 1 - pb,
+            imp: price != null ? 1 / decOf(price) : null,
+            ev: pb != null && price != null ? (over ? pb : 1 - pb) * decOf(price) - 1 : null, under: up != null};
+  }
   const mean = (p.proj || {})[BC.s];
-  if (mean == null) return '';
-  const pmf = bcPmf(mean, BC.s), mx = Math.max(...pmf), n = pmf.length;
-  const bars = pmf.map((v, k) => `<i class="${BC.side === 'over' ? (k > line ? 'ov' : '') : (k < line ? 'un' : '')}" style="height:${Math.max(2, v / mx * 100)}%" title="${k}: ${(v * 100).toFixed(1)}%"></i>`).join('');
-  const xPct = Math.min(100, Math.max(0, (line + 0.5) / n * 100));
-  return `<div class="bc-dist"><div class="bc-bars">${bars}<b class="bc-mark" style="left:${xPct}%"><span>${line}</span></b></div>
-    <div class="bc-axis"><span>0</span><span>proj ${num(mean)}</span><span>${n - 1}+</span></div></div>`;
+  let pOver = null;
+  if (mean != null && (BC_MODELED[BC.s] || BC.s === 'fg3')) {
+    const pmf = bcPmf(mean, BC.s); pOver = 0;
+    pmf.forEach((v, k) => { if (k > L) pOver += v; });
+  }
+  const lo = [...rows].reverse().find(r => r[0] < L), hi = rows.find(r => r[0] > L);
+  return {exact: false, side: BC.side, line: L, lo, hi, pMod: pOver == null ? null : BC.side === 'over' ? pOver : 1 - pOver};
 }
-function bcRender(scrollRung) {
-  const p = playerOf(BC.pid), el = document.getElementById('bc');
-  if (!p || !el) return;
-  const g = gameOf(p.gid) || {};
-  const bets = p.bets || {};
-  const best = bcBest(p);
-  const rows = bets[BC.s] || [];
-  const k = bcPick();
+function bcLegFor(p, k) {
   const meta = BC_MKTS[BC.s] || [BC.s, BC.s];
-  const q = BC.q.toLowerCase().trim();
-  const mk = Object.keys(BC_MKTS).filter(s => bets[s] && (!q || (BC_MKTS[s][0] + ' ' + BC_MKTS[s][1]).toLowerCase().includes(q)));
-  const evTxt = k && k.ev != null ? `<b class="${moneyCls(k.ev)}">${money(10 * k.ev)}</b>` : '<b class="dim">-</b>';
-  const legLabel = k ? `${p.name} ${BC.s === 'dd' || BC.s === 'td' ? meta[0] + ' Yes' : (BC.side === 'over' ? 'Over ' : 'Under ') + k.line + ' ' + meta[1]}` : '';
-  const leg = k && k.sel ? {sel: k.sel, price: k.price, gid: p.gid, market: 'player_' + BC.s, label: legLabel} : null;
-  const li = leg ? regLeg(leg) : -1;
   const yesNo = BC.s === 'dd' || BC.s === 'td';
-  el.innerHTML = `<div class="bc-grip"></div>
-    <div class="bc-hd">${hs(p, 'm')}<div style="min-width:0;flex:1"><div class="bc-name">${esc(p.name)}</div>
-      <div class="sub">${logo(p.team)} ${esc(p.team)} ${p.home ? 'vs' : '@'} ${esc(p.opp)} · ${tipTime(g.start)} · ${num(p.min)} min</div></div>
-      <button class="bc-x" onclick="closeBetCard()" aria-label="Close">×</button></div>
-    ${best ? `<button class="bc-best${best.s === BC.s && best.i === BC.i && best.side === BC.side ? ' on' : ''}" onclick="BC.s='${best.s}';BC.i=${best.i};BC.side='${best.side}';bcRender(true)">
+  return k && k.exact && k.sel ? {sel: k.sel, price: k.price, gid: p.gid, market: 'player_' + BC.s,
+    label: `${p.name} ${yesNo ? meta[0] + ' Yes' : (k.side === 'over' ? 'Over ' : 'Under ') + k.line + ' ' + meta[1]}`} : null;
+}
+// the full back face; scrubbing then only updates pieces of it (bcUpdate),
+// so the slider under a finger is never replaced mid-drag
+function bcRender() {
+  const p = playerOf(BC.pid), el = document.getElementById('pcBack');
+  if (!p || !el) return;
+  const rows = bcRows();
+  const yesNo = BC.s === 'dd' || BC.s === 'td';
+  const best = bcBest(p);
+  const lo = rows.length ? rows[0][0] : 0, hi = rows.length ? rows[rows.length - 1][0] : 0;
+  el.innerHTML = `${pcHead(p, 'back')}
+    <div class="pc-body">
+    ${best ? `<button class="bc-best" id="bcBest" onclick="bcTake('${best.s}',${best.i},'${best.side}')">
         <span class="eb">${best.ev > 0 ? 'Best value' : 'Closest to fair'}</span>
         <span class="bt">${best.side === 'over' ? 'Over' : 'Under'} ${best.line} ${BC_MKTS[best.s][1]} <em>${fmtOdds(best.price)}</em></span>
         <span class="bv ${moneyCls(best.ev)}">${money(10 * best.ev)} <small>per $10</small></span>
         <span class="bw">Across his points, rebounds and assists lines priced ${BC_REC_PRICE[0]} to +${BC_REC_PRICE[1]}, where the model is calibrated</span></button>` : ''}
-    <label class="bc-search"><input type="search" placeholder="Search his markets: points, threes, double..." value="${esc(BC.q)}" oninput="BC.q=this.value;bcRender();this.focus();this.setSelectionRange(this.value.length,this.value.length)" aria-label="Search markets"></label>
-    <div class="bc-mkts">${mk.map(s => `<button class="${s === BC.s ? 'on' : ''}" onclick="BC.s='${s}';BC.i=bcMain(playerOf(BC.pid),'${s}');BC.side=bcLean(playerOf(BC.pid),'${s}',BC.i);bcRender(true)">
-        ${BC_MKTS[s][0]}${p.proj && p.proj[s] != null ? ` <span>${num(p.proj[s])}</span>` : ''}</button>`).join('') || '<span class="dim" style="font-size:12px">No market matches.</span>'}</div>
-    ${k ? `<div class="bc-main">
-      <div class="bc-line"><div><div class="bc-big">${yesNo ? meta[0] + ': Yes' : `${BC.side === 'over' ? 'Over' : 'Under'} ${k.line} <span>${meta[0]}</span>`}</div>
-        ${!yesNo && k.under ? `<div class="bc-side"><button class="${BC.side === 'over' ? 'on' : ''}" onclick="BC.side='over';bcRender()">Over</button><button class="${BC.side === 'under' ? 'on' : ''}" onclick="BC.side='under';bcRender()">Under</button></div>`
-          : !yesNo ? (p.proj && p.proj[BC.s] != null && p.proj[BC.s] < k.line
-              ? `<div class="bc-note bc-warn">Model projects ${num(p.proj[BC.s])}, under this line. Onyx is offering only the over here.</div>`
-              : '<div class="bc-note">Alternate line: Onyx prices the over only</div>') : ''}</div>
-        <div class="bc-price">${fmtOdds(k.price)}<span>Onyx</span></div></div>
-      <div class="bc-stats">
-        <div><span>Model</span><b>${k.pMod != null ? pct(k.pMod, 1) : '-'}</b></div>
-        <div><span>Onyx implied</span><b>${k.imp != null ? pct(k.imp, 1) : '-'}</b></div>
-        <div><span>Blended</span><b>${k.pBl != null ? pct(k.pBl, 1) : '-'}</b></div>
-        <div><span>EV per $10</span>${evTxt}</div></div>
-      ${yesNo ? '' : bcChart(p, k.line)}
-      ${rows.length > 1 ? `<div class="bc-slide"><input type="range" min="0" max="${rows.length - 1}" step="1" value="${BC.i}"
-          oninput="BC.i=+this.value;bcRender(true)" aria-label="Line" style="--pct:${rows.length > 1 ? BC.i / (rows.length - 1) * 100 : 0}%">
-        <div class="bc-rungs" id="bcRungs">${rows.map((r, j) => `<button class="${j === BC.i ? 'on' : ''}${r[3] != null ? ' main' : ''}" onclick="BC.i=${j};bcRender(true)">
-          <b>${r[0]}</b><span>${fmtOdds(r[1] != null ? r[1] : r[3])}</span></button>`).join('')}</div></div>` : ''}
-      <div class="bc-note">${BC_MODELED[BC.s] ? 'Blended = 20% model, 80% Onyx price with the margin removed: the same math as the board.'
+    <label class="bc-search"><input type="search" placeholder="Search his markets: points, threes, double..." value="${esc(BC.q)}" oninput="BC.q=this.value;bcMkts()" aria-label="Search markets"></label>
+    <div class="bc-mkts" id="bcMkts"></div>
+    ${rows.length ? `<div class="bc-main">
+      <div class="bc-line"><div><div class="bc-big" id="bcBig"></div>
+        <div class="bc-side" id="bcSide"><button data-s="over" onclick="BC.side='over';bcUpdate()">Over</button><button data-s="under" onclick="BC.side='under';bcUpdate()">Under</button></div>
+        <div class="bc-note" id="bcSideNote"></div></div>
+        <div class="bc-price" id="bcPrice"></div></div>
+      <div class="bc-stats" id="bcStats"></div>
+      ${yesNo ? '' : `<div class="bc-dist" id="bcDist"></div>`}
+      ${rows.length > 1 ? `<div class="bc-slide"><input id="bcRange" type="range" min="${lo}" max="${hi}" step="0.1" value="${BC.x}" aria-label="Line">
+        <div class="bc-rungs" id="bcRungs">${rows.map((r, j) => `<button data-j="${j}" class="${r[3] != null ? 'main' : ''}" onclick="bcGo(${j})">
+          <b>${r[0]}</b><span></span></button>`).join('')}</div></div>` : ''}
+      <div class="bc-note">${BC_MODELED[BC.s] ? 'Blended = 20% model, 80% Onyx price with the margin removed: the same math as the board. Drag the slider or the chart: between Onyx lines you see the model chance, release to snap to a line you can bet.'
           : BC.s === 'fg3' ? 'Threes: model shape not backtested yet, so no recommendation is made from it.'
           : 'Not modeled: the Onyx price only, no recommendation.'}</div>
-      <div class="bc-acts">
-        <button class="btn-secondary" ${leg ? `onclick="slipToggle(${li});bcRender()"` : 'disabled'}>${leg && inSlip(leg.sel) ? '✓ In your parlay' : '+ Add to parlay'}</button>
-        <button class="btn-primary" ${leg ? 'data-sel="1"' : 'disabled'}>⚡ Bet on Onyx</button>
-      </div></div>` : '<div class="empty">No Onyx line on this market.</div>'}`;
-  // the primary button goes straight to Onyx for this exact selection
-  const bp = el.querySelector('.btn-primary[data-sel]');
-  if (bp && leg) bp.onclick = () => { track('onyx_click', {link_type: 'single', market: leg.market, selection: leg.label, odds: String(leg.price), source: 'bet_card'});
+      <div class="bc-acts"><button class="btn-secondary" id="bcAdd">+ Add to parlay</button><button class="btn-primary" id="bcBet">⚡ Bet on Onyx</button></div>
+    </div>` : '<div class="empty">No Onyx line on this market.</div>'}
+    </div>`;
+  bcMkts();
+  // scrub: the native range for keyboard and touch, the chart for direct drag
+  const rg = document.getElementById('bcRange');
+  if (rg) {
+    rg.addEventListener('input', () => bcScrub(+rg.value));
+    rg.addEventListener('change', () => bcSnap());
+  }
+  bcChartBind();
+  bcUpdate(true);
+}
+function bcMkts() {
+  const p = playerOf(BC.pid), box = document.getElementById('bcMkts');
+  if (!p || !box) return;
+  const q = BC.q.toLowerCase().trim(), bets = p.bets || {};
+  const mk = Object.keys(BC_MKTS).filter(s => bets[s] && (!q || (BC_MKTS[s][0] + ' ' + BC_MKTS[s][1]).toLowerCase().includes(q)));
+  box.innerHTML = mk.map(s => `<button class="${s === BC.s ? 'on' : ''}" onclick="bcGo(null,'${s}')">
+      ${BC_MKTS[s][0]}${p.proj && p.proj[s] != null ? ` <span>${num(p.proj[s])}</span>` : ''}</button>`).join('')
+    || '<span class="dim" style="font-size:12px">No market matches.</span>';
+}
+// jump to a rung (or a market's main line on the model's side)
+function bcGo(j, s) {
+  const p = playerOf(BC.pid);
+  if (s && s !== BC.s) {
+    BC.s = s;
+    const i = j == null ? bcMain(p, s) : j;
+    BC.i = i; BC.x = bcRows()[i][0];
+    if (j == null) BC.side = bcLean(p, s, i);
+    bcRender();
+    return;
+  }
+  if (j == null) j = bcMain(p, BC.s);
+  BC.i = j; BC.x = bcRows()[j][0];
+  bcUpdate(true);
+}
+function bcTake(s, i, side) {
+  const same = s === BC.s;
+  BC.side = side;
+  if (same) bcGo(i); else { BC.s = s; BC.i = i; BC.x = bcRows()[i][0]; bcRender(); }
+}
+var _bcTick = -1;
+function bcScrub(x) {
+  BC.x = x;
+  const j = bcNearest(x), rows = bcRows();
+  if (Math.abs(rows[j][0] - Math.round(x * 2) / 2) < 1e-9 && j !== _bcTick) { _bcTick = j; if (window.OnyxUI && OnyxUI.buzz) OnyxUI.buzz(); }
+  bcUpdate(false);
+}
+function bcSnap() {
+  const j = bcNearest(BC.x);
+  BC.i = j; BC.x = bcRows()[j][0];
+  bcUpdate(true);
+}
+function bcChartBind() {
+  const dist = document.getElementById('bcDist');
+  if (!dist) return;
+  let drag = false;
+  const at = e => {
+    const bars = dist.querySelector('.bc-bars');
+    if (!bars) return;
+    const r = bars.getBoundingClientRect(), n = bars.children.length - 1;   // last child is the marker
+    const rows = bcRows();
+    const x = Math.min(rows[rows.length - 1][0], Math.max(rows[0][0], +dist.dataset.k0 + (e.clientX - r.left) / r.width * n - 0.5));
+    const rg = document.getElementById('bcRange'); if (rg) rg.value = x;
+    bcScrub(x);
+  };
+  dist.addEventListener('pointerdown', e => { drag = true; dist.setPointerCapture(e.pointerId); at(e); });
+  dist.addEventListener('pointermove', e => { if (drag) at(e); });
+  const end = () => { if (drag) { drag = false; bcSnap(); } };
+  dist.addEventListener('pointerup', end); dist.addEventListener('pointercancel', end);
+}
+function bcUpdate(scrollRung) {
+  const p = playerOf(BC.pid), rows = bcRows();
+  if (!p || !rows.length || !document.getElementById('bcBig')) return;
+  const k = bcPick(), meta = BC_MKTS[BC.s] || [BC.s, BC.s], yesNo = BC.s === 'dd' || BC.s === 'td';
+  const $ = id => document.getElementById(id);
+  $('bcBig').innerHTML = yesNo ? `${meta[0]}: Yes` : `${k.side === 'over' ? 'Over' : 'Under'} ${k.exact ? k.line : k.line.toFixed(1)} <span>${meta[0]}</span>`;
+  $('bcPrice').innerHTML = k.exact ? `${fmtOdds(k.price)}<span>Onyx</span>` : `<i class="na">not offered</i><span>scrubbing</span>`;
+  $('bcPrice').classList.toggle('ghost', !k.exact);
+  const sideBox = $('bcSide'), under = k.exact ? k.under : false;
+  sideBox.style.display = !yesNo && k.exact && under ? '' : 'none';
+  sideBox.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.s === k.side));
+  const proj = (p.proj || {})[BC.s];
+  $('bcSideNote').innerHTML = yesNo || !k.exact ? (k.exact ? '' : `Between Onyx lines${k.lo ? ` · <b>${k.lo[0]}</b> ${fmtOdds(k.lo[1] != null ? k.lo[1] : k.lo[3])}` : ''}${k.hi ? ` · <b>${k.hi[0]}</b> ${fmtOdds(k.hi[1] != null ? k.hi[1] : k.hi[3])}` : ''} · release to snap`)
+    : under ? '' : proj != null && proj < k.line ? `<span class="bc-warn">Model projects ${num(proj)}, under this line. Onyx is offering only the over here.</span>` : 'Alternate line: Onyx prices the over only';
+  $('bcStats').innerHTML = `
+    <div><span>Model</span><b>${k.pMod != null ? pct(k.pMod, 1) : '-'}</b></div>
+    <div><span>Onyx implied</span><b>${k.exact && k.imp != null ? pct(k.imp, 1) : '-'}</b></div>
+    <div><span>Blended</span><b>${k.exact && k.pBl != null ? pct(k.pBl, 1) : '-'}</b></div>
+    <div><span>EV per $10</span>${k.exact && k.ev != null ? `<b class="${moneyCls(k.ev)}">${money(10 * k.ev)}</b>` : '<b class="dim">-</b>'}</div>`;
+  // the distribution: built once per market, then only the marker and colours move
+  const dist = $('bcDist');
+  if (dist && proj != null && (BC_MODELED[BC.s] || BC.s === 'fg3')) {
+    let bars = dist.querySelector('.bc-bars');
+    if (!bars || dist.dataset.s !== BC.s) {
+      // only the stretch that matters (his ladder plus the model's likely
+      // range), so every pixel of a scrub is a finer step
+      const full = bcPmf(proj, BC.s), mx = Math.max(...full), cut = mx * 0.02;
+      let k0 = full.findIndex(v => v >= cut), k1 = full.length - 1 - [...full].reverse().findIndex(v => v >= cut);
+      k0 = Math.max(0, Math.min(k0, Math.floor(rows[0][0]) - 1)); k1 = Math.min(full.length - 1, Math.max(k1, Math.ceil(rows[rows.length - 1][0]) + 1));
+      const pmf = full.slice(k0, k1 + 1);
+      dist.dataset.s = BC.s; dist.dataset.k0 = k0;
+      dist.innerHTML = `<div class="bc-bars">${pmf.map((v, i) => `<i style="height:${Math.max(2, v / mx * 100)}%" title="${i + k0}: ${(v * 100).toFixed(1)}%"></i>`).join('')}<b class="bc-mark"><span></span></b></div>
+        <div class="bc-axis"><span>${k0}</span><span>proj ${num(proj)}</span><span>${k1}${k1 === full.length - 1 ? '+' : ''}</span></div>`;
+      bars = dist.querySelector('.bc-bars');
+    }
+    const n = bars.children.length - 1, L = k.line, k0 = +dist.dataset.k0;
+    [...bars.children].forEach((b, i) => { if (b.tagName === 'I') b.className = k.side === 'over' ? (i + k0 > L ? 'ov' : '') : (i + k0 < L ? 'un' : ''); });
+    const mark = bars.querySelector('.bc-mark');
+    mark.style.left = Math.min(100, Math.max(0, (BC.x - k0 + 0.5) / n * 100)) + '%';
+    mark.classList.toggle('ghost', !k.exact);
+    mark.querySelector('span').textContent = k.exact ? k.line : (Math.round(BC.x * 2) / 2).toFixed(1);
+  } else if (dist) dist.innerHTML = '';
+  const rg = $('bcRange');
+  if (rg) {
+    if (document.activeElement !== rg || scrollRung) rg.value = BC.x;
+    const lo = rows[0][0], hi = rows[rows.length - 1][0];
+    rg.style.setProperty('--pct', ((BC.x - lo) / Math.max(1e-9, hi - lo) * 100) + '%');
+  }
+  const rungs = $('bcRungs');
+  if (rungs) {
+    const near = bcNearest(BC.x);
+    rungs.querySelectorAll('button').forEach(b => {
+      const j = +b.dataset.j, r = rows[j], u = k.side === 'under' && r[3] != null;
+      b.classList.toggle('on', k.exact && j === BC.i); b.classList.toggle('near', !k.exact && j === near);
+      b.querySelector('span').textContent = (u ? 'U ' : r[3] != null ? 'O ' : '') + fmtOdds(u ? r[3] : r[1] != null ? r[1] : r[3]);
+    });
+    if (scrollRung) { const on = rungs.querySelector('.on'); if (on) on.scrollIntoView({block: 'nearest', inline: 'center', behavior: 'smooth'}); }
+  }
+  const best = $('bcBest'), b0 = bcBest(p);
+  if (best && b0) best.classList.toggle('on', k.exact && b0.s === BC.s && b0.i === BC.i && b0.side === k.side);
+  // actions: this exact Onyx selection, or nothing while between lines
+  const leg = bcLegFor(p, k);
+  const add = $('bcAdd'), bet = $('bcBet');
+  add.disabled = bet.disabled = !leg;
+  add.textContent = leg && inSlip(leg.sel) ? '✓ In your parlay' : '+ Add to parlay';
+  add.onclick = () => { if (!leg) return; slipToggle(regLeg(leg)); bcUpdate(false); };
+  bet.onclick = () => { if (!leg) return; track('onyx_click', {link_type: 'single', market: leg.market, selection: leg.label, odds: String(leg.price), source: 'player_card'});
     window.open(shareUrl([leg.sel]), '_blank', 'noopener'); };
-  if (scrollRung) { const on = el.querySelector('#bcRungs .on'); if (on) on.scrollIntoView({block: 'nearest', inline: 'center', behavior: 'smooth'}); }
 }
-function closePlayer() {
-  document.getElementById('pdr').classList.remove('open');
-  document.getElementById('pdrBg').classList.remove('open');
-}
-
 // ── tabs ───────────────────────────────────────────────────────────
 var currentTab = 'home';
 var RENDER = {home: renderHome, games: renderGames, board: renderBoard, scorers: renderScorers, record: renderRecord, model: renderModel};

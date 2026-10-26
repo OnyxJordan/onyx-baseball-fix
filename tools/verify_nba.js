@@ -67,10 +67,14 @@ function serve(rootDir) {
       const p = (NBA_DATA.players || []).find(x => !x.out);
       if (!p) return 'no players';
       try { openPlayer(p.pid); } catch (e) { return e.message; }
-      const t = document.getElementById('pdr').innerText;
-      return /\bundefined\b|\bNaN\b/.test(t) ? 'bad drawer text' : 'ok';
+      const pc = document.getElementById('pc');
+      if (!pc || !pc.classList.contains('open') || pc.dataset.face !== 'front') return 'card did not open on the player side';
+      const t = document.getElementById('pcFront').innerText;
+      if (/\bundefined\b|\bNaN\b/.test(t)) return 'bad card text';
+      pcClose();
+      return 'ok';
     });
-    console.log(`  ${dr === 'ok' || dr === 'no players' ? 'ok  ' : 'FAIL'} drawer   ${dr}`);
+    console.log(`  ${dr === 'ok' || dr === 'no players' ? 'ok  ' : 'FAIL'} card     ${dr}`);
     if (dr !== 'ok' && dr !== 'no players') failures++;
     // the player bet card: opens from a prop, shows his markets, moves the
     // line when the ladder has more than one rung, closes cleanly
@@ -79,19 +83,34 @@ function serve(rootDir) {
       if (!p) return 'no priced players';
       try { openBetCard(p.pid, Object.keys(p.bets)[0]); } catch (e) { return e.message; }
       await new Promise(r => setTimeout(r, 350));
-      const el = document.getElementById('bc');
+      const el = document.getElementById('pc');
       if (!el || !el.classList.contains('open')) return 'did not open';
-      const t = el.innerText;
+      if (el.dataset.face !== 'back' || !document.getElementById('pcFlip').classList.contains('flipped')) return 'did not flip to the bets side';
+      const back = document.getElementById('pcBack');
+      const t = back.innerText;
       if (/\bundefined\b|\bNaN\b/.test(t)) return 'bad card text';
-      if (!el.querySelector('.bc-mkts button')) return 'no markets';
-      const r = el.querySelector('.bc-slide input[type=range]');
-      if (r && +r.max > 0) {
-        const before = el.querySelector('.bc-big').innerText;
-        r.value = +r.value === +r.max ? 0 : +r.max; r.dispatchEvent(new Event('input', {bubbles: true}));
-        if (document.querySelector('#bc .bc-big').innerText === before) return 'slider did not move the line';
+      if (!back.querySelector('.bc-mkts button')) return 'no markets';
+      const r = back.querySelector('.bc-slide input[type=range]');
+      if (r && +r.max > +r.min) {
+        const before = back.querySelector('.bc-big').innerText;
+        r.value = +r.value === +r.max ? r.min : r.max; r.dispatchEvent(new Event('input', {bubbles: true}));
+        // 10/26: a re-render replaced the slider mid-drag, so a drag moved one rung
+        if (back.querySelector('.bc-slide input[type=range]') !== r) return 'slider rebuilt mid-drag';
+        if (back.querySelector('.bc-big').innerText === before) return 'slider did not move the line';
+        // fine steps between offered lines, then a snap on release
+        const rungs = [...back.querySelectorAll('.bc-rungs button b')].map(b => +b.innerText);
+        if (rungs.length > 1 && rungs[1] - rungs[0] >= 1) {
+          r.value = rungs[0] + 0.5 * (rungs[1] - rungs[0]) + 0.01; r.dispatchEvent(new Event('input', {bubbles: true}));
+          const off = rungs.includes(Math.round(+r.value * 2) / 2);
+          if (!off && !/not offered/.test(back.querySelector('.bc-price').innerText)) return 'between lines but shows a price';
+          r.dispatchEvent(new Event('change', {bubbles: true}));
+          if (!rungs.includes(+r.value)) return 'release did not snap to an Onyx line';
+        }
       }
+      pcFlip('front');
+      if (el.dataset.face !== 'front') return 'did not flip back';
       closeBetCard();
-      return document.getElementById('bc').classList.contains('open') ? 'did not close' : 'ok';
+      return el.classList.contains('open') ? 'did not close' : 'ok';
     });
     console.log(`  ${bc === 'ok' || bc === 'no priced players' ? 'ok  ' : 'FAIL'} bet card ${bc}`);
     if (bc !== 'ok' && bc !== 'no priced players') failures++;

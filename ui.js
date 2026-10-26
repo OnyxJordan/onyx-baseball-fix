@@ -428,8 +428,7 @@
         return r;
       };
     }
-    var pdr = document.getElementById('pdr');   // NBA player sheet
-    if (pdr && typeof closePlayer === 'function' && matchMedia('(max-width:760px)').matches) swipeDown(pdr, closePlayer);
+    // the NBA player card handles its own swipe-down (it flips, so it needs both faces)
     var ham = document.getElementById('navHamburger');
     if (ham) {
       ham.removeAttribute('onclick');

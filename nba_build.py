@@ -28,9 +28,16 @@ from nba_model import role_gap, VERSION, project_slate, price_side, STATS
 
 SHELL, OUT = "nba_shell.html", "nba.html"
 LEDGER = "picks_history.json"
-TICKETS = "ticket_history.json"     # the daily Top Scorer Parlay, one $10 ticket per slate
+TICKETS = "ticket_history.json"     # the Model's Parlay, one $10 ticket per slate
 TICKET_LOCK = "ticket_lock.json"     # today's ticket, refreshed until the first tip, then frozen
-TICKET_LEGS, TICKET_MIN_LEGS, TICKET_MIN_MIN, TICKET_MIN_PROB = 3, 2, 26.0, 0.47
+# The Model's Parlay: the algorithm's best look to WIN. Replayed on 2025-26 at
+# Onyx prices (main lines), chosen on Oct-Jan, judged on Feb-Apr: picking the
+# 3 highest blended win chances (any of pts / reb / ast, either side, one per
+# game and player) hit 28.6% at opening / 22.4% at closing prices (claimed
+# 24%), against 12.2% / 4.1% for top-scorer overs. Main lines only (the
+# history has no alternate ladders to prove them on).
+TICKET_LEGS, TICKET_MIN_LEGS, TICKET_MIN_MIN = 3, 2, 24.0
+TICKET_PRICE = (-400, 150)
 STAKE = 10.0
 
 # Picks lane (v1). Deliberately strict: an honest lane is a quiet lane.
@@ -254,30 +261,36 @@ def grade(ledger, today):
 
 # ── the daily Top Scorer Parlay, tracked like the MLB Model's Ticket ─────────
 def ticket_legs(rows, games):
-    """Exactly the ticket the home page shows (nba_shell.html topScorerLegs):
-    tonight's highest projected scorers, one per untipped game, healthy, 26+
-    projected minutes, with an Onyx points-over the blend does not lean
-    against (P(over) >= 47%)."""
-    out, used = [], set()
-    pool = []
+    """The Model's Parlay: the three Onyx main-line legs with the highest
+    blended win chance (20% model / 80% Onyx no-vig, the board's number),
+    any of points / rebounds / assists, over or under, priced -400..+150,
+    projected 24+ minutes, healthy, untipped, one leg per game and per player."""
+    cands = []
     for r in rows:
-        pr = (r.get("props") or {}).get("pts")
-        over = ((pr or {}).get("all") or {}).get("over") or {}
-        if r["out"] or r["inj"] or r["min"] < TICKET_MIN_MIN or not pr or not over.get("sel"):
+        if r["out"] or r["inj"] or r["min"] < TICKET_MIN_MIN:
             continue
         if (games.get(r["gid"]) or {}).get("state") != "pre":
             continue
-        if over.get("prob") is not None and over["prob"] < TICKET_MIN_PROB:
+        for s_, pr in (r.get("props") or {}).items():
+            if pr.get("src") != "onyx":
+                continue
+            for side, a in (pr.get("all") or {}).items():
+                if not a.get("sel") or a.get("prob") is None or a.get("price") is None:
+                    continue
+                if not (TICKET_PRICE[0] <= a["price"] <= TICKET_PRICE[1]):
+                    continue
+                cands.append((a["prob"], r, s_, side, pr, a))
+    cands.sort(key=lambda c: -c[0])
+    out, g_used, p_used = [], set(), set()
+    for prob, r, s_, side, pr, a in cands:
+        if len(out) >= TICKET_LEGS:
+            break
+        if r["gid"] in g_used or r["pid"] in p_used:
             continue
-        pool.append((r, pr, over))
-    pool.sort(key=lambda x: -x[0]["proj"]["pts"])
-    for r, pr, over in pool:
-        if len(out) >= TICKET_LEGS or r["gid"] in used:
-            continue
-        used.add(r["gid"])
+        g_used.add(r["gid"]); p_used.add(r["pid"])
         out.append({"pid": r["pid"], "player": r["name"], "team": r["team"], "opp": r["opp"], "gid": r["gid"],
-                    "stat": "pts", "side": "over", "line": pr["line"], "odds": over["price"],
-                    "prob": over.get("prob"), "proj": r["proj"]["pts"], "sel": over.get("sel"), "hit": None})
+                    "stat": s_, "side": side, "line": pr["line"], "odds": a["price"], "prob": prob,
+                    "proj": r["proj"][s_], "sel": a["sel"], "hit": None})
     return out
 
 
@@ -346,8 +359,12 @@ def grade_tickets(today):
                 if not g or g[4] <= 0:
                     leg["hit"], leg["actual"] = "void", None
                 else:
-                    leg["actual"] = g[5]
-                    leg["hit"] = g[5] > leg["line"]
+                    act = {"pts": g[5], "reb": g[6], "ast": g[7]}[leg.get("stat", "pts")]
+                    leg["actual"] = act
+                    if act == leg["line"]:
+                        leg["hit"] = "void"                       # push: drops out like a DNP
+                    else:
+                        leg["hit"] = (act > leg["line"]) == (leg.get("side", "over") == "over")
             elif stale:
                 leg["hit"], leg["actual"] = "void", None
         if any(l.get("hit") is None for l in t["legs"]):
