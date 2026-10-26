@@ -6217,9 +6217,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        0
+        3
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Nauhany Vitoria Leme Da Silva",
@@ -6228,9 +6228,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        1
+        5
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
@@ -8452,7 +8452,7 @@
        "win": false,
        "sets": [
         6,
-        0
+        1
        ],
        "serve": true
       },
@@ -8464,7 +8464,7 @@
        "win": false,
        "sets": [
         1,
-        2
+        5
        ],
        "serve": false
       }
@@ -8474,7 +8474,7 @@
      "id": "187290",
      "start": "2026-10-26T22:05Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Qualifying Final",
      "draw": "Women's Singles",
      "court": "Estadio Mexcovery",
@@ -8486,9 +8486,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        6,
+        0
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Victoria Hu",
@@ -8497,17 +8498,18 @@
        "seed": null,
        "win": false,
        "sets": [
-        1
+        2,
+        0
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
     {
      "id": "187292",
-     "start": "2026-10-26T22:30Z",
-     "state": "pre",
-     "detail": "10/26 - 6:30 PM EDT",
+     "start": "2026-10-26T22:35Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Qualifying Final",
      "draw": "Women's Singles",
      "court": "Court 2",
@@ -8518,7 +8520,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/bel.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        1
+       ],
        "serve": false
       },
       {
@@ -8527,8 +8531,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ukr.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        3
+       ],
+       "serve": true
       }
      ]
     },
@@ -9434,5 +9440,5 @@
    ]
   }
  ],
- "fetched": "2026-10-26T22:22:47+00:00"
+ "fetched": "2026-10-26T22:54:24+00:00"
 }
