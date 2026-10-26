@@ -473,6 +473,33 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
   | Tennis (ATP) | 5,149 matches | The best blend gave the model no weight | 38-51, -8.4% at opening prices |
 
   The college football spread and total edges are the lead worth building on.
+- **College football spread lane (10/26, live):** run with
+  `tools/sports_backtest.py cfb bt/cfb_lines.json --markets=spread,total`.
+  - **Rule:** 20% model / 80% Onyx no-vig, edge 2-6pp, price -200 to +150, at most 6 a
+    slate.
+  - **Tune (2025):** 13-8.
+  - **Test (2026):** 27-19 (+12.2%) at opening prices, 21-19 (+0.6%) at closing.
+  - **Caveat:** the market restriction was chosen after the first run, on the same test
+    games, and 46 picks is a small sample, so the public ledger is the real test. If it
+    bleeds at closing prices, pull it.
+- **NBA gamecenter (10/26):**
+  - **Header:** the five-column header cannot overlap the score and the clock at any
+    width.
+  - **Box score:** ESPN's full box, roster-sized, with F. Last names and a team totals
+    row. It has three fit-to-screen views:
+    - Props: the live stat over our projection and the Onyx line, coloured by the lean;
+    - Shooting: FG, FG%, 3PT, FT, +/-;
+    - Hustle: REB, OR, DR, AST, STL, BLK, TO, PF.
+  - **Shot chart:** tap a player (in the box or the chips) to filter the court to his
+    shots. His panel shows his live props against the projection, the line and his
+    pace, with a jump to his bet card.
+  - **The floor:** the ten players ESPN marks `active` are drawn by jersey number.
+    Offense sits at its spots, each defender a step inside, the last shooter where he
+    shot from, and the ball with the team in possession. Who is on the floor is live;
+    the spots are illustrative and labelled so.
+  - **Refresh:** the open game refreshes every 5s.
+- **Sport gamecenters:** the open live football or hockey game refreshes its summary
+  every 6s, and the scoreboard polls every 10s while anything is live.
 - **NBA combos:** the historical Onyx feed has no points, rebounds and assists combo
   lines for 2025-26 (0 of 1,223 games). Combos stay on the bet card labelled "not
   backtested" and stay out of picks and the Model's Parlay until there is a season of
