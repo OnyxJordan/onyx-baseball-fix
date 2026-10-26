@@ -154,6 +154,25 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
 .rec-big{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
 .rec-big .v{font-size:28px;font-weight:800;font-family:monospace}
 .rec-big .l{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-top:4px}
+.rec-big.rec-3{grid-template-columns:repeat(3,1fr)}.rec-big.rec-5{grid-template-columns:repeat(5,1fr)}
+.rec-big .l b{color:var(--text2);font-weight:700}
+.tsp-rec{display:block;margin-top:4px;font-size:11px;color:#d795ff;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.money-pos{color:#61e970!important}.money-neg{color:#f87171!important}
+.tk-chart{position:relative;height:150px;margin:12px 0 4px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.tk-chart .zero{position:absolute;left:12px;font:700 10px monospace;color:var(--text3)}
+.tk{background:linear-gradient(155deg,rgba(176,56,249,.10),var(--bg2) 55%);border:1px solid var(--border2);border-radius:14px;padding:12px 14px;margin-top:10px}
+.tk.today{border-color:rgba(176,56,249,.55);box-shadow:0 0 22px rgba(176,56,249,.12)}
+.tk-hd{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+.tk-date{font:800 12px monospace;letter-spacing:.06em;color:var(--text)}
+.tk-tag{font:800 9px monospace;letter-spacing:.12em;padding:3px 8px;border-radius:12px;text-transform:uppercase}
+.tk-tag.win{background:rgba(97,233,112,.14);color:#61e970}.tk-tag.loss{background:rgba(248,113,113,.14);color:#f87171}
+.tk-tag.void,.tk-tag.pend{background:var(--bg4);color:var(--text3)}.tk-tag.live{background:rgba(176,56,249,.18);color:#d795ff}
+.tk-pay{margin-left:auto;font:700 12px monospace;color:var(--text2)}.tk-pay b{font-size:14px}
+.tk-leg{display:flex;align-items:center;gap:10px;padding:7px 2px;border-top:1px dashed rgba(176,56,249,.18)}
+.tk-leg .hs.s{flex-shrink:0}.tk-leg .nm{font-weight:700;font-size:13px}.tk-leg .sub{font-size:11px;color:var(--text3)}
+.tk-leg .mk{margin-left:auto;font:800 13px monospace;min-width:54px;text-align:right}
+.mk.hit{color:#61e970}.mk.miss{color:#f87171}.mk.void,.mk.pend{color:var(--text3)}
+@media (max-width:760px){.rec-big.rec-3{grid-template-columns:repeat(3,1fr)}.rec-big.rec-3 .v{font-size:20px}.rec-big.rec-5{grid-template-columns:repeat(2,1fr)}}
 .res-W{color:#61e970;font-weight:800}.res-L{color:#f87171;font-weight:800}.res-P,.res-V{color:var(--text3);font-weight:800}
 .prose{max-width:780px;line-height:1.75;color:var(--text2);font-size:15px}
 .prose h3{color:var(--text);font-size:17px;margin:26px 0 8px}.prose b{color:var(--text)}
@@ -355,11 +374,15 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
 <div class="pane" id="pane-record"><div class="nba-wrap">
   <div class="sec-hdr"><div><span class="sec-title">Onyx Picks Record · every pick graded against the final box score</span></div><span class="sec-count" id="recSince"></span></div>
   <div class="rec-big" id="recBig"></div>
-  <div class="sec-hdr"><span class="sec-title">By Market</span></div>
-  <div class="rec-big" id="recByStat"></div>
+  <div class="sec-hdr"><span class="sec-title">By Market · $10 on every pick</span></div>
+  <div class="rec-big rec-3" id="recByStat"></div>
+  <div class="sec-hdr"><div><span class="sec-title">Daily Top Scorer Parlay · one $10 ticket per slate, locked at first tip, auto-graded</span></div><span class="sec-count" id="tkCount"></span></div>
+  <div class="rec-big rec-5" id="tkBig"></div>
+  <div class="tk-chart" id="tkChart"></div>
+  <div id="tkList"></div>
   <div class="sec-hdr"><span class="sec-title">Pick Log</span><span class="sec-count" id="recCount"></span></div>
   <div class="tbl"><table>
-    <thead><tr><th>Date</th><th>Player</th><th>Pick</th><th class="r">Odds</th><th class="r">Proj</th><th class="r">Edge</th><th class="r">Actual</th><th class="r">Result</th></tr></thead>
+    <thead><tr><th>Date</th><th>Player</th><th>Pick</th><th class="r">Odds</th><th class="r">Proj</th><th class="r">Edge</th><th class="r">Actual</th><th class="r">Result</th><th class="r">$10 P&amp;L</th></tr></thead>
     <tbody id="recBody"></tbody>
   </table></div>
 </div></div>
@@ -615,6 +638,12 @@ function topScorerLegs(n) {
   return out;
 }
 var TSP_N = 3;
+// the parlay's own public record, so the pitch carries its receipts
+function tspRecord() {
+  const T = D.tickets || {};
+  if (!(T.w || T.l)) return 'Tracked daily on the Record tab, locked at first tip';
+  return `Tracked: ${T.w}-${T.l} · ${money(T.pnl || 0)} on $10 tickets`;
+}
 function tspHtml() {
   const ps = topScorerLegs(TSP_N);
   if (ps.length < 2) return `<div class="empty">The top scorer parlay builds once Onyx posts points lines for games that have not tipped.</div>`;
@@ -628,7 +657,8 @@ function tspHtml() {
         <div class="ln">Over ${p.props.pts.line} PTS · proj <b style="color:#d795ff">${num(p.proj.pts)}</b></div></div>
         ${legChip(legs[k], 'over')}</div>`).join('')}</div>
     <div class="tsp-foot">
-      <span class="tsp-pay">${ps.length}-leg parlay <b>${amerOf(dec)}</b> · $10 pays <b>$${(10 * dec).toFixed(0)}</b></span>
+      <span class="tsp-pay">${ps.length}-leg parlay <b>${amerOf(dec)}</b> · $10 pays <b>$${(10 * dec).toFixed(0)}</b>
+        <a class="tsp-rec" onclick="gotoTab('record')">${tspRecord()}</a></span>
       <div class="tsp-btns">
         <button class="btn-secondary" onclick="tspAdd([${ids.join(',')}])">${allIn ? '✓ In your slip' : '+ Add to Parlay Builder'}</button>
         <button class="btn-primary" onclick="tspBet([${ids.join(',')}])">⚡ Bet it on Onyx</button>
@@ -1113,35 +1143,101 @@ function pbpView(g, sum) {
 }
 
 // ── record ─────────────────────────────────────────────────────────
+function money(v) { v = +v || 0; return (v >= 0 ? '+$' : '-$') + Math.abs(v).toFixed(2); }
+function moneyCls(v) { return v > 0 ? 'money-pos' : v < 0 ? 'money-neg' : ''; }
+// a ledger row's player, with a headshot even when he is not on tonight's slate
+function recPlayer(k) {
+  const p = playerOf(k.pid);
+  return p ? (p.hs || p.img ? p : {...p, hs: k.hs}) : {name: k.name || k.player, hs: k.hs};
+}
 function renderRecord() {
   const r = D.record || {rows: []};
-  const units = r.units || 0;
+  const units = r.units || 0, dollars = r.dollars != null ? r.dollars : units * 10;
   document.getElementById('recSince').textContent = r.started ? 'since ' + r.started : '';
   document.getElementById('recBig').innerHTML = [
     [`${r.w || 0}-${r.l || 0}${r.p ? '-' + r.p : ''}`, 'Record', ''],
     [(r.w + r.l) ? pct(r.w / (r.w + r.l)) : '-', 'Hit rate', ''],
-    [(units >= 0 ? '+' : '') + units.toFixed(2) + 'u', 'Units (1u flat)', units > 0 ? 'edge-pos' : ''],
-    [r.pending || 0, 'Pending', ''],
-  ].map(([v, l, c]) => `<div class="nba-card"><div class="v ${c}">${esc(v)}</div><div class="l">${esc(l)}</div></div>`).join('');
+    [money(dollars), `$10 on every pick · <b>${(units >= 0 ? '+' : '') + units.toFixed(2)}u</b>`, moneyCls(dollars)],
+    [(r.roi != null ? (r.roi >= 0 ? '+' : '') + (r.roi * 100).toFixed(1) + '%' : '-'), `ROI · <b>${r.pending || 0}</b> pending`, moneyCls(r.roi || 0)],
+  ].map(([v, l, c]) => `<div class="nba-card"><div class="v ${c}">${esc(v)}</div><div class="l">${l}</div></div>`).join('');
   const bs = r.by_stat || {};
   document.getElementById('recByStat').innerHTML = ['pts', 'reb', 'ast'].map(s => {
     const b = bs[s] || {w: 0, l: 0, units: 0};
-    return `<div class="nba-card"><div class="v">${b.w}-${b.l}</div><div class="l">${STAT_NAME[s]} · ${(b.units >= 0 ? '+' : '') + (b.units || 0).toFixed(2)}u</div></div>`;
+    const d = b.dollars != null ? b.dollars : (b.units || 0) * 10;
+    return `<div class="nba-card"><div class="v">${b.w}-${b.l}</div><div class="l">${STAT_NAME[s]} · <b class="${moneyCls(d)}">${money(d)}</b> · ${(b.units >= 0 ? '+' : '') + (b.units || 0).toFixed(2)}u</div></div>`;
   }).join('');
+  renderTickets();
   const rows = r.rows || [];
   document.getElementById('recCount').textContent = rows.length + ' picks';
   document.getElementById('recBody').innerHTML = rows.map(k => {
-    const p = playerOf(k.pid) || {name: k.name, hs: null};
+    const pl = k.result === 'W' ? 10 * (k.price > 0 ? k.price / 100 : 100 / -k.price) : k.result === 'L' ? -10 : k.result ? 0 : null;
     return `<tr>
     <td class="mono dim">${esc(k.date)}</td>
-    <td><div class="who">${hs(p, 's')}<div><div class="nm">${esc(k.name)}</div><div class="sub">${logo(k.team)} ${esc(k.team)} vs ${esc(k.opp)}</div></div></div></td>
+    <td><div class="who">${hs(recPlayer(k), 's')}<div><div class="nm">${esc(k.name)}</div><div class="sub">${logo(k.team)} ${esc(k.team)} vs ${esc(k.opp)}</div></div></div></td>
     <td>${k.side === 'over' ? 'Over' : 'Under'} ${k.line} ${STAT_ABBR[k.stat]}</td>
     <td class="r mono">${fmtOdds(k.price)}</td>
     <td class="r mono">${num(k.proj)}</td>
     <td class="r mono edge-pos">${pp(k.edge)}</td>
     <td class="r mono">${k.actual != null ? k.actual : '-'}</td>
     <td class="r">${k.result ? `<span class="res-${esc(k.result)}">${esc(k.result === 'V' ? 'VOID' : k.result)}</span>` : '<span class="dim">pending</span>'}</td>
-  </tr>`; }).join('') || '<tr><td colspan="8"><div class="empty" style="border:none">The record starts with the first qualified pick.</div></td></tr>';
+    <td class="r mono ${pl != null ? moneyCls(pl) : 'dim'}">${pl != null ? money(pl) : '-'}</td>
+  </tr>`; }).join('') || '<tr><td colspan="9"><div class="empty" style="border:none">The record starts with the first qualified pick.</div></td></tr>';
+}
+
+// Daily Top Scorer Parlay record: the MLB Model's Ticket, for NBA. The build
+// (nba_build.update_ticket) freezes the home page's Top Scorer Parlay at the
+// slate's first tip into data/nba/ticket_history.json and grades it leg by
+// leg; a leg whose player never played is void and drops out of the payout.
+function renderTickets() {
+  const T = D.tickets || {rows: []};
+  const rows = T.rows || [];
+  const dec = o => 1 + (o > 0 ? o / 100 : 100 / -o);
+  document.getElementById('tkCount').textContent = rows.length + ' ticket' + (rows.length === 1 ? '' : 's') + ' tracked';
+  document.getElementById('tkBig').innerHTML = [
+    [`${T.w || 0}-${T.l || 0}`, 'Record', (T.w || 0) > (T.l || 0) ? 'money-pos' : (T.l || 0) > (T.w || 0) ? 'money-neg' : ''],
+    [String(T.pending || 0), 'Pending', ''],
+    [money(T.pnl || 0), 'Total P&L', moneyCls(T.pnl || 0)],
+    [((T.roi || 0) >= 0 ? '+' : '') + ((T.roi || 0) * 100).toFixed(1) + '%', 'ROI', moneyCls(T.roi || 0)],
+    ['$10', 'Per ticket', 'dim'],
+  ].map(([v, l, c]) => `<div class="nba-card"><div class="v ${c}">${esc(v)}</div><div class="l">${esc(l)}</div></div>`).join('');
+  // running P&L
+  const chrono = rows.slice().reverse().filter(t => t.result === 'win' || t.result === 'loss');
+  const chart = document.getElementById('tkChart');
+  if (chrono.length < 2) {
+    chart.innerHTML = `<div class="dim" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;text-align:center;padding:0 16px">${chrono.length ? 'The running P&L chart draws from the second graded ticket.' : 'The first ticket locks at tonight\'s first tip and is graded when its last game goes final.'}</div>`;
+  } else {
+    let cum = 0;
+    const vals = [0, ...chrono.map(t => (cum += +t.pnl || 0))];
+    const W = 600, H = 150, pad = 14, lo = Math.min(...vals), hi = Math.max(...vals), rg = Math.max(hi - lo, 10);
+    const x = i => pad + i / (vals.length - 1) * (W - 2 * pad), y = v => H - pad - (v - lo) / rg * (H - 2 * pad);
+    const pts = vals.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+    const col = cum >= 0 ? '#61e970' : '#f87171';
+    chart.innerHTML = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="width:100%;height:100%">
+      <defs><linearGradient id="tkg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${col}" stop-opacity=".28"/><stop offset="1" stop-color="${col}" stop-opacity="0"/></linearGradient></defs>
+      <line x1="${pad}" x2="${W - pad}" y1="${y(0)}" y2="${y(0)}" stroke="rgba(255,255,255,.15)" stroke-dasharray="4 4"/>
+      <polygon points="${x(0)},${y(lo)} ${pts} ${x(vals.length - 1)},${y(lo)}" fill="url(#tkg)"/>
+      <polyline points="${pts}" fill="none" stroke="${col}" stroke-width="2.5" vector-effect="non-scaling-stroke"/></svg>
+      <span class="zero" style="top:${Math.max(4, Math.min(H - 16, y(0) - 14))}px">$0</span>`;
+  }
+  const legRow = (l, live) => {
+    const mk = l.hit === true ? ['hit', '✓ ' + l.actual] : l.hit === false ? ['miss', '✗ ' + l.actual] : l.hit === 'void' ? ['void', 'VOID'] : ['pend', live ? 'live' : '-'];
+    return `<div class="tk-leg">${hs(recPlayer(l), 's')}<div style="min-width:0">
+      <div class="nm">${esc(l.player)}</div>
+      <div class="sub">${logo(l.team)} ${esc(l.team)} vs ${esc(l.opp)} · Over ${l.line} PTS ${fmtOdds(l.odds)} · proj ${num(l.proj)}</div></div>
+      <span class="mk ${mk[0]}">${esc(mk[1])}</span></div>`;
+  };
+  const card = (t, today) => {
+    const d = (t.legs || []).filter(l => l.hit !== 'void').reduce((m, l) => m * dec(l.odds), 1);
+    const tag = t.result ? `<span class="tk-tag ${t.result}">${t.result === 'win' ? 'WIN' : t.result === 'loss' ? 'LOSS' : 'VOID'}</span>`
+      : today && !t.locked ? '<span class="tk-tag pend">locks at first tip</span>' : '<span class="tk-tag live">locked · live</span>';
+    const pay = t.result ? `<b class="${moneyCls(t.pnl)}">${money(t.pnl)}</b>` : `$10 pays <b>$${(10 * d).toFixed(2)}</b>`;
+    return `<div class="tk${today ? ' today' : ''}"><div class="tk-hd"><span class="tk-date">${esc(t.date)}</span>${tag}
+      <span class="tk-pay">${(t.legs || []).length}-leg · ${fmtOdds(Math.round(d >= 2 ? (d - 1) * 100 : -100 / (d - 1)))} · ${pay}</span></div>
+      ${(t.legs || []).map(l => legRow(l, !t.result && (today ? t.locked : true))).join('')}</div>`;
+  };
+  const todayT = T.today && !rows.some(t => t.date === T.today.date) ? card(T.today, true) : '';
+  document.getElementById('tkList').innerHTML = todayT + rows.map(t => card(t, t.date === (D.date || ''))).join('')
+    || '<div class="empty">No ticket yet: one builds once Onyx posts points lines, and locks at the first tip.</div>';
 }
 
 // ── player drawer ──────────────────────────────────────────────────

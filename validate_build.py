@@ -63,6 +63,8 @@ LEDGER_RETENTION_DAYS = {
     "hr_history": None,   # all-time since 10/15; the 60-day prune was removed
     # NBA picks ledger (nba_build.py): append-only, same rule
     "nba/picks_history": None,
+    # NBA daily Top Scorer Parlay ledger: one ticket per slate, locked at first tip
+    "nba/ticket_history": None,
 }
 LEDGERS = tuple(LEDGER_RETENTION_DAYS)
 
