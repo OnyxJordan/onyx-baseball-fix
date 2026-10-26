@@ -83,6 +83,14 @@ jobs:
       - name: Headless NBA page check
         run: node tools/verify_nba.js
 
+      # Sport pages (NFL, college football, NHL, tennis, golf): build each from
+      # committed data/<sport>/ and walk every tab at phone and desktop size
+      - name: Build sport pages from committed data
+        run: for s in nfl cfb nhl tennis golf; do python3 -B sports_build.py $s; done
+
+      - name: Headless sport page check
+        run: node tools/verify_sports.js
+
       # Installed-iPhone gate for both pages: a 0 safe-area inset (what iOS
       # sometimes reports) must not put the header or menu under the status
       # bar, and the bottom menu must open, navigate and close.

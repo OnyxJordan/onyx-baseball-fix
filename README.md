@@ -377,6 +377,47 @@ so old links and the pipeline are unchanged.
 - **`verify_pwa.js`** also checks the hub at 320px and 393px: manifest, status bar,
   header, all seven sports, no sideways scroll, and that the wordmark draws.
 
+## Onyx Sports pages: NFL, college football, NHL, tennis, golf (10/26)
+
+One engine, one template, one config per sport (`sports_common.SPORTS`). Each sport reads
+and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
+`continue-on-error`, so no sport can block MLB, NBA or another sport.
+
+- **Pipeline:**
+  - `sports_espn.py <sport>` writes `slate.json` in one shape for every sport. Team
+    sports fill `games`; tennis fills `events` with their singles matches; golf fills
+    `events` with the leaderboard.
+  - For the NFL it also reads every final box score once into `player_games.json`. The
+    first run backfills last season, which is the model's prior.
+  - `sports_build.py <sport>` builds the page from `sport_shell.html`. It injects the MLB
+    stylesheet (like `nba_build.py`), the sport key (`window.OX_SITE`, which `ui.js`
+    reads for the bar, menu, search and footer) and `SD`.
+- **Template:** Home, Games, Onyx Board, Plays and Model tabs. The page polls ESPN's
+  scoreboard live: every 15s while anything is live, otherwise every 30s. Gamecenters
+  by kind:
+  - **Football:** the field with the ball spot, line of scrimmage and first-down marker,
+    down and distance, win probability, scoring plays, drives, team stats and leaders.
+    All from ESPN's `summary`.
+  - **Hockey:** by-period scores, goals and team stats.
+  - **Tennis:** live and finished singles matches by tournament, set scores and who is
+    serving.
+  - **Golf:** a searchable leaderboard with every round.
+- **Onyx prices:** `odds.json` per sport, written by the coming `sports_odds.py`. The
+  Board says the feed is being wired until then, and never shows another book.
+  `tools/onyx_markets_probe.py` (the manual `odds_probe.yml` workflow) reports what
+  the Onyx book prices per sport, so each fetcher is built against real markets.
+- **NFL model (`nfl_model.py`, v0):**
+  - **Covers:** passing, rushing and receiving yards, and receptions.
+  - **Projection:** a recency-weighted season mean, shrunk toward last season, times a
+    regressed opponent factor.
+  - **Test:** `test()` re-runs on every build against the season average and the last-3
+    average, on games the model never saw. The page shows the numbers.
+  - **Status:** leans only. No tracked picks until a backtest against real Onyx NFL
+    prices passes, and until there is an injury feed.
+- **Other sports:** "model in the lab", with the plan on the page.
+- **Gate:** `tools/verify_sports.js` checks every page and tab at 390px and 1280px, and
+  opens a gamecenter. CI runs it.
+
 ## Frontend (`shell.html`, ~7,000 lines)
 
 Brand: purple leads (hub palette — Purple 400 `#B038F9` on Onyx `#0C0C0C`, Titanium
@@ -596,6 +637,8 @@ why a local `auto_build.py` still produces a full board.
 | `shell.html` | hand-tuned template — **never regenerate** |
 | `index.html` | the built page (generated every run; never hand-edit) |
 | `home.html` | Onyx Sports hub, the PWA start page (static, hand-edited) |
+| `sport_shell.html`, `sports_*.py`, `nfl_model.py` | NFL, college football, NHL, tennis and golf pages: one template, one engine; `data/<sport>/` |
+| `nfl.html` … `golf.html` | built sport pages (generated every run; never hand-edit) |
 | `onyx.css`, `onyx.js` | Onyx design layer and raster art, shared by every page |
 | `model.py` | v41 HR model + pitcher K projections; changelog at top is the lab notebook |
 | `career_db.json`, `pitcher_db.json` | canonical hitter/pitcher DBs — **never regenerate** outside `rebuild.yml` |

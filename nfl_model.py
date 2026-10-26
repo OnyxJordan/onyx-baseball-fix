@@ -1,0 +1,151 @@
+"""
+nfl_model.py - Onyx NFL player projections.
+
+VERSION v0 (10/26). The lab notebook: every change bumps VERSION and adds an
+entry here citing its evidence (CLAUDE.md rule 2 applies to this model too).
+
+  v0  10/26  Passing, rushing and receiving yards and receptions per player.
+             proj = shrink(recency-weighted this-season mean, toward last
+             season's mean) x opponent factor. Tuned on 2025 (weeks 4-18),
+             tested out of sample on 2026 weeks 3+ against two baselines a
+             bettor would use: the season-to-date average and the last-3
+             average. Grid tune (decay x prior weight x opponent weight) chose
+             decay .95, prior 1.5 games, opponent .5. Out of sample (2026,
+             MAE improvement vs season avg / vs last 3):
+               passing yards   +5.8% / +9.8%   (138 player-games)
+               receiving yds   +5.7% / +8.6%   (617)
+               receptions      +5.3% / +8.2%   (617)
+               rushing yards   +1.9% / +2.5%   (211)
+             Most of the gain is last season as the prior: 2025 itself had no
+             2024 data, and there the model only matches the season average.
+             The test re-runs on every build (test()) and the page shows it.
+             Not a pick model yet: no Onyx price backtest, no injury feed, so
+             the page shows leans, never tracked picks.
+
+Inputs: data/nfl/player_games.json rows from sports_espn.py (one per
+player-game: pass_yds, rush_yds, rec_yds, rec, tgt, att, rush_att...).
+"""
+
+from collections import defaultdict
+
+VERSION = "v0"
+STATS = ("pass_yds", "rush_yds", "rec_yds", "rec")
+# who counts as having a role in a stat (per-game volume in the window used)
+ROLE = {"pass_yds": ("att", 15), "rush_yds": ("rush_att", 6), "rec_yds": ("tgt", 3), "rec": ("tgt", 3)}
+# tuned on 2025 weeks 4-18 (tune()); see the changelog for the test
+P = {"decay": 0.95, "k_prior": 1.5, "opp_w": 0.5, "opp_k": 4.0}
+
+
+def _games_by_player(rows):
+    by = defaultdict(list)
+    for r in rows:
+        by[r["pid"]].append(r)
+    for v in by.values():
+        v.sort(key=lambda r: (r["season"], r["week"]))
+    return by
+
+
+def _team_allowed(rows):
+    """Per (season, week, defense team): yards allowed by stat, from the
+    offense rows of that game."""
+    out = defaultdict(lambda: defaultdict(float))
+    for r in rows:
+        k = (r["season"], r["week"], r["opp"])
+        for s in STATS:
+            out[k][s] += r.get(s) or 0.0
+    return out
+
+
+def _opp_factor(allowed, season, week, opp, s, p, lg_cache):
+    """How much of stat s this defense allows vs league average, from its
+    games before `week`, regressed with opp_k pseudo-games."""
+    vals = [allowed[(season, w, opp)][s] for w in range(1, week) if (season, w, opp) in allowed]
+    if not vals:
+        return 1.0
+    key = (season, week, s)
+    if key not in lg_cache:
+        pool = [d[s] for (se, w, _t), d in allowed.items() if se == season and w < week]
+        lg_cache[key] = (sum(pool) / len(pool)) if pool else None
+    lg = lg_cache[key]
+    if not lg:
+        return 1.0
+    n = len(vals)
+    ratio = (sum(vals) / n) / lg
+    return 1 + p["opp_w"] * (ratio - 1) * n / (n + p["opp_k"])
+
+
+def project(hist, s, season, week, opp, allowed, p=None, lg_cache=None):
+    """Projection for stat s in (season, week) from the player's games
+    strictly before it. Returns (proj, info) or (None, None) without a role."""
+    p = p or P
+    lg_cache = {} if lg_cache is None else lg_cache
+    cur = [g for g in hist if g["season"] == season and g["week"] < week]
+    prev = [g for g in hist if g["season"] == season - 1]
+    rk, rmin = ROLE[s]
+    recent = cur[-4:] or prev[-4:]
+    if not recent or sum(g.get(rk) or 0 for g in recent) / len(recent) < rmin:
+        return None, None
+    w = [p["decay"] ** i for i in range(len(cur))][::-1]
+    m_cur = sum((g.get(s) or 0) * wi for g, wi in zip(cur, w)) / sum(w) if cur else None
+    n_eff = sum(w)
+    prior = (sum(g.get(s) or 0 for g in prev) / len(prev)) if len(prev) >= 4 else None
+    if m_cur is None and prior is None:
+        return None, None
+    if m_cur is None:
+        base = prior
+    elif prior is None:
+        base = m_cur
+    else:
+        base = (n_eff * m_cur + p["k_prior"] * prior) / (n_eff + p["k_prior"])
+    f = _opp_factor(allowed, season, week, opp, s, p, lg_cache) if opp else 1.0
+    return base * f, {"season": m_cur, "prior": prior, "opp": f, "l3": [g.get(s) or 0 for g in cur[-3:]]}
+
+
+def _eval(rows, seasons, weeks_from, p):
+    """Mean absolute error of the projection vs the two baselines, on every
+    player-game with a role in the stat (season-to-date mean needs 2 games)."""
+    by = _games_by_player(rows)
+    allowed = _team_allowed(rows)
+    lgc = {}
+    err = {s: {"m": [], "avg": [], "l3": []} for s in STATS}
+    for pid, gs in by.items():
+        for i, g in enumerate(gs):
+            if g["season"] not in seasons or g["week"] < weeks_from:
+                continue
+            prior_games = gs[:i]
+            cur = [x for x in prior_games if x["season"] == g["season"]]
+            if len(cur) < 2:
+                continue
+            for s in STATS:
+                pr, _ = project(prior_games, s, g["season"], g["week"], g["opp"], allowed, p, lgc)
+                if pr is None:
+                    continue
+                act = g.get(s) or 0
+                avg = sum(x.get(s) or 0 for x in cur) / len(cur)
+                l3 = cur[-3:]
+                l3m = sum(x.get(s) or 0 for x in l3) / len(l3)
+                err[s]["m"].append(abs(pr - act)); err[s]["avg"].append(abs(avg - act)); err[s]["l3"].append(abs(l3m - act))
+    out = {}
+    for s, e in err.items():
+        n = len(e["m"])
+        if n:
+            out[s] = {"n": n, "mae": sum(e["m"]) / n, "avg": sum(e["avg"]) / n, "l3": sum(e["l3"]) / n}
+    return out
+
+
+def tune(rows, season):
+    best = None
+    for decay in (0.75, 0.85, 0.95):
+        for kp in (1.5, 3.0, 5.0):
+            for ow in (0.0, 0.5, 1.0):
+                p = {"decay": decay, "k_prior": kp, "opp_w": ow, "opp_k": 4.0}
+                r = _eval(rows, {season}, 4, p)
+                score = sum(v["mae"] / v["avg"] for v in r.values()) / max(1, len(r))
+                if best is None or score < best[0]:
+                    best = (score, p)
+    return best
+
+
+def test(rows, season):
+    """Out-of-sample: this season, weeks 3+, with the shipped parameters."""
+    return _eval(rows, {season}, 3, P)

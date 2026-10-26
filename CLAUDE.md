@@ -58,6 +58,11 @@ stays MLB at the root URL. `onyx.css` (the onyxodds.com design layer) and `onyx.
 raster art) load last on every page. Restyle the sites there, not by rewriting
 `shell.html`. Never commit Onyx's licensed font files; the free stand-ins are deliberate.
 
+NFL, college football, NHL, tennis and golf share one engine (`sports_espn.py`,
+`sports_build.py`, `sport_shell.html`; config in `sports_common.SPORTS`). A sport shows
+**leans or "model in the lab", never tracked picks**, until its model is backtested
+against real Onyx prices, the same bar NBA and MLB cleared. Gate: `node tools/verify_sports.js`.
+
 ## Dates
 
 Everything runs on the **baseball day = ET − 4h** (rolls at 4 AM ET). Never date anything

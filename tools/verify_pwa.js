@@ -16,8 +16,8 @@
  * and in both: More opens the menu, a tile navigates and closes it, the
  * hamburger opens the same menu, search finds something, no page errors.
  * Then the Onyx Sports hub (home.html, the manifest's start page) at 320
- * and 393px: solid status bar, header in place, all seven sports with the
- * live ones linked, no sideways scroll, the raster ONYX drawn.
+ * and 393px: solid status bar, header in place, all seven sports linked
+ * to their sites, no sideways scroll, the raster ONYX drawn.
  *
  *   python3 -B nba_build.py && node tools/verify_pwa.js
  */
@@ -164,7 +164,9 @@ function serve() {
     if (st.bar !== 'black') bad.push(`status bar style "${st.bar}"`);
     if (st.headTop < 0 || st.headTop > 40) bad.push(`header at ${Math.round(st.headTop)}px`);
     if (st.cards !== 7) bad.push(`${st.cards} sport cards, want 7`);
-    if (!st.live.includes('nba.html') || !st.live.includes('index.html')) bad.push(`live sports link to ${st.live.join(', ')}`);
+    const want = ['nba.html', 'index.html', 'nfl.html', 'cfb.html', 'nhl.html', 'tennis.html', 'golf.html'];
+    const miss = want.filter(h => !st.live.includes(h));
+    if (miss.length) bad.push(`sports not linked: ${miss.join(', ')}`);
     if (st.sw > st.vw) bad.push(`page scrolls sideways (${st.sw}px > ${st.vw}px)`);
     if (!inked) bad.push('ONYX raster wordmark did not draw');
     bad.push(...errs);
