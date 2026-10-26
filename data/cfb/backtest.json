@@ -1,0 +1,99 @@
+{
+ "version": "v1",
+ "sport": "cfb",
+ "label": "Team ratings against real Onyx game lines",
+ "split": "2026-03-01",
+ "w": 0.1,
+ "per_market_test": {
+  "ml": {
+   "n": 361,
+   "blend_ll": 0.5192,
+   "onyx_ll": 0.5167,
+   "model_only_ll": 0.5991
+  },
+  "spread": {
+   "n": 375,
+   "blend_ll": 0.6934,
+   "onyx_ll": 0.6947,
+   "model_only_ll": 0.8153
+  },
+  "total": {
+   "n": 374,
+   "blend_ll": 0.6897,
+   "onyx_ll": 0.6927,
+   "model_only_ll": 0.7044
+  }
+ },
+ "n_samples": 3907,
+ "lane_ll": {
+  "blend": 0.5281,
+  "onyx": 0.5167
+ },
+ "lane": {
+  "markets": [
+   "ml"
+  ],
+  "w": 0.3,
+  "edge_min": 0.02,
+  "edge_max": 0.06,
+  "price_min": -250,
+  "price_max": 250,
+  "max_per_slate": 6
+ },
+ "tune": {
+  "n": 28,
+  "w": 17,
+  "roi": 0.4106
+ },
+ "test_open": {
+  "n": 40,
+  "w": 17,
+  "roi": 0.0539,
+  "claimed": 0.4574,
+  "hit": 0.425
+ },
+ "test_close": {
+  "n": 33,
+  "w": 12,
+  "roi": -0.0788
+ },
+ "passed": false,
+ "page": {
+  "passed": false,
+  "version": "v1",
+  "run": "2026-10-26",
+  "title": "Team ratings against real Onyx game lines",
+  "summary": [
+   "Every game priced only from results before it, against Onyx's real opening and closing lines. The rule was chosen on games before 2026-03-01 and judged on 2026-03-01 on, which it never saw.",
+   "The model's weight in the blend is 10%.",
+   "Not passed: the lane lost money at closing prices. Leans only until it does."
+  ],
+  "stats": [
+   {
+    "k": "Moneyline log loss",
+    "v": "0.5192",
+    "d": "vs Onyx 0.5167 · model alone 0.5991 · 361 lines"
+   },
+   {
+    "k": "Spread log loss",
+    "v": "0.6934",
+    "d": "vs Onyx 0.6947 · model alone 0.8153 · 375 lines"
+   },
+   {
+    "k": "Total log loss",
+    "v": "0.6897",
+    "d": "vs Onyx 0.6927 · model alone 0.7044 · 374 lines"
+   },
+   {
+    "k": "Lane at opening prices",
+    "v": "17-23",
+    "d": "ROI +5.4% · claimed 45.7% vs hit 42.5%"
+   },
+   {
+    "k": "Lane at closing prices",
+    "v": "12-21",
+    "d": "ROI -7.9%"
+   }
+  ]
+ }
+}

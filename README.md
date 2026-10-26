@@ -463,6 +463,16 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
     totals and every prop market do not.
   - No lane made money on the tune window.
   - The NFL stays leans only, and the page says why.
+- **College football, NHL and tennis backtests (10/26):** none passed, so all three stay
+  leans only.
+
+  | Sport | Lines tested | Blend vs Onyx (log loss) | Best rule on test games |
+  |---|---|---|---|
+  | College football | 939 FBS games matched (of 2,911; FCS games have no ratings) | Spread 0.6934 vs 0.6947 and total 0.6897 vs 0.6927, both slightly better; moneyline 0.5192 vs 0.5167, worse | Moneyline: +5.4% at opening prices, -7.9% at closing |
+  | NHL | 1,539 games | Moneyline, puck line and total all slightly worse | Moneyline: 5-33 at opening prices |
+  | Tennis (ATP) | 5,149 matches | The best blend gave the model no weight | 38-51, -8.4% at opening prices |
+
+  The college football spread and total edges are the lead worth building on.
 - **NBA combos:** the historical Onyx feed has no points, rebounds and assists combo
   lines for 2025-26 (0 of 1,223 games). Combos stay on the bet card labelled "not
   backtested" and stay out of picks and the Model's Parlay until there is a season of
