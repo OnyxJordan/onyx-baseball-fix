@@ -460,14 +460,16 @@ function myBets() {
   h += B.map(b => {
     const L = LG.find(x => x.k === b.sport);
     const gid = (b.legs || []).map(l => l.gid).find(Boolean);
-    const e = L && gid ? evFor(L.k, gid) : null;
+    // NBA legs carry our own game ids, so find the game by the player's team
+    const np = b.sport === 'nba' && MY.nba ? (b.legs || []).map(l => (MY.nba.players || []).find(x => x.pid === l.pid)).find(Boolean) : null;
+    const e = L && np ? evFor('nba', null, np.team) : L && gid ? evFor(L.k, gid) : null;
     const price = b.legs && b.legs.length === 1 ? b.legs[0].price : null;
     return `<a class="my-b${e && e.state === 'in' ? ' live' : ''}" href="${PAGE[b.sport] || 'home.html'}${e && L.k !== 'nba' && L.k !== 'mlb' ? '#games:' + e.id : ''}">
       <b>${esc(b.label || 'Onyx bet')}</b><span class="p">${price != null ? fmtOdds(price) : ''}</span>
       <span class="st">${esc(String(b.sport || '').toUpperCase())} · opened ${esc(etShort(b.at))}${e ? ' · ' + esc(evState(e)) : ''}</span><span></span>
       ${b.legs && b.legs.length > 1 ? `<div class="legs">${b.legs.map(l => esc(l.label || 'leg')).join('<br>')}</div>` : ''}</a>`;
   }).join('');
-  return h ? `<div class="my-grid">${h}</div><div class="my-note">Every Onyx bet you open from this app, on this device. Betting a player prop also follows him live. Settled results live in your Onyx account. <a href="#" onclick="if(confirm('Clear My bets on this device?')){localStorage.removeItem('onyxMyBets');renderMy()}return false" style="color:#d795ff">Clear</a></div>`
+  return h ? `<div class="my-grid">${h}</div><div class="my-note">Every Onyx bet you open from this app, on this device. Betting a player prop also follows that player live. Settled results live in your Onyx account. <a href="#" onclick="if(confirm('Clear My bets on this device?')){localStorage.removeItem('onyxMyBets');renderMy()}return false" style="color:#d795ff">Clear</a></div>`
     : `<div class="my-empty">No bets yet. Tap any Onyx price or "Bet on Onyx" in a sport and it lands here, and the player it is on starts tracking live.</div>`;
 }
 var MY_P = [];
@@ -477,6 +479,7 @@ async function loadMy() {
       MY.tn = js.flatMap(j => (j.events || []).flatMap(e => (e.groupings || []).filter(g => /Singles/.test((g.grouping || {}).displayName || '')).flatMap(g => g.competitions || []))); }),
     fetch(ESPN + 'golf/pga/scoreboard').then(r => r.json()).then(j => { MY.gf = (j.events || [])[0] || null; }).catch(() => {}),
   ]));
+  if (!MY.nba && ls('onyxMyBets', []).some(b => b.sport === 'nba')) { try { MY.nba = await getJSON('data/nba/slate.json'); } catch (e) {} }
   MY_P = await myPlayers();
   renderMy();
   const anyLive = LG.some(L => evs(L.k).some(e => e.state === 'in')) || MY.tn.some(c => ((c.status || {}).type || {}).state === 'in');
