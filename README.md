@@ -513,6 +513,24 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
     - Alerts come as toasts through `window.OX_TOAST` from `ui.js`: every stat
       gain, a vibrate when an over cashes, and when an under dies.
     - Tracked games outside the open one refresh every 12s.
+- **NFL / college football / NHL live tracker (10/27, `sport_shell.html`):**
+  - **Box score:** compact and fits the screen. Football has passing, rushing and
+    receiving tables; hockey has skaters (G, A, SOG, +/-, TOI) and goalies, with a green
+    dot for who is on the ice.
+  - **Player panel:** tap a player for his live number against every Onyx line on him,
+    our projection, Follow, and Bet him on Onyx.
+  - **Your players · live:** on Home and Games, stored in localStorage
+    `onyxFollow_<sport>`. Follow from the panel or the star on any projection row. It
+    shows each followed player's Onyx lines on the model's side: the live stat, a bar
+    to the line, "needs N", and cashed or dead.
+  - **Alerts:** toasts through `window.OX_TOAST`; followed live games refresh every 12s.
+  - **Football plays:** recent plays (deduped across drives); tap one to draw it on the
+    field, snap to whistle, with down, distance and yards.
+  - **Hockey rink:** every shot, home team shooting right; goals as dots, other shots as
+    crosses.
+    - The skaters ESPN lists in `onIce` are drawn by jersey number (spots illustrative).
+    - Filter by player with the chips, and tap a shot to mark it.
+  - **Header:** the gamecenter header stacks on phones, like NBA's.
 - **Sport gamecenters:** the open live football or hockey game refreshes its summary
   every 6s, and the scoreboard polls every 10s while anything is live.
 - **NBA combos:** the historical Onyx feed has no points, rebounds and assists combo
