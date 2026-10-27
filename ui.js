@@ -586,6 +586,35 @@
     setTimeout(function () { showWhatsNew(false); }, 1200);
     window.OnyxUI = {toast: toast, openMenu: openSheet, closeMenu: closeSheet, swipeDown: swipeDown, buzz: buzz};
   }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
-  else boot();
+  // ticker pace: every score / picks ticker slides its track -50% (two
+  // identical halves), so a fixed duration made a 56-game college football
+  // slate race and a 3-game night crawl. Measure the real width after each
+  // refresh and set the duration for one steady reading speed everywhere.
+  var TICK_PX_S = 38;
+  function paceTickers() {
+    var els = document.querySelectorAll('.score-ticker-track, .hero-ticker');
+    Array.prototype.forEach.call(els, function (el) {
+      var half = el.scrollWidth / 2;
+      if (!half || el.style.animationName === 'none' || el.style.animation === 'none') return;
+      var last = +el.getAttribute('data-pace-w') || 0;
+      if (last && Math.abs(half - last) / last < 0.04) return;      // same content: leave the loop alone
+      el.setAttribute('data-pace-w', String(Math.round(half)));
+      el.style.animationDuration = Math.max(20, Math.round(half / TICK_PX_S)) + 's';
+    });
+  }
+  function watchTickers() {
+    paceTickers();
+    if (!window.MutationObserver) return;
+    var pend = 0;
+    var mo = new MutationObserver(function () { if (!pend) pend = setTimeout(function () { pend = 0; paceTickers(); }, 120); });
+    Array.prototype.forEach.call(document.querySelectorAll('.score-ticker-track, .hero-ticker'), function (el) {
+      mo.observe(el, {childList: true, subtree: true, characterData: true});
+    });
+    window.addEventListener('resize', function () { setTimeout(paceTickers, 200); });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(paceTickers);
+  }
+  window.OX_PACE_TICKERS = paceTickers;
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { boot(); watchTickers(); });
+  else { boot(); watchTickers(); }
 })();

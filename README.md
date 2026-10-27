@@ -581,6 +581,15 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
   - **Honest limit:** this is device-local and only sees bets opened from the app. It is
     not the user's Onyx account. Syncing real bets and settlements needs an Onyx account
     API, which is a product ask for the Onyx team.
+- **Ticker pace (10/27):** every score and picks ticker scrolls at one speed (~38 px/s).
+  `ui.js` measures each track after every refresh and sets its duration; a fixed 60s had a
+  56-game CFB slate scrolling at ~240 px/s. Sport pages repeat short slates so the loop has
+  no gap.
+- **Sport model breakdowns (10/27):** `sports_build.py` emits `model.engine` for every sport
+  (the steps of a price, the factors and the pick lane, all read from the live model
+  parameters and `backtest.json`), rendered on the Model tab. A sport still in the lab also
+  gets `model.projected`: what its best backtest lane would play on this slate, shown on
+  the Plays tab as "Lean · not tracked" and never written to a ledger.
 - **College football** shares the football tracker. It was checked on a real final, PITT
   @ MIA 10/24: a followed receiver at 149 receiving yards, 14 tappable plays and 6 box
   tables.

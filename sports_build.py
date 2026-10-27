@@ -143,6 +143,12 @@ def nfl_block(lane, slate, odds):
         return (row.get(r["mkt"]) or 0.0) if row else "void"
     block = model_frame("nfl", lane, slate, odds, M, grows + out, block, resolve)
     block["proj"] = proj
+    eng = engine_team("nfl", M, M.GAME_P, gw, bt, block["status"] == "live")
+    eng["steps"].insert(0, engine_nfl_props(M))
+    eng["factors"].insert(0, ["chart", "Player projections", "Passing, rushing and receiving yards and receptions from every box score this season, last season as the prior and the opponent's defense, re-tested on every build against the season average and last-3 average.", "Foundation", ""])
+    block["engine"] = eng
+    if block["status"] != "live":
+        block["projected"] = projected_plays(grows, bt, slate.get("date"))
     return block
 
 TEAM_MODELS = {"nfl": "nfl_model", "cfb": "cfb_model", "nhl": "nhl_model"}
@@ -227,6 +233,97 @@ def tennis_rows(lane, slate, odds, w):
                     out.append(r)
     out.sort(key=lambda r: -r["edge"])
     return out
+
+
+MKT_WORD = {"ml": "moneyline", "spread": "spread", "total": "total", "pass_yds": "passing yards", "rush_yds": "rushing yards",
+            "rec_yds": "receiving yards", "rec": "receptions"}
+
+
+def projected_plays(rows, bt, date):
+    """What the lane WOULD play on this slate: the same screen as a tracked
+    pick (the backtest's best lane: markets, edge band, price band, one per
+    game). For a sport in the lab these are leans on the page, never logged,
+    never graded; the label says the lane has not beaten Onyx yet."""
+    if not (bt or {}).get("lane"):
+        return []
+    return [dict(r, projected=True) for r in lane_picks(rows, bt, date)]
+
+
+def _lane_card(bt, live):
+    lane = (bt or {}).get("lane") or {}
+    if not lane:
+        return None
+    return {"markets": [MKT_WORD.get(m, m) for m in lane.get("markets", [])], "edge": [lane.get("edge_min"), lane.get("edge_max")],
+            "price": [lane.get("price_min"), lane.get("price_max")], "per_slate": lane.get("max_per_slate"),
+            "w": lane.get("w"), "passed": bool(bt.get("passed")), "live": live}
+
+
+def engine_team(key, M, GP, w, bt, live):
+    """The Model tab's breakdown for a team-ratings sport, from the live
+    parameters: each step of a price, the factors, the lane."""
+    hockey = getattr(M, "KIND", "football") == "hockey"
+    unit = "goals" if hockey else "points"
+    T = M.GAME_TEST if key == "nfl" else M.TEST
+    steps = [
+        {"t": "1 · Team ratings", "rows": [
+            ["Built from", f"every final this season and last ({T['n']:,} games held out to test it)" if T.get("n") else "every final this season and last"],
+            ["Recency", f"a game {GP['half_life']} days old counts half as much as tonight's (half-life)"],
+            ["Pull to average", f"each rating starts with {GP['ridge']:g} {'game' if GP['ridge'] == 1 else 'games'}' worth of league average, so a hot start is not a rating".replace("1 game' worth", "1 game's worth")],
+            ["Home edge", f"{GP['home']:g} {unit} to the home side, none at a neutral site"],
+            ["Needs", f"{GP.get('min_games', 3)} games for both teams before a line is priced"]]},
+        {"t": "2 · From ratings to a price", "rows": (
+            [["Goals", "each side's goals are Poisson around its expected goals"],
+             ["Overtime", f"a regulation tie goes to the home side {GP['p_ot_home'] * 100:.0f}% of the time"],
+             ["Puck line, total", "read off the same goal distribution, overtime included"]] if hockey else
+            [["Margin", f"normal around the projected margin, spread {GP['sd_margin']:g} points"],
+             ["Total", f"normal around the projected total, spread {GP['sd_total']:g} points"],
+             ["Moneyline, spread", "the chance the margin clears zero, or the line"]])},
+        {"t": "3 · Against the Onyx price", "bars": [["Onyx market (no vig)", round((1 - w) * 100)], ["Onyx model", round(w * 100)]],
+         "note": "The model's chance is blended with Onyx's own no-vig price; edge is the blended chance minus the chance the listed price implies. " +
+                 ("The market carries most of the weight because, line for line, it is the sharper read." if w < 0.5 else
+                  "The backtest gave the model and the market an even say." if w == 0.5 else
+                  "The backtest gave the model the larger say.")}]
+    factors = [
+        ["chart", "Offense and defense", f"Every team carries two ratings in {unit}: what it scores above average and what it allows. Tonight's projection is league average plus the home edge plus one side's offense minus the other's defense.", "Foundation", ""],
+        ["clock", "Recency", f"Half-life {GP['half_life']} days: rosters and form move, so last month counts more than last season. The summer break decays last season on its own.", "Tuned", "purple"],
+        ["shield", "Pull to average", f"Ridge {GP['ridge']:g}: ratings are shrunk toward average until a team has earned it, which is what stops a 3-game sample from looking elite.", "Tuned", "blue"],
+        ["scale", "Market blend", f"{round(w * 100)}% model, {round((1 - w) * 100)}% Onyx no-vig. Chosen by the backtest against real Onyx prices.", "Market", "blue"],
+    ]
+    if getattr(M, "NO_TOTALS", False):
+        factors.append(["eye", "Totals held back", f"The ratings' totals did not beat a flat league average ({T['mae_total']:.2f} vs {T['base_mae_total']:.2f} {unit} of error), so totals are never leaned or picked.", "Guardrail", "blue"])
+    elif T.get("mae_total") is not None:
+        factors.append(["eye", "Totals", f"Total error {T['mae_total']:.2f} {unit} vs {T['base_mae_total']:.2f} for the league average on games the ratings never saw.", "Tested", ""])
+    if hockey:
+        factors.append(["bell", "Goalies next", "The starting goalie moves an NHL price more than anything else. Confirmations are not in the model yet, which is part of why it stays in the lab.", "Planned", ""])
+    return {"steps": steps, "factors": factors, "lane": _lane_card(bt, live)}
+
+
+def engine_nfl_props(M):
+    return {"t": "Player projections", "rows": [
+        ["This season", f"recent games weigh more: each week back counts {M.P['decay']:g}x the one after it"],
+        ["Last season", f"worth {M.P['k_prior']:g} games of this season, so week 2 is not a coin flip"],
+        ["Opponent", f"what the defense allows, regressed {M.P['opp_k']:g} games toward league average, at strength {M.P['opp_w']:g}"],
+        ["Role", "only players with a real role in the stat (attempts, carries or targets per game) get a projection"],
+        ["Spread", "yards are normal around the projection, receptions negative binomial, widened to the spread that fits Onyx lines best"]]}
+
+
+def engine_tennis(TM, w, bt, live):
+    P = TM.P
+    return {"steps": [
+        {"t": "1 · Elo ratings", "rows": [
+            ["Built from", "every completed ATP and WTA singles match since 2023, retirements and walkovers dropped"],
+            ["Update", f"a win moves a rating by K x (1 - expected chance), K = {P['k0']:g} / (matches + 5)^{P['shape']:g}"],
+            ["New players", "move fast; veterans move slowly"],
+            ["Needs", f"{P['min_matches']} matches for both players before a match is priced"]]},
+        {"t": "2 · Against the Onyx price", "bars": [["Onyx market (no vig)", round((1 - w) * 100)], ["Onyx model", round(w * 100)]],
+         "note": "Elo gives the chance each player wins; it is blended with Onyx's no-vig price and the edge is measured against the price you actually get."}],
+        "factors": [
+            ["chart", "Elo", "One number per player that rises with wins and falls with losses, scaled by how surprising the result was.", "Foundation", ""],
+            ["pace", "K schedule", f"K = {P['k0']:g} / (matches + 5)^{P['shape']:g}, FiveThirtyEight's schedule: a newcomer's rating finds its level in a few weeks, a veteran's barely moves on one upset.", "Tuned", "purple"],
+            ["eye", "Grand Slams", "Weighting Slam results more (1.1x, 1.3x) tested no better, so every match counts the same.", "Tested", "blue"],
+            ["bell", "Surfaces next", "Clay, grass and hard-court ratings are the next step; a single rating blurs specialists.", "Planned", ""],
+            ["scale", "Market blend", f"{round(w * 100)}% model, {round((1 - w) * 100)}% Onyx no-vig.", "Market", "blue"]],
+        "lane": _lane_card(bt, live)}
 
 
 def lane_picks(rows, bt, date):
@@ -323,6 +420,9 @@ def team_block(key, lane, slate, odds):
         roadmap=ROADMAP.get(key, []))
     base = model_frame(key, lane, slate, odds, M, rows, base, grade_team(lane))
     base["proj"] = proj
+    base["engine"] = engine_team(key, M, GP, w, bt, base["status"] == "live")
+    if base["status"] != "live":
+        base["projected"] = projected_plays(rows, bt, slate.get("date"))
     return base
 
 
@@ -345,6 +445,9 @@ def tennis_block(lane, slate, odds):
         roadmap=ROADMAP["tennis"])
     base = model_frame("tennis", lane, slate, odds, TM, rows, base, grade_tennis(lane))
     base["players"] = tennis_players(lane, slate)
+    base["engine"] = engine_tennis(TM, w, bt, base["status"] == "live")
+    if base["status"] != "live":
+        base["projected"] = projected_plays(rows, bt, slate.get("date"))
     return base
 
 
@@ -371,7 +474,12 @@ def lab_block(key, cfg):
             "note": (f"Onyx {cfg['name']} is live for scores, the gamecenter and Onyx prices as they post. The {cfg['name']} model "
                      "is in the lab: nothing here is a pick until it has been backtested against real Onyx prices."),
             "method": [METHOD[cfg["kind"]], "Every price on this page is an Onyx price."],
-            "roadmap": ROADMAP.get(key, []), "tests": [], "rows": [], "top": []}
+            "roadmap": ROADMAP.get(key, []), "tests": [], "rows": [], "top": [],
+            "engine": {"steps": [{"t": "What is live today", "rows": [
+                ["Leaderboard", "position, score to par, today and thru, polled live"],
+                ["Every hole", "each player's card hole by hole, with birdies, bogeys and the rest marked"],
+                ["Tournament stats", "driving, fairways, greens, putting, sand saves and earnings for each player"]]}],
+                "factors": [], "lane": None}}
 
 
 def main():
