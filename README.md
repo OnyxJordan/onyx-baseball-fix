@@ -547,6 +547,23 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
     - a set (from completed-set counts);
     - the over cashing;
     - the result.
+- **Golf live tracker (10/27):** pgatour.com-style leaderboard: Pos, Player (follow star),
+  Total, Today, Thru.
+  - **Click-down row:** clicking a row opens the player inline with:
+    - round tabs;
+    - a hole-by-hole course strip, each hole drawn by its par (from strokes and score to
+      par), with his score on the green and eagle, birdie, par, bogey or double colouring;
+    - out / in totals;
+    - his tournament stats from ESPN's core API (CORS open): drive average, fairways,
+      greens in regulation, putts per GIR, sand saves, birdies, eagles, bogeys and
+      earnings.
+  - **Your players:** a followed golfer's position, total, today, thru, last six holes
+    and movement.
+  - **Alerts:** every non-par hole, with a vibrate on an eagle, and taking the lead.
+  - **Data:** `sports_espn.golf_round` stores every hole as [hole, strokes, to-par]; the
+    page parses the live scoreboard into the same shape (`gfParse`).
+  - **No shot positions:** shot-by-shot ball positions are PGA TOUR ShotLink, licensed
+    and not public. The page says so instead of drawing invented shots.
 - **College football** shares the football tracker. It was checked on a real final, PITT
   @ MIA 10/24: a followed receiver at 149 receiving yards, 14 tappable plays and 6 box
   tables.
