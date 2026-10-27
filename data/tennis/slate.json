@@ -773,9 +773,9 @@
        "sets": [
         5,
         6,
-        2
+        3
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Alexander Zverev",
@@ -2222,9 +2222,9 @@
        "sets": [
         7,
         6,
-        1
+        2
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Ben Shelton",
@@ -2237,7 +2237,7 @@
         7,
         2
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
@@ -6693,13 +6693,42 @@
      ]
     },
     {
+     "id": "185772",
+     "start": "2026-10-28T14:30Z",
+     "state": "pre",
+     "detail": "10/28 - 10:30 AM EDT",
+     "round": "Round 2",
+     "draw": "Women's Singles",
+     "court": "Quadra 1",
+     "p": [
+      {
+       "name": "Luna Maria Cinalli",
+       "short": "L. Cinalli",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      },
+      {
+       "name": "Alice Tubello",
+       "short": "A. Tubello",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      }
+     ]
+    },
+    {
      "id": "185773",
      "start": "2026-10-28T14:30Z",
      "state": "pre",
      "detail": "10/28 - 10:30 AM EDT",
      "round": "Round 2",
      "draw": "Women's Singles",
-     "court": "",
+     "court": "Quadra Central",
      "p": [
       {
        "name": "Jazmin Ortenzi",
@@ -6723,12 +6752,12 @@
     },
     {
      "id": "185769",
-     "start": "2026-10-29T04:00Z",
+     "start": "2026-10-28T16:00Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "10/28 - 12:00 PM EDT",
      "round": "Round 2",
      "draw": "Women's Singles",
-     "court": "",
+     "court": "Quadra 1",
      "p": [
       {
        "name": "Antonia Vergara Rivera",
@@ -6743,6 +6772,93 @@
        "name": "Leyre Romero Gormaz",
        "short": "L. Romero Gormaz",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      }
+     ]
+    },
+    {
+     "id": "185768",
+     "start": "2026-10-28T19:00Z",
+     "state": "pre",
+     "detail": "10/28 - 3:00 PM EDT",
+     "round": "Round 2",
+     "draw": "Women's Singles",
+     "court": "Quadra Central",
+     "p": [
+      {
+       "name": "Solana Sierra",
+       "short": "S. Sierra",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      },
+      {
+       "name": "Gabriela Ce",
+       "short": "G. Ce",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/bra.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      }
+     ]
+    },
+    {
+     "id": "185771",
+     "start": "2026-10-28T21:00Z",
+     "state": "pre",
+     "detail": "10/28 - 5:00 PM EDT",
+     "round": "Round 2",
+     "draw": "Women's Singles",
+     "court": "Quadra Central",
+     "p": [
+      {
+       "name": "Luisina Giovannini",
+       "short": "L. Giovannini",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      },
+      {
+       "name": "Nauhany Vitoria Leme Da Silva",
+       "short": "N. Leme Da Silva",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/bra.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      }
+     ]
+    },
+    {
+     "id": "185770",
+     "start": "2026-10-29T04:00Z",
+     "state": "pre",
+     "detail": "TBD",
+     "round": "Round 2",
+     "draw": "Women's Singles",
+     "court": "",
+     "p": [
+      {
+       "name": "TBD",
+       "short": "TBD",
+       "flag": null,
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      },
+      {
+       "name": "Francesca Jones",
+       "short": "F. Jones",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/gbr.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -6809,69 +6925,11 @@
      ]
     },
     {
-     "id": "185772",
-     "start": "2026-10-29T04:00Z",
+     "id": "185775",
+     "start": "2026-10-30T04:00Z",
      "state": "pre",
      "detail": "TBD",
-     "round": "Round 2",
-     "draw": "Women's Singles",
-     "court": "",
-     "p": [
-      {
-       "name": "Luna Maria Cinalli",
-       "short": "L. Cinalli",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "Alice Tubello",
-       "short": "A. Tubello",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      }
-     ]
-    },
-    {
-     "id": "185771",
-     "start": "2026-10-29T04:00Z",
-     "state": "pre",
-     "detail": "TBD",
-     "round": "Round 2",
-     "draw": "Women's Singles",
-     "court": "",
-     "p": [
-      {
-       "name": "Luisina Giovannini",
-       "short": "L. Giovannini",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "Nauhany Vitoria Leme Da Silva",
-       "short": "N. Leme Da Silva",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/bra.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      }
-     ]
-    },
-    {
-     "id": "185770",
-     "start": "2026-10-29T04:00Z",
-     "state": "pre",
-     "detail": "TBD",
-     "round": "Round 2",
+     "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "",
      "p": [
@@ -6885,38 +6943,9 @@
        "serve": false
       },
       {
-       "name": "Francesca Jones",
-       "short": "F. Jones",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/gbr.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      }
-     ]
-    },
-    {
-     "id": "185768",
-     "start": "2026-10-29T04:00Z",
-     "state": "pre",
-     "detail": "TBD",
-     "round": "Round 2",
-     "draw": "Women's Singles",
-     "court": "",
-     "p": [
-      {
-       "name": "Solana Sierra",
-       "short": "S. Sierra",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "Gabriela Ce",
-       "short": "G. Ce",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/bra.png",
+       "name": "TBD",
+       "short": "TBD",
+       "flag": null,
        "seed": null,
        "win": false,
        "sets": [],
@@ -7012,36 +7041,7 @@
      ]
     },
     {
-     "id": "185775",
-     "start": "2026-10-30T04:00Z",
-     "state": "pre",
-     "detail": "TBD",
-     "round": "Quarterfinal",
-     "draw": "Women's Singles",
-     "court": "",
-     "p": [
-      {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      }
-     ]
-    },
-    {
-     "id": "185779",
+     "id": "185780",
      "start": "2026-10-31T04:00Z",
      "state": "pre",
      "detail": "TBD",
@@ -7070,7 +7070,7 @@
      ]
     },
     {
-     "id": "185780",
+     "id": "185779",
      "start": "2026-10-31T04:00Z",
      "state": "pre",
      "detail": "TBD",
@@ -9026,7 +9026,7 @@
         6,
         5
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Polona Hercog",
@@ -9036,7 +9036,7 @@
        "win": false,
        "sets": [
         7,
-        5
+        6
        ],
        "serve": false
       }
@@ -9093,9 +9093,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        3
+        4
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Marian Gomez Pezuela Cano",
@@ -9780,5 +9780,5 @@
    ]
   }
  ],
- "fetched": "2026-10-27T19:09:10+00:00"
+ "fetched": "2026-10-27T19:11:38+00:00"
 }
