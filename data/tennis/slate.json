@@ -3656,8 +3656,8 @@
     {
      "id": "185711",
      "start": "2026-10-27T03:05Z",
-     "state": "in",
-     "detail": "3rd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -3671,20 +3671,20 @@
        "sets": [
         4,
         7,
-        2
+        4
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Kaitlin Quevedo",
        "short": "K. Quevedo",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
         6,
-        2
+        6
        ],
        "serve": false
       }
@@ -3728,8 +3728,8 @@
     {
      "id": "185709",
      "start": "2026-10-27T05:15Z",
-     "state": "in",
-     "detail": "1st",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Court 2",
@@ -3739,11 +3739,13 @@
        "short": "Z. Sonmez",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/tur.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
-        1
+        6,
+        4,
+        6
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Sara Sorribes Tormo",
@@ -3752,7 +3754,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        1
+        1,
+        6,
+        2
        ],
        "serve": false
       }
@@ -3760,9 +3764,9 @@
     },
     {
      "id": "185718",
-     "start": "2026-10-27T05:50Z",
-     "state": "pre",
-     "detail": "10/27 - 1:50 AM EDT",
+     "start": "2026-10-27T06:05Z",
+     "state": "in",
+     "detail": "2nd",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -3773,7 +3777,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        5,
+        6
+       ],
        "serve": false
       },
       {
@@ -3782,45 +3789,19 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ukr.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
-      }
-     ]
-    },
-    {
-     "id": "185705",
-     "start": "2026-10-27T06:15Z",
-     "state": "pre",
-     "detail": "10/27 - 2:15 AM EDT",
-     "round": "Round 1",
-     "draw": "Women's Singles",
-     "court": "Court 2",
-     "p": [
-      {
-       "name": "Claire Liu",
-       "short": "C. Liu",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "Antonia Ruzic",
-       "short": "A. Ruzic",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/cro.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
+       "sets": [
+        7,
+        1
+       ],
        "serve": false
       }
      ]
     },
     {
      "id": "185725",
-     "start": "2026-10-27T06:50Z",
+     "start": "2026-10-27T07:30Z",
      "state": "pre",
-     "detail": "10/27 - 2:50 AM EDT",
+     "detail": "10/27 - 3:30 AM EDT",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -3846,10 +3827,39 @@
      ]
     },
     {
-     "id": "185724",
-     "start": "2026-10-27T07:50Z",
+     "id": "185705",
+     "start": "2026-10-27T07:30Z",
      "state": "pre",
-     "detail": "10/27 - 3:50 AM EDT",
+     "detail": "10/27 - 3:30 AM EDT",
+     "round": "Round 1",
+     "draw": "Women's Singles",
+     "court": "Court 2",
+     "p": [
+      {
+       "name": "Claire Liu",
+       "short": "C. Liu",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      },
+      {
+       "name": "Antonia Ruzic",
+       "short": "A. Ruzic",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/cro.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      }
+     ]
+    },
+    {
+     "id": "185724",
+     "start": "2026-10-27T08:30Z",
+     "state": "pre",
+     "detail": "10/27 - 4:30 AM EDT",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -4029,9 +4039,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Zeynep Sonmez",
+       "short": "Z. Sonmez",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/tur.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -4145,9 +4155,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Kaitlin Quevedo",
+       "short": "K. Quevedo",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -5233,8 +5243,8 @@
     {
      "id": "185673",
      "start": "2026-10-27T03:25Z",
-     "state": "in",
-     "detail": "3rd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Center",
@@ -5248,7 +5258,7 @@
        "sets": [
         4,
         6,
-        0
+        1
        ],
        "serve": false
       },
@@ -5257,13 +5267,13 @@
        "short": "Y. Putintseva",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/kaz.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
         3,
-        2
+        6
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -5305,8 +5315,8 @@
     {
      "id": "185668",
      "start": "2026-10-27T05:30Z",
-     "state": "pre",
-     "detail": "10/27 - 1:30 AM EDT",
+     "state": "in",
+     "detail": "3rd",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Show Court",
@@ -5317,8 +5327,12 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/cze.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        4,
+        7,
+        0
+       ],
+       "serve": true
       },
       {
        "name": "Aliaksandra Sasnovich",
@@ -5326,16 +5340,20 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/blr.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        6,
+        6,
+        1
+       ],
        "serve": false
       }
      ]
     },
     {
      "id": "185659",
-     "start": "2026-10-27T06:00Z",
-     "state": "pre",
-     "detail": "10/27 - 2:00 AM EDT",
+     "start": "2026-10-27T06:10Z",
+     "state": "in",
+     "detail": "2nd",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Center",
@@ -5346,8 +5364,11 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/jpn.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        2,
+        2
+       ],
+       "serve": true
       },
       {
        "name": "Leylah Fernandez",
@@ -5355,16 +5376,19 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/can.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        6,
+        4
+       ],
        "serve": false
       }
      ]
     },
     {
      "id": "185661",
-     "start": "2026-10-27T06:30Z",
+     "start": "2026-10-27T07:50Z",
      "state": "pre",
-     "detail": "10/27 - 2:30 AM EDT",
+     "detail": "10/27 - 3:50 AM EDT",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Show Court",
@@ -5544,9 +5568,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Yulia Putintseva",
+       "short": "Y. Putintseva",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/kaz.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -9506,5 +9530,5 @@
    ]
   }
  ],
- "fetched": "2026-10-27T05:29:40+00:00"
+ "fetched": "2026-10-27T07:30:56+00:00"
 }
