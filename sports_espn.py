@@ -97,6 +97,18 @@ def tennis_events(paths):
     return events
 
 
+def golf_round(l):
+    """One round: strokes and to-par, every hole played as [hole, strokes, to-par],
+    and ESPN's birdie / bogey / eagle counts (the page's live tracker reads the
+    same shape off the scoreboard)."""
+    holes = sorted((h for h in l.get("linescores") or [] if h.get("value") is not None), key=lambda h: h.get("period") or 0)
+    st = ((((l.get("statistics") or {}).get("categories") or [{}])[0]).get("stats") or [])
+    val = lambda i: (st[i].get("value") if i < len(st) else None)
+    return {"s": l.get("value"), "d": l.get("displayValue"),
+            "h": [[h.get("period"), int(h["value"]), (h.get("scoreType") or {}).get("displayValue") or "E"] for h in holes],
+            "b": val(0), "bo": val(1), "e": val(4)}
+
+
 def golf_events(paths):
     events = []
     for path in paths:
@@ -107,10 +119,10 @@ def golf_events(paths):
             board = []
             for p in c.get("competitors") or []:
                 a = p.get("athlete") or {}
-                rounds = [{"s": l.get("value"), "d": l.get("displayValue")} for l in p.get("linescores") or []]
+                rounds = [golf_round(l) for l in p.get("linescores") or [] if l.get("value") is not None or l.get("linescores")]
                 board.append({"pos": p.get("order"), "name": a.get("displayName"), "flag": (a.get("flag") or {}).get("href"),
                               "to_par": p.get("score"), "rounds": rounds,
-                              "id": a.get("id")})
+                              "id": a.get("id") or p.get("id")})
             board.sort(key=lambda r: r["pos"] or 999)
             events.append({"id": e.get("id"), "tour": path.split("/")[-1].upper(), "name": e.get("name"),
                            "start": e.get("date"), "end": e.get("endDate"), "state": st.get("state"),

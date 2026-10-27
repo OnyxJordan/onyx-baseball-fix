@@ -141,6 +141,38 @@
 .mc-form b{display:block;font:800 10px monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--text3)}
 .mc-form .r{font:800 11px monospace}.mc-form .r.w{color:#61e970}.mc-form .r.l{color:#f87171}
 .tn-m.sel{border-color:#b038f9}
+.gf-tbl{min-width:0!important}.gf-tbl td,.gf-tbl th{padding:8px 6px}
+.gf-hd{display:grid;grid-template-columns:26px minmax(0,1fr) auto;gap:10px;align-items:center;margin-bottom:10px}
+.gf-hd img{width:24px;height:16px;object-fit:cover;border-radius:2px}.gf-hd b{display:block;font-size:18px}.gf-hd span{font:600 11px monospace;color:var(--text3)}
+.gf-st{display:flex;gap:6px}.gf-st div{background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:5px 9px;text-align:center}
+.gf-st span{display:block;font:700 9px monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--text3)}.gf-st b{font:800 16px monospace}
+.sc-rd{margin-top:12px}.sc-rh{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:5px}.sc-rh b{font:800 11px monospace;letter-spacing:.08em;text-transform:uppercase}.sc-rh span{font:600 10px monospace;color:var(--text3)}
+.sc-row{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:3px;margin-bottom:3px}
+.sc-h{border-radius:7px;border:1px solid var(--border2);text-align:center;padding:2px 0;background:rgba(255,255,255,.03);min-width:0}
+.sc-h span{display:block;font:600 8px monospace;color:var(--text3)}.sc-h b{display:block;font:800 13px monospace;min-height:16px}
+.sc-h.eg{background:#b038f9;border-color:#b038f9}.sc-h.eg b,.sc-h.eg span{color:#fff}
+.sc-h.bd{background:rgba(97,233,112,.18);border-color:rgba(97,233,112,.6)}.sc-h.bd b{color:#61e970}
+.sc-h.bg{background:rgba(248,113,113,.12);border-color:rgba(248,113,113,.45)}.sc-h.bg b{color:#f87171}
+.sc-h.db{background:rgba(248,113,113,.28);border-color:#f87171}.sc-h.db b{color:#fff}
+.sc-h.na{opacity:.35}
+.sc-key{display:flex;gap:6px;align-items:center;flex-wrap:wrap;font:600 10px monospace;color:var(--text3);margin-top:8px}.sc-key .sc-h{display:inline-block;width:12px;height:12px;padding:0}
+.gf-car{display:inline-block;margin-left:4px;font-size:9px;color:var(--text3)}
+.gf-x td{padding:0!important;background:rgba(176,56,249,.05)}
+.gfx{padding:12px 10px 14px;border-top:1px solid rgba(176,56,249,.35)}
+.gfx-top{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.gfx-cap{font:600 10px monospace;color:var(--text3);margin:8px 0 6px}
+.gh-row{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:4px;margin-bottom:4px}
+.gh{border-radius:8px;border:1px solid var(--border2);background:#11161a;text-align:center;overflow:hidden}
+.gh svg{display:block;width:100%;height:auto}
+.gh .fw{fill:none;stroke:#1f5133;stroke-width:9;stroke-linecap:round}
+.gh .tee{fill:#2b6b45}.gh .gr{fill:#2f8f55}.gh .pin{stroke:#fff;stroke-width:1.2}
+.gh text{font:800 9px monospace;fill:#fff;text-anchor:middle}
+.gh span{display:block;font:700 9px monospace;color:var(--text3);padding:1px 0 2px}.gh span i{font-style:normal;margin-left:2px;opacity:.6}
+.gh.eg{border-color:#b038f9}.gh.eg .gr{fill:#b038f9}
+.gh.bd{border-color:rgba(97,233,112,.7)}.gh.bd .gr{fill:#3fbf5a}
+.gh.bg{border-color:rgba(248,113,113,.55)}.gh.bg .gr{fill:#b84a4a}
+.gh.db{border-color:#f87171}.gh.db .gr{fill:#d03030}
+.gh.na{opacity:.45}.gh.na .gr{fill:#2a3a30}
 /* live tracker (football + hockey) */
 .bx{width:100%;border-collapse:collapse;table-layout:fixed;font:600 12px monospace;font-variant-numeric:tabular-nums}
 .bx th{font:700 9px monospace;letter-spacing:.06em;color:var(--text3);padding:6px 2px;text-align:center;border-bottom:1px solid var(--border2)}
@@ -366,7 +398,7 @@ function renderHome() {
     const top = (SD.model || {}).top || [];
     if (top.length) body += `<div class="sec-hdr"><span class="sec-title">Model projections · top of the slate</span></div>${projTable(top.slice(0, 8))}`;
   }
-  document.getElementById('homeBody').innerHTML = ((KIND === 'football' || KIND === 'hockey' || KIND === 'tennis') ? `<div id="ypHome">${yourPlayers()}</div>` : '') + body;
+  document.getElementById('homeBody').innerHTML = ((KIND === 'football' || KIND === 'hockey' || KIND === 'tennis' || KIND === 'golf') ? `<div id="ypHome">${yourPlayers()}</div>` : '') + body;
 }
 
 // ── games + gamecenter ─────────────────────────────────────────────
@@ -385,7 +417,7 @@ var GFILTER = 'all';
 function renderGames() {
   const el = document.getElementById('gamesBody');
   if (KIND === 'tennis') { el.innerHTML = `<div id="ypGames">${yourPlayers()}</div><div id="gcBox">${OPEN_MATCH ? matchCenter(OPEN_MATCH) : ''}</div>` + tnAll(); return; }
-  if (KIND === 'golf') { el.innerHTML = gfAll(); return; }
+  if (KIND === 'golf') { el.innerHTML = `<div id="ypGames">${yourPlayers()}</div>` + gfAll(); return; }
   const games = (SD.games || []).map(live);
   const segs = [['all', 'All'], ['in', 'Live'], ['pre', 'Upcoming'], ['post', 'Final']];
   const shown = games.filter(g => GFILTER === 'all' || g.state === GFILTER);
@@ -779,7 +811,8 @@ var YP_SNAP = {}, YP_READY = {};
 function trackedPlayers() {
   return FOLLOW.filter(f => game(f.gid)).map(f => {
     const g = live(game(f.gid)), s = GC_CACHE[f.gid];
-    const P = s ? boxOf(s, g).byId[f.id] : null;
+    const BB = s ? boxOf(s, g) : null;
+    const P = BB ? (BB.byId[f.id] || Object.values(BB.byId).find(x => nk(x.name) === nk(f.name)) || null) : null;
     let legs = linesFor(f.gid, f.name);
     if (!legs.length) legs = (KIND === 'hockey' ? ['points', 'shots'] : ['rec_yds', 'rush_yds', 'pass_yds']).map(m => ({mkt: m, line: null, side: 'over'}));
     return {f, g, P, legs};
@@ -787,6 +820,7 @@ function trackedPlayers() {
 }
 function yourPlayers() {
   if (KIND === 'tennis') return tnYourPlayers();
+  if (KIND === 'golf') return gfYourPlayers();
   const T = trackedPlayers();
   if (!T.length) return '';
   const rows = T.map(({f, g, P, legs}) => {
@@ -969,6 +1003,106 @@ function tnAlerts() {
     if (mo && mo.total != null && g0[0] + g0[1] <= mo.total && g1[0] + g1[1] > mo.total) OX_TOAST(`✓ Over ${mo.total} games cashed · ${last(0)} vs ${last(1)}`, {ms: 5000});
   }));
 }
+// ── golf live tracker: scorecards, followed players, hole-by-hole alerts ──
+var GF_OPEN = null, GF_PREV = {};
+function gfRound(l) {
+  const holes = (l.linescores || []).filter(h => h.value != null).sort((a, b) => (a.period || 0) - (b.period || 0));
+  const st = ((((l.statistics || {}).categories || [{}])[0]).stats || []);
+  const v = i => i < st.length ? st[i].value : null;
+  return {s: l.value, d: l.displayValue, h: holes.map(h => [h.period, +h.value, (h.scoreType || {}).displayValue || 'E']), b: v(0), bo: v(1), e: v(4)};
+}
+function gfParse(c) {
+  return (c.competitors || []).map(p => ({pos: p.order, id: String((p.athlete || {}).id || p.id || ''), name: (p.athlete || {}).displayName, flag: ((p.athlete || {}).flag || {}).href,
+    to_par: p.score, rounds: (p.linescores || []).filter(l => l.value != null || (l.linescores || []).length).map(gfRound)})).sort((a, b) => (a.pos || 999) - (b.pos || 999));
+}
+function gfRel(t) { t = String(t || 'E'); return t === 'E' ? 0 : parseInt(t, 10) || 0; }
+function gfCls(t) { const r = gfRel(t); return r <= -2 ? 'eg' : r === -1 ? 'bd' : r === 0 ? 'pr' : r === 1 ? 'bg' : 'db'; }
+function gfWord(t) { const r = gfRel(t); return r <= -3 ? 'albatross' : r === -2 ? 'eagle' : r === -1 ? 'birdie' : r === 0 ? 'par' : r === 1 ? 'bogey' : r === 2 ? 'double bogey' : 'triple+'; }
+// the round in progress (or the last one played), today's score and holes played
+function gfNow(r) {
+  const rs = (r.rounds || []).filter(x => (x.h || []).length);
+  const cur = rs[rs.length - 1];
+  if (!cur) return {today: '-', thru: '-', last: null, rd: 0};
+  const thru = cur.h.length >= 18 ? 'F' : cur.h.length;
+  return {today: cur.d || 'E', thru, last: cur.h[cur.h.length - 1], rd: rs.length, cur};
+}
+function gfPosLabel(e, r) {
+  const tied = e.board.filter(x => x.to_par === r.to_par).length > 1;
+  const better = e.board.filter(x => gfRel(x.to_par) < gfRel(r.to_par)).length;
+  return (tied ? 'T' : '') + (better + 1);
+}
+function gfFollowBtn(r) {
+  const id = String(r.id || nk(r.name));
+  return `<button class="fl-btn${isF(id) ? ' on' : ''}" onclick="event.stopPropagation();toggleF('${esc(id)}','${esc(String(r.name).replace(/'/g, ''))}','')">${isF(id) ? '★ Following' : '☆ Follow'}</button>`;
+}
+function gfOpen(id) {
+  GF_OPEN = id; GQ = '';
+  if (currentTab !== 'games') gotoTab('games'); else renderGames();
+  const b = document.querySelector('.gf-x'); if (b) b.scrollIntoView({behavior: 'smooth', block: 'center'});
+}
+function rerenderGolf() { if (currentTab === 'home') renderHome(); else renderGames(); }
+function gfFind(id) { for (const e of SD.events || []) { const r = (e.board || []).find(x => String(x.id || nk(x.name)) === id); if (r) return [e, r]; } return [null, null]; }
+function gfYourPlayers() {
+  const T = FOLLOW.map(f => ({f, er: gfFind(f.id)})).filter(x => x.er[1]);
+  if (!T.length) return '';
+  return `<div class="yp"><div class="yp-h"><b>Your players · live</b><span>followed golfers · alerts on birdies, eagles, bogeys and the lead</span></div><div class="yp-list">${T.map(({f, er}) => {
+    const [e, r] = er, N = gfNow(r), mv = (GF_PREV[f.id] || {}).move;
+    const recent = N.cur ? N.cur.h.slice(-6) : [];
+    return `<div class="yp-p" onclick="if(!event.target.closest('button'))gfOpen('${esc(f.id)}')">
+      ${r.flag ? `<img src="${esc(r.flag)}" alt="" style="border-radius:6px;object-fit:cover" onerror="this.style.visibility='hidden'">` : '<span></span>'}
+      <div class="yp-who"><b>${esc(r.name)}</b><span class="${e.state === 'in' ? 'live' : ''}">${e.state === 'in' ? '● ' : ''}${gfPosLabel(e, r)} · ${esc(r.to_par)} · today ${esc(N.today)} thru ${esc(N.thru)}${mv ? ' · ' + (mv > 0 ? '▲' + mv : '▼' + -mv) : ''}</span></div>
+      <button class="x" onclick="toggleF('${esc(f.id)}','${esc(String(f.name).replace(/'/g, ''))}','')" aria-label="Unfollow">×</button>
+      <div class="yp-legs"><div class="yp-leg"><div class="t"><span>Last ${recent.length} holes</span><em>${N.last ? 'hole ' + N.last[0] + ': ' + gfWord(N.last[2]) : ''}</em></div>
+        <div class="sc-row" style="margin-top:4px">${recent.map(h => `<div class="sc-h ${gfCls(h[2])}"><span>${h[0]}</span><b>${h[1]}</b></div>`).join('') || '<span class="dim">tees off later</span>'}</div></div></div></div>`;
+  }).join('')}</div></div>`;
+}
+// alerts: every new hole a followed golfer plays that is not a par, and the lead
+function gfAlerts() {
+  const watch = new Set(FOLLOW.map(f => f.id));
+  (SD.events || []).forEach(e => (e.board || []).forEach(r => {
+    const id = String(r.id || nk(r.name)), N = gfNow(r), pos = gfPosLabel(e, r);
+    const key = N.rd + ':' + (N.cur ? N.cur.h.length : 0), prev = GF_PREV[id];
+    GF_PREV[id] = {key, pos, rank: parseInt(String(pos).replace('T', ''), 10), move: prev ? (prev.rank - parseInt(String(pos).replace('T', ''), 10)) || prev.move : 0};
+    if (!watch.has(id) || !prev || !window.OX_TOAST || prev.key === key || e.state !== 'in' || !N.last) return;
+    const last = String(r.name).split(' ').pop(), rel = gfRel(N.last[2]);
+    if (rel !== 0) OX_TOAST(`${last} ${gfWord(N.last[2])} at ${N.last[0]} · ${r.to_par}, ${pos}`, {ms: rel <= -2 ? 5000 : 3200, rm: rel > 0});
+    if (rel <= -2 && navigator.vibrate) try { navigator.vibrate([30, 40, 30]); } catch (x) {}
+    if (pos === '1' && prev.pos !== '1') OX_TOAST(`${last} takes the lead · ${r.to_par}`, {ms: 5000});
+  }));
+}
+// for My bets (ui.js): what an Onyx selection is; a prop bet follows the player live
+window.OX_SELINFO = function (sel) {
+  const O = SD.odds || {};
+  for (const p of O.props || []) {
+    if (p.over_sel === sel || p.under_sel === sel) {
+      const ov = p.over_sel === sel;
+      return {label: p.mkt === 'anytime_td' ? `${p.name} anytime TD` : `${p.name} ${ov ? 'Over' : 'Under'} ${p.line} ${STAT_AB[p.mkt] || p.mkt}`, price: ov ? p.over : p.under,
+              name: p.name, mkt: p.mkt, side: ov ? 'over' : 'under', line: p.line, gid: p.gid};
+    }
+  }
+  for (const [gid, o] of Object.entries(O.games || {})) {
+    const g = game(gid) || {};
+    const m = [['home_ml_sel', `${g.home} to win`, o.home_ml], ['away_ml_sel', `${g.away} to win`, o.away_ml], ['home_spread_sel', `${g.home} ${o.home_spread > 0 ? '+' : ''}${o.home_spread}`, o.home_spread_price],
+               ['away_spread_sel', `${g.away} ${o.away_spread > 0 ? '+' : ''}${o.away_spread}`, o.away_spread_price], ['over_sel', `${g.away} @ ${g.home} Over ${o.total}`, o.over_price], ['under_sel', `${g.away} @ ${g.home} Under ${o.total}`, o.under_price]]
+      .find(x => o[x[0]] === sel);
+    if (m) return {label: m[1], price: m[2], gid};
+  }
+  for (const [mid, o] of Object.entries(O.matches || {})) {
+    const m = [['ml0_sel', `${(o.p || [])[0]} to win`, o.ml0], ['ml1_sel', `${(o.p || [])[1]} to win`, o.ml1], ['over_sel', `Over ${o.total} games`, o.over], ['under_sel', `Under ${o.total} games`, o.under]].find(x => o[x[0]] === sel);
+    if (m) return {label: m[1], price: m[2], gid: mid, players: o.p, name: m[0] === 'ml0_sel' ? (o.p || [])[0] : m[0] === 'ml1_sel' ? (o.p || [])[1] : undefined};
+  }
+  return null;
+};
+window.OX_ONBET = function (rec) {
+  let n = 0;
+  rec.legs.forEach(l => {
+    if (!l.name || !l.gid) return;
+    const r = ((SD.model || {}).rows || []).find(x => x.gid === l.gid && nk(x.name) === nk(l.name) && x.pid);
+    const id = KIND === 'tennis' ? nk(l.name) : r ? String(r.pid) : 'n:' + nk(l.name);
+    if (!isF(id)) { FOLLOW = FOLLOW.concat([{id, name: l.name, gid: l.gid}]); n++; }
+  });
+  if (n) { try { localStorage.setItem(FKEY, JSON.stringify(FOLLOW)); } catch (e) {} ['ypHome', 'ypGames'].forEach(i => { const el = document.getElementById(i); if (el) el.innerHTML = yourPlayers(); }); }
+};
 // tennis
 var TFILTER = 'live';
 function tnMatch(e, m) {
@@ -988,14 +1122,54 @@ function tnAll() {
 }
 // golf
 var GQ = '';
+// pgatour.com-style: a row clicks down into the player's course, card and stats
+var GF_RD = {}, GF_STATS = {};
+function gfHoleSvg(n, h) {
+  // the hole drawn by its par (par from strokes and score to par): a par 3 is short and
+  // straight, a par 4 bends, a par 5 is long with an S; the result sits on the green
+  const par = h ? h[1] - gfRel(h[2]) : 4;
+  const path = par === 3 ? 'M30 84 L30 26' : par === 5 ? 'M30 86 C 8 70, 52 52, 30 38 S 22 22, 30 16' : (n % 2 ? 'M30 86 C 30 60, 16 46, 22 24' : 'M30 86 C 30 60, 44 46, 38 24');
+  const g = par === 3 ? [30, 22] : par === 5 ? [30, 13] : [n % 2 ? 22 : 38, 20];
+  const c = h ? gfCls(h[2]) : 'na';
+  return `<div class="gh ${c}"><svg viewBox="0 0 60 96" aria-label="Hole ${n}, par ${par}">
+    <path d="${path}" class="fw"/><rect x="25" y="84" width="10" height="6" rx="2" class="tee"/>
+    <ellipse cx="${g[0]}" cy="${g[1]}" rx="9" ry="7" class="gr"/><line x1="${g[0]}" y1="${g[1]}" x2="${g[0]}" y2="${g[1] - 11}" class="pin"/>
+    ${h ? `<text x="${g[0]}" y="${g[1] + 3.5}">${h[1]}</text>` : ''}</svg><span>${n}<i>P${par}</i></span></div>`;
+}
+function gfExpand(e, r) {
+  const id = String(r.id || nk(r.name));
+  const rounds = (r.rounds || []).filter(x => (x.h || []).length);
+  if (!rounds.length) return `<div class="gfx"><div class="dim">No holes played yet.</div>${gfFollowBtn(r)}</div>`;
+  const ri = Math.min(GF_RD[id] ?? rounds.length - 1, rounds.length - 1), x = rounds[ri];
+  const by = {}; (x.h || []).forEach(h => { by[h[0]] = h; });
+  const st = GF_STATS[id];
+  if (st === undefined && e.id && location.protocol !== 'file:') {
+    GF_STATS[id] = null;
+    fetch(`https://sports.core.api.espn.com/v2/sports/golf/leagues/${(e.tour || 'pga').toLowerCase()}/events/${e.id}/competitions/${e.id}/competitors/${id}/statistics`)
+      .then(q => q.json()).then(j => { const o = {}; ((j.splits || {}).categories || []).forEach(c => (c.stats || []).forEach(z => { o[z.name] = z.displayValue; })); GF_STATS[id] = o; renderGames(); })
+      .catch(() => { GF_STATS[id] = {}; });
+  }
+  const S = st || {};
+  const stat = (k, l, suf) => S[k] != null && S[k] !== '' ? `<div><span>${l}</span><b>${esc(S[k])}${suf || ''}</b></div>` : '';
+  const strip = (a, b) => `<div class="gh-row">${Array.from({length: b - a + 1}, (_, k) => gfHoleSvg(a + k, by[a + k])).join('')}</div>`;
+  const out9 = (x.h || []).filter(h => h[0] <= 9).reduce((t, h) => t + h[1], 0), in9 = (x.h || []).filter(h => h[0] > 9).reduce((t, h) => t + h[1], 0);
+  return `<div class="gfx">
+    <div class="gfx-top"><div class="sp-tabs-seg" style="margin:0">${rounds.map((rr, i) => `<button class="${i === ri ? 'on' : ''}" onclick="event.stopPropagation();GF_RD['${esc(id)}']=${i};renderGames()">R${i + 1} ${esc(rr.d || '')}</button>`).join('')}</div>${gfFollowBtn(r)}</div>
+    <div class="gfx-cap">Round ${ri + 1} · ${x.h.length >= 18 ? 'F' : 'thru ' + x.h.length} · out ${out9 || '-'} · in ${in9 || '-'}${x.s != null && x.h.length >= 18 ? ' · ' + x.s + ' strokes' : ''} · ${x.b || 0} birdies${x.e ? ', ' + x.e + ' eagle' : ''}, ${x.bo || 0} bogeys</div>
+    ${strip(1, 9)}${strip(10, 18)}
+    <div class="sc-key"><span class="sc-h eg"><b></b></span>eagle <span class="sc-h bd"><b></b></span>birdie <span class="sc-h pr"><b></b></span>par <span class="sc-h bg"><b></b></span>bogey <span class="sc-h db"><b></b></span>double+</div>
+    ${st ? `<div class="fx" style="margin-top:10px">${stat('driveDistAvg', 'Drive avg', ' yd')}${stat('driveAccuracyPct', 'Fairways', '%')}${stat('gir', 'Greens in reg', '%')}${stat('puttsGirAvg', 'Putts per GIR')}${stat('sandSaves', 'Sand saves', '%')}${stat('birdies', 'Birdies')}${stat('eagles', 'Eagles')}${stat('bogeys', 'Bogeys')}${stat('officialAmount', 'Earnings')}</div>` : st === null ? '<div class="dim" style="font-size:11px;margin-top:8px">Loading his tournament stats...</div>' : ''}
+    <div class="dim" style="font-size:10px;margin-top:6px">Each hole is drawn by its par with his score on the green. Shot-by-shot ball positions come from the PGA TOUR's licensed ShotLink feed, which is not public.</div></div>`;
+}
 function gfBoard(e, n) {
   const rows = e.board.filter(r => !GQ || String(r.name).toLowerCase().includes(GQ)).slice(0, n || 200);
   const par = v => { const s = String(v || ''); return s.startsWith('-') ? 'u' : s.startsWith('+') ? 'o' : ''; };
-  const R = Math.max(4, ...e.board.map(r => r.rounds.length));
-  return `<div class="tbl"><table><thead><tr><th>Pos</th><th>Player</th><th class="r">To par</th>${Array.from({length: R}, (_, i) => `<th class="r">R${i + 1}</th>`).join('')}</tr></thead>
-    <tbody>${rows.map(r => `<tr><td class="gf-pos">${esc(r.pos)}</td><td>${r.flag ? `<img class="gf-flag" src="${esc(r.flag)}" alt="" loading="lazy">` : ''}<b>${esc(r.name)}</b></td>
-      <td class="r gf-par ${par(r.to_par)}">${esc(r.to_par)}</td>${Array.from({length: R}, (_, i) => `<td class="r mono dim">${esc((r.rounds[i] || {}).s == null ? '-' : r.rounds[i].s)}</td>`).join('')}</tr>`).join('')
-      || `<tr><td colspan="${3 + R}"><div class="empty" style="border:0">No player matches.</div></td></tr>`}</tbody></table></div>`;
+  return `<div class="tbl"><table class="gf-tbl"><thead><tr><th>Pos</th><th>Player</th><th class="r">Total</th><th class="r">Today</th><th class="r">Thru</th></tr></thead>
+    <tbody>${rows.map(r => { const N = gfNow(r), id = String(r.id || nk(r.name));
+      return `<tr class="tap${GF_OPEN === id ? ' sel' : ''}" onclick="if(!event.target.closest('button')){GF_OPEN=GF_OPEN==='${esc(id)}'?null:'${esc(id)}';rerenderGolf()}"><td class="gf-pos">${esc(gfPosLabel(e, r))}<span class="gf-car">${GF_OPEN === id ? '▴' : '▾'}</span></td>
+      <td><button class="fl-btn${isF(id) ? ' on' : ''}" style="padding:1px 6px;margin-right:4px" onclick="toggleF('${esc(id)}','${esc(String(r.name).replace(/'/g, ''))}','')">${isF(id) ? '★' : '☆'}</button>${r.flag ? `<img class="gf-flag" src="${esc(r.flag)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">` : ''}<b>${esc(r.name)}</b></td>
+      <td class="r gf-par ${par(r.to_par)}">${esc(r.to_par)}</td><td class="r mono gf-par ${par(N.today)}">${esc(N.today)}</td><td class="r mono dim">${esc(N.thru)}</td></tr>${GF_OPEN === id ? `<tr class="gf-x"><td colspan="5">${gfExpand(e, r)}</td></tr>` : ''}`; }).join('')
+      || `<tr><td colspan="5"><div class="empty" style="border:0">No player matches.</div></td></tr>`}</tbody></table></div>`;
 }
 function gfAll() {
   return (SD.events || []).map(e => `<div class="sec-hdr"><span class="sec-title">${esc(e.name)}${e.venue ? ' · ' + esc(e.venue) : ''}</span><span class="sec-count">${esc(e.detail || '')}</span></div>
@@ -1169,13 +1343,13 @@ function pollLive() {
         (j.events || []).forEach(e => {
           const ev = (SD.events || []).find(x => x.id === e.id); if (!ev) return;
           const c = (e.competitions || [{}])[0];
-          ev.board = (c.competitors || []).map(p => ({pos: p.order, name: (p.athlete || {}).displayName, flag: ((p.athlete || {}).flag || {}).href, to_par: p.score,
-            rounds: (p.linescores || []).map(l => ({s: l.value, d: l.displayValue}))})).sort((a, b) => (a.pos || 999) - (b.pos || 999));
+          ev.board = gfParse(c);
           ev.state = ((e.status || {}).type || {}).state; ev.detail = ((e.status || {}).type || {}).shortDetail;
           if (ev.state === 'in') anyLive = true;
         });
       }
     });
+    if (KIND === 'golf') { gfAlerts(); ['ypHome', 'ypGames'].forEach(i => { const y = document.getElementById(i); if (y) y.innerHTML = yourPlayers(); }); }
     if (KIND === 'tennis') { tnAlerts(); ['ypHome', 'ypGames'].forEach(i => { const y = document.getElementById(i); if (y) y.innerHTML = yourPlayers(); }); }
     ticker();
     if (currentTab === 'games' && !(document.activeElement && document.activeElement.tagName === 'INPUT')) {

@@ -547,6 +547,40 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
     - a set (from completed-set counts);
     - the over cashing;
     - the result.
+- **Golf live tracker (10/27):** pgatour.com-style leaderboard: Pos, Player (follow star),
+  Total, Today, Thru.
+  - **Click-down row:** clicking a row opens the player inline with:
+    - round tabs;
+    - a hole-by-hole course strip, each hole drawn by its par (from strokes and score to
+      par), with his score on the green and eagle, birdie, par, bogey or double colouring;
+    - out / in totals;
+    - his tournament stats from ESPN's core API (CORS open): drive average, fairways,
+      greens in regulation, putts per GIR, sand saves, birdies, eagles, bogeys and
+      earnings.
+  - **Your players:** a followed golfer's position, total, today, thru, last six holes
+    and movement.
+  - **Alerts:** every non-par hole, with a vibrate on an eagle, and taking the lead.
+  - **Data:** `sports_espn.golf_round` stores every hole as [hole, strokes, to-par]; the
+    page parses the live scoreboard into the same shape (`gfParse`).
+  - **No shot positions:** shot-by-shot ball positions are PGA TOUR ShotLink, licensed
+    and not public. The page says so instead of drawing invented shots.
+- **My Onyx (10/27), `home.html#my`:** one place for everything a user follows, across
+  every sport. Tabs:
+  - **Live now:** every live game in NBA, NFL, CFB, NHL, MLB and tennis (set by set), plus
+    the golf leader. When nothing is live it shows "Up next".
+  - **My players:** every followed player across all sports with a live stat line from
+    ESPN (NBA follows and slip legs, `onyxFollow_<sport>`, tennis by name, golf by id).
+  - **My bets:** every Onyx bet opened from the app on this device.
+  - **How bets are logged (`ui.js`):** `window.open` and share-link taps to
+    `app.onyxodds.com/share` are logged to `localStorage.onyxMyBets` (last 200; an
+    identical bet within 60s is a duplicate).
+    - Each page's `window.OX_SELINFO(sel)` turns a selection into its label, Onyx price
+      and game.
+    - `window.OX_ONBET(rec)` auto-follows the player on a prop bet (or a tennis
+      moneyline), so his live line starts tracking.
+  - **Honest limit:** this is device-local and only sees bets opened from the app. It is
+    not the user's Onyx account. Syncing real bets and settlements needs an Onyx account
+    API, which is a product ask for the Onyx team.
 - **College football** shares the football tracker. It was checked on a real final, PITT
   @ MIA 10/24: a followed receiver at 149 receiving yards, 14 tappable plays and 6 box
   tables.
