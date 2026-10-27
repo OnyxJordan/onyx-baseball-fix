@@ -3622,7 +3622,7 @@
      "id": "185715",
      "start": "2026-10-27T03:05Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Court 6",
@@ -3634,7 +3634,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        4
+        7,
+        1
        ],
        "serve": true
       },
@@ -3645,7 +3646,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        4
+        5,
+        1
        ],
        "serve": false
       }
@@ -3668,7 +3670,7 @@
        "win": false,
        "sets": [
         4,
-        0
+        3
        ],
        "serve": false
       },
@@ -3680,7 +3682,7 @@
        "win": false,
        "sets": [
         6,
-        0
+        3
        ],
        "serve": true
       }
@@ -3690,7 +3692,7 @@
      "id": "185726",
      "start": "2026-10-27T03:05Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Court 2",
@@ -3702,7 +3704,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        5
+        7,
+        1
        ],
        "serve": true
       },
@@ -3713,37 +3716,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        5
+        6,
+        0
        ],
-       "serve": false
-      }
-     ]
-    },
-    {
-     "id": "185718",
-     "start": "2026-10-27T04:30Z",
-     "state": "pre",
-     "detail": "10/27 - 12:30 AM EDT",
-     "round": "Round 1",
-     "draw": "Women's Singles",
-     "court": "Center Court",
-     "p": [
-      {
-       "name": "Katie Volynets",
-       "short": "K. Volynets",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "Dayana Yastremska",
-       "short": "D. Yastremska",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ukr.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
        "serve": false
       }
      ]
@@ -3770,6 +3745,35 @@
        "name": "Sara Sorribes Tormo",
        "short": "S. Sorribes Tormo",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      }
+     ]
+    },
+    {
+     "id": "185718",
+     "start": "2026-10-27T04:45Z",
+     "state": "pre",
+     "detail": "10/27 - 12:45 AM EDT",
+     "round": "Round 1",
+     "draw": "Women's Singles",
+     "court": "Center Court",
+     "p": [
+      {
+       "name": "Katie Volynets",
+       "short": "K. Volynets",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      },
+      {
+       "name": "Dayana Yastremska",
+       "short": "D. Yastremska",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ukr.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -5224,7 +5228,7 @@
      "id": "185673",
      "start": "2026-10-27T03:25Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Center",
@@ -5236,7 +5240,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        4,
+        0
        ],
        "serve": true
       },
@@ -5247,7 +5252,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        6,
+        0
        ],
        "serve": false
       }
@@ -5269,9 +5275,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        0
+        4
        ],
-       "serve": false
+       "serve": true
       },
       {
        "name": "Diane Parry",
@@ -5280,9 +5286,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        0
+        3
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -9490,5 +9496,5 @@
    ]
   }
  ],
- "fetched": "2026-10-27T03:55:27+00:00"
+ "fetched": "2026-10-27T04:27:09+00:00"
 }
