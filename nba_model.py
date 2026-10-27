@@ -2,6 +2,42 @@
 nba_model.py - Onyx NBA points / rebounds / assists projection model.
 
 CHANGELOG (the lab notebook: every change bumps VERSION and cites evidence)
+  v5 (2026-10-27) WHO INHERITS AN OUT PLAYER'S MINUTES (refill_minutes).
+     Trigger: 10/26 OKC was missing Holmgren, Jalen Williams, Wallace, Topic
+     and four more. v4 handed the freed minutes to the 15+ min rotation in
+     proportion, so Ajay Mitchell went to 38.0 projected minutes and Caruso
+     to 34.1. Actual: Mitchell 25, Caruso 9; Kenrich Williams (6-7 usual)
+     played 24, Jaylin Williams 26, McCain 30. Coaches find the minutes on
+     the bench, and the model gave them to the starters.
+     Measured first (tools/nba_backtest.py, SIM_ROSTER on so the slate holds
+     the healthy scratches production sees). 2025-26, team missing 2+
+     rotation players, minutes bias by projected minutes: 34+ +3.94, 28-34
+     +0.57, 20-28 -1.26, 12-20 -4.01, 0-12 -6.51.
+     Change: when a team is under 240, each OUT player's share of the gap is
+     split EVENLY across everyone left, bench included (fill_exp 0, floor 0),
+     with double weight at his position (fill_pos 1). Grid of 120 (exp
+     1 / .5 / 0 / -.5 / -1, floor 0 / 8 / 15, cap 4 / 8 / 12 / none, position
+     0 / 1) tuned on 2024-25; every top-12 setting had floor 0.
+     Judged on 2025-26 (never seen by the tuner), healthy scratches on the
+     slate, v4 -> v5:
+       all 26,352 player-games   pts MAE 4.517 -> 4.505  min 5.25 -> 5.16  obj .4714 -> .4699
+       team missing 1+           pts 4.589 -> 4.570  min 5.47 -> 5.33
+       team missing 2+           pts 4.781 -> 4.733  min 5.98 -> 5.66
+       2+ out, 34+ projected     minutes bias +3.94 -> +1.36
+       projected 20+ min         pts 5.240 -> 5.237  min 4.45 -> 4.41
+     On the v4 replay basis (who played known, as the v2-v4 entries quote):
+       projection vs Onyx closing line MAE 3.087 -> 3.074 (line 3.030)
+     Picks lane (same rules, same basis), 2025-26, v4 -> v5: Feb-Apr open 73-59 +7.7% ->
+     77-70 +2.4%, close 53-45 +5.6% -> 64-56 +4.2%; Oct-Jan close 39-38 ->
+     46-41 +2.5%. n 100-150 per window: within noise both ways.
+     Tested and NOT applied: re-homing the OUT player's shots (usg_alpha 0.2 /
+     0.4, with a position tilt). Tiny MAE gain (.4699 -> .4697) but the lane
+     got worse in Feb-Apr in both replays. The team-total fit already re-homes
+     his points.
+     Honest note on the replay: with the healthy scratches on the slate
+     (production's view), the lane is still ahead at Onyx OPENING prices but
+     behind at CLOSING prices, v4 and v5 alike (Feb-Apr close 77-83 -6.5% /
+     80-86 -6.1%). The edge is in the early number.
   v4 (2026-10-25) THREE SEASONS OF HISTORY, AGED, REGRESSED TO ROLE.
      The prior was one season of box scores: a player who missed last season
      (Haliburton, Achilles) projected like a near-rookie, and early-season
@@ -122,7 +158,7 @@ CHANGELOG (the lab notebook: every change bumps VERSION and cites evidence)
 import math
 from collections import defaultdict
 
-VERSION = "v4"
+VERSION = "v5"
 
 LEAGUE = {"ppg": 115.0, "reb": 44.0, "ast": 27.0, "poss": 99.5}
 POS_RATE = {   # per-minute league rates by listed position, used only without a prior
@@ -161,6 +197,14 @@ P = {
     "pm_k": 0.0,             # minutes nudge per +10 plus-minus per 36 (recent)
     "usg_alpha": 0.0,
     "usg_gamma": 1.0,
+    "usg_pos": 0.0,          # extra share of an OUT player's plays to teammates at his position
+    # who inherits an OUT teammate's minutes (refill_minutes). fill_on 0 = the
+    # v1-v4 rule (fit_team_minutes: the 15+ min rotation, in proportion)
+    "fill_on": 1.0,          # v5
+    "fill_exp": 0.0,         # weight ~ (base minutes + 4) ^ exp: v5 0 = an even split, bench included
+    "fill_pos": 1.0,         # v5: double weight for the OUT player's position group
+    "fill_cap": 99.0,        # most minutes one player can inherit
+    "fill_floor": 0.0,       # v5: anyone on the roster can inherit (was the 15+ min rotation)
     "usg_beta_pts": 0.8,
     "usg_beta_ast": 0.5,
     "usg_beta_reb": 0.0,
@@ -515,6 +559,40 @@ def fit_team_minutes(mins, total=240.0):
     return m
 
 
+def refill_minutes(rs):
+    """fit_team_minutes with a say in WHO inherits: when the team is under
+    240 (teammates out), the shortfall is split by each OUT player's minutes
+    and handed to everyone left with weight (base + 4) ^ fill_exp (below 0
+    leans to the bench, which is where coaches actually find the minutes),
+    x (1 + fill_pos) at the OUT player's position, each player inheriting
+    at most fill_cap minutes and 40 in all. Over 240 it trims as before."""
+    m = [0.0 if r["out"] else r["min_base"] for r in rs]
+    if sum(m) >= 240.0:
+        return fit_team_minutes(m)
+    outs = [o for o in rs if o["out"] and o["min_full"] > 0]
+    tot_out = sum(min(o["min_full"], 36.0) for o in outs)
+    short = 240.0 - sum(m)
+    shares = [(o, short * min(o["min_full"], 36.0) / tot_out) for o in outs] if tot_out > 0 else [(None, short)]
+    got = [0.0] * len(rs)
+    for o, give in shares:
+        for _ in range(4):
+            elig = [i for i, r in enumerate(rs) if not r["out"] and m[i] >= P["fill_floor"]
+                    and got[i] < P["fill_cap"] - 1e-6 and m[i] < 40.0]
+            if give <= 0.25 or not elig:
+                break
+            w = {i: (m[i] + 4.0) ** P["fill_exp"] *
+                 (1 + (P["fill_pos"] if o is not None and _pos_key(rs[i]["pos"]) == _pos_key(o["pos"]) else 0.0))
+                 for i in elig}
+            ws = sum(w.values())
+            left = 0.0
+            for i in elig:
+                add = give * w[i] / ws
+                take = min(add, P["fill_cap"] - got[i], 40.0 - m[i])
+                m[i] += take; got[i] += take; left += add - take
+            give = left
+    return m
+
+
 def usage_per_min(prior, games):
     """Plays used (FGA + 0.44 FTA + TOV) per minute: last season as a
     300-minute prior, this season's box scores on top. None without data."""
@@ -772,7 +850,7 @@ def project_slate(slate, prior, player_games, team_games, team_hist=None, roles=
     for r in rows:
         r["min_base"] = 0.0 if r["out"] else r["min_full"]
     for (gid, team), rs in by_team.items():
-        fitted = fit_team_minutes([r["min_base"] for r in rs])
+        fitted = refill_minutes(rs) if P["fill_on"] else fit_team_minutes([r["min_base"] for r in rs])
         g = games[gid]
         b2b = yday in prof(team)["dates"]
         if g.get("spread") is not None:
@@ -793,16 +871,23 @@ def project_slate(slate, prior, player_games, team_games, team_hist=None, roles=
         # re-absorbed by who is left, tilted toward high-usage players
         # (share ~ upm^(1+gamma) x minutes); a usage bump lifts per-minute
         # points / assists by (boost)^beta, efficiency slipping as it rises
-        lost = sum((r["upm"] or 0) * min(r["min_full"], 36.0) for r in rs if r["out"])
         avail = [r for r in rs if not r["out"] and r["upm"] and r["min"] > 0]
-        wsum = sum(r["upm"] ** (1 + P["usg_gamma"]) * r["min"] for r in avail)
         for r in rs:
             r["usg"] = usg_pct(r["upm"])
             r["usg_boost"] = 1.0
-        if lost > 0 and wsum > 0 and P["usg_alpha"] > 0:
+        if P["usg_alpha"] > 0 and avail:
+            extra = {id(r): 0.0 for r in avail}
+            for o in rs:
+                if not o["out"] or not o["upm"]:
+                    continue
+                lost = o["upm"] * min(o["min_full"], 36.0)
+                w = {id(r): r["upm"] ** (1 + P["usg_gamma"]) * r["min"] *
+                     (1 + P["usg_pos"] * (_pos_key(r["pos"]) == _pos_key(o["pos"]))) for r in avail}
+                ws = sum(w.values())
+                for r in avail:
+                    extra[id(r)] += P["usg_alpha"] * lost * w[id(r)] / ws
             for r in avail:
-                extra = P["usg_alpha"] * lost * (r["upm"] ** (1 + P["usg_gamma"]) * r["min"]) / wsum
-                r["usg_boost"] = round(min(1.35, 1 + extra / r["min"] / r["upm"]), 4)
+                r["usg_boost"] = round(min(1.35, 1 + extra[id(r)] / r["min"] / r["upm"]), 4)
         for r in rs:
             r["usg_adj"] = usg_pct((r["upm"] or 0) * r["usg_boost"]) if r["upm"] else None
 

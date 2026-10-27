@@ -51,6 +51,12 @@ PICK_PRICE = (-180, 150)
 PICK_MIN_MIN = 24.0           # projected minutes
 PICK_MAX_GAP = 1.5           # role-mismatch guard: projection >1.5 SD off the line is a role
                              # disagreement, not an edge (backtest: model side 47-50% there)
+PICK_LOCK_H = 3.0             # an UNSETTLED game's picks wait for the last 3 hours before tip: a team on
+                              # the second night of a back-to-back (those reports land in the afternoon)
+                              # or a 15+ min player listed questionable / day-to-day. 10/26: OKC (b2b)
+                              # locked Ajay Mitchell Under 15.5 at 5 AM ET; Holmgren was ruled out at
+                              # 2:30 PM ET and the projection flipped (he scored 30). Settled games still
+                              # lock early: the lane's edge is at opening prices (v5 changelog).
 PICK_MAX_PER_GAME = 2
 PICK_MAX_PER_SLATE = 6
 VOID_AFTER_DAYS = 3
@@ -152,9 +158,22 @@ def bet_ladders(r, rec):
     return out
 
 
-def qualifies(r, s, pr, game):
+def unsettled_games(rows):
+    """Games whose injury picture can still move: either team on a back-to-back's
+    second night, or a 15+ minute player questionable / day-to-day."""
+    return {r["gid"] for r in rows if r.get("b2b") or (r["inj"] in M.RISK_STATUSES and r["min"] >= 15)}
+
+
+def qualifies(r, s, pr, game, unsettled=()):
     if not pr or pr["src"] != "onyx" or game.get("state") != "pre":
         return False
+    if r["gid"] in unsettled:
+        try:
+            tip = datetime.fromisoformat(game["start"].replace("Z", "+00:00"))
+            if datetime.now(timezone.utc) < tip - timedelta(hours=PICK_LOCK_H):
+                return False
+        except (KeyError, TypeError, ValueError, AttributeError):
+            return False            # no tip time: never lock an unsettled game blind
     if r["out"] or r["inj"] or r["min"] < PICK_MIN_MIN:
         return False
     if not (r["gp"] >= 2 or r["prior_gp"] >= 20):
@@ -200,7 +219,7 @@ def engine_card(slate, tg, lg, hist=None, th=None):
             "use_prior": M.USE_PRIOR_MIN,
             "lane": {"min_edge": PICK_MIN_EDGE, "max_edge": PICK_MAX_EDGE, "signals": PICK_MIN_SIGNALS,
                      "price": list(PICK_PRICE), "min_min": PICK_MIN_MIN, "max_gap": PICK_MAX_GAP,
-                     "per_game": PICK_MAX_PER_GAME, "per_slate": PICK_MAX_PER_SLATE},
+                     "per_game": PICK_MAX_PER_GAME, "per_slate": PICK_MAX_PER_SLATE, "lock_h": PICK_LOCK_H},
             "teams": teams, "H": {k: (list(v) if isinstance(v, tuple) else v) for k, v in M.H.items()},
             "aging": aging_card(hist)}
 
@@ -474,9 +493,10 @@ def main():
     for k in today_rows:
         per_game[k["gid"]] = per_game.get(k["gid"], 0) + 1
     cands = []
+    unsettled = unsettled_games(rows)
     for r in rows:
         for s, pr in r["props"].items():
-            if qualifies(r, s, pr, games.get(r["gid"], {})):
+            if qualifies(r, s, pr, games.get(r["gid"], {}), unsettled):
                 cands.append((pr["edge"], r, s, pr))
     cands.sort(key=lambda c: -c[0])
     added, used_players = 0, {k["pid"] for k in today_rows}

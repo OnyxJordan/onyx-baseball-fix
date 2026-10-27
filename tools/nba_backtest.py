@@ -39,6 +39,7 @@ NAMEMAP = {}   # gid -> {nk(name): props}, filled when lines load
 
 STATS = ("pts", "reb", "ast")
 SIM_OUT = True                # reconstruct the injury report (see walk)
+SIM_ROSTER = False            # also list healthy players who sat (production sees the whole roster)
 SPLIT = "2026-02-01"          # tune before, test on/after
 MIN_PROJ = 20.0               # prop-relevant players for the headline numbers
 
@@ -172,21 +173,27 @@ def walk(G, lines, season_start, season_end, prior, mkt=None):
                         for pid, (nm, pos, mn) in gm.items():
                             seen[pid].append((nm, pos, mn))
                     for pid, apps in seen.items():
-                        if pid in here or len(apps) < 3 or sum(a[2] for a in apps) / len(apps) < 15:
+                        if pid in here:
+                            continue
+                        rot = len(apps) >= 3 and sum(a[2] for a in apps) / len(apps) >= 15
+                        # SIM_ROSTER: anyone else seen in the last 5 games sat tonight;
+                        # a regular (3+ of 5) is on the injury report, a fringe
+                        # player is a healthy scratch the model must still place
+                        if not rot and not SIM_ROSTER:
                             continue
                         opp = g["away"] if team == g["home"] else g["home"]
                         slate["players"].append({"pid": pid, "name": apps[-1][0], "team": team, "opp": opp,
                                                  "home": team == g["home"], "gid": fid, "pos": apps[-1][1],
-                                                 "inj": "OUT"})
+                                                 "inj": "OUT" if rot or len(apps) >= 3 else "", "_rot": rot})
         rows, _ = M.project_slate(slate, prior, pg, tg, HIST_CTX["team_hist"], HIST_CTX["roles"])
         n_out = defaultdict(int)
         for p in slate["players"]:
-            if p["inj"] == "OUT":
+            if p["inj"] == "OUT" and p.get("_rot", True):
                 n_out[(p["gid"], p["team"])] += 1
         actual = {(fid, l["pid"]): l for fid in fids for l in lines[fid]}
         for r in rows:
             a = actual.get((r["gid"], r["pid"]))
-            if not a:
+            if not a or a["min"] <= 0:   # scored on who played: the same population whatever the slate holds
                 continue
             hist = [x for x in (pg.get(r["pid"]) or {}).get("g", []) if x[4] > 0]
             pri = prior.get(r["pid"])
