@@ -830,8 +830,8 @@
     {
      "id": "185180",
      "start": "2026-10-27T20:25Z",
-     "state": "in",
-     "detail": "3rd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 1",
      "draw": "Men's Singles",
      "court": "Centre Court",
@@ -845,20 +845,20 @@
        "sets": [
         4,
         6,
-        2
+        3
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Flavio Cobolli",
        "short": "F. Cobolli",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ita.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
         3,
-        3
+        6
        ],
        "serve": false
       }
@@ -1202,9 +1202,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Flavio Cobolli",
+       "short": "F. Cobolli",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ita.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -6693,7 +6693,7 @@
      "id": "185766",
      "start": "2026-10-27T21:40Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Quadra Central",
@@ -6705,9 +6705,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        4
+        7,
+        1
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Carolina Alves",
@@ -6716,9 +6717,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        3
+        5,
+        1
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
@@ -9184,8 +9186,8 @@
     {
      "id": "185789",
      "start": "2026-10-27T20:40Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Court 2",
@@ -9207,20 +9209,20 @@
        "short": "V. Strakhova",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ukr.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        5
+        6
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
     {
      "id": "185807",
      "start": "2026-10-27T21:20Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Estadio Mexcovery",
@@ -9233,19 +9235,19 @@
        "win": false,
        "sets": [
         1,
-        0
+        2
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Tamara Zidansek",
        "short": "T. Zidansek",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/slo.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        3
+        6
        ],
        "serve": false
       }
@@ -9268,9 +9270,9 @@
        "win": false,
        "sets": [
         6,
-        1
+        5
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Mell Reasco Gonzalez",
@@ -9280,7 +9282,7 @@
        "win": false,
        "sets": [
         4,
-        0
+        2
        ],
        "serve": false
       }
@@ -9288,9 +9290,9 @@
     },
     {
      "id": "185809",
-     "start": "2026-10-27T22:30Z",
-     "state": "pre",
-     "detail": "10/27 - 6:30 PM EDT",
+     "start": "2026-10-27T22:35Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Court 2",
@@ -9301,8 +9303,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        1
+       ],
+       "serve": true
       },
       {
        "name": "Victoria Rodriguez",
@@ -9310,16 +9314,18 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/mex.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        3
+       ],
        "serve": false
       }
      ]
     },
     {
      "id": "185800",
-     "start": "2026-10-27T23:00Z",
+     "start": "2026-10-27T23:05Z",
      "state": "pre",
-     "detail": "10/27 - 7:00 PM EDT",
+     "detail": "10/27 - 7:05 PM EDT",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Estadio Mexcovery",
@@ -9421,9 +9427,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Tamara Zidansek",
+       "short": "T. Zidansek",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/slo.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -9470,9 +9476,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Valeriya Strakhova",
+       "short": "V. Strakhova",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ukr.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -9840,5 +9846,5 @@
    ]
   }
  ],
- "fetched": "2026-10-27T22:26:16+00:00"
+ "fetched": "2026-10-27T22:57:36+00:00"
 }
