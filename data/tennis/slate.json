@@ -3635,9 +3635,9 @@
        "win": false,
        "sets": [
         7,
-        1
+        5
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Simona Waltert",
@@ -3647,9 +3647,9 @@
        "win": false,
        "sets": [
         5,
-        1
+        2
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
@@ -3670,7 +3670,7 @@
        "win": false,
        "sets": [
         4,
-        3
+        6
        ],
        "serve": false
       },
@@ -3682,9 +3682,9 @@
        "win": false,
        "sets": [
         6,
-        3
+        6
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -3705,9 +3705,9 @@
        "win": false,
        "sets": [
         7,
-        1
+        5
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Anastasia Zakharova",
@@ -3717,46 +3717,17 @@
        "win": false,
        "sets": [
         6,
-        0
+        4
        ],
        "serve": false
       }
      ]
     },
     {
-     "id": "185709",
-     "start": "2026-10-27T04:30Z",
-     "state": "pre",
-     "detail": "10/27 - 12:30 AM EDT",
-     "round": "Round 1",
-     "draw": "Women's Singles",
-     "court": "Court 2",
-     "p": [
-      {
-       "name": "Zeynep Sonmez",
-       "short": "Z. Sonmez",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/tur.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "Sara Sorribes Tormo",
-       "short": "S. Sorribes Tormo",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      }
-     ]
-    },
-    {
      "id": "185718",
-     "start": "2026-10-27T04:45Z",
+     "start": "2026-10-27T05:10Z",
      "state": "pre",
-     "detail": "10/27 - 12:45 AM EDT",
+     "detail": "10/27 - 1:10 AM EDT",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -3774,6 +3745,35 @@
        "name": "Dayana Yastremska",
        "short": "D. Yastremska",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ukr.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      }
+     ]
+    },
+    {
+     "id": "185709",
+     "start": "2026-10-27T05:15Z",
+     "state": "pre",
+     "detail": "10/27 - 1:15 AM EDT",
+     "round": "Round 1",
+     "draw": "Women's Singles",
+     "court": "Court 2",
+     "p": [
+      {
+       "name": "Zeynep Sonmez",
+       "short": "Z. Sonmez",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/tur.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      },
+      {
+       "name": "Sara Sorribes Tormo",
+       "short": "S. Sorribes Tormo",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -5241,7 +5241,7 @@
        "win": false,
        "sets": [
         4,
-        0
+        4
        ],
        "serve": true
       },
@@ -5253,7 +5253,7 @@
        "win": false,
        "sets": [
         6,
-        0
+        2
        ],
        "serve": false
       }
@@ -5263,7 +5263,7 @@
      "id": "185677",
      "start": "2026-10-27T03:45Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Show Court",
@@ -5275,9 +5275,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        4
+        7,
+        1
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Diane Parry",
@@ -5286,17 +5287,18 @@
        "seed": null,
        "win": false,
        "sets": [
-        3
+        5,
+        1
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
     {
      "id": "185668",
-     "start": "2026-10-27T05:00Z",
+     "start": "2026-10-27T05:20Z",
      "state": "pre",
-     "detail": "10/27 - 1:00 AM EDT",
+     "detail": "10/27 - 1:20 AM EDT",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Show Court",
@@ -9496,5 +9498,5 @@
    ]
   }
  ],
- "fetched": "2026-10-27T04:27:09+00:00"
+ "fetched": "2026-10-27T04:58:28+00:00"
 }
