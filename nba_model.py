@@ -161,6 +161,14 @@ P = {
     "pm_k": 0.0,             # minutes nudge per +10 plus-minus per 36 (recent)
     "usg_alpha": 0.0,
     "usg_gamma": 1.0,
+    "usg_pos": 0.0,          # extra share of an OUT player's plays to teammates at his position
+    # who inherits an OUT teammate's minutes (refill_minutes). fill_on 0 = the
+    # v1-v4 rule (fit_team_minutes: the 15+ min rotation, in proportion)
+    "fill_on": 0.0,
+    "fill_exp": 1.0,         # weight ~ base minutes ^ exp (below 1 spreads to the bench)
+    "fill_pos": 0.0,         # extra weight for the OUT player's position group
+    "fill_cap": 99.0,        # most minutes one player can inherit
+    "fill_floor": 15.0,      # least base minutes to inherit any
     "usg_beta_pts": 0.8,
     "usg_beta_ast": 0.5,
     "usg_beta_reb": 0.0,
@@ -515,6 +523,40 @@ def fit_team_minutes(mins, total=240.0):
     return m
 
 
+def refill_minutes(rs):
+    """fit_team_minutes with a say in WHO inherits: when the team is under
+    240 (teammates out), the shortfall is split by each OUT player's minutes
+    and handed to everyone left with weight (base + 4) ^ fill_exp (below 0
+    leans to the bench, which is where coaches actually find the minutes),
+    x (1 + fill_pos) at the OUT player's position, each player inheriting
+    at most fill_cap minutes and 40 in all. Over 240 it trims as before."""
+    m = [0.0 if r["out"] else r["min_base"] for r in rs]
+    if sum(m) >= 240.0:
+        return fit_team_minutes(m)
+    outs = [o for o in rs if o["out"] and o["min_full"] > 0]
+    tot_out = sum(min(o["min_full"], 36.0) for o in outs)
+    short = 240.0 - sum(m)
+    shares = [(o, short * min(o["min_full"], 36.0) / tot_out) for o in outs] if tot_out > 0 else [(None, short)]
+    got = [0.0] * len(rs)
+    for o, give in shares:
+        for _ in range(4):
+            elig = [i for i, r in enumerate(rs) if not r["out"] and m[i] >= P["fill_floor"]
+                    and got[i] < P["fill_cap"] - 1e-6 and m[i] < 40.0]
+            if give <= 0.25 or not elig:
+                break
+            w = {i: (m[i] + 4.0) ** P["fill_exp"] *
+                 (1 + (P["fill_pos"] if o is not None and _pos_key(rs[i]["pos"]) == _pos_key(o["pos"]) else 0.0))
+                 for i in elig}
+            ws = sum(w.values())
+            left = 0.0
+            for i in elig:
+                add = give * w[i] / ws
+                take = min(add, P["fill_cap"] - got[i], 40.0 - m[i])
+                m[i] += take; got[i] += take; left += add - take
+            give = left
+    return m
+
+
 def usage_per_min(prior, games):
     """Plays used (FGA + 0.44 FTA + TOV) per minute: last season as a
     300-minute prior, this season's box scores on top. None without data."""
@@ -772,7 +814,7 @@ def project_slate(slate, prior, player_games, team_games, team_hist=None, roles=
     for r in rows:
         r["min_base"] = 0.0 if r["out"] else r["min_full"]
     for (gid, team), rs in by_team.items():
-        fitted = fit_team_minutes([r["min_base"] for r in rs])
+        fitted = refill_minutes(rs) if P["fill_on"] else fit_team_minutes([r["min_base"] for r in rs])
         g = games[gid]
         b2b = yday in prof(team)["dates"]
         if g.get("spread") is not None:
@@ -793,16 +835,23 @@ def project_slate(slate, prior, player_games, team_games, team_hist=None, roles=
         # re-absorbed by who is left, tilted toward high-usage players
         # (share ~ upm^(1+gamma) x minutes); a usage bump lifts per-minute
         # points / assists by (boost)^beta, efficiency slipping as it rises
-        lost = sum((r["upm"] or 0) * min(r["min_full"], 36.0) for r in rs if r["out"])
         avail = [r for r in rs if not r["out"] and r["upm"] and r["min"] > 0]
-        wsum = sum(r["upm"] ** (1 + P["usg_gamma"]) * r["min"] for r in avail)
         for r in rs:
             r["usg"] = usg_pct(r["upm"])
             r["usg_boost"] = 1.0
-        if lost > 0 and wsum > 0 and P["usg_alpha"] > 0:
+        if P["usg_alpha"] > 0 and avail:
+            extra = {id(r): 0.0 for r in avail}
+            for o in rs:
+                if not o["out"] or not o["upm"]:
+                    continue
+                lost = o["upm"] * min(o["min_full"], 36.0)
+                w = {id(r): r["upm"] ** (1 + P["usg_gamma"]) * r["min"] *
+                     (1 + P["usg_pos"] * (_pos_key(r["pos"]) == _pos_key(o["pos"]))) for r in avail}
+                ws = sum(w.values())
+                for r in avail:
+                    extra[id(r)] += P["usg_alpha"] * lost * w[id(r)] / ws
             for r in avail:
-                extra = P["usg_alpha"] * lost * (r["upm"] ** (1 + P["usg_gamma"]) * r["min"]) / wsum
-                r["usg_boost"] = round(min(1.35, 1 + extra / r["min"] / r["upm"]), 4)
+                r["usg_boost"] = round(min(1.35, 1 + extra[id(r)] / r["min"] / r["upm"]), 4)
         for r in rs:
             r["usg_adj"] = usg_pct((r["upm"] or 0) * r["usg_boost"]) if r["upm"] else None
 

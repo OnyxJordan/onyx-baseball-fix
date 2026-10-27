@@ -2621,6 +2621,7 @@ function renderModel() {
     ['scale', 'Market blend', `${pctv(w)}% model, ${pctv(1 - w)}% Onyx no-vig market. Chosen by the backtest on log loss: the blend beat both the model alone and the market alone.`, 'Market', 'blue'],
     ['bell', 'Distribution', `Stat lines are right-skewed: a typical night lands a little under the average and big nights pull it up. A negative binomial with a fitted spread per stat turns the projection into over and under probabilities.`, 'Output', ''],
     ['eye', 'Role check', `When the projection sits more than ${L.max_gap} standard deviations from the line, the market almost always knows something about the role that box scores do not. Those props show "role check" on the board and can never be a pick.`, 'Guardrail', 'blue'],
+    ['clock', 'Injury report first', `A pick locks only in the last ${L.lock_h || 3} hours before tip, after the game-day injury report. Teams on the second night of a back-to-back can rule players out in the afternoon, and every minute and shot those players leave behind moves the projections around them.`, 'Guardrail', 'blue'],
   ];
   document.getElementById('engFactors').innerHTML = f.map(x => factorCard(...x)).join('');
 
@@ -2662,7 +2663,7 @@ function renderModel() {
     ['Back-to-back', `&times;${P.b2b_mult} for 30+ minutes`],
     ['Distribution spread', Object.keys(sd).map(s => `${STAT_ABBR[s]} sd = ${sd[s][0]}&times;mean + ${sd[s][1]}`).join(' · ')],
     ['Blend', `${pctv(w)}% model / ${pctv(1 - w)}% Onyx no-vig`],
-    ['Pick lane', `edge ${pctv(L.min_edge || 0)} to ${pctv(L.max_edge || 0)}pp, price ${fmtOdds((L.price || [])[0])} to ${fmtOdds((L.price || [])[1])}, ${L.min_min}+ projected minutes, ${L.signals}+ form reads agree, role gap under ${L.max_gap} sd, ${L.per_game} per game, ${L.per_slate} per night`],
+    ['Pick lane', `edge ${pctv(L.min_edge || 0)} to ${pctv(L.max_edge || 0)}pp, price ${fmtOdds((L.price || [])[0])} to ${fmtOdds((L.price || [])[1])}, ${L.min_min}+ projected minutes, ${L.signals}+ form reads agree, role gap under ${L.max_gap} sd, ${L.per_game} per game, ${L.per_slate} per night${L.lock_h ? `, locked only in the last ${L.lock_h} hours before tip` : ''}`],
     ['Data', 'OpticOdds box scores, injuries and Onyx lines; ESPN as backup and for live play-by-play'],
   ];
   document.getElementById('engSpec').innerHTML = '<tbody>' + spec.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('') + '</tbody>';

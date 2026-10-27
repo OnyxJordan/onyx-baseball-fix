@@ -51,6 +51,9 @@ PICK_PRICE = (-180, 150)
 PICK_MIN_MIN = 24.0           # projected minutes
 PICK_MAX_GAP = 1.5           # role-mismatch guard: projection >1.5 SD off the line is a role
                              # disagreement, not an edge (backtest: model side 47-50% there)
+PICK_LOCK_H = 3.0             # a game's picks log only in the last 3 hours before tip, after the
+                              # game-day injury report (10/26: Ajay Mitchell locked Under at 5 AM ET;
+                              # Holmgren was ruled out at 2:30 PM ET and the projection flipped)
 PICK_MAX_PER_GAME = 2
 PICK_MAX_PER_SLATE = 6
 VOID_AFTER_DAYS = 3
@@ -155,6 +158,12 @@ def bet_ladders(r, rec):
 def qualifies(r, s, pr, game):
     if not pr or pr["src"] != "onyx" or game.get("state") != "pre":
         return False
+    try:
+        tip = datetime.fromisoformat(game["start"].replace("Z", "+00:00"))
+        if datetime.now(timezone.utc) < tip - timedelta(hours=PICK_LOCK_H):
+            return False
+    except (KeyError, TypeError, ValueError, AttributeError):
+        return False                # no tip time: never lock blind
     if r["out"] or r["inj"] or r["min"] < PICK_MIN_MIN:
         return False
     if not (r["gp"] >= 2 or r["prior_gp"] >= 20):
@@ -200,7 +209,7 @@ def engine_card(slate, tg, lg, hist=None, th=None):
             "use_prior": M.USE_PRIOR_MIN,
             "lane": {"min_edge": PICK_MIN_EDGE, "max_edge": PICK_MAX_EDGE, "signals": PICK_MIN_SIGNALS,
                      "price": list(PICK_PRICE), "min_min": PICK_MIN_MIN, "max_gap": PICK_MAX_GAP,
-                     "per_game": PICK_MAX_PER_GAME, "per_slate": PICK_MAX_PER_SLATE},
+                     "per_game": PICK_MAX_PER_GAME, "per_slate": PICK_MAX_PER_SLATE, "lock_h": PICK_LOCK_H},
             "teams": teams, "H": {k: (list(v) if isinstance(v, tuple) else v) for k, v in M.H.items()},
             "aging": aging_card(hist)}
 
