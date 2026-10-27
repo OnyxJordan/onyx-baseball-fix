@@ -759,7 +759,7 @@
      "id": "185188",
      "start": "2026-10-27T17:00Z",
      "state": "in",
-     "detail": "2nd",
+     "detail": "3rd",
      "round": "Round 1",
      "draw": "Men's Singles",
      "court": "Centre Court",
@@ -772,7 +772,8 @@
        "win": false,
        "sets": [
         5,
-        3
+        6,
+        0
        ],
        "serve": false
       },
@@ -784,7 +785,8 @@
        "win": false,
        "sets": [
         7,
-        0
+        3,
+        1
        ],
        "serve": false
       }
@@ -794,7 +796,7 @@
      "id": "185186",
      "start": "2026-10-27T17:15Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 1",
      "draw": "Men's Singles",
      "court": "Glaubandich Court",
@@ -806,7 +808,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        3
+        4,
+        1
        ],
        "serve": true
       },
@@ -817,7 +820,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        5
+        6,
+        3
        ],
        "serve": false
       }
@@ -2166,8 +2170,8 @@
     {
      "id": "185144",
      "start": "2026-10-27T15:25Z",
-     "state": "in",
-     "detail": "3rd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 1",
      "draw": "Men's Singles",
      "court": "IWB Court 1",
@@ -2183,18 +2187,18 @@
         3,
         3
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Alex Michelsen",
        "short": "A. Michelsen",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         5,
         6,
-        5
+        6
        ],
        "serve": false
       }
@@ -2217,9 +2221,9 @@
        "win": false,
        "sets": [
         7,
-        0
+        5
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Ben Shelton",
@@ -2229,17 +2233,17 @@
        "win": false,
        "sets": [
         6,
-        0
+        4
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
     {
      "id": "185143",
-     "start": "2026-10-27T18:30Z",
+     "start": "2026-10-27T18:45Z",
      "state": "pre",
-     "detail": "10/27 - 2:30 PM EDT",
+     "detail": "10/27 - 2:45 PM EDT",
      "round": "Round 1",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -2602,9 +2606,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Alex Michelsen",
+       "short": "A. Michelsen",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -6568,7 +6572,7 @@
      "id": "185751",
      "start": "2026-10-27T17:50Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Quadra 1",
@@ -6580,9 +6584,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        6,
+        1
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Rebeca Pereira",
@@ -6591,9 +6596,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        0
+        1,
+        1
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
@@ -8967,8 +8973,8 @@
     {
      "id": "185805",
      "start": "2026-10-27T16:30Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Estadio Mexcovery",
@@ -8990,10 +8996,10 @@
        "short": "E. Mandlik",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        5
+        6
        ],
        "serve": false
       }
@@ -9003,7 +9009,7 @@
      "id": "185804",
      "start": "2026-10-27T17:00Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Court 3",
@@ -9015,9 +9021,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        5
+        6,
+        2
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Polona Hercog",
@@ -9026,9 +9033,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        6
+        7,
+        1
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
@@ -9048,9 +9056,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        0
+        5
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Fiona Ferro",
@@ -9059,7 +9067,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        1
+        4
        ],
        "serve": false
       }
@@ -9068,8 +9076,8 @@
     {
      "id": "185790",
      "start": "2026-10-27T18:20Z",
-     "state": "pre",
-     "detail": "10/27 - 2:20 PM EDT",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Estadio Mexcovery",
@@ -9080,8 +9088,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/rom.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        0
+       ],
+       "serve": true
       },
       {
        "name": "Marian Gomez Pezuela Cano",
@@ -9089,16 +9099,18 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/mex.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        2
+       ],
        "serve": false
       }
      ]
     },
     {
      "id": "185792",
-     "start": "2026-10-27T18:30Z",
+     "start": "2026-10-27T18:50Z",
      "state": "pre",
-     "detail": "10/27 - 2:30 PM EDT",
+     "detail": "10/27 - 2:50 PM EDT",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Court 3",
@@ -9510,9 +9522,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Elizabeth Mandlik",
+       "short": "E. Mandlik",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -9764,5 +9776,5 @@
    ]
   }
  ],
- "fetched": "2026-10-27T18:05:02+00:00"
+ "fetched": "2026-10-27T18:37:11+00:00"
 }
