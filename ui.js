@@ -424,6 +424,7 @@
     while (stack.children.length > 3) stack.firstChild.remove();
     setTimeout(function () { t.classList.add('out'); setTimeout(function () { t.remove(); }, 260); }, opts.ms || 2600);
   }
+  window.OX_TOAST = toast;   // pages raise live alerts through the same toast
   function parlayCount() { try { return typeof parlaySlip !== 'undefined' && parlaySlip ? parlaySlip.length : 0; } catch (e) { return 0; } }
 
   // ── 6. hooks into the page ────────────────────────────────────────────

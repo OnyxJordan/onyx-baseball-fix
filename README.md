@@ -498,6 +498,21 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
     shot from, and the ball with the team in possession. Who is on the floor is live;
     the spots are illustrative and labelled so.
   - **Refresh:** the open game refreshes every 5s.
+- **Live experience (10/27):**
+  - **Stacked header:** on phones the header stacks, like a scoreboard: each team
+    gets a row with logo, full name, record and score, and the clock sits under them.
+  - **See the shot:** every shot in the play feed has a "See shot" tap. It marks the
+    spot on the court, draws its line to the rim, and labels the quarter, clock,
+    distance and make or miss.
+  - **Your players · live:** the card sits at the top of Home and Games.
+    - It tracks every player in the parlay slip on his slip legs, plus anyone
+      followed with "Follow" on his shot-chart panel (stored in localStorage
+      `onyxNbaFollow`), on the model's side of his Onyx lines.
+    - Each leg shows the live stat, a bar to the line, "needs N", the pace, and
+      cashed or dead.
+    - Alerts come as toasts through `window.OX_TOAST` from `ui.js`: every stat
+      gain, a vibrate when an over cashes, and when an under dies.
+    - Tracked games outside the open one refresh every 12s.
 - **Sport gamecenters:** the open live football or hockey game refreshes its summary
   every 6s, and the scoreboard polls every 10s while anything is live.
 - **NBA combos:** the historical Onyx feed has no points, rebounds and assists combo

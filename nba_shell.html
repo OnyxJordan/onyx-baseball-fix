@@ -342,14 +342,14 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
 .nb-hd::before{content:'';position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,#635bff,#b038f9)}
 .nb-tm{display:flex;align-items:center;gap:8px;min-width:0}.nb-tm.h{flex-direction:row-reverse;text-align:right}
 .nb-tm .gc-logo{width:36px;height:36px;flex-shrink:0}
-.nb-tm .nm{min-width:0}.nb-tm .nm b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.nb-tm .nm span{font:600 11px monospace;color:var(--text3)}
+.nb-tm .nb-nm{min-width:0}.nb-tm .nb-nm b{display:block;color:var(--text);font:800 15px 'Space Grotesk',system-ui,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nb-tm .nb-nm>span{font:600 11px monospace;color:var(--text3)}
 .nb-sc{font:800 36px monospace;line-height:1;font-variant-numeric:tabular-nums}.nb-sc.lose{color:var(--text3)}
 .nb-st{text-align:center;font:800 11px monospace;letter-spacing:.04em;text-transform:uppercase;color:var(--text3);line-height:1.3}
 .nb-st.live{color:#61e970}.nb-st small{display:block;font-weight:600;color:var(--text3);text-transform:none}
 .nb-tm .full{display:inline}.nb-tm .ab{display:none}
 @media (max-width:560px){.nb-hd{gap:6px;padding:12px 10px}.nb-sc{font-size:28px}.nb-tm .gc-logo{width:28px;height:28px}
-  .nb-tm .full{display:none}.nb-tm .ab{display:inline}.nb-tm .nm b{font-size:14px}.nb-st{font-size:10px}}
+  .nb-tm .full{display:none}.nb-tm .ab{display:inline}.nb-tm .nb-nm b{font-size:14px}.nb-st{font-size:10px}}
 #gcBody .gc-subnav{gap:6px}#gcBody .gc-subnav button{flex:1;min-width:0;padding:8px 6px;white-space:nowrap;font-size:11px;letter-spacing:.06em}
 .bx-seg{display:flex;gap:6px;margin:0 0 10px}.bx-seg button{flex:1;padding:8px 6px;border-radius:999px;border:1px solid var(--border2);background:rgba(255,255,255,.03);color:var(--text2);font:700 11px monospace;letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
 .bx-seg button.on{background:linear-gradient(135deg,#b038f9,#635bff);color:#fff;border-color:transparent}
@@ -383,6 +383,46 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
 .floor-roll{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;font-size:11px}
 .floor-roll div{background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:7px 9px;line-height:1.55}
 .floor-roll b{font:800 10px monospace;letter-spacing:.08em}
+@media (max-width:560px){
+  .nb-hd{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"at as" "ht hs" "st st";row-gap:8px;padding:12px 14px}
+  .nb-hd>.nb-tm:nth-child(1){grid-area:at}.nb-hd>.nb-sc:nth-child(2){grid-area:as}.nb-hd>.nb-st{grid-area:st;text-align:left;border-top:1px solid var(--border);padding-top:8px}
+  .nb-hd>.nb-sc:nth-child(4){grid-area:hs}.nb-hd>.nb-tm:nth-child(5){grid-area:ht}
+  .nb-tm.h{flex-direction:row;text-align:left}
+  .nb-tm .full{display:inline}.nb-tm .ab{display:none}.nb-tm .nb-nm b{font-size:17px}.nb-sc{font-size:30px;text-align:right}}
+/* tapped play on the court */
+.court-svg .pick{fill:none;stroke:#fff;stroke-width:.3;animation:courtPulse 1.4s ease-out infinite;transform-box:fill-box;transform-origin:center}
+.court-svg .pick-x{stroke:#fff;stroke-width:.25}
+.play-sel{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:10px;background:rgba(176,56,249,.14);border:1px solid rgba(176,56,249,.5);margin-bottom:10px;font-size:13px;line-height:1.45}
+.play-sel b{font:800 10px monospace;letter-spacing:.08em;color:#d795ff;display:block}
+.play-sel button{margin-left:auto;background:none;border:0;color:var(--text3);font:800 16px monospace;cursor:pointer}
+.gc-pbp-row.tap{cursor:pointer}.gc-pbp-row.tap:hover{border-color:rgba(176,56,249,.55)}
+.gc-pbp-row.on{border-color:#b038f9;background:rgba(176,56,249,.14)}
+.gc-pbp-row .shot-ic{float:right;font:700 9px monospace;color:#d795ff;letter-spacing:.06em;margin-left:6px}
+/* your players */
+.yp{border:1px solid rgba(176,56,249,.45);border-radius:16px;background:linear-gradient(160deg,rgba(176,56,249,.14),var(--bg2) 60%);padding:12px;margin-bottom:12px}
+.yp-h{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.yp-h b{font:800 11px monospace;letter-spacing:.12em;text-transform:uppercase;color:#d795ff}
+.yp-h span{font:600 10px monospace;color:var(--text3)}
+.yp-list{display:flex;flex-direction:column;gap:8px}
+.yp-p{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px;border-radius:12px;background:var(--bg3);border:1px solid var(--border2);cursor:pointer}
+.yp-p img{width:40px;height:40px;border-radius:50%;object-fit:cover;object-position:50% 15%;background:var(--bg2)}
+.yp-p .yp-who{min-width:0;display:block}.yp-p .yp-who b{display:block;font-size:15px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.yp-p .yp-who span{display:block;font:600 10px monospace;color:var(--text3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.yp-p .yp-who span.live{color:#61e970}
+.yp-p .x{background:none;border:0;color:var(--text3);font:800 14px monospace;cursor:pointer;padding:4px}
+.yp-legs{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:6px}
+.yp-leg{padding:6px 8px;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid var(--border2)}
+.yp-leg .t{display:flex;justify-content:space-between;font:700 10px monospace;color:var(--text3);letter-spacing:.04em}
+.yp-leg .v{font:800 16px monospace}.yp-leg .v small{font:600 10px monospace;color:var(--text3);margin-left:4px}
+.yp-bar{position:relative;height:5px;border-radius:3px;background:rgba(255,255,255,.08);margin-top:5px;overflow:hidden}
+.yp-bar i{position:absolute;left:0;top:0;bottom:0;background:#d795ff;border-radius:3px;transition:width .6s ease}
+.yp-bar u{position:absolute;top:-2px;bottom:-2px;width:2px;background:#fff;opacity:.7}
+.yp-leg.win{border-color:rgba(97,233,112,.55)}.yp-leg.win .v,.yp-leg.win .t em{color:#61e970}.yp-leg.win .yp-bar i{background:#61e970}
+.yp-leg.loss{border-color:rgba(248,113,113,.5)}.yp-leg.loss .v{color:#f87171}.yp-leg.loss .yp-bar i{background:#f87171}
+.yp-leg .t em{font-style:normal;color:#d795ff}
+.yp-leg.bump{animation:ypBump .9s ease}
+@keyframes ypBump{0%{box-shadow:0 0 0 0 rgba(176,56,249,.7)}100%{box-shadow:0 0 0 10px rgba(176,56,249,0)}}
+.fl-btn{background:none;border:1px solid var(--border2);border-radius:999px;color:var(--text2);font:700 11px monospace;padding:5px 10px;cursor:pointer}
+.fl-btn.on{border-color:#b038f9;color:#d795ff;background:rgba(176,56,249,.12)}
 /* record */
 .rec-big{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
 .rec-big .v{font-size:28px;font-weight:800;font-family:monospace}
@@ -538,6 +578,7 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
   </div>
   <div class="home-stats-grid" id="homeStats"></div>
   <div class="home-body">
+    <div id="homeYP" style="padding:0 0 4px"></div>
     <div class="home-section">
       <div class="home-section-tag">The Model's Parlay</div>
       <h2 class="home-section-title">Tonight's best look to win</h2>
@@ -1071,6 +1112,7 @@ function pickCard(k) {
   </div>`;
 }
 function renderHome() {
+  const yp = document.getElementById('homeYP'); if (yp) yp.innerHTML = yourPlayers();
   document.getElementById('homeMP').innerHTML = mpHtml();
   const picks = D.picks || [];
   document.getElementById('picksTag').textContent = 'Onyx Picks · ' + picks.length + ' today';
@@ -1366,7 +1408,7 @@ function boxIndex(sum) {
     (blk.athletes || []).forEach(a => {
       const st = a.stats || [];
       const v = l => { const i = idx[l]; return i != null && st[i] != null ? parseFloat(String(st[i]).split('-')[0]) || 0 : 0; };
-      const row = {min: v('MIN'), pts: v('PTS'), reb: v('REB'), ast: v('AST'), dnp: !!a.didNotPlay || !st.length,
+      const row = {min: v('MIN'), pts: v('PTS'), reb: v('REB'), ast: v('AST'), fg3: v('3PT'), dnp: !!a.didNotPlay || !st.length,
                    team: (t.team || {}).abbreviation};
       const ath = a.athlete || {};
       if (ath.id) out[String(ath.id)] = row;
@@ -1375,13 +1417,109 @@ function boxIndex(sum) {
   }));
   return out;
 }
+// ── your players: the slip's legs and anyone followed, live, with alerts ──
+var FOLLOW = [];
+try { FOLLOW = JSON.parse(localStorage.getItem('onyxNbaFollow') || '[]') || []; } catch (e) {}
+function followSave() { try { localStorage.setItem('onyxNbaFollow', JSON.stringify(FOLLOW)); } catch (e) {} }
+function isFollowed(pid) { return FOLLOW.includes(pid); }
+function toggleFollow(pid) {
+  FOLLOW = isFollowed(pid) ? FOLLOW.filter(x => x !== pid) : FOLLOW.concat([pid]);
+  followSave();
+  const p = playerOf(pid);
+  if (window.OX_TOAST && p) OX_TOAST(isFollowed(pid) ? `Following ${p.name}: live alerts on` : `Stopped following ${p.name}`, {rm: !isFollowed(pid)});
+  rerender();
+}
+var YP_STATS = {pts: 'PTS', reb: 'REB', ast: 'AST', fg3: '3PM'};
+// every tracked player with the legs to watch: slip legs first, else his props on the model's side
+function tracked() {
+  const by = {};
+  (parlaySlip || []).forEach(l => { if (l.pid && l.stat && YP_STATS[l.stat]) (by[l.pid] = by[l.pid] || {src: 'slip', legs: []}).legs.push({stat: l.stat, side: l.side, line: l.line}); });
+  FOLLOW.forEach(pid => {
+    if (by[pid]) return;
+    const p = playerOf(pid); if (!p) return;
+    const legs = ['pts', 'reb', 'ast'].filter(s => (p.props || {})[s]).map(s => ({stat: s, side: p.props[s].side, line: p.props[s].line}));
+    by[pid] = {src: 'follow', legs: legs.length ? legs : [{stat: 'pts', side: 'over', line: null}]};
+  });
+  return Object.entries(by).map(([pid, v]) => ({p: playerOf(pid), ...v})).filter(x => x.p && gameOf(x.p.gid));
+}
+var YP_SNAP = {};
+function ypLegState(g, line, side, v) {
+  if (line == null || v == null) return '';
+  if (side === 'over') return v > line ? 'win' : g.state === 'post' ? 'loss' : '';
+  return v > line ? 'loss' : g.state === 'post' ? 'win' : '';
+}
+function yourPlayers() {
+  const T = tracked();
+  if (!T.length) return '';
+  const rows = T.map(({p, legs, src}) => {
+    const g = gameOf(p.gid), b = liveLine(p, boxIndex(SUMMARY[g.gid]));
+    const st = g.state === 'live' ? `<span class="live">● ${esc(g.detail || 'LIVE')} · ${esc(g.away)} ${esc(g.away_score)}-${esc(g.home_score)} ${esc(g.home)}</span>`
+      : g.state === 'post' ? `<span>Final · ${esc(g.away)} ${esc(g.away_score)}-${esc(g.home_score)} ${esc(g.home)}</span>` : `<span>${esc(p.team)} ${p.home ? 'vs' : '@'} ${esc(p.opp)} · ${tipTime(g.start)}</span>`;
+    const mins = b ? b.min : 0;
+    const legHtml = legs.map(l => {
+      const v = b ? b[l.stat] : null;
+      const cls = started(g) ? ypLegState(g, l.line, l.side, v) : '';
+      const rem = Math.max(0, (p.min || 0) - mins);
+      const pace = g.state === 'live' && b && mins > 0 ? v + rem * (.5 * v / mins + .5 * ((p.proj || {})[l.stat] || 0) / Math.max(p.min || 1, 1)) : null;
+      const k = p.pid + ':' + l.stat;
+      const bump = YP_SNAP[k] != null && v != null && v > YP_SNAP[k] ? ' bump' : '';
+      const fill = l.line ? Math.min(100, ((v ?? 0) / (l.line + .5)) * 100) : 0;
+      const need = l.line != null && v != null && l.side === 'over' && v <= l.line ? Math.floor(l.line) + 1 - v : null;
+      return `<div class="yp-leg ${cls}${bump}"><div class="t"><span>${l.line != null ? (l.side === 'over' ? 'O ' : 'U ') + l.line + ' ' : ''}${YP_STATS[l.stat]}</span>
+        <em>${cls === 'win' ? '✓ cashed' : cls === 'loss' ? '✗' : need != null && started(g) ? 'needs ' + need : started(g) ? '' : 'proj ' + num((p.proj || {})[l.stat])}</em></div>
+        <div class="v">${started(g) && v != null ? v : '-'}${pace != null ? `<small>pace ${num(pace)}</small>` : ''}</div>
+        ${l.line != null ? `<div class="yp-bar"><i style="width:${fill}%"></i><u style="left:${(l.line / (l.line + .5)) * 100}%"></u></div>` : ''}</div>`;
+    }).join('');
+    return `<div class="yp-p" onclick="if(!event.target.closest('button')){gcSel='${esc(p.gid)}';gcShotP='${esc(p.hs || '')}';gotoTab('games');var c=document.getElementById('gcBody');if(c)c.scrollIntoView({behavior:'smooth'})}">
+      ${hsUrl(p) ? `<img src="${esc(hsUrl(p))}" alt="" loading="lazy">` : '<span></span>'}
+      <div class="yp-who"><b>${esc(p.name)}</b>${st}</div>
+      ${src === 'follow' ? `<button class="x" onclick="toggleFollow('${esc(p.pid)}')" aria-label="Unfollow">×</button>` : '<span class="dim" style="font:700 9px monospace">SLIP</span>'}
+      <div class="yp-legs">${legHtml}</div></div>`;
+  }).join('');
+  return `<div class="yp"><div class="yp-h"><b>Your players · live</b><span>your parlay legs + players you follow · alerts on</span></div><div class="yp-list">${rows}</div></div>`;
+}
+// alerts: compare each tracked stat with the last refresh
+var YP_READY = {};
+function ypAlerts() {
+  tracked().forEach(({p, legs}) => {
+    const g = gameOf(p.gid); if (!g || !started(g)) return;
+    const b = liveLine(p, boxIndex(SUMMARY[g.gid])); if (!b) return;
+    legs.forEach(l => {
+      const k = p.pid + ':' + l.stat, v = b[l.stat], was = YP_SNAP[k];
+      if (YP_READY[g.gid] && was != null && v > was && window.OX_TOAST) {
+        const line = l.line != null ? ` · ${v} / ${l.side === 'over' ? 'O' : 'U'} ${l.line}` : ` · ${v}`;
+        const cashed = l.side === 'over' && l.line != null && was <= l.line && v > l.line;
+        const dead = l.side === 'under' && l.line != null && was <= l.line && v > l.line;
+        OX_TOAST(cashed ? `✓ ${lastName(p.name)} Over ${l.line} ${YP_STATS[l.stat]} cashed (${v})` : dead ? `✗ ${lastName(p.name)} went over ${l.line} ${YP_STATS[l.stat]} (${v})`
+          : `${lastName(p.name)} +${v - was} ${YP_STATS[l.stat]}${line}`, {ms: cashed ? 5000 : 3200, rm: dead});
+        if (cashed && navigator.vibrate) try { navigator.vibrate([30, 40, 30]); } catch (e) {}
+      }
+      YP_SNAP[k] = v;
+    });
+    YP_READY[g.gid] = true;
+  });
+}
+// keep every tracked player's live game fresh, not only the open one
+var _ypTimer = null;
+function ypLoop() {
+  clearTimeout(_ypTimer);
+  if (location.protocol === 'file:') return;
+  const gids = [...new Set(tracked().map(x => x.p.gid))].filter(gid => { const g = gameOf(gid); return g && g.state === 'live' && (LIVE[gid] || {}).eid; });
+  Promise.all(gids.filter(gid => !(currentTab === 'games' && gcSel === gid)).map(gid =>
+    fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/summary?event=' + LIVE[gid].eid).then(r => r.json()).then(j => { SUMMARY[gid] = j; }).catch(() => {})))
+    .then(() => {
+      ypAlerts();
+      ['ypBox', 'homeYP'].forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = yourPlayers(); });
+    });
+  _ypTimer = setTimeout(ypLoop, gids.length ? 12000 : 30000);
+}
 function renderGames() {
   const g = gcPick();
   const gs = (D.games || []).slice().sort((a, b) => {
     const k = x => x.state === 'live' ? 0 : x.state === 'pre' ? 1 : 2;
     return k(a) - k(b) || String(a.start).localeCompare(String(b.start));
   });
-  document.getElementById('gcGrid').innerHTML = gs.length ? '<div class="sb-grid">' + gs.map(x => sbCard(x, g && x.gid === g.gid)).join('') + '</div>' : '';
+  document.getElementById('gcGrid').innerHTML = `<div id="ypBox">${yourPlayers()}</div>` + (gs.length ? '<div class="sb-grid">' + gs.map(x => sbCard(x, g && x.gid === g.gid)).join('') + '</div>' : '');
   const body = document.getElementById('gcBody');
   if (!g) { body.innerHTML = '<div class="gc-empty">No NBA games on the slate today.</div>'; return; }
   gcSel = g.gid;
@@ -1393,7 +1531,7 @@ function renderGames() {
     : fin ? '<div class="nb-st">Final</div>'
     : `<div class="nb-st">${tipTime(g.start)}<small>${g.spread != null ? esc(g.home) + ' ' + (g.spread > 0 ? '+' : '') + g.spread : ''}${g.total != null ? ' · O/U ' + g.total : ''}</small></div>`;
   const tm = (ab, rec, home) => `<div class="nb-tm${home ? ' h' : ''}"><span class="gc-logo" style="background-image:url(${(D.logos || {})[ab] || ''})"></span>
-    <div class="nm"><b><span class="full">${esc(TEAM_NICK[ab] || ab)}</span><span class="ab">${esc(ab)}</span></b><span>${esc(rec || '')}</span></div></div>`;
+    <div class="nb-nm"><b><span class="full">${esc(TEAM_NICK[ab] || ab)}</span><span class="ab">${esc(ab)}</span></b><span>${esc(rec || '')}</span></div></div>`;
   const scr = (sc, lose) => `<div class="nb-sc${lose ? ' lose' : ''}">${(live || fin) ? esc(sc) : ''}</div>`;
   const header = `<div class="nb-hd">${tm(g.away, g.away_rec, false)}${scr(g.away_score, fin && a < h)}${stateHtml}${scr(g.home_score, fin && h < a)}${tm(g.home, g.home_rec, true)}</div>`;
 
@@ -1471,7 +1609,7 @@ function overview(g, sum) {
   return html;
 }
 // ESPN's box, one row per player in roster order, every stat column by label
-var gcBoxMode = 'props', gcShotP = null, FLOOR_POS = {};
+var gcBoxMode = 'props', gcShotP = null, gcPlay = null, FLOOR_POS = {};
 function espnTeams(g, sum) {
   const lv = LIVE[g.gid] || {};
   return ((sum && sum.boxscore && sum.boxscore.players) || []).map(t => {
@@ -1561,6 +1699,7 @@ function loadSummary(g) {
   fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/summary?event=' + lv.eid)
     .then(r => r.json()).then(j => {
       SUMMARY[g.gid] = j;
+      ypAlerts();
       if (currentTab === 'games' && gcSel === g.gid) rerender();
       // the open live game refreshes every 8s: play-by-play, court, box
       if (g.state === 'live' && currentTab === 'games' && gcSel === g.gid)
@@ -1670,7 +1809,9 @@ function courtSvg(g, plays, teams, pid) {
     <path class="ln" d="M21 5.25 A4 4 0 0 0 29 5.25"/>
     <line class="ln" x1="22" y1="4" x2="28" y2="4" style="stroke:rgba(255,255,255,.35)"/>
     <circle cx="25" cy="5.25" r=".75" fill="none" stroke="#d795ff" stroke-width=".3"/>
-    ${marks}${pulse}${floor}</svg>`;
+    ${marks}${pulse}${floor}${(() => { const q = gcPlay && plays.find(x => x.id === gcPlay && hasSpot(x)); if (!q) return '';
+      const x = q.coordinate.x, y = q.coordinate.y;
+      return `<line class="pick-x" x1="25" y1="5.25" x2="${x}" y2="${y}" stroke-dasharray=".6 .5"/><circle class="pick" cx="${x}" cy="${y}" r="1.6"/><circle cx="${x}" cy="${y}" r=".9" fill="${col(teamOfPlay(q, g))}" stroke="#fff" stroke-width=".25"/>`; })()}</svg>`;
 }
 // slide the floor tokens from where they were to where they are
 function animateFloor() {
@@ -1694,7 +1835,8 @@ function shotFocus(g, x) {
   return `<div class="sc-focus">${cell('PTS', 'pts', x.n('PTS'))}${cell('REB', 'reb', x.n('REB'))}${cell('AST', 'ast', x.n('AST'))}${cell('3PM', 'fg3', x.n('3PT'))}
     <div><span>FG</span><b>${esc(x.v('FG') || '-')}</b><small>${pctOf(x.v('FG'))} · 3PT ${esc(x.v('3PT') || '-')}</small></div>
     <div><span>MIN</span><b>${esc(x.v('MIN') || '0')}</b><small>${me ? 'proj ' + num(me.min, 0) : ''}${x.v('+/-') ? ' · ' + esc(x.v('+/-')) : ''}</small></div></div>
-    ${me ? `<button class="btn-secondary" style="width:100%;margin:-2px 0 10px" onclick="openPlayer('${esc(me.pid)}')">Open ${esc(lastName(me.name))}'s card and bet his props</button>` : ''}`;
+    ${me ? `<div style="display:flex;gap:8px;margin:-2px 0 10px"><button class="btn-secondary" style="flex:1" onclick="openPlayer('${esc(me.pid)}')">${esc(lastName(me.name))}'s card · bet his props</button>
+      <button class="fl-btn${isFollowed(me.pid) ? ' on' : ''}" onclick="toggleFollow('${esc(me.pid)}')">${isFollowed(me.pid) ? '★ Following' : '☆ Follow'}</button></div>` : ''}`;
 }
 function liveCourt(g, sum) {
   const plays = playsOf(sum);
@@ -1713,13 +1855,16 @@ function liveCourt(g, sum) {
     ${people.map(p => `<button class="${gcShotP === p.x.id ? 'on' : ''}" onclick="gcShotP='${esc(p.x.id)}';rerender()"><i style="background:${col(p.t)}"></i>${esc(p.x.short)} ${p.m}/${p.a}</button>`).join('')}</div>`;
   const last = plays[plays.length - 1];
   const pos = g.state === 'live' ? possession(g, plays) : {team: null, why: 'Final'};
-  const clock = `${(last.period || {}).displayValue || ''} · ${(last.clock || {}).displayValue || ''}`;
+  const clock = `Q${(last.period || {}).number || ''} ${(last.clock || {}).displayValue || ''}`;
   const recent = plays.filter(p => p.text && (!gcShotP || (p.participants || []).some(q => String((q.athlete || {}).id) === gcShotP))).slice(-6).reverse();
   const floorRoll = g.state === 'live' && !gcShotP && teams.length === 2 ? `<div class="floor-roll">${teams.map(t =>
     `<div><b style="color:${col(t.ab)}">${esc(t.ab)} ON THE FLOOR</b><br>${t.players.filter(x => x.on).map(x => `#${esc(x.jersey)} ${esc(x.short)}`).join('<br>') || '-'}</div>`).join('')}</div>` : '';
   setTimeout(animateFloor, 0);
   return `<div class="gc-card" id="gcCourt"><div class="gc-card-title">${sel ? esc(sel.name) + ' · every shot' : 'Live court · the ten on the floor and every shot'}${g.state === 'live' ? ' · refreshes every 5s' : ''}</div>
-    ${chips}${sel ? shotFocus(g, sel) : ''}
+    ${chips}${(() => { const q = gcPlay && plays.find(x => x.id === gcPlay && hasSpot(x)); if (!q) return '';
+      const ft = Math.round(Math.hypot(q.coordinate.x - 25, q.coordinate.y - 5.25));
+      return `<div class="play-sel"><div><b>${esc(teamOfPlay(q, g) || '')} · Q${esc((q.period || {}).number || '')} ${esc((q.clock || {}).displayValue || '')} · ${ft} FT · ${q.scoringPlay ? 'MADE' : 'MISSED'}</b>${esc(q.text || '')}</div><button onclick="gcPlay=null;rerender()" aria-label="Clear">×</button></div>`; })()}
+    ${sel ? shotFocus(g, sel) : ''}
     <div class="court-wrap"><div>${courtSvg(g, plays, teams, gcShotP)}
       <div class="court-legend"><span><i style="background:#635bff"></i>${esc(g.away)} made</span><span>✕ miss</span>
         <span><i style="background:#b038f9"></i>${esc(g.home)} made</span>${!gcShotP && g.state === 'live' ? '<span>numbers = players on the floor (live lineups; spots illustrative)</span>' : '<span>latest shot pulses</span>'}</div>
@@ -1734,9 +1879,17 @@ function liveCourt(g, sum) {
       <div class="mini-pbp">${(gcShotP ? recent : recent.slice(1)).map(p => pbpRow(g, p)).join('')}</div>
     </div></div></div>`;
 }
+function hasSpot(p) { return p.shootingPlay && p.coordinate && p.coordinate.x >= 0 && p.coordinate.x <= 50 && p.coordinate.y >= 0 && p.coordinate.y <= 47; }
+function showPlay(id) {
+  gcPlay = gcPlay === id ? null : id;
+  if (gcView === 'pbp') gcView = 'overview';
+  rerender();
+  const c = document.getElementById('gcCourt'); if (c && gcPlay) c.scrollIntoView({behavior: 'smooth', block: 'start'});
+}
 function pbpRow(g, p) {
   const t = teamOfPlay(p, g);
-  return `<div class="gc-pbp-row${p.scoringPlay ? ' scoring' : ''}"><span class="sc">${p.awayScore ?? ''}-${p.homeScore ?? ''}</span>
+  const spot = hasSpot(p);
+  return `<div class="gc-pbp-row${p.scoringPlay ? ' scoring' : ''}${spot ? ' tap' : ''}${gcPlay === p.id ? ' on' : ''}"${spot ? ` onclick="showPlay('${esc(p.id)}')"` : ''}>${spot ? '<span class="shot-ic">◎ SEE SHOT</span>' : ''}<span class="sc">${p.awayScore ?? ''}-${p.homeScore ?? ''}</span>
     <div class="ev">${t ? esc(t) + ' · ' : ''}${esc((p.period || {}).number ? 'Q' + p.period.number : '')} ${esc((p.clock || {}).displayValue || '')}</div>
     <div style="font-size:12px;color:var(--text2);margin-top:3px">${esc(p.text || '')}</div></div>`;
 }
@@ -2559,6 +2712,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const h = (location.hash || '').slice(1);
   gotoTab(RENDER[h] ? h : 'home');
   pollLive();
+  setTimeout(ypLoop, 2500);   // after the first scoreboard poll maps ESPN event ids
 });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') { closePlayer(); closeNav(); } });
 </script>
