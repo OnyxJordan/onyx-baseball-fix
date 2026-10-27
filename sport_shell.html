@@ -811,7 +811,8 @@ var YP_SNAP = {}, YP_READY = {};
 function trackedPlayers() {
   return FOLLOW.filter(f => game(f.gid)).map(f => {
     const g = live(game(f.gid)), s = GC_CACHE[f.gid];
-    const P = s ? boxOf(s, g).byId[f.id] : null;
+    const BB = s ? boxOf(s, g) : null;
+    const P = BB ? (BB.byId[f.id] || Object.values(BB.byId).find(x => nk(x.name) === nk(f.name)) || null) : null;
     let legs = linesFor(f.gid, f.name);
     if (!legs.length) legs = (KIND === 'hockey' ? ['points', 'shots'] : ['rec_yds', 'rush_yds', 'pass_yds']).map(m => ({mkt: m, line: null, side: 'over'}));
     return {f, g, P, legs};
@@ -1069,6 +1070,39 @@ function gfAlerts() {
     if (pos === '1' && prev.pos !== '1') OX_TOAST(`${last} takes the lead · ${r.to_par}`, {ms: 5000});
   }));
 }
+// for My bets (ui.js): what an Onyx selection is; a prop bet follows the player live
+window.OX_SELINFO = function (sel) {
+  const O = SD.odds || {};
+  for (const p of O.props || []) {
+    if (p.over_sel === sel || p.under_sel === sel) {
+      const ov = p.over_sel === sel;
+      return {label: p.mkt === 'anytime_td' ? `${p.name} anytime TD` : `${p.name} ${ov ? 'Over' : 'Under'} ${p.line} ${STAT_AB[p.mkt] || p.mkt}`, price: ov ? p.over : p.under,
+              name: p.name, mkt: p.mkt, side: ov ? 'over' : 'under', line: p.line, gid: p.gid};
+    }
+  }
+  for (const [gid, o] of Object.entries(O.games || {})) {
+    const g = game(gid) || {};
+    const m = [['home_ml_sel', `${g.home} to win`, o.home_ml], ['away_ml_sel', `${g.away} to win`, o.away_ml], ['home_spread_sel', `${g.home} ${o.home_spread > 0 ? '+' : ''}${o.home_spread}`, o.home_spread_price],
+               ['away_spread_sel', `${g.away} ${o.away_spread > 0 ? '+' : ''}${o.away_spread}`, o.away_spread_price], ['over_sel', `${g.away} @ ${g.home} Over ${o.total}`, o.over_price], ['under_sel', `${g.away} @ ${g.home} Under ${o.total}`, o.under_price]]
+      .find(x => o[x[0]] === sel);
+    if (m) return {label: m[1], price: m[2], gid};
+  }
+  for (const [mid, o] of Object.entries(O.matches || {})) {
+    const m = [['ml0_sel', `${(o.p || [])[0]} to win`, o.ml0], ['ml1_sel', `${(o.p || [])[1]} to win`, o.ml1], ['over_sel', `Over ${o.total} games`, o.over], ['under_sel', `Under ${o.total} games`, o.under]].find(x => o[x[0]] === sel);
+    if (m) return {label: m[1], price: m[2], gid: mid, players: o.p, name: m[0] === 'ml0_sel' ? (o.p || [])[0] : m[0] === 'ml1_sel' ? (o.p || [])[1] : undefined};
+  }
+  return null;
+};
+window.OX_ONBET = function (rec) {
+  let n = 0;
+  rec.legs.forEach(l => {
+    if (!l.name || !l.gid) return;
+    const r = ((SD.model || {}).rows || []).find(x => x.gid === l.gid && nk(x.name) === nk(l.name) && x.pid);
+    const id = KIND === 'tennis' ? nk(l.name) : r ? String(r.pid) : 'n:' + nk(l.name);
+    if (!isF(id)) { FOLLOW = FOLLOW.concat([{id, name: l.name, gid: l.gid}]); n++; }
+  });
+  if (n) { try { localStorage.setItem(FKEY, JSON.stringify(FOLLOW)); } catch (e) {} ['ypHome', 'ypGames'].forEach(i => { const el = document.getElementById(i); if (el) el.innerHTML = yourPlayers(); }); }
+};
 // tennis
 var TFILTER = 'live';
 function tnMatch(e, m) {

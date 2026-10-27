@@ -886,6 +886,19 @@ function betLeg(i) {
     window.open(g && g.slug ? 'https://app.onyxodds.com/game/' + g.slug : ONYX_FALLBACK_URL, '_blank', 'noopener');
   }
 }
+// for My bets (ui.js): what an Onyx selection is, and follow a bet player live
+window.OX_SELINFO = function (sel) {
+  const l = LEGS.find(x => x && x.sel === sel) || parlaySlip.find(x => x.sel === sel);
+  if (l) return {label: l.label, price: l.price, pid: l.pid, stat: l.stat, side: l.side, line: l.line, gid: l.gid};
+  for (const p of D.players || []) for (const [st, pr] of Object.entries(p.props || {})) for (const [sd, o] of Object.entries(pr.all || {}))
+    if (o.sel === sel) return {label: `${p.name} ${sd === 'over' ? 'Over' : 'Under'} ${pr.line} ${STAT_ABBR[st] || st}`, price: o.price, pid: p.pid, stat: st, side: sd, line: pr.line, gid: p.gid};
+  return null;
+};
+window.OX_ONBET = function (rec) {
+  let n = 0;
+  rec.legs.forEach(l => { if (l.pid && !isFollowed(l.pid)) { FOLLOW.push(l.pid); n++; } });
+  if (n) { followSave(); ['ypBox', 'homeYP'].forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = yourPlayers(); }); }
+};
 function slipAdd(leg) {
   if (!leg || !leg.sel || inSlip(leg.sel) || parlaySlip.length >= 10) return false;
   parlaySlip.push({sel: leg.sel, label: leg.label, odds: leg.price});

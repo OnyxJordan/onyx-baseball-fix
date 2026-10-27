@@ -294,6 +294,7 @@
           '<div><b>' + esc(t[1]) + '</b><span>' + esc(t[3]) + '</span></div></button>';
       }).join('') + '</div>' +
       '<div class="oacts">' +
+      '<a class="oact ox-all" href="home.html#my">' + OX_MARK + 'My Onyx: players and bets</a>' +
       '<a class="oact ox-all" href="home.html">' + OX_MARK + 'All Onyx sports</a>' +
       '<button class="oact pri" data-act="slip">' + svg('slip') + 'Parlay builder</button>' +
       '<button class="oact" data-act="share">' + svg('share') + 'Share Onyx</button>' +
@@ -425,6 +426,42 @@
     setTimeout(function () { t.classList.add('out'); setTimeout(function () { t.remove(); }, 260); }, opts.ms || 2600);
   }
   window.OX_TOAST = toast;   // pages raise live alerts through the same toast
+  // ── My bets: every Onyx bet opened from the app, kept on this device ──
+  // Pages describe a selection through window.OX_SELINFO(sel) and react to a
+  // logged bet through window.OX_ONBET(rec) (a player prop follows the player).
+  // This is what was opened on Onyx from here, not the Onyx account itself.
+  var lastTap = '';
+  document.addEventListener('click', function (e) {
+    var t = e.target && e.target.closest ? e.target.closest('button,a,[onclick]') : null;
+    if (!t) return;
+    lastTap = (t.getAttribute('aria-label') || t.innerText || '').replace(/\s+/g, ' ').trim().slice(0, 140);
+    if (t.tagName === 'A' && /onyxodds\.com\/share/.test(t.href || '')) logBet(t.href, lastTap);
+  }, true);
+  function myBets() { try { return JSON.parse(localStorage.getItem('onyxMyBets') || '[]') || []; } catch (e) { return []; } }
+  function logBet(url, label) {
+    var sels = [], m, re = /selection=([^&]+)/g;
+    while ((m = re.exec(url))) sels.push(decodeURIComponent(m[1]));
+    if (!sels.length) return;
+    var legs = sels.map(function (x) {
+      var i = null; try { i = window.OX_SELINFO ? window.OX_SELINFO(x) : null; } catch (e) {}
+      return Object.assign({sel: x}, i || {});
+    });
+    var all = myBets(), now = Date.now();
+    var key = sels.slice().sort().join(',');
+    if (all.some(function (b) { return b.key === key && now - b.t < 60000; })) return;
+    var rec = {t: now, at: new Date(now).toISOString(), sport: SITE, key: key, legs: legs,
+               label: legs.length === 1 && legs[0].label ? legs[0].label : (legs.length > 1 ? legs.length + '-leg parlay' : label)};
+    all.push(rec);
+    try { localStorage.setItem('onyxMyBets', JSON.stringify(all.slice(-200))); } catch (e) {}
+    try { if (window.OX_ONBET) window.OX_ONBET(rec); } catch (e) {}
+    toast('Saved to My bets: ' + rec.label, {action: 'View', onAction: function () { location.href = 'home.html#my'; }});
+  }
+  var _open = window.open;
+  window.open = function (u) {
+    try { if (/onyxodds\.com\/share/.test(String(u))) logBet(String(u), lastTap); } catch (e) {}
+    return _open.apply(window, arguments);
+  };
+  window.OX_MYBETS = myBets;
   function parlayCount() { try { return typeof parlaySlip !== 'undefined' && parlaySlip ? parlaySlip.length : 0; } catch (e) { return 0; } }
 
   // ── 6. hooks into the page ────────────────────────────────────────────

@@ -22,6 +22,41 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
   addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 }
 </script>
+<style>
+/* My Onyx: favorites, bets and everything live, across every sport */
+.my{padding:28px 0 8px}
+.my-h{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.my-h h2{margin:0;font-size:clamp(28px,6vw,46px);line-height:1}
+.my-h p{margin:6px 0 0;color:var(--ox-200,#b9b2c4);font-size:14px;max-width:520px}
+.my-tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-bottom:12px}.my-tabs::-webkit-scrollbar{display:none}
+.my-tabs button{flex-shrink:0;padding:9px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:#ddd;font:700 12px monospace;letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
+.my-tabs button.on{background:linear-gradient(135deg,#b038f9,#635bff);color:#fff;border-color:transparent}
+.my-tabs button b{margin-left:6px;opacity:.8}
+.my-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:10px}
+.my-c{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:10px;align-items:center;padding:12px;border-radius:16px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.035);color:#fff;text-decoration:none;min-width:0}
+.my-c:hover{border-color:rgba(176,56,249,.6)}
+.my-c.live{border-color:rgba(97,233,112,.45);background:linear-gradient(160deg,rgba(97,233,112,.08),rgba(255,255,255,.03))}
+.my-c img,.my-c .ph{width:44px;height:44px;border-radius:50%;object-fit:cover;object-position:50% 15%;background:#1b1720}
+.my-c .ph{display:flex;align-items:center;justify-content:center;font:800 11px monospace;color:#d795ff}
+.my-c .w{min-width:0}.my-c .w b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.my-c .w span{display:block;font:600 11px monospace;color:#9a93a6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.my-c .w span.st{color:#cfc8da}.my-c.live .w span.st{color:#61e970}
+.my-c .lg{font:800 9px monospace;letter-spacing:.08em;padding:3px 7px;border-radius:999px;background:rgba(176,56,249,.18);color:#d795ff;align-self:start;white-space:nowrap}
+.my-g{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:8px;align-items:center;padding:12px;border-radius:16px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.035);color:#fff;text-decoration:none}
+.my-g.live{border-color:rgba(97,233,112,.45)}
+.my-g .t{display:flex;align-items:center;gap:8px;min-width:0}.my-g .t.h{justify-content:flex-end}
+.my-g .t img{width:26px;height:26px;object-fit:contain}.my-g .t b{font:800 14px monospace}
+.my-g .sc{font:800 20px monospace;text-align:center;min-width:64px}.my-g .sc small{display:block;font:700 9px monospace;color:#61e970;letter-spacing:.04em}
+.my-g .sc small.pre{color:#9a93a6}
+.my-g .lgt{grid-column:1/-1;display:flex;justify-content:space-between;font:700 9px monospace;letter-spacing:.08em;color:#9a93a6;text-transform:uppercase}
+.my-empty{padding:22px;border:1px dashed rgba(255,255,255,.18);border-radius:16px;color:#9a93a6;font-size:13px;line-height:1.6;text-align:center}
+.my-empty a{color:#d795ff}
+.my-b{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;padding:12px;border-radius:16px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.035);color:#fff;text-decoration:none}
+.my-b b{font-size:14px}.my-b .p{font:800 14px monospace;color:#d795ff;text-align:right}
+.my-b span{font:600 11px monospace;color:#9a93a6}.my-b .legs{grid-column:1/-1;font-size:12px;color:#cfc8da;line-height:1.5}
+.my-b.live{border-color:rgba(97,233,112,.45)}.my-b.live span.st{color:#61e970}
+.my-note{font:600 10px monospace;color:#7d768a;margin-top:10px;line-height:1.5}
+</style>
 </head>
 <body class="ox-page">
 
@@ -58,7 +93,8 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
       <h1>Research<br><em>on</em> everything</h1>
       <p>Onyx Sports Data compiles the best numbers across the industry, runs them through models we test in public and prices every one against the live Onyx line.</p>
       <div class="ox-hero-cta">
-        <a class="ox-btn fill" href="#sports">Choose a sport</a>
+        <a class="ox-btn fill" href="#my">My Onyx</a>
+        <a class="ox-btn" href="#sports">Choose a sport</a>
         <a class="ox-btn" href="#parlay">Tonight's parlay</a>
       </div>
     </div>
@@ -72,6 +108,14 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
       <div><b id="tLive">7</b><span>Sports live, 2 models graded</span></div>
     </div>
   </div>
+
+  <!-- ── My Onyx: your players, your bets, everything live ─────────── -->
+  <section class="ox-wrap my" id="my">
+    <div class="my-h"><div><span class="ox-eyebrow">My Onyx</span><h2>Your players.<br>Your bets. Live.</h2>
+      <p>Everyone you follow and every Onyx bet you open from the app, across every sport, with live scores and stat lines in one place.</p></div></div>
+    <div class="my-tabs" id="myTabs"></div>
+    <div id="myBody"><div class="my-empty">Loading live scores across every sport...</div></div>
+  </section>
 
   <!-- ── the sports ───────────────────────────────────────────── -->
   <section class="ox-sec" id="sports">
@@ -308,6 +352,158 @@ document.querySelectorAll('[data-onyx]').forEach(a => {
   gtag('js', new Date()); gtag('config', 'G-03T8V1N52E');
   const s = document.createElement('script'); s.async = true; s.src = 'https://www.googletagmanager.com/gtag/js?id=G-03T8V1N52E'; document.head.appendChild(s);
 })();
+
+// ── My Onyx: favorites from every sport page, bets opened on Onyx, all live ──
+var ESPN = 'https://site.api.espn.com/apis/site/v2/sports/';
+var LG = [
+  {k: 'nba', lg: 'NBA', path: 'basketball/nba', page: 'nba.html', kind: 'basketball'},
+  {k: 'nfl', lg: 'NFL', path: 'football/nfl', page: 'nfl.html', kind: 'football'},
+  {k: 'cfb', lg: 'NCAAF', path: 'football/college-football', page: 'cfb.html', kind: 'football', q: 'groups=80&limit=300'},
+  {k: 'nhl', lg: 'NHL', path: 'hockey/nhl', page: 'nhl.html', kind: 'hockey'},
+  {k: 'mlb', lg: 'MLB', path: 'baseball/mlb', page: 'index.html', kind: 'baseball'},
+];
+var MY = {tab: 'live', sb: {}, sum: {}, tn: [], gf: null, nba: null, timer: null};
+function ls(k, d) { try { return JSON.parse(localStorage.getItem(k) || 'null') || d; } catch (e) { return d; } }
+function nk(n) { return String(n || '').normalize('NFKD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[.'’-]/g, ' ').replace(/\b(jr|sr|ii|iii|iv)\b/g, ' ').replace(/\s+/g, ' ').trim(); }
+function etShort(iso) { try { return new Date(iso).toLocaleString('en-US', {weekday: 'short', hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York'}); } catch (e) { return ''; } }
+async function sbOf(L) { try { const r = await fetch(ESPN + L.path + '/scoreboard' + (L.q ? '?' + L.q : '')); MY.sb[L.k] = await r.json(); } catch (e) { MY.sb[L.k] = MY.sb[L.k] || {events: []}; } }
+function evs(k) { return ((MY.sb[k] || {}).events || []).map(e => { const c = (e.competitions || [{}])[0], st = (e.status || {}).type || {};
+  const t = {}; (c.competitors || []).forEach(x => { t[x.homeAway] = x; });
+  const T = x => ({ab: ((x || {}).team || {}).abbreviation, logo: ((x || {}).team || {}).logo, sc: (x || {}).score});
+  return {id: e.id, start: e.date, state: st.state, detail: st.shortDetail || st.detail, a: T(t.away), h: T(t.home)}; }); }
+async function sumOf(L, id) {
+  if (MY.sum[id] && MY.sum[id].state === 'post') return MY.sum[id].j;
+  try { const j = await (await fetch(ESPN + L.path + '/summary?event=' + id)).json(); MY.sum[id] = {j, state: ((((j.header || {}).competitions || [{}])[0].status || {}).type || {}).state}; return j; } catch (e) { return null; }
+}
+// a player's line off ESPN's box, by athlete id or name
+function statLine(kind, j, aid, name) {
+  if (!j) return '';
+  const out = [];
+  ((j.boxscore || {}).players || []).forEach(t => (t.statistics || []).forEach(b => (b.athletes || []).forEach(a => {
+    const at = a.athlete || {};
+    if (!(String(at.id) === String(aid) || nk(at.displayName) === nk(name))) return;
+    const L = b.labels || b.keys || [], v = l => { const i = L.indexOf(l); return i < 0 ? null : (a.stats || [])[i]; };
+    if (kind === 'basketball' && (a.stats || []).length) out.push(`${v('PTS')} PTS · ${v('REB')} REB · ${v('AST')} AST · ${String(v('3PT') || '0').split('-')[0]} 3PM · ${v('MIN')} MIN`);
+    if (kind === 'football') {
+      if (b.name === 'passing') out.push(`${v('C/ATT')} ${v('YDS')} pass yds ${v('TD')} TD`);
+      if (b.name === 'rushing') out.push(`${v('CAR')} car ${v('YDS')} rush yds`);
+      if (b.name === 'receiving') out.push(`${v('REC')} rec ${v('YDS')} yds ${v('TD') !== '0' ? v('TD') + ' TD' : ''}`);
+    }
+    if (kind === 'hockey' && L.includes('G')) out.push(`${v('G')} G · ${v('A')} A · ${v('SOG')} SOG · ${v('TOI')} TOI`);
+  })));
+  return out.join(' · ');
+}
+function evFor(k, gid, team) { const E = evs(k); return E.find(e => e.id === gid) || (team ? E.find(e => e.a.ab === team || e.h.ab === team) : null); }
+function evState(e) { return !e ? '' : e.state === 'in' ? `${e.a.ab} ${e.a.sc}-${e.h.sc} ${e.h.ab} · ${e.detail}` : e.state === 'post' ? `Final · ${e.a.ab} ${e.a.sc}-${e.h.sc} ${e.h.ab}` : `${e.a.ab} @ ${e.h.ab} · ${etShort(e.start)}`; }
+async function myPlayers() {
+  const out = [];
+  // NBA: followed players and the parlay slip's players
+  const nbaF = ls('onyxNbaFollow', []), slip = ls('onyxNbaSlip', []);
+  const pids = [...new Set(nbaF.concat(slip.map(l => l.pid).filter(Boolean)))];
+  if (pids.length) {
+    if (!MY.nba) { try { MY.nba = await getJSON('data/nba/slate.json'); } catch (e) { MY.nba = {players: []}; } }
+    for (const pid of pids) {
+      const p = (MY.nba.players || []).find(x => x.pid === pid); if (!p) continue;
+      const e = evFor('nba', null, p.team), L = LG[0];
+      const line = e && e.state !== 'pre' ? statLine('basketball', await sumOf(L, e.id), p.hs, p.name) : '';
+      const legs = slip.filter(l => l.pid === pid).map(l => l.label).join(' · ');
+      out.push({lg: 'NBA', name: p.name, hs: p.hs ? `https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/${p.hs}.png&w=96&h=70&scale=crop` : '', live: e && e.state === 'in',
+                st: evState(e) || `${p.team} vs ${p.opp}`, line: line || legs, href: 'nba.html#games', order: e ? (e.state === 'in' ? 0 : e.state === 'pre' ? 1 : 2) : 3});
+    }
+  }
+  // NFL, college football, NHL: ESPN athlete ids and game ids
+  for (const L of LG.slice(1, 4)) {
+    for (const f of ls('onyxFollow_' + L.k, [])) {
+      const e = evFor(L.k, f.gid);
+      const line = e && e.state !== 'pre' ? statLine(L.kind, await sumOf(L, e.id), f.id, f.name) : '';
+      out.push({lg: L.lg, name: f.name, hs: /^\d+$/.test(f.id) ? `https://a.espncdn.com/i/headshots/${L.k === 'cfb' ? 'college-football' : L.k}/players/full/${f.id}.png` : '', live: e && e.state === 'in',
+                st: evState(e) || 'Not on this week\'s slate', line, href: `${L.page}#games:${f.gid}`, order: e ? (e.state === 'in' ? 0 : e.state === 'pre' ? 1 : 2) : 3});
+    }
+  }
+  // tennis: the player's match on the ATP / WTA boards
+  for (const f of ls('onyxFollow_tennis', [])) {
+    let hit = null;
+    MY.tn.forEach(c => { if ((c.competitors || []).some(p => nk((p.athlete || {}).displayName) === f.id)) { const st = (c.status || {}).type || {}; const r = st.state === 'in' ? 0 : st.state === 'pre' ? 1 : 2; if (!hit || r < hit.r) hit = {c, r, st}; } });
+    const ps = hit ? hit.c.competitors.map(p => ({n: (p.athlete || {}).displayName, s: (p.linescores || []).map(x => x.value).join(' ')})) : [];
+    const me = ps.find(p => nk(p.n) === f.id), op = ps.find(p => nk(p.n) !== f.id);
+    out.push({lg: 'TENNIS', name: f.name, hs: '', live: hit && hit.r === 0, st: hit ? (hit.r === 0 ? `Live vs ${op.n}` : hit.r === 1 ? `vs ${op.n} · ${etShort(hit.c.date)}` : `${(hit.c.competitors.find(p => nk((p.athlete || {}).displayName) === f.id) || {}).winner ? 'Won' : 'Lost'} vs ${op.n}`) : 'No match this week',
+              line: hit && hit.r !== 1 ? `${me.s}  |  ${op.s}` : '', href: 'tennis.html#games', order: hit ? hit.r : 3});
+  }
+  // golf: position, total, today
+  for (const f of ls('onyxFollow_golf', [])) {
+    const ev = MY.gf, c = ev ? (ev.competitions || [{}])[0] : null;
+    const p = c ? (c.competitors || []).find(x => String(x.id) === f.id || String((x.athlete || {}).id) === f.id) : null;
+    const st = ((ev || {}).status || {}).type || {};
+    const rds = p ? (p.linescores || []).filter(l => (l.linescores || []).length) : [];
+    const cur = rds[rds.length - 1];
+    out.push({lg: 'GOLF', name: f.name, hs: `https://a.espncdn.com/i/headshots/golf/players/full/${f.id}.png`, live: st.state === 'in',
+              st: p ? `${(ev || {}).name || ''}` : 'Not in this week\'s field', line: p ? `${p.score} total · today ${cur ? cur.displayValue : '-'} thru ${cur ? (cur.linescores.length >= 18 ? 'F' : cur.linescores.length) : '-'}` : '', href: 'golf.html#games', order: st.state === 'in' ? 0 : 2});
+  }
+  return out.sort((a, b) => a.order - b.order);
+}
+function playerCard(p) {
+  return `<a class="my-c${p.live ? ' live' : ''}" href="${esc(p.href)}">${p.hs ? `<img src="${esc(p.hs)}" alt="" loading="lazy" onerror="this.outerHTML='<span class=&quot;ph&quot;>${esc(p.lg)}</span>'">` : `<span class="ph">${esc(p.lg)}</span>`}
+    <div class="w"><b>${esc(p.name)}</b><span class="st">${p.live ? '● ' : ''}${esc(p.st)}</span>${p.line ? `<span>${esc(p.line)}</span>` : ''}</div><span class="lg">${esc(p.lg)}</span></a>`;
+}
+function gameCard(L, e) {
+  const href = L.k === 'nba' ? 'nba.html#games' : L.k === 'mlb' ? 'index.html' : `${L.page}#games:${e.id}`;
+  const sc = e.state === 'pre' ? `<small class="pre">${esc(etShort(e.start))}</small>vs` : `${esc(e.a.sc)}-${esc(e.h.sc)}<small>${e.state === 'in' ? esc(e.detail) : 'FINAL'}</small>`;
+  return `<a class="my-g${e.state === 'in' ? ' live' : ''}" href="${href}"><div class="lgt"><span>${esc(L.lg)}</span><span>${e.state === 'in' ? '● live' : ''}</span></div>
+    <div class="t">${e.a.logo ? `<img src="${esc(e.a.logo)}" alt="" loading="lazy">` : ''}<b>${esc(e.a.ab)}</b></div><div class="sc">${sc}</div><div class="t h"><b>${esc(e.h.ab)}</b>${e.h.logo ? `<img src="${esc(e.h.logo)}" alt="" loading="lazy">` : ''}</div></a>`;
+}
+function myBets() {
+  const B = ls('onyxMyBets', []).slice().reverse();
+  const slip = ls('onyxNbaSlip', []);
+  const PAGE = {nba: 'nba.html', mlb: 'index.html', nfl: 'nfl.html', cfb: 'cfb.html', nhl: 'nhl.html', tennis: 'tennis.html', golf: 'golf.html'};
+  let h = '';
+  if (slip.length) h += `<a class="my-b" href="nba.html#home"><b>NBA parlay in progress · ${slip.length} leg${slip.length > 1 ? 's' : ''}</b><span class="p">open slip</span><div class="legs">${slip.map(l => esc(l.label || '')).join('<br>')}</div></a>`;
+  h += B.map(b => {
+    const L = LG.find(x => x.k === b.sport);
+    const gid = (b.legs || []).map(l => l.gid).find(Boolean);
+    const e = L && gid ? evFor(L.k, gid) : null;
+    const price = b.legs && b.legs.length === 1 ? b.legs[0].price : null;
+    return `<a class="my-b${e && e.state === 'in' ? ' live' : ''}" href="${PAGE[b.sport] || 'home.html'}${e && L.k !== 'nba' && L.k !== 'mlb' ? '#games:' + e.id : ''}">
+      <b>${esc(b.label || 'Onyx bet')}</b><span class="p">${price != null ? fmtOdds(price) : ''}</span>
+      <span class="st">${esc(String(b.sport || '').toUpperCase())} · opened ${esc(etShort(b.at))}${e ? ' · ' + esc(evState(e)) : ''}</span><span></span>
+      ${b.legs && b.legs.length > 1 ? `<div class="legs">${b.legs.map(l => esc(l.label || 'leg')).join('<br>')}</div>` : ''}</a>`;
+  }).join('');
+  return h ? `<div class="my-grid">${h}</div><div class="my-note">Every Onyx bet you open from this app, on this device. Betting a player prop also follows him live. Settled results live in your Onyx account. <a href="#" onclick="if(confirm('Clear My bets on this device?')){localStorage.removeItem('onyxMyBets');renderMy()}return false" style="color:#d795ff">Clear</a></div>`
+    : `<div class="my-empty">No bets yet. Tap any Onyx price or "Bet on Onyx" in a sport and it lands here, and the player it is on starts tracking live.</div>`;
+}
+var MY_P = [];
+async function loadMy() {
+  await Promise.all(LG.map(sbOf).concat([
+    Promise.all(['atp', 'wta'].map(t => fetch(ESPN + 'tennis/' + t + '/scoreboard').then(r => r.json()).catch(() => ({events: []})))).then(js => {
+      MY.tn = js.flatMap(j => (j.events || []).flatMap(e => (e.groupings || []).filter(g => /Singles/.test((g.grouping || {}).displayName || '')).flatMap(g => g.competitions || []))); }),
+    fetch(ESPN + 'golf/pga/scoreboard').then(r => r.json()).then(j => { MY.gf = (j.events || [])[0] || null; }).catch(() => {}),
+  ]));
+  MY_P = await myPlayers();
+  renderMy();
+  const anyLive = LG.some(L => evs(L.k).some(e => e.state === 'in')) || MY.tn.some(c => ((c.status || {}).type || {}).state === 'in');
+  clearTimeout(MY.timer); MY.timer = setTimeout(loadMy, anyLive ? 20000 : 60000);
+}
+function renderMy() {
+  const live = LG.flatMap(L => evs(L.k).filter(e => e.state === 'in').map(e => [L, e]));
+  const next = LG.flatMap(L => evs(L.k).filter(e => e.state === 'pre').map(e => [L, e])).sort((a, b) => String(a[1].start).localeCompare(String(b[1].start))).slice(0, 8);
+  const nb = ls('onyxMyBets', []).length + (ls('onyxNbaSlip', []).length ? 1 : 0);
+  const tabs = [['live', 'Live now', live.length], ['players', 'My players', MY_P.length], ['bets', 'My bets', nb]];
+  document.getElementById('myTabs').innerHTML = tabs.map(([k, t, n]) => `<button class="${MY.tab === k ? 'on' : ''}" onclick="MY.tab='${k}';renderMy()">${t}<b>${n}</b></button>`).join('');
+  let h = '';
+  if (MY.tab === 'live') {
+    const tl = MY.tn.filter(c => ((c.status || {}).type || {}).state === 'in').slice(0, 6);
+    h = live.length || tl.length ? `<div class="my-grid">${live.map(([L, e]) => gameCard(L, e)).join('')}${tl.map(c => `<a class="my-g live" href="tennis.html#games"><div class="lgt"><span>Tennis</span><span>● live</span></div>
+        ${c.competitors.slice(0, 2).map((p, i) => `<div class="t${i ? ' h' : ''}"><b>${esc(((p.athlete || {}).shortName || (p.athlete || {}).displayName || ''))}</b></div>${i ? '' : `<div class="sc" style="font-size:15px">${((c.competitors[0] || {}).linescores || []).map((x, k) => `${x.value}-${(((c.competitors[1] || {}).linescores || [])[k] || {}).value ?? 0}`).join(' ') || 'vs'}<small>Set ${((c.competitors[0] || {}).linescores || []).length || 1}</small></div>`}`).join('')}</a>`).join('')}</div>`
+      : `<div class="my-empty">Nothing live right now.</div>${next.length ? `<div class="my-note" style="margin:12px 0 8px">UP NEXT</div><div class="my-grid">${next.map(([L, e]) => gameCard(L, e)).join('')}</div>` : ''}`;
+    if (MY.gf && (((MY.gf.status || {}).type || {}).state === 'in')) h += `<div class="my-note" style="margin:12px 0 8px">GOLF · ${esc(MY.gf.name)}</div><a class="my-b live" href="golf.html#games"><b>${esc(((((MY.gf.competitions || [{}])[0].competitors || [])[0] || {}).athlete || {}).displayName || '')} leads</b><span class="p">${esc((((MY.gf.competitions || [{}])[0].competitors || [])[0] || {}).score || '')}</span></a>`;
+  } else if (MY.tab === 'players') {
+    h = MY_P.length ? `<div class="my-grid">${MY_P.map(playerCard).join('')}</div><div class="my-note">Follow anyone from a sport page (the star or Follow button). Their live line shows here and alerts fire on their page.</div>`
+      : `<div class="my-empty">You are not following anyone yet. Open a sport, tap a player and hit Follow, or the star next to his name. NBA parlay legs show up here too.</div>`;
+  } else h = myBets();
+  document.getElementById('myBody').innerHTML = h;
+}
+if (location.hash === '#my') setTimeout(() => document.getElementById('my').scrollIntoView(), 50);
+loadMy();
+
 marquees(); sports(); tonight();
 if (window.OnyxArt) marks(); else addEventListener('DOMContentLoaded', marks);
 </script>
