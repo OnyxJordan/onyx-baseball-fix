@@ -128,6 +128,19 @@
 .lean-o{color:#b038f9}.lean-u{color:#9b96ff}
 .edge-pos{color:#61e970}.edge-neg{color:var(--text3)}
 @media (max-width:560px){.gc-mid .sc{font-size:26px}.gc-side b{font-size:14px}.gc-hd .lg.l{width:34px;height:34px}}
+.mc-top{display:flex;justify-content:space-between;gap:8px;font:700 10px monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);margin-bottom:10px}
+.mc-top .live{color:#61e970}
+.mc-p{display:grid;grid-template-columns:24px minmax(0,1fr) 10px auto 26px;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--border2)}
+.mc-p img{width:22px;height:15px;object-fit:cover;border-radius:2px}
+.mc-nm{min-width:0}.mc-nm b{display:block;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mc-nm span{font:600 10px monospace;color:var(--text3)}
+.mc-p.w .mc-nm b{color:#61e970}
+.mc-p .sv{width:8px;height:8px;border-radius:50%;background:#61e970;box-shadow:0 0 8px #61e970}
+.mc-sets{display:flex;gap:6px;font:800 18px monospace}.mc-sets span{min-width:14px;text-align:center;opacity:.55}.mc-sets span.won{opacity:1}
+.mc-sw{font:800 20px monospace;text-align:right;color:#d795ff}
+.mc-form{background:var(--bg3);border:1px solid var(--border2);border-radius:12px;padding:10px 12px;font-size:12px;line-height:1.7}
+.mc-form b{display:block;font:800 10px monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--text3)}
+.mc-form .r{font:800 11px monospace}.mc-form .r.w{color:#61e970}.mc-form .r.l{color:#f87171}
+.tn-m.sel{border-color:#b038f9}
 /* live tracker (football + hockey) */
 .bx{width:100%;border-collapse:collapse;table-layout:fixed;font:600 12px monospace;font-variant-numeric:tabular-nums}
 .bx th{font:700 9px monospace;letter-spacing:.06em;color:var(--text3);padding:6px 2px;text-align:center;border-bottom:1px solid var(--border2)}
@@ -353,7 +366,7 @@ function renderHome() {
     const top = (SD.model || {}).top || [];
     if (top.length) body += `<div class="sec-hdr"><span class="sec-title">Model projections · top of the slate</span></div>${projTable(top.slice(0, 8))}`;
   }
-  document.getElementById('homeBody').innerHTML = ((KIND === 'football' || KIND === 'hockey') ? `<div id="ypHome">${yourPlayers()}</div>` : '') + body;
+  document.getElementById('homeBody').innerHTML = ((KIND === 'football' || KIND === 'hockey' || KIND === 'tennis') ? `<div id="ypHome">${yourPlayers()}</div>` : '') + body;
 }
 
 // ── games + gamecenter ─────────────────────────────────────────────
@@ -371,7 +384,7 @@ function gameCard(g0) {
 var GFILTER = 'all';
 function renderGames() {
   const el = document.getElementById('gamesBody');
-  if (KIND === 'tennis') { el.innerHTML = tnAll(); return; }
+  if (KIND === 'tennis') { el.innerHTML = `<div id="ypGames">${yourPlayers()}</div><div id="gcBox">${OPEN_MATCH ? matchCenter(OPEN_MATCH) : ''}</div>` + tnAll(); return; }
   if (KIND === 'golf') { el.innerHTML = gfAll(); return; }
   const games = (SD.games || []).map(live);
   const segs = [['all', 'All'], ['in', 'Live'], ['pre', 'Upcoming'], ['post', 'Final']];
@@ -773,6 +786,7 @@ function trackedPlayers() {
   });
 }
 function yourPlayers() {
+  if (KIND === 'tennis') return tnYourPlayers();
   const T = trackedPlayers();
   if (!T.length) return '';
   const rows = T.map(({f, g, P, legs}) => {
@@ -827,6 +841,134 @@ function ypLoop() {
     .then(() => { ypAlerts(); ['ypHome', 'ypGames'].forEach(i => { const el = document.getElementById(i); if (el) el.innerHTML = yourPlayers(); }); });
   _ypTimer = setTimeout(ypLoop, gids.length ? 12000 : 30000);
 }
+// ── tennis live tracker: match center, followed players, alerts ──
+var OPEN_MATCH = null, TN_PREV = {};
+function tnFind(id) { for (const e of SD.events || []) for (const m of e.matches || []) if (m.id === id) return [e, m]; return [null, null]; }
+function tnGames(m) { return m.p.map(x => x.sets.reduce((a, b) => a + (+b || 0), 0)); }
+function tnSetsWon(m, sets, state) {
+  sets = sets || m.p.map(x => x.sets); state = state || m.state;
+  const w = [0, 0];
+  (sets[0] || []).forEach((v, j) => { const o = (sets[1] || [])[j] || 0; const done = j < sets[0].length - 1 || state === 'post';
+    if (done && (v >= 6 || o >= 6) && v !== o) w[v > o ? 0 : 1]++; });
+  return w;
+}
+// every Onyx line on the match, with where it stands right now
+function tnLines(m) {
+  const mo = ((SD.odds || {}).matches || {})[m.id];
+  if (!mo) return [];
+  const G = tnGames(m), tg = G[0] + G[1], S = tnSetsWon(m), fin = m.state === 'post', go = m.state !== 'pre';
+  const last = n => String(n || '').split(' ').pop();
+  const out = [];
+  [0, 1].forEach(i => {
+    if (mo['ml' + i] == null) return;
+    const st = fin ? (m.p[i].win ? 'win' : 'loss') : '';
+    out.push({k: 'ml' + i, who: i, label: `${last(m.p[i].name)} to win`, price: mo['ml' + i], sel: mo['ml' + i + '_sel'], st,
+              now: go ? `sets ${S[i]}-${S[1 - i]}` : '', bar: null});
+  });
+  [0, 1].forEach(i => {
+    const sp = mo['sp' + i]; if (sp == null) return;
+    const mg = G[i] - G[1 - i] + sp;
+    out.push({k: 'sp' + i, who: i, label: `${last(m.p[i].name)} ${sp > 0 ? '+' : ''}${sp} games`, price: mo['sp' + i + '_price'], sel: mo['sp' + i + '_sel'],
+              st: fin ? (mg > 0 ? 'win' : 'loss') : go ? (mg > 0 ? 'pend' : '') : '',
+              now: fin ? (mg > 0 ? `covered by ${num(mg, 1)}` : `missed by ${num(-mg, 1)}`) : go ? (mg > 0 ? `covering by ${num(mg, 1)}` : `needs ${num(-mg + .5, 1)}`) : '', bar: null});
+  });
+  if (mo.total != null) {
+    const need = Math.floor(mo.total) + 1 - tg;
+    out.push({k: 'ov', label: `Over ${mo.total} games`, price: mo.over, sel: mo.over_sel, st: tg > mo.total ? 'win' : fin ? 'loss' : '',
+              now: go ? (tg > mo.total ? `${tg} games, cashed` : `${tg} games, needs ${need}`) : '', bar: Math.min(100, tg / mo.total * 100)});
+    out.push({k: 'un', label: `Under ${mo.total} games`, price: mo.under, sel: mo.under_sel, st: tg > mo.total ? 'loss' : fin ? 'win' : '',
+              now: go ? `${tg} games so far` : '', bar: Math.min(100, tg / mo.total * 100)});
+  }
+  return out;
+}
+function tnPlayer(name) { return ((SD.model || {}).players || {})[nk(name)] || null; }
+function tnLean(m) { return ((SD.model || {}).rows || []).find(r => r.gid === m.id) || null; }
+function matchCenter(id) {
+  const [e, m] = tnFind(id); if (!m) return '';
+  const S = tnSetsWon(m);
+  const row = (x, i) => { const P = tnPlayer(x.name);
+    return `<div class="mc-p${x.win ? ' w' : ''}">${x.flag ? `<img src="${esc(x.flag)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">` : '<i></i>'}
+      <div class="mc-nm"><b>${esc(x.name)}</b><span>${x.seed ? 'Seed ' + esc(x.seed) + ' · ' : ''}${P && P.elo ? 'Elo ' + P.elo : 'unrated'}</span></div>
+      ${m.state === 'in' && x.serve ? '<i class="sv" title="Serving"></i>' : '<i></i>'}
+      <div class="mc-sets">${x.sets.map((v, j) => `<span class="${(m.p[1 - i].sets[j] || 0) < v ? 'won' : ''}">${v}</span>`).join('')}</div>
+      <div class="mc-sw">${m.state === 'pre' ? '' : S[i]}</div></div>`; };
+  const L = tnLines(m), lean = tnLean(m);
+  const form = x => { const P = tnPlayer(x.name); if (!P || !(P.form || []).length) return '';
+    return `<div class="mc-form"><b>${esc(x.name.split(' ').pop())} · last ${P.form.length}</b>${P.form.map(f => `<div><span class="r ${f.w ? 'w' : 'l'}">${f.w ? 'W' : 'L'} ${esc(f.s)}</span> ${esc(f.opp)} <span class="dim">${esc(f.ev || '')} · ${esc(f.d)}</span></div>`).join('')}</div>`; };
+  return `<div class="gc" id="gc"><div class="mc-top"><span>${esc(e.tour)} · ${esc(e.name)} · ${esc(m.round || '')}</span><span class="${m.state === 'in' ? 'live' : ''}">${m.state === 'in' ? '● ' + esc(m.detail || 'Live') : m.state === 'post' ? esc(m.detail || 'Final') : esc(tipTime(m.start))}</span></div>
+    ${row(m.p[0], 0)}${row(m.p[1], 1)}
+    ${m.court ? `<div class="dim" style="font-size:11px;margin-top:6px">${esc(m.court)}</div>` : ''}
+    ${L.length ? `<div class="gc-sec"><h4>Onyx lines · live</h4><div class="fx">${L.map(l => `<div class="${l.st}" ${l.sel ? `onclick="bet('${esc(l.sel)}','${esc(l.label)}')" style="cursor:pointer"` : ''}>
+      <span>${esc(l.label)}</span><b>${fmtOdds(l.price)}</b><small>${esc(l.now || (l.st === 'win' ? 'cashed' : ''))}</small>
+      ${l.bar != null ? `<div class="yp-bar"><i style="width:${l.bar}%"></i></div>` : ''}</div>`).join('')}</div></div>` : '<div class="gc-sec"><div class="dim" style="font-size:12px">Onyx has not priced this match.</div></div>'}
+    ${lean ? `<div class="gc-sec"><h4>The model · leans, not picks</h4><div class="play"><span class="t">ELO</span><span><b>${esc(pickLabel(lean))}</b> · model ${pct(lean.model_p, 1)} · Onyx no-vig ${pct(lean.fair, 1)} · ${esc(lean.detail || '')}</span><span class="r ${lean.edge > 0 ? 'td' : ''}">${lean.edge > 0 ? '+' : ''}${(lean.edge * 100).toFixed(1)}pp</span></div></div>` : ''}
+    <div class="gc-sec" style="display:flex;gap:8px;flex-wrap:wrap">${m.p.map(x => tnFollowBtn(x.name)).join('')}<button class="btn-secondary" onclick="OPEN_MATCH=null;renderGames()">Close</button></div>
+    <div class="gc-sec"><div class="bx-grid">${form(m.p[0])}${form(m.p[1])}</div></div></div>`;
+}
+function tnFollowBtn(name) {
+  const id = nk(name);
+  return `<button class="fl-btn${isF(id) ? ' on' : ''}" onclick="event.stopPropagation();toggleF('${esc(id)}','${esc(String(name).replace(/'/g, ''))}','')">${isF(id) ? '★ ' : '☆ '}${esc(String(name).split(' ').pop())}</button>`;
+}
+function openMatch(id) {
+  OPEN_MATCH = id;
+  if (currentTab !== 'games') gotoTab('games'); else renderGames();
+  const b = document.getElementById('gcBox'); if (b) b.scrollIntoView({behavior: 'smooth', block: 'start'});
+  track('match_open', {id});
+}
+// a followed player's match this week: live first, then next, then the latest result
+function tnMatchOf(id) {
+  let best = null, rank = 9;
+  (SD.events || []).forEach(e => (e.matches || []).forEach(m => { if (!m.p.some(x => nk(x.name) === id)) return;
+    const r = m.state === 'in' ? 0 : m.state === 'pre' ? 1 : 2;
+    if (r < rank || (r === rank && r === 2 && String(m.start) > String(best[1].start)) || (r === rank && r === 1 && String(m.start) < String(best[1].start))) { best = [e, m]; rank = r; } }));
+  return best;
+}
+function tnYourPlayers() {
+  const T = FOLLOW.map(f => ({f, em: tnMatchOf(f.id)})).filter(x => x.em);
+  if (!T.length) return '';
+  return `<div class="yp"><div class="yp-h"><b>Your players · live</b><span>followed players, their match and its Onyx lines · alerts on breaks, sets, results</span></div><div class="yp-list">${T.map(({f, em}) => {
+    const [e, m] = em, i = m.p.findIndex(x => nk(x.name) === f.id), o = m.p[1 - i];
+    const G = tnGames(m);
+    const st = m.state === 'in' ? `<span class="live">● ${m.p[i].sets.map((v, j) => v + '-' + (o.sets[j] ?? 0)).join(' ')}${m.p[i].serve ? ' · serving' : o.serve ? ' · returning' : ''}</span>`
+      : m.state === 'post' ? `<span>${m.p[i].win ? 'Won' : 'Lost'} ${m.p[i].sets.map((v, j) => v + '-' + (o.sets[j] ?? 0)).join(' ')} vs ${esc(o.name)}</span>` : `<span>vs ${esc(o.name)} · ${esc(m.round || '')} · ${tipTime(m.start)}</span>`;
+    const legs = tnLines(m).filter(l => l.who === i || l.k === 'ov');
+    return `<div class="yp-p" onclick="if(!event.target.closest('button'))openMatch('${esc(m.id)}')">
+      ${m.p[i].flag ? `<img src="${esc(m.p[i].flag)}" alt="" style="border-radius:6px;object-fit:cover" onerror="this.style.visibility='hidden'">` : '<span></span>'}<div class="yp-who"><b>${esc(m.p[i].name)}</b>${st}</div>
+      <button class="x" onclick="toggleF('${esc(f.id)}','${esc(String(f.name).replace(/'/g, ''))}','')" aria-label="Unfollow">×</button>
+      <div class="yp-legs">${legs.length ? legs.map(l => `<div class="yp-leg ${l.st === 'pend' ? '' : l.st}"><div class="t"><span>${esc(l.label)}</span><em>${l.st === 'win' ? '✓ cashed' : l.st === 'loss' ? '✗' : fmtOdds(l.price)}</em></div>
+        <div class="v" style="font-size:13px">${esc(l.now || (m.state === 'pre' ? 'starts ' + tipTime(m.start) : '-'))}</div>${l.bar != null ? `<div class="yp-bar"><i style="width:${l.bar}%"></i></div>` : ''}</div>`).join('')
+        : `<div class="yp-leg"><div class="t"><span>Games</span></div><div class="v">${m.state === 'pre' ? '-' : G[i] + '-' + G[1 - i]}</div></div>`}</div></div>`; }).join('')}</div></div>`;
+}
+// alerts: compare each followed (or open) match with the previous poll
+function tnAlerts() {
+  const watch = new Set(FOLLOW.map(f => f.id));
+  (SD.events || []).forEach(e => (e.matches || []).forEach(m => {
+    const mine = m.p.some(x => watch.has(nk(x.name))) || m.id === OPEN_MATCH;
+    const prev = TN_PREV[m.id];
+    TN_PREV[m.id] = {sets: m.p.map(x => x.sets.slice()), serve: m.p.map(x => !!x.serve), state: m.state};
+    if (!mine || !prev || !window.OX_TOAST) return;
+    const last = i => String(m.p[i].name).split(' ').pop();
+    if (prev.state !== 'post' && m.state === 'post') {
+      const w = m.p[0].win ? 0 : 1;
+      OX_TOAST(`${last(w)} wins ${m.p[w].sets.map((v, j) => v + '-' + (m.p[1 - w].sets[j] ?? 0)).join(' ')}`, {ms: 5000});
+      if (navigator.vibrate) try { navigator.vibrate([30, 40, 30]); } catch (x) {}
+      return;
+    }
+    const g0 = prev.sets.map(s => s.reduce((a, b) => a + (+b || 0), 0)), g1 = tnGames(m);
+    const S0 = tnSetsWon(m, prev.sets, prev.state), S1 = tnSetsWon(m);
+    const score = i => m.p[i].sets.map((v, j) => v + '-' + (m.p[1 - i].sets[j] ?? 0)).join(' ');
+    [0, 1].forEach(i => {
+      if (S1[i] > S0[i]) OX_TOAST(`${last(i)} takes the set · ${score(i)}`, {ms: 3500});
+      // one game since the last poll, won by the player who was receiving: a break
+      else if (g1[i] === g0[i] + 1 && g1[1 - i] === g0[1 - i] && prev.state === 'in') {
+        const server = prev.serve.indexOf(true);
+        if (server >= 0 && server !== i) OX_TOAST(`Break! ${last(i)} breaks ${last(1 - i)} · ${score(i)}`, {ms: 3500});
+      }
+    });
+    const mo = ((SD.odds || {}).matches || {})[m.id];
+    if (mo && mo.total != null && g0[0] + g0[1] <= mo.total && g1[0] + g1[1] > mo.total) OX_TOAST(`✓ Over ${mo.total} games cashed · ${last(0)} vs ${last(1)}`, {ms: 5000});
+  }));
+}
 // tennis
 var TFILTER = 'live';
 function tnMatch(e, m) {
@@ -834,7 +976,7 @@ function tnMatch(e, m) {
     <div class="tn-sets">${x.sets.map((v, j) => `<span style="${(m.p[1 - i].sets[j] || 0) < v ? '' : 'opacity:.55'}">${v}</span>`).join('')}</div>`;
   const mo = ((SD.odds || {}).matches || {})[m.id];
   const odds = mo && m.state !== 'post' ? `<div class="gm-lines" style="grid-column:1/-1">${chip(mo.ml0, m.p[0].name + ' to win', mo.ml0_sel, (m.p[0].short || m.p[0].name).split(' ').pop())}${chip(mo.ml1, m.p[1].name + ' to win', mo.ml1_sel, (m.p[1].short || m.p[1].name).split(' ').pop())}${mo.total != null ? chip(mo.over, 'Over ' + mo.total + ' games', mo.over_sel, 'O ' + mo.total + ' gms') + chip(mo.under, 'Under ' + mo.total + ' games', mo.under_sel, 'U ' + mo.total + ' gms') : ''}</div>` : '';
-  return `<div class="tn-m">${p(m.p[0], 0)}${p(m.p[1], 1)}${odds}<div class="tn-meta">${m.state === 'in' ? '<span style="color:#61e970">● Live</span> · ' : ''}${esc(e.tour)} · ${esc(m.round || '')}${m.state === 'pre' ? ' · ' + esc(tipTime(m.start)) : m.state === 'post' ? ' · ' + esc(m.detail || 'Final') : ''}</div></div>`;
+  return `<div class="tn-m${OPEN_MATCH === m.id ? ' sel' : ''}" onclick="if(!event.target.closest('.chipx'))openMatch('${esc(m.id)}')" style="cursor:pointer">${p(m.p[0], 0)}${p(m.p[1], 1)}${odds}<div class="tn-meta">${m.state === 'in' ? '<span style="color:#61e970">● Live</span> · ' : ''}${esc(e.tour)} · ${esc(m.round || '')}${m.state === 'pre' ? ' · ' + esc(tipTime(m.start)) : m.state === 'post' ? ' · ' + esc(m.detail || 'Final') : ''}</div></div>`;
 }
 function tnAll() {
   const segs = [['live', 'Live'], ['pre', 'Upcoming'], ['post', 'Results']];
@@ -1034,6 +1176,7 @@ function pollLive() {
         });
       }
     });
+    if (KIND === 'tennis') { tnAlerts(); ['ypHome', 'ypGames'].forEach(i => { const y = document.getElementById(i); if (y) y.innerHTML = yourPlayers(); }); }
     ticker();
     if (currentTab === 'games' && !(document.activeElement && document.activeElement.tagName === 'INPUT')) {
       if (KIND === 'football' || KIND === 'hockey') { if (OPEN_GAME) { drawGame(OPEN_GAME); } else renderGames(); } else renderGames();

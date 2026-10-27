@@ -531,6 +531,25 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
     - The skaters ESPN lists in `onIce` are drawn by jersey number (spots illustrative).
     - Filter by player with the chips, and tap a shot to mark it.
   - **Header:** the gamecenter header stacks on phones, like NBA's.
+- **Tennis live tracker (10/27):** ESPN's tennis feed carries set scores, the server and
+  results only, with no point-by-point or serve stats, so the tracker is built from those.
+  - **Match center:** tap any match for:
+    - both players with flag, seed and Elo, the live set grid, the server dot and sets
+      won;
+    - every Onyx line scored live: moneyline, game spread ("covering by", "needs",
+      "missed by") and total games ("N games, needs M"), each tappable to bet;
+    - the Elo lean and each player's last six results (`model.players` from
+      `sports_build.tennis_players`).
+  - **Your players · live:** follow a player and his live, next or latest match this week
+    shows on Home and Games with his lines.
+  - **Alerts (`tnAlerts`, on every 10s poll):**
+    - a break of serve (one game since the last poll won by the receiver);
+    - a set (from completed-set counts);
+    - the over cashing;
+    - the result.
+- **College football** shares the football tracker. It was checked on a real final, PITT
+  @ MIA 10/24: a followed receiver at 149 receiving yards, 14 tappable plays and 6 box
+  tables.
 - **Sport gamecenters:** the open live football or hockey game refreshes its summary
   every 6s, and the scoreboard polls every 10s while anything is live.
 - **NBA combos:** the historical Onyx feed has no points, rebounds and assists combo
