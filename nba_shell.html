@@ -337,6 +337,52 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
 .box-team{font-size:12px;font-weight:800;letter-spacing:.06em;margin:4px 0 8px;display:flex;align-items:center;gap:8px}
 .box-cell-hit{color:#61e970;font-weight:800}
 .prop-trk{font-size:10px;color:var(--text3);font-family:monospace}
+/* gamecenter v2: header, full box, player shot chart, floor tracker */
+.nb-hd{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(64px,auto) auto minmax(0,1fr);align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px 14px;margin-bottom:12px;position:relative;overflow:hidden}
+.nb-hd::before{content:'';position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,#635bff,#b038f9)}
+.nb-tm{display:flex;align-items:center;gap:8px;min-width:0}.nb-tm.h{flex-direction:row-reverse;text-align:right}
+.nb-tm .gc-logo{width:36px;height:36px;flex-shrink:0}
+.nb-tm .nm{min-width:0}.nb-tm .nm b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nb-tm .nm span{font:600 11px monospace;color:var(--text3)}
+.nb-sc{font:800 36px monospace;line-height:1;font-variant-numeric:tabular-nums}.nb-sc.lose{color:var(--text3)}
+.nb-st{text-align:center;font:800 11px monospace;letter-spacing:.04em;text-transform:uppercase;color:var(--text3);line-height:1.3}
+.nb-st.live{color:#61e970}.nb-st small{display:block;font-weight:600;color:var(--text3);text-transform:none}
+.nb-tm .full{display:inline}.nb-tm .ab{display:none}
+@media (max-width:560px){.nb-hd{gap:6px;padding:12px 10px}.nb-sc{font-size:28px}.nb-tm .gc-logo{width:28px;height:28px}
+  .nb-tm .full{display:none}.nb-tm .ab{display:inline}.nb-tm .nm b{font-size:14px}.nb-st{font-size:10px}}
+#gcBody .gc-subnav{gap:6px}#gcBody .gc-subnav button{flex:1;min-width:0;padding:8px 6px;white-space:nowrap;font-size:11px;letter-spacing:.06em}
+.bx-seg{display:flex;gap:6px;margin:0 0 10px}.bx-seg button{flex:1;padding:8px 6px;border-radius:999px;border:1px solid var(--border2);background:rgba(255,255,255,.03);color:var(--text2);font:700 11px monospace;letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
+.bx-seg button.on{background:linear-gradient(135deg,#b038f9,#635bff);color:#fff;border-color:transparent}
+.bx{width:100%;border-collapse:collapse;table-layout:fixed;font:600 12px monospace;font-variant-numeric:tabular-nums}
+.bx th{font:700 9px monospace;letter-spacing:.06em;color:var(--text3);padding:6px 2px;text-align:center;border-bottom:1px solid var(--border2)}
+.bx td{padding:7px 2px;text-align:center;border-bottom:1px solid rgba(255,255,255,.05);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bx th:first-child,.bx td:first-child{text-align:left;padding-left:2px}
+.bx td.nm{font:700 12px 'Space Grotesk',system-ui,sans-serif;color:var(--text)}
+.bx td.nm i{display:inline-block;width:5px;height:5px;border-radius:50%;background:#61e970;margin-right:5px;vertical-align:2px;box-shadow:0 0 6px #61e970}
+.bx td.nm em{font-style:normal;color:var(--text3);font:600 10px monospace;margin-left:3px}
+.bx tr.tap{cursor:pointer}.bx tr.tap:hover td{background:rgba(176,56,249,.06)}.bx tr.sel td{background:rgba(176,56,249,.14)}
+.bx td small{display:block;font:600 9px monospace;color:var(--text3);margin-top:2px;overflow:hidden;text-overflow:ellipsis}
+.bx td small.ln{margin-top:0;color:#d795ff}
+.bx td.win{color:#61e970}.bx td.pend{color:#d795ff}.bx td.loss{color:#f87171}
+.bx tr.tot td{font-weight:800;border-top:1px solid var(--border2);border-bottom:0;color:var(--text2)}
+.bx-dnp{font-size:11px;color:var(--text3);margin-top:8px;line-height:1.5}
+.sc-chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:2px 0 10px}.sc-chips::-webkit-scrollbar{display:none}
+.sc-chips button{flex-shrink:0;padding:6px 10px;border-radius:999px;border:1px solid var(--border2);background:rgba(255,255,255,.03);color:var(--text2);font:700 11px monospace;cursor:pointer;white-space:nowrap}
+.sc-chips button.on{border-color:#b038f9;background:rgba(176,56,249,.2);color:#fff}
+.sc-chips button i{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;vertical-align:0}
+.sc-focus{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-bottom:10px}
+.sc-focus div{background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:7px 8px}
+.sc-focus span{display:block;font:700 9px monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--text3)}
+.sc-focus b{font:800 15px monospace}.sc-focus small{display:block;font:600 10px monospace;color:var(--text3)}
+.sc-focus .win b{color:#61e970}.sc-focus .pend b{color:#d795ff}.sc-focus .loss b{color:#f87171}
+.court-svg .tok{transition:transform .9s cubic-bezier(.2,.9,.25,1)}
+.court-svg .tok text{font:800 1.5px monospace;fill:#fff;text-anchor:middle;dominant-baseline:central;pointer-events:none}
+.court-svg .tok.sh circle{stroke:#fff;stroke-width:.35}
+.court-svg .ball{transition:transform .9s cubic-bezier(.2,.9,.25,1)}
+.court-svg .made.big{stroke-width:.3}
+.floor-roll{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;font-size:11px}
+.floor-roll div{background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:7px 9px;line-height:1.55}
+.floor-roll b{font:800 10px monospace;letter-spacing:.08em}
 /* record */
 .rec-big{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
 .rec-big .v{font-size:28px;font-weight:800;font-family:monospace}
@@ -1343,17 +1389,13 @@ function renderGames() {
   const a = +g.away_score, h = +g.home_score;
   const sum = SUMMARY[g.gid];
   const box = boxIndex(sum);
-  const stateHtml = live ? `<div class="gc-state live">${esc(g.detail || 'LIVE')}</div>`
-    : fin ? '<div class="gc-state final">FINAL</div>'
-    : `<div class="gc-state">${tipTime(g.start)}</div><div class="gc-outs">${g.spread != null ? esc(g.home) + ' ' + (g.spread > 0 ? '+' : '') + g.spread : ''}${g.total != null ? ' · O/U ' + g.total : ''}</div>`;
-  const side = (ab, rec, sc, lose, home) => home
-    ? `<div class="gc-side home"><div class="gc-tscore ${lose ? 'losing' : ''}">${(live || fin) ? esc(sc) : ''}</div>
-        <div style="text-align:right"><div class="gc-tname">${esc(TEAM_NICK[ab] || ab)}</div><div class="gc-trec">${esc(rec || '')}</div></div>
-        <span class="gc-logo" style="background-image:url(${(D.logos || {})[ab] || ''})"></span></div>`
-    : `<div class="gc-side"><span class="gc-logo" style="background-image:url(${(D.logos || {})[ab] || ''})"></span>
-        <div><div class="gc-tname">${esc(TEAM_NICK[ab] || ab)}</div><div class="gc-trec">${esc(rec || '')}</div></div>
-        <div class="gc-tscore ${lose ? 'losing' : ''}">${(live || fin) ? esc(sc) : ''}</div></div>`;
-  const header = `<div class="gc-header">${side(g.away, g.away_rec, g.away_score, fin && a < h, false)}<div class="gc-mid">${stateHtml}</div>${side(g.home, g.home_rec, g.home_score, fin && h < a, true)}</div>`;
+  const stateHtml = live ? `<div class="nb-st live">${esc(g.detail || 'LIVE')}</div>`
+    : fin ? '<div class="nb-st">Final</div>'
+    : `<div class="nb-st">${tipTime(g.start)}<small>${g.spread != null ? esc(g.home) + ' ' + (g.spread > 0 ? '+' : '') + g.spread : ''}${g.total != null ? ' · O/U ' + g.total : ''}</small></div>`;
+  const tm = (ab, rec, home) => `<div class="nb-tm${home ? ' h' : ''}"><span class="gc-logo" style="background-image:url(${(D.logos || {})[ab] || ''})"></span>
+    <div class="nm"><b><span class="full">${esc(TEAM_NICK[ab] || ab)}</span><span class="ab">${esc(ab)}</span></b><span>${esc(rec || '')}</span></div></div>`;
+  const scr = (sc, lose) => `<div class="nb-sc${lose ? ' lose' : ''}">${(live || fin) ? esc(sc) : ''}</div>`;
+  const header = `<div class="nb-hd">${tm(g.away, g.away_rec, false)}${scr(g.away_score, fin && a < h)}${stateHtml}${scr(g.home_score, fin && h < a)}${tm(g.home, g.home_rec, true)}</div>`;
 
   // bet bar: the game on Onyx + its ML / spread / total
   const chips = [];
@@ -1383,11 +1425,11 @@ function renderGames() {
     <div class="gc-hs-row">${cells || '<div class="dim">No projections for this game.</div>'}</div></div>`;
 
   const sub = `<div class="gc-subnav"><button class="${gcView === 'overview' ? 'on' : ''}" onclick="gcView='overview';rerender()">Overview</button>
-    <button class="${gcView === 'pbp' ? 'on' : ''}" onclick="gcView='pbp';rerender()">Play By Play</button>
-    <button class="${gcView === 'box' ? 'on' : ''}" onclick="gcView='box';rerender()">Box Score</button></div>`;
+    <button class="${gcView === 'pbp' ? 'on' : ''}" onclick="gcView='pbp';rerender()">Plays</button>
+    <button class="${gcView === 'box' ? 'on' : ''}" onclick="gcView='box';rerender()">Box</button></div>`;
   const court = started(g) ? liveCourt(g, sum) : '';
   body.innerHTML = header + court + betbar + watch + sub
-    + (gcView === 'box' ? boxView(g, box) : gcView === 'pbp' ? pbpView(g, sum) : overview(g, sum));
+    + (gcView === 'box' ? boxView(g, box, sum) : gcView === 'pbp' ? pbpView(g, sum) : overview(g, sum));
   if (started(g) && !sum) loadSummary(g);
 }
 function overview(g, sum) {
@@ -1428,25 +1470,88 @@ function overview(g, sum) {
   if (!html && !started(g)) html = '<div class="gc-empty">Live line score and win probability appear at tip.</div>';
   return html;
 }
-function boxView(g, box) {
-  const team = ab => {
-    const ps = (D.players || []).filter(p => p.team === ab && p.gid === g.gid && (p.min >= 4 || liveLine(p, box)))
-      .sort((x, y) => (liveLine(y, box) || {min: 0}).min - (liveLine(x, box) || {min: 0}).min || y.proj.pts - x.proj.pts);
-    const cell = (p, b, s) => {
-      const pr = (p.props || {})[s];
-      const v = b ? b[s] : null;
-      const st = leanStatus(p, s, v, g);
-      const cls = st && v != null ? {'st-win': 'cell-win', 'st-pend': 'cell-pend', 'st-loss': 'cell-loss'}[st.cls] || '' : '';
-      return `<td class="${cls}">${v != null ? v : '-'}<div class="prop-trk">${num(p.proj[s])}${pr ? ' · ' + (pr.side === 'over' ? 'O' : 'U') + ' ' + pr.line : ''}</div></td>`;
-    };
-    return `<div class="gc-card"><div class="box-team">${logo(ab)} ${esc(TEAM_NICK[ab] || ab)}</div>
-      <table class="gc-line"><thead><tr><th>Player</th><th>MIN</th><th>PTS</th><th>REB</th><th>AST</th></tr></thead><tbody>
-      ${ps.map(p => { const b = liveLine(p, box);
-        return `<tr class="tr-tap" onclick="if(cardTap(event))openPlayer('${esc(p.pid)}')"><td>${esc(p.name)}${p.inj ? ` <span class="tagx r">${esc(p.inj)}</span>` : ''}</td>
-          <td>${b ? b.min : '-'}<div class="prop-trk">${num(p.min, 0)}</div></td>${cell(p, b, 'pts')}${cell(p, b, 'reb')}${cell(p, b, 'ast')}</tr>`; }).join('')}
-      </tbody></table></div>`;
+// ESPN's box, one row per player in roster order, every stat column by label
+var gcBoxMode = 'props', gcShotP = null, FLOOR_POS = {};
+function espnTeams(g, sum) {
+  const lv = LIVE[g.gid] || {};
+  return ((sum && sum.boxscore && sum.boxscore.players) || []).map(t => {
+    const blk = (t.statistics || [])[0] || {};
+    const L = blk.labels || [];
+    const col = (st, l) => { const i = L.indexOf(l); return i < 0 || st == null ? null : st[i]; };
+    const ab = lv.ids && lv.ids[String((t.team || {}).id)] || (t.team || {}).abbreviation;
+    const players = (blk.athletes || []).map(a => {
+      const at = a.athlete || {}, st = a.stats || [];
+      const v = l => col(st, l);
+      return {id: String(at.id || ''), name: at.displayName || '', short: at.shortName || shortName(at.displayName), jersey: at.jersey || '',
+              pos: ((at.position || {}).abbreviation) || '', starter: !!a.starter, on: !!a.active, dnp: !!a.didNotPlay || !st.length,
+              reason: a.reason || '', v, n: l => { const x = v(l); return x == null ? 0 : parseFloat(String(x).split('-')[0]) || 0; }};
+    });
+    return {ab, players, tot: l => col(blk.totals, l)};
+  });
+}
+function shortName(n) {
+  const w = String(n || '').trim().split(/\s+/);
+  while (w.length > 2 && NAME_SUFFIX.test(w[w.length - 1])) w.pop();
+  return w.length > 1 ? w[0][0] + '. ' + w.slice(1).join(' ') : (w[0] || '');
+}
+function ourPlayer(g, x) {
+  return (D.players || []).find(p => p.gid === g.gid && (String(p.hs) === x.id || String(p.name).toLowerCase() === x.name.toLowerCase())) || null;
+}
+function pctOf(ma) { const m = String(ma || '').split('-'); return m.length === 2 && +m[1] ? Math.round(100 * +m[0] / +m[1]) + '%' : '-'; }
+var BOX_COLS = {
+  props: [['MIN', 'MIN'], ['PTS', 'pts'], ['REB', 'reb'], ['AST', 'ast'], ['3PM', 'fg3']],
+  shoot: [['MIN', 'MIN'], ['PTS', 'PTS'], ['FG', 'FG'], ['FG%', 'FG%'], ['3PT', '3PT'], ['FT', 'FT'], ['+/-', '+/-']],
+  more: [['REB', 'REB'], ['OR', 'OREB'], ['DR', 'DREB'], ['AST', 'AST'], ['STL', 'STL'], ['BLK', 'BLK'], ['TO', 'TO'], ['PF', 'PF']],
+};
+function boxView(g, box, sum) {
+  const teams = espnTeams(g, sum);
+  const seg = `<div class="bx-seg">${[['props', 'Props'], ['shoot', 'Shooting'], ['more', 'Hustle']].map(([k, l]) =>
+    `<button class="${gcBoxMode === k ? 'on' : ''}" onclick="gcBoxMode='${k}';rerender()">${l}</button>`).join('')}</div>`;
+  if (!teams.length) return seg + preBox(g);
+  const cols = BOX_COLS[gcBoxMode];
+  const propCell = (g, x, me, s) => {
+    const live = s === 'fg3' ? x.n('3PT') : x.n(s.toUpperCase());
+    if (!me) return `<td>${x.dnp ? '-' : live}</td>`;
+    const pr = (me.props || {})[s], st = leanStatus(me, s, x.dnp ? null : live, g);
+    const cls = st && started(g) ? {'st-win': 'win', 'st-pend': 'pend', 'st-loss': 'loss'}[st.cls] || '' : '';
+    return `<td class="${cls}">${x.dnp ? '-' : live}<small>${num(me.proj[s])}</small>${pr ? `<small class="ln">${pr.side === 'over' ? 'o' : 'u'}${pr.line}</small>` : ''}</td>`;
   };
-  return `<div class="dim" style="font-size:11px;margin:-4px 0 10px">Live stat on top; projection and the model's lean on the Onyx line underneath. Green = the lean has cashed (an over once it clears, an under at the final buzzer), lilac = on track, red = dead.</div>` + team(g.away) + team(g.home);
+  const table = t => {
+    const rows = t.players.filter(x => !x.dnp);
+    const dnp = t.players.filter(x => x.dnp);
+    const width = gcBoxMode === 'props' ? 34 : gcBoxMode === 'shoot' ? 29 : 27;
+    return `<div class="gc-card"><div class="box-team">${logo(t.ab)} ${esc(TEAM_NICK[t.ab] || t.ab)}</div>
+      <table class="bx"><colgroup><col style="width:${width}%">${cols.map(() => '<col>').join('')}</colgroup>
+      <thead><tr><th>Player</th>${cols.map(c => `<th>${c[0]}</th>`).join('')}</tr></thead><tbody>
+      ${rows.map(x => { const me = ourPlayer(g, x);
+        return `<tr class="tap${gcShotP === x.id ? ' sel' : ''}" onclick="gcShotP='${esc(x.id)}';rerender();var c=document.getElementById('gcCourt');if(c)c.scrollIntoView({behavior:'smooth',block:'start'})">
+          <td class="nm">${x.on && g.state === 'live' ? '<i title="On the floor"></i>' : ''}${esc(x.short)}${gcBoxMode === 'props' ? `<em>${esc(x.pos)}</em>` : ''}</td>
+          ${cols.map(([lab, key]) => gcBoxMode === 'props' && key !== 'MIN' ? propCell(g, x, me, key)
+            : key === 'MIN' && gcBoxMode === 'props' ? `<td>${x.v('MIN') ?? '-'}${me ? `<small>${num(me.min, 0)}</small>` : ''}</td>`
+            : key === 'FG%' ? `<td>${pctOf(x.v('FG'))}</td>` : `<td>${esc(x.v(key) ?? '-')}</td>`).join('')}</tr>`; }).join('')}
+      <tr class="tot"><td>Team</td>${cols.map(([lab, key]) => { const k = key === 'fg3' ? '3PT' : key === 'MIN' ? null : key.length <= 3 && key === key.toLowerCase() ? key.toUpperCase() : key;
+        if (!k) return '<td></td>';
+        if (k === 'FG%') return `<td>${pctOf(t.tot('FG'))}</td>`;
+        const v = t.tot(k); return `<td>${esc(k === '3PT' && gcBoxMode === 'props' ? String(v || '').split('-')[0] : v ?? '')}</td>`; }).join('')}</tr>
+      </tbody></table>
+      ${dnp.length ? `<div class="bx-dnp">Did not play: ${dnp.map(x => esc(x.short)).join(', ')}</div>` : ''}</div>`;
+  };
+  return seg + `<div class="dim" style="font-size:11px;margin:-2px 0 10px">${gcBoxMode === 'props'
+    ? 'Live stat on top; our projection and the lean on the Onyx line underneath (o = over, u = under). Green = cashed, lilac = on track, red = dead.'
+    : 'Tap any player to see his shot chart on the court.'}${g.state === 'live' ? ' Green dot = on the floor now.' : ''}</div>` + teams.map(table).join('');
+}
+// before tip: our projections in the same compact table
+function preBox(g) {
+  return [g.away, g.home].map(ab => {
+    const ps = (D.players || []).filter(p => p.team === ab && p.gid === g.gid && !p.out && p.min >= 4).sort((x, y) => y.min - x.min);
+    return `<div class="gc-card"><div class="box-team">${logo(ab)} ${esc(TEAM_NICK[ab] || ab)} · projected</div>
+      <table class="bx"><colgroup><col style="width:34%"><col><col><col><col><col></colgroup>
+      <thead><tr><th>Player</th><th>MIN</th><th>PTS</th><th>REB</th><th>AST</th><th>3PM</th></tr></thead><tbody>
+      ${ps.map(p => `<tr class="tap" onclick="openPlayer('${esc(p.pid)}')"><td class="nm">${esc(shortName(p.name))}${p.inj ? `<em>${esc(p.inj)}</em>` : ''}</td><td>${num(p.min, 0)}</td>
+        ${['pts', 'reb', 'ast', 'fg3'].map(s => { const pr = (p.props || {})[s];
+          return `<td>${num(p.proj[s])}${pr ? `<small>${pr.side === 'over' ? 'o' : 'u'}${pr.line}</small>` : ''}</td>`; }).join('')}</tr>`).join('')}
+      </tbody></table></div>`;
+  }).join('');
 }
 var _sumTimer = null;
 function loadSummary(g) {
@@ -1459,7 +1564,7 @@ function loadSummary(g) {
       if (currentTab === 'games' && gcSel === g.gid) rerender();
       // the open live game refreshes every 8s: play-by-play, court, box
       if (g.state === 'live' && currentTab === 'games' && gcSel === g.gid)
-        _sumTimer = setTimeout(() => { const x = gameOf(g.gid); if (x) loadSummary(x); }, 8000);
+        _sumTimer = setTimeout(() => { const x = gameOf(g.gid); if (x) loadSummary(x); }, 5000);
     })
     .catch(() => {});
 }
@@ -1507,19 +1612,56 @@ function possession(g, plays) {
   }
   return {team: null, why: ''};
 }
-function courtSvg(g, plays) {
+function shotsOf(plays) {
+  return plays.filter(p => p.shootingPlay && p.coordinate && p.coordinate.x >= 0 && p.coordinate.x <= 50
+                        && p.coordinate.y >= 0 && p.coordinate.y <= 47 && !/free throw/i.test((p.type || {}).text || ''));
+}
+function shooterOf(p) { return String(((p.participants || [])[0] || {}).athlete && p.participants[0].athlete.id || ''); }
+var OFF_SPOTS = [[25, 26], [8, 19], [42, 19], [3.5, 3], [31, 6]];   // top, wings, corner, post
+function courtSvg(g, plays, teams, pid) {
   // ESPN shot coordinates: x 0-50 ft sideline to sideline, y feet from the baseline
-  const shots = plays.filter(p => p.shootingPlay && p.coordinate && p.coordinate.x >= 0 && p.coordinate.x <= 50
-                               && p.coordinate.y >= 0 && p.coordinate.y <= 47 && !/free throw/i.test((p.type || {}).text || ''));
+  const all = shotsOf(plays);
+  const shots = pid ? all.filter(p => shooterOf(p) === pid) : all;
   const col = t => t === g.home ? '#b038f9' : '#635bff';
   const last = shots[shots.length - 1];
+  const big = pid ? 1.35 : 1;
   const marks = shots.map((p, i) => {
     const t = teamOfPlay(p, g), x = p.coordinate.x, y = p.coordinate.y;
-    const op = i >= shots.length - 10 ? 1 : .45;
-    return p.scoringPlay ? `<circle class="made" cx="${x}" cy="${y}" r=".75" fill="${col(t)}" stroke="#0c0c0c" opacity="${op}"/>`
-                         : `<circle class="miss" cx="${x}" cy="${y}" r=".65" stroke="${col(t)}" opacity="${op * .85}"/>`;
+    const op = pid || i >= shots.length - 10 ? 1 : .45;
+    return p.scoringPlay ? `<circle class="made${pid ? ' big' : ''}" cx="${x}" cy="${y}" r="${.75 * big}" fill="${col(t)}" stroke="#0c0c0c" opacity="${op}"/>`
+                         : `<g opacity="${op * .9}" stroke="${col(t)}" stroke-width="${.3 * big}"><line x1="${x - .6 * big}" y1="${y - .6 * big}" x2="${x + .6 * big}" y2="${y + .6 * big}"/><line x1="${x - .6 * big}" y1="${y + .6 * big}" x2="${x + .6 * big}" y2="${y - .6 * big}"/></g>`;
   }).join('');
   const pulse = last ? `<circle class="pulse" cx="${last.coordinate.x}" cy="${last.coordinate.y}" r="1" stroke="${col(teamOfPlay(last, g))}"/>` : '';
+  // the floor: the ten players ESPN marks on the court, offense at its spots, each defender a step toward the rim,
+  // the last shooter where he shot from. Positions are illustrative; who is out there is the live feed.
+  let floor = '';
+  if (!pid && g.state === 'live' && teams.length === 2) {
+    const lastShot = all[all.length - 1];
+    const pos = possession(g, plays);
+    const offAb = pos.team || (lastShot ? teamOfPlay(lastShot, g) : g.away);
+    const onFor = ab => ((teams.find(t => t.ab === ab) || {}).players || []).filter(x => x.on).slice(0, 5);
+    const off = onFor(offAb), def = onFor(offAb === g.home ? g.away : g.home);
+    // the last shooter keeps the ball only while his team still has it
+    const shooter = lastShot && off.some(x => x.id === shooterOf(lastShot)) ? shooterOf(lastShot) : null;
+    const toks = [];
+    off.forEach((x, k) => {
+      let [px, py] = OFF_SPOTS[k];
+      if (x.id === shooter && lastShot) { px = lastShot.coordinate.x; py = lastShot.coordinate.y; }
+      toks.push({x, px, py, c: col(offAb)});
+    });
+    def.forEach((x, k) => {
+      const [ox, oy] = toks[k] ? [toks[k].px, toks[k].py] : OFF_SPOTS[k];
+      toks.push({x, px: ox + (25 - ox) * .18, py: oy + (5.25 - oy) * .18, c: col(offAb === g.home ? g.away : g.home), d: 1});
+    });
+    floor = toks.map(t => {
+      const prev = FLOOR_POS[t.x.id] || [t.px, t.py];
+      FLOOR_POS[t.x.id] = [t.px, t.py];
+      return `<g class="tok${t.x.id === shooter ? ' sh' : ''}" data-to="${t.px},${t.py}" style="transform:translate(${prev[0]}px,${prev[1]}px)">
+        <circle r="1.55" fill="${t.c}" opacity="${t.d ? .75 : 1}"/><text>${esc(t.x.jersey || '')}</text><title>${esc(t.x.name)}</title></g>`;
+    }).join('');
+    const bh = toks.find(t => t.x.id === shooter) || toks[0];
+    if (bh) floor += `<circle class="ball" r=".65" fill="#e2702b" stroke="#fff" stroke-width=".15" style="transform:translate(${bh.px + 1.3}px,${bh.py - 1.1}px)"/>`;
+  }
   return `<svg class="court-svg" viewBox="-1 -1 52 37" aria-label="Live shot chart">
     <rect class="ln" x="0" y="0" width="50" height="35"/>
     <rect class="ln" x="17" y="0" width="16" height="19"/><rect class="ln" x="19" y="0" width="12" height="19"/>
@@ -1528,19 +1670,60 @@ function courtSvg(g, plays) {
     <path class="ln" d="M21 5.25 A4 4 0 0 0 29 5.25"/>
     <line class="ln" x1="22" y1="4" x2="28" y2="4" style="stroke:rgba(255,255,255,.35)"/>
     <circle cx="25" cy="5.25" r=".75" fill="none" stroke="#d795ff" stroke-width=".3"/>
-    ${marks}${pulse}</svg>`;
+    ${marks}${pulse}${floor}</svg>`;
+}
+// slide the floor tokens from where they were to where they are
+function animateFloor() {
+  requestAnimationFrame(() => requestAnimationFrame(() => document.querySelectorAll('.court-svg .tok[data-to]').forEach(el => {
+    const [x, y] = el.dataset.to.split(','); el.style.transform = `translate(${x}px,${y}px)`;
+  })));
+}
+// a player's live line next to his props: the stat, our projection, the Onyx line, where he is pacing
+function shotFocus(g, x) {
+  const me = ourPlayer(g, x);
+  const mins = x.n('MIN');
+  const cell = (lab, s, live) => {
+    if (!me) return `<div><span>${lab}</span><b>${live}</b></div>`;
+    const pr = (me.props || {})[s], st = leanStatus(me, s, live, g);
+    const rem = Math.max(0, (me.min || 0) - mins);
+    const pace = g.state === 'live' && mins > 0 ? live + rem * (.5 * live / mins + .5 * (me.proj[s] || 0) / Math.max(me.min || 1, 1)) : null;
+    const cls = st ? {'st-win': 'win', 'st-pend': 'pend', 'st-loss': 'loss'}[st.cls] || '' : '';
+    return `<div class="${cls}"><span>${lab}${pr ? ' · ' + (pr.side === 'over' ? 'O' : 'U') + ' ' + pr.line : ''}</span><b>${live}</b>
+      <small>proj ${num(me.proj[s])}</small>${pace != null ? `<small>pace ${num(pace)}</small>` : ''}</div>`;
+  };
+  return `<div class="sc-focus">${cell('PTS', 'pts', x.n('PTS'))}${cell('REB', 'reb', x.n('REB'))}${cell('AST', 'ast', x.n('AST'))}${cell('3PM', 'fg3', x.n('3PT'))}
+    <div><span>FG</span><b>${esc(x.v('FG') || '-')}</b><small>${pctOf(x.v('FG'))} · 3PT ${esc(x.v('3PT') || '-')}</small></div>
+    <div><span>MIN</span><b>${esc(x.v('MIN') || '0')}</b><small>${me ? 'proj ' + num(me.min, 0) : ''}${x.v('+/-') ? ' · ' + esc(x.v('+/-')) : ''}</small></div></div>
+    ${me ? `<button class="btn-secondary" style="width:100%;margin:-2px 0 10px" onclick="openPlayer('${esc(me.pid)}')">Open ${esc(lastName(me.name))}'s card and bet his props</button>` : ''}`;
 }
 function liveCourt(g, sum) {
   const plays = playsOf(sum);
-  if (!plays.length) return `<div class="gc-card"><div class="gc-card-title">Live court</div><div class="dim" style="font-size:12px">Waiting for the play-by-play feed...</div></div>`;
+  if (!plays.length) return `<div class="gc-card" id="gcCourt"><div class="gc-card-title">Live court</div><div class="dim" style="font-size:12px">Waiting for the play-by-play feed...</div></div>`;
+  const teams = espnTeams(g, sum);
+  const all = shotsOf(plays);
+  const ids = {};
+  all.forEach(p => { const k = shooterOf(p); if (k) { ids[k] = ids[k] || {a: 0, m: 0}; ids[k].a++; ids[k].m += p.scoringPlay ? 1 : 0; } });
+  const people = [];
+  teams.forEach(t => t.players.forEach(x => { if (ids[x.id]) people.push({x, t: t.ab, ...ids[x.id]}); }));
+  people.sort((a, b) => (b.x.id === gcShotP) - (a.x.id === gcShotP) || b.a - a.a);
+  if (gcShotP && !people.some(p => p.x.id === gcShotP) && !teams.some(t => t.players.some(x => x.id === gcShotP))) gcShotP = null;
+  const sel = gcShotP ? teams.flatMap(t => t.players).find(x => x.id === gcShotP) : null;
+  const col = ab => ab === g.home ? '#b038f9' : '#635bff';
+  const chips = `<div class="sc-chips"><button class="${!gcShotP ? 'on' : ''}" onclick="gcShotP=null;rerender()">All shots</button>
+    ${people.map(p => `<button class="${gcShotP === p.x.id ? 'on' : ''}" onclick="gcShotP='${esc(p.x.id)}';rerender()"><i style="background:${col(p.t)}"></i>${esc(p.x.short)} ${p.m}/${p.a}</button>`).join('')}</div>`;
   const last = plays[plays.length - 1];
   const pos = g.state === 'live' ? possession(g, plays) : {team: null, why: 'Final'};
   const clock = `${(last.period || {}).displayValue || ''} · ${(last.clock || {}).displayValue || ''}`;
-  const recent = plays.filter(p => p.text).slice(-6).reverse();
-  return `<div class="gc-card"><div class="gc-card-title">Live court · ball tracking from the play-by-play${g.state === 'live' ? ' · refreshes every 8s' : ''}</div>
-    <div class="court-wrap"><div>${courtSvg(g, plays)}
-      <div class="court-legend"><span><i style="background:#635bff"></i>${esc(g.away)} made</span><span><i style="border:1px solid #635bff"></i>${esc(g.away)} miss</span>
-        <span><i style="background:#b038f9"></i>${esc(g.home)} made</span><span><i style="border:1px solid #b038f9"></i>${esc(g.home)} miss</span><span>latest shot pulses</span></div></div>
+  const recent = plays.filter(p => p.text && (!gcShotP || (p.participants || []).some(q => String((q.athlete || {}).id) === gcShotP))).slice(-6).reverse();
+  const floorRoll = g.state === 'live' && !gcShotP && teams.length === 2 ? `<div class="floor-roll">${teams.map(t =>
+    `<div><b style="color:${col(t.ab)}">${esc(t.ab)} ON THE FLOOR</b><br>${t.players.filter(x => x.on).map(x => `#${esc(x.jersey)} ${esc(x.short)}`).join('<br>') || '-'}</div>`).join('')}</div>` : '';
+  setTimeout(animateFloor, 0);
+  return `<div class="gc-card" id="gcCourt"><div class="gc-card-title">${sel ? esc(sel.name) + ' · every shot' : 'Live court · the ten on the floor and every shot'}${g.state === 'live' ? ' · refreshes every 5s' : ''}</div>
+    ${chips}${sel ? shotFocus(g, sel) : ''}
+    <div class="court-wrap"><div>${courtSvg(g, plays, teams, gcShotP)}
+      <div class="court-legend"><span><i style="background:#635bff"></i>${esc(g.away)} made</span><span>✕ miss</span>
+        <span><i style="background:#b038f9"></i>${esc(g.home)} made</span>${!gcShotP && g.state === 'live' ? '<span>numbers = players on the floor (live lineups; spots illustrative)</span>' : '<span>latest shot pulses</span>'}</div>
+      ${floorRoll}</div>
     <div>
       <div class="poss">${g.state === 'live' ? '<span class="dot"></span>' : ''}
         <div><div class="lbl">${g.state === 'live' ? 'Possession' : 'Game over'}</div>
@@ -1548,7 +1731,7 @@ function liveCourt(g, sum) {
           ${pos.team && pos.why ? `<div class="dim" style="font-size:11px">${esc(pos.why)}</div>` : ''}</div>
         <div class="clk">${esc(clock)}</div></div>
       <div class="lastplay"><span class="when">LAST PLAY · ${esc(clock)} · ${esc(g.away)} ${last.awayScore ?? ''} - ${esc(g.home)} ${last.homeScore ?? ''}</span>${esc(last.text || '')}</div>
-      <div class="mini-pbp">${recent.slice(1).map(p => pbpRow(g, p)).join('')}</div>
+      <div class="mini-pbp">${(gcShotP ? recent : recent.slice(1)).map(p => pbpRow(g, p)).join('')}</div>
     </div></div></div>`;
 }
 function pbpRow(g, p) {

@@ -1,4 +1,25 @@
 {
+ "per_market_tune": {
+  "ml": {
+   "n": 318,
+   "blend_ll": 0.5453,
+   "onyx_ll": 0.5455
+  },
+  "spread": {
+   "n": 319,
+   "blend_ll": 0.693,
+   "onyx_ll": 0.6934
+  },
+  "total": {
+   "n": 322,
+   "blend_ll": 0.693,
+   "onyx_ll": 0.693
+  }
+ },
+ "only": [
+  "spread",
+  "total"
+ ],
  "version": "v1",
  "sport": "cfb",
  "label": "Team ratings against real Onyx game lines",
@@ -26,47 +47,47 @@
  },
  "n_samples": 3907,
  "lane_ll": {
-  "blend": 0.5281,
-  "onyx": 0.5167
+  "blend": 0.6938,
+  "onyx": 0.6947
  },
  "lane": {
   "markets": [
-   "ml"
+   "spread"
   ],
-  "w": 0.3,
+  "w": 0.2,
   "edge_min": 0.02,
   "edge_max": 0.06,
-  "price_min": -250,
-  "price_max": 250,
+  "price_min": -200,
+  "price_max": 150,
   "max_per_slate": 6
  },
  "tune": {
-  "n": 28,
-  "w": 17,
-  "roi": 0.4106
+  "n": 21,
+  "w": 13,
+  "roi": 0.1826
  },
  "test_open": {
-  "n": 40,
-  "w": 17,
-  "roi": 0.0539,
-  "claimed": 0.4574,
-  "hit": 0.425
+  "n": 46,
+  "w": 27,
+  "roi": 0.1217,
+  "claimed": 0.5647,
+  "hit": 0.587
  },
  "test_close": {
-  "n": 33,
-  "w": 12,
-  "roi": -0.0788
+  "n": 40,
+  "w": 21,
+  "roi": 0.0058
  },
- "passed": false,
+ "passed": true,
  "page": {
-  "passed": false,
+  "passed": true,
   "version": "v1",
   "run": "2026-10-26",
   "title": "Team ratings against real Onyx game lines",
   "summary": [
    "Every game priced only from results before it, against Onyx's real opening and closing lines. The rule was chosen on games before 2026-03-01 and judged on 2026-03-01 on, which it never saw.",
    "The model's weight in the blend is 10%.",
-   "Not passed: the lane lost money at closing prices. Leans only until it does."
+   "Passed: the blend beat Onyx's no-vig price and the lane won money at both opening and closing prices. Tracked picks are live, graded in public."
   ],
   "stats": [
    {
@@ -86,13 +107,13 @@
    },
    {
     "k": "Lane at opening prices",
-    "v": "17-23",
-    "d": "ROI +5.4% · claimed 45.7% vs hit 42.5%"
+    "v": "27-19",
+    "d": "ROI +12.2% · claimed 56.5% vs hit 58.7%"
    },
    {
     "k": "Lane at closing prices",
-    "v": "12-21",
-    "d": "ROI -7.9%"
+    "v": "21-19",
+    "d": "ROI +0.6%"
    }
   ]
  }

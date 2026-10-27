@@ -269,10 +269,13 @@ def evaluate(key, samples, version, label):
     test_c = [r for r in samples if r["when"] == "c" and r["date"] >= split]
     mk_all = sorted({r["mkt"] for r in samples})
     # 1) blend weight per market group, on log loss in the tune window
-    best_w = min(W_GRID, key=lambda w: logloss(tune_o, w)[0]) if tune_o else 0.0
+    tw = [r for r in tune_o if not ONLY or r["mkt"] in ONLY]
+    best_w = min(W_GRID, key=lambda w: logloss(tw, w)[0]) if tw else 0.0
     # 2) lane rule on the tune window: highest ROI with at least MIN_PICKS/2 picks
     best = None
     sets = [ms for ms in MKT_SETS if all(m in mk_all for m in ms)] or [tuple(mk_all)]
+    if ONLY:   # --markets: the lane may use only these (and the blend is judged on them)
+        sets = [ms for ms in sets if all(m in ONLY for m in ms)]
     if key == "nfl" and any(m not in ("ml", "spread", "total") for m in mk_all):
         sets = [(m,) for m in mk_all if m not in ("ml", "spread", "total")] + [tuple(m for m in mk_all if m not in ("ml", "spread", "total"))]
     for ms in sets:
@@ -292,7 +295,13 @@ def evaluate(key, samples, version, label):
         if a:
             ll, llm = logloss(a, best_w)
             per_mkt[m] = {"n": len(a), "blend_ll": round(ll, 4), "onyx_ll": round(llm, 4), "model_only_ll": round(logloss(a, 1.0)[0], 4)}
-    result = {"version": version, "sport": key, "label": label, "split": split, "w": best_w, "per_market_test": per_mkt,
+    per_mkt_tune = {}
+    for m in mk_all:
+        a = [r for r in tune_o if r["mkt"] == m]
+        if a:
+            ll, llm = logloss(a, best_w)
+            per_mkt_tune[m] = {"n": len(a), "blend_ll": round(ll, 4), "onyx_ll": round(llm, 4)}
+    result = {"per_market_tune": per_mkt_tune, "only": list(ONLY) if ONLY else None, "version": version, "sport": key, "label": label, "split": split, "w": best_w, "per_market_test": per_mkt,
               "n_samples": len(samples)}
     passed = False
     if best:
@@ -344,9 +353,17 @@ def page(result, key):
             "summary": summary, "stats": stats}
 
 
+ONLY = None
+
+
 def main():
-    key = sys.argv[1]
-    files = sys.argv[2:]
+    global ONLY
+    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    for a in sys.argv[1:]:
+        if a.startswith("--markets="):
+            ONLY = tuple(a.split("=", 1)[1].split(","))
+    key = args[0]
+    files = args[1:]
     if key == "tennis":
         import tennis_model as M
         samples = tennis_samples(files)

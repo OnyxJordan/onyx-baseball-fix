@@ -338,15 +338,19 @@ function drawGame(gid) {
     <div class="gc-sec" style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-primary" onclick="bet(null,'game ${esc(g.away)} @ ${esc(g.home)}')">⚡ Bet this game on Onyx</button>
       <button class="btn-secondary" onclick="OPEN_GAME=null;renderGames()">Close</button></div>
     <div id="gcDetail">${s ? (KIND === 'hockey' ? hockeyDetail(s, g) : footballDetail(s, g)) : '<div class="empty">Loading the gamecenter…</div>'}</div></div>`;
-  if (!s || g.state === 'in') loadSummary(gid);
+  if (!s || (g.state === 'in' && !_gcTimer)) loadSummary(gid);
 }
+var _gcTimer = null;
 function loadSummary(gid) {
   if (location.protocol === 'file:') return;
+  clearTimeout(_gcTimer); _gcTimer = null;
   fetch('https://site.api.espn.com/apis/site/v2/sports/' + C.espn[0] + '/summary?event=' + gid)
     .then(r => r.json()).then(j => {
       GC_CACHE[gid] = j;
       const el = document.getElementById('gcDetail');
       if (el && OPEN_GAME === gid) el.innerHTML = KIND === 'hockey' ? hockeyDetail(j, live(game(gid))) : footballDetail(j, live(game(gid)));
+      // the open live game refreshes on its own every 6s, between scoreboard polls
+      if (OPEN_GAME === gid && live(game(gid) || {}).state === 'in' && !document.hidden) _gcTimer = setTimeout(() => loadSummary(gid), 6000);
     }).catch(() => {
       const el = document.getElementById('gcDetail');
       if (el && OPEN_GAME === gid) el.innerHTML = '<div class="empty">Live feed unavailable, retrying shortly.</div>';
@@ -687,7 +691,7 @@ function pollLive() {
     if (currentTab === 'games' && !(document.activeElement && document.activeElement.tagName === 'INPUT')) {
       if (KIND === 'football' || KIND === 'hockey') { if (OPEN_GAME) { drawGame(OPEN_GAME); } else renderGames(); } else renderGames();
     } else if (currentTab === 'home') renderHome();
-    clearTimeout(_poll); _poll = setTimeout(pollLive, anyLive ? 15000 : 30000);
+    clearTimeout(_poll); _poll = setTimeout(pollLive, anyLive ? 10000 : 30000);
   });
 }
 // search (ui.js): teams and players on this page
