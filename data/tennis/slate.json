@@ -3634,9 +3634,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        4
        ],
-       "serve": false
+       "serve": true
       },
       {
        "name": "Simona Waltert",
@@ -3645,7 +3645,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        3
+        4
        ],
        "serve": false
       }
@@ -3655,7 +3655,7 @@
      "id": "185711",
      "start": "2026-10-27T03:05Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -3667,7 +3667,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        4
+        4,
+        0
        ],
        "serve": false
       },
@@ -3678,9 +3679,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        4
+        6,
+        0
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
@@ -3700,9 +3702,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        4
+        5
        ],
-       "serve": false
+       "serve": true
       },
       {
        "name": "Anastasia Zakharova",
@@ -3711,9 +3713,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        3
+        5
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -5234,9 +5236,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        1
+        2
        ],
-       "serve": false
+       "serve": true
       },
       {
        "name": "Yulia Putintseva",
@@ -5245,17 +5247,17 @@
        "seed": null,
        "win": false,
        "sets": [
-        0
+        2
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
     {
      "id": "185677",
      "start": "2026-10-27T03:45Z",
-     "state": "pre",
-     "detail": "10/26 - 11:45 PM EDT",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Show Court",
@@ -5266,7 +5268,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        0
+       ],
        "serve": false
       },
       {
@@ -5275,8 +5279,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        0
+       ],
+       "serve": true
       }
      ]
     },
@@ -9484,5 +9490,5 @@
    ]
   }
  ],
- "fetched": "2026-10-27T03:39:22+00:00"
+ "fetched": "2026-10-27T03:55:27+00:00"
 }
