@@ -1827,6 +1827,19 @@ body::after {
 .lab h3{margin:0 0 6px;font-size:20px}
 .lab p{margin:0 0 8px;font-size:13px;line-height:1.6;color:var(--text2)}
 .lab ul{margin:6px 0 0;padding-left:18px;font-size:13px;line-height:1.7;color:var(--text2)}
+.wblock{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px 18px;margin-top:12px}
+.wtitle{font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px}
+.wbar{display:flex;height:26px;border-radius:7px;overflow:hidden;gap:2px}
+.wseg{display:flex;align-items:center;justify-content:center;min-width:34px;font-family:monospace;font-size:11px;font-weight:800;color:#fff}
+.wleg{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;font-size:11px;color:var(--text3)}
+.wleg i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.wnote{font-size:12px;line-height:1.6;color:var(--text3);margin-top:10px}
+.wrow{display:grid;grid-template-columns:150px 1fr;gap:10px;font-size:12px;line-height:1.6;color:var(--text3);padding:6px 0;border-top:1px solid var(--border)}
+.wrow:first-of-type{border-top:none}.wrow b{color:var(--text)}
+@media (max-width:600px){.wrow{grid-template-columns:1fr;gap:2px}}
+.sp-factors{margin-top:12px}
+.pk.lean{border-style:dashed;border-color:rgba(176,56,249,.35);background:linear-gradient(160deg,rgba(99,91,255,.08),var(--bg2) 60%)}
+.pk-badge{font:700 9px monospace;letter-spacing:.12em;text-transform:uppercase;color:#d795ff;border:1px solid rgba(176,56,249,.4);border-radius:999px;padding:3px 8px;align-self:flex-start}
 .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:10px 0}
 .stat-grid>div{background:var(--bg3);border:1px solid var(--border2);border-radius:12px;padding:10px 12px}
 .stat-grid>div>span{display:block;font:700 9px monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)}
@@ -1985,7 +1998,7 @@ body::after {
 
 <script>
 // Injected by sports_build.py. `var`, read before any other script line (CLAUDE.md rule 5).
-var SD = /*SPORT_DATA*/{"sport":"golf","cfg":{"name":"Golf","full":"Onyx Golf","kind":"golf","espn":["golf/pga"],"espn_q":"","tone":"purple","art":"golf","onyx_league":null},"date":"2026-10-27","label":"VidantaWorld Mexico Open","season":null,"games":[],"events":[{"id":"401850978","tour":"PGA","name":"VidantaWorld Mexico Open","start":"2026-10-29T04:00Z","end":"2026-11-01T04:00Z","state":"pre","detail":null,"round":0,"venue":null,"board":[]}],"odds":{},"model":{"status":"lab","version":null,"title":"What is live, and what the model will be","note":"Onyx Golf is live for scores, the gamecenter and Onyx prices as they post. The Golf model is in the lab: nothing here is a pick until it has been backtested against real Onyx prices.","method":["The leaderboard comes from ESPN's public feed, polled live: position, score to par and every round.","Every price on this page is an Onyx price."],"roadmap":["Onyx outrights, top 5, 10 and 20, and head-to-head matchups","Strokes-gained projections by course fit, tested against Onyx prices before any pick","Live round-by-round leaderboard with each player's Onyx price"],"tests":[],"rows":[],"top":[]},"generated":"2026-10-27T17:33:13+00:00"}/*END_SPORT_DATA*/;
+var SD = /*SPORT_DATA*/{"sport":"golf","cfg":{"name":"Golf","full":"Onyx Golf","kind":"golf","espn":["golf/pga"],"espn_q":"","tone":"purple","art":"golf","onyx_league":null},"date":"2026-10-27","label":"VidantaWorld Mexico Open","season":null,"games":[],"events":[{"id":"401850978","tour":"PGA","name":"VidantaWorld Mexico Open","start":"2026-10-29T04:00Z","end":"2026-11-01T04:00Z","state":"pre","detail":null,"round":0,"venue":null,"board":[]}],"odds":{},"model":{"status":"lab","version":null,"title":"What is live, and what the model will be","note":"Onyx Golf is live for scores, the gamecenter and Onyx prices as they post. The Golf model is in the lab: nothing here is a pick until it has been backtested against real Onyx prices.","method":["The leaderboard comes from ESPN's public feed, polled live: position, score to par and every round.","Every price on this page is an Onyx price."],"roadmap":["Onyx outrights, top 5, 10 and 20, and head-to-head matchups","Strokes-gained projections by course fit, tested against Onyx prices before any pick","Live round-by-round leaderboard with each player's Onyx price"],"tests":[],"rows":[],"top":[],"engine":{"steps":[{"t":"What is live today","rows":[["Leaderboard","position, score to par, today and thru, polled live"],["Every hole","each player's card hole by hole, with birdies, bogeys and the rest marked"],["Tournament stats","driving, fairways, greens, putting, sand saves and earnings for each player"]]}],"factors":[],"lane":null}},"generated":"2026-10-27T18:05:13+00:00"}/*END_SPORT_DATA*/;
 var ONYX_REFERRER = 'KR680261';
 var GA_MEASUREMENT_ID = 'G-03T8V1N52E';
 var C = SD.cfg || {};
@@ -2062,7 +2075,10 @@ function ticker() {
       return sg(`${state}${logo(g.away_logo)}<span class="score-team">${esc(g.away)}</span>${pre ? '' : `<span class="score-num ${cls(as, hs)}">${esc(g.away_score)}</span>`}<span class="score-sep">${pre ? '@' : '|'}</span>${logo(g.home_logo)}<span class="score-team">${esc(g.home)}</span>${pre ? '' : `<span class="score-num ${cls(hs, as)}">${esc(g.home_score)}</span>`}`, `openGame('${g.gid}')`);
     });
   const t = document.getElementById('ticker');
-  t.innerHTML = items.length ? items.join('') + items.join('') : '';
+  // two identical halves loop seamlessly; a short slate repeats inside each
+  // half so the bar never shows a gap (ui.js sets the speed from the width)
+  const half = items.join('').repeat(Math.max(1, Math.ceil(8 / Math.max(1, items.length))));
+  t.innerHTML = items.length ? half + half : '';
   t.parentNode.style.display = items.length ? '' : 'none';
 }
 
@@ -2922,7 +2938,7 @@ function renderBoard() {
   }
   el.innerHTML = out.join('');
 }
-var MKT_NAME = {pass_yds: 'Passing yards', rush_yds: 'Rushing yards', rec_yds: 'Receiving yards', rec: 'Receptions',
+var MKT_NAME = {ml: 'Moneyline', spread: 'Spread', total: 'Total', pass_yds: 'Passing yards', rush_yds: 'Rushing yards', rec_yds: 'Receiving yards', rec: 'Receptions',
                 pass_td: 'Passing TDs', anytime_td: 'Anytime TD', goals: 'Goals', shots: 'Shots on goal', points: 'Points', assists: 'Assists', saves: 'Saves'};
 
 // ── plays (model) ───────────────────────────────────────────────────
@@ -2941,7 +2957,7 @@ function pickLabel(r) {
   return `${r.name} ${r.side === 'over' ? 'Over' : 'Under'} ${r.line} ${MKT_NAME[r.mkt] || r.mkt}`;
 }
 function playCards(rows) {
-  return `<div class="pk-grid">${rows.map(r => `<div class="pk">
+  return `<div class="pk-grid">${rows.map(r => `<div class="pk${r.projected ? ' lean' : ''}">${r.projected ? '<span class="pk-badge">Lean · not tracked</span>' : ''}
     <div class="pk-top"><span>${esc(MKT_NAME[r.mkt] || r.mkt)}</span><span>${esc(r.matchup || '')}</span></div>
     <div class="pk-main">${r.hs ? `<img class="lg m" style="border-radius:50%" src="${esc(r.hs)}" alt="" loading="lazy">` : ''}<b>${esc(pickLabel(r))}</b></div>
     <div class="pk-nums"><div><span>Onyx</span><b>${fmtOdds(r.price)}</b></div><div><span>Win chance</span><b>${pct(r.prob)}</b></div>
@@ -2991,8 +3007,13 @@ function renderPlays() {
     ${(M.tests || []).length ? `<div class="stat-grid">${M.tests.map(t => `<div><span>${esc(t.k)}</span><b>${esc(t.v)}</b><div class="dim" style="font-size:11px">${esc(t.d || '')}</div></div>`).join('')}</div>` : ''}
     ${M.status !== 'live' && (M.roadmap || []).length ? `<ul>${M.roadmap.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}</div>`;
   const picks = M.picks || [];
+  const proj = M.projected || [];
+  const lanePass = (M.engine || {}).lane;
   const pickHtml = M.status === 'live' ? `<div class="sec-hdr"><span class="sec-title">Today's plays</span><span class="sec-count">${picks.length}</span></div>
-    ${picks.length ? playCards(picks) : '<div class="empty">No play clears the bar on this slate. A quiet slate is the screens working.</div>'}` : '';
+    ${picks.length ? playCards(picks) : '<div class="empty">No play clears the bar on this slate. A quiet slate is the screens working.</div>'}`
+    : lanePass ? `<div class="sec-hdr"><span class="sec-title">Projected plays · what the lane would play</span><span class="sec-count">${proj.length}</span></div>
+    <p class="dim" style="font-size:12px;line-height:1.6;margin:0 0 10px">The model's strongest leans on this slate, through the same screen a tracked pick uses (${esc(lanePass.markets.join(', '))}, ${(lanePass.edge[0] * 100).toFixed(0)} to ${(lanePass.edge[1] * 100).toFixed(0)}pp of edge, ${fmtOdds(lanePass.price[0])} to ${fmtOdds(lanePass.price[1])}). That screen has not beaten Onyx's prices in the backtest yet, so these are not tracked or graded.</p>
+    ${proj.length ? playCards(proj) : '<div class="empty">Nothing clears the screen on this slate.</div>'}` : '';
   const rows = M.rows || [];
   const gameRows = rows.filter(r => r.kind), propRows = rows.filter(r => !r.kind);
   let body = '';
@@ -3006,12 +3027,45 @@ function renderPlays() {
   }
   el.innerHTML = lab + pickHtml + body + recordBlock(M.record) + (!rows.length && M.status !== 'live' ? '' : '');
 }
+var ENGINE_ICON = {
+  clock: '<circle cx="8" cy="8" r="6.5"/><path d="M8 4v4l2.5 2"/>',
+  pace: '<path d="M2 12a6 6 0 0 1 12 0"/><path d="M8 12l3-4"/>',
+  shield: '<path d="M8 1.5l5 2v4c0 3.5-2.5 5.8-5 7-2.5-1.2-5-3.5-5-7v-4z"/>',
+  chart: '<path d="M2 13h12M4 10l3-3 2 2 4-5"/>',
+  scale: '<path d="M8 2v12M3 14h10M3 5h10M3 5l-1.5 4h3zM13 5l-1.5 4h3z"/>',
+  bell: '<path d="M2 13c2 0 3-10 6-10s4 10 6 10"/>',
+  eye: '<path d="M1.5 8s2.5-4.5 6.5-4.5S14.5 8 14.5 8 12 12.5 8 12.5 1.5 8 1.5 8z"/><circle cx="8" cy="8" r="2"/>',
+};
+function factorCard(icon, title, desc, tag, tone) {
+  return `<div class="factor-card"><div class="factor-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">${ENGINE_ICON[icon] || ''}</svg></div>
+    <div class="factor-title">${esc(title)}</div><div class="factor-desc">${esc(desc)}</div><span class="factor-tag ${tone || ''}">${esc(tag)}</span></div>`;
+}
+function wbar(parts) {
+  const C = ['#3a3a4a', '#b038f9', '#635bff', '#d795ff'];
+  return `<div class="wbar">${parts.map(([lab, v], i) => `<div class="wseg" style="flex:${v};background:${C[i % C.length]}" title="${esc(lab)} ${Math.round(v)}%"><span>${Math.round(v)}%</span></div>`).join('')}</div>
+    <div class="wleg">${parts.map(([lab, v], i) => `<span><i style="background:${C[i % C.length]}"></i>${esc(lab)}</span>`).join('')}</div>`;
+}
+function engineHtml(E) {
+  if (!E) return '';
+  const steps = (E.steps || []).map(st => `<div class="wblock"><div class="wtitle">${esc(st.t)}</div>
+    ${st.bars ? wbar(st.bars) : ''}${(st.rows || []).map(r => `<div class="wrow"><b>${esc(r[0])}</b><span>${esc(r[1])}</span></div>`).join('')}
+    ${st.note ? `<div class="wnote">${esc(st.note)}</div>` : ''}</div>`).join('');
+  const L = E.lane;
+  const lane = L ? `<div class="wblock"><div class="wtitle">${L.live ? 'The pick lane · live and graded in public' : 'The pick lane · in the lab'}</div>
+    <div class="wrow"><b>Markets</b><span>${esc(L.markets.join(', '))}</span></div>
+    <div class="wrow"><b>Edge</b><span>${(L.edge[0] * 100).toFixed(0)} to ${(L.edge[1] * 100).toFixed(0)}pp over the price's implied chance (bigger gaps are usually news the model missed)</span></div>
+    <div class="wrow"><b>Price</b><span>${fmtOdds(L.price[0])} to ${fmtOdds(L.price[1])}, one play per game, ${L.per_slate} a slate at most</span></div>
+    <div class="wnote">${L.passed ? 'This lane beat real Onyx prices on games it never saw, so its plays are tracked picks with a public record.' : 'This is the best lane the backtest found, and it did not beat Onyx on the games it never saw. Its plays show as projected leans on the Plays tab, never tracked or graded, until a model version passes.'}</div></div>` : '';
+  const f = (E.factors || []).length ? `<div class="factor-grid sp-factors">${E.factors.map(x => factorCard(...x)).join('')}</div>` : '';
+  return `<div class="sec-hdr"><span class="sec-title">How a ${KIND === 'tennis' ? 'match price' : KIND === 'golf' ? 'golf read' : 'price'} is built</span></div>${steps}${lane}${f}`;
+}
 function renderModel() {
   const M = SD.model || {};
   document.getElementById('modelBody').innerHTML = `<div class="lab"><div class="eb">How Onyx ${esc(C.name)} works</div><h3>${esc(M.title || 'The data, the model and what is tested')}</h3>
     ${(M.method || []).map(p => `<p>${esc(p)}</p>`).join('') || `<p>Live scores, the gamecenter and the schedule come from ESPN's public feed, refreshed through the day and polled live on this page. Every price is an Onyx price.</p>`}
     ${(M.tests || []).length ? `<div class="stat-grid">${M.tests.map(t => `<div><span>${esc(t.k)}</span><b>${esc(t.v)}</b><div class="dim" style="font-size:11px">${esc(t.d || '')}</div></div>`).join('')}</div>` : ''}
     <p class="dim" style="font-size:12px">Model ${esc(M.version || 'not live yet')} · ${M.status === 'live' ? 'picks live' : 'leans only'} · data built ${esc(SD.generated ? new Date(SD.generated).toLocaleString('en-US', {timeZone: 'America/New_York'}) + ' ET' : '')}</p></div>
+    ${engineHtml(M.engine)}
     ${backtestBlock(M.backtest)}
     ${(M.changelog || []).length ? `<div class="lab"><div class="eb">Changelog · the lab notebook</div><ul>${M.changelog.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>` : ''}
     ${(M.roadmap || []).length ? `<div class="lab"><div class="eb">Next</div><ul>${M.roadmap.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>` : ''}
