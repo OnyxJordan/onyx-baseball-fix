@@ -343,7 +343,27 @@ def tennis_block(lane, slate, odds):
         tests=[{"k": "Match log loss", "v": "0.627", "d": "7,875 matches in 2026 the ratings never saw"},
                {"k": "Favourite won", "v": "64.0%", "d": "same matches"}],
         roadmap=ROADMAP["tennis"])
-    return model_frame("tennis", lane, slate, odds, TM, rows, base, grade_tennis(lane))
+    base = model_frame("tennis", lane, slate, odds, TM, rows, base, grade_tennis(lane))
+    base["players"] = tennis_players(lane, slate)
+    return base
+
+
+def tennis_players(lane, slate):
+    """For the match center: each player on the board this week, his Elo,
+    the matches it rests on, and his last six results (45 days kept)."""
+    import tennis_model as TM
+    E = TM.load(lane)
+    res = (lane.load("results.json", {}) or {}).get("matches") or []
+    names = {p["name"] for e in slate.get("events") or [] for m in e.get("matches") or [] if m.get("state") != "post" for p in m["p"]}
+    out = {}
+    for n in names:
+        k = nk(n)
+        form = [m for m in res if nk(m["w"]) == k or nk(m["l"]) == k][-6:]
+        out[k] = {"elo": round(E.r[k]) if k in E.r else None, "n": E.n.get(k, 0),
+                  "form": [{"d": m["date"][5:], "w": nk(m["w"]) == k, "opp": m["l"] if nk(m["w"]) == k else m["w"],
+                            "s": f"{m['sets_w']}-{m['sets_l']}" if nk(m["w"]) == k else f"{m['sets_l']}-{m['sets_w']}",
+                            "ev": m.get("event"), "rd": m.get("round")} for m in reversed(form)]}
+    return out
 
 
 def lab_block(key, cfg):
