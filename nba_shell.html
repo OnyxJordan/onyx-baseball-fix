@@ -1967,7 +1967,7 @@ function renderTickets() {
   const chrono = rows.slice().reverse().filter(t => t.result === 'win' || t.result === 'loss');
   const chart = document.getElementById('tkChart');
   if (chrono.length < 2) {
-    chart.innerHTML = `<div class="dim" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;text-align:center;padding:0 16px">${chrono.length ? 'The running P&L chart draws from the second graded ticket.' : 'The first ticket locks at tonight\'s first tip and is graded when its last game goes final.'}</div>`;
+    chart.innerHTML = `<div class="dim" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;text-align:center;padding:0 16px">${chrono.length ? 'The running P&L chart draws from the second graded ticket.' : rows.length ? 'The first ticket is locked and is graded when its last game goes final.' : 'The first ticket locks at tonight\'s first tip and is graded when its last game goes final.'}</div>`;
   } else {
     let cum = 0;
     const vals = [0, ...chrono.map(t => (cum += +t.pnl || 0))];
@@ -1992,11 +1992,11 @@ function renderTickets() {
   const card = (t, today) => {
     const d = (t.legs || []).filter(l => l.hit !== 'void').reduce((m, l) => m * dec(l.odds), 1);
     const tag = t.result ? `<span class="tk-tag ${t.result}">${t.result === 'win' ? 'WIN' : t.result === 'loss' ? 'LOSS' : 'VOID'}</span>`
-      : today && !t.locked ? '<span class="tk-tag pend">locks at first tip</span>' : '<span class="tk-tag live">locked · live</span>';
+      : today && !(t.locked || t.locked_at) ? '<span class="tk-tag pend">locks at first tip</span>' : '<span class="tk-tag live">locked · live</span>';
     const pay = t.result ? `<b class="${moneyCls(t.pnl)}">${money(t.pnl)}</b>` : `$10 pays <b>$${(10 * d).toFixed(2)}</b>`;
     return `<div class="tk${today ? ' today' : ''}"><div class="tk-hd"><span class="tk-date">${esc(t.date)}</span>${tag}
       <span class="tk-pay">${(t.legs || []).length}-leg · ${fmtOdds(Math.round(d >= 2 ? (d - 1) * 100 : -100 / (d - 1)))} · ${pay}</span></div>
-      ${(t.legs || []).map(l => legRow(l, !t.result && (today ? t.locked : true))).join('')}</div>`;
+      ${(t.legs || []).map(l => legRow(l, !t.result && (today ? !!(t.locked || t.locked_at) : true))).join('')}</div>`;
   };
   const todayT = T.today && !rows.some(t => t.date === T.today.date) ? card(T.today, true) : '';
   document.getElementById('tkList').innerHTML = todayT + rows.map(t => card(t, t.date === (D.date || ''))).join('')
