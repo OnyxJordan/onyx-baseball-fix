@@ -2519,9 +2519,9 @@
        "sets": [
         3,
         6,
-        2
+        6
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Hubert Hurkacz",
@@ -2532,7 +2532,7 @@
        "sets": [
         6,
         3,
-        3
+        6
        ],
        "serve": false
       }
@@ -7010,7 +7010,7 @@
      "id": "185771",
      "start": "2026-10-28T21:05Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Quadra Central",
@@ -7022,6 +7022,7 @@
        "seed": null,
        "win": false,
        "sets": [
+        4,
         3
        ],
        "serve": true
@@ -7033,7 +7034,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        5
+        6,
+        3
        ],
        "serve": false
       }
@@ -9653,8 +9655,8 @@
     {
      "id": "185797",
      "start": "2026-10-28T21:40Z",
-     "state": "pre",
-     "detail": "10/28 - 5:40 PM EDT",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Estadio Mexcovery",
@@ -9665,7 +9667,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        4
+       ],
        "serve": false
       },
       {
@@ -9674,8 +9678,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/rom.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        2
+       ],
+       "serve": true
       }
      ]
     },
@@ -10088,5 +10094,5 @@
    ]
   }
  ],
- "fetched": "2026-10-28T21:43:28+00:00"
+ "fetched": "2026-10-28T22:14:59+00:00"
 }
