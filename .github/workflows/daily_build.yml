@@ -112,9 +112,13 @@ jobs:
             if git push; then break; fi
             echo "push rejected, rebasing onto fresh main (attempt $i)"
             git pull --rebase -X theirs origin main || { git rebase --abort || true; git pull --rebase -s ours origin main || true; }
+            python3 -B newest_lines.py || true   # the newer Onyx NBA pull wins the race, not the later push
             sleep $((i * 3))
           done
           git push || { echo "::warning::push lost the race 4x; next scheduled run recovers"; exit 0; }
+      - name: Deploy the latest main, not this run's snapshot
+        # a run that pushed first but deploys last must not roll the page back
+        run: git fetch -q origin main && git checkout -q origin/main -- .
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
