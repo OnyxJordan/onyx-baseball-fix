@@ -9362,7 +9362,7 @@
      "id": "185798",
      "start": "2026-10-28T00:25Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Court 2",
@@ -9374,7 +9374,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        1
+        6,
+        0
        ],
        "serve": false
       },
@@ -9385,17 +9386,18 @@
        "seed": null,
        "win": false,
        "sets": [
+        1,
         0
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
     {
      "id": "185803",
      "start": "2026-10-28T00:30Z",
-     "state": "pre",
-     "detail": "10/27 - 8:30 PM EDT",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Estadio Mexcovery",
@@ -9406,8 +9408,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        2
+       ],
+       "serve": true
       },
       {
        "name": "Nadia Podoroska",
@@ -9415,7 +9419,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        4
+       ],
        "serve": false
       }
      ]
@@ -9858,5 +9864,5 @@
    ]
   }
  ],
- "fetched": "2026-10-28T00:33:10+00:00"
+ "fetched": "2026-10-28T01:04:40+00:00"
 }
