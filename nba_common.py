@@ -226,6 +226,28 @@ def current_season(day):
     return day.year + 1 if day.month >= 8 else day.year
 
 
+def refresh_onoff(day):
+    """data/nba/onoff.json (nba_onoff.py): count every new final's lineup
+    stints. Always the shared data/nba/ copy, whichever fetcher runs, and
+    never fatal: a failed pull leaves yesterday's table in place."""
+    import nba_onoff
+    base = Path("data/nba")
+
+    def ld(name, default):
+        try:
+            v = json.loads((base / name).read_text(encoding="utf-8"))
+            return v if isinstance(v, type(default)) else default
+        except (OSError, ValueError):
+            return default
+
+    def sv(name, obj):
+        (base / name).write_text(json.dumps(obj, separators=(",", ":"), ensure_ascii=False), encoding="utf-8")
+    try:
+        nba_onoff.refresh(day, ld, sv, current_season)
+    except Exception as ex:
+        print(f"  on/off: refresh failed ({ex}); keeping the last table")
+
+
 def refresh_history(day):
     """data/nba/history.json: ESPN season totals for the last HISTORY_SEASONS
     seasons, players and teams. Past seasons never change, so each is pulled

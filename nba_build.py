@@ -496,7 +496,31 @@ def main():
     hp, th, roles, n_hist = M.slate_history(slate, hist, current_season(date.fromisoformat(today)))
     prior = {**prior, **hp}
     print(f"  history priors: {n_hist} of {len(slate.get('players', []))} players")
-    rows, lg = project_slate(slate, prior, pg, tg, th, roles)
+    # on/off splits (nba_onoff.py, data/nba/onoff.json): last season + this one
+    import nba_onoff
+    oo_state = load("onoff.json", {}) or {}
+    oo = nba_onoff.tonight(oo_state, current_season(date.fromisoformat(today)), M.P["oo_prev"]) if oo_state.get("seasons") else None
+    rows, lg = project_slate(slate, prior, pg, tg, th, roles, oo)
+    if oo is not None:
+        # for the page: each player's own split without each teammate OUT tonight
+        names = {str(r.get("hs")): r["name"] for r in rows if r.get("hs")}
+        by_team = {}
+        for r in rows:
+            by_team.setdefault((r["gid"], r["team"]), []).append(r)
+        for rs in by_team.values():
+            def mpg(o):   # how much the missing teammate normally plays
+                return ((o.get("season") or {}).get("min") or (o.get("baseline") or {}).get("min") or 0)
+            outs = [o for o in rs if o["out"] and o.get("hs") and mpg(o) >= 15]
+            for r in rs:
+                if r["out"] or not r.get("hs") or not outs:
+                    continue
+                ctx = []
+                for o in outs:
+                    v = nba_onoff.per36(oo, str(r["hs"]), str(o["hs"]))
+                    if v and v["min_off"] >= 60:
+                        ctx.append({"name": names.get(str(o["hs"]), o["name"]), "mpg": round(mpg(o), 1), **v})
+                if ctx:
+                    r["oo_ctx"] = sorted(ctx, key=lambda c: -c["mpg"])[:3]
     priced = attach_props(rows, props, source)
 
     ledger = load(LEDGER, [])

@@ -2,6 +2,36 @@
 nba_model.py - Onyx NBA points / rebounds / assists projection model.
 
 CHANGELOG (the lab notebook: every change bumps VERSION and cites evidence)
+  v7 (2026-10-28) ON/OFF SPLITS FROM LINEUPS (nba_onoff.py).
+     Every regular-season lineup since 2024-25 rebuilt from ESPN play-by-play
+     (2,435 games; starters plus each substitution; stint minutes match the
+     box within 0.31 min per player). For each teammate pair: what P produces
+     per minute with T on the floor and with T off. When T is OUT tonight,
+     P's points / rebounds / assists rates move by his own log(off/on) ratio,
+     shrunk toward 0 by oo_k minutes on the thinner side, at strength oo_a,
+     summed over the OUT teammates and capped at +/- oo_cap.
+     Why: v3 and v5 handed missing usage around by formula and lost both
+     times; on 10/26 Ajay Mitchell's minutes were right and his shots nearly
+     doubled. Measured, e.g. 2025-26: Mitchell 20.5 pts/36 without Jalen
+     Williams vs 14.5 with; Reaves 32.1 without Doncic vs 19.3.
+     Tuned on 2025-26 Oct-Jan, judged on Feb-Apr (2024-25 on/off as last
+     season, healthy scratches on the slate; objective = half all players,
+     half teams missing 2+ rotation players):
+       v6                        train .46905  test .48137
+       a .6, k 1500, last 1.0    train .46865  test .48118   <- shipped
+       a .3, k 400,  last .5     train .46869  test .48117
+       a 1.0, k 100              train .48452  test .49521   (thin samples hurt)
+     Light settings helped in both windows; strong ones with little evidence
+     hurt badly. Game-level with-or-without (whole games T missed) tested the
+     same way: best test .48115, train no better than v6, so stints won.
+     Blend log loss vs closing Onyx lines .6898 -> .6897. Lanes within noise:
+     Oct-Jan open +14.8% -> +17.2%, close -17.3% -> -23.5%; Feb-Apr open +3.6%
+     -> +2.5%, close +9.4% -> +13.0% (n 70-130 a window).
+     Honest size: for Mitchell on 10/26 it moves points ~11.6 -> ~12.1. It
+     is a small, steady accuracy gain, not a fix for shot spikes. The splits
+     are also shown on every player card for a teammate out tonight.
+     Production: data/nba/onoff.json (last season seeded from the pull, this
+     season grown by every new final in nba_fetch / nba_espn, fail soft).
   v6 (2026-10-28) PROJECTIONS RAN LOW, SO THE BOARD LEANED UNDER.
      Trigger: the 10/28 board showed 284 of 381 best sides (18+ min) as
      Unders, the projection under the Onyx points line 72% of the time by
@@ -186,7 +216,7 @@ CHANGELOG (the lab notebook: every change bumps VERSION and cites evidence)
 import math
 from collections import defaultdict
 
-VERSION = "v6"
+VERSION = "v7"
 
 LEAGUE = {"ppg": 115.0, "reb": 44.0, "ast": 27.0, "poss": 99.5}
 POS_RATE = {   # per-minute league rates by listed position, used only without a prior
@@ -233,6 +263,14 @@ P = {
     "fill_pos": 1.0,         # v5: double weight for the OUT player's position group
     "fill_cap": 99.0,        # most minutes one player can inherit
     "fill_floor": 0.0,       # v5: anyone on the roster can inherit (was the 15+ min rotation)
+    # on/off (nba_onoff.py): a player whose teammate is OUT tonight produces at
+    # his own measured "teammate off / teammate on" per-minute ratio, shrunk
+    # toward 1 by oo_k minutes of evidence, applied at strength oo_a, the summed
+    # log ratio capped at +/- oo_cap. oo_a 0 = off.
+    "oo_a": 0.6,             # v7, see changelog
+    "oo_k": 1500.0,
+    "oo_cap": 0.35,
+    "oo_prev": 1.0,          # last season's on/off minutes count in full
     "usg_beta_pts": 0.8,
     "usg_beta_ast": 0.5,
     "usg_beta_reb": 0.0,
@@ -835,10 +873,14 @@ def price_side(mean, stat, mkt):
 ROLES = {}    # role_table of last season, set per slate (project_slate roles=)
 
 
-def project_slate(slate, prior, player_games, team_games, team_hist=None, roles=None):
+ONOFF = None   # nba_onoff.OnOff for tonight (set by the caller), keyed by ESPN athlete id
+
+
+def project_slate(slate, prior, player_games, team_games, team_hist=None, roles=None, onoff=None):
     """One projection row per rostered player on today's slate."""
-    global ROLES
+    global ROLES, ONOFF
     ROLES = roles or {}
+    ONOFF = onoff
     lg = league_from_teams(team_games)
     games = {g["gid"]: g for g in slate.get("games", [])}
     profiles = {}
@@ -863,7 +905,7 @@ def project_slate(slate, prior, player_games, team_games, team_hist=None, roles=
         rows.append({
             "pid": p["pid"], "name": p["name"], "team": p["team"], "opp": p["opp"],
             "home": p["home"], "gid": p["gid"], "pos": p.get("pos", ""),
-            "inj": status, "inj_detail": p.get("inj_detail", ""), "out": out,
+            "inj": status, "inj_detail": p.get("inj_detail", ""), "out": out, "hs": p.get("hs"),
             "_prior": pr, "_games": pg,
             "min_full": base_minutes(pr, pg, p["team"], len(team_games.get(p["team"], []))),
             "upm": usage_per_min(pr, pg),
@@ -918,6 +960,16 @@ def project_slate(slate, prior, player_games, team_games, team_hist=None, roles=
                 r["usg_boost"] = round(min(1.35, 1 + extra[id(r)] / r["min"] / r["upm"]), 4)
         for r in rs:
             r["usg_adj"] = usg_pct((r["upm"] or 0) * r["usg_boost"]) if r["upm"] else None
+        # on/off: each OUT teammate moves this player's rates by his own measured split
+        outs = [o.get("hs") for o in rs if o["out"] and o.get("hs")]
+        for r in rs:
+            r["oo"] = {}
+            if ONOFF is None or not P["oo_a"] or r["out"] or not r.get("hs") or not outs:
+                continue
+            for s_, key in (("pts", "pts"), ("reb", "reb"), ("ast", "ast")):
+                lr = sum(ONOFF.log_ratio(str(r["hs"]), str(o), key, P["oo_k"]) for o in outs)
+                lr = max(-P["oo_cap"], min(P["oo_cap"], lr))
+                r["oo"][s_] = round(math.exp(P["oo_a"] * lr), 4)
 
     for r in rows:
         g = games[r["gid"]]
@@ -937,6 +989,7 @@ def project_slate(slate, prior, player_games, team_games, team_hist=None, roles=
         for s in STATS:
             rate = per_minute(r["_prior"], r["_games"], s, r["pos"])
             rate *= r["usg_boost"] ** P["usg_beta_" + s]
+            rate *= r["oo"].get(s, 1.0)
             proj[s] = round(r["min"] * rate * f[s], 2) if not r["out"] else 0.0
         # made threes, for the player bet card only: minutes x per-minute rate
         # from the same 3-season history, no environment terms. NOT backtested

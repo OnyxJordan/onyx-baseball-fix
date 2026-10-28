@@ -585,6 +585,15 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
   `ui.js` measures each track after every refresh and sets its duration; a fixed 60s had a
   56-game CFB slate scrolling at ~240 px/s. Sport pages repeat short slates so the loop has
   no gap.
+- **NBA on/off splits (10/28, model v7):** `nba_onoff.py` rebuilds every lineup from ESPN
+  play-by-play (starters plus each substitution) and keeps, for every teammate pair, what
+  each player produces per minute with the teammate on the floor and off it. A teammate OUT
+  tonight moves the player's points / rebounds / assists by his own split, shrunk hard
+  (`oo_k` 1,500 minutes) and applied lightly (`oo_a` 0.6). `data/nba/onoff.json` holds last
+  season (seeded once with `tools/nba_pbp_pull.py`) and this season, grown by
+  `nba_common.refresh_onoff` in both fetchers (fail soft; a failed fetch is retried, a
+  malformed summary is skipped). The player card shows the split for each rotation
+  teammate out tonight. Evidence in the v7 changelog: a small, steady gain.
 - **Fresh NBA lines (10/28):** edges are only as good as the line. `nba_lines.yml` re-pulls
   only the Onyx NBA prices every 10 minutes through the evening and rebuilds `nba.html` with
   `NBA_LINES_ONLY=1` (no grading, no picks, no ticket changes: it never writes a ledger and

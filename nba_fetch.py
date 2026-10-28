@@ -26,6 +26,7 @@ preferring OpticOdds.
 import json, os, subprocess, sys, time, urllib.parse
 from datetime import date, datetime, timedelta, timezone
 
+import nba_common
 from nba_common import ESPN, ET, espn_get, game_day, load, save, team_abbr, nk, refresh_history
 from fetch_onyx import http_json, OPTIC
 
@@ -355,6 +356,7 @@ def main():
     ingest_box_scores(today)
     fetch_priors(slate)
     refresh_history(today)   # 3-season priors + age curve (ESPN season totals; past seasons pulled once)
+    nba_common.refresh_onoff(today)   # on/off splits from every new final's play-by-play
     print("=== NBA fetch done (OpticOdds) ===")
     return 0
 
