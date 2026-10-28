@@ -5575,8 +5575,8 @@
     {
      "id": "185680",
      "start": "2026-10-28T01:35Z",
-     "state": "in",
-     "detail": "3rd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Center",
@@ -5599,11 +5599,11 @@
        "short": "K. Rakhimova",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/uzb.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
         4,
-        5
+        7
        ],
        "serve": false
       }
@@ -5611,9 +5611,9 @@
     },
     {
      "id": "185682",
-     "start": "2026-10-28T04:30Z",
-     "state": "pre",
-     "detail": "10/28 - 12:30 AM EDT",
+     "start": "2026-10-28T04:45Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Center",
@@ -5624,8 +5624,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/aus.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        0
+       ],
+       "serve": true
       },
       {
        "name": "Cristina Bucsa",
@@ -5633,7 +5635,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        0
+       ],
        "serve": false
       }
      ]
@@ -5889,9 +5893,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Kamilla Rakhimova",
+       "short": "K. Rakhimova",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/uzb.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -9874,5 +9878,5 @@
    ]
   }
  ],
- "fetched": "2026-10-28T04:17:04+00:00"
+ "fetched": "2026-10-28T04:48:53+00:00"
 }
