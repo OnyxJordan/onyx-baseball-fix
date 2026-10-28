@@ -605,6 +605,11 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
   run with a game tipping within 4 hours arms `nba_lines_chain.yml` (one sleeper, ~9 min),
   which starts the next run; every full refresh also starts it, and the cron stays as a
   third backup.
+  Newest pull wins: when a push is rejected, the pipelines rebase preferring their own files,
+  which once put 38-second-older prices back on main. `newest_lines.py` runs after every such
+  rebase (refresh, daily build, lines) and, if main's Onyx pull is newer, keeps it and rebuilds
+  `nba.html` in lines-only mode. Every deploy then uploads the latest main, not the run's own
+  snapshot, so a run that deploys last cannot roll the page back.
 - **Sport model breakdowns (10/27):** `sports_build.py` emits `model.engine` for every sport
   (the steps of a price, the factors and the pick lane, all read from the live model
   parameters and `backtest.json`), rendered on the Model tab. A sport still in the lab also

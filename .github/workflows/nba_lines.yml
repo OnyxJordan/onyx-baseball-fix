@@ -97,10 +97,15 @@ jobs:
           for i in 1 2 3 4; do
             if git push; then break; fi
             git pull --rebase -X theirs origin main || { git rebase --abort || true; git pull --rebase -s ours origin main || true; }
+            python3 -B newest_lines.py || true   # the newer Onyx NBA pull wins the race, not the later push
             sleep $((i * 3))
           done
           git push || { echo "::warning::push lost the race 4x; the next 10-min run recovers"; exit 0; }
           echo "changed=true" >> "$GITHUB_OUTPUT"
+      - name: Deploy the latest main, not this run's snapshot
+        # a run that pushed first but deploys last must not roll the page back
+        if: steps.commit.outputs.changed == 'true'
+        run: git fetch -q origin main && git checkout -q origin/main -- .
       - name: Upload Pages artifact
         if: steps.commit.outputs.changed == 'true'
         uses: actions/upload-pages-artifact@v3
