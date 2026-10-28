@@ -975,7 +975,7 @@
      "id": "185185",
      "start": "2026-10-28T16:45Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 2",
      "draw": "Men's Singles",
      "court": "Glaubandich Court",
@@ -987,7 +987,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        3
+        6,
+        2
        ],
        "serve": false
       },
@@ -998,9 +999,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        4
+        4,
+        2
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
@@ -1020,9 +1022,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        3
+        5
        ],
-       "serve": false
+       "serve": true
       },
       {
        "name": "Jurij Rodionov",
@@ -1031,7 +1033,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        6
        ],
        "serve": false
       }
@@ -2422,8 +2424,8 @@
     {
      "id": "185133",
      "start": "2026-10-28T15:20Z",
-     "state": "in",
-     "detail": "3rd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 1",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -2437,20 +2439,20 @@
        "sets": [
         6,
         3,
-        2
+        4
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Novak Djokovic",
        "short": "N. Djokovic",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ser.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         4,
         6,
-        2
+        6
        ],
        "serve": false
       }
@@ -2458,9 +2460,9 @@
     },
     {
      "id": "185138",
-     "start": "2026-10-28T17:30Z",
+     "start": "2026-10-28T18:05Z",
      "state": "pre",
-     "detail": "10/28 - 1:30 PM EDT",
+     "detail": "10/28 - 2:05 PM EDT",
      "round": "Round 1",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -2487,9 +2489,9 @@
     },
     {
      "id": "185146",
-     "start": "2026-10-28T18:30Z",
+     "start": "2026-10-28T19:00Z",
      "state": "pre",
-     "detail": "10/28 - 2:30 PM EDT",
+     "detail": "10/28 - 3:00 PM EDT",
      "round": "Round 2",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -2620,9 +2622,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Novak Djokovic",
+       "short": "N. Djokovic",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ser.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -6914,7 +6916,7 @@
      "id": "185769",
      "start": "2026-10-28T16:05Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Quadra 1",
@@ -6926,7 +6928,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        5
+        5,
+        1
        ],
        "serve": false
       },
@@ -6937,7 +6940,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        7
+        7,
+        3
        ],
        "serve": false
       }
@@ -6959,7 +6963,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        1
+        3
        ],
        "serve": false
       },
@@ -6970,7 +6974,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        1
+        3
        ],
        "serve": true
       }
@@ -8167,9 +8171,9 @@
        "win": false,
        "sets": [
         3,
-        1
+        5
        ],
-       "serve": false
+       "serve": true
       },
       {
        "name": "Elizara Yaneva",
@@ -8179,9 +8183,9 @@
        "win": false,
        "sets": [
         6,
-        2
+        3
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -8189,7 +8193,7 @@
      "id": "185846",
      "start": "2026-10-28T16:30Z",
      "state": "in",
-     "detail": "2nd",
+     "detail": "3rd",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Centre Court",
@@ -8202,7 +8206,8 @@
        "win": false,
        "sets": [
         1,
-        4
+        6,
+        3
        ],
        "serve": true
       },
@@ -8214,7 +8219,8 @@
        "win": false,
        "sets": [
         6,
-        2
+        2,
+        1
        ],
        "serve": false
       }
@@ -8222,9 +8228,9 @@
     },
     {
      "id": "185849",
-     "start": "2026-10-28T17:30Z",
+     "start": "2026-10-28T18:00Z",
      "state": "pre",
-     "detail": "10/28 - 1:30 PM EDT",
+     "detail": "10/28 - 2:00 PM EDT",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Grandstand",
@@ -10040,5 +10046,5 @@
    ]
   }
  ],
- "fetched": "2026-10-28T17:23:05+00:00"
+ "fetched": "2026-10-28T17:55:21+00:00"
 }
