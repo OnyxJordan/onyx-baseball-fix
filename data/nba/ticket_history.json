@@ -116,5 +116,60 @@
   "pnl": -10.0,
   "locked_at": "2026-10-28T00:01:35+00:00",
   "graded_at": "2026-10-28T07:21:20+00:00"
+ },
+ {
+  "date": "2026-10-28",
+  "stake": 10.0,
+  "data_src": "optic",
+  "legs": [
+   {
+    "pid": "3F8B2DD8AF32",
+    "player": "OG Anunoby",
+    "team": "NY",
+    "opp": "CHI",
+    "gid": "2026102914629F52",
+    "stat": "ast",
+    "side": "over",
+    "line": 1.5,
+    "odds": -175,
+    "prob": 0.6193,
+    "proj": 2.6,
+    "sel": "be50239c-b3c2-4475-b9b9-3cca109421e3",
+    "hit": null
+   },
+   {
+    "pid": "30C9ABBBF692",
+    "player": "Stephen Curry",
+    "team": "GS",
+    "opp": "MIN",
+    "gid": "202610292B76C103",
+    "stat": "reb",
+    "side": "under",
+    "line": 3.5,
+    "odds": -176,
+    "prob": 0.6167,
+    "proj": 2.77,
+    "sel": "099a35f9-6cf4-4a40-aab7-9c90bb52a901",
+    "hit": null
+   },
+   {
+    "pid": "88E87BF2A103",
+    "player": "Alexandre Sarr",
+    "team": "WSH",
+    "opp": "CLE",
+    "gid": "20261028278A6EDB",
+    "stat": "ast",
+    "side": "over",
+    "line": 1.5,
+    "odds": -163,
+    "prob": 0.614,
+    "proj": 2.73,
+    "sel": "e8372ac2-a5a5-46fd-b895-606f59743dfe",
+    "hit": null
+   }
+  ],
+  "result": null,
+  "pnl": null,
+  "locked_at": "2026-10-28T23:17:53+00:00"
  }
 ]

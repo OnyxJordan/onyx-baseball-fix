@@ -9655,8 +9655,8 @@
     {
      "id": "185797",
      "start": "2026-10-28T21:40Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Estadio Mexcovery",
@@ -9666,10 +9666,10 @@
        "short": "C. Monnet",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        5
+        6
        ],
        "serve": false
       },
@@ -9683,15 +9683,15 @@
         2,
         1
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
     {
      "id": "185808",
-     "start": "2026-10-28T23:00Z",
-     "state": "pre",
-     "detail": "10/28 - 7:00 PM EDT",
+     "start": "2026-10-28T23:05Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Estadio Mexcovery",
@@ -9702,7 +9702,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        1
+       ],
        "serve": false
       },
       {
@@ -9711,7 +9713,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        2
+       ],
        "serve": false
       }
      ]
@@ -9929,9 +9933,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Carole Monnet",
+       "short": "C. Monnet",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -10096,5 +10100,5 @@
    ]
   }
  ],
- "fetched": "2026-10-28T22:46:33+00:00"
+ "fetched": "2026-10-28T23:18:18+00:00"
 }
