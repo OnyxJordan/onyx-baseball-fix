@@ -975,7 +975,7 @@
      "id": "185185",
      "start": "2026-10-28T16:45Z",
      "state": "post",
-     "detail": "Suspended",
+     "detail": "Final",
      "round": "Round 2",
      "draw": "Men's Singles",
      "court": "Glaubandich Court",
@@ -985,10 +985,10 @@
        "short": "A. Mannarino",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        4
+        7
        ],
        "serve": false
       },
@@ -1009,8 +1009,8 @@
     {
      "id": "185179",
      "start": "2026-10-28T17:00Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 1",
      "draw": "Men's Singles",
      "court": "Centre Court",
@@ -1020,10 +1020,10 @@
        "short": "N. Basilashvili",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/geo.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         7,
-        3
+        6
        ],
        "serve": false
       },
@@ -1035,17 +1035,17 @@
        "win": false,
        "sets": [
         6,
-        0
+        1
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
     {
      "id": "185198",
-     "start": "2026-10-28T19:00Z",
+     "start": "2026-10-28T19:05Z",
      "state": "pre",
-     "detail": "10/28 - 3:00 PM EDT",
+     "detail": "10/28 - 3:05 PM EDT",
      "round": "Round 2",
      "draw": "Men's Singles",
      "court": "Centre Court",
@@ -1176,9 +1176,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Nikoloz Basilashvili",
+       "short": "N. Basilashvili",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/geo.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -1292,9 +1292,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Adrian Mannarino",
+       "short": "A. Mannarino",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -2476,9 +2476,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        1
+        4
        ],
-       "serve": false
+       "serve": true
       },
       {
        "name": "Taylor Fritz",
@@ -2487,9 +2487,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        1
+        5
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -6957,7 +6957,7 @@
      "id": "185768",
      "start": "2026-10-28T17:10Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Quadra Central",
@@ -6969,9 +6969,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        7
+        7,
+        2
        ],
-       "serve": false
+       "serve": true
       },
       {
        "name": "Gabriela Ce",
@@ -6980,7 +6981,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        6
+        6,
+        4
        ],
        "serve": false
       }
@@ -8163,8 +8165,8 @@
     {
      "id": "185844",
      "start": "2026-10-28T16:30Z",
-     "state": "in",
-     "detail": "3rd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Grandstand",
@@ -8187,13 +8189,13 @@
        "short": "E. Yaneva",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/bul.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
         3,
-        5
+        6
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -8236,9 +8238,9 @@
     },
     {
      "id": "185849",
-     "start": "2026-10-28T18:30Z",
-     "state": "pre",
-     "detail": "10/28 - 2:30 PM EDT",
+     "start": "2026-10-28T18:40Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Grandstand",
@@ -8249,7 +8251,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ger.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        3
+       ],
        "serve": false
       },
       {
@@ -8258,8 +8262,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/pol.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        2
+       ],
+       "serve": true
       }
      ]
     },
@@ -8476,9 +8482,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Elizara Yaneva",
+       "short": "E. Yaneva",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/bul.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -10054,5 +10060,5 @@
    ]
   }
  ],
- "fetched": "2026-10-28T18:27:50+00:00"
+ "fetched": "2026-10-28T18:59:56+00:00"
 }
