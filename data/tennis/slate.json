@@ -6692,8 +6692,8 @@
     {
      "id": "185766",
      "start": "2026-10-27T21:40Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Quadra Central",
@@ -6703,10 +6703,10 @@
        "short": "J. Grabher",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/aut.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         7,
-        4
+        7
        ],
        "serve": false
       },
@@ -6718,7 +6718,7 @@
        "win": false,
        "sets": [
         5,
-        4
+        6
        ],
        "serve": false
       }
@@ -6937,9 +6937,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Julia Grabher",
+       "short": "J. Grabher",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/aut.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -9292,7 +9292,7 @@
      "id": "185809",
      "start": "2026-10-27T22:35Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Court 2",
@@ -9304,6 +9304,7 @@
        "seed": null,
        "win": false,
        "sets": [
+        7,
         5
        ],
        "serve": false
@@ -9315,7 +9316,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        6
+        6,
+        0
        ],
        "serve": false
       }
@@ -9325,7 +9327,7 @@
      "id": "185800",
      "start": "2026-10-27T23:05Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Estadio Mexcovery",
@@ -9337,9 +9339,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        3
+        6,
+        1
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Katherine Hui",
@@ -9348,17 +9351,18 @@
        "seed": null,
        "win": false,
        "sets": [
+        3,
         2
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
     {
      "id": "185798",
-     "start": "2026-10-28T00:00Z",
+     "start": "2026-10-28T00:20Z",
      "state": "pre",
-     "detail": "10/27 - 8:00 PM EDT",
+     "detail": "10/27 - 8:20 PM EDT",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Court 2",
@@ -9413,27 +9417,27 @@
      ]
     },
     {
-     "id": "185810",
-     "start": "2026-10-28T04:00Z",
+     "id": "185797",
+     "start": "2026-10-28T21:30Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "10/28 - 5:30 PM EDT",
      "round": "Round 2",
      "draw": "Women's Singles",
-     "court": "",
+     "court": "Estadio Mexcovery",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Carole Monnet",
+       "short": "C. Monnet",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
        "win": false,
        "sets": [],
        "serve": false
       },
       {
-       "name": "Tamara Zidansek",
-       "short": "T. Zidansek",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/slo.png",
+       "name": "Carmen Andreea Herea",
+       "short": "C. Herea",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/rom.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -9442,27 +9446,56 @@
      ]
     },
     {
-     "id": "185794",
-     "start": "2026-10-28T04:00Z",
+     "id": "185808",
+     "start": "2026-10-28T23:00Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "10/28 - 7:00 PM EDT",
      "round": "Round 2",
      "draw": "Women's Singles",
-     "court": "",
+     "court": "Estadio Mexcovery",
      "p": [
       {
-       "name": "Martina Colmegna",
-       "short": "M. Colmegna",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ita.png",
+       "name": "Elizabeth Mandlik",
+       "short": "E. Mandlik",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
        "win": false,
        "sets": [],
        "serve": false
       },
       {
-       "name": "Tatjana Maria",
-       "short": "T. Maria",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ger.png",
+       "name": "Selena Janicijevic",
+       "short": "S. Janicijevic",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      }
+     ]
+    },
+    {
+     "id": "185806",
+     "start": "2026-10-29T00:30Z",
+     "state": "pre",
+     "detail": "10/28 - 8:30 PM EDT",
+     "round": "Round 2",
+     "draw": "Women's Singles",
+     "court": "Estadio Mexcovery",
+     "p": [
+      {
+       "name": "Adriana Reami",
+       "short": "A. Reami",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      },
+      {
+       "name": "Fiona Ferro",
+       "short": "F. Ferro",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -9472,7 +9505,7 @@
     },
     {
      "id": "185796",
-     "start": "2026-10-28T04:00Z",
+     "start": "2026-10-29T04:00Z",
      "state": "pre",
      "detail": "TBD",
      "round": "Round 2",
@@ -9500,8 +9533,8 @@
      ]
     },
     {
-     "id": "185797",
-     "start": "2026-10-28T04:00Z",
+     "id": "185810",
+     "start": "2026-10-29T04:00Z",
      "state": "pre",
      "detail": "TBD",
      "round": "Round 2",
@@ -9509,18 +9542,18 @@
      "court": "",
      "p": [
       {
-       "name": "Carole Monnet",
-       "short": "C. Monnet",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
+       "name": "TBD",
+       "short": "TBD",
+       "flag": null,
        "seed": null,
        "win": false,
        "sets": [],
        "serve": false
       },
       {
-       "name": "Carmen Andreea Herea",
-       "short": "C. Herea",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/rom.png",
+       "name": "Tamara Zidansek",
+       "short": "T. Zidansek",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/slo.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -9530,7 +9563,7 @@
     },
     {
      "id": "185801",
-     "start": "2026-10-28T04:00Z",
+     "start": "2026-10-29T04:00Z",
      "state": "pre",
      "detail": "TBD",
      "round": "Round 2",
@@ -9558,8 +9591,8 @@
      ]
     },
     {
-     "id": "185806",
-     "start": "2026-10-28T04:00Z",
+     "id": "185794",
+     "start": "2026-10-29T04:00Z",
      "state": "pre",
      "detail": "TBD",
      "round": "Round 2",
@@ -9567,47 +9600,18 @@
      "court": "",
      "p": [
       {
-       "name": "Adriana Reami",
-       "short": "A. Reami",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
+       "name": "Martina Colmegna",
+       "short": "M. Colmegna",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ita.png",
        "seed": null,
        "win": false,
        "sets": [],
        "serve": false
       },
       {
-       "name": "Fiona Ferro",
-       "short": "F. Ferro",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      }
-     ]
-    },
-    {
-     "id": "185808",
-     "start": "2026-10-28T04:00Z",
-     "state": "pre",
-     "detail": "TBD",
-     "round": "Round 2",
-     "draw": "Women's Singles",
-     "court": "",
-     "p": [
-      {
-       "name": "Elizabeth Mandlik",
-       "short": "E. Mandlik",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "Selena Janicijevic",
-       "short": "S. Janicijevic",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
+       "name": "Tatjana Maria",
+       "short": "T. Maria",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ger.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -9617,7 +9621,7 @@
     },
     {
      "id": "185812",
-     "start": "2026-10-28T04:00Z",
+     "start": "2026-10-29T04:00Z",
      "state": "pre",
      "detail": "TBD",
      "round": "Round 2",
@@ -9850,5 +9854,5 @@
    ]
   }
  ],
- "fetched": "2026-10-27T23:29:02+00:00"
+ "fetched": "2026-10-28T00:01:52+00:00"
 }

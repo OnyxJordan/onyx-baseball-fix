@@ -57,5 +57,60 @@
   "pnl": -10.0,
   "locked_at": "2026-10-26T23:25:38+00:00",
   "graded_at": "2026-10-27T03:39:06+00:00"
+ },
+ {
+  "date": "2026-10-27",
+  "stake": 10.0,
+  "data_src": "optic",
+  "legs": [
+   {
+    "pid": "705A1539F76B",
+    "player": "John Collins",
+    "team": "DET",
+    "opp": "NY",
+    "gid": "20261028960B9394",
+    "stat": "ast",
+    "side": "under",
+    "line": 1.5,
+    "odds": -192,
+    "prob": 0.6424,
+    "proj": 0.98,
+    "sel": "55363317-e3a6-4c8d-880c-a8c91a93fcc5",
+    "hit": null
+   },
+   {
+    "pid": "C4C84A5A054A",
+    "player": "Ziaire Williams",
+    "team": "LAL",
+    "opp": "POR",
+    "gid": "20261028594A30DF",
+    "stat": "reb",
+    "side": "over",
+    "line": 2.5,
+    "odds": -175,
+    "prob": 0.5935,
+    "proj": 3.36,
+    "sel": "5fc141b5-e025-44e6-af0e-9a8e3b7156b8",
+    "hit": null
+   },
+   {
+    "pid": "13EF407D545CCEE4",
+    "player": "Darius Acuff Jr.",
+    "team": "SAC",
+    "opp": "SA",
+    "gid": "20261028D1FC41EF",
+    "stat": "reb",
+    "side": "over",
+    "line": 2.5,
+    "odds": -163,
+    "prob": 0.587,
+    "proj": 3.37,
+    "sel": "83e34301-d242-440d-9312-8bf5b34b3e43",
+    "hit": null
+   }
+  ],
+  "result": null,
+  "pnl": null,
+  "locked_at": "2026-10-28T00:01:35+00:00"
  }
 ]
