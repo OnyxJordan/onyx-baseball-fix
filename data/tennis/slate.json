@@ -1,5 +1,5 @@
 {
- "date": "2026-10-27",
+ "date": "2026-10-28",
  "sport": "tennis",
  "name": "Tennis",
  "label": "Erste Bank Open · Swiss Indoors Basel · Guangzhou Open",
@@ -4071,8 +4071,8 @@
     {
      "id": "185710",
      "start": "2026-10-28T07:20Z",
-     "state": "in",
-     "detail": "1st",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -4084,7 +4084,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        0
+        1,
+        4
        ],
        "serve": false
       },
@@ -4093,19 +4094,20 @@
        "short": "P. Badosa",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
-        0
+        6,
+        6
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
     {
      "id": "185714",
-     "start": "2026-10-28T08:00Z",
-     "state": "pre",
-     "detail": "10/28 - 4:00 AM EDT",
+     "start": "2026-10-28T08:40Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -4116,7 +4118,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ina.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        3
+       ],
        "serve": false
       },
       {
@@ -4125,8 +4129,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/gbr.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        4
+       ],
+       "serve": true
       }
      ]
     },
@@ -4352,9 +4358,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Paula Badosa",
+       "short": "P. Badosa",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -5662,7 +5668,7 @@
      "id": "185669",
      "start": "2026-10-28T06:50Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "3rd",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Center",
@@ -5674,7 +5680,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        4
+        6,
+        5,
+        5
        ],
        "serve": false
       },
@@ -5685,17 +5693,19 @@
        "seed": null,
        "win": false,
        "sets": [
-        1
+        3,
+        7,
+        3
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
     {
      "id": "185667",
-     "start": "2026-10-28T08:00Z",
+     "start": "2026-10-28T09:30Z",
      "state": "pre",
-     "detail": "10/28 - 4:00 AM EDT",
+     "detail": "10/28 - 5:30 AM EDT",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Center",
@@ -5721,13 +5731,71 @@
      ]
     },
     {
-     "id": "185672",
-     "start": "2026-10-29T04:00Z",
+     "id": "185660",
+     "start": "2026-10-29T01:30Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "10/28 - 9:30 PM EDT",
      "round": "Round 2",
      "draw": "Women's Singles",
-     "court": "",
+     "court": "Center",
+     "p": [
+      {
+       "name": "Kimberly Birrell",
+       "short": "K. Birrell",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/aus.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      },
+      {
+       "name": "Alycia Parks",
+       "short": "A. Parks",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      }
+     ]
+    },
+    {
+     "id": "185678",
+     "start": "2026-10-29T02:30Z",
+     "state": "pre",
+     "detail": "10/28 - 10:30 PM EDT",
+     "round": "Round 2",
+     "draw": "Women's Singles",
+     "court": "Center",
+     "p": [
+      {
+       "name": "Elise Mertens",
+       "short": "E. Mertens",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/bel.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      },
+      {
+       "name": "Leylah Fernandez",
+       "short": "L. Fernandez",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/can.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      }
+     ]
+    },
+    {
+     "id": "185672",
+     "start": "2026-10-29T05:30Z",
+     "state": "pre",
+     "detail": "10/29 - 1:30 AM EDT",
+     "round": "Round 2",
+     "draw": "Women's Singles",
+     "court": "Center",
      "p": [
       {
        "name": "Mia Pohankova",
@@ -5751,12 +5819,12 @@
     },
     {
      "id": "185676",
-     "start": "2026-10-29T04:00Z",
+     "start": "2026-10-29T08:00Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "10/29 - 4:00 AM EDT",
      "round": "Round 2",
      "draw": "Women's Singles",
-     "court": "",
+     "court": "Center",
      "p": [
       {
        "name": "Yulia Putintseva",
@@ -5771,64 +5839,6 @@
        "name": "Elena Rybakina",
        "short": "E. Rybakina",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/kaz.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      }
-     ]
-    },
-    {
-     "id": "185678",
-     "start": "2026-10-29T04:00Z",
-     "state": "pre",
-     "detail": "TBD",
-     "round": "Round 2",
-     "draw": "Women's Singles",
-     "court": "",
-     "p": [
-      {
-       "name": "Elise Mertens",
-       "short": "E. Mertens",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/bel.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "Leylah Fernandez",
-       "short": "L. Fernandez",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/can.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      }
-     ]
-    },
-    {
-     "id": "185660",
-     "start": "2026-10-29T04:00Z",
-     "state": "pre",
-     "detail": "TBD",
-     "round": "Round 2",
-     "draw": "Women's Singles",
-     "court": "",
-     "p": [
-      {
-       "name": "Kimberly Birrell",
-       "short": "K. Birrell",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/aus.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "Alycia Parks",
-       "short": "A. Parks",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -9898,5 +9908,5 @@
    ]
   }
  ],
- "fetched": "2026-10-28T07:21:37+00:00"
+ "fetched": "2026-10-28T09:24:08+00:00"
 }
