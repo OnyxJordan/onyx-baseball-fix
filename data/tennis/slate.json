@@ -5575,8 +5575,8 @@
     {
      "id": "185680",
      "start": "2026-10-28T01:35Z",
-     "state": "pre",
-     "detail": "10/27 - 9:35 PM EDT",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Center",
@@ -5587,7 +5587,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/rus.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        3
+       ],
        "serve": false
       },
       {
@@ -5596,7 +5598,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/uzb.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        3
+       ],
        "serve": false
       }
      ]
@@ -9361,8 +9365,8 @@
     {
      "id": "185798",
      "start": "2026-10-28T00:25Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Court 2",
@@ -9372,10 +9376,10 @@
        "short": "M. Bulgaru",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/rom.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        5
+        6
        ],
        "serve": false
       },
@@ -9389,7 +9393,7 @@
         1,
         1
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -9410,9 +9414,9 @@
        "win": false,
        "sets": [
         4,
-        0
+        3
        ],
-       "serve": false
+       "serve": true
       },
       {
        "name": "Nadia Podoroska",
@@ -9422,9 +9426,9 @@
        "win": false,
        "sets": [
         6,
-        1
+        5
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -9583,9 +9587,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Miriam Bulgaru",
+       "short": "M. Bulgaru",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/rom.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -9866,5 +9870,5 @@
    ]
   }
  ],
- "fetched": "2026-10-28T01:36:01+00:00"
+ "fetched": "2026-10-28T02:07:30+00:00"
 }
