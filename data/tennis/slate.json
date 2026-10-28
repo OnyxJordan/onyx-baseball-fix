@@ -5589,7 +5589,7 @@
        "win": false,
        "sets": [
         4,
-        1
+        5
        ],
        "serve": false
       },
@@ -5601,7 +5601,7 @@
        "win": false,
        "sets": [
         6,
-        0
+        4
        ],
        "serve": false
       }
@@ -5609,9 +5609,9 @@
     },
     {
      "id": "185682",
-     "start": "2026-10-28T02:30Z",
+     "start": "2026-10-28T03:10Z",
      "state": "pre",
-     "detail": "10/27 - 10:30 PM EDT",
+     "detail": "10/27 - 11:10 PM EDT",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Center",
@@ -5687,35 +5687,6 @@
        "name": "Alexandra Eala",
        "short": "A. Eala",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/phi.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      }
-     ]
-    },
-    {
-     "id": "185660",
-     "start": "2026-10-29T04:00Z",
-     "state": "pre",
-     "detail": "TBD",
-     "round": "Round 2",
-     "draw": "Women's Singles",
-     "court": "",
-     "p": [
-      {
-       "name": "Kimberly Birrell",
-       "short": "K. Birrell",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/aus.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "Alycia Parks",
-       "short": "A. Parks",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -5811,27 +5782,27 @@
      ]
     },
     {
-     "id": "185683",
-     "start": "2026-10-30T04:00Z",
+     "id": "185660",
+     "start": "2026-10-29T04:00Z",
      "state": "pre",
      "detail": "TBD",
-     "round": "Quarterfinal",
+     "round": "Round 2",
      "draw": "Women's Singles",
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Kimberly Birrell",
+       "short": "K. Birrell",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/aus.png",
        "seed": null,
        "win": false,
        "sets": [],
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Alycia Parks",
+       "short": "A. Parks",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -5840,7 +5811,7 @@
      ]
     },
     {
-     "id": "185684",
+     "id": "185686",
      "start": "2026-10-30T04:00Z",
      "state": "pre",
      "detail": "TBD",
@@ -5898,7 +5869,36 @@
      ]
     },
     {
-     "id": "185686",
+     "id": "185684",
+     "start": "2026-10-30T04:00Z",
+     "state": "pre",
+     "detail": "TBD",
+     "round": "Quarterfinal",
+     "draw": "Women's Singles",
+     "court": "",
+     "p": [
+      {
+       "name": "TBD",
+       "short": "TBD",
+       "flag": null,
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      },
+      {
+       "name": "TBD",
+       "short": "TBD",
+       "flag": null,
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      }
+     ]
+    },
+    {
+     "id": "185683",
      "start": "2026-10-30T04:00Z",
      "state": "pre",
      "detail": "TBD",
@@ -9872,5 +9872,5 @@
    ]
   }
  ],
- "fetched": "2026-10-28T02:30:25+00:00"
+ "fetched": "2026-10-28T03:03:00+00:00"
 }
