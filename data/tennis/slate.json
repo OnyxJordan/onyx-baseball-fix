@@ -1044,8 +1044,8 @@
     {
      "id": "185198",
      "start": "2026-10-28T19:15Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 2",
      "draw": "Men's Singles",
      "court": "Centre Court",
@@ -1055,10 +1055,10 @@
        "short": "A. de Minaur",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/aus.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        5
+        6
        ],
        "serve": false
       },
@@ -1289,9 +1289,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Alex de Minaur",
+       "short": "A. de Minaur",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/aus.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -2505,7 +2505,7 @@
      "id": "185146",
      "start": "2026-10-28T20:15Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "3rd",
      "round": "Round 2",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -2517,7 +2517,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        1
+        3,
+        6,
+        6
        ],
        "serve": false
       },
@@ -2528,9 +2530,11 @@
        "seed": null,
        "win": false,
        "sets": [
-        1
+        6,
+        3,
+        6
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -7004,9 +7008,9 @@
     },
     {
      "id": "185771",
-     "start": "2026-10-28T21:00Z",
-     "state": "pre",
-     "detail": "10/28 - 5:00 PM EDT",
+     "start": "2026-10-28T21:05Z",
+     "state": "in",
+     "detail": "2nd",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Quadra Central",
@@ -7017,8 +7021,11 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        4,
+        3
+       ],
+       "serve": true
       },
       {
        "name": "Nauhany Vitoria Leme Da Silva",
@@ -7026,48 +7033,22 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/bra.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
-      }
-     ]
-    },
-    {
-     "id": "185770",
-     "start": "2026-10-29T04:00Z",
-     "state": "pre",
-     "detail": "TBD",
-     "round": "Round 2",
-     "draw": "Women's Singles",
-     "court": "",
-     "p": [
-      {
-       "name": "Marjorie Souza",
-       "short": "M. Souza",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/bra.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "Francesca Jones",
-       "short": "F. Jones",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/gbr.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
+       "sets": [
+        6,
+        3
+       ],
        "serve": false
       }
      ]
     },
     {
      "id": "185767",
-     "start": "2026-10-29T04:00Z",
+     "start": "2026-10-29T15:00Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "10/29 - 11:00 AM EDT",
      "round": "Round 2",
      "draw": "Women's Singles",
-     "court": "",
+     "court": "Quadra Central",
      "p": [
       {
        "name": "Yasmine Kabbaj",
@@ -7090,13 +7071,42 @@
      ]
     },
     {
-     "id": "185774",
-     "start": "2026-10-29T04:00Z",
+     "id": "185770",
+     "start": "2026-10-29T16:30Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "10/29 - 12:30 PM EDT",
      "round": "Round 2",
      "draw": "Women's Singles",
-     "court": "",
+     "court": "Quadra Central",
+     "p": [
+      {
+       "name": "Marjorie Souza",
+       "short": "M. Souza",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/bra.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      },
+      {
+       "name": "Francesca Jones",
+       "short": "F. Jones",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/gbr.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      }
+     ]
+    },
+    {
+     "id": "185774",
+     "start": "2026-10-29T18:00Z",
+     "state": "pre",
+     "detail": "10/29 - 2:00 PM EDT",
+     "round": "Round 2",
+     "draw": "Women's Singles",
+     "court": "Quadra Central",
      "p": [
       {
        "name": "Julia Grabher",
@@ -8286,13 +8296,71 @@
      ]
     },
     {
-     "id": "185848",
-     "start": "2026-10-28T23:00Z",
+     "id": "185845",
+     "start": "2026-10-29T13:00Z",
      "state": "pre",
-     "detail": "10/28 - 7:00 PM EDT",
+     "detail": "10/29 - 9:00 AM EDT",
      "round": "Round 2",
      "draw": "Women's Singles",
-     "court": "",
+     "court": "Grandstand",
+     "p": [
+      {
+       "name": "Erika Andreeva",
+       "short": "E. Andreeva",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/rus.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      },
+      {
+       "name": "Marina Bassols Ribera",
+       "short": "M. Bassols Ribera",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      }
+     ]
+    },
+    {
+     "id": "185850",
+     "start": "2026-10-29T14:00Z",
+     "state": "pre",
+     "detail": "10/29 - 10:00 AM EDT",
+     "round": "Round 2",
+     "draw": "Women's Singles",
+     "court": "Court 1",
+     "p": [
+      {
+       "name": "Elsa Jacquemot",
+       "short": "E. Jacquemot",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      },
+      {
+       "name": "Susan Bandecchi",
+       "short": "S. Bandecchi",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/sui.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      }
+     ]
+    },
+    {
+     "id": "185848",
+     "start": "2026-10-29T14:30Z",
+     "state": "pre",
+     "detail": "10/29 - 10:30 AM EDT",
+     "round": "Round 2",
+     "draw": "Women's Singles",
+     "court": "Grandstand",
      "p": [
       {
        "name": "Ayla Aksu",
@@ -8319,71 +8387,13 @@
      ]
     },
     {
-     "id": "185845",
-     "start": "2026-10-29T13:00Z",
-     "state": "pre",
-     "detail": "10/29 - 9:00 AM EDT",
-     "round": "Round 2",
-     "draw": "Women's Singles",
-     "court": "Centre Court",
-     "p": [
-      {
-       "name": "Erika Andreeva",
-       "short": "E. Andreeva",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/rus.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "Marina Bassols Ribera",
-       "short": "M. Bassols Ribera",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      }
-     ]
-    },
-    {
-     "id": "185850",
-     "start": "2026-10-29T14:30Z",
-     "state": "pre",
-     "detail": "10/29 - 10:30 AM EDT",
-     "round": "Round 2",
-     "draw": "Women's Singles",
-     "court": "Centre Court",
-     "p": [
-      {
-       "name": "Elsa Jacquemot",
-       "short": "E. Jacquemot",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "Susan Bandecchi",
-       "short": "S. Bandecchi",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/sui.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      }
-     ]
-    },
-    {
      "id": "185851",
      "start": "2026-10-29T16:00Z",
      "state": "pre",
      "detail": "10/29 - 12:00 PM EDT",
      "round": "Round 2",
      "draw": "Women's Singles",
-     "court": "Centre Court",
+     "court": "Grandstand",
      "p": [
       {
        "name": "Katarina Zavatska",
@@ -8407,12 +8417,12 @@
     },
     {
      "id": "185847",
-     "start": "2026-10-29T19:30Z",
+     "start": "2026-10-29T17:30Z",
      "state": "pre",
-     "detail": "10/29 - 3:30 PM EDT",
+     "detail": "10/29 - 1:30 PM EDT",
      "round": "Round 2",
      "draw": "Women's Singles",
-     "court": "Centre Court",
+     "court": "Grandstand",
      "p": [
       {
        "name": "Lisa Pigato",
@@ -9644,9 +9654,9 @@
     },
     {
      "id": "185797",
-     "start": "2026-10-28T21:30Z",
-     "state": "pre",
-     "detail": "10/28 - 5:30 PM EDT",
+     "start": "2026-10-28T21:40Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Estadio Mexcovery",
@@ -9657,7 +9667,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        4
+       ],
        "serve": false
       },
       {
@@ -9666,8 +9678,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/rom.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        2
+       ],
+       "serve": true
       }
      ]
     },
@@ -10080,5 +10094,5 @@
    ]
   }
  ],
- "fetched": "2026-10-28T20:29:51+00:00"
+ "fetched": "2026-10-28T22:14:59+00:00"
 }
