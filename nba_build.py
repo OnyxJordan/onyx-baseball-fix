@@ -547,7 +547,9 @@ def main():
         "generated": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "league": lg,
         "meta": {"players_projected": sum(1 for r in rows if not r["out"] and r["min"] >= 10),
-                 "priced": priced, "picks": len(today_rows)},
+                 "priced": priced, "picks": len(today_rows),
+                 # games whose picks wait for the last PICK_LOCK_H hours (the page's watchlist says so)
+                 "unsettled": sorted(unsettled), "lock_h": PICK_LOCK_H},
         "games": slate["games"], "players": players_out,
         "picks": today_rows, "record": record, "tickets": tickets,
         # 80px team logos baked in (tools/nba_make_logos.py): no third-party

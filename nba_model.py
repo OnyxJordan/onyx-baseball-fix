@@ -2,6 +2,34 @@
 nba_model.py - Onyx NBA points / rebounds / assists projection model.
 
 CHANGELOG (the lab notebook: every change bumps VERSION and cites evidence)
+  v6 (2026-10-28) PROJECTIONS RAN LOW, SO THE BOARD LEANED UNDER.
+     Trigger: the 10/28 board showed 284 of 381 best sides (18+ min) as
+     Unders, the projection under the Onyx points line 72% of the time by
+     0.89 on average. Measured (2025-26, healthy scratches on the slate,
+     players projected 24+ min, closing lines): projection - actual pts
+     -0.87, reb -0.29, ast -0.27, while the Onyx line - actual was only
+     -0.17 / -0.09 / -0.16. The v2 final scale (.96 / .94 / .96) was set
+     before the three-season prior and the full-roster minutes fit, and both
+     pull rotation projections down. The lane was 93% Unders (175 of 188 at
+     opening prices).
+     Change: final scale refitted on 2024-25 so projected = actual on 24+ min
+     players: pts .96 -> 1.026, reb .94 -> 1.006, ast .96 -> 1.022.
+     Judged on 2025-26 (never seen by the fit), healthy scratches on the slate:
+       bias  pts -0.89 -> +0.08  reb -0.32 -> +0.01  ast -0.25 -> -0.04
+       MAE   pts 5.240 -> 5.243  reb 2.004 -> 2.010  ast 1.570 -> 1.576 (flat: MAE
+             rewards the median, which sits below the mean on skewed stats)
+       model P(over), mean vs overs cashed: .395 -> .443 (actual .484)
+       lane  open 188-160 +5.3% -> 120-98 +8.2%; close 155-160 -4.5% -> 93-92 -1.6%
+             Under share of picks 93% -> 63%
+     On the v4 replay basis: lane open +6.8% -> +6.5%, close +3.5% -> +13.4%.
+     Facts this rests on, for the next change: Unders cash 50.5-52.0% on Onyx
+     NBA props (every Under -3% to -5%, every Over -7% to -9%), so some Under
+     lean is the market, not a bug. And the model's own P(over) is far too
+     confident: refitted to outcomes (a + b logit p, Oct-Jan), b is .13 pts /
+     .23 reb / .26 ast. The 20% model weight already applies about that much
+     shrinkage, which is why the blend, not the raw model, is what is priced.
+     Calibrating the model before the blend leaves ~1 pick a season: tested,
+     not applied.
   v5 (2026-10-27) WHO INHERITS AN OUT PLAYER'S MINUTES (refill_minutes).
      Trigger: 10/26 OKC was missing Holmgren, Jalen Williams, Wallace, Topic
      and four more. v4 handed the freed minutes to the 15+ min rotation in
@@ -158,7 +186,7 @@ CHANGELOG (the lab notebook: every change bumps VERSION and cites evidence)
 import math
 from collections import defaultdict
 
-VERSION = "v5"
+VERSION = "v6"
 
 LEAGUE = {"ppg": 115.0, "reb": 44.0, "ast": 27.0, "poss": 99.5}
 POS_RATE = {   # per-minute league rates by listed position, used only without a prior
@@ -185,9 +213,9 @@ P = {
     "pts_fit_exp": 0.8,      # how hard team points are pulled to the target total
     "home_pts": 0.02,
     "blowout_k": 0.004,
-    "scale_pts": 0.96,        # final per-stat scale (bias correction from the backtest)
-    "scale_reb": 0.94,
-    "scale_ast": 0.96,
+    "scale_pts": 1.026,       # final per-stat scale (bias correction); v6, see changelog
+    "scale_reb": 1.006,
+    "scale_ast": 1.022,
     # usage redistribution (teammates OUT): share of the missing usage that
     # is re-absorbed, how strongly it tilts to high-usage players, and how a
     # usage bump converts into per-minute points / assists / rebounds

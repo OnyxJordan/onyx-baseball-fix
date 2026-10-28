@@ -1176,6 +1176,16 @@ function plMisses(p, s, pr) {
   if (!(pr.ev > 0)) m.push('no positive EV');
   const n = plReads(p, s, pr.side, pr.line).filter(r => r.ok).length;
   if (n < L.signals) m.push(`${n} of 3 form reads agree, needs ${L.signals}`);
+  // nba_build's last gates: an unsettled game waits for the injury report,
+  // one play per player, PICK_MAX_PER_GAME a game, PICK_MAX_PER_SLATE a night
+  const meta = D.meta || {}, picks = D.picks || [];
+  if (!m.length && (meta.unsettled || []).includes(p.gid) && g.start) {
+    const opens = new Date(new Date(g.start).getTime() - (meta.lock_h || 3) * 3600e3);
+    if (Date.now() < opens) m.push(`waits for the injury report: can lock from ${tipTime(opens.toISOString())}`);
+  }
+  if (!m.length && picks.some(k => k.pid === p.pid)) m.push('one play per player: he already has one');
+  if (!m.length && picks.filter(k => k.gid === p.gid).length >= (L.per_game || 2)) m.push(`this game already has ${L.per_game || 2} plays`);
+  if (!m.length && picks.length >= (L.per_slate || 6)) m.push(`tonight already has ${L.per_slate || 6} plays`);
   return m;
 }
 // conviction ranks the screens a pick cleared; it is not a backtested hit rate
@@ -1294,7 +1304,7 @@ function renderPlays() {
       return `<div class="pl-w" onclick="openBetCard('${esc(w.p.pid)}','${w.st}')" tabindex="0">
         <div class="who">${hs(w.p, 's')}<div style="min-width:0"><div class="nm">${esc(w.p.name)}</div>
           <div class="sub">${w.pr.side === 'over' ? 'Over' : 'Under'} ${w.pr.line} ${STAT_ABBR[w.st]} · proj ${num(w.p.proj[w.st])} · edge ${pp(w.pr.edge)}</div></div></div>
-        <span class="pl-miss">${esc(w.miss[0] || 'clears the screens; slate or game cap reached')}</span>
+        <span class="pl-miss">${esc(w.miss[0] || 'clears every screen: logs on the next build')}</span>
         ${li >= 0 ? `<span class="pl-price sm" onclick="event.stopPropagation();betLeg(${li})">${fmtOdds(w.pr.price)}</span>` : ''}
       </div>`;
     }).join('')}</div>` : '';
