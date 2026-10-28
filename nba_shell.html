@@ -123,6 +123,9 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
 .pl-banner .pl-eb{font:700 11px monospace;letter-spacing:.14em;text-transform:uppercase;color:#d795ff;margin-bottom:6px}
 .pl-banner h2{margin:0 0 6px;font-size:clamp(20px,3vw,28px);font-weight:800;line-height:1.05}
 .pl-banner p{margin:0;font-size:13px;line-height:1.6;color:var(--text2);max-width:880px}
+.pl-lines{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:-4px 0 12px;font:600 12px 'Space Grotesk',sans-serif;color:var(--text3)}
+.pl-lines i{width:7px;height:7px;border-radius:50%;background:#61e970;display:inline-block}
+.pl-lines.old{color:#f0a3ff}.pl-lines.old i{background:#f87171}
 .pl-rec-in{width:100%;display:flex;flex-wrap:wrap;align-items:center;gap:8px 26px;padding:12px 16px;margin-bottom:14px;border-radius:14px;border:1px solid var(--border2);background:var(--bg2);color:var(--text);cursor:pointer;text-align:left}
 .pl-rec-in:hover{border-color:rgba(176,56,249,.5)}
 .pl-rec-in span{display:flex;flex-direction:column}.pl-rec-in b{font:800 18px monospace}.pl-rec-in i{font-style:normal;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)}
@@ -600,6 +603,7 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
 <!-- ═══ PLAYS: recommended plays, MLB Edge Plays style ═══════════ -->
 <div class="pane" id="pane-plays"><div class="nba-wrap">
   <div class="pl-banner" id="plBanner"></div>
+  <div class="pl-lines" id="plLines"></div>
   <div class="pl-rec" id="plRec"></div>
   <div class="pl-tools">
     <div class="seg" id="plStat"></div>
@@ -1262,6 +1266,15 @@ function renderPlays() {
     <h2>Where the model beats the Onyx line</h2>
     <p>Tracked picks clear every screen: an edge of +${(L.min_edge * 100).toFixed(0)} to +${(L.max_edge * 100).toFixed(0)} points over the Onyx price, priced ${L.price[0]} to +${L.price[1]},
       ${L.min_min}+ projected minutes, at least ${L.signals} of 3 form reads on the same side, and no role mismatch. Odds are logged the moment a play qualifies, locked at tip and graded off the box score. Tap any play for every line on him.</p>`;
+  // how old these Onyx prices are: the page is rebuilt from a fresh pull about
+  // every 10 minutes through the evening, and picks never log off lines older
+  // than meta.lines_max_age. Past that, say so instead of showing stale edges as live.
+  const M_ = D.meta || {}, la = M_.lines_at ? new Date(M_.lines_at) : null;
+  const ageMin = la ? Math.max(0, Math.round((Date.now() - la.getTime()) / 60000)) : null;
+  const old = ageMin != null && ageMin > (M_.lines_max_age || 20) + 10;
+  document.getElementById('plLines').className = 'pl-lines' + (old ? ' old' : '');
+  document.getElementById('plLines').innerHTML = la ? `<i></i>Onyx prices as of ${esc(tipTime(M_.lines_at))} · ${ageMin < 1 ? 'just now' : ageMin + ' min ago'}${old
+    ? ' · lines may have moved since: tap through for the live Onyx price' : ''}` : '';
   const R = D.record || {};
   document.getElementById('plRec').innerHTML = `<button class="pl-rec-in" onclick="gotoTab('record')">
     <span><b>${R.w || 0}-${R.l || 0}${R.p ? '-' + R.p : ''}</b><i>Record</i></span>

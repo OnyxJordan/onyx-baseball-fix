@@ -18,7 +18,7 @@ removed or re-priced. A pick whose player never logs a minute is a void.
     python3 nba_build.py
 """
 
-import json, re, sys
+import json, os, re, sys
 from datetime import date, datetime, timedelta, timezone
 
 import nba_common
@@ -59,6 +59,21 @@ PICK_LOCK_H = 3.0             # an UNSETTLED game's picks wait for the last 3 ho
                               # lock early: the lane's edge is at opening prices (v5 changelog).
 PICK_MAX_PER_GAME = 2
 PICK_MAX_PER_SLATE = 6
+PICK_MAX_LINE_AGE_MIN = 20    # never log a pick off Onyx prices older than this (a failed odds pull
+                              # leaves the last props.json in place: its edges are against stale lines)
+# NBA_LINES_ONLY=1 (nba_lines.yml, every 10 min through the evening): re-price
+# and rebuild the page from fresh Onyx lines without touching any ledger -
+# no grading, no new picks, no ticket changes. The full refresh owns those.
+LINES_ONLY = os.environ.get("NBA_LINES_ONLY") == "1"
+
+
+def line_age_min(props, now=None):
+    """Minutes since props.json was fetched; None when it has no time."""
+    try:
+        t = datetime.fromisoformat(str(props.get("fetched")).replace("Z", "+00:00"))
+    except (TypeError, ValueError):
+        return None
+    return ((now or datetime.now(timezone.utc)) - t).total_seconds() / 60.0
 VOID_AFTER_DAYS = 3
 
 
@@ -485,7 +500,12 @@ def main():
     priced = attach_props(rows, props, source)
 
     ledger = load(LEDGER, [])
-    n_graded = grade(ledger, today)
+    n_graded = 0 if LINES_ONLY else grade(ledger, today)
+    age = line_age_min(props)
+    fresh = age is not None and age <= PICK_MAX_LINE_AGE_MIN
+    if not LINES_ONLY and props and not fresh:
+        print(f"  picks: Onyx prices are {'of unknown age' if age is None else f'{age:.0f} min old'}; "
+              f"none logged until a fresh pull (max {PICK_MAX_LINE_AGE_MIN} min)")
     games = {g["gid"]: g for g in slate["games"]}
     have = {(k["date"], k["pid"], k["stat"]) for k in ledger}
     today_rows = [k for k in ledger if k["date"] == today]
@@ -501,6 +521,8 @@ def main():
     cands.sort(key=lambda c: -c[0])
     added, used_players = 0, {k["pid"] for k in today_rows}
     for edge, r, s, pr in cands:
+        if LINES_ONLY or not fresh:
+            break
         if len(today_rows) >= PICK_MAX_PER_SLATE:
             break
         if (today, r["pid"], s) in have or r["pid"] in used_players:
@@ -520,11 +542,17 @@ def main():
         used_players.add(r["pid"])
         per_game[r["gid"]] = per_game.get(r["gid"], 0) + 1
         added += 1
-    save(LEDGER, ledger, indent=1)
+    if not LINES_ONLY:
+        save(LEDGER, ledger, indent=1)
 
     # the daily Top Scorer Parlay: grade past tickets, refresh / lock today's
-    th_hist, n_tk = grade_tickets(today)
-    lock = update_ticket(rows, games, slate, today, source)
+    if LINES_ONLY:
+        lock = load(TICKET_LOCK, {})
+        if lock.get("date") != today:
+            lock = {"date": today, "locked": False, "legs": []}
+    else:
+        th_hist, n_tk = grade_tickets(today)
+        lock = update_ticket(rows, games, slate, today, source)
     th_hist = load(TICKETS, [])
     tickets = summarize_tickets(th_hist, lock)
     # every record row gets a headshot, not only players on tonight's slate
@@ -549,7 +577,9 @@ def main():
         "meta": {"players_projected": sum(1 for r in rows if not r["out"] and r["min"] >= 10),
                  "priced": priced, "picks": len(today_rows),
                  # games whose picks wait for the last PICK_LOCK_H hours (the page's watchlist says so)
-                 "unsettled": sorted(unsettled), "lock_h": PICK_LOCK_H},
+                 "unsettled": sorted(unsettled), "lock_h": PICK_LOCK_H,
+                 # when these Onyx prices were pulled: the page shows their age
+                 "lines_at": props.get("fetched"), "lines_max_age": PICK_MAX_LINE_AGE_MIN},
         "games": slate["games"], "players": players_out,
         "picks": today_rows, "record": record, "tickets": tickets,
         # 80px team logos baked in (tools/nba_make_logos.py): no third-party
@@ -576,7 +606,8 @@ def main():
     rec = data["record"]
     print(f"  {len(slate['games'])} games, {data['meta']['players_projected']} projected, "
           f"{priced} priced props, {n_graded} graded, +{added} picks "
-          f"(today {len(today_rows)}), record {rec['w']}-{rec['l']}-{rec['p']} {rec['units']:+.2f}u")
+          f"(today {len(today_rows)}), record {rec['w']}-{rec['l']}-{rec['p']} {rec['units']:+.2f}u"
+          f"{' [lines only: no ledger writes]' if LINES_ONLY else ''}")
     print(f"  wrote {OUT} ({len(html) // 1024} KB)")
     return 0
 

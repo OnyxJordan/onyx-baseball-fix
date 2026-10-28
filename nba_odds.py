@@ -251,6 +251,18 @@ def main():
     if okey:
         try:
             o_players, o_games = onyx_pull(okey, slate)
+            ALL = list(STATS.values()) + list(EXTRA.values())
+            had = sum(1 for cur in players.values() for s in ALL if (cur.get(s) or {}).get("src") == "onyx")
+            got = sum(1 for rec in o_players.values() for s in ALL if s in rec)
+            if o_players and got >= 0.6 * had:
+                # a market Onyx no longer lists (taken down: a scratch, a tipped
+                # game) must not keep its old price on the board. Only on a
+                # full-looking pull: a partial one (a fixture timed out) must
+                # not wipe a whole game's lines.
+                for k, cur in players.items():
+                    for s in ALL:
+                        if (cur.get(s) or {}).get("src") == "onyx" and s not in (o_players.get(k) or {}):
+                            cur.pop(s, None)
             for k, rec in o_players.items():
                 cur = players.setdefault(k, {"name": rec["name"]})
                 cur.update({kk: vv for kk, vv in rec.items() if kk != "name"})
@@ -274,8 +286,11 @@ def main():
         except Exception as ex:
             print(f"nba odds api: failed ({ex})")
 
+    # "fetched" is when ONYX prices were last pulled: a failed or empty pull
+    # keeps the earlier time, so the page and the pick guard see their real age
+    fetched = datetime.now(timezone.utc).isoformat(timespec="seconds") if n_onyx else (prev.get("fetched") if same else None)
     save("props.json", {"date": slate["date"],
-                        "fetched": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                        "fetched": fetched,
                         "players": players, "games": games})
     n = sum(1 for r in players.values() for s in STATS.values() if s in r)
     print(f"nba odds: {n} priced player-markets for {slate['date']} ({n_onyx} from Onyx this run)")
