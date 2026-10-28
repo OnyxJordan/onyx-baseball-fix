@@ -1058,9 +1058,9 @@
        "win": false,
        "sets": [
         6,
-        1
+        5
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Learner Tien",
@@ -1070,7 +1070,7 @@
        "win": false,
        "sets": [
         4,
-        0
+        2
        ],
        "serve": false
       }
@@ -2503,9 +2503,9 @@
     },
     {
      "id": "185146",
-     "start": "2026-10-28T20:00Z",
-     "state": "pre",
-     "detail": "10/28 - 4:00 PM EDT",
+     "start": "2026-10-28T20:15Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 2",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -2516,7 +2516,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/den.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        1
+       ],
        "serve": false
       },
       {
@@ -2525,8 +2527,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/pol.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        1
+       ],
+       "serve": true
       }
      ]
     },
@@ -8283,12 +8287,12 @@
     },
     {
      "id": "185848",
-     "start": "2026-10-28T19:40Z",
-     "state": "in",
-     "detail": "1st",
+     "start": "2026-10-28T23:00Z",
+     "state": "pre",
+     "detail": "10/28 - 7:00 PM EDT",
      "round": "Round 2",
      "draw": "Women's Singles",
-     "court": "Centre Court",
+     "court": "",
      "p": [
       {
        "name": "Ayla Aksu",
@@ -10076,5 +10080,5 @@
    ]
   }
  ],
- "fetched": "2026-10-28T20:04:04+00:00"
+ "fetched": "2026-10-28T20:29:51+00:00"
 }
