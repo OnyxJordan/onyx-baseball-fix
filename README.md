@@ -585,6 +585,13 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
   `ui.js` measures each track after every refresh and sets its duration; a fixed 60s had a
   56-game CFB slate scrolling at ~240 px/s. Sport pages repeat short slates so the loop has
   no gap.
+- **Fresh NBA lines (10/28):** edges are only as good as the line. `nba_lines.yml` re-pulls
+  only the Onyx NBA prices every 10 minutes through the evening and rebuilds `nba.html` with
+  `NBA_LINES_ONLY=1` (no grading, no picks, no ticket changes: it never writes a ledger and
+  commits only `data/nba/props.json` and `nba.html`). `nba_build` refuses to log a pick off
+  prices older than `PICK_MAX_LINE_AGE_MIN` (20). `nba_odds` stamps `fetched` only on a real
+  Onyx pull (a failed pull keeps the old time, so the age is honest) and drops a line Onyx
+  delisted. The Plays tab shows the prices' age and flags them once they are stale.
 - **Sport model breakdowns (10/27):** `sports_build.py` emits `model.engine` for every sport
   (the steps of a price, the factors and the pick lane, all read from the live model
   parameters and `backtest.json`), rendered on the Model tab. A sport still in the lab also
