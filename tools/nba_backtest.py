@@ -40,6 +40,8 @@ NAMEMAP = {}   # gid -> {nk(name): props}, filled when lines load
 STATS = ("pts", "reb", "ast")
 SIM_OUT = True                # reconstruct the injury report (see walk)
 SIM_ROSTER = False            # also list healthy players who sat (production sees the whole roster)
+HS_OF = {}                    # Optic pid -> ESPN athlete id (on/off tables are keyed by ESPN id)
+ONOFF_FEED = None             # callable(day) -> nba_onoff.OnOff built only from games before that day
 SPLIT = "2026-02-01"          # tune before, test on/after
 MIN_PROJ = 20.0               # prop-relevant players for the headline numbers
 
@@ -163,7 +165,8 @@ def walk(G, lines, season_start, season_end, prior, mkt=None):
                 here.add(l["pid"])
                 opp = g["away"] if l["team"] == g["home"] else g["home"]
                 slate["players"].append({"pid": l["pid"], "name": l["name"], "team": l["team"], "opp": opp,
-                                         "home": l["team"] == g["home"], "gid": fid, "pos": l["pos"], "inj": ""})
+                                         "home": l["team"] == g["home"], "gid": fid, "pos": l["pos"], "inj": "",
+                                         "hs": HS_OF.get(l["pid"])})
             # the injury report, reconstructed: a recent rotation player (3 of
             # the team's last 5 games, 15+ min there) absent tonight is OUT
             if SIM_OUT:
@@ -184,8 +187,10 @@ def walk(G, lines, season_start, season_end, prior, mkt=None):
                         opp = g["away"] if team == g["home"] else g["home"]
                         slate["players"].append({"pid": pid, "name": apps[-1][0], "team": team, "opp": opp,
                                                  "home": team == g["home"], "gid": fid, "pos": apps[-1][1],
-                                                 "inj": "OUT" if rot or len(apps) >= 3 else "", "_rot": rot})
-        rows, _ = M.project_slate(slate, prior, pg, tg, HIST_CTX["team_hist"], HIST_CTX["roles"])
+                                                 "inj": "OUT" if rot or len(apps) >= 3 else "", "_rot": rot,
+                                                 "hs": HS_OF.get(pid)})
+        rows, _ = M.project_slate(slate, prior, pg, tg, HIST_CTX["team_hist"], HIST_CTX["roles"],
+                                  ONOFF_FEED(d) if ONOFF_FEED else None)
         n_out = defaultdict(int)
         for p in slate["players"]:
             if p["inj"] == "OUT" and p.get("_rot", True):

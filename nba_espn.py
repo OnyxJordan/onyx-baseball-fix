@@ -324,6 +324,7 @@ def main():
     ingest_box_scores(today)
     if not Path("data/nba/history.json").exists():   # the OpticOdds path keeps the shared copy
         nba_common.refresh_history(today)
+    nba_common.refresh_onoff(today)
     print("=== NBA ESPN backup done ===")
 
 
