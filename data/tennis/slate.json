@@ -9691,7 +9691,7 @@
      "id": "185808",
      "start": "2026-10-28T23:05Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Estadio Mexcovery",
@@ -9703,7 +9703,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        1
+        2,
+        2
        ],
        "serve": false
       },
@@ -9714,9 +9715,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        6,
+        0
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
@@ -9751,12 +9753,12 @@
     },
     {
      "id": "185796",
-     "start": "2026-10-29T04:00Z",
+     "start": "2026-10-29T20:00Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "10/29 - 4:00 PM EDT",
      "round": "Round 2",
      "draw": "Women's Singles",
-     "court": "",
+     "court": "Court 2",
      "p": [
       {
        "name": "Valeriya Strakhova",
@@ -9779,42 +9781,13 @@
      ]
     },
     {
-     "id": "185810",
-     "start": "2026-10-29T04:00Z",
-     "state": "pre",
-     "detail": "TBD",
-     "round": "Round 2",
-     "draw": "Women's Singles",
-     "court": "",
-     "p": [
-      {
-       "name": "Alicia Herrero Linana",
-       "short": "A. Herrero Linana",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "Tamara Zidansek",
-       "short": "T. Zidansek",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/slo.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      }
-     ]
-    },
-    {
      "id": "185801",
-     "start": "2026-10-29T04:00Z",
+     "start": "2026-10-29T20:00Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "10/29 - 4:00 PM EDT",
      "round": "Round 2",
      "draw": "Women's Singles",
-     "court": "",
+     "court": "Estadio Mexcovery",
      "p": [
       {
        "name": "Miriam Bulgaru",
@@ -9838,12 +9811,12 @@
     },
     {
      "id": "185794",
-     "start": "2026-10-29T04:00Z",
+     "start": "2026-10-29T21:30Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "10/29 - 5:30 PM EDT",
      "round": "Round 2",
      "draw": "Women's Singles",
-     "court": "",
+     "court": "Estadio Mexcovery",
      "p": [
       {
        "name": "Martina Colmegna",
@@ -9867,12 +9840,12 @@
     },
     {
      "id": "185812",
-     "start": "2026-10-29T04:00Z",
+     "start": "2026-10-30T00:00Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "10/29 - 8:00 PM EDT",
      "round": "Round 2",
      "draw": "Women's Singles",
-     "court": "",
+     "court": "Estadio Mexcovery",
      "p": [
       {
        "name": "Bianca Andreescu",
@@ -9887,6 +9860,35 @@
        "name": "Diletta Cherubini",
        "short": "D. Cherubini",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ita.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      }
+     ]
+    },
+    {
+     "id": "185810",
+     "start": "2026-10-30T01:30Z",
+     "state": "pre",
+     "detail": "10/29 - 9:30 PM EDT",
+     "round": "Round 2",
+     "draw": "Women's Singles",
+     "court": "Estadio Mexcovery",
+     "p": [
+      {
+       "name": "Alicia Herrero Linana",
+       "short": "A. Herrero Linana",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      },
+      {
+       "name": "Tamara Zidansek",
+       "short": "T. Zidansek",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/slo.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -10100,5 +10102,5 @@
    ]
   }
  ],
- "fetched": "2026-10-28T23:18:18+00:00"
+ "fetched": "2026-10-28T23:49:44+00:00"
 }
