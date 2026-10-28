@@ -601,6 +601,10 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
   prices older than `PICK_MAX_LINE_AGE_MIN` (20). `nba_odds` stamps `fetched` only on a real
   Onyx pull (a failed pull keeps the old time, so the age is honest) and drops a line Onyx
   delisted. The Plays tab shows the prices' age and flags them once they are stale.
+  Scheduled crons for it never fired on 10/28, so it runs as a loop like the refresh: each
+  run with a game tipping within 4 hours arms `nba_lines_chain.yml` (one sleeper, ~9 min),
+  which starts the next run; every full refresh also starts it, and the cron stays as a
+  third backup.
 - **Sport model breakdowns (10/27):** `sports_build.py` emits `model.engine` for every sport
   (the steps of a price, the factors and the pick lane, all read from the live model
   parameters and `backtest.json`), rendered on the Model tab. A sport still in the lab also

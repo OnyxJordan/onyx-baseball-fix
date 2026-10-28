@@ -1,0 +1,33 @@
+name: NBA lines chain sleeper
+# Keeps nba_lines.yml running every ~10 minutes while an NBA game tips within
+# 4 hours. GitHub's scheduler is not reliable enough for that (on 10/28 none of
+# the new workflow's cron slots fired for 40 minutes; the 8/27 blackout dropped
+# crons entirely), so like the refresh chain (chain.yml) this loop runs on API
+# dispatches: every lines run that still has a game ahead arms this sleeper,
+# which waits and dispatches the next lines run. Its own concurrency group with
+# cancel-in-progress keeps exactly one sleeper, however many runs arm it. The
+# full refresh also starts nba_lines.yml, so a dropped chain restarts itself
+# within ~30 minutes; the cron in nba_lines.yml stays as a third backup.
+on:
+  workflow_dispatch:
+permissions:
+  actions: write
+concurrency:
+  group: onyx-nba-lines-chain
+  cancel-in-progress: true
+jobs:
+  sleeper:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Wait for the next lines slot
+        run: sleep 540
+      - name: Dispatch the next lines run
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for i in 1 2 3; do
+            gh workflow run nba_lines.yml --repo ${{ github.repository }} --ref main && exit 0
+            sleep $((i * 15))
+          done
+          echo "::warning::could not dispatch the next lines run; the refresh restarts it"
