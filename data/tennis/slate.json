@@ -1043,9 +1043,9 @@
     },
     {
      "id": "185198",
-     "start": "2026-10-28T19:05Z",
-     "state": "pre",
-     "detail": "10/28 - 3:05 PM EDT",
+     "start": "2026-10-28T19:15Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 2",
      "draw": "Men's Singles",
      "court": "Centre Court",
@@ -1056,7 +1056,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/aus.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        1
+       ],
        "serve": false
       },
       {
@@ -1065,19 +1067,21 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        1
+       ],
+       "serve": true
       }
      ]
     },
     {
      "id": "185187",
-     "start": "2026-10-29T04:00Z",
+     "start": "2026-10-29T12:30Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "10/29 - 8:30 AM EDT",
      "round": "Round 2",
      "draw": "Men's Singles",
-     "court": "",
+     "court": "Centre Court",
      "p": [
       {
        "name": "Daniil Medvedev",
@@ -1101,12 +1105,12 @@
     },
     {
      "id": "185190",
-     "start": "2026-10-29T04:00Z",
+     "start": "2026-10-29T12:30Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "10/29 - 8:30 AM EDT",
      "round": "Round 2",
      "draw": "Men's Singles",
-     "court": "",
+     "court": "Glaubandich Court",
      "p": [
       {
        "name": "Luciano Darderi",
@@ -1129,42 +1133,13 @@
      ]
     },
     {
-     "id": "185183",
-     "start": "2026-10-29T04:00Z",
-     "state": "pre",
-     "detail": "TBD",
-     "round": "Round 2",
-     "draw": "Men's Singles",
-     "court": "",
-     "p": [
-      {
-       "name": "Tallon Griekspoor",
-       "short": "T. Griekspoor",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ned.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "Alexander Zverev",
-       "short": "A. Zverev",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ger.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      }
-     ]
-    },
-    {
      "id": "185193",
-     "start": "2026-10-29T04:00Z",
+     "start": "2026-10-29T14:00Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "10/29 - 10:00 AM EDT",
      "round": "Round 2",
      "draw": "Men's Singles",
-     "court": "",
+     "court": "Centre Court",
      "p": [
       {
        "name": "Carlos Alcaraz",
@@ -1188,12 +1163,12 @@
     },
     {
      "id": "185194",
-     "start": "2026-10-29T04:00Z",
+     "start": "2026-10-29T16:00Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "10/29 - 12:00 PM EDT",
      "round": "Round 2",
      "draw": "Men's Singles",
-     "court": "",
+     "court": "Glaubandich Court",
      "p": [
       {
        "name": "Lorenzo Musetti",
@@ -1216,13 +1191,42 @@
      ]
     },
     {
-     "id": "185196",
-     "start": "2026-10-29T04:00Z",
+     "id": "185183",
+     "start": "2026-10-29T16:30Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "10/29 - 12:30 PM EDT",
      "round": "Round 2",
      "draw": "Men's Singles",
-     "court": "",
+     "court": "Centre Court",
+     "p": [
+      {
+       "name": "Tallon Griekspoor",
+       "short": "T. Griekspoor",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ned.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      },
+      {
+       "name": "Alexander Zverev",
+       "short": "A. Zverev",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ger.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      }
+     ]
+    },
+    {
+     "id": "185196",
+     "start": "2026-10-29T19:00Z",
+     "state": "pre",
+     "detail": "10/29 - 3:00 PM EDT",
+     "round": "Round 2",
+     "draw": "Men's Singles",
+     "court": "Centre Court",
      "p": [
       {
        "name": "Matteo Berrettini",
@@ -1245,7 +1249,36 @@
      ]
     },
     {
-     "id": "185202",
+     "id": "185199",
+     "start": "2026-10-30T04:00Z",
+     "state": "pre",
+     "detail": "TBD",
+     "round": "Quarterfinal",
+     "draw": "Men's Singles",
+     "court": "",
+     "p": [
+      {
+       "name": "TBD",
+       "short": "TBD",
+       "flag": null,
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      },
+      {
+       "name": "TBD",
+       "short": "TBD",
+       "flag": null,
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      }
+     ]
+    },
+    {
+     "id": "185200",
      "start": "2026-10-30T04:00Z",
      "state": "pre",
      "detail": "TBD",
@@ -1303,7 +1336,7 @@
      ]
     },
     {
-     "id": "185200",
+     "id": "185202",
      "start": "2026-10-30T04:00Z",
      "state": "pre",
      "detail": "TBD",
@@ -1332,36 +1365,7 @@
      ]
     },
     {
-     "id": "185199",
-     "start": "2026-10-30T04:00Z",
-     "state": "pre",
-     "detail": "TBD",
-     "round": "Quarterfinal",
-     "draw": "Men's Singles",
-     "court": "",
-     "p": [
-      {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      }
-     ]
-    },
-    {
-     "id": "185203",
+     "id": "185204",
      "start": "2026-10-31T04:00Z",
      "state": "pre",
      "detail": "TBD",
@@ -1390,7 +1394,7 @@
      ]
     },
     {
-     "id": "185204",
+     "id": "185203",
      "start": "2026-10-31T04:00Z",
      "state": "pre",
      "detail": "TBD",
@@ -2464,7 +2468,7 @@
      "id": "185138",
      "start": "2026-10-28T18:15Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 1",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -2476,9 +2480,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        4
+        4,
+        3
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Taylor Fritz",
@@ -2487,7 +2492,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        5
+        6,
+        4
        ],
        "serve": false
       }
@@ -2495,9 +2501,9 @@
     },
     {
      "id": "185146",
-     "start": "2026-10-28T19:00Z",
+     "start": "2026-10-28T19:40Z",
      "state": "pre",
-     "detail": "10/28 - 3:00 PM EDT",
+     "detail": "10/28 - 3:40 PM EDT",
      "round": "Round 2",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -6957,7 +6963,7 @@
      "id": "185768",
      "start": "2026-10-28T17:10Z",
      "state": "in",
-     "detail": "2nd",
+     "detail": "3rd",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Quadra Central",
@@ -6970,9 +6976,10 @@
        "win": false,
        "sets": [
         7,
+        3,
         2
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Gabriela Ce",
@@ -6982,7 +6989,8 @@
        "win": false,
        "sets": [
         6,
-        4
+        6,
+        2
        ],
        "serve": false
       }
@@ -8240,7 +8248,7 @@
      "id": "185849",
      "start": "2026-10-28T18:40Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Grandstand",
@@ -8252,9 +8260,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        3
+        6,
+        1
        ],
-       "serve": false
+       "serve": true
       },
       {
        "name": "Linda Klimovicova",
@@ -8263,9 +8272,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        4,
+        1
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -10060,5 +10070,5 @@
    ]
   }
  ],
- "fetched": "2026-10-28T18:59:56+00:00"
+ "fetched": "2026-10-28T19:31:34+00:00"
 }
