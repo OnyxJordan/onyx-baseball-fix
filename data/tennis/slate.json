@@ -4034,8 +4034,8 @@
     {
      "id": "185708",
      "start": "2026-10-28T05:05Z",
-     "state": "in",
-     "detail": "1st",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -4047,7 +4047,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        6,
+        1,
+        4
        ],
        "serve": false
       },
@@ -4056,19 +4058,21 @@
        "short": "K. Siniakova",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/cze.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
-        1
+        2,
+        6,
+        6
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
     {
      "id": "185710",
-     "start": "2026-10-28T06:30Z",
-     "state": "pre",
-     "detail": "10/28 - 2:30 AM EDT",
+     "start": "2026-10-28T07:20Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -4079,7 +4083,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/aut.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        0
+       ],
        "serve": false
       },
       {
@@ -4088,8 +4094,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        0
+       ],
+       "serve": true
       }
      ]
     },
@@ -4161,9 +4169,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Katerina Siniakova",
+       "short": "K. Siniakova",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/cze.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -5616,8 +5624,8 @@
     {
      "id": "185682",
      "start": "2026-10-28T04:45Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Center",
@@ -5627,10 +5635,11 @@
        "short": "M. Joint",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/aus.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        0
+        2,
+        6
        ],
        "serve": false
       },
@@ -5642,17 +5651,18 @@
        "win": false,
        "sets": [
         1,
-        0
+        6,
+        4
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
     {
      "id": "185669",
-     "start": "2026-10-28T05:30Z",
-     "state": "pre",
-     "detail": "10/28 - 1:30 AM EDT",
+     "start": "2026-10-28T06:50Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Center",
@@ -5663,7 +5673,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/rus.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        4
+       ],
        "serve": false
       },
       {
@@ -5672,7 +5684,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/blr.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        1
+       ],
        "serve": false
       }
      ]
@@ -5890,9 +5904,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Maya Joint",
+       "short": "M. Joint",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/aus.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -9884,5 +9898,5 @@
    ]
   }
  ],
- "fetched": "2026-10-28T05:20:17+00:00"
+ "fetched": "2026-10-28T07:21:37+00:00"
 }
