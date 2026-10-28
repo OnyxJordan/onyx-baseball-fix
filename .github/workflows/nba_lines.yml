@@ -9,8 +9,9 @@ name: NBA lines (fresh Onyx prices every 10 min, evenings)
 # (nba_build refuses to log off prices older than PICK_MAX_LINE_AGE_MIN).
 on:
   schedule:
-    # every 10 min, 6 PM - midnight ET in EDT (5 - 11 PM in EST): the window
-    # NBA tips in. Exits in seconds when no game is still to tip.
+    # backup only: the loop runs on the sleeper (nba_lines_chain.yml) and the
+    # refresh's kick, because scheduled crons proved unreliable. Every 10 min,
+    # 6 PM - midnight ET in EDT. Exits in seconds unless a game tips within 4 hours.
     - cron: "5,15,25,35,45,55 22-23 * * *"
     - cron: "5,15,25,35,45,55 0-3 * * *"
   workflow_dispatch:
@@ -18,16 +19,20 @@ permissions:
   contents: write
   pages: write
   id-token: write
-# its own group: never cancels or queues behind the full refresh (onyx-build)
+  actions: write
+# its own group: never cancels or queues behind the full refresh (onyx-build).
+# No cancel-in-progress: a run started by the refresh or the sleeper waits for
+# one mid-push instead of killing it (a newer pending run replaces an older one).
 concurrency:
   group: onyx-nba-lines
-  cancel-in-progress: true
+  cancel-in-progress: false
 jobs:
   lines:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     outputs:
       changed: ${{ steps.commit.outputs.changed }}
+      go: ${{ steps.gate.outputs.go }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -40,15 +45,16 @@ jobs:
         run: |
           python3 - <<'EOF' >> "$GITHUB_OUTPUT"
           import json
-          from datetime import datetime, timezone
+          from datetime import datetime, timedelta, timezone
           try:
               s = json.load(open("data/nba/slate.json"))
           except Exception:
               s = {}
           now = datetime.now(timezone.utc)
-          def pre(g):
+          def pre(g):   # a game still to tip, within the next 4 hours (lines move most then)
               try:
-                  return g.get("state") == "pre" and datetime.fromisoformat(str(g["start"]).replace("Z", "+00:00")) > now
+                  t = datetime.fromisoformat(str(g["start"]).replace("Z", "+00:00"))
+                  return g.get("state") == "pre" and now < t <= now + timedelta(hours=4)
               except Exception:
                   return False
           print("go=" + ("true" if any(pre(g) for g in s.get("games", [])) else "false"))
@@ -119,3 +125,20 @@ jobs:
       - name: Deploy to GitHub Pages (second attempt)
         if: steps.deployment.outcome == 'failure'
         uses: actions/deploy-pages@v4
+  requeue:
+    # the self-driving loop (scheduled crons alone proved unreliable): while a
+    # game tips within 4 hours, arm the sleeper, which starts the next run
+    needs: lines
+    if: always() && needs.lines.outputs.go == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Arm the lines sleeper
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for i in 1 2 3; do
+            gh workflow run nba_lines_chain.yml --repo ${{ github.repository }} --ref main && exit 0
+            sleep $((i * 15))
+          done
+          echo "::warning::could not arm the lines sleeper; the refresh restarts the chain"

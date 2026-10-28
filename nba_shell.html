@@ -203,7 +203,11 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
 .pc[data-face=back] .pc-front,.pc[data-face=front] .pc-back{pointer-events:none}
 .pc-back{transform:rotateY(180deg);background:linear-gradient(180deg,rgba(22,20,52,.995),rgba(12,12,18,.995) 46%)}
 /* holographic foil along the edge; follows the pointer on desktop */
-.pc-face::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;padding:1.5px;
+/* the foil is pinned to the card's frame, not its content: as an absolute ::after inside the
+   scrolling face it scrolled with the content and drew a purple box across the stats. A sticky
+   zero-width float stays in view without taking any room in the layout. */
+.pc-face::before{content:"";position:-webkit-sticky;position:sticky;top:0;float:left;width:100%;height:100%;margin-right:-100%;
+  z-index:6;border-radius:inherit;pointer-events:none;padding:1.5px;box-sizing:border-box;
   background:conic-gradient(from 210deg at var(--gx) 0%,rgba(176,56,249,.9),rgba(99,91,255,.7),rgba(97,233,233,.35),rgba(215,149,255,.85),rgba(176,56,249,.9));
   -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:.75}
 .pc-head{position:relative;display:grid;grid-template-columns:auto 1fr auto auto;align-items:center;gap:12px;padding:18px 18px 12px;overflow:hidden}
