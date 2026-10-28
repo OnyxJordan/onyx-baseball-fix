@@ -2504,8 +2504,8 @@
     {
      "id": "185146",
      "start": "2026-10-28T20:15Z",
-     "state": "in",
-     "detail": "3rd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 2",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -2515,11 +2515,11 @@
        "short": "H. Rune",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/den.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         3,
         6,
-        6
+        7
        ],
        "serve": false
       },
@@ -2818,9 +2818,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Holger Rune",
+       "short": "H. Rune",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/den.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -7009,8 +7009,8 @@
     {
      "id": "185771",
      "start": "2026-10-28T21:05Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Quadra Central",
@@ -7023,19 +7023,19 @@
        "win": false,
        "sets": [
         4,
-        3
+        4
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Nauhany Vitoria Leme Da Silva",
        "short": "N. Leme Da Silva",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/bra.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        3
+        6
        ],
        "serve": false
       }
@@ -7225,9 +7225,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Nauhany Vitoria Leme Da Silva",
+       "short": "N. Leme Da Silva",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/bra.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -9656,7 +9656,7 @@
      "id": "185797",
      "start": "2026-10-28T21:40Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Estadio Mexcovery",
@@ -9668,7 +9668,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        4
+        6,
+        5
        ],
        "serve": false
       },
@@ -9679,7 +9680,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        2,
+        1
        ],
        "serve": true
       }
@@ -10094,5 +10096,5 @@
    ]
   }
  ],
- "fetched": "2026-10-28T22:14:59+00:00"
+ "fetched": "2026-10-28T22:46:33+00:00"
 }
