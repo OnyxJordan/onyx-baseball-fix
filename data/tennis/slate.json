@@ -4033,9 +4033,9 @@
     },
     {
      "id": "185708",
-     "start": "2026-10-28T05:00Z",
-     "state": "pre",
-     "detail": "10/28 - 1:00 AM EDT",
+     "start": "2026-10-28T05:05Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -4046,7 +4046,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/tha.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        2
+       ],
        "serve": false
       },
       {
@@ -4055,8 +4057,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/cze.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        1
+       ],
+       "serve": true
       }
      ]
     },
@@ -5613,7 +5617,7 @@
      "id": "185682",
      "start": "2026-10-28T04:45Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Center",
@@ -5625,9 +5629,10 @@
        "seed": null,
        "win": false,
        "sets": [
+        6,
         0
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Cristina Bucsa",
@@ -5636,9 +5641,10 @@
        "seed": null,
        "win": false,
        "sets": [
+        1,
         0
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
@@ -9878,5 +9884,5 @@
    ]
   }
  ],
- "fetched": "2026-10-28T04:48:53+00:00"
+ "fetched": "2026-10-28T05:20:17+00:00"
 }
