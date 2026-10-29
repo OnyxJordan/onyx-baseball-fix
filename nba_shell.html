@@ -2633,7 +2633,7 @@ function renderModel() {
       <div class="wrow"><b>Rebounds, assists</b><span>(game pace &divide; league)<sup>${P.pace_exp}</sup> &times; (opponent allowed &divide; league)<sup>${P.opp_exp}</sup>, held to &plusmn;12%</span></div>
       <div class="wrow"><b>Final scale</b><span>pts &times;${P.scale_pts} · reb &times;${P.scale_reb} · ast &times;${P.scale_ast} (bias correction the backtest asked for)</span></div></div>
     <div class="wblock"><div class="wtitle">4 · Probability vs the Onyx line</div>
-      ${wbar([['Onyx market (no vig)', (1 - w) * 100, C4], ['Onyx model', w * 100, C1]])}
+      ${wbar([['Onyx market', (1 - w) * 100, C4], ['Onyx model', w * 100, C1]])}
       <div class="wnote">The market is the sharper single read (its line misses by less than any model we tested), so it carries most of the weight and the model moves the number where it sees something. Edge is measured against the price you actually get.</div></div>`;
 
   const f = [
@@ -2651,7 +2651,7 @@ function renderModel() {
     ['pm', 'Plus-minus', `Each player's on-court point differential, shown on the board as a read on how his lineups are playing. ${P.pm_k ? 'It nudges minutes at strength ' + P.pm_k + '.' : 'Backtested as a minutes signal across a full season: it did not improve projections, so it informs rather than moves the number.'}`, P.pm_k ? 'Live' : 'Context', 'gold'],
     ['bed', 'Rest and game script', `Back-to-backs trim ${pctv(1 - (P.b2b_mult || 1))}% for 30+ minute players. Spreads of 10+ trim heavy-minute players for blowout risk (up to 6%).`, 'Timing', 'gold'],
     ['cross', 'Injuries', `OUT and DOUBTFUL players are projected at zero. Their minutes are split evenly across everyone left, bench included, with double weight at the same position, because that is where coaches actually find them. Questionable players are projected but can never be a pick.`, 'News', 'gold'],
-    ['scale', 'Market blend', `${pctv(w)}% model, ${pctv(1 - w)}% Onyx no-vig market. Chosen by the backtest on log loss: the blend beat both the model alone and the market alone.`, 'Market', 'blue'],
+    ['scale', 'Market blend', `${pctv(w)}% model, ${pctv(1 - w)}% the Onyx market. Chosen by the backtest on log loss: the blend beat both the model alone and the market alone.`, 'Market', 'blue'],
     ['bell', 'Distribution', `Stat lines are right-skewed: a typical night lands a little under the average and big nights pull it up. A negative binomial with a fitted spread per stat turns the projection into over and under probabilities.`, 'Output', ''],
     ['eye', 'Role check', `When the projection sits more than ${L.max_gap} standard deviations from the line, the market almost always knows something about the role that box scores do not. Those props show "role check" on the board and can never be a pick.`, 'Guardrail', 'blue'],
     ['clock', 'Injury report first', `When either team is on the second night of a back-to-back or has a rotation player listed questionable, a pick waits for the last ${L.lock_h || 3} hours before tip, after the game-day injury report. Those teams can rule players out in the afternoon, and every minute and shot a missing player leaves behind moves the projections around him. Settled games lock early, at the opening Onyx price.`, 'Guardrail', 'blue'],
@@ -2695,7 +2695,7 @@ function renderModel() {
     ['Points fit strength', `${P.pts_fit_exp}`],
     ['Back-to-back', `&times;${P.b2b_mult} for 30+ minutes`],
     ['Distribution spread', Object.keys(sd).map(s => `${STAT_ABBR[s]} sd = ${sd[s][0]}&times;mean + ${sd[s][1]}`).join(' · ')],
-    ['Blend', `${pctv(w)}% model / ${pctv(1 - w)}% Onyx no-vig`],
+    ['Blend', `${pctv(w)}% model / ${pctv(1 - w)}% Onyx market`],
     ['Pick lane', `edge ${pctv(L.min_edge || 0)} to ${pctv(L.max_edge || 0)}pp, price ${fmtOdds((L.price || [])[0])} to ${fmtOdds((L.price || [])[1])}, ${L.min_min}+ projected minutes, ${L.signals}+ form reads agree, role gap under ${L.max_gap} sd, ${L.per_game} per game, ${L.per_slate} per night${L.lock_h ? `, unsettled games wait for the last ${L.lock_h} hours before tip` : ''}`],
     ['Data', 'OpticOdds box scores, injuries and Onyx lines; ESPN as backup and for live play-by-play'],
   ];

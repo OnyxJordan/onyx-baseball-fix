@@ -41,19 +41,46 @@
 .sp-tabs-seg button{flex-shrink:0;padding:8px 13px;border-radius:999px;border:1px solid var(--border2);background:rgba(255,255,255,.04);color:var(--text2);font:700 12px 'Space Grotesk',system-ui,sans-serif;cursor:pointer;white-space:nowrap}
 .sp-tabs-seg button.on{background:linear-gradient(135deg,#b038f9,#635bff);color:#fff;border-color:transparent}
 /* game cards */
-.gm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:10px}
-.gm{display:flex;flex-direction:column;gap:8px;padding:12px 14px;border-radius:14px;border:1px solid var(--border2);background:var(--bg2);cursor:pointer;color:var(--text);text-align:left;font:inherit;transition:border-color .2s,transform .2s}
-.gm:hover,.gm.sel{border-color:rgba(176,56,249,.6)}.gm:hover{transform:translateY(-2px)}
+.gm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:12px}
+.gm{--ocw:62px;position:relative;display:flex;flex-direction:column;gap:6px;padding:12px 14px 10px;border-radius:16px;border:1px solid var(--border2);
+  background:radial-gradient(120% 70% at 0% 0%,rgba(176,56,249,.09),transparent 55%),linear-gradient(180deg,rgba(255,255,255,.025),transparent 45%),var(--bg2);
+  cursor:pointer;color:var(--text);text-align:left;font:inherit;transition:border-color .2s,transform .2s,box-shadow .2s}
+.gm:hover,.gm.sel{border-color:rgba(176,56,249,.6);box-shadow:0 14px 34px -18px rgba(176,56,249,.65)}.gm:hover{transform:translateY(-2px)}
+/* Onyx odds board: one row per side, Spread / Total / Money columns, every sport */
+.gm-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:6px}
+.gm.odds .gm-row{grid-template-columns:minmax(0,1fr) auto repeat(3,var(--ocw));column-gap:5px}
+.gm-row.lose{opacity:.55}
+.gm-id{display:flex;align-items:center;gap:9px;min-width:0}
+.gm-nm{min-width:0}.gm-nm b{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;font-size:15px;line-height:1.15;hyphens:auto;-webkit-hyphens:auto}
+.gm.odds .gm-nm b{font-size:14px}
+.gm-nm>span{display:block;font:500 10px monospace;color:var(--text3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gm-nm .rk{display:inline;font:700 10px monospace;color:#d795ff;margin:0 4px 0 0}
+.gm-row .sc{font:800 20px monospace;min-width:26px;text-align:right}
+.gm-oh{font:700 9px monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);padding-top:4px}
+.gm-oh>span:nth-child(n+3){text-align:center}
+.gm-onyx{display:inline-flex;align-items:center;gap:5px;color:#d795ff}.gm-onyx::before{content:"";width:6px;height:6px;border-radius:2px;background:linear-gradient(135deg,#b038f9,#635bff)}
+.oc{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;height:44px;padding:0 4px;border-radius:10px;
+  border:1px solid rgba(255,255,255,.08);background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.02));color:var(--text);font:inherit;cursor:pointer;
+  transition:background .15s,border-color .15s,box-shadow .15s,transform .15s}
+.oc b{font:800 14px monospace;letter-spacing:-.02em}.oc i{font:600 10px monospace;font-style:normal;color:var(--text3);white-space:nowrap}
+.oc:hover{border-color:#b038f9;background:linear-gradient(135deg,rgba(176,56,249,.32),rgba(99,91,255,.24));box-shadow:0 6px 18px -8px rgba(176,56,249,.8);transform:translateY(-1px)}
+.oc:hover i{color:#e9d5ff}
+.oc.dead{cursor:default;opacity:.35;background:transparent;border-style:dashed}
+.gm-ft{margin-top:auto;padding-top:6px;display:flex;justify-content:space-between;font:700 9px monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)}
+.gm:hover .gm-ft b{color:#d795ff}
+.gm-flag{width:22px;height:15px;object-fit:cover;border-radius:3px;flex-shrink:0}
+.gm-row .sets{display:flex;gap:5px;font:800 15px monospace}.gm-row .sets span{min-width:12px;text-align:center;opacity:.5}.gm-row .sets span.won{opacity:1}
+.gm-row .sv{display:inline-block;width:7px;height:7px;border-radius:50%;background:#61e970;box-shadow:0 0 6px #61e970;margin-left:6px;vertical-align:1px}
+.gm-board{--ocw:72px;display:flex;flex-direction:column;gap:6px}
+.gm-nm .nm-s{display:none}
+@media (max-width:440px){.gm .lg.m{width:24px;height:24px}.gm-id{gap:7px}.gm-nm .nm-f{display:none}.gm-nm .nm-s{display:inline}}
+@media (max-width:380px){.gm{--ocw:56px;padding:11px 11px 9px}.oc b{font-size:13px}.gm-nm b{font-size:14px}}
 .gm-top{display:flex;justify-content:space-between;align-items:center;gap:8px;font:700 11px monospace;color:var(--text3);text-transform:uppercase;letter-spacing:.05em}
+.gm-top>span:first-child{flex-shrink:0}.gm-top>span:last-child{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .gm-top .live{color:#61e970}.gm-top .live::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:#61e970;margin-right:6px;animation:oxBlink 1.4s infinite}
-.gm-t{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px}
-.gm-t b{font-size:15px}.gm-t .rec{font:500 11px monospace;color:var(--text3);margin-left:6px}
-.gm-t .sc{font:800 20px monospace}.gm-t.lose{opacity:.55}
-.gm-t .rk{font:700 10px monospace;color:#d795ff;margin-right:4px}
-.gm-lines{display:flex;gap:6px;flex-wrap:wrap}
-.chipx{display:inline-flex;flex-direction:column;align-items:center;min-width:64px;padding:5px 8px;border-radius:10px;border:1px solid var(--border2);background:rgba(255,255,255,.03);cursor:pointer;color:var(--text);font:inherit}
+.chipx{display:inline-flex;flex-direction:column;align-items:center;min-width:64px;padding:5px 8px;border-radius:10px;border:1px solid rgba(255,255,255,.08);background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.02));cursor:pointer;color:var(--text);font:inherit;transition:background .15s,border-color .15s,box-shadow .15s}
 .chipx b{font:800 13px monospace}.chipx span{font:700 9px monospace;letter-spacing:.06em;color:var(--text3);text-transform:uppercase}
-.chipx:hover{border-color:#b038f9}
+.chipx:hover{border-color:#b038f9;background:linear-gradient(135deg,rgba(176,56,249,.32),rgba(99,91,255,.24));box-shadow:0 6px 18px -8px rgba(176,56,249,.8)}
 .chipx.dead{opacity:.4;cursor:default}
 /* gamecenter */
 .gc{margin-top:14px;border:1px solid var(--border2);border-radius:18px;background:linear-gradient(180deg,rgba(33,27,37,.6),var(--bg2));padding:16px;scroll-margin-top:120px}
@@ -322,17 +349,36 @@ function chip(price, label, sel, sub) {
   if (price == null) return `<span class="chipx dead"><b>-</b><span>${esc(sub || label)}</span></span>`;
   return `<button class="chipx" onclick="event.stopPropagation();bet(${sel ? `'${esc(sel)}'` : 'null'},'${esc(label)}')"><b>${fmtOdds(price)}</b><span>${esc(sub || label)}</span></button>`;
 }
-function lineChips(g) {
+const sgn = v => (v > 0 ? '+' : '') + v;
+// one odds cell: the line on top (spread / total), the Onyx price below
+function oc(price, line, label, sel) {
+  const ln = line ? `<i>${esc(line)}</i>` : '';
+  if (price == null) return `<span class="oc dead">${ln}<b>-</b></span>`;
+  return `<button class="oc" onclick="event.stopPropagation();bet(${sel ? `'${esc(sel)}'` : 'null'},'${esc(label)}')">${ln}<b>${fmtOdds(price)}</b></button>`;
+}
+// Spread / Total / Money for one side of a game (away row carries the Over, home the Under)
+function gameCells(g, side) {
   const o = gameOdds(g.gid);
-  if (!o) return '';
-  const sp = v => v == null ? '' : (v > 0 ? '+' : '') + v;
-  return `<div class="gm-lines">
-    ${o.away_ml != null ? chip(o.away_ml, g.away + ' ML', o.away_ml_sel, g.away + ' ML') : ''}
-    ${o.home_ml != null ? chip(o.home_ml, g.home + ' ML', o.home_ml_sel, g.home + ' ML') : ''}
-    ${o.home_spread != null ? chip(o.home_spread_price, g.home + ' ' + sp(o.home_spread), o.home_spread_sel, g.home + ' ' + sp(o.home_spread)) : ''}
-    ${o.total != null ? chip(o.over_price, 'Over ' + o.total, o.over_sel, 'O ' + o.total) : ''}
-    ${o.total != null ? chip(o.under_price, 'Under ' + o.total, o.under_sel, 'U ' + o.total) : ''}
-  </div>`;
+  if (!o || g.state === 'post') return null;
+  const nm = g[side], sp = o[side + '_spread'], ov = side === 'away';
+  return [
+    sp != null ? oc(o[side + '_spread_price'], sgn(sp), nm + ' ' + sgn(sp), o[side + '_spread_sel']) : oc(null, ''),
+    o.total != null ? oc(ov ? o.over_price : o.under_price, (ov ? 'O ' : 'U ') + o.total, (ov ? 'Over ' : 'Under ') + o.total, ov ? o.over_sel : o.under_sel) : oc(null, ''),
+    oc(o[side + '_ml'], '', nm + ' ML', o[side + '_ml_sel'])];
+}
+// the board: an "Onyx" header row, then one row per side; rows = [{id, sc, cells, lose}]
+function oddsRows(rows) {
+  const odds = rows.some(r => r.cells);
+  const head = odds ? `<div class="gm-row gm-oh"><span class="gm-onyx">Onyx</span><span></span><span>Spread</span><span>Total</span><span>Money</span></div>` : '';
+  return {odds, html: head + rows.map(r => `<div class="gm-row${r.lose ? ' lose' : ''}"><div class="gm-id">${r.id}</div><span class="sc">${r.sc || ''}</span>${odds ? (r.cells || [oc(null, ''), oc(null, ''), oc(null, '')]).join('') : ''}</div>`).join('')};
+}
+function teamId(g, side, full) {
+  const rk = g[side + '_rank'] ? `<span class="rk">#${esc(g[side + '_rank'])}</span> ` : '';
+  return `${lg(g[side + '_logo'], 'm')}<div class="gm-nm"><b>${rk}${esc(full ? (g[side + '_name'] || g[side]) : (g[side + '_short'] || g[side]))}</b><span>${esc(g[side + '_rec'] || '')}</span></div>`;
+}
+function gameBoard(g) {
+  const b = oddsRows(['away', 'home'].map(sd => ({id: teamId(g, sd, true), cells: gameCells(g, sd)})));
+  return b.odds ? `<div class="gm-board">${b.html}</div>` : '';
 }
 
 // ── shell ───────────────────────────────────────────────────────────
@@ -401,7 +447,7 @@ function renderHome() {
   if (KIND === 'tennis') {
     const lv = (SD.events || []).flatMap(e => e.matches.filter(m => m.state === 'in').map(m => [e, m]));
     const nx = (SD.events || []).flatMap(e => e.matches.filter(m => m.state === 'pre').map(m => [e, m])).slice(0, 6);
-    body = `<div class="sec-hdr"><span class="sec-title">${lv.length ? 'Live now' : 'Up next'}</span></div><div class="tn-grid">${(lv.length ? lv : nx).slice(0, 12).map(([e, m]) => tnMatch(e, m)).join('') || '<div class="empty">No singles matches on the board right now.</div>'}</div>`;
+    body = `<div class="sec-hdr"><span class="sec-title">${lv.length ? 'Live now' : 'Up next'}</span></div><div class="gm-grid">${(lv.length ? lv : nx).slice(0, 12).map(([e, m]) => tnMatch(e, m)).join('') || '<div class="empty">No singles matches on the board right now.</div>'}</div>`;
   } else if (KIND === 'golf') {
     const e = (SD.events || [])[0];
     body = e ? `<div class="sec-hdr"><span class="sec-title">${esc(e.name)} · top 10</span><span class="sec-count">${esc(e.detail || '')}</span></div>${gfBoard(e, 10)}
@@ -421,12 +467,12 @@ function renderHome() {
 function gameCard(g0) {
   const g = live(g0);
   const fin = g.state === 'post', aw = +g.away_score > +g.home_score;
-  const rk = r => r ? `<span class="rk">#${r}</span>` : '';
-  return `<div class="gm${OPEN_GAME === g.gid ? ' sel' : ''}" onclick="openGame('${g.gid}')" tabindex="0" onkeydown="if(event.key==='Enter')openGame('${g.gid}')">
+  const b = oddsRows(['away', 'home'].map(sd => ({id: teamId(g, sd), sc: g.state !== 'pre' ? esc(g[sd + '_score']) : '',
+    cells: gameCells(g, sd), lose: fin && (sd === 'away' ? !aw : aw)})));
+  return `<div class="gm${b.odds ? ' odds' : ''}${OPEN_GAME === g.gid ? ' sel' : ''}" onclick="openGame('${g.gid}')" tabindex="0" onkeydown="if(event.key==='Enter')openGame('${g.gid}')">
     <div class="gm-top"><span>${stateTxt(g)}</span><span>${esc(g.tv || '')}</span></div>
-    <div class="gm-t${fin && !aw ? ' lose' : ''}">${lg(g.away_logo, 'm')}<div>${rk(g.away_rank)}<b>${esc(g.away_short || g.away)}</b><span class="rec">${esc(g.away_rec || '')}</span></div><span class="sc">${g.state !== 'pre' ? esc(g.away_score) : ''}</span></div>
-    <div class="gm-t${fin && aw ? ' lose' : ''}">${lg(g.home_logo, 'm')}<div>${rk(g.home_rank)}<b>${esc(g.home_short || g.home)}</b><span class="rec">${esc(g.home_rec || '')}</span></div><span class="sc">${g.state !== 'pre' ? esc(g.home_score) : ''}</span></div>
-    ${lineChips(g)}
+    ${b.html}
+    <div class="gm-ft"><span>${b.odds ? 'Tap a price to bet on Onyx' : g.state === 'pre' ? 'Lines post on Onyx soon' : ''}</span><b>Gamecenter ›</b></div>
   </div>`;
 }
 var GFILTER = 'all';
@@ -463,7 +509,7 @@ function drawGame(gid) {
     ${g.state !== 'pre' ? `<div class="ssc a">${esc(g.away_score)}</div><div class="ssc h">${esc(g.home_score)}</div>` : ''}</div>`;
   const s = GC_CACHE[gid];
   box.innerHTML = `<div class="gc" id="gc">${head}
-    ${lineChips(g) ? `<div class="gc-sec"><h4>Onyx lines</h4>${lineChips(g)}</div>` : ''}
+    ${gameBoard(g) ? `<div class="gc-sec"><h4>Onyx lines</h4>${gameBoard(g)}</div>` : ''}
     <div class="gc-sec" style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-primary" onclick="bet(null,'game ${esc(g.away)} @ ${esc(g.home)}')">⚡ Bet this game on Onyx</button>
       <button class="btn-secondary" onclick="OPEN_GAME=null;renderGames()">Close</button></div>
     <div id="gcDetail">${s ? gcDetail(s, g) : '<div class="empty">Loading the gamecenter…</div>'}</div></div>`;
@@ -951,7 +997,7 @@ function matchCenter(id) {
     ${L.length ? `<div class="gc-sec"><h4>Onyx lines · live</h4><div class="fx">${L.map(l => `<div class="${l.st}" ${l.sel ? `onclick="bet('${esc(l.sel)}','${esc(l.label)}')" style="cursor:pointer"` : ''}>
       <span>${esc(l.label)}</span><b>${fmtOdds(l.price)}</b><small>${esc(l.now || (l.st === 'win' ? 'cashed' : ''))}</small>
       ${l.bar != null ? `<div class="yp-bar"><i style="width:${l.bar}%"></i></div>` : ''}</div>`).join('')}</div></div>` : '<div class="gc-sec"><div class="dim" style="font-size:12px">Onyx has not priced this match.</div></div>'}
-    ${lean ? `<div class="gc-sec"><h4>The model · leans, not picks</h4><div class="play"><span class="t">ELO</span><span><b>${esc(pickLabel(lean))}</b> · model ${pct(lean.model_p, 1)} · Onyx no-vig ${pct(lean.fair, 1)} · ${esc(lean.detail || '')}</span><span class="r ${lean.edge > 0 ? 'td' : ''}">${lean.edge > 0 ? '+' : ''}${(lean.edge * 100).toFixed(1)}pp</span></div></div>` : ''}
+    ${lean ? `<div class="gc-sec"><h4>The model · leans, not picks</h4><div class="play"><span class="t">ELO</span><span><b>${esc(pickLabel(lean))}</b> · model ${pct(lean.model_p, 1)} · ${esc(lean.detail || '')}</span><span class="r ${lean.edge > 0 ? 'td' : ''}">${lean.edge > 0 ? '+' : ''}${(lean.edge * 100).toFixed(1)}pp</span></div></div>` : ''}
     <div class="gc-sec" style="display:flex;gap:8px;flex-wrap:wrap">${m.p.map(x => tnFollowBtn(x.name)).join('')}<button class="btn-secondary" onclick="OPEN_MATCH=null;renderGames()">Close</button></div>
     <div class="gc-sec"><div class="bx-grid">${form(m.p[0])}${form(m.p[1])}</div></div></div>`;
 }
@@ -1104,7 +1150,8 @@ window.OX_SELINFO = function (sel) {
     if (m) return {label: m[1], price: m[2], gid};
   }
   for (const [mid, o] of Object.entries(O.matches || {})) {
-    const m = [['ml0_sel', `${(o.p || [])[0]} to win`, o.ml0], ['ml1_sel', `${(o.p || [])[1]} to win`, o.ml1], ['over_sel', `Over ${o.total} games`, o.over], ['under_sel', `Under ${o.total} games`, o.under]].find(x => o[x[0]] === sel);
+    const m = [['ml0_sel', `${(o.p || [])[0]} to win`, o.ml0], ['ml1_sel', `${(o.p || [])[1]} to win`, o.ml1], ['sp0_sel', `${(o.p || [])[0]} ${o.sp0 > 0 ? '+' : ''}${o.sp0} games`, o.sp0_price], ['sp1_sel', `${(o.p || [])[1]} ${o.sp1 > 0 ? '+' : ''}${o.sp1} games`, o.sp1_price],
+               ['over_sel', `Over ${o.total} games`, o.over], ['under_sel', `Under ${o.total} games`, o.under]].find(x => o[x[0]] === sel);
     if (m) return {label: m[1], price: m[2], gid: mid, players: o.p, name: m[0] === 'ml0_sel' ? (o.p || [])[0] : m[0] === 'ml1_sel' ? (o.p || [])[1] : undefined};
   }
   return null;
@@ -1122,18 +1169,31 @@ window.OX_ONBET = function (rec) {
 // tennis
 var TFILTER = 'live';
 function tnMatch(e, m) {
-  const p = (x, i) => `<div class="tn-p${x.win ? ' w' : ''}">${x.flag ? `<img src="${esc(x.flag)}" alt="" loading="lazy">` : ''}<b>${esc(x.name)}</b>${x.seed ? ` <span class="dim">(${esc(x.seed)})</span>` : ''}${m.state === 'in' && x.serve ? '<i class="sv" title="Serving"></i>' : ''}</div>
-    <div class="tn-sets">${x.sets.map((v, j) => `<span style="${(m.p[1 - i].sets[j] || 0) < v ? '' : 'opacity:.55'}">${v}</span>`).join('')}</div>`;
-  const mo = ((SD.odds || {}).matches || {})[m.id];
-  const odds = mo && m.state !== 'post' ? `<div class="gm-lines" style="grid-column:1/-1">${chip(mo.ml0, m.p[0].name + ' to win', mo.ml0_sel, (m.p[0].short || m.p[0].name).split(' ').pop())}${chip(mo.ml1, m.p[1].name + ' to win', mo.ml1_sel, (m.p[1].short || m.p[1].name).split(' ').pop())}${mo.total != null ? chip(mo.over, 'Over ' + mo.total + ' games', mo.over_sel, 'O ' + mo.total + ' gms') + chip(mo.under, 'Under ' + mo.total + ' games', mo.under_sel, 'U ' + mo.total + ' gms') : ''}</div>` : '';
-  return `<div class="tn-m${OPEN_MATCH === m.id ? ' sel' : ''}" onclick="if(!event.target.closest('.chipx'))openMatch('${esc(m.id)}')" style="cursor:pointer">${p(m.p[0], 0)}${p(m.p[1], 1)}${odds}<div class="tn-meta">${m.state === 'in' ? '<span style="color:#61e970">● Live</span> · ' : ''}${esc(e.tour)} · ${esc(m.round || '')}${m.state === 'pre' ? ' · ' + esc(tipTime(m.start)) : m.state === 'post' ? ' · ' + esc(m.detail || 'Final') : ''}</div></div>`;
+  const mo = m.state !== 'post' ? ((SD.odds || {}).matches || {})[m.id] : null;
+  const cells = i => {
+    if (!mo) return null;
+    const x = m.p[i], sp = mo['sp' + i], ov = i === 0;
+    return [
+      sp != null ? oc(mo['sp' + i + '_price'], sgn(sp), x.name + ' ' + sgn(sp) + ' games', mo['sp' + i + '_sel']) : oc(null, ''),
+      mo.total != null ? oc(ov ? mo.over : mo.under, (ov ? 'O ' : 'U ') + mo.total, (ov ? 'Over ' : 'Under ') + mo.total + ' games', ov ? mo.over_sel : mo.under_sel) : oc(null, ''),
+      oc(mo['ml' + i], '', x.name + ' to win', mo['ml' + i + '_sel'])];
+  };
+  const id = (x, i) => `${x.flag ? `<img class="gm-flag" src="${esc(x.flag)}" alt="" loading="lazy">` : ''}<div class="gm-nm"><b><span class="nm-f">${esc(x.name)}</span><span class="nm-s">${esc(x.short || x.name)}</span>${m.state === 'in' && x.serve ? '<i class="sv" title="Serving"></i>' : ''}</b><span>${x.seed ? 'Seed ' + esc(x.seed) : ''}</span></div>`;
+  const sets = i => m.state === 'pre' ? '' : `<span class="sets">${m.p[i].sets.map((v, j) => `<span class="${(m.p[1 - i].sets[j] || 0) < v ? 'won' : ''}">${v}</span>`).join('')}</span>`;
+  const bd = oddsRows([0, 1].map(i => ({id: id(m.p[i], i), sc: sets(i), cells: cells(i), lose: m.state === 'post' && !m.p[i].win})));
+  const st = m.state === 'in' ? `<span class="live">${esc(m.detail || 'Live')}</span>` : m.state === 'post' ? esc(m.detail || 'Final') : esc(tipTime(m.start));
+  return `<div class="gm${bd.odds ? ' odds' : ''}${OPEN_MATCH === m.id ? ' sel' : ''}" onclick="openMatch('${esc(m.id)}')" tabindex="0" onkeydown="if(event.key==='Enter')openMatch('${esc(m.id)}')">
+    <div class="gm-top"><span>${st}</span><span>${esc(e.tour)} · ${esc(m.round || '')}</span></div>
+    ${bd.html}
+    <div class="gm-ft"><span>${bd.odds ? 'Tap a price to bet on Onyx' : m.state === 'pre' ? 'Lines post on Onyx soon' : ''}</span><b>Match center ›</b></div>
+  </div>`;
 }
 function tnAll() {
   const segs = [['live', 'Live'], ['pre', 'Upcoming'], ['post', 'Results']];
   const st = TFILTER === 'live' ? 'in' : TFILTER;
   return `<div class="sec-hdr"><span class="sec-title">ATP and WTA singles this week</span></div>
     <div class="sp-tabs-seg">${segs.map(([k, t]) => `<button class="${TFILTER === k ? 'on' : ''}" onclick="TFILTER='${k}';renderGames()">${t}</button>`).join('')}</div>
-    ${(SD.events || []).map(e => { const ms = e.matches.filter(m => m.state === st); return ms.length ? `<div class="tn-ev"><div class="sec-hdr" style="margin-top:8px"><span class="sec-title">${esc(e.tour)} · ${esc(e.name)}</span><span class="sec-count">${ms.length} matches</span></div><div class="tn-grid">${ms.slice(0, 40).map(m => tnMatch(e, m)).join('')}</div></div>` : ''; }).join('')
+    ${(SD.events || []).map(e => { const ms = e.matches.filter(m => m.state === st); return ms.length ? `<div class="tn-ev"><div class="sec-hdr" style="margin-top:8px"><span class="sec-title">${esc(e.tour)} · ${esc(e.name)}</span><span class="sec-count">${ms.length} matches</span></div><div class="gm-grid">${ms.slice(0, 40).map(m => tnMatch(e, m)).join('')}</div></div>` : ''; }).join('')
       || `<div class="empty">No ${TFILTER === 'live' ? 'live' : TFILTER === 'pre' ? 'upcoming' : 'finished'} singles matches right now.</div>`}`;
 }
 // golf
@@ -1208,7 +1268,7 @@ function renderBoard() {
   }
   if (KIND === 'tennis' && Object.keys(O.matches || {}).length) {
     const ms = (SD.events || []).flatMap(e => e.matches.filter(m => m.state !== 'post' && (O.matches || {})[m.id]).map(m => [e, m]));
-    out.push(`<div class="tn-grid">${ms.map(([e, m]) => tnMatch(e, m)).join('') || '<div class="empty">No open Onyx match prices right now.</div>'}</div>`);
+    out.push(`<div class="gm-grid">${ms.map(([e, m]) => tnMatch(e, m)).join('') || '<div class="empty">No open Onyx match prices right now.</div>'}</div>`);
   }
   if (O.games && Object.keys(O.games).length) {
     out.push(`<div class="gm-grid">${games.filter(g => g.state !== 'post' && gameOdds(g.gid)).map(gameCard).join('') || '<div class="empty">No open game lines right now.</div>'}</div>`);
@@ -1284,10 +1344,10 @@ function backtestBlock(B) {
 }
 var PMKT = 'all';
 function gameLeanTable(rows, inGame) {
-  return `<div class="tbl"><table><thead><tr>${inGame ? '' : '<th>Game</th>'}<th>Lean</th><th class="r">Model</th><th class="r">Onyx no-vig</th><th class="r">Blend</th><th class="r">Edge</th><th class="r">Onyx</th></tr></thead><tbody>
+  return `<div class="tbl"><table><thead><tr>${inGame ? '' : '<th>Game</th>'}<th>Lean</th><th class="r">Model</th><th class="r">Blend</th><th class="r">Edge</th><th class="r">Onyx</th></tr></thead><tbody>
     ${rows.map(r => `<tr class="tap" onclick="${r.gid && !inGame ? `openGame('${esc(r.gid)}')` : ''}">${inGame ? '' : `<td><b>${esc(r.matchup || '')}</b>${r.start ? ` <span class="dim">${esc(tipTime(r.start))}</span>` : ''}</td>`}
       <td><b class="${r.edge > 0 ? 'lean-o' : ''}">${esc(pickLabel(r))}</b>${r.detail && !inGame ? ` <span class="dim">${esc(r.detail)}</span>` : ''}</td>
-      <td class="r mono">${pct(r.model_p, 1)}</td><td class="r mono dim">${pct(r.fair, 1)}</td><td class="r mono">${pct(r.prob, 1)}</td>
+      <td class="r mono">${pct(r.model_p, 1)}</td><td class="r mono">${pct(r.prob, 1)}</td>
       <td class="r mono ${r.edge > 0 ? 'edge-pos' : 'edge-neg'}">${r.edge != null ? (r.edge > 0 ? '+' : '') + (r.edge * 100).toFixed(1) + 'pp' : '-'}</td>
       <td class="r" onclick="event.stopPropagation()">${r.price != null ? chip(r.price, pickLabel(r), r.sel, 'Onyx') : '<span class="dim">no line</span>'}</td></tr>`).join('')}
   </tbody></table></div>`;

@@ -126,7 +126,7 @@ def nfl_block(lane, slate, odds):
     block["tests"].append({"k": "Game win log loss", "v": f"{M.GAME_TEST['logloss']:.3f}",
                            "d": f"vs {M.GAME_TEST['base_logloss']:.3f} home base rate · {M.GAME_TEST['n']} games"})
     block["method"].append("Game lines: every team carries an offense and a defense rating in points, fitted on every final this season and "
-                           "last, and each Onyx moneyline, spread and total is priced from them, then blended with Onyx's no-vig price.")
+                           "last, and each Onyx moneyline, spread and total is priced from them, then blended with the Onyx market.")
     by_gid = {}
     for r in rows:
         by_gid.setdefault(r["gid"], {})[nk(r["name"])] = r
@@ -278,8 +278,8 @@ def engine_team(key, M, GP, w, bt, live):
             [["Margin", f"normal around the projected margin, spread {GP['sd_margin']:g} points"],
              ["Total", f"normal around the projected total, spread {GP['sd_total']:g} points"],
              ["Moneyline, spread", "the chance the margin clears zero, or the line"]])},
-        {"t": "3 · Against the Onyx price", "bars": [["Onyx market (no vig)", round((1 - w) * 100)], ["Onyx model", round(w * 100)]],
-         "note": "The model's chance is blended with Onyx's own no-vig price; edge is the blended chance minus the chance the listed price implies. " +
+        {"t": "3 · Against the Onyx price", "bars": [["Onyx market", round((1 - w) * 100)], ["Onyx model", round(w * 100)]],
+         "note": "The model's chance is blended with the Onyx market; edge is the blended chance minus the chance the listed price implies. " +
                  ("The market carries most of the weight because, line for line, it is the sharper read." if w < 0.5 else
                   "The backtest gave the model and the market an even say." if w == 0.5 else
                   "The backtest gave the model the larger say.")}]
@@ -287,7 +287,7 @@ def engine_team(key, M, GP, w, bt, live):
         ["chart", "Offense and defense", f"Every team carries two ratings in {unit}: what it scores above average and what it allows. Tonight's projection is league average plus the home edge plus one side's offense minus the other's defense.", "Foundation", ""],
         ["clock", "Recency", f"Half-life {GP['half_life']} days: rosters and form move, so last month counts more than last season. The summer break decays last season on its own.", "Tuned", "purple"],
         ["shield", "Pull to average", f"Ridge {GP['ridge']:g}: ratings are shrunk toward average until a team has earned it, which is what stops a 3-game sample from looking elite.", "Tuned", "blue"],
-        ["scale", "Market blend", f"{round(w * 100)}% model, {round((1 - w) * 100)}% Onyx no-vig. Chosen by the backtest against real Onyx prices.", "Market", "blue"],
+        ["scale", "Market blend", f"{round(w * 100)}% model, {round((1 - w) * 100)}% Onyx market. Chosen by the backtest against real Onyx prices.", "Market", "blue"],
     ]
     if getattr(M, "NO_TOTALS", False):
         factors.append(["eye", "Totals held back", f"The ratings' totals did not beat a flat league average ({T['mae_total']:.2f} vs {T['base_mae_total']:.2f} {unit} of error), so totals are never leaned or picked.", "Guardrail", "blue"])
@@ -315,14 +315,14 @@ def engine_tennis(TM, w, bt, live):
             ["Update", f"a win moves a rating by K x (1 - expected chance), K = {P['k0']:g} / (matches + 5)^{P['shape']:g}"],
             ["New players", "move fast; veterans move slowly"],
             ["Needs", f"{P['min_matches']} matches for both players before a match is priced"]]},
-        {"t": "2 · Against the Onyx price", "bars": [["Onyx market (no vig)", round((1 - w) * 100)], ["Onyx model", round(w * 100)]],
-         "note": "Elo gives the chance each player wins; it is blended with Onyx's no-vig price and the edge is measured against the price you actually get."}],
+        {"t": "2 · Against the Onyx price", "bars": [["Onyx market", round((1 - w) * 100)], ["Onyx model", round(w * 100)]],
+         "note": "Elo gives the chance each player wins; it is blended with the Onyx market and the edge is measured against the price you actually get."}],
         "factors": [
             ["chart", "Elo", "One number per player that rises with wins and falls with losses, scaled by how surprising the result was.", "Foundation", ""],
             ["pace", "K schedule", f"K = {P['k0']:g} / (matches + 5)^{P['shape']:g}, FiveThirtyEight's schedule: a newcomer's rating finds its level in a few weeks, a veteran's barely moves on one upset.", "Tuned", "purple"],
             ["eye", "Grand Slams", "Weighting Slam results more (1.1x, 1.3x) tested no better, so every match counts the same.", "Tested", "blue"],
             ["bell", "Surfaces next", "Clay, grass and hard-court ratings are the next step; a single rating blurs specialists.", "Planned", ""],
-            ["scale", "Market blend", f"{round(w * 100)}% model, {round((1 - w) * 100)}% Onyx no-vig.", "Market", "blue"]],
+            ["scale", "Market blend", f"{round(w * 100)}% model, {round((1 - w) * 100)}% Onyx market.", "Market", "blue"]],
         "lane": _lane_card(bt, live)}
 
 
@@ -407,14 +407,14 @@ def team_block(key, lane, slate, odds):
     base = L.model_block(
         title="Team ratings against every Onyx game line",
         note=(f"Every team carries an offense and a defense rating in {unit}, fitted on every final this season and last, "
-              f"recent games weighing more. Each Onyx moneyline, spread and total is priced from them and blended with Onyx's own "
-              f"no-vig price. Tracked picks switch on only after the ratings beat real Onyx prices in a backtest."),
+              f"recent games weighing more. Each Onyx moneyline, spread and total is priced from them and blended with the Onyx "
+              f"market. Tracked picks switch on only after the ratings beat real Onyx prices in a backtest."),
         method=[METHOD[cfg["kind"]],
                 f"Ratings: {unit} scored = league average + home edge + the team's offense - the opponent's defense, fitted by weighted "
                 f"least squares with a pull toward average so a team with three games is not rated off three games.",
                 ("Hockey prices: each side's goals are Poisson; a regulation tie goes to overtime. " if cfg["kind"] == "hockey" else
                  "Football prices: the margin and the total are normal around the ratings' projection. ") +
-                f"The blend gives the model {round(w * 100)}% and Onyx's no-vig price the rest; edge is the blended chance minus the price's implied chance."],
+                f"The blend gives the model {round(w * 100)}% and the Onyx market the rest; edge is the blended chance minus the price's implied chance."],
         tests=[{"k": "Win log loss", "v": f"{TEST['logloss']:.3f}", "d": f"vs {TEST['base_logloss']:.3f} home base rate · {TEST['n']} games from {TEST['window']}"},
                {"k": f"Total error ({unit})", "v": f"{TEST['mae_total']:.2f}", "d": f"vs {TEST['base_mae_total']:.2f} league average"}],
         roadmap=ROADMAP.get(key, []))
@@ -434,12 +434,12 @@ def tennis_block(lane, slate, odds):
     base = L.model_block(
         title="Elo ratings against every Onyx match price",
         note=("Every ATP and WTA singles player carries an Elo rating built from every completed match since 2023. Each Onyx match "
-              "price is set against it and blended with Onyx's own no-vig price. Tracked picks switch on only after the ratings "
+              "price is set against it and blended with the Onyx market. Tracked picks switch on only after the ratings "
               "beat real Onyx prices in a backtest."),
         method=[METHOD["tennis"],
                 "Elo: a win moves a rating by K x (1 - expected), K = 150 / (matches + 5)^0.4, so new players move fast and veterans slowly. "
                 "Retirements and walkovers are dropped. A player needs 10 matches before the model prices them.",
-                f"The blend gives the model {round(w * 100)}% and Onyx's no-vig price the rest."],
+                f"The blend gives the model {round(w * 100)}% and the Onyx market the rest."],
         tests=[{"k": "Match log loss", "v": "0.627", "d": "7,875 matches in 2026 the ratings never saw"},
                {"k": "Favourite won", "v": "64.0%", "d": "same matches"}],
         roadmap=ROADMAP["tennis"])
