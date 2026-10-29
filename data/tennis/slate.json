@@ -1,5 +1,5 @@
 {
- "date": "2026-10-28",
+ "date": "2026-10-29",
  "sport": "tennis",
  "name": "Tennis",
  "label": "Erste Bank Open · Swiss Indoors Basel · Guangzhou Open",
@@ -4323,9 +4323,9 @@
     },
     {
      "id": "185722",
-     "start": "2026-10-29T07:20Z",
-     "state": "pre",
-     "detail": "10/29 - 3:20 AM EDT",
+     "start": "2026-10-29T07:15Z",
+     "state": "in",
+     "detail": "3rd",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -4336,8 +4336,12 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/chn.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        6,
+        4,
+        1
+       ],
+       "serve": true
       },
       {
        "name": "Maria Timofeeva",
@@ -4345,16 +4349,20 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/uzb.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        3,
+        6,
+        2
+       ],
        "serve": false
       }
      ]
     },
     {
      "id": "185727",
-     "start": "2026-10-29T08:30Z",
+     "start": "2026-10-29T09:30Z",
      "state": "pre",
-     "detail": "10/29 - 4:30 AM EDT",
+     "detail": "10/29 - 5:30 AM EDT",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -5909,8 +5917,8 @@
     {
      "id": "185672",
      "start": "2026-10-29T05:45Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Center",
@@ -5920,10 +5928,10 @@
        "short": "M. Pohankova",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/svk.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        5
+        7
        ],
        "serve": false
       },
@@ -5935,7 +5943,7 @@
        "win": false,
        "sets": [
         3,
-        4
+        5
        ],
        "serve": false
       }
@@ -5943,9 +5951,9 @@
     },
     {
      "id": "185676",
-     "start": "2026-10-29T08:00Z",
-     "state": "pre",
-     "detail": "10/29 - 4:00 AM EDT",
+     "start": "2026-10-29T08:05Z",
+     "state": "in",
+     "detail": "2nd",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Center",
@@ -5956,7 +5964,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/kaz.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        2,
+        3
+       ],
        "serve": false
       },
       {
@@ -5965,77 +5976,22 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/kaz.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
-      }
-     ]
-    },
-    {
-     "id": "185686",
-     "start": "2026-10-30T04:00Z",
-     "state": "pre",
-     "detail": "TBD",
-     "round": "Quarterfinal",
-     "draw": "Women's Singles",
-     "court": "",
-     "p": [
-      {
-       "name": "Alycia Parks",
-       "short": "A. Parks",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      }
-     ]
-    },
-    {
-     "id": "185685",
-     "start": "2026-10-30T04:00Z",
-     "state": "pre",
-     "detail": "TBD",
-     "round": "Quarterfinal",
-     "draw": "Women's Singles",
-     "court": "",
-     "p": [
-      {
-       "name": "Diana Shnaider",
-       "short": "D. Shnaider",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/rus.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "Alexandra Eala",
-       "short": "A. Eala",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/phi.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
+       "sets": [
+        6,
+        5
+       ],
        "serve": false
       }
      ]
     },
     {
      "id": "185684",
-     "start": "2026-10-30T04:00Z",
+     "start": "2026-10-30T01:30Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "10/29 - 9:30 PM EDT",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
-     "court": "",
+     "court": "Center",
      "p": [
       {
        "name": "Maya Joint",
@@ -6058,13 +6014,42 @@
      ]
     },
     {
-     "id": "185683",
-     "start": "2026-10-30T04:00Z",
+     "id": "185686",
+     "start": "2026-10-30T02:30Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "10/29 - 10:30 PM EDT",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
-     "court": "",
+     "court": "Center",
+     "p": [
+      {
+       "name": "Alycia Parks",
+       "short": "A. Parks",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      },
+      {
+       "name": "Mia Pohankova",
+       "short": "M. Pohankova",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/svk.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      }
+     ]
+    },
+    {
+     "id": "185683",
+     "start": "2026-10-30T05:30Z",
+     "state": "pre",
+     "detail": "10/30 - 1:30 AM EDT",
+     "round": "Quarterfinal",
+     "draw": "Women's Singles",
+     "court": "Center",
      "p": [
       {
        "name": "Leylah Fernandez",
@@ -6079,6 +6064,35 @@
        "name": "TBD",
        "short": "TBD",
        "flag": null,
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      }
+     ]
+    },
+    {
+     "id": "185685",
+     "start": "2026-10-30T08:00Z",
+     "state": "pre",
+     "detail": "10/30 - 4:00 AM EDT",
+     "round": "Quarterfinal",
+     "draw": "Women's Singles",
+     "court": "Center",
+     "p": [
+      {
+       "name": "Diana Shnaider",
+       "short": "D. Shnaider",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/rus.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      },
+      {
+       "name": "Alexandra Eala",
+       "short": "A. Eala",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/phi.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -10136,5 +10150,5 @@
    ]
   }
  ],
- "fetched": "2026-10-29T07:12:26+00:00"
+ "fetched": "2026-10-29T09:14:15+00:00"
 }
