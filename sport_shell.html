@@ -194,6 +194,20 @@
 .mc-form b{display:block;font:800 10px monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--text3)}
 .mc-form .r{font:800 11px monospace}.mc-form .r.w{color:#61e970}.mc-form .r.l{color:#f87171}
 .tn-m.sel{border-color:#b038f9}
+/* list rows (phone first): projections, leans */
+.pl-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,420px),1fr));gap:8px}
+.pl-row{display:flex;flex-direction:column;gap:8px;padding:11px 12px;border-radius:14px;border:1px solid var(--border2);background:linear-gradient(180deg,rgba(255,255,255,.025),transparent 50%),var(--bg2);min-width:0}
+.pl-row.tap{cursor:pointer}.pl-row.tap:hover{border-color:rgba(176,56,249,.55)}
+.pl-who{display:flex;align-items:center;gap:10px;min-width:0}
+.pl-hs{width:36px;height:36px;border-radius:50%;object-fit:cover;background:var(--bg3);flex-shrink:0}
+.pl-nm{flex:1;min-width:0}.pl-nm b{display:block;font-size:15px;line-height:1.2}.pl-nm span{display:block;font:500 11px monospace;color:var(--text3);margin-top:2px}
+.pl-pj{text-align:right;flex-shrink:0}.pl-pj b{display:block;font:800 20px monospace;line-height:1}.pl-pj span{display:block;font:700 9px monospace;letter-spacing:.08em;text-transform:uppercase;color:#d795ff;margin-top:3px}
+.pl-ev{display:flex;align-items:center;gap:12px;flex-wrap:wrap;font:600 11px monospace;color:var(--text3)}
+.pl-ev b{color:var(--text2);font-weight:800}
+.pl-ev .fl-btn{padding:2px 8px}
+.pl-ln{margin-left:auto}
+.pl-ln .chipx{min-width:0;flex-direction:row;gap:6px;padding:6px 10px}
+.ln-top{display:flex;justify-content:space-between;gap:8px;font:700 10px monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--text3)}
 .tc-wrap{max-width:720px;margin:12px auto 0;border-radius:16px;overflow:hidden;box-shadow:0 18px 40px -22px rgba(176,56,249,.7)}
 .tc{display:block;width:100%;height:auto}
 .tc-nm{font:800 22px 'Space Grotesk',system-ui,sans-serif;fill:#fff;paint-order:stroke;stroke:rgba(0,0,0,.35);stroke-width:4px}
@@ -499,7 +513,7 @@ function renderHome() {
     body = `<div class="sec-hdr"><span class="sec-title">${games.some(g => g.state === 'in') ? 'Live now and up next' : 'Up next'}</span><span class="sec-count">${games.length} games</span></div>
       <div class="gm-grid">${up.map(gameCard).join('') || '<div class="empty">No games on the slate.</div>'}</div>`;
     const top = (SD.model || {}).top || [];
-    if (top.length) body += `<div class="sec-hdr"><span class="sec-title">Model projections · top of the slate</span></div>${projTable(top.slice(0, 8))}`;
+    if (top.length) body += `<div class="sec-hdr"><span class="sec-title">Top projections</span></div>${projTable(top.slice(0, 8))}`;
   }
   document.getElementById('homeBody').innerHTML = ((KIND === 'football' || KIND === 'hockey' || KIND === 'tennis' || KIND === 'golf') ? `<div id="ypHome">${yourPlayers()}</div>` : '') + body;
 }
@@ -1672,13 +1686,19 @@ var MKT_NAME = {ml: 'Moneyline', spread: 'Spread', total: 'Total', pass_yds: 'Pa
                 pass_td: 'Passing TDs', anytime_td: 'Anytime TD', first_td: 'First TD', goals: 'Goals', shots: 'Shots on goal', points: 'Points', assists: 'Assists', saves: 'Saves'};
 
 // ── plays (model) ───────────────────────────────────────────────────
+// player projections as list rows (phone first): who and what, the projection big on the
+// right, then the evidence and the Onyx line underneath; two per line on wide screens
 function projTable(rows) {
-  return `<div class="tbl"><table><thead><tr><th>Player</th><th>Market</th><th class="r">Proj</th><th class="r">Last 3</th><th class="r">Season</th><th class="r">Onyx line</th><th class="r">Lean · Onyx</th></tr></thead><tbody>
-    ${rows.map(r => `<tr><td>${r.pid ? `<button class="fl-btn${isF(r.pid) ? ' on' : ''}" style="padding:2px 7px;margin-right:4px" title="Follow live" onclick="toggleF('${esc(r.pid)}','${esc(String(r.name).replace(/'/g, ''))}','${esc(r.gid)}')">${isF(r.pid) ? '★' : '☆'}</button>` : ''}${r.hs ? `<img class="lg" style="border-radius:50%" src="${esc(r.hs)}" alt="" loading="lazy">` : ''} <b>${esc(r.name)}</b> <span class="dim">${esc(r.team)} ${r.home ? 'vs' : '@'} ${esc(r.opp)}</span></td>
-      <td class="dim">${esc(MKT_NAME[r.mkt] || r.mkt)}</td><td class="r mono"><b>${num(r.proj)}</b></td><td class="r mono dim">${esc((r.l3 || []).join(' '))}</td><td class="r mono dim">${num(r.season)}</td>
-      <td class="r mono">${r.line != null ? esc(r.line) : '-'}</td><td class="r">${r.line == null ? '<span class="dim">-</span>' : r.proj > r.line
-        ? chip(r.over, r.name + ' Over ' + r.line, r.over_sel, 'Over') : chip(r.under, r.name + ' Under ' + r.line, r.under_sel, 'Under')}</td></tr>`).join('')}
-  </tbody></table></div>`;
+  return `<div class="pl-list">${rows.map(r => {
+    const side = r.line == null ? null : (r.side || (r.proj > r.line ? 'over' : 'under'));
+    const lean = r.line == null ? '<span class="dim">no Onyx line</span>' : side === 'over'
+      ? chip(r.over, r.name + ' Over ' + r.line, r.over_sel, 'Over ' + r.line) : chip(r.under, r.name + ' Under ' + r.line, r.under_sel, 'Under ' + r.line);
+    return `<div class="pl-row">
+      <div class="pl-who">${r.hs ? `<img class="pl-hs" src="${esc(r.hs)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">` : '<span class="pl-hs"></span>'}
+        <div class="pl-nm"><b>${esc(r.name)}</b><span>${esc(r.team)} ${r.home ? 'vs' : '@'} ${esc(r.opp)} · ${esc(MKT_NAME[r.mkt] || r.mkt)}</span></div>
+        <div class="pl-pj"><b>${num(r.proj)}</b><span>${r.prob != null && side ? pct(r.prob, 0) + ' ' + (side === 'over' ? 'O' : 'U') : 'proj'}</span></div></div>
+      <div class="pl-ev"><span>L3 <b>${esc((r.l3 || []).join(' · ') || '-')}</b></span><span>Szn <b>${num(r.season)}</b></span>${r.pid ? `<button class="fl-btn${isF(r.pid) ? ' on' : ''}" title="Follow live" onclick="toggleF('${esc(r.pid)}','${esc(String(r.name).replace(/'/g, ''))}','${esc(r.gid)}')">${isF(r.pid) ? '★' : '☆'}</button>` : ''}<span class="pl-ln">${lean}</span></div>
+    </div>`; }).join('')}</div>`;
 }
 function pickLabel(r) {
   if (r.kind === 'ml') return `${r.name} to win`;
@@ -1702,14 +1722,15 @@ function playCards(rows) {
 // touchdown scorers (nfl_model v2): each player's anytime and first TD chance against Onyx's price
 function tdTable(rows, title) {
   if (!rows || !rows.length) return '';
-  const cell = (p, price, sel, value, label) => price == null ? `<td class="r"><b>${pct(p, 0)}</b><div class="dim" style="font-size:10px">no line</div></td>`
-    : `<td class="r"><b class="${value ? 'edge-pos' : ''}">${pct(p, 0)}${value ? ' ✓' : ''}</b><div>${chip(price, label, sel, 'Onyx')}</div></td>`;
   return `<div class="sec-hdr"><span class="sec-title">${esc(title)}</span><span class="sec-count">${rows.length}</span></div>
-    <p class="dim" style="font-size:12px;line-height:1.6;margin:0 0 10px">Each player's chance to score: his share of the team's carries and targets, his own touchdown record and Onyx's implied team points, blended with Onyx's price. ✓ marks anytime value: the model beats Onyx's price by 5 points or more, the bar that made money in the 2026 backtest (it was not proven in 2025). First TD is shown for information: Onyx's first-TD prices beat the model. Leans, not tracked picks.</p>
-    <div class="tbl"><table><thead><tr><th>Player</th><th class="r">Anytime TD</th><th class="r">First TD</th></tr></thead><tbody>
-    ${rows.map(r => `<tr><td><b>${esc(r.name)}</b> <span class="dim">${esc(r.matchup || r.team)}</span></td>
-      ${cell(r.any, r.any_price, r.any_sel, r.any_value, r.name + ' anytime TD')}${cell(r.first, r.first_price, r.first_sel, false, r.name + ' first TD')}</tr>`).join('')}
-    </tbody></table></div>`;
+    <p class="dim" style="font-size:12px;line-height:1.6;margin:0 0 10px">Chance to score from his carries and targets, his touchdown record and Onyx's team total, blended with Onyx's price. ✓ = the model beats the price by 5+ points (the bar that won in 2026 testing). Leans, not tracked.</p>
+    <div class="pl-list">${rows.map(r => `<div class="pl-row">
+      <div class="pl-who">${r.hs ? `<img class="pl-hs" src="${esc(r.hs)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">` : '<span class="pl-hs"></span>'}
+        <div class="pl-nm"><b>${esc(r.name)}</b><span>${esc(r.matchup || r.team)}</span></div>
+        <div class="pl-pj"><b class="${r.any_value ? 'edge-pos' : ''}">${pct(r.any, 0)}${r.any_value ? ' ✓' : ''}</b><span>anytime TD</span></div></div>
+      <div class="pl-ev"><span>First TD <b>${pct(r.first, 0)}</b></span>${r.first_price != null ? `<span>${chip(r.first_price, r.name + ' first TD', r.first_sel, 'First')}</span>` : ''}
+        <span class="pl-ln">${r.any_price != null ? chip(r.any_price, r.name + ' anytime TD', r.any_sel, 'Anytime') : '<span class="dim">no Onyx line</span>'}</span></div>
+    </div>`).join('')}</div>`;
 }
 function recordBlock(R) {
   if (!R || !(R.w + R.l + R.p + R.pending)) return '';
@@ -1733,14 +1754,15 @@ function backtestBlock(B) {
     <p class="dim" style="font-size:12px">Model ${esc(B.version || '')} · run ${esc(B.run || '')}</p></div>`;
 }
 var PMKT = 'all';
+// game leans as list rows: the lean and its confidence big, the numbers and the Onyx price underneath
 function gameLeanTable(rows, inGame) {
-  return `<div class="tbl"><table><thead><tr>${inGame ? '' : '<th>Game</th>'}<th>Lean</th><th class="r">Model</th><th class="r">Blend</th><th class="r">Edge</th><th class="r">Onyx</th></tr></thead><tbody>
-    ${rows.map(r => `<tr class="tap" onclick="${r.gid && !inGame ? `openGame('${esc(r.gid)}')` : ''}">${inGame ? '' : `<td><b>${esc(r.matchup || '')}</b>${r.start ? ` <span class="dim">${esc(tipTime(r.start))}</span>` : ''}</td>`}
-      <td><b class="${r.edge > 0 ? 'lean-o' : ''}">${esc(pickLabel(r))}</b>${r.detail && !inGame ? ` <span class="dim">${esc(r.detail)}</span>` : ''}</td>
-      <td class="r mono">${pct(r.model_p, 1)}</td><td class="r mono">${pct(r.prob, 1)}</td>
-      <td class="r mono ${r.edge > 0 ? 'edge-pos' : 'edge-neg'}">${r.edge != null ? (r.edge > 0 ? '+' : '') + (r.edge * 100).toFixed(1) + 'pp' : '-'}</td>
-      <td class="r" onclick="event.stopPropagation()">${r.price != null ? chip(r.price, pickLabel(r), r.sel, 'Onyx') : '<span class="dim">no line</span>'}</td></tr>`).join('')}
-  </tbody></table></div>`;
+  return `<div class="pl-list">${rows.map(r => `<div class="pl-row ln${r.gid && !inGame ? ' tap' : ''}" ${r.gid && !inGame ? `onclick="openGame('${esc(r.gid)}')"` : ''}>
+      ${inGame ? '' : `<div class="ln-top"><span>${esc(r.matchup || '')}</span><span>${r.start ? esc(tipTime(r.start)) : ''}</span></div>`}
+      <div class="pl-who"><div class="pl-nm"><b class="${r.edge > 0 ? 'lean-o' : ''}">${esc(pickLabel(r))}</b><span>${esc(r.detail || '')}</span></div>
+        <div class="pl-pj"><b>${pct(r.prob, 0)}</b><span>confidence</span></div></div>
+      <div class="pl-ev"><span>Model <b>${pct(r.model_p, 1)}</b></span><span>Edge <b class="${r.edge > 0 ? 'edge-pos' : 'edge-neg'}">${r.edge != null ? (r.edge > 0 ? '+' : '') + (r.edge * 100).toFixed(1) + 'pp' : '-'}</b></span>
+        <span class="pl-ln" onclick="event.stopPropagation()">${r.price != null ? chip(r.price, pickLabel(r), r.sel, 'Onyx') : '<span class="dim">no line</span>'}</span></div>
+    </div>`).join('')}</div>`;
 }
 function renderPlays() {
   const M = SD.model || {};
@@ -1761,11 +1783,11 @@ function renderPlays() {
   const rows = M.rows || [];
   const gameRows = rows.filter(r => r.kind), propRows = rows.filter(r => !r.kind);
   let body = (M.td || []).length ? tdTable(M.td.slice(0, 60), 'Touchdown scorers · anytime and first TD') : '';
-  if (gameRows.length) body += `<div class="sec-hdr"><span class="sec-title">Model vs Onyx · ${M.status === 'live' ? 'every game' : 'leans, not picks, not graded'}</span><span class="sec-count">${gameRows.length}</span></div>${gameLeanTable(gameRows.slice(0, 150))}`;
+  if (gameRows.length) body += `<div class="sec-hdr"><span class="sec-title">Game lines · ${M.status === 'live' ? 'model vs Onyx' : 'leans'}</span><span class="sec-count">${gameRows.length}</span></div>${gameLeanTable(gameRows.slice(0, 150))}`;
   if (propRows.length) {
     const mk = [...new Set(propRows.map(r => r.mkt))];
     const shown = propRows.filter(r => PMKT === 'all' || r.mkt === PMKT);
-    body += `<div class="sec-hdr"><span class="sec-title">${M.status === 'live' ? 'Player projections' : 'Model leans · projections, not picks, not graded'}</span><span class="sec-count">${shown.length}</span></div>
+    body += `<div class="sec-hdr"><span class="sec-title">Player projections${M.status === 'live' ? '' : ' · leans'}</span><span class="sec-count">${shown.length}</span></div>
     <div class="sp-tabs-seg"><button class="${PMKT === 'all' ? 'on' : ''}" onclick="PMKT='all';renderPlays()">All</button>${mk.map(m => `<button class="${PMKT === m ? 'on' : ''}" onclick="PMKT='${esc(m)}';renderPlays()">${esc(MKT_NAME[m] || m)}</button>`).join('')}</div>
     ${projTable(shown.slice(0, 120))}`;
   }
