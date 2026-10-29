@@ -875,7 +875,20 @@ ESPN's resizing CDN, matched to OpticOdds players by team + name once a day
 (`data/nba/headshots.json`), with the OpticOdds image as a fallback. Live
 scores, quarter line scores, box scores and win probability are polled
 client-side from ESPN's public scoreboard / summary (15s while a game is
-live). The **Top Scorer Parlay** (home + Top Scorers tab) takes tonight's
+live). **Live pace** (`livePace` / `paceOver` / `paceCard` in `nba_shell.html`): once a
+game tips, every prop shows where it finishes from where it stands, and the gamecenter's
+Live pace card lists every Onyx line with the chance the model's side lands from here.
+Final = current stat + rest-of-game minutes x rate. Minutes left use his share so far
+blended with his projected share (96 minutes of evidence), cut for starters and lifted for
+the bench past a 12-point margin late. The rate counts tonight's stats as that many minutes
+of evidence against the model's per-minute rate (pts/reb 128, ast/3PM 192): one hot half
+rarely carries. Backtested on 342,428 checkpoints (every 6 minutes of 3,096 ESPN
+play-by-play games), fit on 2024-25 and scored on 2025-26: final-line error vs the old
+50/50 pace number fell pts 3.66 to 3.13, reb 1.51 to 1.27, ast 1.03 to 0.89, 3PM 0.65 to
+0.58. Chances are a negative binomial (variance a*mu + c*mu^2, plus a 0.65 logit slope on
+points) calibrated within about 3 points on the held-out season. The game clock comes from
+the scoreboard (`LIVE[gid].per/.clk`; under a minute ESPN sends seconds only). Fouls are
+not in the play-by-play archive, so foul trouble is not modeled yet. The **Top Scorer Parlay** (home + Top Scorers tab) takes tonight's
 highest projected scorers, one per untipped game, whose Onyx points-over is
 priced and not leaned against by the blend, and opens them as one Onyx slip.
 
