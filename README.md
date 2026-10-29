@@ -547,6 +547,37 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
     - a set (from completed-set counts);
     - the over cashing;
     - the result.
+- **Tennis live model (10/29):** the match center models the match game by game, since
+  the feed has no point score.
+  - **Fit:** each player's point-on-serve chance is fitted to Onyx's moneyline and its game
+    total at once, as two form scenarios (favourite sharp, favourite flat) around a tour
+    baseline (ATP .64, WTA .56).
+    - One fixed strength over-projected totals by 2-3 games: on 10/29's 30 priced matches
+      the over came out 60% against Onyx's 49%.
+    - With the two scenarios, all 30 match both prices to within 0.2 points.
+  - **Live:** the score reweights the scenarios (how likely each finished set, and the set
+    in play, was under each), then holds, tiebreaks and sets are played out exactly.
+  - **Shown:** win chance and its path (start, each set, every game seen), projected total
+    and margin, each Onyx line's chance to cash, hold chances, and breaks per set.
+    - Breaks per set come from who served every game, rebuilt from the current server and
+      the games played.
+  - **Also shown:** "serving for the set or match" and "up a break"; a court (surface by
+    tournament, ends from the games played, server marked); a game log of holds and
+    breaks seen while the page is open (`sessionStorage`).
+  - Best of five only for ATP at the four Slams.
+- **Gamecenter navigation (10/29):** every gamecenter (football, hockey, tennis) opens
+  with a bar:
+  - "‹ Scoreboard" (or "‹ All matches") closes it and scrolls to the list;
+  - a strip of every other game switches straight to it.
+  - The shared stylesheet clips the body sideways, which breaks `position: sticky`, so
+    `gcFloatSync` pins a copy of the bar to the top once the original scrolls away.
+- **Card names fit on phones (10/29):** iOS hyphenated long names ("Sacramen-to"), so
+  names never break mid-word; `fitNames` steps a name's font down (not below 11px) until
+  its longest word fits.
+- **Sport ledger key (10/29):** `sports_lab.Ledger` keys a pick by game, market and side
+  rather than by build date.
+  - Weekly slates rebuild daily, so the date in the key re-logged PITT +7.5 on 10/26,
+    10/27 and 10/28.
 - **Golf live tracker (10/27):** pgatour.com-style leaderboard: Pos, Player (follow star),
   Total, Today, Thru.
   - **Click-down row:** clicking a row opens the player inline with:
