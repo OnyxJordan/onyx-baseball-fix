@@ -571,6 +571,14 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
   - a strip of every other game switches straight to it.
   - The shared stylesheet clips the body sideways, which breaks `position: sticky`, so
     `gcFloatSync` pins a copy of the bar to the top once the original scrolls away.
+- **NBA scoreboard matches every sport (10/29):** NBA's games use the same cards, Onyx odds
+  board and gamecenter bar as `sport_shell.html`.
+  - The CSS is lifted verbatim, with `sbCard`, `nbNav` and `gcFloatSync` in
+    `nba_shell.html`.
+  - `nba_odds.py` now keeps both spread sides and the over and under with prices and
+    selections, so every cell is tappable.
+  - On every sport, cards show prices only before the game starts. Pre-game prices never
+    sit on a live game (stale line); live games say "follow it live in the gamecenter".
 - **Card names fit on phones (10/29):** iOS hyphenated long names ("Sacramen-to"), so
   names never break mid-word; `fitNames` steps a name's font down (not below 11px) until
   its longest word fits.

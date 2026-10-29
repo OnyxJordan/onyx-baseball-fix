@@ -88,7 +88,9 @@ def pick_source(today):
 def merge_lines(slate, props):
     for g in slate["games"]:
         gl = (props.get("games") or {}).get(f"{g['away']}_{g['home']}") or {}
-        for k in ("spread", "total", "away_ml", "home_ml", "away_ml_sel", "home_ml_sel", "slug"):
+        for k in ("spread", "total", "away_ml", "home_ml", "away_ml_sel", "home_ml_sel", "slug",
+                  "away_spread", "away_spread_price", "away_spread_sel", "home_spread", "home_spread_price", "home_spread_sel",
+                  "over_price", "over_sel", "under_price", "under_sel"):
             if gl.get(k) is not None:
                 g[k] = gl[k]
         if g.get("total") and g.get("spread") is not None:
