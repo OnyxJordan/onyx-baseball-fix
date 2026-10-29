@@ -357,6 +357,11 @@ def main():
     fetch_priors(slate)
     refresh_history(today)   # 3-season priors + age curve (ESPN season totals; past seasons pulled once)
     nba_common.refresh_onoff(today)   # on/off splits from every new final's play-by-play
+    try:
+        import nba_jumps   # opening tips for the first-basket lean (data/nba/jumps.json)
+        nba_jumps.update(today)
+    except Exception as e:
+        print(f"  opening tips: {str(e)[:160]}")
     print("=== NBA fetch done (OpticOdds) ===")
     return 0
 

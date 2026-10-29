@@ -164,6 +164,14 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
 .gc-hs.st-loss .gc-hs-img{--hs-ring:#f87171;box-shadow:none;opacity:.75}
 .gc-hs.st-loss .gc-hs-pct{color:#f87171}
 .gc-hs-lean{font-family:monospace;font-size:9px;font-weight:700;letter-spacing:.04em}
+.fb-tip{font-size:12px;color:var(--text2);margin:-2px 0 8px}.fb-done{font-size:12px;margin:0 0 8px;padding:6px 10px;border-radius:10px;background:rgba(97,233,112,.08);border:1px solid rgba(97,233,112,.4)}
+.fb-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:6px}
+.fb-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:7px 10px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid var(--border2)}
+.fb-row.val{border-color:rgba(176,56,249,.55);background:rgba(176,56,249,.08)}.fb-row.hit{border-color:rgba(97,233,112,.6);background:rgba(97,233,112,.08)}
+.fb-who{min-width:0}.fb-who b{display:block;font:700 13px 'Space Grotesk',system-ui,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fb-who span{display:block;font:600 10px monospace;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.fb-row.val .fb-who span{color:#d795ff}
+.fb-pct{display:flex;flex-direction:column;align-items:center;min-width:48px}.fb-pct b{font:800 15px monospace}.fb-pct span{font:700 9px monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--text3)}
 .lp-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,360px),1fr));gap:6px}
 .lp-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:8px 10px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid var(--border2);cursor:pointer}
 .lp-who{min-width:0}.lp-who b{display:block;font:700 13px 'Space Grotesk',system-ui,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -687,6 +695,7 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
   </div>
   <div id="plCards"></div>
   <div id="plWatch"></div>
+  <div id="plFb"></div>
 </div></div>
 
 <!-- ═══ GAMES (gamecenter, MLB components) ═════════════════════ -->
@@ -1386,6 +1395,7 @@ function renderPlays() {
   // closest to qualifying first: fewest failed screens, then the bigger edge
   near.sort((a, b) => a.miss.length - b.miss.length || b.pr.edge - a.pr.edge);
   const W = near.slice(0, 8);
+  document.getElementById('plFb').innerHTML = fbLeans();
   document.getElementById('plWatch').innerHTML = W.length ? `<div class="pl-div"><i></i><span>Watchlist · near misses · not picks · not graded</span><i></i></div>
     <div class="pl-watch">${W.map(w => {
       const leg = propLeg(w.p, w.st, w.pr.side), li = leg ? regLeg(leg) : -1;
@@ -1396,6 +1406,91 @@ function renderPlays() {
         ${li >= 0 ? `<span class="pl-price sm" onclick="event.stopPropagation();betLeg(${li})">${fmtOdds(w.pr.price)}</span>` : ''}
       </div>`;
     }).join('')}</div>` : '';
+}
+// ── first basket (free throws count, Onyx's market): who scores the game's first points ──
+// Team half: the team that wins the opening tip scores first 65% of the time (2,428
+// games, 2024-26); each team's jumper is the starter with the most opening tips on
+// record, and his chance to win it is (won + 2) / (jumped + 4) against the other's.
+// Player half: the five starters split it by shot volume, (FGA + 0.9) / (minutes + 30)
+// to the 0.75 power. Fit on 2024-25; on 1,075 2025-26 games Onyx priced it went 45-376
+// at +41% ROI where it beat the opening price by 20%+, but -4% against the closing
+// price after mid-January. A lean, never a tracked pick.
+var FB_P = {g: .75, q: .65, a0: .9, m0: 30, value: .20};
+function fbStarters(g) {
+  const posted = {};
+  (((SUMMARY[g.gid] || {}).boxscore || {}).players || []).forEach(t => {
+    const ab = ESPN_ABBR[(t.team || {}).abbreviation] || (t.team || {}).abbreviation;
+    (t.statistics || []).forEach(b => (b.athletes || []).forEach(a => { if (a.starter && a.athlete) (posted[ab] = posted[ab] || []).push(String(a.athlete.id)); }));
+  });
+  const out = {};
+  [g.away, g.home].forEach(ab => {
+    const roster = (D.players || []).filter(p => p.gid === g.gid && p.team === ab && !p.out);
+    const ids = posted[ab] || [];
+    let st = ids.length === 5 ? roster.filter(p => ids.includes(String(p.hs))) : [];
+    const lineup = st.length === 5;
+    if (!lineup) {
+      const rate = p => { const s = p.season || {}; return (s.starts || 0) / Math.max(1, s.gp || 1); };
+      st = roster.slice().sort((x, y) => rate(y) - rate(x) || y.min - x.min).slice(0, 5);
+    }
+    out[ab] = {players: st, lineup};
+  });
+  return out;
+}
+function fbModel(g) {
+  const T = fbStarters(g), J = D.jumps || {};
+  if (T[g.away].players.length < 5 || T[g.home].players.length < 5) return null;
+  const jumper = ab => T[ab].players.slice().sort((x, y) => ((J[y.hs] || [0, 0])[1]) - ((J[x.hs] || [0, 0])[1]))[0];
+  const ja = jumper(g.away), jh = jumper(g.home);
+  const r = p => { const v = J[p && p.hs]; return v ? (v[0] + 2) / (v[1] + 4) : .5; };
+  const tipA = r(ja) / (r(ja) + r(jh));
+  const rows = [];
+  [g.away, g.home].forEach(ab => {
+    const pt = ab === g.away ? tipA : 1 - tipA, first = pt * FB_P.q + (1 - pt) * (1 - FB_P.q);
+    const w = T[ab].players.map(p => { const s = p.season || {}, gp = s.gp || 0;
+      return Math.pow(((s.fga || 0) * gp + FB_P.a0) / ((s.min || 0) * gp + FB_P.m0), FB_P.g); });
+    const W = w.reduce((a, b) => a + b, 0) || 1;
+    T[ab].players.forEach((p, i) => {
+      const prob = first * w[i] / W, fb = p.fb || {};
+      const imp = fb.yes != null ? 1 / (fb.yes > 0 ? 1 + fb.yes / 100 : 1 + 100 / -fb.yes) : null;
+      rows.push({p, team: ab, prob, price: fb.yes, sel: fb.sel, imp, value: imp != null && prob >= imp * (1 + FB_P.value)});
+    });
+  });
+  rows.sort((a, b) => b.prob - a.prob);
+  return {rows, ja, jh, tipA, lineup: T[g.away].lineup && T[g.home].lineup};
+}
+// who actually scored first, from the play-by-play once the game is on
+function fbScored(g) {
+  const pl = playsOf(SUMMARY[g.gid]).find(x => x.scoringPlay);
+  if (!pl) return null;
+  const id = String((((pl.participants || [])[0] || {}).athlete || {}).id || '');
+  return {id, p: (D.players || []).find(p => String(p.hs) === id && p.gid === g.gid), text: pl.text};
+}
+function fbRow(g, x, done) {
+  const leg = x.price != null && x.sel ? {sel: x.sel, price: x.price, gid: g.gid, market: 'first basket', label: x.p.name + ' first basket'} : null;
+  return `<div class="fb-row${done && done.id === String(x.p.hs) ? ' hit' : ''}${x.value ? ' val' : ''}">
+    <div class="fb-who"><b>${esc(lastName(x.p.name))}</b><span>${esc(x.team)}${x.imp != null ? ' · Onyx ' + Math.round(100 * x.imp) + '%' : ''}${x.value ? ' · value' : ''}</span></div>
+    <div class="fb-pct"><b>${(100 * x.prob).toFixed(1)}%</b><span>model</span></div>
+    ${leg && g.state === 'pre' ? nbOc(x.price, '', leg) : `<span class="oc dead"><b>${x.price != null ? fmtOdds(x.price) : '-'}</b></span>`}</div>`;
+}
+function fbCard(g) {
+  const M = fbModel(g); if (!M) return '';
+  const done = started(g) ? fbScored(g) : null;
+  if (started(g) && !done && g.state !== 'live') return '';
+  const nm = p => p ? lastName(p.name) : '?';
+  return `<div class="gc-card"><div class="gc-card-title">First basket · free throws count · ${M.lineup ? 'confirmed starters' : 'projected starters'}</div>
+    <div class="fb-tip">Opening tip: <b>${esc(nm(M.ja))}</b> vs <b>${esc(nm(M.jh))}</b> · ${esc(g.away)} wins it ${Math.round(100 * M.tipA)}%, ${esc(g.home)} ${Math.round(100 * (1 - M.tipA))}%</div>
+    ${done ? `<div class="fb-done">First basket: <b>${esc(done.p ? done.p.name : (done.text || '').split(' makes')[0])}</b>${done.p ? ` · the model had him at ${(100 * (M.rows.find(x => String(x.p.hs) === done.id) || {prob: 0}).prob).toFixed(1)}%` : ''}</div>` : ''}
+    <div class="fb-list">${M.rows.map(x => fbRow(g, x, done)).join('')}</div>
+    <div class="dim" style="font-size:11px;margin-top:8px">Lean, not a tracked pick. The team that wins the opening tip scores first 65% of the time; within a team the starters split it by shot volume. Value = the model's chance at least 20% above Onyx's. On 2025-26 that beat Onyx's opening prices (+41% ROI on 421 bets) but not the closing prices after mid-January (-4%).</div></div>`;
+}
+// the Picks tab: every untipped game's first-basket value, best first
+function fbLeans() {
+  const rows = (D.games || []).filter(g => g.state === 'pre').flatMap(g => { const M = fbModel(g); return M ? M.rows.filter(x => x.value).map(x => ({g, x})) : []; })
+    .sort((a, b) => b.x.prob / b.x.imp - a.x.prob / a.x.imp).slice(0, 8);
+  if (!rows.length) return '';
+  return `<div class="pl-div"><i></i><span>First basket leans · not picks · not graded</span><i></i></div>
+    <div class="fb-list">${rows.map(({g, x}) => fbRow(g, x, null).replace('<div class="fb-who"><b>', `<div class="fb-who" onclick="openGame('${esc(g.gid)}')" style="cursor:pointer"><b>`).replace(`<span>${esc(x.team)}`, `<span>${esc(g.away)} @ ${esc(g.home)} · ${esc(x.team)}`)).join('')}</div>
+    <div class="dim" style="font-size:11px;margin:6px 0 14px">Where the model's chance is at least 20% above Onyx's price, from projected starters until lineups post. Beat Onyx's opening prices in the 2025-26 backtest, not the closing ones late in the season.</div>`;
 }
 // ── board ──────────────────────────────────────────────────────────
 var boardStat = 'pts', boardSort = {k: 'proj', dir: -1};
@@ -1721,7 +1816,7 @@ function renderGames() {
     <button class="${gcView === 'pbp' ? 'on' : ''}" onclick="gcView='pbp';rerender()">Plays</button>
     <button class="${gcView === 'box' ? 'on' : ''}" onclick="gcView='box';rerender()">Box</button></div>`;
   const court = started(g) ? liveCourt(g, sum) : '';
-  body.innerHTML = nbNav(g.gid) + header + court + betbar + watch + paceCard(g, box) + sub
+  body.innerHTML = nbNav(g.gid) + header + court + betbar + watch + paceCard(g, box) + fbCard(g) + sub
     + (gcView === 'box' ? boxView(g, box, sum) : gcView === 'pbp' ? pbpView(g, sum) : overview(g, sum));
   const on = body.querySelector('.gc-strip .on'); if (on) on.parentNode.scrollLeft = on.offsetLeft - 60;
   gcFloatSync();

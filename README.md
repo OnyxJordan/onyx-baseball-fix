@@ -919,7 +919,18 @@ ESPN's resizing CDN, matched to OpticOdds players by team + name once a day
 (`data/nba/headshots.json`), with the OpticOdds image as a fallback. Live
 scores, quarter line scores, box scores and win probability are polled
 client-side from ESPN's public scoreboard / summary (15s while a game is
-live). **Live pace** (`livePace` / `paceOver` / `paceCard` in `nba_shell.html`): once a
+live). **First basket** (`fbModel` / `fbCard` / `fbLeans` in `nba_shell.html`, lean only): the
+team that wins the opening tip scores first 65% of the time (2,428 games); each team's jumper is
+the starter with the most tips in `data/nba/jumps.json` (`nba_jumps.py`, seeded from the 2024-26
+play-by-play, updated by both NBA fetch paths), tip chance (won+2)/(jumped+4) against the other;
+the five starters (ESPN's posted lineup, else the most regular starters) split the team's share
+by ((FGA x games + 0.9) / (minutes x games + 30))^0.75 (`season.fga` from the box rows). Onyx's
+`first_basket_including_ft` price rides along in `nba_odds.py` (`props.json` players[].fb).
+Value = model at least 20% over Onyx's implied chance. Backtest (fit 2024-25, 1,075 Onyx-priced
+2025-26 games): +41.3% ROI on 421 bets at the opening price, +19.8% at the close, but -4.4% at
+the close after mid-January; Onyx's price is slightly sharper on log loss. Shown in the
+gamecenter and as "First basket leans" on the Picks tab, never tracked. **Live pace**
+(`livePace` / `paceOver` / `paceCard` in `nba_shell.html`): once a
 game tips, every prop shows where it finishes from where it stands, and the gamecenter's
 Live pace card lists every Onyx line with the chance the model's side lands from here.
 Final = current stat + rest-of-game minutes x rate. Minutes left use his share so far

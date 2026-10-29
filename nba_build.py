@@ -110,6 +110,8 @@ def attach_props(rows, props, source):
         if not rec or r["out"]:
             continue
         r["bets"] = bet_ladders(r, rec)
+        if (rec.get("fb") or {}).get("yes") is not None:
+            r["fb"] = rec["fb"]   # Onyx first basket (incl. FT): the page's first-basket lean
         for s in STATS:
             mkt = rec.get(s)
             if not mkt:
@@ -596,6 +598,7 @@ def main():
         # combined-stat projections for the bet card: sums of the three (card only)
         out["proj"] = {**r["proj"], **{c: round(sum(r["proj"].get(x, 0.0) for x in xs), 2) for c, xs in M.COMBOS.items()}}
         players_out.append(out)
+    jp = (load("jumps.json", {}) or {}).get("players") or {}
     data = {
         "date": today, "source": source, "model_version": VERSION,
         "generated": datetime.now(timezone.utc).isoformat(timespec="seconds"),
@@ -612,6 +615,9 @@ def main():
         # host needed at page load
         "logos": load("team_logos.json", {}),
         "engine": engine_card(slate, tg, lg, hist, th),
+        # opening-tip records [won, jumped] for tonight's players (nba_jumps.py): the
+        # first-basket lean picks each team's jumper and the chance it wins the tip
+        "jumps": {h: jp[h] for h in {p.get("hs") for p in players_out} if h in jp},
     }
     shell = open(SHELL, encoding="utf-8").read()
     # one design system: the MLB stylesheet is copied out of shell.html on

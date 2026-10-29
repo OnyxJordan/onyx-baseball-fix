@@ -39,6 +39,8 @@ GAME_MKTS = ("moneyline", "point_spread", "total_points")
 EXTRA = {"player_made_threes": "fg3", "player_double_double": "dd", "player_triple_double": "td",
          "player_points_+_rebounds_+_assists": "pra", "player_points_+_rebounds": "pr",
          "player_points_+_assists": "pa"}
+# first basket, free throws included (Onyx's market; the backtest graded it that way)
+FB_MKT = "first_basket_including_ft"
 OAPI = "https://api.the-odds-api.com/v4/sports/basketball_nba"
 BOOK_PREF = ["draftkings", "fanduel", "betmgm", "caesars"]
 PROPS_MIN_AGE_MIN = int(os.environ.get("NBA_PROPS_MIN_AGE_MIN", "90"))
@@ -105,7 +107,7 @@ def onyx_pull(key, slate):
         print("nba onyx: no fixtures to price")
         return {}, {}
     by_fid = {v: k for k, v in fids.items()}
-    mk = "".join(f"&market={m}" for m in list(STATS) + list(EXTRA) + list(GAME_MKTS))
+    mk = "".join(f"&market={m}" for m in list(STATS) + list(EXTRA) + list(GAME_MKTS) + [FB_MKT])
 
     players, games = {}, {}
     order = list(fids.items())
@@ -150,6 +152,11 @@ def onyx_pull(key, slate):
                     if float(od["points"]) != e["line"]:
                         continue
                     e[side], e[side + "_sel"] = price, _sel(od)
+                elif m == FB_MKT:
+                    name = od.get("selection") or od.get("name") or ""
+                    if name and str(od.get("selection_line") or "yes").lower() in ("yes", ""):
+                        rec = players.setdefault(nk(name), {"name": name})
+                        rec["fb"] = {"yes": price, "sel": _sel(od), "src": "onyx"}
                 elif m == "moneyline":
                     t = team_abbr(od.get("selection") or od.get("name"))
                     if t in (away, home):

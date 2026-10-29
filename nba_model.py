@@ -1005,6 +1005,9 @@ def project_slate(slate, prior, player_games, team_games, team_hist=None, roles=
             r["season"]["pm"] = round(sum(pmv) / len(pmv), 1) if pmv else None
             r["season"]["starts"] = sum(1 for x in played if len(x) > 9 and x[9])
             r["season"]["gp"] = len(played)
+            # field-goal attempts per game: the first-basket share among starters (page only)
+            fga = [x[10] for x in played if len(x) > 10 and x[10] is not None]
+            r["season"]["fga"] = round(sum(fga) / len(fga), 1) if fga else None
         r["util"] = round(100.0 * r["min"] / 48.0, 1)
         r["last5"] = [{"d": x[0], "opp": x[2], "min": x[4], "pts": x[5], "reb": x[6], "ast": x[7]}
                       for x in r["_games"][-5:]]
