@@ -56,6 +56,7 @@
 .gm-nm>span{display:block;font:500 10px monospace;color:var(--text3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .gm-nm .rk{display:inline;font:700 10px monospace;color:#d795ff;margin:0 4px 0 0}
 .gm-row .sc{font:800 20px monospace;min-width:26px;text-align:right}
+.gm-row .sc:empty{min-width:0}.gm.odds .gm-row .sc:empty{margin-left:-5px}.gm.odds .lg.m{width:26px;height:26px}
 .gm-oh{font:700 9px monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);padding-top:4px}
 .gm-oh>span:nth-child(n+3){text-align:center}
 .gm-onyx{display:inline-flex;align-items:center;gap:5px;color:#d795ff}.gm-onyx::before{content:"";width:6px;height:6px;border-radius:2px;background:linear-gradient(135deg,#b038f9,#635bff)}
@@ -399,7 +400,7 @@ function oc(price, line, label, sel) {
 // Spread / Total / Money for one side of a game (away row carries the Over, home the Under)
 function gameCells(g, side) {
   const o = gameOdds(g.gid);
-  if (!o || g.state === 'post') return null;
+  if (!o || g.state !== 'pre') return null;   // pre-game prices never sit on a live game (stale line)
   const nm = g[side], sp = o[side + '_spread'], ov = side === 'away';
   return [
     sp != null ? oc(o[side + '_spread_price'], sgn(sp), nm + ' ' + sgn(sp), o[side + '_spread_sel']) : oc(null, ''),
@@ -512,7 +513,7 @@ function gameCard(g0) {
   return `<div class="gm${b.odds ? ' odds' : ''}${OPEN_GAME === g.gid ? ' sel' : ''}" onclick="openGame('${g.gid}')" tabindex="0" onkeydown="if(event.key==='Enter')openGame('${g.gid}')">
     <div class="gm-top"><span>${stateTxt(g)}</span><span>${esc(g.tv || '')}</span></div>
     ${b.html}
-    <div class="gm-ft"><span>${b.odds ? 'Tap a price to bet on Onyx' : g.state === 'pre' ? 'Lines post on Onyx soon' : ''}</span><b>Gamecenter ›</b></div>
+    <div class="gm-ft"><span>${b.odds ? 'Tap a price to bet on Onyx' : g.state === 'pre' ? 'Lines post on Onyx soon' : g.state === 'in' ? 'Follow it live in the gamecenter' : ''}</span><b>Gamecenter ›</b></div>
   </div>`;
 }
 var GFILTER = 'all';
@@ -1543,7 +1544,7 @@ window.OX_ONBET = function (rec) {
 // tennis
 var TFILTER = 'live';
 function tnMatch(e, m) {
-  const mo = m.state !== 'post' ? ((SD.odds || {}).matches || {})[m.id] : null;
+  const mo = m.state === 'pre' ? ((SD.odds || {}).matches || {})[m.id] : null;   // no pre-game prices on a live match
   const cells = i => {
     if (!mo) return null;
     const x = m.p[i], sp = mo['sp' + i], ov = i === 0;
@@ -1559,7 +1560,7 @@ function tnMatch(e, m) {
   return `<div class="gm${bd.odds ? ' odds' : ''}${OPEN_MATCH === m.id ? ' sel' : ''}" onclick="openMatch('${esc(m.id)}')" tabindex="0" onkeydown="if(event.key==='Enter')openMatch('${esc(m.id)}')">
     <div class="gm-top"><span>${st}</span><span>${esc(e.tour)} · ${esc(m.round || '')}</span></div>
     ${bd.html}
-    <div class="gm-ft"><span>${bd.odds ? 'Tap a price to bet on Onyx' : m.state === 'pre' ? 'Lines post on Onyx soon' : ''}</span><b>Match center ›</b></div>
+    <div class="gm-ft"><span>${bd.odds ? 'Tap a price to bet on Onyx' : m.state === 'pre' ? 'Lines post on Onyx soon' : m.state === 'in' ? 'Follow it live in the match center' : ''}</span><b>Match center ›</b></div>
   </div>`;
 }
 function tnAll() {

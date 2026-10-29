@@ -90,6 +90,63 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
 .tbl .r{text-align:right}
 .mono{font-family:monospace}.big{font-family:monospace;font-size:15px;font-weight:800}.dim{color:var(--text3)}
 .pbar{height:4px;border-radius:2px;background:var(--bg5);margin-top:5px;overflow:hidden}.pbar i{display:block;height:100%;background:linear-gradient(90deg,#8d16b8,#d795ff)}
+/* scoreboard cards, Onyx odds board and gamecenter bar: the same design as every
+   other Onyx Sports page (sport_shell.html), so all gamecenters look alike */
+.lg{width:22px;height:22px;object-fit:contain;vertical-align:middle;flex-shrink:0}
+.lg.l{width:46px;height:46px}.lg.m{width:30px;height:30px}
+.gm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:12px}
+.gm{--ocw:62px;position:relative;display:flex;flex-direction:column;gap:6px;padding:12px 14px 10px;border-radius:16px;border:1px solid var(--border2);
+  background:radial-gradient(120% 70% at 0% 0%,rgba(176,56,249,.09),transparent 55%),linear-gradient(180deg,rgba(255,255,255,.025),transparent 45%),var(--bg2);
+  cursor:pointer;color:var(--text);text-align:left;font:inherit;transition:border-color .2s,transform .2s,box-shadow .2s}
+.gm:hover,.gm.sel{border-color:rgba(176,56,249,.6);box-shadow:0 14px 34px -18px rgba(176,56,249,.65)}.gm:hover{transform:translateY(-2px)}
+.gm-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:6px}
+.gm.odds .gm-row,.gm-board .gm-row{grid-template-columns:minmax(0,1fr) auto repeat(3,var(--ocw));column-gap:5px}
+.gm-row.lose{opacity:.55}
+.gm-id{display:flex;align-items:center;gap:9px;min-width:0}
+.gm-nm{min-width:0}.gm-nm b{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;font-size:15px;line-height:1.15;hyphens:manual;-webkit-hyphens:manual;word-break:keep-all;overflow-wrap:normal}
+.gm.odds .gm-nm b{font-size:14px}
+.gm-nm>span{display:block;font:500 10px monospace;color:var(--text3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gm-nm .rk{display:inline;font:700 10px monospace;color:#d795ff;margin:0 4px 0 0}
+.gm-row .sc{font:800 20px monospace;min-width:26px;text-align:right}
+.gm-row .sc:empty{min-width:0}.gm.odds .gm-row .sc:empty{margin-left:-5px}.gm.odds .lg.m{width:26px;height:26px}
+.gm-oh{font:700 9px monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);padding-top:4px}
+.gm-oh>span:nth-child(n+3){text-align:center}
+.gm-onyx{display:inline-flex;align-items:center;gap:5px;color:#d795ff}.gm-onyx::before{content:"";width:6px;height:6px;border-radius:2px;background:linear-gradient(135deg,#b038f9,#635bff)}
+.oc{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;height:44px;padding:0 4px;border-radius:10px;
+  border:1px solid rgba(255,255,255,.08);background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.02));color:var(--text);font:inherit;cursor:pointer;
+  transition:background .15s,border-color .15s,box-shadow .15s,transform .15s}
+.oc b{font:800 14px monospace;letter-spacing:-.02em}.oc i{font:600 10px monospace;font-style:normal;color:var(--text3);white-space:nowrap}
+.oc:hover{border-color:#b038f9;background:linear-gradient(135deg,rgba(176,56,249,.32),rgba(99,91,255,.24));box-shadow:0 6px 18px -8px rgba(176,56,249,.8);transform:translateY(-1px)}
+.oc:hover i{color:#e9d5ff}
+.oc.dead{cursor:default;opacity:.35;background:transparent;border-style:dashed}
+.gm-ft{margin-top:auto;padding-top:6px;display:flex;justify-content:space-between;font:700 9px monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)}
+.gm:hover .gm-ft b{color:#d795ff}
+.gm-flag{width:22px;height:15px;object-fit:cover;border-radius:3px;flex-shrink:0}
+.gm-row .sets{display:flex;gap:5px;font:800 15px monospace}.gm-row .sets span{min-width:12px;text-align:center;opacity:.5}.gm-row .sets span.won{opacity:1}
+.gm-row .sv{display:inline-block;width:7px;height:7px;border-radius:50%;background:#61e970;box-shadow:0 0 6px #61e970;margin-left:6px;vertical-align:1px}
+.gm-board{--ocw:72px;display:flex;flex-direction:column;gap:6px}
+.gm-nm .nm-s{display:none}
+@media (max-width:440px){.gm{--ocw:54px;padding:11px 11px 9px}.gm.odds .gm-row,.gm-board .gm-row{column-gap:4px}.oc b{font-size:13px}.oc i{font-size:9px}.gm .lg.m{width:22px;height:22px}.gm-id{gap:6px}.gm-nm .nm-f{display:none}.gm-nm .nm-s{display:inline}}
+@media (max-width:380px){.gm{--ocw:52px;padding:11px 10px 9px}.oc b{font-size:13px}.gm-nm b{font-size:14px}}
+.gm-top{display:flex;justify-content:space-between;align-items:center;gap:8px;font:700 11px monospace;color:var(--text3);text-transform:uppercase;letter-spacing:.05em}
+.gm-top>span:first-child{flex-shrink:0}.gm-top>span:last-child{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gm-top .live{color:#61e970}.gm-top .live::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:#61e970;margin-right:6px;animation:oxBlink 1.4s infinite}
+.gc-nav{position:relative;z-index:30;display:flex;align-items:center;gap:8px;margin:-16px -16px 12px;padding:10px 12px;border-radius:18px 18px 0 0;
+  background:rgba(17,14,20,.92);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2)}
+.gc-back{flex-shrink:0;display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:999px;border:1px solid rgba(176,56,249,.5);background:linear-gradient(135deg,rgba(176,56,249,.25),rgba(99,91,255,.18));color:#fff;font:700 12px 'Space Grotesk',system-ui,sans-serif;cursor:pointer}
+.gc-back:hover{border-color:#b038f9}
+#gcFloat{position:fixed;left:0;right:0;top:0;z-index:950;padding:calc(env(safe-area-inset-top) + 6px) 12px 6px;transform:translateY(-110%);transition:transform .2s;pointer-events:none}
+#gcFloat.on{transform:none;pointer-events:auto}
+#gcFloat .gc-nav{margin:0 auto;max-width:1148px;border-radius:16px;border:1px solid var(--border2);box-shadow:0 12px 30px -12px rgba(0,0,0,.8)}
+.gc-strip{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;min-width:0;flex:1;-webkit-mask-image:linear-gradient(90deg,#000 88%,transparent)}.gc-strip::-webkit-scrollbar{display:none}
+.gc-strip button{flex-shrink:0;display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:10px;border:1px solid var(--border2);background:rgba(255,255,255,.04);color:var(--text2);font:700 11px monospace;cursor:pointer;white-space:nowrap}
+.gc-strip button.on{border-color:#b038f9;color:#fff;background:rgba(176,56,249,.18)}
+.gc-strip button .lv{width:6px;height:6px;border-radius:50%;background:#61e970;box-shadow:0 0 6px #61e970}
+.gc-strip button em{font-style:normal;color:var(--text3);font-weight:600}
+.gm-grid{margin-bottom:6px}
+#gcBody > .gc-nav{margin:0 0 12px;border-radius:14px;border:1px solid var(--border2)}
+.gm-top .live{color:#61e970}
+.oc.in-slip{border-color:#b038f9;background:rgba(176,56,249,.22)}
 /* gamecenter (MLB .gc-* / .sb-*), NBA bits */
 .gc-hs-img{overflow:hidden}
 .gc-hs-img img{width:100%;height:100%;object-fit:cover;object-position:50% 15%}
@@ -1414,28 +1471,71 @@ function gcPick() {
   if (gcSel && gameOf(gcSel)) return gameOf(gcSel);
   return gs.find(g => g.state === 'live') || gs.find(g => g.state === 'pre') || gs[0] || null;
 }
-function sbCard(g, sel) {
-  const live = g.state === 'live', fin = g.state === 'post';
-  const a = +g.away_score, h = +g.home_score;
-  const team = (ab, sc, lose, side) => {
-    const ml = g[side + '_ml'];
-    const mlLeg = ml != null ? {sel: g[side + '_ml_sel'] || null, price: ml, gid: g.gid, market: 'moneyline', label: `${TEAM_NICK[ab] || ab} ML`} : null;
-    return `<div class="sb-team"><span class="sticker-logo" style="background-image:url(${(D.logos || {})[ab] || ''})"></span><span class="sb-ab">${esc(ab)}</span>
-      ${(live || fin) ? `<span class="sb-score${lose ? ' lose' : ''}">${sc ?? ''}</span>`
-        : (mlLeg ? `<span class="sb-ml" onclick="event.stopPropagation();betLeg(${regLeg(mlLeg)})">${fmtOdds(ml)}</span>` : '')}</div>`;
-  };
-  const cls = `sb-card${sel ? ' sel' : ''}${live ? ' live' : ''}${!live && !fin ? ' sched' : ''}`;
-  const open = `onclick="gcSel='${esc(g.gid)}';rerender();document.getElementById('gcBody').scrollIntoView({behavior:'smooth',block:'start'})"`;
-  if (!live && !fin) {
-    return `<div class="${cls}" ${open}>
-      <div class="sb-toprow"><span class="sb-state sched">${tipTime(g.start)}</span>${g.total != null ? `<span class="sb-ou">O/U ${g.total}</span>` : ''}</div>
-      <div class="sb-teams">${team(g.away, null, false, 'away')}${team(g.home, null, false, 'home')}</div></div>`;
-  }
-  const side = live ? `<div class="sb-state live"><span class="sb-dot"></span>${esc(g.detail || 'LIVE')}</div>` : `<div class="sb-state fin">FINAL</div>`;
-  return `<div class="${cls}" ${open}>
-    <div class="sb-teams">${team(g.away, g.away_score, fin && a < h, 'away')}${team(g.home, g.home_score, fin && h < a, 'home')}</div>
-    <div class="sb-side">${side}</div></div>`;
+// scoreboard card, the same as every other sport: an Onyx odds board (Spread / Total /
+// Money, one row per team; away row carries the Over) before tip. Live and final games
+// show the score only: the board's prices are pre-game, so they never sit on a live game.
+function nbOc(price, line, leg) {
+  const ln = line ? `<i>${esc(line)}</i>` : '';
+  if (price == null || !leg) return `<span class="oc dead">${ln}<b>-</b></span>`;
+  return `<button class="oc${inSlip(leg.sel) ? ' in-slip' : ''}" onclick="event.stopPropagation();betLeg(${regLeg(leg)})">${ln}<b>${fmtOdds(price)}</b></button>`;
 }
+function nbCells(g, side) {
+  if (g.state !== 'pre' || (g.away_ml == null && g.home_ml == null && g.total == null)) return null;
+  const ab = g[side], nick = TEAM_NICK[ab] || ab, ov = side === 'away', sg = v => (v > 0 ? '+' : '') + v;
+  const sp = g[side + '_spread'] != null ? g[side + '_spread'] : g.spread != null ? (side === 'home' ? g.spread : -g.spread) : null;
+  const L = (sel, price, market, label) => price == null ? null : {sel: sel || null, price, gid: g.gid, market, label};
+  return [
+    sp != null ? nbOc(g[side + '_spread_price'], sg(sp), L(g[side + '_spread_sel'], g[side + '_spread_price'], 'spread', `${nick} ${sg(sp)}`)) : nbOc(null, ''),
+    g.total != null ? nbOc(ov ? g.over_price : g.under_price, (ov ? 'O ' : 'U ') + g.total, L(ov ? g.over_sel : g.under_sel, ov ? g.over_price : g.under_price, 'total', `${g.away} @ ${g.home} ${ov ? 'Over' : 'Under'} ${g.total}`)) : nbOc(null, ''),
+    nbOc(g[side + '_ml'], '', L(g[side + '_ml_sel'], g[side + '_ml'], 'moneyline', `${nick} ML`))];
+}
+function sbCard(g, sel) {
+  const live = g.state === 'live', fin = g.state === 'post', a = +g.away_score, h = +g.home_score;
+  const rows = ['away', 'home'].map(sd => ({sd, cells: nbCells(g, sd)}));
+  const odds = rows.some(r => r.cells);
+  const id = sd => { const ab = g[sd], lg = (D.logos || {})[ab], rec = g[sd + '_rec'] || '';
+    return `${lg ? `<img class="lg m" src="${esc(lg)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">` : ''}<div class="gm-nm"><b>${esc(TEAM_NICK[ab] || ab)}</b><span>${odds ? esc(rec) : esc(ab) + (rec ? ' · ' + esc(rec) : '')}</span></div>`; };
+  const lose = sd => fin && (sd === 'away' ? a < h : h < a);
+  const head = odds ? `<div class="gm-row gm-oh"><span class="gm-onyx">Onyx</span><span></span><span>Spread</span><span>Total</span><span>Money</span></div>` : '';
+  const body = rows.map(r => `<div class="gm-row${lose(r.sd) ? ' lose' : ''}"><div class="gm-id">${id(r.sd)}</div><span class="sc">${live || fin ? esc(g[r.sd + '_score'] ?? '') : ''}</span>${odds ? (r.cells || [nbOc(null, ''), nbOc(null, ''), nbOc(null, '')]).join('') : ''}</div>`).join('');
+  const st = live ? `<span class="live">${esc(g.detail || 'Live')}</span>` : fin ? 'Final' : esc(tipTime(g.start));
+  const foot = odds ? 'Tap a price to bet on Onyx' : g.state === 'pre' ? 'Lines post on Onyx soon' : live ? 'Follow it live in the gamecenter' : '';
+  return `<div class="gm${odds ? ' odds' : ''}${sel ? ' sel' : ''}" onclick="gcSel='${esc(g.gid)}';rerender();gcScroll()" tabindex="0" onkeydown="if(event.key==='Enter'){gcSel='${esc(g.gid)}';rerender();gcScroll()}">
+    <div class="gm-top"><span>${st}</span><span>${g.total != null && !odds && g.state === 'pre' ? 'O/U ' + esc(g.total) : ''}</span></div>
+    ${head}${body}
+    <div class="gm-ft"><span>${foot}</span><b>Gamecenter ›</b></div></div>`;
+}
+function gcScroll() { const b = document.getElementById('gcBody'); if (b) b.scrollIntoView({behavior: 'smooth', block: 'start'}); }
+// gamecenter bar (as on every sport): back to the scoreboard, or straight to another game
+function nbNav(cur) {
+  const k = x => x.state === 'live' ? 0 : x.state === 'pre' ? 1 : 2;
+  const gs = (D.games || []).slice().sort((a, b) => k(a) - k(b) || String(a.start).localeCompare(String(b.start)));
+  return `<div class="gc-nav"><button class="gc-back" onclick="nbBack()">‹ Scoreboard</button><div class="gc-strip">${gs.map(x =>
+    `<button class="${x.gid === cur ? 'on' : ''}" onclick="gcSel='${esc(x.gid)}';rerender();gcScroll()">${x.state === 'live' ? '<i class="lv"></i>' : ''}${x.state === 'pre' ? `${esc(x.away)} @ ${esc(x.home)} <em>${esc(tipTime(x.start).replace(/ ET$/, ''))}</em>` : `${esc(x.away)} ${esc(x.away_score)}-${esc(x.home_score)} ${esc(x.home)}${x.state === 'post' ? ' <em>F</em>' : ''}`}</button>`).join('')}</div></div>`;
+}
+function nbBack() { const el = document.querySelector('#gcGrid .gm-grid') || document.getElementById('gcGrid'); if (el) el.scrollIntoView({behavior: 'smooth', block: 'start'}); }
+// the shared stylesheet clips the body sideways (no position:sticky), so a copy of the bar pins on scroll
+function gcFloatSync() {
+  let f = document.getElementById('gcFloat');
+  const n = document.querySelector('#gcBody > .gc-nav'), body = document.getElementById('gcBody');
+  if (!n || !body || !body.offsetParent) { if (f) f.classList.remove('on'); return; }
+  if (!f) { f = document.createElement('div'); f.id = 'gcFloat'; document.body.appendChild(f); }
+  if (f.dataset.src !== n.innerHTML) { f.innerHTML = '<div class="gc-nav">' + n.innerHTML + '</div>'; f.dataset.src = n.innerHTML;
+    const on = f.querySelector('.gc-strip .on'); if (on) on.parentNode.scrollLeft = on.offsetLeft - 60; }
+  const r = n.getBoundingClientRect(), g = body.getBoundingClientRect();
+  f.classList.toggle('on', r.bottom < 0 && g.bottom > 120);
+}
+addEventListener('scroll', gcFloatSync, {passive: true});
+// names never split mid-word; a long one steps its font down until it fits
+function fitNames() {
+  document.querySelectorAll('.gm-nm b').forEach(b => { if (!b.clientWidth) return; b.style.fontSize = '';
+    let fs = parseFloat(getComputedStyle(b).fontSize); while (b.scrollWidth > b.clientWidth + 1 && fs > 11) { fs -= 0.5; b.style.fontSize = fs + 'px'; } });
+}
+var _fitRaf = 0;
+function fitSoon() { cancelAnimationFrame(_fitRaf); _fitRaf = requestAnimationFrame(fitNames); }
+// a pane is shown by a class change, not new nodes, so watch class changes too
+new MutationObserver(fitSoon).observe(document.documentElement, {childList: true, subtree: true, attributes: true, attributeFilter: ['class']});
+addEventListener('resize', fitSoon);
 function liveLine(p, box) {
   // live box line for one of our players: match the ESPN athlete id (hs), then the name
   if (!box) return null;
@@ -1559,7 +1659,7 @@ function renderGames() {
     const k = x => x.state === 'live' ? 0 : x.state === 'pre' ? 1 : 2;
     return k(a) - k(b) || String(a.start).localeCompare(String(b.start));
   });
-  document.getElementById('gcGrid').innerHTML = `<div id="ypBox">${yourPlayers()}</div>` + (gs.length ? '<div class="sb-grid">' + gs.map(x => sbCard(x, g && x.gid === g.gid)).join('') + '</div>' : '');
+  document.getElementById('gcGrid').innerHTML = `<div id="ypBox">${yourPlayers()}</div>` + (gs.length ? '<div class="gm-grid">' + gs.map(x => sbCard(x, g && x.gid === g.gid)).join('') + '</div>' : '');
   const body = document.getElementById('gcBody');
   if (!g) { body.innerHTML = '<div class="gc-empty">No NBA games on the slate today.</div>'; return; }
   gcSel = g.gid;
@@ -1606,8 +1706,10 @@ function renderGames() {
     <button class="${gcView === 'pbp' ? 'on' : ''}" onclick="gcView='pbp';rerender()">Plays</button>
     <button class="${gcView === 'box' ? 'on' : ''}" onclick="gcView='box';rerender()">Box</button></div>`;
   const court = started(g) ? liveCourt(g, sum) : '';
-  body.innerHTML = header + court + betbar + watch + sub
+  body.innerHTML = nbNav(g.gid) + header + court + betbar + watch + sub
     + (gcView === 'box' ? boxView(g, box, sum) : gcView === 'pbp' ? pbpView(g, sum) : overview(g, sum));
+  const on = body.querySelector('.gc-strip .on'); if (on) on.parentNode.scrollLeft = on.offsetLeft - 60;
+  gcFloatSync();
   if (started(g) && !sum) loadSummary(g);
 }
 function overview(g, sum) {

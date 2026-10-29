@@ -20,7 +20,8 @@ throttled and skipped once Onyx covers the slate.
 Writes data/nba/props.json:
   {date, fetched, players: {nk(name): {name, pid, pts|reb|ast: {line, over,
    under, over_sel, under_sel, src}}}, games: {AWAY_HOME: {gid, slug,
-   spread, total, away_ml, home_ml, away_ml_sel, home_ml_sel, src}}}
+   spread, total, away_ml, home_ml, away_ml_sel, home_ml_sel, src,
+   away/home_spread(_price, _sel), over/under_price, over/under_sel}}}
 """
 
 import json, os, re, sys, time, urllib.parse, urllib.request
@@ -155,11 +156,18 @@ def onyx_pull(key, slate):
                         side = "away" if t == away else "home"
                         gl[f"{side}_ml"], gl[f"{side}_ml_sel"] = price, _sel(od)
                 elif m == "point_spread" and od.get("is_main"):
+                    # both sides, priced and tappable on the scoreboard (like every other sport)
                     t = team_abbr(od.get("selection"))
-                    if t == home and od.get("points") is not None:
-                        gl["spread"] = float(od["points"])
+                    if t in (away, home) and od.get("points") is not None:
+                        side = "away" if t == away else "home"
+                        gl[f"{side}_spread"], gl[f"{side}_spread_price"], gl[f"{side}_spread_sel"] = float(od["points"]), price, _sel(od)
+                        if t == home:
+                            gl["spread"] = float(od["points"])
                 elif m == "total_points" and od.get("is_main") and od.get("points") is not None:
                     gl["total"] = float(od["points"])
+                    ts = str(od.get("selection_line") or "").lower()
+                    if ts in ("over", "under"):
+                        gl[f"{ts}_price"], gl[f"{ts}_sel"] = price, _sel(od)
             for (name, stat), e in list(ladders.items()) + list(extras.items()):
                 if e.get("over") is None and e.get("under") is None:
                     continue
