@@ -929,7 +929,17 @@ by ((FGA x games + 0.9) / (minutes x games + 30))^0.75 (`season.fga` from the bo
 Value = model at least 20% over Onyx's implied chance. Backtest (fit 2024-25, 1,075 Onyx-priced
 2025-26 games): +41.3% ROI on 421 bets at the opening price, +19.8% at the close, but -4.4% at
 the close after mid-January; Onyx's price is slightly sharper on log loss. Shown in the
-gamecenter and as "First basket leans" on the Picks tab, never tracked. **Live pace**
+gamecenter and as "First basket leans" on the Picks tab, never tracked. **Quarters and halves**
+(`qhCard`, lean only): each read scales Onyx's own full-game line to the period (1Q total
+25.4% of the game total, 1H 50.5%, 1Q margin 34% of the spread; sd 12 / 18 / 11, tuned on
+Oct-Jan 2025-26 for honest chances). Onyx's `1st_quarter_total_points`,
+`1st_half_total_points` and `1st_quarter_moneyline` ride along in `nba_odds.py` (game
+`q1_*` / `h1_*` keys). Against 1,197 Onyx-priced games (rebuilt 1Q / 1H scores match
+Onyx's finals in 1,195), scored on Feb-Apr: the 1Q total beat Onyx's price (log loss
+.6862 vs .6918 open, .6870 vs .6924 close; 3pp+ edge 84-66 +7.5% open, 81-70 +3.3% close,
+promising, not proven); the 1H total (.6913 vs .6905) and the 1Q moneyline (.6487 vs .6485
+close) did not. Onyx's period lines are well set on average (1Q line 25.33% of the game
+total at the open vs 25.46% scored). Only the 1Q total shows a "lean" flag. **Live pace**
 (`livePace` / `paceOver` / `paceCard` in `nba_shell.html`): once a
 game tips, every prop shows where it finishes from where it stands, and the gamecenter's
 Live pace card lists every Onyx line with the chance the model's side lands from here.

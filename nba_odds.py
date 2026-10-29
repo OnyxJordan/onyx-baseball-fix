@@ -41,6 +41,9 @@ EXTRA = {"player_made_threes": "fg3", "player_double_double": "dd", "player_trip
          "player_points_+_assists": "pa"}
 # first basket, free throws included (Onyx's market; the backtest graded it that way)
 FB_MKT = "first_basket_including_ft"
+# quarters and halves (shown as leans: tools backtest in README), game -> q1_* / h1_* keys
+PERIOD_TOTALS = {"1st_quarter_total_points": "q1", "1st_half_total_points": "h1"}
+Q1_ML = "1st_quarter_moneyline"
 OAPI = "https://api.the-odds-api.com/v4/sports/basketball_nba"
 BOOK_PREF = ["draftkings", "fanduel", "betmgm", "caesars"]
 PROPS_MIN_AGE_MIN = int(os.environ.get("NBA_PROPS_MIN_AGE_MIN", "90"))
@@ -107,7 +110,7 @@ def onyx_pull(key, slate):
         print("nba onyx: no fixtures to price")
         return {}, {}
     by_fid = {v: k for k, v in fids.items()}
-    mk = "".join(f"&market={m}" for m in list(STATS) + list(EXTRA) + list(GAME_MKTS) + [FB_MKT])
+    mk = "".join(f"&market={m}" for m in list(STATS) + list(EXTRA) + list(GAME_MKTS) + [FB_MKT, Q1_ML] + list(PERIOD_TOTALS))
 
     players, games = {}, {}
     order = list(fids.items())
@@ -157,6 +160,17 @@ def onyx_pull(key, slate):
                     if name and str(od.get("selection_line") or "yes").lower() in ("yes", ""):
                         rec = players.setdefault(nk(name), {"name": name})
                         rec["fb"] = {"yes": price, "sel": _sel(od), "src": "onyx"}
+                elif m in PERIOD_TOTALS and od.get("points") is not None and od.get("is_main", True):
+                    ts = str(od.get("selection_line") or "").lower()
+                    if ts in ("over", "under"):
+                        pre = PERIOD_TOTALS[m]
+                        gl[f"{pre}_total"] = float(od["points"])
+                        gl[f"{pre}_{ts}_price"], gl[f"{pre}_{ts}_sel"] = price, _sel(od)
+                elif m == Q1_ML:
+                    t = team_abbr(od.get("selection") or od.get("name"))
+                    if t in (away, home):
+                        side = "away" if t == away else "home"
+                        gl[f"q1_{side}_ml"], gl[f"q1_{side}_ml_sel"] = price, _sel(od)
                 elif m == "moneyline":
                     t = team_abbr(od.get("selection") or od.get("name"))
                     if t in (away, home):

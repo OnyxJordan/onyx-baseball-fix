@@ -172,6 +172,14 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
 .fb-who span{display:block;font:600 10px monospace;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
 .fb-row.val .fb-who span{color:#d795ff}
 .fb-pct{display:flex;flex-direction:column;align-items:center;min-width:48px}.fb-pct b{font:800 15px monospace}.fb-pct span{font:700 9px monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--text3)}
+.qh-row{padding:8px 0;border-top:1px solid rgba(255,255,255,.06)}.qh-row:first-of-type{border-top:0}
+.qh-h{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:6px}.qh-h b{font:700 13px 'Space Grotesk',system-ui,sans-serif}
+.qh-h span{font:600 11px monospace;color:var(--text3)}.qh-h em{font-style:normal;color:var(--text2)}.qh-h em.up{color:#61e970}.qh-h em.dn{color:#f87171}
+.qh-sides{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:6px}
+.qh-side{display:flex;justify-content:space-between;align-items:center;gap:6px;min-width:0;padding:6px 8px;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid var(--border2)}
+.qh-side>span{min-width:0}.qh-side>span b,.qh-side>span i{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qh-side>span b{font:600 11px monospace;color:var(--text2)}.qh-side>span i{font:800 14px monospace;font-style:normal;color:var(--text);margin-top:2px}
+.qh-side.val{border-color:rgba(176,56,249,.55);background:rgba(176,56,249,.08)}.qh-side.val>span i{color:#d795ff}
 .lp-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,360px),1fr));gap:6px}
 .lp-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:8px 10px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid var(--border2);cursor:pointer}
 .lp-who{min-width:0}.lp-who b{display:block;font:700 13px 'Space Grotesk',system-ui,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -1492,6 +1500,46 @@ function fbLeans() {
     <div class="fb-list">${rows.map(({g, x}) => fbRow(g, x, null).replace('<div class="fb-who"><b>', `<div class="fb-who" onclick="openGame('${esc(g.gid)}')" style="cursor:pointer"><b>`).replace(`<span>${esc(x.team)}`, `<span>${esc(g.away)} @ ${esc(g.home)} · ${esc(x.team)}`)).join('')}</div>
     <div class="dim" style="font-size:11px;margin:6px 0 14px">Where the model's chance is at least 20% above Onyx's price, from projected starters until lineups post. Beat Onyx's opening prices in the 2025-26 backtest, not the closing ones late in the season.</div>`;
 }
+// ── quarters and halves: the model's 1st-quarter / 1st-half reads against Onyx ──
+// Each scales Onyx's own full-game line down to the period: the 1Q total is 25.4% of the
+// game total, the 1H total 50.5%, the 1Q margin 34% of the full-game spread (2025-26, 1,197
+// games). Spreads (sd) are tuned for honest chances on Oct-Jan and scored on Feb-Apr: the 1Q
+// total beat Onyx's price there (+7.5% on 150 bets at the open, +3.3% at the close: promising,
+// not proven); the 1H total and the 1Q moneyline did not beat Onyx. Leans, never tracked.
+var QH_P = {q1: .254, q1_sd: 12, h1: .505, h1_sd: 18, q1m: .34, q1m_sd: 11, value: .03};
+function qhNorm(x) { const t = 1 / (1 + .2316419 * Math.abs(x)), d = .3989423 * Math.exp(-x * x / 2);
+  const p = d * t * (.3193815 + t * (-.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274)))); return x > 0 ? 1 - p : p; }
+function qhImp(a) { return a == null ? null : 1 / (a > 0 ? 1 + a / 100 : 1 + 100 / -a); }
+function qhCard(g) {
+  if (g.total == null) return '';
+  const lv = LIVE[g.gid] || {}, ls = [lv.away_ls || [], lv.home_ls || []];
+  const q1Act = ls[0].length >= 1 && ls[1].length >= 1 && (g.state === 'post' || (lv.per || 0) > 1) ? [+ls[0][0], +ls[1][0]] : null;
+  const h1Act = ls[0].length >= 2 && ls[1].length >= 2 && (g.state === 'post' || (lv.per || 0) > 2) ? [+ls[0][0] + +ls[0][1], +ls[1][0] + +ls[1][1]] : null;
+  const pre = g.state === 'pre';
+  const chip = (price, sel, label, p, lean) => {
+    const pc = p != null ? Math.round(100 * p) + '%' : '';
+    const leg = price != null && sel && pre ? {sel, price, gid: g.gid, market: 'period', label} : null;
+    return `<div class="qh-side${lean ? ' val' : ''}"><span><b>${esc(label.split(' · ')[1] || label)}</b><i>${pc || '&nbsp;'}${lean ? ' · lean' : ''}</i></span>${leg ? nbOc(price, '', leg) : `<span class="oc dead"><b>${price != null ? fmtOdds(price) : '-'}</b></span>`}</div>`;
+  };
+  const tot = (key, name, r, sd, act, lean) => {
+    const mu = g.total * r, line = g[key + '_total'];
+    const po = line != null ? 1 - qhNorm((line - mu) / sd) : null;
+    const io = qhImp(g[key + '_over_price']), iu = qhImp(g[key + '_under_price']);
+    const res = act ? act[0] + act[1] : null;
+    return `<div class="qh-row"><div class="qh-h"><b>${name}</b><span>proj ${num(mu)}${line != null ? ' · Onyx ' + line : ''}${res != null ? ` · <em class="${line != null ? (res > line ? 'up' : res < line ? 'dn' : '') : ''}">final ${res}${line != null ? (res > line ? ', over' : res < line ? ', under' : ', push') : ''}</em>` : ''}</span></div>
+      ${line != null ? `<div class="qh-sides">${chip(g[key + '_over_price'], g[key + '_over_sel'], `${name} · Over ${line}`, po, lean && io != null && po - io >= QH_P.value)}${chip(g[key + '_under_price'], g[key + '_under_sel'], `${name} · Under ${line}`, 1 - po, lean && iu != null && (1 - po) - iu >= QH_P.value)}</div>` : '<div class="dim" style="font-size:11px">No Onyx line yet</div>'}</div>`;
+  };
+  let win = '';
+  if (g.spread != null) {
+    const m = -g.spread * QH_P.q1m, pw = 1 - qhNorm((.5 - m) / QH_P.q1m_sd), pl = qhNorm((-.5 - m) / QH_P.q1m_sd), ph = pw / (pw + pl);
+    const lead = m >= 0 ? g.home : g.away;
+    win = `<div class="qh-row"><div class="qh-h"><b>1st quarter winner</b><span>${esc(lead)} by ${num(Math.abs(m))}${q1Act ? ` · <em>final ${esc(g.away)} ${q1Act[0]}-${q1Act[1]} ${esc(g.home)}</em>` : ''}</span></div>
+      ${g.q1_away_ml != null || g.q1_home_ml != null ? `<div class="qh-sides">${chip(g.q1_away_ml, g.q1_away_ml_sel, `1st quarter · ${g.away}`, 1 - ph, false)}${chip(g.q1_home_ml, g.q1_home_ml_sel, `1st quarter · ${g.home}`, ph, false)}</div>` : '<div class="dim" style="font-size:11px">No Onyx line yet</div>'}</div>`;
+  }
+  return `<div class="gc-card"><div class="gc-card-title">Quarters and halves · leans</div>
+    ${tot('q1', '1st quarter total', QH_P.q1, QH_P.q1_sd, q1Act, true)}${tot('h1', '1st half total', QH_P.h1, QH_P.h1_sd, h1Act, false)}${win}
+    <div class="dim" style="font-size:11px;margin-top:8px">Each read scales Onyx's own game line down to the period (the 1st quarter carries 25.4% of the points, the 1st half 50.5%). % = the model's chance. Lean = the 1st-quarter total side where the model is 3+ points above Onyx's price: it beat Onyx's opening prices on Feb-Apr 2026 (+7.5%, 150 bets), not proven yet. The 1st-half total and the 1st-quarter winner did not beat Onyx, so they show the read only.</div></div>`;
+}
 // ── board ──────────────────────────────────────────────────────────
 var boardStat = 'pts', boardSort = {k: 'proj', dir: -1};
 function setStat(s) {
@@ -1816,7 +1864,7 @@ function renderGames() {
     <button class="${gcView === 'pbp' ? 'on' : ''}" onclick="gcView='pbp';rerender()">Plays</button>
     <button class="${gcView === 'box' ? 'on' : ''}" onclick="gcView='box';rerender()">Box</button></div>`;
   const court = started(g) ? liveCourt(g, sum) : '';
-  body.innerHTML = nbNav(g.gid) + header + court + betbar + watch + paceCard(g, box) + fbCard(g) + sub
+  body.innerHTML = nbNav(g.gid) + header + court + betbar + watch + paceCard(g, box) + fbCard(g) + qhCard(g) + sub
     + (gcView === 'box' ? boxView(g, box, sum) : gcView === 'pbp' ? pbpView(g, sum) : overview(g, sum));
   const on = body.querySelector('.gc-strip .on'); if (on) on.parentNode.scrollLeft = on.offsetLeft - 60;
   gcFloatSync();
