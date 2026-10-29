@@ -23,6 +23,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from fetch_onyx import http_json, OPTIC   # noqa: E402
 
 H = {"X-Api-Key": os.environ.get("OPTICODDS_API_KEY", "").strip()}
+YES_MARKETS = {"first_basket_including_ft", "first_touchdown_scorer", "anytime_touchdown_scorer",
+               "first_goal_scorer", "anytime_goal_scorer", "player_home_runs_yes_no"}
 GAME = {"moneyline", "point_spread", "puck_line", "game_spread", "run_line",
         "total_points", "total_goals", "total_games", "total_runs"}
 
@@ -68,9 +70,17 @@ def main():
         rows = (r or {}).get("data") or []
         props, game = {}, {}
         for od in (rows[0].get("odds") if rows else None) or []:
+            m, side, who = od.get("market_id"), str(od.get("selection_line") or "").lower(), od.get("selection")
+            # yes-only player markets (first basket, first / anytime TD) carry no over / under
+            # and no main line: store the "yes" price where an over would go, "no" as the under
+            if m in YES_MARKETS and m in markets and who:
+                e = props.setdefault(who, {}).setdefault(m, {"o": [None, None, None], "c": [None, None, None]})
+                j = 2 if side == "no" else 1
+                for key, v in (("o", od.get("olv") or {}), ("c", od.get("clv") or {})):
+                    e[key][j] = v.get("price")
+                continue
             if not od.get("is_main"):
                 continue
-            m, side, who = od.get("market_id"), str(od.get("selection_line") or "").lower(), od.get("selection")
             if m in GAME:
                 key = side if side in ("over", "under") else (who or od.get("name"))
                 if key:
