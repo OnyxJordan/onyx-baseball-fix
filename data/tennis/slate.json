@@ -2774,9 +2774,9 @@
        "win": false,
        "sets": [
         6,
-        1
+        6
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Ben Shelton",
@@ -2786,7 +2786,7 @@
        "win": false,
        "sets": [
         3,
-        1
+        5
        ],
        "serve": false
       }
@@ -9909,8 +9909,8 @@
     {
      "id": "185796",
      "start": "2026-10-29T20:05Z",
-     "state": "in",
-     "detail": "3rd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Court 2",
@@ -9920,11 +9920,11 @@
        "short": "V. Strakhova",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ukr.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         2,
         6,
-        4
+        6
        ],
        "serve": false
       },
@@ -9939,7 +9939,7 @@
         2,
         2
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -10017,7 +10017,7 @@
      "id": "185794",
      "start": "2026-10-29T21:55Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Estadio Mexcovery",
@@ -10029,7 +10029,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        1
+        1,
+        0
        ],
        "serve": false
       },
@@ -10040,7 +10041,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        1
+        6,
+        3
        ],
        "serve": true
       }
@@ -10114,9 +10116,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Valeriya Strakhova",
+       "short": "V. Strakhova",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ukr.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -10310,5 +10312,5 @@
    ]
   }
  ],
- "fetched": "2026-10-29T22:09:41+00:00"
+ "fetched": "2026-10-29T22:41:05+00:00"
 }
