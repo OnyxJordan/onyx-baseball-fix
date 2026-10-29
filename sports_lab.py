@@ -134,6 +134,11 @@ class Ledger:
         self.rows = lane.load("picks_history.json", []) or []
 
     def key(self, r):
+        # one pick per game, market and side, whatever day it was built on: weekly slates
+        # (college football, NFL) rebuild daily, and a date in the key re-logged the same
+        # bet each day (10/26-10/28: GT @ PITT, PITT +7.5 three times)
+        if r.get("gid"):
+            return (r.get("gid"), r.get("name"), r["mkt"], r["side"])
         return (r["date"], r.get("gid"), r.get("name"), r["mkt"], r["side"])
 
     def add(self, row):
