@@ -139,11 +139,22 @@ def nfl_block(lane, slate, odds):
             g, team, opp, home, last = meta[pid]
             row = {"pid": pid, "name": last["name"], "hs": last.get("hs"), "team": team, "opp": opp, "home": home, "gid": g["gid"],
                    "matchup": f"{team} {'vs' if home else '@'} {opp}", "any": round(p_any, 4), "first": round(p_first, 4)}
+            TP = M.TD_P
             for key, mk in (("any", "anytime_td"), ("first", "first_td")):
                 ln = props.get((nk(last["name"]), mk))
                 if ln and ln.get("over") is not None:
                     imp_ = L.implied(ln["over"])
-                    row[key + "_price"], row[key + "_sel"], row[key + "_edge"] = ln["over"], ln.get("over_sel"), round(row[key] - imp_, 4)
+                    row[key + "_price"], row[key + "_sel"] = ln["over"], ln.get("over_sel")
+                    row[key + "_model"] = row[key]
+                    if key == "any":
+                        # v3: the chance shown is the model blended 50/50 with Onyx's price (margin removed);
+                        # value only where the model itself beats the price by 5pp+ (the backtest's bar)
+                        row["any"] = round(TP["w_blend"] * row["any_model"] + (1 - TP["w_blend"]) * TP["mkt_scale"] * imp_, 4)
+                        row["any_edge"] = round(row["any_model"] - imp_, 4)
+                        row["any_value"] = row["any_edge"] >= TP["value_edge"]
+                    else:
+                        row["first_edge"] = round(row["first"] - imp_, 4)
+                        row["first_value"] = False    # Onyx's first-TD price beat the model in the backtest
             td_rows.append(row)
         td_rows.sort(key=lambda r: -r["any"])
         block["td"] = td_rows[:400]
@@ -188,7 +199,8 @@ def nfl_block(lane, slate, odds):
         # touchdown scorers join the plays as anytime TD props
         tdp = [{"pid": r["pid"], "name": r["name"], "hs": r.get("hs"), "gid": r["gid"], "matchup": r["matchup"], "mkt": "anytime_td",
                 "side": "over", "line": 0.5, "price": r["any_price"], "sel": r.get("any_sel"), "prob": r["any"],
-                "implied": round(L.implied(r["any_price"]), 4), "edge": r["any_edge"]} for r in block.get("td", []) if r.get("any_price") is not None]
+                "implied": round(L.implied(r["any_price"]), 4), "edge": r["any_edge"]}
+               for r in block.get("td", []) if r.get("any_price") is not None and r.get("any_value")]
         block["projected"] = top_plays(grows + out + tdp)
     return block
 

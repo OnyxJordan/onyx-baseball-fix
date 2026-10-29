@@ -1,8 +1,23 @@
 """
 nfl_model.py - Onyx NFL player projections.
 
-VERSION v2 (10/29). The lab notebook: every change bumps VERSION and adds an
+VERSION v3 (10/29). The lab notebook: every change bumps VERSION and adds an
 entry here citing its evidence (CLAUDE.md rule 2 applies to this model too).
+
+  v3  10/29  Touchdown scorers against Onyx's TD prices (441 games, 12,080
+             anytime and 12,382 first-TD prices, open and close; tools/
+             onyx_lines_pull.py yes-only markets). Anytime: on the 2026 test
+             season a 50/50 blend of the model and Onyx's price (margin
+             removed, scale .94) beats Onyx's own price, log loss .4788 vs
+             .4829 (1,397 player-games); 2025 (tune) the blend only matches
+             it (.4800 vs .4796). Betting where the model beats the CLOSING
+             price by 5pp+: 2026 +72.9% (173), 2025 +6.5% (336); by 2-5pp
+             2026 +47.7%, 2025 -6.4%. Opening price 5pp+: 2026 +104.8%, 2025
+             -2.2%. Promising, not proven: the chance shown is the 50/50
+             blend, value is flagged only at 5pp+ over the price, and it stays
+             a lean. First TD: Onyx's price beats the model both seasons
+             (.1882 vs .1900 in 2026) and value bets lost (2025 -21% to
+             -58%), so first TD is shown as information, never as value.
 
   v2  10/29  Touchdown scorers: anytime and first TD chances per player.
              Expected team TDs = c x Onyx implied team points / 7 (implied =
@@ -63,7 +78,7 @@ player-game: pass_yds, rush_yds, rec_yds, rec, tgt, att, rush_att...).
 
 from collections import defaultdict
 
-VERSION = "v2"
+VERSION = "v3"
 # game lines (team_model.py), tuned 10/26: see v1
 GAME_P = {"half_life": 240, "ridge": 5, "home": 2.0, "sd_margin": 13.5, "sd_total": 13.0, "min_games": 3}
 GAME_TEST = {"n": 199, "logloss": 0.648, "base_logloss": 0.698, "mae_total": 10.90, "base_mae_total": 11.71,
@@ -208,7 +223,8 @@ def test(rows, season):
 
 
 # ── touchdown scorers (v2) ────────────────────────────────────────────
-TD_P = {"c": 0.8, "w_rush": 0.8, "w_tgt": 1.0, "w_hist": 0.3, "k": 4.0, "n_games": 8, "other": 0.055}
+TD_P = {"c": 0.8, "w_rush": 0.8, "w_tgt": 1.0, "w_hist": 0.3, "k": 4.0, "n_games": 8, "other": 0.055,
+        "w_blend": 0.5, "mkt_scale": 0.94, "value_edge": 0.05}   # v3, see changelog
 
 
 def td_lambdas(rows, players, implied, p=TD_P):

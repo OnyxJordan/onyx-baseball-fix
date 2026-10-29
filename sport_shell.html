@@ -1702,13 +1702,13 @@ function playCards(rows) {
 // touchdown scorers (nfl_model v2): each player's anytime and first TD chance against Onyx's price
 function tdTable(rows, title) {
   if (!rows || !rows.length) return '';
-  const cell = (p, price, sel, edge, label) => price == null ? `<td class="r"><b>${pct(p, 0)}</b><div class="dim" style="font-size:10px">no line</div></td>`
-    : `<td class="r"><b class="${edge > 0 ? 'edge-pos' : ''}">${pct(p, 0)}</b><div>${chip(price, label, sel, 'Onyx')}</div></td>`;
+  const cell = (p, price, sel, value, label) => price == null ? `<td class="r"><b>${pct(p, 0)}</b><div class="dim" style="font-size:10px">no line</div></td>`
+    : `<td class="r"><b class="${value ? 'edge-pos' : ''}">${pct(p, 0)}${value ? ' ✓' : ''}</b><div>${chip(price, label, sel, 'Onyx')}</div></td>`;
   return `<div class="sec-hdr"><span class="sec-title">${esc(title)}</span><span class="sec-count">${rows.length}</span></div>
-    <p class="dim" style="font-size:12px;line-height:1.6;margin:0 0 10px">The model's chance each player scores: his share of the team's carries and targets, his own touchdown record and Onyx's implied team points. Green means the chance beats the Onyx price. Leans, not tracked picks.</p>
+    <p class="dim" style="font-size:12px;line-height:1.6;margin:0 0 10px">Each player's chance to score: his share of the team's carries and targets, his own touchdown record and Onyx's implied team points, blended with Onyx's price. ✓ marks anytime value: the model beats Onyx's price by 5 points or more, the bar that made money in the 2026 backtest (it was not proven in 2025). First TD is shown for information: Onyx's first-TD prices beat the model. Leans, not tracked picks.</p>
     <div class="tbl"><table><thead><tr><th>Player</th><th class="r">Anytime TD</th><th class="r">First TD</th></tr></thead><tbody>
     ${rows.map(r => `<tr><td><b>${esc(r.name)}</b> <span class="dim">${esc(r.matchup || r.team)}</span></td>
-      ${cell(r.any, r.any_price, r.any_sel, r.any_edge, r.name + ' anytime TD')}${cell(r.first, r.first_price, r.first_sel, r.first_edge, r.name + ' first TD')}</tr>`).join('')}
+      ${cell(r.any, r.any_price, r.any_sel, r.any_value, r.name + ' anytime TD')}${cell(r.first, r.first_price, r.first_sel, false, r.name + ' first TD')}</tr>`).join('')}
     </tbody></table></div>`;
 }
 function recordBlock(R) {
