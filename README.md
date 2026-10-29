@@ -456,6 +456,22 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
       handle the push.
     - Parameters and tests live in `nfl_model.GAME_P`, `cfb_model.P` and `nhl_model.P`.
       Each was tuned on early-season games and judged on later games it never saw.
+  - **NHL rebuild, tested 10/29 and not adopted (the page stays on v1 leans):** every
+    test tuned before 1/15/2026 and scored on later games, 1,766 ESPN box scores.
+    - Team ratings v1: the moneyline lane went 5-33 at Onyx's opening prices.
+    - Skater points / assists (24k + 24k Onyx lines; per-60 rate decayed 30 games,
+      shrunk 5 hours to position, x expected TOI, + power-play role and home ice):
+      Onyx's price is sharper (log loss .6294 vs .6343), every edge size loses (-5% to
+      -12%), and a 20/80 model / Onyx blend only matches Onyx.
+    - Starting goalie (each team's usual #1 over 20 games vs who started; goals saved
+      above the league rate per 30 shots): +7% on the tuning months, -12.6% on later
+      games at the open. Onyx's opening lines already carry the starter.
+    - Data note: about 2% of Onyx's historical opening prop pairs are not real two-sided
+      lines (e.g. over +1400 / under -115: a ladder rung's over against the main
+      under). An unfiltered NHL props run showed +58.8% at 8pp+ edges, all of it from
+      those pairs. `tools/sports_backtest.py` already keeps only pairs with 0-12% vig
+      (`sane`); any ad hoc backtest must do the same. Re-checked the live NFL receptions
+      lane with the filter: 184-160 (+12.5%) at 5pp+ on 2026, unchanged.
   - **NFL player props (`nfl_model.py` v1):** projections as before. The chances come
     from spreads fitted to real Onyx lines.
   - **Tennis (`tennis_model.py` v1):** Elo, K = 150/(n+5)^0.4. On 7,875 matches in
