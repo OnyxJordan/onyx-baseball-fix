@@ -1151,8 +1151,8 @@
     {
      "id": "185193",
      "start": "2026-10-29T15:35Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 2",
      "draw": "Men's Singles",
      "court": "Centre Court",
@@ -1162,10 +1162,10 @@
        "short": "C. Alcaraz",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        5
+        7
        ],
        "serve": false
       },
@@ -1187,7 +1187,7 @@
      "id": "185194",
      "start": "2026-10-29T16:05Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 2",
      "draw": "Men's Singles",
      "court": "Glaubandich Court",
@@ -1199,9 +1199,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        4
+        4,
+        2
        ],
-       "serve": false
+       "serve": true
       },
       {
        "name": "Arthur Fery",
@@ -1210,7 +1211,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        5
+        6,
+        2
        ],
        "serve": false
       }
@@ -1218,9 +1220,9 @@
     },
     {
      "id": "185183",
-     "start": "2026-10-29T17:10Z",
+     "start": "2026-10-29T17:35Z",
      "state": "pre",
-     "detail": "10/29 - 1:10 PM EDT",
+     "detail": "10/29 - 1:35 PM EDT",
      "round": "Round 2",
      "draw": "Men's Singles",
      "court": "Centre Court",
@@ -1371,9 +1373,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Carlos Alcaraz",
+       "short": "C. Alcaraz",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -2640,7 +2642,7 @@
      "id": "185150",
      "start": "2026-10-29T16:15Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 2",
      "draw": "Men's Singles",
      "court": "IWB Court 1",
@@ -2652,7 +2654,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        4
+        7,
+        0
        ],
        "serve": true
       },
@@ -2663,7 +2666,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        3
+        5,
+        1
        ],
        "serve": false
       }
@@ -2673,7 +2677,7 @@
      "id": "185148",
      "start": "2026-10-29T16:40Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 2",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -2685,9 +2689,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        1
+        4,
+        0
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Taylor Fritz",
@@ -2696,17 +2701,18 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        6,
+        0
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
     {
      "id": "185151",
-     "start": "2026-10-29T17:30Z",
+     "start": "2026-10-29T18:00Z",
      "state": "pre",
-     "detail": "10/29 - 1:30 PM EDT",
+     "detail": "10/29 - 2:00 PM EDT",
      "round": "Round 2",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -2733,9 +2739,9 @@
     },
     {
      "id": "185149",
-     "start": "2026-10-29T18:30Z",
+     "start": "2026-10-29T19:30Z",
      "state": "pre",
-     "detail": "10/29 - 2:30 PM EDT",
+     "detail": "10/29 - 3:30 PM EDT",
      "round": "Round 2",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -2761,13 +2767,71 @@
      ]
     },
     {
-     "id": "185156",
-     "start": "2026-10-30T04:00Z",
+     "id": "185153",
+     "start": "2026-10-30T13:00Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "10/30 - 9:00 AM EDT",
      "round": "Quarterfinal",
      "draw": "Men's Singles",
-     "court": "",
+     "court": "Center Court",
+     "p": [
+      {
+       "name": "Valentin Vacherot",
+       "short": "V. Vacherot",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/mon.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      },
+      {
+       "name": "Holger Rune",
+       "short": "H. Rune",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/den.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      }
+     ]
+    },
+    {
+     "id": "185154",
+     "start": "2026-10-30T14:30Z",
+     "state": "pre",
+     "detail": "10/30 - 10:30 AM EDT",
+     "round": "Quarterfinal",
+     "draw": "Men's Singles",
+     "court": "Center Court",
+     "p": [
+      {
+       "name": "Arthur Fils",
+       "short": "A. Fils",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      },
+      {
+       "name": "TBD",
+       "short": "TBD",
+       "flag": null,
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      }
+     ]
+    },
+    {
+     "id": "185156",
+     "start": "2026-10-30T17:00Z",
+     "state": "pre",
+     "detail": "10/30 - 1:00 PM EDT",
+     "round": "Quarterfinal",
+     "draw": "Men's Singles",
+     "court": "Center Court",
      "p": [
       {
        "name": "Nuno Borges",
@@ -2791,12 +2855,12 @@
     },
     {
      "id": "185155",
-     "start": "2026-10-30T04:00Z",
+     "start": "2026-10-30T18:30Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "10/30 - 2:30 PM EDT",
      "round": "Quarterfinal",
      "draw": "Men's Singles",
-     "court": "",
+     "court": "Center Court",
      "p": [
       {
        "name": "TBD",
@@ -2811,64 +2875,6 @@
        "name": "TBD",
        "short": "TBD",
        "flag": null,
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      }
-     ]
-    },
-    {
-     "id": "185154",
-     "start": "2026-10-30T04:00Z",
-     "state": "pre",
-     "detail": "TBD",
-     "round": "Quarterfinal",
-     "draw": "Men's Singles",
-     "court": "",
-     "p": [
-      {
-       "name": "Arthur Fils",
-       "short": "A. Fils",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      }
-     ]
-    },
-    {
-     "id": "185153",
-     "start": "2026-10-30T04:00Z",
-     "state": "pre",
-     "detail": "TBD",
-     "round": "Quarterfinal",
-     "draw": "Men's Singles",
-     "court": "",
-     "p": [
-      {
-       "name": "Valentin Vacherot",
-       "short": "V. Vacherot",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/mon.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "Holger Rune",
-       "short": "H. Rune",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/den.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -7192,7 +7198,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        1
+        3
        ],
        "serve": true
       },
@@ -7203,7 +7209,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        1
+        5
        ],
        "serve": false
       }
@@ -8443,8 +8449,8 @@
     {
      "id": "185850",
      "start": "2026-10-29T14:30Z",
-     "state": "in",
-     "detail": "3rd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Court 1",
@@ -8454,13 +8460,13 @@
        "short": "E. Jacquemot",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
         6,
-        5
+        6
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Susan Bandecchi",
@@ -8480,8 +8486,8 @@
     {
      "id": "185848",
      "start": "2026-10-29T15:25Z",
-     "state": "in",
-     "detail": "3rd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Grandstand",
@@ -8491,13 +8497,13 @@
        "short": "A. Aksu",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/tur.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         2,
         6,
-        2
+        6
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Lucrezia Stefanini",
@@ -8508,7 +8514,7 @@
        "sets": [
         6,
         4,
-        0
+        3
        ],
        "serve": false
       }
@@ -8516,9 +8522,9 @@
     },
     {
      "id": "185851",
-     "start": "2026-10-29T17:20Z",
+     "start": "2026-10-29T17:30Z",
      "state": "pre",
-     "detail": "10/29 - 1:20 PM EDT",
+     "detail": "10/29 - 1:30 PM EDT",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Grandstand",
@@ -8545,9 +8551,9 @@
     },
     {
      "id": "185847",
-     "start": "2026-10-29T17:30Z",
+     "start": "2026-10-29T18:30Z",
      "state": "pre",
-     "detail": "10/29 - 1:30 PM EDT",
+     "detail": "10/29 - 2:30 PM EDT",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Grandstand",
@@ -8649,9 +8655,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Elsa Jacquemot",
+       "short": "E. Jacquemot",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -8678,9 +8684,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Ayla Aksu",
+       "short": "A. Aksu",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/tur.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -10238,5 +10244,5 @@
    ]
   }
  ],
- "fetched": "2026-10-29T16:56:45+00:00"
+ "fetched": "2026-10-29T17:28:14+00:00"
 }
