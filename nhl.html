@@ -1847,6 +1847,21 @@ body::after {
 .pk-nums{display:grid;grid-template-columns:repeat(auto-fit,minmax(70px,1fr));gap:6px}
 .pk-nums div{background:var(--bg3);border-radius:10px;padding:6px 8px}.pk-nums span{display:block;font:700 9px monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--text3)}.pk-nums b{font:800 14px monospace}
 .pk-res{font:800 13px monospace;text-transform:uppercase;letter-spacing:.06em}.pk-res.w{color:#61e970}.pk-res.l{color:#f87171}
+/* golf model */
+.gm-rk{flex-shrink:0;width:24px;height:24px;border-radius:7px;display:flex;align-items:center;justify-content:center;font:800 11px monospace;background:linear-gradient(135deg,#b038f9,#635bff);color:#fff}
+.gw-row{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,2fr) auto;column-gap:10px;row-gap:2px;align-items:center;margin:6px 0;font-size:12px}
+.gw-row>span{color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gw-bar{position:relative;height:8px;border-radius:5px;background:rgba(255,255,255,.06)}.gw-bar i{position:absolute;inset:0 auto 0 0;border-radius:5px;background:linear-gradient(90deg,#b038f9,#635bff)}
+.gw-bar u{position:absolute;top:-3px;bottom:-3px;width:2px;background:#d795ff;border-radius:1px}
+.gw-row b{font:800 13px monospace}.gw-row em{grid-column:2/4;font:600 10px monospace;font-style:normal;color:var(--text3)}.gw-row em.up{color:#61e970}.gw-row em.dn{color:#f87171}
+.gh2h{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:8px;align-items:center}
+.gh2h select{width:100%;padding:9px 10px;border-radius:10px;background:rgba(255,255,255,.05);border:1px solid var(--border2);color:var(--text);font:600 13px 'Space Grotesk',sans-serif}
+.gh2h span{font:700 11px monospace;color:var(--text3)}
+.gh2h-res{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;margin-top:12px;text-align:center}
+.gh2h-res div{padding:8px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid var(--border2)}.gh2h-res b{display:block;font:800 20px monospace}
+.gh2h-res span{display:block;font:700 10px monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gfx-model{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:baseline;padding:8px 10px;margin-bottom:10px;border-radius:10px;background:rgba(176,56,249,.1);border:1px solid rgba(176,56,249,.35);font:700 12px monospace}
+.gfx-model span{font:700 9px monospace;letter-spacing:.12em;text-transform:uppercase;color:#d795ff}.gfx-model em{font-style:normal;color:var(--text3);font-weight:600}
 /* tennis + golf */
 .tn-ev{margin-bottom:18px}
 .tn-m{display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:center;padding:10px 12px;border-radius:12px;border:1px solid var(--border2);background:var(--bg2)}
@@ -2080,7 +2095,7 @@ body::after {
 
 <script>
 // Injected by sports_build.py. `var`, read before any other script line (CLAUDE.md rule 5).
-var SD = /*SPORT_DATA*/{"sport":"nhl","cfg":{"name":"NHL","full":"Onyx NHL","kind":"hockey","espn":["hockey/nhl"],"espn_q":"","tone":"blue","art":"hockey","onyx_league":"NHL"},"date":"2026-10-28","label":"Wed Oct 28","season":null,"games":[{"gid":"401892596","start":"2026-10-28T23:30Z","state":"post","status":"STATUS_FINAL","detail":"Final","name":"PHI @ WSH","away":"PHI","home":"WSH","away_name":"Philadelphia Flyers","home_name":"Washington Capitals","away_short":"Flyers","home_short":"Capitals","away_loc":"Philadelphia","home_loc":"Washington","away_logo":"https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/phi.png","home_logo":"https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/wsh.png","away_color":"fe5823","home_color":"d71830","away_rec":"3-8-4","home_rec":"7-4-0","away_rank":null,"home_rank":null,"away_score":"2","home_score":"5","venue":"Capital One Arena","neutral":false,"tv":"TNT, truTV, NBC Sports Phil +","week":null},{"gid":"401892597","start":"2026-10-29T00:30Z","state":"post","status":"STATUS_FINAL","detail":"Final","name":"CGY @ EDM","away":"CGY","home":"EDM","away_name":"Calgary Flames","home_name":"Edmonton Oilers","away_short":"Flames","home_short":"Oilers","away_loc":"Calgary","home_loc":"Edmonton","away_logo":"https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/cgy.png","home_logo":"https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/edm.png","away_color":"dd1a32","home_color":"00205b","away_rec":"5-7-0","home_rec":"9-2-2","away_rank":null,"home_rank":null,"away_score":"0","home_score":"4","venue":"Rogers Place","neutral":false,"tv":"ESPN+","week":null},{"gid":"401892598","start":"2026-10-29T01:00Z","state":"post","status":"STATUS_FINAL","detail":"Final","name":"NJ @ COL","away":"NJ","home":"COL","away_name":"New Jersey Devils","home_name":"Colorado Avalanche","away_short":"Devils","home_short":"Avalanche","away_loc":"New Jersey","home_loc":"Colorado","away_logo":"https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/nj.png","home_logo":"https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/col.png","away_color":"e30b2b","home_color":"860038","away_rec":"8-5-0","home_rec":"7-5-1","away_rank":null,"home_rank":null,"away_score":"2","home_score":"5","venue":"Ball Arena","neutral":false,"tv":"ESPN+, MSGSN, Altitude Sports","week":null},{"gid":"401892599","start":"2026-10-29T02:00Z","state":"in","status":"STATUS_END_PERIOD","detail":"End of 2nd","name":"TOR @ SEA","away":"TOR","home":"SEA","away_name":"Toronto Maple Leafs","home_name":"Seattle Kraken","away_short":"Maple Leafs","home_short":"Kraken","away_loc":"Toronto","home_loc":"Seattle","away_logo":"https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/tor.png","home_logo":"https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/sea.png","away_color":"003e7e","home_color":"000d33","away_rec":"7-5-2","home_rec":"7-4-1","away_rank":null,"home_rank":null,"away_score":"2","home_score":"4","venue":"Climate Pledge Arena","neutral":false,"tv":"ESPN+, KONG, KING 5, KHN, Prime Video (L","week":null}],"events":[],"odds":{"date":"2026-10-28","fetched":"2026-10-29T03:47:50+00:00","book":"onyx_odds","games":{},"props":[],"matches":{}},"model":{"status":"lab","version":"v1","title":"Team ratings against every Onyx game line","note":"Every team carries an offense and a defense rating in goals, fitted on every final this season and last, recent games weighing more. Each Onyx moneyline, spread and total is priced from them and blended with the Onyx market. Tracked picks switch on only after the ratings beat real Onyx prices in a backtest.","method":["Scores, periods, goals and team stats come from ESPN's public feed, polled live on this page every 15 to 30 seconds.","Ratings: goals scored = league average + home edge + the team's offense - the opponent's defense, fitted by weighted least squares with a pull toward average so a team with three games is not rated off three games.","Hockey prices: each side's goals are Poisson; a regulation tie goes to overtime. The blend gives the model 50% and the Onyx market the rest; edge is the blended chance minus the price's implied chance."],"tests":[{"k":"Win log loss","v":"0.678","d":"vs 0.690 home base rate · 909 games from 1/15/2026 on"},{"k":"Total error (goals)","v":"1.83","d":"vs 1.84 league average"}],"backtest":{"passed":false,"version":"v1","run":"2026-10-26","title":"Team ratings against real Onyx game lines","summary":["Every game priced only from results before it, against Onyx's real opening and closing lines. The rule was chosen on games before 2026-01-15 and judged on 2026-01-15 on, which it never saw.","The model's weight in the blend is 50%.","Not passed: the lane lost money at opening prices; the lane lost money at closing prices. Leans only until it does."],"stats":[{"k":"Moneyline log loss","v":"0.6649","d":"vs Onyx 0.6582 · model alone 0.6763 · 694 lines"},{"k":"Spread log loss","v":"0.6327","d":"vs Onyx 0.6295 · model alone 0.6458 · 696 lines"},{"k":"Total log loss","v":"0.6887","d":"vs Onyx 0.6865 · model alone 0.6924 · 670 lines"},{"k":"Lane at opening prices","v":"5-33","d":"ROI -62.9% · claimed 39.8% vs hit 13.2%"},{"k":"Lane at closing prices","v":"8-38","d":"ROI -46.7%"}]},"changelog":["v1 10/26 Ratings from 1,671 NHL finals since 10/2025 (ESPN), half-life 45 days, ridge 40, home edge 0.2 goals, a regulation tie goes to the home side 52% of the time. Tuned on 10/20/2025-1/14/2026, judged on 909 later games it never saw: win log loss 0.678 against 0.690 for the home-team base rate; total goals error 1.83 against 1.84 for the league average (totals barely beat a constant). A heavier ridge (80, 160) fit the tuning window better and the test window worse, so it was not taken. Leans only until the Onyx price backtest passes."],"roadmap":["Backtest the team ratings against a season of real Onyx moneylines, puck lines and totals before any pick","Goalie confirmations: the starter moves an NHL price more than anything else","Skater point and assist projections from time on ice, for the player lines Onyx prices"],"rows":[],"picks":[],"record":null,"top":[],"proj":{},"engine":{"steps":[{"t":"1 · Team ratings","rows":[["Built from","every final this season and last (909 games held out to test it)"],["Recency","a game 45 days old counts half as much as tonight's (half-life)"],["Pull to average","each rating starts with 40 games' worth of league average, so a hot start is not a rating"],["Home edge","0.2 goals to the home side, none at a neutral site"],["Needs","3 games for both teams before a line is priced"]]},{"t":"2 · From ratings to a price","rows":[["Goals","each side's goals are Poisson around its expected goals"],["Overtime","a regulation tie goes to the home side 52% of the time"],["Puck line, total","read off the same goal distribution, overtime included"]]},{"t":"3 · Against the Onyx price","bars":[["Onyx market",50],["Onyx model",50]],"note":"The model's chance is blended with the Onyx market; edge is the blended chance minus the chance the listed price implies. The backtest gave the model and the market an even say."}],"factors":[["chart","Offense and defense","Every team carries two ratings in goals: what it scores above average and what it allows. Tonight's projection is league average plus the home edge plus one side's offense minus the other's defense.","Foundation",""],["clock","Recency","Half-life 45 days: rosters and form move, so last month counts more than last season. The summer break decays last season on its own.","Tuned","purple"],["shield","Pull to average","Ridge 40: ratings are shrunk toward average until a team has earned it, which is what stops a 3-game sample from looking elite.","Tuned","blue"],["scale","Market blend","50% model, 50% Onyx market. Chosen by the backtest against real Onyx prices.","Market","blue"],["eye","Totals","Total error 1.83 goals vs 1.84 for the league average on games the ratings never saw.","Tested",""],["bell","Goalies next","The starting goalie moves an NHL price more than anything else. Confirmations are not in the model yet, which is part of why it stays in the lab.","Planned",""]],"lane":{"markets":["moneyline"],"edge":[0.05,0.15],"price":[-250,250],"per_slate":6,"w":0.5,"passed":false,"live":false}},"projected":[]},"generated":"2026-10-29T03:47:50+00:00"}/*END_SPORT_DATA*/;
+var SD = /*SPORT_DATA*/{"sport":"nhl","cfg":{"name":"NHL","full":"Onyx NHL","kind":"hockey","espn":["hockey/nhl"],"espn_q":"","tone":"blue","art":"hockey","onyx_league":"NHL"},"date":"2026-10-28","label":"Wed Oct 28","season":null,"games":[{"gid":"401892596","start":"2026-10-28T23:30Z","state":"post","status":"STATUS_FINAL","detail":"Final","name":"PHI @ WSH","away":"PHI","home":"WSH","away_name":"Philadelphia Flyers","home_name":"Washington Capitals","away_short":"Flyers","home_short":"Capitals","away_loc":"Philadelphia","home_loc":"Washington","away_logo":"https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/phi.png","home_logo":"https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/wsh.png","away_color":"fe5823","home_color":"d71830","away_rec":"3-8-4","home_rec":"7-4-0","away_rank":null,"home_rank":null,"away_score":"2","home_score":"5","venue":"Capital One Arena","neutral":false,"tv":"TNT, truTV, NBC Sports Phil +","week":null},{"gid":"401892597","start":"2026-10-29T00:30Z","state":"post","status":"STATUS_FINAL","detail":"Final","name":"CGY @ EDM","away":"CGY","home":"EDM","away_name":"Calgary Flames","home_name":"Edmonton Oilers","away_short":"Flames","home_short":"Oilers","away_loc":"Calgary","home_loc":"Edmonton","away_logo":"https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/cgy.png","home_logo":"https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/edm.png","away_color":"dd1a32","home_color":"00205b","away_rec":"5-7-0","home_rec":"9-2-2","away_rank":null,"home_rank":null,"away_score":"0","home_score":"4","venue":"Rogers Place","neutral":false,"tv":"ESPN+","week":null},{"gid":"401892598","start":"2026-10-29T01:00Z","state":"post","status":"STATUS_FINAL","detail":"Final","name":"NJ @ COL","away":"NJ","home":"COL","away_name":"New Jersey Devils","home_name":"Colorado Avalanche","away_short":"Devils","home_short":"Avalanche","away_loc":"New Jersey","home_loc":"Colorado","away_logo":"https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/nj.png","home_logo":"https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/col.png","away_color":"e30b2b","home_color":"860038","away_rec":"8-5-0","home_rec":"7-5-1","away_rank":null,"home_rank":null,"away_score":"2","home_score":"5","venue":"Ball Arena","neutral":false,"tv":"ESPN+, MSGSN, Altitude Sports","week":null},{"gid":"401892599","start":"2026-10-29T02:00Z","state":"in","status":"STATUS_IN_PROGRESS","detail":"9:12 - 3rd","name":"TOR @ SEA","away":"TOR","home":"SEA","away_name":"Toronto Maple Leafs","home_name":"Seattle Kraken","away_short":"Maple Leafs","home_short":"Kraken","away_loc":"Toronto","home_loc":"Seattle","away_logo":"https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/tor.png","home_logo":"https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/sea.png","away_color":"003e7e","home_color":"000d33","away_rec":"7-5-2","home_rec":"7-4-1","away_rank":null,"home_rank":null,"away_score":"3","home_score":"4","venue":"Climate Pledge Arena","neutral":false,"tv":"ESPN+, KONG, KING 5, KHN, Prime Video (L","week":null}],"events":[],"odds":{"date":"2026-10-28","fetched":"2026-10-29T04:19:11+00:00","book":"onyx_odds","games":{},"props":[],"matches":{}},"model":{"status":"lab","version":"v1","title":"Team ratings against every Onyx game line","note":"Every team carries an offense and a defense rating in goals, fitted on every final this season and last, recent games weighing more. Each Onyx moneyline, spread and total is priced from them and blended with the Onyx market. Tracked picks switch on only after the ratings beat real Onyx prices in a backtest.","method":["Scores, periods, goals and team stats come from ESPN's public feed, polled live on this page every 15 to 30 seconds.","Ratings: goals scored = league average + home edge + the team's offense - the opponent's defense, fitted by weighted least squares with a pull toward average so a team with three games is not rated off three games.","Hockey prices: each side's goals are Poisson; a regulation tie goes to overtime. The blend gives the model 50% and the Onyx market the rest; edge is the blended chance minus the price's implied chance."],"tests":[{"k":"Win log loss","v":"0.678","d":"vs 0.690 home base rate · 909 games from 1/15/2026 on"},{"k":"Total error (goals)","v":"1.83","d":"vs 1.84 league average"}],"backtest":{"passed":false,"version":"v1","run":"2026-10-26","title":"Team ratings against real Onyx game lines","summary":["Every game priced only from results before it, against Onyx's real opening and closing lines. The rule was chosen on games before 2026-01-15 and judged on 2026-01-15 on, which it never saw.","The model's weight in the blend is 50%.","Not passed: the lane lost money at opening prices; the lane lost money at closing prices. Leans only until it does."],"stats":[{"k":"Moneyline log loss","v":"0.6649","d":"vs Onyx 0.6582 · model alone 0.6763 · 694 lines"},{"k":"Spread log loss","v":"0.6327","d":"vs Onyx 0.6295 · model alone 0.6458 · 696 lines"},{"k":"Total log loss","v":"0.6887","d":"vs Onyx 0.6865 · model alone 0.6924 · 670 lines"},{"k":"Lane at opening prices","v":"5-33","d":"ROI -62.9% · claimed 39.8% vs hit 13.2%"},{"k":"Lane at closing prices","v":"8-38","d":"ROI -46.7%"}]},"changelog":["v1 10/26 Ratings from 1,671 NHL finals since 10/2025 (ESPN), half-life 45 days, ridge 40, home edge 0.2 goals, a regulation tie goes to the home side 52% of the time. Tuned on 10/20/2025-1/14/2026, judged on 909 later games it never saw: win log loss 0.678 against 0.690 for the home-team base rate; total goals error 1.83 against 1.84 for the league average (totals barely beat a constant). A heavier ridge (80, 160) fit the tuning window better and the test window worse, so it was not taken. Leans only until the Onyx price backtest passes."],"roadmap":["Backtest the team ratings against a season of real Onyx moneylines, puck lines and totals before any pick","Goalie confirmations: the starter moves an NHL price more than anything else","Skater point and assist projections from time on ice, for the player lines Onyx prices"],"rows":[],"picks":[],"record":null,"top":[],"proj":{},"engine":{"steps":[{"t":"1 · Team ratings","rows":[["Built from","every final this season and last (909 games held out to test it)"],["Recency","a game 45 days old counts half as much as tonight's (half-life)"],["Pull to average","each rating starts with 40 games' worth of league average, so a hot start is not a rating"],["Home edge","0.2 goals to the home side, none at a neutral site"],["Needs","3 games for both teams before a line is priced"]]},{"t":"2 · From ratings to a price","rows":[["Goals","each side's goals are Poisson around its expected goals"],["Overtime","a regulation tie goes to the home side 52% of the time"],["Puck line, total","read off the same goal distribution, overtime included"]]},{"t":"3 · Against the Onyx price","bars":[["Onyx market",50],["Onyx model",50]],"note":"The model's chance is blended with the Onyx market; edge is the blended chance minus the chance the listed price implies. The backtest gave the model and the market an even say."}],"factors":[["chart","Offense and defense","Every team carries two ratings in goals: what it scores above average and what it allows. Tonight's projection is league average plus the home edge plus one side's offense minus the other's defense.","Foundation",""],["clock","Recency","Half-life 45 days: rosters and form move, so last month counts more than last season. The summer break decays last season on its own.","Tuned","purple"],["shield","Pull to average","Ridge 40: ratings are shrunk toward average until a team has earned it, which is what stops a 3-game sample from looking elite.","Tuned","blue"],["scale","Market blend","50% model, 50% Onyx market. Chosen by the backtest against real Onyx prices.","Market","blue"],["eye","Totals","Total error 1.83 goals vs 1.84 for the league average on games the ratings never saw.","Tested",""],["bell","Goalies next","The starting goalie moves an NHL price more than anything else. Confirmations are not in the model yet, which is part of why it stays in the lab.","Planned",""]],"lane":{"markets":["moneyline"],"edge":[0.05,0.15],"price":[-250,250],"per_slate":6,"w":0.5,"passed":false,"live":false}},"projected":[]},"generated":"2026-10-29T04:19:17+00:00"}/*END_SPORT_DATA*/;
 var ONYX_REFERRER = 'KR680261';
 var GA_MEASUREMENT_ID = 'G-03T8V1N52E';
 var C = SD.cfg || {};
@@ -2188,7 +2203,7 @@ var HERO = {
   football: ['Every snap.', 'Every Onyx line.', 'Live drives, down and distance, win probability and every Onyx line on the slate, with player projections built from the box scores.'],
   hockey: ['Every shift.', 'Every Onyx line.', 'Live scores, period by period, shots and scoring plays, with every Onyx line on the slate.'],
   tennis: ['Every set.', 'Every Onyx line.', 'Every ATP and WTA singles match on the tour this week, live set by set, with every Onyx line as it posts.'],
-  golf: ['Every round.', 'Every Onyx line.', "This week's leaderboard, round by round, with every Onyx outright and matchup as it posts."],
+  golf: ['Every round.', 'Every chance.', "This week's leaderboard, round by round, with the model's win, top 10 and make-the-cut chances, live as it plays."],
 };
 function renderHome() {
   const h = HERO[KIND] || HERO.football;
@@ -2213,6 +2228,12 @@ function renderHome() {
     const e = (SD.events || [])[0];
     body = e ? `<div class="sec-hdr"><span class="sec-title">${esc(e.name)} · top 10</span><span class="sec-count">${esc(e.detail || '')}</span></div>${gfBoard(e, 10)}
       <button class="btn-secondary" style="margin-top:12px" onclick="gotoTab('games')">Full leaderboard</button>` : '<div class="empty">No tournament on the board this week.</div>';
+    const G = (SD.model || {}).golf, sim = e && G && e.id === G.event ? gfSim(e) : null;
+    if (sim) {
+      const top = G.players.filter(p => sim[p.id]).sort((x, y) => sim[y.id].win - sim[x.id].win).slice(0, 5);
+      body += `<div class="sec-hdr"><span class="sec-title">${e.state === 'in' ? 'Live win chances' : 'Win chances'} · the model</span></div>
+        <div class="pl-list">${top.map(p => `<div class="pl-row" onclick="gotoTab('plays')" style="cursor:pointer"><div class="pl-who"><div class="pl-nm"><b>${esc(p.name)}</b><span>top 10 ${gfPct(sim[p.id].t10)}${G.cut ? ' · cut ' + gfPct(sim[p.id].cut) : ''} · rating ${gfSg(p.r)}</span></div><div class="pl-pj"><b>${gfPct(sim[p.id].win)}</b><span>win</span></div></div></div>`).join('')}</div>`;
+    }
   } else {
     const order = g => g.state === 'in' ? 0 : g.state === 'pre' ? 1 : 2;
     const up = games.slice().sort((a, b) => order(a) - order(b) || (a.start || '').localeCompare(b.start || '')).slice(0, 6);
@@ -3311,7 +3332,7 @@ function gfHoleSvg(n, h) {
 function gfExpand(e, r) {
   const id = String(r.id || nk(r.name));
   const rounds = (r.rounds || []).filter(x => (x.h || []).length);
-  if (!rounds.length) return `<div class="gfx"><div class="dim">No holes played yet.</div>${gfFollowBtn(r)}</div>`;
+  if (!rounds.length) return `<div class="gfx">${gfModelLine(e, r)}<div class="dim">No holes played yet.</div>${gfFollowBtn(r)}</div>`;
   const ri = Math.min(GF_RD[id] ?? rounds.length - 1, rounds.length - 1), x = rounds[ri];
   const by = {}; (x.h || []).forEach(h => { by[h[0]] = h; });
   const st = GF_STATS[id];
@@ -3325,13 +3346,131 @@ function gfExpand(e, r) {
   const stat = (k, l, suf) => S[k] != null && S[k] !== '' ? `<div><span>${l}</span><b>${esc(S[k])}${suf || ''}</b></div>` : '';
   const strip = (a, b) => `<div class="gh-row">${Array.from({length: b - a + 1}, (_, k) => gfHoleSvg(a + k, by[a + k])).join('')}</div>`;
   const out9 = (x.h || []).filter(h => h[0] <= 9).reduce((t, h) => t + h[1], 0), in9 = (x.h || []).filter(h => h[0] > 9).reduce((t, h) => t + h[1], 0);
-  return `<div class="gfx">
+  return `<div class="gfx">${gfModelLine(e, r)}
     <div class="gfx-top"><div class="sp-tabs-seg" style="margin:0">${rounds.map((rr, i) => `<button class="${i === ri ? 'on' : ''}" onclick="event.stopPropagation();GF_RD['${esc(id)}']=${i};renderGames()">R${i + 1} ${esc(rr.d || '')}</button>`).join('')}</div>${gfFollowBtn(r)}</div>
     <div class="gfx-cap">Round ${ri + 1} · ${x.h.length >= 18 ? 'F' : 'thru ' + x.h.length} · out ${out9 || '-'} · in ${in9 || '-'}${x.s != null && x.h.length >= 18 ? ' · ' + x.s + ' strokes' : ''} · ${x.b || 0} birdies${x.e ? ', ' + x.e + ' eagle' : ''}, ${x.bo || 0} bogeys</div>
     ${strip(1, 9)}${strip(10, 18)}
     <div class="sc-key"><span class="sc-h eg"><b></b></span>eagle <span class="sc-h bd"><b></b></span>birdie <span class="sc-h pr"><b></b></span>par <span class="sc-h bg"><b></b></span>bogey <span class="sc-h db"><b></b></span>double+</div>
     ${st ? `<div class="fx" style="margin-top:10px">${stat('driveDistAvg', 'Drive avg', ' yd')}${stat('driveAccuracyPct', 'Fairways', '%')}${stat('gir', 'Greens in reg', '%')}${stat('puttsGirAvg', 'Putts per GIR')}${stat('sandSaves', 'Sand saves', '%')}${stat('birdies', 'Birdies')}${stat('eagles', 'Eagles')}${stat('bogeys', 'Bogeys')}${stat('officialAmount', 'Earnings')}</div>` : st === null ? '<div class="dim" style="font-size:11px;margin-top:8px">Loading his tournament stats...</div>' : ''}
     <div class="dim" style="font-size:10px;margin-top:6px">Each hole is drawn by its par with his score on the green. Shot-by-shot ball positions come from the PGA TOUR's licensed ShotLink feed, which is not public.</div></div>`;
+}
+// ── golf model: play the rest of the tournament 2,000 times from the live leaderboard ──
+// Each round = rating (strokes gained per round vs the field, from golf_model.py) plus
+// noise; scores are whole strokes, so "top 65 and ties" falls exactly as it does on
+// Friday. Before the first tee everyone starts level; once play starts, each player
+// keeps the strokes he has and plays only the holes he has left.
+var GSIM = {key: null, out: null};
+function gfRandn() { let u = 0; while (!u) u = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * Math.random()); }
+function gfState(e) {
+  return (e.board || []).map(r => {
+    let a = 0, b = 0, done = 0, thru = 0;
+    (r.rounds || []).filter(x => (x.h || []).length).forEach((x, i) => {
+      const t = x.h.reduce((s, h) => s + gfRel(h[2]), 0);
+      if (i < 2) a += t; else b += t;
+      if (x.h.length >= 18) done++; else thru = x.h.length;
+    });
+    return {id: String(r.id || ''), a, b, done, thru};
+  });
+}
+function gfSim(e, N) {
+  const G = (SD.model || {}).golf;
+  if (!G || !e || e.id !== G.event) return null;
+  const R = {}; G.players.forEach(p => { R[p.id] = p.r; });
+  const S = gfState(e).filter(x => x.id);
+  const key = e.id + '|' + S.map(x => x.a + ':' + x.b + ':' + x.done + ':' + x.thru).join(',');
+  if (GSIM.key === key) return GSIM.out;
+  N = N || 2000;
+  const n = S.length, sr = G.sim.sr, cut = G.cut || 0;
+  const r = S.map(x => R[x.id] != null ? R[x.id] : -1);
+  // the cut already happened if anyone has started round 3
+  const cutDone = S.some(x => x.done >= 3 || (x.done === 2 && x.thru > 0));
+  const cnt = {win: new Float64Array(n), t5: new Float64Array(n), t10: new Float64Array(n), t20: new Float64Array(n), cut: new Float64Array(n)};
+  const tot = new Float64Array(n), h36 = new Float64Array(n), made = new Uint8Array(n);
+  const play = (i, rd) => {   // to-par still to come in round rd (0-3) for player i
+    const x = S[i];
+    if (rd < x.done) return 0;
+    const f = rd === x.done && x.thru > 0 ? (18 - x.thru) / 18 : 1;
+    return Math.round(f * -r[i] + sr * Math.sqrt(f) * gfRandn());
+  };
+  const keep = [];
+  for (let s = 0; s < N; s++) {
+    for (let i = 0; i < n; i++) h36[i] = S[i].a + play(i, 0) + play(i, 1);
+    if (cut && !cutDone) {
+      const srt = Array.from(h36).sort((p, q) => p - q), line = srt[Math.min(cut, n) - 1];
+      for (let i = 0; i < n; i++) made[i] = h36[i] <= line ? 1 : 0;
+    } else if (cut && cutDone) {
+      for (let i = 0; i < n; i++) made[i] = S[i].done >= 3 || (S[i].done === 2 && S[i].thru > 0) ? 1 : 0;
+      // players through to the weekend who have not teed off yet: anyone inside the 36-hole line
+      const line = Array.from(S.map(x => x.a)).sort((p, q) => p - q)[Math.min(cut, n) - 1];
+      for (let i = 0; i < n; i++) if (!made[i] && S[i].done === 2 && S[i].a <= line) made[i] = 1;
+    } else made.fill(1);
+    for (let i = 0; i < n; i++) tot[i] = made[i] ? h36[i] + S[i].b + play(i, 2) + play(i, 3) + Math.random() * 0.01 : 1e9;
+    const ord = Array.from({length: n}, (_, i) => i).sort((p, q) => tot[p] - tot[q]);
+    ord.forEach((i, k) => { if (!made[i]) return; if (k === 0) cnt.win[i]++; if (k < 5) cnt.t5[i]++; if (k < 10) cnt.t10[i]++; if (k < 20) cnt.t20[i]++; });
+    for (let i = 0; i < n; i++) cnt.cut[i] += made[i];
+    if (s < 600) keep.push([Float64Array.from(tot), Float64Array.from(h36)]);
+  }
+  const out = {};
+  S.forEach((x, i) => { out[x.id] = {win: cnt.win[i] / N, t5: cnt.t5[i] / N, t10: cnt.t10[i] / N, t20: cnt.t20[i] / N, cut: cnt.cut[i] / N, i}; });
+  out._keep = keep; out._cut = cut;
+  GSIM = {key, out};
+  return out;
+}
+// head to head over the week from the same simulated tournaments: lower total wins; a
+// player who misses the cut loses to one who makes it; both out compares 36 holes
+function gfH2H(sim, a, b) {
+  if (!sim || !sim[a] || !sim[b]) return null;
+  const i = sim[a].i, j = sim[b].i; let w = 0, t = 0;
+  sim._keep.forEach(([tot, h36]) => {
+    const A = tot[i] < 1e8 ? tot[i] : 1e6 + h36[i], B = tot[j] < 1e8 ? tot[j] : 1e6 + h36[j];
+    if (Math.round(A) === Math.round(B)) t++; else if (A < B) w++;
+  });
+  const n = sim._keep.length;
+  return {a: w / n, tie: t / n, b: (n - w - t) / n};
+}
+function gfLast(n) { return String(n || '').split(' ').slice(-1)[0]; }
+function gfPct(v) { return v >= .995 ? '>99%' : v < .001 ? '<0.1%' : v < .01 ? (100 * v).toFixed(1) + '%' : Math.round(100 * v) + '%'; }
+function gfSg(v) { return (v > 0 ? '+' : '') + (+v).toFixed(2); }
+var GM_Q = '', GM_N = 25, GH_A = '', GH_B = '';
+function gfModel(e) {
+  const G = (SD.model || {}).golf;
+  if (!G || !e) return '';
+  const sim = gfSim(e) || {};
+  const P = G.players.slice().map(p => ({...p, s: sim[p.id] || {}})).sort((x, y) => (y.s.win || 0) - (x.s.win || 0) || y.r - x.r);
+  const live = e.state === 'in';
+  const shown = P.filter(p => !GM_Q || String(p.name).toLowerCase().includes(GM_Q)).slice(0, GM_Q ? 60 : GM_N);
+  const rows = shown.map((p, k) => `<div class="pl-row">
+      <div class="pl-who"><span class="gm-rk">${k + 1}</span>
+        <div class="pl-nm"><b>${esc(p.name)}</b><span>rating ${gfSg(p.r)} a round · form ${gfSg(p.form)}${p.ch ? ' · course ' + gfSg(p.ch) : ''}${p.fit ? ' · fit ' + gfSg(p.fit) : ''}</span></div>
+        <div class="pl-pj"><b>${gfPct(p.s.win || 0)}</b><span>win</span></div></div>
+      <div class="pl-ev"><span>Top 5 <b>${gfPct(p.s.t5 || 0)}</b></span><span>Top 10 <b>${gfPct(p.s.t10 || 0)}</b></span><span>Top 20 <b>${gfPct(p.s.t20 || 0)}</b></span>${G.cut ? `<span>Cut <b>${gfPct(p.s.cut || 0)}</b></span>` : ''}
+        ${(p.last || []).length ? `<span title="${esc(p.last.map(l => l[1] + ' #' + l[2]).join(', '))}">Last 5 <b>${p.last.map(l => l[2] === 'MC' ? 'MC' : l[2] ? '#' + l[2] : '-').join(' ')}</b></span>` : ''}</div></div>`).join('');
+  const W = G.wins, T = G.tour || {};
+  const wins = W ? `<div class="lab"><div class="eb">What wins at ${esc((G.course || {}).name || 'this course')}</div>
+      <p style="margin:0 0 10px">What separated the top of the board in ${W.events} past ${W.events === 1 ? 'week' : 'weeks'} here (${W.n} player rounds), against a typical TOUR week:</p>
+      ${W.skills.map(k => { const t = T[k.k] || 0, d = k.share - t;
+        return `<div class="gw-row"><span>${esc(k.name)}</span><div class="gw-bar"><i style="width:${Math.round(100 * k.share)}%"></i>${t ? `<u style="left:${Math.round(100 * t)}%"></u>` : ''}</div><b>${Math.round(100 * k.share)}%</b><em class="${d > .04 ? 'up' : d < -.04 ? 'dn' : ''}">${d > .04 ? 'more than usual' : d < -.04 ? 'less than usual' : 'typical'}</em></div>`; }).join('')}
+      <p class="dim" style="font-size:11px;margin:8px 0 0">Bar = share of the week's strokes gained explained by each part of the game; tick = a typical TOUR week. It feeds the course-fit part of each rating at small weight: on its own, form predicts far more.</p></div>` : '';
+  const opts = sel => P.slice().sort((x, y) => String(x.name).localeCompare(String(y.name))).map(p => `<option value="${esc(p.id)}"${p.id === sel ? ' selected' : ''}>${esc(p.name)}</option>`).join('');
+  if (!GH_A && P[0]) GH_A = P[0].id; if (!GH_B && P[1]) GH_B = P[1].id;
+  const h = gfH2H(sim, GH_A, GH_B), nm = id => (P.find(p => p.id === id) || {}).name || '';
+  const h2h = `<div class="lab"><div class="eb">Head to head · over the week</div>
+      <div class="gh2h"><select onchange="GH_A=this.value;renderPlays()">${opts(GH_A)}</select><span>vs</span><select onchange="GH_B=this.value;renderPlays()">${opts(GH_B)}</select></div>
+      ${h ? `<div class="gh2h-res"><div><b>${gfPct(h.a)}</b><span>${esc(gfLast(nm(GH_A)))}</span></div><div><b>${gfPct(h.tie)}</b><span>tie</span></div><div><b>${gfPct(h.b)}</b><span>${esc(gfLast(nm(GH_B)))}</span></div></div>` : ''}
+      <p class="dim" style="font-size:11px;margin:8px 0 0">Lower 72-hole score wins; making the cut beats missing it. Head to head, the model picked the better player over the week 58.8% of the time across 133,000 pairs in 2025-26.</p></div>`;
+  return `<div class="sec-hdr"><span class="sec-title">${esc(e.name)} · ${live ? 'live chances' : 'chances'}</span><span class="sec-count">${G.cut ? 'cut: top ' + G.cut + ' and ties' : 'no cut'}</span></div>
+    <p class="dim" style="font-size:12px;line-height:1.6;margin:0 0 10px">${live ? 'From the live leaderboard: each player keeps his score and plays the holes he has left, 2,000 times.' : 'The tournament played 2,000 times from the first tee.'} ${G.course ? esc(G.course.name) + (G.course.where ? ', ' + esc(G.course.where) : '') + (G.course.par ? ', par ' + G.course.par : '') + (G.course.yards ? ', ' + Number(G.course.yards).toLocaleString() + ' yards' : '') + '.' : ''}</p>
+    <input placeholder="Find a player" value="${esc(GM_Q)}" oninput="GM_Q=this.value.toLowerCase();renderPlays();var i=document.getElementById('gmQ');if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length)}" id="gmQ" style="width:100%;padding:10px 12px;margin-bottom:10px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid var(--border2);color:var(--text);font:500 14px 'Space Grotesk',sans-serif">
+    <div class="pl-list">${rows || '<div class="empty">No player matches.</div>'}</div>
+    ${!GM_Q && P.length > GM_N ? `<button class="btn-secondary" style="width:100%;margin-top:10px" onclick="GM_N=${GM_N >= P.length ? 25 : 'Infinity'};renderPlays()">${GM_N >= P.length ? 'Show fewer' : 'Show all ' + P.length + ' players'}</button>` : ''}
+    ${h2h}${wins}`;
+}
+// one line under a player's leaderboard card: the model's chances for him
+function gfModelLine(e, r) {
+  const G = (SD.model || {}).golf; if (!G || e.id !== G.event) return '';
+  const sim = gfSim(e) || {}, s = sim[String(r.id)], p = G.players.find(x => x.id === String(r.id));
+  if (!s || !p) return '';
+  return `<div class="gfx-model"><span>Model</span><b>win ${gfPct(s.win)}</b><b>top 10 ${gfPct(s.t10)}</b>${G.cut ? `<b>cut ${gfPct(s.cut)}</b>` : ''}<em>rating ${gfSg(p.r)}/rd</em></div>`;
 }
 function gfBoard(e, n) {
   const rows = e.board.filter(r => !GQ || String(r.name).toLowerCase().includes(GQ)).slice(0, n || 200);
@@ -3478,6 +3617,7 @@ function renderPlays() {
     <p>${esc(M.note || `The ${C.name} model is being built and tested. Nothing here is a pick until it has been backtested against real Onyx prices, the same bar the NBA and MLB models had to clear.`)}</p>
     ${(M.tests || []).length ? `<div class="stat-grid">${M.tests.map(t => `<div><span>${esc(t.k)}</span><b>${esc(t.v)}</b><div class="dim" style="font-size:11px">${esc(t.d || '')}</div></div>`).join('')}</div>` : ''}
     ${M.status !== 'live' && (M.roadmap || []).length ? `<ul>${M.roadmap.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}</div>`;
+  if (KIND === 'golf') { el.innerHTML = lab + (gfModel((SD.events || []).find(e => e.id === (M.golf || {}).event)) || '<div class="empty">The model rates this week\'s field once the tournament is on the board.</div>'); return; }
   const picks = M.picks || [];
   const proj = M.projected || [];
   const lanePass = (M.engine || {}).lane;
