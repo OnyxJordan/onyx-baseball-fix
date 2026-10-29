@@ -141,6 +141,11 @@
 .pk-nums{display:grid;grid-template-columns:repeat(auto-fit,minmax(70px,1fr));gap:6px}
 .pk-nums div{background:var(--bg3);border-radius:10px;padding:6px 8px}.pk-nums span{display:block;font:700 9px monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--text3)}.pk-nums b{font:800 14px monospace}
 .pk-res{font:800 13px monospace;text-transform:uppercase;letter-spacing:.06em}.pk-res.w{color:#61e970}.pk-res.l{color:#f87171}
+/* on trial at the opening price */
+.ot-h{font:700 10px monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin:10px 0 6px}
+.ot-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;align-items:center;padding:7px 10px;margin-bottom:6px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid var(--border2)}
+.ot-who{min-width:0}.ot-who b{display:block;font:700 13px 'Space Grotesk',system-ui,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ot-who span{display:block;font:600 10px monospace;color:var(--text3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ot-px{font:800 13px monospace;color:var(--text2)}.ot-row>b{font:800 10px monospace;min-width:30px;text-align:right}.ot-w{color:#61e970}.ot-l{color:#f87171}
 /* golf model */
 .gm-rk{flex-shrink:0;width:24px;height:24px;border-radius:7px;display:flex;align-items:center;justify-content:center;font:800 11px monospace;background:linear-gradient(135deg,#b038f9,#635bff);color:#fff}
 .gw-row{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,2fr) auto;column-gap:10px;row-gap:2px;align-items:center;margin:6px 0;font-size:12px}
@@ -1931,7 +1936,26 @@ function renderPlays() {
     <div class="sp-tabs-seg"><button class="${PMKT === 'all' ? 'on' : ''}" onclick="PMKT='all';renderPlays()">All</button>${mk.map(m => `<button class="${PMKT === m ? 'on' : ''}" onclick="PMKT='${esc(m)}';renderPlays()">${esc(MKT_NAME[m] || m)}</button>`).join('')}</div>
     ${projTable(shown.slice(0, 120))}`;
   }
-  el.innerHTML = lab + pickHtml + body + recordBlock(M.record) + (!rows.length && M.status !== 'live' ? '' : '');
+  el.innerHTML = lab + openTrialSport(M.open) + pickHtml + body + recordBlock(M.record) + (!rows.length && M.status !== 'live' ? '' : '');
+}
+// receptions at Onyx's opening price, on trial (sports_build.nfl_open_lane): logged only
+// while Onyx still shows the first price we saw for that line, graded off the box score
+function openTrialSport(O) {
+  if (!O) return '';
+  const rows = O.rows || [];
+  const u = v => (v > 0 ? '+' : '') + (v || 0).toFixed(2) + 'u';
+  const row = k => {
+    const g = (SD.games || []).find(x => x.gid === k.gid) || {};
+    const live = g.state === 'pre' && !k.result && k.sel;
+    const res = k.result === 'W' ? '<b class="ot-w">Won</b>' : k.result === 'L' ? '<b class="ot-l">Lost</b>' : k.result === 'P' ? '<b>Push</b>' : k.result === 'V' ? '<b>Void</b>' : '<b class="dim">Open</b>';
+    return `<div class="ot-row"><div class="ot-who"><b>${esc(k.name)} ${k.side === 'over' ? 'Over' : 'Under'} ${k.line} receptions</b><span>${esc(k.matchup)} · proj ${num(k.proj)} · model ${(100 * k.prob).toFixed(1)}% vs Onyx ${(100 * k.implied).toFixed(1)}%${k.actual != null ? ' · caught ' + k.actual : ''}</span></div>
+      ${live ? chip(k.price, k.name + ' ' + (k.side === 'over' ? 'Over ' : 'Under ') + k.line + ' receptions', k.sel, fmtOdds(k.price)) : `<span class="ot-px">${fmtOdds(k.price)}</span>`}${res}</div>`;
+  };
+  const open = rows.filter(k => !k.result), done = rows.filter(k => k.result).slice(0, 12);
+  return `<div class="sec-hdr"><span class="sec-title">On trial · Onyx opening prices</span><span class="sec-count">${O.w || 0}-${O.l || 0}${O.p ? '-' + O.p : ''} · ${u(O.units)}</span></div>
+    <p class="dim" style="font-size:12px;line-height:1.6;margin:0 0 10px">Receptions, logged only while Onyx still shows the first price we saw for that line, at that price, and graded off the box score. The model (v5: nflverse targets per dropback and snap share, averaged with the volume model) beat Onyx's opening price in both seasons it was tested (+2.5% and +17.6%) but not its closing price, so it stays on trial until this record says otherwise.</p>
+    ${open.length ? open.map(row).join('') : '<div class="dim" style="font-size:12px;margin:0 0 10px">No receptions line at its opening price clears the bar right now.</div>'}
+    ${done.length ? `<div class="ot-h">Graded</div>${done.map(row).join('')}` : ''}`;
 }
 var ENGINE_ICON = {
   clock: '<circle cx="8" cy="8" r="6.5"/><path d="M8 4v4l2.5 2"/>',

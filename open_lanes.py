@@ -90,7 +90,9 @@ def fb_probs(rows, game, jumps):
 # ── capture, then log at the opening price ──────────────────────────────────
 def run(rows, slate, props, today, jumps):
     """Capture first-seen prices, log qualifying plays. Returns (ledger, n_logged)."""
-    O = load(OPENING, {}) or {}
+    O = load(OPENING, None)
+    first_run = O is None          # the system's first look: every price already up is a baseline, never a play
+    O = O or {}
     if O.get("date") != today:
         O = {"date": today, "q1": {}, "fb": {}}
     pg = (props or {}).get("games") or {}
@@ -99,12 +101,12 @@ def run(rows, slate, props, today, jumps):
         gl = pg.get(f"{g['away']}_{g['home']}") or {}
         if gl.get("q1_total") is not None and g["gid"] not in O["q1"] and g.get("state", "pre") == "pre":
             O["q1"][g["gid"]] = {"line": gl["q1_total"], "over": gl.get("q1_over_price"), "under": gl.get("q1_under_price"),
-                                 "total": gl.get("total"), "ts": ts}
+                                 "total": gl.get("total"), "ts": ts, **({"baseline": True} if first_run else {})}
     for r in rows:
         fb = r.get("fb") or {}
         key = f"{r['gid']}|{r['pid']}"
         if fb.get("yes") is not None and key not in O["fb"]:
-            O["fb"][key] = {"yes": fb["yes"], "ts": ts}
+            O["fb"][key] = {"yes": fb["yes"], "ts": ts, **({"baseline": True} if first_run else {})}
     save(OPENING, O, indent=1)
 
     ledger = load(LEDGER, []) or []
@@ -116,7 +118,7 @@ def run(rows, slate, props, today, jumps):
         gl = pg.get(f"{g['away']}_{g['home']}") or {}
         # 1st-quarter total
         op = O["q1"].get(g["gid"])
-        if op and op.get("total"):
+        if op and op.get("total") and not op.get("baseline"):
             mu = op["total"] * P["q1"]
             po = 1 - _phi((op["line"] - mu) / P["q1_sd"])
             for side, p, price, sel in (("over", po, op["over"], gl.get("q1_over_sel")), ("under", 1 - po, op["under"], gl.get("q1_under_sel"))):
@@ -139,7 +141,7 @@ def run(rows, slate, props, today, jumps):
             if r["gid"] != g["gid"] or r["pid"] not in probs:
                 continue
             op = O["fb"].get(f"{r['gid']}|{r['pid']}"); fb = r.get("fb") or {}
-            if not op or fb.get("yes") != op["yes"]:
+            if not op or op.get("baseline") or fb.get("yes") != op["yes"]:
                 continue
             p = probs[r["pid"]]
             if p >= implied(op["yes"]) * (1 + P["fb_rel"]):

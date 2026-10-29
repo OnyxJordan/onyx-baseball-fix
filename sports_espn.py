@@ -267,6 +267,12 @@ def main():
         slate["bye"] = [t.get("abbreviation") for t in (sb.get("week") or {}).get("teamsOnBye") or []]
         if cfg.get("box") and slate["season"]:
             ingest_nfl(lane, wk, slate["season"])
+        if key == "nfl" and slate["season"]:
+            try:   # nflverse targets, dropbacks and snap shares for the v5 receptions model (once a day)
+                import nfl_verse
+                nfl_verse.update(int(slate["season"]), str(lane.data / "nflverse.json"))
+            except Exception as x:
+                print(f"  nflverse: {str(x)[:160]}")
     elif cfg["kind"] == "tennis":
         slate["events"] = tennis_events(cfg["espn"])
         slate["label"] = " · ".join(e["name"] for e in slate["events"][:3])

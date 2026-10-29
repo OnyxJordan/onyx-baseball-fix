@@ -474,6 +474,20 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
       lane with the filter: 184-160 (+12.5%) at 5pp+ on 2026, unchanged.
   - **NFL player props (`nfl_model.py` v1):** projections as before. The chances come
     from spreads fitted to real Onyx lines.
+  - **NFL receptions v5 and the opening-price lane (10/29):** `nfl_verse.py` pulls
+    nflverse play-by-play and snap counts once a day into `data/nfl/nflverse.json`
+    (current season + the last one, ~800 KB). v5 receptions = 50/50 average of the v4
+    volume projection and `nfl_model.project_verse` (targets per team dropback, snap
+    trend, team dropbacks x implied points and spread). 3pp+ value bets at Onyx's
+    OPENING price: 2025 +2.5% (848), 2026 +17.6% (367); at the close 2025 -7.2%. So it
+    runs as `sports_build.nfl_open_lane`: the first price seen for each receptions line
+    goes to `data/nfl/opening.json`; a play is logged to `data/nfl/open_trial.json`
+    (append-only, validate_build ledger list) only while the live line is still the
+    opening one, at most 12 a day by edge, graded off the box score.
+  - **Baseline rule (both NBA and NFL opening lanes):** the system's very first capture
+    (no `opening.json` yet) marks every price already on the board as a baseline and
+    never logs it, because those lines may have opened days earlier. Only markets that
+    appear after capture is running can produce plays.
   - **Tennis (`tennis_model.py` v1):** Elo, K = 150/(n+5)^0.4. On 7,875 matches in
     2026 it never saw, log loss is 0.627 and the favourite won 64.0%.
   - **Golf (`golf_model.py`, golf-v1, 10/29):** stays "model in the lab" because Onyx

@@ -1,8 +1,23 @@
 """
 nfl_model.py - Onyx NFL player projections.
 
-VERSION v4 (10/29). The lab notebook: every change bumps VERSION and adds an
+VERSION v5 (10/29). The lab notebook: every change bumps VERSION and adds an
 entry here citing its evidence (CLAUDE.md rule 2 applies to this model too).
+
+  v5  10/29  Receptions: the v4 volume projection averaged 50/50 with an nflverse
+             model (nfl_verse.py: play-by-play and snap counts, free): his targets
+             per team dropback (decay .9, last 10 games, shrunk by 60 dropbacks),
+             scaled by his snap-share trend (last game vs his average, power .5),
+             x the team's recent dropbacks x (implied points / 22.5) x exp(.1 x
+             spread / 7), x catch rate. Tuned on 2025, judged on 2026, against Onyx
+             prop lines (two-sided pairs with 0-15% vig only). Value bets 3pp+:
+             opening price 2025 408-440 +2.5%, 2026 201-166 +17.6%; closing price
+             2025 346-444 -7.2%, 2026 215-190 +13.2%. v4 alone at the open: 2025
+             -2.5%, 2026 +17.9%; at the close 2025 -10.3%. The v5 average is the
+             first receptions model positive at Onyx's opening price in both
+             seasons, so it runs as an on-trial lane at the opening price
+             (data/nfl/open_trial.json). Injury redistribution, opponent pass
+             defense and receiving yards from nflverse tested and left out.
 
   v4  10/29  Receptions and receiving yards from volume, not averages: his
              target share (last 8 games) x the team's expected targets (its
@@ -95,10 +110,10 @@ Inputs: data/nfl/player_games.json rows from sports_espn.py (one per
 player-game: pass_yds, rush_yds, rec_yds, rec, tgt, att, rush_att...).
 """
 
-import math
+import math, re, unicodedata
 from collections import defaultdict
 
-VERSION = "v4"
+VERSION = "v5"
 # game lines (team_model.py), tuned 10/26: see v1
 GAME_P = {"half_life": 240, "ridge": 5, "home": 2.0, "sd_margin": 13.5, "sd_total": 13.0, "min_games": 3}
 GAME_TEST = {"n": 199, "logloss": 0.648, "base_logloss": 0.698, "mae_total": 10.90, "base_mae_total": 11.71,
@@ -318,6 +333,68 @@ def project_volume(stat, h, th, implied, spread, p=None):
     if stat == "rec":
         return tg * (sum(x["rec"] for x in h) + p["k"] * 0.65) / (n_t + p["k"])
     return tg * (sum(x["rec_yds"] for x in h) + p["k"] * 7.8) / (n_t + p["k"])
+
+
+# v5: receptions from nflverse (nfl_verse.py) - targets per team dropback, the snap trend,
+# and the team's recent dropbacks scaled by Onyx's implied points and spread - averaged
+# 50/50 with the v4 volume projection.
+VERSE_P = {"dec": 0.9, "n": 10, "k": 60.0, "b_snap": 0.5, "e_imp": 1.0, "e_sp": 0.1, "w": 0.5}
+VERSE_TEAM = {"WSH": "WAS", "LAR": "LA"}
+
+
+def _vk(s):
+    s = unicodedata.normalize("NFKD", s or "").encode("ascii", "ignore").decode().lower()
+    return re.sub(r"[^a-z]", "", re.sub(r"\b(jr|sr|ii|iii|iv|v)\b\.?", "", s))
+
+
+def _short(full):
+    """'Travis Kelce' -> 'tkelce', the key nflverse's 'T.Kelce' reduces to."""
+    if "." in (full or "") and " " not in (full or "").strip():
+        return _vk(full)
+    parts = re.sub(r"\b(jr|sr|ii|iii|iv|v)\b\.?", "", (full or "").lower()).replace(".", " ").split()
+    return _vk(parts[0][0] + "".join(parts[1:])) if len(parts) > 1 else _vk(full)
+
+
+def verse_index(D):
+    """nflverse.json -> lookups keyed by (team, short name) and (team, week key)."""
+    P, TG, SN = {}, {}, {}
+    for yr, x in (D or {}).get("seasons", {}).items():
+        names = x.get("names") or {}
+        for s, w, t, pid, v in x.get("ply") or []:
+            P.setdefault((t, _short(names.get(pid, ""))), []).append((s * 100 + w, v.get("tgt", 0), v.get("rec", 0)))
+        for s, w, t, v in x.get("team") or []:
+            TG.setdefault(t, []).append((s * 100 + w, v.get("db", 0)))
+        for s, w, t, n, pct in x.get("snaps") or []:
+            SN.setdefault((t, n), []).append((s * 100 + w, pct))
+    for d in (P, TG, SN):
+        for k in d:
+            d[k].sort()
+    return P, TG, SN
+
+
+def project_verse(idx, team, name, season, week, implied, spread, p=VERSE_P):
+    """Expected receptions from nflverse targets per dropback, or None without enough history."""
+    P, TG, SN = idx
+    t = VERSE_TEAM.get(team, team)
+    key = season * 100 + week
+    h = [x for x in P.get((t, _short(name)), []) if x[0] < key][-p["n"]:]
+    if len(h) < 2:
+        return None
+    tdb = dict(TG.get(t, []))
+    w = [p["dec"] ** (len(h) - 1 - i) for i in range(len(h))]
+    db = sum(wi * tdb.get(x[0], 0) for x, wi in zip(h, w))
+    share = (sum(wi * x[1] for x, wi in zip(h, w)) + p["k"] * 0.09) / (db + p["k"])
+    sn = [v for k, v in SN.get((t, _vk(name)), []) if k < key][-p["n"]:]
+    if len(sn) >= 2 and sum(sn) > 0:
+        share *= min(1.5, max(0.6, sn[-1] / (sum(sn) / len(sn)))) ** p["b_snap"]
+    recent = [v for k, v in TG.get(t, []) if k < key][-p["n"]:]
+    if not recent:
+        return None
+    ww = [p["dec"] ** (len(recent) - 1 - i) for i in range(len(recent))]
+    edb = sum(v * wi for v, wi in zip(recent, ww)) / sum(ww)
+    edb *= ((implied or 22.5) / 22.5) ** p["e_imp"] * math.exp(p["e_sp"] * (spread or 0.0) / 7.0)
+    nt = sum(x[1] for x in h)
+    return edb * share * (sum(x[2] for x in h) + 8 * 0.65) / (nt + 8)
 
 
 def prob_over_volume(stat, mu, line):
