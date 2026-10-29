@@ -5831,8 +5831,8 @@
     {
      "id": "185660",
      "start": "2026-10-29T01:35Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Center",
@@ -5847,17 +5847,17 @@
         3,
         1
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Alycia Parks",
        "short": "A. Parks",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        3
+        6
        ],
        "serve": false
       }
@@ -5865,9 +5865,9 @@
     },
     {
      "id": "185678",
-     "start": "2026-10-29T03:00Z",
-     "state": "pre",
-     "detail": "10/28 - 11:00 PM EDT",
+     "start": "2026-10-29T03:05Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Center",
@@ -5878,8 +5878,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/bel.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        0
+       ],
+       "serve": true
       },
       {
        "name": "Leylah Fernandez",
@@ -5887,7 +5889,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/can.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        1
+       ],
        "serve": false
       }
      ]
@@ -5960,9 +5964,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Alycia Parks",
+       "short": "A. Parks",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -9731,41 +9735,6 @@
      ]
     },
     {
-     "id": "185806",
-     "start": "2026-10-29T01:20Z",
-     "state": "post",
-     "detail": "Suspended",
-     "round": "Round 2",
-     "draw": "Women's Singles",
-     "court": "Estadio Mexcovery",
-     "p": [
-      {
-       "name": "Adriana Reami",
-       "short": "A. Reami",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
-       "seed": null,
-       "win": false,
-       "sets": [
-        0,
-        0
-       ],
-       "serve": false
-      },
-      {
-       "name": "Fiona Ferro",
-       "short": "F. Ferro",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
-       "seed": null,
-       "win": false,
-       "sets": [
-        6,
-        1
-       ],
-       "serve": false
-      }
-     ]
-    },
-    {
      "id": "185796",
      "start": "2026-10-29T20:00Z",
      "state": "pre",
@@ -9824,10 +9793,45 @@
      ]
     },
     {
-     "id": "185794",
+     "id": "185806",
      "start": "2026-10-29T21:30Z",
      "state": "pre",
      "detail": "10/29 - 5:30 PM EDT",
+     "round": "Round 2",
+     "draw": "Women's Singles",
+     "court": "Estadio Mexcovery",
+     "p": [
+      {
+       "name": "Adriana Reami",
+       "short": "A. Reami",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
+       "seed": null,
+       "win": false,
+       "sets": [
+        0,
+        0
+       ],
+       "serve": false
+      },
+      {
+       "name": "Fiona Ferro",
+       "short": "F. Ferro",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
+       "seed": null,
+       "win": false,
+       "sets": [
+        6,
+        1
+       ],
+       "serve": false
+      }
+     ]
+    },
+    {
+     "id": "185794",
+     "start": "2026-10-29T23:00Z",
+     "state": "pre",
+     "detail": "10/29 - 7:00 PM EDT",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Estadio Mexcovery",
@@ -10116,5 +10120,5 @@
    ]
   }
  ],
- "fetched": "2026-10-29T02:42:21+00:00"
+ "fetched": "2026-10-29T03:13:55+00:00"
 }
