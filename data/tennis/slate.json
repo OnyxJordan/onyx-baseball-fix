@@ -2760,8 +2760,8 @@
     {
      "id": "185149",
      "start": "2026-10-29T21:15Z",
-     "state": "in",
-     "detail": "3rd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 2",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -2771,11 +2771,11 @@
        "short": "J. Kym",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/sui.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
         6,
-        3
+        7
        ],
        "serve": false
       },
@@ -2788,7 +2788,7 @@
        "sets": [
         3,
         7,
-        2
+        6
        ],
        "serve": false
       }
@@ -2900,9 +2900,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Jerome Kym",
+       "short": "J. Kym",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/sui.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -10018,8 +10018,8 @@
     {
      "id": "185794",
      "start": "2026-10-29T21:55Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Estadio Mexcovery",
@@ -10032,7 +10032,7 @@
        "win": false,
        "sets": [
         1,
-        4
+        6
        ],
        "serve": false
       },
@@ -10041,10 +10041,10 @@
        "short": "T. Maria",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ger.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        5
+        7
        ],
        "serve": false
       }
@@ -10127,9 +10127,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Tatjana Maria",
+       "short": "T. Maria",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ger.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -10314,5 +10314,5 @@
    ]
   }
  ],
- "fetched": "2026-10-29T23:12:35+00:00"
+ "fetched": "2026-10-29T23:44:11+00:00"
 }
