@@ -571,6 +571,21 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
   - a strip of every other game switches straight to it.
   - The shared stylesheet clips the body sideways, which breaks `position: sticky`, so
     `gcFloatSync` pins a copy of the bar to the top once the original scrolls away.
+- **Plays lead with spreads, totals and props (10/29):** a sport still in the lab now fills its
+  plays with `sports_build.top_plays` instead of the backtested lane's market (which made NHL and
+  tennis all moneylines).
+  - **What qualifies:** every priced Onyx line where the blended chance beats the price by at least
+    1pp and the play is more likely than not (`PLAY_MIN_PROB` .50).
+  - **Selection:** one per game market or player, two per game, twelve per slate. Moneylines are
+    down-weighted (`PLAY_PREF`).
+  - **Display:** each card shows its confidence (the chance) and stays a lean until the sport
+    passes its backtest.
+- **NFL touchdown scorers (`nfl_model` v2):** anytime and first TD chances from Onyx's implied team
+  points, opportunity share and own TD share (evidence in the changelog). A "Touchdown scorers"
+  table runs on Plays and in each gamecenter, and anytime TD props can be plays.
+  - `sports_odds.py` now also pulls `first_touchdown_scorer`.
+- **Tennis games markets (`tennis_model` v2):** the game-level match chain prices total games and
+  the game spread from Elo, so tennis plays are spreads and totals.
 - **NBA scoreboard matches every sport (10/29):** NBA's games use the same cards, Onyx odds
   board and gamecenter bar as `sport_shell.html`.
   - The CSS is lifted verbatim, with `sbCard`, `nbNav` and `gcFloatSync` in

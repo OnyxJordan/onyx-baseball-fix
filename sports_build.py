@@ -110,6 +110,43 @@ def nfl_block(lane, slate, odds):
             r.update(side=ps["side"], price=ps["price"], sel=r["over_sel"] if ps["side"] == "over" else r["under_sel"],
                      prob=ps["prob"], implied=ps["implied"], edge=ps["edge"], ev=ps["ev"], model_p=ps["model_p"],
                      matchup=f"{r['team']} {'vs' if r['home'] else '@'} {r['opp']}")
+    # touchdown scorers (nfl_model v2): anytime and first TD chances from Onyx's
+    # implied team points, against Onyx's yes prices (one-sided, so the edge is
+    # measured against the price as listed, margin included)
+    td_rows = []
+    if hasattr(M, "td_lambdas"):
+        implied, players, meta = {}, [], {}
+        for g in slate.get("games") or []:
+            o = ((odds or {}).get("games") or {}).get(g["gid"]) or {}
+            if g.get("state") != "pre" or o.get("total") is None:
+                continue
+            hsp = o.get("home_spread") or 0.0
+            implied[g["home"]], implied[g["away"]] = (o["total"] - hsp) / 2, (o["total"] + hsp) / 2
+            for team, opp, home in ((g["away"], g["home"], False), (g["home"], g["away"], True)):
+                lw = last_game.get(team)
+                for pid, gs in by.items():
+                    cur = [x for x in gs if x["season"] == season]
+                    if cur and cur[-1]["team"] == team and cur[-1]["week"] == lw and \
+                            any((x.get("rush_att") or 0) + (x.get("tgt") or 0) > 0 for x in cur[-4:]):
+                        players.append((pid, team))
+                        meta[pid] = (g, team, opp, home, cur[-1])
+        lams = M.td_lambdas(rows, players, implied)
+        by_g = {}
+        for pid, l in lams.items():
+            by_g.setdefault(meta[pid][0]["gid"], {})[pid] = l
+        probs = M.td_probs(by_g)
+        for pid, (p_any, p_first) in probs.items():
+            g, team, opp, home, last = meta[pid]
+            row = {"pid": pid, "name": last["name"], "hs": last.get("hs"), "team": team, "opp": opp, "home": home, "gid": g["gid"],
+                   "matchup": f"{team} {'vs' if home else '@'} {opp}", "any": round(p_any, 4), "first": round(p_first, 4)}
+            for key, mk in (("any", "anytime_td"), ("first", "first_td")):
+                ln = props.get((nk(last["name"]), mk))
+                if ln and ln.get("over") is not None:
+                    imp_ = L.implied(ln["over"])
+                    row[key + "_price"], row[key + "_sel"], row[key + "_edge"] = ln["over"], ln.get("over_sel"), round(row[key] - imp_, 4)
+            td_rows.append(row)
+        td_rows.sort(key=lambda r: -r["any"])
+        block["td"] = td_rows[:400]
     # lines Onyx prices first, largest gap between projection and line first
     out.sort(key=lambda r: (r["line"] is None, -abs(r["proj"] - r["line"]) / max(1.0, r["line"]) if r["line"] is not None else -r["proj"]))
     # the slate's headline numbers: best projection per market
@@ -148,7 +185,11 @@ def nfl_block(lane, slate, odds):
     eng["factors"].insert(0, ["chart", "Player projections", "Passing, rushing and receiving yards and receptions from every box score this season, last season as the prior and the opponent's defense, re-tested on every build against the season average and last-3 average.", "Foundation", ""])
     block["engine"] = eng
     if block["status"] != "live":
-        block["projected"] = projected_plays(grows, bt, slate.get("date"))
+        # touchdown scorers join the plays as anytime TD props
+        tdp = [{"pid": r["pid"], "name": r["name"], "hs": r.get("hs"), "gid": r["gid"], "matchup": r["matchup"], "mkt": "anytime_td",
+                "side": "over", "line": 0.5, "price": r["any_price"], "sel": r.get("any_sel"), "prob": r["any"],
+                "implied": round(L.implied(r["any_price"]), 4), "edge": r["any_edge"]} for r in block.get("td", []) if r.get("any_price") is not None]
+        block["projected"] = top_plays(grows + out + tdp)
     return block
 
 TEAM_MODELS = {"nfl": "nfl_model", "cfb": "cfb_model", "nhl": "nhl_model"}
@@ -231,12 +272,63 @@ def tennis_rows(lane, slate, odds, w):
                 if r:
                     r["matchup"] = f"{a} vs {b}"
                     out.append(r)
+            # games markets (v2): the Elo view of the total and the game spread
+            if o.get("total") is not None or o.get("sp0") is not None:
+                gm = TM.games_markets(p0, e.get("tour"), e.get("name"), o.get("total"), o.get("sp0"))
+                det = f"Elo {E.r.get(nk(a), 1500):.0f} vs {E.r.get(nk(b), 1500):.0f} · {gm['exp_games']:.1f} games projected"
+                if o.get("total") is not None and o.get("over") is not None and o.get("under") is not None:
+                    r = _row(g, "total", "Total games", o["total"], "", None, gm["p_over"], o["over"], o["under"],
+                             o.get("over_sel"), o.get("under_sel"), w, det)
+                    if r:
+                        r["matchup"] = f"{a} vs {b}"
+                        out.append(r)
+                if o.get("sp0") is not None and o.get("sp0_price") is not None and o.get("sp1_price") is not None:
+                    r = _row(g, "spread", a, o["sp0"], f"{o['sp0']:+g}", None, gm["p_cover0"], o["sp0_price"], o["sp1_price"],
+                             o.get("sp0_sel"), o.get("sp1_sel"), w, det)
+                    if r:
+                        r["matchup"] = f"{a} vs {b}"
+                        out.append(r)
     out.sort(key=lambda r: -r["edge"])
     return out
 
 
 MKT_WORD = {"ml": "moneyline", "spread": "spread", "total": "total", "pass_yds": "passing yards", "rush_yds": "rushing yards",
             "rec_yds": "receiving yards", "rec": "receptions"}
+
+
+# what people bet first: spreads, totals and player props lead the plays; a
+# moneyline only shows when its game has no spread or total worth playing
+PLAY_PREF = {"spread": 1.0, "total": 1.0, "prop": 1.0, "ml": 0.5}
+PLAY_MAX, PLAY_PER_GAME, PLAY_MIN_EDGE, PLAY_MIN_PROB = 12, 2, 0.01, 0.50   # a play is more likely to win than not
+
+
+def top_plays(rows):
+    """The slate's plays for a sport still in the lab: every priced Onyx line
+    the model has a chance for, value only (the blended chance beats the
+    price's implied chance by PLAY_MIN_EDGE), one per game market and one per
+    player, spreads / totals / props first. Each carries its confidence (the
+    blended chance of the side). Leans, never logged or graded."""
+    best = {}
+    for r in rows:
+        if r.get("prob") is None or r.get("price") is None or r.get("edge") is None:
+            continue
+        if r["edge"] < PLAY_MIN_EDGE or r["prob"] < PLAY_MIN_PROB:
+            continue
+        kind = r.get("kind") or "prop"
+        key = (r.get("gid"), kind if kind != "prop" else ("p", r.get("pid") or r.get("name")))
+        score = r["edge"] * PLAY_PREF.get(kind, 1.0)
+        if key not in best or score > best[key][0]:
+            best[key] = (score, r)
+    ranked = sorted(best.values(), key=lambda x: -x[0])
+    out, per_game = [], {}
+    for score, r in ranked:
+        if per_game.get(r.get("gid"), 0) >= PLAY_PER_GAME:
+            continue
+        per_game[r.get("gid")] = per_game.get(r.get("gid"), 0) + 1
+        out.append(dict(r, projected=True, value=True))
+        if len(out) >= PLAY_MAX:
+            break
+    return out
 
 
 def projected_plays(rows, bt, date):
@@ -422,7 +514,7 @@ def team_block(key, lane, slate, odds):
     base["proj"] = proj
     base["engine"] = engine_team(key, M, GP, w, bt, base["status"] == "live")
     if base["status"] != "live":
-        base["projected"] = projected_plays(rows, bt, slate.get("date"))
+        base["projected"] = top_plays(rows)
     return base
 
 
@@ -447,7 +539,7 @@ def tennis_block(lane, slate, odds):
     base["players"] = tennis_players(lane, slate)
     base["engine"] = engine_tennis(TM, w, bt, base["status"] == "live")
     if base["status"] != "live":
-        base["projected"] = projected_plays(rows, bt, slate.get("date"))
+        base["projected"] = top_plays(rows)
     return base
 
 

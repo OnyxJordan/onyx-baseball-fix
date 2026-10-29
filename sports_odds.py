@@ -33,8 +33,10 @@ FOOTBALL_PROPS = {"player_passing_yards": "pass_yds", "player_rushing_yards": "r
                   "player_receiving_yards": "rec_yds", "player_receptions": "rec",
                   "player_passing_touchdowns": "pass_td"}
 MARKETS = {
-    "nfl": {"game": ("moneyline", "point_spread", "total_points"), "props": FOOTBALL_PROPS, "yes": {"anytime_touchdown_scorer": "anytime_td"}},
-    "cfb": {"game": ("moneyline", "point_spread", "total_points"), "props": FOOTBALL_PROPS, "yes": {"anytime_touchdown_scorer": "anytime_td"}},
+    "nfl": {"game": ("moneyline", "point_spread", "total_points"), "props": FOOTBALL_PROPS,
+            "yes": {"anytime_touchdown_scorer": "anytime_td", "first_touchdown_scorer": "first_td"}},
+    "cfb": {"game": ("moneyline", "point_spread", "total_points"), "props": FOOTBALL_PROPS,
+            "yes": {"anytime_touchdown_scorer": "anytime_td", "first_touchdown_scorer": "first_td"}},
     "nhl": {"game": ("moneyline", "puck_line", "total_goals"), "props": {"player_points": "points", "player_assists": "assists"}, "yes": {}},
     "tennis": {"game": ("moneyline", "game_spread", "total_games"), "props": {}, "yes": {}, "leagues": ("atp", "wta")},
 }
