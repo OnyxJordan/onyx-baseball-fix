@@ -325,6 +325,11 @@ def main():
     if not Path("data/nba/history.json").exists():   # the OpticOdds path keeps the shared copy
         nba_common.refresh_history(today)
     nba_common.refresh_onoff(today)
+    try:
+        import nba_jumps   # opening tips for the first-basket lean (data/nba/jumps.json)
+        nba_jumps.update(today)
+    except Exception as e:
+        print(f"  opening tips: {str(e)[:160]}")
     print("=== NBA ESPN backup done ===")
 
 
