@@ -1223,8 +1223,8 @@
     {
      "id": "185183",
      "start": "2026-10-29T17:40Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 2",
      "draw": "Men's Singles",
      "court": "Centre Court",
@@ -1246,20 +1246,20 @@
        "short": "A. Zverev",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ger.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        4
+        7
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
     {
      "id": "185196",
-     "start": "2026-10-29T19:00Z",
+     "start": "2026-10-29T19:35Z",
      "state": "pre",
-     "detail": "10/29 - 3:00 PM EDT",
+     "detail": "10/29 - 3:35 PM EDT",
      "round": "Round 2",
      "draw": "Men's Singles",
      "court": "Centre Court",
@@ -1361,9 +1361,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Alexander Zverev",
+       "short": "A. Zverev",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ger.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -2720,7 +2720,7 @@
      "id": "185151",
      "start": "2026-10-29T18:20Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 2",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -2732,7 +2732,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        5
+        6,
+        3
        ],
        "serve": false
       },
@@ -2743,7 +2744,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        6
+        7,
+        2
        ],
        "serve": false
       }
@@ -2751,9 +2753,9 @@
     },
     {
      "id": "185149",
-     "start": "2026-10-29T19:30Z",
+     "start": "2026-10-29T20:00Z",
      "state": "pre",
-     "detail": "10/29 - 3:30 PM EDT",
+     "detail": "10/29 - 4:00 PM EDT",
      "round": "Round 2",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -7245,9 +7247,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        5
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Maria Lourdes Carle",
@@ -7256,9 +7258,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        3
+        5
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
@@ -8542,7 +8544,7 @@
      "id": "185851",
      "start": "2026-10-29T17:30Z",
      "state": "in",
-     "detail": "2nd",
+     "detail": "3rd",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Grandstand",
@@ -8555,9 +8557,10 @@
        "win": false,
        "sets": [
         3,
-        4
+        6,
+        1
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Anna Blinkova",
@@ -8567,6 +8570,7 @@
        "win": false,
        "sets": [
         6,
+        4,
         4
        ],
        "serve": false
@@ -8575,9 +8579,9 @@
     },
     {
      "id": "185847",
-     "start": "2026-10-29T19:15Z",
+     "start": "2026-10-29T19:40Z",
      "state": "pre",
-     "detail": "10/29 - 3:15 PM EDT",
+     "detail": "10/29 - 3:40 PM EDT",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Grandstand",
@@ -10268,5 +10272,5 @@
    ]
   }
  ],
- "fetched": "2026-10-29T19:03:59+00:00"
+ "fetched": "2026-10-29T19:35:34+00:00"
 }
