@@ -6,7 +6,7 @@ Changelog (newest first; each entry cites its evidence)
 
   v1  10/26  Spread pick lane (tools/sports_backtest.py --markets=spread,total,
       2,911 Onyx games, 939 matched to FBS finals). Blend 20% model / 80%
-      Onyx no-vig, edge 2-6pp, price -200 to +150, at most 6 a slate. Chosen
+      Onyx market, edge 2-6pp, price -200 to +150, at most 6 a slate. Chosen
       on 2025 games (21 picks, 13-8), judged on 2026: 27-19 (+12.2%) at
       opening prices, 21-19 (+0.6%) at closing; spread log loss 0.6938 vs
       Onyx 0.6947. Passed the bar, so spread picks are live and graded in

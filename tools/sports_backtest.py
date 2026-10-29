@@ -336,7 +336,7 @@ def page(result, key):
     summary = [f"Every game priced only from results before it, against Onyx's real opening and closing lines. The rule was chosen on games before {result['split']} and judged on {result['split']} on, which it never saw.",
                (f"The model's weight in the blend is {round(result['w'] * 100)}%." if result["w"] else "On the tuning window the best blend gave the model no weight: Onyx's own price was better on its own.")]
     if result["passed"]:
-        summary.append("Passed: the blend beat Onyx's no-vig price and the lane won money at both opening and closing prices. Tracked picks are live, graded in public.")
+        summary.append("Passed: the blend beat the Onyx market and the lane won money at both opening and closing prices. Tracked picks are live, graded in public.")
     else:
         why = []
         if not lane:
