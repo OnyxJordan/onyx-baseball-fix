@@ -593,6 +593,7 @@ function drawGame(gid) {
   const s = GC_CACHE[gid];
   box.innerHTML = `<div class="gc" id="gc">${gameNav(gid)}${head}
     ${gameBoard(g) ? `<div class="gc-sec"><h4>Onyx lines</h4>${gameBoard(g)}</div>` : ''}
+    ${((SD.model || {}).td || []).some(r => r.gid === g.gid) ? `<div class="gc-sec">${tdTable(SD.model.td.filter(r => r.gid === g.gid).slice(0, 14), 'Touchdown scorers')}</div>` : ''}
     <div class="gc-sec" style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-primary" onclick="bet(null,'game ${esc(g.away)} @ ${esc(g.home)}')">⚡ Bet this game on Onyx</button>
       <button class="btn-secondary" onclick="OPEN_GAME=null;renderGames()">Close</button></div>
     <div id="gcDetail">${s ? gcDetail(s, g) : '<div class="empty">Loading the gamecenter…</div>'}</div></div>`;
@@ -1668,7 +1669,7 @@ function renderBoard() {
   el.innerHTML = out.join('');
 }
 var MKT_NAME = {ml: 'Moneyline', spread: 'Spread', total: 'Total', pass_yds: 'Passing yards', rush_yds: 'Rushing yards', rec_yds: 'Receiving yards', rec: 'Receptions',
-                pass_td: 'Passing TDs', anytime_td: 'Anytime TD', goals: 'Goals', shots: 'Shots on goal', points: 'Points', assists: 'Assists', saves: 'Saves'};
+                pass_td: 'Passing TDs', anytime_td: 'Anytime TD', first_td: 'First TD', goals: 'Goals', shots: 'Shots on goal', points: 'Points', assists: 'Assists', saves: 'Saves'};
 
 // ── plays (model) ───────────────────────────────────────────────────
 function projTable(rows) {
@@ -1683,18 +1684,32 @@ function pickLabel(r) {
   if (r.kind === 'ml') return `${r.name} to win`;
   if (r.kind === 'spread') return `${r.name} ${r.line_txt || ''}`;
   if (r.kind === 'total') return `${r.name} ${r.side === 'over' ? 'Over' : 'Under'} ${r.line}`;
+  if (r.mkt === 'anytime_td') return `${r.name} to score a TD`;
+  if (r.mkt === 'first_td') return `${r.name} first TD`;
   return `${r.name} ${r.side === 'over' ? 'Over' : 'Under'} ${r.line} ${MKT_NAME[r.mkt] || r.mkt}`;
 }
 function playCards(rows) {
   return `<div class="pk-grid">${rows.map(r => `<div class="pk${r.projected ? ' lean' : ''}">${r.projected ? '<span class="pk-badge">Lean · not tracked</span>' : ''}
     <div class="pk-top"><span>${esc(MKT_NAME[r.mkt] || r.mkt)}</span><span>${esc(r.matchup || '')}</span></div>
     <div class="pk-main">${r.hs ? `<img class="lg m" style="border-radius:50%" src="${esc(r.hs)}" alt="" loading="lazy">` : ''}<b>${esc(pickLabel(r))}</b></div>
-    <div class="pk-nums"><div><span>Onyx</span><b>${fmtOdds(r.price)}</b></div><div><span>Win chance</span><b>${pct(r.prob)}</b></div>
+    <div class="pk-nums"><div><span>Onyx</span><b>${fmtOdds(r.price)}</b></div><div><span>${r.projected ? 'Confidence' : 'Win chance'}</span><b>${pct(r.prob)}</b></div>
       <div><span>Implied</span><b>${pct(r.implied)}</b></div><div><span>Edge</span><b class="edge-pos">${r.edge != null ? '+' + (r.edge * 100).toFixed(1) + 'pp' : '-'}</b></div>
       ${r.proj != null ? `<div><span>Projection</span><b>${num(r.proj)}</b></div>` : ''}</div>
     ${r.result ? `<div class="pk-res ${r.result === 'W' ? 'w' : r.result === 'L' ? 'l' : ''}">${r.result === 'W' ? 'Won' : r.result === 'L' ? 'Lost' : r.result === 'P' ? 'Push' : 'Void'}${r.actual != null ? ' · ' + esc(r.actual) : ''}</div>`
       : `<button class="btn-primary" onclick="bet('${esc(r.sel || '')}','${esc(pickLabel(r)).replace(/'/g, '')}')">⚡ Bet on Onyx</button>`}
   </div>`).join('')}</div>`;
+}
+// touchdown scorers (nfl_model v2): each player's anytime and first TD chance against Onyx's price
+function tdTable(rows, title) {
+  if (!rows || !rows.length) return '';
+  const cell = (p, price, sel, edge, label) => price == null ? `<td class="r"><b>${pct(p, 0)}</b><div class="dim" style="font-size:10px">no line</div></td>`
+    : `<td class="r"><b class="${edge > 0 ? 'edge-pos' : ''}">${pct(p, 0)}</b><div>${chip(price, label, sel, 'Onyx')}</div></td>`;
+  return `<div class="sec-hdr"><span class="sec-title">${esc(title)}</span><span class="sec-count">${rows.length}</span></div>
+    <p class="dim" style="font-size:12px;line-height:1.6;margin:0 0 10px">The model's chance each player scores: his share of the team's carries and targets, his own touchdown record and Onyx's implied team points. Green means the chance beats the Onyx price. Leans, not tracked picks.</p>
+    <div class="tbl"><table><thead><tr><th>Player</th><th class="r">Anytime TD</th><th class="r">First TD</th></tr></thead><tbody>
+    ${rows.map(r => `<tr><td><b>${esc(r.name)}</b> <span class="dim">${esc(r.matchup || r.team)}</span></td>
+      ${cell(r.any, r.any_price, r.any_sel, r.any_edge, r.name + ' anytime TD')}${cell(r.first, r.first_price, r.first_sel, r.first_edge, r.name + ' first TD')}</tr>`).join('')}
+    </tbody></table></div>`;
 }
 function recordBlock(R) {
   if (!R || !(R.w + R.l + R.p + R.pending)) return '';
@@ -1740,12 +1755,12 @@ function renderPlays() {
   const lanePass = (M.engine || {}).lane;
   const pickHtml = M.status === 'live' ? `<div class="sec-hdr"><span class="sec-title">Today's plays</span><span class="sec-count">${picks.length}</span></div>
     ${picks.length ? playCards(picks) : '<div class="empty">No play clears the bar on this slate. A quiet slate is the screens working.</div>'}`
-    : lanePass ? `<div class="sec-hdr"><span class="sec-title">Projected plays · what the lane would play</span><span class="sec-count">${proj.length}</span></div>
-    <p class="dim" style="font-size:12px;line-height:1.6;margin:0 0 10px">The model's strongest leans on this slate, through the same screen a tracked pick uses (${esc(lanePass.markets.join(', '))}, ${(lanePass.edge[0] * 100).toFixed(0)} to ${(lanePass.edge[1] * 100).toFixed(0)}pp of edge, ${fmtOdds(lanePass.price[0])} to ${fmtOdds(lanePass.price[1])}). That screen has not beaten Onyx's prices in the backtest yet, so these are not tracked or graded.</p>
-    ${proj.length ? playCards(proj) : '<div class="empty">Nothing clears the screen on this slate.</div>'}` : '';
+    : `<div class="sec-hdr"><span class="sec-title">Today's plays · spreads, totals and props</span><span class="sec-count">${proj.length}</span></div>
+    <p class="dim" style="font-size:12px;line-height:1.6;margin:0 0 10px">Where the model's chance beats Onyx's price by a point or more, best value first, two per game at most. Confidence is the model's chance the play wins. Leans while the ${esc(C.name)} model is still in the lab: not tracked or graded until it beats Onyx's prices in a backtest.</p>
+    ${proj.length ? playCards(proj) : '<div class="empty">No line on this slate beats the Onyx price by a point. A quiet slate is the screens working.</div>'}`;
   const rows = M.rows || [];
   const gameRows = rows.filter(r => r.kind), propRows = rows.filter(r => !r.kind);
-  let body = '';
+  let body = (M.td || []).length ? tdTable(M.td.slice(0, 60), 'Touchdown scorers · anytime and first TD') : '';
   if (gameRows.length) body += `<div class="sec-hdr"><span class="sec-title">Model vs Onyx · ${M.status === 'live' ? 'every game' : 'leans, not picks, not graded'}</span><span class="sec-count">${gameRows.length}</span></div>${gameLeanTable(gameRows.slice(0, 150))}`;
   if (propRows.length) {
     const mk = [...new Set(propRows.map(r => r.mkt))];

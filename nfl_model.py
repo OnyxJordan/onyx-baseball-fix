@@ -1,8 +1,24 @@
 """
 nfl_model.py - Onyx NFL player projections.
 
-VERSION v1 (10/26). The lab notebook: every change bumps VERSION and adds an
+VERSION v2 (10/29). The lab notebook: every change bumps VERSION and adds an
 entry here citing its evidence (CLAUDE.md rule 2 applies to this model too).
+
+  v2  10/29  Touchdown scorers: anytime and first TD chances per player.
+             Expected team TDs = c x Onyx implied team points / 7 (implied =
+             (total -/+ spread) / 2). A player's share of them blends his
+             opportunity share (rushes and targets over the team's, last 8
+             games, rush weight .8, target weight 1.0) with his own TD share
+             pulled toward that opportunity share (k = 4 team TDs), weight .3.
+             Anytime = 1 - exp(-lambda). First TD = (1 - .055) x his lambda /
+             all listed players' lambda in the game (5.5% of 2025 first TDs
+             were defense, returns or unlisted players). Tuned on 2025
+             (4,241 player-games), judged on 2026 (1,423): anytime log loss
+             0.4819 vs 0.5819 for the player's own TD rate and 0.5302 flat;
+             calibrated (predicted .150 actual .159, .369/.369, .539/.521).
+             First TD log score 2.823 vs 3.017 uniform over listed players
+             (78 games; predicted .044/.051, .105/.103). Not yet tested
+             against Onyx's TD prices: leans only.
 
   v1  10/26  Game lines: team offense and defense ratings in points from
              392 NFL finals (2025 and 2026, team_model.py), half-life 240
@@ -47,7 +63,7 @@ player-game: pass_yds, rush_yds, rec_yds, rec, tgt, att, rush_att...).
 
 from collections import defaultdict
 
-VERSION = "v1"
+VERSION = "v2"
 # game lines (team_model.py), tuned 10/26: see v1
 GAME_P = {"half_life": 240, "ridge": 5, "home": 2.0, "sd_margin": 13.5, "sd_total": 13.0, "min_games": 3}
 GAME_TEST = {"n": 199, "logloss": 0.648, "base_logloss": 0.698, "mae_total": 10.90, "base_mae_total": 11.71,
@@ -189,3 +205,44 @@ def tune(rows, season):
 def test(rows, season):
     """Out-of-sample: this season, weeks 3+, with the shipped parameters."""
     return _eval(rows, {season}, 3, P)
+
+
+# ── touchdown scorers (v2) ────────────────────────────────────────────
+TD_P = {"c": 0.8, "w_rush": 0.8, "w_tgt": 1.0, "w_hist": 0.3, "k": 4.0, "n_games": 8, "other": 0.055}
+
+
+def td_lambdas(rows, players, implied, p=TD_P):
+    """Expected TDs for each player tonight. rows: every player-game so far;
+    players: [(pid, team)] who suit up; implied: {team: Onyx implied points}."""
+    by_game = defaultdict(lambda: defaultdict(lambda: [0.0, 0.0]))   # gid -> team -> [opportunities, TDs]
+    for r in rows:
+        t = by_game[r["gid"]][r["team"]]
+        t[0] += (r.get("rush_att") or 0) + (r.get("tgt") or 0)
+        t[1] += (r.get("rush_td") or 0) + (r.get("rec_td") or 0)
+    hist = defaultdict(list)
+    for r in sorted(rows, key=lambda r: r["date"]):
+        hist[r["pid"]].append(r)
+    out = {}
+    for pid, team in players:
+        h = hist.get(pid, [])[-p["n_games"]:]
+        imp = implied.get(team)
+        if len(h) < 2 or not imp:
+            continue
+        opps = sum(by_game[x["gid"]][x["team"]][0] for x in h) or 1.0
+        tds_team = sum(by_game[x["gid"]][x["team"]][1] for x in h)
+        u = (p["w_rush"] * sum(x.get("rush_att") or 0 for x in h) + p["w_tgt"] * sum(x.get("tgt") or 0 for x in h)) / opps
+        own = sum((x.get("rush_td") or 0) + (x.get("rec_td") or 0) for x in h)
+        hs = (own + p["k"] * u) / (tds_team + p["k"])
+        out[pid] = p["c"] * imp / 7.0 * ((1 - p["w_hist"]) * u + p["w_hist"] * hs)
+    return out
+
+
+def td_probs(lams_by_game, p=TD_P):
+    """{gid: {pid: lambda}} -> {pid: (anytime, first)}."""
+    import math
+    out = {}
+    for gid, lams in lams_by_game.items():
+        z = sum(lams.values())
+        for pid, l in lams.items():
+            out[pid] = (1 - math.exp(-l), (1 - p["other"]) * l / z if z > 0 else 0.0)
+    return out
