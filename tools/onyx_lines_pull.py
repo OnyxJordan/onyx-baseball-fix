@@ -81,8 +81,12 @@ def main():
                 continue
             if not od.get("is_main"):
                 continue
-            if m in GAME:
+            if m in GAME or m.startswith(("1st_", "2nd_", "3rd_", "4th_")) or m == "team_total":
+                if m not in markets:
+                    continue
                 key = side if side in ("over", "under") else (who or od.get("name"))
+                if m.endswith("team_total") and who:      # two teams share over / under
+                    key = f"{who}|{side}"
                 if key:
                     o, c = od.get("olv") or {}, od.get("clv") or {}
                     game.setdefault(m, {})[key] = {"o": [o.get("points"), o.get("price")], "c": [c.get("points"), c.get("price")]}
