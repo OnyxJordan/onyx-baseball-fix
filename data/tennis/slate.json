@@ -5832,7 +5832,7 @@
      "id": "185660",
      "start": "2026-10-29T01:35Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Center",
@@ -5844,9 +5844,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        3,
+        1
        ],
-       "serve": false
+       "serve": true
       },
       {
        "name": "Alycia Parks",
@@ -5855,7 +5856,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        4
+        6,
+        3
        ],
        "serve": false
       }
@@ -5863,9 +5865,9 @@
     },
     {
      "id": "185678",
-     "start": "2026-10-29T02:30Z",
+     "start": "2026-10-29T03:00Z",
      "state": "pre",
-     "detail": "10/28 - 10:30 PM EDT",
+     "detail": "10/28 - 11:00 PM EDT",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Center",
@@ -10114,5 +10116,5 @@
    ]
   }
  ],
- "fetched": "2026-10-29T02:10:54+00:00"
+ "fetched": "2026-10-29T02:42:21+00:00"
 }
