@@ -14,7 +14,7 @@ says so instead of going blank.
 import json, re, sys
 from datetime import datetime, timezone
 
-from sports_common import Lane, SPORTS, nk
+from sports_common import Lane, SPORTS, game_day, nk
 import sports_lab as L
 
 ONYX_LEAGUE = {"nfl": "NFL", "cfb": "NCAAF", "nhl": "NHL"}
@@ -32,9 +32,9 @@ ROADMAP = {
     "tennis": ["Backtest the Elo ratings against real Onyx match prices before any pick",
                "Surface-specific ratings (hard, clay, grass)",
                "Total games and game spread from a serve and return point model"],
-    "golf": ["Onyx outrights, top 5, 10 and 20, and head-to-head matchups",
-             "Strokes-gained projections by course fit, tested against Onyx prices before any pick",
-             "Live round-by-round leaderboard with each player's Onyx price"],
+    "golf": ["Onyx does not price golf yet: when it does (outrights, top 10, matchups), the model is tested against those prices before any pick",
+             "Wind and rain from the forecast, if the weather test shows players who handle it better than their form",
+             "LPGA and DP World Tour fields, on the same strokes-gained engine"],
 }
 METHOD = {
     "football": "Scores, drives, down and distance, win probability and team stats come from ESPN's public feed, refreshed through the day and polled live on this page every 15 to 30 seconds.",
@@ -593,6 +593,48 @@ def tennis_players(lane, slate):
     return out
 
 
+def golf_block(lane, slate):
+    """Ratings for this week's PGA TOUR field; the page simulates the tournament from them."""
+    import golf_model as G
+    cfg = lane.cfg
+    base = lab_block("golf", cfg)
+    e = next((x for x in slate.get("events") or [] if x.get("tour") == "PGA"), None)
+    H = lane.load("history.json", None)
+    if not e or not H:
+        return base
+    course = (e.get("course") or {}).get("id")
+    players = G.field_ratings(H, e.get("board") or [], course, slate.get("date") or str(game_day()))
+    wins = G.wins_here(H, course) if course else None
+    base.update({
+        "status": "lab", "version": G.VERSION, "changelog": G.CHANGELOG, "tests": G.TESTS,
+        "title": "Strokes gained, simulated: how a golf read is built",
+        "note": ("Onyx does not price golf yet, so nothing here is a pick: these are the model's chances, "
+                 "tested against five seasons of PGA TOUR results. They become tracked picks only after they beat real Onyx prices."),
+        "method": [METHOD["golf"],
+                   "Every player gets a rating in strokes gained per round against the field, from every round he has played "
+                   "in the last four seasons (recent rounds count most), what he has done at this course before, and how his "
+                   "game fits what this course rewards. The page then plays the tournament 2,000 times, cut and all, from the "
+                   "first tee or from the live leaderboard, and counts how often each player wins, finishes top 5, 10 and 20, "
+                   "and makes the cut."],
+        "golf": {"event": e.get("id"), "course": e.get("course"), "cut": e.get("cut_n", 65),
+                 "sim": {"sr": G.P["sr"], "sp": G.P["sp"]}, "players": players, "wins": wins, "tour": G.tour_wins(H),
+                 "history_events": len(H.get("rows") or {})},
+        "engine": {"steps": [
+            {"t": "The rating: strokes gained per round vs the field", "rows": [
+                ["Form", "every round in four seasons, a round 240 days old counts half; new players start at -1.0"],
+                ["Course history", "what form missed by at this course before, shrunk hard (8 rounds of evidence) and added at a quarter"],
+                ["Course fit", "which games over-perform here: driving distance, accuracy, greens hit and putting, learned from past weeks at the course"],
+                ["Green type", "bermuda and paspalum vs bent and poa: tested, no signal, left out"]],
+             "note": "Form carries almost all of it. Course history and fit move a player a tenth of a stroke or two."},
+            {"t": "The simulation", "rows": [
+                ["Each round", "his rating plus noise: one round swings about 2.6 strokes either way for anyone"],
+                ["The cut", f"top {e.get('cut_n', 65)} and ties after 36 holes" if e.get("cut_n") else "no cut this week"],
+                ["Live", "from the current leaderboard: holes left in the round underway, then the rounds to come"]]}],
+            "factors": [], "lane": None},
+    })
+    return base
+
+
 def lab_block(key, cfg):
     return {"status": "lab", "version": None, "title": "What is live, and what the model will be",
             "note": (f"Onyx {cfg['name']} is live for scores, the gamecenter and Onyx prices as they post. The {cfg['name']} model "
@@ -620,6 +662,8 @@ def main():
         model = team_block(key, lane, slate, odds)
     elif key == "tennis":
         model = tennis_block(lane, slate, odds)
+    elif key == "golf":
+        model = golf_block(lane, slate)
     else:
         model = lab_block(key, cfg)
     page_cfg = {"name": cfg["name"], "full": cfg["full"], "kind": cfg["kind"], "espn": cfg["espn"],

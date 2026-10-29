@@ -131,6 +131,34 @@ def golf_events(paths):
     return events
 
 
+def golf_meta(lane, events):
+    """The golf model's inputs for this week's PGA TOUR event: its course and cut rule
+    (ESPN's core API), and any newly finished events appended to data/golf/history.json."""
+    import golf_model
+    for e in events:
+        if e.get("tour") != "PGA" or not e.get("id"):
+            continue
+        try:
+            meta = golf_model._get(golf_model.CORE.format(e["id"])) or {}
+            c = (meta.get("courses") or [None])[0] if len(meta.get("courses") or []) == 1 else None
+            t = golf_model._get(str(((meta.get("tournament") or {}).get("$ref") or "")).replace("http://", "https://")
+                                .replace(".pvt/", ".com/")) if meta.get("tournament") else None
+            e["course"] = {"id": str(c["id"]), "name": c.get("name"), "par": c.get("shotsToPar"), "yards": c.get("totalYards"),
+                           "where": ", ".join(x for x in ((c.get("address") or {}).get("city"), (c.get("address") or {}).get("state")
+                                                          or (c.get("address") or {}).get("country")) if x)} if c else None
+            e["signature"] = bool(meta.get("isSignature"))
+            e["cut_n"] = golf_model.cut_rule(e.get("name"), e["signature"], (t or {}).get("cutRound", 2))
+        except Exception as x:   # the leaderboard above is already saved
+            print(f"  golf meta: {str(x)[:160]}")
+        break
+    try:
+        _, n = golf_model.update(str(lane.data / "history.json"))
+        if n:
+            print(f"  golf history: +{n} events")
+    except Exception as x:
+        print(f"  golf history: {str(x)[:160]}")
+
+
 # ── NFL box scores (the model's input) ─────────────────────────────────────
 CATS = {
     "passing": {"completions/passingAttempts": ("cmp", "att"), "passingYards": "pass_yds", "passingTouchdowns": "pass_td",
@@ -245,6 +273,7 @@ def main():
     elif cfg["kind"] == "golf":
         slate["events"] = golf_events(cfg["espn"])
         slate["label"] = " · ".join(e["name"] for e in slate["events"][:2])
+        golf_meta(lane, slate["events"])
     lane.save("slate.json", slate, indent=1)
     try:
         import sports_history

@@ -444,8 +444,35 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
     from spreads fitted to real Onyx lines.
   - **Tennis (`tennis_model.py` v1):** Elo, K = 150/(n+5)^0.4. On 7,875 matches in
     2026 it never saw, log loss is 0.627 and the favourite won 64.0%.
-  - **Golf:** stays "model in the lab". Onyx prices no golf market, so there is
-    nothing to test a golf model against.
+  - **Golf (`golf_model.py`, golf-v1, 10/29):** stays "model in the lab" because Onyx
+    prices no golf market. `tools/onyx_golf_probe.py` (`odds_probe.yml`, `job=golf`)
+    scanned every PGA, LPGA and DP World Tour fixture this week and the 60 days before:
+    zero Onyx prices. The model is still built and tested against results:
+    - **Rating:** strokes gained per round vs the field. Form (every round in four
+      seasons, 240-day half-life, newcomers start at -1.0 with 4 rounds of evidence),
+      plus course history (his residuals at this course, shrunk by 8 rounds, x0.25),
+      plus course fit (ridge regression of residuals on his decayed stat profile:
+      driving distance, accuracy, greens hit, putts per GIR, learned per course, x0.5).
+    - **History:** `data/golf/history.json`, one row per player-event
+      `[pid, name, finish, [SG per round], [z dist, acc, gir, putt]]`, four years.
+      `sports_espn.py golf` appends each finished event (`golf_model.update`) and
+      stores this week's course and cut rule on the slate. Rebuild from ESPN with
+      `python3 golf_model.py data/golf/history.json 2023`.
+    - **Simulation (in the page, `gfSim`):** 2,000 tournaments; each round is the
+      rating plus N(0, 2.6) strokes, rounded to whole strokes so "top 65 and ties"
+      cuts exactly (50 at the Masters and signature events, 60 US Open, 70 PGA and
+      The Open, none when ESPN's `cutRound` is 0). Live, each player keeps his
+      strokes and plays only the holes he has left.
+    - **Backtest (walk-forward, 222 stroke-play events 2022-26, tuned 2023-24,
+      scored 2025-26):** round error 3.17 (field average) to 2.79 (form) to 2.78
+      (+ history) to 2.76 (+ fit); head to head 58.8% over 133k pairs; calibrated
+      finishing chances (top 10 13.6% predicted, 12.3% happened; make the cut 59%
+      to 61%, 81% to 81%). History and fit barely move the finishing chances.
+    - **Tested and left out:** green type (bermuda / paspalum vs bent / poa, 63
+      courses tagged where the grass is certain): no signal. Wind is being tested
+      against Open-Meteo's archive; it goes in only if it beats form.
+    - **Pipeline:** pure Python (`requests` only; the course-fit solve is a 4x4
+      Gaussian elimination). Replaying all history takes about half a second.
 - **Backtests (`tools/sports_backtest.py`, dev only):**
   - **Data:** historical Onyx opening and closing lines come from
     `tools/onyx_lines_pull.py` (`odds_probe.yml`, `job=lines`) into `bt/`.
