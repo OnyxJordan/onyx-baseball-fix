@@ -236,6 +236,22 @@ Before reporting "the record on the site is wrong," apply the filter first.
 Grading conventions: never-appeared = void (`"void"`/`"dnp"`), client checks are strict
 `=== true / === false` so void strings are record-safe.
 
+**Closing a season (10/29, after the 2026 World Series, Brewers in five).** The record
+moves, it is never deleted. `python3 tools/mlb_season_close.py 2026 "The Brewers won the
+World Series."`:
+- copies the four MLB ledgers byte for byte to `data/archive/mlb_2026/`;
+- freezes `mlb-2026.html`, today's page with the final grades injected (the offseason
+  build stops at "no games today - leaving index.html untouched", so Game 5's grades would
+  otherwise never reach the page);
+- empties the four live ledgers and the live page's record globals, and puts a note atop
+  the Record pane (in `index.html` and `shell.html`) linking the frozen page.
+
+`validate_build.py` allows a ledger to shrink only when every row it held at HEAD is in a
+`data/archive/*/` copy (a warning, not a failure); any other shrink still blocks the build.
+Final 2026 as displayed: Top 5 Plays 58-241 (-19.4% ROI; the 5 "pending" are voids the
+record tab has always counted that way). Next season, the live record starts at 0-0 on
+Opening Day.
+
 ## Injected globals: the TDZ rule, precisely
 
 `auto_build.py` injects 12 globals via `replace_const()`; `update_stats.py` injects

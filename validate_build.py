@@ -200,6 +200,22 @@ def _git_json(path):
         return None
 
 
+def _archived(name, rows):
+    """A season close moves a ledger, it does not drop it: True when every row the
+    ledger held at HEAD sits in one of the season archives (data/archive/*/)."""
+    base = name.split("/")[-1] + ".json"
+    for a in sorted((DATA / "archive").glob("*/" + base)):
+        try:
+            kept = json.loads(a.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        if isinstance(kept, list):
+            seen = {json.dumps(r, sort_keys=True) for r in kept}
+            if all(json.dumps(r, sort_keys=True) in seen for r in rows):
+                return True
+    return False
+
+
 def check_ledgers():
     """The graded record grows; it never shrinks. Hard rule 6, enforced."""
     for name in LEDGERS:
@@ -220,6 +236,10 @@ def check_ledgers():
             continue
 
         keep = LEDGER_RETENTION_DAYS.get(name)
+        if len(now) < len(was) and _archived(name, was):
+            warn(f"data/{name}.json {len(was)} -> {len(now)} rows: season closed, every "
+                 f"row is in data/archive/ (tools/mlb_season_close.py)")
+            continue
         if keep is None:
             if len(now) < len(was):
                 fail(f"data/{name}.json SHRANK {len(was)} -> {len(now)} rows. "
