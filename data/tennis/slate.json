@@ -5831,8 +5831,8 @@
     {
      "id": "185660",
      "start": "2026-10-29T01:35Z",
-     "state": "pre",
-     "detail": "10/28 - 9:35 PM EDT",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Center",
@@ -5843,7 +5843,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/aus.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        2
+       ],
        "serve": false
       },
       {
@@ -5852,7 +5854,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        4
+       ],
        "serve": false
       }
      ]
@@ -9727,8 +9731,8 @@
     {
      "id": "185806",
      "start": "2026-10-29T01:20Z",
-     "state": "in",
-     "detail": "1st",
+     "state": "post",
+     "detail": "Suspended",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Estadio Mexcovery",
@@ -9740,6 +9744,7 @@
        "seed": null,
        "win": false,
        "sets": [
+        0,
         0
        ],
        "serve": false
@@ -9751,9 +9756,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        3
+        6,
+        1
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -10108,5 +10114,5 @@
    ]
   }
  ],
- "fetched": "2026-10-29T01:37:56+00:00"
+ "fetched": "2026-10-29T02:10:54+00:00"
 }
