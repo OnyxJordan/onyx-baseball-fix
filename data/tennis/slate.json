@@ -2540,9 +2540,9 @@
     },
     {
      "id": "185147",
-     "start": "2026-10-29T11:00Z",
-     "state": "pre",
-     "detail": "10/29 - 7:00 AM EDT",
+     "start": "2026-10-29T11:10Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 2",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -2553,7 +2553,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        1
+       ],
        "serve": false
       },
       {
@@ -2562,7 +2564,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/mon.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        0
+       ],
        "serve": false
       }
      ]
@@ -4324,8 +4328,8 @@
     {
      "id": "185722",
      "start": "2026-10-29T07:15Z",
-     "state": "in",
-     "detail": "3rd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -4335,13 +4339,13 @@
        "short": "X. Sun",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/chn.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
         4,
-        1
+        7
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Maria Timofeeva",
@@ -4352,7 +4356,7 @@
        "sets": [
         3,
         6,
-        2
+        6
        ],
        "serve": false
       }
@@ -4360,9 +4364,9 @@
     },
     {
      "id": "185727",
-     "start": "2026-10-29T09:30Z",
-     "state": "pre",
-     "detail": "10/29 - 5:30 AM EDT",
+     "start": "2026-10-29T10:15Z",
+     "state": "in",
+     "detail": "2nd",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -4373,8 +4377,11 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        7,
+        0
+       ],
+       "serve": true
       },
       {
        "name": "Anna Bondar",
@@ -4382,16 +4389,19 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/hun.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        5,
+        0
+       ],
        "serve": false
       }
      ]
     },
     {
      "id": "185719",
-     "start": "2026-10-29T11:00Z",
+     "start": "2026-10-29T11:30Z",
      "state": "pre",
-     "detail": "10/29 - 7:00 AM EDT",
+     "detail": "10/29 - 7:30 AM EDT",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -4522,9 +4532,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Xinran Sun",
+       "short": "X. Sun",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/chn.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -5952,8 +5962,8 @@
     {
      "id": "185676",
      "start": "2026-10-29T08:05Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Center",
@@ -5975,10 +5985,10 @@
        "short": "E. Rybakina",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/kaz.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        5
+        6
        ],
        "serve": false
       }
@@ -6061,9 +6071,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Elena Rybakina",
+       "short": "E. Rybakina",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/kaz.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -10150,5 +10160,5 @@
    ]
   }
  ],
- "fetched": "2026-10-29T09:14:15+00:00"
+ "fetched": "2026-10-29T11:15:48+00:00"
 }
