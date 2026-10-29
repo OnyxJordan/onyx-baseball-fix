@@ -9690,8 +9690,8 @@
     {
      "id": "185808",
      "start": "2026-10-28T23:05Z",
-     "state": "in",
-     "detail": "3rd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Estadio Mexcovery",
@@ -9701,11 +9701,11 @@
        "short": "E. Mandlik",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         2,
         6,
-        2
+        6
        ],
        "serve": false
       },
@@ -9718,7 +9718,7 @@
        "sets": [
         6,
         0,
-        2
+        4
        ],
        "serve": false
       }
@@ -9726,9 +9726,9 @@
     },
     {
      "id": "185806",
-     "start": "2026-10-29T01:00Z",
+     "start": "2026-10-29T01:15Z",
      "state": "pre",
-     "detail": "10/28 - 9:00 PM EDT",
+     "detail": "10/28 - 9:15 PM EDT",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Estadio Mexcovery",
@@ -9995,9 +9995,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Elizabeth Mandlik",
+       "short": "E. Mandlik",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -10104,5 +10104,5 @@
    ]
   }
  ],
- "fetched": "2026-10-29T00:42:40+00:00"
+ "fetched": "2026-10-29T01:14:05+00:00"
 }
