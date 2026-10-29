@@ -1754,10 +1754,10 @@ body::after {
 .gm:hover,.gm.sel{border-color:rgba(176,56,249,.6);box-shadow:0 14px 34px -18px rgba(176,56,249,.65)}.gm:hover{transform:translateY(-2px)}
 /* Onyx odds board: one row per side, Spread / Total / Money columns, every sport */
 .gm-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:6px}
-.gm.odds .gm-row{grid-template-columns:minmax(0,1fr) auto repeat(3,var(--ocw));column-gap:5px}
+.gm.odds .gm-row,.gm-board .gm-row{grid-template-columns:minmax(0,1fr) auto repeat(3,var(--ocw));column-gap:5px}
 .gm-row.lose{opacity:.55}
 .gm-id{display:flex;align-items:center;gap:9px;min-width:0}
-.gm-nm{min-width:0}.gm-nm b{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;font-size:15px;line-height:1.15;hyphens:auto;-webkit-hyphens:auto}
+.gm-nm{min-width:0}.gm-nm b{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;font-size:15px;line-height:1.15;hyphens:manual;-webkit-hyphens:manual;word-break:keep-all;overflow-wrap:normal}
 .gm.odds .gm-nm b{font-size:14px}
 .gm-nm>span{display:block;font:500 10px monospace;color:var(--text3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .gm-nm .rk{display:inline;font:700 10px monospace;color:#d795ff;margin:0 4px 0 0}
@@ -1779,8 +1779,8 @@ body::after {
 .gm-row .sv{display:inline-block;width:7px;height:7px;border-radius:50%;background:#61e970;box-shadow:0 0 6px #61e970;margin-left:6px;vertical-align:1px}
 .gm-board{--ocw:72px;display:flex;flex-direction:column;gap:6px}
 .gm-nm .nm-s{display:none}
-@media (max-width:440px){.gm .lg.m{width:24px;height:24px}.gm-id{gap:7px}.gm-nm .nm-f{display:none}.gm-nm .nm-s{display:inline}}
-@media (max-width:380px){.gm{--ocw:56px;padding:11px 11px 9px}.oc b{font-size:13px}.gm-nm b{font-size:14px}}
+@media (max-width:440px){.gm{--ocw:54px;padding:11px 11px 9px}.gm.odds .gm-row,.gm-board .gm-row{column-gap:4px}.oc b{font-size:13px}.oc i{font-size:9px}.gm .lg.m{width:22px;height:22px}.gm-id{gap:6px}.gm-nm .nm-f{display:none}.gm-nm .nm-s{display:inline}}
+@media (max-width:380px){.gm{--ocw:52px;padding:11px 10px 9px}.oc b{font-size:13px}.gm-nm b{font-size:14px}}
 .gm-top{display:flex;justify-content:space-between;align-items:center;gap:8px;font:700 11px monospace;color:var(--text3);text-transform:uppercase;letter-spacing:.05em}
 .gm-top>span:first-child{flex-shrink:0}.gm-top>span:last-child{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .gm-top .live{color:#61e970}.gm-top .live::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:#61e970;margin-right:6px;animation:oxBlink 1.4s infinite}
@@ -1796,6 +1796,18 @@ body::after {
 .gc-mid{text-align:center}.gc-mid .sc{font:800 34px monospace;letter-spacing:.02em}
 .gc-mid .st{font:700 11px monospace;color:var(--text3);text-transform:uppercase}
 .gc-mid .st.live{color:#61e970}
+.gc-nav{position:relative;z-index:30;display:flex;align-items:center;gap:8px;margin:-16px -16px 12px;padding:10px 12px;border-radius:18px 18px 0 0;
+  background:rgba(17,14,20,.92);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2)}
+.gc-back{flex-shrink:0;display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:999px;border:1px solid rgba(176,56,249,.5);background:linear-gradient(135deg,rgba(176,56,249,.25),rgba(99,91,255,.18));color:#fff;font:700 12px 'Space Grotesk',system-ui,sans-serif;cursor:pointer}
+.gc-back:hover{border-color:#b038f9}
+#gcFloat{position:fixed;left:0;right:0;top:0;z-index:950;padding:calc(env(safe-area-inset-top) + 6px) 12px 6px;transform:translateY(-110%);transition:transform .2s;pointer-events:none}
+#gcFloat.on{transform:none;pointer-events:auto}
+#gcFloat .gc-nav{margin:0 auto;max-width:1148px;border-radius:16px;border:1px solid var(--border2);box-shadow:0 12px 30px -12px rgba(0,0,0,.8)}
+.gc-strip{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;min-width:0;flex:1;-webkit-mask-image:linear-gradient(90deg,#000 88%,transparent)}.gc-strip::-webkit-scrollbar{display:none}
+.gc-strip button{flex-shrink:0;display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:10px;border:1px solid var(--border2);background:rgba(255,255,255,.04);color:var(--text2);font:700 11px monospace;cursor:pointer;white-space:nowrap}
+.gc-strip button.on{border-color:#b038f9;color:#fff;background:rgba(176,56,249,.18)}
+.gc-strip button .lv{width:6px;height:6px;border-radius:50%;background:#61e970;box-shadow:0 0 6px #61e970}
+.gc-strip button em{font-style:normal;color:var(--text3);font-weight:600}
 .gc-sec{margin-top:16px}.gc-sec h4{margin:0 0 8px;font:800 11px monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--text3)}
 .field{position:relative;height:96px;border-radius:12px;overflow:hidden;background:repeating-linear-gradient(90deg,#123d22 0 10%,#14462a 10% 20%);border:1px solid rgba(97,233,112,.25)}
 .field .ez{position:absolute;top:0;bottom:0;width:8%;display:flex;align-items:center;justify-content:center;font:800 10px monospace;color:rgba(255,255,255,.75);writing-mode:vertical-rl;text-orientation:mixed;letter-spacing:.2em}
@@ -1887,6 +1899,34 @@ body::after {
 .mc-form b{display:block;font:800 10px monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--text3)}
 .mc-form .r{font:800 11px monospace}.mc-form .r.w{color:#61e970}.mc-form .r.l{color:#f87171}
 .tn-m.sel{border-color:#b038f9}
+.tc-wrap{max-width:720px;margin:12px auto 0;border-radius:16px;overflow:hidden;box-shadow:0 18px 40px -22px rgba(176,56,249,.7)}
+.tc{display:block;width:100%;height:auto}
+.tc-nm{font:800 22px 'Space Grotesk',system-ui,sans-serif;fill:#fff;paint-order:stroke;stroke:rgba(0,0,0,.35);stroke-width:4px}
+.tc-tag{font:800 12px monospace;letter-spacing:.18em;fill:#61e970}
+.tc-sf{font:700 11px monospace;letter-spacing:.16em;fill:rgba(255,255,255,.6)}
+.tc-ball{animation:tcToss 1.8s ease-in-out infinite}
+@keyframes tcToss{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+@media (prefers-reduced-motion:reduce){.tc-ball{animation:none}}
+.tn-sit{margin-top:10px;padding:9px 12px;border-radius:12px;border:1px solid var(--border2);background:rgba(255,255,255,.04);font:800 12px monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--text2);text-align:center}
+.tn-sit.hot{border-color:rgba(176,56,249,.6);background:linear-gradient(135deg,rgba(176,56,249,.28),rgba(99,91,255,.18));color:#fff;box-shadow:0 0 24px -8px rgba(176,56,249,.8)}
+.tn-wp{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center}
+.tn-wp b{display:block;font-size:13px}.tn-wp span{font:800 22px monospace}.tn-wp .r{text-align:right}
+.tn-wpbar{height:10px;border-radius:999px;background:rgba(155,150,255,.25);overflow:hidden}.tn-wpbar i{display:block;height:100%;background:linear-gradient(90deg,#635bff,#b038f9);border-radius:999px;transition:width .6s}
+.tc-chart{display:block;width:100%;height:150px;margin-top:10px;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:12px}
+.tc-ax{font:700 10px monospace;fill:rgba(255,255,255,.55)}
+.tn-kp{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin-top:10px}
+.tn-kp>div{background:var(--bg3);border:1px solid var(--border2);border-radius:12px;padding:9px 11px}
+.tn-kp span{display:block;font:700 9px monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)}.tn-kp b{font:800 14px monospace}.tn-kp em{font-style:normal;color:#d795ff;font-size:11px;margin-left:4px}
+.tn-sets-t{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}
+.tn-sets-t>div{background:var(--bg3);border:1px solid var(--border2);border-radius:12px;padding:9px 11px}
+.tn-sets-t span{display:block;font:700 9px monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)}.tn-sets-t b{font:800 18px monospace}.tn-sets-t sup{font-size:9px;color:#d795ff;margin-left:2px}
+.tn-sets-t em{display:block;font-style:normal;font:600 11px monospace;color:var(--text2);margin-top:2px}
+.tn-ch{font-style:normal;color:#d795ff;font-weight:800}
+.tn-log{display:flex;flex-direction:column;gap:4px}
+.tn-log>div{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:7px 10px;border-radius:10px;background:var(--bg3);border:1px solid var(--border);font-size:13px}
+.tn-log>div span{font:700 11px monospace;color:var(--text3)}
+.tn-log>div.brk{border-color:rgba(176,56,249,.55);background:linear-gradient(135deg,rgba(176,56,249,.2),rgba(99,91,255,.1))}
+.tn-log>div.gap{justify-content:center;font:600 11px monospace;color:var(--text3)}
 .gf-tbl{min-width:0!important}.gf-tbl td,.gf-tbl th{padding:8px 6px}
 .gf-hd{display:grid;grid-template-columns:26px minmax(0,1fr) auto;gap:10px;align-items:center;margin-bottom:10px}
 .gf-hd img{width:24px;height:16px;object-fit:cover;border-radius:2px}.gf-hd b{display:block;font-size:18px}.gf-hd span{font:600 11px monospace;color:var(--text3)}
@@ -2025,7 +2065,7 @@ body::after {
 
 <script>
 // Injected by sports_build.py. `var`, read before any other script line (CLAUDE.md rule 5).
-var SD = /*SPORT_DATA*/{"sport":"nhl","cfg":{"name":"NHL","full":"Onyx NHL","kind":"hockey","espn":["hockey/nhl"],"espn_q":"","tone":"blue","art":"hockey","onyx_league":"NHL"},"date":"2026-10-28","label":"Wed Oct 28","season":null,"games":[{"gid":"401892596","start":"2026-10-28T23:30Z","state":"in","status":"STATUS_END_PERIOD","detail":"End of 2nd","name":"PHI @ WSH","away":"PHI","home":"WSH","away_name":"Philadelphia Flyers","home_name":"Washington Capitals","away_short":"Flyers","home_short":"Capitals","away_loc":"Philadelphia","home_loc":"Washington","away_logo":"https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/phi.png","home_logo":"https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/wsh.png","away_color":"fe5823","home_color":"d71830","away_rec":"3-7-4","home_rec":"6-4-0","away_rank":null,"home_rank":null,"away_score":"1","home_score":"3","venue":"Capital One Arena","neutral":false,"tv":"TNT, truTV, NBC Sports Phil +","week":null},{"gid":"401892597","start":"2026-10-29T00:30Z","state":"in","status":"STATUS_IN_PROGRESS","detail":"3:51 - 1st","name":"CGY @ EDM","away":"CGY","home":"EDM","away_name":"Calgary Flames","home_name":"Edmonton Oilers","away_short":"Flames","home_short":"Oilers","away_loc":"Calgary","home_loc":"Edmonton","away_logo":"https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/cgy.png","home_logo":"https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/edm.png","away_color":"dd1a32","home_color":"00205b","away_rec":"5-6-0","home_rec":"8-2-2","away_rank":null,"home_rank":null,"away_score":"0","home_score":"1","venue":"Rogers Place","neutral":false,"tv":"ESPN+","week":null},{"gid":"401892598","start":"2026-10-29T01:00Z","state":"in","status":"STATUS_IN_PROGRESS","detail":"16:57 - 1st","name":"NJ @ COL","away":"NJ","home":"COL","away_name":"New Jersey Devils","home_name":"Colorado Avalanche","away_short":"Devils","home_short":"Avalanche","away_loc":"New Jersey","home_loc":"Colorado","away_logo":"https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/nj.png","home_logo":"https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/col.png","away_color":"e30b2b","home_color":"860038","away_rec":"8-4-0","home_rec":"6-5-1","away_rank":null,"home_rank":null,"away_score":"0","home_score":"0","venue":"Ball Arena","neutral":false,"tv":"ESPN+, MSGSN, Altitude Sports","week":null},{"gid":"401892599","start":"2026-10-29T02:00Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/28 - 10:00 PM EDT","name":"TOR @ SEA","away":"TOR","home":"SEA","away_name":"Toronto Maple Leafs","home_name":"Seattle Kraken","away_short":"Maple Leafs","home_short":"Kraken","away_loc":"Toronto","home_loc":"Seattle","away_logo":"https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/tor.png","home_logo":"https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/sea.png","away_color":"003e7e","home_color":"000d33","away_rec":"7-5-2","home_rec":"7-4-1","away_rank":null,"home_rank":null,"away_score":"0","home_score":"0","venue":"Climate Pledge Arena","neutral":false,"tv":"ESPN+, KONG, KING 5, KHN, Prime Video (L","week":null}],"events":[],"odds":{"date":"2026-10-28","fetched":"2026-10-29T01:14:04+00:00","book":"onyx_odds","games":{"401892599":{"total":6.5,"under_price":100,"under_sel":"96ec3bfa-5936-4764-a186-d5edca354794","home_ml":110,"home_ml_sel":"c3edf62e-cb9f-413e-8018-aa13eb38f095","home_spread":1.5,"home_spread_price":-218,"home_spread_sel":"8811bae4-686c-41ff-8adf-b85dd413b0cf","away_ml":-130,"away_ml_sel":"f7681ec1-a2e5-4442-964c-1eba0c9fd949","over_price":-120,"over_sel":"435ccd76-031a-47ae-b2aa-936d28e57dfc","away_spread":-1.5,"away_spread_price":180,"away_spread_sel":"aa57a152-7038-4a57-8afa-18b6ba6ef645"}},"props":[{"name":"Bobby McMann","mkt":"assists","line":0.5,"gid":"401892599","over":225,"under":-310,"over_sel":"7c7b1079-0b07-4c29-9729-3fb08b6077c4","under_sel":"83df2b8a-cf5f-4ae4-b7ae-4b4b91a0e7ab"},{"name":"Gavin McKenna","mkt":"points","line":0.5,"gid":"401892599","over":-135,"under":null,"over_sel":"206fb293-04c9-4ff2-987b-dd681238ba14"},{"name":"Kaapo Kakko","mkt":"assists","line":0.5,"gid":"401892599","over":175,"under":-240,"under_sel":"8bd590c8-7945-40ac-b728-941ed397c153","over_sel":"70208fec-fe01-4e00-a7c0-fddcfa17fc89"},{"name":"Nicholas Paul","mkt":"points","line":0.5,"gid":"401892599","over":140,"under":-190,"under_sel":"341b0b56-fb94-4258-952a-43dedf6d93b5","over_sel":"40ccbc28-1def-4e8c-bab8-8f6dd183e661"},{"name":"Mackie Samoskevich","mkt":"points","line":0.5,"gid":"401892599","over":130,"under":-175,"over_sel":"d91e818a-8ccf-46e4-89ca-083d4a4d64c7","under_sel":"df1d8918-29e2-4b19-a98d-a6d7b95173e0"},{"name":"Chandler Stephenson","mkt":"assists","line":0.5,"gid":"401892599","over":150,"under":-205,"under_sel":"87c12dcd-7b44-4552-a1dd-6291d7b72ef7","over_sel":"b7d4eb5e-bb24-40c3-81d7-bf8720582ec5"},{"name":"Brandon Montour","mkt":"points","line":0.5,"gid":"401892599","over":110,"under":-145,"over_sel":"4b44d25a-e309-443f-92e6-c7db083c5898","under_sel":"d0a0ffb0-869f-42f5-b6ba-b1cd631079db"},{"name":"Jordan Eberle","mkt":"assists","line":0.5,"gid":"401892599","over":165,"under":-225,"over_sel":"294cb9e1-e0a5-42aa-a985-35de0ab66ec3","under_sel":"959ccd66-79c8-4732-b74c-6cde32d027ef"},{"name":"Gavin McKenna","mkt":"assists","line":0.5,"gid":"401892599","over":145,"under":-200,"under_sel":"f7474cae-1b74-44eb-baa3-4c4d8c53287d","over_sel":"3b68922d-a60b-4ab8-96f6-871b7edec12e"},{"name":"William Nylander","mkt":"assists","line":0.5,"gid":"401892599","over":-120,"under":-115,"under_sel":"ec77f98c-2dfd-407c-b31d-6cd87fead271","over_sel":"1b612981-db28-4973-965e-f98a73b5db94"},{"name":"Bobby McMann","mkt":"points","line":0.5,"gid":"401892599","over":-125,"under":-105,"under_sel":"6b595c6a-8a80-4655-9639-b939e8ce4951","over_sel":"fd0d25e1-11e1-4aaf-86fe-4e5052977d1e"},{"name":"Chandler Stephenson","mkt":"points","line":0.5,"gid":"401892599","over":-110,"under":-120,"under_sel":"30dce4fa-52c1-4c79-a629-1c9cc75d6198","over_sel":"f66c61e4-5019-4090-84d6-e94db41ddaf4"},{"name":"Easton Cowan","mkt":"assists","line":0.5,"gid":"401892599","over":165,"under":-220,"under_sel":"4e30a5b5-2fdb-4f94-bd28-5a2075093370","over_sel":"0efe60c1-8d93-452a-b605-ccbcfa3b31f7"},{"name":"Kaapo Kakko","mkt":"points","line":0.5,"gid":"401892599","over":-105,"under":-130,"over_sel":"8a202def-823e-43d6-93e1-6f14fc980702","under_sel":"1dae4087-ae39-4cc6-b32a-150b6a6dec6c"},{"name":"Vince Dunn","mkt":"points","line":0.5,"gid":"401892599","over":-110,"under":-125,"under_sel":"90151e74-9a5b-4a7d-8ff1-13c5ffab01c6","over_sel":"2cbfd8d5-33a4-4a9f-91c6-da95b35d01d7"},{"name":"Auston Matthews","mkt":"assists","line":0.5,"gid":"401892599","over":-110,"under":-120,"under_sel":"d939192f-278a-4f36-bd2b-6335daebc348","over_sel":"b05b5ffb-fada-4069-9013-c164be083e9b"},{"name":"Easton Cowan","mkt":"points","line":0.5,"gid":"401892599","over":-130,"under":-105,"under_sel":"876a1314-0782-45ba-a598-65c6378e575c","over_sel":"54ec6650-3fd4-423e-9ae0-f6488ab445a1"},{"name":"Nicholas Paul","mkt":"assists","line":0.5,"gid":"401892599","over":275,"under":-390,"under_sel":"75225919-970e-4fa5-a85d-b2d6a88dfe51","over_sel":"b1aa98ac-8118-44f6-83f1-a72c717c9dae"},{"name":"Berkly Catton","mkt":"assists","line":0.5,"gid":"401892599","over":215,"under":-295,"under_sel":"5e0de6c1-6764-416e-a9e5-7ecb46f2c35c","over_sel":"eaf83437-2e2e-4ae5-89f5-3433deae4737"},{"name":"Auston Matthews","mkt":"points","line":1.5,"gid":"401892599","over":155,"under":-210,"under_sel":"8386a5c4-3821-4d07-af4e-94abff65ea4e","over_sel":"ef6e7977-8e78-433f-ba45-43e5082f6698"},{"name":"Mackie Samoskevich","mkt":"assists","line":0.5,"gid":"401892599","over":235,"under":-330,"under_sel":"3209077a-0c47-435d-8e62-83f3fc869b4b","over_sel":"4a06e354-f799-491c-b156-7d0e5c68c54b"},{"name":"Jack Roslovic","mkt":"assists","line":0.5,"gid":"401892599","over":160,"under":-220,"over_sel":"35357de6-42cd-4681-b39b-40223dc53867","under_sel":"da3181dd-8be0-4de4-b6d6-f3824a78d002"},{"name":"Darren Raddysh","mkt":"assists","line":0.5,"gid":"401892599","over":115,"under":-150,"over_sel":"a58d3104-c7a6-4ecf-b51c-09e21494eb2e","under_sel":"7ac281f2-fca6-4845-aaa9-ba1aef23acb2"},{"name":"Jordan Eberle","mkt":"points","line":0.5,"gid":"401892599","over":-130,"under":-105,"over_sel":"373c6a87-1d2e-491d-86f9-3d7b4559a9d9","under_sel":"8d4cd780-3581-4bcb-aead-a308fc8643fc"},{"name":"Brandon Montour","mkt":"assists","line":0.5,"gid":"401892599","over":150,"under":-205,"over_sel":"95726a30-0b5f-4c43-a148-614d76ccbf9b","under_sel":"3362c278-d0e2-44e8-aa25-79adc23c3bb1"},{"name":"Berkly Catton","mkt":"points","line":0.5,"gid":"401892599","over":120,"under":-165,"over_sel":"033c350d-fd21-475f-ace1-b2bea110064e","under_sel":"ec36a423-c005-4945-a5a4-026809a92f33"},{"name":"William Nylander","mkt":"points","line":1.5,"gid":"401892599","over":170,"under":-235,"under_sel":"2bead965-e2f4-4bee-a73a-690197b16be5","over_sel":"9da2e4cb-d8f2-4b9f-81c5-c3fa2d8254a2"},{"name":"Vince Dunn","mkt":"assists","line":0.5,"gid":"401892599","over":125,"under":-165,"under_sel":"555f4472-9cf5-4c36-995b-9ade96e7e315","over_sel":"82936ffc-9302-4c7d-8303-b7cf2f2b5d20"},{"name":"Jack Roslovic","mkt":"points","line":0.5,"gid":"401892599","over":-130,"under":-105,"under_sel":"3e94ec5f-e0e6-471d-b85e-1d36fedea273","over_sel":"d3c310dd-2d1c-4891-95cf-07bd8d6971e4"},{"name":"Morgan Rielly","mkt":"points","line":0.5,"gid":"401892599","over":160,"under":-215,"under_sel":"5e0cf8c8-a0d8-4c2c-919c-dbf310cea9d5","over_sel":"7bae6c06-c4fd-4575-9c23-25f04f58bf05"},{"name":"Matty Beniers","mkt":"assists","line":0.5,"gid":"401892599","over":165,"under":-220,"under_sel":"98648deb-d0b6-4a0e-9419-155c1a72934d","over_sel":"50f7a680-f536-4616-bf24-bf5fd5ff215a"},{"name":"Morgan Rielly","mkt":"assists","line":0.5,"gid":"401892599","over":215,"under":-295,"under_sel":"b2abed55-39c8-4bca-a38d-bee4fe1fd0c1","over_sel":"9f66503e-aa5d-4241-bf17-5a884e7e009e"},{"name":"Matty Beniers","mkt":"points","line":0.5,"gid":"401892599","over":-120,"under":-110,"over_sel":"48104304-7f45-45d4-98b7-c1652ccc27d0","under_sel":"6ade2ed0-5c45-40ff-921f-19a3ac853d61"},{"name":"Darren Raddysh","mkt":"points","line":0.5,"gid":"401892599","over":-130,"under":-105,"under_sel":"f8626fc3-2a62-4938-a58b-ec81fba317f7","over_sel":"4b58d476-2054-4cd1-8f7f-c5e999a62be7"}],"matches":{}},"model":{"status":"lab","version":"v1","title":"Team ratings against every Onyx game line","note":"Every team carries an offense and a defense rating in goals, fitted on every final this season and last, recent games weighing more. Each Onyx moneyline, spread and total is priced from them and blended with the Onyx market. Tracked picks switch on only after the ratings beat real Onyx prices in a backtest.","method":["Scores, periods, goals and team stats come from ESPN's public feed, polled live on this page every 15 to 30 seconds.","Ratings: goals scored = league average + home edge + the team's offense - the opponent's defense, fitted by weighted least squares with a pull toward average so a team with three games is not rated off three games.","Hockey prices: each side's goals are Poisson; a regulation tie goes to overtime. The blend gives the model 50% and the Onyx market the rest; edge is the blended chance minus the price's implied chance."],"tests":[{"k":"Win log loss","v":"0.678","d":"vs 0.690 home base rate · 909 games from 1/15/2026 on"},{"k":"Total error (goals)","v":"1.83","d":"vs 1.84 league average"}],"backtest":{"passed":false,"version":"v1","run":"2026-10-26","title":"Team ratings against real Onyx game lines","summary":["Every game priced only from results before it, against Onyx's real opening and closing lines. The rule was chosen on games before 2026-01-15 and judged on 2026-01-15 on, which it never saw.","The model's weight in the blend is 50%.","Not passed: the lane lost money at opening prices; the lane lost money at closing prices. Leans only until it does."],"stats":[{"k":"Moneyline log loss","v":"0.6649","d":"vs Onyx 0.6582 · model alone 0.6763 · 694 lines"},{"k":"Spread log loss","v":"0.6327","d":"vs Onyx 0.6295 · model alone 0.6458 · 696 lines"},{"k":"Total log loss","v":"0.6887","d":"vs Onyx 0.6865 · model alone 0.6924 · 670 lines"},{"k":"Lane at opening prices","v":"5-33","d":"ROI -62.9% · claimed 39.8% vs hit 13.2%"},{"k":"Lane at closing prices","v":"8-38","d":"ROI -46.7%"}]},"changelog":["v1 10/26 Ratings from 1,671 NHL finals since 10/2025 (ESPN), half-life 45 days, ridge 40, home edge 0.2 goals, a regulation tie goes to the home side 52% of the time. Tuned on 10/20/2025-1/14/2026, judged on 909 later games it never saw: win log loss 0.678 against 0.690 for the home-team base rate; total goals error 1.83 against 1.84 for the league average (totals barely beat a constant). A heavier ridge (80, 160) fit the tuning window better and the test window worse, so it was not taken. Leans only until the Onyx price backtest passes."],"roadmap":["Backtest the team ratings against a season of real Onyx moneylines, puck lines and totals before any pick","Goalie confirmations: the starter moves an NHL price more than anything else","Skater point and assist projections from time on ice, for the player lines Onyx prices"],"rows":[{"gid":"401892599","start":"2026-10-29T02:00Z","matchup":"TOR @ SEA","kind":"spread","mkt":"spread","price":-218,"sel":"8811bae4-686c-41ff-8adf-b85dd413b0cf","prob":0.6994,"implied":0.6855,"edge":0.0139,"ev":0.0203,"model_p":0.7414,"fair":0.6575,"detail":"model TOR 3.2 SEA 3.4","name":"SEA","side":"over","line":-1.5,"line_txt":"+1.5","team_side":"home"},{"gid":"401892599","start":"2026-10-29T02:00Z","matchup":"TOR @ SEA","kind":"ml","mkt":"ml","price":110,"sel":"c3edf62e-cb9f-413e-8018-aa13eb38f095","prob":0.4898,"implied":0.4762,"edge":0.0136,"ev":0.0286,"model_p":0.5224,"fair":0.4573,"detail":"model TOR 3.2 SEA 3.4","name":"SEA","side":"over","line":0.0,"line_txt":"","team_side":"home"},{"gid":"401892599","start":"2026-10-29T02:00Z","matchup":"TOR @ SEA","kind":"total","mkt":"total","price":-120,"sel":"435ccd76-031a-47ae-b2aa-936d28e57dfc","prob":0.53,"implied":0.5455,"edge":-0.0155,"ev":-0.0284,"model_p":0.5382,"fair":0.5217,"detail":"model TOR 3.2 SEA 3.4 · total 6.6","name":"Total","side":"over","line":6.5}],"picks":[],"record":null,"top":[],"proj":{"401892599":{"home":3.36,"away":3.24,"home_win":0.5224,"unit":"goals"}},"engine":{"steps":[{"t":"1 · Team ratings","rows":[["Built from","every final this season and last (909 games held out to test it)"],["Recency","a game 45 days old counts half as much as tonight's (half-life)"],["Pull to average","each rating starts with 40 games' worth of league average, so a hot start is not a rating"],["Home edge","0.2 goals to the home side, none at a neutral site"],["Needs","3 games for both teams before a line is priced"]]},{"t":"2 · From ratings to a price","rows":[["Goals","each side's goals are Poisson around its expected goals"],["Overtime","a regulation tie goes to the home side 52% of the time"],["Puck line, total","read off the same goal distribution, overtime included"]]},{"t":"3 · Against the Onyx price","bars":[["Onyx market",50],["Onyx model",50]],"note":"The model's chance is blended with the Onyx market; edge is the blended chance minus the chance the listed price implies. The backtest gave the model and the market an even say."}],"factors":[["chart","Offense and defense","Every team carries two ratings in goals: what it scores above average and what it allows. Tonight's projection is league average plus the home edge plus one side's offense minus the other's defense.","Foundation",""],["clock","Recency","Half-life 45 days: rosters and form move, so last month counts more than last season. The summer break decays last season on its own.","Tuned","purple"],["shield","Pull to average","Ridge 40: ratings are shrunk toward average until a team has earned it, which is what stops a 3-game sample from looking elite.","Tuned","blue"],["scale","Market blend","50% model, 50% Onyx market. Chosen by the backtest against real Onyx prices.","Market","blue"],["eye","Totals","Total error 1.83 goals vs 1.84 for the league average on games the ratings never saw.","Tested",""],["bell","Goalies next","The starting goalie moves an NHL price more than anything else. Confirmations are not in the model yet, which is part of why it stays in the lab.","Planned",""]],"lane":{"markets":["moneyline"],"edge":[0.05,0.15],"price":[-250,250],"per_slate":6,"w":0.5,"passed":false,"live":false}},"projected":[]},"generated":"2026-10-29T01:14:05+00:00"}/*END_SPORT_DATA*/;
+var SD = /*SPORT_DATA*/{"sport":"nhl","cfg":{"name":"NHL","full":"Onyx NHL","kind":"hockey","espn":["hockey/nhl"],"espn_q":"","tone":"blue","art":"hockey","onyx_league":"NHL"},"date":"2026-10-28","label":"Wed Oct 28","season":null,"games":[{"gid":"401892596","start":"2026-10-28T23:30Z","state":"in","status":"STATUS_IN_PROGRESS","detail":"14:44 - 3rd","name":"PHI @ WSH","away":"PHI","home":"WSH","away_name":"Philadelphia Flyers","home_name":"Washington Capitals","away_short":"Flyers","home_short":"Capitals","away_loc":"Philadelphia","home_loc":"Washington","away_logo":"https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/phi.png","home_logo":"https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/wsh.png","away_color":"fe5823","home_color":"d71830","away_rec":"3-7-4","home_rec":"6-4-0","away_rank":null,"home_rank":null,"away_score":"1","home_score":"3","venue":"Capital One Arena","neutral":false,"tv":"TNT, truTV, NBC Sports Phil +","week":null},{"gid":"401892597","start":"2026-10-29T00:30Z","state":"in","status":"STATUS_IN_PROGRESS","detail":"20:00 - 2nd","name":"CGY @ EDM","away":"CGY","home":"EDM","away_name":"Calgary Flames","home_name":"Edmonton Oilers","away_short":"Flames","home_short":"Oilers","away_loc":"Calgary","home_loc":"Edmonton","away_logo":"https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/cgy.png","home_logo":"https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/edm.png","away_color":"dd1a32","home_color":"00205b","away_rec":"5-6-0","home_rec":"8-2-2","away_rank":null,"home_rank":null,"away_score":"0","home_score":"1","venue":"Rogers Place","neutral":false,"tv":"ESPN+","week":null},{"gid":"401892598","start":"2026-10-29T01:00Z","state":"in","status":"STATUS_IN_PROGRESS","detail":"4:35 - 1st","name":"NJ @ COL","away":"NJ","home":"COL","away_name":"New Jersey Devils","home_name":"Colorado Avalanche","away_short":"Devils","home_short":"Avalanche","away_loc":"New Jersey","home_loc":"Colorado","away_logo":"https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/nj.png","home_logo":"https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/col.png","away_color":"e30b2b","home_color":"860038","away_rec":"8-4-0","home_rec":"6-5-1","away_rank":null,"home_rank":null,"away_score":"1","home_score":"0","venue":"Ball Arena","neutral":false,"tv":"ESPN+, MSGSN, Altitude Sports","week":null},{"gid":"401892599","start":"2026-10-29T02:00Z","state":"pre","status":"STATUS_SCHEDULED","detail":"10/28 - 10:00 PM EDT","name":"TOR @ SEA","away":"TOR","home":"SEA","away_name":"Toronto Maple Leafs","home_name":"Seattle Kraken","away_short":"Maple Leafs","home_short":"Kraken","away_loc":"Toronto","home_loc":"Seattle","away_logo":"https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/tor.png","home_logo":"https://a.espncdn.com/i/teamlogos/nhl/500/scoreboard/sea.png","away_color":"003e7e","home_color":"000d33","away_rec":"7-5-2","home_rec":"7-4-1","away_rank":null,"home_rank":null,"away_score":"0","home_score":"0","venue":"Climate Pledge Arena","neutral":false,"tv":"ESPN+, KONG, KING 5, KHN, Prime Video (L","week":null}],"events":[],"odds":{"date":"2026-10-28","fetched":"2026-10-29T01:37:55+00:00","book":"onyx_odds","games":{"401892599":{"away_spread":-1.5,"away_spread_price":180,"away_spread_sel":"aa57a152-7038-4a57-8afa-18b6ba6ef645","total":6.5,"over_price":-120,"over_sel":"435ccd76-031a-47ae-b2aa-936d28e57dfc","under_price":100,"under_sel":"96ec3bfa-5936-4764-a186-d5edca354794","home_spread":1.5,"home_spread_price":-218,"home_spread_sel":"8811bae4-686c-41ff-8adf-b85dd413b0cf","away_ml":-130,"away_ml_sel":"f7681ec1-a2e5-4442-964c-1eba0c9fd949","home_ml":110,"home_ml_sel":"c3edf62e-cb9f-413e-8018-aa13eb38f095"}},"props":[{"name":"Kaapo Kakko","mkt":"assists","line":0.5,"gid":"401892599","over":175,"under":-240,"over_sel":"70208fec-fe01-4e00-a7c0-fddcfa17fc89","under_sel":"8bd590c8-7945-40ac-b728-941ed397c153"},{"name":"Nicholas Paul","mkt":"points","line":0.5,"gid":"401892599","over":140,"under":-190,"over_sel":"40ccbc28-1def-4e8c-bab8-8f6dd183e661","under_sel":"341b0b56-fb94-4258-952a-43dedf6d93b5"},{"name":"Jack Roslovic","mkt":"assists","line":0.5,"gid":"401892599","over":160,"under":-220,"over_sel":"35357de6-42cd-4681-b39b-40223dc53867","under_sel":"da3181dd-8be0-4de4-b6d6-f3824a78d002"},{"name":"Bobby McMann","mkt":"assists","line":0.5,"gid":"401892599","over":225,"under":-310,"over_sel":"7c7b1079-0b07-4c29-9729-3fb08b6077c4","under_sel":"83df2b8a-cf5f-4ae4-b7ae-4b4b91a0e7ab"},{"name":"Bobby McMann","mkt":"points","line":0.5,"gid":"401892599","over":-125,"under":-105,"over_sel":"fd0d25e1-11e1-4aaf-86fe-4e5052977d1e","under_sel":"6b595c6a-8a80-4655-9639-b939e8ce4951"},{"name":"Mackie Samoskevich","mkt":"assists","line":0.5,"gid":"401892599","over":235,"under":-330,"under_sel":"3209077a-0c47-435d-8e62-83f3fc869b4b","over_sel":"4a06e354-f799-491c-b156-7d0e5c68c54b"},{"name":"Berkly Catton","mkt":"assists","line":0.5,"gid":"401892599","over":215,"under":-295,"over_sel":"eaf83437-2e2e-4ae5-89f5-3433deae4737","under_sel":"5e0de6c1-6764-416e-a9e5-7ecb46f2c35c"},{"name":"Chandler Stephenson","mkt":"points","line":0.5,"gid":"401892599","over":-110,"under":-120,"under_sel":"30dce4fa-52c1-4c79-a629-1c9cc75d6198","over_sel":"f66c61e4-5019-4090-84d6-e94db41ddaf4"},{"name":"Brandon Montour","mkt":"points","line":0.5,"gid":"401892599","over":110,"under":-145,"over_sel":"4b44d25a-e309-443f-92e6-c7db083c5898","under_sel":"d0a0ffb0-869f-42f5-b6ba-b1cd631079db"},{"name":"Morgan Rielly","mkt":"points","line":0.5,"gid":"401892599","over":160,"under":-215,"over_sel":"7bae6c06-c4fd-4575-9c23-25f04f58bf05","under_sel":"5e0cf8c8-a0d8-4c2c-919c-dbf310cea9d5"},{"name":"Vince Dunn","mkt":"points","line":0.5,"gid":"401892599","over":-110,"under":-125,"over_sel":"2cbfd8d5-33a4-4a9f-91c6-da95b35d01d7","under_sel":"90151e74-9a5b-4a7d-8ff1-13c5ffab01c6"},{"name":"Jordan Eberle","mkt":"assists","line":0.5,"gid":"401892599","over":165,"under":-225,"under_sel":"959ccd66-79c8-4732-b74c-6cde32d027ef","over_sel":"294cb9e1-e0a5-42aa-a985-35de0ab66ec3"},{"name":"Easton Cowan","mkt":"points","line":0.5,"gid":"401892599","over":-130,"under":-105,"over_sel":"54ec6650-3fd4-423e-9ae0-f6488ab445a1","under_sel":"876a1314-0782-45ba-a598-65c6378e575c"},{"name":"William Nylander","mkt":"assists","line":0.5,"gid":"401892599","over":-120,"under":-115,"over_sel":"1b612981-db28-4973-965e-f98a73b5db94","under_sel":"ec77f98c-2dfd-407c-b31d-6cd87fead271"},{"name":"Kaapo Kakko","mkt":"points","line":0.5,"gid":"401892599","over":-105,"under":-130,"under_sel":"1dae4087-ae39-4cc6-b32a-150b6a6dec6c","over_sel":"8a202def-823e-43d6-93e1-6f14fc980702"},{"name":"Darren Raddysh","mkt":"assists","line":0.5,"gid":"401892599","over":115,"under":-150,"over_sel":"a58d3104-c7a6-4ecf-b51c-09e21494eb2e","under_sel":"7ac281f2-fca6-4845-aaa9-ba1aef23acb2"},{"name":"Jordan Eberle","mkt":"points","line":0.5,"gid":"401892599","over":-130,"under":-105,"under_sel":"8d4cd780-3581-4bcb-aead-a308fc8643fc","over_sel":"373c6a87-1d2e-491d-86f9-3d7b4559a9d9"},{"name":"Jack Roslovic","mkt":"points","line":0.5,"gid":"401892599","over":-130,"under":-105,"under_sel":"3e94ec5f-e0e6-471d-b85e-1d36fedea273","over_sel":"d3c310dd-2d1c-4891-95cf-07bd8d6971e4"},{"name":"Berkly Catton","mkt":"points","line":0.5,"gid":"401892599","over":120,"under":-165,"under_sel":"ec36a423-c005-4945-a5a4-026809a92f33","over_sel":"033c350d-fd21-475f-ace1-b2bea110064e"},{"name":"Matty Beniers","mkt":"assists","line":0.5,"gid":"401892599","over":165,"under":-220,"over_sel":"50f7a680-f536-4616-bf24-bf5fd5ff215a","under_sel":"98648deb-d0b6-4a0e-9419-155c1a72934d"},{"name":"Mackie Samoskevich","mkt":"points","line":0.5,"gid":"401892599","over":130,"under":-175,"over_sel":"d91e818a-8ccf-46e4-89ca-083d4a4d64c7","under_sel":"df1d8918-29e2-4b19-a98d-a6d7b95173e0"},{"name":"Vince Dunn","mkt":"assists","line":0.5,"gid":"401892599","over":125,"under":-165,"under_sel":"555f4472-9cf5-4c36-995b-9ade96e7e315","over_sel":"82936ffc-9302-4c7d-8303-b7cf2f2b5d20"},{"name":"Auston Matthews","mkt":"assists","line":0.5,"gid":"401892599","over":-110,"under":-120,"over_sel":"b05b5ffb-fada-4069-9013-c164be083e9b","under_sel":"d939192f-278a-4f36-bd2b-6335daebc348"},{"name":"Easton Cowan","mkt":"assists","line":0.5,"gid":"401892599","over":165,"under":-220,"over_sel":"0efe60c1-8d93-452a-b605-ccbcfa3b31f7","under_sel":"4e30a5b5-2fdb-4f94-bd28-5a2075093370"},{"name":"William Nylander","mkt":"points","line":1.5,"gid":"401892599","over":170,"under":-235,"over_sel":"9da2e4cb-d8f2-4b9f-81c5-c3fa2d8254a2","under_sel":"2bead965-e2f4-4bee-a73a-690197b16be5"},{"name":"Darren Raddysh","mkt":"points","line":0.5,"gid":"401892599","over":-130,"under":-105,"under_sel":"f8626fc3-2a62-4938-a58b-ec81fba317f7","over_sel":"4b58d476-2054-4cd1-8f7f-c5e999a62be7"},{"name":"Brandon Montour","mkt":"assists","line":0.5,"gid":"401892599","over":150,"under":-205,"under_sel":"3362c278-d0e2-44e8-aa25-79adc23c3bb1","over_sel":"95726a30-0b5f-4c43-a148-614d76ccbf9b"},{"name":"Nicholas Paul","mkt":"assists","line":0.5,"gid":"401892599","over":275,"under":-390,"under_sel":"75225919-970e-4fa5-a85d-b2d6a88dfe51","over_sel":"b1aa98ac-8118-44f6-83f1-a72c717c9dae"},{"name":"Gavin McKenna","mkt":"points","line":0.5,"gid":"401892599","over":-135,"under":null,"over_sel":"206fb293-04c9-4ff2-987b-dd681238ba14"},{"name":"Matty Beniers","mkt":"points","line":0.5,"gid":"401892599","over":-120,"under":-110,"over_sel":"48104304-7f45-45d4-98b7-c1652ccc27d0","under_sel":"6ade2ed0-5c45-40ff-921f-19a3ac853d61"},{"name":"Gavin McKenna","mkt":"assists","line":0.5,"gid":"401892599","over":145,"under":-200,"over_sel":"3b68922d-a60b-4ab8-96f6-871b7edec12e","under_sel":"f7474cae-1b74-44eb-baa3-4c4d8c53287d"},{"name":"Auston Matthews","mkt":"points","line":1.5,"gid":"401892599","over":155,"under":-210,"under_sel":"8386a5c4-3821-4d07-af4e-94abff65ea4e","over_sel":"ef6e7977-8e78-433f-ba45-43e5082f6698"},{"name":"Morgan Rielly","mkt":"assists","line":0.5,"gid":"401892599","over":215,"under":-295,"over_sel":"9f66503e-aa5d-4241-bf17-5a884e7e009e","under_sel":"b2abed55-39c8-4bca-a38d-bee4fe1fd0c1"},{"name":"Chandler Stephenson","mkt":"assists","line":0.5,"gid":"401892599","over":150,"under":-205,"under_sel":"87c12dcd-7b44-4552-a1dd-6291d7b72ef7","over_sel":"b7d4eb5e-bb24-40c3-81d7-bf8720582ec5"}],"matches":{}},"model":{"status":"lab","version":"v1","title":"Team ratings against every Onyx game line","note":"Every team carries an offense and a defense rating in goals, fitted on every final this season and last, recent games weighing more. Each Onyx moneyline, spread and total is priced from them and blended with the Onyx market. Tracked picks switch on only after the ratings beat real Onyx prices in a backtest.","method":["Scores, periods, goals and team stats come from ESPN's public feed, polled live on this page every 15 to 30 seconds.","Ratings: goals scored = league average + home edge + the team's offense - the opponent's defense, fitted by weighted least squares with a pull toward average so a team with three games is not rated off three games.","Hockey prices: each side's goals are Poisson; a regulation tie goes to overtime. The blend gives the model 50% and the Onyx market the rest; edge is the blended chance minus the price's implied chance."],"tests":[{"k":"Win log loss","v":"0.678","d":"vs 0.690 home base rate · 909 games from 1/15/2026 on"},{"k":"Total error (goals)","v":"1.83","d":"vs 1.84 league average"}],"backtest":{"passed":false,"version":"v1","run":"2026-10-26","title":"Team ratings against real Onyx game lines","summary":["Every game priced only from results before it, against Onyx's real opening and closing lines. The rule was chosen on games before 2026-01-15 and judged on 2026-01-15 on, which it never saw.","The model's weight in the blend is 50%.","Not passed: the lane lost money at opening prices; the lane lost money at closing prices. Leans only until it does."],"stats":[{"k":"Moneyline log loss","v":"0.6649","d":"vs Onyx 0.6582 · model alone 0.6763 · 694 lines"},{"k":"Spread log loss","v":"0.6327","d":"vs Onyx 0.6295 · model alone 0.6458 · 696 lines"},{"k":"Total log loss","v":"0.6887","d":"vs Onyx 0.6865 · model alone 0.6924 · 670 lines"},{"k":"Lane at opening prices","v":"5-33","d":"ROI -62.9% · claimed 39.8% vs hit 13.2%"},{"k":"Lane at closing prices","v":"8-38","d":"ROI -46.7%"}]},"changelog":["v1 10/26 Ratings from 1,671 NHL finals since 10/2025 (ESPN), half-life 45 days, ridge 40, home edge 0.2 goals, a regulation tie goes to the home side 52% of the time. Tuned on 10/20/2025-1/14/2026, judged on 909 later games it never saw: win log loss 0.678 against 0.690 for the home-team base rate; total goals error 1.83 against 1.84 for the league average (totals barely beat a constant). A heavier ridge (80, 160) fit the tuning window better and the test window worse, so it was not taken. Leans only until the Onyx price backtest passes."],"roadmap":["Backtest the team ratings against a season of real Onyx moneylines, puck lines and totals before any pick","Goalie confirmations: the starter moves an NHL price more than anything else","Skater point and assist projections from time on ice, for the player lines Onyx prices"],"rows":[{"gid":"401892599","start":"2026-10-29T02:00Z","matchup":"TOR @ SEA","kind":"spread","mkt":"spread","price":-218,"sel":"8811bae4-686c-41ff-8adf-b85dd413b0cf","prob":0.6994,"implied":0.6855,"edge":0.0139,"ev":0.0203,"model_p":0.7414,"fair":0.6575,"detail":"model TOR 3.2 SEA 3.4","name":"SEA","side":"over","line":-1.5,"line_txt":"+1.5","team_side":"home"},{"gid":"401892599","start":"2026-10-29T02:00Z","matchup":"TOR @ SEA","kind":"ml","mkt":"ml","price":110,"sel":"c3edf62e-cb9f-413e-8018-aa13eb38f095","prob":0.4898,"implied":0.4762,"edge":0.0136,"ev":0.0286,"model_p":0.5224,"fair":0.4573,"detail":"model TOR 3.2 SEA 3.4","name":"SEA","side":"over","line":0.0,"line_txt":"","team_side":"home"},{"gid":"401892599","start":"2026-10-29T02:00Z","matchup":"TOR @ SEA","kind":"total","mkt":"total","price":-120,"sel":"435ccd76-031a-47ae-b2aa-936d28e57dfc","prob":0.53,"implied":0.5455,"edge":-0.0155,"ev":-0.0284,"model_p":0.5382,"fair":0.5217,"detail":"model TOR 3.2 SEA 3.4 · total 6.6","name":"Total","side":"over","line":6.5}],"picks":[],"record":null,"top":[],"proj":{"401892599":{"home":3.36,"away":3.24,"home_win":0.5224,"unit":"goals"}},"engine":{"steps":[{"t":"1 · Team ratings","rows":[["Built from","every final this season and last (909 games held out to test it)"],["Recency","a game 45 days old counts half as much as tonight's (half-life)"],["Pull to average","each rating starts with 40 games' worth of league average, so a hot start is not a rating"],["Home edge","0.2 goals to the home side, none at a neutral site"],["Needs","3 games for both teams before a line is priced"]]},{"t":"2 · From ratings to a price","rows":[["Goals","each side's goals are Poisson around its expected goals"],["Overtime","a regulation tie goes to the home side 52% of the time"],["Puck line, total","read off the same goal distribution, overtime included"]]},{"t":"3 · Against the Onyx price","bars":[["Onyx market",50],["Onyx model",50]],"note":"The model's chance is blended with the Onyx market; edge is the blended chance minus the chance the listed price implies. The backtest gave the model and the market an even say."}],"factors":[["chart","Offense and defense","Every team carries two ratings in goals: what it scores above average and what it allows. Tonight's projection is league average plus the home edge plus one side's offense minus the other's defense.","Foundation",""],["clock","Recency","Half-life 45 days: rosters and form move, so last month counts more than last season. The summer break decays last season on its own.","Tuned","purple"],["shield","Pull to average","Ridge 40: ratings are shrunk toward average until a team has earned it, which is what stops a 3-game sample from looking elite.","Tuned","blue"],["scale","Market blend","50% model, 50% Onyx market. Chosen by the backtest against real Onyx prices.","Market","blue"],["eye","Totals","Total error 1.83 goals vs 1.84 for the league average on games the ratings never saw.","Tested",""],["bell","Goalies next","The starting goalie moves an NHL price more than anything else. Confirmations are not in the model yet, which is part of why it stays in the lab.","Planned",""]],"lane":{"markets":["moneyline"],"edge":[0.05,0.15],"price":[-250,250],"per_slate":6,"w":0.5,"passed":false,"live":false}},"projected":[]},"generated":"2026-10-29T01:37:56+00:00"}/*END_SPORT_DATA*/;
 var ONYX_REFERRER = 'KR680261';
 var GA_MEASUREMENT_ID = 'G-03T8V1N52E';
 var C = SD.cfg || {};
@@ -2184,7 +2224,7 @@ function gameCard(g0) {
 var GFILTER = 'all';
 function renderGames() {
   const el = document.getElementById('gamesBody');
-  if (KIND === 'tennis') { el.innerHTML = `<div id="ypGames">${yourPlayers()}</div><div id="gcBox">${OPEN_MATCH ? matchCenter(OPEN_MATCH) : ''}</div>` + tnAll(); return; }
+  if (KIND === 'tennis') { el.innerHTML = `<div id="ypGames">${yourPlayers()}</div><div id="gcBox">${OPEN_MATCH ? matchCenter(OPEN_MATCH) : ''}</div>` + tnAll(); gcFloatSync(); return; }
   if (KIND === 'golf') { el.innerHTML = `<div id="ypGames">${yourPlayers()}</div>` + gfAll(); return; }
   const games = (SD.games || []).map(live);
   const segs = [['all', 'All'], ['in', 'Live'], ['pre', 'Upcoming'], ['post', 'Final']];
@@ -2203,6 +2243,48 @@ function openGame(gid) {
   if (box) box.scrollIntoView({behavior: 'smooth', block: 'start'});
   track('gamecenter_open', {gid});
 }
+// gamecenter nav: back to the scoreboard, or straight to another game
+function gcBack() {
+  OPEN_GAME = null; OPEN_MATCH = null; renderGames(); gcFloatSync();
+  const el = document.querySelector('#gamesBody .sp-tabs-seg') || document.getElementById('gamesBody');
+  if (el) el.scrollIntoView({behavior: 'smooth', block: 'start'});
+}
+function gcNav(items, cur, back) {
+  return `<div class="gc-nav"><button class="gc-back" onclick="gcBack()">‹ ${esc(back)}</button><div class="gc-strip">${items.map(x =>
+    `<button class="${x.id === cur ? 'on' : ''}" onclick="${x.go}">${x.live ? '<i class="lv"></i>' : ''}${x.t}</button>`).join('')}</div></div>`;
+}
+// the shared stylesheet clips the body sideways, which breaks position:sticky, so a copy
+// of the bar pins to the top once the gamecenter's own bar scrolls away
+function gcFloatSync() {
+  let f = document.getElementById('gcFloat');
+  const n = document.querySelector('#gc > .gc-nav'), gc = document.getElementById('gc');
+  if (!n || !gc) { if (f) f.classList.remove('on'); return; }
+  if (!f) { f = document.createElement('div'); f.id = 'gcFloat'; document.body.appendChild(f); }
+  if (f.dataset.src !== n.innerHTML) { f.innerHTML = '<div class="gc-nav">' + n.innerHTML + '</div>'; f.dataset.src = n.innerHTML;
+    const on = f.querySelector('.gc-strip .on'); if (on) on.parentNode.scrollLeft = on.offsetLeft - 60; }
+  const r = n.getBoundingClientRect(), g = gc.getBoundingClientRect();
+  f.classList.toggle('on', r.bottom < 0 && g.bottom > 120);
+}
+addEventListener('scroll', gcFloatSync, {passive: true});
+// card names never split mid-word (iOS hyphenated "Sacramen-to"): a name whose longest
+// word is wider than its column steps its font down until it fits, never below 11px
+function fitNames(root) {
+  (root || document).querySelectorAll('.gm-nm b').forEach(b => {
+    if (!b.clientWidth) return;
+    b.style.fontSize = '';
+    let fs = parseFloat(getComputedStyle(b).fontSize);
+    while (b.scrollWidth > b.clientWidth + 1 && fs > 11) { fs -= 0.5; b.style.fontSize = fs + 'px'; }
+  });
+}
+var _fitRaf = 0;
+new MutationObserver(() => { cancelAnimationFrame(_fitRaf); _fitRaf = requestAnimationFrame(() => fitNames()); }).observe(document.documentElement, {childList: true, subtree: true});
+addEventListener('resize', () => { cancelAnimationFrame(_fitRaf); _fitRaf = requestAnimationFrame(() => fitNames()); });
+function gameNav(cur) {
+  const order = g => g.state === 'in' ? 0 : g.state === 'pre' ? 1 : 2;
+  const gs = (SD.games || []).map(live).sort((a, b) => order(a) - order(b) || String(a.start || '').localeCompare(String(b.start || '')));
+  return gcNav(gs.map(g => ({id: g.gid, live: g.state === 'in', go: `openGame('${esc(g.gid)}')`,
+    t: g.state === 'pre' ? `${esc(g.away)} @ ${esc(g.home)} <em>${esc(tipTime(g.start).replace(/ ET$/, ''))}</em>` : `${esc(g.away)} ${esc(g.away_score)}-${esc(g.home_score)} ${esc(g.home)}${g.state === 'post' ? ' <em>F</em>' : ''}`})), cur, 'Scoreboard');
+}
 var GC_CACHE = {};
 function drawGame(gid) {
   const box = document.getElementById('gcBox');
@@ -2214,11 +2296,13 @@ function drawGame(gid) {
     <div class="gc-side h"><div><b>${esc(g.home_name || g.home)}</b><span>${esc(g.home_rec || '')}</span></div>${lg(g.home_logo, 'l')}</div>
     ${g.state !== 'pre' ? `<div class="ssc a">${esc(g.away_score)}</div><div class="ssc h">${esc(g.home_score)}</div>` : ''}</div>`;
   const s = GC_CACHE[gid];
-  box.innerHTML = `<div class="gc" id="gc">${head}
+  box.innerHTML = `<div class="gc" id="gc">${gameNav(gid)}${head}
     ${gameBoard(g) ? `<div class="gc-sec"><h4>Onyx lines</h4>${gameBoard(g)}</div>` : ''}
     <div class="gc-sec" style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-primary" onclick="bet(null,'game ${esc(g.away)} @ ${esc(g.home)}')">⚡ Bet this game on Onyx</button>
       <button class="btn-secondary" onclick="OPEN_GAME=null;renderGames()">Close</button></div>
     <div id="gcDetail">${s ? gcDetail(s, g) : '<div class="empty">Loading the gamecenter…</div>'}</div></div>`;
+  const on = box.querySelector('.gc-strip .on'); if (on) on.parentNode.scrollLeft = on.offsetLeft - 60;
+  gcFloatSync();
   if (!s || (g.state === 'in' && !_gcTimer)) loadSummary(gid);
 }
 var _gcTimer = null;
@@ -2685,26 +2769,315 @@ function tnLines(m) {
 }
 function tnPlayer(name) { return ((SD.model || {}).players || {})[nk(name)] || null; }
 function tnLean(m) { return ((SD.model || {}).rows || []).find(r => r.gid === m.id) || null; }
+// ── tennis live math ──
+// ESPN's tour feed carries games per set and the server, never the point score, so the
+// match is modelled game by game: each player's chance of winning a point on serve is
+// calibrated so the pre-match win chance matches Onyx's moneyline (Elo when unpriced),
+// then holds, tiebreaks and sets follow exactly. Everything live (win chance, projected
+// total and spread, chance each line cashes) is that chain run from the current score.
+const TN_SLAM = /australian open|roland|french open|wimbledon|us open/i;
+function tnBestOf(e) { return e && e.tour === 'ATP' && TN_SLAM.test(e.name || '') ? 5 : 3; }
+function tnSurface(e) {
+  const n = String((e && e.name) || '');
+  if (/wimbledon|queen|halle|eastbourne|hertogenbosch|mallorca|berlin|bad homburg|nottingham|birmingham|newport/i.test(n)) return 'grass';
+  if (/roland|french open|madrid|rome|internazionali|monte|barcelona|hamburg|gstaad|kitzb|umag|bastad|estoril|munich|geneva|lyon|houston|marrakech|buenos|rio|santiago|bogota|charleston|parma|palermo|prague|rabat|strasbourg|cluj|lausanne|budapest/i.test(n)) return 'clay';
+  return 'hard';
+}
+function tnHold(p) { const q = 1 - p; return p ** 4 * (1 + 4 * q + 10 * q * q) + 20 * p ** 3 * q ** 3 * (p * p / (1 - 2 * p * q)); }
+function tnTB(a, b) {   // first server wins the tiebreak; a, b: each server's point-on-serve chance
+  const M = {};
+  const f = (x, y) => {
+    if (x >= 7 && x - y >= 2) return 1; if (y >= 7 && y - x >= 2) return 0;
+    if (x >= 6 && x === y) { const w = a * (1 - b), l = (1 - a) * b; return w / (w + l); }
+    const k = x * 20 + y; if (k in M) return M[k];
+    const pw = Math.floor((x + y + 1) / 2) % 2 === 0 ? a : 1 - b;
+    return (M[k] = pw * f(x + 1, y) + (1 - pw) * f(x, y + 1));
+  };
+  return f(0, 0);
+}
+// every way a set can finish from (a, b) with s serving: winner, set games, its game margin, next set's server
+function tnSet(a0, b0, s0, pt, H) {
+  const M = {}, tb = [tnTB(pt[0], pt[1]), tnTB(pt[1], pt[0])];
+  const f = (a, b, s) => {
+    const k = a * 100 + b * 10 + s; if (M[k]) return M[k];
+    let o;
+    if (((a >= 6 || b >= 6) && Math.abs(a - b) >= 2) || a === 7 || b === 7) o = {[(a > b ? 0 : 1) + '|' + (a + b) + '|' + (a - b) + '|' + s]: 1};
+    else if (a === 6 && b === 6) { const w0 = s === 0 ? tb[0] : 1 - tb[1]; o = {['0|13|1|' + (1 - s)]: w0, ['1|13|-1|' + (1 - s)]: 1 - w0}; }
+    else {
+      const h = H[s], A = s === 0 ? f(a + 1, b, 1) : f(a + 1, b, 0), B = s === 0 ? f(a, b + 1, 1) : f(a, b + 1, 0), pa = s === 0 ? h : 1 - h;
+      o = {}; for (const [kk, p] of Object.entries(A)) o[kk] = (o[kk] || 0) + pa * p; for (const [kk, p] of Object.entries(B)) o[kk] = (o[kk] || 0) + (1 - pa) * p;
+    }
+    return (M[k] = o);
+  };
+  return Object.entries(f(a0, b0, s0)).map(([k, p]) => { const [w, g, d, nx] = k.split('|').map(Number); return {w, g, d, nx, p}; });
+}
+// from sets (sa, sb) and games (ga, gb) with srv serving: P(player 0 wins) and the distribution of the rest of the match
+function tnRun(sa, sb, ga, gb, srv, pt, need) {
+  const H = [tnHold(pt[0]), tnHold(pt[1])], fresh = {};
+  const setD = (a, b, s) => (a || b) ? tnSet(a, b, s, pt, H) : (fresh[s] = fresh[s] || tnSet(0, 0, s, pt, H));
+  if (srv == null) {   // server unknown (before the first ball): average both
+    const r0 = tnRun(sa, sb, ga, gb, 0, pt, need), r1 = tnRun(sa, sb, ga, gb, 1, pt, need);
+    return {win: (r0.win + r1.win) / 2, dist: r0.dist.map(x => [x[0], x[1], x[2] / 2]).concat(r1.dist.map(x => [x[0], x[1], x[2] / 2]))};
+  }
+  // set by set, merging equal states (sets, server, games so far, margin) so best of five stays small
+  const res = {win: 0, dist: []}, end = {};
+  let cur = {[sa + '|' + sb + '|' + srv + '|0|0']: 1}, first = true;
+  while (Object.keys(cur).length) {
+    const nxt = {};
+    for (const [k, p] of Object.entries(cur)) {
+      const [x, y, s, g0, d0] = k.split('|').map(Number);
+      for (const o of setD(first ? ga : 0, first ? gb : 0, s)) {
+        const nx = x + (o.w === 0), ny = y + (o.w === 1), q = p * o.p, g = g0 + o.g, d = d0 + o.d;
+        if (nx === need || ny === need) { if (nx === need) res.win += q; const ek = g + '|' + d; end[ek] = (end[ek] || 0) + q; }
+        else { const k2 = nx + '|' + ny + '|' + o.nx + '|' + g + '|' + d; nxt[k2] = (nxt[k2] || 0) + q; }
+      }
+    }
+    cur = nxt; first = false;
+  }
+  res.dist = Object.entries(end).map(([k, p]) => { const [g, d] = k.split('|').map(Number); return [g, d, p]; });
+  return res;
+}
+// win chance only, from the start of a set (fast: used to calibrate)
+function tnWin(pt, need) {
+  const H = [tnHold(pt[0]), tnHold(pt[1])], T = [0, 1].map(s => {
+    const o = {}; tnSet(0, 0, s, pt, H).forEach(x => { const k = x.w + '|' + x.nx; o[k] = (o[k] || 0) + x.p; }); return o; });
+  const M = {};
+  const f = (x, y, s) => {
+    if (x === need) return 1; if (y === need) return 0;
+    const k = x * 100 + y * 10 + s; if (k in M) return M[k];
+    let v = 0; for (const [kk, p] of Object.entries(T[s])) { const [w, nx] = kk.split('|').map(Number); v += p * f(x + (w === 0), y + (w === 1), nx); }
+    return (M[k] = v);
+  };
+  return (f(0, 0, 0) + f(0, 0, 1)) / 2;
+}
+var TN_CAL = {};
+function tnPre(m) {   // pre-match chance player 0 wins: Onyx's moneyline, else Elo
+  const mo = ((SD.odds || {}).matches || {})[m.id];
+  const imp = o => o == null ? null : o > 0 ? 100 / (o + 100) : -o / (-o + 100);
+  if (mo && mo.ml0 != null && mo.ml1 != null) { const a = imp(mo.ml0), b = imp(mo.ml1); return {p: a / (a + b), src: 'Onyx price'}; }
+  const A = tnPlayer(m.p[0].name), B = tnPlayer(m.p[1].name);
+  if (A && B && A.elo && B.elo) return {p: 1 / (1 + 10 ** ((B.elo - A.elo) / 400)), src: 'Elo'};
+  return {p: 0.5, src: 'even'};
+}
+// Onyx prices both the winner and the game total, so the model is fitted to both: two form
+// scenarios (the favourite sharp, the favourite flat) around a tour serve baseline, weighted
+// evenly, with their gap set so the chance of the over matches Onyx's total price. One fixed
+// strength over-projects totals by 2-3 games (on 10/29's 30 priced matches the over came out
+// 60% against Onyx's 49%), because real matches are more lopsided than coin-flip points.
+function tnCal(e, m) {
+  if (TN_CAL[m.id]) return TN_CAL[m.id];
+  const pre = tnPre(m), need = Math.ceil(tnBestOf(e) / 2), base = e && e.tour === 'WTA' ? 0.56 : 0.64;
+  const mo = ((SD.odds || {}).matches || {})[m.id] || {};
+  const imp = o => o == null ? null : o > 0 ? 100 / (o + 100) : -o / (-o + 100);
+  const fit = sg => { let lo = -0.3, hi = 0.3;
+    for (let i = 0; i < 18; i++) { const d = (lo + hi) / 2; if ((tnWin([base + d + sg, base - d - sg], need) + tnWin([base + d - sg, base - d + sg], need)) / 2 < pre.p) lo = d; else hi = d; }
+    const d = (lo + hi) / 2; return [[base + d + sg, base - d - sg], [base + d - sg, base - d + sg]]; };
+  let sg = 0.025, src = 'tour default';
+  if (mo.total != null && mo.over != null && mo.under != null) {
+    const want = imp(mo.over) / (imp(mo.over) + imp(mo.under));
+    const pov = g => fit(g).reduce((a, pt) => a + tnRun(0, 0, 0, 0, null, pt, need).dist.reduce((x, q) => x + (q[0] > mo.total ? q[2] : 0), 0) / 2, 0);
+    let lo = 0, hi = 0.1;
+    if (pov(0) <= want) sg = 0; else { for (let i = 0; i < 9; i++) { const g = (lo + hi) / 2; if (pov(g) > want) lo = g; else hi = g; } sg = (lo + hi) / 2; }
+    src = 'Onyx total';
+  }
+  return (TN_CAL[m.id] = {sc: fit(sg), need, pre, sg, src});
+}
+// how likely a set score was under one scenario: a finished set (a, b), or reaching (a, b) mid-set
+function tnSetLik(a, b, fin, s0, pt) {
+  const H = [tnHold(pt[0]), tnHold(pt[1])];
+  const one = s => {
+    if (fin) return tnSet(0, 0, s, pt, H).reduce((x, o) => x + (o.g === a + b && o.d === a - b ? o.p : 0), 0);
+    const R = {'0|0': 1};
+    for (let n = 0; n < a + b; n++) for (let x = 0; x <= n; x++) { const y = n - x, p = R[x + '|' + y]; if (!p || x > a || y > b) continue;
+      if (((x >= 6 || y >= 6) && Math.abs(x - y) >= 2) || x === 7 || y === 7) continue;
+      const sv = n % 2 === 0 ? s : 1 - s, h = H[sv], pa = sv === 0 ? h : 1 - h;
+      R[(x + 1) + '|' + y] = (R[(x + 1) + '|' + y] || 0) + p * pa; R[x + '|' + (y + 1)] = (R[x + '|' + (y + 1)] || 0) + p * (1 - pa); }
+    return R[a + '|' + b] || 0;
+  };
+  return s0 == null ? (one(0) + one(1)) / 2 : one(s0);
+}
+// scenario weights after the sets seen so far (upto: how many sets count; partial: include the set in play)
+function tnPost(cal, st, upto, partial) {
+  let off = 0;
+  const w = cal.sc.map(pt => {
+    let L = 0.5; off = 0;
+    st.sets.forEach((x, j) => {
+      const s0 = st.srv == null ? null : ((st.G - off) % 2 === 0 ? st.srv : 1 - st.srv);
+      if (j < upto && x.fin) L *= tnSetLik(x.a, x.b, true, s0, pt);
+      else if (partial && !x.fin) L *= tnSetLik(x.a, x.b, false, s0, pt);
+      off += x.a + x.b;
+    });
+    return L;
+  });
+  const t = w[0] + w[1]; return t > 0 ? w.map(v => v / t) : [0.5, 0.5];
+}
+function tnMix(cal, st, w, sa, sb, ga, gb, srv) {
+  const out = {win: 0, dist: []};
+  cal.sc.forEach((pt, k) => { const r = tnRun(sa, sb, ga, gb, srv, pt, cal.need); out.win += w[k] * r.win; r.dist.forEach(d => out.dist.push([d[0], d[1], d[2] * w[k]])); });
+  return out;
+}
+// the score as the model reads it: sets, games, the server of every game, breaks per set
+function tnState(m) {
+  const S = m.p.map(x => x.sets.map(v => +v || 0)), n = Math.max(S[0].length, S[1].length);
+  const done = j => { const a = S[0][j] || 0, b = S[1][j] || 0; return ((a >= 6 || b >= 6) && Math.abs(a - b) >= 2) || a === 7 || b === 7 || (m.state === 'post' && j === n - 1); };
+  const G = S[0].reduce((x, y) => x + y, 0) + S[1].reduce((x, y) => x + y, 0);
+  const srv = m.state === 'in' ? m.p.findIndex(x => x.serve) : -1;
+  const serverOf = k => srv < 0 ? null : ((G - k) % 2 === 0 ? srv : 1 - srv);
+  const sets = []; let off = 0, sa = 0, sb = 0, base = 0, diff = 0;
+  for (let j = 0; j < n; j++) {
+    const a = S[0][j] || 0, b = S[1][j] || 0, fin = done(j), tb = fin && a + b === 13;
+    let served0 = null;
+    if (srv >= 0) { served0 = 0; for (let k = off; k < off + a + b - (tb ? 1 : 0); k++) if (serverOf(k) === 0) served0++; }
+    const net = served0 == null ? null : (a - (tb ? (a > b ? 1 : 0) : 0)) - served0;   // breaks won by 0 minus breaks won by 1
+    sets.push({a, b, fin, tb, net});
+    if (fin) { if (a > b) sa++; else sb++; base += a + b; diff += a - b; }
+    off += a + b;
+  }
+  const cur = sets.length && !sets[sets.length - 1].fin ? sets[sets.length - 1] : null;
+  return {sets, sa, sb, ga: cur ? cur.a : 0, gb: cur ? cur.b : 0, cur, srv: srv >= 0 ? srv : null, G, base, diff};
+}
+function tnLive(e, m) {
+  const cal = tnCal(e, m), st = tnState(m);
+  if (m.state === 'post') return {cal, st, w: [0.5, 0.5], win: m.p[0].win ? 1 : 0, dist: [[0, 0, 1]]};
+  const w = tnPost(cal, st, st.sets.length, true), r = tnMix(cal, st, w, st.sa, st.sb, st.ga, st.gb, st.srv);
+  return {cal, st, w, win: r.win, dist: r.dist.map(x => [st.base + x[0], st.diff + x[1], x[2]])};
+}
+function tnSituation(e, m, st, need) {
+  if (m.state !== 'in' || !st.cur) return '';
+  const last = i => String(m.p[i].name).split(' ').pop(), g = [st.ga, st.gb], sw = [st.sa, st.sb];
+  if (g[0] === 6 && g[1] === 6) return 'Tiebreak';
+  if (st.srv == null) return '';
+  const s = st.srv, r = 1 - s, setOrMatch = i => sw[i] === need - 1 ? 'match' : 'set';
+  if (g[s] >= 5 && g[s] > g[r]) return `${last(s)} serving for the ${setOrMatch(s)}`;
+  if (g[r] >= 5 && g[r] > g[s]) return `${last(s)} serving to stay in the ${setOrMatch(r)}`;
+  const net = st.cur.net;
+  if (net) return `${last(net > 0 ? 0 : 1)} up ${Math.abs(net) > 1 ? Math.abs(net) + ' breaks' : 'a break'}`;
+  return 'On serve';
+}
+// the court: surface by tournament, ends from the games played (players change ends after every odd game), the server with the ball
+function tnCourt(e, m, st) {
+  const surf = tnSurface(e), C2 = {hard: ['#2a1f4d', '#3b2a73'], clay: ['#7a3b22', '#a5512c'], grass: ['#1f4d2c', '#2f6b3c']}[surf];
+  const flip = Math.ceil(st.G / 2) % 2 === 1, left = flip ? 1 : 0, right = 1 - left;
+  const nm = i => esc(String(m.p[i].short || m.p[i].name)), live = m.state === 'in';
+  const srv = live ? st.srv : null, sx = srv == null ? null : (srv === left ? 64 : 716);
+  return `<div class="tc-wrap"><svg class="tc" viewBox="0 0 780 380" role="img" aria-label="Court">
+    <defs><radialGradient id="tcG" cx="50%" cy="50%" r="70%"><stop offset="0" stop-color="${C2[1]}"/><stop offset="1" stop-color="${C2[0]}"/></radialGradient>
+      <filter id="tcB"><feGaussianBlur stdDeviation="6"/></filter></defs>
+    <rect x="0" y="0" width="780" height="380" rx="18" fill="${C2[0]}"/>
+    <rect x="60" y="40" width="660" height="300" fill="url(#tcG)" stroke="rgba(255,255,255,.9)" stroke-width="3"/>
+    <g stroke="rgba(255,255,255,.9)" stroke-width="2.5" fill="none">
+      <line x1="60" y1="77.5" x2="720" y2="77.5"/><line x1="60" y1="302.5" x2="720" y2="302.5"/>
+      <line x1="238" y1="77.5" x2="238" y2="302.5"/><line x1="542" y1="77.5" x2="542" y2="302.5"/>
+      <line x1="238" y1="190" x2="542" y2="190"/><line x1="60" y1="190" x2="72" y2="190"/><line x1="708" y1="190" x2="720" y2="190"/></g>
+    <line x1="390" y1="28" x2="390" y2="352" stroke="#fff" stroke-width="4"/><line x1="390" y1="28" x2="390" y2="352" stroke="rgba(0,0,0,.35)" stroke-width="10" stroke-dasharray="2 4"/>
+    <text x="215" y="215" class="tc-nm" text-anchor="middle">${nm(left)}</text><text x="565" y="215" class="tc-nm" text-anchor="middle">${nm(right)}</text>
+    ${sx != null ? `<g class="tc-srv"><circle cx="${sx}" cy="${srv === left ? 230 : 150}" r="20" fill="rgba(176,56,249,.55)" filter="url(#tcB)"/>
+      <circle cx="${sx}" cy="${srv === left ? 230 : 150}" r="9" fill="#fff"/><circle class="tc-ball" cx="${sx + (srv === left ? 14 : -14)}" cy="${srv === left ? 212 : 132}" r="6" fill="#61e970"/></g>
+      <text x="${srv === left ? 215 : 565}" y="245" class="tc-tag" text-anchor="middle">SERVING</text>` : ''}
+    <text x="390" y="22" class="tc-sf" text-anchor="middle">${esc(surf.toUpperCase())}${e && e.name ? ' · ' + esc(String(e.name).toUpperCase()) : ''}</text>
+  </svg></div>`;
+}
+// observed this session (the feed has no history): every game seen change, with hold or break
+var TN_LOG = {};
+try { TN_LOG = JSON.parse(sessionStorage.getItem('ox_tn_log') || '{}') || {}; } catch (x) { TN_LOG = {}; }
+function tnLogSave() { try { sessionStorage.setItem('ox_tn_log', JSON.stringify(TN_LOG)); } catch (x) {} }
+function tnRecord(e, m, prev, mine) {
+  if (m.state !== 'in' && !(prev && prev.state === 'in')) return;
+  const L = TN_LOG[m.id] = TN_LOG[m.id] || {g: [], wp: []};
+  const g1 = tnGames(m), g0 = prev ? prev.sets.map(x => x.reduce((a, b) => a + (+b || 0), 0)) : null;
+  let changed = !L.wp.length;
+  if (g0 && g1[0] + g1[1] > g0[0] + g0[1]) {
+    changed = true;
+    if (g1[0] + g1[1] === g0[0] + g0[1] + 1) {
+      const w = g1[0] > g0[0] ? 0 : 1, s = prev.serve.indexOf(true);
+      L.g.push({w, s, brk: s >= 0 && s !== w, sc: m.p[0].sets.map((v, j) => v + '-' + (m.p[1].sets[j] ?? 0)).join(' '), t: Date.now()});
+    } else L.g.push({gap: g1[0] + g1[1] - g0[0] - g0[1], t: Date.now()});
+    if (L.g.length > 80) L.g = L.g.slice(-80);
+  }
+  if (changed || (prev && prev.state !== m.state)) {
+    if (!mine) { tnLogSave(); return; }
+    const r = tnLive(e, m);
+    L.wp.push([Date.now(), Math.round(r.win * 1000) / 10, g1[0] + g1[1]]);
+    if (L.wp.length > 120) L.wp = L.wp.slice(-120);
+    tnLogSave();
+  }
+}
+// win chance path: the pre-match price, the start of each set (from the set scores), then every game seen live
+function tnPath(e, m, live) {
+  const cal = live.cal, st = live.st, pts = [{x: 0, p: cal.pre.p, l: 'Start'}];
+  let sa = 0, sb = 0, g = 0;
+  st.sets.forEach((x, j) => {
+    if (!x.fin) return;
+    g += x.a + x.b; if (x.a > x.b) sa++; else sb++;
+    if (sa === cal.need || sb === cal.need) { pts.push({x: g, p: sa === cal.need ? 1 : 0, l: 'Final'}); return; }
+    const srvNext = st.srv == null ? null : ((st.G - g) % 2 === 0 ? st.srv : 1 - st.srv);
+    pts.push({x: g, p: tnMix(cal, st, tnPost(cal, st, j + 1, false), sa, sb, 0, 0, srvNext).win, l: 'Set ' + (j + 1)});
+  });
+  ((TN_LOG[m.id] || {}).wp || []).forEach(w => { if (w[2] > g) pts.push({x: w[2], p: w[1] / 100, l: ''}); });
+  if (m.state === 'in') pts.push({x: st.G, p: live.win, l: 'Now'});
+  const seen = {}; return pts.filter(q => { const k = q.x + ':' + q.l; if (seen[k] || (seen[q.x] && !q.l)) return false; seen[k] = seen[q.x] = 1; return true; }).sort((a, b) => a.x - b.x);
+}
+function tnChart(m, pts) {
+  if (pts.length < 2) return '';
+  const W = 640, Hh = 150, X = Math.max(1, pts[pts.length - 1].x), x = v => 30 + v / X * (W - 50), y = p => 12 + (1 - p) * (Hh - 30);
+  const path = pts.map((q, i) => (i ? 'L' : 'M') + x(q.x).toFixed(1) + ' ' + y(q.p).toFixed(1)).join(' ');
+  const area = path + ` L ${x(pts[pts.length - 1].x).toFixed(1)} ${y(0.5)} L ${x(0)} ${y(0.5)} Z`;
+  const last = String(m.p[0].name).split(' ').pop(), last1 = String(m.p[1].name).split(' ').pop();
+  return `<svg class="tc-chart" viewBox="0 0 ${W} ${Hh}" preserveAspectRatio="none">
+    <defs><linearGradient id="wpG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b038f9" stop-opacity=".45"/><stop offset="1" stop-color="#635bff" stop-opacity=".05"/></linearGradient></defs>
+    <line x1="30" x2="${W - 20}" y1="${y(0.5)}" y2="${y(0.5)}" stroke="rgba(255,255,255,.18)" stroke-dasharray="4 4"/>
+    <text x="4" y="${y(1) + 4}" class="tc-ax">${esc(last)}</text><text x="4" y="${y(0) + 4}" class="tc-ax">${esc(last1)}</text>
+    <path d="${area}" fill="url(#wpG)"/><path d="${path}" fill="none" stroke="#c77dff" stroke-width="2.5" stroke-linejoin="round"/>
+    ${pts.filter(q => q.l).map(q => `<circle cx="${x(q.x)}" cy="${y(q.p)}" r="${q.l === 'Now' ? 5 : 3.5}" fill="${q.l === 'Now' ? '#61e970' : '#fff'}"/><text x="${Math.min(W - 24, x(q.x) + 4)}" y="${Math.max(10, y(q.p) - 7)}" class="tc-ax">${esc(q.l)}</text>`).join('')}
+  </svg>`;
+}
 function matchCenter(id) {
   const [e, m] = tnFind(id); if (!m) return '';
-  const S = tnSetsWon(m);
+  const S = tnSetsWon(m), lv = tnLive(e, m), st = lv.st, cal = lv.cal;
+  const sit = tnSituation(e, m, st, cal.need);
   const row = (x, i) => { const P = tnPlayer(x.name);
     return `<div class="mc-p${x.win ? ' w' : ''}">${x.flag ? `<img src="${esc(x.flag)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">` : '<i></i>'}
       <div class="mc-nm"><b>${esc(x.name)}</b><span>${x.seed ? 'Seed ' + esc(x.seed) + ' · ' : ''}${P && P.elo ? 'Elo ' + P.elo : 'unrated'}</span></div>
       ${m.state === 'in' && x.serve ? '<i class="sv" title="Serving"></i>' : '<i></i>'}
       <div class="mc-sets">${x.sets.map((v, j) => `<span class="${(m.p[1 - i].sets[j] || 0) < v ? 'won' : ''}">${v}</span>`).join('')}</div>
       <div class="mc-sw">${m.state === 'pre' ? '' : S[i]}</div></div>`; };
-  const L = tnLines(m), lean = tnLean(m);
-  const form = x => { const P = tnPlayer(x.name); if (!P || !(P.form || []).length) return '';
-    return `<div class="mc-form"><b>${esc(x.name.split(' ').pop())} · last ${P.form.length}</b>${P.form.map(f => `<div><span class="r ${f.w ? 'w' : 'l'}">${f.w ? 'W' : 'L'} ${esc(f.s)}</span> ${esc(f.opp)} <span class="dim">${esc(f.ev || '')} · ${esc(f.d)}</span></div>`).join('')}</div>`; };
-  return `<div class="gc" id="gc"><div class="mc-top"><span>${esc(e.tour)} · ${esc(e.name)} · ${esc(m.round || '')}</span><span class="${m.state === 'in' ? 'live' : ''}">${m.state === 'in' ? '● ' + esc(m.detail || 'Live') : m.state === 'post' ? esc(m.detail || 'Final') : esc(tipTime(m.start))}</span></div>
+  const L = tnLines(m), lean = tnLean(m), mo = ((SD.odds || {}).matches || {})[m.id] || {};
+  // what each line's chance of cashing is now, from the same chain
+  const P = f => lv.dist.reduce((a, d) => a + (f(d) ? d[2] : 0), 0);
+  const chance = l => l.k === 'ml0' ? lv.win : l.k === 'ml1' ? 1 - lv.win : l.k === 'ov' ? P(d => d[0] > mo.total) : l.k === 'un' ? P(d => d[0] < mo.total)
+    : l.k === 'sp0' ? P(d => d[1] + mo.sp0 > 0) : l.k === 'sp1' ? P(d => -d[1] + mo.sp1 > 0) : null;
+  const expT = lv.dist.reduce((a, d) => a + d[0] * d[2], 0), expD = lv.dist.reduce((a, d) => a + d[1] * d[2], 0);
+  const last = i => String(m.p[i].name).split(' ').pop(), pc = v => Math.round(v * 100) + '%';
+  const others = (e ? e.matches : []).filter(x => x.state !== 'post' || x.id === m.id).slice(0, 30);
+  const nav = gcNav(others.map(x => ({id: x.id, live: x.state === 'in', go: `openMatch('${esc(x.id)}')`,
+    t: `${esc(String(x.p[0].short || x.p[0].name).split(' ').pop())} v ${esc(String(x.p[1].short || x.p[1].name).split(' ').pop())}${x.state === 'pre' ? ' <em>' + esc(tipTime(x.start).replace(/ ET$/, '')) + '</em>' : ''}`})), m.id, 'All matches');
+  const form = x => { const Pl = tnPlayer(x.name); if (!Pl || !(Pl.form || []).length) return '';
+    return `<div class="mc-form"><b>${esc(x.name.split(' ').pop())} · last ${Pl.form.length}</b>${Pl.form.map(f => `<div><span class="r ${f.w ? 'w' : 'l'}">${f.w ? 'W' : 'L'} ${esc(f.s)}</span> ${esc(f.opp)} <span class="dim">${esc(f.ev || '')} · ${esc(f.d || '')}</span></div>`).join('')}</div>`; };
+  const H = [0, 1].map(i => lv.w[0] * tnHold(cal.sc[0][i]) + lv.w[1] * tnHold(cal.sc[1][i]));
+  const log = ((TN_LOG[m.id] || {}).g || []).slice().reverse().slice(0, 14);
+  const setsTbl = st.sets.length ? `<div class="tn-sets-t">${st.sets.map((x, j) => `<div><span>Set ${j + 1}</span><b>${x.a}-${x.b}${x.tb ? '<sup>TB</sup>' : ''}</b><em>${x.net == null ? (x.fin ? (x.a > x.b ? last(0) : last(1)) : 'in play') : x.net === 0 ? (x.tb ? 'no breaks to TB' : 'on serve') : last(x.net > 0 ? 0 : 1) + ' +' + Math.abs(x.net) + ' break' + (Math.abs(x.net) > 1 ? 's' : '')}</em></div>`).join('')}</div>` : '';
+  return `<div class="gc" id="gc">${nav}<div class="mc-top"><span>${esc(e.tour)} · ${esc(e.name)} · ${esc(m.round || '')}${tnBestOf(e) === 5 ? ' · best of 5' : ''}</span><span class="${m.state === 'in' ? 'live' : ''}">${m.state === 'in' ? '● ' + esc(m.detail || 'Live') : m.state === 'post' ? esc(m.detail || 'Final') : esc(tipTime(m.start))}</span></div>
     ${row(m.p[0], 0)}${row(m.p[1], 1)}
+    ${sit ? `<div class="tn-sit${/serving for|Tiebreak/.test(sit) ? ' hot' : ''}">${esc(sit)}</div>` : ''}
+    ${tnCourt(e, m, st)}
     ${m.court ? `<div class="dim" style="font-size:11px;margin-top:6px">${esc(m.court)}</div>` : ''}
-    ${L.length ? `<div class="gc-sec"><h4>Onyx lines · live</h4><div class="fx">${L.map(l => `<div class="${l.st}" ${l.sel ? `onclick="bet('${esc(l.sel)}','${esc(l.label)}')" style="cursor:pointer"` : ''}>
-      <span>${esc(l.label)}</span><b>${fmtOdds(l.price)}</b><small>${esc(l.now || (l.st === 'win' ? 'cashed' : ''))}</small>
-      ${l.bar != null ? `<div class="yp-bar"><i style="width:${l.bar}%"></i></div>` : ''}</div>`).join('')}</div></div>` : '<div class="gc-sec"><div class="dim" style="font-size:12px">Onyx has not priced this match.</div></div>'}
+    <div class="gc-sec"><h4>Win chance${m.state === 'in' ? ' · live' : ''}</h4>
+      <div class="tn-wp"><div><b>${esc(last(0))}</b><span>${pc(lv.win)}</span></div><div class="tn-wpbar"><i style="width:${(lv.win * 100).toFixed(1)}%"></i></div><div class="r"><b>${esc(last(1))}</b><span>${pc(1 - lv.win)}</span></div></div>
+      ${tnChart(m, tnPath(e, m, lv))}
+      <div class="tn-kp">
+        <div><span>Hold chance on serve</span><b>${esc(last(0))} ${pc(H[0])} · ${esc(last(1))} ${pc(H[1])}</b></div>
+        ${m.state !== 'post' ? `<div><span>Projected total games</span><b>${expT.toFixed(1)}${mo.total != null ? ` <em>Onyx line ${mo.total}</em>` : ''}</b></div>
+        <div><span>Projected margin</span><b>${esc(expD >= 0 ? last(0) : last(1))} by ${Math.abs(expD).toFixed(1)} games</b></div>` : ''}
+      </div>
+      <div class="dim" style="font-size:11px;line-height:1.5;margin-top:6px">Game by game from the score: serve strength is fitted so the start matches ${cal.pre.src === 'Onyx price' ? "Onyx's moneyline" : cal.pre.src === 'Elo' ? 'the Elo ratings' : 'an even match'}${cal.src === 'Onyx total' ? ' and game total' : ''}, the score so far shows how sharp each player is today, then every hold, break, tiebreak and set is played out from here.</div></div>
+    ${setsTbl ? `<div class="gc-sec"><h4>Set by set · breaks</h4>${setsTbl}</div>` : ''}
+    ${L.length ? `<div class="gc-sec"><h4>Onyx lines · live</h4><div class="fx">${L.map(l => { const c = chance(l); return `<div class="${l.st}" ${l.sel ? `onclick="bet('${esc(l.sel)}','${esc(l.label)}')" style="cursor:pointer"` : ''}>
+      <span>${esc(l.label)}</span><b>${fmtOdds(l.price)}</b><small>${esc(l.now || (l.st === 'win' ? 'cashed' : ''))}${c != null && m.state !== 'post' && !l.st ? ` · <i class="tn-ch">${pc(c)} to cash</i>` : c != null && l.st === 'pend' && m.state !== 'post' ? ` · <i class="tn-ch">${pc(c)}</i>` : ''}</small>
+      ${l.bar != null ? `<div class="yp-bar"><i style="width:${l.bar}%"></i></div>` : ''}</div>`; }).join('')}</div></div>` : '<div class="gc-sec"><div class="dim" style="font-size:12px">Onyx has not priced this match.</div></div>'}
+    ${log.length ? `<div class="gc-sec"><h4>Game by game · since you opened it</h4><div class="tn-log">${log.map(g => g.gap ? `<div class="gap">${g.gap} games between updates</div>`
+      : `<div class="${g.brk ? 'brk' : ''}"><div><b>${esc(last(g.w))}</b> ${g.brk ? 'breaks' : g.s >= 0 ? 'holds' : 'wins the game'}</div><span>${esc(g.sc)}</span></div>`).join('')}</div></div>` : ''}
     ${lean ? `<div class="gc-sec"><h4>The model · leans, not picks</h4><div class="play"><span class="t">ELO</span><span><b>${esc(pickLabel(lean))}</b> · model ${pct(lean.model_p, 1)} · ${esc(lean.detail || '')}</span><span class="r ${lean.edge > 0 ? 'td' : ''}">${lean.edge > 0 ? '+' : ''}${(lean.edge * 100).toFixed(1)}pp</span></div></div>` : ''}
-    <div class="gc-sec" style="display:flex;gap:8px;flex-wrap:wrap">${m.p.map(x => tnFollowBtn(x.name)).join('')}<button class="btn-secondary" onclick="OPEN_MATCH=null;renderGames()">Close</button></div>
+    <div class="gc-sec" style="display:flex;gap:8px;flex-wrap:wrap">${m.p.map(x => tnFollowBtn(x.name)).join('')}<button class="btn-secondary" onclick="gcBack()">Close</button></div>
     <div class="gc-sec"><div class="bx-grid">${form(m.p[0])}${form(m.p[1])}</div></div></div>`;
 }
 function tnFollowBtn(name) {
@@ -2747,6 +3120,7 @@ function tnAlerts() {
   (SD.events || []).forEach(e => (e.matches || []).forEach(m => {
     const mine = m.p.some(x => watch.has(nk(x.name))) || m.id === OPEN_MATCH;
     const prev = TN_PREV[m.id];
+    try { tnRecord(e, m, prev, mine); } catch (x) {}
     TN_PREV[m.id] = {sets: m.p.map(x => x.sets.slice()), serve: m.p.map(x => !!x.serve), state: m.state};
     if (!mine || !prev || !window.OX_TOAST) return;
     const last = i => String(m.p[i].name).split(' ').pop();

@@ -1754,10 +1754,10 @@ body::after {
 .gm:hover,.gm.sel{border-color:rgba(176,56,249,.6);box-shadow:0 14px 34px -18px rgba(176,56,249,.65)}.gm:hover{transform:translateY(-2px)}
 /* Onyx odds board: one row per side, Spread / Total / Money columns, every sport */
 .gm-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:6px}
-.gm.odds .gm-row{grid-template-columns:minmax(0,1fr) auto repeat(3,var(--ocw));column-gap:5px}
+.gm.odds .gm-row,.gm-board .gm-row{grid-template-columns:minmax(0,1fr) auto repeat(3,var(--ocw));column-gap:5px}
 .gm-row.lose{opacity:.55}
 .gm-id{display:flex;align-items:center;gap:9px;min-width:0}
-.gm-nm{min-width:0}.gm-nm b{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;font-size:15px;line-height:1.15;hyphens:auto;-webkit-hyphens:auto}
+.gm-nm{min-width:0}.gm-nm b{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;font-size:15px;line-height:1.15;hyphens:manual;-webkit-hyphens:manual;word-break:keep-all;overflow-wrap:normal}
 .gm.odds .gm-nm b{font-size:14px}
 .gm-nm>span{display:block;font:500 10px monospace;color:var(--text3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .gm-nm .rk{display:inline;font:700 10px monospace;color:#d795ff;margin:0 4px 0 0}
@@ -1779,8 +1779,8 @@ body::after {
 .gm-row .sv{display:inline-block;width:7px;height:7px;border-radius:50%;background:#61e970;box-shadow:0 0 6px #61e970;margin-left:6px;vertical-align:1px}
 .gm-board{--ocw:72px;display:flex;flex-direction:column;gap:6px}
 .gm-nm .nm-s{display:none}
-@media (max-width:440px){.gm .lg.m{width:24px;height:24px}.gm-id{gap:7px}.gm-nm .nm-f{display:none}.gm-nm .nm-s{display:inline}}
-@media (max-width:380px){.gm{--ocw:56px;padding:11px 11px 9px}.oc b{font-size:13px}.gm-nm b{font-size:14px}}
+@media (max-width:440px){.gm{--ocw:54px;padding:11px 11px 9px}.gm.odds .gm-row,.gm-board .gm-row{column-gap:4px}.oc b{font-size:13px}.oc i{font-size:9px}.gm .lg.m{width:22px;height:22px}.gm-id{gap:6px}.gm-nm .nm-f{display:none}.gm-nm .nm-s{display:inline}}
+@media (max-width:380px){.gm{--ocw:52px;padding:11px 10px 9px}.oc b{font-size:13px}.gm-nm b{font-size:14px}}
 .gm-top{display:flex;justify-content:space-between;align-items:center;gap:8px;font:700 11px monospace;color:var(--text3);text-transform:uppercase;letter-spacing:.05em}
 .gm-top>span:first-child{flex-shrink:0}.gm-top>span:last-child{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .gm-top .live{color:#61e970}.gm-top .live::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:#61e970;margin-right:6px;animation:oxBlink 1.4s infinite}
@@ -1796,6 +1796,18 @@ body::after {
 .gc-mid{text-align:center}.gc-mid .sc{font:800 34px monospace;letter-spacing:.02em}
 .gc-mid .st{font:700 11px monospace;color:var(--text3);text-transform:uppercase}
 .gc-mid .st.live{color:#61e970}
+.gc-nav{position:relative;z-index:30;display:flex;align-items:center;gap:8px;margin:-16px -16px 12px;padding:10px 12px;border-radius:18px 18px 0 0;
+  background:rgba(17,14,20,.92);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2)}
+.gc-back{flex-shrink:0;display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:999px;border:1px solid rgba(176,56,249,.5);background:linear-gradient(135deg,rgba(176,56,249,.25),rgba(99,91,255,.18));color:#fff;font:700 12px 'Space Grotesk',system-ui,sans-serif;cursor:pointer}
+.gc-back:hover{border-color:#b038f9}
+#gcFloat{position:fixed;left:0;right:0;top:0;z-index:950;padding:calc(env(safe-area-inset-top) + 6px) 12px 6px;transform:translateY(-110%);transition:transform .2s;pointer-events:none}
+#gcFloat.on{transform:none;pointer-events:auto}
+#gcFloat .gc-nav{margin:0 auto;max-width:1148px;border-radius:16px;border:1px solid var(--border2);box-shadow:0 12px 30px -12px rgba(0,0,0,.8)}
+.gc-strip{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;min-width:0;flex:1;-webkit-mask-image:linear-gradient(90deg,#000 88%,transparent)}.gc-strip::-webkit-scrollbar{display:none}
+.gc-strip button{flex-shrink:0;display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:10px;border:1px solid var(--border2);background:rgba(255,255,255,.04);color:var(--text2);font:700 11px monospace;cursor:pointer;white-space:nowrap}
+.gc-strip button.on{border-color:#b038f9;color:#fff;background:rgba(176,56,249,.18)}
+.gc-strip button .lv{width:6px;height:6px;border-radius:50%;background:#61e970;box-shadow:0 0 6px #61e970}
+.gc-strip button em{font-style:normal;color:var(--text3);font-weight:600}
 .gc-sec{margin-top:16px}.gc-sec h4{margin:0 0 8px;font:800 11px monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--text3)}
 .field{position:relative;height:96px;border-radius:12px;overflow:hidden;background:repeating-linear-gradient(90deg,#123d22 0 10%,#14462a 10% 20%);border:1px solid rgba(97,233,112,.25)}
 .field .ez{position:absolute;top:0;bottom:0;width:8%;display:flex;align-items:center;justify-content:center;font:800 10px monospace;color:rgba(255,255,255,.75);writing-mode:vertical-rl;text-orientation:mixed;letter-spacing:.2em}
@@ -1887,6 +1899,34 @@ body::after {
 .mc-form b{display:block;font:800 10px monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--text3)}
 .mc-form .r{font:800 11px monospace}.mc-form .r.w{color:#61e970}.mc-form .r.l{color:#f87171}
 .tn-m.sel{border-color:#b038f9}
+.tc-wrap{max-width:720px;margin:12px auto 0;border-radius:16px;overflow:hidden;box-shadow:0 18px 40px -22px rgba(176,56,249,.7)}
+.tc{display:block;width:100%;height:auto}
+.tc-nm{font:800 22px 'Space Grotesk',system-ui,sans-serif;fill:#fff;paint-order:stroke;stroke:rgba(0,0,0,.35);stroke-width:4px}
+.tc-tag{font:800 12px monospace;letter-spacing:.18em;fill:#61e970}
+.tc-sf{font:700 11px monospace;letter-spacing:.16em;fill:rgba(255,255,255,.6)}
+.tc-ball{animation:tcToss 1.8s ease-in-out infinite}
+@keyframes tcToss{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+@media (prefers-reduced-motion:reduce){.tc-ball{animation:none}}
+.tn-sit{margin-top:10px;padding:9px 12px;border-radius:12px;border:1px solid var(--border2);background:rgba(255,255,255,.04);font:800 12px monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--text2);text-align:center}
+.tn-sit.hot{border-color:rgba(176,56,249,.6);background:linear-gradient(135deg,rgba(176,56,249,.28),rgba(99,91,255,.18));color:#fff;box-shadow:0 0 24px -8px rgba(176,56,249,.8)}
+.tn-wp{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center}
+.tn-wp b{display:block;font-size:13px}.tn-wp span{font:800 22px monospace}.tn-wp .r{text-align:right}
+.tn-wpbar{height:10px;border-radius:999px;background:rgba(155,150,255,.25);overflow:hidden}.tn-wpbar i{display:block;height:100%;background:linear-gradient(90deg,#635bff,#b038f9);border-radius:999px;transition:width .6s}
+.tc-chart{display:block;width:100%;height:150px;margin-top:10px;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:12px}
+.tc-ax{font:700 10px monospace;fill:rgba(255,255,255,.55)}
+.tn-kp{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin-top:10px}
+.tn-kp>div{background:var(--bg3);border:1px solid var(--border2);border-radius:12px;padding:9px 11px}
+.tn-kp span{display:block;font:700 9px monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)}.tn-kp b{font:800 14px monospace}.tn-kp em{font-style:normal;color:#d795ff;font-size:11px;margin-left:4px}
+.tn-sets-t{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}
+.tn-sets-t>div{background:var(--bg3);border:1px solid var(--border2);border-radius:12px;padding:9px 11px}
+.tn-sets-t span{display:block;font:700 9px monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)}.tn-sets-t b{font:800 18px monospace}.tn-sets-t sup{font-size:9px;color:#d795ff;margin-left:2px}
+.tn-sets-t em{display:block;font-style:normal;font:600 11px monospace;color:var(--text2);margin-top:2px}
+.tn-ch{font-style:normal;color:#d795ff;font-weight:800}
+.tn-log{display:flex;flex-direction:column;gap:4px}
+.tn-log>div{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:7px 10px;border-radius:10px;background:var(--bg3);border:1px solid var(--border);font-size:13px}
+.tn-log>div span{font:700 11px monospace;color:var(--text3)}
+.tn-log>div.brk{border-color:rgba(176,56,249,.55);background:linear-gradient(135deg,rgba(176,56,249,.2),rgba(99,91,255,.1))}
+.tn-log>div.gap{justify-content:center;font:600 11px monospace;color:var(--text3)}
 .gf-tbl{min-width:0!important}.gf-tbl td,.gf-tbl th{padding:8px 6px}
 .gf-hd{display:grid;grid-template-columns:26px minmax(0,1fr) auto;gap:10px;align-items:center;margin-bottom:10px}
 .gf-hd img{width:24px;height:16px;object-fit:cover;border-radius:2px}.gf-hd b{display:block;font-size:18px}.gf-hd span{font:600 11px monospace;color:var(--text3)}
@@ -2025,7 +2065,7 @@ body::after {
 
 <script>
 // Injected by sports_build.py. `var`, read before any other script line (CLAUDE.md rule 5).
-var SD = /*SPORT_DATA*/{"sport":"golf","cfg":{"name":"Golf","full":"Onyx Golf","kind":"golf","espn":["golf/pga"],"espn_q":"","tone":"purple","art":"golf","onyx_league":null},"date":"2026-10-28","label":"VidantaWorld Mexico Open","season":null,"games":[],"events":[{"id":"401850978","tour":"PGA","name":"VidantaWorld Mexico Open","start":"2026-10-29T04:00Z","end":"2026-11-01T04:00Z","state":"pre","detail":null,"round":0,"venue":null,"board":[{"pos":1,"name":"Patton Kizzire","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"3980"},{"pos":2,"name":"David Lipsky","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"6701"},{"pos":3,"name":"Patrick Rodgers","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"6825"},{"pos":4,"name":"Denny McCarthy","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"10054"},{"pos":5,"name":"Danny Walker","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"4408319"},{"pos":6,"name":"Austin Eckroat","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"4425898"},{"pos":7,"name":"Camilo Villegas","flag":"https://a.espncdn.com/i/teamlogos/countries/500/col.png","to_par":"E","rounds":[],"id":"1264"},{"pos":8,"name":"Mark Hubbard","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"9143"},{"pos":9,"name":"Erik van Rooyen","flag":"https://a.espncdn.com/i/teamlogos/countries/500/rsa.png","to_par":"E","rounds":[],"id":"9364"},{"pos":10,"name":"Jordan Smith","flag":"https://a.espncdn.com/i/teamlogos/countries/500/eng.png","to_par":"E","rounds":[],"id":"9506"},{"pos":11,"name":"Zach Bauchou","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"10030"},{"pos":12,"name":"Nick Dunlap","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"4832046"},{"pos":13,"name":"Aaron Baddeley","flag":"https://a.espncdn.com/i/teamlogos/countries/500/aus.png","to_par":"E","rounds":[],"id":"16"},{"pos":14,"name":"Emiliano Grillo","flag":"https://a.espncdn.com/i/teamlogos/countries/500/arg.png","to_par":"E","rounds":[],"id":"5882"},{"pos":15,"name":"Beau Hossler","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"6011"},{"pos":16,"name":"Justin Lower","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"9144"},{"pos":17,"name":"Christiaan Bezuidenhout","flag":"https://a.espncdn.com/i/teamlogos/countries/500/rsa.png","to_par":"E","rounds":[],"id":"9243"},{"pos":18,"name":"Rasmus Neergaard-Petersen","flag":"https://a.espncdn.com/i/teamlogos/countries/500/den.png","to_par":"E","rounds":[],"id":"4858859"},{"pos":19,"name":"Tony Finau","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"2230"},{"pos":20,"name":"Max Homa","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"8973"},{"pos":21,"name":"Corey Conners","flag":"https://a.espncdn.com/i/teamlogos/countries/500/can.png","to_par":"E","rounds":[],"id":"9126"},{"pos":22,"name":"Taylor Pendrith","flag":"https://a.espncdn.com/i/teamlogos/countries/500/can.png","to_par":"E","rounds":[],"id":"9658"},{"pos":23,"name":"Aaron Wise","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"10577"},{"pos":24,"name":"Steven Fisk","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"4426182"},{"pos":25,"name":"Joel Dahmen","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"6196"},{"pos":26,"name":"Davis Riley","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"10058"},{"pos":27,"name":"Cam Davis","flag":"https://a.espncdn.com/i/teamlogos/countries/500/aus.png","to_par":"E","rounds":[],"id":"10863"},{"pos":28,"name":"Andrew Novak","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"11332"},{"pos":29,"name":"Ben Griffin","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"4404992"},{"pos":30,"name":"Aldrich Potgieter","flag":"https://a.espncdn.com/i/teamlogos/countries/500/rsa.png","to_par":"E","rounds":[],"id":"5080439"},{"pos":31,"name":"Ben Martin","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"4638"},{"pos":32,"name":"Harry Higgs","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"4844"},{"pos":33,"name":"Tyler Duncan","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"9569"},{"pos":34,"name":"Taylor Moore","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"10664"},{"pos":35,"name":"Kevin Roy","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"4408320"},{"pos":36,"name":"Sudarshan Yellamaraju","flag":"https://a.espncdn.com/i/teamlogos/countries/500/can.png","to_par":"E","rounds":[],"id":"5143175"},{"pos":37,"name":"Peter Malnati","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"5692"},{"pos":38,"name":"Chad Ramey","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"10057"},{"pos":39,"name":"Rico Hoey","flag":"https://a.espncdn.com/i/teamlogos/countries/500/phi.png","to_par":"E","rounds":[],"id":"11385"},{"pos":40,"name":"Hank Lebioda","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"11387"},{"pos":41,"name":"Lee Hodges","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"4404991"},{"pos":42,"name":"Pierceson Coody","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"4837368"},{"pos":43,"name":"Isaiah Salinda","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"4589406"},{"pos":44,"name":"Chandler Blanchet","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"4618114"},{"pos":45,"name":"Cameron Tankersley","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"4832045"},{"pos":46,"name":"Santiago de la Fuente","flag":"https://a.espncdn.com/i/teamlogos/countries/500/mex.png","to_par":"E","rounds":[],"id":"5044433"},{"pos":47,"name":"A.J. Ewart","flag":"https://a.espncdn.com/i/teamlogos/countries/500/can.png","to_par":"E","rounds":[],"id":"5075652"},{"pos":48,"name":"David Ford","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"5150294"},{"pos":49,"name":"Trace Crowe","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"11183"},{"pos":50,"name":"Tayler Termeer","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"11245"},{"pos":51,"name":"John VanDerLaan","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"4361934"},{"pos":52,"name":"Trent Phillips","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"5075306"},{"pos":53,"name":"Kensei Hirata","flag":"https://a.espncdn.com/i/teamlogos/countries/500/jpn.png","to_par":"E","rounds":[],"id":"5075548"},{"pos":54,"name":"Gordon Sargent","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"5139663"},{"pos":55,"name":"Paul Peterson","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"9600"},{"pos":56,"name":"Christo Lamprecht","flag":"https://a.espncdn.com/i/teamlogos/countries/500/rsa.png","to_par":"E","rounds":[],"id":"11395"},{"pos":57,"name":"Marco Penge","flag":"https://a.espncdn.com/i/teamlogos/countries/500/eng.png","to_par":"E","rounds":[],"id":"4585549"},{"pos":58,"name":"Ben James","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"5077389"},{"pos":59,"name":"John Daly II","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"5215694"},{"pos":60,"name":"Eli Ortego","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"5467701"},{"pos":61,"name":"John Parry","flag":"https://a.espncdn.com/i/teamlogos/countries/500/eng.png","to_par":"E","rounds":[],"id":"4671"},{"pos":62,"name":"Andrew Putnam","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"5502"},{"pos":63,"name":"Max McGreevy","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"11383"},{"pos":64,"name":"Vince Whaley","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"4408315"},{"pos":65,"name":"Takumi Kanaya","flag":"https://a.espncdn.com/i/teamlogos/countries/500/jpn.png","to_par":"E","rounds":[],"id":"4410612"},{"pos":66,"name":"Dylan Wu","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"4423323"},{"pos":67,"name":"Rafael Campos","flag":"https://a.espncdn.com/i/teamlogos/countries/500/pur.png","to_par":"E","rounds":[],"id":"3683"},{"pos":68,"name":"Chan Kim","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"5724"},{"pos":69,"name":"Mackenzie Hughes","flag":"https://a.espncdn.com/i/teamlogos/countries/500/can.png","to_par":"E","rounds":[],"id":"6931"},{"pos":70,"name":"Ben Silverman","flag":"https://a.espncdn.com/i/teamlogos/countries/500/can.png","to_par":"E","rounds":[],"id":"8910"},{"pos":71,"name":"Zac Blair","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"9040"},{"pos":72,"name":"Adam Svensson","flag":"https://a.espncdn.com/i/teamlogos/countries/500/can.png","to_par":"E","rounds":[],"id":"9127"},{"pos":73,"name":"Brice Garnett","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"2283"},{"pos":74,"name":"David Skinns","flag":"https://a.espncdn.com/i/teamlogos/countries/500/eng.png","to_par":"E","rounds":[],"id":"3257"},{"pos":75,"name":"Doug Ghim","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"11456"},{"pos":76,"name":"Chandler Phillips","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"4587989"},{"pos":77,"name":"Jackson Suber","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"4982182"},{"pos":78,"name":"Johnny Keefer","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"5217048"},{"pos":79,"name":"Brian Campbell","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"9525"},{"pos":80,"name":"Wyndham Clark","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"11119"},{"pos":81,"name":"Kevin Yu","flag":"https://a.espncdn.com/i/teamlogos/countries/500/tpe.png","to_par":"E","rounds":[],"id":"4349547"},{"pos":82,"name":"Tom Kim","flag":"https://a.espncdn.com/i/teamlogos/countries/500/sko.png","to_par":"E","rounds":[],"id":"4602673"},{"pos":83,"name":"Joe Highsmith","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"4868733"},{"pos":84,"name":"Karl Vilips","flag":"https://a.espncdn.com/i/teamlogos/countries/500/aus.png","to_par":"E","rounds":[],"id":"5147097"},{"pos":85,"name":"Kevin Streelman","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"1077"},{"pos":86,"name":"Billy Horschel","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"1651"},{"pos":87,"name":"Alvaro Ortiz","flag":"https://a.espncdn.com/i/teamlogos/countries/500/mex.png","to_par":"E","rounds":[],"id":"10481"},{"pos":88,"name":"Garrick Higgo","flag":"https://a.espncdn.com/i/teamlogos/countries/500/rsa.png","to_par":"E","rounds":[],"id":"11393"},{"pos":89,"name":"Harry Hall","flag":"https://a.espncdn.com/i/teamlogos/countries/500/eng.png","to_par":"E","rounds":[],"id":"4589438"},{"pos":90,"name":"William Mouw","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"5076025"},{"pos":91,"name":"Adam Hadwin","flag":"https://a.espncdn.com/i/teamlogos/countries/500/can.png","to_par":"E","rounds":[],"id":"5548"},{"pos":92,"name":"Matthieu Pavon","flag":"https://a.espncdn.com/i/teamlogos/countries/500/fra.png","to_par":"E","rounds":[],"id":"10596"},{"pos":93,"name":"Max Greyserman","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"11101"},{"pos":94,"name":"Rasmus Højgaard","flag":"https://a.espncdn.com/i/teamlogos/countries/500/den.png","to_par":"E","rounds":[],"id":"11253"},{"pos":95,"name":"Will Gordon","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"4565482"},{"pos":96,"name":"Mac Meissner","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"4791222"},{"pos":97,"name":"Marcelo Rozo","flag":"https://a.espncdn.com/i/teamlogos/countries/500/col.png","to_par":"E","rounds":[],"id":"7120"},{"pos":98,"name":"Zecheng Dou","flag":"https://a.espncdn.com/i/teamlogos/countries/500/chn.png","to_par":"E","rounds":[],"id":"8889"},{"pos":99,"name":"Pontus Nyholm","flag":"https://a.espncdn.com/i/teamlogos/countries/500/swe.png","to_par":"E","rounds":[],"id":"4375977"},{"pos":100,"name":"Davis Chatfield","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"5113338"},{"pos":101,"name":"Neal Shipley","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"5209442"},{"pos":102,"name":"Ryder Cowan","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"5362517"},{"pos":103,"name":"Hayden Springer","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"10562"},{"pos":104,"name":"Jeffrey Kang","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"4408318"},{"pos":105,"name":"Blades Brown","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"5211425"},{"pos":106,"name":"Luke Clanton","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"5215039"},{"pos":107,"name":"Kihei Akina","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"5221421"},{"pos":108,"name":"Mauricio Figueroa Ramirez","flag":"https://a.espncdn.com/i/teamlogos/countries/500/mex.png","to_par":"E","rounds":[],"id":"5467702"},{"pos":109,"name":"Haotong Li","flag":"https://a.espncdn.com/i/teamlogos/countries/500/chn.png","to_par":"E","rounds":[],"id":"9221"},{"pos":110,"name":"Jimmy Stanger","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"10990"},{"pos":111,"name":"Alejandro Tosti","flag":"https://a.espncdn.com/i/teamlogos/countries/500/arg.png","to_par":"E","rounds":[],"id":"4358081"},{"pos":112,"name":"Adrien Dumont de Chassart","flag":"https://a.espncdn.com/i/teamlogos/countries/500/bel.png","to_par":"E","rounds":[],"id":"5076011"},{"pos":113,"name":"Gerardo Gomez","flag":"https://a.espncdn.com/i/teamlogos/countries/500/mex.png","to_par":"E","rounds":[],"id":"5268626"},{"pos":114,"name":"Alejandro Fierro","flag":"https://a.espncdn.com/i/teamlogos/countries/500/mex.png","to_par":"E","rounds":[],"id":"5466735"},{"pos":115,"name":"Kristoffer Ventura","flag":"https://a.espncdn.com/i/teamlogos/countries/500/nor.png","to_par":"E","rounds":[],"id":"4351896"},{"pos":116,"name":"Patrick Fishburn","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"4358083"},{"pos":117,"name":"Jesper Svensson","flag":"https://a.espncdn.com/i/teamlogos/countries/500/swe.png","to_par":"E","rounds":[],"id":"4699329"},{"pos":118,"name":"Keita Nakajima","flag":"https://a.espncdn.com/i/teamlogos/countries/500/jpn.png","to_par":"E","rounds":[],"id":"4699418"},{"pos":119,"name":"Omar Morales","flag":"https://a.espncdn.com/i/teamlogos/countries/500/mex.png","to_par":"E","rounds":[],"id":"5143188"},{"pos":120,"name":"Garrett Endicott","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"5371275"}]}],"odds":{},"model":{"status":"lab","version":null,"title":"What is live, and what the model will be","note":"Onyx Golf is live for scores, the gamecenter and Onyx prices as they post. The Golf model is in the lab: nothing here is a pick until it has been backtested against real Onyx prices.","method":["The leaderboard comes from ESPN's public feed, polled live: position, score to par and every round.","Every price on this page is an Onyx price."],"roadmap":["Onyx outrights, top 5, 10 and 20, and head-to-head matchups","Strokes-gained projections by course fit, tested against Onyx prices before any pick","Live round-by-round leaderboard with each player's Onyx price"],"tests":[],"rows":[],"top":[],"engine":{"steps":[{"t":"What is live today","rows":[["Leaderboard","position, score to par, today and thru, polled live"],["Every hole","each player's card hole by hole, with birdies, bogeys and the rest marked"],["Tournament stats","driving, fairways, greens, putting, sand saves and earnings for each player"]]}],"factors":[],"lane":null}},"generated":"2026-10-29T01:14:17+00:00"}/*END_SPORT_DATA*/;
+var SD = /*SPORT_DATA*/{"sport":"golf","cfg":{"name":"Golf","full":"Onyx Golf","kind":"golf","espn":["golf/pga"],"espn_q":"","tone":"purple","art":"golf","onyx_league":null},"date":"2026-10-28","label":"VidantaWorld Mexico Open","season":null,"games":[],"events":[{"id":"401850978","tour":"PGA","name":"VidantaWorld Mexico Open","start":"2026-10-29T04:00Z","end":"2026-11-01T04:00Z","state":"pre","detail":null,"round":0,"venue":null,"board":[{"pos":1,"name":"Patton Kizzire","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"3980"},{"pos":2,"name":"David Lipsky","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"6701"},{"pos":3,"name":"Patrick Rodgers","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"6825"},{"pos":4,"name":"Denny McCarthy","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"10054"},{"pos":5,"name":"Danny Walker","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"4408319"},{"pos":6,"name":"Austin Eckroat","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"4425898"},{"pos":7,"name":"Camilo Villegas","flag":"https://a.espncdn.com/i/teamlogos/countries/500/col.png","to_par":"E","rounds":[],"id":"1264"},{"pos":8,"name":"Mark Hubbard","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"9143"},{"pos":9,"name":"Erik van Rooyen","flag":"https://a.espncdn.com/i/teamlogos/countries/500/rsa.png","to_par":"E","rounds":[],"id":"9364"},{"pos":10,"name":"Jordan Smith","flag":"https://a.espncdn.com/i/teamlogos/countries/500/eng.png","to_par":"E","rounds":[],"id":"9506"},{"pos":11,"name":"Zach Bauchou","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"10030"},{"pos":12,"name":"Nick Dunlap","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"4832046"},{"pos":13,"name":"Aaron Baddeley","flag":"https://a.espncdn.com/i/teamlogos/countries/500/aus.png","to_par":"E","rounds":[],"id":"16"},{"pos":14,"name":"Emiliano Grillo","flag":"https://a.espncdn.com/i/teamlogos/countries/500/arg.png","to_par":"E","rounds":[],"id":"5882"},{"pos":15,"name":"Beau Hossler","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"6011"},{"pos":16,"name":"Justin Lower","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"9144"},{"pos":17,"name":"Christiaan Bezuidenhout","flag":"https://a.espncdn.com/i/teamlogos/countries/500/rsa.png","to_par":"E","rounds":[],"id":"9243"},{"pos":18,"name":"Rasmus Neergaard-Petersen","flag":"https://a.espncdn.com/i/teamlogos/countries/500/den.png","to_par":"E","rounds":[],"id":"4858859"},{"pos":19,"name":"Tony Finau","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"2230"},{"pos":20,"name":"Max Homa","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"8973"},{"pos":21,"name":"Corey Conners","flag":"https://a.espncdn.com/i/teamlogos/countries/500/can.png","to_par":"E","rounds":[],"id":"9126"},{"pos":22,"name":"Taylor Pendrith","flag":"https://a.espncdn.com/i/teamlogos/countries/500/can.png","to_par":"E","rounds":[],"id":"9658"},{"pos":23,"name":"Aaron Wise","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"10577"},{"pos":24,"name":"Steven Fisk","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"4426182"},{"pos":25,"name":"Joel Dahmen","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"6196"},{"pos":26,"name":"Davis Riley","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"10058"},{"pos":27,"name":"Cam Davis","flag":"https://a.espncdn.com/i/teamlogos/countries/500/aus.png","to_par":"E","rounds":[],"id":"10863"},{"pos":28,"name":"Andrew Novak","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"11332"},{"pos":29,"name":"Ben Griffin","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"4404992"},{"pos":30,"name":"Aldrich Potgieter","flag":"https://a.espncdn.com/i/teamlogos/countries/500/rsa.png","to_par":"E","rounds":[],"id":"5080439"},{"pos":31,"name":"Ben Martin","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"4638"},{"pos":32,"name":"Harry Higgs","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"4844"},{"pos":33,"name":"Tyler Duncan","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"9569"},{"pos":34,"name":"Taylor Moore","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"10664"},{"pos":35,"name":"Kevin Roy","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"4408320"},{"pos":36,"name":"Sudarshan Yellamaraju","flag":"https://a.espncdn.com/i/teamlogos/countries/500/can.png","to_par":"E","rounds":[],"id":"5143175"},{"pos":37,"name":"Peter Malnati","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"5692"},{"pos":38,"name":"Chad Ramey","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"10057"},{"pos":39,"name":"Rico Hoey","flag":"https://a.espncdn.com/i/teamlogos/countries/500/phi.png","to_par":"E","rounds":[],"id":"11385"},{"pos":40,"name":"Hank Lebioda","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"11387"},{"pos":41,"name":"Lee Hodges","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"4404991"},{"pos":42,"name":"Pierceson Coody","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"4837368"},{"pos":43,"name":"Isaiah Salinda","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"4589406"},{"pos":44,"name":"Chandler Blanchet","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"4618114"},{"pos":45,"name":"Cameron Tankersley","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"4832045"},{"pos":46,"name":"Santiago de la Fuente","flag":"https://a.espncdn.com/i/teamlogos/countries/500/mex.png","to_par":"E","rounds":[],"id":"5044433"},{"pos":47,"name":"A.J. Ewart","flag":"https://a.espncdn.com/i/teamlogos/countries/500/can.png","to_par":"E","rounds":[],"id":"5075652"},{"pos":48,"name":"David Ford","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"5150294"},{"pos":49,"name":"Trace Crowe","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"11183"},{"pos":50,"name":"Tayler Termeer","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"11245"},{"pos":51,"name":"John VanDerLaan","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"4361934"},{"pos":52,"name":"Trent Phillips","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"5075306"},{"pos":53,"name":"Kensei Hirata","flag":"https://a.espncdn.com/i/teamlogos/countries/500/jpn.png","to_par":"E","rounds":[],"id":"5075548"},{"pos":54,"name":"Gordon Sargent","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"5139663"},{"pos":55,"name":"Paul Peterson","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"9600"},{"pos":56,"name":"Christo Lamprecht","flag":"https://a.espncdn.com/i/teamlogos/countries/500/rsa.png","to_par":"E","rounds":[],"id":"11395"},{"pos":57,"name":"Marco Penge","flag":"https://a.espncdn.com/i/teamlogos/countries/500/eng.png","to_par":"E","rounds":[],"id":"4585549"},{"pos":58,"name":"Ben James","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"5077389"},{"pos":59,"name":"John Daly II","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"5215694"},{"pos":60,"name":"Eli Ortego","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"5467701"},{"pos":61,"name":"John Parry","flag":"https://a.espncdn.com/i/teamlogos/countries/500/eng.png","to_par":"E","rounds":[],"id":"4671"},{"pos":62,"name":"Andrew Putnam","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"5502"},{"pos":63,"name":"Max McGreevy","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"11383"},{"pos":64,"name":"Vince Whaley","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"4408315"},{"pos":65,"name":"Takumi Kanaya","flag":"https://a.espncdn.com/i/teamlogos/countries/500/jpn.png","to_par":"E","rounds":[],"id":"4410612"},{"pos":66,"name":"Dylan Wu","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"4423323"},{"pos":67,"name":"Rafael Campos","flag":"https://a.espncdn.com/i/teamlogos/countries/500/pur.png","to_par":"E","rounds":[],"id":"3683"},{"pos":68,"name":"Chan Kim","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"5724"},{"pos":69,"name":"Mackenzie Hughes","flag":"https://a.espncdn.com/i/teamlogos/countries/500/can.png","to_par":"E","rounds":[],"id":"6931"},{"pos":70,"name":"Ben Silverman","flag":"https://a.espncdn.com/i/teamlogos/countries/500/can.png","to_par":"E","rounds":[],"id":"8910"},{"pos":71,"name":"Zac Blair","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"9040"},{"pos":72,"name":"Adam Svensson","flag":"https://a.espncdn.com/i/teamlogos/countries/500/can.png","to_par":"E","rounds":[],"id":"9127"},{"pos":73,"name":"Brice Garnett","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"2283"},{"pos":74,"name":"David Skinns","flag":"https://a.espncdn.com/i/teamlogos/countries/500/eng.png","to_par":"E","rounds":[],"id":"3257"},{"pos":75,"name":"Doug Ghim","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"11456"},{"pos":76,"name":"Chandler Phillips","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"4587989"},{"pos":77,"name":"Jackson Suber","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"4982182"},{"pos":78,"name":"Johnny Keefer","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"5217048"},{"pos":79,"name":"Brian Campbell","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"9525"},{"pos":80,"name":"Wyndham Clark","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"11119"},{"pos":81,"name":"Kevin Yu","flag":"https://a.espncdn.com/i/teamlogos/countries/500/tpe.png","to_par":"E","rounds":[],"id":"4349547"},{"pos":82,"name":"Tom Kim","flag":"https://a.espncdn.com/i/teamlogos/countries/500/sko.png","to_par":"E","rounds":[],"id":"4602673"},{"pos":83,"name":"Joe Highsmith","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"4868733"},{"pos":84,"name":"Karl Vilips","flag":"https://a.espncdn.com/i/teamlogos/countries/500/aus.png","to_par":"E","rounds":[],"id":"5147097"},{"pos":85,"name":"Kevin Streelman","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"1077"},{"pos":86,"name":"Billy Horschel","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"1651"},{"pos":87,"name":"Alvaro Ortiz","flag":"https://a.espncdn.com/i/teamlogos/countries/500/mex.png","to_par":"E","rounds":[],"id":"10481"},{"pos":88,"name":"Garrick Higgo","flag":"https://a.espncdn.com/i/teamlogos/countries/500/rsa.png","to_par":"E","rounds":[],"id":"11393"},{"pos":89,"name":"Harry Hall","flag":"https://a.espncdn.com/i/teamlogos/countries/500/eng.png","to_par":"E","rounds":[],"id":"4589438"},{"pos":90,"name":"William Mouw","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"5076025"},{"pos":91,"name":"Adam Hadwin","flag":"https://a.espncdn.com/i/teamlogos/countries/500/can.png","to_par":"E","rounds":[],"id":"5548"},{"pos":92,"name":"Matthieu Pavon","flag":"https://a.espncdn.com/i/teamlogos/countries/500/fra.png","to_par":"E","rounds":[],"id":"10596"},{"pos":93,"name":"Max Greyserman","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"11101"},{"pos":94,"name":"Rasmus Højgaard","flag":"https://a.espncdn.com/i/teamlogos/countries/500/den.png","to_par":"E","rounds":[],"id":"11253"},{"pos":95,"name":"Will Gordon","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"4565482"},{"pos":96,"name":"Mac Meissner","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"4791222"},{"pos":97,"name":"Marcelo Rozo","flag":"https://a.espncdn.com/i/teamlogos/countries/500/col.png","to_par":"E","rounds":[],"id":"7120"},{"pos":98,"name":"Zecheng Dou","flag":"https://a.espncdn.com/i/teamlogos/countries/500/chn.png","to_par":"E","rounds":[],"id":"8889"},{"pos":99,"name":"Pontus Nyholm","flag":"https://a.espncdn.com/i/teamlogos/countries/500/swe.png","to_par":"E","rounds":[],"id":"4375977"},{"pos":100,"name":"Davis Chatfield","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"5113338"},{"pos":101,"name":"Neal Shipley","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"5209442"},{"pos":102,"name":"Ryder Cowan","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"5362517"},{"pos":103,"name":"Hayden Springer","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"10562"},{"pos":104,"name":"Jeffrey Kang","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"4408318"},{"pos":105,"name":"Blades Brown","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"5211425"},{"pos":106,"name":"Luke Clanton","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"5215039"},{"pos":107,"name":"Kihei Akina","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"5221421"},{"pos":108,"name":"Mauricio Figueroa Ramirez","flag":"https://a.espncdn.com/i/teamlogos/countries/500/mex.png","to_par":"E","rounds":[],"id":"5467702"},{"pos":109,"name":"Haotong Li","flag":"https://a.espncdn.com/i/teamlogos/countries/500/chn.png","to_par":"E","rounds":[],"id":"9221"},{"pos":110,"name":"Jimmy Stanger","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"10990"},{"pos":111,"name":"Alejandro Tosti","flag":"https://a.espncdn.com/i/teamlogos/countries/500/arg.png","to_par":"E","rounds":[],"id":"4358081"},{"pos":112,"name":"Adrien Dumont de Chassart","flag":"https://a.espncdn.com/i/teamlogos/countries/500/bel.png","to_par":"E","rounds":[],"id":"5076011"},{"pos":113,"name":"Gerardo Gomez","flag":"https://a.espncdn.com/i/teamlogos/countries/500/mex.png","to_par":"E","rounds":[],"id":"5268626"},{"pos":114,"name":"Alejandro Fierro","flag":"https://a.espncdn.com/i/teamlogos/countries/500/mex.png","to_par":"E","rounds":[],"id":"5466735"},{"pos":115,"name":"Kristoffer Ventura","flag":"https://a.espncdn.com/i/teamlogos/countries/500/nor.png","to_par":"E","rounds":[],"id":"4351896"},{"pos":116,"name":"Patrick Fishburn","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"4358083"},{"pos":117,"name":"Jesper Svensson","flag":"https://a.espncdn.com/i/teamlogos/countries/500/swe.png","to_par":"E","rounds":[],"id":"4699329"},{"pos":118,"name":"Keita Nakajima","flag":"https://a.espncdn.com/i/teamlogos/countries/500/jpn.png","to_par":"E","rounds":[],"id":"4699418"},{"pos":119,"name":"Omar Morales","flag":"https://a.espncdn.com/i/teamlogos/countries/500/mex.png","to_par":"E","rounds":[],"id":"5143188"},{"pos":120,"name":"Garrett Endicott","flag":"https://a.espncdn.com/i/teamlogos/countries/500/usa.png","to_par":"E","rounds":[],"id":"5371275"}]}],"odds":{},"model":{"status":"lab","version":null,"title":"What is live, and what the model will be","note":"Onyx Golf is live for scores, the gamecenter and Onyx prices as they post. The Golf model is in the lab: nothing here is a pick until it has been backtested against real Onyx prices.","method":["The leaderboard comes from ESPN's public feed, polled live: position, score to par and every round.","Every price on this page is an Onyx price."],"roadmap":["Onyx outrights, top 5, 10 and 20, and head-to-head matchups","Strokes-gained projections by course fit, tested against Onyx prices before any pick","Live round-by-round leaderboard with each player's Onyx price"],"tests":[],"rows":[],"top":[],"engine":{"steps":[{"t":"What is live today","rows":[["Leaderboard","position, score to par, today and thru, polled live"],["Every hole","each player's card hole by hole, with birdies, bogeys and the rest marked"],["Tournament stats","driving, fairways, greens, putting, sand saves and earnings for each player"]]}],"factors":[],"lane":null}},"generated":"2026-10-29T01:38:06+00:00"}/*END_SPORT_DATA*/;
 var ONYX_REFERRER = 'KR680261';
 var GA_MEASUREMENT_ID = 'G-03T8V1N52E';
 var C = SD.cfg || {};
@@ -2184,7 +2224,7 @@ function gameCard(g0) {
 var GFILTER = 'all';
 function renderGames() {
   const el = document.getElementById('gamesBody');
-  if (KIND === 'tennis') { el.innerHTML = `<div id="ypGames">${yourPlayers()}</div><div id="gcBox">${OPEN_MATCH ? matchCenter(OPEN_MATCH) : ''}</div>` + tnAll(); return; }
+  if (KIND === 'tennis') { el.innerHTML = `<div id="ypGames">${yourPlayers()}</div><div id="gcBox">${OPEN_MATCH ? matchCenter(OPEN_MATCH) : ''}</div>` + tnAll(); gcFloatSync(); return; }
   if (KIND === 'golf') { el.innerHTML = `<div id="ypGames">${yourPlayers()}</div>` + gfAll(); return; }
   const games = (SD.games || []).map(live);
   const segs = [['all', 'All'], ['in', 'Live'], ['pre', 'Upcoming'], ['post', 'Final']];
@@ -2203,6 +2243,48 @@ function openGame(gid) {
   if (box) box.scrollIntoView({behavior: 'smooth', block: 'start'});
   track('gamecenter_open', {gid});
 }
+// gamecenter nav: back to the scoreboard, or straight to another game
+function gcBack() {
+  OPEN_GAME = null; OPEN_MATCH = null; renderGames(); gcFloatSync();
+  const el = document.querySelector('#gamesBody .sp-tabs-seg') || document.getElementById('gamesBody');
+  if (el) el.scrollIntoView({behavior: 'smooth', block: 'start'});
+}
+function gcNav(items, cur, back) {
+  return `<div class="gc-nav"><button class="gc-back" onclick="gcBack()">‹ ${esc(back)}</button><div class="gc-strip">${items.map(x =>
+    `<button class="${x.id === cur ? 'on' : ''}" onclick="${x.go}">${x.live ? '<i class="lv"></i>' : ''}${x.t}</button>`).join('')}</div></div>`;
+}
+// the shared stylesheet clips the body sideways, which breaks position:sticky, so a copy
+// of the bar pins to the top once the gamecenter's own bar scrolls away
+function gcFloatSync() {
+  let f = document.getElementById('gcFloat');
+  const n = document.querySelector('#gc > .gc-nav'), gc = document.getElementById('gc');
+  if (!n || !gc) { if (f) f.classList.remove('on'); return; }
+  if (!f) { f = document.createElement('div'); f.id = 'gcFloat'; document.body.appendChild(f); }
+  if (f.dataset.src !== n.innerHTML) { f.innerHTML = '<div class="gc-nav">' + n.innerHTML + '</div>'; f.dataset.src = n.innerHTML;
+    const on = f.querySelector('.gc-strip .on'); if (on) on.parentNode.scrollLeft = on.offsetLeft - 60; }
+  const r = n.getBoundingClientRect(), g = gc.getBoundingClientRect();
+  f.classList.toggle('on', r.bottom < 0 && g.bottom > 120);
+}
+addEventListener('scroll', gcFloatSync, {passive: true});
+// card names never split mid-word (iOS hyphenated "Sacramen-to"): a name whose longest
+// word is wider than its column steps its font down until it fits, never below 11px
+function fitNames(root) {
+  (root || document).querySelectorAll('.gm-nm b').forEach(b => {
+    if (!b.clientWidth) return;
+    b.style.fontSize = '';
+    let fs = parseFloat(getComputedStyle(b).fontSize);
+    while (b.scrollWidth > b.clientWidth + 1 && fs > 11) { fs -= 0.5; b.style.fontSize = fs + 'px'; }
+  });
+}
+var _fitRaf = 0;
+new MutationObserver(() => { cancelAnimationFrame(_fitRaf); _fitRaf = requestAnimationFrame(() => fitNames()); }).observe(document.documentElement, {childList: true, subtree: true});
+addEventListener('resize', () => { cancelAnimationFrame(_fitRaf); _fitRaf = requestAnimationFrame(() => fitNames()); });
+function gameNav(cur) {
+  const order = g => g.state === 'in' ? 0 : g.state === 'pre' ? 1 : 2;
+  const gs = (SD.games || []).map(live).sort((a, b) => order(a) - order(b) || String(a.start || '').localeCompare(String(b.start || '')));
+  return gcNav(gs.map(g => ({id: g.gid, live: g.state === 'in', go: `openGame('${esc(g.gid)}')`,
+    t: g.state === 'pre' ? `${esc(g.away)} @ ${esc(g.home)} <em>${esc(tipTime(g.start).replace(/ ET$/, ''))}</em>` : `${esc(g.away)} ${esc(g.away_score)}-${esc(g.home_score)} ${esc(g.home)}${g.state === 'post' ? ' <em>F</em>' : ''}`})), cur, 'Scoreboard');
+}
 var GC_CACHE = {};
 function drawGame(gid) {
   const box = document.getElementById('gcBox');
@@ -2214,11 +2296,13 @@ function drawGame(gid) {
     <div class="gc-side h"><div><b>${esc(g.home_name || g.home)}</b><span>${esc(g.home_rec || '')}</span></div>${lg(g.home_logo, 'l')}</div>
     ${g.state !== 'pre' ? `<div class="ssc a">${esc(g.away_score)}</div><div class="ssc h">${esc(g.home_score)}</div>` : ''}</div>`;
   const s = GC_CACHE[gid];
-  box.innerHTML = `<div class="gc" id="gc">${head}
+  box.innerHTML = `<div class="gc" id="gc">${gameNav(gid)}${head}
     ${gameBoard(g) ? `<div class="gc-sec"><h4>Onyx lines</h4>${gameBoard(g)}</div>` : ''}
     <div class="gc-sec" style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-primary" onclick="bet(null,'game ${esc(g.away)} @ ${esc(g.home)}')">⚡ Bet this game on Onyx</button>
       <button class="btn-secondary" onclick="OPEN_GAME=null;renderGames()">Close</button></div>
     <div id="gcDetail">${s ? gcDetail(s, g) : '<div class="empty">Loading the gamecenter…</div>'}</div></div>`;
+  const on = box.querySelector('.gc-strip .on'); if (on) on.parentNode.scrollLeft = on.offsetLeft - 60;
+  gcFloatSync();
   if (!s || (g.state === 'in' && !_gcTimer)) loadSummary(gid);
 }
 var _gcTimer = null;
@@ -2685,26 +2769,315 @@ function tnLines(m) {
 }
 function tnPlayer(name) { return ((SD.model || {}).players || {})[nk(name)] || null; }
 function tnLean(m) { return ((SD.model || {}).rows || []).find(r => r.gid === m.id) || null; }
+// ── tennis live math ──
+// ESPN's tour feed carries games per set and the server, never the point score, so the
+// match is modelled game by game: each player's chance of winning a point on serve is
+// calibrated so the pre-match win chance matches Onyx's moneyline (Elo when unpriced),
+// then holds, tiebreaks and sets follow exactly. Everything live (win chance, projected
+// total and spread, chance each line cashes) is that chain run from the current score.
+const TN_SLAM = /australian open|roland|french open|wimbledon|us open/i;
+function tnBestOf(e) { return e && e.tour === 'ATP' && TN_SLAM.test(e.name || '') ? 5 : 3; }
+function tnSurface(e) {
+  const n = String((e && e.name) || '');
+  if (/wimbledon|queen|halle|eastbourne|hertogenbosch|mallorca|berlin|bad homburg|nottingham|birmingham|newport/i.test(n)) return 'grass';
+  if (/roland|french open|madrid|rome|internazionali|monte|barcelona|hamburg|gstaad|kitzb|umag|bastad|estoril|munich|geneva|lyon|houston|marrakech|buenos|rio|santiago|bogota|charleston|parma|palermo|prague|rabat|strasbourg|cluj|lausanne|budapest/i.test(n)) return 'clay';
+  return 'hard';
+}
+function tnHold(p) { const q = 1 - p; return p ** 4 * (1 + 4 * q + 10 * q * q) + 20 * p ** 3 * q ** 3 * (p * p / (1 - 2 * p * q)); }
+function tnTB(a, b) {   // first server wins the tiebreak; a, b: each server's point-on-serve chance
+  const M = {};
+  const f = (x, y) => {
+    if (x >= 7 && x - y >= 2) return 1; if (y >= 7 && y - x >= 2) return 0;
+    if (x >= 6 && x === y) { const w = a * (1 - b), l = (1 - a) * b; return w / (w + l); }
+    const k = x * 20 + y; if (k in M) return M[k];
+    const pw = Math.floor((x + y + 1) / 2) % 2 === 0 ? a : 1 - b;
+    return (M[k] = pw * f(x + 1, y) + (1 - pw) * f(x, y + 1));
+  };
+  return f(0, 0);
+}
+// every way a set can finish from (a, b) with s serving: winner, set games, its game margin, next set's server
+function tnSet(a0, b0, s0, pt, H) {
+  const M = {}, tb = [tnTB(pt[0], pt[1]), tnTB(pt[1], pt[0])];
+  const f = (a, b, s) => {
+    const k = a * 100 + b * 10 + s; if (M[k]) return M[k];
+    let o;
+    if (((a >= 6 || b >= 6) && Math.abs(a - b) >= 2) || a === 7 || b === 7) o = {[(a > b ? 0 : 1) + '|' + (a + b) + '|' + (a - b) + '|' + s]: 1};
+    else if (a === 6 && b === 6) { const w0 = s === 0 ? tb[0] : 1 - tb[1]; o = {['0|13|1|' + (1 - s)]: w0, ['1|13|-1|' + (1 - s)]: 1 - w0}; }
+    else {
+      const h = H[s], A = s === 0 ? f(a + 1, b, 1) : f(a + 1, b, 0), B = s === 0 ? f(a, b + 1, 1) : f(a, b + 1, 0), pa = s === 0 ? h : 1 - h;
+      o = {}; for (const [kk, p] of Object.entries(A)) o[kk] = (o[kk] || 0) + pa * p; for (const [kk, p] of Object.entries(B)) o[kk] = (o[kk] || 0) + (1 - pa) * p;
+    }
+    return (M[k] = o);
+  };
+  return Object.entries(f(a0, b0, s0)).map(([k, p]) => { const [w, g, d, nx] = k.split('|').map(Number); return {w, g, d, nx, p}; });
+}
+// from sets (sa, sb) and games (ga, gb) with srv serving: P(player 0 wins) and the distribution of the rest of the match
+function tnRun(sa, sb, ga, gb, srv, pt, need) {
+  const H = [tnHold(pt[0]), tnHold(pt[1])], fresh = {};
+  const setD = (a, b, s) => (a || b) ? tnSet(a, b, s, pt, H) : (fresh[s] = fresh[s] || tnSet(0, 0, s, pt, H));
+  if (srv == null) {   // server unknown (before the first ball): average both
+    const r0 = tnRun(sa, sb, ga, gb, 0, pt, need), r1 = tnRun(sa, sb, ga, gb, 1, pt, need);
+    return {win: (r0.win + r1.win) / 2, dist: r0.dist.map(x => [x[0], x[1], x[2] / 2]).concat(r1.dist.map(x => [x[0], x[1], x[2] / 2]))};
+  }
+  // set by set, merging equal states (sets, server, games so far, margin) so best of five stays small
+  const res = {win: 0, dist: []}, end = {};
+  let cur = {[sa + '|' + sb + '|' + srv + '|0|0']: 1}, first = true;
+  while (Object.keys(cur).length) {
+    const nxt = {};
+    for (const [k, p] of Object.entries(cur)) {
+      const [x, y, s, g0, d0] = k.split('|').map(Number);
+      for (const o of setD(first ? ga : 0, first ? gb : 0, s)) {
+        const nx = x + (o.w === 0), ny = y + (o.w === 1), q = p * o.p, g = g0 + o.g, d = d0 + o.d;
+        if (nx === need || ny === need) { if (nx === need) res.win += q; const ek = g + '|' + d; end[ek] = (end[ek] || 0) + q; }
+        else { const k2 = nx + '|' + ny + '|' + o.nx + '|' + g + '|' + d; nxt[k2] = (nxt[k2] || 0) + q; }
+      }
+    }
+    cur = nxt; first = false;
+  }
+  res.dist = Object.entries(end).map(([k, p]) => { const [g, d] = k.split('|').map(Number); return [g, d, p]; });
+  return res;
+}
+// win chance only, from the start of a set (fast: used to calibrate)
+function tnWin(pt, need) {
+  const H = [tnHold(pt[0]), tnHold(pt[1])], T = [0, 1].map(s => {
+    const o = {}; tnSet(0, 0, s, pt, H).forEach(x => { const k = x.w + '|' + x.nx; o[k] = (o[k] || 0) + x.p; }); return o; });
+  const M = {};
+  const f = (x, y, s) => {
+    if (x === need) return 1; if (y === need) return 0;
+    const k = x * 100 + y * 10 + s; if (k in M) return M[k];
+    let v = 0; for (const [kk, p] of Object.entries(T[s])) { const [w, nx] = kk.split('|').map(Number); v += p * f(x + (w === 0), y + (w === 1), nx); }
+    return (M[k] = v);
+  };
+  return (f(0, 0, 0) + f(0, 0, 1)) / 2;
+}
+var TN_CAL = {};
+function tnPre(m) {   // pre-match chance player 0 wins: Onyx's moneyline, else Elo
+  const mo = ((SD.odds || {}).matches || {})[m.id];
+  const imp = o => o == null ? null : o > 0 ? 100 / (o + 100) : -o / (-o + 100);
+  if (mo && mo.ml0 != null && mo.ml1 != null) { const a = imp(mo.ml0), b = imp(mo.ml1); return {p: a / (a + b), src: 'Onyx price'}; }
+  const A = tnPlayer(m.p[0].name), B = tnPlayer(m.p[1].name);
+  if (A && B && A.elo && B.elo) return {p: 1 / (1 + 10 ** ((B.elo - A.elo) / 400)), src: 'Elo'};
+  return {p: 0.5, src: 'even'};
+}
+// Onyx prices both the winner and the game total, so the model is fitted to both: two form
+// scenarios (the favourite sharp, the favourite flat) around a tour serve baseline, weighted
+// evenly, with their gap set so the chance of the over matches Onyx's total price. One fixed
+// strength over-projects totals by 2-3 games (on 10/29's 30 priced matches the over came out
+// 60% against Onyx's 49%), because real matches are more lopsided than coin-flip points.
+function tnCal(e, m) {
+  if (TN_CAL[m.id]) return TN_CAL[m.id];
+  const pre = tnPre(m), need = Math.ceil(tnBestOf(e) / 2), base = e && e.tour === 'WTA' ? 0.56 : 0.64;
+  const mo = ((SD.odds || {}).matches || {})[m.id] || {};
+  const imp = o => o == null ? null : o > 0 ? 100 / (o + 100) : -o / (-o + 100);
+  const fit = sg => { let lo = -0.3, hi = 0.3;
+    for (let i = 0; i < 18; i++) { const d = (lo + hi) / 2; if ((tnWin([base + d + sg, base - d - sg], need) + tnWin([base + d - sg, base - d + sg], need)) / 2 < pre.p) lo = d; else hi = d; }
+    const d = (lo + hi) / 2; return [[base + d + sg, base - d - sg], [base + d - sg, base - d + sg]]; };
+  let sg = 0.025, src = 'tour default';
+  if (mo.total != null && mo.over != null && mo.under != null) {
+    const want = imp(mo.over) / (imp(mo.over) + imp(mo.under));
+    const pov = g => fit(g).reduce((a, pt) => a + tnRun(0, 0, 0, 0, null, pt, need).dist.reduce((x, q) => x + (q[0] > mo.total ? q[2] : 0), 0) / 2, 0);
+    let lo = 0, hi = 0.1;
+    if (pov(0) <= want) sg = 0; else { for (let i = 0; i < 9; i++) { const g = (lo + hi) / 2; if (pov(g) > want) lo = g; else hi = g; } sg = (lo + hi) / 2; }
+    src = 'Onyx total';
+  }
+  return (TN_CAL[m.id] = {sc: fit(sg), need, pre, sg, src});
+}
+// how likely a set score was under one scenario: a finished set (a, b), or reaching (a, b) mid-set
+function tnSetLik(a, b, fin, s0, pt) {
+  const H = [tnHold(pt[0]), tnHold(pt[1])];
+  const one = s => {
+    if (fin) return tnSet(0, 0, s, pt, H).reduce((x, o) => x + (o.g === a + b && o.d === a - b ? o.p : 0), 0);
+    const R = {'0|0': 1};
+    for (let n = 0; n < a + b; n++) for (let x = 0; x <= n; x++) { const y = n - x, p = R[x + '|' + y]; if (!p || x > a || y > b) continue;
+      if (((x >= 6 || y >= 6) && Math.abs(x - y) >= 2) || x === 7 || y === 7) continue;
+      const sv = n % 2 === 0 ? s : 1 - s, h = H[sv], pa = sv === 0 ? h : 1 - h;
+      R[(x + 1) + '|' + y] = (R[(x + 1) + '|' + y] || 0) + p * pa; R[x + '|' + (y + 1)] = (R[x + '|' + (y + 1)] || 0) + p * (1 - pa); }
+    return R[a + '|' + b] || 0;
+  };
+  return s0 == null ? (one(0) + one(1)) / 2 : one(s0);
+}
+// scenario weights after the sets seen so far (upto: how many sets count; partial: include the set in play)
+function tnPost(cal, st, upto, partial) {
+  let off = 0;
+  const w = cal.sc.map(pt => {
+    let L = 0.5; off = 0;
+    st.sets.forEach((x, j) => {
+      const s0 = st.srv == null ? null : ((st.G - off) % 2 === 0 ? st.srv : 1 - st.srv);
+      if (j < upto && x.fin) L *= tnSetLik(x.a, x.b, true, s0, pt);
+      else if (partial && !x.fin) L *= tnSetLik(x.a, x.b, false, s0, pt);
+      off += x.a + x.b;
+    });
+    return L;
+  });
+  const t = w[0] + w[1]; return t > 0 ? w.map(v => v / t) : [0.5, 0.5];
+}
+function tnMix(cal, st, w, sa, sb, ga, gb, srv) {
+  const out = {win: 0, dist: []};
+  cal.sc.forEach((pt, k) => { const r = tnRun(sa, sb, ga, gb, srv, pt, cal.need); out.win += w[k] * r.win; r.dist.forEach(d => out.dist.push([d[0], d[1], d[2] * w[k]])); });
+  return out;
+}
+// the score as the model reads it: sets, games, the server of every game, breaks per set
+function tnState(m) {
+  const S = m.p.map(x => x.sets.map(v => +v || 0)), n = Math.max(S[0].length, S[1].length);
+  const done = j => { const a = S[0][j] || 0, b = S[1][j] || 0; return ((a >= 6 || b >= 6) && Math.abs(a - b) >= 2) || a === 7 || b === 7 || (m.state === 'post' && j === n - 1); };
+  const G = S[0].reduce((x, y) => x + y, 0) + S[1].reduce((x, y) => x + y, 0);
+  const srv = m.state === 'in' ? m.p.findIndex(x => x.serve) : -1;
+  const serverOf = k => srv < 0 ? null : ((G - k) % 2 === 0 ? srv : 1 - srv);
+  const sets = []; let off = 0, sa = 0, sb = 0, base = 0, diff = 0;
+  for (let j = 0; j < n; j++) {
+    const a = S[0][j] || 0, b = S[1][j] || 0, fin = done(j), tb = fin && a + b === 13;
+    let served0 = null;
+    if (srv >= 0) { served0 = 0; for (let k = off; k < off + a + b - (tb ? 1 : 0); k++) if (serverOf(k) === 0) served0++; }
+    const net = served0 == null ? null : (a - (tb ? (a > b ? 1 : 0) : 0)) - served0;   // breaks won by 0 minus breaks won by 1
+    sets.push({a, b, fin, tb, net});
+    if (fin) { if (a > b) sa++; else sb++; base += a + b; diff += a - b; }
+    off += a + b;
+  }
+  const cur = sets.length && !sets[sets.length - 1].fin ? sets[sets.length - 1] : null;
+  return {sets, sa, sb, ga: cur ? cur.a : 0, gb: cur ? cur.b : 0, cur, srv: srv >= 0 ? srv : null, G, base, diff};
+}
+function tnLive(e, m) {
+  const cal = tnCal(e, m), st = tnState(m);
+  if (m.state === 'post') return {cal, st, w: [0.5, 0.5], win: m.p[0].win ? 1 : 0, dist: [[0, 0, 1]]};
+  const w = tnPost(cal, st, st.sets.length, true), r = tnMix(cal, st, w, st.sa, st.sb, st.ga, st.gb, st.srv);
+  return {cal, st, w, win: r.win, dist: r.dist.map(x => [st.base + x[0], st.diff + x[1], x[2]])};
+}
+function tnSituation(e, m, st, need) {
+  if (m.state !== 'in' || !st.cur) return '';
+  const last = i => String(m.p[i].name).split(' ').pop(), g = [st.ga, st.gb], sw = [st.sa, st.sb];
+  if (g[0] === 6 && g[1] === 6) return 'Tiebreak';
+  if (st.srv == null) return '';
+  const s = st.srv, r = 1 - s, setOrMatch = i => sw[i] === need - 1 ? 'match' : 'set';
+  if (g[s] >= 5 && g[s] > g[r]) return `${last(s)} serving for the ${setOrMatch(s)}`;
+  if (g[r] >= 5 && g[r] > g[s]) return `${last(s)} serving to stay in the ${setOrMatch(r)}`;
+  const net = st.cur.net;
+  if (net) return `${last(net > 0 ? 0 : 1)} up ${Math.abs(net) > 1 ? Math.abs(net) + ' breaks' : 'a break'}`;
+  return 'On serve';
+}
+// the court: surface by tournament, ends from the games played (players change ends after every odd game), the server with the ball
+function tnCourt(e, m, st) {
+  const surf = tnSurface(e), C2 = {hard: ['#2a1f4d', '#3b2a73'], clay: ['#7a3b22', '#a5512c'], grass: ['#1f4d2c', '#2f6b3c']}[surf];
+  const flip = Math.ceil(st.G / 2) % 2 === 1, left = flip ? 1 : 0, right = 1 - left;
+  const nm = i => esc(String(m.p[i].short || m.p[i].name)), live = m.state === 'in';
+  const srv = live ? st.srv : null, sx = srv == null ? null : (srv === left ? 64 : 716);
+  return `<div class="tc-wrap"><svg class="tc" viewBox="0 0 780 380" role="img" aria-label="Court">
+    <defs><radialGradient id="tcG" cx="50%" cy="50%" r="70%"><stop offset="0" stop-color="${C2[1]}"/><stop offset="1" stop-color="${C2[0]}"/></radialGradient>
+      <filter id="tcB"><feGaussianBlur stdDeviation="6"/></filter></defs>
+    <rect x="0" y="0" width="780" height="380" rx="18" fill="${C2[0]}"/>
+    <rect x="60" y="40" width="660" height="300" fill="url(#tcG)" stroke="rgba(255,255,255,.9)" stroke-width="3"/>
+    <g stroke="rgba(255,255,255,.9)" stroke-width="2.5" fill="none">
+      <line x1="60" y1="77.5" x2="720" y2="77.5"/><line x1="60" y1="302.5" x2="720" y2="302.5"/>
+      <line x1="238" y1="77.5" x2="238" y2="302.5"/><line x1="542" y1="77.5" x2="542" y2="302.5"/>
+      <line x1="238" y1="190" x2="542" y2="190"/><line x1="60" y1="190" x2="72" y2="190"/><line x1="708" y1="190" x2="720" y2="190"/></g>
+    <line x1="390" y1="28" x2="390" y2="352" stroke="#fff" stroke-width="4"/><line x1="390" y1="28" x2="390" y2="352" stroke="rgba(0,0,0,.35)" stroke-width="10" stroke-dasharray="2 4"/>
+    <text x="215" y="215" class="tc-nm" text-anchor="middle">${nm(left)}</text><text x="565" y="215" class="tc-nm" text-anchor="middle">${nm(right)}</text>
+    ${sx != null ? `<g class="tc-srv"><circle cx="${sx}" cy="${srv === left ? 230 : 150}" r="20" fill="rgba(176,56,249,.55)" filter="url(#tcB)"/>
+      <circle cx="${sx}" cy="${srv === left ? 230 : 150}" r="9" fill="#fff"/><circle class="tc-ball" cx="${sx + (srv === left ? 14 : -14)}" cy="${srv === left ? 212 : 132}" r="6" fill="#61e970"/></g>
+      <text x="${srv === left ? 215 : 565}" y="245" class="tc-tag" text-anchor="middle">SERVING</text>` : ''}
+    <text x="390" y="22" class="tc-sf" text-anchor="middle">${esc(surf.toUpperCase())}${e && e.name ? ' · ' + esc(String(e.name).toUpperCase()) : ''}</text>
+  </svg></div>`;
+}
+// observed this session (the feed has no history): every game seen change, with hold or break
+var TN_LOG = {};
+try { TN_LOG = JSON.parse(sessionStorage.getItem('ox_tn_log') || '{}') || {}; } catch (x) { TN_LOG = {}; }
+function tnLogSave() { try { sessionStorage.setItem('ox_tn_log', JSON.stringify(TN_LOG)); } catch (x) {} }
+function tnRecord(e, m, prev, mine) {
+  if (m.state !== 'in' && !(prev && prev.state === 'in')) return;
+  const L = TN_LOG[m.id] = TN_LOG[m.id] || {g: [], wp: []};
+  const g1 = tnGames(m), g0 = prev ? prev.sets.map(x => x.reduce((a, b) => a + (+b || 0), 0)) : null;
+  let changed = !L.wp.length;
+  if (g0 && g1[0] + g1[1] > g0[0] + g0[1]) {
+    changed = true;
+    if (g1[0] + g1[1] === g0[0] + g0[1] + 1) {
+      const w = g1[0] > g0[0] ? 0 : 1, s = prev.serve.indexOf(true);
+      L.g.push({w, s, brk: s >= 0 && s !== w, sc: m.p[0].sets.map((v, j) => v + '-' + (m.p[1].sets[j] ?? 0)).join(' '), t: Date.now()});
+    } else L.g.push({gap: g1[0] + g1[1] - g0[0] - g0[1], t: Date.now()});
+    if (L.g.length > 80) L.g = L.g.slice(-80);
+  }
+  if (changed || (prev && prev.state !== m.state)) {
+    if (!mine) { tnLogSave(); return; }
+    const r = tnLive(e, m);
+    L.wp.push([Date.now(), Math.round(r.win * 1000) / 10, g1[0] + g1[1]]);
+    if (L.wp.length > 120) L.wp = L.wp.slice(-120);
+    tnLogSave();
+  }
+}
+// win chance path: the pre-match price, the start of each set (from the set scores), then every game seen live
+function tnPath(e, m, live) {
+  const cal = live.cal, st = live.st, pts = [{x: 0, p: cal.pre.p, l: 'Start'}];
+  let sa = 0, sb = 0, g = 0;
+  st.sets.forEach((x, j) => {
+    if (!x.fin) return;
+    g += x.a + x.b; if (x.a > x.b) sa++; else sb++;
+    if (sa === cal.need || sb === cal.need) { pts.push({x: g, p: sa === cal.need ? 1 : 0, l: 'Final'}); return; }
+    const srvNext = st.srv == null ? null : ((st.G - g) % 2 === 0 ? st.srv : 1 - st.srv);
+    pts.push({x: g, p: tnMix(cal, st, tnPost(cal, st, j + 1, false), sa, sb, 0, 0, srvNext).win, l: 'Set ' + (j + 1)});
+  });
+  ((TN_LOG[m.id] || {}).wp || []).forEach(w => { if (w[2] > g) pts.push({x: w[2], p: w[1] / 100, l: ''}); });
+  if (m.state === 'in') pts.push({x: st.G, p: live.win, l: 'Now'});
+  const seen = {}; return pts.filter(q => { const k = q.x + ':' + q.l; if (seen[k] || (seen[q.x] && !q.l)) return false; seen[k] = seen[q.x] = 1; return true; }).sort((a, b) => a.x - b.x);
+}
+function tnChart(m, pts) {
+  if (pts.length < 2) return '';
+  const W = 640, Hh = 150, X = Math.max(1, pts[pts.length - 1].x), x = v => 30 + v / X * (W - 50), y = p => 12 + (1 - p) * (Hh - 30);
+  const path = pts.map((q, i) => (i ? 'L' : 'M') + x(q.x).toFixed(1) + ' ' + y(q.p).toFixed(1)).join(' ');
+  const area = path + ` L ${x(pts[pts.length - 1].x).toFixed(1)} ${y(0.5)} L ${x(0)} ${y(0.5)} Z`;
+  const last = String(m.p[0].name).split(' ').pop(), last1 = String(m.p[1].name).split(' ').pop();
+  return `<svg class="tc-chart" viewBox="0 0 ${W} ${Hh}" preserveAspectRatio="none">
+    <defs><linearGradient id="wpG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b038f9" stop-opacity=".45"/><stop offset="1" stop-color="#635bff" stop-opacity=".05"/></linearGradient></defs>
+    <line x1="30" x2="${W - 20}" y1="${y(0.5)}" y2="${y(0.5)}" stroke="rgba(255,255,255,.18)" stroke-dasharray="4 4"/>
+    <text x="4" y="${y(1) + 4}" class="tc-ax">${esc(last)}</text><text x="4" y="${y(0) + 4}" class="tc-ax">${esc(last1)}</text>
+    <path d="${area}" fill="url(#wpG)"/><path d="${path}" fill="none" stroke="#c77dff" stroke-width="2.5" stroke-linejoin="round"/>
+    ${pts.filter(q => q.l).map(q => `<circle cx="${x(q.x)}" cy="${y(q.p)}" r="${q.l === 'Now' ? 5 : 3.5}" fill="${q.l === 'Now' ? '#61e970' : '#fff'}"/><text x="${Math.min(W - 24, x(q.x) + 4)}" y="${Math.max(10, y(q.p) - 7)}" class="tc-ax">${esc(q.l)}</text>`).join('')}
+  </svg>`;
+}
 function matchCenter(id) {
   const [e, m] = tnFind(id); if (!m) return '';
-  const S = tnSetsWon(m);
+  const S = tnSetsWon(m), lv = tnLive(e, m), st = lv.st, cal = lv.cal;
+  const sit = tnSituation(e, m, st, cal.need);
   const row = (x, i) => { const P = tnPlayer(x.name);
     return `<div class="mc-p${x.win ? ' w' : ''}">${x.flag ? `<img src="${esc(x.flag)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">` : '<i></i>'}
       <div class="mc-nm"><b>${esc(x.name)}</b><span>${x.seed ? 'Seed ' + esc(x.seed) + ' · ' : ''}${P && P.elo ? 'Elo ' + P.elo : 'unrated'}</span></div>
       ${m.state === 'in' && x.serve ? '<i class="sv" title="Serving"></i>' : '<i></i>'}
       <div class="mc-sets">${x.sets.map((v, j) => `<span class="${(m.p[1 - i].sets[j] || 0) < v ? 'won' : ''}">${v}</span>`).join('')}</div>
       <div class="mc-sw">${m.state === 'pre' ? '' : S[i]}</div></div>`; };
-  const L = tnLines(m), lean = tnLean(m);
-  const form = x => { const P = tnPlayer(x.name); if (!P || !(P.form || []).length) return '';
-    return `<div class="mc-form"><b>${esc(x.name.split(' ').pop())} · last ${P.form.length}</b>${P.form.map(f => `<div><span class="r ${f.w ? 'w' : 'l'}">${f.w ? 'W' : 'L'} ${esc(f.s)}</span> ${esc(f.opp)} <span class="dim">${esc(f.ev || '')} · ${esc(f.d)}</span></div>`).join('')}</div>`; };
-  return `<div class="gc" id="gc"><div class="mc-top"><span>${esc(e.tour)} · ${esc(e.name)} · ${esc(m.round || '')}</span><span class="${m.state === 'in' ? 'live' : ''}">${m.state === 'in' ? '● ' + esc(m.detail || 'Live') : m.state === 'post' ? esc(m.detail || 'Final') : esc(tipTime(m.start))}</span></div>
+  const L = tnLines(m), lean = tnLean(m), mo = ((SD.odds || {}).matches || {})[m.id] || {};
+  // what each line's chance of cashing is now, from the same chain
+  const P = f => lv.dist.reduce((a, d) => a + (f(d) ? d[2] : 0), 0);
+  const chance = l => l.k === 'ml0' ? lv.win : l.k === 'ml1' ? 1 - lv.win : l.k === 'ov' ? P(d => d[0] > mo.total) : l.k === 'un' ? P(d => d[0] < mo.total)
+    : l.k === 'sp0' ? P(d => d[1] + mo.sp0 > 0) : l.k === 'sp1' ? P(d => -d[1] + mo.sp1 > 0) : null;
+  const expT = lv.dist.reduce((a, d) => a + d[0] * d[2], 0), expD = lv.dist.reduce((a, d) => a + d[1] * d[2], 0);
+  const last = i => String(m.p[i].name).split(' ').pop(), pc = v => Math.round(v * 100) + '%';
+  const others = (e ? e.matches : []).filter(x => x.state !== 'post' || x.id === m.id).slice(0, 30);
+  const nav = gcNav(others.map(x => ({id: x.id, live: x.state === 'in', go: `openMatch('${esc(x.id)}')`,
+    t: `${esc(String(x.p[0].short || x.p[0].name).split(' ').pop())} v ${esc(String(x.p[1].short || x.p[1].name).split(' ').pop())}${x.state === 'pre' ? ' <em>' + esc(tipTime(x.start).replace(/ ET$/, '')) + '</em>' : ''}`})), m.id, 'All matches');
+  const form = x => { const Pl = tnPlayer(x.name); if (!Pl || !(Pl.form || []).length) return '';
+    return `<div class="mc-form"><b>${esc(x.name.split(' ').pop())} · last ${Pl.form.length}</b>${Pl.form.map(f => `<div><span class="r ${f.w ? 'w' : 'l'}">${f.w ? 'W' : 'L'} ${esc(f.s)}</span> ${esc(f.opp)} <span class="dim">${esc(f.ev || '')} · ${esc(f.d || '')}</span></div>`).join('')}</div>`; };
+  const H = [0, 1].map(i => lv.w[0] * tnHold(cal.sc[0][i]) + lv.w[1] * tnHold(cal.sc[1][i]));
+  const log = ((TN_LOG[m.id] || {}).g || []).slice().reverse().slice(0, 14);
+  const setsTbl = st.sets.length ? `<div class="tn-sets-t">${st.sets.map((x, j) => `<div><span>Set ${j + 1}</span><b>${x.a}-${x.b}${x.tb ? '<sup>TB</sup>' : ''}</b><em>${x.net == null ? (x.fin ? (x.a > x.b ? last(0) : last(1)) : 'in play') : x.net === 0 ? (x.tb ? 'no breaks to TB' : 'on serve') : last(x.net > 0 ? 0 : 1) + ' +' + Math.abs(x.net) + ' break' + (Math.abs(x.net) > 1 ? 's' : '')}</em></div>`).join('')}</div>` : '';
+  return `<div class="gc" id="gc">${nav}<div class="mc-top"><span>${esc(e.tour)} · ${esc(e.name)} · ${esc(m.round || '')}${tnBestOf(e) === 5 ? ' · best of 5' : ''}</span><span class="${m.state === 'in' ? 'live' : ''}">${m.state === 'in' ? '● ' + esc(m.detail || 'Live') : m.state === 'post' ? esc(m.detail || 'Final') : esc(tipTime(m.start))}</span></div>
     ${row(m.p[0], 0)}${row(m.p[1], 1)}
+    ${sit ? `<div class="tn-sit${/serving for|Tiebreak/.test(sit) ? ' hot' : ''}">${esc(sit)}</div>` : ''}
+    ${tnCourt(e, m, st)}
     ${m.court ? `<div class="dim" style="font-size:11px;margin-top:6px">${esc(m.court)}</div>` : ''}
-    ${L.length ? `<div class="gc-sec"><h4>Onyx lines · live</h4><div class="fx">${L.map(l => `<div class="${l.st}" ${l.sel ? `onclick="bet('${esc(l.sel)}','${esc(l.label)}')" style="cursor:pointer"` : ''}>
-      <span>${esc(l.label)}</span><b>${fmtOdds(l.price)}</b><small>${esc(l.now || (l.st === 'win' ? 'cashed' : ''))}</small>
-      ${l.bar != null ? `<div class="yp-bar"><i style="width:${l.bar}%"></i></div>` : ''}</div>`).join('')}</div></div>` : '<div class="gc-sec"><div class="dim" style="font-size:12px">Onyx has not priced this match.</div></div>'}
+    <div class="gc-sec"><h4>Win chance${m.state === 'in' ? ' · live' : ''}</h4>
+      <div class="tn-wp"><div><b>${esc(last(0))}</b><span>${pc(lv.win)}</span></div><div class="tn-wpbar"><i style="width:${(lv.win * 100).toFixed(1)}%"></i></div><div class="r"><b>${esc(last(1))}</b><span>${pc(1 - lv.win)}</span></div></div>
+      ${tnChart(m, tnPath(e, m, lv))}
+      <div class="tn-kp">
+        <div><span>Hold chance on serve</span><b>${esc(last(0))} ${pc(H[0])} · ${esc(last(1))} ${pc(H[1])}</b></div>
+        ${m.state !== 'post' ? `<div><span>Projected total games</span><b>${expT.toFixed(1)}${mo.total != null ? ` <em>Onyx line ${mo.total}</em>` : ''}</b></div>
+        <div><span>Projected margin</span><b>${esc(expD >= 0 ? last(0) : last(1))} by ${Math.abs(expD).toFixed(1)} games</b></div>` : ''}
+      </div>
+      <div class="dim" style="font-size:11px;line-height:1.5;margin-top:6px">Game by game from the score: serve strength is fitted so the start matches ${cal.pre.src === 'Onyx price' ? "Onyx's moneyline" : cal.pre.src === 'Elo' ? 'the Elo ratings' : 'an even match'}${cal.src === 'Onyx total' ? ' and game total' : ''}, the score so far shows how sharp each player is today, then every hold, break, tiebreak and set is played out from here.</div></div>
+    ${setsTbl ? `<div class="gc-sec"><h4>Set by set · breaks</h4>${setsTbl}</div>` : ''}
+    ${L.length ? `<div class="gc-sec"><h4>Onyx lines · live</h4><div class="fx">${L.map(l => { const c = chance(l); return `<div class="${l.st}" ${l.sel ? `onclick="bet('${esc(l.sel)}','${esc(l.label)}')" style="cursor:pointer"` : ''}>
+      <span>${esc(l.label)}</span><b>${fmtOdds(l.price)}</b><small>${esc(l.now || (l.st === 'win' ? 'cashed' : ''))}${c != null && m.state !== 'post' && !l.st ? ` · <i class="tn-ch">${pc(c)} to cash</i>` : c != null && l.st === 'pend' && m.state !== 'post' ? ` · <i class="tn-ch">${pc(c)}</i>` : ''}</small>
+      ${l.bar != null ? `<div class="yp-bar"><i style="width:${l.bar}%"></i></div>` : ''}</div>`; }).join('')}</div></div>` : '<div class="gc-sec"><div class="dim" style="font-size:12px">Onyx has not priced this match.</div></div>'}
+    ${log.length ? `<div class="gc-sec"><h4>Game by game · since you opened it</h4><div class="tn-log">${log.map(g => g.gap ? `<div class="gap">${g.gap} games between updates</div>`
+      : `<div class="${g.brk ? 'brk' : ''}"><div><b>${esc(last(g.w))}</b> ${g.brk ? 'breaks' : g.s >= 0 ? 'holds' : 'wins the game'}</div><span>${esc(g.sc)}</span></div>`).join('')}</div></div>` : ''}
     ${lean ? `<div class="gc-sec"><h4>The model · leans, not picks</h4><div class="play"><span class="t">ELO</span><span><b>${esc(pickLabel(lean))}</b> · model ${pct(lean.model_p, 1)} · ${esc(lean.detail || '')}</span><span class="r ${lean.edge > 0 ? 'td' : ''}">${lean.edge > 0 ? '+' : ''}${(lean.edge * 100).toFixed(1)}pp</span></div></div>` : ''}
-    <div class="gc-sec" style="display:flex;gap:8px;flex-wrap:wrap">${m.p.map(x => tnFollowBtn(x.name)).join('')}<button class="btn-secondary" onclick="OPEN_MATCH=null;renderGames()">Close</button></div>
+    <div class="gc-sec" style="display:flex;gap:8px;flex-wrap:wrap">${m.p.map(x => tnFollowBtn(x.name)).join('')}<button class="btn-secondary" onclick="gcBack()">Close</button></div>
     <div class="gc-sec"><div class="bx-grid">${form(m.p[0])}${form(m.p[1])}</div></div></div>`;
 }
 function tnFollowBtn(name) {
@@ -2747,6 +3120,7 @@ function tnAlerts() {
   (SD.events || []).forEach(e => (e.matches || []).forEach(m => {
     const mine = m.p.some(x => watch.has(nk(x.name))) || m.id === OPEN_MATCH;
     const prev = TN_PREV[m.id];
+    try { tnRecord(e, m, prev, mine); } catch (x) {}
     TN_PREV[m.id] = {sets: m.p.map(x => x.sets.slice()), serve: m.p.map(x => !!x.serve), state: m.state};
     if (!mine || !prev || !window.OX_TOAST) return;
     const last = i => String(m.p[i].name).split(' ').pop();
