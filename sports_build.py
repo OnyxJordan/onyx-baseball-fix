@@ -75,6 +75,15 @@ def nfl_block(lane, slate, odds):
             k = r["team"]
             last_game[k] = max(last_game.get(k, 0), r["week"])
     props = {(nk(p.get("name")), p.get("mkt")): p for p in (odds or {}).get("props") or []}
+    # v4 volume inputs: each team's Onyx implied points and spread tonight (+ = underdog)
+    team_env = {}
+    for g in slate.get("games") or []:
+        o = ((odds or {}).get("games") or {}).get(g["gid"]) or {}
+        if o.get("total") is not None:
+            hsp = o.get("home_spread") or 0.0
+            team_env[g["home"]] = ((o["total"] - hsp) / 2, hsp)
+            team_env[g["away"]] = ((o["total"] + hsp) / 2, -hsp)
+    vol_ph, vol_th = M.volume_history(rows) if hasattr(M, "VOL_P") else ({}, {})
     out = []
     for g in slate.get("games") or []:
         if g.get("state") != "pre":
@@ -90,6 +99,11 @@ def nfl_block(lane, slate, odds):
                     pr, info = M.project(gs, s, season, wk, opp, allowed, M.P, lgc)
                     if pr is None:
                         continue
+                    vol = False
+                    if s in getattr(M, "VOL_P", {}) and team in team_env:
+                        pv = M.project_volume(s, vol_ph.get(pid, []), vol_th.get(team, []), *team_env[team])
+                        if pv is not None:
+                            pr, vol = pv, True
                     ln = props.get((nk(cur[-1]["name"]), s))
                     out.append({"pid": pid, "name": cur[-1]["name"], "hs": cur[-1].get("hs"), "team": team, "opp": opp,
                                 "home": home, "gid": g["gid"], "mkt": s, "proj": round(pr, 1),
@@ -97,15 +111,21 @@ def nfl_block(lane, slate, odds):
                                 "l3": [int(v) for v in info["l3"]], "opp_f": round(info["opp"], 3),
                                 "line": ln.get("line") if ln else None,
                                 "over": ln.get("over") if ln else None, "under": ln.get("under") if ln else None,
-                                "over_sel": ln.get("over_sel") if ln else None, "under_sel": ln.get("under_sel") if ln else None})
+                                "over_sel": ln.get("over_sel") if ln else None, "under_sel": ln.get("under_sel") if ln else None,
+                                "vol": vol})
     # price every two-sided Onyx line: the model's chance, the blend, the edge
     bt = lane.load("backtest.json", None) or {}
     w = ((bt.get("lane") or {}).get("w_props")) or DEFAULT_W
     for r in out:
         if r["line"] is None or r["over"] is None or r["under"] is None:
             continue
-        po = M.prob_over(r["mkt"], r["proj"], r["line"])
-        ps = L.price_side(po, r["over"], r["under"], w)
+        if r.get("vol"):    # v4: volume projection, its own spread, blend weight and value bar
+            po = M.prob_over_volume(r["mkt"], r["proj"], r["line"])
+            ps = L.price_side(po, r["over"], r["under"], M.VOL_P[r["mkt"]]["w"])
+            r["value_min"] = M.VOL_P[r["mkt"]]["edge"]
+        else:
+            po = M.prob_over(r["mkt"], r["proj"], r["line"])
+            ps = L.price_side(po, r["over"], r["under"], w)
         if ps:
             r.update(side=ps["side"], price=ps["price"], sel=r["over_sel"] if ps["side"] == "over" else r["under_sel"],
                      prob=ps["prob"], implied=ps["implied"], edge=ps["edge"], ev=ps["ev"], model_p=ps["model_p"],
@@ -139,11 +159,22 @@ def nfl_block(lane, slate, odds):
             g, team, opp, home, last = meta[pid]
             row = {"pid": pid, "name": last["name"], "hs": last.get("hs"), "team": team, "opp": opp, "home": home, "gid": g["gid"],
                    "matchup": f"{team} {'vs' if home else '@'} {opp}", "any": round(p_any, 4), "first": round(p_first, 4)}
+            TP = M.TD_P
             for key, mk in (("any", "anytime_td"), ("first", "first_td")):
                 ln = props.get((nk(last["name"]), mk))
                 if ln and ln.get("over") is not None:
                     imp_ = L.implied(ln["over"])
-                    row[key + "_price"], row[key + "_sel"], row[key + "_edge"] = ln["over"], ln.get("over_sel"), round(row[key] - imp_, 4)
+                    row[key + "_price"], row[key + "_sel"] = ln["over"], ln.get("over_sel")
+                    row[key + "_model"] = row[key]
+                    if key == "any":
+                        # v3: the chance shown is the model blended 50/50 with Onyx's price (margin removed);
+                        # value only where the model itself beats the price by 5pp+ (the backtest's bar)
+                        row["any"] = round(TP["w_blend"] * row["any_model"] + (1 - TP["w_blend"]) * TP["mkt_scale"] * imp_, 4)
+                        row["any_edge"] = round(row["any_model"] - imp_, 4)
+                        row["any_value"] = row["any_edge"] >= TP["value_edge"]
+                    else:
+                        row["first_edge"] = round(row["first"] - imp_, 4)
+                        row["first_value"] = False    # Onyx's first-TD price beat the model in the backtest
             td_rows.append(row)
         td_rows.sort(key=lambda r: -r["any"])
         block["td"] = td_rows[:400]
@@ -188,7 +219,8 @@ def nfl_block(lane, slate, odds):
         # touchdown scorers join the plays as anytime TD props
         tdp = [{"pid": r["pid"], "name": r["name"], "hs": r.get("hs"), "gid": r["gid"], "matchup": r["matchup"], "mkt": "anytime_td",
                 "side": "over", "line": 0.5, "price": r["any_price"], "sel": r.get("any_sel"), "prob": r["any"],
-                "implied": round(L.implied(r["any_price"]), 4), "edge": r["any_edge"]} for r in block.get("td", []) if r.get("any_price") is not None]
+                "implied": round(L.implied(r["any_price"]), 4), "edge": r["any_edge"]}
+               for r in block.get("td", []) if r.get("any_price") is not None and r.get("any_value")]
         block["projected"] = top_plays(grows + out + tdp)
     return block
 
@@ -312,7 +344,7 @@ def top_plays(rows):
     for r in rows:
         if r.get("prob") is None or r.get("price") is None or r.get("edge") is None:
             continue
-        if r["edge"] < PLAY_MIN_EDGE or r["prob"] < PLAY_MIN_PROB:
+        if r["edge"] < max(PLAY_MIN_EDGE, r.get("value_min") or 0) or r["prob"] < PLAY_MIN_PROB:
             continue
         kind = r.get("kind") or "prop"
         key = (r.get("gid"), kind if kind != "prop" else ("p", r.get("pid") or r.get("name")))

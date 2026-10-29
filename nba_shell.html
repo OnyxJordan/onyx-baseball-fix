@@ -148,19 +148,32 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
 .gm-top .live{color:#61e970}
 .oc.in-slip{border-color:#b038f9;background:rgba(176,56,249,.22)}
 /* gamecenter (MLB .gc-* / .sb-*), NBA bits */
-.gc-hs-img{overflow:hidden}
+.gc-hs-img{overflow:hidden;position:relative}
 .gc-hs-img img{width:100%;height:100%;object-fit:cover;object-position:50% 15%}
+/* the ring sits on a layer ABOVE the photo: an inset shadow on the frame itself is
+   painted under the <img>, so the jersey covered the bottom of the ring on iPhone */
+.gc-hs-img::after{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;box-shadow:inset 0 0 0 2px var(--hs-ring,transparent)}
 /* headshot rings judged against the model's LEAN, not just "went over":
    lean (pregame) purple; pending lilac (Onyx's amber stand-in, no yellow);
    cashed green; dead red */
-.gc-hs.st-lean .gc-hs-img{box-shadow:inset 0 0 0 2px rgba(176,56,249,.7)}
-.gc-hs.st-pend .gc-hs-img{box-shadow:inset 0 0 0 2px #d795ff,0 0 12px rgba(215,149,255,.35)}
+.gc-hs.st-lean .gc-hs-img{--hs-ring:rgba(176,56,249,.7);box-shadow:none}
+.gc-hs.st-pend .gc-hs-img{--hs-ring:#d795ff;box-shadow:0 0 12px rgba(215,149,255,.35)}
 .gc-hs.st-pend .gc-hs-pct{color:#d795ff}
-.gc-hs.st-win .gc-hs-img{box-shadow:inset 0 0 0 2px #61e970,0 0 16px rgba(97,233,112,.45)}
+.gc-hs.st-win .gc-hs-img{--hs-ring:#61e970;box-shadow:0 0 16px rgba(97,233,112,.45)}
 .gc-hs.st-win .gc-hs-pct{color:#61e970}
-.gc-hs.st-loss .gc-hs-img{box-shadow:inset 0 0 0 2px #f87171;opacity:.75}
+.gc-hs.st-loss .gc-hs-img{--hs-ring:#f87171;box-shadow:none;opacity:.75}
 .gc-hs.st-loss .gc-hs-pct{color:#f87171}
 .gc-hs-lean{font-family:monospace;font-size:9px;font-weight:700;letter-spacing:.04em}
+.lp-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,360px),1fr));gap:6px}
+.lp-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:8px 10px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid var(--border2);cursor:pointer}
+.lp-who{min-width:0}.lp-who b{display:block;font:700 13px 'Space Grotesk',system-ui,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lp-who span{display:block;font:600 10px monospace;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.lp-fin,.lp-ln{display:flex;flex-direction:column;align-items:center;min-width:46px}
+.lp-fin b,.lp-ln b{font:800 16px monospace}.lp-fin span,.lp-ln span{font:700 9px monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--text3)}
+.lp-ln{padding:4px 8px;border-radius:10px;border:1px solid var(--border2);background:transparent}
+.lp-ln.win{border-color:rgba(97,233,112,.5);background:rgba(97,233,112,.08)}.lp-ln.win b{color:#61e970}
+.lp-ln.pend{border-color:rgba(215,149,255,.5)}.lp-ln.pend b{color:#d795ff}
+.lp-ln.loss{border-color:rgba(248,113,113,.45)}.lp-ln.loss b{color:#f87171}
 .lean-o{color:#b038f9}.lean-u{color:#635bff}
 .cell-win{color:#61e970;font-weight:800}.cell-pend{color:#d795ff;font-weight:800}.cell-loss{color:#f87171;font-weight:800}
 .pdr-why{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:6px}
@@ -427,7 +440,8 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
 .bx tr.tap{cursor:pointer}.bx tr.tap:hover td{background:rgba(176,56,249,.06)}.bx tr.sel td{background:rgba(176,56,249,.14)}
 .bx td small{display:block;font:600 9px monospace;color:var(--text3);margin-top:2px;overflow:hidden;text-overflow:ellipsis}
 .bx td small.ln{margin-top:0;color:#d795ff}
-.bx td.win{color:#61e970}.bx td.pend{color:#d795ff}.bx td.loss{color:#f87171}
+/* MLB's stylesheet gives .win a red tint; a cashed line is green here */
+.bx td.win{color:#61e970;background:rgba(97,233,112,.1)}.bx td.pend{color:#d795ff}.bx td.loss{color:#f87171}
 .bx tr.tot td{font-weight:800;border-top:1px solid var(--border2);border-bottom:0;color:var(--text2)}
 .bx-dnp{font-size:11px;color:var(--text3);margin-top:8px;line-height:1.5}
 .sc-chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:2px 0 10px}.sc-chips::-webkit-scrollbar{display:none}
@@ -1599,15 +1613,15 @@ function yourPlayers() {
     const legHtml = legs.map(l => {
       const v = b ? b[l.stat] : null;
       const cls = started(g) ? ypLegState(g, l.line, l.side, v) : '';
-      const rem = Math.max(0, (p.min || 0) - mins);
-      const pace = g.state === 'live' && b && mins > 0 ? v + rem * (.5 * v / mins + .5 * ((p.proj || {})[l.stat] || 0) / Math.max(p.min || 1, 1)) : null;
+      const pc = b ? livePace(p, l.stat, v, mins, g) : null, pace = pc ? pc.fin : null;
+      const ch = pc && l.line != null ? paceChance(pc, l.stat, l) : '';
       const k = p.pid + ':' + l.stat;
       const bump = YP_SNAP[k] != null && v != null && v > YP_SNAP[k] ? ' bump' : '';
       const fill = l.line ? Math.min(100, ((v ?? 0) / (l.line + .5)) * 100) : 0;
       const need = l.line != null && v != null && l.side === 'over' && v <= l.line ? Math.floor(l.line) + 1 - v : null;
       return `<div class="yp-leg ${cls}${bump}"><div class="t"><span>${l.line != null ? (l.side === 'over' ? 'O ' : 'U ') + l.line + ' ' : ''}${YP_STATS[l.stat]}</span>
         <em>${cls === 'win' ? '✓ cashed' : cls === 'loss' ? '✗' : need != null && started(g) ? 'needs ' + need : started(g) ? '' : 'proj ' + num((p.proj || {})[l.stat])}</em></div>
-        <div class="v">${started(g) && v != null ? v : '-'}${pace != null ? `<small>pace ${num(pace)}</small>` : ''}</div>
+        <div class="v">${started(g) && v != null ? v : '-'}${pace != null ? `<small>→ ${num(pace)}${ch && cls === '' ? ' · ' + ch : ''}</small>` : ''}</div>
         ${l.line != null ? `<div class="yp-bar"><i style="width:${fill}%"></i><u style="left:${(l.line / (l.line + .5)) * 100}%"></u></div>` : ''}</div>`;
     }).join('');
     return `<div class="yp-p" onclick="if(!event.target.closest('button')){gcSel='${esc(p.gid)}';gcShotP='${esc(p.hs || '')}';gotoTab('games');var c=document.getElementById('gcBody');if(c)c.scrollIntoView({behavior:'smooth'})}">
@@ -1697,7 +1711,8 @@ function renderGames() {
       <div class="gc-hs-img">${hsUrl(p) ? `<img loading="lazy" src="${esc(hsUrl(p))}" alt="" data-alt="${esc(p.img || '')}" onerror="if(this.dataset.alt&&this.src!==this.dataset.alt){this.src=this.dataset.alt;this.dataset.alt=''}else{this.remove()}">` : ''}</div>
       <div class="gc-hs-pct">${mark}${esc(top)}</div>
       <div class="gc-hs-name">${esc(lastName(p.name))}</div>
-      ${st ? `<div class="gc-hs-lean ${st.side === 'over' ? 'lean-o' : 'lean-u'}">${esc(st.label)}</div>` : '<div class="gc-hs-lean dim">no line</div>'}</div>`;
+      ${st ? `<div class="gc-hs-lean ${st.side === 'over' ? 'lean-o' : 'lean-u'}">${esc(st.label)}</div>` : '<div class="gc-hs-lean dim">no line</div>'}
+      ${(pc => pc ? `<div class="gc-hs-lean dim">→ ${num(pc.fin)}</div>` : '')(b ? livePace(p, 'pts', b.pts, b.min, g) : null)}</div>`;
   }).join('');
   const watch = `<div class="gc-card" style="padding-bottom:8px"><div class="gc-card-title">Points watch · ${started(g) ? 'live points vs the model\'s lean' : 'projected points and the model\'s lean'} · tap a player to see the case & bet it</div>
     <div class="gc-hs-row">${cells || '<div class="dim">No projections for this game.</div>'}</div></div>`;
@@ -1706,11 +1721,46 @@ function renderGames() {
     <button class="${gcView === 'pbp' ? 'on' : ''}" onclick="gcView='pbp';rerender()">Plays</button>
     <button class="${gcView === 'box' ? 'on' : ''}" onclick="gcView='box';rerender()">Box</button></div>`;
   const court = started(g) ? liveCourt(g, sum) : '';
-  body.innerHTML = nbNav(g.gid) + header + court + betbar + watch + sub
+  body.innerHTML = nbNav(g.gid) + header + court + betbar + watch + paceCard(g, box) + sub
     + (gcView === 'box' ? boxView(g, box, sum) : gcView === 'pbp' ? pbpView(g, sum) : overview(g, sum));
   const on = body.querySelector('.gc-strip .on'); if (on) on.parentNode.scrollLeft = on.offsetLeft - 60;
   gcFloatSync();
   if (started(g) && !sum) loadSummary(g);
+}
+// live pace card: every Onyx line in this game, where it stands, where it finishes at
+// this pace, and the chance the model's side lands from here
+var LP_STAT = {pts: 'PTS', reb: 'REB', ast: 'AST', fg3: '3PM'};
+var lpAll = false;
+function paceCard(g, box) {
+  if (g.state !== 'live' || !box || !gameClock(g)) return '';
+  const rows = [];
+  (D.players || []).filter(p => p.gid === g.gid && !p.out).forEach(p => {
+    const b = liveLine(p, box); if (!b || b.dnp) return;
+    Object.keys(LP_STAT).forEach(s => {
+      const pr = (p.props || {})[s]; if (!pr || pr.line == null) return;
+      const pc = livePace(p, s, b[s], b.min, g); if (!pc) return;
+      const po = paceOver(pc, s, pr.line), ch = pr.side === 'over' ? po : 1 - po;
+      const done = b[s] > pr.line;   // an over cashed or an under dead: settled either way
+      rows.push({p, s, pr, pc, b, ch, done, cashed: pr.side === 'over' && b[s] > pr.line});
+    });
+  });
+  if (!rows.length) return '';
+  const SO = {pts: 0, reb: 1, ast: 2, fg3: 3};
+  rows.sort((x, y) => (x.done - y.done) || (y.p.proj.pts - x.p.proj.pts) || SO[x.s] - SO[y.s]);
+  const shown = lpAll ? rows : rows.slice(0, 12);
+  const ck = gameClock(g), at = ck.el >= 23.9 && ck.el <= 24.1 ? 'at the half' : ck.el >= 48 ? 'in overtime' : `${num(ck.rem, 0)} min left`;
+  const row = r => {
+    const tone = r.done ? (r.cashed ? 'win' : 'loss') : r.ch >= .6 ? 'win' : r.ch <= .4 ? 'loss' : 'pend';
+    const pct = r.done ? (r.cashed ? '✓' : '✗') : Math.round(100 * r.ch) + '%';
+    return `<div class="lp-row" onclick="openPlayer('${esc(r.p.pid)}')">
+      <div class="lp-who"><b>${esc(lastName(r.p.name))} · ${LP_STAT[r.s]}</b><span>${r.b[r.s]} in ${num(r.b.min, 0)} min · pregame ${num(r.p.proj[r.s])}</span></div>
+      <div class="lp-fin"><b>${num(r.pc.fin)}</b><span>pace</span></div>
+      <div class="lp-ln ${tone}"><b>${pct}</b><span>${r.pr.side === 'over' ? 'O' : 'U'} ${r.pr.line}</span></div></div>`;
+  };
+  return `<div class="gc-card"><div class="gc-card-title">Live pace · ${esc(at)} · where every Onyx line finishes from here</div>
+    <div class="lp-list">${shown.map(row).join('')}</div>
+    ${rows.length > 12 ? `<button class="btn-secondary" style="width:100%;margin-top:8px" onclick="lpAll=!lpAll;rerender()">${lpAll ? 'Show fewer' : 'Show all ' + rows.length + ' lines'}</button>` : ''}
+    <div class="dim" style="font-size:11px;margin-top:8px">Pace = what he has now plus our projection for the rest of the game: minutes left at his share, his rate weighted toward the model (one hot half rarely carries), starters cut in blowouts. % = chance the model's side lands from here. Updates every 15 seconds.</div></div>`;
 }
 function overview(g, sum) {
   let html = '';
@@ -1794,7 +1844,8 @@ function boxView(g, box, sum) {
     if (!me) return `<td>${x.dnp ? '-' : live}</td>`;
     const pr = (me.props || {})[s], st = leanStatus(me, s, x.dnp ? null : live, g);
     const cls = st && started(g) ? {'st-win': 'win', 'st-pend': 'pend', 'st-loss': 'loss'}[st.cls] || '' : '';
-    return `<td class="${cls}">${x.dnp ? '-' : live}<small>${num(me.proj[s])}</small>${pr ? `<small class="ln">${pr.side === 'over' ? 'o' : 'u'}${pr.line}</small>` : ''}</td>`;
+    const pc = !x.dnp ? livePace(me, s, live, x.n('MIN'), g) : null;
+    return `<td class="${cls}">${x.dnp ? '-' : live}<small>${pc ? '→' + num(pc.fin) : num(me.proj[s])}</small>${pr ? `<small class="ln">${pr.side === 'over' ? 'o' : 'u'}${pr.line}</small>` : ''}</td>`;
   };
   const table = t => {
     const rows = t.players.filter(x => !x.dnp);
@@ -1817,7 +1868,8 @@ function boxView(g, box, sum) {
       ${dnp.length ? `<div class="bx-dnp">Did not play: ${dnp.map(x => esc(x.short)).join(', ')}</div>` : ''}</div>`;
   };
   return seg + `<div class="dim" style="font-size:11px;margin:-2px 0 10px">${gcBoxMode === 'props'
-    ? 'Live stat on top; our projection and the lean on the Onyx line underneath (o = over, u = under). Green = cashed, lilac = on track, red = dead.'
+    ? (g.state === 'live' ? 'Live stat on top; → where it finishes at this pace, then the lean on the Onyx line (o = over, u = under). Green = cashed, lilac = on track, red = dead.'
+      : 'Live stat on top; our projection and the lean on the Onyx line underneath (o = over, u = under). Green = cashed, lilac = on track, red = dead.')
     : 'Tap any player to see his shot chart on the court.'}${g.state === 'live' ? ' Green dot = on the floor now.' : ''}</div>` + teams.map(table).join('');
 }
 // before tip: our projections in the same compact table
@@ -1866,6 +1918,58 @@ function leanStatus(p, s, v, g) {
   }
   if (v > line) return {cls: 'st-loss', side, label};
   return {cls: fin ? 'st-win' : 'st-pend', side, label};
+}
+
+// ── live pace: where a player's line finishes from where it stands right now ──
+// Backtested on 342,428 in-game checkpoints (every 6 minutes of 3,096 games of ESPN
+// play-by-play): fit on 2024-25, scored on 2025-26. Rest-of-game minutes blend his
+// minutes share so far with his projected share (96 minutes of evidence), cut for
+// starters and lifted for the bench when the margin passes 12 late. The per-minute rate
+// barely trusts the hot hand: tonight's stats count as N minutes of evidence against
+// the model's rate (pts/reb 128, ast/3PM 192), because first-half streaks mostly do not
+// carry. Error on the final line vs the old pace number: pts 3.66 -> 3.13, reb 1.51 ->
+// 1.27, ast 1.03 -> 0.89, 3PM 0.65 -> 0.58. Chances use a negative binomial, calibrated
+// within about 3 points on the held-out season.
+var LP = {T0: 96, b: 1.3, M: 12, k: {pts: 128, reb: 128, ast: 192, fg3: 192},
+          a: {pts: 3, reb: 1.05, ast: 1.05, fg3: 1.05}, c: {pts: .04, reb: .2, ast: .15, fg3: .2}, sl: {pts: .65, reb: 1, ast: 1, fg3: 1}};
+function gameClock(g) {
+  // {el, rem} in minutes from the scoreboard (period + clock); overtime counts its own 5
+  const lv = LIVE[g.gid] || {}, per = lv.per || 0;
+  if (g.state !== 'live' || !per) return null;
+  // ESPN drops the minutes under 1:00 ("34.4" = 34.4 seconds)
+  const m = String(lv.clk || '').split(':'), left = m.length === 2 ? +m[0] + +m[1] / 60 : (+m[0] || 0) / 60;
+  if (per <= 4) return {el: (per - 1) * 12 + (12 - left), rem: (4 - per) * 12 + left};
+  return {el: 48 + (per - 5) * 5 + (5 - left), rem: left};
+}
+function livePace(p, s, cur, mins, g) {
+  const ck = gameClock(g);
+  if (!ck || cur == null || !p.min || !p.proj || p.proj[s] == null) return null;
+  const el = Math.max(ck.el, .5), w = el / (el + LP.T0);
+  let sh = w * Math.min(1, (mins || 0) / el) + (1 - w) * p.min / 48;
+  const mg = (+g.home_score || 0) - (+g.away_score || 0), mar = Math.abs(mg);
+  const blow = Math.min(1, Math.max(0, (mar - LP.M) / 15)) * Math.pow(Math.min(el, 48) / 48, 2);
+  sh = Math.min(1, Math.max(0, sh * (p.min >= 24 ? 1 - LP.b * blow : 1 + LP.b * blow * .6)));
+  const k = LP.k[s], rate = (cur + k * p.proj[s] / p.min) / ((mins || 0) + k);
+  const mu = ck.rem * sh * rate;
+  return {fin: cur + mu, mu, cur};
+}
+// chance the line clears (over) from here: negative binomial on the rest of the game
+function paceOver(pc, s, line) {
+  if (!pc || line == null) return null;
+  const need = Math.floor(line) + 1 - pc.cur;
+  if (need <= 0) return 1;
+  const mu = Math.max(pc.mu, 1e-6), v = LP.a[s] * mu + LP.c[s] * mu * mu;
+  const r = mu * mu / Math.max(v - mu, 1e-6), q = r / (r + mu);
+  let pmf = Math.exp(r * Math.log(q)), cdf = 0;
+  for (let i = 0; i < need; i++) { cdf += pmf; pmf *= (i + r) / (i + 1) * (1 - q); }
+  const p0 = Math.min(1 - 1e-4, Math.max(1e-4, 1 - cdf)), lg = Math.log(p0 / (1 - p0)) * LP.sl[s];
+  return 1 / (1 + Math.exp(-lg));
+}
+// the lean side's chance as a whole percent ("62%"), or '' when there is no line
+function paceChance(pc, s, pr) {
+  if (!pc || !pr) return '';
+  const po = paceOver(pc, s, pr.line);
+  return Math.round(100 * (pr.side === 'over' ? po : 1 - po)) + '%';
 }
 
 // ── live court: shot chart, possession, last play (ESPN play-by-play) ──
@@ -1968,11 +2072,10 @@ function shotFocus(g, x) {
   const cell = (lab, s, live) => {
     if (!me) return `<div><span>${lab}</span><b>${live}</b></div>`;
     const pr = (me.props || {})[s], st = leanStatus(me, s, live, g);
-    const rem = Math.max(0, (me.min || 0) - mins);
-    const pace = g.state === 'live' && mins > 0 ? live + rem * (.5 * live / mins + .5 * (me.proj[s] || 0) / Math.max(me.min || 1, 1)) : null;
+    const pc = livePace(me, s, live, mins, g), pace = pc ? pc.fin : null, ch = pc ? paceChance(pc, s, pr) : '';
     const cls = st ? {'st-win': 'win', 'st-pend': 'pend', 'st-loss': 'loss'}[st.cls] || '' : '';
     return `<div class="${cls}"><span>${lab}${pr ? ' · ' + (pr.side === 'over' ? 'O' : 'U') + ' ' + pr.line : ''}</span><b>${live}</b>
-      <small>proj ${num(me.proj[s])}</small>${pace != null ? `<small>pace ${num(pace)}</small>` : ''}</div>`;
+      <small>proj ${num(me.proj[s])}</small>${pace != null ? `<small>→ ${num(pace)} final${ch && cls === 'pend' ? ' · ' + ch : ''}</small>` : ''}</div>`;
   };
   return `<div class="sc-focus">${cell('PTS', 'pts', x.n('PTS'))}${cell('REB', 'reb', x.n('REB'))}${cell('AST', 'ast', x.n('AST'))}${cell('3PM', 'fg3', x.n('3PT'))}
     <div><span>FG</span><b>${esc(x.v('FG') || '-')}</b><small>${pctOf(x.v('FG'))} · 3PT ${esc(x.v('3PT') || '-')}</small></div>
@@ -2841,7 +2944,7 @@ function pollLive() {
         const detail = state === 'live' ? (st.shortDetail || 'LIVE') : g.detail;
         if (g.away_score !== side.away.score || g.home_score !== side.home.score || g.state !== state || g.detail !== detail) changed = true;
         g.away_score = side.away.score; g.home_score = side.home.score; g.state = state; g.detail = detail;
-        LIVE[g.gid] = {eid: e.id, away_ls: side.away.ls, home_ls: side.home.ls,
+        LIVE[g.gid] = {eid: e.id, away_ls: side.away.ls, home_ls: side.home.ls, per: +(e.status || {}).period || 0, clk: (e.status || {}).displayClock || '',
                        ids: {[side.away.id]: g.away, [side.home.id]: g.home}};
       });
       // the open game's box score / win probability refresh with the scores

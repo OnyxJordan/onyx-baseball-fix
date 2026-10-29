@@ -1,8 +1,42 @@
 """
 nfl_model.py - Onyx NFL player projections.
 
-VERSION v2 (10/29). The lab notebook: every change bumps VERSION and adds an
+VERSION v4 (10/29). The lab notebook: every change bumps VERSION and adds an
 entry here citing its evidence (CLAUDE.md rule 2 applies to this model too).
+
+  v4  10/29  Receptions and receiving yards from volume, not averages: his
+             target share (last 8 games) x the team's expected targets (its
+             recency-weighted targets, scaled by Onyx's implied team points /
+             22.5 and by exp(e_sp x spread / 7), so a trailing team throws
+             more) x catch rate or yards per target (pulled toward .65 and
+             7.8 by k = 30 targets). Chance from a normal with sd = 3.0 x
+             sqrt(projection) (x 3.2 for yards); 3 to 5 is a plateau (receptions
+             test .6797 / .6798 / .6809 at 3 / 4 / 5). Tested against 8,905 Onyx
+             closing prop lines (441 games). 2026, the season that has a
+             prior season behind it like production: receptions model alone
+             beats Onyx's line, log loss .6797 vs .6859 (913 lines); 50/50
+             blend .6780; value bets 3pp+ 109-78 +24.4%, 5pp+ 45-33 +22.9%.
+             Receiving yards: blend .35 .6910 vs .6932; 3pp+ 21-11 +25.4%,
+             5pp+ (blend .5) +7.7%. 2025, with no prior season, the model only
+             matches Onyx (receptions 3pp+ -4.4%), which is why the edge bar
+             stays: 3pp receptions, 5pp receiving yards. Rushing and passing
+             yards: no edge (2026 value bets -5% to -29%), they stay on v1.
+             Leans until a pick lane is backtested and passes.
+
+  v3  10/29  Touchdown scorers against Onyx's TD prices (441 games, 12,080
+             anytime and 12,382 first-TD prices, open and close; tools/
+             onyx_lines_pull.py yes-only markets). Anytime: on the 2026 test
+             season a 50/50 blend of the model and Onyx's price (margin
+             removed, scale .94) beats Onyx's own price, log loss .4788 vs
+             .4829 (1,397 player-games); 2025 (tune) the blend only matches
+             it (.4800 vs .4796). Betting where the model beats the CLOSING
+             price by 5pp+: 2026 +72.9% (173), 2025 +6.5% (336); by 2-5pp
+             2026 +47.7%, 2025 -6.4%. Opening price 5pp+: 2026 +104.8%, 2025
+             -2.2%. Promising, not proven: the chance shown is the 50/50
+             blend, value is flagged only at 5pp+ over the price, and it stays
+             a lean. First TD: Onyx's price beats the model both seasons
+             (.1882 vs .1900 in 2026) and value bets lost (2025 -21% to
+             -58%), so first TD is shown as information, never as value.
 
   v2  10/29  Touchdown scorers: anytime and first TD chances per player.
              Expected team TDs = c x Onyx implied team points / 7 (implied =
@@ -61,9 +95,10 @@ Inputs: data/nfl/player_games.json rows from sports_espn.py (one per
 player-game: pass_yds, rush_yds, rec_yds, rec, tgt, att, rush_att...).
 """
 
+import math
 from collections import defaultdict
 
-VERSION = "v2"
+VERSION = "v4"
 # game lines (team_model.py), tuned 10/26: see v1
 GAME_P = {"half_life": 240, "ridge": 5, "home": 2.0, "sd_margin": 13.5, "sd_total": 13.0, "min_games": 3}
 GAME_TEST = {"n": 199, "logloss": 0.648, "base_logloss": 0.698, "mae_total": 10.90, "base_mae_total": 11.71,
@@ -208,7 +243,8 @@ def test(rows, season):
 
 
 # ── touchdown scorers (v2) ────────────────────────────────────────────
-TD_P = {"c": 0.8, "w_rush": 0.8, "w_tgt": 1.0, "w_hist": 0.3, "k": 4.0, "n_games": 8, "other": 0.055}
+TD_P = {"c": 0.8, "w_rush": 0.8, "w_tgt": 1.0, "w_hist": 0.3, "k": 4.0, "n_games": 8, "other": 0.055,
+        "w_blend": 0.5, "mkt_scale": 0.94, "value_edge": 0.05}   # v3, see changelog
 
 
 def td_lambdas(rows, players, implied, p=TD_P):
@@ -246,3 +282,46 @@ def td_probs(lams_by_game, p=TD_P):
         for pid, l in lams.items():
             out[pid] = (1 - math.exp(-l), (1 - p["other"]) * l / z if z > 0 else 0.0)
     return out
+
+
+# ── receptions and receiving yards from volume (v4) ──────────────────
+VOL_P = {"rec": {"dec": 0.85, "e_imp": 1.0, "e_sp": 0.15, "k": 30.0, "c": 3.0, "w": 0.5, "edge": 0.03},
+         "rec_yds": {"dec": 0.85, "e_imp": 1.0, "e_sp": 0.08, "k": 30.0, "c": 3.0, "w": 0.35, "edge": 0.05}}
+
+
+def volume_history(rows):
+    """Per player and per team, every game's targets with the team's totals."""
+    tot = defaultdict(lambda: {"tgt": 0.0})
+    for r in rows:
+        tot[(r["gid"], r["team"])]["tgt"] += r.get("tgt") or 0
+    ph, th, seen = defaultdict(list), defaultdict(list), set()
+    for r in sorted(rows, key=lambda r: r["date"]):
+        t = tot[(r["gid"], r["team"])]
+        ph[r["pid"]].append({"tgt": r.get("tgt") or 0.0, "rec": r.get("rec") or 0.0, "rec_yds": r.get("rec_yds") or 0.0,
+                             "team_tgt": t["tgt"]})
+        if (r["gid"], r["team"]) not in seen:
+            seen.add((r["gid"], r["team"]))
+            th[r["team"]].append({"tgt": t["tgt"]})
+    return ph, th
+
+
+def project_volume(stat, h, th, implied, spread, p=None):
+    p = p or VOL_P[stat]
+    h, th = h[-8:], th[-8:]
+    if len(h) < 2 or len(th) < 2 or not implied:
+        return None
+    w = [p["dec"] ** (len(th) - 1 - i) for i in range(len(th))]
+    team_t = sum(x["tgt"] * wi for x, wi in zip(th, w)) / sum(w)
+    team_t *= (implied / 22.5) ** p["e_imp"] * math.exp(p["e_sp"] * (spread or 0.0) / 7.0)
+    tg = sum(x["tgt"] for x in h) / max(1.0, sum(x["team_tgt"] for x in h)) * team_t
+    n_t = sum(x["tgt"] for x in h)
+    if stat == "rec":
+        return tg * (sum(x["rec"] for x in h) + p["k"] * 0.65) / (n_t + p["k"])
+    return tg * (sum(x["rec_yds"] for x in h) + p["k"] * 7.8) / (n_t + p["k"])
+
+
+def prob_over_volume(stat, mu, line):
+    c = VOL_P[stat]["c"]
+    sd = max(0.6, c * math.sqrt(max(mu, 0.3))) if stat == "rec" else max(5.0, c * math.sqrt(max(mu, 1.0)) * 3.2)
+    z = (line - mu) / sd
+    return max(0.02, min(0.98, 0.5 * math.erfc(z / math.sqrt(2))))
