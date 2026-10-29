@@ -945,7 +945,16 @@ by ((FGA x games + 0.9) / (minutes x games + 30))^0.75 (`season.fga` from the bo
 Value = model at least 20% over Onyx's implied chance. Backtest (fit 2024-25, 1,075 Onyx-priced
 2025-26 games): +41.3% ROI on 421 bets at the opening price, +19.8% at the close, but -4.4% at
 the close after mid-January; Onyx's price is slightly sharper on log loss. Shown in the
-gamecenter and as "First basket leans" on the Picks tab, never tracked. **Quarters and halves**
+gamecenter and as "First basket leans" on the Picks tab, never tracked. **On trial at Onyx's opening price** (`open_lanes.py`, `data/nba/open_trial.json`, append-only
+and in validate_build's ledger list): every edge we found beats Onyx's first price far more
+often than its last, so the full refresh (never the 10-minute lines-only run) writes the
+first price it sees for each 1st-quarter total and first-basket market to
+`data/nba/opening.json` (once, timestamped) and logs a play only when the model beats that
+opening price AND the live Onyx price is still the opening one, so every logged play was
+bettable at its logged odds. Lanes: 1Q total (25.4% of the game total, sd 12, 3pp+) and
+first basket (20%+ over implied, two per game at most). Graded from ESPN (1Q line score;
+first scoring play's athlete id). Shown on the Picks tab as "On trial · Onyx opening prices"
+with its own record. **Quarters and halves**
 (`qhCard`, lean only): each read scales Onyx's own full-game line to the period (1Q total
 25.4% of the game total, 1H 50.5%, 1Q margin 34% of the spread; sd 12 / 18 / 11, tuned on
 Oct-Jan 2025-26 for honest chances). Onyx's `1st_quarter_total_points`,

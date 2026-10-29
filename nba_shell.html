@@ -180,6 +180,12 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
 .qh-side>span{min-width:0}.qh-side>span b,.qh-side>span i{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .qh-side>span b{font:600 11px monospace;color:var(--text2)}.qh-side>span i{font:800 14px monospace;font-style:normal;color:var(--text);margin-top:2px}
 .qh-side.val{border-color:rgba(176,56,249,.55);background:rgba(176,56,249,.08)}.qh-side.val>span i{color:#d795ff}
+.ot-rec{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:6px;margin:4px 0 8px}.ot-rec span{padding:8px 10px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid var(--border2)}
+.ot-rec b{display:block;font:800 16px monospace}.ot-rec b.up{color:#61e970}.ot-rec b.dn{color:#f87171}.ot-rec i{display:block;font:700 9px monospace;font-style:normal;letter-spacing:.08em;text-transform:uppercase;color:var(--text3)}
+.ot-note{font-size:12px;line-height:1.55;color:var(--text2);margin:0 0 10px}.ot-h{font:700 10px monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin:10px 0 6px}
+.ot-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;align-items:center;padding:7px 10px;margin-bottom:6px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid var(--border2)}
+.ot-who{min-width:0}.ot-who b{display:block;font:700 13px 'Space Grotesk',system-ui,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ot-who span{display:block;font:600 10px monospace;color:var(--text3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ot-px{font:800 13px monospace;color:var(--text2)}.ot-row>b{font:800 10px monospace;min-width:30px;text-align:right}.ot-w{color:#61e970}.ot-l{color:#f87171}
 .lp-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,360px),1fr));gap:6px}
 .lp-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:8px 10px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid var(--border2);cursor:pointer}
 .lp-who{min-width:0}.lp-who b{display:block;font:700 13px 'Space Grotesk',system-ui,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -702,6 +708,7 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
     <button class="btn-primary pl-top3" id="plTop3"></button>
   </div>
   <div id="plCards"></div>
+  <div id="plOpen"></div>
   <div id="plWatch"></div>
   <div id="plFb"></div>
 </div></div>
@@ -1404,6 +1411,7 @@ function renderPlays() {
   near.sort((a, b) => a.miss.length - b.miss.length || b.pr.edge - a.pr.edge);
   const W = near.slice(0, 8);
   document.getElementById('plFb').innerHTML = fbLeans();
+  document.getElementById('plOpen').innerHTML = openTrial();
   document.getElementById('plWatch').innerHTML = W.length ? `<div class="pl-div"><i></i><span>Watchlist · near misses · not picks · not graded</span><i></i></div>
     <div class="pl-watch">${W.map(w => {
       const leg = propLeg(w.p, w.st, w.pr.side), li = leg ? regLeg(leg) : -1;
@@ -1539,6 +1547,32 @@ function qhCard(g) {
   return `<div class="gc-card"><div class="gc-card-title">Quarters and halves · leans</div>
     ${tot('q1', '1st quarter total', QH_P.q1, QH_P.q1_sd, q1Act, true)}${tot('h1', '1st half total', QH_P.h1, QH_P.h1_sd, h1Act, false)}${win}
     <div class="dim" style="font-size:11px;margin-top:8px">Each read scales Onyx's own game line down to the period (the 1st quarter carries 25.4% of the points, the 1st half 50.5%). % = the model's chance. Lean = the 1st-quarter total side where the model is 3+ points above Onyx's price: it beat Onyx's opening prices on Feb-Apr 2026 (+7.5%, 150 bets), not proven yet. The 1st-half total and the 1st-quarter winner did not beat Onyx, so they show the read only.</div></div>`;
+}
+// ── on trial: plays logged at Onyx's opening price (open_lanes.py) ──
+// The backtests beat Onyx's first price far more often than its last, so these lanes log
+// a play only while Onyx still shows the first price we saw, and grade it in public.
+function openTrial() {
+  const O = D.open || {}, K = O.kinds || {}, A = K.all || {};
+  const rows = O.rows || [];
+  if (!rows.length && !O.started) return `<div class="pl-div"><i></i><span>On trial · Onyx opening prices</span><i></i></div>
+    <div class="ot-note">Two lanes beat Onyx's first price in the backtests: the 1st-quarter total and first basket. From today they log a play only while Onyx still shows the first price we saw for that market, and every play is graded here. None has qualified yet.</div>`;
+  const rec = k => { const x = K[k] || {}; return `${x.w || 0}-${x.l || 0}${x.p ? '-' + x.p : ''}`; };
+  const u = v => (v > 0 ? '+' : '') + (v || 0).toFixed(2) + 'u';
+  const label = k => k.kind === 'q1_total' ? `${esc(k.matchup)} · 1st quarter ${k.side === 'over' ? 'Over' : 'Under'} ${k.line}` : `${esc(k.name)} first basket · ${esc(k.matchup)}`;
+  const today = rows.filter(k => k.date === D.date), past = rows.filter(k => k.date !== D.date).slice(0, 12);
+  const row = k => {
+    const g = (D.games || []).find(x => x.gid === k.gid) || {};
+    const leg = k.sel && g.state === 'pre' && !k.result ? {sel: k.sel, price: k.price, gid: k.gid, market: k.kind, label: label(k).replace(/<[^>]+>/g, '')} : null;
+    const res = k.result === 'W' ? '<b class="ot-w">Won</b>' : k.result === 'L' ? '<b class="ot-l">Lost</b>' : k.result === 'P' ? '<b>Push</b>' : k.result === 'V' ? '<b>Void</b>' : '<b class="dim">Open</b>';
+    return `<div class="ot-row"><div class="ot-who"><b>${label(k)}</b><span>${esc(k.date.slice(5))} · model ${Math.round(1000 * k.prob) / 10}% vs Onyx ${Math.round(1000 * k.implied) / 10}%${k.actual != null && k.kind === 'q1_total' ? ' · scored ' + k.actual : ''}</span></div>
+      ${leg ? nbOc(k.price, '', leg) : `<span class="ot-px">${fmtOdds(k.price)}</span>`}${res}</div>`;
+  };
+  return `<div class="pl-div"><i></i><span>On trial · Onyx opening prices</span><i></i></div>
+    <div class="ot-rec"><span><b>${rec('all')}</b><i>record</i></span><span><b class="${(A.units || 0) >= 0 ? 'up' : 'dn'}">${u(A.units)}</b><i>units, 1 per play</i></span>
+      <span><b>${rec('q1_total')}</b><i>1st-quarter totals</i></span><span><b>${rec('first_basket')}</b><i>first basket</i></span></div>
+    <div class="ot-note">Logged only while Onyx still shows the first price we saw for that market, at that price, then graded after the game. The backtests beat Onyx's first price (1st-quarter total +7.5%, first basket +41%) but not its closing price, so these stay on trial until this record says otherwise.</div>
+    ${today.length ? `<div class="ot-h">Today</div>${today.map(row).join('')}` : '<div class="ot-note dim">No play at the opening prices yet today.</div>'}
+    ${past.length ? `<div class="ot-h">Recent</div>${past.map(row).join('')}` : ''}`;
 }
 // ── board ──────────────────────────────────────────────────────────
 var boardStat = 'pts', boardSort = {k: 'proj', dir: -1};
