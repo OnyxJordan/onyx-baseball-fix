@@ -469,8 +469,9 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
       finishing chances (top 10 13.6% predicted, 12.3% happened; make the cut 59%
       to 61%, 81% to 81%). History and fit barely move the finishing chances.
     - **Tested and left out:** green type (bermuda / paspalum vs bent / poa, 63
-      courses tagged where the grass is certain): no signal. Wind is being tested
-      against Open-Meteo's archive; it goes in only if it beats form.
+      courses tagged where the grass is certain): no signal. Wind (Open-Meteo archive,
+      playing-hours wind for every round): a player's windy-round record scored 2.7588
+      and "wind widens the gaps" 2.7570 vs 2.7569 without, on 2025-26. Left out.
     - **Pipeline:** pure Python (`requests` only; the course-fit solve is a 4x4
       Gaussian elimination). Replaying all history takes about half a second.
 - **Backtests (`tools/sports_backtest.py`, dev only):**

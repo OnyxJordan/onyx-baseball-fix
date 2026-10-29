@@ -18,7 +18,9 @@ events, 2022-26: tuned on 2023-24, scored on 2025-26):
   fit      the course's skill demand: which stat profiles (driving distance, accuracy,
            greens hit, putting) beat their form here, learned from past weeks at the
            course (ridge 20) x his profile, at 0.5 strength
-Tested and left out: green type (bermuda / paspalum vs bent / poa), no signal.
+Tested and left out: green type (bermuda / paspalum vs bent / poa) and wind (Open-Meteo
+playing-hours wind per round: neither a player's windy-round record nor wind widening
+the skill gaps beat form on 2025-26), no signal.
 
 Data: ESPN's public PGA TOUR feed (hole-by-hole rounds, per-event player stats).
 data/golf/history.json holds four years of player-events; update() appends each
@@ -36,7 +38,9 @@ CHANGELOG = [
     "the winner 58.8% of the time. Finishing chances from 1,000 simulated tournaments per event land close to what "
     "happened: top 10 predicted 13.6% came in 12.3%, make the cut 59% came in 61%, 81% came in 81%. Course history and "
     "course fit tighten the round projection but barely move the finishing chances: golf's week-to-week swing is large. "
-    "Green type (bermuda / paspalum vs bent / poa) tested and left out: no signal.",
+    "Green type (bermuda / paspalum vs bent / poa) tested and left out: no signal. Wind tested the same week on "
+    "Open-Meteo's archive for every round (86,000): a player's record in windy rounds, and wind stretching the gap "
+    "between better and worse players, both failed to beat form on 2025-26 (2.7588 and 2.7570 vs 2.7569). Left out.",
 ]
 P = {"H": 240, "k": 4, "m0": -1.0, "kc": 8, "a_ch": .25, "lam": 20, "a_fit": .5, "Hs": 365,
      "sr": 2.6, "sp": 0.0}

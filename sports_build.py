@@ -33,7 +33,7 @@ ROADMAP = {
                "Surface-specific ratings (hard, clay, grass)",
                "Total games and game spread from a serve and return point model"],
     "golf": ["Onyx does not price golf yet: when it does (outrights, top 10, matchups), the model is tested against those prices before any pick",
-             "Wind and rain from the forecast, if the weather test shows players who handle it better than their form",
+             "Recent-event weighting by field strength: beating a signature-event field counts for more than an opposite-field week",
              "LPGA and DP World Tour fields, on the same strokes-gained engine"],
 }
 METHOD = {
@@ -624,7 +624,8 @@ def golf_block(lane, slate):
                 ["Form", "every round in four seasons, a round 240 days old counts half; new players start at -1.0"],
                 ["Course history", "what form missed by at this course before, shrunk hard (8 rounds of evidence) and added at a quarter"],
                 ["Course fit", "which games over-perform here: driving distance, accuracy, greens hit and putting, learned from past weeks at the course"],
-                ["Green type", "bermuda and paspalum vs bent and poa: tested, no signal, left out"]],
+                ["Green type", "bermuda and paspalum vs bent and poa: tested, no signal, left out"],
+                ["Wind", "tested on 86,000 rounds of course weather: no player beats his form in the wind, and wind does not widen the gaps, so it is left out"]],
              "note": "Form carries almost all of it. Course history and fit move a player a tenth of a stroke or two."},
             {"t": "The simulation", "rows": [
                 ["Each round", "his rating plus noise: one round swings about 2.6 strokes either way for anyone"],
