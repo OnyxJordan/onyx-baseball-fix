@@ -474,6 +474,20 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
       lane with the filter: 184-160 (+12.5%) at 5pp+ on 2026, unchanged.
   - **NFL player props (`nfl_model.py` v1):** projections as before. The chances come
     from spreads fitted to real Onyx lines.
+  - **NFL receptions v5 and the opening-price lane (10/29):** `nfl_verse.py` pulls
+    nflverse play-by-play and snap counts once a day into `data/nfl/nflverse.json`
+    (current season + the last one, ~800 KB). v5 receptions = 50/50 average of the v4
+    volume projection and `nfl_model.project_verse` (targets per team dropback, snap
+    trend, team dropbacks x implied points and spread). 3pp+ value bets at Onyx's
+    OPENING price: 2025 +2.5% (848), 2026 +17.6% (367); at the close 2025 -7.2%. So it
+    runs as `sports_build.nfl_open_lane`: the first price seen for each receptions line
+    goes to `data/nfl/opening.json`; a play is logged to `data/nfl/open_trial.json`
+    (append-only, validate_build ledger list) only while the live line is still the
+    opening one, at most 12 a day by edge, graded off the box score.
+  - **Baseline rule (both NBA and NFL opening lanes):** the system's very first capture
+    (no `opening.json` yet) marks every price already on the board as a baseline and
+    never logs it, because those lines may have opened days earlier. Only markets that
+    appear after capture is running can produce plays.
   - **Tennis (`tennis_model.py` v1):** Elo, K = 150/(n+5)^0.4. On 7,875 matches in
     2026 it never saw, log loss is 0.627 and the favourite won 64.0%.
   - **Golf (`golf_model.py`, golf-v1, 10/29):** stays "model in the lab" because Onyx
@@ -945,7 +959,16 @@ by ((FGA x games + 0.9) / (minutes x games + 30))^0.75 (`season.fga` from the bo
 Value = model at least 20% over Onyx's implied chance. Backtest (fit 2024-25, 1,075 Onyx-priced
 2025-26 games): +41.3% ROI on 421 bets at the opening price, +19.8% at the close, but -4.4% at
 the close after mid-January; Onyx's price is slightly sharper on log loss. Shown in the
-gamecenter and as "First basket leans" on the Picks tab, never tracked. **Quarters and halves**
+gamecenter and as "First basket leans" on the Picks tab, never tracked. **On trial at Onyx's opening price** (`open_lanes.py`, `data/nba/open_trial.json`, append-only
+and in validate_build's ledger list): every edge we found beats Onyx's first price far more
+often than its last, so the full refresh (never the 10-minute lines-only run) writes the
+first price it sees for each 1st-quarter total and first-basket market to
+`data/nba/opening.json` (once, timestamped) and logs a play only when the model beats that
+opening price AND the live Onyx price is still the opening one, so every logged play was
+bettable at its logged odds. Lanes: 1Q total (25.4% of the game total, sd 12, 3pp+) and
+first basket (20%+ over implied, two per game at most). Graded from ESPN (1Q line score;
+first scoring play's athlete id). Shown on the Picks tab as "On trial · Onyx opening prices"
+with its own record. **Quarters and halves**
 (`qhCard`, lean only): each read scales Onyx's own full-game line to the period (1Q total
 25.4% of the game total, 1H 50.5%, 1Q margin 34% of the spread; sd 12 / 18 / 11, tuned on
 Oct-Jan 2025-26 for honest chances). Onyx's `1st_quarter_total_points`,

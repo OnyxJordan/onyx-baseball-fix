@@ -44,6 +44,78 @@ METHOD = {
 }
 
 
+OPEN_MAX = 12   # NFL receptions plays logged per day at the opening price, biggest edges first
+
+
+def nfl_open_lane(lane, out, slate, season, rows, M):
+    """Receptions at Onyx's opening price, on trial. The first price we see for each
+    receptions line is written once to data/nfl/opening.json; a play is logged
+    (data/nfl/open_trial.json, append-only) only when the v5 model beats that opening
+    price by 3pp+ and the live Onyx line is still the opening one. Graded from the box."""
+    from datetime import datetime, timezone
+    ts = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    O = lane.load("opening.json", None)
+    first_run = O is None          # the system's first look: every line already up is a baseline, never a play
+    O = O or {}
+    ledger = lane.load("open_trial.json", []) or []
+    games = {g["gid"]: g for g in slate.get("games") or []}
+    for k in [k for k in O if k.split("|")[0] in games and games[k.split("|")[0]].get("state") == "post"]:
+        O.pop(k)    # finished games leave the capture file; their plays live in the ledger
+    have = {k["key"] for k in ledger}
+    cands = []
+    for r in out:
+        if r["mkt"] != "rec" or r["line"] is None or r["over"] is None or r["under"] is None:
+            continue
+        g = games.get(r["gid"]) or {}
+        key = f"{r['gid']}|{nk(r['name'])}|rec"
+        if key not in O and g.get("state") == "pre":
+            O[key] = {"line": r["line"], "over": r["over"], "under": r["under"], "ts": ts, **({"baseline": True} if first_run else {})}
+        op = O.get(key)
+        if not op or op.get("baseline") or g.get("state") != "pre" or key in have or not r.get("vol"):
+            continue
+        if (op["line"], op["over"], op["under"]) != (r["line"], r["over"], r["under"]):
+            continue          # moved off the opening price: not bettable as logged
+        po = M.prob_over_volume("rec", r["proj"], r["line"])
+        for side, p, price, sel in (("over", po, r["over"], r.get("over_sel")), ("under", 1 - po, r["under"], r.get("under_sel"))):
+            if p - L.implied(price) >= 0.03:
+                cands.append((p - L.implied(price), {"date": slate.get("date"), "season": season, "week": g.get("week"), "key": key, "gid": r["gid"],
+                               "pid": r["pid"], "name": r["name"], "team": r["team"], "opp": r["opp"],
+                               "matchup": f"{r['team']} {'vs' if r['home'] else '@'} {r['opp']}", "kind": "rec",
+                               "side": side, "line": r["line"], "price": price, "sel": sel, "proj": r["proj"],
+                               "prob": round(p, 4), "implied": round(L.implied(price), 4), "opened_at": op["ts"],
+                               "logged_at": ts, "model": M.VERSION, "result": None, "actual": None}))
+                break
+    # the biggest edges first, OPEN_MAX a day: a short list, not every line that clears 3pp
+    today_n = sum(1 for k in ledger if k.get("date") == slate.get("date"))
+    for e, row in sorted(cands, key=lambda c: -c[0])[:max(0, OPEN_MAX - today_n)]:
+        ledger.append(row)
+    # grade: the receiver's catches from the box score once his game is final
+    box = {}
+    for x in rows:
+        box[(x.get("gid"), nk(x["name"]))] = x
+    box_games = {x.get("gid") for x in rows}
+    for k in ledger:
+        if k.get("result"):
+            continue
+        g = games.get(k["gid"])
+        x = box.get((k["gid"], nk(k["name"])))
+        if x is not None:
+            a = x.get("rec") or 0
+            k["actual"] = a
+            k["result"] = "P" if a == k["line"] else ("W" if (a > k["line"]) == (k["side"] == "over") else "L")
+            k["graded_at"] = ts
+        elif k["gid"] in box_games:
+            k["result"], k["actual"], k["graded_at"] = "V", None, ts    # the game is in the box, he is not: void
+    lane.save("opening.json", O, indent=1)
+    lane.save("open_trial.json", ledger, indent=1)
+    w = sum(1 for k in ledger if k["result"] == "W"); l_ = sum(1 for k in ledger if k["result"] == "L")
+    pay = lambda a: a / 100.0 if a > 0 else 100.0 / -a
+    units = sum((pay(k["price"]) if k["result"] == "W" else -1.0 if k["result"] == "L" else 0.0) for k in ledger)
+    return {"w": w, "l": l_, "p": sum(1 for k in ledger if k["result"] == "P"), "pending": sum(1 for k in ledger if not k["result"]),
+            "units": round(units, 2), "roi": round(units / (w + l_), 4) if w + l_ else None,
+            "rows": list(reversed(ledger[-80:])), "started": ledger[0]["date"] if ledger else None}
+
+
 def nfl_block(lane, slate, odds):
     import nfl_model as M
     pg = lane.load("player_games.json", {}) or {}
@@ -84,6 +156,8 @@ def nfl_block(lane, slate, odds):
             team_env[g["home"]] = ((o["total"] - hsp) / 2, hsp)
             team_env[g["away"]] = ((o["total"] + hsp) / 2, -hsp)
     vol_ph, vol_th = M.volume_history(rows) if hasattr(M, "VOL_P") else ({}, {})
+    # v5: nflverse targets per dropback and snap trend (nfl_verse.py), averaged with v4 for receptions
+    vidx = M.verse_index(lane.load("nflverse.json", None)) if hasattr(M, "verse_index") else None
     out = []
     for g in slate.get("games") or []:
         if g.get("state") != "pre":
@@ -102,6 +176,10 @@ def nfl_block(lane, slate, odds):
                     vol = False
                     if s in getattr(M, "VOL_P", {}) and team in team_env:
                         pv = M.project_volume(s, vol_ph.get(pid, []), vol_th.get(team, []), *team_env[team])
+                        if pv is not None and s == "rec" and vidx:
+                            pvv = M.project_verse(vidx, team, cur[-1]["name"], season, wk, *team_env[team])
+                            if pvv is not None:
+                                pv = M.VERSE_P["w"] * pvv + (1 - M.VERSE_P["w"]) * pv
                         if pv is not None:
                             pr, vol = pv, True
                     ln = props.get((nk(cur[-1]["name"]), s))
@@ -130,6 +208,8 @@ def nfl_block(lane, slate, odds):
             r.update(side=ps["side"], price=ps["price"], sel=r["over_sel"] if ps["side"] == "over" else r["under_sel"],
                      prob=ps["prob"], implied=ps["implied"], edge=ps["edge"], ev=ps["ev"], model_p=ps["model_p"],
                      matchup=f"{r['team']} {'vs' if r['home'] else '@'} {r['opp']}")
+    # receptions at Onyx's opening price, on trial (the lane that beat the open in both seasons)
+    block["open"] = nfl_open_lane(lane, out, slate, season, rows, M)
     # touchdown scorers (nfl_model v2): anytime and first TD chances from Onyx's
     # implied team points, against Onyx's yes prices (one-sided, so the edge is
     # measured against the price as listed, margin included)

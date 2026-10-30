@@ -576,6 +576,21 @@ def main():
     if not LINES_ONLY:
         save(LEDGER, ledger, indent=1)
 
+    # opening-price lanes, on trial (open_lanes.py): capture Onyx's first prices, log
+    # plays only while the live price is still the opening one, grade from ESPN
+    import open_lanes
+    hs_of = {p["pid"]: p.get("hs") for p in slate.get("players", [])}
+    for r in rows:
+        r["hs"] = r.get("hs") or hs_of.get(r["pid"])
+    if LINES_ONLY:
+        open_led, n_open = load(open_lanes.LEDGER, []) or [], 0
+    else:
+        open_led, n_open_g = open_lanes.grade(today)
+        n_open = 0
+        if fresh:
+            open_led, n_open = open_lanes.run(rows, slate, props, today, (load("jumps.json", {}) or {}).get("players") or {})
+        print(f"  on trial (opening prices): {n_open_g} graded, +{n_open} logged, {len(open_led)} on record")
+
     # the daily Top Scorer Parlay: grade past tickets, refresh / lock today's
     if LINES_ONLY:
         lock = load(TICKET_LOCK, {})
@@ -621,6 +636,8 @@ def main():
         # opening-tip records [won, jumped] for tonight's players (nba_jumps.py): the
         # first-basket lean picks each team's jumper and the chance it wins the tip
         "jumps": {h: jp[h] for h in {p.get("hs") for p in players_out} if h in jp},
+        # plays at Onyx's opening price, on trial (open_lanes.py)
+        "open": open_lanes.summarize(open_led),
     }
     shell = open(SHELL, encoding="utf-8").read()
     # one design system: the MLB stylesheet is copied out of shell.html on

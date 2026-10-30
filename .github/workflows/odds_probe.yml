@@ -13,7 +13,7 @@ on:
         required: false
         default: ""
       job:
-        description: "probe (markets), lines (historical Onyx lines for a backtest), golf (every golf fixture, now and past 60 days) or odds (dry run of sports_odds.py)"
+        description: "probe (markets), lines (historical Onyx lines for a backtest), golf (every golf fixture, now and past 60 days), sources (reach of deeper data sources) or odds (dry run of sports_odds.py)"
         required: false
         default: "probe"
       args:
@@ -32,7 +32,7 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install requests
-      - if: ${{ inputs.job != 'lines' && inputs.job != 'golf' }}
+      - if: ${{ inputs.job != 'lines' && inputs.job != 'golf' && inputs.job != 'sources' }}
         run: python3 tools/onyx_markets_probe.py ${{ inputs.sports }}
         env:
           OPTICODDS_API_KEY: ${{ secrets.OPTICODDS_API_KEY }}
@@ -44,6 +44,22 @@ jobs:
         run: python3 tools/onyx_golf_probe.py ${{ inputs.sports }}
         env:
           OPTICODDS_API_KEY: ${{ secrets.OPTICODDS_API_KEY }}
+      # job=sources: can this runner reach the deeper public data sources (NBA.com
+      # tracking, nflverse, Baseball Savant, NHL API)? Status and a sample of each go
+      # to the artifact; nothing is committed.
+      - if: ${{ inputs.job == 'sources' }}
+        run: |
+          mkdir -p probe
+          H1='Referer: https://www.nba.com/'; H2='Origin: https://www.nba.com'
+          UA='Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36'
+          probe() { n=$1; shift; code=$(curl -sS -o probe/$n.out -w '%{http_code} %{size_download}' --max-time 40 "$@" || echo fail); echo "$n $code" | tee -a probe/sources.txt; }
+          probe nba_passing -H "$H1" -H "$H2" -A "$UA" "https://stats.nba.com/stats/leaguedashptstats?PerMode=PerGame&PlayerOrTeam=Player&PtMeasureType=Passing&Season=2026-27&SeasonType=Regular%20Season&LeagueID=00&LastNGames=0&Month=0&OpponentTeamID=0&PORound=0&TeamID=0&DateFrom=&DateTo=&College=&Conference=&Country=&Division=&DraftPick=&DraftYear=&GameScope=&Height=&Location=&Outcome=&PlayerExperience=&PlayerPosition=&SeasonSegment=&StarterBench=&VsConference=&VsDivision=&Weight="
+          probe nba_rebounding -H "$H1" -H "$H2" -A "$UA" "https://stats.nba.com/stats/leaguedashptstats?PerMode=PerGame&PlayerOrTeam=Player&PtMeasureType=Rebounding&Season=2026-27&SeasonType=Regular%20Season&LeagueID=00&LastNGames=0&Month=0&OpponentTeamID=0&PORound=0&TeamID=0&DateFrom=&DateTo=&College=&Conference=&Country=&Division=&DraftPick=&DraftYear=&GameScope=&Height=&Location=&Outcome=&PlayerExperience=&PlayerPosition=&SeasonSegment=&StarterBench=&VsConference=&VsDivision=&Weight="
+          probe nba_cdn -A "$UA" "https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json"
+          probe savant -A "$UA" "https://baseballsavant.mlb.com/leaderboard/expected_statistics?type=batter&year=2026&position=&team=&min=q&csv=true"
+          probe nhl_api -A "$UA" "https://api-web.nhle.com/v1/gamecenter/2025020500/play-by-play"
+          probe moneypuck -A "$UA" "https://moneypuck.com/moneypuck/playerData/seasonSummary/2025/regular/skaters.csv"
+          probe bbref -A "$UA" "https://www.basketball-reference.com/leagues/NBA_2027_per_game.html"
       # job=odds: a dry run of the live Onyx fetcher (sports_odds.py) for each
       # sport against today's slate; the odds files go to the artifact only
       - if: ${{ inputs.job == 'odds' }}
