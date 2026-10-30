@@ -1326,8 +1326,8 @@
     {
      "id": "185202",
      "start": "2026-10-30T14:35Z",
-     "state": "in",
-     "detail": "1st",
+     "state": "post",
+     "detail": "Final",
      "round": "Quarterfinal",
      "draw": "Men's Singles",
      "court": "Centre Court",
@@ -1337,11 +1337,12 @@
        "short": "C. Alcaraz",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
-        0
+        6,
+        7
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Tommy Paul",
@@ -1350,7 +1351,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        1
+        4,
+        6
        ],
        "serve": false
       }
@@ -1358,9 +1360,9 @@
     },
     {
      "id": "185199",
-     "start": "2026-10-30T16:30Z",
+     "start": "2026-10-30T16:50Z",
      "state": "pre",
-     "detail": "10/30 - 12:30 PM EDT",
+     "detail": "10/30 - 12:50 PM EDT",
      "round": "Quarterfinal",
      "draw": "Men's Singles",
      "court": "Centre Court",
@@ -1424,9 +1426,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Carlos Alcaraz",
+       "short": "C. Alcaraz",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -2807,8 +2809,8 @@
     {
      "id": "185153",
      "start": "2026-10-30T13:10Z",
-     "state": "in",
-     "detail": "3rd",
+     "state": "post",
+     "detail": "Final",
      "round": "Quarterfinal",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -2818,11 +2820,11 @@
        "short": "V. Vacherot",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/mon.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
         3,
-        1
+        6
        ],
        "serve": false
       },
@@ -2835,17 +2837,17 @@
        "sets": [
         3,
         6,
-        0
+        3
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
     {
      "id": "185154",
-     "start": "2026-10-30T15:00Z",
-     "state": "pre",
-     "detail": "10/30 - 11:00 AM EDT",
+     "start": "2026-10-30T15:35Z",
+     "state": "post",
+     "detail": "Retired",
      "round": "Quarterfinal",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -2856,7 +2858,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        2,
+        0
+       ],
        "serve": false
       },
       {
@@ -2864,8 +2869,11 @@
        "short": "T. Fritz",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
-       "win": false,
-       "sets": [],
+       "win": true,
+       "sets": [
+        6,
+        2
+       ],
        "serve": false
       }
      ]
@@ -2930,26 +2938,26 @@
     },
     {
      "id": "185158",
-     "start": "2026-10-31T04:00Z",
+     "start": "2026-10-31T14:00Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "10/31 - 10:00 AM EDT",
      "round": "Semifinal",
      "draw": "Men's Singles",
-     "court": "",
+     "court": "Center Court",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Taylor Fritz",
+       "short": "T. Fritz",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
        "win": false,
        "sets": [],
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Valentin Vacherot",
+       "short": "V. Vacherot",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/mon.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -2959,12 +2967,12 @@
     },
     {
      "id": "185157",
-     "start": "2026-10-31T04:00Z",
+     "start": "2026-10-31T16:00Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "10/31 - 12:00 PM EDT",
      "round": "Semifinal",
      "draw": "Men's Singles",
-     "court": "",
+     "court": "Center Court",
      "p": [
       {
        "name": "TBD",
@@ -4638,8 +4646,8 @@
     {
      "id": "185731",
      "start": "2026-10-30T12:20Z",
-     "state": "in",
-     "detail": "3rd",
+     "state": "post",
+     "detail": "Final",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -4653,20 +4661,20 @@
        "sets": [
         4,
         6,
-        4
+        5
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Lilli Tagger",
        "short": "L. Tagger",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/aut.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
         3,
-        5
+        7
        ],
        "serve": false
       }
@@ -4711,9 +4719,9 @@
      "court": "Center Court",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Lilli Tagger",
+       "short": "L. Tagger",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/aut.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -7350,9 +7358,9 @@
     },
     {
      "id": "185775",
-     "start": "2026-10-30T15:30Z",
-     "state": "pre",
-     "detail": "10/30 - 11:30 AM EDT",
+     "start": "2026-10-30T15:50Z",
+     "state": "in",
+     "detail": "2nd",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Quadra 1",
@@ -7363,8 +7371,11 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/aut.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        1,
+        3
+       ],
+       "serve": true
       },
       {
        "name": "Leyre Romero Gormaz",
@@ -7372,16 +7383,19 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        6,
+        2
+       ],
        "serve": false
       }
      ]
     },
     {
      "id": "185778",
-     "start": "2026-10-30T16:00Z",
-     "state": "pre",
-     "detail": "10/30 - 12:00 PM EDT",
+     "start": "2026-10-30T16:25Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Quadra Central",
@@ -7392,7 +7406,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        3
+       ],
        "serve": false
       },
       {
@@ -7401,8 +7417,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        1
+       ],
+       "serve": true
       }
      ]
     },
@@ -8734,8 +8752,8 @@
     {
      "id": "185857",
      "start": "2026-10-30T13:05Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Grandstand",
@@ -8745,10 +8763,10 @@
        "short": "A. Charaeva",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arm.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        4
+        6
        ],
        "serve": false
       },
@@ -8760,7 +8778,7 @@
        "win": false,
        "sets": [
         4,
-        3
+        4
        ],
        "serve": false
       }
@@ -8769,8 +8787,8 @@
     {
      "id": "185852",
      "start": "2026-10-30T14:30Z",
-     "state": "in",
-     "detail": "1st",
+     "state": "post",
+     "detail": "Final",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Centre Court",
@@ -8782,18 +8800,20 @@
        "seed": null,
        "win": false,
        "sets": [
-        0
+        3,
+        2
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Anna Blinkova",
        "short": "A. Blinkova",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
-        2
+        6,
+        6
        ],
        "serve": false
       }
@@ -8801,9 +8821,9 @@
     },
     {
      "id": "185856",
-     "start": "2026-10-30T14:50Z",
-     "state": "pre",
-     "detail": "10/30 - 10:50 AM EDT",
+     "start": "2026-10-30T15:10Z",
+     "state": "in",
+     "detail": "2nd",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Grandstand",
@@ -8814,7 +8834,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/bul.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        7,
+        4
+       ],
        "serve": false
       },
       {
@@ -8823,19 +8846,22 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        5,
+        3
+       ],
        "serve": false
       }
      ]
     },
     {
      "id": "185853",
-     "start": "2026-10-31T04:00Z",
+     "start": "2026-10-31T13:30Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "10/31 - 9:30 AM EDT",
      "round": "Semifinal",
      "draw": "Women's Singles",
-     "court": "",
+     "court": "Centre Court",
      "p": [
       {
        "name": "Noma Noha Akugue",
@@ -8847,9 +8873,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Anna Blinkova",
+       "short": "A. Blinkova",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -8859,17 +8885,17 @@
     },
     {
      "id": "185854",
-     "start": "2026-10-31T04:00Z",
+     "start": "2026-10-31T15:00Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "10/31 - 11:00 AM EDT",
      "round": "Semifinal",
      "draw": "Women's Singles",
-     "court": "",
+     "court": "Centre Court",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Alina Charaeva",
+       "short": "A. Charaeva",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arm.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -11670,5 +11696,5 @@
    ]
   }
  ],
- "fetched": "2026-10-30T14:45:53+00:00"
+ "fetched": "2026-10-30T16:48:33+00:00"
 }
