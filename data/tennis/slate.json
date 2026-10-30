@@ -1397,7 +1397,7 @@
      "id": "185200",
      "start": "2026-10-30T19:15Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Quarterfinal",
      "draw": "Men's Singles",
      "court": "Centre Court",
@@ -1409,7 +1409,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        7
+        7,
+        4
        ],
        "serve": false
       },
@@ -1420,9 +1421,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        6
+        6,
+        1
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
@@ -7488,8 +7490,8 @@
     {
      "id": "185777",
      "start": "2026-10-30T20:20Z",
-     "state": "pre",
-     "detail": "10/30 - 4:20 PM EDT",
+     "state": "in",
+     "detail": "1st",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Quadra Central",
@@ -7500,7 +7502,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        5
+       ],
        "serve": false
       },
       {
@@ -7509,7 +7513,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        2
+       ],
        "serve": false
       }
      ]
@@ -10282,9 +10288,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        0
+        4
        ],
-       "serve": false
+       "serve": true
       },
       {
        "name": "Tatjana Maria",
@@ -10293,9 +10299,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        5
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -11734,5 +11740,5 @@
    ]
   }
  ],
- "fetched": "2026-10-30T20:21:28+00:00"
+ "fetched": "2026-10-30T20:53:03+00:00"
 }
