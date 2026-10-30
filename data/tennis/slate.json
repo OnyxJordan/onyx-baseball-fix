@@ -1396,8 +1396,8 @@
     {
      "id": "185200",
      "start": "2026-10-30T19:15Z",
-     "state": "pre",
-     "detail": "10/30 - 3:15 PM EDT",
+     "state": "in",
+     "detail": "1st",
      "round": "Quarterfinal",
      "draw": "Men's Singles",
      "court": "Centre Court",
@@ -1408,7 +1408,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/aus.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        1
+       ],
        "serve": false
       },
       {
@@ -1417,8 +1419,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ita.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        1
+       ],
+       "serve": true
       }
      ]
     },
@@ -2923,7 +2927,7 @@
      "id": "185156",
      "start": "2026-10-30T18:50Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Quarterfinal",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -2935,6 +2939,7 @@
        "seed": null,
        "win": false,
        "sets": [
+        2,
         0
        ],
        "serve": true
@@ -2946,7 +2951,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        1
+        6,
+        3
        ],
        "serve": false
       }
@@ -7462,9 +7468,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        0
+        4
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Francesca Jones",
@@ -7473,7 +7479,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        1
+        2
        ],
        "serve": false
       }
@@ -11724,5 +11730,5 @@
    ]
   }
  ],
- "fetched": "2026-10-30T18:58:02+00:00"
+ "fetched": "2026-10-30T19:29:31+00:00"
 }
