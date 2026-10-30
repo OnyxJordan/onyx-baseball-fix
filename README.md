@@ -1170,3 +1170,27 @@ before assuming the model (it's been GitHub infra roughly as often).
   runs use committed data from `origin/main`.
 - Archived pregame boards for studies: one pre-17:00Z commit per date from `git log`,
   `git show <sha>:index.html`, join to box scores via the MLB Stats API.
+
+## Today's top 10 and the Plays tabs (10/30)
+
+Jordan: "what's the point of a model if there's no value to it". The tracked lanes stay
+strict (most nights they post nothing, by design), so every page now leads with the
+model's best plays of the day, clearly labelled, and the home page ranks one Top 10
+across every sport.
+
+- `daily_top.py`: each build (`nba_build.write_top`, `sports_build.write_top`) writes
+  `data/<sport>/top.json`: Onyx main lines priced **-150 to +150** where the sport's own
+  blended chance is at least the price's implied chance and 50%+, for games not yet
+  started. Each row is tagged `tracked` (a graded pick), `trial` (logged at the opening
+  price) or `lean` (the model's read, not graded). NBA: props for 28+ minute starters and
+  the 1st-quarter totals the on-trial model reads.
+- `home.html` `#top10`: reads every sport's file, drops started games and anything more
+  than three days out, ranks by confidence, at most 4 per sport and 2 per game (the rest
+  fill in on a quiet night), and links each to its Onyx selection.
+- Plays tabs: NBA opens with "Today's best plays" (the same list) and a "what we track"
+  strip (tracked picks, on trial, the Model's Parlay); the tracked-picks banner follows.
+  The sport pages lead with the plays (a live sport: tracked picks, then "More plays"),
+  then the on-trial lane and record, with "How this model works" moved to the bottom.
+- The Model's Parlay legs are now **-150 to +150 with 28+ projected minutes** (was -400 to
+  +150, 24+): Jordan's call, -179 / -195 legs are not on every book. Replay in
+  `nba_build.py` beside `TICKET_PRICE`.

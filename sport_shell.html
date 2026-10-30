@@ -1911,7 +1911,7 @@ function gameLeanTable(rows, inGame) {
 function renderPlays() {
   const M = SD.model || {};
   const el = document.getElementById('playsBody');
-  const lab = `<div class="lab"><div class="eb">${M.status === 'live' ? 'Tracked picks' : 'Model in the lab'}</div>
+  const lab = `<div class="lab"><div class="eb">${M.status === 'live' ? 'How the picks work' : 'How this model works · in the lab'}</div>
     <h3>${M.status === 'live' ? 'Where the model beats the Onyx line' : 'Picks switch on when the model earns them'}</h3>
     <p>${esc(M.note || `The ${C.name} model is being built and tested. Nothing here is a pick until it has been backtested against real Onyx prices, the same bar the NBA and MLB models had to clear.`)}</p>
     ${(M.tests || []).length ? `<div class="stat-grid">${M.tests.map(t => `<div><span>${esc(t.k)}</span><b>${esc(t.v)}</b><div class="dim" style="font-size:11px">${esc(t.d || '')}</div></div>`).join('')}</div>` : ''}
@@ -1920,11 +1920,15 @@ function renderPlays() {
   const picks = M.picks || [];
   const proj = M.projected || [];
   const lanePass = (M.engine || {}).lane;
-  const pickHtml = M.status === 'live' ? `<div class="sec-hdr"><span class="sec-title">Today's plays</span><span class="sec-count">${picks.length}</span></div>
-    ${picks.length ? playCards(picks) : '<div class="empty">No play clears the bar on this slate. A quiet slate is the screens working.</div>'}`
-    : `<div class="sec-hdr"><span class="sec-title">Today's plays · spreads, totals and props</span><span class="sec-count">${proj.length}</span></div>
-    <p class="dim" style="font-size:12px;line-height:1.6;margin:0 0 10px">Where the model's chance beats Onyx's price by a point or more, best value first, two per game at most. Confidence is the model's chance the play wins. Leans while the ${esc(C.name)} model is still in the lab: not tracked or graded until it beats Onyx's prices in a backtest.</p>
-    ${proj.length ? playCards(proj) : '<div class="empty">No line on this slate beats the Onyx price by a point. A quiet slate is the screens working.</div>'}`;
+  const picked = new Set(picks.map(k => k.sel));
+  const leans = proj.filter(k => !picked.has(k.sel));
+  const leanHdr = (t, n) => `<div class="sec-hdr"><span class="sec-title">${t}</span><span class="sec-count">${n}</span></div>`;
+  const pickHtml = M.status === 'live'
+    ? leanHdr('Tracked picks · graded', picks.length) + (picks.length ? playCards(picks) : '<div class="empty">No play clears the tracked screens on this slate. The best other plays are below.</div>')
+      + (leans.length ? leanHdr('More plays · model leans, not graded', leans.length) + playCards(leans) : '')
+    : leanHdr("Today's plays · best first", proj.length)
+      + `<p class="dim" style="font-size:12px;line-height:1.6;margin:0 0 10px">Where the model's chance beats Onyx's price, best value first, two per game at most. Confidence is the model's chance the play wins. Model leans: not graded until the ${esc(C.name)} model beats Onyx's prices in a backtest.</p>`
+      + (proj.length ? playCards(proj) : '<div class="empty">No line on this slate beats the Onyx price right now. Plays appear as Onyx posts lines.</div>');
   const rows = M.rows || [];
   const gameRows = rows.filter(r => r.kind), propRows = rows.filter(r => !r.kind);
   let body = (M.td || []).length ? tdTable(M.td.slice(0, 60), 'Touchdown scorers · anytime and first TD') : '';
@@ -1936,7 +1940,8 @@ function renderPlays() {
     <div class="sp-tabs-seg"><button class="${PMKT === 'all' ? 'on' : ''}" onclick="PMKT='all';renderPlays()">All</button>${mk.map(m => `<button class="${PMKT === m ? 'on' : ''}" onclick="PMKT='${esc(m)}';renderPlays()">${esc(MKT_NAME[m] || m)}</button>`).join('')}</div>
     ${projTable(shown.slice(0, 120))}`;
   }
-  el.innerHTML = lab + openTrialSport(M.open) + pickHtml + body + recordBlock(M.record) + (!rows.length && M.status !== 'live' ? '' : '');
+  // what to bet first, then what is tracked, then the detail; how the model works last
+  el.innerHTML = pickHtml + openTrialSport(M.open) + recordBlock(M.record) + body + lab;
 }
 // receptions at Onyx's opening price, on trial (sports_build.nfl_open_lane): logged only
 // while Onyx still shows the first price we saw for that line, graded off the box score

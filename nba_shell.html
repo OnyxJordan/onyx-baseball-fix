@@ -218,6 +218,21 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
 .pl-lines{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:-4px 0 12px;font:600 12px 'Space Grotesk',sans-serif;color:var(--text3)}
 .pl-lines i{width:7px;height:7px;border-radius:50%;background:#61e970;display:inline-block}
 .pl-lines.old{color:#f0a3ff}.pl-lines.old i{background:#f87171}
+/* today's best plays + what we track (top of the Plays tab) */
+.tp-list{display:grid;gap:8px;margin-bottom:14px}
+.tp-r{display:grid;grid-template-columns:26px minmax(0,1fr) auto auto;gap:4px 10px;align-items:center;padding:10px 12px;border-radius:14px;border:1px solid var(--border2);background:var(--bg2)}
+.tp-r.top{border-color:rgba(176,56,249,.5)}
+.tp-n{font:800 16px monospace;color:#d795ff;text-align:center}
+.tp-w{min-width:0}.tp-w b{display:block;font-size:14px;line-height:1.25}.tp-w span{display:block;font:600 11px monospace;color:var(--text3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tp-c{text-align:right}.tp-c b{display:block;font:800 18px monospace;color:#61e970;line-height:1}.tp-c small{font:700 8px monospace;letter-spacing:.06em;color:var(--text3)}
+.tp-w b .tp-tag{display:inline-block;margin-top:0;white-space:nowrap}
+.tp-tag{font:800 8px monospace;letter-spacing:.08em;padding:2px 6px;border-radius:999px;background:rgba(255,255,255,.08);color:var(--text2);text-transform:uppercase;margin-left:6px;vertical-align:1px}
+.tp-tag.tracked{background:rgba(97,233,112,.16);color:#61e970}.tp-tag.trial{background:rgba(99,91,255,.2);color:#b7b2ff}
+.tk-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:18px}
+.tk-strip button{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border-radius:14px;border:1px solid var(--border2);background:var(--bg2);color:var(--text);text-align:left;cursor:pointer;min-width:0}
+.tk-strip b{font:800 16px monospace}.tk-strip i{font-style:normal;font:700 9px monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--text3)}
+.tk-strip em{font-style:normal;font-size:11px;color:var(--text2);line-height:1.35}
+@media(max-width:520px){.tk-strip{grid-template-columns:1fr}}
 .pl-rec-in{width:100%;display:flex;flex-wrap:wrap;align-items:center;gap:8px 26px;padding:12px 16px;margin-bottom:14px;border-radius:14px;border:1px solid var(--border2);background:var(--bg2);color:var(--text);cursor:pointer;text-align:left}
 .pl-rec-in:hover{border-color:rgba(176,56,249,.5)}
 .pl-rec-in span{display:flex;flex-direction:column}.pl-rec-in b{font:800 18px monospace}.pl-rec-in i{font-style:normal;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)}
@@ -699,6 +714,8 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
 
 <!-- ═══ PLAYS: recommended plays, MLB Edge Plays style ═══════════ -->
 <div class="pane" id="pane-plays"><div class="nba-wrap">
+  <div id="plTop"></div>
+  <div id="plTrack"></div>
   <div class="pl-banner" id="plBanner"></div>
   <div class="pl-lines" id="plLines"></div>
   <div class="pl-rec" id="plRec"></div>
@@ -1358,11 +1375,34 @@ function plCard(k, i) {
     </div>
   </article>`;
 }
+// today's best plays: the build's own Top 10 for NBA (daily_top.py), ranked by confidence
+function topPlays() {
+  const T = (D.top || []).filter(p => (gameOf(p.gid) || {}).state === 'pre' || !gameOf(p.gid));
+  const tagTxt = {tracked: 'Tracked pick', trial: 'On trial', lean: 'Model lean'};
+  const head = `<div class="sec-hdr"><div><span class="sec-title">Today's best plays · ranked by confidence</span></div><span class="sec-count">${T.length}</span></div>`;
+  if (!T.length) return head + `<div class="empty">${(D.meta || {}).priced ? 'No standard-priced line (-150 to +150) where the model beats Onyx right now.' : 'Onyx prices are not posted yet for tonight.'}</div>`;
+  return head + `<div class="tp-list">${T.map((p, i) => {
+    const leg = p.sel ? {sel: p.sel, price: p.price, gid: p.gid, market: 'play', label: p.label} : null;
+    return `<div class="tp-r${i < 3 ? ' top' : ''}"><div class="tp-n">${i + 1}</div>
+      <div class="tp-w"><b>${esc(p.label)}<span class="tp-tag ${p.tag}">${tagTxt[p.tag] || 'Model lean'}</span></b><span>${esc(p.matchup)} · ${tipTime(p.start)}</span></div>
+      <div class="tp-c"><b>${Math.round(100 * p.conf)}%</b><small>CONFIDENCE</small></div>
+      ${nbOc(p.price, '', leg)}</div>`;
+  }).join('')}</div>`;
+}
+// what this page tracks, in one place: the graded picks, the on-trial lanes, the parlay
+function trackStrip() {
+  const R = D.record || {}, O = ((D.open || {}).kinds || {}).all || {}, K = D.tickets || {};
+  const rec = (w, l) => `${w || 0}-${l || 0}`;
+  return `<div class="tk-strip">
+    <button onclick="gotoTab('record')"><i>Tracked picks</i><b>${rec(R.w, R.l)}</b><em>Graded nightly. Strict screens, so most nights have none.</em></button>
+    <button onclick="document.getElementById('plOpen').scrollIntoView({behavior:'smooth'})"><i>On trial</i><b>${rec(O.w, O.l)}</b><em>1st-quarter totals and first basket, at Onyx's opening price.</em></button>
+    <button onclick="gotoTab('home')"><i>The Model's Parlay</i><b>${rec(K.w, K.l)}</b><em>Three starters on standard prices, one ticket a night.</em></button></div>`;
+}
 function renderPlays() {
   const L = plLane(), picks = (D.picks || []).slice();
   const date = D.date ? new Date(D.date + 'T12:00:00').toLocaleDateString('en-US', {month: 'short', day: 'numeric'}) : '';
-  document.getElementById('plBanner').innerHTML = `<div class="pl-eb">Onyx Picks · ${esc(date)}</div>
-    <h2>Where the model beats the Onyx line</h2>
+  document.getElementById('plBanner').innerHTML = `<div class="pl-eb">Tracked picks · ${esc(date)}</div>
+    <h2>Graded picks: where the model beats the Onyx line</h2>
     <p>Tracked picks clear every screen: an edge of +${(L.min_edge * 100).toFixed(0)} to +${(L.max_edge * 100).toFixed(0)} points over the Onyx price, priced ${L.price[0]} to +${L.price[1]},
       ${L.min_min}+ projected minutes, at least ${L.signals} of 3 form reads on the same side, and no role mismatch. Odds are logged the moment a play qualifies, locked at tip and graded off the box score. Tap any play for every line on him.</p>`;
   // how old these Onyx prices are: the page is rebuilt from a fresh pull about
@@ -1410,6 +1450,8 @@ function renderPlays() {
   // closest to qualifying first: fewest failed screens, then the bigger edge
   near.sort((a, b) => a.miss.length - b.miss.length || b.pr.edge - a.pr.edge);
   const W = near.slice(0, 8);
+  document.getElementById('plTop').innerHTML = topPlays();
+  document.getElementById('plTrack').innerHTML = trackStrip();
   document.getElementById('plFb').innerHTML = fbLeans();
   document.getElementById('plOpen').innerHTML = openTrial();
   document.getElementById('plWatch').innerHTML = W.length ? `<div class="pl-div"><i></i><span>Watchlist · near misses · not picks · not graded</span><i></i></div>
