@@ -1,5 +1,5 @@
 {
- "date": "2026-10-29",
+ "date": "2026-10-30",
  "sport": "tennis",
  "name": "Tennis",
  "label": "Erste Bank Open · Swiss Indoors Basel · Guangzhou Open",
@@ -4513,8 +4513,8 @@
     {
      "id": "185729",
      "start": "2026-10-30T05:05Z",
-     "state": "in",
-     "detail": "3rd",
+     "state": "post",
+     "detail": "Final",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -4524,11 +4524,11 @@
        "short": "H. Dart",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/gbr.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         3,
         6,
-        3
+        6
        ],
        "serve": false
       },
@@ -4541,7 +4541,7 @@
        "sets": [
         6,
         2,
-        2
+        4
        ],
        "serve": false
       }
@@ -4549,9 +4549,9 @@
     },
     {
      "id": "185730",
-     "start": "2026-10-30T07:20Z",
-     "state": "pre",
-     "detail": "10/30 - 3:20 AM EDT",
+     "start": "2026-10-30T07:50Z",
+     "state": "in",
+     "detail": "2nd",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -4562,7 +4562,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/sui.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        6,
+        2
+       ],
        "serve": false
       },
       {
@@ -4571,16 +4574,19 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        7,
+        1
+       ],
+       "serve": true
       }
      ]
     },
     {
      "id": "185732",
-     "start": "2026-10-30T08:30Z",
+     "start": "2026-10-30T09:30Z",
      "state": "pre",
-     "detail": "10/30 - 4:30 AM EDT",
+     "detail": "10/30 - 5:30 AM EDT",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -4644,9 +4650,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Harriet Dart",
+       "short": "H. Dart",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/gbr.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -6189,9 +6195,9 @@
     },
     {
      "id": "185685",
-     "start": "2026-10-30T08:00Z",
-     "state": "pre",
-     "detail": "10/30 - 4:00 AM EDT",
+     "start": "2026-10-30T08:05Z",
+     "state": "in",
+     "detail": "2nd",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Center",
@@ -6202,7 +6208,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/rus.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        2,
+        3
+       ],
        "serve": false
       },
       {
@@ -6211,7 +6220,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/phi.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        6,
+        2
+       ],
        "serve": false
       }
      ]
@@ -10350,5 +10362,5 @@
    ]
   }
  ],
- "fetched": "2026-10-30T07:11:31+00:00"
+ "fetched": "2026-10-30T09:13:26+00:00"
 }
