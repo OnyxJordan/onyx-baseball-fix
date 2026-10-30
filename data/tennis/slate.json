@@ -1361,8 +1361,8 @@
     {
      "id": "185199",
      "start": "2026-10-30T16:50Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Quarterfinal",
      "draw": "Men's Singles",
      "court": "Centre Court",
@@ -1384,10 +1384,10 @@
        "short": "A. Zverev",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ger.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        5
+        6
        ],
        "serve": false
       }
@@ -1424,12 +1424,12 @@
     },
     {
      "id": "185204",
-     "start": "2026-10-31T04:00Z",
+     "start": "2026-10-31T14:00Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "10/31 - 10:00 AM EDT",
      "round": "Semifinal",
      "draw": "Men's Singles",
-     "court": "",
+     "court": "Centre Court",
      "p": [
       {
        "name": "Carlos Alcaraz",
@@ -1453,12 +1453,12 @@
     },
     {
      "id": "185203",
-     "start": "2026-10-31T04:00Z",
+     "start": "2026-10-31T15:30Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "10/31 - 11:30 AM EDT",
      "round": "Semifinal",
      "draw": "Men's Singles",
-     "court": "",
+     "court": "Centre Court",
      "p": [
       {
        "name": "TBD",
@@ -1470,9 +1470,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Alexander Zverev",
+       "short": "A. Zverev",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ger.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -2888,7 +2888,7 @@
      "id": "185155",
      "start": "2026-10-30T17:05Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Quarterfinal",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -2900,7 +2900,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        5
+        6,
+        3
        ],
        "serve": true
       },
@@ -2911,7 +2912,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        4
+        4,
+        2
        ],
        "serve": false
       }
@@ -7369,8 +7371,8 @@
     {
      "id": "185775",
      "start": "2026-10-30T15:50Z",
-     "state": "in",
-     "detail": "3rd",
+     "state": "post",
+     "detail": "Final",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Quadra 1",
@@ -7380,13 +7382,13 @@
        "short": "J. Grabher",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/aut.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         1,
         6,
-        4
+        7
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Leyre Romero Gormaz",
@@ -7397,7 +7399,7 @@
        "sets": [
         6,
         4,
-        3
+        5
        ],
        "serve": false
       }
@@ -7407,7 +7409,7 @@
      "id": "185778",
      "start": "2026-10-30T16:25Z",
      "state": "in",
-     "detail": "2nd",
+     "detail": "3rd",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Quadra Central",
@@ -7420,9 +7422,10 @@
        "win": false,
        "sets": [
         6,
-        4
+        4,
+        3
        ],
-       "serve": false
+       "serve": true
       },
       {
        "name": "Julia Riera",
@@ -7432,17 +7435,18 @@
        "win": false,
        "sets": [
         1,
+        6,
         5
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
     {
      "id": "185776",
-     "start": "2026-10-30T17:50Z",
+     "start": "2026-10-30T18:30Z",
      "state": "pre",
-     "detail": "10/30 - 1:50 PM EDT",
+     "detail": "10/30 - 2:30 PM EDT",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Quadra Central",
@@ -7469,9 +7473,9 @@
     },
     {
      "id": "185777",
-     "start": "2026-10-30T19:00Z",
+     "start": "2026-10-30T19:30Z",
      "state": "pre",
-     "detail": "10/30 - 3:00 PM EDT",
+     "detail": "10/30 - 3:30 PM EDT",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Quadra Central",
@@ -7506,9 +7510,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Julia Grabher",
+       "short": "J. Grabher",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/aut.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -11712,5 +11716,5 @@
    ]
   }
  ],
- "fetched": "2026-10-30T17:51:41+00:00"
+ "fetched": "2026-10-30T18:26:20+00:00"
 }
