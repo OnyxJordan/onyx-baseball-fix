@@ -6081,8 +6081,8 @@
     {
      "id": "185684",
      "start": "2026-10-30T01:35Z",
-     "state": "pre",
-     "detail": "10/29 - 9:35 PM EDT",
+     "state": "in",
+     "detail": "1st",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Center",
@@ -6093,7 +6093,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/aus.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        5
+       ],
        "serve": false
       },
       {
@@ -6102,8 +6104,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/uzb.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        2
+       ],
+       "serve": true
       }
      ]
     },
@@ -10087,9 +10091,9 @@
     },
     {
      "id": "185810",
-     "start": "2026-10-30T01:40Z",
-     "state": "pre",
-     "detail": "10/29 - 9:40 PM EDT",
+     "start": "2026-10-30T01:50Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Estadio Mexcovery",
@@ -10100,8 +10104,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        2
+       ],
+       "serve": true
       },
       {
        "name": "Tamara Zidansek",
@@ -10109,7 +10115,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/slo.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        2
+       ],
        "serve": false
       }
      ]
@@ -10320,5 +10328,5 @@
    ]
   }
  ],
- "fetched": "2026-10-30T01:39:04+00:00"
+ "fetched": "2026-10-30T02:10:42+00:00"
 }
