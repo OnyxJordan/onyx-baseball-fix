@@ -1409,7 +1409,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        3
+        5
        ],
        "serve": false
       },
@@ -1420,7 +1420,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        4
+        6
        ],
        "serve": false
       }
@@ -2926,8 +2926,8 @@
     {
      "id": "185156",
      "start": "2026-10-30T18:50Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Quarterfinal",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -2949,12 +2949,12 @@
        "short": "J. Struff",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ger.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        5
+        6
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -2997,9 +2997,9 @@
      "court": "Center Court",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Jan-Lennard Struff",
+       "short": "J. Struff",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ger.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -7468,7 +7468,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        6
+        7
        ],
        "serve": false
       },
@@ -7487,9 +7487,9 @@
     },
     {
      "id": "185777",
-     "start": "2026-10-30T20:15Z",
+     "start": "2026-10-30T20:05Z",
      "state": "pre",
-     "detail": "10/30 - 4:15 PM EDT",
+     "detail": "10/30 - 4:05 PM EDT",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Quadra Central",
@@ -10268,9 +10268,9 @@
     },
     {
      "id": "185816",
-     "start": "2026-10-30T20:00Z",
+     "start": "2026-10-30T20:05Z",
      "state": "pre",
-     "detail": "10/30 - 4:00 PM EDT",
+     "detail": "10/30 - 4:05 PM EDT",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Estadio Mexcovery",
@@ -11730,5 +11730,5 @@
    ]
   }
  ],
- "fetched": "2026-10-30T19:49:27+00:00"
+ "fetched": "2026-10-30T20:04:17+00:00"
 }
