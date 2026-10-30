@@ -19,6 +19,7 @@ removed or re-priced. A pick whose player never logs a minute is a void.
 """
 
 import json, os, re, sys
+from pathlib import Path
 from datetime import date, datetime, timedelta, timezone
 
 import nba_common
@@ -36,8 +37,15 @@ TICKET_LOCK = "ticket_lock.json"     # today's ticket, refreshed until the first
 # game and player) hit 28.6% at opening / 22.4% at closing prices (claimed
 # 24%), against 12.2% / 4.1% for top-scorer overs. Main lines only (the
 # history has no alternate ladders to prove them on).
-TICKET_LEGS, TICKET_MIN_LEGS, TICKET_MIN_MIN = 3, 2, 24.0
-TICKET_PRICE = (-400, 150)
+# 10/30: MAINSTREAM LEGS. Jordan: -179 / -195 legs are not listed on every book
+# and the ticket should be starters on standard prices. The replay (2025-26,
+# 142 slates, v7, Onyx prices) put the old -400..+150 / 24 min ticket at -18%
+# at both opening and closing prices (median leg -176); -150..+150 with 28+
+# projected minutes: -14% at the open, +19% at the close (median leg -146).
+# No version is proven at ~140 tickets; this one is no worse and plays like
+# a ticket people actually bet.
+TICKET_LEGS, TICKET_MIN_LEGS, TICKET_MIN_MIN = 3, 2, 28.0
+TICKET_PRICE = (-150, 150)
 STAKE = 10.0
 
 # Picks lane (v1). Deliberately strict: an honest lane is a quiet lane.
@@ -306,8 +314,8 @@ def grade(ledger, today):
 def ticket_legs(rows, games):
     """The Model's Parlay: the three Onyx main-line legs with the highest
     blended win chance (20% model / 80% Onyx no-vig, the board's number),
-    any of points / rebounds / assists, over or under, priced -400..+150,
-    projected 24+ minutes, healthy, untipped, one leg per game and per player."""
+    any of points / rebounds / assists, over or under, priced -150..+150,
+    projected 28+ minutes (starters on standard prices), healthy, untipped, one leg per game and per player."""
     cands = []
     for r in rows:
         if r["out"] or r["inj"] or r["min"] < TICKET_MIN_MIN:
@@ -335,6 +343,44 @@ def ticket_legs(rows, games):
                     "stat": s_, "side": side, "line": pr["line"], "odds": a["price"], "prob": prob,
                     "proj": r["proj"][s_], "sel": a["sel"], "hit": None})
     return out
+
+
+def write_top(rows, games, today_rows, open_led, today):
+    """data/nba/top.json for the home page's Top 10 (daily_top.py): every Onyx
+    main-line prop side for a starter (28+ projected minutes, the parlay's
+    mainstream bar) and every 1st-quarter total the on-trial model reads."""
+    import daily_top as DT, open_lanes as OL
+    tracked = {k.get("sel") for k in today_rows if k.get("sel")}
+    trial = {k.get("sel") for k in open_led if k.get("date") == today and k.get("sel")}
+    tag = lambda sel: "tracked" if sel in tracked else "trial" if sel in trial else "lean"
+    out = []
+    for r in rows:
+        g = games.get(r["gid"]) or {}
+        if r["out"] or r["inj"] or r["min"] < TICKET_MIN_MIN or g.get("state") != "pre":
+            continue
+        for s_, pr in (r.get("props") or {}).items():
+            if pr.get("src") != "onyx":
+                continue
+            for side, a in (pr.get("all") or {}).items():
+                c = {"kind": "prop", "mkt": s_, "name": r["name"], "pid": r["pid"], "side": side, "line": pr["line"],
+                     "price": a.get("price"), "prob": a.get("prob"), "edge": a.get("edge"), "sel": a.get("sel"),
+                     "gid": r["gid"], "matchup": f"{g.get('away')} @ {g.get('home')}", "start": g.get("start")}
+                if a.get("sel") and DT.ok(c):
+                    out.append(DT.entry("nba", c, tag(a.get("sel"))))
+    for g in games.values():
+        if g.get("state") != "pre" or g.get("q1_total") is None or not g.get("total"):
+            continue
+        po = 1 - OL._phi((g["q1_total"] - g["total"] * OL.P["q1"]) / OL.P["q1_sd"])
+        for side, p in (("over", po), ("under", 1 - po)):
+            price, sel = g.get(f"q1_{side}_price"), g.get(f"q1_{side}_sel")
+            if price is None or not sel:
+                continue
+            c = {"kind": "prop", "mkt": "q1_total", "name": f"{g['away']} @ {g['home']}", "pid": "q1", "side": side,
+                 "line": g["q1_total"], "price": price, "prob": p, "edge": p - OL.implied(price), "sel": sel,
+                 "gid": g["gid"], "matchup": f"{g['away']} @ {g['home']}", "start": g.get("start")}
+            if DT.ok(c):
+                out.append(DT.entry("nba", c, tag(sel)))
+    return DT.write(Path("data/nba"), "nba", today, out)
 
 
 def slate_started(slate, now=None):
@@ -645,6 +691,8 @@ def main():
         # plays at Onyx's opening price, on trial (open_lanes.py)
         "open": open_lanes.summarize(open_led),
     }
+    # today's best plays (home page Top 10 and the top of the Plays tab)
+    data["top"] = write_top(rows, games, today_rows, open_led, today)[:10]
     shell = open(SHELL, encoding="utf-8").read()
     # one design system: the MLB stylesheet is copied out of shell.html on
     # every build, so a styling change on the MLB site carries to NBA

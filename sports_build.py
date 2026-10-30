@@ -290,6 +290,7 @@ def nfl_block(lane, slate, odds):
         row = game.get(nk(r["name"]))
         return (row.get(r["mkt"]) or 0.0) if row else "void"
     block = model_frame("nfl", lane, slate, odds, M, grows + out, block, resolve)
+    block["_cands"] = grows + out
     block["proj"] = proj
     eng = engine_team("nfl", M, M.GAME_P, gw, bt, block["status"] == "live")
     eng["steps"].insert(0, engine_nfl_props(M))
@@ -623,10 +624,10 @@ def team_block(key, lane, slate, odds):
                {"k": f"Total error ({unit})", "v": f"{TEST['mae_total']:.2f}", "d": f"vs {TEST['base_mae_total']:.2f} league average"}],
         roadmap=ROADMAP.get(key, []))
     base = model_frame(key, lane, slate, odds, M, rows, base, grade_team(lane))
+    base["_cands"] = rows
     base["proj"] = proj
     base["engine"] = engine_team(key, M, GP, w, bt, base["status"] == "live")
-    if base["status"] != "live":
-        base["projected"] = top_plays(rows)
+    base["projected"] = top_plays(rows)     # leans; a live sport shows them under its tracked picks
     return base
 
 
@@ -648,10 +649,10 @@ def tennis_block(lane, slate, odds):
                {"k": "Favourite won", "v": "64.0%", "d": "same matches"}],
         roadmap=ROADMAP["tennis"])
     base = model_frame("tennis", lane, slate, odds, TM, rows, base, grade_tennis(lane))
+    base["_cands"] = rows
     base["players"] = tennis_players(lane, slate)
     base["engine"] = engine_tennis(TM, w, bt, base["status"] == "live")
-    if base["status"] != "live":
-        base["projected"] = top_plays(rows)
+    base["projected"] = top_plays(rows)     # leans; a live sport shows them under its tracked picks
     return base
 
 
@@ -729,6 +730,24 @@ def lab_block(key, cfg):
                 "factors": [], "lane": None}}
 
 
+def write_top(key, lane, slate, model):
+    """data/<sport>/top.json for the home page's Top 10 (daily_top.py)."""
+    import daily_top as DT
+    cands = model.pop("_cands", None) or []
+    start = {g["gid"]: g.get("start") for g in slate.get("games") or []}
+    for e in slate.get("events") or []:
+        for m in e.get("matches") or []:
+            start[m["id"]] = m.get("start")
+    tracked = {r.get("sel") for r in model.get("picks") or [] if r.get("sel")}
+    trial = {r.get("sel") for r in ((model.get("open") or {}).get("rows") or []) if r.get("sel") and not r.get("result")}
+    pre = {g["gid"] for g in slate.get("games") or [] if g.get("state") == "pre"} | \
+          {m["id"] for e in slate.get("events") or [] for m in e.get("matches") or [] if m.get("state") == "pre"}
+    rows = [DT.entry(key, r, "tracked" if r.get("sel") in tracked else "trial" if r.get("sel") in trial else "lean",
+                     start.get(r.get("gid")))
+            for r in cands if DT.ok(r) and r.get("gid") in pre]
+    DT.write(lane.data, key, slate.get("date"), rows)
+
+
 def main():
     key = (sys.argv[1:] or ["nfl"])[0]
     lane = Lane(key)
@@ -747,6 +766,7 @@ def main():
         model = golf_block(lane, slate)
     else:
         model = lab_block(key, cfg)
+    write_top(key, lane, slate, model)
     page_cfg = {"name": cfg["name"], "full": cfg["full"], "kind": cfg["kind"], "espn": cfg["espn"],
                 "espn_q": cfg.get("espn_q", ""), "tone": cfg["tone"], "art": cfg["art"],
                 "onyx_league": ONYX_LEAGUE.get(key)}

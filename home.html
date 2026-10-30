@@ -24,7 +24,7 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
 </script>
 <style>
 /* My Onyx: favorites, bets and everything live, across every sport */
-.my{padding:28px 0 8px}
+.my{padding-top:28px;padding-bottom:8px}
 .my-h{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
 .my-h h2{margin:0;font-size:clamp(28px,6vw,46px);line-height:1}
 .my-h p{margin:6px 0 0;color:var(--ox-200,#b9b2c4);font-size:14px;max-width:520px}
@@ -56,6 +56,19 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
 .my-b span{font:600 11px monospace;color:#9a93a6}.my-b .legs{grid-column:1/-1;font-size:12px;color:#cfc8da;line-height:1.5}
 .my-b.live{border-color:rgba(97,233,112,.45)}.my-b.live span.st{color:#61e970}
 .my-note{font:600 10px monospace;color:#7d768a;margin-top:10px;line-height:1.5}
+/* Top 10 plays of the day, every sport, ranked by each model's confidence */
+.t10{padding-top:28px;padding-bottom:8px}
+.t10-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:10px}
+.t10-r{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:4px 10px;align-items:center;padding:12px;border-radius:16px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.035);color:#fff}
+.t10-r.top{border-color:rgba(176,56,249,.55);background:linear-gradient(160deg,rgba(176,56,249,.14),rgba(255,255,255,.03))}
+.t10-n{font:800 20px monospace;color:#d795ff;text-align:center;grid-row:span 2}
+.t10-w{min-width:0}.t10-w b{display:block;font-size:15px;line-height:1.25}
+.t10-w span{display:block;font:600 11px monospace;color:#9a93a6;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.t10-c{text-align:right;grid-row:span 2}.t10-c b{display:block;font:800 22px monospace;color:#61e970;line-height:1}.t10-c small{display:block;font:700 9px monospace;color:#9a93a6;letter-spacing:.06em;margin-top:3px}
+.t10-f{grid-column:2;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.t10-tag{font:800 9px monospace;letter-spacing:.08em;padding:3px 7px;border-radius:999px;background:rgba(255,255,255,.08);color:#cfc8da;text-transform:uppercase}
+.t10-tag.sp{background:rgba(176,56,249,.18);color:#d795ff}.t10-tag.tracked{background:rgba(97,233,112,.16);color:#61e970}.t10-tag.trial{background:rgba(99,91,255,.2);color:#b7b2ff}
+.t10-bet{margin-left:auto;font:800 12px monospace;padding:6px 10px;border-radius:999px;background:linear-gradient(135deg,#b038f9,#635bff);color:#fff;text-decoration:none;white-space:nowrap}
 </style>
 </head>
 <body class="ox-page">
@@ -93,7 +106,8 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
       <h1>Research<br><em>on</em> everything</h1>
       <p>Onyx Sports Data compiles the best numbers across the industry, runs them through models we test in public and prices every one against the live Onyx line.</p>
       <div class="ox-hero-cta">
-        <a class="ox-btn fill" href="#my">My Onyx</a>
+        <a class="ox-btn fill" href="#top10">Today's top 10</a>
+        <a class="ox-btn" href="#my">My Onyx</a>
         <a class="ox-btn" href="#sports">Choose a sport</a>
         <a class="ox-btn" href="#parlay">Tonight's parlay</a>
       </div>
@@ -108,6 +122,14 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
       <div><b id="tLive">7</b><span>Sports live, 2 models graded</span></div>
     </div>
   </div>
+
+  <!-- ── Top 10 plays of the day, every sport ─────────────────────── -->
+  <section class="ox-wrap t10" id="top10">
+    <div class="my-h"><div><span class="ox-eyebrow">Today's top 10</span><h2>Our favorite<br>plays today.</h2>
+      <p>The ten plays our models like most across every sport, ranked by each model's confidence. Standard Onyx prices only (-150 to +150), and only where the model's chance beats the price.</p></div></div>
+    <div class="t10-list" id="t10List"><div class="my-empty">Loading today's plays...</div></div>
+    <div class="my-note" id="t10Note"></div>
+  </section>
 
   <!-- ── My Onyx: your players, your bets, everything live ─────────── -->
   <section class="ox-wrap my" id="my">
@@ -293,6 +315,53 @@ function etTime(iso) {
   catch (e) { return '-'; }
 }
 async function getJSON(u) { const r = await fetch(u, {cache: 'no-cache'}); if (!r.ok) throw new Error(u); return r.json(); }
+
+// ── Top 10 plays of the day: every sport build writes data/<sport>/top.json (daily_top.py)
+var T10_SPORTS = [['nba', 'NBA', 'nba.html'], ['nfl', 'NFL', 'nfl.html'], ['cfb', 'NCAAF', 'cfb.html'], ['nhl', 'NHL', 'nhl.html'], ['tennis', 'Tennis', 'tennis.html']];
+var T10_PER_SPORT = 4, T10_PER_GAME = 2;
+function t10When(iso) {
+  try {
+    const d = new Date(iso), now = new Date();
+    const day = d.toLocaleDateString('en-US', {weekday: 'short', timeZone: 'America/New_York'});
+    const today = now.toLocaleDateString('en-US', {weekday: 'short', timeZone: 'America/New_York'});
+    return (day === today ? '' : day + ' ') + etTime(iso) + ' ET';
+  } catch (e) { return ''; }
+}
+async function top10() {
+  const el = document.getElementById('t10List');
+  const files = await Promise.all(T10_SPORTS.map(([k]) => getJSON('data/' + k + '/top.json').catch(() => null)));
+  const now = Date.now(), all = [];
+  files.forEach((f, i) => (f && f.plays || []).forEach(p => {
+    const t = p.start ? Date.parse(p.start) : NaN;
+    if (!isNaN(t) && t <= now) return;                       // started: no longer bettable at this price
+    if (!isNaN(t) && t - now > 3 * 864e5) return;            // more than three days out: not today's play
+    all.push(Object.assign({}, p, {lg: T10_SPORTS[i][1], href: T10_SPORTS[i][2], t}));
+  }));
+  all.sort((a, b) => b.conf - a.conf || b.edge - a.edge);
+  const pick = [], nSport = {}, nGame = {};
+  for (const p of all) {                                     // spread the ten across sports first
+    if ((nSport[p.sport] || 0) >= T10_PER_SPORT || (nGame[p.gid] || 0) >= T10_PER_GAME) continue;
+    nSport[p.sport] = (nSport[p.sport] || 0) + 1; nGame[p.gid] = (nGame[p.gid] || 0) + 1; pick.push(p);
+    if (pick.length >= 10) break;
+  }
+  if (pick.length < 10) for (const p of all) {               // a quiet sport night: let the rest fill in
+    if (pick.includes(p) || (nGame[p.gid] || 0) >= T10_PER_GAME) continue;
+    nGame[p.gid] = (nGame[p.gid] || 0) + 1; pick.push(p);
+    if (pick.length >= 10) break;
+  }
+  pick.sort((a, b) => b.conf - a.conf || b.edge - a.edge);
+  if (!pick.length) { el.innerHTML = '<div class="my-empty">No play clears the bar right now: every model is waiting on fresh Onyx prices. Check back closer to game time.</div>'; return; }
+  const tagTxt = {tracked: 'Tracked pick', trial: 'On trial', lean: 'Model lean'};
+  el.innerHTML = pick.map((p, i) => {
+    const url = p.sel ? 'https://app.onyxodds.com/share?selection=' + encodeURIComponent(p.sel) + '&referrer=' + ONYX_REFERRER : p.href;
+    return `<div class="t10-r${i < 3 ? ' top' : ''}"><div class="t10-n">${i + 1}</div>
+      <div class="t10-w"><b>${esc(p.label)}</b><span>${esc(p.matchup)}${p.start ? ' · ' + esc(t10When(p.start)) : ''}</span></div>
+      <div class="t10-c"><b>${Math.round(100 * p.conf)}%</b><small>CONFIDENCE</small></div>
+      <div class="t10-f"><a class="t10-tag sp" href="${p.href}">${esc(p.lg)}</a><span class="t10-tag ${p.tag}">${tagTxt[p.tag] || 'Model lean'}</span>
+        <a class="t10-bet" href="${url}" target="_blank" rel="noopener" onclick="track('top10_bet',{sport:'${p.sport}',rank:${i + 1}})">${fmtOdds(p.price)} on Onyx</a></div></div>`;
+  }).join('');
+  document.getElementById('t10Note').textContent = 'Confidence is the chance the play wins by that sport\'s model, blended with the Onyx market. "Tracked pick" plays are graded on their sport\'s record; "On trial" plays are logged at Onyx\'s opening price; "Model lean" plays are the model\'s read and are not graded.';
+}
 async function tonight() {
   try {
     const sl = await getJSON('data/nba/slate.json');
@@ -507,7 +576,7 @@ function renderMy() {
 if (location.hash === '#my') setTimeout(() => document.getElementById('my').scrollIntoView(), 50);
 loadMy();
 
-marquees(); sports(); tonight();
+marquees(); sports(); tonight(); top10().catch(() => {});
 if (window.OnyxArt) marks(); else addEventListener('DOMContentLoaded', marks);
 </script>
 </body>
