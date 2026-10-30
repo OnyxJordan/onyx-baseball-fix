@@ -22,8 +22,35 @@ Lanes:
   q1_total     1Q total = 25.4% of Onyx's game total, sd 12; lean when the model
                is 3+ points above Onyx's implied chance
   first_basket tip winner scores first 65%; jumper record (won+2)/(jumped+4); the
-               five starters split it by ((FGA x gp + .9) / (min x gp + 30))^.75;
-               value when the model is 20%+ above Onyx's implied chance
+               five starters split it by ((FGA x gp + .9) / (min x gp + 30))^.5
+               x ((first shots + .4) / (starts + 2))^.25; value when the model
+               is 20%+ above Onyx's implied chance
+
+CHANGELOG
+  open-v2 (2026-10-30) FIRST-SHOT SHARE IN THE FIRST-BASKET SPLIT.
+     ESPN's play-by-play (shot log, 2,435 games 2024-26) shows who took each
+     team's first field-goal attempt. Teams open with a set for the same man,
+     so a starter's share of his team's first shots (this season x1, last x.5,
+     the one before x.25; shrunk by 2 starts toward 1 in 5) is information the
+     season shot rate misses. Fit on 2024-25, judged on 2025-26 (team-first
+     scorer among the ten starters, 1,012 games): log loss 2.2760 -> 2.2694
+     (usage alone was 2.3026 -> 2.2760, so this adds about a third again).
+     A share of the first THREE shots fit 2024-25 better but tested worse
+     (2.2736): dropped. Against Onyx's real 2025-26 prices (1,047 games):
+       open,  edge 20%+   v1 45-376 +41.3% (~174u)  ->  v2 57-476 +38.3% (~204u)
+       open,  edge 10%+   v1 +17.5%                 ->  v2 +28.1%
+       open,  after 1/15  v1 18-151 +23.9%          ->  v2 20-175 +18.5%
+       close, edge 20%+   v1 +19.8%                 ->  v2 +12.6%
+       log loss vs Onyx's opening prices: v1 2.2777, v2 2.2718 (Onyx 2.3845)
+     More accurate in every window; more plays at a similar return at the
+     opening price, which is the only price this lane logs at.
+     Tested in the same pass and NOT used anywhere: shot-quality "luck" (made
+     vs expected points from shot type and distance), referee crews (free
+     throws and pace) and travel / rest for points, rebounds and assists. Luck
+     moved points MAE 5.354 -> 5.343 on unseen games, the rest nothing; none of
+     them changed the props lane at opening prices beyond noise.
+  open-v1 (2026-10-29) the lane opens: 1Q total and first basket at Onyx's
+     opening price (backtests: +7.5% and +41% at the open).
 
 Pipeline-safe: ESPN via requests (nba_common.espn_get) only.
 """
@@ -34,9 +61,10 @@ from nba_common import ESPN, espn_get, load, save, team_abbr
 
 OPENING = "opening.json"
 LEDGER = "open_trial.json"
-VERSION = "open-v1"
+VERSION = "open-v2"
 P = {"q1": .254, "q1_sd": 12.0, "q1_edge": .03,
-     "fb_g": .75, "fb_q": .65, "fb_a0": .9, "fb_m0": 30.0, "fb_rel": .20, "fb_per_game": 2}
+     "fb_g": .5, "fb_q": .65, "fb_a0": .9, "fb_m0": 30.0, "fb_h": .25, "fb_fs0": 2.0,
+     "fb_rel": .20, "fb_per_game": 2}
 VOID_AFTER_DAYS = 3
 
 
@@ -63,12 +91,13 @@ def starters(rows, gid, team):
     return sorted(roster, key=lambda r: (-rate(r), -r["min"]))[:5]
 
 
-def fb_probs(rows, game, jumps):
+def fb_probs(rows, game, jumps, fshots=None):
     """{pid: probability} for the ten projected starters, or {} without two full fives."""
     T = {t: starters(rows, game["gid"], t) for t in (game["away"], game["home"])}
     if any(len(v) < 5 for v in T.values()):
         return {}
     jp = lambda r: jumps.get(str(r.get("hs") or ""), [0, 0])
+    fsh = lambda r: (fshots or {}).get(str(r.get("hs") or ""), [0, 0])
     jumper = {t: max(v, key=lambda r: jp(r)[1]) for t, v in T.items()}
     rate = lambda r: (jp(r)[0] + 2) / (jp(r)[1] + 4)
     ra, rh = rate(jumper[game["away"]]), rate(jumper[game["home"]])
@@ -80,7 +109,9 @@ def fb_probs(rows, game, jumps):
         for r in five:
             s = r.get("season") or {}
             gp = s.get("gp") or 0
-            w.append((((s.get("fga") or 0) * gp + P["fb_a0"]) / ((s.get("min") or 0) * gp + P["fb_m0"])) ** P["fb_g"])
+            n, f = fsh(r)
+            w.append((((s.get("fga") or 0) * gp + P["fb_a0"]) / ((s.get("min") or 0) * gp + P["fb_m0"])) ** P["fb_g"]
+                     * ((f + P["fb_fs0"] * .2) / (n + P["fb_fs0"])) ** P["fb_h"])
         W = sum(w) or 1
         for r, wi in zip(five, w):
             out[r["pid"]] = first * wi / W
@@ -88,7 +119,7 @@ def fb_probs(rows, game, jumps):
 
 
 # ── capture, then log at the opening price ──────────────────────────────────
-def run(rows, slate, props, today, jumps):
+def run(rows, slate, props, today, jumps, fshots=None):
     """Capture first-seen prices, log qualifying plays. Returns (ledger, n_logged)."""
     O = load(OPENING, None)
     first_run = O is None          # the system's first look: every price already up is a baseline, never a play
@@ -134,7 +165,7 @@ def run(rows, slate, props, today, jumps):
                     have.add((today, "q1_total", g["gid"]))
                     added += 1
         # first basket
-        probs = fb_probs(rows, g, jumps)
+        probs = fb_probs(rows, g, jumps, fshots)
         n_game = sum(1 for k in ledger if k["date"] == today and k["kind"] == "first_basket" and k["gid"] == g["gid"])
         cands = []
         for r in rows:
