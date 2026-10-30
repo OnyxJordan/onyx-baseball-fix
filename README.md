@@ -958,7 +958,7 @@ by ((FGA x games + 0.9) / (minutes x games + 30))^0.75 (`season.fga` from the bo
 `first_basket_including_ft` price rides along in `nba_odds.py` (`props.json` players[].fb).
 Value = model at least 20% over Onyx's implied chance. Backtest (fit 2024-25, 1,075 Onyx-priced
 2025-26 games): +41.3% ROI on 421 bets at the opening price, +19.8% at the close, but -4.4% at
-the close after mid-January; Onyx's price is slightly sharper on log loss. Shown in the
+the close after mid-January (open-v2 with the first-shot share: +38.3% on 533 at the open); Onyx's price is slightly sharper on log loss. Shown in the
 gamecenter and as "First basket leans" on the Picks tab, never tracked. **On trial at Onyx's opening price** (`open_lanes.py`, `data/nba/open_trial.json`, append-only
 and in validate_build's ledger list): every edge we found beats Onyx's first price far more
 often than its last, so the full refresh (never the 10-minute lines-only run) writes the
@@ -968,7 +968,20 @@ opening price AND the live Onyx price is still the opening one, so every logged 
 bettable at its logged odds. Lanes: 1Q total (25.4% of the game total, sd 12, 3pp+) and
 first basket (20%+ over implied, two per game at most). Graded from ESPN (1Q line score;
 first scoring play's athlete id). Shown on the Picks tab as "On trial · Onyx opening prices"
-with its own record. **Quarters and halves**
+with its own record. **NBA deep dive (10/30, open-v2):** ESPN's play-by-play carries every
+shot's type and distance, the three referees and the venue, so 2,435 games (2024-26) were
+pulled and four new reads tested against the v7 projections and Onyx's 2025-26 OPENING
+prices (fit before February, judged after): shot-quality "luck" (made vs expected points by
+shot type and distance), referee crews (free throws, pace), rest / travel / altitude, and
+for first basket each starter's share of his team's FIRST shot. Only the last one earned its
+place: first-basket log loss 2.2760 -> 2.2694 on unseen games, and at the opening price
+(edge 20%+) 57-476 +38% (~204u) against 45-376 +41% (~174u) before. Shot luck improved points
+MAE slightly (5.354 -> 5.343) but did not move the props lane beyond noise; referees, rest and
+travel did nothing for props or for game totals (refs called totals 45% before February, 58%
+after: noise). Production: `nba_jumps.py` now also records each final's ten starters and both
+teams' first field-goal attempters (`st` / `fs` in `data/nba/jumps.json`, seeded 2024-26) and
+`first_shots()` turns them into [starts, first shots] (this season x1, last x.5); `open_lanes.fb_probs`
+and the page's `fbModel` (`D.fshots`) use them identically. **Quarters and halves**
 (`qhCard`, lean only): each read scales Onyx's own full-game line to the period (1Q total
 25.4% of the game total, 1H 50.5%, 1Q margin 34% of the spread; sd 12 / 18 / 11, tuned on
 Oct-Jan 2025-26 for honest chances). Onyx's `1st_quarter_total_points`,

@@ -578,8 +578,12 @@ def main():
 
     # opening-price lanes, on trial (open_lanes.py): capture Onyx's first prices, log
     # plays only while the live price is still the opening one, grade from ESPN
-    import open_lanes
+    import open_lanes, nba_jumps
     hs_of = {p["pid"]: p.get("hs") for p in slate.get("players", [])}
+    jumps_all = load("jumps.json", {}) or {}
+    jp = jumps_all.get("players") or {}
+    # [starts, first shots] for tonight's players: the first-basket split (open-v2)
+    fshots = nba_jumps.first_shots(jumps_all, today, {str(h) for h in hs_of.values() if h})
     for r in rows:
         r["hs"] = r.get("hs") or hs_of.get(r["pid"])
     if LINES_ONLY:
@@ -588,7 +592,7 @@ def main():
         open_led, n_open_g = open_lanes.grade(today)
         n_open = 0
         if fresh:
-            open_led, n_open = open_lanes.run(rows, slate, props, today, (load("jumps.json", {}) or {}).get("players") or {})
+            open_led, n_open = open_lanes.run(rows, slate, props, today, jp, fshots)
         print(f"  on trial (opening prices): {n_open_g} graded, +{n_open} logged, {len(open_led)} on record")
 
     # the daily Top Scorer Parlay: grade past tickets, refresh / lock today's
@@ -616,7 +620,6 @@ def main():
         # combined-stat projections for the bet card: sums of the three (card only)
         out["proj"] = {**r["proj"], **{c: round(sum(r["proj"].get(x, 0.0) for x in xs), 2) for c, xs in M.COMBOS.items()}}
         players_out.append(out)
-    jp = (load("jumps.json", {}) or {}).get("players") or {}
     data = {
         "date": today, "source": source, "model_version": VERSION,
         "generated": datetime.now(timezone.utc).isoformat(timespec="seconds"),
@@ -636,6 +639,9 @@ def main():
         # opening-tip records [won, jumped] for tonight's players (nba_jumps.py): the
         # first-basket lean picks each team's jumper and the chance it wins the tip
         "jumps": {h: jp[h] for h in {p.get("hs") for p in players_out} if h in jp},
+        # [starts, first shots taken] per starter, decayed by season: the split of
+        # a team's chance to score first among its five (open_lanes.fb_probs)
+        "fshots": {h: fshots[h] for h in {str(p.get("hs")) for p in players_out} if h in fshots},
         # plays at Onyx's opening price, on trial (open_lanes.py)
         "open": open_lanes.summarize(open_led),
     }

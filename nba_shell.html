@@ -1428,10 +1428,12 @@ function renderPlays() {
 // games, 2024-26); each team's jumper is the starter with the most opening tips on
 // record, and his chance to win it is (won + 2) / (jumped + 4) against the other's.
 // Player half: the five starters split it by shot volume, (FGA + 0.9) / (minutes + 30)
-// to the 0.75 power. Fit on 2024-25; on 1,075 2025-26 games Onyx priced it went 45-376
-// at +41% ROI where it beat the opening price by 20%+, but -4% against the closing
-// price after mid-January. A lean, never a tracked pick.
-var FB_P = {g: .75, q: .65, a0: .9, m0: 30, value: .20};
+// to the 0.5 power, times his share of his team's first shots, ((first + .4) / (starts
+// + 2)) to the 0.25 (open-v2, data D.fshots from nba_jumps.first_shots). Fit on
+// 2024-25; on 1,075 2025-26 games Onyx priced it went 57-476 at +38% ROI where it beat
+// the opening price by 20%+, but -16% against the closing price after mid-January.
+// A lean on this card; the on-trial lane logs it only at the opening price.
+var FB_P = {g: .5, q: .65, a0: .9, m0: 30, h: .25, fs0: 2, value: .20};   // open_lanes.P (open-v2)
 function fbStarters(g) {
   const posted = {};
   (((SUMMARY[g.gid] || {}).boxscore || {}).players || []).forEach(t => {
@@ -1453,7 +1455,7 @@ function fbStarters(g) {
   return out;
 }
 function fbModel(g) {
-  const T = fbStarters(g), J = D.jumps || {};
+  const T = fbStarters(g), J = D.jumps || {}, FS = D.fshots || {};
   if (T[g.away].players.length < 5 || T[g.home].players.length < 5) return null;
   const jumper = ab => T[ab].players.slice().sort((x, y) => ((J[y.hs] || [0, 0])[1]) - ((J[x.hs] || [0, 0])[1]))[0];
   const ja = jumper(g.away), jh = jumper(g.home);
@@ -1462,8 +1464,9 @@ function fbModel(g) {
   const rows = [];
   [g.away, g.home].forEach(ab => {
     const pt = ab === g.away ? tipA : 1 - tipA, first = pt * FB_P.q + (1 - pt) * (1 - FB_P.q);
-    const w = T[ab].players.map(p => { const s = p.season || {}, gp = s.gp || 0;
-      return Math.pow(((s.fga || 0) * gp + FB_P.a0) / ((s.min || 0) * gp + FB_P.m0), FB_P.g); });
+    const w = T[ab].players.map(p => { const s = p.season || {}, gp = s.gp || 0, f = FS[p.hs] || [0, 0];
+      return Math.pow(((s.fga || 0) * gp + FB_P.a0) / ((s.min || 0) * gp + FB_P.m0), FB_P.g)
+        * Math.pow((f[1] + FB_P.fs0 * .2) / (f[0] + FB_P.fs0), FB_P.h); });
     const W = w.reduce((a, b) => a + b, 0) || 1;
     T[ab].players.forEach((p, i) => {
       const prob = first * w[i] / W, fb = p.fb || {};
@@ -1497,7 +1500,7 @@ function fbCard(g) {
     <div class="fb-tip">Opening tip: <b>${esc(nm(M.ja))}</b> vs <b>${esc(nm(M.jh))}</b> · ${esc(g.away)} wins it ${Math.round(100 * M.tipA)}%, ${esc(g.home)} ${Math.round(100 * (1 - M.tipA))}%</div>
     ${done ? `<div class="fb-done">First basket: <b>${esc(done.p ? done.p.name : (done.text || '').split(' makes')[0])}</b>${done.p ? ` · the model had him at ${(100 * (M.rows.find(x => String(x.p.hs) === done.id) || {prob: 0}).prob).toFixed(1)}%` : ''}</div>` : ''}
     <div class="fb-list">${M.rows.map(x => fbRow(g, x, done)).join('')}</div>
-    <div class="dim" style="font-size:11px;margin-top:8px">Lean, not a tracked pick. The team that wins the opening tip scores first 65% of the time; within a team the starters split it by shot volume. Value = the model's chance at least 20% above Onyx's. On 2025-26 that beat Onyx's opening prices (+41% ROI on 421 bets) but not the closing prices after mid-January (-4%).</div></div>`;
+    <div class="dim" style="font-size:11px;margin-top:8px">Lean, not a tracked pick. The team that wins the opening tip scores first 65% of the time; within a team the starters split it by shot volume and by how often each one takes his team's first shot (the opening set play). Value = the model's chance at least 20% above Onyx's. On 2025-26 that beat Onyx's opening prices (+38% ROI on 533 bets) but not the closing prices after mid-January (-16%).</div></div>`;
 }
 // the Picks tab: every untipped game's first-basket value, best first
 function fbLeans() {
@@ -1570,7 +1573,7 @@ function openTrial() {
   return `<div class="pl-div"><i></i><span>On trial · Onyx opening prices</span><i></i></div>
     <div class="ot-rec"><span><b>${rec('all')}</b><i>record</i></span><span><b class="${(A.units || 0) >= 0 ? 'up' : 'dn'}">${u(A.units)}</b><i>units, 1 per play</i></span>
       <span><b>${rec('q1_total')}</b><i>1st-quarter totals</i></span><span><b>${rec('first_basket')}</b><i>first basket</i></span></div>
-    <div class="ot-note">Logged only while Onyx still shows the first price we saw for that market, at that price, then graded after the game. The backtests beat Onyx's first price (1st-quarter total +7.5%, first basket +41%) but not its closing price, so these stay on trial until this record says otherwise.</div>
+    <div class="ot-note">Logged only while Onyx still shows the first price we saw for that market, at that price, then graded after the game. The backtests beat Onyx's first price (1st-quarter total +7.5%, first basket +38%) but not its closing price, so these stay on trial until this record says otherwise.</div>
     ${today.length ? `<div class="ot-h">Today</div>${today.map(row).join('')}` : '<div class="ot-note dim">No play at the opening prices yet today.</div>'}
     ${past.length ? `<div class="ot-h">Recent</div>${past.map(row).join('')}` : ''}`;
 }
