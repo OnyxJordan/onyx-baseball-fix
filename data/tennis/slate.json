@@ -1395,9 +1395,9 @@
     },
     {
      "id": "185200",
-     "start": "2026-10-30T19:00Z",
+     "start": "2026-10-30T19:15Z",
      "state": "pre",
-     "detail": "10/30 - 3:00 PM EDT",
+     "detail": "10/30 - 3:15 PM EDT",
      "round": "Quarterfinal",
      "draw": "Men's Singles",
      "court": "Centre Court",
@@ -2887,8 +2887,8 @@
     {
      "id": "185155",
      "start": "2026-10-30T17:05Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Quarterfinal",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -2898,12 +2898,12 @@
        "short": "J. Lehecka",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/cze.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        3
+        6
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Jerome Kym",
@@ -2921,9 +2921,9 @@
     },
     {
      "id": "185156",
-     "start": "2026-10-30T18:30Z",
-     "state": "pre",
-     "detail": "10/30 - 2:30 PM EDT",
+     "start": "2026-10-30T18:50Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Quarterfinal",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -2934,8 +2934,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/por.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        0
+       ],
+       "serve": true
       },
       {
        "name": "Jan-Lennard Struff",
@@ -2943,7 +2945,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ger.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        1
+       ],
        "serve": false
       }
      ]
@@ -2996,9 +3000,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Jiri Lehecka",
+       "short": "J. Lehecka",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/cze.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -7408,8 +7412,8 @@
     {
      "id": "185778",
      "start": "2026-10-30T16:25Z",
-     "state": "in",
-     "detail": "3rd",
+     "state": "post",
+     "detail": "Final",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Quadra Central",
@@ -7423,20 +7427,20 @@
        "sets": [
         6,
         4,
-        3
+        5
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Julia Riera",
        "short": "J. Riera",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         1,
         6,
-        5
+        7
        ],
        "serve": false
       }
@@ -7444,9 +7448,9 @@
     },
     {
      "id": "185776",
-     "start": "2026-10-30T18:30Z",
-     "state": "pre",
-     "detail": "10/30 - 2:30 PM EDT",
+     "start": "2026-10-30T18:50Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Quadra Central",
@@ -7457,8 +7461,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/bra.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        0
+       ],
+       "serve": true
       },
       {
        "name": "Francesca Jones",
@@ -7466,16 +7472,18 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/gbr.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        1
+       ],
        "serve": false
       }
      ]
     },
     {
      "id": "185777",
-     "start": "2026-10-30T19:30Z",
+     "start": "2026-10-30T20:15Z",
      "state": "pre",
-     "detail": "10/30 - 3:30 PM EDT",
+     "detail": "10/30 - 4:15 PM EDT",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Quadra Central",
@@ -7519,9 +7527,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Julia Riera",
+       "short": "J. Riera",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -11716,5 +11724,5 @@
    ]
   }
  ],
- "fetched": "2026-10-30T18:26:20+00:00"
+ "fetched": "2026-10-30T18:58:02+00:00"
 }
