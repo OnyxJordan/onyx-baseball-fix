@@ -4512,9 +4512,9 @@
     },
     {
      "id": "185729",
-     "start": "2026-10-30T05:00Z",
-     "state": "pre",
-     "detail": "10/30 - 1:00 AM EDT",
+     "start": "2026-10-30T05:05Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -4525,7 +4525,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/gbr.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        0
+       ],
        "serve": false
       },
       {
@@ -4534,8 +4536,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        0
+       ],
+       "serve": true
       }
      ]
     },
@@ -6131,7 +6135,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        1
+        6
        ],
        "serve": false
       },
@@ -6142,9 +6146,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        3
+        5
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
@@ -10100,8 +10104,8 @@
     {
      "id": "185810",
      "start": "2026-10-30T01:50Z",
-     "state": "in",
-     "detail": "3rd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Estadio Mexcovery",
@@ -10111,11 +10115,11 @@
        "short": "A. Herrero Linana",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
         6,
-        6
+        7
        ],
        "serve": false
       },
@@ -10240,9 +10244,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Alicia Herrero Linana",
+       "short": "A. Herrero Linana",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -10340,5 +10344,5 @@
    ]
   }
  ],
- "fetched": "2026-10-30T04:38:05+00:00"
+ "fetched": "2026-10-30T05:10:00+00:00"
 }
