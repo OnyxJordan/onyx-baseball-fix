@@ -6082,7 +6082,7 @@
      "id": "185684",
      "start": "2026-10-30T01:35Z",
      "state": "in",
-     "detail": "2nd",
+     "detail": "3rd",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Center",
@@ -6095,9 +6095,10 @@
        "win": false,
        "sets": [
         5,
-        5
+        7,
+        1
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Kamilla Rakhimova",
@@ -6107,7 +6108,8 @@
        "win": false,
        "sets": [
         7,
-        5
+        5,
+        3
        ],
        "serve": false
       }
@@ -6115,9 +6117,9 @@
     },
     {
      "id": "185686",
-     "start": "2026-10-30T03:20Z",
+     "start": "2026-10-30T04:00Z",
      "state": "pre",
-     "detail": "10/29 - 11:20 PM EDT",
+     "detail": "10/30 - 12:00 AM EDT",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Center",
@@ -10095,7 +10097,7 @@
      "id": "185810",
      "start": "2026-10-30T01:50Z",
      "state": "in",
-     "detail": "2nd",
+     "detail": "3rd",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Estadio Mexcovery",
@@ -10108,7 +10110,8 @@
        "win": false,
        "sets": [
         6,
-        1
+        6,
+        0
        ],
        "serve": false
       },
@@ -10120,9 +10123,10 @@
        "win": false,
        "sets": [
         7,
+        2,
         2
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
@@ -10332,5 +10336,5 @@
    ]
   }
  ],
- "fetched": "2026-10-30T03:13:53+00:00"
+ "fetched": "2026-10-30T03:45:31+00:00"
 }
