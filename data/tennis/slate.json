@@ -1291,8 +1291,8 @@
     {
      "id": "185201",
      "start": "2026-10-30T12:40Z",
-     "state": "in",
-     "detail": "1st",
+     "state": "post",
+     "detail": "Final",
      "round": "Quarterfinal",
      "draw": "Men's Singles",
      "court": "Centre Court",
@@ -1302,9 +1302,10 @@
        "short": "D. Medvedev",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/rus.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
-        3
+        6,
+        6
        ],
        "serve": false
       },
@@ -1315,17 +1316,18 @@
        "seed": null,
        "win": false,
        "sets": [
-        1
+        2,
+        3
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
     {
      "id": "185202",
-     "start": "2026-10-30T14:00Z",
-     "state": "pre",
-     "detail": "10/30 - 10:00 AM EDT",
+     "start": "2026-10-30T14:35Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Quarterfinal",
      "draw": "Men's Singles",
      "court": "Centre Court",
@@ -1336,8 +1338,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        0
+       ],
+       "serve": true
       },
       {
        "name": "Tommy Paul",
@@ -1345,7 +1349,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        1
+       ],
        "serve": false
       }
      ]
@@ -1427,9 +1433,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Daniil Medvedev",
+       "short": "D. Medvedev",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/rus.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -2802,7 +2808,7 @@
      "id": "185153",
      "start": "2026-10-30T13:10Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "3rd",
      "round": "Quarterfinal",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -2814,9 +2820,11 @@
        "seed": null,
        "win": false,
        "sets": [
-        0
+        6,
+        3,
+        1
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Holger Rune",
@@ -2825,17 +2833,19 @@
        "seed": null,
        "win": false,
        "sets": [
+        3,
+        6,
         0
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
     {
      "id": "185154",
-     "start": "2026-10-30T14:30Z",
+     "start": "2026-10-30T15:00Z",
      "state": "pre",
-     "detail": "10/30 - 10:30 AM EDT",
+     "detail": "10/30 - 11:00 AM EDT",
      "round": "Quarterfinal",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -4629,7 +4639,7 @@
      "id": "185731",
      "start": "2026-10-30T12:20Z",
      "state": "in",
-     "detail": "2nd",
+     "detail": "3rd",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -4642,9 +4652,10 @@
        "win": false,
        "sets": [
         4,
-        1
+        6,
+        4
        ],
-       "serve": false
+       "serve": true
       },
       {
        "name": "Lilli Tagger",
@@ -4654,7 +4665,8 @@
        "win": false,
        "sets": [
         6,
-        2
+        3,
+        5
        ],
        "serve": false
       }
@@ -7338,9 +7350,9 @@
     },
     {
      "id": "185775",
-     "start": "2026-10-30T15:00Z",
+     "start": "2026-10-30T15:30Z",
      "state": "pre",
-     "detail": "10/30 - 11:00 AM EDT",
+     "detail": "10/30 - 11:30 AM EDT",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Quadra 1",
@@ -7367,9 +7379,9 @@
     },
     {
      "id": "185778",
-     "start": "2026-10-30T15:00Z",
+     "start": "2026-10-30T16:00Z",
      "state": "pre",
-     "detail": "10/30 - 11:00 AM EDT",
+     "detail": "10/30 - 12:00 PM EDT",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Quadra Central",
@@ -7396,9 +7408,9 @@
     },
     {
      "id": "185776",
-     "start": "2026-10-30T16:30Z",
+     "start": "2026-10-30T17:30Z",
      "state": "pre",
-     "detail": "10/30 - 12:30 PM EDT",
+     "detail": "10/30 - 1:30 PM EDT",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Quadra Central",
@@ -7425,9 +7437,9 @@
     },
     {
      "id": "185777",
-     "start": "2026-10-30T18:00Z",
+     "start": "2026-10-30T19:00Z",
      "state": "pre",
-     "detail": "10/30 - 2:00 PM EDT",
+     "detail": "10/30 - 3:00 PM EDT",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Quadra Central",
@@ -8687,8 +8699,8 @@
     {
      "id": "185855",
      "start": "2026-10-30T13:05Z",
-     "state": "in",
-     "detail": "1st",
+     "state": "post",
+     "detail": "Final",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Centre Court",
@@ -8698,11 +8710,12 @@
        "short": "N. Noha Akugue",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ger.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
-        0
+        6,
+        6
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Ayla Aksu",
@@ -8711,7 +8724,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        4,
+        1
        ],
        "serve": false
       }
@@ -8721,7 +8735,7 @@
      "id": "185857",
      "start": "2026-10-30T13:05Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Grandstand",
@@ -8733,9 +8747,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        0
+        6,
+        4
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Marina Bassols Ribera",
@@ -8744,7 +8759,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        1
+        4,
+        3
        ],
        "serve": false
       }
@@ -8752,9 +8768,9 @@
     },
     {
      "id": "185852",
-     "start": "2026-10-30T14:00Z",
-     "state": "pre",
-     "detail": "10/30 - 10:00 AM EDT",
+     "start": "2026-10-30T14:30Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Centre Court",
@@ -8765,8 +8781,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/pol.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        0
+       ],
+       "serve": true
       },
       {
        "name": "Anna Blinkova",
@@ -8774,16 +8792,18 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        2
+       ],
        "serve": false
       }
      ]
     },
     {
      "id": "185856",
-     "start": "2026-10-30T14:30Z",
+     "start": "2026-10-30T14:50Z",
      "state": "pre",
-     "detail": "10/30 - 10:30 AM EDT",
+     "detail": "10/30 - 10:50 AM EDT",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Grandstand",
@@ -8818,9 +8838,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Noma Noha Akugue",
+       "short": "N. Noha Akugue",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ger.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -11650,5 +11670,5 @@
    ]
   }
  ],
- "fetched": "2026-10-30T13:16:23+00:00"
+ "fetched": "2026-10-30T14:45:53+00:00"
 }
