@@ -10054,7 +10054,7 @@
      "id": "185812",
      "start": "2026-10-30T00:05Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Estadio Mexcovery",
@@ -10066,9 +10066,10 @@
        "seed": null,
        "win": false,
        "sets": [
+        6,
         4
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Diletta Cherubini",
@@ -10077,7 +10078,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        2,
+        1
        ],
        "serve": false
       }
@@ -10318,5 +10320,5 @@
    ]
   }
  ],
- "fetched": "2026-10-30T00:36:09+00:00"
+ "fetched": "2026-10-30T01:07:41+00:00"
 }
