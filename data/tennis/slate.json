@@ -7491,7 +7491,7 @@
      "id": "185777",
      "start": "2026-10-30T20:20Z",
      "state": "in",
-     "detail": "2nd",
+     "detail": "3rd",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Quadra Central",
@@ -7504,7 +7504,8 @@
        "win": false,
        "sets": [
         6,
-        2
+        2,
+        3
        ],
        "serve": true
       },
@@ -7516,7 +7517,8 @@
        "win": false,
        "sets": [
         2,
-        5
+        6,
+        2
        ],
        "serve": false
       }
@@ -10277,8 +10279,8 @@
     {
      "id": "185816",
      "start": "2026-10-30T20:05Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Estadio Mexcovery",
@@ -10291,7 +10293,7 @@
        "win": false,
        "sets": [
         6,
-        2
+        3
        ],
        "serve": false
       },
@@ -10300,10 +10302,10 @@
        "short": "T. Maria",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ger.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         7,
-        1
+        6
        ],
        "serve": false
       }
@@ -10311,9 +10313,9 @@
     },
     {
      "id": "185815",
-     "start": "2026-10-30T21:30Z",
+     "start": "2026-10-30T22:05Z",
      "state": "pre",
-     "detail": "10/30 - 5:30 PM EDT",
+     "detail": "10/30 - 6:05 PM EDT",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Estadio Mexcovery",
@@ -10444,9 +10446,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Tatjana Maria",
+       "short": "T. Maria",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ger.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -11744,5 +11746,5 @@
    ]
   }
  ],
- "fetched": "2026-10-30T21:30:22+00:00"
+ "fetched": "2026-10-30T22:03:02+00:00"
 }
