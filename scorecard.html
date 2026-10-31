@@ -210,10 +210,14 @@ async function scorecard() {
 
 // ── rules lab ────────────────────────────────────────────────────────────
 let LAB = null;
-const SPORT_N = {nfl: 'NFL', cfb: 'NCAAF', nhl: 'NHL', tennis: 'Tennis'};
-const MKT_N = {ml: 'Moneyline', spread: 'Spread', total: 'Game total', rec: 'Receptions', rec_yds: 'Receiving yards', rush_yds: 'Rushing yards',
+const SPORT_N = {nba: 'NBA', nfl: 'NFL', cfb: 'NCAAF', nhl: 'NHL', tennis: 'Tennis'};
+const MKT_N = {pts: 'Points', reb: 'Rebounds', ast: 'Assists', ml: 'Moneyline', spread: 'Spread', total: 'Game total', rec: 'Receptions', rec_yds: 'Receiving yards', rush_yds: 'Rushing yards',
   pass_yds: 'Passing yards', anytime_td: 'Anytime TD'};
 const PRESETS = [
+  {t: 'NBA points unders', s: 'nba', m: 'pts', side: 'B'},
+  {t: 'NBA overs at plus money', s: 'nba', m: 'all', side: 'A', min: 100},
+  {t: 'NBA props, model edge 3+', s: 'nba', m: 'all', side: 'model', edge: 3},
+  {t: 'NBA assists unders', s: 'nba', m: 'ast', side: 'B'},
   {t: 'Home underdogs to win (NFL)', s: 'nfl', m: 'ml', side: 'A', min: 100},
   {t: 'Unders on NFL totals', s: 'nfl', m: 'total', side: 'B'},
   {t: 'NFL receptions unders, model edge 3+', s: 'nfl', m: 'rec', side: 'B', edge: 3},
@@ -234,25 +238,39 @@ function sideNames(m) {
 }
 function fillSelects(keep) {
   const s = document.getElementById('lSport'), m = document.getElementById('lMkt'), sd = document.getElementById('lSide');
-  const sports = Object.keys(LAB.data);
+  const sports = Object.keys(LAB.sports);
   if (!s.options.length) s.innerHTML = `<option value="all">All sports</option>` + sports.map(k => `<option value="${k}">${SPORT_N[k] || k}</option>`).join('');
-  const mk = new Set(); (s.value === 'all' ? sports : [s.value]).forEach(k => Object.keys(LAB.data[k] || {}).forEach(x => mk.add(x)));
+  const mk = new Set(); (s.value === 'all' ? sports : [s.value]).forEach(k => Object.keys(LAB.sports[k].markets || {}).forEach(x => mk.add(x)));
   const mv = keep && keep.m && (mk.has(keep.m) || keep.m === 'all') ? keep.m : (mk.has(m.value) ? m.value : [...mk][0]);
   m.innerHTML = `<option value="all">Every market</option>` + [...mk].map(x => `<option value="${x}">${MKT_N[x] || x}</option>`).join('');
   m.value = mv;
-  const sides = sideNames(m.value).concat([['fav', 'Favorite'], ['dog', 'Underdog'], ['model', "Model's side"]]);
+  const sides = (m.value === 'all' && s.value === 'nba' ? [['A', 'Over'], ['B', 'Under']] : sideNames(m.value)).concat([['fav', 'Favorite'], ['dog', 'Underdog'], ['model', "Model's side"]]);
   const sv = keep && keep.side ? keep.side : sd.value;
   sd.innerHTML = sides.map(([v, n]) => `<option value="${v}">${n}</option>`).join('');
   sd.value = sides.some(x => x[0] === sv) ? sv : sides[0][0];
 }
-function runLab() {
+const DATA = {};
+function need(sports) {
+  return Promise.all(sports.map(k => DATA[k] ? null : (DATA[k] = getJSON('data/rules_lab/' + k + '.json').catch(() => ({}))))).then(() =>
+    Promise.all(sports.map(k => Promise.resolve(DATA[k]).then(v => { DATA[k] = v; }))));
+}
+let RUN = 0;
+async function runLab() {
+  const sp0 = document.getElementById('lSport').value;
+  const want = sp0 === 'all' ? Object.keys(LAB.sports) : [sp0];
+  if (want.some(k => !DATA[k] || DATA[k] instanceof Promise)) {
+    const my = ++RUN;
+    document.getElementById('labOut').innerHTML = '<div class="empty">Loading ' + esc(sp0 === 'all' ? 'every sport' : (SPORT_N[sp0] || sp0)) + ' history...</div>';
+    await need(want);
+    if (my !== RUN) return;
+  }
   const sp = document.getElementById('lSport').value, mk = document.getElementById('lMkt').value, side = document.getElementById('lSide').value;
   const num = id => { const v = document.getElementById(id).value; return v === '' ? null : +v; };
   const pmin = num('lMin'), pmax = num('lMax'), emin = num('lEdge');
   const cells = {};       // `${w}${t}` -> {n, w, u, pr}
-  const sports = sp === 'all' ? Object.keys(LAB.data) : [sp];
+  const sports = sp === 'all' ? Object.keys(LAB.sports) : [sp];
   let usedEdge = false, noModel = 0;
-  sports.forEach(k => Object.entries(LAB.data[k] || {}).forEach(([m, byT]) => {
+  sports.forEach(k => Object.entries(DATA[k] || {}).forEach(([m, byT]) => {
     if (mk !== 'all' && m !== mk) return;
     Object.entries(byT).forEach(([t, rows]) => rows.forEach(([w, p, line, a, b, y]) => {
       // which side this rule bets, its price, the model's chance of it, and whether it won
@@ -277,7 +295,7 @@ function runLab() {
       c.n++; c.w += won ? 1 : 0; c.u += won ? dec(price) - 1 : -1; c.pr += imp(price);
     }));
   }));
-  const winN = sp !== 'all' && LAB.windows[sp] ? LAB.windows[sp].names : ['Earlier season', 'Later season'];
+  const winN = sp !== 'all' && LAB.sports[sp] ? LAB.sports[sp].names : ['Earlier season', 'Later season'];
   const rowsH = [[0, 'o'], [1, 'o'], [0, 'c'], [1, 'c']].map(([w, t]) => {
     const c = cells[w + t] || {n: 0, w: 0, u: 0, pr: 0};
     const roi = c.n ? c.u / c.n : null;
@@ -288,14 +306,14 @@ function runLab() {
   const o0 = rowsH[0], o1 = rowsH[1];
   let v, cls = '';
   if (o0.c.n + o1.c.n === 0) v = 'No bets in the history match this rule. Loosen the price band or the edge.';
-  else if (o0.c.n < 30 || o1.c.n < 30) v = `Too few bets to judge (${o0.c.n} and ${o1.c.n} at the open). A rule needs 30+ in each season before its record means much.`;
-  else if (o0.roi > 0 && o1.roi > 0) { cls = 'good'; v = `Made money at the opening price in both seasons (${pctS(o0.roi)} and ${pctS(o1.roi)}). Worth a trial: the next step is logging it live at the open.`; }
+  else if (o0.c.n < 30 || o1.c.n < 30) v = `Too few bets to judge (${o0.c.n} and ${o1.c.n} at the open). A rule needs 30+ in each period before its record means much.`;
+  else if (o0.roi > 0 && o1.roi > 0) { cls = 'good'; v = `Made money at the opening price in both periods (${pctS(o0.roi)} and ${pctS(o1.roi)}). Worth a trial: the next step is logging it live at the open.`; }
   else { cls = 'bad'; v = `Did not hold up: at the opening price it went ${pctS(o0.roi)} in ${esc(winN[0])} and ${pctS(o1.roi)} in ${esc(winN[1])}. Onyx's margin beats this rule.`; }
   document.getElementById('labOut').innerHTML = `<div class="verdict ${cls}">${v}</div><div class="lab-wrap"><table class="lab-t"><thead><tr><th>When</th><th>Bets</th><th>W-L</th><th>Hit</th><th>Needed</th><th>$10 a bet</th><th>Return</th></tr></thead><tbody>${rowsH.map(r => r.html).join('')}</tbody></table></div>`;
   document.getElementById('labNote').textContent = `"Needed" is the hit rate the prices required to break even. Every model chance is priced only from games before that one. ` +
     (emin != null && noModel ? `${noModel} lines with no model chance (touchdown props) are left out when a model edge is set. ` : '') +
     `Model chances here are the tested ones: NFL props use the season-average projection, not the newer volume model behind the receptions trial, so their edges differ from the live lane's. ` +
-    `History built ${LAB.built}: NFL ${LAB.windows.nfl.names.join(' and ')}, college football ${LAB.windows.cfb.names.join(' and ')}, NHL ${LAB.windows.nhl.names.join(' and ')}, tennis (ATP) ${LAB.windows.tennis.names.join(' and ')}. NBA history is not in the lab yet.`;
+    `History built ${LAB.built}: ` + Object.entries(LAB.sports).map(([k, v]) => `${SPORT_N[k] || k} ${v.names.join(' and ')} (${Object.values(v.markets).reduce((a, b) => a + b, 0).toLocaleString()} prices)`).join(', ') + '.';
 }
 function preset(i) {
   const P = PRESETS[i];

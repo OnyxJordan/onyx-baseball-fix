@@ -30,7 +30,8 @@ import sports_backtest as SB           # noqa: E402
 import sports_lab as L                 # noqa: E402
 from sports_common import Lane, nk     # noqa: E402
 
-WINDOWS = {"nfl": ("2026-03-01", "2025 season", "2026 season"), "cfb": ("2026-03-01", "2025 season", "2026 season"),
+WINDOWS = {"nba": ("2026-02-01", "Oct 2025 to Jan 2026", "Feb to Apr 2026"),
+           "nfl": ("2026-03-01", "2025 season", "2026 season"), "cfb": ("2026-03-01", "2025 season", "2026 season"),
            "nhl": ("2026-01-15", "2025-26 to Jan 14", "Jan 15, 2026 on"), "tennis": ("2026-01-01", "2025", "2026")}
 
 
@@ -95,9 +96,31 @@ def td_rows():
     return out
 
 
+def nba_rows(bt="bt/nba"):
+    """NBA points, rebounds and assists (2025-26, bt/nba/ from the "NBA backtest data"
+    workflow): the walk-forward nba_model projection for every priced player who suited
+    up (a priced player who sat is a void, as Onyx grades it), open and close."""
+    import nba_backtest as NB
+    G, lines = NB.load(bt)
+    prior = NB.build_prior(G, lines, "2025-08-01")
+    mkt = json.load(open(os.path.join(bt, "lines.json")))
+    for gid, g in mkt.items():
+        NB.NAMEMAP[gid] = {nk(n): v for n, v in (g.get("props") or {}).items()}
+    NB.SIM_ROSTER, NB.SIM_LINEUP = True, True          # as production sees the slate (v8)
+    recs = NB.walk(G, lines, "2025-10-01", "2026-04-30", prior, mkt)
+    out = []
+    for which in ("o", "c"):
+        for x in NB.market_rows(recs, "0000", "9999", which):
+            d = x["r"]["d"]
+            out.append(["nba", x["s"], which, int(d >= WINDOWS["nba"][0]), d, x["p_model"], x["line"], x["po"], x["pu"], int(x["over"])])
+    print(f"  nba props: {len(out)} priced samples")
+    return out
+
+
 def main():
     import importlib
     R = []
+    R += nba_rows()
     for key, f in (("nfl", "bt/nfl_game.json"), ("cfb", "bt/cfb_lines.json"), ("nhl", "bt/nhl_lines.json")):
         M = importlib.import_module({"nfl": "nfl_model", "cfb": "cfb_model", "nhl": "nhl_model"}[key])
         GP = M.GAME_P if key == "nfl" else M.P
@@ -109,10 +132,17 @@ def main():
     G = {}
     for sp, mk, t, w, d, p, ln, pa, pb, y in R:
         G.setdefault(sp, {}).setdefault(mk, {}).setdefault(t, []).append([w, None if p is None else round(p, 2), ln, pa, pb, y])
-    out = {"built": date.today().isoformat(), "windows": {k: {"split": v[0], "names": [v[1], v[2]]} for k, v in WINDOWS.items()},
-           "cols": ["w", "p", "line", "a", "b", "y"], "data": G}
-    json.dump(out, open("data/rules_lab.json", "w"), separators=(",", ":"))
-    print(len(R), "rows", Counter((r[0], r[1]) for r in R), os.path.getsize("data/rules_lab.json") // 1024, "KB")
+    # one small index (data/rules_lab.json) and one file per sport (data/rules_lab/<sport>.json),
+    # so a phone loads only the sport being tested
+    os.makedirs("data/rules_lab", exist_ok=True)
+    idx = {"built": date.today().isoformat(), "cols": ["w", "p", "line", "a", "b", "y"], "sports": {}}
+    for sp, mk in G.items():
+        json.dump(mk, open(f"data/rules_lab/{sp}.json", "w"), separators=(",", ":"))
+        idx["sports"][sp] = {"split": WINDOWS[sp][0], "names": [WINDOWS[sp][1], WINDOWS[sp][2]],
+                             "markets": {m: sum(len(v) for v in t.values()) for m, t in mk.items()},
+                             "kb": os.path.getsize(f"data/rules_lab/{sp}.json") // 1024}
+    json.dump(idx, open("data/rules_lab.json", "w"), indent=1)
+    print(len(R), "rows", Counter((r[0], r[1]) for r in R), {k: v["kb"] for k, v in idx["sports"].items()}, "KB")
 
 
 if __name__ == "__main__":
