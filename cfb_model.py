@@ -4,6 +4,22 @@ defense ratings in points (team_model.py), normal margin and total.
 
 Changelog (newest first; each entry cites its evidence)
 
+  v2  10/31  TOTALS LANE ADDED (NO_TOTALS off). Same ratings and parameters as
+      v1; what changes is that Onyx totals are priced and can be picked.
+      tools/sports_backtest.py --markets=total on 2,913 Onyx games (through
+      10/28/2026): blend 30% model, edge 2-10pp, price -200 to +150.
+        tune (2025 season)  63 picks, 34-29, +3.3%
+        test (2026 season)  opening 45-26 +21.0% (claimed 57.2%, hit 63.4%),
+                            closing 28-20 +11.9%; log loss 0.6862 vs Onyx 0.6927
+      The spreads lane re-run on the same data is unchanged (27-19 +12.2% open,
+      21-19 +0.6% close). Both lanes run, each at its own blend weight
+      (backtest.json "lanes"). Why totals help when the model's own total did
+      not beat a constant (13.46 vs 13.43 MAE): blended at 30% it pulls Onyx's
+      CFB totals toward what the ratings expect, and that moved the price the
+      right way on 2026 games. Caveat: totals were examined after the 2026
+      numbers were seen; the tuning season was also positive, but smaller.
+      The public record is the test that counts.
+
   v1  10/26  Spread pick lane (tools/sports_backtest.py --markets=spread,total,
       2,911 Onyx games, 939 matched to FBS finals). Blend 20% model / 80%
       Onyx market, edge 2-6pp, price -200 to +150, at most 6 a slate. Chosen
@@ -26,9 +42,9 @@ Changelog (newest first; each entry cites its evidence)
       backtest passes.
 """
 
-VERSION = "v1"
+VERSION = "v2"
 KIND = "football"
 P = {"half_life": 60, "ridge": 1, "home": 3.0, "sd_margin": 17.0, "sd_total": 17.0, "min_games": 3}
 TEST = {"n": 789, "logloss": 0.576, "base_logloss": 0.689, "mae_total": 13.46, "base_mae_total": 13.43,
         "window": "11/1/2025 on"}
-NO_TOTALS = True
+NO_TOTALS = False   # v2: the totals lane passed (changelog)

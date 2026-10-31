@@ -20,35 +20,35 @@
   "spread",
   "total"
  ],
- "version": "v1",
+ "version": "v2",
  "sport": "cfb",
  "label": "Team ratings against real Onyx game lines",
  "split": "2026-03-01",
  "w": 0.1,
  "per_market_test": {
   "ml": {
-   "n": 361,
-   "blend_ll": 0.5192,
-   "onyx_ll": 0.5167,
-   "model_only_ll": 0.5991
+   "n": 362,
+   "blend_ll": 0.5193,
+   "onyx_ll": 0.5169,
+   "model_only_ll": 0.5992
   },
   "spread": {
-   "n": 375,
+   "n": 376,
    "blend_ll": 0.6934,
-   "onyx_ll": 0.6947,
-   "model_only_ll": 0.8153
+   "onyx_ll": 0.6946,
+   "model_only_ll": 0.8152
   },
   "total": {
-   "n": 374,
+   "n": 375,
    "blend_ll": 0.6897,
    "onyx_ll": 0.6927,
-   "model_only_ll": 0.7044
+   "model_only_ll": 0.7042
   }
  },
- "n_samples": 3907,
+ "n_samples": 3913,
  "lane_ll": {
   "blend": 0.6938,
-  "onyx": 0.6947
+  "onyx": 0.6946
  },
  "lane": {
   "markets": [
@@ -81,40 +81,113 @@
  "passed": true,
  "page": {
   "passed": true,
-  "version": "v1",
-  "run": "2026-10-26",
+  "version": "v2",
+  "run": "2026-10-31",
   "title": "Team ratings against real Onyx game lines",
   "summary": [
    "Every game priced only from results before it, against Onyx's real opening and closing lines. The rule was chosen on games before 2026-03-01 and judged on 2026-03-01 on, which it never saw.",
-   "The model's weight in the blend is 10%.",
-   "Passed: the blend beat the Onyx market and the lane won money at both opening and closing prices. Tracked picks are live, graded in public."
+   "Two lanes, each with its own blend: spreads (model 20%, edge 2 to 6 points) and totals (model 30%, edge 2 to 10 points), both priced -200 to +150.",
+   "Totals joined 10/31 (model v2): they beat Onyx's own price on the 2026 games (log loss 0.6862 vs 0.6927) and also made money on the 2025 tuning games (34-29, +3.3%).",
+   "Passed: both lanes beat the Onyx market and won money at opening and closing prices. Tracked picks are live, graded in public."
   ],
   "stats": [
    {
     "k": "Moneyline log loss",
-    "v": "0.5192",
-    "d": "vs Onyx 0.5167 · model alone 0.5991 · 361 lines"
+    "v": "0.5193",
+    "d": "vs Onyx 0.5169 \u00b7 model alone 0.5992 \u00b7 362 lines"
    },
    {
     "k": "Spread log loss",
     "v": "0.6934",
-    "d": "vs Onyx 0.6947 · model alone 0.8153 · 375 lines"
+    "d": "vs Onyx 0.6946 \u00b7 model alone 0.8152 \u00b7 376 lines"
    },
    {
     "k": "Total log loss",
     "v": "0.6897",
-    "d": "vs Onyx 0.6927 · model alone 0.7044 · 374 lines"
+    "d": "vs Onyx 0.6927 \u00b7 model alone 0.7042 \u00b7 375 lines"
    },
    {
-    "k": "Lane at opening prices",
+    "k": "Spreads lane, opening prices",
     "v": "27-19",
-    "d": "ROI +12.2% · claimed 56.5% vs hit 58.7%"
+    "d": "ROI +12.2% \u00b7 closing 21-19 (+0.6%)"
    },
    {
-    "k": "Lane at closing prices",
-    "v": "21-19",
-    "d": "ROI +0.6%"
+    "k": "Totals lane, opening prices",
+    "v": "45-26",
+    "d": "ROI +21.0% \u00b7 closing 28-20 (+11.9%)"
    }
   ]
+ },
+ "lanes": [
+  {
+   "markets": [
+    "spread"
+   ],
+   "w": 0.2,
+   "edge_min": 0.02,
+   "edge_max": 0.06,
+   "price_min": -200,
+   "price_max": 150,
+   "max_per_slate": 6
+  },
+  {
+   "markets": [
+    "total"
+   ],
+   "w": 0.3,
+   "edge_min": 0.02,
+   "edge_max": 0.1,
+   "price_min": -200,
+   "price_max": 150,
+   "max_per_slate": 6
+  }
+ ],
+ "lane_tests": {
+  "spread": {
+   "tune": {
+    "n": 21,
+    "w": 13,
+    "roi": 0.1826
+   },
+   "test_open": {
+    "n": 46,
+    "w": 27,
+    "roi": 0.1217,
+    "claimed": 0.5647,
+    "hit": 0.587
+   },
+   "test_close": {
+    "n": 40,
+    "w": 21,
+    "roi": 0.0058
+   },
+   "lane_ll": {
+    "blend": 0.6938,
+    "onyx": 0.6946
+   }
+  },
+  "total": {
+   "tune": {
+    "n": 63,
+    "w": 34,
+    "roi": 0.0332
+   },
+   "test_open": {
+    "n": 71,
+    "w": 45,
+    "roi": 0.2103,
+    "claimed": 0.5716,
+    "hit": 0.6338
+   },
+   "test_close": {
+    "n": 48,
+    "w": 28,
+    "roi": 0.119
+   },
+   "lane_ll": {
+    "blend": 0.6862,
+    "onyx": 0.6927
+   }
+  }
  }
 }

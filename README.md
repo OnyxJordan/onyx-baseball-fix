@@ -1275,3 +1275,12 @@ pays +500"; with a leg count each leg carries its share), first TD (NFL), first 
 1st-half totals (NBA, both now on the board), "top / leading rusher, passer, receiver, scorer",
 "who will rebound the most", over-and-under questions (both sides), and "total receptions" as a
 player prop. The relay's schema in `ai/worker.js` carries the same fields.
+
+**College football v2 and an all-sports home page (10/31).** `cfb_model` v2 turns totals on
+(`NO_TOTALS` off) and `data/cfb/backtest.json` carries two lanes (`"lanes"`), each with its own
+blend weight: spreads (20%, 27-19 +12.2% open / +0.6% close on 2026) and totals (30%, 45-26
++21.0% open / 28-20 +11.9% close; 2025 tuning 34-29 +3.3%). `sports_build.model_frame` runs
+every lane, re-pricing the slate at each lane's weight (`rows_for`). Home page: the strip under
+the hero counts every sport from the ESPN scoreboards (games today, plays priced today, next
+start, sports on today and how many models are graded), and the Top 10 takes only games on the
+site's day (ET, rolling at 4 AM), so Sunday's NFL waits for Sunday.
