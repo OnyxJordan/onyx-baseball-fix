@@ -41,7 +41,7 @@ from sports_common import Lane, nk     # noqa: E402
 
 MKT = " · market prices, before Onyx"
 # each sport's periods: (first day, name, market-price period?). Splits match the backtests.
-WINDOWS = {"nba": [("0000", "2024-25" + MKT, 1), ("2025-08-01", "Oct 2025 to Jan 2026", 0), ("2026-02-01", "Feb to Jun 2026", 0),
+WINDOWS = {"nba": [("0000", "2024-25" + MKT, 1), ("0000", "2024-25 season", 0), ("2025-08-01", "Oct 2025 to Jan 2026", 0), ("2026-02-01", "Feb to Jun 2026", 0),
                    ("2026-08-01", "2026-27 season", 0)],
            "nfl": [("0000", "2024 season" + MKT, 1), ("2025-03-01", "2025 season", 0), ("2026-03-01", "2026 season", 0)],
            "cfb": [("0000", "2024 season" + MKT, 1), ("2025-03-01", "2025 season", 0), ("2026-03-01", "2026 season", 0)],
@@ -52,16 +52,19 @@ WINDOWS = {"nba": [("0000", "2024-25" + MKT, 1), ("2025-08-01", "Oct 2025 to Jan
 S = RC.Schedule()
 
 
-def win(sport, d):
-    return max(i for i, w in enumerate(WINDOWS[sport]) if d >= w[0])
+def win(sport, d, market=False):
+    """The period a game falls in: market-price rows (files named *_mkt.json, another book before
+    Onyx priced the sport) get their own periods, Onyx rows the dated ones."""
+    c = [i for i, w in enumerate(WINDOWS[sport]) if bool(w[2]) == bool(market) and d >= w[0]]
+    return c[-1] if c else max(i for i, w in enumerate(WINDOWS[sport]) if d >= w[0])
 
 
 def et_day(iso):
     return (datetime.fromisoformat(str(iso).replace("Z", "+00:00")) - timedelta(hours=8)).date().isoformat()
 
 
-def R_(sport, mkt, when, d, p, line, a, b, y, ctx):
-    return [sport, mkt, when, win(sport, d), d, None if p is None else round(p, 2), line, a, b, y, ctx]
+def R_(sport, mkt, when, d, p, line, a, b, y, ctx, market=False):
+    return [sport, mkt, when, win(sport, d, market), d, None if p is None else round(p, 2), line, a, b, y, ctx]
 
 
 def ctx(sport, home, away, start, d, a_home):
@@ -117,7 +120,7 @@ def game_rows(sport, path):
     """Moneyline, spread / run line / puck line and game total, graded from the final score."""
     if not os.path.exists(path):
         return []
-    out = []
+    out, mkf = [], "_mkt" in path
     for fid, x in json.load(open(path)).items():
         hs, as_ = x.get("hs"), x.get("as")
         if hs is None or as_ is None or not x.get("start"):
@@ -135,7 +138,7 @@ def game_rows(sport, path):
                     ln, pa = sel["over"][when]; pb = sel["under"][when][1]
                     if ln is None or not SB.sane(pa, pb) or t_ == ln:
                         continue
-                    out.append(R_(sport, m, when, d, None, ln, pa, pb, int(t_ > ln), ctx(sport, x["home"], x["away"], x["start"], d, None)))
+                    out.append(R_(sport, m, when, d, None, ln, pa, pb, int(t_ > ln), ctx(sport, x["home"], x["away"], x["start"], d, None), mkf))
                     continue
                 hk = x.get("home") if x.get("home") in sel else None
                 ak = x.get("away") if x.get("away") in sel else None
@@ -147,9 +150,9 @@ def game_rows(sport, path):
                 c = ctx(sport, x["home"], x["away"], x["start"], d, 1)
                 if m == "ml":
                     if m_ != 0:
-                        out.append(R_(sport, m, when, d, None, None, pa, pb, int(m_ > 0), c))
+                        out.append(R_(sport, m, when, d, None, None, pa, pb, int(m_ > 0), c, mkf))
                 elif ln is not None and m_ + ln != 0:
-                    out.append(R_(sport, m, when, d, None, ln, pa, pb, int(m_ + ln > 0), c))
+                    out.append(R_(sport, m, when, d, None, ln, pa, pb, int(m_ + ln > 0), c, mkf))
     return out
 
 
@@ -158,7 +161,7 @@ def prop_rows(sport, path, stat_of, actual, skip=lambda d: False):
     play: a void, as books grade it)."""
     if not os.path.exists(path):
         return []
-    out = []
+    out, mkf = [], "_mkt" in path
     for fid, x in json.load(open(path)).items():
         if not x.get("start"):
             continue
@@ -179,11 +182,11 @@ def prop_rows(sport, path, stat_of, actual, skip=lambda d: False):
                     ln, pa, pb = v[when]
                     if st.endswith("_yes"):
                         if pa is not None:
-                            out.append(R_(sport, st, when, d, None, 0.5, pa, pb, int(a > 0), c))
+                            out.append(R_(sport, st, when, d, None, 0.5, pa, pb, int(a > 0), c, mkf))
                         continue
                     if ln is None or not SB.sane(pa, pb) or a == ln:
                         continue
-                    out.append(R_(sport, st, when, d, None, ln, pa, pb, int(a > ln), c))
+                    out.append(R_(sport, st, when, d, None, ln, pa, pb, int(a > ln), c, mkf))
     return out
 
 
@@ -217,7 +220,7 @@ def nba_more_rows():
     threes all along, everything 2026-27 and 2024-25, graded from the box scores."""
     from nba_common import team_abbr
     out = []
-    for f in ("bt/nba_2425_mkt.json", "bt/nba_lines_full.json"):
+    for f in ("bt/nba_2425_mkt.json", "bt/nba_2425_lines.json", "bt/nba_lines_full.json"):
         out += game_rows("nba", f)
     box = {}
     if os.path.exists("bt/nba/box.json"):
@@ -241,6 +244,7 @@ def nba_more_rows():
     full = prop_rows("nba", "bt/nba_lines_full.json", STAT, act)
     out += [r for r in full if r[1] == "fg3" or r[4] >= "2026-08-01"]   # 2025-26 pts / reb / ast: the replay rows
     out += prop_rows("nba", "bt/nba_2425_mkt.json", STAT, act)
+    out += prop_rows("nba", "bt/nba_2425_lines.json", STAT, act)
     print(f"  nba game lines + extra props: {len(out)}")
     return out
 
@@ -408,7 +412,7 @@ def nfl_2024_rows():
         return None
     STAT = {"player_receptions": "rec", "player_receiving_yards": "rec_yds", "player_rushing_yards": "rush_yds",
             "player_passing_yards": "pass_yds", "anytime_touchdown_scorer": "td_yes"}
-    rows = prop_rows("nfl", f, STAT, act)
+    rows = prop_rows("nfl", f, STAT, act)       # *_mkt.json: market-price periods
     for r in rows:
         if r[1] == "td_yes":
             r[1] = "anytime_td"

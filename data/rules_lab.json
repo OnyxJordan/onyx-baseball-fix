@@ -22,6 +22,7 @@
   "nba": {
    "names": [
     "2024-25 \u00b7 market prices, before Onyx",
+    "2024-25 season",
     "Oct 2025 to Jan 2026",
     "Feb to Jun 2026",
     "2026-27 season"
@@ -31,14 +32,18 @@
    ],
    "periods": [
     1,
-    2
+    2,
+    3
    ],
    "markets": {
-    "pts": 30034,
-    "reb": 27007,
-    "ast": 19863
+    "pts": 44875,
+    "reb": 40206,
+    "ast": 29066,
+    "ml": 1323,
+    "spread": 1299,
+    "total": 1316
    },
-   "kb": 3100
+   "kb": 4749
   },
   "nfl": {
    "names": [
@@ -50,20 +55,21 @@
     0
    ],
    "periods": [
+    0,
     1,
     2
    ],
    "markets": {
-    "ml": 649,
-    "spread": 644,
-    "total": 655,
-    "pass_yds": 1292,
-    "rush_yds": 2034,
-    "rec_yds": 5514,
-    "rec": 5445,
-    "anytime_td": 16229
+    "ml": 804,
+    "spread": 796,
+    "total": 809,
+    "pass_yds": 1592,
+    "rush_yds": 2859,
+    "rec_yds": 7284,
+    "rec": 7050,
+    "anytime_td": 19975
    },
-   "kb": 1341
+   "kb": 1698
   },
   "cfb": {
    "names": [
@@ -83,7 +89,7 @@
     "spread": 1302,
     "total": 1316
    },
-   "kb": 193
+   "kb": 170
   },
   "nhl": {
    "names": [
