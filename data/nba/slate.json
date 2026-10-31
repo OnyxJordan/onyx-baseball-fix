@@ -1,7 +1,7 @@
 {
  "date": "2026-10-31",
  "source": "optic",
- "fetched": "2026-10-31T17:49:34+00:00",
+ "fetched": "2026-10-31T18:52:46+00:00",
  "games": [
   {
    "gid": "20261031B901A1B5",
@@ -15,8 +15,8 @@
    "home": "UTAH",
    "away_rec": "3-1",
    "home_rec": "1-4",
-   "away_score": null,
-   "home_score": null,
+   "away_score": 0,
+   "home_score": 0,
    "spread": null,
    "total": null,
    "away_ml": null,
@@ -809,8 +809,8 @@
    "home": false,
    "gid": "20261031B901A1B5",
    "pos": "SG",
-   "inj": "GTD",
-   "inj_detail": "Ankle (Leg, Soreness, Left)",
+   "inj": "",
+   "inj_detail": "",
    "hs": "4706557",
    "logo": "https://cdn.opticodds.com/player-logos/basketball/610651.png"
   },
@@ -2629,8 +2629,8 @@
    "home": true,
    "gid": "20261031B901A1B5",
    "pos": "PF",
-   "inj": "GTD",
-   "inj_detail": "Wrist (Arm, Right)",
+   "inj": "",
+   "inj_detail": "",
    "hs": "4066336",
    "logo": "https://cdn.opticodds.com/player-logos/basketball/598844.png"
   },
@@ -3214,7 +3214,7 @@
    "home": true,
    "gid": "20261101036048FF",
    "pos": "PG",
-   "inj": "GTD",
+   "inj": "OUT",
    "inj_detail": "Back (Torso)",
    "hs": "4711272",
    "logo": "https://cdn.opticodds.com/player-logos/basketball/598955.png"
@@ -3266,8 +3266,8 @@
    "home": false,
    "gid": "20261031B901A1B5",
    "pos": "C",
-   "inj": "GTD",
-   "inj_detail": "Knee (Leg, Left)",
+   "inj": "",
+   "inj_detail": "",
    "hs": "4066211",
    "logo": "https://cdn.opticodds.com/player-logos/basketball/598964.png"
   },
@@ -3305,8 +3305,8 @@
    "home": false,
    "gid": "20261101D6FCE8F6",
    "pos": "C",
-   "inj": "",
-   "inj_detail": "",
+   "inj": "GTD",
+   "inj_detail": "Back (Torso, Spasms)",
    "hs": "3032976",
    "logo": "https://cdn.opticodds.com/player-logos/basketball/598968.png"
   },

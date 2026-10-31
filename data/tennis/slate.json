@@ -1466,8 +1466,8 @@
     {
      "id": "185203",
      "start": "2026-10-31T16:10Z",
-     "state": "in",
-     "detail": "3rd",
+     "state": "post",
+     "detail": "Final",
      "round": "Semifinal",
      "draw": "Men's Singles",
      "court": "Centre Court",
@@ -1477,11 +1477,11 @@
        "short": "A. de Minaur",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/aus.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
         1,
-        1
+        7
        ],
        "serve": false
       },
@@ -1494,9 +1494,9 @@
        "sets": [
         4,
         6,
-        0
+        6
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -1519,9 +1519,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Alex de Minaur",
+       "short": "A. de Minaur",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/aus.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -3012,8 +3012,8 @@
     {
      "id": "185157",
      "start": "2026-10-31T16:05Z",
-     "state": "in",
-     "detail": "3rd",
+     "state": "post",
+     "detail": "Final",
      "round": "Semifinal",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -3027,7 +3027,7 @@
        "sets": [
         6,
         5,
-        1
+        4
        ],
        "serve": false
       },
@@ -3036,11 +3036,11 @@
        "short": "J. Lehecka",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/cze.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         3,
         7,
-        3
+        6
        ],
        "serve": false
       }
@@ -3065,9 +3065,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Jiri Lehecka",
+       "short": "J. Lehecka",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/cze.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -3555,7 +3555,7 @@
      "id": "187337",
      "start": "2026-10-31T17:15Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Qualifying 1st Round",
      "draw": "Men's Singles",
      "court": "Court 2",
@@ -3567,7 +3567,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        4
+        6,
+        5
        ],
        "serve": false
       },
@@ -3578,6 +3579,7 @@
        "seed": null,
        "win": false,
        "sets": [
+        7,
         4
        ],
        "serve": false
@@ -3731,12 +3733,12 @@
     },
     {
      "id": "187353",
-     "start": "2026-11-01T12:30Z",
+     "start": "2026-11-01T13:00Z",
      "state": "pre",
-     "detail": "11/1 - 7:30 AM EST",
+     "detail": "11/1 - 8:00 AM EST",
      "round": "Qualifying Final",
      "draw": "Men's Singles",
-     "court": "Court 2",
+     "court": "Court 1",
      "p": [
       {
        "name": "Lorenzo Sonego",
@@ -3760,26 +3762,26 @@
     },
     {
      "id": "187352",
-     "start": "2026-11-01T13:00Z",
+     "start": "2026-11-01T13:30Z",
      "state": "pre",
-     "detail": "11/1 - 8:00 AM EST",
+     "detail": "11/1 - 8:30 AM EST",
      "round": "Qualifying Final",
      "draw": "Men's Singles",
-     "court": "Court 1",
+     "court": "Court 2",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Alex Molcan",
+       "short": "A. Molcan",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/svk.png",
        "seed": null,
        "win": false,
        "sets": [],
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Nuno Borges",
+       "short": "N. Borges",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/por.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -15515,5 +15517,5 @@
    ]
   }
  ],
- "fetched": "2026-10-31T17:50:04+00:00"
+ "fetched": "2026-10-31T18:53:13+00:00"
 }
