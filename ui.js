@@ -90,7 +90,7 @@
     },
   };
   // the sport pages: one shape, tabs from sport_shell.html
-  ALL.slice(2).forEach(function (a) {
+  ALL.filter(function (a) { return a[0] !== 'mlb' && a[0] !== 'nba'; }).forEach(function (a) {   // MLB and NBA have their own shapes above
     SITES[a[0]] = {name: a[3],
       bar: [['home', 'Home', 'home'], ['plays', 'Plays', 'plays'], ['games', 'Games', 'games', 1], ['board', 'Board', 'board']],
       tabs: [['home', 'Home', 'home', 'Tonight at a glance'], ['games', 'Games', 'games', 'Live scores and the gamecenter'],

@@ -1856,7 +1856,7 @@ function pickLabel(r) {
   return `${r.name} ${r.side === 'over' ? 'Over' : 'Under'} ${r.line} ${MKT_NAME[r.mkt] || r.mkt}`;
 }
 function playCards(rows) {
-  return `<div class="pk-grid">${rows.map(r => `<div class="pk${r.projected ? ' lean' : ''}">${r.projected ? '<span class="pk-badge">Lean · not tracked</span>' : ''}
+  return `<div class="pk-grid">${rows.map(r => `<div class="pk${r.projected ? ' lean' : ''}">${r.trial ? '<span class="pk-badge" style="color:#61e970;border-color:rgba(97,233,112,.5)">On trial · graded at the open</span>' : r.projected ? '<span class="pk-badge">Lean · not tracked</span>' : ''}
     <div class="pk-top"><span>${esc(MKT_NAME[r.mkt] || r.mkt)}</span><span>${esc(r.matchup || '')}</span></div>
     <div class="pk-main">${r.hs ? `<img class="lg m" style="border-radius:50%" src="${esc(r.hs)}" alt="" loading="lazy">` : ''}<b>${esc(pickLabel(r))}</b></div>
     <div class="pk-nums"><div><span>Onyx</span><b>${fmtOdds(r.price)}</b></div><div><span>${r.projected ? 'Confidence' : 'Win chance'}</span><b>${pct(r.prob)}</b></div>
@@ -1937,7 +1937,7 @@ function renderPlays() {
     ? leanHdr('Tracked picks · graded', picks.length) + (picks.length ? playCards(picks) : '<div class="empty">No play clears the tracked screens on this slate. The best other plays are below.</div>')
       + (leans.length ? leanHdr('More plays · model leans, not graded', leans.length) + playCards(leans) : '')
     : leanHdr("Today's plays · best first", proj.length)
-      + `<p class="dim" style="font-size:12px;line-height:1.6;margin:0 0 10px">Where the model's chance beats Onyx's price, best value first, two per game at most. Confidence is the model's chance the play wins. Model leans: not graded until the ${esc(C.name)} model beats Onyx's prices in a backtest.</p>`
+      + `<p class="dim" style="font-size:12px;line-height:1.6;margin:0 0 10px">Where the model's chance beats Onyx's price, best value first, two per game at most. Confidence is the model's chance the play wins. ${M.status === 'trial' ? 'Plays marked On trial are graded in public at the opening price; the rest are leans, not graded.' : `Model leans: not graded until the ${esc(C.name)} model beats Onyx's prices in a backtest.`}</p>`
       + (proj.length ? playCards(proj) : '<div class="empty">No line on this slate beats the Onyx price right now. Plays appear as Onyx posts lines.</div>');
   const rows = M.rows || [];
   const gameRows = rows.filter(r => r.kind), propRows = rows.filter(r => !r.kind);
@@ -1997,7 +1997,7 @@ function engineHtml(E) {
     ${st.bars ? wbar(st.bars) : ''}${(st.rows || []).map(r => `<div class="wrow"><b>${esc(r[0])}</b><span>${esc(r[1])}</span></div>`).join('')}
     ${st.note ? `<div class="wnote">${esc(st.note)}</div>` : ''}</div>`).join('');
   const L = E.lane;
-  const lane = L ? `<div class="wblock"><div class="wtitle">${L.live ? 'The pick lane · live and graded in public' : 'The pick lane · in the lab'}</div>
+  const lane = L ? `<div class="wblock"><div class="wtitle">${L.live ? 'The pick lane · live and graded in public' : 'The pick lane · not live: its backtest did not pass'}</div>
     <div class="wrow"><b>Markets</b><span>${esc(L.markets.join(', '))}</span></div>
     <div class="wrow"><b>Edge</b><span>${(L.edge[0] * 100).toFixed(0)} to ${(L.edge[1] * 100).toFixed(0)}pp over the price's implied chance (bigger gaps are usually news the model missed)</span></div>
     <div class="wrow"><b>Price</b><span>${fmtOdds(L.price[0])} to ${fmtOdds(L.price[1])}, one play per game, ${L.per_slate} a slate at most</span></div>

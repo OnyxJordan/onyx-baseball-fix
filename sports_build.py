@@ -386,6 +386,8 @@ def nfl_block(lane, slate, odds):
         row = game.get(nk(r["name"]))
         return (row.get(r["mkt"]) or 0.0) if row else "void"
     block = model_frame("nfl", lane, slate, odds, M, grows + out, block, resolve)
+    if block.get("status") != "live":
+        block["status"] = "trial"       # the receptions unders lane is graded at the opening price
     block["_cands"] = grows + out
     block["proj"] = proj
     eng = engine_team("nfl", M, M.GAME_P, gw, bt, block["status"] == "live")
@@ -399,6 +401,11 @@ def nfl_block(lane, slate, odds):
                 "implied": round(L.implied(r["any_price"]), 4), "edge": r["any_edge"]}
                for r in block.get("td", []) if r.get("any_price") is not None and r.get("any_value")]
         block["projected"] = top_plays(grows + out + tdp)
+        # a play the receptions trial lane logged today is graded: mark it, never call it an untracked lean
+        trial = {r.get("sel") for r in (block.get("open") or {}).get("rows") or [] if r.get("sel") and not r.get("result")}
+        for p in block["projected"]:
+            if p.get("sel") in trial:
+                p["trial"] = True
     return block
 
 TEAM_MODELS = {"nfl": "nfl_model", "cfb": "cfb_model", "nhl": "nhl_model"}
@@ -595,7 +602,7 @@ def engine_team(key, M, GP, w, bt, live):
     elif T.get("mae_total") is not None:
         factors.append(["eye", "Totals", f"Total error {T['mae_total']:.2f} {unit} vs {T['base_mae_total']:.2f} for the league average on games the ratings never saw.", "Tested", ""])
     if hockey:
-        factors.append(["bell", "Goalies next", "The starting goalie moves an NHL price more than anything else. Confirmations are not in the model yet, which is part of why it stays in the lab.", "Planned", ""])
+        factors.append(["bell", "Goalies next", "The starting goalie moves an NHL price more than anything else. Confirmations are not in the model yet, which is part of why it stays leans only.", "Planned", ""])
     return {"steps": steps, "factors": factors, "lane": _lane_card(bt, live)}
 
 
