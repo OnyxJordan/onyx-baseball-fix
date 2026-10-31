@@ -12,7 +12,7 @@ data/rules_lab.json (index) and data/rules_lab/<sport>.json. The page applies a 
 Sources (bt/ is local, not committed):
   Onyx prices (tools/onyx_lines_pull.py): bt/nfl_game.json, bt/nfl_lines.json, bt/nfl_td.json,
     bt/cfb_lines.json, bt/cfb_props.json, bt/nhl_lines.json, bt/nhl_props.json,
-    bt/tennis_atp_lines.json, bt/tennis_wta_lines.json, bt/nba_lines_full.json,
+    bt/tennis_atp_lines.json, bt/tennis_wta_lines.json, bt/nba_lines_full.json, bt/nba_threes_pra.json,
     bt/mlb_2025_lines.json, bt/mlb_2026_lines.json, bt/nba/ (the NBA backtest pull)
   Earlier seasons at market prices, before Onyx priced them (onyx_lines_pull.py with another
     book; research only, shown as "market prices, before Onyx", the book never named):
@@ -240,11 +240,13 @@ def nba_more_rows():
     def act(fid, x, name, st):
         b = box.get((fid, nk(name)))
         return (b[0].get(st), b[1]) if b else None
-    STAT = {"player_points": "pts", "player_rebounds": "reb", "player_assists": "ast", "player_threes": "fg3"}
+    STAT = {"player_points": "pts", "player_rebounds": "reb", "player_assists": "ast", "player_threes": "fg3", "player_made_threes": "fg3"}
     full = prop_rows("nba", "bt/nba_lines_full.json", STAT, act)
     out += [r for r in full if r[1] == "fg3" or r[4] >= "2026-08-01"]   # 2025-26 pts / reb / ast: the replay rows
     out += prop_rows("nba", "bt/nba_2425_mkt.json", STAT, act)
     out += prop_rows("nba", "bt/nba_2425_lines.json", STAT, act)
+    if os.path.exists("bt/nba_threes_pra.json"):   # made threes, 2025-26 on (points + rebounds + assists not graded yet)
+        out += prop_rows("nba", "bt/nba_threes_pra.json", STAT, act)
     print(f"  nba game lines + extra props: {len(out)}")
     return out
 
