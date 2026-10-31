@@ -10315,7 +10315,7 @@
      "id": "185815",
      "start": "2026-10-30T22:10Z",
      "state": "in",
-     "detail": "2nd",
+     "detail": "3rd",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Estadio Mexcovery",
@@ -10328,9 +10328,10 @@
        "win": false,
        "sets": [
         2,
-        3
+        6,
+        1
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Nadia Podoroska",
@@ -10340,17 +10341,18 @@
        "win": false,
        "sets": [
         6,
-        3
+        3,
+        1
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
     {
      "id": "185813",
-     "start": "2026-10-31T00:00Z",
+     "start": "2026-10-31T00:15Z",
      "state": "pre",
-     "detail": "10/30 - 8:00 PM EDT",
+     "detail": "10/30 - 8:15 PM EDT",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Estadio Mexcovery",
@@ -11752,5 +11754,5 @@
    ]
   }
  ],
- "fetched": "2026-10-30T23:26:58+00:00"
+ "fetched": "2026-10-30T23:59:50+00:00"
 }
