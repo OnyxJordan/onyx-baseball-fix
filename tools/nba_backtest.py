@@ -40,6 +40,7 @@ NAMEMAP = {}   # gid -> {nk(name): props}, filled when lines load
 STATS = ("pts", "reb", "ast")
 SIM_OUT = True                # reconstruct the injury report (see walk)
 SIM_ROSTER = False            # also list healthy players who sat (production sees the whole roster)
+SIM_LINEUP = False            # confirmed starting fives known (production: when posted before tip)
 HS_OF = {}                    # Optic pid -> ESPN athlete id (on/off tables are keyed by ESPN id)
 ONOFF_FEED = None             # callable(day) -> nba_onoff.OnOff built only from games before that day
 SPLIT = "2026-02-01"          # tune before, test on/after
@@ -166,7 +167,7 @@ def walk(G, lines, season_start, season_end, prior, mkt=None):
                 opp = g["away"] if l["team"] == g["home"] else g["home"]
                 slate["players"].append({"pid": l["pid"], "name": l["name"], "team": l["team"], "opp": opp,
                                          "home": l["team"] == g["home"], "gid": fid, "pos": l["pos"], "inj": "",
-                                         "hs": HS_OF.get(l["pid"])})
+                                         "hs": HS_OF.get(l["pid"]), "starter": bool(l["starter"]) if SIM_LINEUP else None})
             # the injury report, reconstructed: a recent rotation player (3 of
             # the team's last 5 games, 15+ min there) absent tonight is OUT
             if SIM_OUT:
