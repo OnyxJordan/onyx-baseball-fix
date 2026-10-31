@@ -6310,7 +6310,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        0
+        3
        ],
        "serve": false
       },
@@ -6321,7 +6321,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        0
+        3
        ],
        "serve": true
       }
@@ -10355,8 +10355,8 @@
     {
      "id": "185813",
      "start": "2026-10-31T00:40Z",
-     "state": "in",
-     "detail": "3rd",
+     "state": "post",
+     "detail": "Final",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Estadio Mexcovery",
@@ -10379,21 +10379,21 @@
        "short": "F. Ferro",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
         6,
-        3
+        6
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
     {
      "id": "185814",
-     "start": "2026-10-31T03:15Z",
-     "state": "pre",
-     "detail": "10/30 - 11:15 PM EDT",
+     "start": "2026-10-31T03:35Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Estadio Mexcovery",
@@ -10404,8 +10404,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/can.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        1
+       ],
+       "serve": true
       },
       {
        "name": "Alicia Herrero Linana",
@@ -10413,7 +10415,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        0
+       ],
        "serve": false
       }
      ]
@@ -10428,9 +10432,9 @@
      "court": "Estadio Mexcovery",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Fiona Ferro",
+       "short": "F. Ferro",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -10519,8 +10523,8 @@
     {
      "id": "187314",
      "start": "2026-10-31T02:05Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Qualifying 1st Round",
      "draw": "Women's Singles",
      "court": "Centre Court",
@@ -10535,17 +10539,17 @@
         4,
         2
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Himeno Sakatsume",
        "short": "H. Sakatsume",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/jpn.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        1
+        6
        ],
        "serve": false
       }
@@ -10555,7 +10559,7 @@
      "id": "187317",
      "start": "2026-10-31T02:10Z",
      "state": "in",
-     "detail": "2nd",
+     "detail": "3rd",
      "round": "Qualifying 1st Round",
      "draw": "Women's Singles",
      "court": "Court 2",
@@ -10568,9 +10572,10 @@
        "win": false,
        "sets": [
         6,
-        2
+        2,
+        0
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Mika Stojsavljevic",
@@ -10580,6 +10585,7 @@
        "win": false,
        "sets": [
         1,
+        6,
         3
        ],
        "serve": false
@@ -10623,9 +10629,9 @@
     },
     {
      "id": "187310",
-     "start": "2026-10-31T03:30Z",
-     "state": "pre",
-     "detail": "10/30 - 11:30 PM EDT",
+     "start": "2026-10-31T03:20Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Qualifying 1st Round",
      "draw": "Women's Singles",
      "court": "Court 1",
@@ -10636,7 +10642,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/gbr.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        1
+       ],
        "serve": false
       },
       {
@@ -10645,16 +10653,18 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/aus.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        3
+       ],
+       "serve": true
       }
      ]
     },
     {
      "id": "187312",
-     "start": "2026-10-31T03:30Z",
+     "start": "2026-10-31T03:40Z",
      "state": "pre",
-     "detail": "10/30 - 11:30 PM EDT",
+     "detail": "10/30 - 11:40 PM EDT",
      "round": "Qualifying 1st Round",
      "draw": "Women's Singles",
      "court": "Centre Court",
@@ -10681,9 +10691,9 @@
     },
     {
      "id": "187315",
-     "start": "2026-10-31T03:30Z",
+     "start": "2026-10-31T03:50Z",
      "state": "pre",
-     "detail": "10/30 - 11:30 PM EDT",
+     "detail": "10/30 - 11:50 PM EDT",
      "round": "Qualifying 1st Round",
      "draw": "Women's Singles",
      "court": "Court 2",
@@ -11784,5 +11794,5 @@
    ]
   }
  ],
- "fetched": "2026-10-31T03:10:30+00:00"
+ "fetched": "2026-10-31T03:41:47+00:00"
 }
