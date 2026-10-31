@@ -484,6 +484,17 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
     goes to `data/nfl/opening.json`; a play is logged to `data/nfl/open_trial.json`
     (append-only, validate_build ledger list) only while the live line is still the
     opening one, at most 12 a day by edge, graded off the box score.
+  - **NFL injury feed (10/31):** `sports_espn.fetch_injuries` reads ESPN's league-wide
+    report each build (matched by ESPN athlete id, then name). Out, IR, PUP, NFI,
+    inactive, suspended and doubtful players are left off the slate entirely: no
+    projection, no lean, no TD chance, no Top 10 entry, no receptions trial play.
+    Questionable players stay, tagged `inj: "Q"` (a Q badge on the page) and kept out
+    of the Top 10. Fail-soft: no report means the slate runs as before (the build logs
+    `nfl injuries: N ruled out left off the slate, M questionable tagged`). First run,
+    week 9: 29 ruled out, 10 questionable; one ruled-out player (Brenen Thompson, LAC)
+    still had live Onyx anytime and first TD prices. Not a model change (projections
+    are unchanged for everyone who plays), so `nfl_model` stays v5; the volume share of
+    a missing player is not redistributed (tested and left out in v5).
   - **NFL game lines from play-by-play (10/31, tested, not adopted):** opponent-adjusted
     offense and defense ratings in EPA per play (nflverse 2024-2026, win probability
     10-90% plays, half-life 60/120/240 days, ridge 100/300/1000), alone and next to the

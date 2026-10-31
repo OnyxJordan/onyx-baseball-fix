@@ -306,3 +306,42 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
+
+
+# ── injury report ───────────────────────────────────────────────────────
+# ESPN's league-wide report. NOT_PLAYING never gets a projection, a lean, a
+# Top 10 spot or a trial play; QUESTIONABLE stays on the board, tagged "Q".
+NOT_PLAYING = {"OUT", "IR", "IR-R", "PUP-R", "PUP-P", "NFI-R", "NFI-A", "INACTIVE", "RESERVE-SUS", "SUSPENSION",
+               "INJURED RESERVE", "DOUBTFUL", "D"}
+
+
+def fetch_injuries(path="football/nfl"):
+    """{"id": {espn athlete id: tag}, "name": {name key: tag}}, tag = {"s": "OUT" | "Q",
+    "d": "Ankle", "c": short comment}. Players listed Active are left out. Fail-soft:
+    an empty report when ESPN does not answer, so the build runs exactly as before."""
+    import re
+    d = espn_get(path + "/injuries") or {}
+    out = {"id": {}, "name": {}}
+    for t in d.get("injuries") or []:
+        for i in t.get("injuries") or []:
+            ath = i.get("athlete") or {}
+            det = i.get("details") or {}
+            st = ((det.get("fantasyStatus") or {}).get("abbreviation") or i.get("status") or "").upper()
+            tag = "OUT" if st in NOT_PLAYING else "Q" if st.startswith("Q") else None
+            if not tag:
+                continue
+            v = {"s": tag, "d": det.get("type") or "", "c": (i.get("shortComment") or "")[:160]}
+            for l in ath.get("links") or []:
+                m = re.search(r"/id/(\d+)", l.get("href") or "")
+                if m:
+                    out["id"][m.group(1)] = v
+                    break
+            if ath.get("displayName"):
+                out["name"][nk(ath["displayName"])] = v
+    return out
+
+
+def injury_of(inj, pid, name):
+    if not inj:
+        return None
+    return (inj.get("id") or {}).get(str(pid)) or (inj.get("name") or {}).get(nk(name or ""))
