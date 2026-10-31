@@ -1210,3 +1210,11 @@ rushing and passing yards, anytime TD) and the 1st-quarter total, with Winning /
 live and Won / Lost / Push when settled (an over that has cleared, or a 1st-quarter total
 after the 1st, settles early). Tapping a pick opens its game. Picks clear 36 hours after
 their game starts. Device-only by design: nothing is sent anywhere.
+
+**Held pregame lines (10/31).** Onyx takes pregame player props down at tip, so a live NBA
+game's Points watch said "no line". `nba_build.hold_tip_lines` keeps each player's last
+pregame main line for the day in `data/nba/tip_lines.json` (written by full and
+lines-only builds; `nba_lines.yml` commits it) and a tipped game shows it marked
+`closed`: selection ids stripped, `propLeg` returns nothing for it, so it is shown but
+never a bet button, a pick, a Top 10 play or a parlay leg.
+

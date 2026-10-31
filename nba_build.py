@@ -144,6 +144,30 @@ def attach_props(rows, props, source):
 BET_STATS = ("pts", "reb", "ast", "fg3", "pra", "pr", "pa")
 
 
+TIP_LINES = "tip_lines.json"
+
+
+def hold_tip_lines(rows, games, today):
+    """Onyx takes a player's pregame props down at tip, so a live or finished
+    game came back with "no line" in Points watch. Every build keeps the last
+    pregame main line per player (data/nba/tip_lines.json, today only) and a
+    started game shows it, marked closed: no selection ids, so no bet button,
+    and picks / the Top 10 / the parlay only ever read untipped games."""
+    T = load(TIP_LINES, {}) or {}
+    if T.get("date") != today:
+        T = {"date": today, "p": {}}
+    for r in rows:
+        if (games.get(r["gid"]) or {}).get("state", "pre") == "pre":
+            if r["props"]:
+                T["p"][r["pid"]] = r["props"]
+            continue
+        for s_, b in (T["p"].get(r["pid"]) or {}).items():
+            if s_ not in r["props"]:
+                r["props"][s_] = dict(b, closed=True, all={side: {k: v for k, v in a.items() if k != "sel"}
+                                                           for side, a in (b.get("all") or {}).items()})
+    save(TIP_LINES, T)
+
+
 def bet_ladders(r, rec):
     """Every Onyx line on this player for the bet card. Per stat, rows of
     [line, over, over_sel, under, under_sel, p_model, p_blend] (P of the
@@ -575,6 +599,7 @@ def main():
                 if ctx:
                     r["oo_ctx"] = sorted(ctx, key=lambda c: -c["mpg"])[:3]
     priced = attach_props(rows, props, source)
+    hold_tip_lines(rows, {g["gid"]: g for g in slate["games"]}, today)
 
     ledger = load(LEDGER, [])
     n_graded = 0 if LINES_ONLY else grade(ledger, today)

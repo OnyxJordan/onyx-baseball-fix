@@ -1067,7 +1067,7 @@ function renderParlaySlip() {
 // ── data shaping ───────────────────────────────────────────────────
 function propLeg(p, stat, side) {
   const pr = (p.props || {})[stat];
-  if (!pr || !pr.all || !pr.all[side]) return null;
+  if (!pr || !pr.all || !pr.all[side] || pr.closed) return null;   // a tipped game's held line: shown, not bettable
   const s = pr.all[side];
   return {sel: s.sel || null, price: s.price, gid: p.gid, market: 'player_' + STAT_NAME[stat].toLowerCase(),
           pid: p.pid, stat, side, line: pr.line,
