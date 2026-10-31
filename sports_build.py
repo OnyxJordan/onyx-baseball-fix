@@ -20,7 +20,8 @@ import sports_lab as L
 ONYX_LEAGUE = {"nfl": "NFL", "cfb": "NCAAF", "nhl": "NHL"}
 
 ROADMAP = {
-    "nfl": ["Tested 10/26 to 10/31 against two seasons of real Onyx lines (440 games), counting every priced player who played, including games he was never thrown to: receptions unders beat Onyx's opening price in both seasons (+6.1% and +20.1%), so they run on trial at the open; overs did not. Rushing and passing yards did not",
+    "nfl": ["Tested 10/26 to 10/31 against two seasons of real Onyx lines (440 games), counting every priced player who played, including games he was never thrown to: receptions unders beat Onyx's opening price in both seasons (+6.1% and +20.1%), so they run on trial at the open; overs did not",
+            "Tested 10/31: rushing, passing and receiving yards, the current projections and a rebuild from each player's share of his team's carries, dropbacks and targets. None beat Onyx's price in a season it was not tuned on, so they are projections only, never plays",
             "Re-tested 10/31: touchdown scorers lost to Onyx's price in both seasons once players who played without a touch were counted, so the touchdown chance shown is Onyx's price with its margin removed, and no scorer is flagged as value",
             "Tested 10/31: game ratings from every play since 2024 (expected points per play, adjusted for opponent, with scores alongside). On 2026 games they never saw, they made Onyx's spread and total worse, open and close, as the score-only ratings did. NFL sides and totals stay leans",
             "Live 10/31: ESPN's injury report. A player ruled out (out, IR, inactive, doubtful) gets no projection, lean, Top 10 spot or trial play; a questionable player is marked Q and kept out of the Top 10",
@@ -288,6 +289,8 @@ def nfl_block(lane, slate, odds):
                      matchup=f"{r['team']} {'vs' if r['home'] else '@'} {r['opp']}")
             if r.get("vol") and r["mkt"] == "rec" and ps["side"] not in getattr(M, "TRIAL_SIDES", ("over", "under")):
                 r["value_min"] = 1.0      # v6: receptions overs lost at the open (2025 -14.8%), never a play or Top 10
+            if r["mkt"] in getattr(M, "NO_VALUE", ()):
+                r["value_min"] = 1.0      # v7: rushing, passing and receiving yards lost their re-tests, leans only
     # receptions unders at Onyx's opening price, on trial (v6: the side that beat the open in both seasons)
     block["open"] = nfl_open_lane(lane, out, slate, season, rows, M)
     # touchdown scorers (nfl_model v2): anytime and first TD chances from Onyx's

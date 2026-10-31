@@ -502,6 +502,13 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
       play now (`VOL_P["rec_yds"]["edge"] = 1.0`).
     - `tools/sports_backtest.py` now uses the snap counts in `data/nfl/nflverse.json` the
       same way, so future NFL prop tests count these games.
+  - **NFL v7: rushing and passing yards never a play (10/31).** With zero-touch games
+    counted, the v1 projection blended with Onyx's price makes Onyx worse every window
+    (rushing 2026 open log loss .6951 vs .6921; passing .6955 vs .6934). A volume rebuild
+    (share of team carries / dropbacks x team volume x implied points and spread x yards
+    per carry / attempt) improved rushing MAE slightly (19.57 vs 19.78) but its 2025
+    winner (unders 3pp+ +10.7%) lost 14.4% on 2026, and passing lost on 2025. Both are
+    in `nfl_model.NO_VALUE` with receiving yards: projections stay, never plays or Top 10.
   - **NFL injury feed (10/31):** `sports_espn.fetch_injuries` reads ESPN's league-wide
     report each build (matched by ESPN athlete id, then name). Out, IR, PUP, NFI,
     inactive, suspended and doubtful players are left off the slate entirely: no

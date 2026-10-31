@@ -1,8 +1,22 @@
 """
 nfl_model.py - Onyx NFL player projections.
 
-VERSION v6 (10/31). The lab notebook: every change bumps VERSION and adds an
+VERSION v7 (10/31). The lab notebook: every change bumps VERSION and adds an
 entry here citing its evidence (CLAUDE.md rule 2 applies to this model too).
+
+  v7  10/31  Rushing and passing yards are never a play (NO_VALUE). Re-tested with
+             zero-touch games counted (tools/sports_backtest.py, 14,285 priced
+             samples): the v1 projection blended 30% with Onyx's price makes Onyx's
+             chance worse in every window, rushing yards log loss 2025 open .6933 vs
+             Onyx .6931, 2026 open .6951 vs .6921, close .6991 vs .6927; passing yards
+             2025 open .6982 vs .6930, 2026 open .6955 vs .6934. A volume rebuild
+             (his share of team carries or dropbacks x the team's recent volume x
+             (implied points / 22.5)^e x exp(e x spread / 7) x yards per carry or
+             attempt shrunk to 4.3 / 6.6, opponent yards allowed), tuned on 2025:
+             rushing MAE 19.57 vs 19.78 for his average on 2026, but the 2025 winner
+             (unders 3pp+, +10.7% at the open) lost 14.4% on 2026; passing lost on
+             2025 both sides (overs -7.8%, unders -9.4%), so nothing carries forward.
+             Projections stay on the page as leans.
 
   v6  10/31  Anytime TD re-tested, and the v3 result does not hold. The v3 test only
              counted players with a box-score line, so a priced player who played but
@@ -146,7 +160,7 @@ player-game: pass_yds, rush_yds, rec_yds, rec, tgt, att, rush_att...).
 import math, re, unicodedata
 from collections import defaultdict
 
-VERSION = "v6"
+VERSION = "v7"
 # game lines (team_model.py), tuned 10/26: see v1
 GAME_P = {"half_life": 240, "ridge": 5, "home": 2.0, "sd_margin": 13.5, "sd_total": 13.0, "min_games": 3}
 GAME_TEST = {"n": 199, "logloss": 0.648, "base_logloss": 0.698, "mae_total": 10.90, "base_mae_total": 11.71,
@@ -371,6 +385,7 @@ def project_volume(stat, h, th, implied, spread, p=None):
 # v5: receptions from nflverse (nfl_verse.py) - targets per team dropback, the snap trend,
 # and the team's recent dropbacks scaled by Onyx's implied points and spread - averaged
 # 50/50 with the v4 volume projection.
+NO_VALUE = ("rec_yds", "rush_yds", "pass_yds")   # v6 / v7: markets whose re-test lost to Onyx; never a play
 TRIAL_SIDES = ("under",)   # v6: the receptions trial lane logs unders only (changelog)
 VERSE_P = {"dec": 0.9, "n": 10, "k": 60.0, "b_snap": 0.5, "e_imp": 1.0, "e_sp": 0.1, "w": 0.5}
 VERSE_TEAM = {"WSH": "WAS", "LAR": "LA"}
