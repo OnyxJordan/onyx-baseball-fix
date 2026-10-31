@@ -1247,3 +1247,8 @@ model's number on it.
   settings: secrets `ANTHROPIC_API_KEY`, `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` and the
   variable `AI_MODEL`. The model and key are never committed. Set a monthly spend limit on the
   AI account: the page is public.
+
+**10/31 follow-ups.** A parlay spreads across games first and, when the board is short of
+games, fills its remaining legs from games it already uses (an SGP+, labelled on the ticket,
+never one player twice, one game line of each kind per game). My bets (`onyxMyBets`, ui.js and
+home.html) and saved picks (`saved.js`) both clear themselves after 24 hours.

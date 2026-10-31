@@ -368,9 +368,9 @@ async function askGo(q) {
   try { R = await OnyxAsk.ask(q); } catch (e) { out.innerHTML = '<div class="my-empty">Could not load today\'s boards. Try again in a minute.</div>'; return; }
   const understood = `<div class="ask-u">Read as: <b>${esc(R.understood)}</b>${R.via === 'ai' ? ' · AI' : ''}</div>`;
   if (!R.rows.length) { out.innerHTML = understood + `<div class="my-empty">Nothing on today's Onyx board matches that${R.spec.min_price != null || R.spec.max_price != null ? ' at those prices' : ''}. Try loosening it, or a different sport.</div>`; return; }
-  const short = R.spec.intent !== 'list' && R.rows.length < (R.spec.count || 3) ? ` · only ${R.rows.length} game${R.rows.length > 1 ? 's' : ''} on today's board fit, so ${R.rows.length} leg${R.rows.length > 1 ? 's' : ''}` : '';
+  const short = R.spec.intent !== 'list' && R.rows.length < (R.spec.count || 3) ? ` · only ${R.rows.length} leg${R.rows.length > 1 ? 's' : ''} on today's board fit what you asked` : '';
   const SG = R.parlay && R.parlay.same_game;
-  const pl = R.parlay ? `<div class="ask-pl"><div><b>${R.rows.length}-leg ${SG ? 'same-game parlay · ' + esc(R.parlay.matchup) : 'parlay'} · ${fmtOdds(R.parlay.price)}${SG ? '*' : ''}</b><br>
+  const pl = R.parlay ? `<div class="ask-pl"><div><b>${R.rows.length}-leg ${SG ? 'same-game parlay · ' + esc(R.parlay.matchup) : R.parlay.sgp_plus ? 'SGP+' : 'parlay'} · ${fmtOdds(R.parlay.price)}${SG || R.parlay.sgp_plus ? '*' : ''}</b><br>
       ${SG ? `<span>${esc(R.parlay.story)}</span><br>` : ''}<span>Model chance all ${R.rows.length} hit: ${SG ? 'at least ' : ''}${(100 * R.parlay.prob).toFixed(1)}%${esc(short)}</span></div>
       <a class="t10-bet" href="https://app.onyxodds.com/share?${R.parlay.sels.map(s => 'selection=' + encodeURIComponent(s)).join('&')}&referrer=${ONYX_REFERRER}" target="_blank" rel="noopener" onclick="track('ask_parlay_bet',{legs:${R.rows.length}})">Bet parlay on Onyx</a></div>` : '';
   const tagTxt = {tracked: 'Tracked pick', trial: 'On trial', lean: 'Model lean'};
@@ -385,7 +385,7 @@ async function askGo(q) {
       <div class="t10-f"><span class="t10-tag sp">${esc(OnyxAsk.LG[p.sport] || p.sport)}</span><span class="t10-tag ${p.tag}">${tagTxt[p.tag] || 'Model lean'}</span>
         <a class="t10-bet" href="${url}" target="_blank" rel="noopener">${R.two ? 'Anytime TD ' : ''}${fmtOdds(p.price)} on Onyx</a>${save}</div></div>`;
   }).join('');
-  out.innerHTML = understood + pl + `<div class="t10-list">${rows}</div><div class="my-note">${R.two ? 'Onyx prices anytime TD; the 2+ chance is from the model\'s expected touchdowns. ' : ''}Confidence is each sport model's chance blended with Onyx's price. Model leans are not graded. ${SG ? '*Onyx prices same-game parlays itself and usually pays less than the legs multiplied, because the legs are tied together; the same tie is why the true chance sits above the floor shown. ' : ''}${R.pool > R.rows.length ? R.pool + ' plays matched; the best ' + R.rows.length + ' shown.' : ''}</div>`;
+  out.innerHTML = understood + pl + `<div class="t10-list">${rows}</div><div class="my-note">${R.two ? 'Onyx prices anytime TD; the 2+ chance is from the model\'s expected touchdowns. ' : ''}Confidence is each sport model's chance blended with Onyx's price. Model leans are not graded. ${SG || (R.parlay && R.parlay.sgp_plus) ? '*Onyx prices same-game legs itself and usually pays less than the legs multiplied, because the legs are tied together; the same tie is why the true chance sits above the floor shown. ' : ''}${R.pool > R.rows.length ? R.pool + ' plays matched; the best ' + R.rows.length + ' shown.' : ''}</div>`;
 }
 // ── Top 10 plays of the day: every sport build writes data/<sport>/top.json (daily_top.py)
 var T10_SPORTS = [['nba', 'NBA', 'nba.html'], ['nfl', 'NFL', 'nfl.html'], ['cfb', 'NCAAF', 'cfb.html'], ['nhl', 'NHL', 'nhl.html'], ['tennis', 'Tennis', 'tennis.html']];
@@ -504,6 +504,13 @@ var LG = [
 ];
 var MY = {tab: 'live', sb: {}, sum: {}, tn: [], gf: null, nba: null, timer: null};
 function ls(k, d) { try { return JSON.parse(localStorage.getItem(k) || 'null') || d; } catch (e) { return d; } }
+// My bets keep 24 hours (the same rule as ui.js): an old bet clears itself instead of lingering
+function myBetList() {
+  const all = ls('onyxMyBets', []), now = Date.now();
+  const keep = all.filter(b => now - (b.t || Date.parse(b.at) || 0) < 24 * 3600e3);
+  if (keep.length !== all.length) { try { localStorage.setItem('onyxMyBets', JSON.stringify(keep)); } catch (e) {} }
+  return keep;
+}
 function nk(n) { return String(n || '').normalize('NFKD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[.'’-]/g, ' ').replace(/\b(jr|sr|ii|iii|iv)\b/g, ' ').replace(/\s+/g, ' ').trim(); }
 function etShort(iso) { try { return new Date(iso).toLocaleString('en-US', {weekday: 'short', hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York'}); } catch (e) { return ''; } }
 async function sbOf(L) { try { const r = await fetch(ESPN + L.path + '/scoreboard' + (L.q ? '?' + L.q : '')); MY.sb[L.k] = await r.json(); } catch (e) { MY.sb[L.k] = MY.sb[L.k] || {events: []}; } }
@@ -592,7 +599,7 @@ function gameCard(L, e) {
     <div class="t">${e.a.logo ? `<img src="${esc(e.a.logo)}" alt="" loading="lazy">` : ''}<b>${esc(e.a.ab)}</b></div><div class="sc">${sc}</div><div class="t h"><b>${esc(e.h.ab)}</b>${e.h.logo ? `<img src="${esc(e.h.logo)}" alt="" loading="lazy">` : ''}</div></a>`;
 }
 function myBets() {
-  const B = ls('onyxMyBets', []).slice().reverse();
+  const B = myBetList().slice().reverse();
   const slip = ls('onyxNbaSlip', []);
   const PAGE = {nba: 'nba.html', mlb: 'index.html', nfl: 'nfl.html', cfb: 'cfb.html', nhl: 'nhl.html', tennis: 'tennis.html', golf: 'golf.html'};
   let h = '';
@@ -609,7 +616,7 @@ function myBets() {
       <span class="st">${esc(String(b.sport || '').toUpperCase())} · opened ${esc(etShort(b.at))}${e ? ' · ' + esc(evState(e)) : ''}</span><span></span>
       ${b.legs && b.legs.length > 1 ? `<div class="legs">${b.legs.map(l => esc(l.label || 'leg')).join('<br>')}</div>` : ''}</a>`;
   }).join('');
-  return h ? `<div class="my-grid">${h}</div><div class="my-note">Every Onyx bet you open from this app, on this device. Betting a player prop also follows that player live. Settled results live in your Onyx account. <a href="#" onclick="if(confirm('Clear My bets on this device?')){localStorage.removeItem('onyxMyBets');renderMy()}return false" style="color:#d795ff">Clear</a></div>`
+  return h ? `<div class="my-grid">${h}</div><div class="my-note">Every Onyx bet you open from this app, on this device, for 24 hours. Betting a player prop also follows that player live. Settled results live in your Onyx account. <a href="#" onclick="if(confirm('Clear My bets on this device?')){localStorage.removeItem('onyxMyBets');renderMy()}return false" style="color:#d795ff">Clear</a></div>`
     : `<div class="my-empty">No bets yet. Tap any Onyx price or "Bet on Onyx" in a sport and it lands here, and the player it is on starts tracking live.</div>`;
 }
 
@@ -702,7 +709,7 @@ async function loadMy() {
       MY.tn = js.flatMap(j => (j.events || []).flatMap(e => (e.groupings || []).filter(g => /Singles/.test((g.grouping || {}).displayName || '')).flatMap(g => g.competitions || []))); }),
     fetch(ESPN + 'golf/pga/scoreboard').then(r => r.json()).then(j => { MY.gf = (j.events || [])[0] || null; }).catch(() => {}),
   ]));
-  if (!MY.nba && ls('onyxMyBets', []).some(b => b.sport === 'nba')) { try { MY.nba = await getJSON('data/nba/slate.json'); } catch (e) {} }
+  if (!MY.nba && myBetList().some(b => b.sport === 'nba')) { try { MY.nba = await getJSON('data/nba/slate.json'); } catch (e) {} }
   MY_P = await myPlayers();
   MY_PK = await myPicks();
   if (!MY.picked && MY_PK.length) { MY.tab = 'picks'; MY.picked = true; }
@@ -713,12 +720,12 @@ async function loadMy() {
 function renderMy() {
   const live = LG.flatMap(L => evs(L.k).filter(e => e.state === 'in').map(e => [L, e]));
   const next = LG.flatMap(L => evs(L.k).filter(e => e.state === 'pre').map(e => [L, e])).sort((a, b) => String(a[1].start).localeCompare(String(b[1].start))).slice(0, 8);
-  const nb = ls('onyxMyBets', []).length + (ls('onyxNbaSlip', []).length ? 1 : 0);
+  const nb = myBetList().length + (ls('onyxNbaSlip', []).length ? 1 : 0);
   const tabs = [['picks', 'My picks', MY_PK.length], ['live', 'Live now', live.length], ['players', 'My players', MY_P.length], ['bets', 'My bets', nb]];
   document.getElementById('myTabs').innerHTML = tabs.map(([k, t, n]) => `<button class="${MY.tab === k ? 'on' : ''}" onclick="MY.tab='${k}';renderMy()">${t}<b>${n}</b></button>`).join('');
   let h = '';
   if (MY.tab === 'picks') {
-    h = MY_PK.length ? `<div class="my-grid">${MY_PK.map(pickCard).join('')}</div><div class="my-note">Picks you saved with the star, on this device. Each one follows its game live (the player's line for props, the score for game lines) and settles when it ends. Tap one to open its game. Saved picks clear 36 hours after their game starts.</div>`
+    h = MY_PK.length ? `<div class="my-grid">${MY_PK.map(pickCard).join('')}</div><div class="my-note">Picks you saved with the star, on this device. Each one follows its game live (the player's line for props, the score for game lines) and settles when it ends. Tap one to open its game. Saved picks clear 24 hours after their game starts.</div>`
       : `<div class="my-empty">No saved picks yet. Tap the star on any play (the Top 10 above or a sport's Plays tab) and follow it here all night.</div>`;
   } else if (MY.tab === 'live') {
     const tl = MY.tn.filter(c => ((c.status || {}).type || {}).state === 'in').slice(0, 6);
