@@ -10314,8 +10314,8 @@
     {
      "id": "185815",
      "start": "2026-10-30T22:10Z",
-     "state": "in",
-     "detail": "3rd",
+     "state": "post",
+     "detail": "Final",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Estadio Mexcovery",
@@ -10325,11 +10325,11 @@
        "short": "C. Monnet",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         2,
         6,
-        1
+        6
        ],
        "serve": false
       },
@@ -10342,17 +10342,17 @@
        "sets": [
         6,
         3,
-        1
+        2
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
     {
      "id": "185813",
-     "start": "2026-10-31T00:15Z",
+     "start": "2026-10-31T00:35Z",
      "state": "pre",
-     "detail": "10/30 - 8:15 PM EDT",
+     "detail": "10/30 - 8:35 PM EDT",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Estadio Mexcovery",
@@ -10416,9 +10416,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Carole Monnet",
+       "short": "C. Monnet",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -11754,5 +11754,5 @@
    ]
   }
  ],
- "fetched": "2026-10-30T23:59:50+00:00"
+ "fetched": "2026-10-31T00:31:26+00:00"
 }
