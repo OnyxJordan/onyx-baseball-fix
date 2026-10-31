@@ -509,6 +509,18 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
     1Q -5.6%), so no rule carries forward; 2026 1H looked good (+15.8%, 64 bets) but
     the rule fails its tuning season. Line ratios match reality (1H line 0.505 of the
     total, actual 0.506). Always-under 1H: 2025 +1.8% (285), 2026 +12.9% (106): too thin.
+  - **Scorecard and rules lab (`scorecard.html`, 10/31).** One page for every pick lane on
+    the site, graded in the browser straight from the ledgers (NBA props, Model's Parlay
+    and opening trials; NFL receptions trial; CFB tracked and trial; the closed MLB 2026
+    lanes from `data/archive/mlb_2026/` with the published filters: HR edge > 1.5pp, K
+    projection beats the line by > 10%), plus NHL, tennis, NFL and golf as leans with
+    their backtest verdicts. The rules lab (`#lab`) tests a rule (sport, market, side,
+    price band, model edge) against `data/rules_lab.json`: 52,505 real Onyx open and close
+    prices (NFL game lines, props and anytime TD; CFB; NHL; ATP tennis), each with the
+    walk-forward model chance and the result, split into the tune and test windows the
+    backtests use. Rebuild it with `python3 tools/rules_lab_build.py` (dev only, needs
+    the local `bt/` pulls). A rule shows "worth a trial" only with 30+ bets in each
+    window and a profit at the opening price in both. NBA history is not in it yet.
   - **College touchdown scorers in Ask Onyx (10/31).** `sports_build.cfb_td_board` puts every
     Onyx CFB anytime and first TD price on `data/cfb/board.json` (about 800 a Saturday).
     There is no college TD model: the chance is Onyx's price x `TD_SCALE` .82 (the NFL v6

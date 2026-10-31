@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>Onyx Scorecard</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0c0c0c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Onyx Sports">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<meta name="description" content="Every Onyx Sports pick lane in one place, graded in public, and a rules lab to test any betting rule against real Onyx prices.">
+<link rel="stylesheet" href="onyx.css">
+<script src="onyx.js" defer></script>
+<style>
+body{background:#0c0c0c;color:#fff;margin:0}
+.sc{padding-top:28px;padding-bottom:8px}
+.sc-h{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.sc-h h1,.sc-h h2{margin:0;font-size:clamp(30px,7vw,52px);line-height:1}
+.sc-h p{margin:8px 0 0;color:#b9b2c4;font-size:14px;max-width:620px;line-height:1.6}
+.sc-back{display:inline-block;margin:18px 0 0;color:#d795ff;font:700 12px monospace;letter-spacing:.06em;text-transform:uppercase;text-decoration:none}
+.sc-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));gap:8px;margin:0 0 18px}
+.sc-tile{padding:12px 14px;border-radius:14px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.035)}
+.sc-tile b{display:block;font:800 22px monospace}.sc-tile span{font:600 10px monospace;letter-spacing:.08em;text-transform:uppercase;color:#9a93a6}
+.sc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:10px}
+.lane{padding:14px;border-radius:16px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.035);min-width:0}
+.lane.tracked{border-color:rgba(97,233,112,.45)}.lane.trial{border-color:rgba(176,56,249,.55)}.lane.closed{border-color:rgba(255,255,255,.18)}
+.lane-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.tag{display:inline-block;padding:3px 8px;border-radius:999px;font:700 10px monospace;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+.tag.sp{background:rgba(255,255,255,.08);color:#ddd}.tag.tracked{background:rgba(97,233,112,.15);color:#61e970}
+.tag.trial{background:rgba(176,56,249,.2);color:#d795ff}.tag.lean{background:rgba(255,255,255,.06);color:#9a93a6}.tag.closed{background:rgba(255,255,255,.1);color:#ccc}
+.lane h3{margin:0 0 4px;font-size:17px;line-height:1.25}
+.lane .what{margin:0 0 10px;color:#b9b2c4;font-size:13px;line-height:1.55}
+.lane-nums{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-bottom:10px}
+.lane-nums div{padding:8px;border-radius:10px;background:rgba(255,255,255,.04);text-align:center;min-width:0}
+.lane-nums b{display:block;font:800 16px monospace}.lane-nums span{font:600 9px monospace;letter-spacing:.06em;text-transform:uppercase;color:#9a93a6}
+.g{color:#61e970}.r{color:#ff6b81}.p{color:#d795ff}
+.lane .ev{margin:0;color:#9a93a6;font-size:12px;line-height:1.55}
+.lane a.go{display:inline-block;margin-top:8px;color:#d795ff;font:700 11px monospace;text-transform:uppercase;letter-spacing:.06em;text-decoration:none}
+/* rules lab */
+.lab-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));gap:8px;margin-bottom:10px}
+.lab-form label{display:flex;flex-direction:column;gap:4px;font:600 10px monospace;letter-spacing:.08em;text-transform:uppercase;color:#9a93a6}
+.lab-form select,.lab-form input{padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,.16);background:#151418;color:#fff;font:600 14px system-ui,sans-serif;min-width:0}
+.lab-pre{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px}
+.lab-pre button{padding:8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:#ddd;font:600 12px system-ui,sans-serif;cursor:pointer}
+.lab-pre button:hover{border-color:rgba(176,56,249,.7)}
+.lab-out{margin-top:6px}
+.verdict{padding:12px 14px;border-radius:14px;margin-bottom:10px;font-size:14px;line-height:1.5;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04)}
+.verdict.good{border-color:rgba(97,233,112,.5);background:rgba(97,233,112,.08)}.verdict.bad{border-color:rgba(255,107,129,.45);background:rgba(255,107,129,.07)}
+.lab-t{width:100%;border-collapse:collapse;font-size:13px}
+.lab-t th,.lab-t td{padding:8px 6px;border-bottom:1px solid rgba(255,255,255,.08);text-align:right;white-space:nowrap}
+.lab-t th:first-child,.lab-t td:first-child{text-align:left;white-space:normal}
+.lab-t th{font:600 10px monospace;letter-spacing:.06em;text-transform:uppercase;color:#9a93a6}
+.lab-wrap{overflow-x:auto}
+.note{color:#9a93a6;font-size:12px;line-height:1.6;margin:10px 0 0}
+.empty{padding:16px;border-radius:14px;border:1px dashed rgba(255,255,255,.15);color:#9a93a6;font-size:13px}
+</style>
+</head>
+<body class="ox-page">
+<main>
+  <section class="ox-wrap sc" id="scorecard">
+    <a class="sc-back" href="home.html">‹ Onyx Sports</a>
+    <div class="sc-h"><div><span class="ox-eyebrow">The scorecard</span><h1>Every lane.<br>Graded in public.</h1>
+      <p>Every way the site picks, in one place: what is tracked, what is on trial, what is only a lean, and why. Records come straight from the public ledgers and update with every build. Dollar figures are $10 a bet at the price logged.</p></div></div>
+    <div class="sc-tiles" id="scTiles"></div>
+    <div class="sc-grid" id="scLanes"><div class="empty">Loading the ledgers...</div></div>
+    <p class="note">Tracked: a graded pick, live because its model beat real Onyx prices in a season it was not tuned on. On trial: logged at Onyx's opening price, graded, but not yet proven. Lean: the model's read only, never graded, because its backtest did not beat Onyx.</p>
+  </section>
+
+  <section class="ox-wrap sc" id="lab">
+    <div class="sc-h"><div><span class="ox-eyebrow">Rules lab</span><h2>Test any rule.</h2>
+      <p>Pick a rule of thumb and see how it would have done against real Onyx prices, at the opening and the closing line, in each season of history we have. A rule earns trust only if it makes money in both seasons; one hot stretch is not an edge.</p></div></div>
+    <div class="lab-pre" id="labPre"></div>
+    <form class="lab-form" id="labForm" onsubmit="return false">
+      <label>Sport<select id="lSport"></select></label>
+      <label>Market<select id="lMkt"></select></label>
+      <label>Side<select id="lSide"></select></label>
+      <label>Price from<input id="lMin" type="number" inputmode="numeric" placeholder="e.g. -200"></label>
+      <label>Price to<input id="lMax" type="number" inputmode="numeric" placeholder="e.g. +150"></label>
+      <label>Model edge at least (pts)<input id="lEdge" type="number" inputmode="decimal" step="0.5" placeholder="any"></label>
+    </form>
+    <div class="lab-out" id="labOut"><div class="empty">Loading history...</div></div>
+    <p class="note" id="labNote"></p>
+  </section>
+</main>
+
+<script>
+const ONYX_REFERRER = 'KR680261';
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'})[c]); }
+function getJSON(u) { return fetch(u, {cache: 'no-cache'}).then(r => { if (!r.ok) throw new Error(u); return r.json(); }); }
+const dec = o => o > 0 ? 1 + o / 100 : 1 + 100 / -o;
+const imp = o => o > 0 ? 100 / (o + 100) : -o / (-o + 100);
+const money = v => (v < 0 ? '-$' : '+$') + Math.abs(v).toFixed(0);
+const pctS = v => (v >= 0 ? '+' : '') + (100 * v).toFixed(1) + '%';
+const odds = o => o == null ? '-' : (o > 0 ? '+' : '') + o;
+
+// ── the lanes: what each one is, where its record lives, how it grades ───────
+// grade(rows) -> {w, l, p, pend, units (in $10 stakes), priced}
+function gradePicks(rows) {
+  const g = {w: 0, l: 0, p: 0, pend: 0, units: 0, priced: true, last: null};
+  (rows || []).forEach(r => {
+    if (r.result === 'W') { g.w++; g.units += r.price != null ? dec(r.price) - 1 : 0; }
+    else if (r.result === 'L') { g.l++; g.units -= 1; }
+    else if (r.result === 'P' || r.result === 'V') g.p++;
+    else g.pend++;
+    if (r.date && (!g.last || r.date > g.last)) g.last = r.date;
+  });
+  return g;
+}
+function gradeTickets(rows) {
+  const g = {w: 0, l: 0, p: 0, pend: 0, units: 0, priced: true, last: null};
+  (rows || []).forEach(t => {
+    if (t.result === 'win') g.w++; else if (t.result === 'loss') g.l++; else if (t.result) g.p++; else g.pend++;
+    if (typeof t.pnl === 'number') g.units += t.pnl / (t.stake || 10);
+    if (t.date && (!g.last || t.date > g.last)) g.last = t.date;
+  });
+  return g;
+}
+function gradeBool(rows, winKey, oddsKey) {
+  const g = {w: 0, l: 0, p: 0, pend: 0, units: 0, priced: !!oddsKey, last: null};
+  (rows || []).forEach(r => {
+    const v = r[winKey];
+    if (v === true) { g.w++; if (oddsKey && r[oddsKey] != null) g.units += dec(r[oddsKey]) - 1; }
+    else if (v === false) { g.l++; if (oddsKey && r[oddsKey] != null) g.units -= 1; }
+    else g.pend++;
+    if (r.date && (!g.last || r.date > g.last)) g.last = r.date;
+  });
+  return g;
+}
+const LANES = [
+  {sport: 'NBA', name: 'Player props', status: 'tracked', src: 'data/nba/picks_history.json', grade: gradePicks, href: 'nba.html#record',
+   what: 'Points, rebounds and assists where the model beats the Onyx price, graded off the box score.',
+   ev: 'Live because the NBA model beat Onyx\'s prices on a season it never saw (v8 added confirmed starting fives on 10/31).'},
+  {sport: 'NBA', name: "The Model's Parlay", status: 'tracked', src: 'data/nba/ticket_history.json', grade: gradeTickets, href: 'home.html#parlay',
+   what: 'Three mainstream legs a night (-150 to +150, 28+ minute starters), locked at first tip, $10 a ticket.',
+   ev: 'A ticket from the tracked props lane, so it shares that lane\'s evidence.'},
+  {sport: 'NBA', name: '1st-quarter total and first basket', status: 'trial', src: 'data/nba/open_trial.json', grade: gradePicks, href: 'nba.html#plays',
+   what: 'Logged at the first Onyx price we see for the line, only while it is still the opening price.',
+   ev: 'Both beat Onyx\'s opening price in testing but not the closing price, so they are on trial until this record decides.'},
+  {sport: 'NFL', name: 'Receptions unders', status: 'trial', src: 'data/nfl/open_trial.json', grade: gradePicks, href: 'nfl.html#plays',
+   what: 'Receptions unders where the model beats Onyx\'s opening price by 3 points or more, at most 12 a day. Overs logged before 10/31 stay in this record.',
+   ev: 'Counting every player who played, unders beat the opening price in 2025 (+6.1%, 468 bets) and 2026 (+20.1%, 187). Overs did not.'},
+  {sport: 'NCAAF', name: 'Spreads and totals', status: 'tracked', src: 'data/cfb/picks_history.json', grade: gradePicks, href: 'cfb.html#plays',
+   what: 'College spreads (and totals logged before 11/1) where the team ratings beat Onyx\'s price.',
+   ev: 'The spread lane beat Onyx\'s prices on games it never saw; totals moved to on trial on 11/1 after a weak 2025.'},
+  {sport: 'NCAAF', name: 'Totals', status: 'trial', src: 'data/cfb/open_trial.json', grade: gradePicks, href: 'cfb.html#plays',
+   what: 'College totals at Onyx\'s opening price, on trial since 11/1.',
+   ev: 'Passed on 2026 but lost at the 2025 close (-20.3%), so it has to earn its place here.'},
+  {sport: 'NHL', name: 'Team ratings, skaters, goalies', status: 'lean', bt: 'nhl', href: 'nhl.html#model',
+   what: 'Leans on the page, never graded.', ev: ''},
+  {sport: 'Tennis', name: 'Elo match prices', status: 'lean', bt: 'tennis', href: 'tennis.html#model', what: 'Leans on the page, never graded.', ev: ''},
+  {sport: 'NFL', name: 'Sides, totals, yards, touchdowns', status: 'lean', bt: 'nfl', href: 'nfl.html#model',
+   what: 'Leans and projections. Touchdown chances are Onyx\'s own price with the margin removed.',
+   ev: 'Tested 10/26 to 10/31: team ratings (scores and play by play), 1st-half and 1st-quarter totals, rushing, passing and receiving yards and touchdown scorers all lost to Onyx in a season they were not tuned on.'},
+  {sport: 'Golf', name: 'Strokes-gained model', status: 'lean', href: 'golf.html#model', what: 'Built and tested against results.',
+   ev: 'Onyx does not price golf yet, so there is nothing to grade against. It is tested the day Onyx posts golf prices.'},
+  {sport: 'MLB', name: 'HR edge plays (2026)', status: 'closed', src: 'data/archive/mlb_2026/hr_history.json', href: 'mlb-2026.html',
+   filter: r => r.prob != null && r.implied != null && r.prob - r.implied > 1.5, grade: rows => gradeBool(rows, 'win', 'odds'),
+   what: 'Home runs where the model beat the Onyx price by 1.5 points or more. Season closed 10/29.', ev: 'The frozen season page has every play.'},
+  {sport: 'MLB', name: 'Top 5 HR plays (2026)', status: 'closed', src: 'data/archive/mlb_2026/picks_input.json', href: 'mlb-2026.html',
+   filter: r => r.tier === 'edge', grade: rows => gradeBool(rows, 'hit', 'odds'),
+   what: 'The daily top edge plays, graded at the price posted.', ev: 'Season closed 10/29.'},
+  {sport: 'MLB', name: 'Strikeout projections (2026)', status: 'closed', src: 'data/archive/mlb_2026/k_history.json', href: 'mlb-2026.html',
+   filter: r => r.line && Math.abs(r.proj - r.line) / r.line > 0.10, grade: rows => gradeBool(rows, 'win', null),
+   what: 'Every K line where the projection beat the line by more than 10%. No price was recorded, so wins and losses only.', ev: 'Season closed 10/29.'},
+  {sport: 'MLB', name: "The Model's Ticket (2026)", status: 'closed', src: 'data/archive/mlb_2026/ticket_history.json', grade: gradeTickets, href: 'mlb-2026.html',
+   what: 'One $10 home run parlay a day, locked at first pitch.', ev: 'Season closed 10/29.'},
+];
+const ST = {tracked: 'Tracked', trial: 'On trial', lean: 'Lean only', closed: 'Season closed'};
+
+async function scorecard() {
+  const el = document.getElementById('scLanes');
+  const bts = {};
+  await Promise.all(['nfl', 'nhl', 'tennis', 'cfb'].map(k => getJSON('data/' + k + '/backtest.json').then(j => { bts[k] = j; }).catch(() => {})));
+  const res = await Promise.all(LANES.map(L => L.src ? getJSON(L.src).catch(() => null) : Promise.resolve(null)));
+  let tot = {w: 0, l: 0, units: 0}, nLive = 0, nTrial = 0;
+  el.innerHTML = LANES.map((L, i) => {
+    let nums = '', extra = '';
+    if (L.src) {
+      let rows = res[i];
+      rows = Array.isArray(rows) ? rows : (rows && (rows.rows || rows.picks)) || [];
+      if (L.filter) rows = rows.filter(L.filter);
+      const g = L.grade(rows);
+      const n = g.w + g.l;
+      if (L.status === 'tracked' || L.status === 'trial') { tot.w += g.w; tot.l += g.l; tot.units += g.units; }
+      nums = n || g.pend ? `<div class="lane-nums"><div><b>${g.w}-${g.l}${g.p ? '-' + g.p : ''}</b><span>Won-lost${g.p ? '-push' : ''}</span></div>
+        <div><b class="${g.priced ? (g.units >= 0 ? 'g' : 'r') : ''}">${g.priced ? money(10 * g.units) : (n ? (100 * g.w / n).toFixed(1) + '%' : '-')}</b><span>${g.priced ? '$10 a bet' : 'Win rate'}</span></div>
+        <div><b class="p">${g.priced && n ? pctS(g.units / n) : g.pend}</b><span>${g.priced && n ? 'Return' : 'Pending'}</span></div></div>` +
+        (g.pend && g.priced && n ? `<p class="ev">${g.pend} pending.</p>` : '')
+        : `<div class="empty" style="margin-bottom:10px">No plays logged yet.</div>`;
+    }
+    if (L.bt && bts[L.bt]) {
+      const s = ((bts[L.bt].page || {}).summary || []).filter(x => /^Not passed|^Passed/.test(x));
+      if (s.length) extra = `<p class="ev">${esc(s.join(' '))}</p>`;
+    }
+    if (L.status === 'tracked') nLive++; if (L.status === 'trial') nTrial++;
+    return `<div class="lane ${L.status}"><div class="lane-top"><span class="tag sp">${esc(L.sport)}</span><span class="tag ${L.status}">${ST[L.status]}</span></div>
+      <h3>${esc(L.name)}</h3><p class="what">${esc(L.what)}</p>${nums}${L.ev ? `<p class="ev">${esc(L.ev)}</p>` : ''}${extra}
+      ${L.href ? `<a class="go" href="${esc(L.href)}">See every play ›</a>` : ''}</div>`;
+  }).join('');
+  const n = tot.w + tot.l;
+  document.getElementById('scTiles').innerHTML = [
+    [nLive, 'Tracked lanes', 'g'], [nTrial, 'On trial', 'p'],
+    [`${tot.w}-${tot.l}`, 'Tracked + trial record', ''], [n ? money(10 * tot.units) : '-', 'At $10 a bet', tot.units >= 0 ? 'g' : 'r']
+  ].map(([v, l, c]) => `<div class="sc-tile"><b class="${c}">${esc(v)}</b><span>${esc(l)}</span></div>`).join('');
+}
+
+// ── rules lab ────────────────────────────────────────────────────────────
+let LAB = null;
+const SPORT_N = {nfl: 'NFL', cfb: 'NCAAF', nhl: 'NHL', tennis: 'Tennis'};
+const MKT_N = {ml: 'Moneyline', spread: 'Spread', total: 'Game total', rec: 'Receptions', rec_yds: 'Receiving yards', rush_yds: 'Rushing yards',
+  pass_yds: 'Passing yards', anytime_td: 'Anytime TD'};
+const PRESETS = [
+  {t: 'Home underdogs to win (NFL)', s: 'nfl', m: 'ml', side: 'A', min: 100},
+  {t: 'Unders on NFL totals', s: 'nfl', m: 'total', side: 'B'},
+  {t: 'NFL receptions unders, model edge 3+', s: 'nfl', m: 'rec', side: 'B', edge: 3},
+  {t: 'Anytime TD at plus money', s: 'nfl', m: 'anytime_td', side: 'A', min: 100},
+  {t: 'Anytime TD favorites (-150 or shorter)', s: 'nfl', m: 'anytime_td', side: 'A', max: -150},
+  {t: 'Big favorites, -200 or shorter', s: 'all', m: 'ml', side: 'fav', max: -200},
+  {t: 'Underdogs +150 or longer', s: 'all', m: 'ml', side: 'dog', min: 150},
+  {t: 'College home teams against the spread', s: 'cfb', m: 'spread', side: 'A'},
+  {t: 'NHL unders', s: 'nhl', m: 'total', side: 'B'},
+  {t: 'Tennis underdogs', s: 'tennis', m: 'ml', side: 'dog'},
+  {t: "The model's side, edge 3+", s: 'all', m: 'all', side: 'model', edge: 3},
+];
+function sideNames(m) {
+  if (m === 'ml' || m === 'spread') return [['A', 'Home'], ['B', 'Away']];
+  if (m === 'anytime_td') return [['A', 'Yes (scores)']];
+  if (m === 'all') return [];
+  return [['A', 'Over'], ['B', 'Under']];
+}
+function fillSelects(keep) {
+  const s = document.getElementById('lSport'), m = document.getElementById('lMkt'), sd = document.getElementById('lSide');
+  const sports = Object.keys(LAB.data);
+  if (!s.options.length) s.innerHTML = `<option value="all">All sports</option>` + sports.map(k => `<option value="${k}">${SPORT_N[k] || k}</option>`).join('');
+  const mk = new Set(); (s.value === 'all' ? sports : [s.value]).forEach(k => Object.keys(LAB.data[k] || {}).forEach(x => mk.add(x)));
+  const mv = keep && keep.m && (mk.has(keep.m) || keep.m === 'all') ? keep.m : (mk.has(m.value) ? m.value : [...mk][0]);
+  m.innerHTML = `<option value="all">Every market</option>` + [...mk].map(x => `<option value="${x}">${MKT_N[x] || x}</option>`).join('');
+  m.value = mv;
+  const sides = sideNames(m.value).concat([['fav', 'Favorite'], ['dog', 'Underdog'], ['model', "Model's side"]]);
+  const sv = keep && keep.side ? keep.side : sd.value;
+  sd.innerHTML = sides.map(([v, n]) => `<option value="${v}">${n}</option>`).join('');
+  sd.value = sides.some(x => x[0] === sv) ? sv : sides[0][0];
+}
+function runLab() {
+  const sp = document.getElementById('lSport').value, mk = document.getElementById('lMkt').value, side = document.getElementById('lSide').value;
+  const num = id => { const v = document.getElementById(id).value; return v === '' ? null : +v; };
+  const pmin = num('lMin'), pmax = num('lMax'), emin = num('lEdge');
+  const cells = {};       // `${w}${t}` -> {n, w, u, pr}
+  const sports = sp === 'all' ? Object.keys(LAB.data) : [sp];
+  let usedEdge = false, noModel = 0;
+  sports.forEach(k => Object.entries(LAB.data[k] || {}).forEach(([m, byT]) => {
+    if (mk !== 'all' && m !== mk) return;
+    Object.entries(byT).forEach(([t, rows]) => rows.forEach(([w, p, line, a, b, y]) => {
+      // which side this rule bets, its price, the model's chance of it, and whether it won
+      let s = side;
+      if (s === 'fav' || s === 'dog') { if (b == null) { if (s === 'fav' ? a >= 0 : a < 0) return; s = 'A'; } else { const aFav = imp(a) >= imp(b); s = (s === 'fav') === aFav ? 'A' : 'B'; } }
+      if (s === 'model') {
+        if (p == null || b == null) { noModel++; return; }
+        s = p - imp(a) >= (1 - p) - imp(b) ? 'A' : 'B';
+      }
+      if (s === 'B' && b == null) return;
+      const price = s === 'A' ? a : b, won = s === 'A' ? y === 1 : y === 0;
+      if (price == null) return;
+      if (pmin != null && price < pmin) return;
+      if (pmax != null && price > pmax) return;
+      if (emin != null) {
+        if (p == null) { noModel++; return; }
+        usedEdge = true;
+        const ps = s === 'A' ? p : 1 - p;
+        if ((ps - imp(price)) * 100 < emin) return;
+      }
+      const c = cells[w + t] || (cells[w + t] = {n: 0, w: 0, u: 0, pr: 0});
+      c.n++; c.w += won ? 1 : 0; c.u += won ? dec(price) - 1 : -1; c.pr += imp(price);
+    }));
+  }));
+  const winN = sp !== 'all' && LAB.windows[sp] ? LAB.windows[sp].names : ['Earlier season', 'Later season'];
+  const rowsH = [[0, 'o'], [1, 'o'], [0, 'c'], [1, 'c']].map(([w, t]) => {
+    const c = cells[w + t] || {n: 0, w: 0, u: 0, pr: 0};
+    const roi = c.n ? c.u / c.n : null;
+    return {w, t, c, roi, html: `<tr><td>${esc(winN[w])} · ${t === 'o' ? 'opening price' : 'closing price'}</td><td>${c.n}</td><td>${c.n ? c.w + '-' + (c.n - c.w) : '-'}</td>
+      <td>${c.n ? (100 * c.w / c.n).toFixed(1) + '%' : '-'}</td><td>${c.n ? (100 * c.pr / c.n).toFixed(1) + '%' : '-'}</td>
+      <td class="${roi == null ? '' : roi >= 0 ? 'g' : 'r'}">${c.n ? money(10 * c.u) : '-'}</td><td class="${roi == null ? '' : roi >= 0 ? 'g' : 'r'}">${roi == null ? '-' : pctS(roi)}</td></tr>`};
+  });
+  const o0 = rowsH[0], o1 = rowsH[1];
+  let v, cls = '';
+  if (o0.c.n + o1.c.n === 0) v = 'No bets in the history match this rule. Loosen the price band or the edge.';
+  else if (o0.c.n < 30 || o1.c.n < 30) v = `Too few bets to judge (${o0.c.n} and ${o1.c.n} at the open). A rule needs 30+ in each season before its record means much.`;
+  else if (o0.roi > 0 && o1.roi > 0) { cls = 'good'; v = `Made money at the opening price in both seasons (${pctS(o0.roi)} and ${pctS(o1.roi)}). Worth a trial: the next step is logging it live at the open.`; }
+  else { cls = 'bad'; v = `Did not hold up: at the opening price it went ${pctS(o0.roi)} in ${esc(winN[0])} and ${pctS(o1.roi)} in ${esc(winN[1])}. Onyx's margin beats this rule.`; }
+  document.getElementById('labOut').innerHTML = `<div class="verdict ${cls}">${v}</div><div class="lab-wrap"><table class="lab-t"><thead><tr><th>When</th><th>Bets</th><th>W-L</th><th>Hit</th><th>Needed</th><th>$10 a bet</th><th>Return</th></tr></thead><tbody>${rowsH.map(r => r.html).join('')}</tbody></table></div>`;
+  document.getElementById('labNote').textContent = `"Needed" is the hit rate the prices required to break even. Every model chance is priced only from games before that one. ` +
+    (emin != null && noModel ? `${noModel} lines with no model chance (touchdown props) are left out when a model edge is set. ` : '') +
+    `Model chances here are the tested ones: NFL props use the season-average projection, not the newer volume model behind the receptions trial, so their edges differ from the live lane's. ` +
+    `History built ${LAB.built}: NFL ${LAB.windows.nfl.names.join(' and ')}, college football ${LAB.windows.cfb.names.join(' and ')}, NHL ${LAB.windows.nhl.names.join(' and ')}, tennis (ATP) ${LAB.windows.tennis.names.join(' and ')}. NBA history is not in the lab yet.`;
+}
+function preset(i) {
+  const P = PRESETS[i];
+  document.getElementById('lSport').value = P.s;
+  fillSelects({m: P.m, side: P.side});
+  document.getElementById('lMin').value = P.min != null ? P.min : '';
+  document.getElementById('lMax').value = P.max != null ? P.max : '';
+  document.getElementById('lEdge').value = P.edge != null ? P.edge : '';
+  runLab();
+  try { if (window.gtag) gtag('event', 'rules_lab', {rule: P.t}); } catch (e) {}
+}
+async function lab() {
+  try { LAB = await getJSON('data/rules_lab.json'); } catch (e) { document.getElementById('labOut').innerHTML = '<div class="empty">Could not load the history. Try again in a minute.</div>'; return; }
+  document.getElementById('labPre').innerHTML = PRESETS.map((p, i) => `<button type="button" onclick="preset(${i})">${esc(p.t)}</button>`).join('');
+  fillSelects();
+  document.getElementById('lSport').onchange = () => { fillSelects(); runLab(); };
+  document.getElementById('lMkt').onchange = () => { fillSelects({m: document.getElementById('lMkt').value}); runLab(); };
+  ['lSide', 'lMin', 'lMax', 'lEdge'].forEach(id => { const e = document.getElementById(id); e.oninput = runLab; e.onchange = runLab; });
+  preset(0);
+}
+scorecard(); lab();
+</script>
+</body>
+</html>
