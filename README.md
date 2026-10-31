@@ -509,6 +509,17 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
     1Q -5.6%), so no rule carries forward; 2026 1H looked good (+15.8%, 64 bets) but
     the rule fails its tuning season. Line ratios match reality (1H line 0.505 of the
     total, actual 0.506). Always-under 1H: 2025 +1.8% (285), 2026 +12.9% (106): too thin.
+  - **Ask Onyx, game lines and team names (10/31).** Every board now carries both sides of
+    every Onyx game line (`sports_build.both_sides`; NBA game lines from `nba_build.write_top`,
+    priced at Onyx's no-vig chance since there is no NBA game model) and each play's team
+    full name (`tn`, from the slate), so "Ohio State spread", "Georgia Tech", "Buckeyes
+    moneyline" resolve to the team and to that team's own side. `ask.js`: betting words
+    ("sides", "props", "dogs", "lines"...) are never player names; "sides" = spreads and
+    moneylines, "game lines" adds totals; "favorites" / "dogs" with no market = moneyline;
+    "props" = player props only; a game line is one play per game and market (every total
+    was named "Total", which kept one total across the board); a named team or player
+    drops the standard-price floor; a ticket left short by the floor widens to -250 and
+    says so; capital-letter abbreviations only ("MIN -200" is odds).
   - **Scorecard and rules lab (`scorecard.html`, 10/31).** One page for every pick lane on
     the site, graded in the browser straight from the ledgers (NBA props, Model's Parlay
     and opening trials; NFL receptions trial; CFB tracked and trial; the closed MLB 2026
