@@ -1925,7 +1925,8 @@ function renderPlays() {
     <h3>${M.status === 'live' ? 'Where the model beats the Onyx line' : M.status === 'trial' ? 'One lane graded in public, the rest tested and shown as leans' : 'Picks switch on when the model earns them'}</h3>
     <p>${esc(M.note || `The ${C.name} model is being built and tested. Nothing here is a pick until it has been backtested against real Onyx prices, the same bar the NBA and MLB models had to clear.`)}</p>
     ${(M.tests || []).length ? `<div class="stat-grid">${M.tests.map(t => `<div><span>${esc(t.k)}</span><b>${esc(t.v)}</b><div class="dim" style="font-size:11px">${esc(t.d || '')}</div></div>`).join('')}</div>` : ''}
-    ${M.status !== 'live' && (M.roadmap || []).length ? `<ul>${M.roadmap.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}</div>`;
+    ${M.status !== 'live' && (M.roadmap || []).length ? `<ul>${M.roadmap.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
+    <p style="margin-top:10px"><a href="how.html#${esc(window.OX_SITE || "")}" style="color:#d795ff">How every Onyx model works, and the bar a pick has to clear ›</a> · <a href="scorecard.html" style="color:#d795ff">Scorecard ›</a></p></div>`;
   if (KIND === 'golf') { el.innerHTML = lab + (gfModel((SD.events || []).find(e => e.id === (M.golf || {}).event)) || '<div class="empty">The model rates this week\'s field once the tournament is on the board.</div>'); return; }
   const picks = M.picks || [];
   const proj = M.projected || [];
