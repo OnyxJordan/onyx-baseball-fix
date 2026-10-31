@@ -17,6 +17,8 @@
 <meta name="description" content="Onyx Sports Data: models, matchups and live gamecenters for every sport, priced against Onyx. The research desk for your picks.">
 <link rel="stylesheet" href="onyx.css">
 <script src="onyx.js" defer></script>
+<script src="saved.js"></script>
+<script src="ask.js"></script>
 <script>
 if ('serviceWorker' in navigator && location.protocol === 'https:') {
   addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
@@ -55,7 +57,27 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
 .my-b b{font-size:14px}.my-b .p{font:800 14px monospace;color:#d795ff;text-align:right}
 .my-b span{font:600 11px monospace;color:#9a93a6}.my-b .legs{grid-column:1/-1;font-size:12px;color:#cfc8da;line-height:1.5}
 .my-b.live{border-color:rgba(97,233,112,.45)}.my-b.live span.st{color:#61e970}
+.pk-c{position:relative;padding-right:44px}
+.pk-c .pk-res{text-align:right}.pk-c .pk-res i{font:800 10px monospace;letter-spacing:.08em;text-transform:uppercase;font-style:normal;padding:3px 8px;border-radius:999px;background:rgba(255,255,255,.08)}
+.pk-c .pk-res i.w{background:rgba(97,233,112,.18);color:#61e970}.pk-c .pk-res i.l{background:rgba(255,92,122,.18);color:#ff7a93}
+.pk-c.r-w{border-color:rgba(97,233,112,.45)}.pk-c.r-l{border-color:rgba(255,92,122,.4)}
+.pk-c .legs b{color:#fff}
+.pk-bar{grid-column:1/-1;position:relative;height:6px;border-radius:999px;background:rgba(255,255,255,.08);margin-top:2px}
+.pk-bar i{position:absolute;left:0;top:0;bottom:0;border-radius:999px;background:linear-gradient(90deg,#b038f9,#635bff)}
+.pk-bar em{position:absolute;top:-3px;width:2px;height:12px;background:#fff;opacity:.7}
+.pk-x{position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:999px;border:1px solid rgba(255,255,255,.15);background:transparent;color:#9a93a6;font-size:16px;cursor:pointer}
 .my-note{font:600 10px monospace;color:#7d768a;margin-top:10px;line-height:1.5}
+/* Ask Onyx: type what you want, plays and parlays built from today's boards (ask.js) */
+.ask{padding-top:28px;padding-bottom:8px}
+.ask-box{display:flex;gap:8px;align-items:stretch}
+.ask-box input{flex:1;min-width:0;padding:14px 16px;border-radius:16px;border:1px solid rgba(176,56,249,.55);background:rgba(255,255,255,.04);color:#fff;font:600 15px var(--ox-body,system-ui)}
+.ask-box input:focus{outline:none;border-color:#b038f9;box-shadow:0 0 0 3px rgba(176,56,249,.25)}
+.ask-box button{flex-shrink:0;padding:0 18px;border-radius:16px;border:0;background:linear-gradient(135deg,#b038f9,#635bff);color:#fff;font:800 13px monospace;letter-spacing:.06em;cursor:pointer}
+.ask-ex{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:10px 0 4px}.ask-ex::-webkit-scrollbar{display:none}
+.ask-ex button{flex-shrink:0;padding:7px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:#cfc8da;font:600 12px var(--ox-body,system-ui);cursor:pointer}
+.ask-u{font:600 11px monospace;color:#9a93a6;margin:12px 0 10px;line-height:1.5}.ask-u b{color:#d795ff}
+.ask-pl{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;align-items:center;padding:14px;margin-bottom:10px;border-radius:16px;border:1px solid rgba(176,56,249,.55);background:linear-gradient(160deg,rgba(176,56,249,.16),rgba(255,255,255,.03))}
+.ask-pl b{font-size:16px}.ask-pl span{font:600 11px monospace;color:#cfc8da}.ask-pl .t10-bet{margin:0}
 /* Top 10 plays of the day, every sport, ranked by each model's confidence */
 .t10{padding-top:28px;padding-bottom:8px}
 .t10-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:10px}
@@ -68,6 +90,7 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
 .t10-f{grid-column:2;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 .t10-tag{font:800 9px monospace;letter-spacing:.08em;padding:3px 7px;border-radius:999px;background:rgba(255,255,255,.08);color:#cfc8da;text-transform:uppercase}
 .t10-tag.sp{background:rgba(176,56,249,.18);color:#d795ff}.t10-tag.tracked{background:rgba(97,233,112,.16);color:#61e970}.t10-tag.trial{background:rgba(99,91,255,.2);color:#b7b2ff}
+.t10-f .ox-save{width:30px;height:30px;font-size:15px}
 .t10-bet{margin-left:auto;font:800 12px monospace;padding:6px 10px;border-radius:999px;background:linear-gradient(135deg,#b038f9,#635bff);color:#fff;text-decoration:none;white-space:nowrap}
 </style>
 </head>
@@ -106,7 +129,8 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
       <h1>Research<br><em>on</em> everything</h1>
       <p>Onyx Sports Data compiles the best numbers across the industry, runs them through models we test in public and prices every one against the live Onyx line.</p>
       <div class="ox-hero-cta">
-        <a class="ox-btn fill" href="#top10">Today's top 10</a>
+        <a class="ox-btn fill" href="#ask">Ask Onyx</a>
+        <a class="ox-btn" href="#top10">Today's top 10</a>
         <a class="ox-btn" href="#my">My Onyx</a>
         <a class="ox-btn" href="#sports">Choose a sport</a>
         <a class="ox-btn" href="#parlay">Tonight's parlay</a>
@@ -123,6 +147,17 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
     </div>
   </div>
 
+  <!-- ── Ask Onyx: type what you want, we build it (ask.js) ───────────── -->
+  <section class="ox-wrap ask" id="ask">
+    <div class="my-h"><div><span class="ox-eyebrow">Ask Onyx</span><h2>Tell us what<br>you want.</h2>
+      <p>Type it the way you'd say it. Every play comes from today's models and live Onyx prices.</p></div></div>
+    <form class="ask-box" onsubmit="askGo(document.getElementById('askQ').value);return false">
+      <input id="askQ" type="search" enterkeyhint="go" autocomplete="off" maxlength="300" placeholder="3-leg parlay, NBA points overs, no odds shorter than -200">
+      <button type="submit">Build</button></form>
+    <div class="ask-ex" id="askEx"></div>
+    <div id="askOut"></div>
+  </section>
+
   <!-- ── Top 10 plays of the day, every sport ─────────────────────── -->
   <section class="ox-wrap t10" id="top10">
     <div class="my-h"><div><span class="ox-eyebrow">Today's top 10</span><h2>Our favorite<br>plays today.</h2>
@@ -134,7 +169,7 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
   <!-- ── My Onyx: your players, your bets, everything live ─────────── -->
   <section class="ox-wrap my" id="my">
     <div class="my-h"><div><span class="ox-eyebrow">My Onyx</span><h2>Your players.<br>Your bets. Live.</h2>
-      <p>Everyone you follow and every Onyx bet you open from the app, across every sport, with live scores and stat lines in one place.</p></div></div>
+      <p>Every pick you save with the star, everyone you follow and every Onyx bet you open from the app, across every sport, with live scores and stat lines in one place.</p></div></div>
     <div class="my-tabs" id="myTabs"></div>
     <div id="myBody"><div class="my-empty">Loading live scores across every sport...</div></div>
   </section>
@@ -316,6 +351,42 @@ function etTime(iso) {
 }
 async function getJSON(u) { const r = await fetch(u, {cache: 'no-cache'}); if (!r.ok) throw new Error(u); return r.json(); }
 
+
+// ── Ask Onyx (ask.js does the work; this draws it) ──
+var ASK_EX = ['3-leg parlay NBA points overs minimum odds -200', 'Player most likely to score 2 TDs', 'Your favorite correlated SGP',
+              'Most recommended NFL plays', 'Most value in college football', 'Safest 2-leg parlay tonight', 'Plus money plays with an edge'];
+function askInit() {
+  const ex = document.getElementById('askEx'); if (!ex) return;
+  ex.innerHTML = ASK_EX.map((q, i) => `<button type="button" onclick="document.getElementById('askQ').value=ASK_EX[${i}];askGo(ASK_EX[${i}])">${esc(q)}</button>`).join('');
+}
+async function askGo(q) {
+  const out = document.getElementById('askOut');
+  if (!window.OnyxAsk || !String(q || '').trim()) return;
+  out.innerHTML = '<div class="my-empty">Building it from today\'s boards...</div>';
+  track('ask', {q: String(q).slice(0, 100)});
+  let R;
+  try { R = await OnyxAsk.ask(q); } catch (e) { out.innerHTML = '<div class="my-empty">Could not load today\'s boards. Try again in a minute.</div>'; return; }
+  const understood = `<div class="ask-u">Read as: <b>${esc(R.understood)}</b>${R.via === 'ai' ? ' · AI' : ''}</div>`;
+  if (!R.rows.length) { out.innerHTML = understood + `<div class="my-empty">Nothing on today's Onyx board matches that${R.spec.min_price != null || R.spec.max_price != null ? ' at those prices' : ''}. Try loosening it, or a different sport.</div>`; return; }
+  const short = R.spec.intent !== 'list' && R.rows.length < (R.spec.count || 3) ? ` · only ${R.rows.length} game${R.rows.length > 1 ? 's' : ''} on today's board fit, so ${R.rows.length} leg${R.rows.length > 1 ? 's' : ''}` : '';
+  const SG = R.parlay && R.parlay.same_game;
+  const pl = R.parlay ? `<div class="ask-pl"><div><b>${R.rows.length}-leg ${SG ? 'same-game parlay · ' + esc(R.parlay.matchup) : 'parlay'} · ${fmtOdds(R.parlay.price)}${SG ? '*' : ''}</b><br>
+      ${SG ? `<span>${esc(R.parlay.story)}</span><br>` : ''}<span>Model chance all ${R.rows.length} hit: ${SG ? 'at least ' : ''}${(100 * R.parlay.prob).toFixed(1)}%${esc(short)}</span></div>
+      <a class="t10-bet" href="https://app.onyxodds.com/share?${R.parlay.sels.map(s => 'selection=' + encodeURIComponent(s)).join('&')}&referrer=${ONYX_REFERRER}" target="_blank" rel="noopener" onclick="track('ask_parlay_bet',{legs:${R.rows.length}})">Bet parlay on Onyx</a></div>` : '';
+  const tagTxt = {tracked: 'Tracked pick', trial: 'On trial', lean: 'Model lean'};
+  const rows = R.rows.map((p, i) => {
+    const url = p.sel ? 'https://app.onyxodds.com/share?selection=' + encodeURIComponent(p.sel) + '&referrer=' + ONYX_REFERRER : (OnyxAsk.PAGE[p.sport] || '#');
+    const conf = R.two ? p.two : p.conf;
+    const label = R.two ? `${p.name} 2+ touchdowns` : p.label;
+    const save = window.OnyxSaved && !R.two ? OnyxSaved.btn(Object.assign({id: p.sel}, p)) : '';
+    return `<div class="t10-r${i === 0 ? ' top' : ''}"><div class="t10-n">${i + 1}</div>
+      <div class="t10-w"><b>${esc(label)}</b><span>${esc(p.matchup)}${p.start ? ' · ' + esc(t10When(p.start)) : ''}${R.two ? ' · anytime TD ' + Math.round(100 * p.conf) + '%' : p.edge != null ? ' · edge ' + (p.edge >= 0 ? '+' : '') + (100 * p.edge).toFixed(1) : ''}</span></div>
+      <div class="t10-c"><b>${Math.round(100 * conf)}%</b><small>${R.two ? '2+ TD CHANCE' : 'CONFIDENCE'}</small></div>
+      <div class="t10-f"><span class="t10-tag sp">${esc(OnyxAsk.LG[p.sport] || p.sport)}</span><span class="t10-tag ${p.tag}">${tagTxt[p.tag] || 'Model lean'}</span>
+        <a class="t10-bet" href="${url}" target="_blank" rel="noopener">${R.two ? 'Anytime TD ' : ''}${fmtOdds(p.price)} on Onyx</a>${save}</div></div>`;
+  }).join('');
+  out.innerHTML = understood + pl + `<div class="t10-list">${rows}</div><div class="my-note">${R.two ? 'Onyx prices anytime TD; the 2+ chance is from the model\'s expected touchdowns. ' : ''}Confidence is each sport model's chance blended with Onyx's price. Model leans are not graded. ${SG ? '*Onyx prices same-game parlays itself and usually pays less than the legs multiplied, because the legs are tied together; the same tie is why the true chance sits above the floor shown. ' : ''}${R.pool > R.rows.length ? R.pool + ' plays matched; the best ' + R.rows.length + ' shown.' : ''}</div>`;
+}
 // ── Top 10 plays of the day: every sport build writes data/<sport>/top.json (daily_top.py)
 var T10_SPORTS = [['nba', 'NBA', 'nba.html'], ['nfl', 'NFL', 'nfl.html'], ['cfb', 'NCAAF', 'cfb.html'], ['nhl', 'NHL', 'nhl.html'], ['tennis', 'Tennis', 'tennis.html']];
 var T10_PER_SPORT = 4, T10_PER_GAME = 2;
@@ -358,7 +429,7 @@ async function top10() {
       <div class="t10-w"><b>${esc(p.label)}</b><span>${esc(p.matchup)}${p.start ? ' · ' + esc(t10When(p.start)) : ''}</span></div>
       <div class="t10-c"><b>${Math.round(100 * p.conf)}%</b><small>CONFIDENCE</small></div>
       <div class="t10-f"><a class="t10-tag sp" href="${p.href}">${esc(p.lg)}</a><span class="t10-tag ${p.tag}">${tagTxt[p.tag] || 'Model lean'}</span>
-        <a class="t10-bet" href="${url}" target="_blank" rel="noopener" onclick="track('top10_bet',{sport:'${p.sport}',rank:${i + 1}})">${fmtOdds(p.price)} on Onyx</a></div></div>`;
+        <a class="t10-bet" href="${url}" target="_blank" rel="noopener" onclick="track('top10_bet',{sport:'${p.sport}',rank:${i + 1}})">${fmtOdds(p.price)} on Onyx</a>${window.OnyxSaved ? OnyxSaved.btn(Object.assign({id: p.sel}, p)) : ''}</div></div>`;
   }).join('');
   document.getElementById('t10Note').textContent = 'Confidence is the chance the play wins by that sport\'s model, blended with the Onyx market. "Tracked pick" plays are graded on their sport\'s record; "On trial" plays are logged at Onyx\'s opening price; "Model lean" plays are the model\'s read and are not graded.';
 }
@@ -541,6 +612,89 @@ function myBets() {
   return h ? `<div class="my-grid">${h}</div><div class="my-note">Every Onyx bet you open from this app, on this device. Betting a player prop also follows that player live. Settled results live in your Onyx account. <a href="#" onclick="if(confirm('Clear My bets on this device?')){localStorage.removeItem('onyxMyBets');renderMy()}return false" style="color:#d795ff">Clear</a></div>`
     : `<div class="my-empty">No bets yet. Tap any Onyx price or "Bet on Onyx" in a sport and it lands here, and the player it is on starts tracking live.</div>`;
 }
+
+// ── My picks: plays saved with the star (saved.js), followed live off ESPN ──
+var MY_PK = [];
+var PK_STAT = {pts: ['basketball', 'PTS'], reb: ['basketball', 'REB'], ast: ['basketball', 'AST'],
+  rec: ['receiving', 'REC'], rec_yds: ['receiving', 'YDS'], rush_yds: ['rushing', 'YDS'], pass_yds: ['passing', 'YDS']};
+function pkStat(j, p) {
+  // the player's number off ESPN's box: one category for NBA, by stat group for football
+  let v = null, td = 0, seen = false;
+  ((j && j.boxscore || {}).players || []).forEach(t => (t.statistics || []).forEach(b => (b.athletes || []).forEach(a => {
+    if (nk((a.athlete || {}).displayName) !== nk(p.name) || !(a.stats || []).length) return;
+    const L = b.labels || b.keys || [], at = l => { const i = L.indexOf(l); return i < 0 ? null : (a.stats || [])[i]; };
+    seen = true;
+    if (p.mkt === 'anytime_td') { if (b.name === 'rushing' || b.name === 'receiving') td += parseFloat(at('TD')) || 0; return; }
+    const m = PK_STAT[p.mkt]; if (!m) return;
+    if (m[0] === 'basketball' || b.name === m[0]) { const x = parseFloat(at(m[1])); if (!isNaN(x)) v = x; }
+  })));
+  if (p.mkt === 'anytime_td') return seen ? td : null;
+  return v != null ? v : seen ? 0 : null;
+}
+function pkQ1(j) {
+  const cs = (((j || {}).header || {}).competitions || [{}])[0].competitors || [];
+  const q = cs.map(c => parseFloat(((c.linescores || [])[0] || {}).displayValue ?? ((c.linescores || [])[0] || {}).value));
+  return q.length === 2 && q.every(x => !isNaN(x)) ? q[0] + q[1] : null;
+}
+async function pkTrack(p) {
+  const out = {p, state: 'pre', txt: '', cur: null, res: null, lead: null, href: (LG.find(L => L.k === p.sport) || {page: p.sport + '.html'}).page};
+  if (p.sport === 'tennis') {
+    let hit = null;
+    MY.tn.forEach(c => { if ((c.competitors || []).some(x => nk((x.athlete || {}).displayName) === nk(p.name))) hit = c; });
+    out.href = 'tennis.html#games';
+    if (!hit) { out.txt = p.start ? 'Starts ' + etShort(p.start) : ''; return out; }
+    const st = (hit.status || {}).type || {}, me = hit.competitors.find(x => nk((x.athlete || {}).displayName) === nk(p.name));
+    out.state = st.state; out.txt = st.shortDetail || '';
+    if (p.kind === 'ml' && st.state === 'post') out.res = me && me.winner ? 'W' : 'L';
+    return out;
+  }
+  const L = LG.find(x => x.k === p.sport); if (!L) return out;
+  const away = String(p.matchup || '').split(/ @ | vs /)[0];
+  const e = p.sport === 'nba' ? evFor('nba', null, p.team || away) : evFor(L.k, p.gid, p.team);
+  if (!e) { out.txt = p.start ? 'Starts ' + etShort(p.start) : 'Waiting for the game'; return out; }
+  out.state = e.state; out.txt = evState(e);
+  out.href = L.k === 'nba' ? 'nba.html#games' : `${L.page}#games:${e.id}`;
+  if (e.state === 'pre') return out;
+  const as = parseFloat(e.a.sc) || 0, hs = parseFloat(e.h.sc) || 0, done = e.state === 'post';
+  const mine = p.name === e.a.ab ? [as, hs] : p.name === e.h.ab ? [hs, as] : null;
+  let win = null, push = false;
+  if (p.kind === 'ml' && mine) { win = mine[0] > mine[1]; push = mine[0] === mine[1]; out.cur = `${mine[0]}-${mine[1]}`; }
+  else if (p.kind === 'spread' && mine && p.hcap != null) { const m = mine[0] + p.hcap - mine[1]; win = m > 0; push = m === 0; out.cur = `${mine[0]}-${mine[1]}`; }
+  else if (p.kind === 'total') { const t = as + hs; win = p.side === 'over' ? t > p.line : t < p.line; push = t === p.line; out.cur = t; out.lead = [t, p.line]; if (p.side === 'over' && win) out.q1done = true; }
+  else {
+    const j = await sumOf(L, e.id);
+    const v = p.mkt === 'q1_total' ? pkQ1(j) : pkStat(j, p);
+    if (v != null) {
+      const line = p.mkt === 'anytime_td' ? 0.5 : p.line;
+      out.cur = v; out.lead = [v, line];
+      win = p.side === 'under' ? v < line : v > line; push = v === line;
+      // a q1 total is settled once the 1st quarter is over, an over once it clears
+      if (p.mkt === 'q1_total' && ((((j || {}).header || {}).competitions || [{}])[0].status || {}).period > 1) out.q1done = true;
+      if (p.side !== 'under' && win) out.q1done = true;
+    }
+  }
+  if (win != null) out.res = (done || out.q1done) ? (push ? 'P' : win ? 'W' : 'L') : (win ? 'up' : 'down');
+  return out;
+}
+async function myPicks() {
+  const P = window.OnyxSaved ? OnyxSaved.all() : [];
+  const T = await Promise.all(P.map(p => pkTrack(p).catch(() => ({p, state: '', txt: ''}))));
+  const rank = t => t.state === 'in' ? 0 : t.state === 'pre' ? 1 : 2;
+  return T.sort((a, b) => rank(a) - rank(b) || String(a.p.start).localeCompare(String(b.p.start)));
+}
+function pickCard(t) {
+  const p = t.p, R = {W: ['Won', 'w'], L: ['Lost', 'l'], P: ['Push', ''], up: ['Winning', 'w'], down: ['Losing', 'l']}[t.res] || null;
+  // progress toward the line: the bar is the stat so far, the tick is the line
+  const mx = t.lead ? Math.max(t.lead[1] * 1.25, t.lead[0], 1) : 0, bar = t.lead ? Math.max(3, 100 * t.lead[0] / mx) : null, tick = t.lead ? 100 * t.lead[1] / mx : 0;
+  return `<a class="my-b pk-c${t.state === 'in' ? ' live' : ''}${R ? ' r-' + R[1] : ''}" href="${esc(t.href)}">
+    <b>${esc(p.label)}</b><span class="p">${fmtOdds(p.price)}</span>
+    <span class="st">${esc(String(p.sport).toUpperCase())}${p.conf ? ' · ' + Math.round(100 * p.conf) + '% model' : ''} · ${t.state === 'in' ? '● ' : ''}${esc(t.txt || '')}</span>
+    <span class="pk-res">${R ? `<i class="${R[1]}">${R[0]}</i>` : ''}</span>
+    ${t.cur != null ? `<div class="legs">Now <b>${esc(t.cur)}</b>${t.lead ? ` · line ${esc(p.mkt === 'anytime_td' ? 'a TD' : p.line)} (${p.side === 'under' ? 'under' : 'over'})` : ''}</div>` : ''}
+    ${bar != null ? `<div class="pk-bar"><i style="width:${bar.toFixed(0)}%"></i><em style="left:${tick.toFixed(0)}%"></em></div>` : ''}
+    <button class="pk-x" aria-label="Remove" onclick="event.preventDefault();event.stopPropagation();OnyxSaved.remove('${esc(p.id)}')">×</button></a>`;
+}
+addEventListener('onyx-saved', () => { myPicks().then(T => { MY_PK = T; if (T.length) MY.tab = 'picks'; renderMy(); }); });
 var MY_P = [];
 async function loadMy() {
   await Promise.all(LG.map(sbOf).concat([
@@ -550,6 +704,8 @@ async function loadMy() {
   ]));
   if (!MY.nba && ls('onyxMyBets', []).some(b => b.sport === 'nba')) { try { MY.nba = await getJSON('data/nba/slate.json'); } catch (e) {} }
   MY_P = await myPlayers();
+  MY_PK = await myPicks();
+  if (!MY.picked && MY_PK.length) { MY.tab = 'picks'; MY.picked = true; }
   renderMy();
   const anyLive = LG.some(L => evs(L.k).some(e => e.state === 'in')) || MY.tn.some(c => ((c.status || {}).type || {}).state === 'in');
   clearTimeout(MY.timer); MY.timer = setTimeout(loadMy, anyLive ? 20000 : 60000);
@@ -558,10 +714,13 @@ function renderMy() {
   const live = LG.flatMap(L => evs(L.k).filter(e => e.state === 'in').map(e => [L, e]));
   const next = LG.flatMap(L => evs(L.k).filter(e => e.state === 'pre').map(e => [L, e])).sort((a, b) => String(a[1].start).localeCompare(String(b[1].start))).slice(0, 8);
   const nb = ls('onyxMyBets', []).length + (ls('onyxNbaSlip', []).length ? 1 : 0);
-  const tabs = [['live', 'Live now', live.length], ['players', 'My players', MY_P.length], ['bets', 'My bets', nb]];
+  const tabs = [['picks', 'My picks', MY_PK.length], ['live', 'Live now', live.length], ['players', 'My players', MY_P.length], ['bets', 'My bets', nb]];
   document.getElementById('myTabs').innerHTML = tabs.map(([k, t, n]) => `<button class="${MY.tab === k ? 'on' : ''}" onclick="MY.tab='${k}';renderMy()">${t}<b>${n}</b></button>`).join('');
   let h = '';
-  if (MY.tab === 'live') {
+  if (MY.tab === 'picks') {
+    h = MY_PK.length ? `<div class="my-grid">${MY_PK.map(pickCard).join('')}</div><div class="my-note">Picks you saved with the star, on this device. Each one follows its game live (the player's line for props, the score for game lines) and settles when it ends. Tap one to open its game. Saved picks clear 36 hours after their game starts.</div>`
+      : `<div class="my-empty">No saved picks yet. Tap the star on any play (the Top 10 above or a sport's Plays tab) and follow it here all night.</div>`;
+  } else if (MY.tab === 'live') {
     const tl = MY.tn.filter(c => ((c.status || {}).type || {}).state === 'in').slice(0, 6);
     h = live.length || tl.length ? `<div class="my-grid">${live.map(([L, e]) => gameCard(L, e)).join('')}${tl.map(c => `<a class="my-g live" href="tennis.html#games"><div class="lgt"><span>Tennis</span><span>● live</span></div>
         ${c.competitors.slice(0, 2).map((p, i) => `<div class="t${i ? ' h' : ''}"><b>${esc(((p.athlete || {}).shortName || (p.athlete || {}).displayName || ''))}</b></div>${i ? '' : `<div class="sc" style="font-size:15px">${((c.competitors[0] || {}).linescores || []).map((x, k) => `${x.value}-${(((c.competitors[1] || {}).linescores || [])[k] || {}).value ?? 0}`).join(' ') || 'vs'}<small>Set ${((c.competitors[0] || {}).linescores || []).length || 1}</small></div>`}`).join('')}</a>`).join('')}</div>`
@@ -576,7 +735,7 @@ function renderMy() {
 if (location.hash === '#my') setTimeout(() => document.getElementById('my').scrollIntoView(), 50);
 loadMy();
 
-marquees(); sports(); tonight(); top10().catch(() => {});
+marquees(); sports(); tonight(); top10().catch(() => {}); askInit();
 if (window.OnyxArt) marks(); else addEventListener('DOMContentLoaded', marks);
 </script>
 </body>

@@ -1,0 +1,82 @@
+name: Ask Onyx AI relay (deploy)
+# Deploys ai/worker.js to Cloudflare Workers, the private relay that turns a typed
+# request into a search spec for ask.js (the AI key never touches the public site).
+# Then writes the relay's address into ai.json on main so the home page uses it.
+#
+# One-time setup (Settings -> Secrets and variables -> Actions):
+#   secret   ANTHROPIC_API_KEY     the AI key (console.anthropic.com -> API keys)
+#   secret   CLOUDFLARE_API_TOKEN  a Cloudflare API token from the "Edit Cloudflare Workers" template
+#   secret   CLOUDFLARE_ACCOUNT_ID the Cloudflare account id (Workers & Pages overview, right side)
+#   variable AI_MODEL              which model reads the requests
+# Then: Actions -> "Ask Onyx AI relay (deploy)" -> Run workflow.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["ai/**"]
+permissions:
+  contents: write
+concurrency:
+  group: ai-worker
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check setup
+        id: chk
+        env:
+          K: ${{ secrets.ANTHROPIC_API_KEY }}
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          M: ${{ vars.AI_MODEL }}
+        run: |
+          missing=""
+          [ -n "$K" ] || missing="$missing ANTHROPIC_API_KEY"
+          [ -n "$T" ] || missing="$missing CLOUDFLARE_API_TOKEN"
+          [ -n "$A" ] || missing="$missing CLOUDFLARE_ACCOUNT_ID"
+          [ -n "$M" ] || missing="$missing AI_MODEL(variable)"
+          if [ -n "$missing" ]; then
+            echo "::warning::Ask Onyx relay not deployed, missing:$missing. The site keeps using its built-in parser."
+            echo "ready=no" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=yes" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/setup-node@v4
+        if: steps.chk.outputs.ready == 'yes'
+        with:
+          node-version: 22
+      - name: Deploy the relay
+        if: steps.chk.outputs.ready == 'yes'
+        working-directory: ai
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          AI_MODEL: ${{ vars.AI_MODEL }}
+        run: |
+          npm install --no-audit --no-fund
+          npx wrangler deploy --var "AI_MODEL:$AI_MODEL" | tee deploy.log
+          printf '%s' "$ANTHROPIC_API_KEY" | npx wrangler secret put ANTHROPIC_API_KEY
+          url=$(grep -oE 'https://[a-z0-9.-]+\.workers\.dev' deploy.log | head -1)
+          [ -n "$url" ] || { echo "::error::could not read the relay address from the deploy log"; exit 1; }
+          echo "RELAY=$url" >> "$GITHUB_ENV"
+      - name: Check the relay answers
+        if: steps.chk.outputs.ready == 'yes'
+        run: |
+          sleep 5
+          curl -sS -X POST "$RELAY" -H 'origin: https://onyxjordan.github.io' -H 'content-type: application/json' \
+            -d '{"q":"3 leg parlay nba points overs minimum odds -200"}' | tee answer.json
+          grep -q '"spec"' answer.json || { echo "::error::relay did not return a spec"; exit 1; }
+      - name: Point the site at the relay (ai.json)
+        if: steps.chk.outputs.ready == 'yes'
+        run: |
+          printf '{"url": "%s"}\n' "$RELAY" > ai.json
+          if git diff --quiet -- ai.json; then echo "ai.json already points at $RELAY"; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add ai.json
+          git commit -m "Ask Onyx: point the site at the AI relay"
+          for i in 1 2 3 4; do git pull --rebase origin main && git push origin HEAD:main && break; sleep $((i * 5)); done

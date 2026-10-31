@@ -14,6 +14,7 @@
 <meta name="apple-mobile-web-app-title" content="Onyx Sports">
 <!-- shared app shell: bottom menu, search, toasts, status-bar fix (ui.js) -->
 <script src="ui.js" defer></script>
+<script src="saved.js"></script>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="preconnect" href="https://site.api.espn.com" crossorigin>
@@ -220,7 +221,7 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
 .pl-lines.old{color:#f0a3ff}.pl-lines.old i{background:#f87171}
 /* today's best plays + what we track (top of the Plays tab) */
 .tp-list{display:grid;gap:8px;margin-bottom:14px}
-.tp-r{display:grid;grid-template-columns:26px minmax(0,1fr) auto auto;gap:4px 10px;align-items:center;padding:10px 12px;border-radius:14px;border:1px solid var(--border2);background:var(--bg2)}
+.tp-r{display:grid;grid-template-columns:26px minmax(0,1fr) auto auto auto;gap:4px 10px;align-items:center;padding:10px 12px;border-radius:14px;border:1px solid var(--border2);background:var(--bg2)}
 .tp-r.top{border-color:rgba(176,56,249,.5)}
 .tp-n{font:800 16px monospace;color:#d795ff;text-align:center}
 .tp-w{min-width:0}.tp-w b{display:block;font-size:14px;line-height:1.25}.tp-w span{display:block;font:600 11px monospace;color:var(--text3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -1066,7 +1067,7 @@ function renderParlaySlip() {
 // ── data shaping ───────────────────────────────────────────────────
 function propLeg(p, stat, side) {
   const pr = (p.props || {})[stat];
-  if (!pr || !pr.all || !pr.all[side]) return null;
+  if (!pr || !pr.all || !pr.all[side] || pr.closed) return null;   // a tipped game's held line: shown, not bettable
   const s = pr.all[side];
   return {sel: s.sel || null, price: s.price, gid: p.gid, market: 'player_' + STAT_NAME[stat].toLowerCase(),
           pid: p.pid, stat, side, line: pr.line,
@@ -1371,6 +1372,8 @@ function plCard(k, i) {
     <div class="pl-acts">
       <button class="btn-secondary" onclick="event.stopPropagation();slipToggle(${li})">${inSlip(k.sel) ? '✓ In your parlay' : '+ Add to parlay'}</button>
       <button class="btn-primary" onclick="event.stopPropagation();track('onyx_click',{link_type:'single',source:'plays',selection:LEGS[${li}].label});window.open(shareUrl([LEGS[${li}].sel]),'_blank','noopener')">⚡ Bet on Onyx</button>
+      ${window.OnyxSaved ? OnyxSaved.btn({id: k.sel, sport: 'nba', label: plLeg(k).label, matchup: g.away ? g.away + ' @ ' + g.home : '', start: g.start, gid: k.gid,
+        team: p.team || k.team, price: k.price, conf: k.prob, kind: 'prop', mkt: s, side: k.side, line: k.line, name: k.name, tag: 'tracked'}) : ''}
       ${res}
     </div>
   </article>`;
@@ -1386,7 +1389,7 @@ function topPlays() {
     return `<div class="tp-r${i < 3 ? ' top' : ''}"><div class="tp-n">${i + 1}</div>
       <div class="tp-w"><b>${esc(p.label)}<span class="tp-tag ${p.tag}">${tagTxt[p.tag] || 'Model lean'}</span></b><span>${esc(p.matchup)} · ${tipTime(p.start)}</span></div>
       <div class="tp-c"><b>${Math.round(100 * p.conf)}%</b><small>CONFIDENCE</small></div>
-      ${nbOc(p.price, '', leg)}</div>`;
+      ${nbOc(p.price, '', leg)}${window.OnyxSaved ? OnyxSaved.btn(Object.assign({id: p.sel}, p)) : ''}</div>`;
   }).join('')}</div>`;
 }
 // what this page tracks, in one place: the graded picks, the on-trial lanes, the parlay

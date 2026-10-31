@@ -11,7 +11,7 @@ data, and writes <sport>.html. A sport with no slate still builds: the page
 says so instead of going blank.
 """
 
-import json, re, sys
+import json, math, re, sys
 from datetime import datetime, timezone
 
 from sports_common import Lane, SPORTS, game_day, nk
@@ -746,6 +746,20 @@ def write_top(key, lane, slate, model):
                      start.get(r.get("gid")))
             for r in cands if DT.ok(r) and r.get("gid") in pre]
     DT.write(lane.data, key, slate.get("date"), rows)
+    # the full board for "Ask Onyx": every priced side, any price, plus every
+    # anytime-TD price with its expected touchdowns (lam) for "2+ TD" questions
+    tag = lambda r: "tracked" if r.get("sel") in tracked else "trial" if r.get("sel") in trial else "lean"
+    board = [dict(DT.entry(key, r, tag(r), start.get(r.get("gid"))), proj=r.get("proj"))
+             for r in cands if r.get("price") is not None and r.get("prob") is not None and r.get("edge") is not None
+             and r.get("gid") in pre]
+    for r in model.get("td") or []:
+        if r.get("any_price") is None or r.get("gid") not in pre:
+            continue
+        c = {"kind": "prop", "mkt": "anytime_td", "name": r["name"], "pid": r.get("pid"), "team": r.get("team"), "side": "over",
+             "line": 0.5, "price": r["any_price"], "prob": r["any"], "edge": r.get("any_edge") or 0.0, "sel": r.get("any_sel"),
+             "gid": r["gid"], "matchup": r.get("matchup")}
+        board.append(dict(DT.entry(key, c, tag(c), start.get(r["gid"])), lam=round(-math.log(max(1e-6, 1 - r["any"])), 4)))
+    DT.write_board(lane.data, key, slate.get("date"), board)
 
 
 def main():

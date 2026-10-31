@@ -53,7 +53,17 @@ def label(r):
 def entry(sport, r, tag="lean", start=None):
     return {"sport": sport, "label": label(r), "matchup": r.get("matchup") or "", "start": r.get("start") or start,
             "gid": r.get("gid"), "who": r.get("pid") or r.get("name"), "price": r["price"], "conf": round(r["prob"], 4),
-            "edge": round(r["edge"], 4), "sel": r.get("sel"), "tag": tag}
+            "edge": round(r["edge"], 4), "sel": r.get("sel"), "tag": tag,
+            # what the home page needs to follow a saved pick live (saved.js / My picks)
+            "kind": r.get("kind") or "prop", "mkt": r.get("mkt") or r.get("stat") or r.get("kind"), "side": r.get("side"),
+            "line": r.get("line"), "hcap": _hcap(r), "name": r.get("name"), "team": r.get("team")}
+
+
+def _hcap(r):
+    try:
+        return float(r["line_txt"]) if r.get("kind") == "spread" and r.get("line_txt") else None
+    except ValueError:
+        return None
 
 
 def ok(r):
@@ -77,3 +87,27 @@ def write(data_dir, sport, date, rows):
     p.write_text(json.dumps({"sport": sport, "date": date, "generated": datetime.now(timezone.utc).isoformat(timespec="seconds"),
                              "plays": out}, separators=(",", ":")), encoding="utf-8")
     return out
+
+
+BOARD_KEEP = 800
+
+
+def write_board(data_dir, sport, date, rows):
+    """data/<sport>/board.json: every priced Onyx side the model reads today,
+    any price, for the home page's "Ask Onyx" search (it filters and builds
+    parlays from this list; the AI only turns a sentence into a filter).
+    rows: entry() dicts, plus "proj" and, for touchdown props, "lam" (expected
+    touchdowns, so "2+ touchdowns" can be answered from the same number)."""
+    seen, out = set(), []
+    for e in sorted(rows, key=lambda e: -e["conf"]):
+        k = (e["gid"], e["who"], e.get("mkt"), e.get("side"))
+        if k in seen:
+            continue
+        seen.add(k)
+        out.append(e)
+    p = Path(data_dir) / "board.json"
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text(json.dumps({"sport": sport, "date": date, "generated": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                             "plays": out[:BOARD_KEEP]}, separators=(",", ":")), encoding="utf-8")
+    return out
+

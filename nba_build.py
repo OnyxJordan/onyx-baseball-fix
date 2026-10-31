@@ -144,6 +144,30 @@ def attach_props(rows, props, source):
 BET_STATS = ("pts", "reb", "ast", "fg3", "pra", "pr", "pa")
 
 
+TIP_LINES = "tip_lines.json"
+
+
+def hold_tip_lines(rows, games, today):
+    """Onyx takes a player's pregame props down at tip, so a live or finished
+    game came back with "no line" in Points watch. Every build keeps the last
+    pregame main line per player (data/nba/tip_lines.json, today only) and a
+    started game shows it, marked closed: no selection ids, so no bet button,
+    and picks / the Top 10 / the parlay only ever read untipped games."""
+    T = load(TIP_LINES, {}) or {}
+    if T.get("date") != today:
+        T = {"date": today, "p": {}}
+    for r in rows:
+        if (games.get(r["gid"]) or {}).get("state", "pre") == "pre":
+            if r["props"]:
+                T["p"][r["pid"]] = r["props"]
+            continue
+        for s_, b in (T["p"].get(r["pid"]) or {}).items():
+            if s_ not in r["props"]:
+                r["props"][s_] = dict(b, closed=True, all={side: {k: v for k, v in a.items() if k != "sel"}
+                                                           for side, a in (b.get("all") or {}).items()})
+    save(TIP_LINES, T)
+
+
 def bet_ladders(r, rec):
     """Every Onyx line on this player for the bet card. Per stat, rows of
     [line, over, over_sel, under, under_sel, p_model, p_blend] (P of the
@@ -353,19 +377,22 @@ def write_top(rows, games, today_rows, open_led, today):
     tracked = {k.get("sel") for k in today_rows if k.get("sel")}
     trial = {k.get("sel") for k in open_led if k.get("date") == today and k.get("sel")}
     tag = lambda sel: "tracked" if sel in tracked else "trial" if sel in trial else "lean"
-    out = []
+    out, board = [], []
     for r in rows:
         g = games.get(r["gid"]) or {}
-        if r["out"] or r["inj"] or r["min"] < TICKET_MIN_MIN or g.get("state") != "pre":
+        if r["out"] or r["inj"] or g.get("state") != "pre":
             continue
         for s_, pr in (r.get("props") or {}).items():
-            if pr.get("src") != "onyx":
+            if pr.get("src") != "onyx" or pr.get("closed"):
                 continue
             for side, a in (pr.get("all") or {}).items():
-                c = {"kind": "prop", "mkt": s_, "name": r["name"], "pid": r["pid"], "side": side, "line": pr["line"],
+                c = {"kind": "prop", "mkt": s_, "name": r["name"], "pid": r["pid"], "team": r["team"], "side": side, "line": pr["line"],
                      "price": a.get("price"), "prob": a.get("prob"), "edge": a.get("edge"), "sel": a.get("sel"),
                      "gid": r["gid"], "matchup": f"{g.get('away')} @ {g.get('home')}", "start": g.get("start")}
-                if a.get("sel") and DT.ok(c):
+                if not a.get("sel") or c["price"] is None or c["prob"] is None:
+                    continue
+                board.append(dict(DT.entry("nba", c, tag(a.get("sel"))), proj=(r.get("proj") or {}).get(s_), min=r["min"]))
+                if r["min"] >= TICKET_MIN_MIN and DT.ok(c):
                     out.append(DT.entry("nba", c, tag(a.get("sel"))))
     for g in games.values():
         if g.get("state") != "pre" or g.get("q1_total") is None or not g.get("total"):
@@ -375,11 +402,13 @@ def write_top(rows, games, today_rows, open_led, today):
             price, sel = g.get(f"q1_{side}_price"), g.get(f"q1_{side}_sel")
             if price is None or not sel:
                 continue
-            c = {"kind": "prop", "mkt": "q1_total", "name": f"{g['away']} @ {g['home']}", "pid": "q1", "side": side,
+            c = {"kind": "prop", "mkt": "q1_total", "name": f"{g['away']} @ {g['home']}", "pid": "q1", "team": g["away"], "side": side,
                  "line": g["q1_total"], "price": price, "prob": p, "edge": p - OL.implied(price), "sel": sel,
                  "gid": g["gid"], "matchup": f"{g['away']} @ {g['home']}", "start": g.get("start")}
+            board.append(DT.entry("nba", c, tag(sel)))
             if DT.ok(c):
                 out.append(DT.entry("nba", c, tag(sel)))
+    DT.write_board(Path("data/nba"), "nba", today, board)
     return DT.write(Path("data/nba"), "nba", today, out)
 
 
@@ -575,6 +604,7 @@ def main():
                 if ctx:
                     r["oo_ctx"] = sorted(ctx, key=lambda c: -c["mpg"])[:3]
     priced = attach_props(rows, props, source)
+    hold_tip_lines(rows, {g["gid"]: g for g in slate["games"]}, today)
 
     ledger = load(LEDGER, [])
     n_graded = 0 if LINES_ONLY else grade(ledger, today)

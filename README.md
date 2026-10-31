@@ -1194,3 +1194,56 @@ across every sport.
 - The Model's Parlay legs are now **-150 to +150 with 28+ projected minutes** (was -400 to
   +150, 24+): Jordan's call, -179 / -195 legs are not on every book. Replay in
   `nba_build.py` beside `TICKET_PRICE`.
+
+## Saved picks (10/31)
+
+Jordan: "save a pick local so you can follow it the rest of the night by clicking it".
+`saved.js` (loaded by `home.html`, `nba_shell.html`, `sport_shell.html`) keeps one
+localStorage list, `onyxSaved`, and draws the star button (`OnyxSaved.btn(pick)`) on the
+home Top 10, the NBA "Today's best plays" and tracked pick cards, and every sport page's
+play cards. A pick carries what is needed to follow it: sport, game id, team, kind (prop /
+spread / total / ml), market, side, line, handicap, player or team name (`daily_top.entry`
+writes the same fields into `top.json`). The home page's My Onyx opens on **My picks**
+(`myPicks` / `pkTrack`): ESPN's scoreboard gives the score for game lines, the summary box
+gives the player's live number for props (NBA pts / reb / ast; NFL receptions, receiving,
+rushing and passing yards, anytime TD) and the 1st-quarter total, with Winning / Losing
+live and Won / Lost / Push when settled (an over that has cleared, or a 1st-quarter total
+after the 1st, settles early). Tapping a pick opens its game. Picks clear 36 hours after
+their game starts. Device-only by design: nothing is sent anywhere.
+
+**Held pregame lines (10/31).** Onyx takes pregame player props down at tip, so a live NBA
+game's Points watch said "no line". `nba_build.hold_tip_lines` keeps each player's last
+pregame main line for the day in `data/nba/tip_lines.json` (written by full and
+lines-only builds; `nba_lines.yml` commits it) and a tipped game shows it marked
+`closed`: selection ids stripped, `propLeg` returns nothing for it, so it is shown but
+never a bet button, a pick, a Top 10 play or a parlay leg.
+
+
+## Ask Onyx (10/31)
+
+Jordan: type what you want ("3-leg parlay, NBA points overs, minimum odds -200", "player most
+likely to score 2 TDs", "your favorite correlated SGP", "most value in college football") and
+it builds it. **The AI never picks plays.** It only turns the sentence into a search spec;
+`ask.js` runs that spec against today's boards, so every answer is a real Onyx line with our
+model's number on it.
+
+- Boards: `daily_top.write_board` writes `data/<sport>/board.json` on every build: every priced
+  Onyx side (any price) with its blended confidence, edge, tag (tracked / trial / lean),
+  selection id, and for NFL anytime-TD props `lam`, the expected touchdowns, so 2+ TD chance is
+  1 - e^-lam (1 + lam). NBA rows skip held (closed) lines.
+- `ask.js`: the spec (`intent` list / parlay / sgp, count, sports, markets, side, price bounds,
+  confidence and edge floors, player, team, sort conf / rec / edge / price / two_td). Defaults
+  are mainstream: no parlay or SGP leg shorter than -150 and no single shorter than -200 unless
+  the request names its own odds. "Recommended" ranks tracked picks, then on-trial plays, then
+  confidence plus value. SGP: each game gets one storyline from its best leg (shootout: the over,
+  scorers' overs, the anchor team covering; grinder: the under, unders), only legs that fit join,
+  and the page shows the product of chances as a floor (correlated legs hit together) and says
+  Onyx prices SGPs itself.
+- Language: a built-in parser covers the common phrasings with no AI at all. When `ai.json`
+  holds a URL, the sentence goes to the relay first and the parser is the fallback.
+- Relay: `ai/worker.js` (Cloudflare Worker, `@anthropic-ai/sdk`, structured output against the
+  same spec schema, low effort, 12 requests a minute per visitor). Deployed by
+  `.github/workflows/ai_worker.yml`, which also writes `ai.json`. Needs, in the repo's Actions
+  settings: secrets `ANTHROPIC_API_KEY`, `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` and the
+  variable `AI_MODEL`. The model and key are never committed. Set a monthly spend limit on the
+  AI account: the page is public.
