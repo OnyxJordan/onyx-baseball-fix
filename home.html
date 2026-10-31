@@ -150,7 +150,7 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
   <!-- ── Ask Onyx: type what you want, we build it (ask.js) ───────────── -->
   <section class="ox-wrap ask" id="ask">
     <div class="my-h"><div><span class="ox-eyebrow">Ask Onyx</span><h2>Tell us what<br>you want.</h2>
-      <p>Type it the way you'd say it. Every play comes from today's models and live Onyx prices.</p></div></div>
+      <p>Type it the way you'd say it: a player, a team, a parlay, an SGP, odds, a day. Every play comes from today's models and live Onyx prices.</p></div></div>
     <form class="ask-box" onsubmit="askGo(document.getElementById('askQ').value);return false">
       <input id="askQ" type="search" enterkeyhint="go" autocomplete="off" maxlength="300" placeholder="3-leg parlay, NBA points overs, no odds shorter than -200">
       <button type="submit">Build</button></form>
@@ -353,8 +353,9 @@ async function getJSON(u) { const r = await fetch(u, {cache: 'no-cache'}); if (!
 
 
 // ── Ask Onyx (ask.js does the work; this draws it) ──
-var ASK_EX = ['3-leg parlay NBA points overs minimum odds -200', 'Player most likely to score 2 TDs', 'Your favorite correlated SGP',
-              'Most recommended NFL plays', 'Most value in college football', 'Safest 2-leg parlay tonight', 'Plus money plays with an edge'];
+var ASK_EX = ['3-leg parlay NBA points overs minimum odds -200', 'Round robin 4 picks by 2s', 'Parlay that pays +500', 'First TD scorer Sunday', 'Player most likely to score 2 TDs', 'Your favorite correlated SGP',
+              'What do you like tonight', 'Lock of the day', 'Mahomes', 'Lakers game SGP', 'Give me a 4 legger for Sunday',
+              'Most value in college football', 'Underdogs to win this weekend', 'Who scores the most points tonight'];
 function askInit() {
   const ex = document.getElementById('askEx'); if (!ex) return;
   ex.innerHTML = ASK_EX.map((q, i) => `<button type="button" onclick="document.getElementById('askQ').value=ASK_EX[${i}];askGo(ASK_EX[${i}])">${esc(q)}</button>`).join('');
@@ -367,7 +368,8 @@ async function askGo(q) {
   let R;
   try { R = await OnyxAsk.ask(q); } catch (e) { out.innerHTML = '<div class="my-empty">Could not load today\'s boards. Try again in a minute.</div>'; return; }
   const understood = `<div class="ask-u">Read as: <b>${esc(R.understood)}</b>${R.via === 'ai' ? ' · AI' : ''}</div>`;
-  if (!R.rows.length) { out.innerHTML = understood + `<div class="my-empty">Nothing on today's Onyx board matches that${R.spec.min_price != null || R.spec.max_price != null ? ' at those prices' : ''}. Try loosening it, or a different sport.</div>`; return; }
+  if (!R.rows.length) { out.innerHTML = understood + `<div class="my-empty">${R.spec.player ? `No Onyx line on ${esc(R.spec.player)} right now: his game may have started already, or he isn't on today's board.`
+    : `Nothing on today's Onyx board matches that${R.spec.min_price != null || R.spec.max_price != null ? ' at those prices' : ''}. Try loosening it, or a different sport.`}</div>`; return; }
   const short = R.spec.intent !== 'list' && R.rows.length < (R.spec.count || 3) ? ` · only ${R.rows.length} leg${R.rows.length > 1 ? 's' : ''} on today's board fit what you asked` : '';
   const SG = R.parlay && R.parlay.same_game;
   const pl = R.parlay ? `<div class="ask-pl"><div><b>${R.rows.length}-leg ${SG ? 'same-game parlay · ' + esc(R.parlay.matchup) : R.parlay.sgp_plus ? 'SGP+' : 'parlay'} · ${fmtOdds(R.parlay.price)}${SG || R.parlay.sgp_plus ? '*' : ''}</b><br>
@@ -385,7 +387,12 @@ async function askGo(q) {
       <div class="t10-f"><span class="t10-tag sp">${esc(OnyxAsk.LG[p.sport] || p.sport)}</span><span class="t10-tag ${p.tag}">${tagTxt[p.tag] || 'Model lean'}</span>
         <a class="t10-bet" href="${url}" target="_blank" rel="noopener">${R.two ? 'Anytime TD ' : ''}${fmtOdds(p.price)} on Onyx</a>${save}</div></div>`;
   }).join('');
-  out.innerHTML = understood + pl + `<div class="t10-list">${rows}</div><div class="my-note">${R.two ? 'Onyx prices anytime TD; the 2+ chance is from the model\'s expected touchdowns. ' : ''}Confidence is each sport model's chance blended with Onyx's price. Model leans are not graded. ${SG || (R.parlay && R.parlay.sgp_plus) ? '*Onyx prices same-game legs itself and usually pays less than the legs multiplied, because the legs are tied together; the same tie is why the true chance sits above the floor shown. ' : ''}${R.pool > R.rows.length ? R.pool + ' plays matched; the best ' + R.rows.length + ' shown.' : ''}</div>`;
+  // a round robin: every combination of the picks as its own ticket, $1 each
+  const rr = R.rr ? `<div class="ask-pl"><div><b>Round robin by ${R.rr.by}s · ${R.rr.combos.length} tickets</b><br>
+      <span>$1 on each = $${R.rr.combos.length} total · average ticket hits ${(100 * R.rr.hit).toFixed(1)}% by the models</span><br>
+      <span>${R.rr.combos.map(c => 'Legs ' + c.legs.join('+') + ' ' + fmtOdds(c.price)).join(' · ')}</span></div>
+      <a class="t10-bet" href="https://app.onyxodds.com/share?${R.rows.map(p => p.sel).filter(Boolean).map(s => 'selection=' + encodeURIComponent(s)).join('&')}&referrer=${ONYX_REFERRER}" target="_blank" rel="noopener">Open the picks on Onyx</a></div>` : '';
+  out.innerHTML = understood + pl + rr + `<div class="t10-list">${rows}</div><div class="my-note">${R.two ? 'Onyx prices anytime TD; the 2+ chance is from the model\'s expected touchdowns. ' : ''}Confidence is each sport model's chance blended with Onyx's price. Model leans are not graded. ${SG || (R.parlay && R.parlay.sgp_plus) ? '*Onyx prices same-game legs itself and usually pays less than the legs multiplied, because the legs are tied together; the same tie is why the true chance sits above the floor shown. ' : ''}${R.pool > R.rows.length ? R.pool + ' plays matched; the best ' + R.rows.length + ' shown.' : ''}</div>`;
 }
 // ── Top 10 plays of the day: every sport build writes data/<sport>/top.json (daily_top.py)
 var T10_SPORTS = [['nba', 'NBA', 'nba.html'], ['nfl', 'NFL', 'nfl.html'], ['cfb', 'NCAAF', 'cfb.html'], ['nhl', 'NHL', 'nhl.html'], ['tennis', 'Tennis', 'tennis.html']];

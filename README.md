@@ -1252,3 +1252,26 @@ model's number on it.
 games, fills its remaining legs from games it already uses (an SGP+, labelled on the ticket,
 never one player twice, one game line of each kind per game). My bets (`onyxMyBets`, ui.js and
 home.html) and saved picks (`saved.js`) both clear themselves after 24 hours.
+
+**Ask Onyx without AI (10/31).** Jordan chose no accounts and no keys, so the built-in reader
+(`ask.js` `localSpec(q, board)`) does the language. It reads the request against today's boards:
+every player with a line (full name, a last name or first name only one player has), team
+nicknames and abbreviations (NBA, NFL, NHL), markets in everyday words (boards, dimes, catches,
+QB, carries, TD scorer, PRA, puck line, straight up), odds in any wording ("-200 or better",
+"no -150 juice", "+300 or less", "even money", "plus money", "dogs", "chalk"), counts ("4
+legger", "a couple", "a few", "double"), days ("tonight", "Sunday", "this weekend") and asks
+("lock of the day", "what do you like", "best bet", "most value", "longshots", "who scores
+the most points"). A player question lists every line on him, the model's side of each. The AI
+relay (ai/) stays in the repo, unused unless ai.json is ever filled in.
+
+
+**Ask Onyx, wider (10/31).** Names: a full name wins ("Luka Garza"), then star nicknames
+(Giannis, LeBron, Steph, KD, Wemby, SGA, Joker...), then last or first names and one-letter typos
+("luke", "jokick"), always resolving to the most prominent player (NBA points a game from
+`data/nba/prior.json`; NFL by the size of his lines); team and everyday words never match a name.
+A star with no line right now gets "No Onyx line on X right now". New asks: round robins
+("round robin 4 picks by 2s": every combination as its own ticket), payout targets ("parlay that
+pays +500"; with a leg count each leg carries its share), first TD (NFL), first basket and
+1st-half totals (NBA, both now on the board), "top / leading rusher, passer, receiver, scorer",
+"who will rebound the most", over-and-under questions (both sides), and "total receptions" as a
+player prop. The relay's schema in `ai/worker.js` carries the same fields.

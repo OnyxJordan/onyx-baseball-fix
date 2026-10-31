@@ -27,7 +27,8 @@ PRICE = (-150, 150)
 MIN_CONF = 0.50
 KEEP = 30
 WORD = {"pts": "points", "reb": "rebounds", "ast": "assists", "pass_yds": "passing yards", "rush_yds": "rushing yards",
-        "rec_yds": "receiving yards", "rec": "receptions", "q1_total": "1st-quarter points"}
+        "rec_yds": "receiving yards", "rec": "receptions", "q1_total": "1st-quarter points",
+        "h1_total": "1st-half points"}
 
 
 def _num(x):
@@ -47,6 +48,10 @@ def label(r):
     mkt = r.get("mkt") or r.get("stat")
     if mkt == "anytime_td":
         return f"{r['name']} anytime TD"
+    if mkt == "first_td":
+        return f"{r['name']} first TD"
+    if mkt == "first_basket":
+        return f"{r['name']} first basket"
     return f"{r['name']} {side} {_num(r['line'])} {WORD.get(mkt, mkt or '')}".strip()
 
 
@@ -89,7 +94,7 @@ def write(data_dir, sport, date, rows):
     return out
 
 
-BOARD_KEEP = 800
+BOARD_KEEP = 1500
 
 
 def write_board(data_dir, sport, date, rows):

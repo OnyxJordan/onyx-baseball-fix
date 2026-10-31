@@ -759,6 +759,9 @@ def write_top(key, lane, slate, model):
              "line": 0.5, "price": r["any_price"], "prob": r["any"], "edge": r.get("any_edge") or 0.0, "sel": r.get("any_sel"),
              "gid": r["gid"], "matchup": r.get("matchup")}
         board.append(dict(DT.entry(key, c, tag(c), start.get(r["gid"])), lam=round(-math.log(max(1e-6, 1 - r["any"])), 4)))
+        if r.get("first_price") is not None:              # first touchdown scorer (shown, never recommended: Onyx won its backtest)
+            c1 = dict(c, mkt="first_td", price=r["first_price"], prob=r["first"], edge=r.get("first_edge") or 0.0, sel=r.get("first_sel"))
+            board.append(DT.entry(key, c1, "lean", start.get(r["gid"])))
     DT.write_board(lane.data, key, slate.get("date"), board)
 
 

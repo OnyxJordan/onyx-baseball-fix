@@ -369,7 +369,7 @@ def ticket_legs(rows, games):
     return out
 
 
-def write_top(rows, games, today_rows, open_led, today):
+def write_top(rows, games, today_rows, open_led, today, jumps=None, fshots=None):
     """data/nba/top.json for the home page's Top 10 (daily_top.py): every Onyx
     main-line prop side for a starter (28+ projected minutes, the parlay's
     mainstream bar) and every 1st-quarter total the on-trial model reads."""
@@ -408,6 +408,34 @@ def write_top(rows, games, today_rows, open_led, today):
             board.append(DT.entry("nba", c, tag(sel)))
             if DT.ok(c):
                 out.append(DT.entry("nba", c, tag(sel)))
+    # 1st-half totals (the qhCard read: 50.5% of the game total, sd 18) and first
+    # basket (open_lanes.fb_probs): on the board for Ask Onyx, never in the Top 10
+    from statistics import NormalDist
+    for g in games.values():
+        if g.get("state") != "pre":
+            continue
+        if g.get("h1_total") is not None and g.get("total"):
+            po = 1 - NormalDist(g["total"] * 0.505, 18).cdf(g["h1_total"])
+            for side, p in (("over", po), ("under", 1 - po)):
+                price, sel = g.get(f"h1_{side}_price"), g.get(f"h1_{side}_sel")
+                if price is not None and sel:
+                    c = {"kind": "prop", "mkt": "h1_total", "name": f"{g['away']} @ {g['home']}", "pid": "h1", "team": g["away"], "side": side,
+                         "line": g["h1_total"], "price": price, "prob": p, "edge": p - OL.implied(price), "sel": sel,
+                         "gid": g["gid"], "matchup": f"{g['away']} @ {g['home']}", "start": g.get("start")}
+                    board.append(DT.entry("nba", c, tag(sel)))
+        try:
+            fbp = OL.fb_probs(rows, g, jumps or {}, fshots)
+        except Exception:
+            fbp = {}
+        for r in rows:
+            fb = r.get("fb") or {}
+            if r["gid"] != g["gid"] or r["pid"] not in fbp or fb.get("yes") is None or not fb.get("sel"):
+                continue
+            p = fbp[r["pid"]]
+            c = {"kind": "prop", "mkt": "first_basket", "name": r["name"], "pid": r["pid"], "team": r["team"], "side": "over", "line": 0.5,
+                 "price": fb["yes"], "prob": p, "edge": p - OL.implied(fb["yes"]), "sel": fb["sel"],
+                 "gid": g["gid"], "matchup": f"{g['away']} @ {g['home']}", "start": g.get("start")}
+            board.append(DT.entry("nba", c, tag(fb["sel"])))
     DT.write_board(Path("data/nba"), "nba", today, board)
     return DT.write(Path("data/nba"), "nba", today, out)
 
@@ -722,7 +750,7 @@ def main():
         "open": open_lanes.summarize(open_led),
     }
     # today's best plays (home page Top 10 and the top of the Plays tab)
-    data["top"] = write_top(rows, games, today_rows, open_led, today)[:10]
+    data["top"] = write_top(rows, games, today_rows, open_led, today, jp, fshots)[:10]
     shell = open(SHELL, encoding="utf-8").read()
     # one design system: the MLB stylesheet is copied out of shell.html on
     # every build, so a styling change on the MLB site carries to NBA
