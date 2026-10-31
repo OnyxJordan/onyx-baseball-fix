@@ -509,6 +509,15 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
     1Q -5.6%), so no rule carries forward; 2026 1H looked good (+15.8%, 64 bets) but
     the rule fails its tuning season. Line ratios match reality (1H line 0.505 of the
     total, actual 0.506). Always-under 1H: 2025 +1.8% (285), 2026 +12.9% (106): too thin.
+  - **Ask Onyx test sets (10/31).** `tools/ask_corpus.py` writes `tools/ask_corpus.json` (482 phrasings: every
+    sport x market x intent template plus 118 hand-written "how people type it" requests), and
+    `tools/ask_holdout.json` / `ask_holdout2.json` are fresh sets scored once before any fix. `node tools/verify_ask.js
+    [--holdout|--holdout2] [--slow]` runs them on today's boards: a query passes when the reading matches (sport,
+    market, intent, count, side, prices, confidence, team, player, props only), every play returned honors it,
+    and the answer is not empty while the board holds something that fits (day, price and side aware). Scores
+    on 10/31: corpus 482/482; holdout 1 52/59 (88.1%) before its fixes; holdout 2 47/49 (95.9%) on first run. Run
+    it after any `ask.js` change. Speed: boards ~220 KB gzipped, preloaded by the home page; ET day lookups are
+    cached (dated searches went from ~1.1 s to under 15 ms); slowest query 51 ms.
   - **Ask Onyx, game lines and team names (10/31).** Every board now carries both sides of
     every Onyx game line (`sports_build.both_sides`; NBA game lines from `nba_build.write_top`,
     priced at Onyx's no-vig chance since there is no NBA game model) and each play's team

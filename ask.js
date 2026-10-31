@@ -46,9 +46,9 @@
     [/\breceiving\b|\brec(eiving)? yds\b|\breceivers?\b|\bwideouts?\b|\bwrs?\b|\btight ends?\b/, 'rec_yds'],
     [/\brushing\b|\brush\b|\brushers?\b|\bcarries\b|\bground game\b|\brunning backs?\b|\brbs?\b/, 'rush_yds'],
     [/\bpassing\b|\bpass yards\b|\bpassers?\b|\bqbs?\b|\bquarterbacks?\b|\bthrowing\b/, 'pass_yds'],
-    [/\bpoints?\b|\bpts\b|\bscorers?\b|\bbuckets\b/, 'pts'],
-    [/\bspreads?\b|\bcover(s|ing)?\b|\bpuck ?line\b|\bhandicap\b|\bats\b/, 'spread'],
-    [/\b(game )?totals?\b|\bo\/u\b|\bover\/under\b/, 'total'],
+    [/\bpoints?\b(?!\s*guards?)|\bpts\b|\bscorers?\b|\bbuckets\b/, 'pts'],
+    [/\bspreads?\b|\bcover(s|ing)?\b|\bpuck ?lines?\b|\bhandicap\b|\bats\b/, 'spread'],
+    [/\b(game )?totals?\b|\bo\/u\b|\bover ?\/? ?unders?\b|\bover[\s-]unders?\b/, 'total'],
     [/\bmoney ?lines?\b|\bml\b|\bto win\b(?!\s*(about|around)?\s*\+?\$?\d)|\bwinners?\b|\bstraight up\b|\boutright\b/, 'ml'],
   ];
   var NICK = {
@@ -69,18 +69,30 @@
     blues: 'STL', lightning: 'TB', bolts: 'TB', 'maple leafs': 'TOR', leafs: 'TOR', canucks: 'VAN', capitals: 'WSH', caps: 'WSH', winnipeg: 'WPG', 'utah hockey': 'UTAH'
   };
   var SPORT_OF_NICK = {jets: 'nfl', kings: 'nba', panthers: 'nfl', rangers: 'nhl', cardinals: 'nfl', giants: 'nfl'};
+  // every nickname's league, from the order NICK lists them in (NBA, then NFL, then NHL)
+  (function () {
+    var cur = 'nba';
+    Object.keys(NICK).forEach(function (k) {
+      if (k === 'cardinals') cur = 'nfl'; else if (k === 'bruins') cur = 'nhl';
+      if (!SPORT_OF_NICK[k]) SPORT_OF_NICK[k] = cur;
+    });
+  })();
+  // the sport a team or player is in today: from today's boards first
+  function sportsOn(B, test) {
+    var o = {}; (B || []).forEach(function (p) { if (test(p)) o[p.sport] = 1; }); return Object.keys(o);
+  }
   var NUMW = {one: 1, a: 1, two: 2, couple: 2, double: 2, three: 3, few: 3, triple: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10};
   var DAYS = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
 
   function esc(x) { return x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
   // what people call stars: always the player they mean
-  var FAMOUS = {giannis: 'Giannis Antetokounmpo', 'the greek freak': 'Giannis Antetokounmpo', luka: 'Luka Doncic', lebron: 'LeBron James', bron: 'LeBron James',
+  var FAMOUS = {giannis: 'Giannis Antetokounmpo', 'the greek freak': 'Giannis Antetokounmpo', 'greek freak': 'Giannis Antetokounmpo', luka: 'Luka Doncic', lebron: 'LeBron James', bron: 'LeBron James',
     steph: 'Stephen Curry', kd: 'Kevin Durant', wemby: 'Victor Wembanyama', sga: 'Shai Gilgeous-Alexander', shai: 'Shai Gilgeous-Alexander',
     jokic: 'Nikola Jokic', joker: 'Nikola Jokic', embiid: 'Joel Embiid', ant: 'Anthony Edwards', 'ant man': 'Anthony Edwards', ad: 'Anthony Davis',
     'the brow': 'Anthony Davis', dame: 'Damian Lillard', kat: 'Karl-Anthony Towns', jb: 'Jaylen Brown', cp3: 'Chris Paul', harden: 'James Harden',
     booker: 'Devin Booker', tatum: 'Jayson Tatum', mahomes: 'Patrick Mahomes', 'josh allen': 'Josh Allen', lamar: 'Lamar Jackson', burrow: 'Joe Burrow',
     cmc: 'Christian McCaffrey', jj: 'Justin Jefferson', 'ja\'marr': "Ja'Marr Chase", jamarr: "Ja'Marr Chase", ceedee: 'CeeDee Lamb', bijan: 'Bijan Robinson',
-    saquon: 'Saquon Barkley', kelce: 'Travis Kelce', henry: 'Derrick Henry', gibbs: 'Jahmyr Gibbs', jalen: 'Jalen Hurts', ovi: 'Alex Ovechkin',
+    saquon: 'Saquon Barkley', kelce: 'Travis Kelce', henry: 'Derrick Henry', gibbs: 'Jahmyr Gibbs', jalen: 'Jalen Hurts', hurts: 'Jalen Hurts', puka: 'Puka Nacua', 'amon-ra': 'Amon-Ra St. Brown', 'st brown': 'Amon-Ra St. Brown', ovi: 'Alex Ovechkin',
     mcdavid: 'Connor McDavid', mackinnon: 'Nathan MacKinnon', alcaraz: 'Carlos Alcaraz', sinner: 'Jannik Sinner', djokovic: 'Novak Djokovic'};
   function clean(n) { return String(n || '').toLowerCase().replace(/[’']/g, '').replace(/\b(jr|sr|ii|iii|iv)\b\.?/g, '').replace(/[^a-z\s-]/g, '').replace(/\s+/g, ' ').trim(); }
   // everyone a request could name: players with a line today, plus every NBA player on
@@ -137,7 +149,7 @@
     }
     return d + (a.length - i) + (b.length - j) <= 1;
   }
-  var NOT_NAMES = /^(will|wills|rebound|rebounds|assist|catch|rush|pass|likely|likes|half|halves|quarter|quarters|scorer|scorers|rusher|rushers|receiver|receivers|passer|leading|leader|top|round|robin|basket|bucket|touchdown|touchdowns|totals|chance|chances|safest|lock|locks|tonight|tomorrow|night|slate|card|board|sharp|steam|juice|payout|pays|winner|winners|underdog|underdogs|favorite|favorites|again|every|other|their|there|these|those|about|around|would|could|should|shot|shots|star|stars|over|under|overs|unders|most|plus|game|games|best|safe|safest|team|teams|with|tonight|today|points|value|parlay|legs|leg|lock|bets|plays|picks|money|line|lines|odds|total|totals|spread|score|scores|win|wins|first|anytime|rebounds|assists|yards|receptions|sunday|monday|tuesday|wednesday|thursday|friday|saturday|week|weekend|give|what|which|who|like|need|want|good|more|less|than|from|this|that|the|and|for|nba|nfl|nhl|tennis|college|longshots|dogs|favorites|fade|stack|sgp|props|prop|player|players|ticket|double|triple|edge|bet|play|pick|side|sides|only|just|ats|ml|moneyline|moneylines|spreads|run|runs|puck|goal|goals|alt|alts|alternate|ladder|live|hedge|cover|covers|dog|fav|favs|chalk|lean|leans|model|onyx|parlays|sgps|plus|minus|even|safe|hammer|nuke|banker|bankers|longshot|sleeper|sleepers|fades|tail|tails|boost|boosts|power|prime|primetime|early|late|slate|main|night|afternoon|morning|home|away|road|big|small|low|high|long|short|hot|cold|streak|streaks|trend|trends|units|unit|bankroll|book|books|price|prices|number|numbers|key|keys|half|full|period|periods|inning|innings|set|sets|match|matches|fight|fights|card|cards|round|rounds|teaser|teasers|correlated|stacked|same|different|any|all|both|each|either|neither|one|two|three|four|five|six|seven|eight|nine|ten|twelve|dozen|couple|few|some|many|much)$/;
+  var NOT_NAMES = /^(will|wills|rebound|rebounds|assist|catch|rush|pass|likely|likes|half|halves|quarter|quarters|scorer|scorers|rusher|rushers|receiver|receivers|passer|leading|leader|top|round|robin|basket|bucket|touchdown|touchdowns|totals|chance|chances|safest|lock|locks|tonight|tomorrow|night|slate|card|board|sharp|steam|juice|payout|pays|winner|winners|underdog|underdogs|favorite|favorites|again|every|other|their|there|these|those|about|around|would|could|should|shot|shots|star|stars|over|under|overs|unders|most|plus|game|games|best|safe|safest|team|teams|with|tonight|today|points|value|parlay|legs|leg|lock|bets|plays|picks|money|line|lines|odds|total|totals|spread|score|scores|win|wins|first|anytime|rebounds|assists|yards|receptions|sunday|monday|tuesday|wednesday|thursday|friday|saturday|week|weekend|give|what|which|who|like|need|want|good|more|less|than|from|this|that|the|and|for|nba|nfl|nhl|tennis|college|longshots|dogs|favorites|fade|stack|sgp|props|prop|player|players|ticket|double|triple|edge|bet|play|pick|side|sides|only|just|ats|ml|moneyline|moneylines|spreads|run|runs|puck|goal|goals|alt|alts|alternate|ladder|live|hedge|cover|covers|dog|fav|favs|chalk|lean|leans|model|onyx|parlays|sgps|plus|minus|even|safe|hammer|nuke|banker|bankers|longshot|sleeper|sleepers|fades|tail|tails|boost|boosts|power|prime|primetime|early|late|slate|main|night|afternoon|morning|home|away|road|big|small|low|high|long|short|hot|cold|streak|streaks|trend|trends|units|unit|bankroll|book|books|price|prices|number|numbers|key|keys|half|full|period|periods|inning|innings|set|sets|match|matches|fight|fights|card|cards|round|rounds|teaser|teasers|correlated|stacked|same|different|any|all|both|each|either|neither|one|two|three|four|five|six|seven|eight|nine|ten|twelve|dozen|couple|few|some|many|much|pair|guard|guards|center|centers|forward|forwards|wing|wings|qb|qbs|rb|rbs|wr|wrs|te|tes|upset|upsets|value|sharp|sharpest|night|monday|sunday)$/;
   function findPlayer(t, C) {
     var keys = Object.keys(C), words = t.trim().split(/\s+/);
     var best = function (cands) { return cands.sort(function (a, b) { return C[b].score - C[a].score; })[0]; };
@@ -157,7 +169,7 @@
       return words.some(function (w) {
         if (w.length < 3 || NOT_NAMES.test(w) || NICK[w] || NICK[w.replace(/s$/, '')]) return false;
         if (w === parts[0]) return true;
-        return w.length >= 4 && parts.some(function (n) { return n.length >= 4 && lev1(w, n); });
+        return w.length >= 5 && parts.some(function (n) { return n.length >= 5 && lev1(w, n); });
       });
     });
     if (loose.length) return C[best(loose)].name;
@@ -187,11 +199,17 @@
     var n = t.match(/\b(\d{1,2})[\s-]*(leg|legs|legger|picks?|plays?|players?|bets?|team|man|teamer)\b/) || t.match(/\btop\s*(\d{1,2})\b/)
       || t.match(/\bparlay of (\d{1,2})\b/) || t.match(/\b(\d{1,2})\s+(nba|nfl|nhl|college|tennis)\b/);
     var nw = t.match(/\b(two|three|four|five|six|seven|eight|nine|ten|couple|few)( of)?[\s-]*(leg|legs|legger|picks?|plays?|bets?|team|man)\b/);
+    if (!n && !nw) {
+      var n2 = t.match(/\b(\d{1,2})\s+(?:\w+\s+){0,2}?(overs|unders|props|plays|picks|bets|players|teams|sides|dogs|favorites|favs|scorers|rebounds|assists|points|receptions|touchdowns|tds|totals|spreads)\b/);
+      if (n2 && +n2[1] <= 12 && !/\b\d{1,2}\s+(points|rebounds|assists|receptions|tds|touchdowns)\s+(or|and|in|a|per)\b/.test(t)) n = [n2[0], n2[1]];
+      else if (/\b(a )?pair of\b/.test(t)) nw = [null, 'two'];
+      else if (/\b(one|a single|1)\s+(\w+\s+){0,2}?(bet|play|pick|prop|leg)\b(?!s)/.test(t)) nw = [null, 'one'];
+    }
     s.count_set = !!(n || nw);
     s.count = n ? +n[1] : nw ? NUMW[nw[1]] : /\bdouble\b/.test(t) && s.intent === 'parlay' ? 2 : /\btriple\b/.test(t) && s.intent === 'parlay' ? 3 : null;
     // which sport
     if (/\bnba\b|basketball|hoops/.test(t)) s.sports.push('nba');
-    if (/\bnfl\b|pro football|\bfootball\b(?! college)/.test(t) && !/college football/.test(t)) s.sports.push('nfl');
+    if (/\bnfl\b|pro football|\bfootball\b(?! college)/.test(t) && !/college football|ncaa ?f?\b|ncaa football/.test(t)) s.sports.push('nfl');
     if (/college|ncaa|\bcfb\b|ncaaf/.test(t)) s.sports.push('cfb');
     if (/\bnhl\b|hockey/.test(t)) s.sports.push('nhl');
     if (/tennis|\batp\b|\bwta\b/.test(t)) s.sports.push('tennis');
@@ -200,7 +218,7 @@
       if (WORDS[i][1] === 'anytime_td' && (s.markets.indexOf('two_plus_td') >= 0 || s.markets.indexOf('first_td') >= 0)) continue;
       if (WORDS[i][1] === 'q1_total' && (s.markets.indexOf('first_td') >= 0 || s.markets.indexOf('first_basket') >= 0)) continue;
       // "total receptions", "total points for Jokic": a player's total, not the game total
-      if (WORDS[i][1] === 'total' && /\btotal (receptions|catches|yards|rushing|passing|receiving|rebounds|assists|boards|dimes|tds|touchdowns)\b/.test(t)) continue;
+      if (WORDS[i][1] === 'total' && /\btotal (receptions|catches|yards|rushing|passing|receiving|rebounds|assists|boards|dimes|tds|touchdowns|points|pts|bases|hits)\b/.test(t)) continue;
       if (WORDS[i][1] === 'pts' && /\b(first|1st) (basket|bucket|points? of)/.test(t) && !/\bpoints\b(?! of)/.test(t.replace(/(first|1st) points? of/, ''))) continue;
       if (WORDS[i][1] === 'pts' && (/\b(score|scorer)s? (a |an )?(td|touchdown)/.test(t) || /td|touchdown/.test(t))) continue;
       if (WORDS[i][1] === 'total' && /(first|1st)[\s-]*(half|quarter)|\b1h\b|\b1q\b/.test(t)) continue;
@@ -209,6 +227,11 @@
     // "sides", "game lines", "ATS": the game, not a player (spreads and moneylines; totals too for "game lines")
     if (/\bsides?\b|\bteams? to (win|cover)\b|\bteam bets?\b/.test(t) && !/\bboth sides\b/.test(t)) ['spread', 'ml'].forEach(function (m) { if (s.markets.indexOf(m) < 0) s.markets.push(m); });
     if (/\bgame lines?\b|\bmain lines?\b|\bgame bets?\b|\bstraight bets? on games\b/.test(t)) ['spread', 'ml', 'total'].forEach(function (m) { if (s.markets.indexOf(m) < 0) s.markets.push(m); });
+    // "rushing yards over under" is the player's line, not the game total
+    if (s.markets.indexOf('total') >= 0 && !/\b(game )?totals?\b/.test(t) && s.markets.some(function (m) { return /^(pts|reb|ast|rec|rec_yds|rush_yds|pass_yds)$/.test(m); })) s.markets.splice(s.markets.indexOf('total'), 1);
+    // a position word only names a market when no stat was named ("wr receptions" is receptions)
+    if (s.markets.indexOf('rec') >= 0 && s.markets.indexOf('rec_yds') >= 0 && !/receiving|\byards\b|\byds\b/.test(t)) s.markets.splice(s.markets.indexOf('rec_yds'), 1);
+    if (s.markets.indexOf('first_td') >= 0 && /\bnba\b|basketball|bucket|basket|hoops/.test(t) && !/\btds?\b|touchdown/.test(t)) s.markets[s.markets.indexOf('first_td')] = 'first_basket';
     if (/\byards\b|\byds\b/.test(t) && !s.markets.some(function (m) { return /yds/.test(m); })) s.markets.push('rec_yds', 'rush_yds', 'pass_yds');
     if (/\bscore (the )?most\b|\bmost points\b|\btop (point )?scorers?\b|\bleading scorer\b|\bdrop (the )?most\b|\bhighest scor/.test(t)) { if (s.markets.indexOf('pts') < 0) s.markets.push('pts'); s.sort = 'proj'; s.side = 'over'; }
     if (/\bpra\b|pts ?\+ ?reb ?\+ ?ast/.test(t)) ['pts', 'reb', 'ast'].forEach(function (m) { if (s.markets.indexOf(m) < 0) s.markets.push(m); });
@@ -232,7 +255,9 @@
     if (fl) { var v = +(fl[fl.length - 1] && /\d/.test(fl[fl.length - 1]) ? fl[fl.length - 1] : (fl[1] || fl[fl.length - 1])); if (!isNaN(v)) s.min_price = v; }
     var fl2 = t.match(/([+-]\d{3,4})\s*(or better|or longer|and up|or more|minimum|floor)/); if (fl2) s.min_price = +fl2[1];
     var nojuice = t.match(/\bno\s*(-\d{3,4})/); if (nojuice) s.min_price = +nojuice[1] + 1;
-    var mx = t.match(/(max(imum)?( odds)?|no (longer|better) than|below|at most|or less than)\s*([+-]\d{3,4})/) || t.match(/([+-]\d{3,4})\s*(or less|or shorter|max|cap)/);
+    var btw = t.match(/between\s*([+-]?\d{3,4})\s*(and|to|-)\s*([+-]?\d{3,4})/);
+    if (btw) { s.min_price = Math.min(+btw[1], +btw[3]); s.max_price = Math.max(+btw[1], +btw[3]); }
+    var mx = btw ? null : t.match(/(max(imum)?( odds)?|no (longer|better) than|below|at most|or less than)\s*([+-]\d{3,4})/) || t.match(/([+-]\d{3,4})\s*(or less|or shorter|max|cap)/);
     if (mx) { var w = +(mx[mx.length - 1] && /\d/.test(mx[mx.length - 1]) ? mx[mx.length - 1] : mx[1]); if (!isNaN(w)) s.max_price = w; }
     if (/plus money|plus[\s-]odds|\+ ?odds|underdogs?|\bdogs\b|long ?shots?|\bvalue dogs?\b/.test(t)) s.min_price = Math.max(s.min_price == null ? 100 : s.min_price, 100);
     if (/even money|around even|near even|pick ?em/.test(t)) { s.min_price = -125; s.max_price = 125; }
@@ -242,7 +267,7 @@
     if (/recommend|favou?rite (play|pick|bet|sgp|parlay)|best (picks?|plays?|bets?)|top picks?|your picks?|should i (bet|play)|what do you like|you like|pick of the (day|night)|play of the (day|night)|best bet/.test(t)) s.sort = 'rec';
     if (/\bvalue\b|most value|best value|biggest edge|\bedge\b|beats? (the )?(line|price|onyx|book)|mispriced|soft line|\b\+ev\b|positive ev/.test(t)) s.sort = 'edge';
     if (/biggest payout|longshots?|long shots?|lottery|moonshot|highest odds|big payout/.test(t)) s.sort = 'price';
-    if (/lock of the|pick of the|play of the|best bet\b|the lock\b/.test(t) && s.count == null && s.intent === 'list') s.count = 1;
+    if (/lock of the|pick of the|play of the|bet of the|prop of the|best bet\b|the lock\b|(highest|best|top|most likely|safest) (\w+ ){0,3}(prop|play|pick|bet|scorer)\b(?!s)/.test(t) && s.count == null && s.intent === 'list') s.count = 1;
     // confidence floor: "60%", "60 percent", "over 60%"
     var c = t.match(/(\d{2})\s*(%|percent)/); if (c) s.min_conf = +c[1] / 100;
     // time: tonight / today / tomorrow / a weekday / this weekend
@@ -268,19 +293,50 @@
       var nk_ = keys[k];
       if (new RegExp('\\b' + esc(nk_) + '\\b').test(t)) {
         s.team = NICK[keys[k]];
-        if (SPORT_OF_NICK[nk_] && !s.sports.length) s.sports.push(SPORT_OF_NICK[nk_]);
+        if (!s.sports.length) {
+          var lg = SPORT_OF_NICK[nk_], on = sportsOn(B, function (p) { return (p.team || (p.kind !== 'prop' ? p.name : '')) === s.team && (!lg || p.sport === lg); });
+          s.sports.push(on.length === 1 ? on[0] : lg || 'nba');
+        }
         if (nk_ === 'jets' && /hockey|nhl|winnipeg/.test(t)) s.team = 'WPG';
         break;
       }
     }
     if (!s.team) {
+      // big college programs by name, any day (today's boards cover the rest)
+      var CFBN = {alabama: 'ALA', 'crimson tide': 'ALA', michigan: 'MICH', wolverines: 'MICH', 'notre dame': 'ND', texas: 'TEX', longhorns: 'TEX',
+        'ohio state': 'OSU', buckeyes: 'OSU', georgia: 'UGA', bulldogs: 'UGA', clemson: 'CLEM', oregon: 'ORE', ducks: 'ORE', 'penn state': 'PSU',
+        tennessee: 'TENN', auburn: 'AUB', florida: 'FLA', gators: 'FLA', oklahoma: 'OU', sooners: 'OU', miami: 'MIA', wisconsin: 'WIS', iowa: 'IOWA',
+        nebraska: 'NEB', 'texas a&m': 'TA&M', 'texas am': 'TA&M', aggies: 'TA&M', 'florida state': 'FSU', seminoles: 'FSU', 'michigan state': 'MSU',
+        'ole miss': 'MISS', 'mississippi state': 'MSST', kentucky: 'UK', arkansas: 'ARK', missouri: 'MIZ', 'south carolina': 'SC', vanderbilt: 'VAN',
+        'virginia tech': 'VT', louisville: 'LOU', 'north carolina': 'UNC', duke: 'DUKE', stanford: 'STAN', washington: 'WASH', utah: 'UTAH',
+        colorado: 'COLO', 'arizona state': 'ASU', arizona: 'ARIZ', 'kansas state': 'KSU', kansas: 'KU', 'iowa state': 'ISU', baylor: 'BAY',
+        'texas tech': 'TTU', 'oklahoma state': 'OKST', 'boise state': 'BSU', byu: 'BYU', 'west virginia': 'WVU', purdue: 'PUR', indiana: 'IU',
+        minnesota: 'MINN', illinois: 'ILL', northwestern: 'NU', rutgers: 'RUTG', maryland: 'MD', 'georgia tech': 'GT', pitt: 'PITT', syracuse: 'SYR'};
+      if (!s.team) {
+        var ck = Object.keys(CFBN).sort(function (a, b) { return b.length - a.length; });
+        for (var ci = 0; ci < ck.length; ci++) if (new RegExp('(^|\\s)' + esc(ck[ci]) + '(\\s|$)').test(t) && !(ck[ci] === 'miami' && /dolphins|heat|marlins/.test(t)) && !(ck[ci] === 'utah' && /jazz|hockey|nhl|mammoth/.test(t))) {
+          s.team = CFBN[ck[ci]]; if (!s.sports.length) s.sports.push('cfb'); tPlayer = tPlayer.replace(ck[ci], ' '); break;
+        }
+      }
+      // college abbreviations nobody types as a word: any case ("lsu spread")
+      var col = t.match(/\b(lsu|usc|ucla|tcu|smu|byu|ucf|fsu|unlv|utsa|utep|uconn|umass|unc|ole miss)\b/);
+      if (col) { s.team = ({unc: 'UNC', 'ole miss': 'MISS'})[col[1]] || col[1].toUpperCase(); if (!s.sports.length) s.sports.push('cfb'); }
       // abbreviations only when typed in capitals ("MIN -200" is odds, "MIN" is Minnesota)
-      var tm = String(q).match(/\b(ATL|BOS|BKN|CHA|CHI|CLE|DAL|DEN|DET|GS|GSW|HOU|IND|LAC|LAL|MEM|MIA|MIL|MIN|NOP|NYK|OKC|ORL|PHI|PHX|POR|SAC|SAS|TOR|UTAH|UTA|WSH|WAS|ARI|BAL|BUF|CAR|CIN|GB|JAX|KC|LV|LAR|NE|NYG|NYJ|PIT|SEA|SF|TB|TEN|VGK|EDM|COL|NYR|NYI|NJ|CBJ|WPG|VAN|CGY|OTT|MTL|NSH|STL|SJ|ANA|LSU|USC|UCLA|TCU|SMU|BYU|UCF|OSU|PSU|UGA|FSU)\b/);
+      var tm = s.team ? null : String(q).match(/\b(ATL|BOS|BKN|CHA|CHI|CLE|DAL|DEN|DET|GS|GSW|HOU|IND|LAC|LAL|MEM|MIA|MIL|MIN|NOP|NYK|OKC|ORL|PHI|PHX|POR|SAC|SAS|TOR|UTAH|UTA|WSH|WAS|ARI|BAL|BUF|CAR|CIN|GB|JAX|KC|LV|LAR|NE|NYG|NYJ|PIT|SEA|SF|TB|TEN|VGK|EDM|COL|NYR|NYI|NJ|CBJ|WPG|VAN|CGY|OTT|MTL|NSH|STL|SJ|ANA|LSU|USC|UCLA|TCU|SMU|BYU|UCF|OSU|PSU|UGA|FSU)\b/);
       if (tm) s.team = ({GSW: 'GS', NOP: 'NO', NYK: 'NY', SAS: 'SA', UTA: 'UTAH', WAS: 'WSH'})[tm[1]] || tm[1];
     }
     // a player: a nickname, a full name, a last or first name (the most prominent one), or one letter off
     s.player = findPlayer(tPlayer, names(B, PRIOR));
-    if (s.player) { s.team = null; if (s.intent === 'list' && s.count == null && !/props|plays|lines|bets/.test(t)) s.count = 5; }
+    if (s.player) {
+      s.team = null; if (s.intent === 'list' && s.count == null && !/props|plays|lines|bets/.test(t)) s.count = 5;
+      if (!s.sports.length) {
+        var pl = String(s.player).toLowerCase(), on2 = sportsOn(B, function (p) { return p.kind === 'prop' && String(p.name || '').toLowerCase() === pl; });
+        if (on2.length) s.sports = on2;
+        else if ((PRIOR || []).some(function (r) { return String(r.n).toLowerCase() === pl; })) s.sports = ['nba'];
+        else if (/mcdavid|ovechkin|mackinnon|matthews|draisaitl|kucherov|makar|crosby/.test(pl)) s.sports = ['nhl'];
+        else if (/alcaraz|sinner|djokovic|sabalenka|swiatek|gauff/.test(pl)) s.sports = ['tennis'];
+      }
+    }
     // defaults that follow from the rest
     if (s.markets.indexOf('two_plus_td') >= 0) { s.sort = 'two_td'; if (!s.sports.length) s.sports = ['nfl']; }
     if (s.markets.indexOf('anytime_td') >= 0 && !s.sports.length) s.sports = ['nfl', 'cfb'];
@@ -304,7 +360,9 @@
   function dec(o) { return o > 0 ? 1 + o / 100 : 1 + 100 / -o; }
   function am(d) { return d >= 2 ? Math.round((d - 1) * 100) : Math.round(-100 / (d - 1)); }
   // the ET calendar day of a start time vs "today" / "tomorrow" / a weekday / the weekend
-  function etDay(t) { return new Date(new Date(t).toLocaleString('en-US', {timeZone: 'America/New_York'})); }
+  // ET wall-clock date for a timestamp; cached, since toLocaleString is slow and every play shares a few start times
+  var ETC = {};
+  function etDay(t) { var k = typeof t === 'number' ? Math.floor(t / 60000) : t; return ETC[k] || (ETC[k] = new Date(new Date(t).toLocaleString('en-US', {timeZone: 'America/New_York'}))); }
   function whenOk(when, start) {
     var t = Date.parse(start); if (isNaN(t)) return true;
     var g = etDay(t), now = etDay(Date.now() - 4 * 3600e3);   // the site's day rolls at 4 AM ET
@@ -511,5 +569,5 @@
       return res;
     });
   }
-  window.OnyxAsk = {ask: ask, normalize: normalize, localSpec: localSpec, run: run, describe: describe, loadBoards: loadBoards, LG: LG, PAGE: PAGE, MKTS: MKTS};
+  window.OnyxAsk = {whenOk: whenOk, ask: ask, normalize: normalize, localSpec: localSpec, run: run, describe: describe, loadBoards: loadBoards, LG: LG, PAGE: PAGE, MKTS: MKTS};
 })();
