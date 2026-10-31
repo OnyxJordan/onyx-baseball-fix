@@ -54,11 +54,25 @@ for sp in _NICK:
     _NICK[sp].sort(key=lambda t: -len(t[0]))
 
 
+# college: each school's home state (tools/cfb_states.json, from ESPN's scoreboards, non-neutral
+# home games, 2025-26) to a time zone; split states go by where most of the state is
+_STZ = {**{k: E for k in "CT DE DC FL GA IN ME MD MA MI NH NJ NY NC OH PA RI SC VT VA WV KY".split()},
+        **{k: C for k in "AL AR IL IA KS LA MN MS MO NE ND OK SD TN TX WI".split()},
+        **{k: M for k in "CO ID MT NM UT WY".split()}, "AZ": "AZ", **{k: P for k in "CA NV OR WA HI AK".split()}}
+try:
+    import json as _j, os as _o
+    _CFB = {k: _STZ.get(v) for k, v in _j.load(open(_o.path.join(_o.path.dirname(__file__), "cfb_states.json"))).items()}
+except Exception:
+    _CFB = {}
+
+
 def team(sp, t):
     """(canonical key, zone) for a team from any feed, or (raw, None)."""
     if not t:
         return None, None
     s = str(t).strip()
+    if sp == "cfb":
+        return s, _CFB.get(s.upper())
     if (sp, s.upper()) in _AB:
         return _AB[(sp, s.upper())]
     low = " " + re.sub(r"[^a-z0-9 ]", " ", s.lower()) + " "
@@ -106,7 +120,7 @@ def ctx(sp, home, away, start_iso, day, a_home, S):
     crossed, home rest, away rest, month]."""
     hk, hz = team(sp, home)
     ak, az = team(sp, away)
-    hr = local_hour(sp, start_iso, hz if sp != "cfb" else None)
+    hr = local_hour(sp, start_iso, hz)
     zi, za = zone_index(hz), zone_index(az)
     return [a_home, None if hr is None else int(hr >= 17), zi, None if zi is None or za is None else abs(zi - za),
             S.rest(sp, home, day) if S else None, S.rest(sp, away, day) if S else None, int(day[5:7])]
