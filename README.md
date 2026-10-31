@@ -1284,3 +1284,14 @@ every lane, re-pricing the slate at each lane's weight (`rows_for`). Home page: 
 the hero counts every sport from the ESPN scoreboards (games today, plays priced today, next
 start, sports on today and how many models are graded), and the Top 10 takes only games on the
 site's day (ET, rolling at 4 AM), so Sunday's NFL waits for Sunday.
+
+**College football totals on trial (11/1).** Jordan uploaded RotoWire and SaberSim projections
+for the 10/31 main slate. Sides agreed with SaberSim within 3.0 points on average; totals ran 4.2
+points hotter, and 6-11 points hotter on the games the totals lane picked (FLA@UGA, ASU@BYU,
+OSU@USC). With 2025's totals at closing prices (-20.3%) the lane is weaker than its 2026 numbers
+alone suggest, so the totals lane is `"trial": true` in `data/cfb/backtest.json`: graded lanes
+skip it, and `sports_build.team_open_lane` logs it only at Onyx's opening price (first sight in
+`data/cfb/opening.json`, baseline rule as NFL) into `data/cfb/open_trial.json` (append-only, in
+validate_build's ledger list), shown under "On trial" on the CFB Plays tab. The six totals logged
+on 10/31 stay on the graded record. A guard skipping totals far from the market was tested and
+did not help.

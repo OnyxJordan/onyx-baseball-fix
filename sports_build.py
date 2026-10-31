@@ -47,6 +47,68 @@ METHOD = {
 OPEN_MAX = 12   # NFL receptions plays logged per day at the opening price, biggest edges first
 
 
+def team_open_lane(lane, rule, rows, slate, M):
+    """A game-line lane on trial at Onyx's opening price (CFB totals since 11/1): the
+    first price we see for each market is written once to data/<sport>/opening.json and
+    a play is logged (data/<sport>/open_trial.json, append-only) only when the lane's
+    rule passes at that opening price and the live line and price are still the opening
+    ones. Graded from results.json like the tracked picks."""
+    from datetime import datetime, timezone
+    ts = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    O = lane.load("opening.json", None)
+    first_run = O is None          # the first look: every line already up is a baseline, never a play
+    O = O or {}
+    ledger = lane.load("open_trial.json", []) or []
+    games = {g["gid"]: g for g in slate.get("games") or []}
+    for k in [k for k in O if k.split("|")[0] in games and games[k.split("|")[0]].get("state") == "post"]:
+        O.pop(k)
+    have = {k["key"] for k in ledger}
+    cands = []
+    for r in rows:
+        if r["mkt"] not in rule.get("markets", ()):
+            continue
+        g = games.get(r["gid"]) or {}
+        key = f"{r['gid']}|{r['mkt']}|{r['side']}"
+        if key not in O and g.get("state") == "pre":
+            O[key] = {"line": r["line"], "price": r["price"], "ts": ts, **({"baseline": True} if first_run else {})}
+        op = O.get(key)
+        if not op or op.get("baseline") or g.get("state") != "pre" or key in have:
+            continue
+        if (op["line"], op["price"]) != (r["line"], r["price"]):
+            continue          # moved off the opening price: not bettable as logged
+        if not (rule["edge_min"] <= r["edge"] <= rule["edge_max"] and rule["price_min"] <= r["price"] <= rule["price_max"]):
+            continue
+        cands.append((r["edge"], {"date": slate.get("date"), "key": key, "gid": r["gid"], "matchup": r["matchup"], "kind": r["kind"],
+                                  "mkt": r["mkt"], "name": r.get("name"), "side": r["side"], "line": r["line"], "price": r["price"],
+                                  "sel": r.get("sel"), "prob": r["prob"], "implied": r["implied"], "detail": r.get("detail"),
+                                  "opened_at": op["ts"], "logged_at": ts, "model": M.VERSION, "result": None, "actual": None}))
+    today_n = sum(1 for k in ledger if k.get("date") == slate.get("date"))
+    for e, row in sorted(cands, key=lambda c: -c[0])[:max(0, rule.get("max_per_slate", 6) - today_n)]:
+        ledger.append(row)
+    resolve = grade_team(lane)
+    for k in ledger:
+        if k.get("result"):
+            continue
+        act = resolve(dict(k, team_side=None))
+        if act is None:
+            continue
+        k["actual"] = act
+        k["result"] = "P" if act == k["line"] else ("W" if (act > k["line"]) == (k["side"] == "over") else "L")
+        k["graded_at"] = ts
+    lane.save("opening.json", O, indent=1)
+    lane.save("open_trial.json", ledger, indent=1)
+    w = sum(1 for k in ledger if k["result"] == "W"); l_ = sum(1 for k in ledger if k["result"] == "L")
+    pay = lambda a: a / 100.0 if a > 0 else 100.0 / -a
+    units = sum((pay(k["price"]) if k["result"] == "W" else -1.0 if k["result"] == "L" else 0.0) for k in ledger)
+    return {"w": w, "l": l_, "p": sum(1 for k in ledger if k["result"] == "P"), "pending": sum(1 for k in ledger if not k["result"]),
+            "units": round(units, 2), "roi": round(units / (w + l_), 4) if w + l_ else None,
+            "rows": list(reversed(ledger[-80:])), "started": ledger[0]["date"] if ledger else None,
+            "note": ("Totals, logged only while Onyx still shows the first total and price we saw for that game, at that price, and "
+                     "graded off the final score. They beat Onyx on the 2026 games (+21% at opening prices, +12% at closing) but lost "
+                     "at closing prices in 2025 (-20%), so totals are on trial: separate from the graded spreads record until this one "
+                     "says otherwise. Six totals logged on 10/31, before this rule, sit on the graded record.")}
+
+
 def nfl_open_lane(lane, out, slate, season, rows, M):
     """Receptions at Onyx's opening price, on trial. The first price we see for each
     receptions line is written once to data/nfl/opening.json; a play is logged
@@ -588,7 +650,7 @@ def model_frame(key, lane, slate, odds, M, rows, base, resolve, rows_for=None):
     picks = []
     if live:
         lanes = (bt or {}).get("lanes") or [(bt or {}).get("lane")]
-        for rule in [r for r in lanes if r]:
+        for rule in [r for r in lanes if r and not r.get("trial")]:     # a "trial" lane logs at opening prices instead
             rws = rows_for(rule.get("w")) if rows_for and rule.get("w") is not None else rows
             picks += lane_picks(rws, {"lane": rule}, slate.get("date"))
         for p in picks:
@@ -630,6 +692,10 @@ def team_block(key, lane, slate, odds):
         roadmap=ROADMAP.get(key, []))
     base = model_frame(key, lane, slate, odds, M, rows, base, grade_team(lane),
                        rows_for=lambda w_: game_rows(key, M, slate, odds, R, w_)[0])
+    trial = [r for r in (bt.get("lanes") or []) if r.get("trial")] if base["status"] == "live" else []
+    if trial:
+        rule = trial[0]
+        base["open"] = team_open_lane(lane, rule, game_rows(key, M, slate, odds, R, rule["w"])[0], slate, M)
     base["_cands"] = rows
     base["proj"] = proj
     base["engine"] = engine_team(key, M, GP, w, bt, base["status"] == "live")

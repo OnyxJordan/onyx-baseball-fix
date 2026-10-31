@@ -1962,13 +1962,14 @@ function openTrialSport(O) {
     const g = (SD.games || []).find(x => x.gid === k.gid) || {};
     const live = g.state === 'pre' && !k.result && k.sel;
     const res = k.result === 'W' ? '<b class="ot-w">Won</b>' : k.result === 'L' ? '<b class="ot-l">Lost</b>' : k.result === 'P' ? '<b>Push</b>' : k.result === 'V' ? '<b>Void</b>' : '<b class="dim">Open</b>';
-    return `<div class="ot-row"><div class="ot-who"><b>${esc(k.name)} ${k.side === 'over' ? 'Over' : 'Under'} ${k.line} receptions</b><span>${esc(k.matchup)} · proj ${num(k.proj)} · model ${(100 * k.prob).toFixed(1)}% vs Onyx ${(100 * k.implied).toFixed(1)}%${k.actual != null ? ' · caught ' + k.actual : ''}</span></div>
-      ${live ? chip(k.price, k.name + ' ' + (k.side === 'over' ? 'Over ' : 'Under ') + k.line + ' receptions', k.sel, fmtOdds(k.price)) : `<span class="ot-px">${fmtOdds(k.price)}</span>`}${res}</div>`;
+    const tot = k.kind === 'total', what = tot ? `${k.side === 'over' ? 'Over' : 'Under'} ${k.line} total` : `${k.name} ${k.side === 'over' ? 'Over' : 'Under'} ${k.line} receptions`;
+    return `<div class="ot-row"><div class="ot-who"><b>${esc(tot ? k.matchup + ' ' + what : what)}</b><span>${tot ? esc(k.detail || '') : esc(k.matchup) + ' · proj ' + num(k.proj)} · model ${(100 * k.prob).toFixed(1)}% vs Onyx ${(100 * k.implied).toFixed(1)}%${k.actual != null ? (tot ? ' · final total ' : ' · caught ') + k.actual : ''}</span></div>
+      ${live ? chip(k.price, tot ? k.matchup + ' ' + what : what, k.sel, fmtOdds(k.price)) : `<span class="ot-px">${fmtOdds(k.price)}</span>`}${res}</div>`;
   };
   const open = rows.filter(k => !k.result), done = rows.filter(k => k.result).slice(0, 12);
   return `<div class="sec-hdr"><span class="sec-title">On trial · Onyx opening prices</span><span class="sec-count">${O.w || 0}-${O.l || 0}${O.p ? '-' + O.p : ''} · ${u(O.units)}</span></div>
-    <p class="dim" style="font-size:12px;line-height:1.6;margin:0 0 10px">Receptions, logged only while Onyx still shows the first price we saw for that line, at that price, and graded off the box score. The model (v5: nflverse targets per dropback and snap share, averaged with the volume model) beat Onyx's opening price in both seasons it was tested (+2.5% and +17.6%) but not its closing price, so it stays on trial until this record says otherwise.</p>
-    ${open.length ? open.map(row).join('') : '<div class="dim" style="font-size:12px;margin:0 0 10px">No receptions line at its opening price clears the bar right now.</div>'}
+    <p class="dim" style="font-size:12px;line-height:1.6;margin:0 0 10px">${O.note ? esc(O.note) : `Receptions, logged only while Onyx still shows the first price we saw for that line, at that price, and graded off the box score. The model (v5: nflverse targets per dropback and snap share, averaged with the volume model) beat Onyx's opening price in both seasons it was tested (+2.5% and +17.6%) but not its closing price, so it stays on trial until this record says otherwise.`}</p>
+    ${open.length ? open.map(row).join('') : `<div class="dim" style="font-size:12px;margin:0 0 10px">No ${O.note ? 'total' : 'receptions line'} at its opening price clears the bar right now.</div>`}
     ${done.length ? `<div class="ot-h">Graded</div>${done.map(row).join('')}` : ''}`;
 }
 var ENGINE_ICON = {
