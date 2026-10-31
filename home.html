@@ -367,7 +367,7 @@ async function askGo(q) {
   track('ask', {q: String(q).slice(0, 100)});
   let R;
   try { R = await OnyxAsk.ask(q); } catch (e) { out.innerHTML = '<div class="my-empty">Could not load today\'s boards. Try again in a minute.</div>'; return; }
-  const understood = `<div class="ask-u">Read as: <b>${esc(R.understood)}</b>${R.via === 'ai' ? ' · AI' : ''}</div>`;
+  const understood = `<div class="ask-u">Read as: <b>${esc(R.understood)}</b>${R.via === 'ai' ? ' · AI' : ''}</div>${R.note ? `<div class="ask-u">${esc(R.note)}</div>` : ''}`;
   if (!R.rows.length) { out.innerHTML = understood + `<div class="my-empty">${R.spec.player ? `No Onyx line on ${esc(R.spec.player)} right now: his game may have started already, or he isn't on today's board.`
     : `Nothing on today's Onyx board matches that${R.spec.min_price != null || R.spec.max_price != null ? ' at those prices' : ''}. Try loosening it, or a different sport.`}</div>`; return; }
   const short = R.spec.intent !== 'list' && R.rows.length < (R.spec.count || 3) ? ` · only ${R.rows.length} leg${R.rows.length > 1 ? 's' : ''} on today's board fit what you asked` : '';

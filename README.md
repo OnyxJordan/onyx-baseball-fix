@@ -502,6 +502,14 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
       play now (`VOL_P["rec_yds"]["edge"] = 1.0`).
     - `tools/sports_backtest.py` now uses the snap counts in `data/nfl/nflverse.json` the
       same way, so future NFL prop tests count these games.
+  - **College touchdown scorers in Ask Onyx (10/31).** `sports_build.cfb_td_board` puts every
+    Onyx CFB anytime and first TD price on `data/cfb/board.json` (about 800 a Saturday).
+    There is no college TD model: the chance is Onyx's price x `TD_SCALE` .82 (the NFL v6
+    fit), first TD is the player's share of the game's first-TD prices x .9, and `lam`
+    comes from the anytime chance for "2+ TD" questions. In `ask.js`, a "best value"
+    search where nothing beats Onyx's price (every TD search, after v6) ranks by chance
+    instead of by the least-negative edge, which would only surface longshots, and says
+    so in a note under "Read as".
   - **NFL v7: rushing and passing yards never a play (10/31).** With zero-touch games
     counted, the v1 projection blended with Onyx's price makes Onyx worse every window
     (rushing 2026 open log loss .6951 vs .6921; passing .6955 vs .6934). A volume rebuild
