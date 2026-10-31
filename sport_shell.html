@@ -1877,7 +1877,7 @@ function savePick(r) {
 function tdTable(rows, title) {
   if (!rows || !rows.length) return '';
   return `<div class="sec-hdr"><span class="sec-title">${esc(title)}</span><span class="sec-count">${rows.length}</span></div>
-    <p class="dim" style="font-size:12px;line-height:1.6;margin:0 0 10px">Chance to score from his carries and targets, his touchdown record and Onyx's team total, blended with Onyx's price. ✓ = the model beats the price by 5+ points (the bar that won in 2026 testing). Leans, not tracked.</p>
+    <p class="dim" style="font-size:12px;line-height:1.6;margin:0 0 10px">Chance to score: Onyx's price with its margin taken out, which tested better than our own touchdown model on 8,540 priced player-games. Players Onyx has not priced use the model, from carries, targets, his touchdown record and Onyx's team total. Information, not value plays.</p>
     <div class="pl-list">${rows.map(r => `<div class="pl-row">
       <div class="pl-who">${r.hs ? `<img class="pl-hs" src="${esc(r.hs)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">` : '<span class="pl-hs"></span>'}
         <div class="pl-nm"><b>${esc(r.name)}${r.inj ? `<span class="inj-q" title="Questionable${r.inj_d ? ' (' + esc(r.inj_d) + ')' : ''} on the injury report">Q</span>` : ''}</b><span>${esc(r.matchup || r.team)}</span></div>
@@ -1969,7 +1969,7 @@ function openTrialSport(O) {
   };
   const open = rows.filter(k => !k.result), done = rows.filter(k => k.result).slice(0, 12);
   return `<div class="sec-hdr"><span class="sec-title">On trial · Onyx opening prices</span><span class="sec-count">${O.w || 0}-${O.l || 0}${O.p ? '-' + O.p : ''} · ${u(O.units)}</span></div>
-    <p class="dim" style="font-size:12px;line-height:1.6;margin:0 0 10px">${O.note ? esc(O.note) : `Receptions, logged only while Onyx still shows the first price we saw for that line, at that price, and graded off the box score. The model (v5: nflverse targets per dropback and snap share, averaged with the volume model) beat Onyx's opening price in both seasons it was tested (+2.5% and +17.6%) but not its closing price, so it stays on trial until this record says otherwise.`}</p>
+    <p class="dim" style="font-size:12px;line-height:1.6;margin:0 0 10px">${O.note ? esc(O.note) : `Receptions unders, logged only while Onyx still shows the first price we saw for that line, at that price, and graded off the box score. Counting every priced player who played, including games he was never thrown to, the model's unders beat Onyx's opening price in both seasons it was tested (+6.1% and +20.1%); its overs did not, so only unders are logged (since 10/31). It stays on trial until this record says otherwise.`}</p>
     ${open.length ? open.map(row).join('') : `<div class="dim" style="font-size:12px;margin:0 0 10px">No ${O.note ? 'total' : 'receptions line'} at its opening price clears the bar right now.</div>`}
     ${done.length ? `<div class="ot-h">Graded</div>${done.map(row).join('')}` : ''}`;
 }

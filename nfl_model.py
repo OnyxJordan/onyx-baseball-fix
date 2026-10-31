@@ -1,8 +1,41 @@
 """
 nfl_model.py - Onyx NFL player projections.
 
-VERSION v5 (10/29). The lab notebook: every change bumps VERSION and adds an
+VERSION v6 (10/31). The lab notebook: every change bumps VERSION and adds an
 entry here citing its evidence (CLAUDE.md rule 2 applies to this model too).
+
+  v6  10/31  Anytime TD re-tested, and the v3 result does not hold. The v3 test only
+             counted players with a box-score line, so a priced player who played but
+             never touched the ball (a sure loss on the yes side) dropped out. Re-run on
+             nflverse play-by-play (who scored) and snap counts (who played; only a
+             player with no snaps is a void, as Onyx grades it): 8,540 priced
+             player-games, 2025 6,190 / 2026 2,350. Priced players score 17.7% of the
+             time; Onyx's yes price implies 22.0%. Value bets where the v3 model beats
+             the price by 5pp+: opening price 2025 -26.6% (914), 2026 -14.5% (408);
+             closing 2025 -19.2%, 2026 -1.3%. The v3 50/50 blend loses to Onyx's own
+             price on log loss (2025 .4083 vs .4057, 2026 .4016 vs .3992). Red-zone and
+             goal-line shares (inside the 20 / 5) were tried; the tuner kept a 25% red
+             zone weight that did not help 2026 either (5pp+ at the open -15.7%).
+             So: the chance shown is Onyx's price with its margin removed (x .82, fitted
+             on 2025: log loss .4030 vs .4057; 2026 .3981 vs .3992, calibrated 0.15 /
+             0.15, 0.25 / 0.28, 0.34 / 0.37), the model gets no weight where Onyx prices
+             the player (the tuner chose 0 of 0, .1, .2, .3), its scale is cut from .8
+             to .7 for players Onyx does not price (2026 log loss .4080 vs .4105), and
+             no touchdown scorer is ever flagged as value.
+             Receptions trial lane, same flaw, same fix: 286 of 4,338 priced receptions
+             player-games (6.6%) were players who played with zero targets, a sure
+             under, and the v5 test dropped every one. Re-run walk-forward with them
+             (v5 projection, Onyx's opening spread and total, 3pp+ edges): both sides at
+             the open 2025 -4.1% (916), 2026 +11.4% (486); overs 2025 -14.8% (448),
+             2026 +5.9% (299); unders 2025 +6.1% (468), 2026 +20.1% (187); unders at
+             the close 2025 -2.9%, 2026 +8.0%. Chosen on 2025 alone the lane is unders
+             (overs lost 15%); 2026, unseen, agrees. The trial lane now logs unders
+             only (TRIAL_SIDES). Rows already logged stay in the ledger as they are.
+             Receiving yards (v4, value at 5pp+), same re-run with zero-target games
+             counted (278 added): the model sits over the line far too often (1,441
+             over vs 328 under bets) and its overs lose at the open, 2025 -11.6%, 2026
+             -4.9%; unders are flat (+0.9% / +1.6%). No receiving-yards side is a play
+             any more (edge 1.0): projections stay, as leans.
 
   v5  10/29  Receptions: the v4 volume projection averaged 50/50 with an nflverse
              model (nfl_verse.py: play-by-play and snap counts, free): his targets
@@ -113,7 +146,7 @@ player-game: pass_yds, rush_yds, rec_yds, rec, tgt, att, rush_att...).
 import math, re, unicodedata
 from collections import defaultdict
 
-VERSION = "v5"
+VERSION = "v6"
 # game lines (team_model.py), tuned 10/26: see v1
 GAME_P = {"half_life": 240, "ridge": 5, "home": 2.0, "sd_margin": 13.5, "sd_total": 13.0, "min_games": 3}
 GAME_TEST = {"n": 199, "logloss": 0.648, "base_logloss": 0.698, "mae_total": 10.90, "base_mae_total": 11.71,
@@ -258,8 +291,8 @@ def test(rows, season):
 
 
 # ── touchdown scorers (v2) ────────────────────────────────────────────
-TD_P = {"c": 0.8, "w_rush": 0.8, "w_tgt": 1.0, "w_hist": 0.3, "k": 4.0, "n_games": 8, "other": 0.055,
-        "w_blend": 0.5, "mkt_scale": 0.94, "value_edge": 0.05}   # v3, see changelog
+TD_P = {"c": 0.7, "w_rush": 0.8, "w_tgt": 1.0, "w_hist": 0.3, "k": 4.0, "n_games": 8, "other": 0.055,
+        "w_blend": 0.0, "mkt_scale": 0.82, "value_edge": None}   # v6, see changelog: no TD value flag
 
 
 def td_lambdas(rows, players, implied, p=TD_P):
@@ -301,7 +334,7 @@ def td_probs(lams_by_game, p=TD_P):
 
 # ── receptions and receiving yards from volume (v4) ──────────────────
 VOL_P = {"rec": {"dec": 0.85, "e_imp": 1.0, "e_sp": 0.15, "k": 30.0, "c": 3.0, "w": 0.5, "edge": 0.03},
-         "rec_yds": {"dec": 0.85, "e_imp": 1.0, "e_sp": 0.08, "k": 30.0, "c": 3.0, "w": 0.35, "edge": 0.05}}
+         "rec_yds": {"dec": 0.85, "e_imp": 1.0, "e_sp": 0.08, "k": 30.0, "c": 3.0, "w": 0.35, "edge": 1.0}}   # v6: never a play
 
 
 def volume_history(rows):
@@ -338,6 +371,7 @@ def project_volume(stat, h, th, implied, spread, p=None):
 # v5: receptions from nflverse (nfl_verse.py) - targets per team dropback, the snap trend,
 # and the team's recent dropbacks scaled by Onyx's implied points and spread - averaged
 # 50/50 with the v4 volume projection.
+TRIAL_SIDES = ("under",)   # v6: the receptions trial lane logs unders only (changelog)
 VERSE_P = {"dec": 0.9, "n": 10, "k": 60.0, "b_snap": 0.5, "e_imp": 1.0, "e_sp": 0.1, "w": 0.5}
 VERSE_TEAM = {"WSH": "WAS", "LAR": "LA"}
 

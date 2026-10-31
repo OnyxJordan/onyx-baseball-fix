@@ -484,6 +484,24 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
     goes to `data/nfl/opening.json`; a play is logged to `data/nfl/open_trial.json`
     (append-only, validate_build ledger list) only while the live line is still the
     opening one, at most 12 a day by edge, graded off the box score.
+  - **NFL v6: players who played without a touch (10/31).** Every NFL prop backtest
+    before 10/31 graded a priced player off his ESPN box line and skipped him when he
+    had none. But a player with snaps and no target or carry has no box line, and for
+    him the under (or the TD "no") is a sure winner. Skipping those games flattered
+    overs and yes bets. Re-run with nflverse snap counts (only no snaps = void, as Onyx
+    grades it):
+    - Anytime TD (8,540 priced player-games): priced players score 17.7% vs 22.0%
+      implied. Value bets 5pp+ at the open lose (2025 -26.6%, 2026 -14.5%), and the v3
+      50/50 blend loses to Onyx's price. Shown chance is now Onyx's price x .82 (fitted
+      on 2025, calibrated on 2026); no TD is ever flagged as value. Red-zone / goal-line
+      shares did not help.
+    - Receptions trial lane (286 zero-target games added): overs 2025 -14.8%, 2026 +5.9%
+      at the open; unders 2025 +6.1%, 2026 +20.1%. The lane now logs unders only
+      (`nfl_model.TRIAL_SIDES`), and receptions overs are never a play or Top 10 entry.
+    - Receiving yards: overs lose both seasons (-11.6% / -4.9%), unders flat; never a
+      play now (`VOL_P["rec_yds"]["edge"] = 1.0`).
+    - `tools/sports_backtest.py` now uses the snap counts in `data/nfl/nflverse.json` the
+      same way, so future NFL prop tests count these games.
   - **NFL injury feed (10/31):** `sports_espn.fetch_injuries` reads ESPN's league-wide
     report each build (matched by ESPN athlete id, then name). Out, IR, PUP, NFI,
     inactive, suspended and doubtful players are left off the slate entirely: no
