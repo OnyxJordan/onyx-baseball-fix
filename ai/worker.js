@@ -8,8 +8,8 @@
 //   ANTHROPIC_API_KEY  secret     AI_MODEL  variable     ALLOWED_ORIGINS / AI_FALLBACK  wrangler.toml
 import Anthropic from "@anthropic-ai/sdk";
 
-const MARKETS = ["pts", "reb", "ast", "q1_total", "rec", "rec_yds", "rush_yds", "pass_yds",
-  "anytime_td", "two_plus_td", "spread", "total", "ml"];
+const MARKETS = ["pts", "reb", "ast", "q1_total", "h1_total", "first_basket", "rec", "rec_yds", "rush_yds", "pass_yds",
+  "anytime_td", "first_td", "two_plus_td", "spread", "total", "ml"];
 const SPORTS = ["nba", "nfl", "cfb", "nhl", "tennis"];
 
 // the same contract ask.js runs (see its header): every field required, null when unsaid
@@ -17,9 +17,9 @@ const SPEC = {
   type: "object",
   additionalProperties: false,
   required: ["intent", "count", "sports", "markets", "side", "min_price", "max_price", "min_conf",
-    "min_edge", "player", "team", "sort", "one_per_game", "summary"],
+    "min_edge", "player", "team", "sort", "one_per_game", "rr_size", "target_price", "count_set", "when", "summary"],
   properties: {
-    intent: { type: "string", enum: ["parlay", "sgp", "list"] },
+    intent: { type: "string", enum: ["parlay", "sgp", "rr", "list"] },
     count: { type: "integer" },
     sports: { type: "array", items: { type: "string", enum: SPORTS } },
     markets: { type: "array", items: { type: "string", enum: MARKETS } },
@@ -30,7 +30,11 @@ const SPEC = {
     min_edge: { type: ["number", "null"] },
     player: { type: ["string", "null"] },
     team: { type: ["string", "null"] },
-    sort: { type: "string", enum: ["conf", "rec", "edge", "price", "two_td"] },
+    sort: { type: "string", enum: ["conf", "rec", "edge", "price", "proj", "two_td"] },
+    rr_size: { type: ["integer", "null"] },
+    target_price: { type: ["integer", "null"] },
+    count_set: { type: "boolean" },
+    when: { type: ["string", "null"], enum: ["today", "tomorrow", "weekend", "sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", null] },
     one_per_game: { type: "boolean" },
     summary: { type: "string" },
   },
@@ -50,6 +54,11 @@ Fields:
 - player / team: a named player or team (team as its usual abbreviation, e.g. BOS), else null.
 - sort: "conf" for most likely / safest / locks (default), "rec" for what Onyx recommends / its favorites / best picks / what should I bet, "edge" for the most value / where the model beats the line, "price" for the biggest payouts / longshots, "two_td" whenever they ask about 2+ touchdowns.
 - For an SGP on a named game or team, put the team in "team".
+- intent "rr" for a round robin; rr_size is the combination size ("by 2s" = 2, default 2) and count the number of picks (default 4).
+- target_price: a payout they want the whole ticket to reach ("parlay that pays +500" = 500), else null. count_set: true only when they named a number of legs or picks.
+- when: "today" for tonight / today, "tomorrow", "weekend", or a weekday name; null when unsaid.
+- sort "proj" for who will score / catch / rush / rebound the most (the highest projection).
+- first_td (first touchdown scorer), first_basket (NBA first basket), h1_total (NBA 1st-half total).
 - one_per_game: true unless they explicitly want several plays from the same game.
 - summary: one short plain sentence saying what you understood, no odds advice.
 

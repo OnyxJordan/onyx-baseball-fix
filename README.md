@@ -1264,3 +1264,14 @@ legger", "a couple", "a few", "double"), days ("tonight", "Sunday", "this weeken
 the most points"). A player question lists every line on him, the model's side of each. The AI
 relay (ai/) stays in the repo, unused unless ai.json is ever filled in.
 
+
+**Ask Onyx, wider (10/31).** Names: a full name wins ("Luka Garza"), then star nicknames
+(Giannis, LeBron, Steph, KD, Wemby, SGA, Joker...), then last or first names and one-letter typos
+("luke", "jokick"), always resolving to the most prominent player (NBA points a game from
+`data/nba/prior.json`; NFL by the size of his lines); team and everyday words never match a name.
+A star with no line right now gets "No Onyx line on X right now". New asks: round robins
+("round robin 4 picks by 2s": every combination as its own ticket), payout targets ("parlay that
+pays +500"; with a leg count each leg carries its share), first TD (NFL), first basket and
+1st-half totals (NBA, both now on the board), "top / leading rusher, passer, receiver, scorer",
+"who will rebound the most", over-and-under questions (both sides), and "total receptions" as a
+player prop. The relay's schema in `ai/worker.js` carries the same fields.

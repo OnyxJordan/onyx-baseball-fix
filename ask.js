@@ -14,13 +14,16 @@
   var SPORTS = ['nba', 'nfl', 'cfb', 'nhl', 'tennis'];
   var LG = {nba: 'NBA', nfl: 'NFL', cfb: 'NCAAF', nhl: 'NHL', tennis: 'Tennis'};
   var PAGE = {nba: 'nba.html', nfl: 'nfl.html', cfb: 'cfb.html', nhl: 'nhl.html', tennis: 'tennis.html'};
-  var MKTS = ['pts', 'reb', 'ast', 'q1_total', 'rec', 'rec_yds', 'rush_yds', 'pass_yds', 'anytime_td', 'two_plus_td', 'spread', 'total', 'ml'];
-  var BOARD = null, AI = null;
+  var MKTS = ['pts', 'reb', 'ast', 'q1_total', 'h1_total', 'first_basket', 'first_td', 'rec', 'rec_yds', 'rush_yds', 'pass_yds', 'anytime_td', 'two_plus_td', 'spread', 'total', 'ml'];
+  var BOARD = null, AI = null, PRIOR = [];
 
   function getJSON(u) { return fetch(u, {cache: 'no-cache'}).then(function (r) { if (!r.ok) throw new Error(u); return r.json(); }); }
   function loadBoards() {
     if (BOARD) return Promise.resolve(BOARD);
-    return Promise.all(SPORTS.map(function (k) { return getJSON('data/' + k + '/board.json').catch(function () { return null; }); }))
+    var prior = getJSON('data/nba/prior.json').then(function (P) {
+      PRIOR = Object.keys(P || {}).map(function (k) { var r = P[k]; return {n: r.n, ppg: r.gp ? r.pts / r.gp : 0}; });
+    }).catch(function () {});
+    return Promise.all(SPORTS.map(function (k) { return getJSON('data/' + k + '/board.json').catch(function () { return null; }); }).concat([prior]))
       .then(function (fs) { BOARD = []; fs.forEach(function (f) { (f && f.plays || []).forEach(function (p) { BOARD.push(p); }); }); return BOARD; });
   }
   function aiUrl() {
@@ -31,19 +34,22 @@
   // ── the built-in parser: no AI, no keys. Reads the request against today's
   // boards, so it knows every player and team that has a line today. ─────────
   var WORDS = [
+    [/\b(1st|first)\s*(td|touchdown|scorer of the game|to score)\b|\bftd\b|\bfirst (td|touchdown) scorer\b/, 'first_td'],
+    [/\b(1st|first)\s*(basket|bucket|field goal|points? of the game|to score in)\b|\bfirst baskets?\b/, 'first_basket'],
+    [/\b(1st|first)[\s-]*half\b|\b1h\b|\bh1\b|\bhalftime\b/, 'h1_total'],
     [/\b(2|two)\+?\s*(td|tds|touchdowns?)\b|\bmultiple (td|tds|touchdowns)\b|\bmulti[\s-]?td\b|\bdouble (td|tds|touchdown)/, 'two_plus_td'],
     [/\b(anytime\s*)?(td|tds|touchdowns?)\b|\b(td|touchdown) scorers?\b|\bfind the end ?zone\b|\bscore a td\b/, 'anytime_td'],
     [/\b(1st|first)[\s-]*(quarter|q)\b|\b1q\b|\bq1\b/, 'q1_total'],
-    [/\brebounds?\b|\breb\b|\bboards\b|\brebs\b/, 'reb'],
+    [/\brebound(s|ing|er|ers)?\b|\breb\b|\bboards\b|\brebs\b/, 'reb'],
     [/\bassists?\b|\bast\b|\bdimes\b|\bdishes\b/, 'ast'],
     [/\breceptions?\b|\bcatches\b|\brecs\b/, 'rec'],
-    [/\breceiving\b|\brec(eiving)? yds\b/, 'rec_yds'],
-    [/\brushing\b|\brush\b|\bcarries\b|\bground game\b/, 'rush_yds'],
-    [/\bpassing\b|\bpass yards\b|\bqbs?\b|\bquarterbacks?\b|\bthrowing\b/, 'pass_yds'],
+    [/\breceiving\b|\brec(eiving)? yds\b|\breceivers?\b|\bwideouts?\b|\bwrs?\b|\btight ends?\b/, 'rec_yds'],
+    [/\brushing\b|\brush\b|\brushers?\b|\bcarries\b|\bground game\b|\brunning backs?\b|\brbs?\b/, 'rush_yds'],
+    [/\bpassing\b|\bpass yards\b|\bpassers?\b|\bqbs?\b|\bquarterbacks?\b|\bthrowing\b/, 'pass_yds'],
     [/\bpoints?\b|\bpts\b|\bscorers?\b|\bbuckets\b/, 'pts'],
     [/\bspreads?\b|\bcover(s|ing)?\b|\bpuck ?line\b|\bhandicap\b|\bats\b/, 'spread'],
     [/\b(game )?totals?\b|\bo\/u\b|\bover\/under\b/, 'total'],
-    [/\bmoney ?lines?\b|\bml\b|\bto win\b|\bwinners?\b|\bstraight up\b|\boutright\b/, 'ml'],
+    [/\bmoney ?lines?\b|\bml\b|\bto win\b(?!\s*(about|around)?\s*\+?\$?\d)|\bwinners?\b|\bstraight up\b|\boutright\b/, 'ml'],
   ];
   var NICK = {
     // NBA
@@ -67,19 +73,71 @@
   var DAYS = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
 
   function esc(x) { return x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
-  function names(B) {
-    // full names and unique last names (4+ letters) of everyone with a line today
-    var full = {}, last = {}, first = {};
+  // what people call stars: always the player they mean
+  var FAMOUS = {giannis: 'Giannis Antetokounmpo', 'the greek freak': 'Giannis Antetokounmpo', luka: 'Luka Doncic', lebron: 'LeBron James', bron: 'LeBron James',
+    steph: 'Stephen Curry', kd: 'Kevin Durant', wemby: 'Victor Wembanyama', sga: 'Shai Gilgeous-Alexander', shai: 'Shai Gilgeous-Alexander',
+    jokic: 'Nikola Jokic', joker: 'Nikola Jokic', embiid: 'Joel Embiid', ant: 'Anthony Edwards', 'ant man': 'Anthony Edwards', ad: 'Anthony Davis',
+    'the brow': 'Anthony Davis', dame: 'Damian Lillard', kat: 'Karl-Anthony Towns', jb: 'Jaylen Brown', cp3: 'Chris Paul', harden: 'James Harden',
+    booker: 'Devin Booker', tatum: 'Jayson Tatum', mahomes: 'Patrick Mahomes', 'josh allen': 'Josh Allen', lamar: 'Lamar Jackson', burrow: 'Joe Burrow',
+    cmc: 'Christian McCaffrey', jj: 'Justin Jefferson', 'ja\'marr': "Ja'Marr Chase", jamarr: "Ja'Marr Chase", ceedee: 'CeeDee Lamb', bijan: 'Bijan Robinson',
+    saquon: 'Saquon Barkley', kelce: 'Travis Kelce', henry: 'Derrick Henry', gibbs: 'Jahmyr Gibbs', jalen: 'Jalen Hurts', ovi: 'Alex Ovechkin',
+    mcdavid: 'Connor McDavid', mackinnon: 'Nathan MacKinnon', alcaraz: 'Carlos Alcaraz', sinner: 'Jannik Sinner', djokovic: 'Novak Djokovic'};
+  function clean(n) { return String(n || '').toLowerCase().replace(/[’']/g, '').replace(/\b(jr|sr|ii|iii|iv)\b\.?/g, '').replace(/[^a-z\s-]/g, '').replace(/\s+/g, ' ').trim(); }
+  // everyone a request could name: players with a line today, plus every NBA player on
+  // record (data/nba/prior.json) so a star without a line tonight is still recognised.
+  // prominence = points a game last season, plus a little for each line Onyx prices on him
+  function names(B, P) {
+    var C = {};
+    function add(name, score) {
+      var k = clean(name); if (!k || k.split(' ').length < 2) return;
+      var c = C[k] || (C[k] = {name: name, score: 0});
+      c.score += score;
+    }
+    // NFL / college players have no points-a-game on file: their lines say how big a part they are
+    var YW = {pass_yds: 0.1, rush_yds: 0.25, rec_yds: 0.25, rec: 3};
     (B || []).forEach(function (p) {
-      if (p.kind !== 'prop' || !p.name || p.mkt === 'q1_total') return;
-      var n = p.name.toLowerCase().replace(/[’']/g, '').replace(/\b(jr|sr|ii|iii|iv)\b\.?/g, '').replace(/\s+/g, ' ').trim();
-      full[n] = p.name;
-      var parts = n.split(' '), l = parts[parts.length - 1];
-      if (l.length >= 4) last[l] = last[l] && last[l] !== p.name ? '*' : p.name;
-      var f0 = parts[0];
-      if (parts.length > 1 && f0.length >= 4) first[f0] = first[f0] && first[f0] !== p.name ? '*' : p.name;
+      if (p.kind !== 'prop' || !p.name || /_total$/.test(p.mkt)) return;
+      add(p.name, 0.5 + (YW[p.mkt] && p.side === 'over' ? YW[p.mkt] * (p.line || 0) : 0));
     });
-    return {full: full, last: last, first: first};
+    (P || []).forEach(function (r) { add(r.n, r.ppg); });
+    return C;
+  }
+  function lev1(a, b) {                    // true when a and b are at most one edit apart
+    if (a === b) return true;
+    if (Math.abs(a.length - b.length) > 1) return false;
+    var i = 0, j = 0, d = 0;
+    while (i < a.length && j < b.length) {
+      if (a[i] === b[j]) { i++; j++; continue; }
+      if (++d > 1) return false;
+      if (a.length > b.length) i++; else if (b.length > a.length) j++; else { i++; j++; }
+    }
+    return d + (a.length - i) + (b.length - j) <= 1;
+  }
+  var NOT_NAMES = /^(will|wills|rebound|rebounds|assist|catch|rush|pass|likely|likes|half|halves|quarter|quarters|scorer|scorers|rusher|rushers|receiver|receivers|passer|leading|leader|top|round|robin|basket|bucket|touchdown|touchdowns|totals|chance|chances|safest|lock|locks|tonight|tomorrow|night|slate|card|board|sharp|steam|juice|payout|pays|winner|winners|underdog|underdogs|favorite|favorites|again|every|other|their|there|these|those|about|around|would|could|should|shot|shots|star|stars|over|under|overs|unders|most|plus|game|games|best|safe|safest|team|teams|with|tonight|today|points|value|parlay|legs|leg|lock|bets|plays|picks|money|line|lines|odds|total|totals|spread|score|scores|win|wins|first|anytime|rebounds|assists|yards|receptions|sunday|monday|tuesday|wednesday|thursday|friday|saturday|week|weekend|give|what|which|who|like|need|want|good|more|less|than|from|this|that|the|and|for|nba|nfl|nhl|tennis|college|longshots|dogs|favorites|fade|stack|sgp|props|prop|player|players|ticket|double|triple|edge|bet|play|pick)$/;
+  function findPlayer(t, C) {
+    var keys = Object.keys(C), words = t.trim().split(/\s+/);
+    var best = function (cands) { return cands.sort(function (a, b) { return C[b].score - C[a].score; })[0]; };
+    // 1. a full name ("Luka Garza" is Garza, even though "Luka" alone is Doncic)
+    var full = keys.filter(function (k) { return t.indexOf(' ' + k + ' ') >= 0; });
+    if (full.length) return C[best(full)].name;
+    // 2. a nickname or a star's one word name
+    var fam = Object.keys(FAMOUS).sort(function (a, b) { return b.length - a.length; });
+    for (var f = 0; f < fam.length; f++) if (new RegExp('(^|\\s)' + esc(fam[f]) + 's?(\\s|$)').test(t)) return FAMOUS[fam[f]];
+    // 3. a last name: the most prominent player who has it
+    var lastHit = keys.filter(function (k) { var l = k.split(' ').pop(); return l.length >= 3 && !NICK[l] && words.some(function (w) { return w === l || w === l + 's'; }); });
+    if (lastHit.length) return C[best(lastHit)].name;
+    // 4. a first name, or a name one letter off ("luke", "jokick"): every player it could
+    // mean competes and the most prominent wins, so "luke" is Luka Doncic, not a bench Luke
+    var loose = keys.filter(function (k) {
+      var parts = k.split(' ');
+      return words.some(function (w) {
+        if (w.length < 3 || NOT_NAMES.test(w) || NICK[w] || NICK[w.replace(/s$/, '')]) return false;
+        if (w === parts[0]) return true;
+        return w.length >= 4 && parts.some(function (n) { return n.length >= 4 && lev1(w, n); });
+      });
+    });
+    if (loose.length) return C[best(loose)].name;
+    return null;
   }
 
   function localSpec(q, B) {
@@ -90,10 +148,22 @@
     if (/sgp ?(\+|plus)/.test(t)) s.intent = 'parlay';
     else if (/\bsgp\b|same[\s-]*game|correlated|stack/.test(t)) s.intent = 'sgp';
     else if (/parlay|\blegs?\b|legger|ticket|\bslip\b|\bcombo\b|\bdouble\b|\btriple\b|\bteaser\b/.test(t)) s.intent = 'parlay';
+    // a round robin: "round robin 4 picks by 2s", "rr of 5 by 3s"
+    var rr = t.match(/\b(round[\s-]*robin|\brr\b)/);
+    if (rr) {
+      s.intent = 'rr';
+      var by = t.match(/\bby\s*(\d|twos|threes|fours|2s|3s|4s)\b/) || t.match(/\b(\d)s\b/);
+      s.rr_size = by ? ({twos: 2, threes: 3, fours: 4})[by[1]] || parseInt(by[1], 10) : 2;
+    }
+    // a payout target: "parlay that pays +500", "to win around +1000", "a +300 parlay"
+    var tg = t.match(/\b(pays?|paying|payout( of)?|to (win|pay)|around|about|returns?)\s*\+?(\d{3,5})\b/) || t.match(/\+(\d{3,5})\s*(parlay|ticket|sgp|legger)\b/);
+    var tgv = tg ? +(tg.slice(1).filter(function (x) { return x && /^\d+$/.test(x); })[0]) : null;
+    if (tgv && /parlay|ticket|legs?\b|legger|sgp|round/.test(t)) { if (s.intent === 'list') s.intent = 'parlay'; s.target_price = tgv; }
     // how many
     var n = t.match(/\b(\d{1,2})[\s-]*(leg|legs|legger|picks?|plays?|players?|bets?|team|man|teamer)\b/) || t.match(/\btop\s*(\d{1,2})\b/)
       || t.match(/\bparlay of (\d{1,2})\b/) || t.match(/\b(\d{1,2})\s+(nba|nfl|nhl|college|tennis)\b/);
     var nw = t.match(/\b(two|three|four|five|six|seven|eight|nine|ten|couple|few)( of)?[\s-]*(leg|legs|legger|picks?|plays?|bets?|team|man)\b/);
+    s.count_set = !!(n || nw);
     s.count = n ? +n[1] : nw ? NUMW[nw[1]] : /\bdouble\b/.test(t) && s.intent === 'parlay' ? 2 : /\btriple\b/.test(t) && s.intent === 'parlay' ? 3 : null;
     // which sport
     if (/\bnba\b|basketball|hoops/.test(t)) s.sports.push('nba');
@@ -103,16 +173,22 @@
     if (/tennis|\batp\b|\bwta\b/.test(t)) s.sports.push('tennis');
     // which markets
     for (var i = 0; i < WORDS.length; i++) if (WORDS[i][0].test(t) && s.markets.indexOf(WORDS[i][1]) < 0) {
-      if (WORDS[i][1] === 'anytime_td' && s.markets.indexOf('two_plus_td') >= 0) continue;
-      if (WORDS[i][1] === 'pts' && /\b(score|scorer)s? (a |an )?(td|touchdown)/.test(t)) continue;
+      if (WORDS[i][1] === 'anytime_td' && (s.markets.indexOf('two_plus_td') >= 0 || s.markets.indexOf('first_td') >= 0)) continue;
+      if (WORDS[i][1] === 'q1_total' && (s.markets.indexOf('first_td') >= 0 || s.markets.indexOf('first_basket') >= 0)) continue;
+      // "total receptions", "total points for Jokic": a player's total, not the game total
+      if (WORDS[i][1] === 'total' && /\btotal (receptions|catches|yards|rushing|passing|receiving|rebounds|assists|boards|dimes|tds|touchdowns)\b/.test(t)) continue;
+      if (WORDS[i][1] === 'pts' && /\b(first|1st) (basket|bucket|points? of)/.test(t) && !/\bpoints\b(?! of)/.test(t.replace(/(first|1st) points? of/, ''))) continue;
+      if (WORDS[i][1] === 'pts' && (/\b(score|scorer)s? (a |an )?(td|touchdown)/.test(t) || /td|touchdown/.test(t))) continue;
+      if (WORDS[i][1] === 'total' && /(first|1st)[\s-]*(half|quarter)|\b1h\b|\b1q\b/.test(t)) continue;
       s.markets.push(WORDS[i][1]);
     }
     if (/\byards\b|\byds\b/.test(t) && !s.markets.some(function (m) { return /yds/.test(m); })) s.markets.push('rec_yds', 'rush_yds', 'pass_yds');
-    if (/\bscore (the )?most\b|\bmost points\b|\btop scorer\b|\bdrop (the )?most\b/.test(t)) { if (s.markets.indexOf('pts') < 0) s.markets.push('pts'); s.sort = 'proj'; s.side = 'over'; }
+    if (/\bscore (the )?most\b|\bmost points\b|\btop (point )?scorers?\b|\bleading scorer\b|\bdrop (the )?most\b|\bhighest scor/.test(t)) { if (s.markets.indexOf('pts') < 0) s.markets.push('pts'); s.sort = 'proj'; s.side = 'over'; }
     if (/\bpra\b|pts ?\+ ?reb ?\+ ?ast/.test(t)) ['pts', 'reb', 'ast'].forEach(function (m) { if (s.markets.indexOf(m) < 0) s.markets.push(m); });
     // over / under
     var ov = /\bovers?\b|\bhit the over\b|\bgo over\b|\bclear\b/.test(t.replace(/\bover\s*[+-]\d/g, '').replace(/over\/under/g, '')),
         un = /\bunders?\b|\bstay under\b|\bfade\b/.test(t.replace(/\bunder\s*[+-]\d/g, '').replace(/over\/under/g, ''));
+    if (/over ?(\/|or|and|-)? ?under|o\/u/.test(t)) { ov = false; un = false; }
     if (ov && !un) s.side = 'over';
     if (un && !ov) s.side = 'under';
     // odds, in any wording. A floor: "-200 or better", "min -200", "nothing worse than -200",
@@ -155,19 +231,18 @@
       var tm = t.match(/\b(atl|bos|bkn|cha|chi|cle|dal|den|det|gs|gsw|hou|ind|lac|lal|mem|mia|mil|min|nop|nyk|okc|orl|phi|phx|por|sac|sas|tor|utah|uta|wsh|was|ari|bal|buf|car|cin|gb|jax|kc|lv|lar|ne|nyg|nyj|pit|sea|sf|tb|ten|vgk|edm|col|tor|nyr|nyi|nj|cbj|wpg|van|cgy|ott|mtl|nsh|stl|sj|ana)\b/);
       if (tm) s.team = ({gsw: 'GS', nop: 'NO', nyk: 'NY', sas: 'SA', uta: 'UTAH', was: 'WSH'})[tm[1]] || tm[1].toUpperCase();
     }
-    // a player with a line today: full name, or a last name only one player has
-    var N = names(B), fulls = Object.keys(N.full).sort(function (a, b) { return b.length - a.length; });
-    for (var f = 0; f < fulls.length; f++) if (t.indexOf(' ' + fulls[f] + ' ') >= 0) { s.player = N.full[fulls[f]]; break; }
-    if (!s.player) for (var l in N.last) if (N.last[l] !== '*' && new RegExp('\\b' + esc(l) + 's?\\b').test(t)) { s.player = N.last[l]; break; }
-    // a first name only one player on today's board has ("Luka", "Bijan"), never a word the parser already reads
-    if (!s.player) for (var f1 in N.first) if (N.first[f1] !== '*' && !NICK[f1] && DAYS.indexOf(f1) < 0 && !/^(over|under|most|plus|game|best|safe|team|with|tonight|today|points|value)$/.test(f1)
-        && new RegExp('\\b' + esc(f1) + '\\b').test(t)) { s.player = N.first[f1]; break; }
+    // a player: a nickname, a full name, a last or first name (the most prominent one), or one letter off
+    s.player = findPlayer(t, names(B, PRIOR));
     if (s.player) { s.team = null; if (s.intent === 'list' && s.count == null && !/props|plays|lines|bets/.test(t)) s.count = 5; }
     // defaults that follow from the rest
     if (s.markets.indexOf('two_plus_td') >= 0) { s.sort = 'two_td'; if (!s.sports.length) s.sports = ['nfl']; }
     if (s.markets.indexOf('anytime_td') >= 0 && !s.sports.length) s.sports = ['nfl', 'cfb'];
     if (s.markets.some(function (m) { return /^(pts|reb|ast|q1_total)$/.test(m); }) && !s.sports.length) s.sports = ['nba'];
     if (s.markets.some(function (m) { return /^(rec|rec_yds|rush_yds|pass_yds)$/.test(m); }) && !s.sports.length) s.sports = ['nfl'];
+    if (s.intent === 'rr' && s.count == null) s.count = 4;
+    if (/(rebound|assist|catch|rush|pass|score)s? the most|most (receptions|catches|rushing|passing|receiving|yards|rebounds|assists|boards|dimes)|leading (rusher|receiver|passer|rebounder|scorer)s?|top( \d+)? (rusher|receiver|passer|rebounder|scorer|qb|wr|rb)s?/.test(t)) { s.sort = 'proj'; if (s.side === 'any') s.side = 'over'; }
+    if (s.markets.indexOf('first_td') >= 0 && !s.sports.length) s.sports = ['nfl'];
+    if ((s.markets.indexOf('first_basket') >= 0 || s.markets.indexOf('h1_total') >= 0) && !s.sports.length) s.sports = ['nba'];
     if (s.count == null && /\bcouple\b/.test(t)) s.count = 2;
     if (s.count == null && /\b(a )?few\b/.test(t)) s.count = 3;
     if (s.count == null) s.count = s.intent !== 'list' ? 3 : /\b(the|a|one) (player|play|pick|bet|guy|team)\b|\bwho (is|will|gets|has)\b|\bmost likely\b/.test(t) && !/players|plays|picks|guys|teams/.test(t) ? 1 : 5;
@@ -192,6 +267,12 @@
   }
   function run(spec, B) {
     var now = Date.now();
+    // "2 legs paying +300": each leg has to carry its share of the payout
+    if (spec.intent === 'parlay' && spec.target_price && spec.count_set && spec.count >= 1) {
+      var per = Math.pow(1 + spec.target_price / 100, 1 / spec.count);
+      var floor = am(per * 0.97);
+      if (spec.min_price == null || spec.default_floor || spec.min_price < floor) spec = Object.assign({}, spec, {min_price: floor});
+    }
     var mk = (spec.markets || []).slice();
     var two = mk.indexOf('two_plus_td') >= 0 || spec.sort === 'two_td';
     if (two && mk.indexOf('anytime_td') < 0) mk.push('anytime_td');
@@ -220,7 +301,8 @@
       : function (p) { return -p.conf - p.edge / 10; };
     pool.sort(function (a, b) { return key(a) - key(b); });
     if (spec.intent === 'sgp') return sgp(spec, pool, key);
-    var n = Math.max(1, Math.min(spec.intent === 'parlay' ? 8 : 25, spec.count || 5));
+    var n = Math.max(1, Math.min(spec.intent === 'list' ? 25 : 8, spec.count || 5));
+    if (spec.intent === 'parlay' && spec.target_price && !spec.count_set) n = 10;   // no leg count asked: add legs until the payout is reached
     var picked = [], games = {}, who = {};
     for (var i = 0; i < pool.length && picked.length < n; i++) {
       var p = pool[i];
@@ -228,10 +310,11 @@
       if (who[p.sport + p.who + (mine ? p.mkt : '')]) continue;
       if (!mine && (spec.one_per_game !== false || spec.intent === 'parlay') && games[p.gid]) continue;
       who[p.sport + p.who + (mine ? p.mkt : '')] = 1; games[p.gid] = 1; picked.push(p);
+      if (spec.intent === 'parlay' && spec.target_price && !spec.count_set && picked.length >= 2 && ticket(picked).price >= spec.target_price) break;
     }
     // a parlay short of its legs (few games left on the board) fills from games it
     // already uses: an SGP+ (same-game legs plus other games), never one player twice
-    if (spec.intent === 'parlay' && picked.length < n) {
+    if ((spec.intent === 'parlay' || spec.intent === 'rr') && picked.length < n) {
       for (var j = 0; j < pool.length && picked.length < n; j++) {
         var q = pool[j];
         if (who[q.sport + q.who] || picked.indexOf(q) >= 0) continue;
@@ -239,7 +322,18 @@
         who[q.sport + q.who] = 1; picked.push(q);
       }
     }
+    if (spec.intent === 'parlay' && spec.target_price && !spec.count_set) {          // the filler pass can overshoot: stop at the target
+      for (var z = 2; z <= picked.length; z++) if (ticket(picked.slice(0, z)).price >= spec.target_price) { picked = picked.slice(0, z); break; }
+    }
     var out = {rows: picked, pool: pool.length, two: two};
+    if (spec.intent === 'rr' && picked.length >= 2) {
+      var k = Math.max(2, Math.min(picked.length - 1 || 2, spec.rr_size || 2)), combos = [];
+      (function pick(start, cur) {
+        if (cur.length === k) { combos.push(Object.assign(ticket(cur), {legs: cur.map(function (x) { return picked.indexOf(x) + 1; })})); return; }
+        for (var c2 = start; c2 < picked.length; c2++) pick(c2 + 1, cur.concat([picked[c2]]));
+      })(0, []);
+      out.rr = {by: k, combos: combos, hit: combos.reduce(function (a, c3) { return a + c3.prob; }, 0) / combos.length};
+    }
     if (spec.intent === 'parlay' && picked.length > 1) {
       out.parlay = ticket(picked);
       var g = {}; picked.forEach(function (x) { g[x.gid] = (g[x.gid] || 0) + 1; });
@@ -299,13 +393,14 @@
 
   // ── what the spec understood, in plain words ────────────────────────────
   var MW = {pts: 'points', reb: 'rebounds', ast: 'assists', q1_total: '1st-quarter totals', rec: 'receptions', rec_yds: 'receiving yards',
-            rush_yds: 'rushing yards', pass_yds: 'passing yards', anytime_td: 'anytime TD', two_plus_td: '2+ touchdowns', spread: 'spreads', total: 'totals', ml: 'moneylines'};
+            rush_yds: 'rushing yards', pass_yds: 'passing yards', anytime_td: 'anytime TD', first_td: 'first TD', first_basket: 'first basket', h1_total: '1st-half totals', two_plus_td: '2+ touchdowns', spread: 'spreads', total: 'totals', ml: 'moneylines'};
   function describe(s) {
     var b = [];
-    b.push(s.intent === 'sgp' ? (s.count || 3) + '-leg same-game parlay, correlated' : s.intent === 'parlay' ? (s.count || 3) + '-leg parlay' : (s.count || 5) === 1 ? 'top play' : 'top ' + (s.count || 5));
+    b.push(s.intent === 'parlay' && s.target_price && !s.count_set ? 'parlay' : s.intent === 'rr' ? 'round robin of ' + (s.count || 4) + ' by ' + (s.rr_size || 2) + 's' : s.intent === 'sgp' ? (s.count || 3) + '-leg same-game parlay, correlated' : s.intent === 'parlay' ? (s.count || 3) + '-leg parlay' : (s.count || 5) === 1 ? 'top play' : 'top ' + (s.count || 5));
     b.push((s.sports || []).length ? s.sports.map(function (k) { return LG[k] || k; }).join(' + ') : 'every sport');
     if ((s.markets || []).length) b.push(s.markets.map(function (m) { return MW[m] || m; }).join(', '));
     if (s.side && s.side !== 'any') b.push(s.side === 'over' ? 'overs only' : 'unders only');
+    if (s.target_price) b.push('pays about +' + s.target_price);
     if (s.min_price != null) b.push((s.default_floor ? 'standard prices, nothing shorter than ' : 'no price shorter than ') + (s.min_price > 0 ? '+' : '') + s.min_price);
     if (s.max_price != null) b.push('no price longer than ' + (s.max_price > 0 ? '+' : '') + s.max_price);
     if (s.min_conf != null) b.push(Math.round(100 * s.min_conf) + '%+ confidence');
@@ -331,7 +426,8 @@
   function normalize(spec) {
     var s = Object.assign({intent: 'list', count: 5, sports: [], markets: [], side: 'any', sort: 'conf', one_per_game: true}, spec || {});
     var two = (s.markets || []).indexOf('two_plus_td') >= 0 || s.sort === 'two_td';
-    if (s.min_price == null && !two) { s.min_price = s.intent === 'list' ? -200 : -150; s.default_floor = true; }
+    var longMkt = (s.markets || []).some(function (m) { return m === 'first_td' || m === 'first_basket'; });
+    if (s.min_price == null && !two && !longMkt) { s.min_price = s.intent === 'list' ? -200 : -150; s.default_floor = true; }
     return s;
   }
   function ask(q) {
