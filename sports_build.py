@@ -21,6 +21,7 @@ ONYX_LEAGUE = {"nfl": "NFL", "cfb": "NCAAF", "nhl": "NHL"}
 
 ROADMAP = {
     "nfl": ["Tested 10/26 to 10/31 against two seasons of real Onyx lines (440 games), counting every priced player who played, including games he was never thrown to: receptions unders beat Onyx's opening price in both seasons (+6.1% and +20.1%), so they run on trial at the open; overs did not",
+            "Tested 10/31: first-half and first-quarter totals, against how much of a game's total each part has really carried (2025 tuning, 2026 judging, 391 games). The 2025 rule lost at the opening price, so there is nothing to carry forward; always taking the first-half under made +1.8% in 2025 and +12.9% on 106 games in 2026, too few to call it an edge",
             "Tested 10/31: rushing, passing and receiving yards, the current projections and a rebuild from each player's share of his team's carries, dropbacks and targets. None beat Onyx's price in a season it was not tuned on, so they are projections only, never plays",
             "Re-tested 10/31: touchdown scorers lost to Onyx's price in both seasons once players who played without a touch were counted, so the touchdown chance shown is Onyx's price with its margin removed, and no scorer is flagged as value",
             "Tested 10/31: game ratings from every play since 2024 (expected points per play, adjusted for opponent, with scores alongside). On 2026 games they never saw, they made Onyx's spread and total worse, open and close, as the score-only ratings did. NFL sides and totals stay leans",
