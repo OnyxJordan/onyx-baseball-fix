@@ -1481,7 +1481,7 @@
        "sets": [
         6,
         1,
-        1
+        5
        ],
        "serve": false
       },
@@ -1494,9 +1494,9 @@
        "sets": [
         4,
         6,
-        0
+        4
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -3012,8 +3012,8 @@
     {
      "id": "185157",
      "start": "2026-10-31T16:05Z",
-     "state": "in",
-     "detail": "3rd",
+     "state": "post",
+     "detail": "Final",
      "round": "Semifinal",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -3027,7 +3027,7 @@
        "sets": [
         6,
         5,
-        1
+        4
        ],
        "serve": false
       },
@@ -3036,11 +3036,11 @@
        "short": "J. Lehecka",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/cze.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         3,
         7,
-        3
+        6
        ],
        "serve": false
       }
@@ -3065,9 +3065,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Jiri Lehecka",
+       "short": "J. Lehecka",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/cze.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -3555,7 +3555,7 @@
      "id": "187337",
      "start": "2026-10-31T17:15Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Qualifying 1st Round",
      "draw": "Men's Singles",
      "court": "Court 2",
@@ -3567,7 +3567,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        4
+        6,
+        1
        ],
        "serve": false
       },
@@ -3578,7 +3579,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        4
+        7,
+        0
        ],
        "serve": false
       }
@@ -15515,5 +15517,5 @@
    ]
   }
  ],
- "fetched": "2026-10-31T17:50:04+00:00"
+ "fetched": "2026-10-31T18:21:36+00:00"
 }
