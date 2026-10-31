@@ -578,14 +578,19 @@ def grade_tennis(lane):
     return resolve
 
 
-def model_frame(key, lane, slate, odds, M, rows, base, resolve):
-    """Gate, lane, ledger and record around a sport's rows."""
+def model_frame(key, lane, slate, odds, M, rows, base, resolve, rows_for=None):
+    """Gate, lane, ledger and record around a sport's rows. A backtest may hold
+    several lanes ("lanes": spreads and totals, each with its own blend weight);
+    rows_for(w) re-prices the slate at a lane's weight."""
     bt, live = L.gate(lane, M.VERSION)
     led = L.Ledger(lane)
     led.grade(resolve)
     picks = []
     if live:
-        picks = lane_picks(rows, bt, slate.get("date"))
+        lanes = (bt or {}).get("lanes") or [(bt or {}).get("lane")]
+        for rule in [r for r in lanes if r]:
+            rws = rows_for(rule.get("w")) if rows_for and rule.get("w") is not None else rows
+            picks += lane_picks(rws, {"lane": rule}, slate.get("date"))
         for p in picks:
             led.add({k: p.get(k) for k in ("date", "gid", "start", "matchup", "kind", "mkt", "name", "side", "line", "line_txt",
                                            "team_side", "price", "sel", "prob", "implied", "edge", "ev", "model_p", "proj", "hs")})
@@ -623,7 +628,8 @@ def team_block(key, lane, slate, odds):
         tests=[{"k": "Win log loss", "v": f"{TEST['logloss']:.3f}", "d": f"vs {TEST['base_logloss']:.3f} home base rate · {TEST['n']} games from {TEST['window']}"},
                {"k": f"Total error ({unit})", "v": f"{TEST['mae_total']:.2f}", "d": f"vs {TEST['base_mae_total']:.2f} league average"}],
         roadmap=ROADMAP.get(key, []))
-    base = model_frame(key, lane, slate, odds, M, rows, base, grade_team(lane))
+    base = model_frame(key, lane, slate, odds, M, rows, base, grade_team(lane),
+                       rows_for=lambda w_: game_rows(key, M, slate, odds, R, w_)[0])
     base["_cands"] = rows
     base["proj"] = proj
     base["engine"] = engine_team(key, M, GP, w, bt, base["status"] == "live")

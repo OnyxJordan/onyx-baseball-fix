@@ -140,10 +140,10 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
 
   <div class="ox-wrap">
     <div class="ox-tonight" id="oxTonight" aria-live="polite">
-      <div><b class="p" id="tGames">-</b><span>NBA games tonight</span></div>
-      <div><b id="tPlayers">-</b><span>Players projected</span></div>
-      <div><b class="g" id="tTip">-</b><span>First tip (ET)</span></div>
-      <div><b id="tLive">7</b><span>Sports live, 2 models graded</span></div>
+      <div><b class="p" id="tGames">-</b><span>Games today</span></div>
+      <div><b id="tPlayers">-</b><span>Plays priced today</span></div>
+      <div><b class="g" id="tTip">-</b><span id="tTipL">First start (ET)</span></div>
+      <div><b id="tLive">-</b><span id="tLiveL">Sports on today</span></div>
     </div>
   </div>
 
@@ -161,7 +161,7 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
   <!-- ── Top 10 plays of the day, every sport ─────────────────────── -->
   <section class="ox-wrap t10" id="top10">
     <div class="my-h"><div><span class="ox-eyebrow">Today's top 10</span><h2>Our favorite<br>plays today.</h2>
-      <p>The ten plays our models like most across every sport, ranked by each model's confidence. Standard Onyx prices only (-150 to +150), and only where the model's chance beats the price.</p></div></div>
+      <p>The ten plays our models like most on today's games across every sport, ranked by each model's confidence. Standard Onyx prices only (-150 to +150), and only where the model's chance beats the price.</p></div></div>
     <div class="t10-list" id="t10List"><div class="my-empty">Loading today's plays...</div></div>
     <div class="my-note" id="t10Note"></div>
   </section>
@@ -405,6 +405,9 @@ function t10When(iso) {
     return (day === today ? '' : day + ' ') + etTime(iso) + ' ET';
   } catch (e) { return ''; }
 }
+// the site's day: ET, rolling over at 4 AM (a 1 AM ET tip still belongs to last night)
+function siteDay(t) { return new Date(t - 4 * 3600e3).toLocaleDateString('en-CA', {timeZone: 'America/New_York'}); }
+function isToday(iso) { const t = Date.parse(iso); return !isNaN(t) && siteDay(t) === siteDay(Date.now()); }
 async function top10() {
   const el = document.getElementById('t10List');
   const files = await Promise.all(T10_SPORTS.map(([k]) => getJSON('data/' + k + '/top.json').catch(() => null)));
@@ -412,7 +415,7 @@ async function top10() {
   files.forEach((f, i) => (f && f.plays || []).forEach(p => {
     const t = p.start ? Date.parse(p.start) : NaN;
     if (!isNaN(t) && t <= now) return;                       // started: no longer bettable at this price
-    if (!isNaN(t) && t - now > 3 * 864e5) return;            // more than three days out: not today's play
+    if (!isNaN(t) && !isToday(p.start)) return;              // today's games only: Sunday's play waits for Sunday
     all.push(Object.assign({}, p, {lg: T10_SPORTS[i][1], href: T10_SPORTS[i][2], t}));
   }));
   all.sort((a, b) => b.conf - a.conf || b.edge - a.edge);
@@ -428,7 +431,7 @@ async function top10() {
     if (pick.length >= 10) break;
   }
   pick.sort((a, b) => b.conf - a.conf || b.edge - a.edge);
-  if (!pick.length) { el.innerHTML = '<div class="my-empty">No play clears the bar right now: every model is waiting on fresh Onyx prices. Check back closer to game time.</div>'; return; }
+  if (!pick.length) { el.innerHTML = '<div class="my-empty">No play on today\'s games clears the bar right now: games may have started, or the models are waiting on fresh Onyx prices. Ask Onyx below can still build from the rest of the week.</div>'; return; }
   const tagTxt = {tracked: 'Tracked pick', trial: 'On trial', lean: 'Model lean'};
   el.innerHTML = pick.map((p, i) => {
     const url = p.sel ? 'https://app.onyxodds.com/share?selection=' + encodeURIComponent(p.sel) + '&referrer=' + ONYX_REFERRER : p.href;
@@ -440,18 +443,28 @@ async function top10() {
   }).join('');
   document.getElementById('t10Note').textContent = 'Confidence is the chance the play wins by that sport\'s model, blended with the Onyx market. "Tracked pick" plays are graded on their sport\'s record; "On trial" plays are logged at Onyx\'s opening price; "Model lean" plays are the model\'s read and are not graded.';
 }
+
+// the strip under the hero, for every sport: today's games, priced plays, first start, graded models
+async function strip() {
+  const today = [];
+  LG.forEach(L => evs(L.k).forEach(e => { if (isToday(e.start)) today.push({k: L.k, e}); }));
+  (MY.tn || []).forEach(c => { if (isToday(c.date)) today.push({k: 'tennis', e: {start: c.date, state: ((c.status || {}).type || {}).state}}); });
+  if (MY.gf && ((MY.gf.status || {}).type || {}).state === 'in') today.push({k: 'golf', e: {start: MY.gf.date, state: 'in'}});
+  document.getElementById('tGames').textContent = today.length;
+  const upcoming = today.filter(x => x.e.state === 'pre').map(x => x.e.start).sort()[0];
+  const live = today.filter(x => x.e.state === 'in').length;
+  document.getElementById('tTip').textContent = upcoming ? etTime(upcoming) : live ? live + ' live' : 'done';
+  document.getElementById('tTipL').textContent = upcoming ? 'Next start (ET)' : live ? 'Games in progress' : 'Today\'s games';
+  const sports = new Set(today.map(x => x.k));
+  let graded = 1;                                            // NBA's lanes are graded; others count when their backtest passed
+  for (const k of ['nfl', 'cfb', 'nhl', 'tennis']) { try { const b = await getJSON('data/' + k + '/backtest.json'); if (b && b.passed) graded++; } catch (e) {} }
+  document.getElementById('tLive').textContent = sports.size;
+  document.getElementById('tLiveL').textContent = `Sports on today, ${graded} model${graded > 1 ? 's' : ''} graded`;
+  try { const B = await OnyxAsk.loadBoards(); document.getElementById('tPlayers').textContent = B.filter(p => isToday(p.start) && Date.parse(p.start) > Date.now()).length; } catch (e) {}
+  const nb = evs('nba').filter(e => isToday(e.start)), el = document.getElementById('live-basketball'), lv = nb.filter(e => e.state === 'in').length;
+  if (el) el.textContent = lv ? `${lv} live now` : nb.length ? `${nb.length} games today` : 'Open';
+}
 async function tonight() {
-  try {
-    const sl = await getJSON('data/nba/slate.json');
-    const games = sl.games || [];
-    document.getElementById('tGames').textContent = games.length;
-    document.getElementById('tPlayers').textContent = (sl.players || []).length || '-';
-    const first = games.map(g => g.start).filter(Boolean).sort()[0];
-    document.getElementById('tTip').textContent = games.length ? etTime(first) : 'off';
-    const live = games.filter(g => g.state === 'in').length;
-    const el = document.getElementById('live-basketball');
-    if (el) el.textContent = live ? `${live} live now` : games.length ? `${games.length} games tonight` : 'Open';
-  } catch (e) {}
   try {
     const tk = await getJSON('data/nba/ticket_lock.json');
     const legs = tk.legs || [];
@@ -719,6 +732,7 @@ async function loadMy() {
   if (!MY.nba && myBetList().some(b => b.sport === 'nba')) { try { MY.nba = await getJSON('data/nba/slate.json'); } catch (e) {} }
   MY_P = await myPlayers();
   MY_PK = await myPicks();
+  strip().catch(() => {});
   if (!MY.picked && MY_PK.length) { MY.tab = 'picks'; MY.picked = true; }
   renderMy();
   const anyLive = LG.some(L => evs(L.k).some(e => e.state === 'in')) || MY.tn.some(c => ((c.status || {}).type || {}).state === 'in');
