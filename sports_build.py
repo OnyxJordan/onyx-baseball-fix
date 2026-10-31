@@ -27,7 +27,7 @@ ROADMAP = {
             "Drive efficiency and tempo in the ratings, so totals beat the league average",
             "Player projections, built on the NFL engine"],
     "nhl": ["Tested 10/29 against a season of real Onyx prices: team ratings, skater points and assists from ice time, and starting goalies. None beat Onyx on games they never saw, so NHL stays leans",
-            "Next: shot-quality (expected goals) ratings from play-by-play, the one input the tests above did not have",
+            "Tested 10/31: shot-quality (expected goals) ratings from every NHL shot since 2024 (3,008 games). They helped before mid-January 2025-26 but made Onyx's price worse after it and in the first weeks of 2026-27 (moneyline, puck line and total all lost), so they are not used",
             "Skater shots on goal, if Onyx starts pricing them"],
     "tennis": ["Backtest the Elo ratings against real Onyx match prices before any pick",
                "Surface-specific ratings (hard, clay, grass)",
