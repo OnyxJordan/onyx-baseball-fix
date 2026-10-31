@@ -189,10 +189,11 @@ def nfl_block(lane, slate, odds):
     pg = lane.load("player_games.json", {}) or {}
     rows = pg.get("rows") or []
     season = slate.get("season") or max((r["season"] for r in rows), default=None)
-    block = {"status": "lab", "version": M.VERSION, "title": "Player projections and team ratings, tested in the open",
-             "note": ("Projections for passing, rushing and receiving yards and receptions, built from every box score this season "
-                      "with last season as the prior and the opponent's defense, and tested every build on games the model never saw. "
-                      "They are leans, not picks: tracked picks switch on only after the model is backtested against real Onyx prices."),
+    block = {"status": "trial", "version": M.VERSION, "title": "Receptions unders graded on trial; everything else priced, tested and explained",
+             "note": ("One NFL lane is graded in public: receptions unders where the model beats Onyx's opening price by 3 points or more, "
+                      "the only NFL market that beat Onyx in both seasons it was tested on. Everything else on this page is a lean or information: "
+                      "spreads, totals, yards and touchdown chances were each tested against two seasons of real Onyx prices and did not beat them, "
+                      "so they are shown with their numbers, never graded as picks. Injured players are removed before anything is priced."),
              "method": [METHOD["football"],
                         "Each projection blends this season's games (recent weeks weigh more) with last season's average, then adjusts for how much of that stat the opponent's defense has allowed, regressed toward league average.",
                         "The test below re-runs on every build: for every player-game this season from week 3 on, the model's projection against two simple baselines a bettor would use, the season average and the last-3 average. Lower error is better."],
@@ -385,6 +386,8 @@ def nfl_block(lane, slate, odds):
         row = game.get(nk(r["name"]))
         return (row.get(r["mkt"]) or 0.0) if row else "void"
     block = model_frame("nfl", lane, slate, odds, M, grows + out, block, resolve)
+    if block.get("status") != "live":
+        block["status"] = "trial"       # the receptions unders lane is graded at the opening price
     block["_cands"] = grows + out
     block["proj"] = proj
     eng = engine_team("nfl", M, M.GAME_P, gw, bt, block["status"] == "live")
@@ -398,6 +401,11 @@ def nfl_block(lane, slate, odds):
                 "implied": round(L.implied(r["any_price"]), 4), "edge": r["any_edge"]}
                for r in block.get("td", []) if r.get("any_price") is not None and r.get("any_value")]
         block["projected"] = top_plays(grows + out + tdp)
+        # a play the receptions trial lane logged today is graded: mark it, never call it an untracked lean
+        trial = {r.get("sel") for r in (block.get("open") or {}).get("rows") or [] if r.get("sel") and not r.get("result")}
+        for p in block["projected"]:
+            if p.get("sel") in trial:
+                p["trial"] = True
     return block
 
 TEAM_MODELS = {"nfl": "nfl_model", "cfb": "cfb_model", "nhl": "nhl_model"}
@@ -594,7 +602,7 @@ def engine_team(key, M, GP, w, bt, live):
     elif T.get("mae_total") is not None:
         factors.append(["eye", "Totals", f"Total error {T['mae_total']:.2f} {unit} vs {T['base_mae_total']:.2f} for the league average on games the ratings never saw.", "Tested", ""])
     if hockey:
-        factors.append(["bell", "Goalies next", "The starting goalie moves an NHL price more than anything else. Confirmations are not in the model yet, which is part of why it stays in the lab.", "Planned", ""])
+        factors.append(["bell", "Goalies next", "The starting goalie moves an NHL price more than anything else. Confirmations are not in the model yet, which is part of why it stays leans only.", "Planned", ""])
     return {"steps": steps, "factors": factors, "lane": _lane_card(bt, live)}
 
 

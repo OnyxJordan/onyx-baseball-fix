@@ -1,81 +1,169 @@
 {
  "built": "2026-10-31",
  "cols": [
+  "t (0 open, 1 close)",
   "w",
   "p",
-  "line",
+  "l (line)",
   "a",
   "b",
-  "y"
+  "y",
+  "c (ctx)"
+ ],
+ "ctx": [
+  "side A home",
+  "night",
+  "home zone (0 E, 1 C, 2 M, 3 P)",
+  "zones the away team crossed",
+  "home rest",
+  "away rest",
+  "month"
  ],
  "sports": {
   "nba": {
-   "split": "2026-02-01",
    "names": [
+    "2024-25 \u00b7 market prices, before Onyx",
+    "2024-25 season",
     "Oct 2025 to Jan 2026",
-    "Feb to Apr 2026"
+    "Feb to Jun 2026",
+    "2026-27 season"
+   ],
+   "market": [
+    0
+   ],
+   "periods": [
+    0,
+    1,
+    2,
+    3,
+    4
    ],
    "markets": {
-    "pts": 30034,
-    "reb": 27007,
-    "ast": 19863
+    "pts": 71734,
+    "reb": 64511,
+    "ast": 46495,
+    "ml": 5957,
+    "spread": 5905,
+    "total": 5948
    },
-   "kb": 1856
+   "kb": 8080
+  },
+  "mlb": {
+   "names": [
+    "2024 season \u00b7 market prices, before Onyx",
+    "2025 season",
+    "2026 season"
+   ],
+   "market": [
+    0
+   ],
+   "periods": [
+    1,
+    2
+   ],
+   "markets": {
+    "ml": 9058,
+    "spread": 9076,
+    "total": 8733,
+    "h": 147948,
+    "hr_yes": 157925,
+    "k": 15963
+   },
+   "kb": 13720
   },
   "nfl": {
-   "split": "2026-03-01",
    "names": [
+    "2024 season \u00b7 market prices, before Onyx",
     "2025 season",
     "2026 season"
    ],
+   "market": [
+    0
+   ],
+   "periods": [
+    0,
+    1,
+    2
+   ],
    "markets": {
-    "ml": 649,
-    "spread": 644,
-    "total": 655,
-    "pass_yds": 1292,
-    "rush_yds": 2034,
-    "rec_yds": 5514,
-    "rec": 5445,
-    "anytime_td": 16229
+    "ml": 804,
+    "spread": 796,
+    "total": 809,
+    "pass_yds": 1592,
+    "rush_yds": 2859,
+    "rec_yds": 7284,
+    "rec": 7050,
+    "anytime_td": 19975
    },
-   "kb": 787
+   "kb": 1698
   },
   "cfb": {
-   "split": "2026-03-01",
    "names": [
+    "2024 season \u00b7 market prices, before Onyx",
     "2025 season",
     "2026 season"
    ],
-   "markets": {
-    "ml": 1289,
-    "spread": 1302,
-    "total": 1316
-   },
-   "kb": 97
-  },
-  "nhl": {
-   "split": "2026-01-15",
-   "names": [
-    "2025-26 to Jan 14",
-    "Jan 15, 2026 on"
+   "market": [
+    0
+   ],
+   "periods": [
+    0,
+    1,
+    2
    ],
    "markets": {
-    "ml": 2664,
-    "spread": 2671,
-    "total": 2608
+    "ml": 1435,
+    "spread": 1446,
+    "total": 1459,
+    "anytime_td": 12435,
+    "rec_yds": 2663,
+    "rec": 1194,
+    "rush_yds": 1753,
+    "pass_yds": 1021
    },
-   "kb": 190
+   "kb": 1171
+  },
+  "nhl": {
+   "names": [
+    "2024-25 \u00b7 market prices, before Onyx",
+    "2025-26 to Jan 14",
+    "Jan 15 to Jun 2026",
+    "2026-27 season"
+   ],
+   "market": [
+    0
+   ],
+   "periods": [
+    0,
+    1,
+    2,
+    3
+   ],
+   "markets": {
+    "ml": 4520,
+    "spread": 4523,
+    "total": 4448,
+    "g_yes": 61230,
+    "pts": 66820,
+    "sog": 24159,
+    "ast": 37427
+   },
+   "kb": 8070
   },
   "tennis": {
-   "split": "2026-01-01",
    "names": [
     "2025",
     "2026"
    ],
+   "market": [],
+   "periods": [
+    0,
+    1
+   ],
    "markets": {
     "ml": 8193
    },
-   "kb": 200
+   "kb": 240
   }
  }
 }

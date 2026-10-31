@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>How Onyx Works</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0c0c0c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Onyx Sports">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<meta name="description" content="How every Onyx Sports model works: what it reads, how a price is built, what is graded, what was tested and left out, and the bar a pick has to clear.">
+<link rel="stylesheet" href="onyx.css">
+<script src="onyx.js" defer></script>
+<style>
+body{background:#0c0c0c;color:#fff;margin:0}
+.hw{padding-top:28px;padding-bottom:10px}
+.hw h1,.hw h2{margin:0;font-size:clamp(30px,7vw,52px);line-height:1}
+.hw .lead{margin:10px 0 0;color:#b9b2c4;font-size:15px;max-width:700px;line-height:1.65}
+.back{display:inline-block;margin:18px 0 0;color:#d795ff;font:700 12px monospace;letter-spacing:.06em;text-transform:uppercase;text-decoration:none}
+.toc{display:flex;gap:6px;flex-wrap:wrap;margin:16px 0 4px}
+.toc a{padding:8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:#ddd;font:700 11px monospace;letter-spacing:.06em;text-transform:uppercase;text-decoration:none}
+.toc a:hover{border-color:rgba(176,56,249,.7)}
+.bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:10px;margin-top:16px}
+.bar div{padding:14px;border-radius:14px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.035)}
+.bar b{display:block;font-size:15px;margin-bottom:4px}.bar span{color:#b9b2c4;font-size:13px;line-height:1.55}
+.st{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:10px;margin-top:12px}
+.st div{padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.1);font-size:13px;line-height:1.55;color:#b9b2c4}
+.st b{color:#fff}
+.sp{padding:18px;border-radius:18px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);margin:14px 0;scroll-margin-top:16px}
+.sp-h{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+.sp h3{margin:0;font-size:24px}
+.tag{display:inline-block;padding:3px 9px;border-radius:999px;font:700 10px monospace;letter-spacing:.06em;text-transform:uppercase}
+.tag.g{background:rgba(97,233,112,.15);color:#61e970}.tag.p{background:rgba(176,56,249,.2);color:#d795ff}.tag.l{background:rgba(255,255,255,.07);color:#b9b2c4}.tag.c{background:rgba(255,255,255,.1);color:#ddd}
+.sp .one{margin:0 0 12px;color:#ddd;font-size:15px;line-height:1.6}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:12px}
+.blk h4{margin:0 0 6px;font:700 11px monospace;letter-spacing:.1em;text-transform:uppercase;color:#d795ff}
+.blk ul{margin:0;padding-left:18px;color:#b9b2c4;font-size:13.5px;line-height:1.65}
+.blk li b{color:#fff}
+.go{display:inline-block;margin-top:10px;color:#d795ff;font:700 11px monospace;text-transform:uppercase;letter-spacing:.06em;text-decoration:none;margin-right:14px}
+.note{color:#9a93a6;font-size:12px;line-height:1.6;margin:10px 0 0}
+</style>
+</head>
+<body class="ox-page">
+<main>
+<section class="ox-wrap hw">
+  <a class="back" href="home.html">‹ Onyx Sports</a>
+  <span class="ox-eyebrow" style="display:block;margin-top:14px">How it works</span>
+  <h1>Every model,<br>explained.</h1>
+  <p class="lead">What each sport's model reads, how it turns that into a price, what is graded in public, what we tested and threw out, and the bar a pick has to clear before it counts. Every number here comes from tests against real Onyx prices.</p>
+  <div class="toc"><a href="#bar">The bar</a><a href="#nfl">NFL</a><a href="#nba">NBA</a><a href="#nhl">NHL</a><a href="#golf">Golf</a><a href="#tennis">Tennis</a><a href="#cfb">College Football</a><a href="#mlb">MLB</a><a href="#ask">Ask Onyx</a><a href="#lab">Rules lab</a></div>
+</section>
+
+<section class="ox-wrap hw" id="bar">
+  <h2>The bar.</h2>
+  <p class="lead">A model can be clever and still lose to the book. So no pick is graded until its rule has beaten real Onyx prices on games it never saw.</p>
+  <div class="bar">
+    <div><b>1 · Walk forward</b><span>Every game is priced only from what was known before it: no peeking at results, injuries or lines that came later.</span></div>
+    <div><b>2 · Tune, then test</b><span>Weights and the pick rule are chosen on one stretch of games and judged on a later stretch the tuner never saw.</span></div>
+    <div><b>3 · Real Onyx prices</b><span>The test bets at Onyx's opening line (what a morning pick gets) and its closing line (the harder test), with the margin included.</span></div>
+    <div><b>4 · Enough bets, both prices</b><span>30+ picks in the test, a profit at the opening and the closing price, and a better read than Onyx's own price.</span></div>
+  </div>
+  <div class="st">
+    <div><b>Tracked</b>: cleared the bar. Every pick is logged before the game at the price shown and graded the next morning, wins and losses alike.</div>
+    <div><b>On trial</b>: beat the opening price in testing but not every part of the bar. Logged at Onyx's opening price and graded in public on its own record until it proves itself or is dropped.</div>
+    <div><b>Lean</b>: the model's honest read, shown with its numbers, never graded, because its backtest did not beat Onyx.</div>
+  </div>
+  <p class="note">Every model keeps a changelog: each change bumps its version and cites the test behind it. A version bump sends a sport back to leans until it is re-tested.</p>
+</section>
+
+<section class="ox-wrap hw">
+  <div class="sp" id="nfl"><div class="sp-h"><h3>NFL</h3><span class="tag p">On trial · v7</span></div>
+    <p class="one">Receptions unders are graded on trial at Onyx's opening price. Spreads, totals, yards and touchdowns are priced and explained as leans.</p>
+    <div class="grid2">
+      <div class="blk"><h4>What it reads</h4><ul>
+        <li>Every box score this season with last season as the prior, recent weeks weighted more.</li>
+        <li>Each receiver's share of his team's targets per dropback and his snap-share trend (nflverse play-by-play).</li>
+        <li>Onyx's implied team points and spread, so a team expected to trail throws more.</li>
+        <li>ESPN's injury report: ruled-out players are removed before anything is priced; questionable players are marked Q.</li></ul></div>
+      <div class="blk"><h4>What is graded</h4><ul>
+        <li><b>Receptions unders</b> where the model beats the opening price by 3+ points, at most 12 a day.</li>
+        <li>Evidence: counting every priced player who played, unders beat the opening price in 2025 (+6.1%, 468 bets) and 2026 (+20.1%, 187). Overs did not (2025 -14.8%), so they are never plays.</li></ul></div>
+      <div class="blk"><h4>Tested and left out</h4><ul>
+        <li>Team ratings from scores and from every play (expected points per play): no edge over Onyx's spreads or totals.</li>
+        <li>1st-half and 1st-quarter totals: the line already matches how scoring splits.</li>
+        <li>Rushing, passing and receiving yards: lost to Onyx's price in seasons they were not tuned on.</li>
+        <li>Touchdown scorers: priced players score 17.7% of the time against 22.0% implied, so the chance shown is Onyx's price with the margin removed, never flagged as value.</li></ul></div>
+      <div class="blk"><h4>How a price is built</h4><ul>
+        <li>Projection, then a chance from a spread fitted to real Onyx lines, then a blend with Onyx's own no-vig price.</li>
+        <li>Edge = blended chance minus the price's implied chance.</li></ul></div>
+    </div>
+    <a class="go" href="nfl.html#model">NFL Model tab ›</a><a class="go" href="scorecard.html">Its record ›</a>
+  </div>
+
+  <div class="sp" id="nba"><div class="sp-h"><h3>NBA</h3><span class="tag g">Tracked · v8</span></div>
+    <p class="one">Points, rebounds and assists for every rotation player, graded in public, plus the Model's Parlay.</p>
+    <div class="grid2">
+      <div class="blk"><h4>What it reads</h4><ul>
+        <li>Three seasons of history, aged and regressed to each player's role.</li>
+        <li>Minutes: rotation, injuries (who inherits an out player's minutes), confirmed starting fives once posted.</li>
+        <li>Usage, pace, opponent defense and on/off splits rebuilt from every lineup since 2024-25.</li></ul></div>
+      <div class="blk"><h4>What is graded</h4><ul>
+        <li><b>Props</b>: the blended chance beats Onyx's price by 2 to 8 points, 2+ of 3 signals agree (last season, this season, last 5), 24+ projected minutes, at most 2 a game and 6 a night.</li>
+        <li><b>The Model's Parlay</b>: three mainstream legs (-150 to +150, 28+ minute starters), locked at first tip.</li>
+        <li>On trial at the opening price: 1st-quarter totals and first basket.</li></ul></div>
+      <div class="blk"><h4>Evidence</h4><ul>
+        <li>2025-26 replay, tuned on Oct-Jan and judged on Feb-Apr: the props lane went 57-46 (+8.7%) at the opening price and 52-30 (+23.4%) at the close.</li>
+        <li>Projection error on points 4.56 per player-game; minutes 5.30.</li></ul></div>
+      <div class="blk"><h4>Tested and left out</h4><ul>
+        <li>Formula-based usage redistribution (lost twice), shot-quality luck, referee crews and travel schedules: none beat Onyx's opening price.</li>
+        <li>Rest and back-to-backs are already in Onyx's prop prices (rules lab splits, 10/31).</li></ul></div>
+    </div>
+    <a class="go" href="nba.html#model">NBA Model tab ›</a><a class="go" href="scorecard.html">Its record ›</a>
+  </div>
+
+  <div class="sp" id="nhl"><div class="sp-h"><h3>NHL</h3><span class="tag l">Leans · v1</span></div>
+    <p class="one">Team ratings, skaters and goalies, priced against Onyx and shown as leans.</p>
+    <div class="grid2">
+      <div class="blk"><h4>What it reads</h4><ul><li>Goals for and against by team, recency weighted, home ice; skater points and assists from ice time; starting goalies.</li></ul></div>
+      <div class="blk"><h4>Why it is leans</h4><ul>
+        <li>Against a season of Onyx prices the pick lane lost at the opening and closing price.</li>
+        <li>Expected-goals ratings from every shot since 2024 helped early in 2025-26 but made Onyx's price worse after mid-January.</li>
+        <li>Starting goalie: Onyx's opening lines already carry it.</li></ul></div>
+    </div>
+    <a class="go" href="nhl.html#model">NHL Model tab ›</a>
+  </div>
+
+  <div class="sp" id="golf"><div class="sp-h"><h3>Golf</h3><span class="tag l">Leans · golf-v1</span></div>
+    <p class="one">The strokes-gained model rates this week's field: win, top 10 and cut chances, round by round.</p>
+    <div class="grid2">
+      <div class="blk"><h4>What it reads</h4><ul><li>Strokes gained per round over four seasons, course history, course fit from each player's stat profile, conditions and the cut rule.</li></ul></div>
+      <div class="blk"><h4>Why it is leans</h4><ul><li>Onyx does not price golf yet, so there is no price to test against. It is tested the day Onyx posts golf markets.</li></ul></div>
+    </div>
+    <a class="go" href="golf.html#model">Golf Model tab ›</a>
+  </div>
+
+  <div class="sp" id="tennis"><div class="sp-h"><h3>Tennis</h3><span class="tag l">Leans · v2</span></div>
+    <p class="one">Elo match chances for every ATP and WTA singles match, priced against Onyx.</p>
+    <div class="grid2">
+      <div class="blk"><h4>What it reads</h4><ul><li>Every completed match since 2023; a rating that moves with each result by how surprising it was. Games and set markets come from a point-by-point match chain.</li></ul></div>
+      <div class="blk"><h4>Why it is leans</h4><ul><li>On 2026 matches it never saw, Onyx's own price was as good as the blend, and the lane lost at opening and closing prices.</li></ul></div>
+    </div>
+    <a class="go" href="tennis.html#model">Tennis Model tab ›</a>
+  </div>
+
+  <div class="sp" id="cfb"><div class="sp-h"><h3>College Football</h3><span class="tag g">Spreads tracked · totals on trial · v2</span></div>
+    <p class="one">Every FBS game: team ratings priced against Onyx spreads and totals, and player projections for every starter.</p>
+    <div class="grid2">
+      <div class="blk"><h4>What is graded</h4><ul>
+        <li><b>Spreads</b> where the blend (model 20%) beats the price by 2 to 6 points: 27-19 (+12.2%) at the opening price in the test season.</li>
+        <li><b>Totals on trial</b> at the opening price: +21.0% on 2026 games but -20.3% at the 2025 close, so they earn their place on their own record.</li></ul></div>
+      <div class="blk"><h4>Leans</h4><ul><li>Player yards and receptions (built on the NFL engine, checked against outside projections at a .96 to .98 correlation) and touchdown chances from Onyx's price.</li></ul></div>
+    </div>
+    <a class="go" href="cfb.html#model">College Model tab ›</a>
+  </div>
+
+  <div class="sp" id="mlb"><div class="sp-h"><h3>MLB</h3><span class="tag c">2026 season closed · v45</span></div>
+    <p class="one">The home run model, strikeout projections and the Model's Ticket. The 2026 season closed on 10/29; every graded play stays public.</p>
+    <div class="grid2">
+      <div class="blk"><h4>What it read</h4><ul><li>Statcast contact quality, park, weather, pitcher handedness and home run rate, lineups; strikeouts from pitcher form and opponent strikeout rates.</li></ul></div>
+      <div class="blk"><h4>The record</h4><ul><li>Strikeout projections went 487-440 where the projection beat the line by 10%+. The home run edge lane lost and was narrowed in v45; the full ledger is on the frozen season page.</li></ul></div>
+    </div>
+    <a class="go" href="mlb-2026.html">2026 season page ›</a><a class="go" href="scorecard.html">Every lane ›</a>
+  </div>
+</section>
+
+<section class="ox-wrap hw" id="ask">
+  <h2>Ask Onyx.</h2>
+  <p class="lead">Type what you want the way you would say it. The search reads the request into a filter (sport, market, side, prices, team or player, how many, parlay, SGP or round robin, a day) and runs it against today's boards: our models' chances on live Onyx prices. It never invents a line: every play it returns is on Onyx right now. Unless you name your own odds, parlays stay at -150 or longer per leg and single plays at -200 or longer. It is tested on 590 phrasings, typos and slang included, and checked so every play it returns honors what was asked.</p>
+  <a class="go" href="home.html#ask">Try it ›</a>
+</section>
+
+<section class="ox-wrap hw" id="lab">
+  <h2>Rules lab and scorecard.</h2>
+  <p class="lead">The scorecard grades every lane on the site in one place, straight from the public ledgers. The rules lab tests any rule of thumb (a sport, a market, a side, a price band, a model edge and splits like home or away, day or night, coast, travel and rest) against 179,000+ real prices, season by season, at the opening and the closing line. A rule earns trust only if it makes money in every season it is judged on.</p>
+  <a class="go" href="scorecard.html">Scorecard ›</a><a class="go" href="scorecard.html#lab">Rules lab ›</a>
+  <p class="note">Onyx Sports Data is research. Projections are estimates, not guarantees, and past results do not predict future ones. Must be of legal age in your state to play. If you or someone you know has a gambling problem, call 1-800-GAMBLER.</p>
+</section>
+</main>
+</body>
+</html>

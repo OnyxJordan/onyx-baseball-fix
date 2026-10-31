@@ -7,6 +7,11 @@ OpticOdds key). Never prints the key.
     python3 tools/onyx_lines_pull.py football nfl 2025-09-01 2026-10-26 \\
         player_passing_yards,player_rushing_yards,player_receiving_yards,player_receptions bt/nfl_lines.json
 
+An optional 7th argument names another sportsbook id for seasons before Onyx priced
+them (Onyx's history starts in 2025). Those prices are research only: the rules lab
+shows them as "market prices, before Onyx", never as Onyx prices, and the site never
+names the book (CLAUDE.md rule 3).
+
 For every completed fixture in the window: start, teams, final score, and per
 player and market the Onyx main line at open and at close,
   {"o": [line, over, under], "c": [line, over, under]}
@@ -31,6 +36,7 @@ GAME = {"moneyline", "point_spread", "puck_line", "game_spread", "run_line",
 
 def main():
     sport, league, d0, d1, markets, out = sys.argv[1:7]
+    book = sys.argv[7] if len(sys.argv) > 7 else "onyx_odds"
     markets = [m for m in markets.split(",") if m]
     q = f"sport={sport}&league={league}"
 
@@ -65,7 +71,7 @@ def main():
     mk = "".join(f"&market={m}" for m in markets)
     n_props = 0
     for fid, g in games.items():
-        r = get("/fixtures/odds/historical", f"&fixture_id={urllib.parse.quote(fid)}&sportsbook=onyx_odds"
+        r = get("/fixtures/odds/historical", f"&fixture_id={urllib.parse.quote(fid)}&sportsbook={book}"
                                              f"&odds_format=AMERICAN{mk}")
         rows = (r or {}).get("data") or []
         props, game = {}, {}

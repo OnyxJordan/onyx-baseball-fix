@@ -135,6 +135,7 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
         <a class="ox-btn" href="#sports">Choose a sport</a>
         <a class="ox-btn" href="#parlay">Tonight's parlay</a>
         <a class="ox-btn" href="scorecard.html">Scorecard</a>
+        <a class="ox-btn" href="how.html">How it works</a>
       </div>
     </div>
   </section>
@@ -274,9 +275,9 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
 <footer class="ox-foot">
   <div class="ox-wrap">
     <div class="ox-foot-cols">
-      <div class="ox-foot-col"><div class="ox-rule"></div><h5>Models graded</h5><a href="nba.html">Onyx Basketball</a><a href="index.html">Onyx Baseball</a></div>
-      <div class="ox-foot-col"><div class="ox-rule"></div><h5>Live, model in the lab</h5><a href="nfl.html">Onyx NFL</a><a href="cfb.html">Onyx College Football</a><a href="nhl.html">Onyx NHL</a><a href="tennis.html">Onyx Tennis</a><a href="golf.html">Onyx Golf</a></div>
-      <div class="ox-foot-col"><div class="ox-rule"></div><h5>The desk</h5><a href="#about">What this is</a><a href="#gamecenter">Gamecenter</a><a href="#record">The record</a><a href="scorecard.html">Scorecard</a><a href="scorecard.html#lab">Rules lab</a></div>
+      <div class="ox-foot-col"><div class="ox-rule"></div><h5>Picks graded or on trial</h5><a href="nfl.html">Onyx NFL</a><a href="nba.html">Onyx Basketball</a><a href="cfb.html">Onyx College Football</a></div>
+      <div class="ox-foot-col"><div class="ox-rule"></div><h5>Live, model leans</h5><a href="nhl.html">Onyx NHL</a><a href="golf.html">Onyx Golf</a><a href="tennis.html">Onyx Tennis</a><a href="index.html">Onyx Baseball (2026 closed)</a></div>
+      <div class="ox-foot-col"><div class="ox-rule"></div><h5>The desk</h5><a href="#about">What this is</a><a href="#gamecenter">Gamecenter</a><a href="#record">The record</a><a href="scorecard.html">Scorecard</a><a href="scorecard.html#lab">Rules lab</a><a href="how.html">How it works</a></div>
       <div class="ox-foot-col"><div class="ox-rule"></div><h5>Onyx</h5><a data-onyx="footer" href="#" target="_blank" rel="noopener">Bet on Onyx</a><a href="https://onyxodds.com" target="_blank" rel="noopener">onyxodds.com</a></div>
     </div>
     <div class="ox-legal">
@@ -297,18 +298,18 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
 // ── Onyx Sports hub ─────────────────────────────────────────────
 var ONYX_REFERRER = 'KR680261';
 var ONYX_HOME = 'https://app.onyxodds.com/leagues/NBA?utm_source=onyxsports&referrer=' + ONYX_REFERRER;
-var SPORTS = [
-  {k: 'basketball', name: 'Basketball', lg: 'NBA', live: true, href: 'nba.html', tone: 'purple', big: true,
-   d: 'Points, rebounds and assists projected for every rotation player, priced against Onyx. Live court gamecenter.'},
-  {k: 'football', name: 'NFL', lg: 'NFL', live: true, href: 'nfl.html', tone: 'green', mid: true, lab: true,
-   d: 'Live drives, down and distance and win probability. Player projections tested every week, picks once they beat Onyx.'},
-  {k: 'baseball', name: 'Baseball', lg: 'MLB', live: true, href: 'index.html', tone: 'blue', big: true,
-   d: 'The daily home run model, strikeout and edge plays, pitch-by-pitch gamecasts.'},
-  {k: 'cfb', name: 'College Football', lg: 'NCAAF', live: true, href: 'cfb.html', tone: 'lilac', mid: true, lab: true,
-   d: 'Every FBS game with the football gamecenter: drives, field position and win probability.'},
-  {k: 'hockey', name: 'NHL', lg: 'NHL', live: true, href: 'nhl.html', tone: 'blue', lab: true, d: 'Live scores by period, goals and shots. Skater models in the lab.'},
-  {k: 'tennis', name: 'Tennis', lg: 'ATP · WTA', live: true, href: 'tennis.html', tone: 'green', lab: true, d: 'Every ATP and WTA singles match, live set by set, with who is serving.'},
-  {k: 'golf', name: 'Golf', lg: 'PGA', live: true, href: 'golf.html', tone: 'purple', lab: true, d: "This week's leaderboard, round by round. Strokes-gained model in the lab."}
+var SPORTS = [   // ranked by daily importance: NFL, NBA, NHL, Golf, Tennis, College Football, MLB
+  {k: 'football', name: 'NFL', lg: 'NFL', live: true, href: 'nfl.html', tone: 'green', big: true, state: 'trial',
+   d: 'Live drives, down and distance and win probability. Receptions unders graded on trial at the opening price; projections, touchdown chances and injuries for every game.'},
+  {k: 'basketball', name: 'Basketball', lg: 'NBA', live: true, href: 'nba.html', tone: 'purple', big: true, state: 'graded',
+   d: 'Points, rebounds and assists projected for every rotation player, priced against Onyx and graded in public. Live court gamecenter.'},
+  {k: 'hockey', name: 'NHL', lg: 'NHL', live: true, href: 'nhl.html', tone: 'blue', mid: true, state: 'leans', d: 'Live scores by period, goals and shots, with team and skater leans priced against Onyx.'},
+  {k: 'golf', name: 'Golf', lg: 'PGA', live: true, href: 'golf.html', tone: 'purple', mid: true, state: 'leans', d: "This week's leaderboard, round by round, with the strokes-gained model's win, top 10 and cut chances."},
+  {k: 'tennis', name: 'Tennis', lg: 'ATP · WTA', live: true, href: 'tennis.html', tone: 'green', state: 'leans', d: 'Every ATP and WTA singles match, live set by set, with Elo match chances against Onyx prices.'},
+  {k: 'cfb', name: 'College Football', lg: 'NCAAF', live: true, href: 'cfb.html', tone: 'lilac', state: 'graded',
+   d: 'Every FBS game with the football gamecenter. Spreads graded in public, totals on trial, player projections for every starter.'},
+  {k: 'baseball', name: 'Baseball', lg: 'MLB', live: true, href: 'index.html', tone: 'blue', state: 'closed',
+   d: 'The home run model, strikeout and edge plays and pitch-by-pitch gamecasts. 2026 season closed; the full record stays public.'},
 ];
 function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'})[c]); }
 function track(name, params) { try { if (window.gtag) gtag('event', name, params || {}); } catch (e) {} }
@@ -333,7 +334,7 @@ function marquees() {
 
 function sports() {
   document.getElementById('oxSports').innerHTML = SPORTS.map((s, i) => {
-    const tag = s.live ? (s.lab ? '<span class="ox-pill live">Live · model in lab</span>' : '<span class="ox-pill live">Live · model graded</span>') : '<span class="ox-pill soon">Coming soon</span>';
+    const tag = !s.live ? '<span class="ox-pill soon">Coming soon</span>' : '<span class="ox-pill live">' + ({graded: 'Live · picks graded', trial: 'Live · picks on trial', leans: 'Live · model leans', closed: 'Season closed · record public'}[s.state] || 'Live') + '</span>';
     const inner = `<div class="ox-sport-top"><span class="n">${String(i + 1).padStart(2, '0')} / ${String(SPORTS.length).padStart(2, '0')}</span>${tag}</div>
       <canvas data-ox-art="${s.k}" data-ox-tone="${s.tone}" data-ox-fade="0" aria-hidden="true"></canvas>
       <div class="ox-sport-bot"><h3><small>${esc(s.lg)}</small>Onyx ${esc(s.name)}</h3><p>${esc(s.d)}</p>
@@ -397,7 +398,7 @@ async function askGo(q) {
   out.innerHTML = understood + pl + rr + `<div class="t10-list">${rows}</div><div class="my-note">${R.two ? 'Onyx prices anytime TD; the 2+ chance is from the model\'s expected touchdowns. ' : ''}Confidence is each sport model's chance blended with Onyx's price. Model leans are not graded. ${SG || (R.parlay && R.parlay.sgp_plus) ? '*Onyx prices same-game legs itself and usually pays less than the legs multiplied, because the legs are tied together; the same tie is why the true chance sits above the floor shown. ' : ''}${R.pool > R.rows.length ? R.pool + ' plays matched; the best ' + R.rows.length + ' shown.' : ''}</div>`;
 }
 // ── Top 10 plays of the day: every sport build writes data/<sport>/top.json (daily_top.py)
-var T10_SPORTS = [['nba', 'NBA', 'nba.html'], ['nfl', 'NFL', 'nfl.html'], ['cfb', 'NCAAF', 'cfb.html'], ['nhl', 'NHL', 'nhl.html'], ['tennis', 'Tennis', 'tennis.html']];
+var T10_SPORTS = [['nfl', 'NFL', 'nfl.html'], ['nba', 'NBA', 'nba.html'], ['nhl', 'NHL', 'nhl.html'], ['tennis', 'Tennis', 'tennis.html'], ['cfb', 'NCAAF', 'cfb.html']];
 var T10_PER_SPORT = 4, T10_PER_GAME = 2;
 function t10When(iso) {
   try {
@@ -518,10 +519,10 @@ document.querySelectorAll('[data-onyx]').forEach(a => {
 // ── My Onyx: favorites from every sport page, bets opened on Onyx, all live ──
 var ESPN = 'https://site.api.espn.com/apis/site/v2/sports/';
 var LG = [
-  {k: 'nba', lg: 'NBA', path: 'basketball/nba', page: 'nba.html', kind: 'basketball'},
   {k: 'nfl', lg: 'NFL', path: 'football/nfl', page: 'nfl.html', kind: 'football'},
-  {k: 'cfb', lg: 'NCAAF', path: 'football/college-football', page: 'cfb.html', kind: 'football', q: 'groups=80&limit=300'},
+  {k: 'nba', lg: 'NBA', path: 'basketball/nba', page: 'nba.html', kind: 'basketball'},
   {k: 'nhl', lg: 'NHL', path: 'hockey/nhl', page: 'nhl.html', kind: 'hockey'},
+  {k: 'cfb', lg: 'NCAAF', path: 'football/college-football', page: 'cfb.html', kind: 'football', q: 'groups=80&limit=300'},
   {k: 'mlb', lg: 'MLB', path: 'baseball/mlb', page: 'index.html', kind: 'baseball'},
 ];
 var MY = {tab: 'live', sb: {}, sum: {}, tn: [], gf: null, nba: null, timer: null};

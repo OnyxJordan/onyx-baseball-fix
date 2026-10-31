@@ -509,6 +509,25 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
     1Q -5.6%), so no rule carries forward; 2026 1H looked good (+15.8%, 64 bets) but
     the rule fails its tuning season. Line ratios match reality (1H line 0.505 of the
     total, actual 0.506). Always-under 1H: 2025 +1.8% (285), 2026 +12.9% (106): too thin.
+  - **Rules lab history and splits (10/31).** `data/rules_lab/<sport>/<market>.json` (columnar, loaded per
+    market) holds 825,148 priced lines: NBA 2024-25 (Onyx from Feb 2025 and market prices), 2025-26 with the
+    model replay, 2026-27 to date, game lines, threes; MLB 2025-26 Onyx (home run yes, hits, total bases,
+    strikeouts, game lines; MLB 2024 had no earlier prices); NHL 2024-25 market, 2025-27 Onyx props and lines;
+    NFL 2024 market, 2025-26 Onyx; CFB 2024 market (73 games), 2025-26 Onyx with 2026 props; ATP tennis.
+    Every row carries splits (`tools/rules_ctx.py`). Split test (logistic on Onyx's fair price + model + splits,
+    trained on earlier periods, judged on the last; opening prices): no split adds information in NBA (3 seasons),
+    MLB (2 seasons, 75k hits props), NHL props or CFB; small gains only on NHL moneyline (.6439 vs .6469, 230
+    test games) and NFL receptions / rushing yards (.6864 vs .6876, .6890 vs .6921), too thin to change a model.
+    Onyx already prices rest, travel, home and day / night. Rebuild: `python3 tools/rules_lab_build.py`.
+  - **Ask Onyx test sets (10/31).** `tools/ask_corpus.py` writes `tools/ask_corpus.json` (482 phrasings: every
+    sport x market x intent template plus 118 hand-written "how people type it" requests), and
+    `tools/ask_holdout.json` / `ask_holdout2.json` are fresh sets scored once before any fix. `node tools/verify_ask.js
+    [--holdout|--holdout2] [--slow]` runs them on today's boards: a query passes when the reading matches (sport,
+    market, intent, count, side, prices, confidence, team, player, props only), every play returned honors it,
+    and the answer is not empty while the board holds something that fits (day, price and side aware). Scores
+    on 10/31: corpus 482/482; holdout 1 52/59 (88.1%) before its fixes; holdout 2 47/49 (95.9%) on first run. Run
+    it after any `ask.js` change. Speed: boards ~220 KB gzipped, preloaded by the home page; ET day lookups are
+    cached (dated searches went from ~1.1 s to under 15 ms); slowest query 51 ms.
   - **Ask Onyx, game lines and team names (10/31).** Every board now carries both sides of
     every Onyx game line (`sports_build.both_sides`; NBA game lines from `nba_build.write_top`,
     priced at Onyx's no-vig chance since there is no NBA game model) and each play's team

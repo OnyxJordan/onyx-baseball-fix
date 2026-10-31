@@ -520,7 +520,7 @@ function renderHome() {
   const stat = (v, l, c) => `<div class="home-stat"><div class="home-stat-val ${c || ''}">${v}</div><div class="home-stat-label">${l}</div></div>`;
   const n = KIND === 'tennis' ? (SD.events || []).reduce((a, e) => a + e.matches.length, 0) : KIND === 'golf' ? (SD.events || []).reduce((a, e) => a + e.board.length, 0) : games.length;
   document.getElementById('homeStats').innerHTML = stat(n, KIND === 'tennis' ? 'Matches' : KIND === 'golf' ? 'Players' : 'Games', 'purple')
-    + stat(nLive, 'Live now', 'green') + stat(priced || '-', 'Onyx lines') + stat((SD.model || {}).status === 'live' ? 'Live' : 'Lab', 'Model');
+    + stat(nLive, 'Live now', 'green') + stat(priced || '-', 'Onyx lines') + stat({live: 'Live', trial: 'On trial'}[(SD.model || {}).status] || 'Leans', 'Model');
   let body = '';
   if (KIND === 'tennis') {
     const lv = (SD.events || []).flatMap(e => e.matches.filter(m => m.state === 'in').map(m => [e, m]));
@@ -1856,7 +1856,7 @@ function pickLabel(r) {
   return `${r.name} ${r.side === 'over' ? 'Over' : 'Under'} ${r.line} ${MKT_NAME[r.mkt] || r.mkt}`;
 }
 function playCards(rows) {
-  return `<div class="pk-grid">${rows.map(r => `<div class="pk${r.projected ? ' lean' : ''}">${r.projected ? '<span class="pk-badge">Lean · not tracked</span>' : ''}
+  return `<div class="pk-grid">${rows.map(r => `<div class="pk${r.projected ? ' lean' : ''}">${r.trial ? '<span class="pk-badge" style="color:#61e970;border-color:rgba(97,233,112,.5)">On trial · graded at the open</span>' : r.projected ? '<span class="pk-badge">Lean · not tracked</span>' : ''}
     <div class="pk-top"><span>${esc(MKT_NAME[r.mkt] || r.mkt)}</span><span>${esc(r.matchup || '')}</span></div>
     <div class="pk-main">${r.hs ? `<img class="lg m" style="border-radius:50%" src="${esc(r.hs)}" alt="" loading="lazy">` : ''}<b>${esc(pickLabel(r))}</b></div>
     <div class="pk-nums"><div><span>Onyx</span><b>${fmtOdds(r.price)}</b></div><div><span>${r.projected ? 'Confidence' : 'Win chance'}</span><b>${pct(r.prob)}</b></div>
@@ -1921,11 +1921,12 @@ function gameLeanTable(rows, inGame) {
 function renderPlays() {
   const M = SD.model || {};
   const el = document.getElementById('playsBody');
-  const lab = `<div class="lab"><div class="eb">${M.status === 'live' ? 'How the picks work' : 'How this model works · in the lab'}</div>
-    <h3>${M.status === 'live' ? 'Where the model beats the Onyx line' : 'Picks switch on when the model earns them'}</h3>
+  const lab = `<div class="lab"><div class="eb">${M.status === 'live' ? 'How the picks work' : M.status === 'trial' ? 'How the picks work · on trial' : 'How this model works · leans'}</div>
+    <h3>${M.status === 'live' ? 'Where the model beats the Onyx line' : M.status === 'trial' ? 'One lane graded in public, the rest tested and shown as leans' : 'Picks switch on when the model earns them'}</h3>
     <p>${esc(M.note || `The ${C.name} model is being built and tested. Nothing here is a pick until it has been backtested against real Onyx prices, the same bar the NBA and MLB models had to clear.`)}</p>
     ${(M.tests || []).length ? `<div class="stat-grid">${M.tests.map(t => `<div><span>${esc(t.k)}</span><b>${esc(t.v)}</b><div class="dim" style="font-size:11px">${esc(t.d || '')}</div></div>`).join('')}</div>` : ''}
-    ${M.status !== 'live' && (M.roadmap || []).length ? `<ul>${M.roadmap.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}</div>`;
+    ${M.status !== 'live' && (M.roadmap || []).length ? `<ul>${M.roadmap.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
+    <p style="margin-top:10px"><a href="how.html#${esc(window.OX_SITE || "")}" style="color:#d795ff">How every Onyx model works, and the bar a pick has to clear ›</a> · <a href="scorecard.html" style="color:#d795ff">Scorecard ›</a></p></div>`;
   if (KIND === 'golf') { el.innerHTML = lab + (gfModel((SD.events || []).find(e => e.id === (M.golf || {}).event)) || '<div class="empty">The model rates this week\'s field once the tournament is on the board.</div>'); return; }
   const picks = M.picks || [];
   const proj = M.projected || [];
@@ -1937,7 +1938,7 @@ function renderPlays() {
     ? leanHdr('Tracked picks · graded', picks.length) + (picks.length ? playCards(picks) : '<div class="empty">No play clears the tracked screens on this slate. The best other plays are below.</div>')
       + (leans.length ? leanHdr('More plays · model leans, not graded', leans.length) + playCards(leans) : '')
     : leanHdr("Today's plays · best first", proj.length)
-      + `<p class="dim" style="font-size:12px;line-height:1.6;margin:0 0 10px">Where the model's chance beats Onyx's price, best value first, two per game at most. Confidence is the model's chance the play wins. Model leans: not graded until the ${esc(C.name)} model beats Onyx's prices in a backtest.</p>`
+      + `<p class="dim" style="font-size:12px;line-height:1.6;margin:0 0 10px">Where the model's chance beats Onyx's price, best value first, two per game at most. Confidence is the model's chance the play wins. ${M.status === 'trial' ? 'Plays marked On trial are graded in public at the opening price; the rest are leans, not graded.' : `Model leans: not graded until the ${esc(C.name)} model beats Onyx's prices in a backtest.`}</p>`
       + (proj.length ? playCards(proj) : '<div class="empty">No line on this slate beats the Onyx price right now. Plays appear as Onyx posts lines.</div>');
   const rows = M.rows || [];
   const gameRows = rows.filter(r => r.kind), propRows = rows.filter(r => !r.kind);
@@ -1997,7 +1998,7 @@ function engineHtml(E) {
     ${st.bars ? wbar(st.bars) : ''}${(st.rows || []).map(r => `<div class="wrow"><b>${esc(r[0])}</b><span>${esc(r[1])}</span></div>`).join('')}
     ${st.note ? `<div class="wnote">${esc(st.note)}</div>` : ''}</div>`).join('');
   const L = E.lane;
-  const lane = L ? `<div class="wblock"><div class="wtitle">${L.live ? 'The pick lane · live and graded in public' : 'The pick lane · in the lab'}</div>
+  const lane = L ? `<div class="wblock"><div class="wtitle">${L.live ? 'The pick lane · live and graded in public' : 'The pick lane · not live: its backtest did not pass'}</div>
     <div class="wrow"><b>Markets</b><span>${esc(L.markets.join(', '))}</span></div>
     <div class="wrow"><b>Edge</b><span>${(L.edge[0] * 100).toFixed(0)} to ${(L.edge[1] * 100).toFixed(0)}pp over the price's implied chance (bigger gaps are usually news the model missed)</span></div>
     <div class="wrow"><b>Price</b><span>${fmtOdds(L.price[0])} to ${fmtOdds(L.price[1])}, one play per game, ${L.per_slate} a slate at most</span></div>
@@ -2010,7 +2011,7 @@ function renderModel() {
   document.getElementById('modelBody').innerHTML = `<div class="lab"><div class="eb">How Onyx ${esc(C.name)} works</div><h3>${esc(M.title || 'The data, the model and what is tested')}</h3>
     ${(M.method || []).map(p => `<p>${esc(p)}</p>`).join('') || `<p>Live scores, the gamecenter and the schedule come from ESPN's public feed, refreshed through the day and polled live on this page. Every price is an Onyx price.</p>`}
     ${(M.tests || []).length ? `<div class="stat-grid">${M.tests.map(t => `<div><span>${esc(t.k)}</span><b>${esc(t.v)}</b><div class="dim" style="font-size:11px">${esc(t.d || '')}</div></div>`).join('')}</div>` : ''}
-    <p class="dim" style="font-size:12px">Model ${esc(M.version || 'not live yet')} · ${M.status === 'live' ? 'picks live' : 'leans only'} · data built ${esc(SD.generated ? new Date(SD.generated).toLocaleString('en-US', {timeZone: 'America/New_York'}) + ' ET' : '')}</p></div>
+    <p class="dim" style="font-size:12px">Model ${esc(M.version || 'not live yet')} · ${M.status === 'live' ? 'picks live' : M.status === 'trial' ? 'one lane on trial, the rest leans' : 'leans only'} · data built ${esc(SD.generated ? new Date(SD.generated).toLocaleString('en-US', {timeZone: 'America/New_York'}) + ' ET' : '')}</p></div>
     ${engineHtml(M.engine)}
     ${backtestBlock(M.backtest)}
     ${(M.changelog || []).length ? `<div class="lab"><div class="eb">Changelog · the lab notebook</div><ul>${M.changelog.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>` : ''}

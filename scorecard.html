@@ -48,6 +48,12 @@ body{background:#0c0c0c;color:#fff;margin:0}
 .lab-pre button{padding:8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:#ddd;font:600 12px system-ui,sans-serif;cursor:pointer}
 .lab-pre button:hover{border-color:rgba(176,56,249,.7)}
 .lab-out{margin-top:6px}
+.lab-sh{font:700 11px monospace;letter-spacing:.1em;text-transform:uppercase;color:#d795ff;margin:4px 0 6px}
+.lab-split{margin-top:14px}.lab-split h4{margin:0 0 6px;font:700 11px monospace;letter-spacing:.08em;text-transform:uppercase;color:#d795ff}
+.lab-split .sg{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,160px),1fr));gap:6px}
+.lab-split .sc2{padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)}
+.lab-split .sc2 span{display:block;font:600 10px monospace;letter-spacing:.06em;text-transform:uppercase;color:#9a93a6}
+.lab-split .sc2 b{font:800 15px monospace}.lab-split .sc2 small{color:#9a93a6;font-size:11px;margin-left:6px}
 .verdict{padding:12px 14px;border-radius:14px;margin-bottom:10px;font-size:14px;line-height:1.5;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04)}
 .verdict.good{border-color:rgba(97,233,112,.5);background:rgba(97,233,112,.08)}.verdict.bad{border-color:rgba(255,107,129,.45);background:rgba(255,107,129,.07)}
 .lab-t{width:100%;border-collapse:collapse;font-size:13px}
@@ -62,7 +68,7 @@ body{background:#0c0c0c;color:#fff;margin:0}
 <body class="ox-page">
 <main>
   <section class="ox-wrap sc" id="scorecard">
-    <a class="sc-back" href="home.html">‹ Onyx Sports</a>
+    <a class="sc-back" href="home.html">‹ Onyx Sports</a> <a class="sc-back" href="how.html" style="margin-left:14px">How every model works ›</a>
     <div class="sc-h"><div><span class="ox-eyebrow">The scorecard</span><h1>Every lane.<br>Graded in public.</h1>
       <p>Every way the site picks, in one place: what is tracked, what is on trial, what is only a lean, and why. Records come straight from the public ledgers and update with every build. Dollar figures are $10 a bet at the price logged.</p></div></div>
     <div class="sc-tiles" id="scTiles"></div>
@@ -81,6 +87,16 @@ body{background:#0c0c0c;color:#fff;margin:0}
       <label>Price from<input id="lMin" type="number" inputmode="numeric" placeholder="e.g. -200"></label>
       <label>Price to<input id="lMax" type="number" inputmode="numeric" placeholder="e.g. +150"></label>
       <label>Model edge at least (pts)<input id="lEdge" type="number" inputmode="decimal" step="0.5" placeholder="any"></label>
+    </form>
+    <div class="lab-sh">Splits</div>
+    <form class="lab-form" id="labSplits" onsubmit="return false">
+      <label>Bet side is<select id="sHA"><option value="">Home or away</option><option value="h">Home</option><option value="a">Away</option></select></label>
+      <label>Start<select id="sDN"><option value="">Day or night</option><option value="0">Day (before 5 PM local)</option><option value="1">Night</option></select></label>
+      <label>Game in<select id="sTZ"><option value="">Any time zone</option><option value="0">Eastern</option><option value="1">Central</option><option value="2">Mountain</option><option value="3">Pacific</option><option value="ew">East coast (ET)</option><option value="wc">West coast (PT)</option></select></label>
+      <label>Away team travel<select id="sTR"><option value="">Any</option><option value="0">Same time zone</option><option value="1">One zone</option><option value="2">Two+ zones (coast to coast)</option></select></label>
+      <label>Bet team rest<select id="sRS"><option value="">Any</option><option value="1">Back-to-back</option><option value="2">One day off</option><option value="3">Two+ days off</option></select></label>
+      <label>Opponent rest<select id="sRO"><option value="">Any</option><option value="1">Back-to-back</option><option value="2">One day off</option><option value="3">Two+ days off</option></select></label>
+      <label>Month<select id="sMO"><option value="">Any month</option>${''}</select></label>
     </form>
     <div class="lab-out" id="labOut"><div class="empty">Loading history...</div></div>
     <p class="note" id="labNote"></p>
@@ -131,6 +147,12 @@ function gradeBool(rows, winKey, oddsKey) {
   return g;
 }
 const LANES = [
+  {sport: 'NFL', name: 'Receptions unders', status: 'trial', src: 'data/nfl/open_trial.json', grade: gradePicks, href: 'nfl.html#plays',
+   what: 'Receptions unders where the model beats Onyx\'s opening price by 3 points or more, at most 12 a day. Overs logged before 10/31 stay in this record.',
+   ev: 'Counting every player who played, unders beat the opening price in 2025 (+6.1%, 468 bets) and 2026 (+20.1%, 187). Overs did not.'},
+  {sport: 'NFL', name: 'Sides, totals, yards, touchdowns', status: 'lean', bt: 'nfl', href: 'nfl.html#model',
+   what: 'Leans and projections. Touchdown chances are Onyx\'s own price with the margin removed.',
+   ev: 'Tested 10/26 to 10/31: team ratings (scores and play by play), 1st-half and 1st-quarter totals, rushing, passing and receiving yards and touchdown scorers all lost to Onyx in a season they were not tuned on.'},
   {sport: 'NBA', name: 'Player props', status: 'tracked', src: 'data/nba/picks_history.json', grade: gradePicks, href: 'nba.html#record',
    what: 'Points, rebounds and assists where the model beats the Onyx price, graded off the box score.',
    ev: 'Live because the NBA model beat Onyx\'s prices on a season it never saw (v8 added confirmed starting fives on 10/31).'},
@@ -140,23 +162,17 @@ const LANES = [
   {sport: 'NBA', name: '1st-quarter total and first basket', status: 'trial', src: 'data/nba/open_trial.json', grade: gradePicks, href: 'nba.html#plays',
    what: 'Logged at the first Onyx price we see for the line, only while it is still the opening price.',
    ev: 'Both beat Onyx\'s opening price in testing but not the closing price, so they are on trial until this record decides.'},
-  {sport: 'NFL', name: 'Receptions unders', status: 'trial', src: 'data/nfl/open_trial.json', grade: gradePicks, href: 'nfl.html#plays',
-   what: 'Receptions unders where the model beats Onyx\'s opening price by 3 points or more, at most 12 a day. Overs logged before 10/31 stay in this record.',
-   ev: 'Counting every player who played, unders beat the opening price in 2025 (+6.1%, 468 bets) and 2026 (+20.1%, 187). Overs did not.'},
+  {sport: 'NHL', name: 'Team ratings, skaters, goalies', status: 'lean', bt: 'nhl', href: 'nhl.html#model',
+   what: 'Leans on the page, never graded.', ev: ''},
+  {sport: 'Golf', name: 'Strokes-gained model', status: 'lean', href: 'golf.html#model', what: 'Built and tested against results.',
+   ev: 'Onyx does not price golf yet, so there is nothing to grade against. It is tested the day Onyx posts golf prices.'},
+  {sport: 'Tennis', name: 'Elo match prices', status: 'lean', bt: 'tennis', href: 'tennis.html#model', what: 'Leans on the page, never graded.', ev: ''},
   {sport: 'NCAAF', name: 'Spreads and totals', status: 'tracked', src: 'data/cfb/picks_history.json', grade: gradePicks, href: 'cfb.html#plays',
    what: 'College spreads (and totals logged before 11/1) where the team ratings beat Onyx\'s price.',
    ev: 'The spread lane beat Onyx\'s prices on games it never saw; totals moved to on trial on 11/1 after a weak 2025.'},
   {sport: 'NCAAF', name: 'Totals', status: 'trial', src: 'data/cfb/open_trial.json', grade: gradePicks, href: 'cfb.html#plays',
    what: 'College totals at Onyx\'s opening price, on trial since 11/1.',
    ev: 'Passed on 2026 but lost at the 2025 close (-20.3%), so it has to earn its place here.'},
-  {sport: 'NHL', name: 'Team ratings, skaters, goalies', status: 'lean', bt: 'nhl', href: 'nhl.html#model',
-   what: 'Leans on the page, never graded.', ev: ''},
-  {sport: 'Tennis', name: 'Elo match prices', status: 'lean', bt: 'tennis', href: 'tennis.html#model', what: 'Leans on the page, never graded.', ev: ''},
-  {sport: 'NFL', name: 'Sides, totals, yards, touchdowns', status: 'lean', bt: 'nfl', href: 'nfl.html#model',
-   what: 'Leans and projections. Touchdown chances are Onyx\'s own price with the margin removed.',
-   ev: 'Tested 10/26 to 10/31: team ratings (scores and play by play), 1st-half and 1st-quarter totals, rushing, passing and receiving yards and touchdown scorers all lost to Onyx in a season they were not tuned on.'},
-  {sport: 'Golf', name: 'Strokes-gained model', status: 'lean', href: 'golf.html#model', what: 'Built and tested against results.',
-   ev: 'Onyx does not price golf yet, so there is nothing to grade against. It is tested the day Onyx posts golf prices.'},
   {sport: 'MLB', name: 'HR edge plays (2026)', status: 'closed', src: 'data/archive/mlb_2026/hr_history.json', href: 'mlb-2026.html',
    filter: r => r.prob != null && r.implied != null && r.prob - r.implied > 1.5, grade: rows => gradeBool(rows, 'win', 'odds'),
    what: 'Home runs where the model beat the Onyx price by 1.5 points or more. Season closed 10/29.', ev: 'The frozen season page has every play.'},
@@ -218,6 +234,10 @@ const PRESETS = [
   {t: 'NBA overs at plus money', s: 'nba', m: 'all', side: 'A', min: 100},
   {t: 'NBA props, model edge 3+', s: 'nba', m: 'all', side: 'model', edge: 3},
   {t: 'NBA assists unders', s: 'nba', m: 'ast', side: 'B'},
+  {t: 'NBA road teams on a back-to-back', s: 'nba', m: 'spread', side: 'B', split: {sRS: '1'}},
+  {t: 'West coast teams playing early in the East (NFL)', s: 'nfl', m: 'spread', side: 'B', split: {sTR: '2', sDN: '0', sTZ: '0'}},
+  {t: 'NHL home teams vs a tired opponent', s: 'nhl', m: 'ml', side: 'A', split: {sRO: '1'}},
+  {t: 'NFL prime-time unders', s: 'nfl', m: 'total', side: 'B', split: {sDN: '1'}},
   {t: 'MLB home runs at +400 or longer', s: 'mlb', m: 'hr_yes', side: 'A', min: 400},
   {t: 'MLB home runs, +250 to +350', s: 'mlb', m: 'hr_yes', side: 'A', min: 250, max: 350},
   {t: 'MLB strikeout unders', s: 'mlb', m: 'k', side: 'B'},
@@ -255,30 +275,47 @@ function fillSelects(keep) {
   sd.innerHTML = sides.map(([v, n]) => `<option value="${v}">${n}</option>`).join('');
   sd.value = sides.some(x => x[0] === sv) ? sv : sides[0][0];
 }
-const DATA = {};
-function need(sports) {
-  return Promise.all(sports.map(k => DATA[k] ? null : (DATA[k] = getJSON('data/rules_lab/' + k + '.json').catch(() => ({}))))).then(() =>
-    Promise.all(sports.map(k => Promise.resolve(DATA[k]).then(v => { DATA[k] = v; }))));
+// history files: data/rules_lab/<sport>/<market>.json, columnar; loaded only for the market a rule tests
+const DATA = {}, LOADING = {};
+function need(pairs) {
+  return Promise.all(pairs.map(([k, m]) => {
+    if (DATA[k] && DATA[k][m]) return null;
+    const key = k + '/' + m;
+    return LOADING[key] || (LOADING[key] = getJSON('data/rules_lab/' + key + '.json').then(c => {
+      const o = [], cl = [];
+      for (let i = 0; i < c.t.length; i++) (c.t[i] ? cl : o).push([c.w[i], c.p[i], c.l[i], c.a[i], c.b[i], c.y[i], c.c[i]]);
+      (DATA[k] = DATA[k] || {})[m] = {o, c: cl};
+    }).catch(() => { (DATA[k] = DATA[k] || {})[m] = {}; }));
+  }));
 }
 let RUN = 0;
 async function runLab() {
-  const sp0 = document.getElementById('lSport').value;
-  const want = sp0 === 'all' ? Object.keys(LAB.sports) : [sp0];
-  if (want.some(k => !DATA[k] || DATA[k] instanceof Promise)) {
+  const sp0 = document.getElementById('lSport').value, mk0 = document.getElementById('lMkt').value;
+  const pairs = [];
+  (sp0 === 'all' ? Object.keys(LAB.sports) : [sp0]).forEach(k => Object.keys((LAB.sports[k] || {}).markets || {}).forEach(m => { if (mk0 === 'all' || m === mk0) pairs.push([k, m]); }));
+  if (pairs.some(([k, m]) => !(DATA[k] && DATA[k][m]))) {
     const my = ++RUN;
-    document.getElementById('labOut').innerHTML = '<div class="empty">Loading ' + esc(sp0 === 'all' ? 'every sport' : (SPORT_N[sp0] || sp0)) + ' history...</div>';
-    await need(want);
+    const n = pairs.reduce((a, [k, m]) => a + ((LAB.sports[k] || {}).markets || {})[m] || 0, 0);
+    document.getElementById('labOut').innerHTML = '<div class="empty">Loading ' + n.toLocaleString() + ' priced lines of history...</div>';
+    await need(pairs);
     if (my !== RUN) return;
   }
   const sp = document.getElementById('lSport').value, mk = document.getElementById('lMkt').value, side = document.getElementById('lSide').value;
   const num = id => { const v = document.getElementById(id).value; return v === '' ? null : +v; };
   const pmin = num('lMin'), pmax = num('lMax'), emin = num('lEdge');
   const cells = {};       // `${w}${t}` -> {n, w, u, pr}
+  const sv = id => document.getElementById(id).value;
+  const fHA = sv('sHA'), fDN = sv('sDN'), fTZ = sv('sTZ'), fTR = sv('sTR'), fRS = sv('sRS'), fRO = sv('sRO'), fMO = sv('sMO');
+  const restB = r => r == null ? null : r <= 1 ? '1' : r === 2 ? '2' : '3';
+  const SPL = {};         // split -> value -> {n, w, u} at the opening price, Onyx periods
+  const addS = (k, v, won, price) => { if (v == null) return; const o = (SPL[k] = SPL[k] || {}); const c = (o[v] = o[v] || {n: 0, w: 0, u: 0}); c.n++; c.w += won ? 1 : 0; c.u += won ? dec(price) - 1 : -1; };
+  let noCtx = 0;
   const sports = sp === 'all' ? Object.keys(LAB.sports) : [sp];
   let usedEdge = false, noModel = 0;
   sports.forEach(k => Object.entries(DATA[k] || {}).forEach(([m, byT]) => {
     if (mk !== 'all' && m !== mk) return;
-    Object.entries(byT).forEach(([t, rows]) => rows.forEach(([w, p, line, a, b, y]) => {
+    const mkts = (LAB.sports[k] || {}).market || [];
+    Object.entries(byT).forEach(([t, rows]) => rows.forEach(([w, p, line, a, b, y, cx]) => {
       // which side this rule bets, its price, the model's chance of it, and whether it won
       let s = side;
       if (s === 'fav' || s === 'dog') { if (b == null) { if (s === 'fav' ? a >= 0 : a < 0) return; s = 'A'; } else { const aFav = imp(a) >= imp(b); s = (s === 'fav') === aFav ? 'A' : 'B'; } }
@@ -297,8 +334,31 @@ async function runLab() {
         const ps = s === 'A' ? p : 1 - p;
         if ((ps - imp(price)) * 100 < emin) return;
       }
+      // the splits, from the bet side's point of view
+      const x = cx || [];
+      const home = x[0] == null ? null : (s === 'A') === (x[0] === 1);           // is the bet side the home side
+      const myRest = home == null ? null : restB(home ? x[4] : x[5]), opRest = home == null ? null : restB(home ? x[5] : x[4]);
+      if (fHA || fDN || fTZ || fTR || fRS || fRO || fMO) {
+        if (!cx) { noCtx++; return; }
+        if (fHA && (home == null || (fHA === 'h') !== home)) return;
+        if (fDN && String(x[1]) !== fDN) return;
+        if (fTZ && !(fTZ === 'ew' ? x[2] === 0 : fTZ === 'wc' ? x[2] === 3 : String(x[2]) === fTZ)) return;
+        if (fTR && (x[3] == null || (fTR === '2' ? x[3] < 2 : String(x[3]) !== fTR))) return;
+        if (fRS && myRest !== fRS) return;
+        if (fRO && opRest !== fRO) return;
+        if (fMO && String(x[6]) !== fMO) return;
+      }
       const c = cells[w + t] || (cells[w + t] = {n: 0, w: 0, u: 0, pr: 0});
       c.n++; c.w += won ? 1 : 0; c.u += won ? dec(price) - 1 : -1; c.pr += imp(price);
+      if (t === 'o' && cx && mkts.indexOf(w) < 0) {
+        addS('Home or away', home == null ? null : home ? 'Home' : 'Away', won, price);
+        addS('Day or night', x[1] == null ? null : x[1] ? 'Night' : 'Day', won, price);
+        addS('Time zone of the game', x[2] == null ? null : ['Eastern', 'Central', 'Mountain', 'Pacific'][x[2]], won, price);
+        addS('Away team travel', x[3] == null ? null : x[3] >= 2 ? 'Two+ zones' : x[3] === 1 ? 'One zone' : 'Same zone', won, price);
+        addS('Bet team rest', myRest == null ? null : {1: 'Back-to-back', 2: 'One day off', 3: 'Two+ days off'}[myRest], won, price);
+        addS('Opponent rest', opRest == null ? null : {1: 'Opp back-to-back', 2: 'Opp one day off', 3: 'Opp two+ off'}[opRest], won, price);
+        addS('Month', ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][x[6]], won, price);
+      }
     }));
   }));
   // the periods with data (each sport's seasons, oldest first)
@@ -313,7 +373,9 @@ async function runLab() {
       <td class="${roi == null ? '' : roi >= 0 ? 'g' : 'r'}">${c.n ? money(10 * c.u) : '-'}</td><td class="${roi == null ? '' : roi >= 0 ? 'g' : 'r'}">${roi == null ? '-' : pctS(roi)}</td></tr>`};
   });
   // judged at the opening price, period by period: every period with 30+ bets must make money
-  const open = rowsH.filter(r => r.t === 'o'), judged = open.filter(r => r.c.n >= 30);
+  const mkP = sp !== 'all' && LAB.sports[sp] ? LAB.sports[sp].market || [] : [];
+  const open = rowsH.filter(r => r.t === 'o'), judged = open.filter(r => r.c.n >= 30 && mkP.indexOf(r.w) < 0);
+  const mkJ = open.filter(r => r.c.n >= 30 && mkP.indexOf(r.w) >= 0);
   const nm = r => esc(sp !== 'all' && LAB.sports[sp] ? winN[r.w] : winN[per.indexOf(r.w)]);
   const list = judged.map(r => `${pctS(r.roi)} in ${nm(r)}`).join(', ');
   let v, cls = '';
@@ -321,11 +383,19 @@ async function runLab() {
   else if (judged.length < 2) v = `Too few bets to judge: it needs 30+ bets at the opening price in at least two periods (${open.map(r => r.c.n + ' in ' + nm(r)).join(', ')}).`;
   else if (judged.every(r => r.roi > 0)) { cls = 'good'; v = `Made money at the opening price in every period with enough bets (${list}). Worth a trial: the next step is logging it live at the open.`; }
   else { cls = 'bad'; v = `Did not hold up at the opening price: ${list}. Onyx's margin beats this rule.`; }
-  document.getElementById('labOut').innerHTML = `<div class="verdict ${cls}">${v}</div><div class="lab-wrap"><table class="lab-t"><thead><tr><th>When</th><th>Bets</th><th>W-L</th><th>Hit</th><th>Needed</th><th>$10 a bet</th><th>Return</th></tr></thead><tbody>${rowsH.map(r => r.html).join('')}</tbody></table></div>`;
+  if (mkJ.length) v += ` Before Onyx priced it, at market prices: ${mkJ.map(r => pctS(r.roi) + ' in ' + nm(r).replace(/ · market prices, before Onyx/, '')).join(', ')}.`;
+  document.getElementById('labOut').innerHTML = `<div class="verdict ${cls}">${v}</div><div class="lab-wrap"><table class="lab-t"><thead><tr><th>When</th><th>Bets</th><th>W-L</th><th>Hit</th><th>Needed</th><th>$10 a bet</th><th>Return</th></tr></thead><tbody>${rowsH.map(r => r.html).join('')}</tbody></table></div>` +
+    // every split of this rule at once (opening price, Onyx seasons), so the factor that matters stands out
+    (Object.keys(SPL).length ? `<div class="lab-split"><h4>Splits for this rule · opening price, Onyx seasons</h4>` + Object.entries(SPL).map(([k, o]) =>
+      `<div style="margin-bottom:8px"><div class="lab-sh" style="color:#9a93a6">${esc(k)}</div><div class="sg">` + Object.entries(o).filter(([, c]) => c.n >= 10).map(([v, c]) =>
+        `<div class="sc2"><span>${esc(v)}</span><b class="${c.u >= 0 ? 'g' : 'r'}">${pctS(c.u / c.n)}</b><small>${c.w}-${c.n - c.w}</small></div>`).join('') + `</div></div>`).join('') + `</div>` : '');
   document.getElementById('labNote').textContent = `"Needed" is the hit rate the prices required to break even. Every model chance is priced only from games before that one. ` +
     (emin != null && noModel ? `${noModel} lines with no model chance (touchdown props) are left out when a model edge is set. ` : '') +
+    (noCtx ? `${noCtx} lines with no game context (tennis) are left out when a split is set. ` : '') +
+    `Splits are from the bet side's point of view: day means a start before 5 PM at the home park (college: Eastern time); rest counts days since the team's last game. Splits with fewer than 10 bets are hidden. ` +
+    `Periods marked "market prices, before Onyx" use another book's prices from before Onyx priced that sport: research only, judged separately. ` +
     `Model chances here are the tested ones: NFL props use the season-average projection, not the newer volume model behind the receptions trial, so their edges differ from the live lane's. ` +
-    `History built ${LAB.built}: ` + Object.entries(LAB.sports).map(([k, v]) => `${SPORT_N[k] || k} ${v.names.join(' and ')} (${Object.values(v.markets).reduce((a, b) => a + b, 0).toLocaleString()} prices)`).join(', ') + '.';
+    `History built ${LAB.built}: ` + Object.entries(LAB.sports).map(([k, v]) => `${SPORT_N[k] || k} ${(v.periods || v.names.map((_, i) => i)).map(i => v.names[i]).join(' and ')} (${Object.values(v.markets).reduce((a, b) => a + b, 0).toLocaleString()} prices)`).join(', ') + '.';
 }
 function preset(i) {
   const P = PRESETS[i];
@@ -335,6 +405,7 @@ function preset(i) {
   document.getElementById('lMin').value = P.min != null ? P.min : '';
   document.getElementById('lMax').value = P.max != null ? P.max : '';
   document.getElementById('lEdge').value = P.edge != null ? P.edge : '';
+  ['sHA', 'sDN', 'sTZ', 'sTR', 'sRS', 'sRO', 'sMO'].forEach(id => { document.getElementById(id).value = (P.split || {})[id] || ''; });
   runLab();
   try { if (window.gtag) gtag('event', 'rules_lab', {rule: P.t}); } catch (e) {}
 }
@@ -345,7 +416,8 @@ async function lab() {
   fillSelects();
   document.getElementById('lSport').onchange = () => { fillSelects(); runLab(); };
   document.getElementById('lMkt').onchange = () => { fillSelects({m: document.getElementById('lMkt').value}); runLab(); };
-  ['lSide', 'lMin', 'lMax', 'lEdge'].forEach(id => { const e = document.getElementById(id); e.oninput = runLab; e.onchange = runLab; });
+  document.getElementById('sMO').innerHTML = '<option value="">Any month</option>' + ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map((m, i) => `<option value="${i + 1}">${m}</option>`).join('');
+  ['lSide', 'lMin', 'lMax', 'lEdge', 'sHA', 'sDN', 'sTZ', 'sTR', 'sRS', 'sRO', 'sMO'].forEach(id => { const e = document.getElementById(id); e.oninput = runLab; e.onchange = runLab; });
   preset(PRESETS.findIndex(p => p.s === 'all' || LAB.sports[p.s]));
 }
 scorecard(); lab();
