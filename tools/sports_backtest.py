@@ -145,6 +145,19 @@ def nfl_prop_samples(lines):
     by = M._games_by_player(rows)
     allowed = M._team_allowed(rows)
     lgc = {}
+    # who played: nflverse snap counts (data/nfl/nflverse.json). A priced player with
+    # snaps but no box line was never thrown to or handed the ball: his stat is 0 (a
+    # sure under), not a void. Dropping those (the pre-10/31 behaviour) made overs look
+    # far better than they were; only a player with no snaps is a void, as Onyx grades it.
+    snaps = set()
+    for yr, xv in ((lane.load("nflverse.json", {}) or {}).get("seasons") or {}).items():
+        for s_, w_, t_, n_, pct in xv.get("snaps") or []:
+            if pct:
+                snaps.add((s_, w_, t_, n_))
+    vt = getattr(M, "VERSE_TEAM", {})
+    pid_of = {}
+    for r in sorted(rows, key=lambda r: r["date"]):
+        pid_of[(nk(r["name"]), r["team"])] = r
     out = []
     for fid, x in lines.items():
         h, a = tm.get(nk(x["home"])), tm.get(nk(x["away"]))
@@ -157,10 +170,15 @@ def nfl_prop_samples(lines):
         if not g or g["id"] not in by_gid:
             continue
         box = by_gid[g["id"]]
+        any_row = next(iter(box.values()))
         for name, mk in (x.get("props") or {}).items():
             r = box.get(nk(name))
             if not r:
-                continue
+                last = next((pid_of.get((nk(name), t)) for t in (h, a) if pid_of.get((nk(name), t))), None)
+                if not last or (any_row["season"], any_row["week"], vt.get(last["team"], last["team"]), M._vk(name)) not in snaps:
+                    continue          # no snaps: void
+                r = {"pid": last["pid"], "team": last["team"], "season": any_row["season"], "week": any_row["week"],
+                     "opp": a if last["team"] == h else h}   # played, no touches: every stat 0
             hist = [q for q in by.get(r["pid"], []) if (q["season"], q["week"]) < (r["season"], r["week"])]
             for mid, v in mk.items():
                 s = PROP_MKT.get(mid)

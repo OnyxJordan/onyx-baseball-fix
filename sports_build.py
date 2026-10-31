@@ -20,7 +20,8 @@ import sports_lab as L
 ONYX_LEAGUE = {"nfl": "NFL", "cfb": "NCAAF", "nhl": "NHL"}
 
 ROADMAP = {
-    "nfl": ["Tested 10/26 to 10/29 against two seasons of real Onyx lines (440 games): receptions beat Onyx's opening price in both seasons, so they run on trial at the open. Touchdown scorers, rushing and passing yards did not, so they stay leans",
+    "nfl": ["Tested 10/26 to 10/31 against two seasons of real Onyx lines (440 games), counting every priced player who played, including games he was never thrown to: receptions unders beat Onyx's opening price in both seasons (+6.1% and +20.1%), so they run on trial at the open; overs did not. Rushing and passing yards did not",
+            "Re-tested 10/31: touchdown scorers lost to Onyx's price in both seasons once players who played without a touch were counted, so the touchdown chance shown is Onyx's price with its margin removed, and no scorer is flagged as value",
             "Tested 10/31: game ratings from every play since 2024 (expected points per play, adjusted for opponent, with scores alongside). On 2026 games they never saw, they made Onyx's spread and total worse, open and close, as the score-only ratings did. NFL sides and totals stay leans",
             "Live 10/31: ESPN's injury report. A player ruled out (out, IR, inactive, doubtful) gets no projection, lean, Top 10 spot or trial play; a questionable player is marked Q and kept out of the Top 10",
             "Touchdown scorer and passing touchdown markets"],
@@ -140,6 +141,8 @@ def nfl_open_lane(lane, out, slate, season, rows, M):
             continue          # moved off the opening price: not bettable as logged
         po = M.prob_over_volume("rec", r["proj"], r["line"])
         for side, p, price, sel in (("over", po, r["over"], r.get("over_sel")), ("under", 1 - po, r["under"], r.get("under_sel"))):
+            if side not in getattr(M, "TRIAL_SIDES", ("over", "under")):
+                continue          # v6: unders only (overs lost 15% at the open in 2025 once zero-target games count)
             if p - L.implied(price) >= 0.03:
                 cands.append((p - L.implied(price), {"date": slate.get("date"), "season": season, "week": g.get("week"), "key": key, "gid": r["gid"],
                                "pid": r["pid"], "name": r["name"], "team": r["team"], "opp": r["opp"],
@@ -283,7 +286,9 @@ def nfl_block(lane, slate, odds):
             r.update(side=ps["side"], price=ps["price"], sel=r["over_sel"] if ps["side"] == "over" else r["under_sel"],
                      prob=ps["prob"], implied=ps["implied"], edge=ps["edge"], ev=ps["ev"], model_p=ps["model_p"],
                      matchup=f"{r['team']} {'vs' if r['home'] else '@'} {r['opp']}")
-    # receptions at Onyx's opening price, on trial (the lane that beat the open in both seasons)
+            if r.get("vol") and r["mkt"] == "rec" and ps["side"] not in getattr(M, "TRIAL_SIDES", ("over", "under")):
+                r["value_min"] = 1.0      # v6: receptions overs lost at the open (2025 -14.8%), never a play or Top 10
+    # receptions unders at Onyx's opening price, on trial (v6: the side that beat the open in both seasons)
     block["open"] = nfl_open_lane(lane, out, slate, season, rows, M)
     # touchdown scorers (nfl_model v2): anytime and first TD chances from Onyx's
     # implied team points, against Onyx's yes prices (one-sided, so the edge is
@@ -329,11 +334,11 @@ def nfl_block(lane, slate, odds):
                     row[key + "_price"], row[key + "_sel"] = ln["over"], ln.get("over_sel")
                     row[key + "_model"] = row[key]
                     if key == "any":
-                        # v3: the chance shown is the model blended 50/50 with Onyx's price (margin removed);
-                        # value only where the model itself beats the price by 5pp+ (the backtest's bar)
+                        # v6: the chance shown is Onyx's price with its margin removed (x mkt_scale), the
+                        # model's weight w_blend (0: it lost to the price in the 10/31 re-test); never value
                         row["any"] = round(TP["w_blend"] * row["any_model"] + (1 - TP["w_blend"]) * TP["mkt_scale"] * imp_, 4)
-                        row["any_edge"] = round(row["any_model"] - imp_, 4)
-                        row["any_value"] = row["any_edge"] >= TP["value_edge"]
+                        row["any_edge"] = round(row["any"] - imp_, 4)
+                        row["any_value"] = TP["value_edge"] is not None and row["any_model"] - imp_ >= TP["value_edge"]
                     else:
                         row["first_edge"] = round(row["first"] - imp_, 4)
                         row["first_value"] = False    # Onyx's first-TD price beat the model in the backtest
@@ -911,7 +916,8 @@ def write_top(key, lane, slate, model):
           {m["id"] for e in slate.get("events") or [] for m in e.get("matches") or [] if m.get("state") == "pre"}
     rows = [DT.entry(key, r, "tracked" if r.get("sel") in tracked else "trial" if r.get("sel") in trial else "lean",
                      start.get(r.get("gid")))
-            for r in cands if DT.ok(r) and r.get("gid") in pre and not r.get("inj")]   # no questionable players in the Top 10
+            for r in cands if DT.ok(r) and r.get("gid") in pre and not r.get("inj")    # no questionable players in the Top 10
+            and (r.get("value_min") or 0) < 1]                                         # nor a side its own test says loses
     DT.write(lane.data, key, slate.get("date"), rows)
     # the full board for "Ask Onyx": every priced side, any price, plus every
     # anytime-TD price with its expected touchdowns (lam) for "2+ TD" questions
