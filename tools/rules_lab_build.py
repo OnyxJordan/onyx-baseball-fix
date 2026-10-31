@@ -249,6 +249,87 @@ def nba_more_rows():
     return out
 
 
+def nba_period_rows():
+    """NBA 1st-quarter and 1st-half totals and first basket (yes prices), graded from ESPN
+    play-by-play (bt/nba_periods.json: points scored before 12:00 and 24:00 of game time, and the
+    first player to score, free throws included), 2024-25 and 2025-26."""
+    if not os.path.exists("bt/nba_periods.json"):
+        return []
+    from nba_common import team_abbr
+    per = {(g["d"], tuple(g["teams"])): g for g in json.load(open("bt/nba_periods.json"))}
+    out = []
+    for f in ("bt/nba_2425_lines.json", "bt/nba_lines_full.json", "bt/nba_2425_mkt.json"):
+        if not os.path.exists(f):
+            continue
+        mkf = "_mkt" in f
+        for fid, x in json.load(open(f)).items():
+            if not x.get("start"):
+                continue
+            d = et_day(x["start"])
+            h, a = team_abbr(x.get("home")), team_abbr(x.get("away"))
+            g = per.get((d, tuple(sorted([h or "", a or ""]))))
+            if not g:
+                continue
+            c = ctx("nba", x["home"], x["away"], x["start"], d, None)
+            for mk, key, name in (("1st_quarter_total_points", "q1", "q1_total"), ("1st_half_total_points", "h1", "h1_total")):
+                sel = (x.get("game") or {}).get(mk) or {}
+                if "over" not in sel or "under" not in sel:
+                    continue
+                for when in ("o", "c"):
+                    ln, pa = sel["over"][when]; pb = sel["under"][when][1]
+                    if ln is None or not SB.sane(pa, pb) or g[key] == ln:
+                        continue
+                    out.append(R_("nba", name, when, d, None, ln, pa, pb, int(g[key] > ln), c, mkf))
+            first = nk(g.get("first") or "")
+            if not first:
+                continue
+            for name, mk in (x.get("props") or {}).items():
+                v = mk.get("first_basket_including_ft")
+                if not v:
+                    continue
+                for when in ("o", "c"):
+                    if v[when][1] is not None:
+                        out.append(R_("nba", "first_basket", when, d, None, 0.5, v[when][1], None, int(nk(name) == first), c, mkf))
+    print(f"  nba 1Q / 1H totals + first basket: {len(out)}")
+    return out
+
+
+def tennis_game_rows(path):
+    """Tennis total games and game spread (side A = the first-listed player), graded from the
+    results file (games won by each player). No model chance."""
+    if not os.path.exists(path) or not os.path.exists("bt/tennis_results_full.json"):
+        return []
+    res = {}
+    for m in json.load(open("bt/tennis_results_full.json")):
+        res.setdefault((m["date"], frozenset((nk(m["w"]), nk(m["l"])))), m)
+    out = []
+    for fid, x in json.load(open(path)).items():
+        if not x.get("start"):
+            continue
+        a, b = nk(x.get("home")), nk(x.get("away"))
+        d0 = x["start"][:10]; m = None
+        for dd in (d0, (date.fromisoformat(d0) - timedelta(days=1)).isoformat(), (date.fromisoformat(d0) + timedelta(days=1)).isoformat()):
+            m = res.get((dd, frozenset((a, b)))) or m
+        if not m or m.get("games_w") is None:
+            continue
+        ga, gb = (m["games_w"], m["games_l"]) if nk(m["w"]) == a else (m["games_l"], m["games_w"])
+        tot, mar = ga + gb, ga - gb
+        for mk, sel in (x.get("game") or {}).items():
+            for when in ("o", "c"):
+                if mk == "total_games" and "over" in sel and "under" in sel:
+                    ln, pa = sel["over"][when]; pb = sel["under"][when][1]
+                    if ln is not None and SB.sane(pa, pb) and tot != ln:
+                        out.append(R_("tennis", "total_games", when, m["date"], None, ln, pa, pb, int(tot > ln), None))
+                elif mk == "game_spread":
+                    ka = next((k for k in sel if nk(k) == a), None); kb = next((k for k in sel if nk(k) == b), None)
+                    if ka and kb:
+                        (ln, pa), pb = sel[ka][when], sel[kb][when][1]
+                        if ln is not None and SB.sane(pa, pb) and mar + ln != 0:
+                            out.append(R_("tennis", "game_spread", when, m["date"], None, ln, pa, pb, int(mar + ln > 0), None))
+    print(f"  tennis games markets {path}: {len(out)}")
+    return out
+
+
 # ── MLB ────────────────────────────────────────────────────────────────
 def mlb_rows():
     games = []
@@ -452,6 +533,7 @@ def main():
     R = []
     R += nba_rows()
     R += nba_more_rows()
+    R += nba_period_rows()
     R += mlb_rows()
     for key, f in (("nfl", "bt/nfl_game.json"), ("cfb", "bt/cfb_lines.json"), ("nhl", "bt/nhl_lines.json")):
         M = importlib.import_module({"nfl": "nfl_model", "cfb": "cfb_model", "nhl": "nhl_model"}[key])
@@ -463,6 +545,8 @@ def main():
     R += [sample_row("nfl", r) for r in SB.nfl_prop_samples(json.load(open("bt/nfl_lines.json")))]
     R += td_rows()
     R += nfl_2024_rows()
+    for f in ("bt/tennis_atp_games.json", "bt/tennis_wta_games.json"):
+        R += tennis_game_rows(f)
     for f in ("bt/tennis_atp_lines.json", "bt/tennis_wta_lines.json"):
         if os.path.exists(f):
             R += [R_("tennis", r["mkt"], r["when"], r["date"], r["p"], None, r["over"], r["under"], r["y"], None)
