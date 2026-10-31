@@ -28,58 +28,149 @@
     return getJSON('ai.json').then(function (j) { AI = (j && j.url) || ''; return AI; }).catch(function () { AI = ''; return AI; });
   }
 
-  // ── the built-in parser: the common requests, no AI needed ──────────────
+  // ── the built-in parser: no AI, no keys. Reads the request against today's
+  // boards, so it knows every player and team that has a line today. ─────────
   var WORDS = [
-    [/\b(2|two)\+?\s*(td|tds|touchdowns?)\b|\bmultiple (td|tds|touchdowns)\b/, 'two_plus_td'],
-    [/\b(anytime\s*)?(td|tds|touchdowns?)\b/, 'anytime_td'],
-    [/\b(1st|first)[\s-]*(quarter|q)\b|\b1q\b/, 'q1_total'],
-    [/\brebounds?\b|\breb\b|\bboards\b/, 'reb'],
-    [/\bassists?\b|\bast\b|\bdimes\b/, 'ast'],
-    [/\breceptions?\b|\bcatches\b/, 'rec'],
-    [/\breceiving\b/, 'rec_yds'],
-    [/\brushing\b|\brush\b/, 'rush_yds'],
-    [/\bpassing\b|\bpass yards\b/, 'pass_yds'],
-    [/\bpoints?\b|\bpts\b|\bscorers?\b/, 'pts'],
-    [/\bspreads?\b|\bcover\b/, 'spread'],
-    [/\btotals?\b|\bo\/u\b/, 'total'],
-    [/\bmoneylines?\b|\bml\b|\bto win\b|\bwinners?\b/, 'ml'],
+    [/\b(2|two)\+?\s*(td|tds|touchdowns?)\b|\bmultiple (td|tds|touchdowns)\b|\bmulti[\s-]?td\b|\bdouble (td|tds|touchdown)/, 'two_plus_td'],
+    [/\b(anytime\s*)?(td|tds|touchdowns?)\b|\b(td|touchdown) scorers?\b|\bfind the end ?zone\b|\bscore a td\b/, 'anytime_td'],
+    [/\b(1st|first)[\s-]*(quarter|q)\b|\b1q\b|\bq1\b/, 'q1_total'],
+    [/\brebounds?\b|\breb\b|\bboards\b|\brebs\b/, 'reb'],
+    [/\bassists?\b|\bast\b|\bdimes\b|\bdishes\b/, 'ast'],
+    [/\breceptions?\b|\bcatches\b|\brecs\b/, 'rec'],
+    [/\breceiving\b|\brec(eiving)? yds\b/, 'rec_yds'],
+    [/\brushing\b|\brush\b|\bcarries\b|\bground game\b/, 'rush_yds'],
+    [/\bpassing\b|\bpass yards\b|\bqbs?\b|\bquarterbacks?\b|\bthrowing\b/, 'pass_yds'],
+    [/\bpoints?\b|\bpts\b|\bscorers?\b|\bbuckets\b/, 'pts'],
+    [/\bspreads?\b|\bcover(s|ing)?\b|\bpuck ?line\b|\bhandicap\b|\bats\b/, 'spread'],
+    [/\b(game )?totals?\b|\bo\/u\b|\bover\/under\b/, 'total'],
+    [/\bmoney ?lines?\b|\bml\b|\bto win\b|\bwinners?\b|\bstraight up\b|\boutright\b/, 'ml'],
   ];
-  function localSpec(q) {
-    var t = ' ' + q.toLowerCase().replace(/[’']/g, '') + ' ';
-    var s = {intent: /sgp ?(\+|plus)/.test(t) ? 'parlay' : /\bsgp\b|same[\s-]*game|correlated/.test(t) ? 'sgp' : /parlay|legs?\b|ticket|slip/.test(t) ? 'parlay' : 'list', count: null, sports: [], markets: [], side: 'any',
-             min_price: null, max_price: null, min_conf: null, min_edge: null, player: null, team: null, sort: 'conf', one_per_game: true, summary: ''};
-    var n = t.match(/\b(\d{1,2})[\s-]*(leg|legs|picks?|plays?|players?|bets?)\b/) || t.match(/\btop\s*(\d{1,2})\b/);
-    var NUM = {two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, ten: 10};
-    var nw = t.match(/\b(two|three|four|five|six|seven|eight|ten)[\s-]*(leg|legs|picks?|plays?)\b/);
-    s.count = n ? +n[1] : nw ? NUM[nw[1]] : null;
-    if (/\bnba\b|basketball/.test(t)) s.sports.push('nba');
-    if (/\bnfl\b|pro football/.test(t)) s.sports.push('nfl');
-    if (/college|ncaa|cfb/.test(t)) s.sports.push('cfb');
+  var NICK = {
+    // NBA
+    hawks: 'ATL', celtics: 'BOS', nets: 'BKN', hornets: 'CHA', bulls: 'CHI', cavs: 'CLE', cavaliers: 'CLE', mavs: 'DAL', mavericks: 'DAL',
+    nuggets: 'DEN', pistons: 'DET', warriors: 'GS', dubs: 'GS', rockets: 'HOU', pacers: 'IND', clippers: 'LAC', lakers: 'LAL', grizzlies: 'MEM',
+    heat: 'MIA', bucks: 'MIL', wolves: 'MIN', timberwolves: 'MIN', pelicans: 'NO', knicks: 'NY', thunder: 'OKC', magic: 'ORL', sixers: 'PHI',
+    '76ers': 'PHI', suns: 'PHX', blazers: 'POR', 'trail blazers': 'POR', kings: 'SAC', spurs: 'SA', raptors: 'TOR', jazz: 'UTAH', wizards: 'WSH',
+    // NFL
+    cardinals: 'ARI', falcons: 'ATL', ravens: 'BAL', bills: 'BUF', panthers: 'CAR', bears: 'CHI', bengals: 'CIN', browns: 'CLE', cowboys: 'DAL',
+    broncos: 'DEN', lions: 'DET', packers: 'GB', texans: 'HOU', colts: 'IND', jaguars: 'JAX', jags: 'JAX', chiefs: 'KC', raiders: 'LV',
+    chargers: 'LAC', rams: 'LAR', dolphins: 'MIA', vikings: 'MIN', patriots: 'NE', pats: 'NE', saints: 'NO', giants: 'NYG', jets: 'NYJ',
+    eagles: 'PHI', steelers: 'PIT', '49ers': 'SF', niners: 'SF', seahawks: 'SEA', bucs: 'TB', buccaneers: 'TB', titans: 'TEN', commanders: 'WSH',
+    // NHL
+    bruins: 'BOS', sabres: 'BUF', flames: 'CGY', hurricanes: 'CAR', blackhawks: 'CHI', avalanche: 'COL', avs: 'COL', 'blue jackets': 'CBJ', stars: 'DAL',
+    'red wings': 'DET', oilers: 'EDM', canes: 'CAR', ducks: 'ANA', 'golden knights': 'VGK', knights: 'VGK', canadiens: 'MTL', habs: 'MTL', predators: 'NSH',
+    preds: 'NSH', devils: 'NJ', islanders: 'NYI', rangers: 'NYR', senators: 'OTT', flyers: 'PHI', penguins: 'PIT', pens: 'PIT', sharks: 'SJ', kraken: 'SEA',
+    blues: 'STL', lightning: 'TB', bolts: 'TB', 'maple leafs': 'TOR', leafs: 'TOR', canucks: 'VAN', capitals: 'WSH', caps: 'WSH', winnipeg: 'WPG', 'utah hockey': 'UTAH'
+  };
+  var SPORT_OF_NICK = {jets: 'nfl', kings: 'nba', panthers: 'nfl', rangers: 'nhl', cardinals: 'nfl', giants: 'nfl'};
+  var NUMW = {one: 1, a: 1, two: 2, couple: 2, double: 2, three: 3, few: 3, triple: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10};
+  var DAYS = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+
+  function esc(x) { return x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+  function names(B) {
+    // full names and unique last names (4+ letters) of everyone with a line today
+    var full = {}, last = {}, first = {};
+    (B || []).forEach(function (p) {
+      if (p.kind !== 'prop' || !p.name || p.mkt === 'q1_total') return;
+      var n = p.name.toLowerCase().replace(/[’']/g, '').replace(/\b(jr|sr|ii|iii|iv)\b\.?/g, '').replace(/\s+/g, ' ').trim();
+      full[n] = p.name;
+      var parts = n.split(' '), l = parts[parts.length - 1];
+      if (l.length >= 4) last[l] = last[l] && last[l] !== p.name ? '*' : p.name;
+      var f0 = parts[0];
+      if (parts.length > 1 && f0.length >= 4) first[f0] = first[f0] && first[f0] !== p.name ? '*' : p.name;
+    });
+    return {full: full, last: last, first: first};
+  }
+
+  function localSpec(q, B) {
+    var t = ' ' + q.toLowerCase().replace(/[’']/g, '').replace(/[?!,]/g, ' ').replace(/\s+/g, ' ') + ' ';
+    var s = {intent: 'list', count: null, sports: [], markets: [], side: 'any', min_price: null, max_price: null, min_conf: null,
+             min_edge: null, player: null, team: null, sort: 'conf', one_per_game: true, when: null, summary: ''};
+    // what kind of answer
+    if (/sgp ?(\+|plus)/.test(t)) s.intent = 'parlay';
+    else if (/\bsgp\b|same[\s-]*game|correlated|stack/.test(t)) s.intent = 'sgp';
+    else if (/parlay|\blegs?\b|legger|ticket|\bslip\b|\bcombo\b|\bdouble\b|\btriple\b|\bteaser\b/.test(t)) s.intent = 'parlay';
+    // how many
+    var n = t.match(/\b(\d{1,2})[\s-]*(leg|legs|legger|picks?|plays?|players?|bets?|team|man|teamer)\b/) || t.match(/\btop\s*(\d{1,2})\b/)
+      || t.match(/\bparlay of (\d{1,2})\b/) || t.match(/\b(\d{1,2})\s+(nba|nfl|nhl|college|tennis)\b/);
+    var nw = t.match(/\b(two|three|four|five|six|seven|eight|nine|ten|couple|few)( of)?[\s-]*(leg|legs|legger|picks?|plays?|bets?|team|man)\b/);
+    s.count = n ? +n[1] : nw ? NUMW[nw[1]] : /\bdouble\b/.test(t) && s.intent === 'parlay' ? 2 : /\btriple\b/.test(t) && s.intent === 'parlay' ? 3 : null;
+    // which sport
+    if (/\bnba\b|basketball|hoops/.test(t)) s.sports.push('nba');
+    if (/\bnfl\b|pro football|\bfootball\b(?! college)/.test(t) && !/college football/.test(t)) s.sports.push('nfl');
+    if (/college|ncaa|\bcfb\b|ncaaf/.test(t)) s.sports.push('cfb');
     if (/\bnhl\b|hockey/.test(t)) s.sports.push('nhl');
-    if (/tennis|atp|wta/.test(t)) s.sports.push('tennis');
+    if (/tennis|\batp\b|\bwta\b/.test(t)) s.sports.push('tennis');
+    // which markets
     for (var i = 0; i < WORDS.length; i++) if (WORDS[i][0].test(t) && s.markets.indexOf(WORDS[i][1]) < 0) {
       if (WORDS[i][1] === 'anytime_td' && s.markets.indexOf('two_plus_td') >= 0) continue;
+      if (WORDS[i][1] === 'pts' && /\b(score|scorer)s? (a |an )?(td|touchdown)/.test(t)) continue;
       s.markets.push(WORDS[i][1]);
     }
-    if (/\bovers?\b/.test(t) && !/\bunders?\b/.test(t)) s.side = 'over';
-    if (/\bunders?\b/.test(t) && !/\bovers?\b/.test(t)) s.side = 'under';
-    // odds: "minimum odds -200" / "no worse than -200" / "at least -200" set the floor;
-    // "plus money" / "underdogs" / "+150 or longer" set it above even money
-    var o = t.match(/(min(imum)?( odds)?|no (worse|shorter) than|at least|nothing (worse|shorter) than|odds( of)?|above|over)\s*([+-]\d{3,4})/);
-    if (o) s.min_price = +o[o.length - 1];
-    var mx = t.match(/(max(imum)?( odds)?|no (longer|better) than|under|below|at most)\s*([+-]\d{3,4})/);
-    if (mx) s.max_price = +mx[mx.length - 1];
-    if (/plus money|underdogs?|long ?shots?|\+ ?odds/.test(t)) s.min_price = Math.max(s.min_price == null ? 100 : s.min_price, 100);
-    if (/value|edge|best bets?|beat(s)? (the )?(line|price|onyx)/.test(t)) s.sort = 'edge';
-    if (/most likely|safest|locks?|highest (chance|confidence|probability)/.test(t)) s.sort = 'conf';
-    if (/recommend|favou?rite|best picks?|top picks?|your picks?|should i (bet|play)/.test(t)) s.sort = 'rec';
-    if (/most value|best value|biggest edge/.test(t)) s.sort = 'edge';
-    if (/biggest payout|longshots?|long shots?/.test(t)) s.sort = 'price';
-    var tm = t.match(/\b(atl|bos|bkn|cha|chi|cle|dal|den|det|gs|hou|ind|lac|lal|mem|mia|mil|min|no|ny|nyk|okc|orl|phi|phx|por|sac|sa|tor|utah|wsh|ari|bal|buf|car|cin|gb|jax|kc|lv|lar|lac|ne|nyg|nyj|pit|sea|sf|tb|ten)\b/);
-    if (tm && /\b(game|sgp|same game|parlay|tonight|team)\b/.test(t)) s.team = tm[1].toUpperCase();
-    if (s.markets.indexOf('two_plus_td') >= 0) { s.sort = 'two_td'; s.sports = s.sports.length ? s.sports : ['nfl']; }
-    var c = t.match(/(\d{2})\s*%/); if (c) s.min_conf = +c[1] / 100;
-    if (s.count == null) s.count = s.intent !== 'list' ? 3 : /\b(the|a) (player|play|pick)\b|\bmost likely\b/.test(t) && !/players|plays|picks/.test(t) ? 1 : 5;
+    if (/\byards\b|\byds\b/.test(t) && !s.markets.some(function (m) { return /yds/.test(m); })) s.markets.push('rec_yds', 'rush_yds', 'pass_yds');
+    if (/\bscore (the )?most\b|\bmost points\b|\btop scorer\b|\bdrop (the )?most\b/.test(t)) { if (s.markets.indexOf('pts') < 0) s.markets.push('pts'); s.sort = 'proj'; s.side = 'over'; }
+    if (/\bpra\b|pts ?\+ ?reb ?\+ ?ast/.test(t)) ['pts', 'reb', 'ast'].forEach(function (m) { if (s.markets.indexOf(m) < 0) s.markets.push(m); });
+    // over / under
+    var ov = /\bovers?\b|\bhit the over\b|\bgo over\b|\bclear\b/.test(t.replace(/\bover\s*[+-]\d/g, '').replace(/over\/under/g, '')),
+        un = /\bunders?\b|\bstay under\b|\bfade\b/.test(t.replace(/\bunder\s*[+-]\d/g, '').replace(/over\/under/g, ''));
+    if (ov && !un) s.side = 'over';
+    if (un && !ov) s.side = 'under';
+    // odds, in any wording. A floor: "-200 or better", "min -200", "nothing worse than -200",
+    // "no -200 juice". A ceiling: "+300 or less", "max +300", "under +300".
+    var fl = t.match(/(min(imum)?( odds)?( of)?|no (worse|shorter|juicier) than|nothing (worse|shorter|juicier) than|at least|odds( of)?|better than|above)\s*([+-]?\d{3,4})/)
+      || t.match(/([+-]\d{3,4})\s*(or better|or longer|and up|or more|minimum|min\b|floor)/) || t.match(/\bno\s*(-\d{3,4})\s*(juice|or worse)?/);
+    if (fl) { var v = +(fl[fl.length - 1] && /\d/.test(fl[fl.length - 1]) ? fl[fl.length - 1] : (fl[1] || fl[fl.length - 1])); if (!isNaN(v)) s.min_price = v; }
+    var fl2 = t.match(/([+-]\d{3,4})\s*(or better|or longer|and up|or more|minimum|floor)/); if (fl2) s.min_price = +fl2[1];
+    var nojuice = t.match(/\bno\s*(-\d{3,4})/); if (nojuice) s.min_price = +nojuice[1] + 1;
+    var mx = t.match(/(max(imum)?( odds)?|no (longer|better) than|below|at most|or less than)\s*([+-]\d{3,4})/) || t.match(/([+-]\d{3,4})\s*(or less|or shorter|max|cap)/);
+    if (mx) { var w = +(mx[mx.length - 1] && /\d/.test(mx[mx.length - 1]) ? mx[mx.length - 1] : mx[1]); if (!isNaN(w)) s.max_price = w; }
+    if (/plus money|plus[\s-]odds|\+ ?odds|underdogs?|\bdogs\b|long ?shots?|\bvalue dogs?\b/.test(t)) s.min_price = Math.max(s.min_price == null ? 100 : s.min_price, 100);
+    if (/even money|around even|near even|pick ?em/.test(t)) { s.min_price = -125; s.max_price = 125; }
+    if (/\bfavou?rites?\b|\bchalk\b/.test(t) && /\bml\b|money ?line|to win|\bwin\b/.test(t)) s.max_price = Math.min(s.max_price == null ? -101 : s.max_price, -101);
+    // ordering
+    if (/most likely|safest|safe\b|locks?\b|highest (chance|confidence|probability|hit rate)|sure ?thing|surest|can.?t lose|banker/.test(t)) s.sort = 'conf';
+    if (/recommend|favou?rite (play|pick|bet|sgp|parlay)|best (picks?|plays?|bets?)|top picks?|your picks?|should i (bet|play)|what do you like|you like|pick of the (day|night)|play of the (day|night)|best bet/.test(t)) s.sort = 'rec';
+    if (/\bvalue\b|most value|best value|biggest edge|\bedge\b|beats? (the )?(line|price|onyx|book)|mispriced|soft line|\b\+ev\b|positive ev/.test(t)) s.sort = 'edge';
+    if (/biggest payout|longshots?|long shots?|lottery|moonshot|highest odds|big payout/.test(t)) s.sort = 'price';
+    if (/lock of the|pick of the|play of the|best bet\b|the lock\b/.test(t) && s.count == null && s.intent === 'list') s.count = 1;
+    // confidence floor: "60%", "60 percent", "over 60%"
+    var c = t.match(/(\d{2})\s*(%|percent)/); if (c) s.min_conf = +c[1] / 100;
+    // time: tonight / today / tomorrow / a weekday / this weekend
+    if (/tonight|today|this evening/.test(t)) s.when = 'today';
+    else if (/tomorrow/.test(t)) s.when = 'tomorrow';
+    else if (/this weekend|weekend/.test(t)) s.when = 'weekend';
+    else for (var d = 0; d < 7; d++) if (new RegExp('\\b' + DAYS[d] + '\\b').test(t)) { s.when = DAYS[d]; break; }
+    // a team, by nickname or abbreviation
+    var keys = Object.keys(NICK).sort(function (a, b) { return b.length - a.length; });
+    for (var k = 0; k < keys.length; k++) {
+      var nk_ = keys[k];
+      if (new RegExp('\\b' + esc(nk_) + '\\b').test(t)) {
+        s.team = NICK[keys[k]];
+        if (SPORT_OF_NICK[nk_] && !s.sports.length) s.sports.push(SPORT_OF_NICK[nk_]);
+        if (nk_ === 'jets' && /hockey|nhl|winnipeg/.test(t)) s.team = 'WPG';
+        break;
+      }
+    }
+    if (!s.team) {
+      var tm = t.match(/\b(atl|bos|bkn|cha|chi|cle|dal|den|det|gs|gsw|hou|ind|lac|lal|mem|mia|mil|min|nop|nyk|okc|orl|phi|phx|por|sac|sas|tor|utah|uta|wsh|was|ari|bal|buf|car|cin|gb|jax|kc|lv|lar|ne|nyg|nyj|pit|sea|sf|tb|ten|vgk|edm|col|tor|nyr|nyi|nj|cbj|wpg|van|cgy|ott|mtl|nsh|stl|sj|ana)\b/);
+      if (tm) s.team = ({gsw: 'GS', nop: 'NO', nyk: 'NY', sas: 'SA', uta: 'UTAH', was: 'WSH'})[tm[1]] || tm[1].toUpperCase();
+    }
+    // a player with a line today: full name, or a last name only one player has
+    var N = names(B), fulls = Object.keys(N.full).sort(function (a, b) { return b.length - a.length; });
+    for (var f = 0; f < fulls.length; f++) if (t.indexOf(' ' + fulls[f] + ' ') >= 0) { s.player = N.full[fulls[f]]; break; }
+    if (!s.player) for (var l in N.last) if (N.last[l] !== '*' && new RegExp('\\b' + esc(l) + 's?\\b').test(t)) { s.player = N.last[l]; break; }
+    // a first name only one player on today's board has ("Luka", "Bijan"), never a word the parser already reads
+    if (!s.player) for (var f1 in N.first) if (N.first[f1] !== '*' && !NICK[f1] && DAYS.indexOf(f1) < 0 && !/^(over|under|most|plus|game|best|safe|team|with|tonight|today|points|value)$/.test(f1)
+        && new RegExp('\\b' + esc(f1) + '\\b').test(t)) { s.player = N.first[f1]; break; }
+    if (s.player) { s.team = null; if (s.intent === 'list' && s.count == null && !/props|plays|lines|bets/.test(t)) s.count = 5; }
+    // defaults that follow from the rest
+    if (s.markets.indexOf('two_plus_td') >= 0) { s.sort = 'two_td'; if (!s.sports.length) s.sports = ['nfl']; }
+    if (s.markets.indexOf('anytime_td') >= 0 && !s.sports.length) s.sports = ['nfl', 'cfb'];
+    if (s.markets.some(function (m) { return /^(pts|reb|ast|q1_total)$/.test(m); }) && !s.sports.length) s.sports = ['nba'];
+    if (s.markets.some(function (m) { return /^(rec|rec_yds|rush_yds|pass_yds)$/.test(m); }) && !s.sports.length) s.sports = ['nfl'];
+    if (s.count == null && /\bcouple\b/.test(t)) s.count = 2;
+    if (s.count == null && /\b(a )?few\b/.test(t)) s.count = 3;
+    if (s.count == null) s.count = s.intent !== 'list' ? 3 : /\b(the|a|one) (player|play|pick|bet|guy|team)\b|\bwho (is|will|gets|has)\b|\bmost likely\b/.test(t) && !/players|plays|picks|guys|teams/.test(t) ? 1 : 5;
     return s;
   }
 
@@ -87,6 +178,18 @@
   function p2(lam) { return lam == null ? null : 1 - Math.exp(-lam) * (1 + lam); }
   function dec(o) { return o > 0 ? 1 + o / 100 : 1 + 100 / -o; }
   function am(d) { return d >= 2 ? Math.round((d - 1) * 100) : Math.round(-100 / (d - 1)); }
+  // the ET calendar day of a start time vs "today" / "tomorrow" / a weekday / the weekend
+  function etDay(t) { return new Date(new Date(t).toLocaleString('en-US', {timeZone: 'America/New_York'})); }
+  function whenOk(when, start) {
+    var t = Date.parse(start); if (isNaN(t)) return true;
+    var g = etDay(t), now = etDay(Date.now() - 4 * 3600e3);   // the site's day rolls at 4 AM ET
+    var days = Math.round((new Date(g.getFullYear(), g.getMonth(), g.getDate()) - new Date(now.getFullYear(), now.getMonth(), now.getDate())) / 864e5);
+    if (g.getHours() < 4) days -= 1;                            // a 1 AM tip belongs to the night before
+    if (when === 'today') return days <= 0;
+    if (when === 'tomorrow') return days === 1;
+    if (when === 'weekend') return g.getDay() === 0 || g.getDay() === 6;
+    var wd = DAYS.indexOf(when); return wd < 0 || (g.getDay() === wd && days < 7);
+  }
   function run(spec, B) {
     var now = Date.now();
     var mk = (spec.markets || []).slice();
@@ -103,7 +206,8 @@
       if (spec.min_conf != null && p.conf < spec.min_conf) return false;
       if (spec.min_edge != null && p.edge < spec.min_edge) return false;
       if (spec.player && String(p.name || p.label).toLowerCase().indexOf(String(spec.player).toLowerCase()) < 0) return false;
-      if (spec.team && [p.team, p.matchup, p.name].join(' ').toUpperCase().indexOf(String(spec.team).toUpperCase()) < 0) return false;
+      if (spec.team && !new RegExp('(^|[^A-Z])' + String(spec.team).toUpperCase() + '([^A-Z]|$)').test([p.team, p.matchup, p.name].join(' ').toUpperCase())) return false;
+      if (spec.when && !whenOk(spec.when, p.start)) return false;
       return true;
     }).map(function (p) { return two ? Object.assign({}, p, {two: p2(p.lam)}) : p; });
     // "recommended": what this site stands behind first (graded picks, then the
@@ -111,6 +215,7 @@
     var REC = {tracked: 0.2, trial: 0.1};
     var key = spec.sort === 'two_td' || two ? function (p) { return -p.two; } : spec.sort === 'edge' ? function (p) { return -p.edge; }
       : spec.sort === 'price' ? function (p) { return -p.price; }
+      : spec.sort === 'proj' ? function (p) { return -(p.proj || 0); }
       : spec.sort === 'rec' ? function (p) { return -((REC[p.tag] || 0) + p.conf + 2 * Math.max(-0.05, p.edge)); }
       : function (p) { return -p.conf - p.edge / 10; };
     pool.sort(function (a, b) { return key(a) - key(b); });
@@ -119,9 +224,10 @@
     var picked = [], games = {}, who = {};
     for (var i = 0; i < pool.length && picked.length < n; i++) {
       var p = pool[i];
-      if (who[p.sport + p.who]) continue;
-      if ((spec.one_per_game !== false || spec.intent === 'parlay') && games[p.gid]) continue;
-      who[p.sport + p.who] = 1; games[p.gid] = 1; picked.push(p);
+      var mine = spec.player && spec.intent === 'list';            // "Mahomes": every line on him
+      if (who[p.sport + p.who + (mine ? p.mkt : '')]) continue;
+      if (!mine && (spec.one_per_game !== false || spec.intent === 'parlay') && games[p.gid]) continue;
+      who[p.sport + p.who + (mine ? p.mkt : '')] = 1; games[p.gid] = 1; picked.push(p);
     }
     // a parlay short of its legs (few games left on the board) fills from games it
     // already uses: an SGP+ (same-game legs plus other games), never one player twice
@@ -204,19 +310,20 @@
     if (s.max_price != null) b.push('no price longer than ' + (s.max_price > 0 ? '+' : '') + s.max_price);
     if (s.min_conf != null) b.push(Math.round(100 * s.min_conf) + '%+ confidence');
     if (s.player) b.push(s.player);
+    if (s.when) b.push(s.when === 'today' ? 'tonight' : s.when);
     if (s.team) b.push(s.team);
-    b.push(s.sort === 'rec' ? 'what we recommend most first' : s.sort === 'price' ? 'biggest payouts first' : s.sort === 'edge' ? 'best value first' : s.sort === 'two_td' ? 'most likely 2+ TDs first' : 'highest confidence first');
+    b.push(s.sort === 'proj' ? 'highest projection first' : s.sort === 'rec' ? 'what we recommend most first' : s.sort === 'price' ? 'biggest payouts first' : s.sort === 'edge' ? 'best value first' : s.sort === 'two_td' ? 'most likely 2+ TDs first' : 'highest confidence first');
     return b.join(' · ');
   }
 
-  function toSpec(q) {
+  function toSpec(q, B) {
     return aiUrl().then(function (u) {
-      if (!u) return {spec: localSpec(q), via: 'local'};
+      if (!u) return {spec: localSpec(q, B), via: 'local'};
       var ctl = new AbortController(); var tm = setTimeout(function () { ctl.abort(); }, 15000);
       return fetch(u, {method: 'POST', headers: {'content-type': 'application/json'}, body: JSON.stringify({q: q}), signal: ctl.signal})
         .then(function (r) { clearTimeout(tm); if (!r.ok) throw new Error('relay ' + r.status); return r.json(); })
         .then(function (j) { if (!j || !j.spec) throw new Error('no spec'); return {spec: j.spec, via: 'ai'}; })
-        .catch(function () { return {spec: localSpec(q), via: 'local'}; });
+        .catch(function () { return {spec: localSpec(q, B), via: 'local'}; });
     });
   }
   // mainstream by default: unless the request names its own odds, no parlay leg
@@ -230,7 +337,7 @@
   function ask(q) {
     q = String(q || '').trim().slice(0, 300);
     if (!q) return Promise.resolve(null);
-    return Promise.all([toSpec(q), loadBoards()]).then(function (a) {
+    return loadBoards().then(function (B) { return Promise.all([toSpec(q, B), B]); }).then(function (a) {
       var spec = normalize(a[0].spec);
       var res = run(spec, a[1]);
       res.spec = spec; res.via = a[0].via; res.understood = describe(spec);

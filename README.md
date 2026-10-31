@@ -1252,3 +1252,15 @@ model's number on it.
 games, fills its remaining legs from games it already uses (an SGP+, labelled on the ticket,
 never one player twice, one game line of each kind per game). My bets (`onyxMyBets`, ui.js and
 home.html) and saved picks (`saved.js`) both clear themselves after 24 hours.
+
+**Ask Onyx without AI (10/31).** Jordan chose no accounts and no keys, so the built-in reader
+(`ask.js` `localSpec(q, board)`) does the language. It reads the request against today's boards:
+every player with a line (full name, a last name or first name only one player has), team
+nicknames and abbreviations (NBA, NFL, NHL), markets in everyday words (boards, dimes, catches,
+QB, carries, TD scorer, PRA, puck line, straight up), odds in any wording ("-200 or better",
+"no -150 juice", "+300 or less", "even money", "plus money", "dogs", "chalk"), counts ("4
+legger", "a couple", "a few", "double"), days ("tonight", "Sunday", "this weekend") and asks
+("lock of the day", "what do you like", "best bet", "most value", "longshots", "who scores
+the most points"). A player question lists every line on him, the model's side of each. The AI
+relay (ai/) stays in the repo, unused unless ai.json is ever filled in.
+

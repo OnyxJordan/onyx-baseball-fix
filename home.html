@@ -150,7 +150,7 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
   <!-- ── Ask Onyx: type what you want, we build it (ask.js) ───────────── -->
   <section class="ox-wrap ask" id="ask">
     <div class="my-h"><div><span class="ox-eyebrow">Ask Onyx</span><h2>Tell us what<br>you want.</h2>
-      <p>Type it the way you'd say it. Every play comes from today's models and live Onyx prices.</p></div></div>
+      <p>Type it the way you'd say it: a player, a team, a parlay, an SGP, odds, a day. Every play comes from today's models and live Onyx prices.</p></div></div>
     <form class="ask-box" onsubmit="askGo(document.getElementById('askQ').value);return false">
       <input id="askQ" type="search" enterkeyhint="go" autocomplete="off" maxlength="300" placeholder="3-leg parlay, NBA points overs, no odds shorter than -200">
       <button type="submit">Build</button></form>
@@ -354,7 +354,8 @@ async function getJSON(u) { const r = await fetch(u, {cache: 'no-cache'}); if (!
 
 // ── Ask Onyx (ask.js does the work; this draws it) ──
 var ASK_EX = ['3-leg parlay NBA points overs minimum odds -200', 'Player most likely to score 2 TDs', 'Your favorite correlated SGP',
-              'Most recommended NFL plays', 'Most value in college football', 'Safest 2-leg parlay tonight', 'Plus money plays with an edge'];
+              'What do you like tonight', 'Lock of the day', 'Mahomes', 'Lakers game SGP', 'Give me a 4 legger for Sunday',
+              'Most value in college football', 'Underdogs to win this weekend', 'Who scores the most points tonight'];
 function askInit() {
   const ex = document.getElementById('askEx'); if (!ex) return;
   ex.innerHTML = ASK_EX.map((q, i) => `<button type="button" onclick="document.getElementById('askQ').value=ASK_EX[${i}];askGo(ASK_EX[${i}])">${esc(q)}</button>`).join('');
