@@ -520,7 +520,7 @@ function renderHome() {
   const stat = (v, l, c) => `<div class="home-stat"><div class="home-stat-val ${c || ''}">${v}</div><div class="home-stat-label">${l}</div></div>`;
   const n = KIND === 'tennis' ? (SD.events || []).reduce((a, e) => a + e.matches.length, 0) : KIND === 'golf' ? (SD.events || []).reduce((a, e) => a + e.board.length, 0) : games.length;
   document.getElementById('homeStats').innerHTML = stat(n, KIND === 'tennis' ? 'Matches' : KIND === 'golf' ? 'Players' : 'Games', 'purple')
-    + stat(nLive, 'Live now', 'green') + stat(priced || '-', 'Onyx lines') + stat((SD.model || {}).status === 'live' ? 'Live' : 'Lab', 'Model');
+    + stat(nLive, 'Live now', 'green') + stat(priced || '-', 'Onyx lines') + stat({live: 'Live', trial: 'On trial'}[(SD.model || {}).status] || 'Leans', 'Model');
   let body = '';
   if (KIND === 'tennis') {
     const lv = (SD.events || []).flatMap(e => e.matches.filter(m => m.state === 'in').map(m => [e, m]));
@@ -1921,8 +1921,8 @@ function gameLeanTable(rows, inGame) {
 function renderPlays() {
   const M = SD.model || {};
   const el = document.getElementById('playsBody');
-  const lab = `<div class="lab"><div class="eb">${M.status === 'live' ? 'How the picks work' : 'How this model works · in the lab'}</div>
-    <h3>${M.status === 'live' ? 'Where the model beats the Onyx line' : 'Picks switch on when the model earns them'}</h3>
+  const lab = `<div class="lab"><div class="eb">${M.status === 'live' ? 'How the picks work' : M.status === 'trial' ? 'How the picks work · on trial' : 'How this model works · leans'}</div>
+    <h3>${M.status === 'live' ? 'Where the model beats the Onyx line' : M.status === 'trial' ? 'One lane graded in public, the rest tested and shown as leans' : 'Picks switch on when the model earns them'}</h3>
     <p>${esc(M.note || `The ${C.name} model is being built and tested. Nothing here is a pick until it has been backtested against real Onyx prices, the same bar the NBA and MLB models had to clear.`)}</p>
     ${(M.tests || []).length ? `<div class="stat-grid">${M.tests.map(t => `<div><span>${esc(t.k)}</span><b>${esc(t.v)}</b><div class="dim" style="font-size:11px">${esc(t.d || '')}</div></div>`).join('')}</div>` : ''}
     ${M.status !== 'live' && (M.roadmap || []).length ? `<ul>${M.roadmap.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}</div>`;
@@ -2010,7 +2010,7 @@ function renderModel() {
   document.getElementById('modelBody').innerHTML = `<div class="lab"><div class="eb">How Onyx ${esc(C.name)} works</div><h3>${esc(M.title || 'The data, the model and what is tested')}</h3>
     ${(M.method || []).map(p => `<p>${esc(p)}</p>`).join('') || `<p>Live scores, the gamecenter and the schedule come from ESPN's public feed, refreshed through the day and polled live on this page. Every price is an Onyx price.</p>`}
     ${(M.tests || []).length ? `<div class="stat-grid">${M.tests.map(t => `<div><span>${esc(t.k)}</span><b>${esc(t.v)}</b><div class="dim" style="font-size:11px">${esc(t.d || '')}</div></div>`).join('')}</div>` : ''}
-    <p class="dim" style="font-size:12px">Model ${esc(M.version || 'not live yet')} · ${M.status === 'live' ? 'picks live' : 'leans only'} · data built ${esc(SD.generated ? new Date(SD.generated).toLocaleString('en-US', {timeZone: 'America/New_York'}) + ' ET' : '')}</p></div>
+    <p class="dim" style="font-size:12px">Model ${esc(M.version || 'not live yet')} · ${M.status === 'live' ? 'picks live' : M.status === 'trial' ? 'one lane on trial, the rest leans' : 'leans only'} · data built ${esc(SD.generated ? new Date(SD.generated).toLocaleString('en-US', {timeZone: 'America/New_York'}) + ' ET' : '')}</p></div>
     ${engineHtml(M.engine)}
     ${backtestBlock(M.backtest)}
     ${(M.changelog || []).length ? `<div class="lab"><div class="eb">Changelog · the lab notebook</div><ul>${M.changelog.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>` : ''}

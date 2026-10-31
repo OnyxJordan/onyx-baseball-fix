@@ -22,9 +22,10 @@
   // every Onyx Sports page: the sport pages built from sport_shell.html set
   // window.OX_SITE before this script runs; MLB and NBA are detected
   var SITE = window.OX_SITE || (IS_NBA ? 'nba' : 'mlb');
-  var ALL = [['mlb', 'MLB', './', 'Baseball'], ['nba', 'NBA', 'nba.html', 'Basketball'], ['nfl', 'NFL', 'nfl.html', 'NFL'],
-             ['cfb', 'CFB', 'cfb.html', 'College Football'], ['nhl', 'NHL', 'nhl.html', 'NHL'],
-             ['tennis', 'Tennis', 'tennis.html', 'Tennis'], ['golf', 'Golf', 'golf.html', 'Golf']];
+  // ranked by daily importance (10/31): NFL, NBA, NHL, Golf, Tennis, College Football, MLB
+  var ALL = [['nfl', 'NFL', 'nfl.html', 'NFL'], ['nba', 'NBA', 'nba.html', 'Basketball'], ['nhl', 'NHL', 'nhl.html', 'NHL'],
+             ['golf', 'Golf', 'golf.html', 'Golf'], ['tennis', 'Tennis', 'tennis.html', 'Tennis'],
+             ['cfb', 'CFB', 'cfb.html', 'College Football'], ['mlb', 'MLB', './', 'Baseball']];
   function sportSeg(cls) {
     return '<div class="oseg ' + (cls || '') + '" role="tablist" aria-label="Sport">' + ALL.map(function (a) {
       return '<a href="' + a[2] + '"' + (a[0] === SITE ? ' class="on" aria-current="page"' : '') + '>' + a[1] + '</a>';

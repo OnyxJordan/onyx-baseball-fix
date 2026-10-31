@@ -189,10 +189,11 @@ def nfl_block(lane, slate, odds):
     pg = lane.load("player_games.json", {}) or {}
     rows = pg.get("rows") or []
     season = slate.get("season") or max((r["season"] for r in rows), default=None)
-    block = {"status": "lab", "version": M.VERSION, "title": "Player projections and team ratings, tested in the open",
-             "note": ("Projections for passing, rushing and receiving yards and receptions, built from every box score this season "
-                      "with last season as the prior and the opponent's defense, and tested every build on games the model never saw. "
-                      "They are leans, not picks: tracked picks switch on only after the model is backtested against real Onyx prices."),
+    block = {"status": "trial", "version": M.VERSION, "title": "Receptions unders graded on trial; everything else priced, tested and explained",
+             "note": ("One NFL lane is graded in public: receptions unders where the model beats Onyx's opening price by 3 points or more, "
+                      "the only NFL market that beat Onyx in both seasons it was tested on. Everything else on this page is a lean or information: "
+                      "spreads, totals, yards and touchdown chances were each tested against two seasons of real Onyx prices and did not beat them, "
+                      "so they are shown with their numbers, never graded as picks. Injured players are removed before anything is priced."),
              "method": [METHOD["football"],
                         "Each projection blends this season's games (recent weeks weigh more) with last season's average, then adjusts for how much of that stat the opponent's defense has allowed, regressed toward league average.",
                         "The test below re-runs on every build: for every player-game this season from week 3 on, the model's projection against two simple baselines a bettor would use, the season average and the last-3 average. Lower error is better."],
