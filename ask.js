@@ -245,7 +245,7 @@
     if ((s.markets.indexOf('first_basket') >= 0 || s.markets.indexOf('h1_total') >= 0) && !s.sports.length) s.sports = ['nba'];
     if (s.count == null && /\bcouple\b/.test(t)) s.count = 2;
     if (s.count == null && /\b(a )?few\b/.test(t)) s.count = 3;
-    if (s.count == null) s.count = s.intent !== 'list' ? 3 : /\b(the|a|one) (player|play|pick|bet|guy|team)\b|\bwho (is|will|gets|has)\b|\bmost likely\b/.test(t) && !/players|plays|picks|guys|teams/.test(t) ? 1 : 5;
+    if (s.count == null) s.count = s.intent !== 'list' ? 3 : /\b(the|a|one) (player|play|pick|bet|guy|team)\b|\bwho (is|will|gets|has)\b|\bmost likely\b/.test(t) && !/players|plays|picks|guys|teams|scorers|receivers|rushers|passers|options|bets|choices/.test(t) ? 1 : 5;
     return s;
   }
 
@@ -300,6 +300,16 @@
       : spec.sort === 'rec' ? function (p) { return -((REC[p.tag] || 0) + p.conf + 2 * Math.max(-0.05, p.edge)); }
       : function (p) { return -p.conf - p.edge / 10; };
     pool.sort(function (a, b) { return key(a) - key(b); });
+    // "best value" when nothing in the pool beats Onyx's price (touchdown scorers: none did in
+    // testing): ranking by the least-negative edge would just surface longshots, so show the
+    // most likely instead and say so
+    var note = '';
+    if (spec.sort === 'edge' && !two && pool.length && pool[0].edge <= 0) {
+      key = function (p) { return -p.conf - p.edge / 10; };
+      pool.sort(function (a, b) { return key(a) - key(b); });
+      note = (mk.length && mk.every(function (m) { return /td$/.test(m); }) ? 'No touchdown scorer beats Onyx\'s price in our testing' : 'Nothing that matches beats Onyx\'s price right now')
+        + ', so these are the most likely instead.';
+    }
     if (spec.intent === 'sgp') return sgp(spec, pool, key);
     var n = Math.max(1, Math.min(spec.intent === 'list' ? 25 : 8, spec.count || 5));
     if (spec.intent === 'parlay' && spec.target_price && !spec.count_set) n = 10;   // no leg count asked: add legs until the payout is reached
@@ -325,7 +335,7 @@
     if (spec.intent === 'parlay' && spec.target_price && !spec.count_set) {          // the filler pass can overshoot: stop at the target
       for (var z = 2; z <= picked.length; z++) if (ticket(picked.slice(0, z)).price >= spec.target_price) { picked = picked.slice(0, z); break; }
     }
-    var out = {rows: picked, pool: pool.length, two: two};
+    var out = {rows: picked, pool: pool.length, two: two, note: note};
     if (spec.intent === 'rr' && picked.length >= 2) {
       var k = Math.max(2, Math.min(picked.length - 1 || 2, spec.rr_size || 2)), combos = [];
       (function pick(start, cur) {

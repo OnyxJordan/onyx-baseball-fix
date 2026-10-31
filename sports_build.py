@@ -20,7 +20,8 @@ import sports_lab as L
 ONYX_LEAGUE = {"nfl": "NFL", "cfb": "NCAAF", "nhl": "NHL"}
 
 ROADMAP = {
-    "nfl": ["Tested 10/26 to 10/31 against two seasons of real Onyx lines (440 games), counting every priced player who played, including games he was never thrown to: receptions unders beat Onyx's opening price in both seasons (+6.1% and +20.1%), so they run on trial at the open; overs did not. Rushing and passing yards did not",
+    "nfl": ["Tested 10/26 to 10/31 against two seasons of real Onyx lines (440 games), counting every priced player who played, including games he was never thrown to: receptions unders beat Onyx's opening price in both seasons (+6.1% and +20.1%), so they run on trial at the open; overs did not",
+            "Tested 10/31: rushing, passing and receiving yards, the current projections and a rebuild from each player's share of his team's carries, dropbacks and targets. None beat Onyx's price in a season it was not tuned on, so they are projections only, never plays",
             "Re-tested 10/31: touchdown scorers lost to Onyx's price in both seasons once players who played without a touch were counted, so the touchdown chance shown is Onyx's price with its margin removed, and no scorer is flagged as value",
             "Tested 10/31: game ratings from every play since 2024 (expected points per play, adjusted for opponent, with scores alongside). On 2026 games they never saw, they made Onyx's spread and total worse, open and close, as the score-only ratings did. NFL sides and totals stay leans",
             "Live 10/31: ESPN's injury report. A player ruled out (out, IR, inactive, doubtful) gets no projection, lean, Top 10 spot or trial play; a questionable player is marked Q and kept out of the Top 10",
@@ -288,6 +289,8 @@ def nfl_block(lane, slate, odds):
                      matchup=f"{r['team']} {'vs' if r['home'] else '@'} {r['opp']}")
             if r.get("vol") and r["mkt"] == "rec" and ps["side"] not in getattr(M, "TRIAL_SIDES", ("over", "under")):
                 r["value_min"] = 1.0      # v6: receptions overs lost at the open (2025 -14.8%), never a play or Top 10
+            if r["mkt"] in getattr(M, "NO_VALUE", ()):
+                r["value_min"] = 1.0      # v7: rushing, passing and receiving yards lost their re-tests, leans only
     # receptions unders at Onyx's opening price, on trial (v6: the side that beat the open in both seasons)
     block["open"] = nfl_open_lane(lane, out, slate, season, rows, M)
     # touchdown scorers (nfl_model v2): anytime and first TD chances from Onyx's
@@ -902,6 +905,48 @@ def lab_block(key, cfg):
                 "factors": [], "lane": None}}
 
 
+TD_SCALE = 0.82        # Onyx's anytime-TD yes price x this = the chance (NFL v6 fit: priced players
+                       # score 17.7% vs 22.0% implied; the margin on a one-sided TD price is that big)
+CFB_FIRST_LISTED = 0.9   # share of first touchdowns scored by a listed player (rest: defense, returns, unlisted)
+
+
+def cfb_td_board(lane, slate, pre, start, DT):
+    """College touchdown scorers for "Ask Onyx": every Onyx anytime and first TD price on a
+    game not yet started. There is no college touchdown model: the chance is Onyx's price
+    with its margin taken out (TD_SCALE, fitted on NFL prices), and first TD is each
+    listed player's share of the game's prices x CFB_FIRST_LISTED. So the edge is never
+    positive and nothing here is ever value; it answers "who is most likely to score"."""
+    odds = lane.load("odds.json", {}) or {}
+    games = {g["gid"]: g for g in slate.get("games") or []}
+    team_of = {}
+    for r in (lane.load("player_games.json", {}) or {}).get("rows") or []:
+        team_of[nk(r.get("name"))] = r.get("team")
+    first_sum = {}
+    for p in odds.get("props") or []:
+        if p.get("mkt") == "first_td" and p.get("over") is not None:
+            first_sum[p["gid"]] = first_sum.get(p["gid"], 0.0) + L.implied(p["over"])
+    out = []
+    for p in odds.get("props") or []:
+        g = games.get(p.get("gid"))
+        if p.get("mkt") not in ("anytime_td", "first_td") or p.get("over") is None or not g or p["gid"] not in pre:
+            continue
+        imp = L.implied(p["over"])
+        tm = team_of.get(nk(p.get("name")))
+        tm = tm if tm in (g.get("home"), g.get("away")) else None
+        if p["mkt"] == "anytime_td":
+            conf = TD_SCALE * imp
+        else:
+            conf = CFB_FIRST_LISTED * imp / max(first_sum.get(p["gid"], 1.0), 1.0)
+        c = {"kind": "prop", "mkt": p["mkt"], "name": p.get("name"), "team": tm, "side": "over", "line": 0.5,
+             "price": p["over"], "prob": conf, "edge": conf - imp, "sel": p.get("over_sel"), "gid": p["gid"],
+             "matchup": f"{g.get('away')} @ {g.get('home')}"}
+        e = DT.entry("cfb", c, "lean", start.get(p["gid"]))
+        if p["mkt"] == "anytime_td":
+            e["lam"] = round(-math.log(max(1e-6, 1 - conf)), 4)
+        out.append(e)
+    return out
+
+
 def write_top(key, lane, slate, model):
     """data/<sport>/top.json for the home page's Top 10 (daily_top.py)."""
     import daily_top as DT
@@ -935,6 +980,8 @@ def write_top(key, lane, slate, model):
         if r.get("first_price") is not None:              # first touchdown scorer (shown, never recommended: Onyx won its backtest)
             c1 = dict(c, mkt="first_td", price=r["first_price"], prob=r["first"], edge=r.get("first_edge") or 0.0, sel=r.get("first_sel"))
             board.append(DT.entry(key, c1, "lean", start.get(r["gid"])))
+    if key == "cfb":
+        board += cfb_td_board(lane, slate, pre, start, DT)
     DT.write_board(lane.data, key, slate.get("date"), board)
 
 
