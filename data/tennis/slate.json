@@ -10350,9 +10350,9 @@
     },
     {
      "id": "185813",
-     "start": "2026-10-31T00:35Z",
-     "state": "pre",
-     "detail": "10/30 - 8:35 PM EDT",
+     "start": "2026-10-31T00:40Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Estadio Mexcovery",
@@ -10363,7 +10363,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        0
+       ],
        "serve": false
       },
       {
@@ -10372,8 +10374,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        2
+       ],
+       "serve": true
       }
      ]
     },
@@ -10407,42 +10411,13 @@
      ]
     },
     {
-     "id": "185818",
-     "start": "2026-10-31T04:00Z",
-     "state": "pre",
-     "detail": "TBD",
-     "round": "Semifinal",
-     "draw": "Women's Singles",
-     "court": "",
-     "p": [
-      {
-       "name": "Carole Monnet",
-       "short": "C. Monnet",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      }
-     ]
-    },
-    {
      "id": "185817",
-     "start": "2026-10-31T04:00Z",
+     "start": "2026-11-01T00:00Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "10/31 - 8:00 PM EDT",
      "round": "Semifinal",
      "draw": "Women's Singles",
-     "court": "",
+     "court": "Estadio Mexcovery",
      "p": [
       {
        "name": "TBD",
@@ -10457,6 +10432,35 @@
        "name": "Tatjana Maria",
        "short": "T. Maria",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ger.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      }
+     ]
+    },
+    {
+     "id": "185818",
+     "start": "2026-11-01T01:30Z",
+     "state": "pre",
+     "detail": "10/31 - 9:30 PM EDT",
+     "round": "Semifinal",
+     "draw": "Women's Singles",
+     "court": "Estadio Mexcovery",
+     "p": [
+      {
+       "name": "Carole Monnet",
+       "short": "C. Monnet",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      },
+      {
+       "name": "TBD",
+       "short": "TBD",
+       "flag": null,
        "seed": null,
        "win": false,
        "sets": [],
@@ -11754,5 +11758,5 @@
    ]
   }
  ],
- "fetched": "2026-10-31T00:31:26+00:00"
+ "fetched": "2026-10-31T00:53:35+00:00"
 }
