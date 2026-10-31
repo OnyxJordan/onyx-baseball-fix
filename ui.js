@@ -437,7 +437,14 @@
     lastTap = (t.getAttribute('aria-label') || t.innerText || '').replace(/\s+/g, ' ').trim().slice(0, 140);
     if (t.tagName === 'A' && /onyxodds\.com\/share/.test(t.href || '')) logBet(t.href, lastTap);
   }, true);
-  function myBets() { try { return JSON.parse(localStorage.getItem('onyxMyBets') || '[]') || []; } catch (e) { return []; } }
+  // My bets keep 24 hours: last night's bets (and their players' live follows) clear themselves
+  var BET_KEEP_MS = 24 * 3600e3;
+  function myBets() {
+    var all; try { all = JSON.parse(localStorage.getItem('onyxMyBets') || '[]') || []; } catch (e) { return []; }
+    var now = Date.now(), keep = all.filter(function (b) { return now - (b.t || Date.parse(b.at) || 0) < BET_KEEP_MS; });
+    if (keep.length !== all.length) { try { localStorage.setItem('onyxMyBets', JSON.stringify(keep)); } catch (e) {} }
+    return keep;
+  }
   function logBet(url, label) {
     var sels = [], m, re = /selection=([^&]+)/g;
     while ((m = re.exec(url))) sels.push(decodeURIComponent(m[1]));

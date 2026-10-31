@@ -46,7 +46,7 @@
   ];
   function localSpec(q) {
     var t = ' ' + q.toLowerCase().replace(/[’']/g, '') + ' ';
-    var s = {intent: /\bsgp\b|same[\s-]*game|correlated/.test(t) ? 'sgp' : /parlay|legs?\b|ticket|slip/.test(t) ? 'parlay' : 'list', count: null, sports: [], markets: [], side: 'any',
+    var s = {intent: /sgp ?(\+|plus)/.test(t) ? 'parlay' : /\bsgp\b|same[\s-]*game|correlated/.test(t) ? 'sgp' : /parlay|legs?\b|ticket|slip/.test(t) ? 'parlay' : 'list', count: null, sports: [], markets: [], side: 'any',
              min_price: null, max_price: null, min_conf: null, min_edge: null, player: null, team: null, sort: 'conf', one_per_game: true, summary: ''};
     var n = t.match(/\b(\d{1,2})[\s-]*(leg|legs|picks?|plays?|players?|bets?)\b/) || t.match(/\btop\s*(\d{1,2})\b/);
     var NUM = {two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, ten: 10};
@@ -123,8 +123,22 @@
       if ((spec.one_per_game !== false || spec.intent === 'parlay') && games[p.gid]) continue;
       who[p.sport + p.who] = 1; games[p.gid] = 1; picked.push(p);
     }
+    // a parlay short of its legs (few games left on the board) fills from games it
+    // already uses: an SGP+ (same-game legs plus other games), never one player twice
+    if (spec.intent === 'parlay' && picked.length < n) {
+      for (var j = 0; j < pool.length && picked.length < n; j++) {
+        var q = pool[j];
+        if (who[q.sport + q.who] || picked.indexOf(q) >= 0) continue;
+        if (picked.some(function (x) { return x.gid === q.gid && x.kind === q.kind && q.kind !== 'prop'; })) continue;  // one game line of each kind
+        who[q.sport + q.who] = 1; picked.push(q);
+      }
+    }
     var out = {rows: picked, pool: pool.length, two: two};
-    if (spec.intent === 'parlay' && picked.length > 1) out.parlay = ticket(picked);
+    if (spec.intent === 'parlay' && picked.length > 1) {
+      out.parlay = ticket(picked);
+      var g = {}; picked.forEach(function (x) { g[x.gid] = (g[x.gid] || 0) + 1; });
+      out.parlay.sgp_plus = Object.keys(g).length < picked.length;
+    }
     return out;
   }
   function ticket(legs) {

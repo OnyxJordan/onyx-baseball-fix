@@ -5,10 +5,10 @@
 //    hcap (spread), name (player or team), saved: ISO time}
 // Pages call OnyxSaved.btn(pick) for the star button; home.html reads OnyxSaved.all().
 (function () {
-  var KEY = 'onyxSaved', KEEP_H = 36, REG = [];
+  var KEY = 'onyxSaved', KEEP_H = 24, REG = [];
   function read() { try { return JSON.parse(localStorage.getItem(KEY) || '[]') || []; } catch (e) { return []; } }
   function write(a) { try { localStorage.setItem(KEY, JSON.stringify(a)); } catch (e) {} try { dispatchEvent(new Event('onyx-saved')); } catch (e) {} }
-  // a pick drops off 36 hours after its game starts: tonight's picks, followed through the night
+  // a pick drops off 24 hours after its game starts: tonight's picks, followed through the night
   function all() {
     var now = Date.now(), a = read(), keep = a.filter(function (p) { var t = Date.parse(p.start || p.saved); return isNaN(t) || now - t < KEEP_H * 3600e3; });
     if (keep.length !== a.length) write(keep);

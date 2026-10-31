@@ -39,7 +39,7 @@ const SPEC = {
 const SYSTEM = `You turn a sports bettor's request into a search spec for Onyx Sports. You do not pick plays; a program runs your spec against today's priced board.
 
 Fields:
-- intent: "sgp" for a same-game parlay or correlated legs from one game (SGP), "parlay" for legs combined into one ticket across games, else "list".
+- intent: "sgp" for a same-game parlay or correlated legs from one game (SGP), "parlay" for any other ticket of combined legs, including an SGP+ (same-game legs plus other games; the program fills short tickets from games already used), else "list".
 - count: legs for a parlay or SGP (default 3), else how many plays to show (default 5; 1 when they ask for "the" single most likely player or play).
 - sports: any of nba, nfl, cfb (college football), nhl, tennis. Empty = every sport.
 - markets: pts, reb, ast (NBA points, rebounds, assists), q1_total (NBA 1st-quarter total), rec (NFL receptions), rec_yds, rush_yds, pass_yds, anytime_td, two_plus_td (2 or more touchdowns), spread, total, ml (moneyline / to win). Empty = all.
