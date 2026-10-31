@@ -377,19 +377,22 @@ def write_top(rows, games, today_rows, open_led, today):
     tracked = {k.get("sel") for k in today_rows if k.get("sel")}
     trial = {k.get("sel") for k in open_led if k.get("date") == today and k.get("sel")}
     tag = lambda sel: "tracked" if sel in tracked else "trial" if sel in trial else "lean"
-    out = []
+    out, board = [], []
     for r in rows:
         g = games.get(r["gid"]) or {}
-        if r["out"] or r["inj"] or r["min"] < TICKET_MIN_MIN or g.get("state") != "pre":
+        if r["out"] or r["inj"] or g.get("state") != "pre":
             continue
         for s_, pr in (r.get("props") or {}).items():
-            if pr.get("src") != "onyx":
+            if pr.get("src") != "onyx" or pr.get("closed"):
                 continue
             for side, a in (pr.get("all") or {}).items():
                 c = {"kind": "prop", "mkt": s_, "name": r["name"], "pid": r["pid"], "team": r["team"], "side": side, "line": pr["line"],
                      "price": a.get("price"), "prob": a.get("prob"), "edge": a.get("edge"), "sel": a.get("sel"),
                      "gid": r["gid"], "matchup": f"{g.get('away')} @ {g.get('home')}", "start": g.get("start")}
-                if a.get("sel") and DT.ok(c):
+                if not a.get("sel") or c["price"] is None or c["prob"] is None:
+                    continue
+                board.append(dict(DT.entry("nba", c, tag(a.get("sel"))), proj=(r.get("proj") or {}).get(s_), min=r["min"]))
+                if r["min"] >= TICKET_MIN_MIN and DT.ok(c):
                     out.append(DT.entry("nba", c, tag(a.get("sel"))))
     for g in games.values():
         if g.get("state") != "pre" or g.get("q1_total") is None or not g.get("total"):
@@ -402,8 +405,10 @@ def write_top(rows, games, today_rows, open_led, today):
             c = {"kind": "prop", "mkt": "q1_total", "name": f"{g['away']} @ {g['home']}", "pid": "q1", "team": g["away"], "side": side,
                  "line": g["q1_total"], "price": price, "prob": p, "edge": p - OL.implied(price), "sel": sel,
                  "gid": g["gid"], "matchup": f"{g['away']} @ {g['home']}", "start": g.get("start")}
+            board.append(DT.entry("nba", c, tag(sel)))
             if DT.ok(c):
                 out.append(DT.entry("nba", c, tag(sel)))
+    DT.write_board(Path("data/nba"), "nba", today, board)
     return DT.write(Path("data/nba"), "nba", today, out)
 
 

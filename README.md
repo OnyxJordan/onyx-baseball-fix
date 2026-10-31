@@ -1218,3 +1218,32 @@ lines-only builds; `nba_lines.yml` commits it) and a tipped game shows it marked
 `closed`: selection ids stripped, `propLeg` returns nothing for it, so it is shown but
 never a bet button, a pick, a Top 10 play or a parlay leg.
 
+
+## Ask Onyx (10/31)
+
+Jordan: type what you want ("3-leg parlay, NBA points overs, minimum odds -200", "player most
+likely to score 2 TDs", "your favorite correlated SGP", "most value in college football") and
+it builds it. **The AI never picks plays.** It only turns the sentence into a search spec;
+`ask.js` runs that spec against today's boards, so every answer is a real Onyx line with our
+model's number on it.
+
+- Boards: `daily_top.write_board` writes `data/<sport>/board.json` on every build: every priced
+  Onyx side (any price) with its blended confidence, edge, tag (tracked / trial / lean),
+  selection id, and for NFL anytime-TD props `lam`, the expected touchdowns, so 2+ TD chance is
+  1 - e^-lam (1 + lam). NBA rows skip held (closed) lines.
+- `ask.js`: the spec (`intent` list / parlay / sgp, count, sports, markets, side, price bounds,
+  confidence and edge floors, player, team, sort conf / rec / edge / price / two_td). Defaults
+  are mainstream: no parlay or SGP leg shorter than -150 and no single shorter than -200 unless
+  the request names its own odds. "Recommended" ranks tracked picks, then on-trial plays, then
+  confidence plus value. SGP: each game gets one storyline from its best leg (shootout: the over,
+  scorers' overs, the anchor team covering; grinder: the under, unders), only legs that fit join,
+  and the page shows the product of chances as a floor (correlated legs hit together) and says
+  Onyx prices SGPs itself.
+- Language: a built-in parser covers the common phrasings with no AI at all. When `ai.json`
+  holds a URL, the sentence goes to the relay first and the parser is the fallback.
+- Relay: `ai/worker.js` (Cloudflare Worker, `@anthropic-ai/sdk`, structured output against the
+  same spec schema, low effort, 12 requests a minute per visitor). Deployed by
+  `.github/workflows/ai_worker.yml`, which also writes `ai.json`. Needs, in the repo's Actions
+  settings: secrets `ANTHROPIC_API_KEY`, `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` and the
+  variable `AI_MODEL`. The model and key are never committed. Set a monthly spend limit on the
+  AI account: the page is public.

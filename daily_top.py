@@ -87,3 +87,27 @@ def write(data_dir, sport, date, rows):
     p.write_text(json.dumps({"sport": sport, "date": date, "generated": datetime.now(timezone.utc).isoformat(timespec="seconds"),
                              "plays": out}, separators=(",", ":")), encoding="utf-8")
     return out
+
+
+BOARD_KEEP = 800
+
+
+def write_board(data_dir, sport, date, rows):
+    """data/<sport>/board.json: every priced Onyx side the model reads today,
+    any price, for the home page's "Ask Onyx" search (it filters and builds
+    parlays from this list; the AI only turns a sentence into a filter).
+    rows: entry() dicts, plus "proj" and, for touchdown props, "lam" (expected
+    touchdowns, so "2+ touchdowns" can be answered from the same number)."""
+    seen, out = set(), []
+    for e in sorted(rows, key=lambda e: -e["conf"]):
+        k = (e["gid"], e["who"], e.get("mkt"), e.get("side"))
+        if k in seen:
+            continue
+        seen.add(k)
+        out.append(e)
+    p = Path(data_dir) / "board.json"
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text(json.dumps({"sport": sport, "date": date, "generated": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                             "plays": out[:BOARD_KEEP]}, separators=(",", ":")), encoding="utf-8")
+    return out
+

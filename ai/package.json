@@ -1,0 +1,12 @@
+{
+  "name": "onyx-ask",
+  "private": true,
+  "type": "module",
+  "description": "Ask Onyx relay: turns a sentence into a search spec for ask.js (Cloudflare Worker)",
+  "dependencies": {
+    "@anthropic-ai/sdk": "latest"
+  },
+  "devDependencies": {
+    "wrangler": "latest"
+  }
+}
