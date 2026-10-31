@@ -1479,7 +1479,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        0
+        4
        ],
        "serve": false
       },
@@ -1490,7 +1490,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        0
+        2
        ],
        "serve": true
       }
@@ -3009,7 +3009,7 @@
      "id": "185157",
      "start": "2026-10-31T16:05Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Semifinal",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -3021,7 +3021,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        6,
+        1
        ],
        "serve": false
       },
@@ -3032,6 +3033,7 @@
        "seed": null,
        "win": false,
        "sets": [
+        3,
         0
        ],
        "serve": true
@@ -3452,7 +3454,7 @@
        "sets": [
         7,
         3,
-        1
+        3
        ],
        "serve": false
       },
@@ -3465,7 +3467,7 @@
        "sets": [
         6,
         6,
-        0
+        5
        ],
        "serve": false
       }
@@ -3475,7 +3477,7 @@
      "id": "187343",
      "start": "2026-10-31T15:25Z",
      "state": "in",
-     "detail": "2nd",
+     "detail": "3rd",
      "round": "Qualifying 1st Round",
      "draw": "Men's Singles",
      "court": "Court 1",
@@ -3488,6 +3490,7 @@
        "win": false,
        "sets": [
         6,
+        1,
         0
        ],
        "serve": false
@@ -3500,7 +3503,8 @@
        "win": false,
        "sets": [
         4,
-        1
+        6,
+        0
        ],
        "serve": false
       }
@@ -3522,7 +3526,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        0
+        4
        ],
        "serve": false
       },
@@ -3533,7 +3537,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        0
+        5
        ],
        "serve": false
       }
@@ -3541,9 +3545,9 @@
     },
     {
      "id": "187337",
-     "start": "2026-10-31T16:15Z",
+     "start": "2026-10-31T16:50Z",
      "state": "pre",
-     "detail": "10/31 - 12:15 PM EDT",
+     "detail": "10/31 - 12:50 PM EDT",
      "round": "Qualifying 1st Round",
      "draw": "Men's Singles",
      "court": "Court 2",
@@ -3569,42 +3573,13 @@
      ]
     },
     {
-     "id": "187348",
-     "start": "2026-11-01T04:00Z",
-     "state": "pre",
-     "detail": "TBD",
-     "round": "Qualifying Final",
-     "draw": "Men's Singles",
-     "court": "",
-     "p": [
-      {
-       "name": "Miomir Kecmanovic",
-       "short": "M. Kecmanovic",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ser.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "Juan Manuel Cerundolo",
-       "short": "J. Cerundolo",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      }
-     ]
-    },
-    {
      "id": "187349",
-     "start": "2026-11-01T04:00Z",
+     "start": "2026-11-01T10:00Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "11/1 - 5:00 AM EST",
      "round": "Qualifying Final",
      "draw": "Men's Singles",
-     "court": "",
+     "court": "Court Central",
      "p": [
       {
        "name": "Mattia Bellucci",
@@ -3627,13 +3602,71 @@
      ]
     },
     {
-     "id": "187350",
-     "start": "2026-11-01T04:00Z",
+     "id": "187354",
+     "start": "2026-11-01T10:00Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "11/1 - 5:00 AM EST",
      "round": "Qualifying Final",
      "draw": "Men's Singles",
-     "court": "",
+     "court": "Court 1",
+     "p": [
+      {
+       "name": "Vit Kopriva",
+       "short": "V. Kopriva",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/cze.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      },
+      {
+       "name": "Rinky Hijikata",
+       "short": "R. Hijikata",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/aus.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      }
+     ]
+    },
+    {
+     "id": "187348",
+     "start": "2026-11-01T11:00Z",
+     "state": "pre",
+     "detail": "11/1 - 6:00 AM EST",
+     "round": "Qualifying Final",
+     "draw": "Men's Singles",
+     "court": "Court 2",
+     "p": [
+      {
+       "name": "Miomir Kecmanovic",
+       "short": "M. Kecmanovic",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ser.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      },
+      {
+       "name": "Juan Manuel Cerundolo",
+       "short": "J. Cerundolo",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      }
+     ]
+    },
+    {
+     "id": "187350",
+     "start": "2026-11-01T11:30Z",
+     "state": "pre",
+     "detail": "11/1 - 6:30 AM EST",
+     "round": "Qualifying Final",
+     "draw": "Men's Singles",
+     "court": "Court Central",
      "p": [
       {
        "name": "Yannick Hanfmann",
@@ -3645,9 +3678,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Benjamin Bonzi",
+       "short": "B. Bonzi",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -3657,17 +3690,46 @@
     },
     {
      "id": "187351",
-     "start": "2026-11-01T04:00Z",
+     "start": "2026-11-01T11:30Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "11/1 - 6:30 AM EST",
      "round": "Qualifying Final",
      "draw": "Men's Singles",
-     "court": "",
+     "court": "Court 1",
      "p": [
       {
        "name": "Tomas Machac",
        "short": "T. Machac",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/cze.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      },
+      {
+       "name": "Sebastian Baez",
+       "short": "S. Baez",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      }
+     ]
+    },
+    {
+     "id": "187353",
+     "start": "2026-11-01T12:30Z",
+     "state": "pre",
+     "detail": "11/1 - 7:30 AM EST",
+     "round": "Qualifying Final",
+     "draw": "Men's Singles",
+     "court": "Court 2",
+     "p": [
+      {
+       "name": "TBD",
+       "short": "TBD",
+       "flag": null,
        "seed": null,
        "win": false,
        "sets": [],
@@ -3686,12 +3748,12 @@
     },
     {
      "id": "187352",
-     "start": "2026-11-01T04:00Z",
+     "start": "2026-11-01T13:00Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "11/1 - 8:00 AM EST",
      "round": "Qualifying Final",
      "draw": "Men's Singles",
-     "court": "",
+     "court": "Court 1",
      "p": [
       {
        "name": "TBD",
@@ -3706,64 +3768,6 @@
        "name": "TBD",
        "short": "TBD",
        "flag": null,
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      }
-     ]
-    },
-    {
-     "id": "187353",
-     "start": "2026-11-01T04:00Z",
-     "state": "pre",
-     "detail": "TBD",
-     "round": "Qualifying Final",
-     "draw": "Men's Singles",
-     "court": "",
-     "p": [
-      {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      }
-     ]
-    },
-    {
-     "id": "187354",
-     "start": "2026-11-01T04:00Z",
-     "state": "pre",
-     "detail": "TBD",
-     "round": "Qualifying Final",
-     "draw": "Men's Singles",
-     "court": "",
-     "p": [
-      {
-       "name": "Vit Kopriva",
-       "short": "V. Kopriva",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/cze.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "Rinky Hijikata",
-       "short": "R. Hijikata",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/aus.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -9908,7 +9912,7 @@
      "id": "185779",
      "start": "2026-10-31T15:50Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Semifinal",
      "draw": "Women's Singles",
      "court": "Quadra Central",
@@ -9920,9 +9924,10 @@
        "seed": null,
        "win": false,
        "sets": [
+        6,
         5
        ],
-       "serve": false
+       "serve": true
       },
       {
        "name": "Nauhany Vitoria Leme Da Silva",
@@ -9931,9 +9936,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        0
+        0,
+        1
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -11292,7 +11298,7 @@
      "id": "185854",
      "start": "2026-10-31T15:15Z",
      "state": "in",
-     "detail": "2nd",
+     "detail": "3rd",
      "round": "Semifinal",
      "draw": "Women's Singles",
      "court": "Centre Court",
@@ -11305,9 +11311,10 @@
        "win": false,
        "sets": [
         6,
-        2
+        4,
+        0
        ],
-       "serve": false
+       "serve": true
       },
       {
        "name": "Elsa Jacquemot",
@@ -11317,7 +11324,8 @@
        "win": false,
        "sets": [
         2,
-        3
+        6,
+        1
        ],
        "serve": false
       }
@@ -15495,5 +15503,5 @@
    ]
   }
  ],
- "fetched": "2026-10-31T16:15:12+00:00"
+ "fetched": "2026-10-31T16:46:45+00:00"
 }
