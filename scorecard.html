@@ -227,7 +227,7 @@ async function scorecard() {
 // ── rules lab ────────────────────────────────────────────────────────────
 let LAB = null;
 const SPORT_N = {mlb: 'MLB', nba: 'NBA', nfl: 'NFL', cfb: 'NCAAF', nhl: 'NHL', tennis: 'Tennis'};
-const MKT_N = {fg3: 'Threes', hr_yes: 'Home run (yes)', k: 'Pitcher strikeouts', h: 'Hits', tb: 'Total bases', pts: 'Points', reb: 'Rebounds', ast: 'Assists', ml: 'Moneyline', spread: 'Spread', total: 'Game total', rec: 'Receptions', rec_yds: 'Receiving yards', rush_yds: 'Rushing yards',
+const MKT_N = {total_games: 'Total games', game_spread: 'Game spread', q1_total: '1st-quarter total', h1_total: '1st-half total', first_basket: 'First basket (yes)', pra: 'Points + rebounds + assists', g_yes: 'Anytime goal (yes)', sog: 'Shots on goal', fg3: 'Threes', hr_yes: 'Home run (yes)', k: 'Pitcher strikeouts', h: 'Hits', tb: 'Total bases', pts: 'Points', reb: 'Rebounds', ast: 'Assists', ml: 'Moneyline', spread: 'Spread', total: 'Game total', rec: 'Receptions', rec_yds: 'Receiving yards', rush_yds: 'Rushing yards',
   pass_yds: 'Passing yards', anytime_td: 'Anytime TD'};
 const PRESETS = [
   {t: 'NBA points unders', s: 'nba', m: 'pts', side: 'B'},
@@ -235,6 +235,14 @@ const PRESETS = [
   {t: 'NBA props, model edge 3+', s: 'nba', m: 'all', side: 'model', edge: 3},
   {t: 'NBA assists unders', s: 'nba', m: 'ast', side: 'B'},
   {t: 'NBA road teams on a back-to-back', s: 'nba', m: 'spread', side: 'B', split: {sRS: '1'}},
+  {t: 'NBA 1st-quarter unders', s: 'nba', m: 'q1_total', side: 'B'},
+  {t: 'NBA 1st-half overs', s: 'nba', m: 'h1_total', side: 'A'},
+  {t: 'First basket, +600 or shorter', s: 'nba', m: 'first_basket', side: 'A', max: 600},
+  {t: 'First basket longshots, +1500 or longer', s: 'nba', m: 'first_basket', side: 'A', min: 1500},
+  {t: 'NBA threes unders', s: 'nba', m: 'fg3', side: 'B'},
+  {t: 'NBA threes overs', s: 'nba', m: 'fg3', side: 'A'},
+  {t: 'NHL anytime goal at +200 or shorter', s: 'nhl', m: 'g_yes', side: 'A', max: 200},
+  {t: 'NHL shots on goal unders', s: 'nhl', m: 'sog', side: 'B'},
   {t: 'West coast teams playing early in the East (NFL)', s: 'nfl', m: 'spread', side: 'B', split: {sTR: '2', sDN: '0', sTZ: '0'}},
   {t: 'NHL home teams vs a tired opponent', s: 'nhl', m: 'ml', side: 'A', split: {sRO: '1'}},
   {t: 'NFL prime-time unders', s: 'nfl', m: 'total', side: 'B', split: {sDN: '1'}},
@@ -253,12 +261,16 @@ const PRESETS = [
   {t: 'College home teams against the spread', s: 'cfb', m: 'spread', side: 'A'},
   {t: 'NHL unders', s: 'nhl', m: 'total', side: 'B'},
   {t: 'Tennis underdogs', s: 'tennis', m: 'ml', side: 'dog'},
+  {t: 'Tennis total games unders', s: 'tennis', m: 'total_games', side: 'B'},
+  {t: 'Tennis favorites on the game spread', s: 'tennis', m: 'game_spread', side: 'fav'},
   {t: "The model's side, edge 3+", s: 'all', m: 'all', side: 'model', edge: 3},
 ];
 function sideNames(m) {
   if (m === 'ml' || m === 'spread') return [['A', 'Home'], ['B', 'Away']];
   if (m === 'anytime_td') return [['A', 'Yes (scores)']];
   if (m === 'hr_yes') return [['A', 'Yes (homers)'], ['B', 'No']];
+  if (m === 'first_basket' || m === 'g_yes') return [['A', 'Yes']];
+  if (m === 'game_spread' || (m === 'ml' && document.getElementById('lSport').value === 'tennis')) return [];   // tennis: favorite / underdog are the sides that mean something
   if (m === 'all') return [];
   return [['A', 'Over'], ['B', 'Under']];
 }
