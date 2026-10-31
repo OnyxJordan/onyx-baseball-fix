@@ -211,20 +211,29 @@ def box_rows(summary, gid, season, week, date):
 
 
 def ingest_nfl(lane, cur_week, year):
+    """The NFL: last season once (the prior), then this season's weeks."""
+    return ingest_box(lane, "football/nfl", "", cur_week, year, prior_weeks=range(1, 19))
+
+
+def ingest_box(lane, path, q, cur_week, year, prior_weeks=()):
+    """Box scores into data/<sport>/player_games.json: last season's prior_weeks once,
+    then this season's weeks up to now (the last LOOKBACK_WEEKS re-checked). College
+    football (11/1) reads this season only: ~65 FBS games a week is enough history by
+    midseason, and a full prior season would double the file."""
     pg = lane.load("player_games.json", {}) or {}
     if pg.get("_ver") != BOX_VER:
         pg = {"_ver": BOX_VER, "_games": [], "rows": []}
     seen = set(pg["_games"])
     todo = []
     # last season once (the prior), then this season's weeks up to now
-    for season, weeks in ((year - 1, range(1, 19)), (year, range(1, (cur_week or 1) + 1))):
+    for season, weeks in ((year - 1, prior_weeks), (year, range(1, (cur_week or 1) + 1))):
         recent = season == year
         for wk in weeks:
             if not recent and any(g.startswith(f"{season}:{wk}:") for g in seen):
                 continue
             if recent and cur_week and wk < cur_week - LOOKBACK_WEEKS and any(g.startswith(f"{season}:{wk}:") for g in seen):
                 continue
-            sb = espn_get("football/nfl/scoreboard", f"seasontype=2&week={wk}&dates={season}") or {}
+            sb = espn_get(path + "/scoreboard", f"seasontype=2&week={wk}&dates={season}" + (("&" + q) if q else "")) or {}
             for e in sb.get("events") or []:
                 st = ((e.get("status") or {}).get("type") or {})
                 key = f"{season}:{wk}:{e.get('id')}"
@@ -233,7 +242,7 @@ def ingest_nfl(lane, cur_week, year):
             time.sleep(0.15)
     added = 0
     for key, gid, season, wk, d in todo:
-        s = espn_get("football/nfl/summary", f"event={gid}")
+        s = espn_get(path + "/summary", f"event={gid}")
         if not s:
             continue
         pg["rows"].extend(box_rows(s, gid, season, wk, d))
@@ -266,7 +275,10 @@ def main():
         slate["season_type"] = (sb.get("season") or {}).get("type")
         slate["bye"] = [t.get("abbreviation") for t in (sb.get("week") or {}).get("teamsOnBye") or []]
         if cfg.get("box") and slate["season"]:
-            ingest_nfl(lane, wk, slate["season"])
+            if key == "nfl":
+                ingest_nfl(lane, wk, slate["season"])
+            else:
+                ingest_box(lane, cfg["espn"][0], cfg.get("espn_q", ""), wk, slate["season"])
         if key == "nfl" and slate["season"]:
             try:   # nflverse targets, dropbacks and snap shares for the v5 receptions model (once a day)
                 import nfl_verse

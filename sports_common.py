@@ -34,7 +34,7 @@ SPORTS = {
             "season_start": "2026-09-01"},
     "cfb": {"name": "College Football", "full": "Onyx College Football", "espn": ["football/college-football"],
             "kind": "football", "slate": "week", "optic": ("football", "ncaaf"), "tone": "lilac", "art": "cfb",
-            "espn_q": "groups=80&limit=300"},
+            "espn_q": "groups=80&limit=300", "box": True},
     "nhl": {"name": "NHL", "full": "Onyx NHL", "espn": ["hockey/nhl"], "kind": "hockey", "slate": "day",
             "optic": ("hockey", "nhl"), "tone": "blue", "art": "hockey"},
     "tennis": {"name": "Tennis", "full": "Onyx Tennis", "espn": ["tennis/atp", "tennis/wta"], "kind": "tennis",

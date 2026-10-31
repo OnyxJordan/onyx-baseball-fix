@@ -1306,3 +1306,15 @@ skip it, and `sports_build.team_open_lane` logs it only at Onyx's opening price 
 validate_build's ledger list), shown under "On trial" on the CFB Plays tab. The six totals logged
 on 10/31 stay on the graded record. A guard skipping totals far from the market was tested and
 did not help.
+
+**College football player projections (11/1).** `sports_espn.ingest_box` (the NFL box-score
+reader, generalized) reads every FBS box score this season into `data/cfb/player_games.json`
+(575 games, weeks 1-9 seeded; the daily run adds new finals). `cfb_players.py` runs nfl_model's
+engine with college roles (no targets in ESPN's college box, so receptions set the receiving
+role), tuned on weeks 4-6 and judged on 7-9: MAE vs the season average rushing +3.7%, passing
++1.7%, receiving +0.4%, receptions +0.6% (and +4-7% vs the last-3 average). Priced against Onyx's
+college player props as leans (no Onyx college prop history to backtest on), with a role guard:
+a projection more than 1 sd from the line, or under 60% / over 167% of it, is shown but never
+priced. Against RotoWire's 10/31 projections: correlation 0.96-0.98 on passing, rushing and
+receiving yards and receptions, typical gap 6-12%; our rushing runs ~5 yards lower because
+college rushing counts sacks.
