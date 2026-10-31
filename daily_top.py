@@ -53,7 +53,17 @@ def label(r):
 def entry(sport, r, tag="lean", start=None):
     return {"sport": sport, "label": label(r), "matchup": r.get("matchup") or "", "start": r.get("start") or start,
             "gid": r.get("gid"), "who": r.get("pid") or r.get("name"), "price": r["price"], "conf": round(r["prob"], 4),
-            "edge": round(r["edge"], 4), "sel": r.get("sel"), "tag": tag}
+            "edge": round(r["edge"], 4), "sel": r.get("sel"), "tag": tag,
+            # what the home page needs to follow a saved pick live (saved.js / My picks)
+            "kind": r.get("kind") or "prop", "mkt": r.get("mkt") or r.get("stat") or r.get("kind"), "side": r.get("side"),
+            "line": r.get("line"), "hcap": _hcap(r), "name": r.get("name"), "team": r.get("team")}
+
+
+def _hcap(r):
+    try:
+        return float(r["line_txt"]) if r.get("kind") == "spread" and r.get("line_txt") else None
+    except ValueError:
+        return None
 
 
 def ok(r):

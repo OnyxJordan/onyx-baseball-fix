@@ -362,7 +362,7 @@ def write_top(rows, games, today_rows, open_led, today):
             if pr.get("src") != "onyx":
                 continue
             for side, a in (pr.get("all") or {}).items():
-                c = {"kind": "prop", "mkt": s_, "name": r["name"], "pid": r["pid"], "side": side, "line": pr["line"],
+                c = {"kind": "prop", "mkt": s_, "name": r["name"], "pid": r["pid"], "team": r["team"], "side": side, "line": pr["line"],
                      "price": a.get("price"), "prob": a.get("prob"), "edge": a.get("edge"), "sel": a.get("sel"),
                      "gid": r["gid"], "matchup": f"{g.get('away')} @ {g.get('home')}", "start": g.get("start")}
                 if a.get("sel") and DT.ok(c):
@@ -375,7 +375,7 @@ def write_top(rows, games, today_rows, open_led, today):
             price, sel = g.get(f"q1_{side}_price"), g.get(f"q1_{side}_sel")
             if price is None or not sel:
                 continue
-            c = {"kind": "prop", "mkt": "q1_total", "name": f"{g['away']} @ {g['home']}", "pid": "q1", "side": side,
+            c = {"kind": "prop", "mkt": "q1_total", "name": f"{g['away']} @ {g['home']}", "pid": "q1", "team": g["away"], "side": side,
                  "line": g["q1_total"], "price": price, "prob": p, "edge": p - OL.implied(price), "sel": sel,
                  "gid": g["gid"], "matchup": f"{g['away']} @ {g['home']}", "start": g.get("start")}
             if DT.ok(c):

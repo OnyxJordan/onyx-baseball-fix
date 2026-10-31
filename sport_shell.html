@@ -14,6 +14,7 @@
 <script>window.OX_SITE = '/*SPORT_KEY*/';</script>
 <!-- shared app shell: bottom menu, search, toasts, status-bar fix (ui.js) -->
 <script src="ui.js" defer></script>
+<script src="saved.js"></script>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="preconnect" href="https://site.api.espn.com" crossorigin>
@@ -138,6 +139,7 @@
 .pk{display:flex;flex-direction:column;gap:10px;padding:14px;border-radius:14px;border:1px solid rgba(176,56,249,.45);background:linear-gradient(160deg,rgba(176,56,249,.12),var(--bg2) 60%)}
 .pk-top{display:flex;justify-content:space-between;gap:8px;font:700 10px monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--text3)}
 .pk-main{display:flex;align-items:center;gap:10px}.pk-main b{font-size:16px;line-height:1.3}
+.pk-acts{display:flex;gap:8px;align-items:center}.pk-acts .btn-primary{flex:1}
 .pk-nums{display:grid;grid-template-columns:repeat(auto-fit,minmax(70px,1fr));gap:6px}
 .pk-nums div{background:var(--bg3);border-radius:10px;padding:6px 8px}.pk-nums span{display:block;font:700 9px monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--text3)}.pk-nums b{font:800 14px monospace}
 .pk-res{font:800 13px monospace;text-transform:uppercase;letter-spacing:.06em}.pk-res.w{color:#61e970}.pk-res.l{color:#f87171}
@@ -1860,8 +1862,15 @@ function playCards(rows) {
       <div><span>Implied</span><b>${pct(r.implied)}</b></div><div><span>Edge</span><b class="edge-pos">${r.edge != null ? '+' + (r.edge * 100).toFixed(1) + 'pp' : '-'}</b></div>
       ${r.proj != null ? `<div><span>Projection</span><b>${num(r.proj)}</b></div>` : ''}</div>
     ${r.result ? `<div class="pk-res ${r.result === 'W' ? 'w' : r.result === 'L' ? 'l' : ''}">${r.result === 'W' ? 'Won' : r.result === 'L' ? 'Lost' : r.result === 'P' ? 'Push' : 'Void'}${r.actual != null ? ' · ' + esc(r.actual) : ''}</div>`
-      : `<button class="btn-primary" onclick="bet('${esc(r.sel || '')}','${esc(pickLabel(r)).replace(/'/g, '')}')">⚡ Bet on Onyx</button>`}
+      : `<div class="pk-acts"><button class="btn-primary" onclick="bet('${esc(r.sel || '')}','${esc(pickLabel(r)).replace(/'/g, '')}')">⚡ Bet on Onyx</button>${window.OnyxSaved ? OnyxSaved.btn(savePick(r)) : ''}</div>`}
   </div>`).join('')}</div>`;
+}
+// a play as a saved pick (saved.js): followed live in My picks on the home page
+function savePick(r) {
+  const g = (SD.games || []).find(x => x.gid === r.gid) || {};
+  return {id: r.sel, sport: SD.sport, label: pickLabel(r), matchup: r.matchup || '', start: r.start || g.start, gid: r.gid,
+          team: r.team, price: r.price, conf: r.prob, kind: r.kind || 'prop', mkt: r.mkt, side: r.side, line: r.line,
+          hcap: r.kind === 'spread' && r.line_txt ? parseFloat(r.line_txt) : null, name: r.name};
 }
 // touchdown scorers (nfl_model v2): each player's anytime and first TD chance against Onyx's price
 function tdTable(rows, title) {

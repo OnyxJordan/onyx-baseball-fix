@@ -1194,3 +1194,19 @@ across every sport.
 - The Model's Parlay legs are now **-150 to +150 with 28+ projected minutes** (was -400 to
   +150, 24+): Jordan's call, -179 / -195 legs are not on every book. Replay in
   `nba_build.py` beside `TICKET_PRICE`.
+
+## Saved picks (10/31)
+
+Jordan: "save a pick local so you can follow it the rest of the night by clicking it".
+`saved.js` (loaded by `home.html`, `nba_shell.html`, `sport_shell.html`) keeps one
+localStorage list, `onyxSaved`, and draws the star button (`OnyxSaved.btn(pick)`) on the
+home Top 10, the NBA "Today's best plays" and tracked pick cards, and every sport page's
+play cards. A pick carries what is needed to follow it: sport, game id, team, kind (prop /
+spread / total / ml), market, side, line, handicap, player or team name (`daily_top.entry`
+writes the same fields into `top.json`). The home page's My Onyx opens on **My picks**
+(`myPicks` / `pkTrack`): ESPN's scoreboard gives the score for game lines, the summary box
+gives the player's live number for props (NBA pts / reb / ast; NFL receptions, receiving,
+rushing and passing yards, anytime TD) and the 1st-quarter total, with Winning / Losing
+live and Won / Lost / Push when settled (an over that has cleared, or a 1st-quarter total
+after the 1st, settles early). Tapping a pick opens its game. Picks clear 36 hours after
+their game starts. Device-only by design: nothing is sent anywhere.
