@@ -20,7 +20,8 @@ import sports_lab as L
 ONYX_LEAGUE = {"nfl": "NFL", "cfb": "NCAAF", "nhl": "NHL"}
 
 ROADMAP = {
-    "nfl": ["Backtest the projections and the game ratings against a full season of real Onyx lines; tracked picks switch on only where they beat the price",
+    "nfl": ["Tested 10/26 to 10/29 against two seasons of real Onyx lines (440 games): receptions beat Onyx's opening price in both seasons, so they run on trial at the open. Touchdown scorers, rushing and passing yards did not, so they stay leans",
+            "Tested 10/31: game ratings from every play since 2024 (expected points per play, adjusted for opponent, with scores alongside). On 2026 games they never saw, they made Onyx's spread and total worse, open and close, as the score-only ratings did. NFL sides and totals stay leans",
             "Injury and inactive feed, so a scratched player never gets a lean",
             "Touchdown scorer and passing touchdown markets"],
     "cfb": ["Backtest the team ratings against a season of real Onyx spreads and moneylines before any pick",

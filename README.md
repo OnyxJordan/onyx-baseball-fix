@@ -484,6 +484,17 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
     goes to `data/nfl/opening.json`; a play is logged to `data/nfl/open_trial.json`
     (append-only, validate_build ledger list) only while the live line is still the
     opening one, at most 12 a day by edge, graded off the box score.
+  - **NFL game lines from play-by-play (10/31, tested, not adopted):** opponent-adjusted
+    offense and defense ratings in EPA per play (nflverse 2024-2026, win probability
+    10-90% plays, half-life 60/120/240 days, ridge 100/300/1000), alone and next to the
+    score ratings, fitted on 2025 and judged on 2026 weeks 1-8 against Onyx (440
+    games). Does the rating explain what Onyx's line misses? Slope of (result minus
+    line) on the rating: 2025 weeks 9+ spread open t 1.30, total open t 1.29; 2026
+    spread open t -1.20, close t -1.46, total open t 0.56, close t -0.62. Model-alone
+    log loss 0.730 spread / 0.725 total vs Onyx 0.694 / 0.690; a 20% blend still loses
+    to Onyx on 2026. Wind (game-time, from nflverse) was not monotone (8-12 mph
+    unders 36/57, 16+ mph 9/16) and is not known at the open. Nothing shipped;
+    NFL sides and totals stay leans. Script: scratch only, numbers here.
   - **Baseline rule (both NBA and NFL opening lanes):** the system's very first capture
     (no `opening.json` yet) marks every price already on the board as a baseline and
     never logs it, because those lines may have opened days earlier. Only markets that
