@@ -1284,3 +1284,25 @@ every lane, re-pricing the slate at each lane's weight (`rows_for`). Home page: 
 the hero counts every sport from the ESPN scoreboards (games today, plays priced today, next
 start, sports on today and how many models are graded), and the Top 10 takes only games on the
 site's day (ET, rolling at 4 AM), so Sunday's NFL waits for Sunday.
+
+**NHL expected goals, tested and not used (10/31).** Every NHL shot since 10/2024 from the NHL
+API (3,008 games): a shot model on 2024-25 (distance, angle, shot type, strength, rebounds,
+empty net; log loss 0.223 vs 0.254 base) turned into walk-forward team xG for and against, Poisson
+prices for moneyline, puck line and total, blended with Onyx's no-vig price. Before 1/15/2026 the
+blend beat Onyx (moneyline 0.6864 vs 0.6896 at w .5); after it, and on 2026-27 so far, every weight
+above 0 was worse than Onyx alone and every lane lost (2026-27 moneyline -11% / puck line -7% at
+opening prices). NHL stays leans. Also re-tried 10/31 with market-restricted lanes: NFL game lines
+(spread / total / moneyline: tuning windows all negative, 8-14 test picks) and tennis moneylines
+(-8% open): neither passes.
+
+
+**College football totals on trial (11/1).** Jordan uploaded RotoWire and SaberSim projections
+for the 10/31 main slate. Sides agreed with SaberSim within 3.0 points on average; totals ran 4.2
+points hotter, and 6-11 points hotter on the games the totals lane picked (FLA@UGA, ASU@BYU,
+OSU@USC). With 2025's totals at closing prices (-20.3%) the lane is weaker than its 2026 numbers
+alone suggest, so the totals lane is `"trial": true` in `data/cfb/backtest.json`: graded lanes
+skip it, and `sports_build.team_open_lane` logs it only at Onyx's opening price (first sight in
+`data/cfb/opening.json`, baseline rule as NFL) into `data/cfb/open_trial.json` (append-only, in
+validate_build's ledger list), shown under "On trial" on the CFB Plays tab. The six totals logged
+on 10/31 stay on the graded record. A guard skipping totals far from the market was tested and
+did not help.

@@ -87,8 +87,8 @@
   "summary": [
    "Every game priced only from results before it, against Onyx's real opening and closing lines. The rule was chosen on games before 2026-03-01 and judged on 2026-03-01 on, which it never saw.",
    "Two lanes, each with its own blend: spreads (model 20%, edge 2 to 6 points) and totals (model 30%, edge 2 to 10 points), both priced -200 to +150.",
-   "Totals joined 10/31 (model v2): they beat Onyx's own price on the 2026 games (log loss 0.6862 vs 0.6927) and also made money on the 2025 tuning games (34-29, +3.3%).",
-   "Passed: both lanes beat the Onyx market and won money at opening and closing prices. Tracked picks are live, graded in public."
+   "Totals joined 10/31 (model v2) and moved to on trial 11/1: +21.0% at opening and +11.9% at closing prices on 2026 games, but -20.3% at closing prices in 2025, and our totals run hotter than outside projections. They log at Onyx's opening price, on their own record.",
+   "Passed: the spreads lane beat the Onyx market and won money at opening and closing prices. Spread picks are live, graded in public; totals are on trial."
   ],
   "stats": [
    {
@@ -139,7 +139,8 @@
    "edge_max": 0.1,
    "price_min": -200,
    "price_max": 150,
-   "max_per_slate": 6
+   "max_per_slate": 6,
+   "trial": true
   }
  ],
  "lane_tests": {
