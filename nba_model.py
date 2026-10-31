@@ -2,6 +2,32 @@
 nba_model.py - Onyx NBA points / rebounds / assists projection model.
 
 CHANGELOG (the lab notebook: every change bumps VERSION and cites evidence)
+  v8 (2026-11-01) CONFIRMED STARTING FIVES (lineup_minutes, nba_build.attach_lineups).
+     Trigger: Jordan's SaberSim check of 10/30. Over 159 players our points tracked
+     SaberSim closely (correlation .97, 1.4 pts apart) but the worst misses were all
+     late starters SaberSim knew about and we did not: Capela 5 projected minutes (SaberSim
+     26.5, played 30), Gafford 13 (25.6, played 29), Jase Richardson 15 (26.7, played 33).
+     Change: once ESPN posts a team's five, a confirmed starter projected below his
+     minutes as a starter (or 29) moves halfway there; a player who started 3 of his last
+     5 but is not in the five moves halfway to his bench minutes (or 18). Then the
+     240-minute refill as before.
+     Evidence (tools/nba_backtest.py, SIM_LINEUP: the real starters on the slate, as
+     production sees them once posted; 2025-26, SIM_ROSTER, on/off; chosen on Oct-Jan from
+     a .5/.8/1.0 x 26/29 grid, judged on Feb-Apr):
+                              v7 (no lineups)        v8 (a .5, 29)
+       Oct-Jan  minutes MAE   4.96                   4.83
+                points MAE    4.433                  4.408
+                lane open     54-37 +17.2%           55-30 +28.0%
+                lane close    28-43 -23.5%           29-25  +5.3%
+       Feb-Apr  minutes MAE   5.45                   5.30
+                points MAE    4.604                  4.559   (reb 1.868 -> 1.857, ast 1.339 -> 1.334)
+                blend vs open 0.6882                 0.6874  (Onyx 0.6895)
+                lane open     64-59 +2.5%            57-46  +8.7%
+                lane close    61-45 +13.0%           52-30 +23.4%
+     Every grid setting improved minutes and the open-price blend in both windows; a
+     full pull (1.0) over-corrected. Production only knows the five once ESPN posts it,
+     usually shortly before tip, so the gain lands on the 10-minute lines refreshes in
+     the last hours; before that the model runs exactly as v7.
   v7 (2026-10-28) ON/OFF SPLITS FROM LINEUPS (nba_onoff.py).
      Every regular-season lineup since 2024-25 rebuilt from ESPN play-by-play
      (2,435 games; starters plus each substitution; stint minutes match the
@@ -216,7 +242,7 @@ CHANGELOG (the lab notebook: every change bumps VERSION and cites evidence)
 import math
 from collections import defaultdict
 
-VERSION = "v7"
+VERSION = "v8"
 
 LEAGUE = {"ppg": 115.0, "reb": 44.0, "ast": 27.0, "poss": 99.5}
 POS_RATE = {   # per-minute league rates by listed position, used only without a prior
@@ -261,6 +287,9 @@ P = {
     "fill_on": 1.0,          # v5
     "fill_exp": 0.0,         # weight ~ (base minutes + 4) ^ exp: v5 0 = an even split, bench included
     "fill_pos": 1.0,         # v5: double weight for the OUT player's position group
+    # confirmed starting lineups (v8 candidate): a confirmed starter is pulled toward starter
+    # minutes, a usual starter who is not in the five toward bench minutes, by st_a
+    "st_a": 0.5, "st_min": 29.0, "bench_min": 18.0,      # v8
     "fill_cap": 99.0,        # most minutes one player can inherit
     "fill_floor": 0.0,       # v5: anyone on the roster can inherit (was the 15+ min rotation)
     # on/off (nba_onoff.py): a player whose teammate is OUT tonight produces at
@@ -590,6 +619,26 @@ def base_minutes(prior, games, team, team_gp=0):
     return base
 
 
+def lineup_minutes(base, games, starter):
+    """Confirmed lineups (slate player "starter": True / False, None when the team's five
+    is not posted). A confirmed starter projected below starter minutes moves toward
+    his own minutes as a starter (or st_min); a player who has been starting but is
+    not in tonight's five moves toward his bench minutes (or bench_min). st_a = 0 off."""
+    if starter is None or not P["st_a"]:
+        return base
+    as_st = [g[IDX["min"]] for g in games[-15:] if len(g) > 9 and g[9] and g[IDX["min"]] > 0]
+    as_bn = [g[IDX["min"]] for g in games[-15:] if len(g) > 9 and not g[9] and g[IDX["min"]] > 0]
+    if starter:
+        tgt = sum(as_st) / len(as_st) if len(as_st) >= 2 else P["st_min"]
+        tgt = max(tgt, P["st_min"] * 0.85)
+        return base + P["st_a"] * max(0.0, tgt - base)
+    recent_st = sum(1 for g in games[-5:] if len(g) > 9 and g[9])
+    if recent_st >= 3:
+        tgt = sum(as_bn) / len(as_bn) if len(as_bn) >= 2 else P["bench_min"]
+        return base - P["st_a"] * max(0.0, base - tgt)
+    return base
+
+
 def fit_team_minutes(mins, total=240.0):
     """Rescale one team's expected minutes to the 240 available.
     Over 240 (deep benches over-counted): trim the deep bench first, starters
@@ -907,7 +956,7 @@ def project_slate(slate, prior, player_games, team_games, team_hist=None, roles=
             "home": p["home"], "gid": p["gid"], "pos": p.get("pos", ""),
             "inj": status, "inj_detail": p.get("inj_detail", ""), "out": out, "hs": p.get("hs"),
             "_prior": pr, "_games": pg,
-            "min_full": base_minutes(pr, pg, p["team"], len(team_games.get(p["team"], []))),
+            "min_full": lineup_minutes(base_minutes(pr, pg, p["team"], len(team_games.get(p["team"], []))), pg, p.get("starter")),
             "upm": usage_per_min(pr, pg),
             "gp": len([x for x in pg if x[IDX["min"]] > 0]),
             "prior_gp": (pr or {}).get("gp", 0),

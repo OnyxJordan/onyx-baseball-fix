@@ -1318,3 +1318,13 @@ a projection more than 1 sd from the line, or under 60% / over 167% of it, is sh
 priced. Against RotoWire's 10/31 projections: correlation 0.96-0.98 on passing, rushing and
 receiving yards and receptions, typical gap 6-12%; our rushing runs ~5 yards lower because
 college rushing counts sacks.
+
+**NBA v8: confirmed starting fives (11/1).** Jordan's SaberSim comparison of 10/30 showed our
+worst misses were late starters (Capela, Gafford, Jase Richardson projected 5-15 minutes, played
+29-33). `nba_build.attach_lineups` reads ESPN's game summary for games within 4 hours of tip and,
+for a team with exactly five starters posted, marks every player starter True / False (None
+otherwise, and the model runs as v7). `nba_model.lineup_minutes` pulls a confirmed starter halfway
+to his minutes as a starter (or 29) and a usual starter left out of the five halfway to his bench
+minutes (or 18), before the 240-minute refill. Backtest (`SIM_LINEUP` in tools/nba_backtest.py):
+Feb-Apr minutes MAE 5.45 -> 5.30, points 4.604 -> 4.559, lane open +2.5% -> +8.7%, close +13.0% ->
++23.4%. Fail-soft: a lineup error leaves the slate as it was.

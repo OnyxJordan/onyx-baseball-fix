@@ -369,6 +369,44 @@ def ticket_legs(rows, games):
     return out
 
 
+def attach_lineups(slate, today):
+    """Confirmed starting fives (nba_model v8): ESPN's game summary lists the five
+    starters per team once they are posted before tip. A team with exactly five
+    flagged gets every player marked starter True / False; otherwise None (unknown),
+    and the model runs as before. Games within 4 hours of tip only (cheap).
+    Fail-soft: any error leaves the slate untouched."""
+    from nba_common import ESPN, espn_get, team_abbr
+    try:
+        now = datetime.now(timezone.utc)
+        soon = [g for g in slate.get("games", []) if g.get("state") == "pre" and g.get("start")
+                and (datetime.fromisoformat(str(g["start"]).replace("Z", "+00:00")) - now).total_seconds() < 4 * 3600]
+        if not soon:
+            return 0
+        sb = espn_get(f"{ESPN}/scoreboard", {"dates": today.replace("-", "")}) or {}
+        eid = {}
+        for e in sb.get("events") or []:
+            cs = {c.get("homeAway"): team_abbr((c.get("team") or {}).get("abbreviation")) for c in (e.get("competitions") or [{}])[0].get("competitors") or []}
+            eid[(cs.get("away"), cs.get("home"))] = e.get("id")
+        five = {}
+        for g in soon:
+            i = eid.get((g["away"], g["home"]))
+            if not i:
+                continue
+            d = espn_get(f"{ESPN}/summary", {"event": i}) or {}
+            for t in (d.get("boxscore") or {}).get("players") or []:
+                ab = team_abbr((t.get("team") or {}).get("abbreviation"))
+                ids = {str((a.get("athlete") or {}).get("id")) for b in t.get("statistics") or [] for a in b.get("athletes") or [] if a.get("starter")}
+                if len(ids) == 5:
+                    five[(g["gid"], ab)] = ids
+        for p in slate.get("players", []):
+            ids = five.get((p.get("gid"), p.get("team")))
+            p["starter"] = (str(p.get("hs")) in ids) if ids else None
+        return len(five)
+    except Exception as x:
+        print(f"  lineups: skipped ({str(x)[:120]})")
+        return 0
+
+
 def write_top(rows, games, today_rows, open_led, today, jumps=None, fshots=None):
     """data/nba/top.json for the home page's Top 10 (daily_top.py): every Onyx
     main-line prop side for a starter (28+ projected minutes, the parlay's
@@ -610,6 +648,9 @@ def main():
     import nba_onoff
     oo_state = load("onoff.json", {}) or {}
     oo = nba_onoff.tonight(oo_state, current_season(date.fromisoformat(today)), M.P["oo_prev"]) if oo_state.get("seasons") else None
+    n_lu = attach_lineups(slate, today)
+    if n_lu:
+        print(f"  confirmed starting fives: {n_lu} teams")
     rows, lg = project_slate(slate, prior, pg, tg, th, roles, oo)
     if oo is not None:
         # for the page: each player's own split without each teammate OUT tonight
