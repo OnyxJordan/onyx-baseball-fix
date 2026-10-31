@@ -502,6 +502,13 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
       play now (`VOL_P["rec_yds"]["edge"] = 1.0`).
     - `tools/sports_backtest.py` now uses the snap counts in `data/nfl/nflverse.json` the
       same way, so future NFL prop tests count these games.
+  - **NFL 1st-half and 1st-quarter totals (10/31, tested, not adopted).** Onyx's 1H / 1Q
+    lines (nfl_td.json, 391 games with nflverse quarter scores) against a walk-forward
+    model: the empirical share of the full-game total each part carried, applied to
+    Onyx's full-game line. 2025 (tune) at the open lost both markets (1H 2pp+ -9.2%,
+    1Q -5.6%), so no rule carries forward; 2026 1H looked good (+15.8%, 64 bets) but
+    the rule fails its tuning season. Line ratios match reality (1H line 0.505 of the
+    total, actual 0.506). Always-under 1H: 2025 +1.8% (285), 2026 +12.9% (106): too thin.
   - **College touchdown scorers in Ask Onyx (10/31).** `sports_build.cfb_td_board` puts every
     Onyx CFB anytime and first TD price on `data/cfb/board.json` (about 800 a Saturday).
     There is no college TD model: the chance is Onyx's price x `TD_SCALE` .82 (the NFL v6
