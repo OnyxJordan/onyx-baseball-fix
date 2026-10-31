@@ -227,7 +227,7 @@ async function scorecard() {
 // ── rules lab ────────────────────────────────────────────────────────────
 let LAB = null;
 const SPORT_N = {mlb: 'MLB', nba: 'NBA', nfl: 'NFL', cfb: 'NCAAF', nhl: 'NHL', tennis: 'Tennis'};
-const MKT_N = {total_games: 'Total games', game_spread: 'Game spread', q1_total: '1st-quarter total', h1_total: '1st-half total', first_basket: 'First basket (yes)', pra: 'Points + rebounds + assists', g_yes: 'Anytime goal (yes)', sog: 'Shots on goal', fg3: 'Threes', hr_yes: 'Home run (yes)', k: 'Pitcher strikeouts', h: 'Hits', tb: 'Total bases', pts: 'Points', reb: 'Rebounds', ast: 'Assists', ml: 'Moneyline', spread: 'Spread', total: 'Game total', rec: 'Receptions', rec_yds: 'Receiving yards', rush_yds: 'Rushing yards',
+const MKT_N = {total_games: 'Total games', game_spread: 'Game spread', q1_total: '1st-quarter total', h1_total: '1st-half total', first_basket: 'First basket (yes)', pra: 'Points + rebounds + assists', pr: 'Points + rebounds', pa: 'Points + assists', g_yes: 'Anytime goal (yes)', sog: 'Shots on goal', fg3: 'Threes', hr_yes: 'Home run (yes)', k: 'Pitcher strikeouts', h: 'Hits', tb: 'Total bases', pts: 'Points', reb: 'Rebounds', ast: 'Assists', ml: 'Moneyline', spread: 'Spread', total: 'Game total', rec: 'Receptions', rec_yds: 'Receiving yards', rush_yds: 'Rushing yards',
   pass_yds: 'Passing yards', anytime_td: 'Anytime TD'};
 const PRESETS = [
   {t: 'NBA points unders', s: 'nba', m: 'pts', side: 'B'},
@@ -241,6 +241,7 @@ const PRESETS = [
   {t: 'First basket longshots, +1500 or longer', s: 'nba', m: 'first_basket', side: 'A', min: 1500},
   {t: 'NBA threes unders', s: 'nba', m: 'fg3', side: 'B'},
   {t: 'NBA threes overs', s: 'nba', m: 'fg3', side: 'A'},
+  {t: 'NBA points + rebounds + assists unders', s: 'nba', m: 'pra', side: 'B'},
   {t: 'NHL anytime goal at +200 or shorter', s: 'nhl', m: 'g_yes', side: 'A', max: 200},
   {t: 'NHL shots on goal unders', s: 'nhl', m: 'sog', side: 'B'},
   {t: 'West coast teams playing early in the East (NFL)', s: 'nfl', m: 'spread', side: 'B', split: {sTR: '2', sDN: '0', sTZ: '0'}},

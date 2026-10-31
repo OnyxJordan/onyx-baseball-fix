@@ -239,14 +239,23 @@ def nba_more_rows():
                 box[(g[1], nk(rec.get("n")))] = ({"pts": g[5], "reb": g[6], "ast": g[7], "fg3": g[8]}, bool(g[3]))
     def act(fid, x, name, st):
         b = box.get((fid, nk(name)))
-        return (b[0].get(st), b[1]) if b else None
-    STAT = {"player_points": "pts", "player_rebounds": "reb", "player_assists": "ast", "player_threes": "fg3", "player_made_threes": "fg3"}
+        if not b:
+            return None
+        s = b[0]
+        if st in ("pra", "pr", "pa"):   # combos: the sum of the parts off the same box line
+            parts = [s.get(k) for k in {"pra": ("pts", "reb", "ast"), "pr": ("pts", "reb"), "pa": ("pts", "ast")}[st]]
+            return (None if None in parts else sum(parts), b[1])
+        return (s.get(st), b[1])
+    STAT = {"player_points": "pts", "player_rebounds": "reb", "player_assists": "ast", "player_threes": "fg3", "player_made_threes": "fg3",
+            "player_points_+_rebounds_+_assists": "pra", "player_points_+_rebounds": "pr", "player_points_+_assists": "pa"}
     full = prop_rows("nba", "bt/nba_lines_full.json", STAT, act)
     out += [r for r in full if r[1] == "fg3" or r[4] >= "2026-08-01"]   # 2025-26 pts / reb / ast: the replay rows
     out += prop_rows("nba", "bt/nba_2425_mkt.json", STAT, act)
     out += prop_rows("nba", "bt/nba_2425_lines.json", STAT, act)
     if os.path.exists("bt/nba_threes_pra.json"):   # made threes, 2025-26 on (points + rebounds + assists not graded yet)
         out += prop_rows("nba", "bt/nba_threes_pra.json", STAT, act)
+    for f in ("bt/nba_combos_a.json", "bt/nba_combos_b.json"):   # P+R+A, P+R, P+A, 2025-26 on
+        out += prop_rows("nba", f, STAT, act)
     print(f"  nba game lines + extra props: {len(out)}")
     return out
 
@@ -370,6 +379,8 @@ def mlb_rows():
     out = []
     for f in ("bt/mlb_2024_mkt.json", "bt/mlb_2025_lines.json", "bt/mlb_2026_lines.json"):
         out += game_rows("mlb", f)
+        out += prop_rows("mlb", f, STAT, act)
+    for f in ("bt/mlb_tb_a.json", "bt/mlb_tb_b.json", "bt/mlb_tb_c.json", "bt/mlb_tb_d.json"):   # total bases, 2025-26
         out += prop_rows("mlb", f, STAT, act)
     print(f"  mlb: {len(out)}")
     return out
