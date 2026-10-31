@@ -663,6 +663,65 @@ def model_frame(key, lane, slate, odds, M, rows, base, resolve, rows_for=None):
     return base
 
 
+def cfb_player_rows(lane, slate, odds, w):
+    """College football player projections (cfb_players.py) for every FBS player
+    with a role on tonight's slate, priced against Onyx's player props where
+    Onyx has a line. Leans: no history of Onyx college prop prices to test on."""
+    import cfb_players as C
+    import nfl_model as N
+    pg = lane.load("player_games.json", {}) or {}
+    rows = pg.get("rows") or []
+    season = slate.get("season")
+    if not rows or not season:
+        return []
+    wk = int((slate.get("label") or "Week 0").split()[-1]) if str(slate.get("label") or "").startswith("Week") else 99
+    by = N._games_by_player(rows)
+    allowed = N._team_allowed(rows)
+    last_game, lgc = {}, {}
+    for r in rows:
+        if r["season"] == season and r["week"] < wk:
+            last_game[r["team"]] = max(last_game.get(r["team"], 0), r["week"])
+    props = {(nk(p.get("name")), p.get("mkt")): p for p in (odds or {}).get("props") or []}
+    out = []
+    for g in slate.get("games") or []:
+        if g.get("state") != "pre":
+            continue
+        for team, opp, home in ((g["away"], g["home"], False), (g["home"], g["away"], True)):
+            lw = last_game.get(team)
+            for pid, gs in by.items():
+                cur = [x for x in gs if x["season"] == season and x["week"] < wk]
+                if not cur or cur[-1]["team"] != team or cur[-1]["week"] != lw:
+                    continue   # only players who played in the team's latest game
+                for st in C.STATS:
+                    pr, info = C.project(gs, st, season, wk, opp, allowed, C.P, lgc)
+                    if pr is None:
+                        continue
+                    ln = props.get((nk(cur[-1]["name"]), st)) or {}
+                    r = {"pid": pid, "name": cur[-1]["name"], "hs": cur[-1].get("hs"), "team": team, "opp": opp, "home": home,
+                         "gid": g["gid"], "start": g.get("start"), "mkt": st, "proj": round(pr, 1),
+                         "season": round(info["season"], 1), "l3": [int(v) for v in info["l3"]], "opp_f": round(info["opp"], 3),
+                         "line": ln.get("line"), "over": ln.get("over"), "under": ln.get("under"),
+                         "over_sel": ln.get("over_sel"), "under_sel": ln.get("under_sel"),
+                         "matchup": f"{team} {'vs' if home else '@'} {opp}"}
+                    pr = max(0.0, pr)     # college rushing counts sacks: a quarterback can average below zero
+                    r["proj"] = round(pr, 1)
+                    # role guard (as NBA's): a projection 1+ sd from the line, or under 60% / over 167% of it,
+                    # describes a different role (a split backfield, a new starter) or a stale line, not an
+                    # edge: shown, never priced. Without it the biggest "edges" were all role changes.
+                    sd_ = (C.SD[st][0] + C.SD[st][1] * pr) if st in C.SD else math.sqrt(C.REC_VAR * max(pr, 0.3))
+                    ratio = pr / r["line"] if r["line"] else 1.0
+                    if r["line"] is not None and (abs(pr - r["line"]) > 1.0 * sd_ or not (0.6 <= ratio <= 1.67)):
+                        r["role_flag"] = True
+                    elif r["line"] is not None and r["over"] is not None and r["under"] is not None:
+                        ps = L.price_side(C.prob_over(st, pr, r["line"]), r["over"], r["under"], w)
+                        if ps:
+                            r.update(side=ps["side"], price=ps["price"], sel=r["over_sel"] if ps["side"] == "over" else r["under_sel"],
+                                     prob=ps["prob"], implied=ps["implied"], edge=ps["edge"], ev=ps["ev"], model_p=ps["model_p"])
+                    out.append(r)
+    out.sort(key=lambda r: (r["line"] is None, -abs(r["proj"] - (r["line"] or r["proj"])) / max(1.0, r["line"] or 1.0)))
+    return out
+
+
 def team_block(key, lane, slate, odds):
     import importlib
     import team_model as T
@@ -699,7 +758,19 @@ def team_block(key, lane, slate, odds):
     base["_cands"] = rows
     base["proj"] = proj
     base["engine"] = engine_team(key, M, GP, w, bt, base["status"] == "live")
-    base["projected"] = top_plays(rows)     # leans; a live sport shows them under its tracked picks
+    if key == "cfb":
+        # v2 11/1: player projections (cfb_players.py) join the game lines, leans only
+        import cfb_players as C
+        prow = cfb_player_rows(lane, slate, odds, DEFAULT_W)
+        base["rows"] = rows + prow
+        base["_cands"] = rows + [r for r in prow if r.get("prob") is not None]
+        names = {"pass_yds": "Passing yards", "rush_yds": "Rushing yards", "rec_yds": "Receiving yards", "rec": "Receptions"}
+        for st, (n, mae, avg, l3) in C.TEST.items():
+            base["tests"].append({"k": names[st] + " (players)", "v": f"{(1 - mae / avg) * 100:+.1f}%",
+                                  "d": f"vs season avg · {(1 - mae / l3) * 100:+.1f}% vs last 3 · {n} games, weeks 7-9"})
+        base["projected"] = top_plays(rows + [r for r in prow if r.get("prob") is not None])
+    else:
+        base["projected"] = top_plays(rows)     # leans; a live sport shows them under its tracked picks
     return base
 
 
@@ -724,7 +795,7 @@ def tennis_block(lane, slate, odds):
     base["_cands"] = rows
     base["players"] = tennis_players(lane, slate)
     base["engine"] = engine_tennis(TM, w, bt, base["status"] == "live")
-    base["projected"] = top_plays(rows)     # leans; a live sport shows them under its tracked picks
+    base["projected"] = top_plays(rows)
     return base
 
 
