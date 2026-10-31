@@ -104,7 +104,7 @@ def team_samples(key, lines, M, GP):
                 po, pu = ml[hk_][when][1], ml[ak_][when][1]
                 if sane(po, pu) and m != 0:
                     out.append({"date": g["date"], "gid": g["id"], "mkt": "ml", "when": when, "p": pr["home_win"],
-                                "over": po, "under": pu, "y": 1 if m > 0 else 0})
+                                "over": po, "under": pu, "y": 1 if m > 0 else 0, "ht": h, "at": a, "start": x["start"]})
             sp = gm.get("point_spread") or gm.get("puck_line") or {}
             hs_ = next((k for k in sp if tm.get(nk(k)) == h), None)
             as_ = next((k for k in sp if tm.get(nk(k)) == a), None)
@@ -113,14 +113,14 @@ def team_samples(key, lines, M, GP):
                 pu = sp[as_][when][1]
                 if pts is not None and sane(po, pu) and m + pts != 0:
                     out.append({"date": g["date"], "gid": g["id"], "mkt": "spread", "when": when, "p": pr["home_cover"](pts),
-                                "over": po, "under": pu, "y": 1 if m + pts > 0 else 0, "line": pts})
+                                "over": po, "under": pu, "y": 1 if m + pts > 0 else 0, "line": pts, "ht": h, "at": a, "start": x["start"]})
             tt = gm.get("total_points") or gm.get("total_goals") or {}
             if "over" in tt and "under" in tt:
                 ln, po = tt["over"][when]
                 pu = tt["under"][when][1]
                 if ln is not None and sane(po, pu) and tot != ln:
                     out.append({"date": g["date"], "gid": g["id"], "mkt": "total", "when": when, "p": pr["over"](ln),
-                                "over": po, "under": pu, "y": 1 if tot > ln else 0, "line": ln})
+                                "over": po, "under": pu, "y": 1 if tot > ln else 0, "line": ln, "ht": h, "at": a, "start": x["start"]})
     print(f"  {key}: {len(lines)} Onyx games, {unmatched} not matched to ESPN finals, {len(out)} priced samples")
     return out
 
@@ -193,7 +193,8 @@ def nfl_prop_samples(lines):
                     if ln is None or not sane(po, pu) or act == ln:
                         continue
                     out.append({"date": g["date"], "gid": g["id"], "mkt": s, "when": when, "p": M.prob_over(s, pr, ln),
-                                "over": po, "under": pu, "y": 1 if act > ln else 0, "line": ln, "proj": pr})
+                                "over": po, "under": pu, "y": 1 if act > ln else 0, "line": ln, "proj": pr,
+                                "ht": h, "at": a, "start": x["start"], "team": r["team"]})
     print(f"  nfl props: {len(out)} priced samples")
     return out
 
