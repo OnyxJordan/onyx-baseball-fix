@@ -222,7 +222,8 @@
 .pl-row.tap{cursor:pointer}.pl-row.tap:hover{border-color:rgba(176,56,249,.55)}
 .pl-who{display:flex;align-items:center;gap:10px;min-width:0}
 .pl-hs{width:36px;height:36px;border-radius:50%;object-fit:cover;background:var(--bg3);flex-shrink:0}
-.pl-nm{flex:1;min-width:0}.pl-nm b{display:block;font-size:15px;line-height:1.2}.pl-nm span{display:block;font:500 11px monospace;color:var(--text3);margin-top:2px}
+.pl-nm{flex:1;min-width:0}.pl-nm b{display:block;font-size:15px;line-height:1.2}
+.pl-nm .inj-q,.inj-q{display:inline-block;margin:0 0 0 6px;padding:1px 5px;border-radius:5px;font:700 10px monospace;vertical-align:2px;color:#ff8fa3;background:rgba(255,99,132,.14);border:1px solid rgba(255,99,132,.4)}.pl-nm span{display:block;font:500 11px monospace;color:var(--text3);margin-top:2px}
 .pl-pj{text-align:right;flex-shrink:0}.pl-pj b{display:block;font:800 20px monospace;line-height:1}.pl-pj span{display:block;font:700 9px monospace;letter-spacing:.08em;text-transform:uppercase;color:#d795ff;margin-top:3px}
 .pl-ev{display:flex;align-items:center;gap:12px;flex-wrap:wrap;font:600 11px monospace;color:var(--text3)}
 .pl-ev b{color:var(--text2);font-weight:800}
@@ -1841,7 +1842,7 @@ function projTable(rows) {
       ? chip(r.over, r.name + ' Over ' + r.line, r.over_sel, 'Over ' + r.line) : chip(r.under, r.name + ' Under ' + r.line, r.under_sel, 'Under ' + r.line);
     return `<div class="pl-row">
       <div class="pl-who">${r.hs ? `<img class="pl-hs" src="${esc(r.hs)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">` : '<span class="pl-hs"></span>'}
-        <div class="pl-nm"><b>${esc(r.name)}</b><span>${esc(r.team)} ${r.home ? 'vs' : '@'} ${esc(r.opp)} · ${esc(MKT_NAME[r.mkt] || r.mkt)}</span></div>
+        <div class="pl-nm"><b>${esc(r.name)}${r.inj ? `<span class="inj-q" title="Questionable${r.inj_d ? ' (' + esc(r.inj_d) + ')' : ''} on the injury report">Q</span>` : ''}</b><span>${esc(r.team)} ${r.home ? 'vs' : '@'} ${esc(r.opp)} · ${esc(MKT_NAME[r.mkt] || r.mkt)}</span></div>
         <div class="pl-pj"><b>${num(r.proj)}</b><span>${r.prob != null && side ? pct(r.prob, 0) + ' ' + (side === 'over' ? 'O' : 'U') : 'proj'}</span></div></div>
       <div class="pl-ev"><span>L3 <b>${esc((r.l3 || []).join(' · ') || '-')}</b></span><span>Szn <b>${num(r.season)}</b></span>${r.pid ? `<button class="fl-btn${isF(r.pid) ? ' on' : ''}" title="Follow live" onclick="toggleF('${esc(r.pid)}','${esc(String(r.name).replace(/'/g, ''))}','${esc(r.gid)}')">${isF(r.pid) ? '★' : '☆'}</button>` : ''}<span class="pl-ln">${lean}</span></div>
     </div>`; }).join('')}</div>`;
@@ -1879,7 +1880,7 @@ function tdTable(rows, title) {
     <p class="dim" style="font-size:12px;line-height:1.6;margin:0 0 10px">Chance to score from his carries and targets, his touchdown record and Onyx's team total, blended with Onyx's price. ✓ = the model beats the price by 5+ points (the bar that won in 2026 testing). Leans, not tracked.</p>
     <div class="pl-list">${rows.map(r => `<div class="pl-row">
       <div class="pl-who">${r.hs ? `<img class="pl-hs" src="${esc(r.hs)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">` : '<span class="pl-hs"></span>'}
-        <div class="pl-nm"><b>${esc(r.name)}</b><span>${esc(r.matchup || r.team)}</span></div>
+        <div class="pl-nm"><b>${esc(r.name)}${r.inj ? `<span class="inj-q" title="Questionable${r.inj_d ? ' (' + esc(r.inj_d) + ')' : ''} on the injury report">Q</span>` : ''}</b><span>${esc(r.matchup || r.team)}</span></div>
         <div class="pl-pj"><b class="${r.any_value ? 'edge-pos' : ''}">${pct(r.any, 0)}${r.any_value ? ' ✓' : ''}</b><span>anytime TD</span></div></div>
       <div class="pl-ev"><span>First TD <b>${pct(r.first, 0)}</b></span>${r.first_price != null ? `<span>${chip(r.first_price, r.name + ' first TD', r.first_sel, 'First')}</span>` : ''}
         <span class="pl-ln">${r.any_price != null ? chip(r.any_price, r.name + ' anytime TD', r.any_sel, 'Anytime') : '<span class="dim">no Onyx line</span>'}</span></div>

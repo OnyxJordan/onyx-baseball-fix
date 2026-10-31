@@ -22,7 +22,7 @@ ONYX_LEAGUE = {"nfl": "NFL", "cfb": "NCAAF", "nhl": "NHL"}
 ROADMAP = {
     "nfl": ["Tested 10/26 to 10/29 against two seasons of real Onyx lines (440 games): receptions beat Onyx's opening price in both seasons, so they run on trial at the open. Touchdown scorers, rushing and passing yards did not, so they stay leans",
             "Tested 10/31: game ratings from every play since 2024 (expected points per play, adjusted for opponent, with scores alongside). On 2026 games they never saw, they made Onyx's spread and total worse, open and close, as the score-only ratings did. NFL sides and totals stay leans",
-            "Injury and inactive feed, so a scratched player never gets a lean",
+            "Live 10/31: ESPN's injury report. A player ruled out (out, IR, inactive, doubtful) gets no projection, lean, Top 10 spot or trial play; a questionable player is marked Q and kept out of the Top 10",
             "Touchdown scorer and passing touchdown markets"],
     "cfb": ["Backtest the team ratings against a season of real Onyx spreads and moneylines before any pick",
             "Drive efficiency and tempo in the ratings, so totals beat the league average",
@@ -221,6 +221,14 @@ def nfl_block(lane, slate, odds):
     vol_ph, vol_th = M.volume_history(rows) if hasattr(M, "VOL_P") else ({}, {})
     # v5: nflverse targets per dropback and snap trend (nfl_verse.py), averaged with v4 for receptions
     vidx = M.verse_index(lane.load("nflverse.json", None)) if hasattr(M, "verse_index") else None
+    # ESPN's injury report: ruled out (out, IR, inactive, doubtful) gets nothing; questionable is tagged "Q"
+    import sports_espn as E
+    try:
+        inj = E.fetch_injuries("football/nfl")
+    except Exception as ex:          # fail-soft: no report means the slate runs as before
+        print(f"  nfl injuries: {ex}")
+        inj = {}
+    dropped = set()
     out = []
     for g in slate.get("games") or []:
         if g.get("state") != "pre":
@@ -232,6 +240,10 @@ def nfl_block(lane, slate, odds):
                 cur = [x for x in gs if x["season"] == season]
                 if not cur or cur[-1]["team"] != team or cur[-1]["week"] != lw:
                     continue   # only players who played in the team's latest game
+                it = E.injury_of(inj, pid, cur[-1]["name"])
+                if it and it["s"] == "OUT":
+                    dropped.add(pid)
+                    continue
                 for s in M.STATS:
                     pr, info = M.project(gs, s, season, wk, opp, allowed, M.P, lgc)
                     if pr is None:
@@ -253,7 +265,7 @@ def nfl_block(lane, slate, odds):
                                 "line": ln.get("line") if ln else None,
                                 "over": ln.get("over") if ln else None, "under": ln.get("under") if ln else None,
                                 "over_sel": ln.get("over_sel") if ln else None, "under_sel": ln.get("under_sel") if ln else None,
-                                "vol": vol})
+                                "vol": vol, **({"inj": "Q", "inj_d": it["d"]} if it else {})})
     # price every two-sided Onyx line: the model's chance, the blend, the edge
     bt = lane.load("backtest.json", None) or {}
     w = ((bt.get("lane") or {}).get("w_props")) or DEFAULT_W
@@ -289,6 +301,10 @@ def nfl_block(lane, slate, odds):
                 lw = last_game.get(team)
                 for pid, gs in by.items():
                     cur = [x for x in gs if x["season"] == season]
+                    it = E.injury_of(inj, pid, cur[-1]["name"]) if cur else None
+                    if it and it["s"] == "OUT":
+                        dropped.add(pid)
+                        continue    # ruled out: his share goes to no one here (redistribution tested, left out in v5)
                     if cur and cur[-1]["team"] == team and cur[-1]["week"] == lw and \
                             any((x.get("rush_att") or 0) + (x.get("tgt") or 0) > 0 for x in cur[-4:]):
                         players.append((pid, team))
@@ -302,6 +318,9 @@ def nfl_block(lane, slate, odds):
             g, team, opp, home, last = meta[pid]
             row = {"pid": pid, "name": last["name"], "hs": last.get("hs"), "team": team, "opp": opp, "home": home, "gid": g["gid"],
                    "matchup": f"{team} {'vs' if home else '@'} {opp}", "any": round(p_any, 4), "first": round(p_first, 4)}
+            it = E.injury_of(inj, pid, last["name"])
+            if it:
+                row["inj"], row["inj_d"] = "Q", it["d"]
             TP = M.TD_P
             for key, mk in (("any", "anytime_td"), ("first", "first_td")):
                 ln = props.get((nk(last["name"]), mk))
@@ -328,6 +347,10 @@ def nfl_block(lane, slate, odds):
     for s in M.STATS:
         top += [r for r in out if r["mkt"] == s][:2]
     block["top"] = top
+    n_q = len({r["pid"] for r in out if r.get("inj")})
+    block["injuries"] = {"out": len(dropped), "q": n_q, "ok": bool(inj.get("id") or inj.get("name")) if inj else False}
+    print(f"  nfl injuries: {len(dropped)} ruled out left off the slate, {n_q} questionable tagged"
+          + ("" if block["injuries"]["ok"] else " (no report: ESPN did not answer)"))
     # game lines on the same frame as college football and the NHL
     import team_model as T
     games = (lane.load("results.json", {}) or {}).get("games") or []
@@ -888,7 +911,7 @@ def write_top(key, lane, slate, model):
           {m["id"] for e in slate.get("events") or [] for m in e.get("matches") or [] if m.get("state") == "pre"}
     rows = [DT.entry(key, r, "tracked" if r.get("sel") in tracked else "trial" if r.get("sel") in trial else "lean",
                      start.get(r.get("gid")))
-            for r in cands if DT.ok(r) and r.get("gid") in pre]
+            for r in cands if DT.ok(r) and r.get("gid") in pre and not r.get("inj")]   # no questionable players in the Top 10
     DT.write(lane.data, key, slate.get("date"), rows)
     # the full board for "Ask Onyx": every priced side, any price, plus every
     # anytime-TD price with its expected touchdowns (lam) for "2+ TD" questions
