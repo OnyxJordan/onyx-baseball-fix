@@ -471,15 +471,28 @@ def main():
     for sp, mk, t, w, d, p, ln, pa, pb, y, c in R:
         G.setdefault(sp, {}).setdefault(mk, {}).setdefault(t, []).append([w, p, ln, pa, pb, y, c])
     os.makedirs("data/rules_lab", exist_ok=True)
-    idx = {"built": date.today().isoformat(), "cols": ["w", "p", "line", "a", "b", "y", "ctx"],
+    idx = {"built": date.today().isoformat(), "cols": ["t (0 open, 1 close)", "w", "p", "l (line)", "a", "b", "y", "c (ctx)"],
            "ctx": ["side A home", "night", "home zone (0 E, 1 C, 2 M, 3 P)", "zones the away team crossed", "home rest", "away rest", "month"],
            "sports": {}}
+    import shutil
+    for old in os.listdir("data/rules_lab"):
+        p = os.path.join("data/rules_lab", old)
+        shutil.rmtree(p) if os.path.isdir(p) else os.remove(p)
     for sp, mk in G.items():
-        json.dump(mk, open(f"data/rules_lab/{sp}.json", "w"), separators=(",", ":"))
+        # one file per sport and market, columnar (a list per column, open and close rows together
+        # with t = 0 open / 1 close): about half the size of row lists and quick to parse on a phone
+        os.makedirs(f"data/rules_lab/{sp}", exist_ok=True)
+        for m, byT in mk.items():
+            cols = {k: [] for k in ("t", "w", "p", "l", "a", "b", "y", "c")}
+            for t, rows in byT.items():
+                for w, p, ln, pa, pb, y, c in rows:
+                    cols["t"].append(0 if t == "o" else 1); cols["w"].append(w); cols["p"].append(p); cols["l"].append(ln)
+                    cols["a"].append(pa); cols["b"].append(pb); cols["y"].append(y); cols["c"].append(c)
+            json.dump(cols, open(f"data/rules_lab/{sp}/{m}.json", "w"), separators=(",", ":"))
         idx["sports"][sp] = {"names": [w[1] for w in WINDOWS[sp]], "market": [i for i, w in enumerate(WINDOWS[sp]) if w[2]],
                              "periods": sorted({r[0] for tt in mk.values() for rr in tt.values() for r in rr}),
                              "markets": {m: sum(len(v) for v in tt.values()) for m, tt in mk.items()},
-                             "kb": os.path.getsize(f"data/rules_lab/{sp}.json") // 1024}
+                             "kb": sum(os.path.getsize(f"data/rules_lab/{sp}/{m}.json") for m in mk) // 1024}
     json.dump(idx, open("data/rules_lab.json", "w"), indent=1)
     print(len(R), "rows", Counter((r[0], r[1]) for r in R))
     print({k: (v["kb"], v["periods"]) for k, v in idx["sports"].items()})

@@ -1,13 +1,14 @@
 {
  "built": "2026-10-31",
  "cols": [
+  "t (0 open, 1 close)",
   "w",
   "p",
-  "line",
+  "l (line)",
   "a",
   "b",
   "y",
-  "ctx"
+  "c (ctx)"
  ],
  "ctx": [
   "side A home",
@@ -31,19 +32,44 @@
     0
    ],
    "periods": [
+    0,
     1,
     2,
-    3
+    3,
+    4
    ],
    "markets": {
-    "pts": 44875,
-    "reb": 40206,
-    "ast": 29066,
-    "ml": 1323,
-    "spread": 1299,
-    "total": 1316
+    "pts": 71734,
+    "reb": 64511,
+    "ast": 46495,
+    "ml": 5957,
+    "spread": 5905,
+    "total": 5948
    },
-   "kb": 4749
+   "kb": 8080
+  },
+  "mlb": {
+   "names": [
+    "2024 season \u00b7 market prices, before Onyx",
+    "2025 season",
+    "2026 season"
+   ],
+   "market": [
+    0
+   ],
+   "periods": [
+    1,
+    2
+   ],
+   "markets": {
+    "ml": 9058,
+    "spread": 9076,
+    "total": 8733,
+    "h": 147948,
+    "hr_yes": 157925,
+    "k": 15963
+   },
+   "kb": 13720
   },
   "nfl": {
    "names": [
@@ -81,15 +107,21 @@
     0
    ],
    "periods": [
+    0,
     1,
     2
    ],
    "markets": {
-    "ml": 1289,
-    "spread": 1302,
-    "total": 1316
+    "ml": 1435,
+    "spread": 1446,
+    "total": 1459,
+    "anytime_td": 12435,
+    "rec_yds": 2663,
+    "rec": 1194,
+    "rush_yds": 1753,
+    "pass_yds": 1021
    },
-   "kb": 170
+   "kb": 1171
   },
   "nhl": {
    "names": [
@@ -102,16 +134,21 @@
     0
    ],
    "periods": [
+    0,
     1,
     2,
     3
    ],
    "markets": {
-    "ml": 2664,
-    "spread": 2671,
-    "total": 2608
+    "ml": 4520,
+    "spread": 4523,
+    "total": 4448,
+    "g_yes": 61230,
+    "pts": 66820,
+    "sog": 24159,
+    "ast": 37427
    },
-   "kb": 327
+   "kb": 8070
   },
   "tennis": {
    "names": [

@@ -275,19 +275,29 @@ function fillSelects(keep) {
   sd.innerHTML = sides.map(([v, n]) => `<option value="${v}">${n}</option>`).join('');
   sd.value = sides.some(x => x[0] === sv) ? sv : sides[0][0];
 }
-const DATA = {};
-function need(sports) {
-  return Promise.all(sports.map(k => DATA[k] ? null : (DATA[k] = getJSON('data/rules_lab/' + k + '.json').catch(() => ({}))))).then(() =>
-    Promise.all(sports.map(k => Promise.resolve(DATA[k]).then(v => { DATA[k] = v; }))));
+// history files: data/rules_lab/<sport>/<market>.json, columnar; loaded only for the market a rule tests
+const DATA = {}, LOADING = {};
+function need(pairs) {
+  return Promise.all(pairs.map(([k, m]) => {
+    if (DATA[k] && DATA[k][m]) return null;
+    const key = k + '/' + m;
+    return LOADING[key] || (LOADING[key] = getJSON('data/rules_lab/' + key + '.json').then(c => {
+      const o = [], cl = [];
+      for (let i = 0; i < c.t.length; i++) (c.t[i] ? cl : o).push([c.w[i], c.p[i], c.l[i], c.a[i], c.b[i], c.y[i], c.c[i]]);
+      (DATA[k] = DATA[k] || {})[m] = {o, c: cl};
+    }).catch(() => { (DATA[k] = DATA[k] || {})[m] = {}; }));
+  }));
 }
 let RUN = 0;
 async function runLab() {
-  const sp0 = document.getElementById('lSport').value;
-  const want = sp0 === 'all' ? Object.keys(LAB.sports) : [sp0];
-  if (want.some(k => !DATA[k] || DATA[k] instanceof Promise)) {
+  const sp0 = document.getElementById('lSport').value, mk0 = document.getElementById('lMkt').value;
+  const pairs = [];
+  (sp0 === 'all' ? Object.keys(LAB.sports) : [sp0]).forEach(k => Object.keys((LAB.sports[k] || {}).markets || {}).forEach(m => { if (mk0 === 'all' || m === mk0) pairs.push([k, m]); }));
+  if (pairs.some(([k, m]) => !(DATA[k] && DATA[k][m]))) {
     const my = ++RUN;
-    document.getElementById('labOut').innerHTML = '<div class="empty">Loading ' + esc(sp0 === 'all' ? 'every sport' : (SPORT_N[sp0] || sp0)) + ' history...</div>';
-    await need(want);
+    const n = pairs.reduce((a, [k, m]) => a + ((LAB.sports[k] || {}).markets || {})[m] || 0, 0);
+    document.getElementById('labOut').innerHTML = '<div class="empty">Loading ' + n.toLocaleString() + ' priced lines of history...</div>';
+    await need(pairs);
     if (my !== RUN) return;
   }
   const sp = document.getElementById('lSport').value, mk = document.getElementById('lMkt').value, side = document.getElementById('lSide').value;
