@@ -10365,9 +10365,9 @@
        "win": false,
        "sets": [
         2,
-        3
+        6
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Fiona Ferro",
@@ -10377,7 +10377,7 @@
        "win": false,
        "sets": [
         6,
-        4
+        6
        ],
        "serve": false
       }
@@ -10385,9 +10385,9 @@
     },
     {
      "id": "185814",
-     "start": "2026-10-31T02:00Z",
+     "start": "2026-10-31T02:40Z",
      "state": "pre",
-     "detail": "10/30 - 10:00 PM EDT",
+     "detail": "10/30 - 10:40 PM EDT",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Estadio Mexcovery",
@@ -10511,68 +10511,10 @@
    "venue": null,
    "matches": [
     {
-     "id": "187317",
-     "start": "2026-10-31T02:00Z",
-     "state": "pre",
-     "detail": "10/30 - 10:00 PM EDT",
-     "round": "Qualifying 1st Round",
-     "draw": "Women's Singles",
-     "court": "Court 2",
-     "p": [
-      {
-       "name": "Alevtina Ibragimova",
-       "short": "A. Ibragimova",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/rus.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "Mika Stojsavljevic",
-       "short": "M. Stojsavljevic",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/gbr.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      }
-     ]
-    },
-    {
-     "id": "187316",
-     "start": "2026-10-31T02:00Z",
-     "state": "pre",
-     "detail": "10/30 - 10:00 PM EDT",
-     "round": "Qualifying 1st Round",
-     "draw": "Women's Singles",
-     "court": "Court 1",
-     "p": [
-      {
-       "name": "Hayu Kinoshita",
-       "short": "H. Kinoshita",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/jpn.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "Tatiana Prozorova",
-       "short": "T. Prozorova",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/rus.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      }
-     ]
-    },
-    {
      "id": "187314",
-     "start": "2026-10-31T02:00Z",
-     "state": "pre",
-     "detail": "10/30 - 10:00 PM EDT",
+     "start": "2026-10-31T02:05Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Qualifying 1st Round",
      "draw": "Women's Singles",
      "court": "Centre Court",
@@ -10583,7 +10525,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/hkg.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        3
+       ],
        "serve": false
       },
       {
@@ -10592,7 +10536,75 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/jpn.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        2
+       ],
+       "serve": false
+      }
+     ]
+    },
+    {
+     "id": "187317",
+     "start": "2026-10-31T02:10Z",
+     "state": "in",
+     "detail": "1st",
+     "round": "Qualifying 1st Round",
+     "draw": "Women's Singles",
+     "court": "Court 2",
+     "p": [
+      {
+       "name": "Alevtina Ibragimova",
+       "short": "A. Ibragimova",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/rus.png",
+       "seed": null,
+       "win": false,
+       "sets": [
+        3
+       ],
+       "serve": true
+      },
+      {
+       "name": "Mika Stojsavljevic",
+       "short": "M. Stojsavljevic",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/gbr.png",
+       "seed": null,
+       "win": false,
+       "sets": [
+        1
+       ],
+       "serve": false
+      }
+     ]
+    },
+    {
+     "id": "187316",
+     "start": "2026-10-31T02:10Z",
+     "state": "in",
+     "detail": "1st",
+     "round": "Qualifying 1st Round",
+     "draw": "Women's Singles",
+     "court": "Court 1",
+     "p": [
+      {
+       "name": "Hayu Kinoshita",
+       "short": "H. Kinoshita",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/jpn.png",
+       "seed": null,
+       "win": false,
+       "sets": [
+        1
+       ],
+       "serve": true
+      },
+      {
+       "name": "Tatiana Prozorova",
+       "short": "T. Prozorova",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/rus.png",
+       "seed": null,
+       "win": false,
+       "sets": [
+        3
+       ],
        "serve": false
       }
      ]
@@ -11760,5 +11772,5 @@
    ]
   }
  ],
- "fetched": "2026-10-31T01:57:20+00:00"
+ "fetched": "2026-10-31T02:28:44+00:00"
 }
