@@ -1467,7 +1467,7 @@
      "id": "185203",
      "start": "2026-10-31T16:10Z",
      "state": "in",
-     "detail": "2nd",
+     "detail": "3rd",
      "round": "Semifinal",
      "draw": "Men's Singles",
      "court": "Centre Court",
@@ -1480,7 +1480,8 @@
        "win": false,
        "sets": [
         6,
-        0
+        1,
+        1
        ],
        "serve": false
       },
@@ -1492,20 +1493,21 @@
        "win": false,
        "sets": [
         4,
-        3
+        6,
+        0
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
     {
      "id": "185205",
-     "start": "2026-11-01T04:00Z",
+     "start": "2026-11-01T13:00Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "11/1 - 8:00 AM EST",
      "round": "Final",
      "draw": "Men's Singles",
-     "court": "",
+     "court": "Centre Court",
      "p": [
       {
        "name": "Carlos Alcaraz",
@@ -3011,7 +3013,7 @@
      "id": "185157",
      "start": "2026-10-31T16:05Z",
      "state": "in",
-     "detail": "2nd",
+     "detail": "3rd",
      "round": "Semifinal",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -3024,7 +3026,8 @@
        "win": false,
        "sets": [
         6,
-        5
+        5,
+        1
        ],
        "serve": false
       },
@@ -3036,7 +3039,8 @@
        "win": false,
        "sets": [
         3,
-        4
+        7,
+        3
        ],
        "serve": false
       }
@@ -3044,12 +3048,12 @@
     },
     {
      "id": "185159",
-     "start": "2026-11-01T04:00Z",
+     "start": "2026-11-01T14:30Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "11/1 - 9:30 AM EST",
      "round": "Final",
      "draw": "Men's Singles",
-     "court": "",
+     "court": "Center Court",
      "p": [
       {
        "name": "Valentin Vacherot",
@@ -3478,8 +3482,8 @@
     {
      "id": "187343",
      "start": "2026-10-31T15:25Z",
-     "state": "in",
-     "detail": "3rd",
+     "state": "post",
+     "detail": "Final",
      "round": "Qualifying 1st Round",
      "draw": "Men's Singles",
      "court": "Court 1",
@@ -3493,7 +3497,7 @@
        "sets": [
         6,
         1,
-        3
+        5
        ],
        "serve": false
       },
@@ -3502,11 +3506,11 @@
        "short": "N. Borges",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/por.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         4,
         6,
-        4
+        7
        ],
        "serve": false
       }
@@ -3515,8 +3519,8 @@
     {
      "id": "187344",
      "start": "2026-10-31T16:10Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Qualifying 1st Round",
      "draw": "Men's Singles",
      "court": "Court 3",
@@ -3529,7 +3533,7 @@
        "win": false,
        "sets": [
         4,
-        4
+        6
        ],
        "serve": false
       },
@@ -3538,10 +3542,10 @@
        "short": "A. Molcan",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/svk.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        3
+        7
        ],
        "serve": false
       }
@@ -3563,7 +3567,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        0
+        4
        ],
        "serve": false
       },
@@ -3574,7 +3578,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        0
+        4
        ],
        "serve": false
       }
@@ -11341,12 +11345,12 @@
     },
     {
      "id": "185865",
-     "start": "2026-11-01T04:00Z",
+     "start": "2026-11-01T14:00Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "11/1 - 9:00 AM EST",
      "round": "Final",
      "draw": "Women's Singles",
-     "court": "",
+     "court": "Centre Court",
      "p": [
       {
        "name": "Alina Charaeva",
@@ -15511,5 +15515,5 @@
    ]
   }
  ],
- "fetched": "2026-10-31T17:18:26+00:00"
+ "fetched": "2026-10-31T17:50:04+00:00"
 }
