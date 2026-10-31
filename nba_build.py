@@ -474,6 +474,33 @@ def write_top(rows, games, today_rows, open_led, today, jumps=None, fshots=None)
                  "price": fb["yes"], "prob": p, "edge": p - OL.implied(fb["yes"]), "sel": fb["sel"],
                  "gid": g["gid"], "matchup": f"{g['away']} @ {g['home']}", "start": g.get("start")}
             board.append(DT.entry("nba", c, tag(fb["sel"])))
+    # game lines for Ask Onyx ("Celtics spread", "NBA sides", "game totals"): there is no NBA
+    # game model, so the chance is Onyx's own price with the margin removed; never value, never Top 10
+    for g in games.values():
+        if g.get("state") != "pre":
+            continue
+        mu = f"{g['away']} @ {g['home']}"
+        pairs = []
+        if g.get("home_spread_price") is not None and g.get("away_spread_price") is not None and g.get("home_spread") is not None:
+            for side, other in (("home", "away"), ("away", "home")):
+                ln = g.get(f"{side}_spread")
+                pairs.append(("spread", g[side], side, ln, g[f"{side}_spread_price"], g[f"{other}_spread_price"], g.get(f"{side}_spread_sel"),
+                              f"{ln:+g}" if ln is not None else ""))
+        if g.get("home_ml") is not None and g.get("away_ml") is not None:
+            for side, other in (("home", "away"), ("away", "home")):
+                pairs.append(("ml", g[side], side, None, g[f"{side}_ml"], g[f"{other}_ml"], g.get(f"{side}_ml_sel"), ""))
+        if g.get("total") is not None and g.get("over_price") is not None and g.get("under_price") is not None:
+            for side, other in (("over", "under"), ("under", "over")):
+                pairs.append(("total", "Total", side, g["total"], g[f"{side}_price"], g[f"{other}_price"], g.get(f"{side}_sel"), ""))
+        for kind, name, side, ln, price, oprice, sel, ltxt in pairs:
+            if not sel or price is None or oprice is None:
+                continue
+            ip, io = OL.implied(price), OL.implied(oprice)
+            p = ip / (ip + io)
+            c = {"kind": kind, "mkt": kind, "name": name, "team": name if kind != "total" else None, "side": "over" if side in ("home", "over") else "under",
+                 "line": ln, "line_txt": ltxt, "price": price, "prob": p, "edge": p - ip, "sel": sel,
+                 "gid": g["gid"], "matchup": mu, "start": g.get("start")}
+            board.append(DT.entry("nba", c, "lean"))
     DT.write_board(Path("data/nba"), "nba", today, board)
     return DT.write(Path("data/nba"), "nba", today, out)
 

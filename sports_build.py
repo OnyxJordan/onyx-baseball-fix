@@ -906,6 +906,46 @@ def lab_block(key, cfg):
                 "factors": [], "lane": None}}
 
 
+def both_sides(key, lane, slate, pre, start, board, DT):
+    """Every side of every Onyx game line for Ask Onyx, not only the side a model leans:
+    "Georgia to cover" needs Georgia's spread even when the lean is Florida's. A side whose
+    other half the model priced gets the complement of that chance; a game the model did not
+    price gets Onyx's own price with the margin removed. Leans only, never value plays."""
+    odds = (lane.load("odds.json", {}) or {}).get("games") or {}
+    have = {e.get("sel") for e in board if e.get("sel")}
+    model = {}
+    for e in board:
+        if e.get("kind") in ("spread", "ml", "total"):
+            model[(e["gid"], e["kind"])] = e
+    out = []
+    for g in slate.get("games") or []:
+        o = odds.get(g["gid"]) or {}
+        if g["gid"] not in pre or not o:
+            continue
+        mu = f"{g['away']} @ {g['home']}"
+        sides = []
+        for side, other in (("home", "away"), ("away", "home")):
+            if o.get(f"{side}_spread_sel") and o.get(f"{side}_spread_price") is not None and o.get(f"{other}_spread_price") is not None and o.get(f"{side}_spread") is not None:
+                ln = o[f"{side}_spread"]
+                sides.append(("spread", g[side], "over", -ln, f"{ln:+g}", o[f"{side}_spread_price"], o[f"{other}_spread_price"], o[f"{side}_spread_sel"]))
+            if o.get(f"{side}_ml_sel") and o.get(f"{side}_ml") is not None and o.get(f"{other}_ml") is not None:
+                sides.append(("ml", g[side], "over", 0.0, "", o[f"{side}_ml"], o[f"{other}_ml"], o[f"{side}_ml_sel"]))
+        for side, other in (("over", "under"), ("under", "over")):
+            if o.get(f"{side}_sel") and o.get(f"{side}_price") is not None and o.get(f"{other}_price") is not None and o.get("total") is not None:
+                sides.append(("total", "Total", side, o["total"], "", o[f"{side}_price"], o[f"{other}_price"], o[f"{side}_sel"]))
+        for kind, name, side, ln, ltxt, price, oprice, sel in sides:
+            if sel in have:
+                continue
+            ip, io = L.implied(price), L.implied(oprice)
+            m = model.get((g["gid"], kind))
+            p = (1 - m["conf"]) if m and m.get("conf") is not None else ip / (ip + io)
+            c = {"kind": kind, "mkt": kind, "name": name, "team": name if kind != "total" else None, "side": side, "line": ln,
+                 "line_txt": ltxt, "price": price, "prob": p, "edge": p - ip, "sel": sel, "gid": g["gid"], "matchup": mu}
+            out.append(DT.entry(key, c, "lean", start.get(g["gid"])))
+            have.add(sel)
+    return out
+
+
 TD_SCALE = 0.82        # Onyx's anytime-TD yes price x this = the chance (NFL v6 fit: priced players
                        # score 17.7% vs 22.0% implied; the margin on a one-sided TD price is that big)
 CFB_FIRST_LISTED = 0.9   # share of first touchdowns scored by a listed player (rest: defense, returns, unlisted)
@@ -983,7 +1023,13 @@ def write_top(key, lane, slate, model):
             board.append(DT.entry(key, c1, "lean", start.get(r["gid"])))
     if key == "cfb":
         board += cfb_td_board(lane, slate, pre, start, DT)
-    DT.write_board(lane.data, key, slate.get("date"), board)
+    board += both_sides(key, lane, slate, pre, start, board, DT)
+    teams = {}
+    for g in slate.get("games") or []:
+        for side in ("home", "away"):
+            if g.get(side) and g.get(side + "_name"):
+                teams[g[side]] = g[side + "_name"]
+    DT.write_board(lane.data, key, slate.get("date"), board, teams)
 
 
 def main():

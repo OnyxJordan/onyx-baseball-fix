@@ -96,11 +96,35 @@
     // NFL / college players have no points-a-game on file: their lines say how big a part they are
     var YW = {pass_yds: 0.1, rush_yds: 0.25, rec_yds: 0.25, rec: 3};
     (B || []).forEach(function (p) {
-      if (p.kind !== 'prop' || !p.name || /_total$/.test(p.mkt)) return;
+      if (p.kind !== 'prop' || !p.name || /_total$/.test(p.mkt) || /\bD\/ST\b|\bdefense\b/i.test(p.name)) return;
       add(p.name, 0.5 + (YW[p.mkt] && p.side === 'over' ? YW[p.mkt] * (p.line || 0) : 0));
     });
     (P || []).forEach(function (r) { add(r.n, r.ppg); });
     return C;
+  }
+  // team names on today's boards (daily_top.write_board adds "tn": the full name): the full
+  // name, the school or city (name minus the mascot), and the mascot, each pointing to the
+  // abbreviation the board uses. Built once per board.
+  var TIDX = null;
+  function teamIndex(B) {
+    if (TIDX && TIDX.b === B) return TIDX.i;
+    var I = {};
+    function put(k, abbr, sport, pri) {
+      k = clean(k); if (!k || k.length < 4 || NOT_NAMES.test(k) || NICK[k]) return;
+      if (!I[k] || I[k].pri > pri) I[k] = {abbr: abbr, sport: sport, pri: pri};
+    }
+    (B || []).forEach(function (p) {
+      if (!p.tn) return;
+      var abbr = p.kind === 'prop' ? p.team : (p.team || p.name); if (!abbr) return;
+      var w = clean(p.tn).split(' ');
+      put(w.join(' '), abbr, p.sport, 0);
+      if (w.length >= 2) put(w.slice(0, -1).join(' '), abbr, p.sport, 1);     // "ohio state", "green bay"
+      if (w.length >= 3) put(w.slice(-2).join(' '), abbr, p.sport, 2);         // "crimson tide"
+      put(w[w.length - 1], abbr, p.sport, 3);                                   // "buckeyes"
+      if (w.length >= 3) put(w.slice(0, -2).join(' '), abbr, p.sport, 4);     // "alabama" (from "Alabama Crimson Tide")
+    });
+    TIDX = {b: B, i: I};
+    return I;
   }
   function lev1(a, b) {                    // true when a and b are at most one edit apart
     if (a === b) return true;
@@ -113,7 +137,7 @@
     }
     return d + (a.length - i) + (b.length - j) <= 1;
   }
-  var NOT_NAMES = /^(will|wills|rebound|rebounds|assist|catch|rush|pass|likely|likes|half|halves|quarter|quarters|scorer|scorers|rusher|rushers|receiver|receivers|passer|leading|leader|top|round|robin|basket|bucket|touchdown|touchdowns|totals|chance|chances|safest|lock|locks|tonight|tomorrow|night|slate|card|board|sharp|steam|juice|payout|pays|winner|winners|underdog|underdogs|favorite|favorites|again|every|other|their|there|these|those|about|around|would|could|should|shot|shots|star|stars|over|under|overs|unders|most|plus|game|games|best|safe|safest|team|teams|with|tonight|today|points|value|parlay|legs|leg|lock|bets|plays|picks|money|line|lines|odds|total|totals|spread|score|scores|win|wins|first|anytime|rebounds|assists|yards|receptions|sunday|monday|tuesday|wednesday|thursday|friday|saturday|week|weekend|give|what|which|who|like|need|want|good|more|less|than|from|this|that|the|and|for|nba|nfl|nhl|tennis|college|longshots|dogs|favorites|fade|stack|sgp|props|prop|player|players|ticket|double|triple|edge|bet|play|pick)$/;
+  var NOT_NAMES = /^(will|wills|rebound|rebounds|assist|catch|rush|pass|likely|likes|half|halves|quarter|quarters|scorer|scorers|rusher|rushers|receiver|receivers|passer|leading|leader|top|round|robin|basket|bucket|touchdown|touchdowns|totals|chance|chances|safest|lock|locks|tonight|tomorrow|night|slate|card|board|sharp|steam|juice|payout|pays|winner|winners|underdog|underdogs|favorite|favorites|again|every|other|their|there|these|those|about|around|would|could|should|shot|shots|star|stars|over|under|overs|unders|most|plus|game|games|best|safe|safest|team|teams|with|tonight|today|points|value|parlay|legs|leg|lock|bets|plays|picks|money|line|lines|odds|total|totals|spread|score|scores|win|wins|first|anytime|rebounds|assists|yards|receptions|sunday|monday|tuesday|wednesday|thursday|friday|saturday|week|weekend|give|what|which|who|like|need|want|good|more|less|than|from|this|that|the|and|for|nba|nfl|nhl|tennis|college|longshots|dogs|favorites|fade|stack|sgp|props|prop|player|players|ticket|double|triple|edge|bet|play|pick|side|sides|only|just|ats|ml|moneyline|moneylines|spreads|run|runs|puck|goal|goals|alt|alts|alternate|ladder|live|hedge|cover|covers|dog|fav|favs|chalk|lean|leans|model|onyx|parlays|sgps|plus|minus|even|safe|hammer|nuke|banker|bankers|longshot|sleeper|sleepers|fades|tail|tails|boost|boosts|power|prime|primetime|early|late|slate|main|night|afternoon|morning|home|away|road|big|small|low|high|long|short|hot|cold|streak|streaks|trend|trends|units|unit|bankroll|book|books|price|prices|number|numbers|key|keys|half|full|period|periods|inning|innings|set|sets|match|matches|fight|fights|card|cards|round|rounds|teaser|teasers|correlated|stacked|same|different|any|all|both|each|either|neither|one|two|three|four|five|six|seven|eight|nine|ten|twelve|dozen|couple|few|some|many|much)$/;
   function findPlayer(t, C) {
     var keys = Object.keys(C), words = t.trim().split(/\s+/);
     var best = function (cands) { return cands.sort(function (a, b) { return C[b].score - C[a].score; })[0]; };
@@ -124,7 +148,7 @@
     var fam = Object.keys(FAMOUS).sort(function (a, b) { return b.length - a.length; });
     for (var f = 0; f < fam.length; f++) if (new RegExp('(^|\\s)' + esc(fam[f]) + 's?(\\s|$)').test(t)) return FAMOUS[fam[f]];
     // 3. a last name: the most prominent player who has it
-    var lastHit = keys.filter(function (k) { var l = k.split(' ').pop(); return l.length >= 3 && !NICK[l] && words.some(function (w) { return w === l || w === l + 's'; }); });
+    var lastHit = keys.filter(function (k) { var l = k.split(' ').pop(); return l.length >= 3 && !NICK[l] && !NOT_NAMES.test(l) && words.some(function (w) { return !NOT_NAMES.test(w) && (w === l || w === l + 's'); }); });
     if (lastHit.length) return C[best(lastHit)].name;
     // 4. a first name, or a name one letter off ("luke", "jokick"): every player it could
     // mean competes and the most prominent wins, so "luke" is Luka Doncic, not a bench Luke
@@ -182,9 +206,19 @@
       if (WORDS[i][1] === 'total' && /(first|1st)[\s-]*(half|quarter)|\b1h\b|\b1q\b/.test(t)) continue;
       s.markets.push(WORDS[i][1]);
     }
+    // "sides", "game lines", "ATS": the game, not a player (spreads and moneylines; totals too for "game lines")
+    if (/\bsides?\b|\bteams? to (win|cover)\b|\bteam bets?\b/.test(t) && !/\bboth sides\b/.test(t)) ['spread', 'ml'].forEach(function (m) { if (s.markets.indexOf(m) < 0) s.markets.push(m); });
+    if (/\bgame lines?\b|\bmain lines?\b|\bgame bets?\b|\bstraight bets? on games\b/.test(t)) ['spread', 'ml', 'total'].forEach(function (m) { if (s.markets.indexOf(m) < 0) s.markets.push(m); });
     if (/\byards\b|\byds\b/.test(t) && !s.markets.some(function (m) { return /yds/.test(m); })) s.markets.push('rec_yds', 'rush_yds', 'pass_yds');
     if (/\bscore (the )?most\b|\bmost points\b|\btop (point )?scorers?\b|\bleading scorer\b|\bdrop (the )?most\b|\bhighest scor/.test(t)) { if (s.markets.indexOf('pts') < 0) s.markets.push('pts'); s.sort = 'proj'; s.side = 'over'; }
     if (/\bpra\b|pts ?\+ ?reb ?\+ ?ast/.test(t)) ['pts', 'reb', 'ast'].forEach(function (m) { if (s.markets.indexOf(m) < 0) s.markets.push(m); });
+    // "favorites" / "dogs" with no market named: to win (moneyline); "favorite play / pick / prop" is a recommendation, not this
+    var favW = /\bfavou?rites\b|\bfavs\b|\bchalk\b|\bfavou?rite\b(?!\s+(\w+\s+){0,2}(plays?|picks?|props?|bets?|sgps?|parlays?|tickets?|leans?|sides?|legs?))/.test(t) && !/\b(your|our|onyx'?s?|the model'?s?|my) favou?rites?\b/.test(t);
+    var dogW = /\bunderdogs?\b|\bdogs\b/.test(t);
+    var propsW = /\bprops?\b|\bplayer (bets?|lines?|markets?)\b/.test(t) && !/\bgame props?\b/.test(t);
+    if ((favW || dogW) && !s.markets.length && !propsW) s.markets.push('ml');
+    if (favW && !dogW && s.markets.length === 1 && s.markets[0] === 'ml') s.max_price = s.max_price == null ? -101 : Math.min(s.max_price, -101);
+    if (propsW) s.props_only = true;
     // over / under
     var ov = /\bovers?\b|\bhit the over\b|\bgo over\b|\bclear\b/.test(t.replace(/\bover\s*[+-]\d/g, '').replace(/over\/under/g, '')),
         un = /\bunders?\b|\bstay under\b|\bfade\b/.test(t.replace(/\bunder\s*[+-]\d/g, '').replace(/over\/under/g, ''));
@@ -216,9 +250,21 @@
     else if (/tomorrow/.test(t)) s.when = 'tomorrow';
     else if (/this weekend|weekend/.test(t)) s.when = 'weekend';
     else for (var d = 0; d < 7; d++) if (new RegExp('\\b' + DAYS[d] + '\\b').test(t)) { s.when = DAYS[d]; break; }
+    // a team by its name on today's boards ("ohio state", "georgia tech", "buckeyes", "green bay"):
+    // the longest name in the request wins, so "georgia tech" is not Georgia
+    var TI = teamIndex(B), tkeys = Object.keys(TI).sort(function (a, b) { return b.length - a.length || TI[a].pri - TI[b].pri; });
+    var tPlayer = t;
+    for (var ti = 0; ti < tkeys.length; ti++) {
+      if (new RegExp('(^|\\s)' + esc(tkeys[ti]) + 's?(\\s|$)').test(t)) {
+        s.team = TI[tkeys[ti]].abbr;
+        if (!s.sports.length) s.sports.push(TI[tkeys[ti]].sport);
+        tPlayer = t.replace(new RegExp('(^|\\s)' + esc(tkeys[ti]) + 's?(?=\\s|$)'), ' ');
+        break;
+      }
+    }
     // a team, by nickname or abbreviation
     var keys = Object.keys(NICK).sort(function (a, b) { return b.length - a.length; });
-    for (var k = 0; k < keys.length; k++) {
+    for (var k = 0; k < keys.length && !s.team; k++) {
       var nk_ = keys[k];
       if (new RegExp('\\b' + esc(nk_) + '\\b').test(t)) {
         s.team = NICK[keys[k]];
@@ -228,11 +274,12 @@
       }
     }
     if (!s.team) {
-      var tm = t.match(/\b(atl|bos|bkn|cha|chi|cle|dal|den|det|gs|gsw|hou|ind|lac|lal|mem|mia|mil|min|nop|nyk|okc|orl|phi|phx|por|sac|sas|tor|utah|uta|wsh|was|ari|bal|buf|car|cin|gb|jax|kc|lv|lar|ne|nyg|nyj|pit|sea|sf|tb|ten|vgk|edm|col|tor|nyr|nyi|nj|cbj|wpg|van|cgy|ott|mtl|nsh|stl|sj|ana)\b/);
-      if (tm) s.team = ({gsw: 'GS', nop: 'NO', nyk: 'NY', sas: 'SA', uta: 'UTAH', was: 'WSH'})[tm[1]] || tm[1].toUpperCase();
+      // abbreviations only when typed in capitals ("MIN -200" is odds, "MIN" is Minnesota)
+      var tm = String(q).match(/\b(ATL|BOS|BKN|CHA|CHI|CLE|DAL|DEN|DET|GS|GSW|HOU|IND|LAC|LAL|MEM|MIA|MIL|MIN|NOP|NYK|OKC|ORL|PHI|PHX|POR|SAC|SAS|TOR|UTAH|UTA|WSH|WAS|ARI|BAL|BUF|CAR|CIN|GB|JAX|KC|LV|LAR|NE|NYG|NYJ|PIT|SEA|SF|TB|TEN|VGK|EDM|COL|NYR|NYI|NJ|CBJ|WPG|VAN|CGY|OTT|MTL|NSH|STL|SJ|ANA|LSU|USC|UCLA|TCU|SMU|BYU|UCF|OSU|PSU|UGA|FSU)\b/);
+      if (tm) s.team = ({GSW: 'GS', NOP: 'NO', NYK: 'NY', SAS: 'SA', UTA: 'UTAH', WAS: 'WSH'})[tm[1]] || tm[1];
     }
     // a player: a nickname, a full name, a last or first name (the most prominent one), or one letter off
-    s.player = findPlayer(t, names(B, PRIOR));
+    s.player = findPlayer(tPlayer, names(B, PRIOR));
     if (s.player) { s.team = null; if (s.intent === 'list' && s.count == null && !/props|plays|lines|bets/.test(t)) s.count = 5; }
     // defaults that follow from the rest
     if (s.markets.indexOf('two_plus_td') >= 0) { s.sort = 'two_td'; if (!s.sports.length) s.sports = ['nfl']; }
@@ -250,6 +297,9 @@
   }
 
   // ── the spec, run against today's boards ────────────────────────────────
+  // who a play is about: a player, or for a game line the game and the market (every game total
+  // is named "Total", so keying on the name alone kept one total across the whole board)
+  function WHO(p) { return p.kind === 'prop' ? p.sport + ':' + p.who : p.sport + ':' + p.gid + ':' + (p.kind === 'spread' || p.kind === 'ml' ? 'side' : p.kind); }
   function p2(lam) { return lam == null ? null : 1 - Math.exp(-lam) * (1 + lam); }
   function dec(o) { return o > 0 ? 1 + o / 100 : 1 + 100 / -o; }
   function am(d) { return d >= 2 ? Math.round((d - 1) * 100) : Math.round(-100 / (d - 1)); }
@@ -280,6 +330,7 @@
       var t = Date.parse(p.start); if (!isNaN(t) && t <= now) return false;
       if (spec.sports && spec.sports.length && spec.sports.indexOf(p.sport) < 0) return false;
       if (mk.length && mk.indexOf(p.mkt) < 0 && mk.indexOf(p.kind) < 0) return false;
+      if (spec.props_only && p.kind !== 'prop') return false;
       if (spec.side && spec.side !== 'any' && (p.kind === 'prop' || p.kind === 'total') && p.side !== spec.side) return false;
       if (two) return p.lam != null;
       if (spec.min_price != null && p.price < spec.min_price) return false;
@@ -288,6 +339,7 @@
       if (spec.min_edge != null && p.edge < spec.min_edge) return false;
       if (spec.player && String(p.name || p.label).toLowerCase().indexOf(String(spec.player).toLowerCase()) < 0) return false;
       if (spec.team && !new RegExp('(^|[^A-Z])' + String(spec.team).toUpperCase() + '([^A-Z]|$)').test([p.team, p.matchup, p.name].join(' ').toUpperCase())) return false;
+      if (spec.team && (p.kind === 'spread' || p.kind === 'ml') && String(p.team || p.name).toUpperCase() !== String(spec.team).toUpperCase()) return false;   // "Georgia to cover" is Georgia's side
       if (spec.when && !whenOk(spec.when, p.start)) return false;
       return true;
     }).map(function (p) { return two ? Object.assign({}, p, {two: p2(p.lam)}) : p; });
@@ -317,9 +369,9 @@
     for (var i = 0; i < pool.length && picked.length < n; i++) {
       var p = pool[i];
       var mine = spec.player && spec.intent === 'list';            // "Mahomes": every line on him
-      if (who[p.sport + p.who + (mine ? p.mkt : '')]) continue;
+      if (who[WHO(p) + (mine ? p.mkt : '')]) continue;
       if (!mine && (spec.one_per_game !== false || spec.intent === 'parlay') && games[p.gid]) continue;
-      who[p.sport + p.who + (mine ? p.mkt : '')] = 1; games[p.gid] = 1; picked.push(p);
+      who[WHO(p) + (mine ? p.mkt : '')] = 1; games[p.gid] = 1; picked.push(p);
       if (spec.intent === 'parlay' && spec.target_price && !spec.count_set && picked.length >= 2 && ticket(picked).price >= spec.target_price) break;
     }
     // a parlay short of its legs (few games left on the board) fills from games it
@@ -327,9 +379,9 @@
     if ((spec.intent === 'parlay' || spec.intent === 'rr') && picked.length < n) {
       for (var j = 0; j < pool.length && picked.length < n; j++) {
         var q = pool[j];
-        if (who[q.sport + q.who] || picked.indexOf(q) >= 0) continue;
+        if (who[WHO(q)] || picked.indexOf(q) >= 0) continue;
         if (picked.some(function (x) { return x.gid === q.gid && x.kind === q.kind && q.kind !== 'prop'; })) continue;  // one game line of each kind
-        who[q.sport + q.who] = 1; picked.push(q);
+        who[WHO(q)] = 1; picked.push(q);
       }
     }
     if (spec.intent === 'parlay' && spec.target_price && !spec.count_set) {          // the filler pass can overshoot: stop at the target
@@ -381,13 +433,13 @@
       var G = by[gid];
       for (var a = 0; a < Math.min(3, G.length); a++) {           // try the game's top three anchors
         var anchor = G[a], story = anchor.kind === 'prop' || anchor.kind === 'total' ? anchor.side : 'over';
-        var legs = [anchor], who = {}; who[anchor.who] = 1;
+        var legs = [anchor], who = {}; who[WHO(anchor)] = 1;
         var kinds = {}; kinds[anchor.kind + (anchor.kind === 'prop' ? '' : anchor.name)] = 1;
         for (var i = 0; i < G.length && legs.length < n; i++) {
           var p = G[i];
-          if (p === anchor || who[p.who] || !fits(story, anchor, p)) continue;
+          if (p === anchor || who[WHO(p)] || !fits(story, anchor, p)) continue;
           if (p.kind !== 'prop' && kinds[p.kind]) continue;          // one game line of each kind
-          who[p.who] = 1; kinds[p.kind] = 1; legs.push(p);
+          who[WHO(p)] = 1; kinds[p.kind] = 1; legs.push(p);
         }
         if (legs.length < 2) continue;
         var t = ticket(legs), score = legs.length * 10 + t.prob;    // the full ticket first, then the likeliest
@@ -437,7 +489,9 @@
     var s = Object.assign({intent: 'list', count: 5, sports: [], markets: [], side: 'any', sort: 'conf', one_per_game: true}, spec || {});
     var two = (s.markets || []).indexOf('two_plus_td') >= 0 || s.sort === 'two_td';
     var longMkt = (s.markets || []).some(function (m) { return m === 'first_td' || m === 'first_basket'; });
-    if (s.min_price == null && !two && !longMkt) { s.min_price = s.intent === 'list' ? -200 : -150; s.default_floor = true; }
+    // a named team or player: every line on them, at any price ("Buckeyes moneyline" at -400 is still the answer)
+    if (s.min_price == null && !two && !longMkt && !s.team && !s.player) { s.min_price = s.intent === 'list' ? -200 : -150; s.default_floor = true; }
+    if (s.team && s.intent === 'list') s.one_per_game = false;      // "Ohio State player props": several from the one game
     return s;
   }
   function ask(q) {
@@ -446,6 +500,13 @@
     return loadBoards().then(function (B) { return Promise.all([toSpec(q, B), B]); }).then(function (a) {
       var spec = normalize(a[0].spec);
       var res = run(spec, a[1]);
+      // the standard-price floor left the ticket short (favorites, a thin board): widen it once and say so
+      var want = spec.intent === 'list' ? 1 : (spec.count || 3);
+      if (spec.default_floor && res.rows.length < want && spec.intent !== 'sgp') {
+        var wide = Object.assign({}, spec, {min_price: -250});
+        var r2 = run(wide, a[1]);
+        if (r2.rows.length > res.rows.length) { res = r2; spec = wide; res.note = (res.note ? res.note + ' ' : '') + 'Not enough at standard prices (-150 or longer), so this reaches to -250.'; }
+      }
       res.spec = spec; res.via = a[0].via; res.understood = describe(spec);
       return res;
     });
