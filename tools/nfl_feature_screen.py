@@ -205,7 +205,7 @@ def ll(w, X, y):
     return t / len(y)
 
 
-def screen(DATA):
+def screen(DATA, out_path="bt/nfl_screen.json"):
     out = {}
     for mkt, S in DATA.items():
         tr = [s for s in S if s["season"] == 2025]
@@ -240,11 +240,11 @@ def screen(DATA):
         for d_te, fk, c25, c26, d_tr in rows[:10]:
             same = "same sign" if c25 * c26 > 0 else "FLIPS"
             print(f"   {fk:16s} {d_te:+8.2f}     {d_tr:+8.2f}    {c25:+.3f}    {c26:+.3f}  {same}")
-    json.dump({m: [list(r) for r in rows] for m, rows in out.items()}, open("bt/nfl_screen.json", "w"))
+    json.dump({m: [list(r) for r in rows] for m, rows in out.items()}, open(out_path, "w"))
 
 
 
-def select_and_test(DATA, k_max=4):
+def select_and_test(DATA, k_max=4, out="bt/nfl_select.json"):
     """Pick features on 2025 alone (forward selection, judged on the second half of
     2025 after fitting on the first), then fit on all of 2025 and judge on 2026:
     log loss against Onyx and value bets at the opening price."""
@@ -349,7 +349,7 @@ def select_and_test(DATA, k_max=4):
         print(f"   2026 log loss: model {mdl:.4f} vs Onyx {raw:.4f} (Onyx refit {base:.4f})")
         print(f"   2025 (fit) 3pp+: {r['bets_2025_3pp']}")
         print(f"   2026 (unseen) 3pp+: {r['bets_2026_3pp']}   5pp+: {r['bets_2026_5pp']}")
-    json.dump(res, open("bt/nfl_select.json", "w"), indent=1)
+    json.dump(res, open(out, "w"), indent=1)
     return res
 
 
