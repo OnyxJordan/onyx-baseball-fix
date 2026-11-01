@@ -801,7 +801,7 @@ function shortNm(n) { const w = String(n || '').trim().split(/\s+/); while (w.le
 // the stat each Onyx market settles on, read off ESPN's box
 var FB_MAP = {passing: {YDS: 'pass_yds', TD: 'pass_td'}, rushing: {YDS: 'rush_yds', TD: 'rush_td'}, receiving: {REC: 'rec', YDS: 'rec_yds', TD: 'rec_td'}};
 var HK_MAP = {G: 'goals', A: 'assists', SOG: 'shots', SV: 'saves'};
-var STAT_AB = {pass_yds: 'PASS YDS', rush_yds: 'RUSH YDS', rec_yds: 'REC YDS', rec: 'REC', pass_td: 'PASS TD', anytime_td: 'TD', points: 'PTS', assists: 'AST', goals: 'G', shots: 'SOG', saves: 'SV'};
+var STAT_AB = {pass_yds: 'PASS YDS', rush_yds: 'RUSH YDS', rec_yds: 'REC YDS', rec: 'REC', pass_td: 'PASS TD', pass_att: 'PASS ATT', pass_rush_yds: 'PASS+RUSH', rush_rec_yds: 'RUSH+REC', two_td: '2+ TD', anytime_td: 'TD', points: 'PTS', assists: 'AST', goals: 'G', shots: 'SOG', saves: 'SV'};
 function boxOf(s, g) {
   const teams = [], byId = {};
   const ids = {};
@@ -1830,7 +1830,7 @@ function renderBoard() {
   el.innerHTML = out.join('');
 }
 var MKT_NAME = {ml: 'Moneyline', spread: 'Spread', total: 'Total', pass_yds: 'Passing yards', rush_yds: 'Rushing yards', rec_yds: 'Receiving yards', rec: 'Receptions',
-                pass_td: 'Passing TDs', anytime_td: 'Anytime TD', first_td: 'First TD', goals: 'Goals', shots: 'Shots on goal', points: 'Points', assists: 'Assists', saves: 'Saves'};
+                pass_td: 'Passing TDs', pass_att: 'Pass attempts', pass_rush_yds: 'Passing + rushing yards', rush_rec_yds: 'Rushing + receiving yards', two_td: '2+ touchdowns', anytime_td: 'Anytime TD', first_td: 'First TD', goals: 'Goals', shots: 'Shots on goal', points: 'Points', assists: 'Assists', saves: 'Saves'};
 
 // ── plays (model) ───────────────────────────────────────────────────
 // player projections as list rows (phone first): who and what, the projection big on the

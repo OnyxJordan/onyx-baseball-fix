@@ -1,9 +1,23 @@
 """
 nfl_model.py - Onyx NFL player projections.
 
-VERSION v9 (11/1). The lab notebook: every change bumps VERSION and adds an
+VERSION v10 (11/1). The lab notebook: every change bumps VERSION and adds an
 entry here citing its evidence (CLAUDE.md rule 2 applies to this model too).
 
+  v10 11/1   Every NFL player market Onyx prices is projected (markets probe 11/1: Onyx
+             also prices passing attempts, passing + rushing yards, rushing + receiving
+             yards and player touchdowns over 1.5, none of which were on the board). The
+             three yardage/volume markets use the v0 model (recency-weighted mean, last
+             season as the prior, opponent factor) on their own box-score totals, chance
+             from a normal. Passing attempts, walk-forward against 205 Onyx lines (Aug-Oct
+             2026): the model alone trails Onyx's line at every spread tried, log loss
+             .7159 vs .6894 at sd 12 (+10% per touchdown of spread), and 30% blended .6906
+             vs .6894; 3pp+ unders 41-30 +9.6% at the open but -0.6% at the close, overs
+             -25.6%: a lean. Rushing + receiving and passing + rushing yards have no Onyx
+             history yet (none in the 2026 pull; Onyx appears to have added them this
+             week), so they are leans until there is a season to test. 2+ touchdowns is
+             information: the chance comes from the anytime chance shown (Poisson), shown
+             against Onyx's over 1.5 price, never value. All four are NO_VALUE.
   v9  11/1   Passing touchdowns are projected (Onyx prices them; they were off the board).
              Expected passing TDs = .75 x Onyx implied team points / 7 x .62 (the league's
              passing share of TDs) x (his recent passing-TD rate / league 1.35)^.5, the rate
@@ -183,14 +197,31 @@ player-game: pass_yds, rush_yds, rec_yds, rec, tgt, att, rush_att...).
 import math, re, unicodedata
 from collections import defaultdict
 
-VERSION = "v9"
+VERSION = "v10"
 # game lines (team_model.py), tuned 10/26: see v1
 GAME_P = {"half_life": 240, "ridge": 5, "home": 2.0, "sd_margin": 13.5, "sd_total": 13.0, "min_games": 3}
 GAME_TEST = {"n": 199, "logloss": 0.648, "base_logloss": 0.698, "mae_total": 10.90, "base_mae_total": 11.71,
              "window": "12/1/2025 on"}
 STATS = ("pass_yds", "rush_yds", "rec_yds", "rec")
 # who counts as having a role in a stat (per-game volume in the window used)
-ROLE = {"pass_yds": ("att", 15), "rush_yds": ("rush_att", 6), "rec_yds": ("tgt", 3), "rec": ("tgt", 3)}
+ROLE = {"pass_yds": ("att", 15), "rush_yds": ("rush_att", 6), "rec_yds": ("tgt", 3), "rec": ("tgt", 3),
+        "pass_att": ("att", 15), "pass_rush_yds": ("att", 15), "rush_rec_yds": ("touch", 5)}
+# v10: Onyx's other NFL player markets (markets probe 11/1), projected from the same
+# recency-weighted model on their own box-score totals. STATS stays the four v0 markets
+# (the page's test and the receptions/yards models); EXTRA rides along in production.
+EXTRA = ("pass_att", "pass_rush_yds", "rush_rec_yds")
+PROJ_STATS = STATS + EXTRA
+
+
+def add_derived(rows):
+    """Box rows gain the combined totals Onyx prices: rushing + receiving yards,
+    passing + rushing yards, and touches (carries + targets) for the role check."""
+    for r in rows:
+        r["rush_rec_yds"] = (r.get("rush_yds") or 0.0) + (r.get("rec_yds") or 0.0)
+        r["pass_rush_yds"] = (r.get("pass_yds") or 0.0) + (r.get("rush_yds") or 0.0)
+        r["touch"] = (r.get("rush_att") or 0.0) + (r.get("tgt") or 0.0)
+        r.setdefault("pass_att", r.get("att") or 0.0)
+    return rows
 # tuned on 2025 weeks 4-18 (tune()); see the changelog for the test
 P = {"decay": 0.95, "k_prior": 1.5, "opp_w": 0.5, "opp_k": 4.0}
 
@@ -200,7 +231,9 @@ P = {"decay": 0.95, "k_prior": 1.5, "opp_w": 0.5, "opp_k": 4.0}
 # receptions ~ negative binomial with variance 1.25 x mean
 # v1: widened to the spread that fits real Onyx lines best (2x yards, 1.6x
 # receptions sd): narrower, the model was confidently wrong against the line
-PROP_SD = {"pass_yds": (160.0, 0.0), "rush_yds": (40.0, 0.54), "rec_yds": (30.0, 0.66)}
+PROP_SD = {"pass_yds": (160.0, 0.0), "rush_yds": (40.0, 0.54), "rec_yds": (30.0, 0.66),
+           # v10 starting spreads, refit against Onyx lines in the v10 test (changelog)
+           "pass_att": (12.0, 0.0), "pass_rush_yds": (160.0, 0.0), "rush_rec_yds": (40.0, 0.5)}
 REC_VAR = 3.2
 
 
@@ -227,7 +260,7 @@ def _team_allowed(rows):
     out = defaultdict(lambda: defaultdict(float))
     for r in rows:
         k = (r["season"], r["week"], r["opp"])
-        for s in STATS:
+        for s in PROJ_STATS:
             out[k][s] += r.get(s) or 0.0
     return out
 
@@ -408,7 +441,7 @@ def project_volume(stat, h, th, implied, spread, p=None):
 # v5: receptions from nflverse (nfl_verse.py) - targets per team dropback, the snap trend,
 # and the team's recent dropbacks scaled by Onyx's implied points and spread - averaged
 # 50/50 with the v4 volume projection.
-NO_VALUE = ("rec_yds", "rush_yds", "pass_yds", "pass_td")   # v6 / v7: markets whose re-test lost to Onyx; never a play
+NO_VALUE = ("rec_yds", "rush_yds", "pass_yds", "pass_td", "pass_att", "pass_rush_yds", "rush_rec_yds")   # v6 / v7: markets whose re-test lost to Onyx; never a play
 TRIAL_SIDES = ("under",)   # v6: the receptions trial lane logs unders only (changelog)
 VERSE_P = {"dec": 0.9, "n": 10, "k": 60.0, "b_snap": 0.5, "e_imp": 1.0, "e_sp": 0.1, "w": 0.5}
 VERSE_TEAM = {"WSH": "WAS", "LAR": "LA"}
