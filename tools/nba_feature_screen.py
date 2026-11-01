@@ -20,6 +20,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import sports_lab as L                  # noqa: E402
 import nfl_feature_screen as S          # noqa: E402
+import nba_market as NM                 # noqa: E402
 
 SPLIT = "2026-02-01"
 COLS = ("fid", "pid", "name", "pos", "team", "starter", "min", "sec", "pts", "reb", "ast", "fg3", "fga", "fta", "oreb", "tov", "pm", "dreb")
@@ -136,6 +137,9 @@ def main():
                      "total": tot, "spread": sh if b["home"] else -sh, "implied": imp, "home": 1.0 if b["home"] else 0.0,
                      "rest": float(min(rest, 5)), "b2b": 1.0 if prev in played[team] else 0.0,
                      "opp_b2b": 1.0 if prev in played[opp] else 0.0, "games": float(len(cur)), "line": ln}
+                if stat == "ast":     # the live lane's definitions (nba_market.py), so the test is what runs
+                    fm = NM.features([r["ast"] for r in h], [o["ast"] for o in ob], lg(b["day"], "ast"), ln)
+                    f.update(opp_allowed=fm["opp_allowed"], line_z=fm["line_z"])
                 c = v.get("c") or [None, None, None]
                 DATA[stat].append({"season": 2025 if b["day"] < SPLIT else 2026, "date": b["day"], "p": io / (io + iu), "po": po, "pu": pu,
                                    "line_": ln, "cl": c[0], "co": c[1], "cu": c[2], "line": ln, "y": int(act > ln), "f": f})
