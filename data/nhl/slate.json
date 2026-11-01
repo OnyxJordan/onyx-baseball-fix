@@ -38,8 +38,8 @@
    "gid": "401892625",
    "start": "2026-11-01T20:30Z",
    "state": "in",
-   "status": "STATUS_IN_PROGRESS",
-   "detail": "11:16 - 1st",
+   "status": "STATUS_END_PERIOD",
+   "detail": "End of 1st",
    "name": "MIN @ WSH",
    "away": "MIN",
    "home": "WSH",
@@ -67,9 +67,9 @@
   {
    "gid": "401892626",
    "start": "2026-11-01T21:00Z",
-   "state": "pre",
-   "status": "STATUS_SCHEDULED",
-   "detail": "11/1 - 4:00 PM EST",
+   "state": "in",
+   "status": "STATUS_IN_PROGRESS",
+   "detail": "12:43 - 1st",
    "name": "UTA @ PHI",
    "away": "UTA",
    "home": "PHI",
@@ -156,7 +156,7 @@
   }
  ],
  "events": [],
- "fetched": "2026-11-01T20:54:47+00:00",
+ "fetched": "2026-11-01T21:22:16+00:00",
  "season": null,
  "season_type": null,
  "bye": []
