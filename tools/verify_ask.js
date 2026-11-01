@@ -52,8 +52,8 @@ const srv = http.createServer((q, r) => { const p = path.join(root, decodeURICom
       }
       // an empty answer is a failure when today's boards have something that fits
       const want = (e.sports || s.sports || []).length ? (e.sports || s.sports) : null, wm = (e.markets || s.markets || []).length ? (e.markets || s.markets) : null;
-      const exists = !e.team && !e.player && !s.team && !s.player && avail(want, wm, s);
-      if (!legs.length && exists) why.push('empty answer while the board has plays that fit');
+      const exists = !e.team && !e.player && !s.team && !(s.teams || []).length && !s.player && avail(want, wm, s);
+      if (!legs.length && exists && !R.clarify) why.push('empty answer while the board has plays that fit');   // a question back (R.clarify) is an answer
       if (s.intent === 'parlay' && legs.length > 1 && R.parlay && R.parlay.price == null) why.push('parlay without a price');
       out.push({q: c.q, ok: !why.length, why, ms: Math.round(ms), n: legs.length, read: R.understood});
     }
