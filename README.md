@@ -483,7 +483,7 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
     runs as `sports_build.nfl_open_lane`: the first price seen for each receptions line
     goes to `data/nfl/opening.json`; a play is logged to `data/nfl/open_trial.json`
     (append-only, validate_build ledger list) only while the live line is still the
-    opening one, at most 12 a day by edge, graded off the box score.
+    opening one, every one that qualifies (no daily cap since v8, 11/1), graded off the box score.
   - **NFL v6: players who played without a touch (10/31).** Every NFL prop backtest
     before 10/31 graded a priced player off his ESPN box line and skipped him when he
     had none. But a player with snaps and no target or carry has no box line, and for

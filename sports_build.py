@@ -48,7 +48,7 @@ METHOD = {
 }
 
 
-OPEN_MAX = 12   # NFL receptions plays logged per day at the opening price, biggest edges first
+OPEN_MAX = None   # nfl_model v8: no daily cap; every under 3pp+ at the open, exactly as the v6 test ran
 
 
 def team_open_lane(lane, rule, rows, slate, M):
@@ -170,9 +170,9 @@ def nfl_open_lane(lane, out, slate, season, rows, M):
                                "prob": round(p, 4), "implied": round(L.implied(price), 4), "opened_at": op["ts"],
                                "logged_at": ts, "model": M.VERSION, "result": None, "actual": None}))
                 break
-    # the biggest edges first, OPEN_MAX a day: a short list, not every line that clears 3pp
+    # every qualifying under (v8): a daily cap kept the biggest edges, the weakest bets
     today_n = sum(1 for k in ledger if k.get("date") == slate.get("date"))
-    for e, row in sorted(cands, key=lambda c: -c[0])[:max(0, OPEN_MAX - today_n)]:
+    for e, row in sorted(cands, key=lambda c: -c[0])[:None if OPEN_MAX is None else max(0, OPEN_MAX - today_n)]:
         ledger.append(row)
     # grade: the receiver's catches from the box score once his game is final
     box = {}

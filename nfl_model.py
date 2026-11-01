@@ -1,9 +1,20 @@
 """
 nfl_model.py - Onyx NFL player projections.
 
-VERSION v7 (10/31). The lab notebook: every change bumps VERSION and adds an
+VERSION v8 (11/1). The lab notebook: every change bumps VERSION and adds an
 entry here citing its evidence (CLAUDE.md rule 2 applies to this model too).
 
+  v8  11/1   The receptions trial lane logs every under that beats the opening price by
+             3pp+, with no daily cap. The live lane kept the 12 biggest edges a day, a cap
+             the v6 test never had, and the biggest edges are the weakest bets: unders at
+             the open by edge, 2025 (the season the rule was chosen on) 3-5pp +8.7% (191),
+             5-8pp +9.0% (167), 8-12pp -2.7% (81), 12pp+ -3.6% (29); 2026 3-5pp +28.9%
+             (72), 5-8pp +16.7% (59), 8pp+ +12.4% (56). The 12-a-day cap took 2025 from
+             +6.1% (468) to +0.7% (311) and 2026 from +20.1% (187) to +15.3% (110), so the
+             live lane was a weaker rule than the one that passed. No edge ceiling is added
+             (that would be a new rule fitted here); the lane now runs exactly as tested.
+             Same session: the trial grades a player with snaps and no box line as 0
+             catches, as the v6 test does (was a void).
   v7  10/31  Rushing and passing yards are never a play (NO_VALUE). Re-tested with
              zero-touch games counted (tools/sports_backtest.py, 14,285 priced
              samples): the v1 projection blended 30% with Onyx's price makes Onyx's
@@ -160,7 +171,7 @@ player-game: pass_yds, rush_yds, rec_yds, rec, tgt, att, rush_att...).
 import math, re, unicodedata
 from collections import defaultdict
 
-VERSION = "v7"
+VERSION = "v8"
 # game lines (team_model.py), tuned 10/26: see v1
 GAME_P = {"half_life": 240, "ridge": 5, "home": 2.0, "sd_margin": 13.5, "sd_total": 13.0, "min_games": 3}
 GAME_TEST = {"n": 199, "logloss": 0.648, "base_logloss": 0.698, "mae_total": 10.90, "base_mae_total": 11.71,

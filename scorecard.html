@@ -148,7 +148,7 @@ function gradeBool(rows, winKey, oddsKey) {
 }
 const LANES = [
   {sport: 'NFL', name: 'Receptions unders', status: 'trial', src: 'data/nfl/open_trial.json', grade: gradePicks, href: 'nfl.html#plays',
-   what: 'Receptions unders where the model beats Onyx\'s opening price by 3 points or more, at most 12 a day. Overs logged before 10/31 stay in this record.',
+   what: 'Receptions unders where the model beats Onyx\'s opening price by 3 points or more, every one that qualifies. Overs logged before 10/31 stay in this record.',
    ev: 'Counting every player who played, unders beat the opening price in 2025 (+6.1%, 468 bets) and 2026 (+20.1%, 187). Overs did not.'},
   {sport: 'NFL', name: 'Sides, totals, yards, touchdowns', status: 'lean', bt: 'nfl', href: 'nfl.html#model',
    what: 'Leans and projections. Touchdown chances are Onyx\'s own price with the margin removed.',
