@@ -6,18 +6,25 @@ entry here citing its evidence (CLAUDE.md rule 2 applies to this model too).
 
   v10 11/1   Every NFL player market Onyx prices is projected (markets probe 11/1: Onyx
              also prices passing attempts, passing + rushing yards, rushing + receiving
-             yards and player touchdowns over 1.5, none of which were on the board). The
-             three yardage/volume markets use the v0 model (recency-weighted mean, last
-             season as the prior, opponent factor) on their own box-score totals, chance
-             from a normal. Passing attempts, walk-forward against 205 Onyx lines (Aug-Oct
-             2026): the model alone trails Onyx's line at every spread tried, log loss
-             .7159 vs .6894 at sd 12 (+10% per touchdown of spread), and 30% blended .6906
-             vs .6894; 3pp+ unders 41-30 +9.6% at the open but -0.6% at the close, overs
-             -25.6%: a lean. Rushing + receiving and passing + rushing yards have no Onyx
-             history yet (none in the 2026 pull; Onyx appears to have added them this
-             week), so they are leans until there is a season to test. 2+ touchdowns is
-             information: the chance comes from the anytime chance shown (Poisson), shown
-             against Onyx's over 1.5 price, never value. All four are NO_VALUE.
+             yards and player touchdowns over 1.5, none of which were on the board; the
+             two "+" markets were never fetched because the market id went out unencoded).
+             The three yardage/volume markets use the v0 model (recency-weighted mean,
+             last season as the prior, opponent factor) on their own box-score totals,
+             chance from a normal, sd tuned on 2025 against Onyx lines and judged on 2026,
+             walk-forward with Onyx's opening spread and total:
+               passing attempts (479 / 205 lines), sd 16: alone .7053 vs Onyx .6934
+               (2025 open), 30% blend .6913; 2026 open .6913 vs .6894. Unders 3pp+ at
+               the open 2025 +14.5% (154), 2026 +0.4% (53); overs -20.4% / -17.1%.
+               rushing + receiving yards (570 / 297), sd 60: alone .7008 vs .6927; blend
+               2025 .6898 vs .6927, 2026 .6968 vs .6936. Unders 3pp+ at the open 2025
+               +16.6% (147), 2026 -3.0% (62); 5pp+ +20.2% / +4.4%; overs lose both.
+               passing + rushing yards (416 / 194), sd 120: alone .7541 vs .6933, every
+               side loses both seasons (-13% to -34%); the model's share of the chance
+               shown is cut to 10% (BLEND_W) so it cannot drag Onyx's down.
+             No rule chosen on 2025 held on 2026 at the open, so all three are leans
+             (NO_VALUE); rushing + receiving unders is the one to keep watching. 2+
+             touchdowns is information: the chance comes from the anytime chance shown
+             (Poisson), shown against Onyx's over 1.5 price, never value.
   v9  11/1   Passing touchdowns are projected (Onyx prices them; they were off the board).
              Expected passing TDs = .75 x Onyx implied team points / 7 x .62 (the league's
              passing share of TDs) x (his recent passing-TD rate / league 1.35)^.5, the rate
@@ -233,7 +240,9 @@ P = {"decay": 0.95, "k_prior": 1.5, "opp_w": 0.5, "opp_k": 4.0}
 # receptions sd): narrower, the model was confidently wrong against the line
 PROP_SD = {"pass_yds": (160.0, 0.0), "rush_yds": (40.0, 0.54), "rec_yds": (30.0, 0.66),
            # v10 starting spreads, refit against Onyx lines in the v10 test (changelog)
-           "pass_att": (12.0, 0.0), "pass_rush_yds": (160.0, 0.0), "rush_rec_yds": (40.0, 0.5)}
+           "pass_att": (16.0, 0.0), "pass_rush_yds": (120.0, 0.0), "rush_rec_yds": (60.0, 0.0)}
+# v10: the model's share of the chance shown, where it differs from the 30% default
+BLEND_W = {"pass_rush_yds": 0.1}
 REC_VAR = 3.2
 
 

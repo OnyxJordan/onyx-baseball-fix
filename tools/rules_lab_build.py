@@ -242,7 +242,7 @@ def nba_more_rows():
         if not b:
             return None
         s = b[0]
-        if st in ("pra", "pr", "pa"):   # combos, should Onyx history for them appear (none for 2025-27 as of 11/1)
+        if st in ("pra", "pr", "pa"):   # combos: the sum of the parts off the same box line
             parts = [s.get(k) for k in {"pra": ("pts", "reb", "ast"), "pr": ("pts", "reb"), "pa": ("pts", "ast")}[st]]
             return (None if None in parts else sum(parts), b[1])
         return (s.get(st), b[1])
@@ -254,6 +254,8 @@ def nba_more_rows():
     out += prop_rows("nba", "bt/nba_2425_lines.json", STAT, act)
     if os.path.exists("bt/nba_threes_pra.json"):   # made threes, 2025-26 on (points + rebounds + assists not graded yet)
         out += prop_rows("nba", "bt/nba_threes_pra.json", STAT, act)
+    for f in ("bt/nba_combos_a.json", "bt/nba_combos_b.json"):   # P+R+A, P+R, P+A (pulled 11/1 with the market ids encoded)
+        out += prop_rows("nba", f, STAT, act)
     print(f"  nba game lines + extra props: {len(out)}")
     return out
 
