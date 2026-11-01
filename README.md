@@ -522,6 +522,19 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
     ledger `data/cfb/prop_trial.json` (capture `prop_opening.json`), graded off the box; a
     player with no box line is a void (Onyx settles him at 0, so this undercounts unders).
     Receiving yards failed; receptions and passing yards had too few early lines to choose on.
+  - **NFL cross-market statistics (11/1, tested, not adopted).** `--cross` adds Onyx's own
+    opening lines in the player's other markets (a combo vs the sum of its parts, yards vs
+    catches, passing TDs vs passing yards). Passing + rushing yards vs its parts sharpens the
+    chance (2026 log loss .6885 vs Onyx .6931, 196 lines) but rarely makes a 3pp edge (7 bets);
+    rushing + receiving yards' parts gap won in 2025 (+12.7%) and lost in 2026 (-11.6%).
+    Receiving yards and passing TDs: nothing. No lane.
+  - **Tennis vs Onyx (11/1, tested, not adopted).** `tools/tennis_feature_screen.py` rebuilds
+    Elo, surface Elo, 14/45-day form and fatigue, games share and games per match walk-forward
+    from 36,666 results and runs the v11 method on 15,491 matched Onyx lines (match winner
+    5,059 / 6,581, total games 1,411 / 2,503, games spread 1,418 / 2,546; chosen before
+    1/1/2026, judged after). Nothing beat Onyx on the unseen year: match winner .6009 vs .6000,
+    total games .6927 vs .6909 (unders 3pp+ -15.5%), spread .6935 vs .6890. Onyx's tennis prices
+    are efficient; tennis stays leans.
   - **NHL points and assists vs Onyx (11/1, tested, not adopted).** `tools/nhl_box_pull.py`
     pulls NHL API boxscores (ice time, shots, power-play goals, shifts, hits, blocks,
     position) and `tools/nhl_feature_screen.py` runs the NFL v11 method on 16,484 points and
