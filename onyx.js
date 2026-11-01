@@ -169,12 +169,15 @@
     var move = function (e) {
       var r = cv.getBoundingClientRect();
       self.tx = (e.clientX - r.left) / self.cw; self.ty = (e.clientY - r.top) / self.ch;
-      if (REDUCED) self.draw(performance.now());
+      // entering: jump straight to the pointer (easing in from -1e4 took 2-3 s to arrive)
+      if (self.mx < -1e3) { self.mx = self.tx; self.my = self.ty; }
+      self.hot = true;
+      if (REDUCED) self.draw(performance.now()); else loop();
     };
     var host = cv.closest('[data-ox-host]') || cv;
     host.addEventListener('pointermove', move, {passive: true});
     host.addEventListener('pointerdown', move, {passive: true});
-    host.addEventListener('pointerleave', function () { self.tx = -1e4; self.ty = -1e4; if (REDUCED) self.draw(performance.now()); });
+    host.addEventListener('pointerleave', function () { self.tx = -1e4; self.ty = -1e4; self.hot = false; if (REDUCED) self.draw(performance.now()); });
   }
   Art.prototype.resize = function () {
     var cv = this.cv, w = cv.clientWidth, h = cv.clientHeight;
@@ -204,7 +207,9 @@
   Art.prototype.draw = function (now) {
     if (!this.mask) return;
     var t = REDUCED ? 0 : (now - this.t0) / 1000 * this.calm, c = this.ctx, L = RAMP.length - 1;
-    this.mx += (this.tx - this.mx) * 0.18; this.my += (this.ty - this.my) * 0.18;
+    var dt = Math.min(100, now - (this.tl || now)), ez = 1 - Math.pow(0.6, dt / 16.7);
+    this.tl = now;
+    this.mx += (this.tx - this.mx) * ez; this.my += (this.ty - this.my) * ez;
     if (this.tx < -1e3) { this.mx = this.tx; this.my = this.ty; }
     var R = Math.max(6, this.cols * 0.07), R2 = R * R, rows = this.rows, cols = this.cols;
     var buckets = [[], [], [], [], [], [], [], []];
@@ -239,16 +244,20 @@
     }
   };
 
-  // one clock for every canvas, ~30 fps, only while something is on screen
+  // one clock for every canvas, only while something is on screen: the one under the
+  // pointer redraws every frame so it tracks instantly; idle ones breathe at ~20 fps
   var last = 0, running = false;
   function tick(now) {
     running = false;
     if (document.hidden) return;
+    var idle = now - last > 48;
+    if (idle) last = now;
     var any = false;
-    if (now - last > 32) {
-      last = now;
-      arts.forEach(function (a) { if (a.visible) { a.draw(now); any = true; } });
-    } else any = arts.some(function (a) { return a.visible; });
+    arts.forEach(function (a) {
+      if (!a.visible) return;
+      any = true;
+      if (a.hot || idle) a.draw(now);
+    });
     if (any) loop();
   }
   function loop() { if (!running && !REDUCED) { running = true; requestAnimationFrame(tick); } }
@@ -260,9 +269,14 @@
     });
   }, {rootMargin: '80px'}) : null;
 
+  // a canvas that changes size (a card's text wraps, fonts land) gets a fresh grid
+  var ro = 'ResizeObserver' in window ? new ResizeObserver(function (es) {
+    es.forEach(function (e) { var a = e.target._oxArt; if (a && a.resize()) a.draw(performance.now()); });
+  }) : null;
   function mount(cv) {
     if (cv._oxArt) return cv._oxArt;
     var a = new Art(cv); cv._oxArt = a; arts.push(a);
+    if (ro) ro.observe(cv);
     if (io) io.observe(cv); else { a.visible = true; loop(); }
     return a;
   }

@@ -136,10 +136,11 @@
 .ox-sport{grid-column:span 4;position:relative;display:flex;flex-direction:column;min-height:400px;padding:18px;border:1px solid var(--ox-stroke);
   background:linear-gradient(180deg,rgba(33,27,37,.55),rgba(12,12,12,0) 70%);text-decoration:none;color:var(--ox-white);overflow:hidden;
   transition:border-color .25s,transform .35s cubic-bezier(.2,.9,.25,1)}
-.ox-sport.big{grid-column:span 7;min-height:470px}.ox-sport.mid{grid-column:span 5;min-height:470px}
+.ox-sport.big{grid-column:span 7;min-height:470px}.ox-sport.mid{grid-column:span 5;min-height:470px}.ox-sport.half{grid-column:span 6;min-height:420px}
 .ox-sport:hover{border-color:rgba(176,56,249,.65);transform:translateY(-4px)}
 .ox-sport.soon{cursor:default}.ox-sport.soon:hover{border-color:var(--ox-600);transform:none}
-.ox-sport canvas{position:absolute;left:0;right:0;top:44px;bottom:120px;width:100%;height:calc(100% - 164px)}
+/* the art fills the space between the header and the text, never under either */
+.ox-sport canvas{display:block;position:relative;flex:1 1 0;min-height:150px;width:calc(100% + 36px);height:auto;margin:8px -18px 10px}
 .ox-sport.soon canvas{opacity:.55}
 .ox-sport-top{position:relative;z-index:2;display:flex;justify-content:space-between;align-items:center;gap:8px}
 .ox-sport-top .n{font:500 11px var(--ox-mono);color:var(--ox-body)}
@@ -152,10 +153,10 @@
 .ox-sport .go span{display:inline-flex;align-items:center;gap:8px}
 .ox-sport .go span::after{content:"\2192";transition:transform .25s}
 .ox-sport:hover .go span::after{transform:translateX(5px)}
-@media (max-width:1000px){.ox-sport,.ox-sport.big,.ox-sport.mid{grid-column:span 6;min-height:380px}.ox-sport:last-child{grid-column:span 12}}
+@media (max-width:1000px){.ox-sport,.ox-sport.big,.ox-sport.mid,.ox-sport.half{grid-column:span 6;min-height:380px}.ox-sport:last-child{grid-column:span 12}}
 @media (max-width:620px){
-  .ox-sports{grid-template-columns:1fr}.ox-sport,.ox-sport.big,.ox-sport.mid,.ox-sport:last-child{grid-column:auto;min-height:330px}
-  .ox-sport canvas{bottom:132px;height:calc(100% - 176px)}
+  .ox-sports{grid-template-columns:1fr}.ox-sport,.ox-sport.big,.ox-sport.mid,.ox-sport.half,.ox-sport:last-child{grid-column:auto;min-height:330px}
+  .ox-sport canvas{min-height:140px}
 }
 
 /* what this is */
