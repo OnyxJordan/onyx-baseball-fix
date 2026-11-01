@@ -96,6 +96,62 @@ def main():
                             io_, iu_ = L.implied(v["o"][1]), L.implied(v["o"][2])
                             XL[(fid, nm)][mid_] = (v["o"][0], io_ / (io_ + iu_))
 
+    # --role (11/1): who is ahead of him on the depth chart the day before, and how much
+    # volume the teammates ruled Out / Doubtful that week leave behind (nflverse depth charts
+    # and injury reports, both known before kickoff)
+    DEPTH, INJ = {}, defaultdict(set)
+    if "--role" in sys.argv:
+        for y in (2025, 2026):
+            p_ = f"{BT}nflx/depth_charts_{y}.csv"
+            if os.path.exists(p_):
+                for r in csv.DictReader(open(p_)):
+                    if r["pos_abb"] in ("QB", "RB", "WR", "TE") and r["gsis_id"]:
+                        k_ = (r["team"], r["dt"][:10])
+                        DEPTH.setdefault(k_, {})[r["gsis_id"]] = min(int(r["pos_rank"] or 9), DEPTH.get(k_, {}).get(r["gsis_id"], 9))
+            p_ = f"{BT}nflx/injuries_{y}.csv"
+            if os.path.exists(p_):
+                for r in csv.DictReader(open(p_)):
+                    if r["report_status"] in ("Out", "Doubtful"):
+                        INJ[(int(r["season"]), int(r["week"]), r["team"])].add(r["gsis_id"])
+                    elif r["report_status"] == "Questionable":
+                        INJ[(int(r["season"]), int(r["week"]), r["team"], "q")].add(r["gsis_id"])
+    depth_days = defaultdict(list)
+    for (t_, d_) in DEPTH:
+        depth_days[t_].append(d_)
+    for t_ in depth_days:
+        depth_days[t_].sort()
+
+    def role(pid, season, week, team, gdate):
+        if not DEPTH:
+            return {}
+        ds = [d_ for d_ in depth_days.get(team, []) if d_ < gdate]
+        rank = DEPTH[(team, ds[-1])].get(pid, 5) if ds else 5
+        # his rank at his previous game: a move up the chart is a new role
+        h = [g for g in by_pid.get(pid, []) if (g["season"], g["week"]) < (season, week)]
+        prev = 5
+        if h:
+            lg_ = h[-1]
+            pd = [d_ for d_ in depth_days.get(lg_["team"], []) if d_ < gdate and d_ <= f"{lg_['season'] + (1 if lg_['week'] > 17 else 0)}-12-31"]
+            pd = [d_ for d_ in pd if d_ < ds[-1]] if ds else pd
+            # the chart about a week before tonight's
+            if ds:
+                wk_ago = [d_ for d_ in depth_days.get(team, []) if d_ < ds[-1] and d_ <= (date.fromisoformat(ds[-1]) - timedelta(days=6)).isoformat()]
+                if wk_ago:
+                    prev = DEPTH[(team, wk_ago[-1])].get(pid, 5)
+        out_ids = INJ.get((season, week, team), set()) - {pid}
+        vt = vc = va = 0.0
+        for oid in out_ids:
+            oh = [g for g in by_pid.get(oid, []) if (g["season"], g["week"]) < (season, week)][-5:]
+            if not oh:
+                continue
+            for g in oh:
+                tw = IX.team_wk[(g["season"], g["week"], g["team"])]
+                vt += g["targets"] / max(1.0, tw["targets"]) / len(oh)
+                vc += g["carries"] / max(1.0, tw["carries"]) / len(oh)
+                va += g["attempts"] / max(1.0, tw["attempts"]) / len(oh)
+        return {"depth": float(rank), "depth_up": float(prev - rank), "vac_tgt": vt, "vac_car": vc, "vac_qb": va,
+                "own_q": 1.0 if pid in INJ.get((season, week, team, "q"), set()) else 0.0}
+
     def cross(mkt, fid, nm, f, ln):
         o = XL.get((fid, nm), {})
         g = lambda m: o.get(m, (None, None))[0]
@@ -185,6 +241,8 @@ def main():
                         continue
                     if "--cross" in sys.argv:
                         f.update(cross(mkt, fid, nm, f, ln))
+                    if "--role" in sys.argv:
+                        f.update(role(pid, season, week, team, g["date"]))
                     c = v.get("c") or [None, None, None]
                     S.append({"season": 2025 if g["date"] < "2026-03-01" else 2026, "date": g["date"], "p": io / (io + iu), "po": po, "pu": pu, "line_": ln,
                               "cl": c[0], "co": c[1], "cu": c[2],
@@ -399,7 +457,7 @@ def select_and_test(DATA, k_max=4, out="bt/nfl_select.json"):
         print(f"   2026 log loss: model {mdl:.4f} vs Onyx {raw:.4f} (Onyx refit {base:.4f})")
         print(f"   2025 (fit) 3pp+: {r['bets_2025_3pp']}")
         print(f"   2026 (unseen) 3pp+: {r['bets_2026_3pp']}   5pp+: {r['bets_2026_5pp']}")
-    json.dump(res, open(out.replace(".json", "_cross.json") if "--cross" in sys.argv else out, "w"), indent=1)
+    json.dump(res, open(out.replace(".json", "_cross.json") if "--cross" in sys.argv else out.replace(".json", "_role.json") if "--role" in sys.argv else out, "w"), indent=1)
     return res
 
 
