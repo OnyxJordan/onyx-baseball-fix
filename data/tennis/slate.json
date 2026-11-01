@@ -3068,9 +3068,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        1
+        2
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Jiri Lehecka",
@@ -3079,7 +3079,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        3
+        5
        ],
        "serve": false
       }
@@ -3795,7 +3795,7 @@
        "sets": [
         6,
         4,
-        1
+        2
        ],
        "serve": false
       },
@@ -3808,7 +3808,7 @@
        "sets": [
         3,
         6,
-        0
+        1
        ],
        "serve": false
       }
@@ -3831,7 +3831,7 @@
        "win": false,
        "sets": [
         7,
-        1
+        4
        ],
        "serve": false
       },
@@ -3843,7 +3843,7 @@
        "win": false,
        "sets": [
         6,
-        0
+        1
        ],
        "serve": false
       }
@@ -10049,7 +10049,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        4
+        5
        ],
        "serve": false
       },
@@ -10062,7 +10062,7 @@
        "sets": [
         3
        ],
-       "serve": false
+       "serve": true
       }
      ]
     }
@@ -11429,7 +11429,7 @@
      "id": "185865",
      "start": "2026-11-01T14:15Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Final",
      "draw": "Women's Singles",
      "court": "Centre Court",
@@ -11441,9 +11441,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        6
+        6,
+        1
        ],
-       "serve": false
+       "serve": true
       },
       {
        "name": "Noma Noha Akugue",
@@ -11452,7 +11453,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        3
+        3,
+        1
        ],
        "serve": false
       }
@@ -16794,9 +16796,9 @@
        "win": false,
        "sets": [
         6,
-        2
+        4
        ],
-       "serve": false
+       "serve": true
       },
       {
        "name": "Darja Suvirdjonkova",
@@ -17801,5 +17803,5 @@
    ]
   }
  ],
- "fetched": "2026-11-01T15:03:47+00:00"
+ "fetched": "2026-11-01T15:15:43+00:00"
 }
