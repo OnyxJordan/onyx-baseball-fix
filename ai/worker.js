@@ -79,6 +79,8 @@ Fields:
 - sort "proj" for who will score / catch / rush / rebound the most (the highest projection).
 - first_td (first touchdown scorer), first_basket (NBA first basket), h1_total (NBA 1st-half total).
 - one_per_game: true unless they explicitly want several plays from the same game.
+- markets: empty unless they name a market or clearly mean one; never list several markets to cover a request that names none ("+150 or longer" names no market).
+- when: null unless they mention a day or "tonight" / "today".
 - pass_td (passing TDs), pass_att (pass attempts), rush_rec_yds (rushing + receiving yards), pass_rush_yds (passing + rushing yards).
 - teams: when they name two or more teams ("from the Chiefs, Broncos, Patriots or Dolphins"), every one of them as ESPN abbreviations (KC, DEN, NE, MIA, WSH, JAX, LAR, LAC, GB, NO, SF, TB, NYG, NYJ, LV); then team is null. One team goes in team and teams is empty. Never drop a team they named.
 - clarify: null almost always. Set it only when guessing would give them the wrong thing: (a) two very different readings are equally likely, (b) something we do not price (a sport other than nba, nfl, cfb, nhl, tennis; a market not listed). Then question is one short, friendly question that says what you can do, and options are 2 to 4 complete requests they can tap, each one a full sentence the program can run on its own (e.g. "3 leg anytime TD parlay from tonight's games", "3 leg anytime TD parlay from KC, DEN, NE or MIA next week"). Still fill every other field with your best reading. Do not ask just because they say "live" or "in-game": the page shows our live numbers for the games being played by itself; fill the sport and teams they named.
@@ -148,6 +150,8 @@ async function chat(env, system, user, name, schema, maxTokens) {
       body: JSON.stringify({
         model: env.AI_MODEL,
         max_completion_tokens: maxTokens,
+        // the same question gets the same reading: no sampling noise (reasoning models take no temperature)
+        ...(/^(o\d|gpt-5)/.test(env.AI_MODEL) ? {} : { temperature: 0, seed: 7 }),
         messages: [{ role: "system", content: system }, { role: "user", content: user }],
         response_format: { type: "json_schema", json_schema: { name, strict: true, schema } },
       }),
