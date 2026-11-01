@@ -243,6 +243,8 @@ def nfl_block(lane, slate, odds):
         if v:
             block["tests"].append({"k": names[s], "v": f"{(1 - v['mae'] / v['avg']) * 100:+.1f}%",
                                    "d": f"vs season avg · {(1 - v['mae'] / v['l3']) * 100:+.1f}% vs last 3 · {v['n']} games"})
+    if hasattr(M, "add_derived"):
+        M.add_derived(rows)     # v10: combined totals Onyx prices (rush + rec, pass + rush) and touches
     by = M._games_by_player(rows)
     allowed = M._team_allowed(rows)
     lgc = {}
@@ -286,7 +288,7 @@ def nfl_block(lane, slate, odds):
                 if it and it["s"] == "OUT":
                     dropped.add(pid)
                     continue
-                for s in M.STATS:
+                for s in getattr(M, "PROJ_STATS", M.STATS):
                     pr, info = M.project(gs, s, season, wk, opp, allowed, M.P, lgc)
                     if pr is None:
                         continue
@@ -308,13 +310,30 @@ def nfl_block(lane, slate, odds):
                                 "over": ln.get("over") if ln else None, "under": ln.get("under") if ln else None,
                                 "over_sel": ln.get("over_sel") if ln else None, "under_sel": ln.get("under_sel") if ln else None,
                                 "vol": vol, **({"inj": "Q", "inj_d": it["d"]} if it else {})})
+                # v9: passing touchdowns for a quarterback who passed in the team's last game
+                if hasattr(M, "project_pass_td") and (cur[-1].get("att") or 0) >= M.PTD_P["min_att"] and team in team_env:
+                    lam = M.project_pass_td(gs, team_env[team][0])
+                    if lam is not None:
+                        qg = [x for x in cur if (x.get("att") or 0) >= M.PTD_P["min_att"]]
+                        ln = props.get((nk(cur[-1]["name"]), "pass_td"))
+                        out.append({"pid": pid, "name": cur[-1]["name"], "hs": cur[-1].get("hs"), "team": team, "opp": opp,
+                                    "home": home, "gid": g["gid"], "mkt": "pass_td", "proj": round(lam, 2),
+                                    "season": round(sum(x.get("pass_td") or 0 for x in qg) / len(qg), 2) if qg else None,
+                                    "l3": [int(x.get("pass_td") or 0) for x in qg[-3:]], "opp_f": 1.0,
+                                    "line": ln.get("line") if ln else None,
+                                    "over": ln.get("over") if ln else None, "under": ln.get("under") if ln else None,
+                                    "over_sel": ln.get("over_sel") if ln else None, "under_sel": ln.get("under_sel") if ln else None,
+                                    "vol": False, "ptd": True, **({"inj": "Q", "inj_d": it["d"]} if it else {})})
     # price every two-sided Onyx line: the model's chance, the blend, the edge
     bt = lane.load("backtest.json", None) or {}
     w = ((bt.get("lane") or {}).get("w_props")) or DEFAULT_W
     for r in out:
         if r["line"] is None or r["over"] is None or r["under"] is None:
             continue
-        if r.get("vol"):    # v4: volume projection, its own spread, blend weight and value bar
+        if r.get("ptd"):    # v9: passing touchdowns, Poisson, 30% model
+            po = M.prob_over_poisson(r["proj"], r["line"])
+            ps = L.price_side(po, r["over"], r["under"], M.PTD_P["w"])
+        elif r.get("vol"):    # v4: volume projection, its own spread, blend weight and value bar
             po = M.prob_over_volume(r["mkt"], r["proj"], r["line"])
             ps = L.price_side(po, r["over"], r["under"], M.VOL_P[r["mkt"]]["w"])
             r["value_min"] = M.VOL_P[r["mkt"]]["edge"]
@@ -383,6 +402,14 @@ def nfl_block(lane, slate, odds):
                     else:
                         row["first_edge"] = round(row["first"] - imp_, 4)
                         row["first_value"] = False    # Onyx's first-TD price beat the model in the backtest
+            # v10: 2+ touchdowns from the anytime chance shown (Poisson: lambda = -ln(1 - anytime)),
+            # against Onyx's over 1.5 price; information, never value
+            lam2 = -math.log(max(1e-6, 1 - row["any"]))
+            row["two"] = round(1 - math.exp(-lam2) * (1 + lam2), 4)
+            ln2 = props.get((nk(last["name"]), "two_td"))
+            if ln2 and ln2.get("over") is not None:
+                row["two_price"], row["two_sel"] = ln2["over"], ln2.get("over_sel")
+                row["two_edge"] = round(row["two"] - L.implied(ln2["over"]), 4)
             td_rows.append(row)
         td_rows.sort(key=lambda r: -r["any"])
         block["td"] = td_rows[:400]
@@ -545,7 +572,8 @@ def tennis_rows(lane, slate, odds, w):
 
 
 MKT_WORD = {"ml": "moneyline", "spread": "spread", "total": "total", "pass_yds": "passing yards", "rush_yds": "rushing yards",
-            "rec_yds": "receiving yards", "rec": "receptions"}
+            "rec_yds": "receiving yards", "rec": "receptions", "pass_td": "passing TDs",
+            "pass_att": "pass attempts", "pass_rush_yds": "passing + rushing yards", "rush_rec_yds": "rushing + receiving yards", "two_td": "2+ touchdowns"}
 
 
 # what people bet first: spreads, totals and player props lead the plays; a
@@ -1065,6 +1093,9 @@ def write_top(key, lane, slate, model):
         if r.get("first_price") is not None:              # first touchdown scorer (shown, never recommended: Onyx won its backtest)
             c1 = dict(c, mkt="first_td", price=r["first_price"], prob=r["first"], edge=r.get("first_edge") or 0.0, sel=r.get("first_sel"))
             board.append(DT.entry(key, c1, "lean", start.get(r["gid"])))
+        if r.get("two_price") is not None:                # 2+ touchdowns at Onyx's over 1.5 (v10, information)
+            c2 = dict(c, mkt="two_td", line=1.5, price=r["two_price"], prob=r["two"], edge=r.get("two_edge") or 0.0, sel=r.get("two_sel"))
+            board.append(DT.entry(key, c2, "lean", start.get(r["gid"])))
     if key == "cfb":
         board += cfb_td_board(lane, slate, pre, start, DT)
     board += both_sides(key, lane, slate, pre, start, board, DT)

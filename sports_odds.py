@@ -31,10 +31,11 @@ from fetch_onyx import http_json, OPTIC   # noqa: E402
 SEL_RE = re.compile(r"selection=([0-9a-fA-F-]{36})")
 FOOTBALL_PROPS = {"player_passing_yards": "pass_yds", "player_rushing_yards": "rush_yds",
                   "player_receiving_yards": "rec_yds", "player_receptions": "rec",
-                  "player_passing_touchdowns": "pass_td"}
+                  "player_passing_touchdowns": "pass_td", "player_passing_attempts": "pass_att",
+                  "player_passing_+_rushing_yards": "pass_rush_yds", "player_rushing_+_receiving_yards": "rush_rec_yds"}
 MARKETS = {
     "nfl": {"game": ("moneyline", "point_spread", "total_points"), "props": FOOTBALL_PROPS,
-            "yes": {"anytime_touchdown_scorer": "anytime_td", "first_touchdown_scorer": "first_td"}},
+            "yes": {"anytime_touchdown_scorer": "anytime_td", "first_touchdown_scorer": "first_td"}, "extra": ("player_touchdowns",)},
     "cfb": {"game": ("moneyline", "point_spread", "total_points"), "props": FOOTBALL_PROPS,
             "yes": {"anytime_touchdown_scorer": "anytime_td", "first_touchdown_scorer": "first_td"}},
     "nhl": {"game": ("moneyline", "puck_line", "total_goals"), "props": {"player_points": "points", "player_assists": "assists"}, "yes": {}},
@@ -162,7 +163,7 @@ def main():
                 g, a, h = match_game(f, slate["next_games"])
                 if g:
                     targets[fid] = (lg, ("next", g, a, h))
-    mk = "".join(f"&market={m}" for m in list(spec["game"]) + list(spec["props"]) + list(spec["yes"]))
+    mk = "".join(f"&market={urllib.parse.quote(m)}" for m in list(spec["game"]) + list(spec["props"]) + list(spec["yes"]) + list(spec.get("extra", ())))
     by_league = {}
     for fid, (lg, t) in targets.items():
         by_league.setdefault(lg, []).append(fid)
@@ -224,6 +225,11 @@ def main():
                     mid = od.get("market_id")
                     sel = od.get("selection") or od.get("name") or ""
                     side = str(od.get("selection_line") or "").lower()
+                    if mid == "player_touchdowns" and side == "over" and od.get("points") is not None and float(od["points"]) == 1.5 and sel:
+                        # 2+ touchdowns (11/1): Onyx's over 1.5 on a player's touchdowns, not its main (0.5) line
+                        out["props"].append({"name": sel, "mkt": "two_td", "line": 1.5, "over": price, "over_sel": _sel(od),
+                                             "under": None, "under_sel": None, "gid": g["gid"]})
+                        continue
                     if mid in spec["yes"] and od.get("is_main"):
                         who = od.get("selection") or od.get("selection_line") or od.get("name")
                         if who:
