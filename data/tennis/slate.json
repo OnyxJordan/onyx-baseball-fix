@@ -12813,9 +12813,9 @@
     },
     {
      "id": "185817",
-     "start": "2026-11-01T00:00Z",
-     "state": "pre",
-     "detail": "10/31 - 8:00 PM EDT",
+     "start": "2026-11-01T00:05Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Semifinal",
      "draw": "Women's Singles",
      "court": "Estadio Mexcovery",
@@ -12826,7 +12826,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        1
+       ],
        "serve": false
       },
       {
@@ -12835,8 +12837,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ger.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        1
+       ],
+       "serve": true
       }
      ]
     },
@@ -15519,5 +15523,5 @@
    ]
   }
  ],
- "fetched": "2026-10-31T23:43:50+00:00"
+ "fetched": "2026-11-01T00:15:16+00:00"
 }
