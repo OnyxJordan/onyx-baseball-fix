@@ -38,6 +38,7 @@
   var OX_MARK = '<svg viewBox="0 0 100 137" fill="currentColor" aria-hidden="true"><path d="m39.041 109.178 18.493 9.863-33.972 17.945L0 124.384v-84.11l39.041-20.411zm21.918-81.37-18.493-9.863L76.438 0 100 12.603v84.246L60.959 117.26z"/></svg>';
 
   var I = {   // 16px stroke icons
+    bell: '<path d="M4 11V7a4 4 0 0 1 8 0v4l1.2 1.5H2.8z"/><path d="M6.5 14a1.6 1.6 0 0 0 3 0"/>',
     home: '<path d="M2 6.5L8 2l6 4.5V14H2z"/><path d="M6 14V9h4v5"/>',
     board: '<rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 6h6M5 9h6M5 12h3"/>',
     games: '<circle cx="8" cy="8" r="6"/><path d="M2 8h12M8 2c2.5 2 2.5 10 0 12M8 2c-2.5 2-2.5 10 0 12"/>',
@@ -299,7 +300,9 @@
       '<a class="oact ox-all" href="home.html">' + OX_MARK + 'All Onyx sports</a>' +
       '<button class="oact pri" data-act="slip">' + svg('slip') + 'Parlay builder</button>' +
       '<button class="oact" data-act="share">' + svg('share') + 'Share Onyx</button>' +
-      '<button class="oact" data-act="new">' + svg('spark') + "What's new</button></div>";
+      '<button class="oact" data-act="new">' + svg('spark') + "What's new</button>" +
+      (window.OnyxSaved && OnyxSaved.setAlerts ? '<button class="oact" data-act="alerts">' + svg('bell') + '<span class="oact-al">Win alerts: ' + (OnyxSaved.alertsOn() ? 'on' : 'off') + '</span></button>' : '') +
+      '</div>';
     document.body.appendChild(sheetBg);
     document.body.appendChild(sheet);
     sheetBg.addEventListener('click', closeSheet);
@@ -325,6 +328,13 @@
       else if (navigator.clipboard) navigator.clipboard.writeText(data.url).then(function () { toast('Link copied'); }).catch(function () {});
     });
     sheet.querySelector('[data-act="new"]').addEventListener('click', function () { closeSheet(); showWhatsNew(true); });
+    var al = sheet.querySelector('[data-act="alerts"]');
+    if (al) al.addEventListener('click', function () {
+      // win alerts (saved.js): a pop-up and a phone alert the moment a saved pick cashes
+      Promise.resolve(OnyxSaved.setAlerts(!OnyxSaved.alertsOn())).then(function () {
+        al.querySelector('.oact-al').textContent = 'Win alerts: ' + (OnyxSaved.alertsOn() ? 'on' : 'off');
+      });
+    });
     var input = sheet.querySelector('input');
     input.addEventListener('input', function () { search(input.value); });
     input.addEventListener('keydown', function (e) {
