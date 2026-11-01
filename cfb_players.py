@@ -11,6 +11,22 @@ outcomes around a projection is fitted on college games, which are wider than th
 
 Changelog (newest first; each entry cites its evidence)
 
+  v2  11/1  Rushing yards: a market model on Onyx's price. tools/cfb_feature_screen.py runs the
+      NFL v11 method on every Onyx college rushing-yards line of 2026 (opening price):
+      P(over) = sigmoid(a + b logit(Onyx no-vig) + sum c z(stat)), statistics chosen on
+      lines before 10/1 (221) and judged on lines after (525). Chosen: rushing yards the
+      opponent allows (vs league), carries it allows, and how far the line sits from the
+      runner's season average in his own game-to-game spread. On the unseen weeks: log loss
+      .6794 vs Onyx .6916; unders at 3pp+ 92-59 +14.4%, at 5pp+ 47-20 +31.7%; at Onyx's
+      closing price with the same line 24-19 +5.5%. By edge, unders at 3-5pp were flat in
+      both periods (-1.4%, +0.6%) and 5pp+ won in both (33-14 before 10/1, 47-20 after), so
+      the lane is rushing yards unders at 5pp+ at the opening price, on trial
+      (data/cfb/prop_trial.json). Onyx's college rushing lines go over only 41.7% of the
+      time, so most of the edge is that unders are underpriced; the model picks which.
+      Players with no box line are voids here (Onyx settles them at 0, an under win), so the
+      test undercounts unders. Receiving yards (2026 log loss .6987 vs .6938), receptions
+      and passing yards (too few early lines to choose on) stay leans.
+
   v1  11/1  Built on 575 FBS games, weeks 1-9 of 2026. Parameters tuned on weeks 4-6,
       judged on weeks 7-9 the tuner never saw: MAE vs the season average / last-3
       average, rushing yards 29.5 vs 30.7 / 31.5 (+3.7% / +6.2%), passing 70.2 vs
@@ -25,7 +41,7 @@ from collections import defaultdict
 
 import nfl_model as N
 
-VERSION = "v1"
+VERSION = "v2"
 STATS = N.STATS
 ROLE = {"pass_yds": ("att", 12), "rush_yds": ("rush_att", 5), "rec_yds": ("rec", 1.5), "rec": ("rec", 1.5)}
 P = {"decay": 0.95, "k_prior": 0.0, "opp_w": 1.0, "opp_k": 8.0}   # tuned on weeks 4-6
@@ -138,3 +154,110 @@ if __name__ == "__main__":
     test, _ = evaluate(rows, season, 7, 9, p)
     for s, v in test.items():
         print(f"TEST weeks 7-9 {s:9s} n={v['n']:5d}  model {v['mae']:6.2f}  season avg {v['avg']:6.2f} ({(1 - v['mae'] / v['avg']) * 100:+.1f}%)  last 3 {v['l3']:6.2f} ({(1 - v['mae'] / v['l3']) * 100:+.1f}%)")
+
+
+# v2 (11/1): market models on Onyx's price. The statistics, computed the same way here for
+# the backtest (tools/cfb_feature_screen.py) and the live build, from box scores before the game.
+VOL = {"rec": "rec", "rec_yds": "rec", "rush_yds": "rush_att", "pass_yds": "att"}
+_SUM = ("rec", "rec_yds", "rush_yds", "pass_yds", "rush_att", "att")
+
+
+class MarketIndex:
+    def __init__(self, rows):
+        self.by_pid = defaultdict(list)
+        self.team_g = defaultdict(lambda: defaultdict(float))     # (gid, team) totals
+        self.opp_g = defaultdict(lambda: defaultdict(float))      # (gid, defense) allowed
+        self.gdate = {}
+        for r in sorted(rows, key=lambda r: r["date"]):
+            r = dict(r)
+            for k in _SUM:
+                r[k] = r.get(k) or 0.0
+            self.by_pid[r["pid"]].append(r)
+            self.gdate[(r["gid"], r["team"])] = r["date"]
+            self.gdate[(r["gid"], r["opp"])] = r["date"]
+            for k in _SUM:
+                self.team_g[(r["gid"], r["team"])][k] += r[k]
+                self.opp_g[(r["gid"], r["opp"])][k] += r[k]
+        self._lg = {}
+
+    def _log(self, team, d, src):
+        return [v for (gid, t), v in src.items() if t == team and self.gdate[(gid, t)] < d]
+
+    def lg(self, d, k):
+        if (d, k) not in self._lg:
+            vals = [v[k] for (gid, t), v in self.opp_g.items() if self.gdate[(gid, t)] < d]
+            self._lg[(d, k)] = (sum(vals) / len(vals) if vals else 0.0) or 1.0
+        return self._lg[(d, k)]
+
+    def features(self, pid, team, opp, home, d, line, mkt, spread, total):
+        """Statistics known before the game on date d; spread is the team's (+ = underdog)."""
+        mean = lambda xs: sum(xs) / len(xs) if xs else 0.0
+        h = [g for g in self.by_pid.get(pid, []) if g["date"] < d]
+        if len(h) < 2:
+            return None
+        l3, vol = h[-3:], VOL[mkt]
+        sd = (sum((g[mkt] - mean([q[mkt] for q in h])) ** 2 for g in h) / max(1, len(h) - 1)) ** 0.5
+        tl, ol = self._log(team, d, self.team_g), self._log(opp, d, self.opp_g)
+        return {"l3": mean([g[mkt] for g in l3]), "season": mean([g[mkt] for g in h]),
+                "line_vs_l3": line - mean([g[mkt] for g in l3]), "line_vs_season": line - mean([g[mkt] for g in h]),
+                "line_z": (line - mean([g[mkt] for g in h])) / sd if sd else 0.0, "sd": sd,
+                "trend": mean([g[mkt] for g in l3]) - mean([g[mkt] for g in h]),
+                "vol_l3": mean([g[vol] for g in l3]), "vol_season": mean([g[vol] for g in h]),
+                "eff": sum(g[mkt] for g in h) / max(1.0, sum(g[vol] for g in h)) if mkt != "rec" else 0.0,
+                "share": mean([g[vol] / max(1.0, self.team_g[(g["gid"], g["team"])][vol]) for g in h]),
+                "team_vol": mean([t[vol] for t in tl]), "team_stat": mean([t[mkt] for t in tl]),
+                "opp_allowed": mean([o[mkt] for o in ol]) / self.lg(d, mkt) if ol else 1.0,
+                "opp_vol": mean([o[vol] for o in ol]) / self.lg(d, vol) if ol else 1.0,
+                "implied": (total - spread) / 2, "spread": spread, "total": total, "home": 1.0 if home else 0.0,
+                "games": float(len(h)), "line": line}
+
+
+V2 = {
+ "rush_yds": {
+  "side": "under",
+  "features": [
+   "opp_allowed",
+   "opp_vol",
+   "line_z"
+  ],
+  "mu": [
+   0.76618,
+   0.93086,
+   -0.04839
+  ],
+  "sd": [
+   0.3329,
+   0.13902,
+   6.167
+  ],
+  "w": [
+   -0.33483,
+   0.09384,
+   0.33464,
+   -0.09416,
+   -0.24238
+  ]
+ }
+}
+V2_EDGE = 0.05
+LABEL = {"opp_allowed": "rushing yards the defense allows", "opp_vol": "carries the defense allows",
+         "line_z": "line vs his usual range"}
+
+
+def prob_v2(mkt, p_onyx, f):
+    S = V2[mkt]
+    p = min(max(p_onyx, 1e-4), 1 - 1e-4)
+    z = S["w"][0] + S["w"][1] * math.log(p / (1 - p))
+    for k, mu, sd, c in zip(S["features"], S["mu"], S["sd"], S["w"][2:]):
+        z += c * (f.get(k, 0.0) - mu) / (sd or 1.0)
+    return 1 / (1 + math.exp(-max(-30, min(30, z))))
+
+
+def why_v2(mkt, p_onyx, f):
+    S = V2[mkt]
+    mid = dict(zip(S["features"], S["mu"]))
+    base = prob_v2(mkt, p_onyx, mid)
+    out = [{"k": LABEL.get(k, k), "v": round(f.get(k, 0.0), 2), "avg": round(mu, 2),
+            "pp": round(100 * (prob_v2(mkt, p_onyx, dict(mid, **{k: f.get(k, 0.0)})) - base), 1)}
+           for k, mu in zip(S["features"], S["mu"])]
+    return sorted(out, key=lambda d: -abs(d["pp"]))
