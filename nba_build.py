@@ -764,7 +764,7 @@ def main():
         open_led, n_open_g = open_lanes.grade(today)
         n_open = 0
         if fresh:
-            open_led, n_open = open_lanes.run(rows, slate, props, today, jp, fshots)
+            open_led, n_open = open_lanes.run(rows, slate, props, today, jp, fshots, games_log=pg, tg=tg, source=source)
         print(f"  on trial (opening prices): {n_open_g} graded, +{n_open} logged, {len(open_led)} on record")
 
     # the daily Top Scorer Parlay: grade past tickets, refresh / lock today's

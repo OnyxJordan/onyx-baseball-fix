@@ -21,12 +21,31 @@ on this public record, never on the backtest alone.
 Lanes:
   q1_total     1Q total = 25.4% of Onyx's game total, sd 12; lean when the model
                is 3+ points above Onyx's implied chance
+  ast_under    assists unders (nba_market.py): Onyx's opening price moved by the
+               assists the opponent allows and the line vs his usual range; logged
+               when the under beats the opening price by 3+ points
   first_basket tip winner scores first 65%; jumper record (won+2)/(jumped+4); the
                five starters split it by ((FGA x gp + .9) / (min x gp + 30))^.5
                x ((first shots + .4) / (starts + 2))^.25; value when the model
                is 20%+ above Onyx's implied chance
 
 CHANGELOG
+  open-v3 (2026-11-01) ASSISTS UNDERS. tools/nba_feature_screen.py tested ~30 statistics
+     (minutes and their trend, usage, per-36 rates, starter share, pace, what the
+     opponent allows, Onyx's total and spread, rest, back-to-backs) against 49,000
+     Onyx 2025-26 points, rebounds and assists lines: P(over) = sigmoid(a + b logit(Onyx
+     no-vig) + sum c z(stat)), chosen on lines before 2/1/2026, judged after. Points and
+     rebounds: nothing beat Onyx. Assists: the assists the opponent allows (last 15
+     games vs the league) and the line against his last-10 average in his own spread.
+     On the unseen half, log loss .6845 vs Onyx .6857; unders at 3+ points of edge
+     99-78 (+15.1%) before 2/1 and 47-37 (+11.1%) after, 5+ points 15-10 (+18.7%).
+     Overs lost (-14.0%), so unders only. Graded off the box score (a player who does
+     not play is a void).
+     FIX: run() read the opening file with load(OPENING, None), which nba_common.load
+     answers with None whatever is on disk, so every run counted as the first look and
+     marked every opening price a baseline: from 10/30 to 11/1 the 1st-quarter total and
+     first-basket lanes could not log a single play (open_trial.json stayed empty). The
+     first look is now decided by whether the file exists.
   open-v2 (2026-10-30) FIRST-SHOT SHARE IN THE FIRST-BASKET SPLIT.
      ESPN's play-by-play (shot log, 2,435 games 2024-26) shows who took each
      team's first field-goal attempt. Teams open with a set for the same man,
@@ -57,11 +76,11 @@ Pipeline-safe: ESPN via requests (nba_common.espn_get) only.
 import math
 from datetime import date, datetime, timedelta, timezone
 
-from nba_common import ESPN, espn_get, load, save, team_abbr
+from nba_common import DATA, ESPN, espn_get, load, save, team_abbr
 
 OPENING = "opening.json"
 LEDGER = "open_trial.json"
-VERSION = "open-v2"
+VERSION = "open-v3"
 P = {"q1": .254, "q1_sd": 12.0, "q1_edge": .03,
      "fb_g": .5, "fb_q": .65, "fb_a0": .9, "fb_m0": 30.0, "fb_h": .25, "fb_fs0": 2.0,
      "fb_rel": .20, "fb_per_game": 2}
@@ -119,13 +138,44 @@ def fb_probs(rows, game, jumps, fshots=None):
 
 
 # ── capture, then log at the opening price ──────────────────────────────────
-def run(rows, slate, props, today, jumps, fshots=None):
+def _ast_inputs(pg, tg, today):
+    """Per player: assists in games played before today; per team: assists allowed per
+    game before today; the league's average allowed per team-game before this month."""
+    ah = {pid: [g[7] or 0 for g in (rec.get("g") or []) if g[0] < today and (g[4] or 0) > 0]
+          for pid, rec in (pg or {}).items() if isinstance(rec, dict)}
+    allowed, alls = {}, []
+    month = today[:7] + "-01"
+    for team, gs in (tg or {}).items():
+        if not isinstance(gs, list):
+            continue
+        xs = sorted((x for x in gs if x.get("d", "9") < today and x.get("opp_ast") is not None), key=lambda x: x["d"])
+        allowed[team] = [x["opp_ast"] for x in xs]
+        alls += [x["opp_ast"] for x in xs if x["d"] < month]
+    if not alls:     # the season's first month: everything before today
+        alls = [a for v in allowed.values() for a in v]
+    return ah, allowed, (sum(alls) / len(alls)) if alls else None
+
+
+def run(rows, slate, props, today, jumps, fshots=None, games_log=None, tg=None, source=None):
     """Capture first-seen prices, log qualifying plays. Returns (ledger, n_logged)."""
-    O = load(OPENING, None)
-    first_run = O is None          # the system's first look: every price already up is a baseline, never a play
-    O = O or {}
+    import nba_market as NM
+    from nba_common import nk
+    # the system's first look: every price already up is a baseline, never a play. (11/1: this
+    # read load(OPENING, None), which nba_common.load always answers with None, so every
+    # run was a "first look" and no play could ever be logged; the file's existence decides.)
+    first_run = not (DATA / OPENING).exists()
+    O = load(OPENING, {})
     if O.get("date") != today:
-        O = {"date": today, "q1": {}, "fb": {}}
+        O = {"date": today, "q1": {}, "fb": {}, "ast": {}}
+    ast_first = "ast" not in O     # the assists lane's first look today (open-v3): lines already up are baselines
+    O.setdefault("ast", {})
+    book = (props or {}).get("players") or {}
+    by_optic = {v.get("optic_pid"): v for v in book.values() if v.get("optic_pid")}
+
+    def ast_line(r):
+        rec = (by_optic.get(r["pid"]) if source == "optic" else None) or book.get(nk(r["name"])) or {}
+        m = rec.get("ast") or {}
+        return m if None not in (m.get("line"), m.get("over"), m.get("under")) else None
     pg = (props or {}).get("games") or {}
     ts = _now()
     for g in slate.get("games", []):
@@ -138,7 +188,12 @@ def run(rows, slate, props, today, jumps, fshots=None):
         key = f"{r['gid']}|{r['pid']}"
         if fb.get("yes") is not None and key not in O["fb"]:
             O["fb"][key] = {"yes": fb["yes"], "ts": ts, **({"baseline": True} if first_run else {})}
+        m = ast_line(r) if not r.get("out") else None
+        if m and key not in O["ast"]:
+            O["ast"][key] = {"line": m["line"], "over": m["over"], "under": m["under"], "ts": ts,
+                             **({"baseline": True} if first_run or ast_first else {})}
     save(OPENING, O, indent=1)
+    ah, allowed, lg_allowed = _ast_inputs(games_log, tg, today) if games_log and tg else ({}, {}, None)
 
     ledger = load(LEDGER, []) or []
     have = {(k["date"], k["kind"], k["key"]) for k in ledger}
@@ -177,6 +232,32 @@ def run(rows, slate, props, today, jumps, fshots=None):
             p = probs[r["pid"]]
             if p >= implied(op["yes"]) * (1 + P["fb_rel"]):
                 cands.append((p / implied(op["yes"]), r, p, op, fb))
+        # assists unders (open-v3)
+        for r in rows:
+            if r["gid"] != g["gid"] or r.get("out") or lg_allowed is None:
+                continue
+            key = f"{r['gid']}|{r['pid']}"
+            op, m = O["ast"].get(key), ast_line(r)
+            if not op or op.get("baseline") or not m or (today, "ast_under", key) in have:
+                continue
+            if (m["line"], m["over"], m["under"]) != (op["line"], op["over"], op["under"]):
+                continue          # no longer at the opening price
+            f = NM.features(ah.get(r["pid"]) or [], allowed.get(r.get("opp")) or [], lg_allowed, op["line"])
+            if f is None:
+                continue
+            io, iu = implied(op["over"]), implied(op["under"])
+            p_under = 1 - NM.prob_over(io / (io + iu), f)
+            if p_under - iu < NM.EDGE:
+                continue
+            ledger.append({"date": today, "kind": "ast_under", "key": key, "gid": g["gid"],
+                           "matchup": f"{g['away']} @ {g['home']}", "away": g["away"], "home": g["home"],
+                           "pid": r["pid"], "hs": r.get("hs"), "name": r["name"], "team": r["team"], "data_src": source,
+                           "side": "under", "line": op["line"], "price": op["under"], "sel": m.get("under_sel"),
+                           "prob": round(p_under, 4), "implied": round(iu, 4), "proj": round(f["l10"], 1),
+                           "why": NM.why(io / (io + iu), f), "opened_at": op["ts"], "logged_at": ts, "model": VERSION,
+                           "result": None, "actual": None})
+            have.add((today, "ast_under", key))
+            added += 1
         for rel, r, p, op, fb in sorted(cands, key=lambda c: -c[0]):
             key = f"{r['gid']}|{r['pid']}"
             if n_game >= P["fb_per_game"] or (today, "first_basket", key) in have:
@@ -211,8 +292,27 @@ def _espn_game(day, away, home, cache):
 def grade(today):
     ledger = load(LEDGER, []) or []
     cache, sums, n = {}, {}, 0
+    stores = {}
     for k in ledger:
         if k.get("result"):
+            continue
+        if k["kind"] == "ast_under":     # off the box score, like the tracked props (nba_build.grade)
+            sub = "espn/" if k.get("data_src") == "espn" else ""
+            if sub not in stores:
+                stores[sub] = load(sub + "player_games.json", {}) or {}
+            pg = stores[sub]
+            if k["gid"] in set(pg.get("_games", [])):
+                g = next((x for x in (pg.get(k["pid"]) or {}).get("g", []) if x[1] == k["gid"]), None)
+                if not g or (g[4] or 0) <= 0:
+                    k["result"], k["actual"] = "V", None      # did not play: void
+                else:
+                    k["actual"] = g[7]
+                    k["result"] = "P" if g[7] == k["line"] else ("W" if g[7] < k["line"] else "L")
+                k["graded_at"] = _now()
+                n += 1
+            elif date.fromisoformat(k["date"]) < date.fromisoformat(today) - timedelta(days=VOID_AFTER_DAYS):
+                k["result"], k["actual"] = "V", None
+                n += 1
             continue
         e, side = _espn_game(k["date"], k["away"], k["home"], cache)
         done = e is not None and ((e.get("status") or {}).get("type") or {}).get("state") == "post"
@@ -246,7 +346,7 @@ def grade(today):
 
 def summarize(ledger):
     out = {"kinds": {}, "rows": [], "today": []}
-    for kind in ("q1_total", "first_basket", "all"):
+    for kind in ("q1_total", "first_basket", "ast_under", "all"):
         rows = [k for k in ledger if kind == "all" or k["kind"] == kind]
         w = sum(1 for k in rows if k["result"] == "W"); l = sum(1 for k in rows if k["result"] == "L")
         units = sum(payout(k["price"]) if k["result"] == "W" else -1.0 if k["result"] == "L" else 0.0 for k in rows)
