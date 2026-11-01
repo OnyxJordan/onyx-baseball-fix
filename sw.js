@@ -29,3 +29,15 @@ self.addEventListener('fetch', e => {
       .catch(() => caches.match(e.request, { ignoreSearch: true }))
   );
 });
+
+// win alerts from saved.js (tag onyx-win-<pick>): a tap opens My picks
+self.addEventListener('notificationclick', e => {
+  const n = e.notification;
+  if (!String(n.tag || '').startsWith('onyx-win-')) return;
+  n.close();
+  const url = new URL((n.data && n.data.url) || 'home.html#my', self.registration.scope).href;
+  e.waitUntil(clients.matchAll({type: 'window', includeUncontrolled: true}).then(cs => {
+    for (const c of cs) if ('focus' in c) { if (c.navigate) c.navigate(url).catch(() => {}); return c.focus(); }
+    return clients.openWindow(url);
+  }));
+});
