@@ -12978,8 +12978,8 @@
     {
      "id": "185819",
      "start": "2026-11-01T22:05Z",
-     "state": "pre",
-     "detail": "11/1 - 5:05 PM EST",
+     "state": "in",
+     "detail": "1st",
      "round": "Final",
      "draw": "Women's Singles",
      "court": "Estadio Mexcovery",
@@ -12990,7 +12990,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/can.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        4
+       ],
        "serve": false
       },
       {
@@ -12999,7 +13001,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ger.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        1
+       ],
        "serve": false
       }
      ]
@@ -15727,35 +15731,6 @@
      ]
     },
     {
-     "id": "187368",
-     "start": "2026-11-01T17:00Z",
-     "state": "post",
-     "detail": "Walkover",
-     "round": "Qualifying Final",
-     "draw": "Women's Singles",
-     "court": "",
-     "p": [
-      {
-       "name": "Maria Paulina Perez Garcia",
-       "short": "M. Perez Garcia",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/col.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "Carolina Alves",
-       "short": "C. Alves",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/bra.png",
-       "seed": null,
-       "win": true,
-       "sets": [],
-       "serve": false
-      }
-     ]
-    },
-    {
      "id": "187370",
      "start": "2026-11-01T19:00Z",
      "state": "post",
@@ -15823,35 +15798,6 @@
         7,
         6
        ],
-       "serve": false
-      }
-     ]
-    },
-    {
-     "id": "186720",
-     "start": "2026-11-02T05:00Z",
-     "state": "pre",
-     "detail": "TBD",
-     "round": "Round 1",
-     "draw": "Women's Singles",
-     "court": "",
-     "p": [
-      {
-       "name": "Renata Zarazua",
-       "short": "R. Zarazua",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/mex.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "Nadia Podoroska",
-       "short": "N. Podoroska",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
        "serve": false
       }
      ]
@@ -16052,6 +15998,64 @@
        "name": "Rebeka Masarova",
        "short": "R. Masarova",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/sui.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      }
+     ]
+    },
+    {
+     "id": "186721",
+     "start": "2026-11-03T05:00Z",
+     "state": "pre",
+     "detail": "TBD",
+     "round": "Round 1",
+     "draw": "Women's Singles",
+     "court": "",
+     "p": [
+      {
+       "name": "Despina Papamichail",
+       "short": "D. Papamichail",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/gre.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      },
+      {
+       "name": "Maria Lourdes Carle",
+       "short": "M. Carle",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      }
+     ]
+    },
+    {
+     "id": "186720",
+     "start": "2026-11-03T05:00Z",
+     "state": "pre",
+     "detail": "TBD",
+     "round": "Round 1",
+     "draw": "Women's Singles",
+     "court": "",
+     "p": [
+      {
+       "name": "Renata Zarazua",
+       "short": "R. Zarazua",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/mex.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      },
+      {
+       "name": "Nadia Podoroska",
+       "short": "N. Podoroska",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -16263,36 +16267,7 @@
      ]
     },
     {
-     "id": "186721",
-     "start": "2026-11-03T05:00Z",
-     "state": "pre",
-     "detail": "TBD",
-     "round": "Round 1",
-     "draw": "Women's Singles",
-     "court": "",
-     "p": [
-      {
-       "name": "Despina Papamichail",
-       "short": "D. Papamichail",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/gre.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "Maria Lourdes Carle",
-       "short": "M. Carle",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      }
-     ]
-    },
-    {
-     "id": "186723",
+     "id": "186722",
      "start": "2026-11-04T05:00Z",
      "state": "pre",
      "detail": "TBD",
@@ -16495,7 +16470,7 @@
      ]
     },
     {
-     "id": "186722",
+     "id": "186723",
      "start": "2026-11-04T05:00Z",
      "state": "pre",
      "detail": "TBD",
@@ -17833,5 +17808,5 @@
    ]
   }
  ],
- "fetched": "2026-11-01T22:05:16+00:00"
+ "fetched": "2026-11-01T22:37:30+00:00"
 }
