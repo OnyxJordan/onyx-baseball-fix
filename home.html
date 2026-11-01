@@ -300,14 +300,14 @@ var ONYX_REFERRER = 'KR680261';
 var ONYX_HOME = 'https://app.onyxodds.com/leagues/NBA?utm_source=onyxsports&referrer=' + ONYX_REFERRER;
 var SPORTS = [   // ranked by daily importance: NFL, NBA, NHL, Golf, Tennis, College Football, MLB
   {k: 'football', name: 'NFL', lg: 'NFL', live: true, href: 'nfl.html', tone: 'green', big: true, state: 'trial',
-   d: 'Live drives, down and distance and win probability. Receptions unders graded on trial at the opening price; projections, touchdown chances and injuries for every game.'},
+   d: 'Live drives, down and distance and win probability. Four prop lanes graded on trial at the opening price, each play with its reasons; projections, touchdown chances and injuries for every game.'},
   {k: 'basketball', name: 'Basketball', lg: 'NBA', live: true, href: 'nba.html', tone: 'purple', big: true, state: 'graded',
-   d: 'Points, rebounds and assists projected for every rotation player, priced against Onyx and graded in public. Live court gamecenter.'},
-  {k: 'hockey', name: 'NHL', lg: 'NHL', live: true, href: 'nhl.html', tone: 'blue', mid: true, state: 'leans', d: 'Live scores by period, goals and shots, with team and skater leans priced against Onyx.'},
+   d: 'Points, rebounds and assists projected for every rotation player, priced against Onyx and graded in public, with assists unders on trial. Live court gamecenter.'},
+  {k: 'hockey', name: 'NHL', lg: 'NHL', live: true, href: 'nhl.html', tone: 'blue', mid: true, state: 'trial', d: 'Live scores by period, goals and shots, team and skater leans priced against Onyx, and unders when the home team played last night on trial.'},
   {k: 'golf', name: 'Golf', lg: 'PGA', live: true, href: 'golf.html', tone: 'purple', mid: true, state: 'leans', d: "This week's leaderboard, round by round, with the strokes-gained model's win, top 10 and cut chances."},
   {k: 'tennis', name: 'Tennis', lg: 'ATP · WTA', live: true, href: 'tennis.html', tone: 'green', state: 'leans', d: 'Every ATP and WTA singles match, live set by set, with Elo match chances against Onyx prices.'},
   {k: 'cfb', name: 'College Football', lg: 'NCAAF', live: true, href: 'cfb.html', tone: 'lilac', state: 'graded',
-   d: 'Every FBS game with the football gamecenter. Spreads graded in public, totals on trial, player projections for every starter.'},
+   d: 'Every FBS game with the football gamecenter. Spreads graded in public, totals and rushing yards unders on trial, player projections for every starter.'},
   {k: 'baseball', name: 'Baseball', lg: 'MLB', live: true, href: 'index.html', tone: 'blue', state: 'closed',
    d: 'The home run model, strikeout and edge plays and pitch-by-pitch gamecasts. 2026 season closed; the full record stays public.'},
 ];
@@ -333,15 +333,17 @@ function marquees() {
 }
 
 function sports() {
+  const SIZE = ['big', 'mid', '', '', '', 'half', 'half'];
   document.getElementById('oxSports').innerHTML = SPORTS.map((s, i) => {
+    const sz = SPORTS.length === 7 ? SIZE[i] : (s.big ? 'big' : s.mid ? 'mid' : '');
     const tag = !s.live ? '<span class="ox-pill soon">Coming soon</span>' : '<span class="ox-pill live">' + ({graded: 'Live · picks graded', trial: 'Live · picks on trial', leans: 'Live · model leans', closed: 'Season closed · record public'}[s.state] || 'Live') + '</span>';
     const inner = `<div class="ox-sport-top"><span class="n">${String(i + 1).padStart(2, '0')} / ${String(SPORTS.length).padStart(2, '0')}</span>${tag}</div>
       <canvas data-ox-art="${s.k}" data-ox-tone="${s.tone}" data-ox-fade="0" aria-hidden="true"></canvas>
       <div class="ox-sport-bot"><h3><small>${esc(s.lg)}</small>Onyx ${esc(s.name)}</h3><p>${esc(s.d)}</p>
         <div class="go">${s.live ? `<em id="live-${s.k}">Open</em><span>Enter</span>` : '<span style="color:var(--ox-400)">In the lab</span>'}</div></div>`;
     return s.live
-      ? `<a class="ox-sport${s.big ? ' big' : s.mid ? ' mid' : ''}" href="${s.href}" data-ox-host onclick="track('hub_sport',{sport:'${s.k}'})">${inner}</a>`
-      : `<div class="ox-sport soon${s.mid ? ' mid' : ''}" data-ox-host aria-label="Onyx ${esc(s.name)}, coming soon">${inner}</div>`;
+      ? `<a class="ox-sport${sz ? ' ' + sz : ''}" href="${s.href}" data-ox-host onclick="track('hub_sport',{sport:'${s.k}'})">${inner}</a>`
+      : `<div class="ox-sport soon${sz ? ' ' + sz : ''}" data-ox-host aria-label="Onyx ${esc(s.name)}, coming soon">${inner}</div>`;
   }).join('');
   if (window.OnyxArt) OnyxArt.scan(document.getElementById('oxSports'));
 }
