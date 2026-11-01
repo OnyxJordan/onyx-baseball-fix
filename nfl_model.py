@@ -1,9 +1,36 @@
 """
 nfl_model.py - Onyx NFL player projections.
 
-VERSION v10 (11/1). The lab notebook: every change bumps VERSION and adds an
+VERSION v11 (11/1). The lab notebook: every change bumps VERSION and adds an
 entry here citing its evidence (CLAUDE.md rule 2 applies to this model too).
 
+  v11 11/1   Market models: Onyx's own price plus the statistics that beat it. For every
+             Onyx player-prop line in 2025 and 2026 (opening price) the feature screen
+             builds ~45 pre-kickoff statistics from nflverse weekly stats, snap shares, the
+             opponent's defense and Onyx's game lines (the same code the site
+             runs), then per market: P(over) = sigmoid(a + b logit(Onyx no-vig) +
+             sum c_i z(stat_i)). Statistics are chosen on 2025 alone (forward selection; a
+             statistic enters only if it lowers log loss on BOTH halves of 2025 out of fold;
+             ridge 5; at most 4) and judged on 2026, which the selection never saw. Three
+             markets pass every bar (beat or tie Onyx's log loss on 2026, win at 3pp+ edge at
+             the opening price in both seasons) and go on trial at the opening price:
+               rushing yards UNDERS (yards per target in EPA, target trend): log loss 2026
+               .6896 vs Onyx .6925; 3pp+ 2025 65-48 +9.3%, 2026 27-19 +11.1%.
+               passing yards OVERS (line vs his last 5, air yards per attempt, catches the
+               defense allows, spread): .6885 vs .6935; 2025 48-37 +6.9%, 2026 15-11 +10.0%.
+               pass attempts UNDERS (catches the defense allows, game-to-game swings, recent
+               trend, his yards per carry): .6914 vs .6908 (Onyx refit .6932); 2025 162-94
+               +20.0%, 2026 61-45 +9.1%.
+             Coefficients are refit on both seasons (V11). At Onyx's CLOSING price, with the
+             same line, the edges mostly vanish (pass attempts unders 2026 13-18 -20.6%):
+             Onyx moves these lines toward the model before kickoff, so they are graded only
+             at the opening price, never at the close. Failed and left as leans: passing +
+             rushing yards (2026 log loss .7078 vs .6931 despite +9.8% overs), receiving
+             yards (2026 unders -3.3%), rushing + receiving yards (+2.3%, log loss worse),
+             passing TDs (-16% to -31% on 2026). Receptions keep the v8 lane.
+             Edge buckets (2025 fit / 2026 unseen): pass attempts unders at 12pp+ 62-27 +32.6%
+             / 19-14 +9.6%, so big gaps are kept, but they win less often than the chance
+             shown (58% in 2026); rushing and passing yards buckets are too thin to cap.
   v10 11/1   Every NFL player market Onyx prices is projected (markets probe 11/1: Onyx
              also prices passing attempts, passing + rushing yards, rushing + receiving
              yards and player touchdowns over 1.5, none of which were on the board; the
@@ -204,7 +231,7 @@ player-game: pass_yds, rush_yds, rec_yds, rec, tgt, att, rush_att...).
 import math, re, unicodedata
 from collections import defaultdict
 
-VERSION = "v10"
+VERSION = "v11"
 # game lines (team_model.py), tuned 10/26: see v1
 GAME_P = {"half_life": 240, "ridge": 5, "home": 2.0, "sd_margin": 13.5, "sd_total": 13.0, "min_games": 3}
 GAME_TEST = {"n": 199, "logloss": 0.648, "base_logloss": 0.698, "mae_total": 10.90, "base_mae_total": 11.71,
@@ -536,3 +563,118 @@ def project_pass_td(games, implied, p=PTD_P):
 def prob_over_poisson(lam, line):
     k = int(math.floor(line))
     return max(0.0, min(1.0, 1.0 - sum(math.exp(-lam) * lam ** i / math.factorial(i) for i in range(k + 1))))
+
+
+# v11 (11/1): market models on Onyx's opening price + statistics chosen on 2025, judged on
+# 2026 (tools/nfl_feature_screen.py --select; coefficients refit on both seasons). Each is a
+# trial lane at the opening price on its side only, 3pp+ edge. w = [a, b on logit(Onyx), c_i...]
+V11 = {
+ "rush_yds": {
+  "side": "under",
+  "features": [
+   "rec_epa_t",
+   "tgt_trend"
+  ],
+  "mu": [
+   -0.00805,
+   -0.00891
+  ],
+  "sd": [
+   0.44036,
+   0.73857
+  ],
+  "w": [
+   -0.10206,
+   0.15475,
+   -0.10678,
+   -0.03863
+  ]
+ },
+ "pass_yds": {
+  "side": "over",
+  "features": [
+   "line_vs_l5",
+   "pass_adot",
+   "opp_rec",
+   "spread"
+  ],
+  "mu": [
+   11.81416,
+   7.72369,
+   0.98924,
+   -0.02726
+  ],
+  "sd": [
+   45.33528,
+   1.16945,
+   0.14429,
+   5.7501
+  ],
+  "w": [
+   0.02364,
+   0.03528,
+   0.14525,
+   0.12956,
+   0.13291,
+   -0.09071
+  ]
+ },
+ "pass_att": {
+  "side": "under",
+  "features": [
+   "opp_rec",
+   "sd8",
+   "trend",
+   "ypc"
+  ],
+  "mu": [
+   0.98912,
+   8.59394,
+   0.61673,
+   4.10532
+  ],
+  "sd": [
+   0.14434,
+   3.58745,
+   4.80381,
+   1.86939
+  ],
+  "w": [
+   -0.18462,
+   0.1825,
+   0.27572,
+   -0.2273,
+   0.09218,
+   -0.12595
+  ]
+ }
+}
+V11_EDGE = 0.03
+
+
+def _logit(p):
+    p = min(max(p, 1e-4), 1 - 1e-4)
+    return math.log(p / (1 - p))
+
+
+def prob_v11(mkt, p_onyx, f):
+    """The v11 chance of the over: Onyx's no-vig chance moved by the chosen statistics."""
+    S = V11[mkt]
+    z = S["w"][0] + S["w"][1] * _logit(p_onyx)
+    for k, mu, sd, c in zip(S["features"], S["mu"], S["sd"], S["w"][2:]):
+        z += c * (f.get(k, 0.0) - mu) / (sd or 1.0)
+    return 1 / (1 + math.exp(-max(-30, min(30, z))))
+
+
+def why_v11(mkt, p_onyx, f):
+    """Each statistic's push on the chance of the over, in points: why the model got there."""
+    import nfl_features as F
+    S = V11[mkt]
+    base = prob_v11(mkt, p_onyx, {k: mu for k, mu in zip(S["features"], S["mu"])})
+    out = []
+    for k, mu, sd, c in zip(S["features"], S["mu"], S["sd"], S["w"][2:]):
+        x = f.get(k, 0.0)
+        g = dict({kk: m for kk, m in zip(S["features"], S["mu"])}, **{k: x})
+        out.append({"k": F.LABEL.get(k, k), "v": round(x, 2), "avg": round(mu, 2),
+                    "pp": round(100 * (prob_v11(mkt, p_onyx, g) - base), 1)})
+    return sorted(out, key=lambda d: -abs(d["pp"]))

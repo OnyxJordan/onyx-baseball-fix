@@ -22,6 +22,7 @@ from datetime import date, timedelta
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import sports_lab as L   # noqa: E402
+import nfl_features as F   # noqa: E402
 
 BT = "bt/"
 MARKETS = {   # our key: (Onyx market id, nflverse stat column or derived, line files)
@@ -41,7 +42,7 @@ NICK = {"Cardinals": "ARI", "Falcons": "ATL", "Ravens": "BAL", "Bills": "BUF", "
         "Seahawks": "SEA", "Buccaneers": "TB", "Titans": "TEN", "Commanders": "WAS"}
 
 
-def nk(s):
+def nk(s):  # same as nfl_features.nk
     s = unicodedata.normalize("NFKD", s or "").encode("ascii", "ignore").decode().lower()
     return re.sub(r"[^a-z]", "", re.sub(r"\b(jr|sr|ii|iii|iv|v)\b\.?", "", s))
 
@@ -54,51 +55,21 @@ def num(x):
 
 
 def load_stats():
-    """nflverse weekly player stats, regular + post season, keyed for lookups."""
+    """nflverse weekly player stats, regular + post season."""
     rows = []
     for y in (2024, 2025, 2026):
         for p in (f"{BT}nflv/stats_player_week_{y}.csv", f"{BT}nfl24/stats_player_week_{y}.csv"):
             if os.path.exists(p):
-                for r in csv.DictReader(open(p)):
-                    g = {k: num(r.get(k)) for k in ("completions", "attempts", "passing_yards", "passing_tds", "passing_epa",
-                         "passing_cpoe", "passing_air_yards", "sacks_suffered", "carries", "rushing_yards", "rushing_tds",
-                         "rushing_epa", "receptions", "targets", "receiving_yards", "receiving_tds", "receiving_air_yards",
-                         "receiving_yards_after_catch", "receiving_epa", "target_share", "air_yards_share", "wopr", "racr")}
-                    g["rush_rec_yds"] = g["rushing_yards"] + g["receiving_yards"]
-                    g["pass_rush_yds"] = g["passing_yards"] + g["rushing_yards"]
-                    g.update(season=int(r["season"]), week=int(r["week"]), team=r["team"], opp=r["opponent_team"],
-                             pid=r["player_id"], key=nk(r["player_display_name"]), pos=r.get("position_group") or r.get("position"))
-                    rows.append(g)
+                rows += [c for c in (F.compact(r) for r in csv.DictReader(open(p))) if c]
                 break
-    rows.sort(key=lambda g: (g["season"], g["week"]))
     return rows
 
 
 def main():
     only = [a for a in sys.argv[1:] if not a.startswith("--")]
-    stats = load_stats()
-    by_pid = defaultdict(list)
-    by_name = {}
-    team_wk = defaultdict(lambda: defaultdict(float))     # (season, week, team) -> team totals
-    opp_wk = defaultdict(lambda: defaultdict(float))      # (season, week, defense) -> allowed totals
-    for g in stats:
-        by_pid[g["pid"]].append(g)
-        by_name[(g["season"], g["team"], g["key"])] = g["pid"]
-        t = team_wk[(g["season"], g["week"], g["team"])]
-        o = opp_wk[(g["season"], g["week"], g["opp"])]
-        for k in ("attempts", "carries", "targets", "passing_yards", "rushing_yards", "receiving_yards", "passing_epa",
-                  "rushing_epa", "receptions", "passing_tds", "sacks_suffered"):
-            t[k] += g[k]
-            o[k] += g[k]
-        o["n_" + (g["pos"] or "x")] += 0   # touch
-        if g["pos"] in ("WR", "TE", "RB"):
-            o["rec_yds_" + g["pos"]] += g["receiving_yards"]
-            o["rec_" + g["pos"]] += g["receptions"]
-    snaps = {}
     vj = json.load(open("data/nfl/nflverse.json"))
-    for yr, xv in (vj.get("seasons") or {}).items():
-        for s_, w_, t_, n_, pct in xv.get("snaps") or []:
-            snaps[(s_, w_, t_, n_)] = pct
+    IX = F.Index(load_stats(), F.snaps_of(vj))
+    by_pid, by_name, snaps = IX.by_pid, IX.by_name, IX.snaps
     res = json.load(open("data/nfl/results.json"))["games"]
     wk_of = {}
     for r in json.load(open("data/nfl/player_games.json"))["rows"]:
@@ -111,79 +82,7 @@ def main():
     ESPN2V = {"WSH": "WAS", "LAR": "LA"}
     ab = lambda s: NICK.get((s or "").split()[-1])
 
-    def hist(pid, season, week, n=None):
-        h = [g for g in by_pid.get(pid, []) if (g["season"], g["week"]) < (season, week)]
-        return h[-n:] if n else h
-
-    def team_hist(team, season, week, n=4):
-        ks = sorted((s, w) for (s, w, t) in team_wk if t == team and (s, w) < (season, week))[-n:]
-        return [team_wk[(s, w, team)] for s, w in ks]
-
-    def opp_hist(team, season, week, n=6):
-        ks = sorted((s, w) for (s, w, t) in opp_wk if t == team and s == season and w < week)[-n:]
-        return [opp_wk[(s, w, team)] for s, w in ks]
-
-    league = {}
-
-    def lg(season, week, k):
-        key = (season, week, k)
-        if key not in league:
-            vals = [d[k] for (s, w, t), d in opp_wk.items() if s == season and w < week]
-            league[key] = (sum(vals) / len(vals)) if vals else 0.0
-        return league[key]
-
-    def mean(xs):
-        return sum(xs) / len(xs) if xs else 0.0
-
-    def features(pid, season, week, team, opp, stat, line, imp, spread, home):
-        h = hist(pid, season, week)
-        cur = [g for g in h if g["season"] == season]
-        l3, l5, l8 = h[-3:], h[-5:], h[-8:]
-        if len(h) < 2:
-            return None
-        v = lambda gs, k: mean([g[k] for g in gs])
-        sd8 = (sum((g[stat] - v(l8, stat)) ** 2 for g in l8) / max(1, len(l8) - 1)) ** 0.5 if len(l8) > 1 else 0.0
-        th = team_hist(team, season, week)
-        oh = opp_hist(opp, season, week)
-        f = {
-            "l3": v(l3, stat), "l5": v(l5, stat), "season": v(cur, stat) if cur else v(l8, stat),
-            "line_vs_l5": line - v(l5, stat), "line_vs_season": line - (v(cur, stat) if cur else v(l8, stat)),
-            "line_z": (line - v(l8, stat)) / sd8 if sd8 > 0 else 0.0,
-            "trend": v(l3, stat) - v(l8, stat), "sd8": sd8, "cv8": sd8 / v(l8, stat) if v(l8, stat) else 0.0,
-            "tgt_share": v(l5, "target_share"), "air_share": v(l5, "air_yards_share"), "wopr": v(l5, "wopr"),
-            "tgt_l3": v(l3, "targets"), "tgt_trend": v(l3, "targets") - v(l8, "targets"),
-            "adot": (sum(g["receiving_air_yards"] for g in l8) / max(1.0, sum(g["targets"] for g in l8))),
-            "yac_rec": (sum(g["receiving_yards_after_catch"] for g in l8) / max(1.0, sum(g["receptions"] for g in l8))),
-            "catch_rate": (sum(g["receptions"] for g in l8) / max(1.0, sum(g["targets"] for g in l8))),
-            "ypt": (sum(g["receiving_yards"] for g in l8) / max(1.0, sum(g["targets"] for g in l8))),
-            "rec_epa_t": (sum(g["receiving_epa"] for g in l8) / max(1.0, sum(g["targets"] for g in l8))),
-            "racr": v(l5, "racr"),
-            "carries_l3": v(l3, "carries"), "ypc": (sum(g["rushing_yards"] for g in l8) / max(1.0, sum(g["carries"] for g in l8))),
-            "rush_epa_c": (sum(g["rushing_epa"] for g in l8) / max(1.0, sum(g["carries"] for g in l8))),
-            "carry_share": mean([g["carries"] / max(1.0, team_wk[(g["season"], g["week"], g["team"])]["carries"]) for g in l5]),
-            "att_l3": v(l3, "attempts"), "pass_epa_db": (sum(g["passing_epa"] for g in l8) / max(1.0, sum(g["attempts"] + g["sacks_suffered"] for g in l8))),
-            "cpoe": v(l8, "passing_cpoe"), "pass_adot": (sum(g["passing_air_yards"] for g in l8) / max(1.0, sum(g["attempts"] for g in l8))),
-            "team_pass_rate": mean([t["attempts"] / max(1.0, t["attempts"] + t["carries"]) for t in th]) if th else 0.0,
-            "team_plays": mean([t["attempts"] + t["carries"] for t in th]) if th else 0.0,
-            "implied": imp, "spread": spread, "home": 1.0 if home else 0.0, "week": float(week),
-            "opp_pass_yds": (mean([o["passing_yards"] for o in oh]) / lg(season, week, "passing_yards")) if oh and lg(season, week, "passing_yards") else 1.0,
-            "opp_rush_yds": (mean([o["rushing_yards"] for o in oh]) / lg(season, week, "rushing_yards")) if oh and lg(season, week, "rushing_yards") else 1.0,
-            "opp_rec": (mean([o["receptions"] for o in oh]) / lg(season, week, "receptions")) if oh and lg(season, week, "receptions") else 1.0,
-            "opp_pass_epa": mean([o["passing_epa"] / max(1.0, o["attempts"]) for o in oh]) if oh else 0.0,
-            "opp_rush_epa": mean([o["rushing_epa"] / max(1.0, o["carries"]) for o in oh]) if oh else 0.0,
-            "opp_sacks": mean([o["sacks_suffered"] for o in oh]) if oh else 0.0,
-            "games_played": float(len(cur)),
-        }
-        sn = [snaps.get((g["season"], g["week"], g["team"], g["key"]), None) for g in l5]
-        sn = [x for x in sn if x is not None]
-        f["snap_avg"] = mean(sn)
-        f["snap_last"] = sn[-1] if sn else 0.0
-        f["snap_trend"] = (sn[-1] - mean(sn)) if sn else 0.0
-        if h:
-            last = h[-1]
-            gap = (season - last["season"]) * 20 + (week - last["week"])
-            f["weeks_since"] = float(gap)
-        return f
+    features = IX.features
 
     DATA = {}
     for mkt, (mid, stat, files) in MARKETS.items():
@@ -243,7 +142,9 @@ def main():
                     f = features(pid, season, week, team, opp, stat, ln, imp, spr, home)
                     if f is None:
                         continue
-                    S.append({"season": 2025 if g["date"] < "2026-03-01" else 2026, "date": g["date"], "p": io / (io + iu), "po": po, "pu": pu,
+                    c = v.get("c") or [None, None, None]
+                    S.append({"season": 2025 if g["date"] < "2026-03-01" else 2026, "date": g["date"], "p": io / (io + iu), "po": po, "pu": pu, "line_": ln,
+                              "cl": c[0], "co": c[1], "cu": c[2],
                               "line": ln, "y": int(act > ln), "f": f})
         DATA[mkt] = S
         print(f"{mkt}: {sum(1 for s in S if s['season'] == 2025)} lines 2025, {sum(1 for s in S if s['season'] == 2026)} 2026")
@@ -395,7 +296,7 @@ def select_and_test(DATA, k_max=4):
         mdl = ll(w, X(te, chosen), y(te))
         raw = sum(-math.log(s["p"] if s["y"] else 1 - s["p"]) for s in te) / len(te)
 
-        def bets(ss, edge):
+        def bets(ss, edge, close=False):
             Xs = X(ss, chosen)
             out = {}
             for side in ("over", "under"):
@@ -404,7 +305,12 @@ def select_and_test(DATA, k_max=4):
                 for s, xi in zip(ss, Xs):
                     z = sum(c * d for c, d in zip(w, xi))
                     p = 1 / (1 + math.exp(-z))
-                    pr, price = (p, s["po"]) if side == "over" else (1 - p, s["pu"])
+                    if close:     # the same model judged at Onyx's closing price, where the closing line is the opening one
+                        if s.get("cl") != s.get("line_") or s.get("co") is None or s.get("cu") is None:
+                            continue
+                        pr, price = (p, s["co"]) if side == "over" else (1 - p, s["cu"])
+                    else:
+                        pr, price = (p, s["po"]) if side == "over" else (1 - p, s["pu"])
                     if pr - L.implied(price) >= edge:
                         won = (s["y"] == 1) == (side == "over")
                         n += 1
@@ -416,7 +322,30 @@ def select_and_test(DATA, k_max=4):
                     "onyx_refit_2026": round(base, 4), "bets_2025_3pp": bets(tr, 0.03), "bets_2026_3pp": bets(te, 0.03),
                     "bets_2026_5pp": bets(te, 0.05), "n": (len(tr), len(te))}
         r = res[mkt]
+        r["bets_2025_close"], r["bets_2026_close"] = bets(tr, 0.03, True), bets(te, 0.03, True)
+        # the production spec: features chosen on 2025, coefficients refit on both seasons
+        allS = tr + te
+        r["spec"] = {"features": chosen, "mu": [stats_[f][0] for f in chosen], "sd": [stats_[f][1] for f in chosen],
+                     "w": fit(X(allS, chosen), y(allS), R)}
+        # edge buckets with the production spec's selection weights (fit on 2025): do bigger gaps win more?
+        def buckets(ss):
+            Xs = X(ss, chosen)
+            out = {}
+            for s, xi in zip(ss, Xs):
+                p = 1 / (1 + math.exp(-sum(c * d for c, d in zip(w, xi))))
+                for side, pr, price in (("over", p, s["po"]), ("under", 1 - p, s["pu"])):
+                    e = pr - L.implied(price)
+                    if e < 0.03:
+                        continue
+                    bk = "3-5" if e < .05 else "5-8" if e < .08 else "8-12" if e < .12 else "12+"
+                    won = (s["y"] == 1) == (side == "over")
+                    o = out.setdefault(side, {}).setdefault(bk, [0, 0, 0.0])
+                    o[0] += won; o[1] += 1 - won; o[2] += (price / 100 if price > 0 else 100 / -price) if won else -1
+            return {sd: {bk: (v[0], v[1], round(100 * v[2] / (v[0] + v[1]), 1)) for bk, v in d.items()} for sd, d in out.items()}
+        r["buckets"] = {"2025": buckets(tr), "2026": buckets(te)}
         print(f"\n## {mkt}  chose {chosen} coef {r['coef']}")
+        print(f"   edge buckets 2025 {r['buckets']['2025']}\n   edge buckets 2026 {r['buckets']['2026']}")
+        print(f"   3pp+ at the CLOSE (same line as open): 2025 {r['bets_2025_close']}  2026 {r['bets_2026_close']}")
         print(f"   2026 log loss: model {mdl:.4f} vs Onyx {raw:.4f} (Onyx refit {base:.4f})")
         print(f"   2025 (fit) 3pp+: {r['bets_2025_3pp']}")
         print(f"   2026 (unseen) 3pp+: {r['bets_2026_3pp']}   5pp+: {r['bets_2026_5pp']}")

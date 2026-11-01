@@ -135,10 +135,21 @@ def nfl_open_lane(lane, out, slate, season, rows, M):
     for g in slate.get("next_games") or []:
         seen.setdefault(g["gid"], ts)
     nxt_games = {g["gid"] for g in slate.get("next_games") or []}
+    # v11: the market-model lanes (rushing yards unders, passing yards overs, pass attempts
+    # unders) capture their opening prices the same way. A lane's first run marks every line
+    # already up as a baseline (it may have opened before we looked); lines that appear
+    # after that are opens.
+    v11 = getattr(M, "V11", {})
+    mkts = ("rec",) + tuple(v11)
+    starts = O.setdefault("_lane_start", {})
+    new_lanes = [m for m in v11 if m not in starts]
+    for m in new_lanes:
+        starts[m] = ts
     for p in (lane.load("odds.json", {}) or {}).get("next_props") or []:
-        if p.get("mkt") == "rec" and p.get("gid") in nxt_games and None not in (p.get("line"), p.get("over"), p.get("under")):
-            O.setdefault(f"{p['gid']}|{nk(p['name'])}|rec", {"line": p["line"], "over": p["over"], "under": p["under"],
-                                                             "ts": ts, "next": True})
+        if p.get("mkt") in mkts and p.get("gid") in nxt_games and None not in (p.get("line"), p.get("over"), p.get("under")):
+            O.setdefault(f"{p['gid']}|{nk(p['name'])}|{p['mkt']}", {"line": p["line"], "over": p["over"], "under": p["under"],
+                                                                    "ts": ts, "next": True,
+                                                                    **({"baseline": True} if p["mkt"] in new_lanes else {})})
     fresh = {gid for gid in games if gid not in seen}
     for gid in games:
         seen.setdefault(gid, ts)
@@ -146,18 +157,35 @@ def nfl_open_lane(lane, out, slate, season, rows, M):
         seen.pop(gid)
     cands = []
     for r in out:
-        if r["mkt"] != "rec" or r["line"] is None or r["over"] is None or r["under"] is None:
+        if r["mkt"] not in mkts or r["line"] is None or r["over"] is None or r["under"] is None:
             continue
         g = games.get(r["gid"]) or {}
-        key = f"{r['gid']}|{nk(r['name'])}|rec"
+        key = f"{r['gid']}|{nk(r['name'])}|{r['mkt']}"
         if key not in O and g.get("state") == "pre":
             O[key] = {"line": r["line"], "over": r["over"], "under": r["under"], "ts": ts,
-                      **({"baseline": True} if first_run or r["gid"] in fresh else {})}
+                      **({"baseline": True} if first_run or r["gid"] in fresh or r["mkt"] in new_lanes else {})}
         op = O.get(key)
-        if not op or op.get("baseline") or g.get("state") != "pre" or key in have or not r.get("vol"):
+        if not op or op.get("baseline") or g.get("state") != "pre" or key in have:
             continue
         if (op["line"], op["over"], op["under"]) != (r["line"], r["over"], r["under"]):
             continue          # moved off the opening price: not bettable as logged
+        if r["mkt"] in v11:
+            if r.get("v11") is None:
+                continue
+            side = v11[r["mkt"]]["side"]
+            p = r["v11"] if side == "over" else 1 - r["v11"]
+            price, sel = (r["over"], r.get("over_sel")) if side == "over" else (r["under"], r.get("under_sel"))
+            if p - L.implied(price) >= M.V11_EDGE:
+                cands.append((p - L.implied(price), {"date": slate.get("date"), "season": season, "week": g.get("week"), "key": key,
+                               "gid": r["gid"], "pid": r["pid"], "name": r["name"], "team": r["team"], "opp": r["opp"],
+                               "matchup": f"{r['team']} {'vs' if r['home'] else '@'} {r['opp']}", "kind": r["mkt"],
+                               "lane": f"{r['mkt']}_{side}", "side": side, "line": r["line"], "price": price, "sel": sel,
+                               "proj": r["proj"], "prob": round(p, 4), "implied": round(L.implied(price), 4),
+                               "why": r.get("why"), "opened_at": op["ts"], "logged_at": ts, "model": M.VERSION,
+                               "result": None, "actual": None}))
+            continue
+        if not r.get("vol"):
+            continue
         po = M.prob_over_volume("rec", r["proj"], r["line"])
         for side, p, price, sel in (("over", po, r["over"], r.get("over_sel")), ("under", 1 - po, r["under"], r.get("under_sel"))):
             if side not in getattr(M, "TRIAL_SIDES", ("over", "under")):
@@ -195,8 +223,9 @@ def nfl_open_lane(lane, out, slate, season, rows, M):
             continue
         g = games.get(k["gid"])
         x = box.get((k["gid"], nk(k["name"])))
+        stat = k.get("kind") or "rec"
         if x is not None:
-            a = x.get("rec") or 0
+            a = x.get(stat) or 0
             k["actual"] = a
             k["result"] = "P" if a == k["line"] else ("W" if (a > k["line"]) == (k["side"] == "over") else "L")
             k["graded_at"] = ts
@@ -215,8 +244,24 @@ def nfl_open_lane(lane, out, slate, season, rows, M):
     w = sum(1 for k in ledger if k["result"] == "W"); l_ = sum(1 for k in ledger if k["result"] == "L")
     pay = lambda a: a / 100.0 if a > 0 else 100.0 / -a
     units = sum((pay(k["price"]) if k["result"] == "W" else -1.0 if k["result"] == "L" else 0.0) for k in ledger)
+    LN = {"rec_under": "Receptions unders", "rush_yds_under": "Rushing yards unders", "pass_yds_over": "Passing yards overs",
+          "pass_att_under": "Pass attempts unders"}
+    lanes = []
+    for ln_ in ["rec_under"] + [f"{m}_{v11[m]['side']}" for m in v11]:
+        ks = [k for k in ledger if (k.get("lane") or "rec_under") == ln_]
+        ww = sum(1 for k in ks if k["result"] == "W"); ll_ = sum(1 for k in ks if k["result"] == "L")
+        lanes.append({"lane": ln_, "name": LN.get(ln_, ln_), "w": ww, "l": ll_, "p": sum(1 for k in ks if k["result"] == "P"),
+                      "pending": sum(1 for k in ks if not k["result"]),
+                      "units": round(sum((pay(k["price"]) if k["result"] == "W" else -1.0 if k["result"] == "L" else 0.0) for k in ks), 2)})
+    note = ("Four NFL lanes, each logged only while Onyx still shows the first price we saw for that line, at that price, and graded off the box score. "
+            "Receptions unders (since 10/31): counting every priced player who played, the model's unders beat Onyx's opening price in both seasons tested (+6.1% and +20.1%). "
+            "Since 11/1 (v11), three market models that start from Onyx's own price and add the statistics that beat it in a season they never saw: "
+            "rushing yards unders (2025 +9.3%, 2026 +11.1%), passing yards overs (+6.9%, +10.0%) and pass attempts unders (+20.0%, +9.1%). "
+            "Each play lists why the model got there. At Onyx's closing price these edges mostly disappear, so they count only at the open. "
+            "They stay on trial until this record says otherwise.") if v11 else None
     return {"w": w, "l": l_, "p": sum(1 for k in ledger if k["result"] == "P"), "pending": sum(1 for k in ledger if not k["result"]),
-            "units": round(units, 2), "roi": round(units / (w + l_), 4) if w + l_ else None,
+            "units": round(units, 2), "roi": round(units / (w + l_), 4) if w + l_ else None, "lanes": lanes,
+            **({"note": note, "empty": "line"} if note else {}),
             "rows": list(reversed(ledger[-80:])), "started": ledger[0]["date"] if ledger else None}
 
 
@@ -264,7 +309,13 @@ def nfl_block(lane, slate, odds):
             team_env[g["away"]] = ((o["total"] + hsp) / 2, -hsp)
     vol_ph, vol_th = M.volume_history(rows) if hasattr(M, "VOL_P") else ({}, {})
     # v5: nflverse targets per dropback and snap trend (nfl_verse.py), averaged with v4 for receptions
-    vidx = M.verse_index(lane.load("nflverse.json", None)) if hasattr(M, "verse_index") else None
+    verse = lane.load("nflverse.json", None)
+    vidx = M.verse_index(verse) if hasattr(M, "verse_index") else None
+    # v11: the market models' statistics (nflverse weekly stats, nfl_features.py)
+    fidx = None
+    if getattr(M, "V11", None):
+        import nfl_features as F
+        fidx = F.index_of(verse)
     # ESPN's injury report: ruled out (out, IR, inactive, doubtful) gets nothing; questionable is tagged "Q"
     import sports_espn as E
     try:
@@ -330,7 +381,23 @@ def nfl_block(lane, slate, odds):
     for r in out:
         if r["line"] is None or r["over"] is None or r["under"] is None:
             continue
-        if r.get("ptd"):    # v9: passing touchdowns, Poisson, 30% model
+        if fidx is not None and r["mkt"] in M.V11 and team_env.get(r["team"]):
+            fo, _ = L.fair_pair(r["over"], r["under"])
+            vt = getattr(M, "VERSE_TEAM", {})
+            tm, op_ = vt.get(r["team"], r["team"]), vt.get(r["opp"], r["opp"])
+            gwk = next((g.get("week") for g in slate.get("games") or [] if g["gid"] == r["gid"]), None)
+            pid_v = fidx.pid_of(season, tm, F.nk(r["name"])) if gwk else None
+            if fo is not None and pid_v:
+                wk_v = gwk + (18 if slate.get("season_type") == 3 else 0)
+                f = fidx.features(pid_v, season, wk_v, tm, op_, F.STAT[r["mkt"]], r["line"], *team_env[r["team"]], r["home"])
+                if f is not None:
+                    r["v11"] = round(M.prob_v11(r["mkt"], fo, f), 4)
+                    r["why"] = M.why_v11(r["mkt"], fo, f)
+        if r.get("v11") is not None:     # v11: Onyx's price moved by the statistics that beat it
+            ps = L.price_side(r["v11"], r["over"], r["under"], 1.0)
+            side = M.V11[r["mkt"]]["side"]
+            r["value_min"] = M.V11_EDGE if ps and ps["side"] == side else 1.0
+        elif r.get("ptd"):    # v9: passing touchdowns, Poisson, 30% model
             po = M.prob_over_poisson(r["proj"], r["line"])
             ps = L.price_side(po, r["over"], r["under"], M.PTD_P["w"])
         elif r.get("vol"):    # v4: volume projection, its own spread, blend weight and value bar
@@ -346,7 +413,7 @@ def nfl_block(lane, slate, odds):
                      matchup=f"{r['team']} {'vs' if r['home'] else '@'} {r['opp']}")
             if r.get("vol") and r["mkt"] == "rec" and ps["side"] not in getattr(M, "TRIAL_SIDES", ("over", "under")):
                 r["value_min"] = 1.0      # v6: receptions overs lost at the open (2025 -14.8%), never a play or Top 10
-            if r["mkt"] in getattr(M, "NO_VALUE", ()):
+            if r["mkt"] in getattr(M, "NO_VALUE", ()) and r.get("v11") is None:
                 r["value_min"] = 1.0      # v7: rushing, passing and receiving yards lost their re-tests, leans only
     # receptions unders at Onyx's opening price, on trial (v6: the side that beat the open in both seasons)
     block["open"] = nfl_open_lane(lane, out, slate, season, rows, M)
@@ -455,6 +522,14 @@ def nfl_block(lane, slate, odds):
     block["proj"] = proj
     eng = engine_team("nfl", M, M.GAME_P, gw, bt, block["status"] == "live")
     eng["steps"].insert(0, engine_nfl_props(M))
+    if getattr(M, "V11", None):
+        import nfl_features as F
+        W = {"rush_yds": "Rushing yards unders", "pass_yds": "Passing yards overs", "pass_att": "Pass attempts unders"}
+        eng["steps"].insert(1, {"t": "Market models (v11) · Onyx's price plus the statistics that beat it", "rows":
+            [[W.get(m, m), "; ".join(f"{F.LABEL.get(k, k)} ({'+' if c > 0 else '-'} to the over)" for k, c in zip(S["features"], S["w"][2:]))]
+             for m, S in M.V11.items()] + [["How chosen", "about 45 statistics tested on every Onyx line in 2025; one is kept only if it beats Onyx's price on both halves of 2025, then judged on 2026, which it never saw"],
+                                          ["When", f"logged on trial at Onyx's opening price, {round(M.V11_EDGE * 100)}pp edge or more; at the closing price these edges mostly vanish"]],
+            "note": "Every play from these models lists each statistic's push on the chance in points, so you can see why it got there."})
     eng["factors"].insert(0, ["chart", "Player projections", "Passing, rushing and receiving yards and receptions from every box score this season, last season as the prior and the opponent's defense, re-tested on every build against the season average and last-3 average.", "Foundation", ""])
     block["engine"] = eng
     if block["status"] != "live":

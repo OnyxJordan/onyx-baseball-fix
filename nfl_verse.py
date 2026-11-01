@@ -10,6 +10,7 @@ play-by-play and snap counts and writes data/nfl/nflverse.json:
   team   [season, week, team, {db, tgt, air}]                      dropbacks per game
   snaps  [season, week, team, player key, offense snap share]
   names  {receiver id: "T.Kelce"}
+  wk     nflverse weekly player stats (nfl_features.HEAD + FIELDS), the v11 model's inputs
 
 The last season is pulled once and kept (the model's prior). Pipeline-safe: requests only.
 """
@@ -70,8 +71,11 @@ def season_rows(yr):
         if r.get("game_type") in ("REG", "WC", "DIV", "CON", "SB") and r.get("position") in ("WR", "TE", "RB", "FB") \
                 and float(r.get("offense_pct") or 0) > 0:
             snaps.append([yr, int(r["week"]), r["team"], nk(r["player"]), float(r.get("offense_pct") or 0)])
+    # v11 (11/1): weekly player stats, the inputs of the market models (nfl_features.py)
+    import nfl_features as F
+    wk = [c for c in (F.compact(r) for r in _csv(f"{BASE}stats_player/stats_player_week_{yr}.csv") or []) if c]
     return {"ply": [[*k, v] for k, v in ply.items()], "team": [[*k, v] for k, v in team.items()],
-            "snaps": snaps, "names": names}
+            "snaps": snaps, "names": names, "wk": wk}
 
 
 def update(season, path=PATH):
@@ -82,12 +86,13 @@ def update(season, path=PATH):
         D = {"seasons": {}}
     cur = D["seasons"].get(str(season)) or {}
     age = (datetime.now(timezone.utc) - datetime.fromisoformat(cur["at"])).total_seconds() / 3600 if cur.get("at") else 1e9
-    if age >= MAX_AGE_H:
+    if age >= MAX_AGE_H or "wk" not in cur:
         x = season_rows(season)
         if x:
             D["seasons"][str(season)] = {**x, "at": datetime.now(timezone.utc).isoformat(timespec="seconds")}
-            print(f"  nflverse {season}: {len(x['ply'])} player-games, {len(x['team'])} team-games, {len(x['snaps'])} snap rows")
-    if str(season - 1) not in D["seasons"]:
+            print(f"  nflverse {season}: {len(x['ply'])} player-games, {len(x['team'])} team-games, {len(x['snaps'])} snap rows, "
+                  f"{len(x['wk'])} weekly stat rows")
+    if str(season - 1) not in D["seasons"] or "wk" not in D["seasons"][str(season - 1)]:
         x = season_rows(season - 1)
         if x:
             D["seasons"][str(season - 1)] = {**x, "at": datetime.now(timezone.utc).isoformat(timespec="seconds")}
