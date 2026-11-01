@@ -131,7 +131,7 @@ def main():
         book = "onyx_odds"
     book = os.environ.get("ONYX_SPORTSBOOK", "").strip() or book
 
-    days = 7 if lane.cfg["slate"] == "week" else 2
+    days = 9 if lane.cfg["slate"] == "week" else 2   # 9: reaches next Sunday from Sunday and Monday (next-week capture)
     start = datetime.strptime(slate.get("date") or str(game_day()), "%Y-%m-%d")
     leagues = spec.get("leagues") or (league,)
     fixtures = {}
@@ -147,7 +147,7 @@ def main():
         return 0
 
     out = {"date": slate.get("date"), "fetched": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-           "book": book, "games": {}, "props": [], "matches": {}}
+           "book": book, "games": {}, "props": [], "matches": {}, "next_props": []}
     targets = {}
     for fid, (lg, f) in fixtures.items():
         if key == "tennis":
@@ -158,6 +158,10 @@ def main():
             g, a, h = match_game(f, slate.get("games") or [])
             if g and g.get("state") != "post":
                 targets[fid] = (lg, ("game", g, a, h))
+            elif slate.get("next_games"):
+                g, a, h = match_game(f, slate["next_games"])
+                if g:
+                    targets[fid] = (lg, ("next", g, a, h))
     mk = "".join(f"&market={m}" for m in list(spec["game"]) + list(spec["props"]) + list(spec["yes"]))
     by_league = {}
     for fid, (lg, t) in targets.items():
@@ -195,6 +199,22 @@ def main():
                             mo[f"sp{idx}"], mo[f"sp{idx}_price"], mo[f"sp{idx}_sel"] = float(od["points"]), price, _sel(od)
                     continue
                 g, a_name, h_name = kind[1], kind[2], kind[3]
+                if kind[0] == "next":
+                    # next week's game: its two-sided player lines only, kept apart from this
+                    # week's props (they are keyed by name), for the opening-price capture
+                    nxt = {}
+                    for od in row.get("odds") or []:
+                        price, mid = american(od.get("price")), od.get("market_id")
+                        sel, side = od.get("selection") or od.get("name") or "", str(od.get("selection_line") or "").lower()
+                        if (price is None or mid not in spec["props"] or not od.get("is_main") or side not in ("over", "under")
+                                or od.get("points") is None or not sel):
+                            continue
+                        e = nxt.setdefault((sel, mid), {"name": sel, "mkt": spec["props"][mid], "line": float(od["points"]),
+                                                        "gid": g["gid"], "over": None, "under": None})
+                        if float(od["points"]) == e["line"]:
+                            e[side], e[side + "_sel"] = price, _sel(od)
+                    out["next_props"] += [e for e in nxt.values() if e["over"] is not None and e["under"] is not None]
+                    continue
                 gl = out["games"].setdefault(g["gid"], {})
                 props = {}
                 for od in row.get("odds") or []:
@@ -241,7 +261,8 @@ def main():
     out["matches"] = {k: v for k, v in out["matches"].items() if len(v) > 1}   # drop matches Onyx has not priced
     lane.save("odds.json", out, indent=None)
     print(f"{key} odds: book '{book}' · {len(fixtures)} fixtures, {len(targets)} matched to the slate · "
-          f"{len(out['games'])} games with lines, {len(out['props'])} player lines, {len(out['matches'])} matches")
+          f"{len(out['games'])} games with lines, {len(out['props'])} player lines, {len(out['matches'])} matches"
+          + (f", {len(out['next_props'])} next-week player lines" if out["next_props"] else ""))
     return 0
 
 

@@ -274,6 +274,16 @@ def main():
         slate["season"] = (sb.get("season") or {}).get("year")
         slate["season_type"] = (sb.get("season") or {}).get("type")
         slate["bye"] = [t.get("abbreviation") for t in (sb.get("week") or {}).get("teamsOnBye") or []]
+        if key == "nfl" and wk:
+            # next week's games, for opening-price capture only (11/1): Onyx posts receptions
+            # lines before ESPN rolls its scoreboard to the next week (~Wed 12:15 AM ET; 47 of
+            # 135 week-8 lines were already up), so without this those lines were first seen a
+            # day late and logged as if that were the open. Nothing else reads next_games.
+            try:
+                nx = espn_get(path, f"seasontype={slate['season_type'] or 2}&week={wk + 1}") or {}
+                slate["next_games"] = [g for g in team_games(nx) if g.get("state") == "pre"]
+            except Exception as x:
+                print(f"  next week: {str(x)[:120]}")
         if cfg.get("box") and slate["season"]:
             if key == "nfl":
                 ingest_nfl(lane, wk, slate["season"])

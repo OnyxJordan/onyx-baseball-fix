@@ -118,7 +118,7 @@ def nfl_open_lane(lane, out, slate, season, rows, M):
     receptions line is written once to data/nfl/opening.json; a play is logged
     (data/nfl/open_trial.json, append-only) only when the v5 model beats that opening
     price by 3pp+ and the live Onyx line is still the opening one. Graded from the box."""
-    from datetime import datetime, timezone
+    from datetime import datetime, timedelta, timezone
     ts = datetime.now(timezone.utc).isoformat(timespec="seconds")
     O = lane.load("opening.json", None)
     first_run = O is None          # the system's first look: every line already up is a baseline, never a play
@@ -128,6 +128,22 @@ def nfl_open_lane(lane, out, slate, season, rows, M):
     for k in [k for k in O if k.split("|")[0] in games and games[k.split("|")[0]].get("state") == "post"]:
         O.pop(k)    # finished games leave the capture file; their plays live in the ledger
     have = {k["key"] for k in ledger}
+    # games we have watched for opening prices (11/1). A game first seen already in this
+    # week's slate (next week's fetch missed it) may have lines up for days: they are
+    # baselines, never the open. Seeded once with this week's games, watched since 10/30.
+    seen = O.setdefault("_seen", {g: ts for g in games} if not first_run else {})
+    for g in slate.get("next_games") or []:
+        seen.setdefault(g["gid"], ts)
+    nxt_games = {g["gid"] for g in slate.get("next_games") or []}
+    for p in (lane.load("odds.json", {}) or {}).get("next_props") or []:
+        if p.get("mkt") == "rec" and p.get("gid") in nxt_games and None not in (p.get("line"), p.get("over"), p.get("under")):
+            O.setdefault(f"{p['gid']}|{nk(p['name'])}|rec", {"line": p["line"], "over": p["over"], "under": p["under"],
+                                                             "ts": ts, "next": True})
+    fresh = {gid for gid in games if gid not in seen}
+    for gid in games:
+        seen.setdefault(gid, ts)
+    for gid in [g for g, t in seen.items() if t < (datetime.now(timezone.utc) - timedelta(days=30)).isoformat()]:
+        seen.pop(gid)
     cands = []
     for r in out:
         if r["mkt"] != "rec" or r["line"] is None or r["over"] is None or r["under"] is None:
@@ -135,7 +151,8 @@ def nfl_open_lane(lane, out, slate, season, rows, M):
         g = games.get(r["gid"]) or {}
         key = f"{r['gid']}|{nk(r['name'])}|rec"
         if key not in O and g.get("state") == "pre":
-            O[key] = {"line": r["line"], "over": r["over"], "under": r["under"], "ts": ts, **({"baseline": True} if first_run else {})}
+            O[key] = {"line": r["line"], "over": r["over"], "under": r["under"], "ts": ts,
+                      **({"baseline": True} if first_run or r["gid"] in fresh else {})}
         op = O.get(key)
         if not op or op.get("baseline") or g.get("state") != "pre" or key in have or not r.get("vol"):
             continue
