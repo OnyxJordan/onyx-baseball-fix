@@ -653,6 +653,10 @@
     if (!teamList(s).length && (h.teams || []).length > 1) { s.teams = h.teams; s.team = null; }
     else if (!teamList(s).length && h.team) s.team = h.team;
     if (!s.player && h.player && !(s.exclude || []).length) s.player = h.player;
+    // a scattershot list of markets nobody named (3+ where the reader found none) is the AI guessing
+    if ((s.markets || []).length >= 3 && !(h.markets || []).length) s.markets = [];
+    // a day nobody named
+    if (s.when && !h.when && !/\b(today|tonight|tomorrow|weekend|this week|sunday|monday|tuesday|wednesday|thursday|friday|saturday|sun|mon|tue|wed|thu|fri|sat)\b/.test(t)) s.when = null;
     if (JSON.stringify(s) !== before) s._fixed = true;     // the AI's one-line reply may describe what it misread: drop it
     return s;
   }
