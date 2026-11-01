@@ -19,6 +19,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from fetch_onyx import http_json, OPTIC   # noqa: E402
 
 BOOK = os.environ.get("ONYX_SPORTSBOOK", "").strip() or "onyx_odds"
+ALT = [b for b in os.environ.get("ALT_BOOKS", "draftkings,fanduel,pinnacle").split(",") if b]
 LEAGUES = [("football", "nfl"), ("football", "ncaaf"), ("basketball", "nba"), ("hockey", "nhl"), ("tennis", None)]
 
 
@@ -63,8 +64,8 @@ def main():
     if not live:
         return 0
 
-    def pull(sport, league, fid):
-        u = f"{OPTIC}/fixtures/odds?sport={sport}&league={league}&sportsbook={urllib.parse.quote(BOOK)}&odds_format=AMERICAN&fixture_id={urllib.parse.quote(fid)}"
+    def pull(sport, league, fid, book=None):
+        u = f"{OPTIC}/fixtures/odds?sport={sport}&league={league}&sportsbook={urllib.parse.quote(book or BOOK)}&odds_format=AMERICAN&fixture_id={urllib.parse.quote(fid)}"
         r = get(u) or {}
         rows = []
         for row in r.get("data") or []:
@@ -94,7 +95,11 @@ def main():
                "rows_first": len(a), "rows_second": len(b), "moved": moved, "props": props, "with_ids": sels,
                "markets": mk.most_common(25), "sample": b[:3]}
         out["fixtures"].append(rec)
-        print(f"\n{league} {name} [{f.get('status')}]: {len(a)} -> {len(b)} priced rows, {moved} prices moved in {gap}s, "
+        # control: the same live fixture from other books, to tell "Onyx does not price live" from "the feed has no live odds"
+        alt = {bk: len(pull(sport, league, f["id"], bk)) for bk in ALT}
+        rec["alt_books"] = alt
+        print(f"\n{league} {name} [{f.get('status')}]: other books on this live game: {alt}")
+        print(f"{league} {name} [{f.get('status')}]: {len(a)} -> {len(b)} priced rows, {moved} prices moved in {gap}s, "
               f"{props} player-prop rows; markets: {', '.join(f'{m}({n})' for m, n in mk.most_common(12))}")
         if b:
             print("  sample:", json.dumps(b[0])[:500])
