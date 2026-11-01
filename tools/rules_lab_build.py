@@ -436,6 +436,7 @@ def td_rows():
     team_of = {}
     for r in sorted(rows, key=lambda r: r["date"]):
         team_of[nk(r["name"])] = r["team"]
+    first = json.load(open("bt/nfl_first_td.json")) if os.path.exists("bt/nfl_first_td.json") else {}
     out = []
     for fid, x in json.load(open("bt/nfl_td.json")).items():
         h, a = tm.get(nk(x["home"])), tm.get(nk(x["away"]))
@@ -456,13 +457,50 @@ def td_rows():
                 if not t or (wk["season"], wk["week"], M.VERSE_TEAM.get(t, t), M._vk(name)) not in snaps:
                     continue
                 td = 0
-            v = mk.get("anytime_touchdown_scorer")
-            if not v:
-                continue
             c = ctx("nfl", g["home"], g["away"], x["start"], g["date"], int(t == g["home"]))
-            for when in ("o", "c"):
-                if v[when][1] is not None:
-                    out.append(R_("nfl", "anytime_td", when, g["date"], None, 0.5, v[when][1], None, int(td > 0), c))
+            v = mk.get("anytime_touchdown_scorer")
+            if v:
+                for when in ("o", "c"):
+                    if v[when][1] is not None:
+                        out.append(R_("nfl", "anytime_td", when, g["date"], None, 0.5, v[when][1], None, int(td > 0), c))
+            v, ft = mk.get("first_touchdown_scorer"), first.get(g["id"])
+            if v and ft:   # first TD scorer: he played (a box line or snaps), graded off ESPN's scoring plays
+                won = int(bool(ft.get("name")) and nk(ft["name"]) == nk(name))
+                for when in ("o", "c"):
+                    if v[when][1] is not None:
+                        out.append(R_("nfl", "first_td", when, g["date"], None, 0.5, v[when][1], None, won, c))
+    return out
+
+
+def nfl_pass_td_rows():
+    """QB passing touchdowns (Onyx 2025-26 on), graded off the ESPN box (data/nfl/player_games.json):
+    a quarterback with no passing line did not play, a void."""
+    f = "bt/nfl_pass_td.json"
+    if not os.path.exists(f):
+        return []
+    lane = Lane("nfl")
+    rows = (lane.load("player_games.json", {}) or {}).get("rows") or []
+    res = (lane.load("results.json", {}) or {}).get("games") or []
+    tm = SB.team_map("nfl")
+    by_day = {}
+    for g in res:
+        by_day.setdefault(g["date"], []).append(g)
+    box = {}
+    for r in rows:
+        if r.get("att"):
+            box[(r["gid"], nk(r["name"]))] = r
+    gid_of = {}
+    def act(fid, x, name, st):
+        if fid not in gid_of:
+            h, a = tm.get(nk(x["home"])), tm.get(nk(x["away"]))
+            d0, g = (x["start"] or "")[:10], None
+            for dd in (d0, (date.fromisoformat(d0) - timedelta(days=1)).isoformat()):
+                g = next((y for y in by_day.get(dd, []) if y["home"] == h and y["away"] == a), None) or g
+            gid_of[fid] = g["id"] if g else None
+        r = box.get((gid_of[fid], nk(name)))
+        return (r.get("pass_td"), bool(r.get("home"))) if r else None
+    out = prop_rows("nfl", f, {"player_passing_touchdowns": "pass_td"}, act)
+    print(f"  nfl passing TDs: {len(out)}")
     return out
 
 
@@ -557,6 +595,7 @@ def main():
     R += nhl_more_rows()
     R += [sample_row("nfl", r) for r in SB.nfl_prop_samples(json.load(open("bt/nfl_lines.json")))]
     R += td_rows()
+    R += nfl_pass_td_rows()
     R += nfl_2024_rows()
     for f in ("bt/tennis_atp_games.json", "bt/tennis_wta_games.json"):
         R += tennis_game_rows(f)
