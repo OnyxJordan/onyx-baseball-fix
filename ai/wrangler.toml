@@ -1,12 +1,10 @@
 # Ask Onyx relay (ai/worker.js). Deployed by .github/workflows/ai_worker.yml.
 # Secrets and the model are set at deploy time from GitHub, never stored here:
-#   ANTHROPIC_API_KEY  (GitHub secret)  the AI key, held only by Cloudflare
-#   AI_MODEL           (GitHub variable) which model reads the questions
+#   OPENAI_API_KEY  (GitHub secret)   the AI key, held only by Cloudflare
+#   AI_MODEL        (GitHub variable) which OpenAI model reads the questions (default gpt-4.1-mini)
 name = "onyx-ask"
 main = "worker.js"
 compatibility_date = "2026-09-01"
-compatibility_flags = ["nodejs_compat"]
 
 [vars]
 ALLOWED_ORIGINS = "https://onyxjordan.github.io"
-AI_FALLBACK = "off"

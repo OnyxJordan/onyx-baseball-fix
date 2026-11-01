@@ -9,7 +9,10 @@
 // The spec is the one contract between the two (ai/worker.js holds the same schema):
 //   {intent: "parlay"|"sgp"|"list", count, sports[], markets[], side: "over"|"under"|"any",
 //    min_price, max_price, min_conf, min_edge, player, team, sort: "conf"|"rec"|"edge"|"price"|"two_td",
-//    one_per_game, summary}
+//    one_per_game, exclude[], summary}
+// With the relay on, the AI also gets the previous answer (ctx) so follow-ups work ("swap leg 2",
+// "make it +500", "same but NBA"), says one line back (say), and explains the legs afterwards
+// (explain) from their numbers only. Without it, the built-in parser handles "swap leg N".
 (function () {
   var SPORTS = ['nba', 'nfl', 'cfb', 'nhl', 'tennis'];
   var LG = {nba: 'NBA', nfl: 'NFL', cfb: 'NCAAF', nhl: 'NHL', tennis: 'Tennis'};
@@ -409,6 +412,7 @@
       if (spec.min_conf != null && p.conf < spec.min_conf) return false;
       if (spec.min_edge != null && p.edge < spec.min_edge) return false;
       if (spec.player && String(p.name || p.label).toLowerCase().indexOf(String(spec.player).toLowerCase()) < 0) return false;
+      if (spec.exclude && spec.exclude.length && spec.exclude.some(function (x) { x = String(x || '').toLowerCase().trim(); return x && (String(p.name || '') + ' ' + String(p.label || '')).toLowerCase().indexOf(x) >= 0; })) return false;
       if (spec.team && !new RegExp('(^|[^A-Z])' + String(spec.team).toUpperCase() + '([^A-Z]|$)').test([p.team, p.matchup, p.name].join(' ').toUpperCase())) return false;
       if (spec.team && (p.kind === 'spread' || p.kind === 'ml') && String(p.team || p.name).toUpperCase() !== String(spec.team).toUpperCase()) return false;   // "Georgia to cover" is Georgia's side
       if (spec.when && !whenOk(spec.when, p.start)) return false;
@@ -565,14 +569,54 @@
     return b.join(' · ');
   }
 
+  // the last answer, for follow-ups ("swap leg 2", "make it +500"); reset() starts fresh
+  var LAST = null;
+  function reset() { LAST = null; }
+  // the built-in follow-up: "swap / replace / drop leg 2", "not Mahomes" on the last answer
+  function localFollow(q) {
+    if (!LAST) return null;
+    var t = q.toLowerCase(), m = t.match(/\b(swap|replace|change|drop|remove|sub|switch)( out)? (leg|pick|play)? ?#?(\d)\b/);
+    if (m && LAST.legs[+m[4] - 1]) {
+      var x = Object.assign({}, LAST.spec, {exclude: (LAST.spec.exclude || []).concat([LAST.legs[+m[4] - 1].name])});
+      if (/\bdrop|remove\b/.test(m[1]) && x.intent !== 'list') x.count = Math.max(1, (x.count || 3) - 1);
+      return x;
+    }
+    return null;
+  }
   function toSpec(q, B) {
     return aiUrl().then(function (u) {
-      if (!u) return {spec: localSpec(q, B), via: 'local'};
+      var lf = localFollow(q);
+      if (!u) return {spec: lf || localSpec(q, B), via: 'local'};
       var ctl = new AbortController(); var tm = setTimeout(function () { ctl.abort(); }, 15000);
-      return fetch(u, {method: 'POST', headers: {'content-type': 'application/json'}, body: JSON.stringify({q: q}), signal: ctl.signal})
+      var ctx = LAST ? {q: LAST.q, spec: LAST.spec, legs: LAST.legs} : null;
+      // the built-in reader's take goes along (tested on 500 phrasings): the AI starts from it and
+      // corrects only what it misread, so nothing the parser has learned is lost
+      var hint = null; try { hint = lf || localSpec(q, B); } catch (e) { hint = null; }
+      return fetch(u, {method: 'POST', headers: {'content-type': 'application/json'}, body: JSON.stringify({q: q, ctx: ctx, hint: hint}), signal: ctl.signal})
         .then(function (r) { clearTimeout(tm); if (!r.ok) throw new Error('relay ' + r.status); return r.json(); })
-        .then(function (j) { if (!j || !j.spec) throw new Error('no spec'); return {spec: j.spec, via: 'ai'}; })
-        .catch(function () { return {spec: localSpec(q, B), via: 'local'}; });
+        .then(function (j) { if (!j || !j.spec) throw new Error('no spec'); return {spec: j.spec, say: j.say || '', via: 'ai'}; })
+        .catch(function () { return {spec: lf || localSpec(q, B), via: 'local'}; });
+    });
+  }
+  // the AI's read on an answer, from the legs' own numbers (null without the relay)
+  function explain(R, q) {
+    if (!R || !R.rows || !R.rows.length) return Promise.resolve(null);
+    return aiUrl().then(function (u) {
+      if (!u) return null;
+      var legs = R.rows.slice(0, 8).map(function (p, i) {
+        var o = {n: i + 1, play: p.label, game: p.matchup, price: p.price, conf: Math.round(1000 * p.conf) / 10, edge: Math.round(1000 * p.edge) / 10, tag: p.tag || 'lean'};
+        if (p.model != null) o.model = Math.round(1000 * p.model) / 10;
+        if (p.proj != null) { o.proj = p.proj; o.line = p.line; }
+        if (p.two != null) o.two_td = Math.round(1000 * p.two) / 10;
+        return o;
+      });
+      var ticket = R.parlay ? {legs: R.rows.length, price: R.parlay.price, all_hit: Math.round(1000 * R.parlay.prob) / 10, same_game: !!R.parlay.same_game} : null;
+      var ctl = new AbortController(); var tm = setTimeout(function () { ctl.abort(); }, 20000);
+      return fetch(u, {method: 'POST', headers: {'content-type': 'application/json'}, signal: ctl.signal,
+                       body: JSON.stringify({explain: {q: q, legs: legs, ticket: ticket, note: R.note || ''}})})
+        .then(function (r) { clearTimeout(tm); return r.ok ? r.json() : null; })
+        .then(function (j) { return j && j.text ? j.text : null; })
+        .catch(function () { return null; });
     });
   }
   // mainstream by default: unless the request names its own odds, no parlay leg
@@ -617,9 +661,11 @@
           ? 'Favorites are the scorers our TD model rates highest against their price. Touchdown prices carry a big margin, so every edge reads negative, and the TD model has not beaten Onyx\'s price in testing yet.'
           : 'Touchdown prices carry a big margin (priced players score about 18% of the time against 22% implied), so every edge reads negative.');
       }
-      res.spec = spec; res.via = a[0].via; res.understood = describe(spec);
+      res.spec = spec; res.via = a[0].via; res.say = a[0].say || ''; res.understood = describe(spec);
+      if (spec.exclude && spec.exclude.length) res.understood += ' · without ' + spec.exclude.join(', ');
+      LAST = {q: q, spec: a[0].spec, legs: (res.rows || []).map(function (p) { return {name: p.name || p.label, play: p.label, price: p.price}; })};
       return res;
     });
   }
-  window.OnyxAsk = {whenOk: whenOk, ask: ask, normalize: normalize, localSpec: localSpec, run: run, describe: describe, loadBoards: loadBoards, LG: LG, PAGE: PAGE, MKTS: MKTS};
+  window.OnyxAsk = {whenOk: whenOk, ask: ask, explain: explain, reset: reset, normalize: normalize, localSpec: localSpec, run: run, describe: describe, loadBoards: loadBoards, LG: LG, PAGE: PAGE, MKTS: MKTS};
 })();
