@@ -37,7 +37,7 @@ jobs:
         run: python3 tools/onyx_live_probe.py ${{ inputs.args || '60' }}
         env:
           OPTICODDS_API_KEY: ${{ secrets.OPTICODDS_API_KEY }}
-      - if: ${{ inputs.job != 'lines' && inputs.job != 'golf' && inputs.job != 'sources' && inputs.job != 'live' && inputs.job != 'odds' }}
+      - if: ${{ inputs.job != 'lines' && inputs.job != 'golf' && inputs.job != 'sources' && inputs.job != 'live' }}
         run: python3 tools/onyx_markets_probe.py ${{ inputs.sports }}
         env:
           OPTICODDS_API_KEY: ${{ secrets.OPTICODDS_API_KEY }}
