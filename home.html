@@ -387,7 +387,7 @@ async function askGo(q) {
     const label = R.two ? `${p.name} 2+ touchdowns` : p.label;
     const save = window.OnyxSaved && !R.two ? OnyxSaved.btn(Object.assign({id: p.sel}, p)) : '';
     return `<div class="t10-r${i === 0 ? ' top' : ''}"><div class="t10-n">${i + 1}</div>
-      <div class="t10-w"><b>${esc(label)}</b><span>${esc(p.matchup)}${p.start ? ' · ' + esc(t10When(p.start)) : ''}${R.two ? ' · anytime TD ' + Math.round(100 * p.conf) + '%' : p.edge != null ? ' · edge ' + (p.edge >= 0 ? '+' : '') + (100 * p.edge).toFixed(1) : ''}</span></div>
+      <div class="t10-w"><b>${esc(label)}</b><span>${esc(p.matchup)}${p.start ? ' · ' + esc(t10When(p.start)) : ''}${R.two ? ' · anytime TD ' + Math.round(100 * p.conf) + '%' : p.edge != null ? ' · edge ' + (p.edge >= 0 ? '+' : '') + (100 * p.edge).toFixed(1) : ''}${!R.two && p.model != null && /td$/.test(p.mkt || '') ? ' · TD model ' + Math.round(100 * p.model) + '%' : ''}</span></div>
       <div class="t10-c"><b>${Math.round(100 * conf)}%</b><small>${R.two ? '2+ TD CHANCE' : 'CONFIDENCE'}</small></div>
       <div class="t10-f"><span class="t10-tag sp">${esc(OnyxAsk.LG[p.sport] || p.sport)}</span><span class="t10-tag ${p.tag}">${tagTxt[p.tag] || 'Model lean'}</span>
         <a class="t10-bet" href="${url}" target="_blank" rel="noopener">${R.two ? 'Anytime TD ' : ''}${fmtOdds(p.price)} on Onyx</a>${save}</div></div>`;
