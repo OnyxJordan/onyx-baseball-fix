@@ -26,10 +26,10 @@ import nfl_features as F   # noqa: E402
 
 BT = "bt/"
 MARKETS = {   # our key: (Onyx market id, nflverse stat column or derived, line files)
-    "rec": ("player_receptions", "receptions", ["nfl_lines.json"]),
-    "rec_yds": ("player_receiving_yards", "receiving_yards", ["nfl_lines.json"]),
-    "rush_yds": ("player_rushing_yards", "rushing_yards", ["nfl_lines.json"]),
-    "pass_yds": ("player_passing_yards", "passing_yards", ["nfl_lines.json"]),
+    "rec": ("player_receptions", "receptions", ["nfl_lines.json", "nfl_2024_mkt.json"]),
+    "rec_yds": ("player_receiving_yards", "receiving_yards", ["nfl_lines.json", "nfl_2024_mkt.json"]),
+    "rush_yds": ("player_rushing_yards", "rushing_yards", ["nfl_lines.json", "nfl_2024_mkt.json"]),
+    "pass_yds": ("player_passing_yards", "passing_yards", ["nfl_lines.json", "nfl_2024_mkt.json"]),
     "pass_att": ("player_passing_attempts", "attempts", ["nfl_combo_a.json", "nfl_combo_b.json"]),
     "pass_td": ("player_passing_touchdowns", "passing_tds", ["nfl_pass_td.json"]),
     "rush_rec_yds": ("player_rushing_+_receiving_yards", "rush_rec_yds", ["nfl_combo_ya.json", "nfl_combo_yb.json"]),
@@ -70,6 +70,10 @@ def main():
     vj = json.load(open("data/nfl/nflverse.json"))
     IX = F.Index(load_stats(), F.snaps_of(vj))
     by_pid, by_name, snaps = IX.by_pid, IX.by_name, IX.snaps
+    if os.path.exists(BT + "nfl24/snap_counts_2024.csv"):
+        for r in csv.DictReader(open(BT + "nfl24/snap_counts_2024.csv")):
+            if r.get("game_type") == "REG" or r.get("game_type") in ("WC", "DIV", "CON", "SB"):
+                snaps[(int(r["season"]), int(r["week"]), r["team"], nk(r["player"]))] = num(r.get("offense_pct"))
     res = json.load(open("data/nfl/results.json"))["games"]
     wk_of = {}
     for r in json.load(open("data/nfl/player_games.json"))["rows"]:
@@ -78,6 +82,10 @@ def main():
     by_day = defaultdict(list)
     for g in res:
         by_day[g["date"]].append(g)
+    if os.path.exists(BT + "nfl24/games.json"):      # 2024 (nflverse game ids and team codes)
+        for g in json.load(open(BT + "nfl24/games.json")):
+            if g.get("season") == 2024:
+                by_day[g["date"]].append({"id": g["gid"], "date": g["date"], "season": 2024, "week": g["week"], "home": g["home"], "away": g["away"]})
     games = json.load(open(BT + "nfl_game.json"))
     ESPN2V = {"WSH": "WAS", "LAR": "LA"}
     ab = lambda s: NICK.get((s or "").split()[-1])
@@ -158,7 +166,7 @@ def main():
     # and roof. Team numbers are rolling, last 4 games before tonight.
     PB_T, PB_G = {}, {}
     if "--pbp" in sys.argv:
-        for y in (2025, 2026):
+        for y in (2024, 2025, 2026):
             p_ = f"{BT}nflx/play_by_play_{y}.csv"
             if not os.path.exists(p_):
                 continue
@@ -256,7 +264,7 @@ def main():
                     g = next((y for y in by_day.get(dd, []) if ESPN2V.get(y["home"], y["home"]) == h_ and ESPN2V.get(y["away"], y["away"]) == a_), None) or g
                 if not g:
                     continue
-                gl = (games.get(fid) or {}).get("game") or {}
+                gl = (games.get(fid) or {}).get("game") or x.get("game") or {}
                 sp, tt = gl.get("point_spread") or {}, gl.get("total_points") or {}
                 hk = next((k for k in sp if ab(k) == h_), None)
                 if not hk or "over" not in tt or tt["over"]["o"][0] is None:
@@ -300,13 +308,13 @@ def main():
                     if "--pbp" in sys.argv:
                         f.update(pbp_feats(season, week, team, opp, g["date"]))
                     c = v.get("c") or [None, None, None]
-                    S.append({"season": 2025 if g["date"] < "2026-03-01" else 2026, "date": g["date"], "p": io / (io + iu), "po": po, "pu": pu, "line_": ln,
+                    S.append({"season": 2024 if g["date"] < "2025-03-01" else 2025 if g["date"] < "2026-03-01" else 2026, "date": g["date"], "p": io / (io + iu), "po": po, "pu": pu, "line_": ln,
                               "cl": c[0], "co": c[1], "cu": c[2],
                               "line": ln, "y": int(act > ln), "f": f,
                               **({"act": act, "pid": pid, "team": team, "opp": opp, "season_": season, "week": week, "env": (imp, spr, home)}
                                  if "--proj" in sys.argv else {})})
         DATA[mkt] = S
-        print(f"{mkt}: {sum(1 for s in S if s['season'] == 2025)} lines 2025, {sum(1 for s in S if s['season'] == 2026)} 2026")
+        print(f"{mkt}: {sum(1 for s in S if s['season'] == 2024)} lines 2024 (market), {sum(1 for s in S if s['season'] == 2025)} 2025, {sum(1 for s in S if s['season'] == 2026)} 2026")
     if "--proj" in sys.argv:      # hand the rows (with actuals) to tools/nfl_proj_test.py
         return DATA, IX
     if "--select" not in sys.argv:
@@ -369,7 +377,8 @@ def ll(w, X, y):
 def screen(DATA, out_path="bt/nfl_screen.json"):
     out = {}
     for mkt, S in DATA.items():
-        tr = [s for s in S if s["season"] == 2025]
+        TRAIN = {int(x) for x in ([a.split("=", 1)[1] for a in sys.argv if a.startswith("--train=")] or ["2025"])[0].split(",")}
+        tr = [s for s in S if s["season"] in TRAIN]
         te = [s for s in S if s["season"] == 2026]
         if len(tr) < 150 or len(te) < 60:
             print(f"\n{mkt}: too few lines to screen ({len(tr)} / {len(te)})")
@@ -411,7 +420,8 @@ def select_and_test(DATA, k_max=4, out="bt/nfl_select.json"):
     log loss against Onyx and value bets at the opening price."""
     res = {}
     for mkt, S in DATA.items():
-        tr = sorted([s for s in S if s["season"] == 2025], key=lambda s: s.get("date", ""))
+        TRAIN = {int(x) for x in ([a.split("=", 1)[1] for a in sys.argv if a.startswith("--train=")] or ["2025"])[0].split(",")}
+        tr = sorted([s for s in S if s["season"] in TRAIN], key=lambda s: s.get("date", ""))
         te = [s for s in S if s["season"] == 2026]
         if len(tr) < 150 or len(te) < 60:
             continue
@@ -513,7 +523,9 @@ def select_and_test(DATA, k_max=4, out="bt/nfl_select.json"):
         print(f"   2026 log loss: model {mdl:.4f} vs Onyx {raw:.4f} (Onyx refit {base:.4f})")
         print(f"   2025 (fit) 3pp+: {r['bets_2025_3pp']}")
         print(f"   2026 (unseen) 3pp+: {r['bets_2026_3pp']}   5pp+: {r['bets_2026_5pp']}")
-    json.dump(res, open(out.replace(".json", "_cross.json") if "--cross" in sys.argv else out.replace(".json", "_role.json") if "--role" in sys.argv else out.replace(".json", "_pbp.json") if "--pbp" in sys.argv else out, "w"), indent=1)
+    tag = "_cross" if "--cross" in sys.argv else "_role" if "--role" in sys.argv else "_pbp" if "--pbp" in sys.argv else ""
+    tag += "_3y" if any(a.startswith("--train=") for a in sys.argv) else ""
+    json.dump(res, open(out.replace(".json", tag + ".json"), "w"), indent=1)
     return res
 
 
