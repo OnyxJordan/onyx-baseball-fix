@@ -339,7 +339,7 @@ def nfl_block(lane, slate, odds):
             r["value_min"] = M.VOL_P[r["mkt"]]["edge"]
         else:
             po = M.prob_over(r["mkt"], r["proj"], r["line"])
-            ps = L.price_side(po, r["over"], r["under"], w)
+            ps = L.price_side(po, r["over"], r["under"], getattr(M, "BLEND_W", {}).get(r["mkt"], w))
         if ps:
             r.update(side=ps["side"], price=ps["price"], sel=r["over_sel"] if ps["side"] == "over" else r["under_sel"],
                      prob=ps["prob"], implied=ps["implied"], edge=ps["edge"], ev=ps["ev"], model_p=ps["model_p"],
