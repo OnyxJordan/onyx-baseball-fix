@@ -8719,9 +8719,9 @@
     },
     {
      "id": "185689",
-     "start": "2026-11-01T03:00Z",
-     "state": "pre",
-     "detail": "10/31 - 11:00 PM EDT",
+     "start": "2026-11-01T03:05Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Final",
      "draw": "Women's Singles",
      "court": "Center",
@@ -8732,7 +8732,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/rus.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        1
+       ],
        "serve": false
       },
       {
@@ -8741,8 +8743,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/can.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        1
+       ],
+       "serve": true
       }
      ]
     }
@@ -12852,7 +12856,7 @@
      "id": "185818",
      "start": "2026-11-01T02:25Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Semifinal",
      "draw": "Women's Singles",
      "court": "Estadio Mexcovery",
@@ -12864,9 +12868,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        3,
+        1
        ],
-       "serve": false
+       "serve": true
       },
       {
        "name": "Bianca Andreescu",
@@ -12875,9 +12880,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        4
+        6,
+        1
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -13208,8 +13214,8 @@
     {
      "id": "187318",
      "start": "2026-11-01T02:05Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Qualifying Final",
      "draw": "Women's Singles",
      "court": "Court 1",
@@ -13222,19 +13228,19 @@
        "win": false,
        "sets": [
         2,
-        0
+        1
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Aliaksandra Sasnovich",
        "short": "A. Sasnovich",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/blr.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        0
+        6
        ],
        "serve": false
       }
@@ -13244,7 +13250,7 @@
      "id": "187320",
      "start": "2026-11-01T02:10Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Qualifying Final",
      "draw": "Women's Singles",
      "court": "Court 2",
@@ -13256,9 +13262,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        4
+        4,
+        1
        ],
-       "serve": false
+       "serve": true
       },
       {
        "name": "Tatiana Prozorova",
@@ -13267,7 +13274,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        5
+        6,
+        4
        ],
        "serve": false
       }
@@ -15541,5 +15549,5 @@
    ]
   }
  ],
- "fetched": "2026-11-01T02:53:13+00:00"
+ "fetched": "2026-11-01T03:24:53+00:00"
 }
