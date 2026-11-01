@@ -12850,9 +12850,9 @@
     },
     {
      "id": "185818",
-     "start": "2026-11-01T02:20Z",
-     "state": "pre",
-     "detail": "10/31 - 10:20 PM EDT",
+     "start": "2026-11-01T02:25Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Semifinal",
      "draw": "Women's Singles",
      "court": "Estadio Mexcovery",
@@ -12863,7 +12863,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        2
+       ],
        "serve": false
       },
       {
@@ -12872,8 +12874,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/can.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        4
+       ],
+       "serve": true
       }
      ]
     },
@@ -13205,7 +13209,7 @@
      "id": "187318",
      "start": "2026-11-01T02:05Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Qualifying Final",
      "draw": "Women's Singles",
      "court": "Court 1",
@@ -13217,7 +13221,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        1
+        2,
+        0
        ],
        "serve": true
       },
@@ -13228,7 +13233,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        1
+        6,
+        0
        ],
        "serve": false
       }
@@ -13250,7 +13256,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        0
+        4
        ],
        "serve": false
       },
@@ -13261,7 +13267,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        5
        ],
        "serve": false
       }
@@ -15535,5 +15541,5 @@
    ]
   }
  ],
- "fetched": "2026-11-01T02:21:37+00:00"
+ "fetched": "2026-11-01T02:53:13+00:00"
 }
