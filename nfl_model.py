@@ -1,9 +1,17 @@
 """
 nfl_model.py - Onyx NFL player projections.
 
-VERSION v12 (11/1). The lab notebook: every change bumps VERSION and adds an
+VERSION v13 (11/1). The lab notebook: every change bumps VERSION and adds an
 entry here citing its evidence (CLAUDE.md rule 2 applies to this model too).
 
+  v13 11/1   The chance shown for pass attempts is calibrated (Jordan: three pass attempts
+             unders in the Top 6 felt wrong). On 2026 the model's pass attempts picks showed
+             62.9% on average and won 57.5%: overconfident on its big gaps. Pulling the chance
+             shown halfway back to Onyx's no-vig price is the most accurate on 2026 (log loss
+             .6844 vs .6914 unshrunk, .6908 Onyx alone), so pass attempts show and rank at
+             Onyx + 0.5 x (model - Onyx). Rushing yards unders were already honest (shown
+             58.7%, won 58.7%) and keep the full model. The trial lane's rule is unchanged: it
+             still logs at 3pp+ on the full model, exactly as tested.
   v12 11/1   Three seasons, and the wind. tools/nfl_feature_screen.py now reads 2024 at market
              prices (before Onyx; receptions, receiving, rushing and passing yards) and nflverse
              play-by-play: pass rate over expected, neutral pace, the defense's PROE and pace,
@@ -253,7 +261,7 @@ player-game: pass_yds, rush_yds, rec_yds, rec, tgt, att, rush_att...).
 import math, re, unicodedata
 from collections import defaultdict
 
-VERSION = "v12"
+VERSION = "v13"
 # game lines (team_model.py), tuned 10/26: see v1
 GAME_P = {"half_life": 240, "ridge": 5, "home": 2.0, "sd_margin": 13.5, "sd_total": 13.0, "min_games": 3}
 GAME_TEST = {"n": 199, "logloss": 0.648, "base_logloss": 0.698, "mae_total": 10.90, "base_mae_total": 11.71,
@@ -643,6 +651,8 @@ V11 = {
  }
 }  # v12: passing yards overs dropped (failed 2024)
 V11_EDGE = 0.03
+# v13: share of the model in the chance shown (calibration on 2026; the lanes still use the full model)
+V11_SHOW = {"pass_att": 0.5, "rush_yds": 1.0}
 
 
 def _logit(p):
