@@ -14,7 +14,7 @@
   var SPORTS = ['nba', 'nfl', 'cfb', 'nhl', 'tennis'];
   var LG = {nba: 'NBA', nfl: 'NFL', cfb: 'NCAAF', nhl: 'NHL', tennis: 'Tennis'};
   var PAGE = {nba: 'nba.html', nfl: 'nfl.html', cfb: 'cfb.html', nhl: 'nhl.html', tennis: 'tennis.html'};
-  var MKTS = ['pts', 'reb', 'ast', 'q1_total', 'h1_total', 'first_basket', 'first_td', 'rec', 'rec_yds', 'rush_yds', 'pass_yds', 'anytime_td', 'two_plus_td', 'spread', 'total', 'ml'];
+  var MKTS = ['pts', 'reb', 'ast', 'q1_total', 'h1_total', 'first_basket', 'first_td', 'rec', 'rec_yds', 'rush_yds', 'pass_yds', 'pass_td', 'anytime_td', 'two_plus_td', 'spread', 'total', 'ml'];
   var BOARD = null, AI = null, PRIOR = [];
 
   function getJSON(u) { return fetch(u, {cache: 'no-cache'}).then(function (r) { if (!r.ok) throw new Error(u); return r.json(); }); }
@@ -37,6 +37,7 @@
     [/\b(1st|first)\s*(td|touchdown|scorer of the game|to score)\b|\bftd\b|\bfirst (td|touchdown) scorer\b/, 'first_td'],
     [/\b(1st|first)\s*(basket|bucket|field goal|points? of the game|to score in)\b|\bfirst baskets?\b/, 'first_basket'],
     [/\b(1st|first)[\s-]*half\b|\b1h\b|\bh1\b|\bhalftime\b/, 'h1_total'],
+    [/\bpass(ing)?\s*(td|tds|touchdowns?)\b|\b(td|touchdown) pass(es)?\b|\b(qb|quarterback)s?('s)? (td|tds|touchdowns?)\b/, 'pass_td'],
     [/\b(2|two)\+?\s*(td|tds|touchdowns?)\b|\bmultiple (td|tds|touchdowns)\b|\bmulti[\s-]?td\b|\bdouble (td|tds|touchdown)/, 'two_plus_td'],
     [/\b(anytime\s*)?(td|tds|touchdowns?)\b|\b(td|touchdown) scorers?\b|\bfind the end ?zone\b|\bscore a td\b/, 'anytime_td'],
     [/\b(1st|first)[\s-]*(quarter|q)\b|\b1q\b|\bq1\b/, 'q1_total'],
@@ -215,7 +216,8 @@
     if (/tennis|\batp\b|\bwta\b/.test(t)) s.sports.push('tennis');
     // which markets
     for (var i = 0; i < WORDS.length; i++) if (WORDS[i][0].test(t) && s.markets.indexOf(WORDS[i][1]) < 0) {
-      if (WORDS[i][1] === 'anytime_td' && (s.markets.indexOf('two_plus_td') >= 0 || s.markets.indexOf('first_td') >= 0)) continue;
+      if (WORDS[i][1] === 'anytime_td' && (s.markets.indexOf('two_plus_td') >= 0 || s.markets.indexOf('first_td') >= 0 || s.markets.indexOf('pass_td') >= 0)) continue;
+      if (WORDS[i][1] === 'pass_yds' && s.markets.indexOf('pass_td') >= 0 && !/\byards\b|\byds\b/.test(t)) continue;
       if (WORDS[i][1] === 'q1_total' && (s.markets.indexOf('first_td') >= 0 || s.markets.indexOf('first_basket') >= 0)) continue;
       // "total receptions", "total points for Jokic": a player's total, not the game total
       if (WORDS[i][1] === 'total' && /\btotal (receptions|catches|yards|rushing|passing|receiving|rebounds|assists|boards|dimes|tds|touchdowns|points|pts|bases|hits)\b/.test(t)) continue;
@@ -228,7 +230,7 @@
     if (/\bsides?\b|\bteams? to (win|cover)\b|\bteam bets?\b/.test(t) && !/\bboth sides\b/.test(t)) ['spread', 'ml'].forEach(function (m) { if (s.markets.indexOf(m) < 0) s.markets.push(m); });
     if (/\bgame lines?\b|\bmain lines?\b|\bgame bets?\b|\bstraight bets? on games\b/.test(t)) ['spread', 'ml', 'total'].forEach(function (m) { if (s.markets.indexOf(m) < 0) s.markets.push(m); });
     // "rushing yards over under" is the player's line, not the game total
-    if (s.markets.indexOf('total') >= 0 && !/\b(game )?totals?\b/.test(t) && s.markets.some(function (m) { return /^(pts|reb|ast|rec|rec_yds|rush_yds|pass_yds)$/.test(m); })) s.markets.splice(s.markets.indexOf('total'), 1);
+    if (s.markets.indexOf('total') >= 0 && !/\b(game )?totals?\b/.test(t) && s.markets.some(function (m) { return /^(pts|reb|ast|rec|rec_yds|rush_yds|pass_yds|pass_td)$/.test(m); })) s.markets.splice(s.markets.indexOf('total'), 1);
     // a position word only names a market when no stat was named ("wr receptions" is receptions)
     if (s.markets.indexOf('rec') >= 0 && s.markets.indexOf('rec_yds') >= 0 && !/receiving|\byards\b|\byds\b/.test(t)) s.markets.splice(s.markets.indexOf('rec_yds'), 1);
     if (s.markets.indexOf('first_td') >= 0 && /\bnba\b|basketball|bucket|basket|hoops/.test(t) && !/\btds?\b|touchdown/.test(t)) s.markets[s.markets.indexOf('first_td')] = 'first_basket';
@@ -341,7 +343,7 @@
     if (s.markets.indexOf('two_plus_td') >= 0) { s.sort = 'two_td'; if (!s.sports.length) s.sports = ['nfl']; }
     if (s.markets.indexOf('anytime_td') >= 0 && !s.sports.length) s.sports = ['nfl', 'cfb'];
     if (s.markets.some(function (m) { return /^(pts|reb|ast|q1_total)$/.test(m); }) && !s.sports.length) s.sports = ['nba'];
-    if (s.markets.some(function (m) { return /^(rec|rec_yds|rush_yds|pass_yds)$/.test(m); }) && !s.sports.length) s.sports = ['nfl'];
+    if (s.markets.some(function (m) { return /^(rec|rec_yds|rush_yds|pass_yds|pass_td)$/.test(m); }) && !s.sports.length) s.sports = ['nfl'];
     if (s.intent === 'rr' && s.count == null) s.count = 4;
     if (/(rebound|assist|catch|rush|pass|score)s? the most|most (receptions|catches|rushing|passing|receiving|yards|rebounds|assists|boards|dimes)|leading (rusher|receiver|passer|rebounder|scorer)s?|top( \d+)? (rusher|receiver|passer|rebounder|scorer|qb|wr|rb)s?/.test(t)) { s.sort = 'proj'; if (s.side === 'any') s.side = 'over'; }
     if (s.markets.indexOf('first_td') >= 0 && !s.sports.length) s.sports = ['nfl'];
@@ -513,7 +515,7 @@
 
   // ── what the spec understood, in plain words ────────────────────────────
   var MW = {pts: 'points', reb: 'rebounds', ast: 'assists', q1_total: '1st-quarter totals', rec: 'receptions', rec_yds: 'receiving yards',
-            rush_yds: 'rushing yards', pass_yds: 'passing yards', anytime_td: 'anytime TD', first_td: 'first TD', first_basket: 'first basket', h1_total: '1st-half totals', two_plus_td: '2+ touchdowns', spread: 'spreads', total: 'totals', ml: 'moneylines'};
+            rush_yds: 'rushing yards', pass_yds: 'passing yards', pass_td: 'passing TDs', anytime_td: 'anytime TD', first_td: 'first TD', first_basket: 'first basket', h1_total: '1st-half totals', two_plus_td: '2+ touchdowns', spread: 'spreads', total: 'totals', ml: 'moneylines'};
   function describe(s) {
     var b = [];
     b.push(s.intent === 'parlay' && s.target_price && !s.count_set ? 'parlay' : s.intent === 'rr' ? 'round robin of ' + (s.count || 4) + ' by ' + (s.rr_size || 2) + 's' : s.intent === 'sgp' ? (s.count || 3) + '-leg same-game parlay, correlated' : s.intent === 'parlay' ? (s.count || 3) + '-leg parlay' : (s.count || 5) === 1 ? 'top play' : 'top ' + (s.count || 5));

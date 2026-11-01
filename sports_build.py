@@ -308,13 +308,30 @@ def nfl_block(lane, slate, odds):
                                 "over": ln.get("over") if ln else None, "under": ln.get("under") if ln else None,
                                 "over_sel": ln.get("over_sel") if ln else None, "under_sel": ln.get("under_sel") if ln else None,
                                 "vol": vol, **({"inj": "Q", "inj_d": it["d"]} if it else {})})
+                # v9: passing touchdowns for a quarterback who passed in the team's last game
+                if hasattr(M, "project_pass_td") and (cur[-1].get("att") or 0) >= M.PTD_P["min_att"] and team in team_env:
+                    lam = M.project_pass_td(gs, team_env[team][0])
+                    if lam is not None:
+                        qg = [x for x in cur if (x.get("att") or 0) >= M.PTD_P["min_att"]]
+                        ln = props.get((nk(cur[-1]["name"]), "pass_td"))
+                        out.append({"pid": pid, "name": cur[-1]["name"], "hs": cur[-1].get("hs"), "team": team, "opp": opp,
+                                    "home": home, "gid": g["gid"], "mkt": "pass_td", "proj": round(lam, 2),
+                                    "season": round(sum(x.get("pass_td") or 0 for x in qg) / len(qg), 2) if qg else None,
+                                    "l3": [int(x.get("pass_td") or 0) for x in qg[-3:]], "opp_f": 1.0,
+                                    "line": ln.get("line") if ln else None,
+                                    "over": ln.get("over") if ln else None, "under": ln.get("under") if ln else None,
+                                    "over_sel": ln.get("over_sel") if ln else None, "under_sel": ln.get("under_sel") if ln else None,
+                                    "vol": False, "ptd": True, **({"inj": "Q", "inj_d": it["d"]} if it else {})})
     # price every two-sided Onyx line: the model's chance, the blend, the edge
     bt = lane.load("backtest.json", None) or {}
     w = ((bt.get("lane") or {}).get("w_props")) or DEFAULT_W
     for r in out:
         if r["line"] is None or r["over"] is None or r["under"] is None:
             continue
-        if r.get("vol"):    # v4: volume projection, its own spread, blend weight and value bar
+        if r.get("ptd"):    # v9: passing touchdowns, Poisson, 30% model
+            po = M.prob_over_poisson(r["proj"], r["line"])
+            ps = L.price_side(po, r["over"], r["under"], M.PTD_P["w"])
+        elif r.get("vol"):    # v4: volume projection, its own spread, blend weight and value bar
             po = M.prob_over_volume(r["mkt"], r["proj"], r["line"])
             ps = L.price_side(po, r["over"], r["under"], M.VOL_P[r["mkt"]]["w"])
             r["value_min"] = M.VOL_P[r["mkt"]]["edge"]
@@ -545,7 +562,7 @@ def tennis_rows(lane, slate, odds, w):
 
 
 MKT_WORD = {"ml": "moneyline", "spread": "spread", "total": "total", "pass_yds": "passing yards", "rush_yds": "rushing yards",
-            "rec_yds": "receiving yards", "rec": "receptions"}
+            "rec_yds": "receiving yards", "rec": "receptions", "pass_td": "passing TDs"}
 
 
 # what people bet first: spreads, totals and player props lead the plays; a
