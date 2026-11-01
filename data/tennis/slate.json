@@ -15758,8 +15758,8 @@
     {
      "id": "187370",
      "start": "2026-11-01T19:00Z",
-     "state": "pre",
-     "detail": "11/1 - 2:00 PM EST",
+     "state": "in",
+     "detail": "1st",
      "round": "Qualifying Final",
      "draw": "Women's Singles",
      "court": "Campo 1",
@@ -15770,8 +15770,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        1
+       ],
+       "serve": true
       },
       {
        "name": "Elizabeth Mandlik",
@@ -15779,16 +15781,18 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        1
+       ],
        "serve": false
       }
      ]
     },
     {
      "id": "187367",
-     "start": "2026-11-01T19:00Z",
-     "state": "pre",
-     "detail": "11/1 - 2:00 PM EST",
+     "start": "2026-11-01T19:05Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Qualifying Final",
      "draw": "Women's Singles",
      "court": "Campo 3",
@@ -15799,7 +15803,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        1
+       ],
        "serve": false
       },
       {
@@ -15808,8 +15814,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/col.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        0
+       ],
+       "serve": true
       }
      ]
     },
@@ -17819,5 +17827,5 @@
    ]
   }
  ],
- "fetched": "2026-11-01T18:42:45+00:00"
+ "fetched": "2026-11-01T19:14:30+00:00"
 }
