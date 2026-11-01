@@ -84,6 +84,47 @@ def main():
 
     features = IX.features
 
+    # Onyx's own lines in the player's other markets, same game (opening): a combo priced out
+    # of line with its parts, or yards out of line with catches, is information
+    XL = defaultdict(dict)
+    for fn in ("nfl_lines.json", "nfl_combo_a.json", "nfl_combo_b.json", "nfl_combo_ya.json", "nfl_combo_yb.json", "nfl_pass_td.json"):
+        if os.path.exists(BT + fn):
+            for fid, x in json.load(open(BT + fn)).items():
+                for nm, mk in (x.get("props") or {}).items():
+                    for mid_, v in mk.items():
+                        if v.get("o") and v["o"][0] is not None and None not in v["o"][1:3]:
+                            io_, iu_ = L.implied(v["o"][1]), L.implied(v["o"][2])
+                            XL[(fid, nm)][mid_] = (v["o"][0], io_ / (io_ + iu_))
+
+    def cross(mkt, fid, nm, f, ln):
+        o = XL.get((fid, nm), {})
+        g = lambda m: o.get(m, (None, None))[0]
+        out = {}
+        ry, rcy, py, rec = g("player_rushing_yards"), g("player_receiving_yards"), g("player_passing_yards"), g("player_receptions")
+        if mkt == "rush_rec_yds":
+            out["x_parts"] = (ry or 0) + (rcy or 0) - ln if (ry is not None or rcy is not None) else 0.0
+            out["x_has"] = float((ry is not None) + (rcy is not None))
+        if mkt == "pass_rush_yds":
+            out["x_parts"] = (py or 0) + (ry or 0) - ln if py is not None else 0.0
+            out["x_has"] = float((py is not None) + (ry is not None))
+        if mkt == "rec_yds":
+            out["x_rec_ypr"] = rec * f["ypt"] / max(0.3, f["catch_rate"]) - ln if rec is not None else 0.0
+            out["x_rec_line"] = rec or 0.0
+            out["x_ypr_line"] = ln / rec if rec else 0.0
+        if mkt == "rec":
+            out["x_yds_line"] = rcy or 0.0
+            out["x_ypc_implied"] = rcy / ln if rcy and ln else 0.0
+        if mkt == "pass_td":
+            out["x_pass_yds"] = py or 0.0
+            out["x_att"] = g("player_passing_attempts") or 0.0
+            out["x_td_per_100"] = 100 * ln / py if py else 0.0
+        if mkt in ("pass_yds", "pass_att"):
+            out["x_att"] = g("player_passing_attempts") or 0.0
+            out["x_pass_yds"] = py or 0.0
+        if mkt == "rush_yds":
+            out["x_rec_yds"] = rcy or 0.0
+        return out
+
     DATA = {}
     for mkt, (mid, stat, files) in MARKETS.items():
         if only and mkt not in only:
@@ -142,6 +183,8 @@ def main():
                     f = features(pid, season, week, team, opp, stat, ln, imp, spr, home)
                     if f is None:
                         continue
+                    if "--cross" in sys.argv:
+                        f.update(cross(mkt, fid, nm, f, ln))
                     c = v.get("c") or [None, None, None]
                     S.append({"season": 2025 if g["date"] < "2026-03-01" else 2026, "date": g["date"], "p": io / (io + iu), "po": po, "pu": pu, "line_": ln,
                               "cl": c[0], "co": c[1], "cu": c[2],
@@ -290,6 +333,9 @@ def select_and_test(DATA, k_max=4, out="bt/nfl_select.json"):
                 chosen.append(cand[1])
             else:
                 break
+        forced = [x.split("=", 1)[1] for x in sys.argv if x.startswith("--force=")]
+        if forced:      # judge a fixed set of statistics (chosen by the screen) instead of selecting
+            chosen = [k for k in forced[0].split(",") if k in keys]
         w = fit(X(tr, chosen), y(tr), R)
         wb = fit(X(tr, []), y(tr))
         base = ll(wb, X(te, []), y(te))
@@ -349,7 +395,7 @@ def select_and_test(DATA, k_max=4, out="bt/nfl_select.json"):
         print(f"   2026 log loss: model {mdl:.4f} vs Onyx {raw:.4f} (Onyx refit {base:.4f})")
         print(f"   2025 (fit) 3pp+: {r['bets_2025_3pp']}")
         print(f"   2026 (unseen) 3pp+: {r['bets_2026_3pp']}   5pp+: {r['bets_2026_5pp']}")
-    json.dump(res, open(out, "w"), indent=1)
+    json.dump(res, open(out.replace(".json", "_cross.json") if "--cross" in sys.argv else out, "w"), indent=1)
     return res
 
 

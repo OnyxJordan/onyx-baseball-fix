@@ -522,6 +522,29 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
     ledger `data/cfb/prop_trial.json` (capture `prop_opening.json`), graded off the box; a
     player with no box line is a void (Onyx settles him at 0, so this undercounts unders).
     Receiving yards failed; receptions and passing yards had too few early lines to choose on.
+  - **NHL unders on a home back-to-back (11/1, nhl_model v2, on trial).** `tools/nhl_game_screen.py`
+    screens ~60 team statistics from the NHL API boxscores against Onyx's moneyline, puck
+    line and total (chosen before 2/1/2026, judged after). Nothing chosen beat Onyx, but the
+    home team on a back-to-back helped total-goals log loss in both periods (2026 .6836 vs
+    .6875). As a rule, every under on a home back-to-back: 2024-25 market prices 41-32
+    +9.6%, Onyx before 2/1 54-35 +16.9%, after 26-9 +46.2%; close 38-29 / 21-8. Logged at
+    the opening total and price by `sports_build.nhl_b2b_lane` to `data/nhl/b2b_trial.json`
+    (capture `b2b_opening.json`); who played yesterday comes from the NHL schedule API by
+    local date (ESPN results are dated in UTC, which misreads late games). Graded off
+    `results.json`.
+  - **NFL cross-market statistics (11/1, tested, not adopted).** `--cross` adds Onyx's own
+    opening lines in the player's other markets (a combo vs the sum of its parts, yards vs
+    catches, passing TDs vs passing yards). Passing + rushing yards vs its parts sharpens the
+    chance (2026 log loss .6885 vs Onyx .6931, 196 lines) but rarely makes a 3pp edge (7 bets);
+    rushing + receiving yards' parts gap won in 2025 (+12.7%) and lost in 2026 (-11.6%).
+    Receiving yards and passing TDs: nothing. No lane.
+  - **Tennis vs Onyx (11/1, tested, not adopted).** `tools/tennis_feature_screen.py` rebuilds
+    Elo, surface Elo, 14/45-day form and fatigue, games share and games per match walk-forward
+    from 36,666 results and runs the v11 method on 15,491 matched Onyx lines (match winner
+    5,059 / 6,581, total games 1,411 / 2,503, games spread 1,418 / 2,546; chosen before
+    1/1/2026, judged after). Nothing beat Onyx on the unseen year: match winner .6009 vs .6000,
+    total games .6927 vs .6909 (unders 3pp+ -15.5%), spread .6935 vs .6890. Onyx's tennis prices
+    are efficient; tennis stays leans.
   - **NHL points and assists vs Onyx (11/1, tested, not adopted).** `tools/nhl_box_pull.py`
     pulls NHL API boxscores (ice time, shots, power-play goals, shifts, hits, blocks,
     position) and `tools/nhl_feature_screen.py` runs the NFL v11 method on 16,484 points and
