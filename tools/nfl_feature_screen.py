@@ -422,7 +422,8 @@ def select_and_test(DATA, k_max=4, out="bt/nfl_select.json"):
     for mkt, S in DATA.items():
         TRAIN = {int(x) for x in ([a.split("=", 1)[1] for a in sys.argv if a.startswith("--train=")] or ["2025"])[0].split(",")}
         tr = sorted([s for s in S if s["season"] in TRAIN], key=lambda s: s.get("date", ""))
-        te = [s for s in S if s["season"] == 2026]
+        TEST = int(([a.split("=", 1)[1] for a in sys.argv if a.startswith("--test=")] or ["2026"])[0])
+        te = [s for s in S if s["season"] == TEST]
         if len(tr) < 150 or len(te) < 60:
             continue
         keys = list(tr[0]["f"])
