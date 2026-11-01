@@ -156,7 +156,7 @@
     }
     return d + (a.length - i) + (b.length - j) <= 1;
   }
-  var NOT_NAMES = /^(will|wills|rebound|rebounds|assist|catch|rush|pass|likely|likes|half|halves|quarter|quarters|scorer|scorers|rusher|rushers|receiver|receivers|passer|leading|leader|top|round|robin|basket|bucket|touchdown|touchdowns|totals|chance|chances|safest|lock|locks|tonight|tomorrow|night|slate|card|board|sharp|steam|juice|payout|pays|winner|winners|underdog|underdogs|favorite|favorites|again|every|other|their|there|these|those|about|around|would|could|should|shot|shots|star|stars|over|under|overs|unders|most|plus|game|games|best|safe|safest|team|teams|with|tonight|today|points|value|parlay|legs|leg|lock|bets|plays|picks|money|line|lines|odds|total|totals|spread|score|scores|win|wins|first|anytime|rebounds|assists|yards|receptions|sunday|monday|tuesday|wednesday|thursday|friday|saturday|week|weekend|give|what|which|who|like|need|want|good|more|less|than|from|this|that|the|and|for|nba|nfl|nhl|tennis|college|longshots|dogs|favorites|fade|stack|sgp|props|prop|player|players|ticket|double|triple|edge|bet|play|pick|side|sides|only|just|ats|ml|moneyline|moneylines|spreads|run|runs|puck|goal|goals|alt|alts|alternate|ladder|live|hedge|cover|covers|dog|fav|favs|chalk|lean|leans|model|onyx|parlays|sgps|plus|minus|even|safe|hammer|nuke|banker|bankers|longshot|sleeper|sleepers|fades|tail|tails|boost|boosts|power|prime|primetime|early|late|slate|main|night|afternoon|morning|home|away|road|big|small|low|high|long|short|hot|cold|streak|streaks|trend|trends|units|unit|bankroll|book|books|price|prices|number|numbers|key|keys|half|full|period|periods|inning|innings|set|sets|match|matches|fight|fights|card|cards|round|rounds|teaser|teasers|correlated|stacked|same|different|any|all|both|each|either|neither|one|two|three|four|five|six|seven|eight|nine|ten|twelve|dozen|couple|few|some|many|much|pair|guard|guards|center|centers|forward|forwards|wing|wings|qb|qbs|rb|rbs|wr|wrs|te|tes|upset|upsets|value|sharp|sharpest|night|monday|sunday)$/;
+  var NOT_NAMES = /^(gimme|gimmie|lemme|pls|plz|yo|build|hit|show|whats|wanna|gonna|tonite|please|need|want|give|can|you|me|my|some|good|best|top|safest|what|about|is|going|his|her|for|the|a|an|and|or|from|with|i|will|wills|rebound|rebounds|assist|catch|rush|pass|likely|likes|half|halves|quarter|quarters|scorer|scorers|rusher|rushers|receiver|receivers|passer|leading|leader|top|round|robin|basket|bucket|touchdown|touchdowns|totals|chance|chances|safest|lock|locks|tonight|tomorrow|night|slate|card|board|sharp|steam|juice|payout|pays|winner|winners|underdog|underdogs|favorite|favorites|again|every|other|their|there|these|those|about|around|would|could|should|shot|shots|star|stars|over|under|overs|unders|most|plus|game|games|best|safe|safest|team|teams|with|tonight|today|points|value|parlay|legs|leg|lock|bets|plays|picks|money|line|lines|odds|total|totals|spread|score|scores|win|wins|first|anytime|rebounds|assists|yards|receptions|sunday|monday|tuesday|wednesday|thursday|friday|saturday|week|weekend|give|what|which|who|like|need|want|good|more|less|than|from|this|that|the|and|for|nba|nfl|nhl|tennis|college|longshots|dogs|favorites|fade|stack|sgp|props|prop|player|players|ticket|double|triple|edge|bet|play|pick|side|sides|only|just|ats|ml|moneyline|moneylines|spreads|run|runs|puck|goal|goals|alt|alts|alternate|ladder|live|hedge|cover|covers|dog|fav|favs|chalk|lean|leans|model|onyx|parlays|sgps|plus|minus|even|safe|hammer|nuke|banker|bankers|longshot|sleeper|sleepers|fades|tail|tails|boost|boosts|power|prime|primetime|early|late|slate|main|night|afternoon|morning|home|away|road|big|small|low|high|long|short|hot|cold|streak|streaks|trend|trends|units|unit|bankroll|book|books|price|prices|number|numbers|key|keys|half|full|period|periods|inning|innings|set|sets|match|matches|fight|fights|card|cards|round|rounds|teaser|teasers|correlated|stacked|same|different|any|all|both|each|either|neither|one|two|three|four|five|six|seven|eight|nine|ten|twelve|dozen|couple|few|some|many|much|pair|guard|guards|center|centers|forward|forwards|wing|wings|qb|qbs|rb|rbs|wr|wrs|te|tes|upset|upsets|value|sharp|sharpest|night|monday|sunday)$/;
   function findPlayer(t, C) {
     var keys = Object.keys(C), words = t.trim().split(/\s+/);
     var best = function (cands) { return cands.sort(function (a, b) { return C[b].score - C[a].score; })[0]; };
@@ -185,6 +185,12 @@
 
   function localSpec(q, B) {
     var t = ' ' + q.toLowerCase().replace(/[’']/g, '').replace(/[?!,]/g, ' ').replace(/\s+/g, ' ') + ' ';
+    // the common misspellings (tested: tools/ask_bigcorpus.py), and shorthand
+    t = t.replace(/\bparly\b|\bparley\b|\bparlya\b/g, 'parlay').replace(/\bpasing\b/g, 'passing').replace(/\brec[ie]{2}ving\b/g, 'receiving')
+         .replace(/\brusing\b|\brushin\b/g, 'rushing').replace(/\breboun?ds?\b|\brebouds\b/g, 'rebounds').replace(/\basists?\b/g, 'assists')
+         .replace(/\brecep[a-z]*ons?\b/g, 'receptions').replace(/\bpionts\b|\bponts\b/g, 'points').replace(/\bbasketbal\b/g, 'basketball')
+         .replace(/\bhocky\b|\bhockee\b/g, 'hockey').replace(/\btouchdwns?\b|\btouchdowns?\b/g, function (m) { return /s$/.test(m) ? 'touchdowns' : 'touchdown'; })
+         .replace(/\brec (yards|yds)\b/g, 'receiving yards').replace(/\brush (yards|yds)\b/g, 'rushing yards').replace(/\bpass (yards|yds)\b/g, 'passing yards');
     var s = {intent: 'list', count: null, sports: [], markets: [], side: 'any', min_price: null, max_price: null, min_conf: null,
              min_edge: null, player: null, team: null, sort: 'conf', one_per_game: true, when: null, summary: ''};
     // what kind of answer
@@ -205,7 +211,8 @@
     // how many
     var n = t.match(/\b(\d{1,2})[\s-]*(leg|legs|legger|picks?|plays?|players?|bets?|team|man|teamer)\b/) || t.match(/\btop\s*(\d{1,2})\b/)
       || t.match(/\bparlay of (\d{1,2})\b/) || t.match(/\b(\d{1,2})\s+(nba|nfl|nhl|college|tennis)\b/);
-    var nw = t.match(/\b(two|three|four|five|six|seven|eight|nine|ten|couple|few)( of)?[\s-]*(leg|legs|legger|picks?|plays?|bets?|team|man)\b/);
+    var nw = t.match(/\b(two|three|four|five|six|seven|eight|nine|ten|couple|few)( of)?[\s-]*(leg|legs|legger|picks?|plays?|bets?|team|man)\b/)
+      || t.match(/\b(?:parlay|ticket|sgp) of (two|three|four|five|six|seven|eight|nine|ten)\b/);
     if (!n && !nw) {
       var n2 = t.match(/\b(\d{1,2})\s+(?:\w+\s+){0,2}?(overs|unders|props|plays|picks|bets|players|teams|sides|dogs|favorites|favs|scorers|rebounds|assists|points|receptions|touchdowns|tds|totals|spreads|parlay|sgp|legger)\b/);
       if (n2 && +n2[1] <= 12 && !/\b\d{1,2}\s+(points|rebounds|assists|receptions|tds|touchdowns)\s+(or|and|in|a|per)\b/.test(t)) n = [n2[0], n2[1]];
@@ -253,8 +260,10 @@
     if (favW && !dogW && s.markets.length === 1 && s.markets[0] === 'ml') s.max_price = s.max_price == null ? -101 : Math.min(s.max_price, -101);
     if (propsW) s.props_only = true;
     // over / under
-    var ov = /\bovers?\b|\bhit the over\b|\bgo over\b|\bclear\b/.test(t.replace(/\bover\s*[+-]\d/g, '').replace(/over\/under/g, '')),
-        un = /\bunders?\b|\bstay under\b|\bfade\b/.test(t.replace(/\bunder\s*[+-]\d/g, '').replace(/over\/under/g, ''));
+    // "over +150" alone is a price; "under -110 or better" is the under at a price rule
+    var PR = '\\s*[+-]\\d+(?!\\d|\\s*(or|and)\\s*(better|shorter|longer|worse|more|less))';
+    var ov = /\bovers?\b|\bhit the over\b|\bgo over\b|\bclear\b/.test(t.replace(new RegExp('\\bover' + PR, 'g'), '').replace(/over\/under/g, '')),
+        un = /\bunders?\b|\bstay under\b|\bfade\b/.test(t.replace(new RegExp('\\bunder' + PR, 'g'), '').replace(/over\/under/g, ''));
     if (/over ?(\/|or|and|-)? ?under|o\/u/.test(t)) { ov = false; un = false; }
     if (ov && !un) s.side = 'over';
     if (un && !ov) s.side = 'under';
@@ -305,7 +314,9 @@
     }
     // a team, by nickname or abbreviation
     var keys = Object.keys(NICK).sort(function (a, b) { return b.length - a.length; });
-    for (var k = 0; k < keys.length && !s.team; k++) {
+    // "oregon ducks", "miami hurricanes": a college name before the nickname is the college, not the pro team
+    var collegeLead = /\b(oregon|florida|georgia|texas|alabama|michigan|ohio state|penn state|miami|arizona|arizona state|washington|iowa|iowa state|kansas|kansas state|oklahoma|tennessee|kentucky|louisville|clemson|auburn|lsu|usc|ucla|notre dame|colorado|utah|stanford|baylor|tcu|wisconsin|minnesota|nebraska|missouri|arkansas|ole miss|south carolina|north carolina|nc state|virginia|virginia tech|syracuse|pitt|boston college|byu|houston|cincinnati|ucf|texas tech)\s+(ducks|gators|bulldogs|longhorns|crimson tide|wolverines|buckeyes|nittany lions|hurricanes|wildcats|huskies|hawkeyes|cyclones|jayhawks|sooners|volunteers|cardinals|tigers|trojans|bruins|fighting irish|buffaloes|utes|bears|horned frogs|badgers|gophers|golden gophers|cornhuskers|razorbacks|rebels|gamecocks|tar heels|wolfpack|cavaliers|hokies|orange|panthers|eagles|cougars|bearcats|knights|red raiders|sun devils)\b/.test(t);
+    for (var k = 0; k < keys.length && !s.team && !collegeLead; k++) {
       var nk_ = keys[k];
       if (new RegExp('\\b' + esc(nk_) + '\\b').test(t)) {
         s.team = NICK[keys[k]];
@@ -319,9 +330,11 @@
     }
     // several teams: "from the Chiefs, Broncos, Patriots or Dolphins" (one league, nicknames)
     var many = [];
-    for (var k2 = 0; k2 < keys.length; k2++) {
+    // the league of the nickname actually typed ("broncos" is DEN in the NFL, not the Nuggets)
+    var lgOf = SPORT_OF_NICK[keys.filter(function (x) { return NICK[x] === s.team && new RegExp('\\b' + esc(x) + '\\b').test(t); })[0]];
+    for (var k2 = 0; k2 < keys.length && !collegeLead; k2++) {
       if (new RegExp('\\b' + esc(keys[k2]) + '\\b').test(t) && many.indexOf(NICK[keys[k2]]) < 0
-          && (!s.team || SPORT_OF_NICK[keys[k2]] === SPORT_OF_NICK[keys.filter(function (x) { return NICK[x] === s.team; })[0]])) many.push(NICK[keys[k2]]);
+          && (!s.team || SPORT_OF_NICK[keys[k2]] === lgOf)) many.push(NICK[keys[k2]]);
     }
     if (many.length > 1) { s.teams = many; s.team = null; }
     if (!s.team && !(s.teams || []).length) {
