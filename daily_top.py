@@ -20,7 +20,8 @@ Onyx's opening price, on trial) or "lean" (the model's read, not graded).
 Pipeline-safe: json only.
 """
 import json
-from datetime import datetime, timezone
+import re
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 PRICE = (-150, 150)
@@ -98,6 +99,46 @@ def write(data_dir, sport, date, rows):
 BOARD_KEEP = 1500
 
 
+_NUM = re.compile(r"([+-]?\d+(?:\.\d+)?)\s*$")
+
+
+def keep_pregame(data_dir, rows, hours=36):
+    """data/<sport>/pregame.json: every game's last pregame Onyx line (spread by team, total,
+    moneyline by side), captured only while the game has not started and kept 36 hours after.
+    The board drops a game at its start; the live tab (live.js) starts each live chance from
+    this line. Fail-soft: a bad file is rebuilt."""
+    p = Path(data_dir) / "pregame.json"
+    try:
+        P = json.loads(p.read_text(encoding="utf-8"))
+    except Exception:
+        P = {}
+    now = datetime.now(timezone.utc)
+
+    def when(s):
+        try:
+            return datetime.fromisoformat(str(s).replace("Z", "+00:00"))
+        except ValueError:
+            return None
+    for e in rows:
+        k = e.get("kind")
+        st = when(e.get("start"))
+        if k not in ("spread", "total", "ml") or not st or st <= now or not e.get("matchup"):
+            continue
+        g = P.setdefault(str(e.get("gid")), {"m": e["matchup"], "start": e.get("start"), "sp": {}, "ml": {}})
+        g["m"], g["start"] = e["matchup"], e.get("start")
+        if k == "total" and e.get("line") is not None:
+            g["tot"] = e["line"]
+        elif k == "spread":
+            m = _NUM.search(str(e.get("label") or ""))
+            if m:
+                g["sp"][e.get("name")] = float(m.group(1))
+        elif k == "ml" and e.get("price") is not None:
+            g["ml"][e.get("name")] = e["price"]
+    P = {k: v for k, v in P.items() if (when(v.get("start")) or now) > now - timedelta(hours=hours)}
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text(json.dumps(P, separators=(",", ":")), encoding="utf-8")
+
+
 def write_board(data_dir, sport, date, rows, teams=None):
     """data/<sport>/board.json: every priced Onyx side the model reads today,
     any price, for the home page's "Ask Onyx" search (it filters and builds
@@ -115,6 +156,7 @@ def write_board(data_dir, sport, date, rows, teams=None):
             continue
         seen.add(k)
         out.append(e)
+    keep_pregame(data_dir, out)
     p = Path(data_dir) / "board.json"
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(json.dumps({"sport": sport, "date": date, "generated": datetime.now(timezone.utc).isoformat(timespec="seconds"),

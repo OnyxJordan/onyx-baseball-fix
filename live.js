@@ -134,5 +134,100 @@
     return out;
   }
 
-  window.OnyxLive = {left: left, model: model, plays: plays, noVig: noVig, implied: implied, phi: phi};
+  // ── every game in progress, every sport: ESPN state + our pregame line -> live numbers ──
+  var ESPN = 'https://site.api.espn.com/apis/site/v2/sports/';
+  var LEAGUES = [['nfl', 'football/nfl'], ['cfb', 'football/college-football'], ['nba', 'basketball/nba'], ['nhl', 'hockey/nhl'],
+                 ['tennis', 'tennis/atp'], ['tennis', 'tennis/wta']];
+  var DEF_TOTAL = {nfl: 44, cfb: 54, nba: 228, nhl: 6};
+  var BOARD = {}, PRE = {}, BOARD_AT = 0;
+  function getJSON(u) { return fetch(u, {cache: 'no-cache'}).then(function (r) { if (!r.ok) throw new Error(u); return r.json(); }); }
+  function boards() {
+    if (Date.now() - BOARD_AT < 10 * 60e3) return Promise.resolve(BOARD);
+    return Promise.all(['nfl', 'cfb', 'nba', 'nhl', 'tennis'].map(function (k) {
+      return Promise.all([
+        getJSON('data/' + k + '/board.json').then(function (j) { BOARD[k] = j.plays || []; }).catch(function () { BOARD[k] = BOARD[k] || []; }),
+        getJSON('data/' + k + '/pregame.json').then(function (j) { PRE[k] = j || {}; }).catch(function () { PRE[k] = PRE[k] || {}; })]);
+    })).then(function () { BOARD_AT = Date.now(); return BOARD; });
+  }
+  function nk(n) { return String(n || '').normalize('NFKD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z ]/g, ' ').replace(/\s+/g, ' ').trim(); }
+  // the pregame Onyx line for a game: home expected margin, total, home win chance.
+  // data/<sport>/pregame.json keeps each game's last line from before its start (the board
+  // drops a game once it starts); the board is the fallback. Spreads come from the label
+  // ("NE -7"), which is always the team's own handicap.
+  var NUM = /([+-]?\d+(?:\.\d+)?)\s*$/;
+  function sameGame(m, home, away) { return m === away + ' @ ' + home || m === home + ' vs ' + away || m === away + ' vs ' + home; }
+  function pregame(sport, rows, home, away, pre) {
+    var out = {margin: null, total: null, home_win: null, spread_txt: null, total_txt: null};
+    var hit = null;
+    Object.keys(pre || {}).forEach(function (k) { if (sameGame(pre[k].m, home, away)) hit = pre[k]; });
+    var sp = {}, ml = {}, tot = null;
+    if (hit) { sp = hit.sp || {}; ml = hit.ml || {}; tot = hit.tot; }
+    else rows.forEach(function (p) {
+      if (p.kind === 'prop' || !sameGame(p.matchup, home, away)) return;
+      if (p.kind === 'spread') { var m = NUM.exec(String(p.label || '')); if (m) sp[p.name] = +m[1]; }
+      else if (p.kind === 'total' && p.line != null) tot = p.line;
+      else if (p.kind === 'ml' && p.price != null) ml[p.name] = p.price;
+    });
+    var hn = Object.keys(sp).filter(function (n) { return n === home || nk(n) === nk(home); })[0];
+    var an = Object.keys(sp).filter(function (n) { return n === away || nk(n) === nk(away); })[0];
+    var hl = hn != null ? sp[hn] : an != null ? -sp[an] : null;
+    if (hl != null) { out.margin = -hl; out.spread_txt = home + ' ' + (hl > 0 ? '+' + hl : hl === 0 ? 'pk' : hl); }
+    if (tot != null) { out.total = tot; out.total_txt = String(tot); }
+    var mh = Object.keys(ml).filter(function (n) { return n === home || nk(n) === nk(home); })[0];
+    var ma = Object.keys(ml).filter(function (n) { return n === away || nk(n) === nk(away); })[0];
+    if (mh != null) out.home_win = noVig(ml[mh], ma != null ? ml[ma] : null);
+    else if (ma != null) out.home_win = 1 - noVig(ml[ma], null);
+    return out;
+  }
+  function team(c) { var t = c.team || {}; return t.abbreviation || (c.athlete || {}).displayName || t.displayName; }
+  // one live game -> what the page shows
+  function game(sport, e, c, rows, pre0) {
+    var st = (c.status || e.status || {}), ty = st.type || {};
+    if (ty.state !== 'in') return null;
+    var H = {}, cs = c.competitors || [];
+    cs.forEach(function (x) { H[x.homeAway || (x.order === 1 ? 'home' : 'away')] = x; });
+    if (!H.home || !H.away) { H.away = cs[0]; H.home = cs[1]; }
+    if (!H.home || !H.away) return null;
+    var home = team(H.home), away = team(H.away), g;
+    if (sport === 'tennis') {
+      var sets = function (me, op) { var w = 0; (me.linescores || []).forEach(function (l, i) { var a = +l.value, b = +((op.linescores || [])[i] || {}).value;
+        if ((a >= 6 && a - b >= 2) || a === 7) w++; }); return w; };
+      var pg = pregame(sport, rows, home, away, pre0);
+      g = {hs: sets(H.home, H.away), as: sets(H.away, H.home), best: /grand slam|open/i.test(e.name || '') && (e.groupings || [{}])[0] && /men/i.test(((e.groupings || [{}])[0].grouping || {}).displayName || '') ? 5 : 3,
+           pre_home_win: pg.home_win, home: home, away: away};
+      var m = model('tennis', g);
+      return {sport: sport, gid: e.id, home: home, away: away, state: (H.away.linescores || []).map(function (l, i) { return l.value + '-' + (((H.home.linescores || [])[i] || {}).value || 0); }).join(' '),
+              detail: ty.shortDetail || ty.detail || '', home_win: m.win(), pre: pg, f: null, name: away + ' vs ' + home};
+    }
+    var hs = +H.home.score || 0, as = +H.away.score || 0, f = left(sport, st.period, st.clock);
+    if (f == null) return null;
+    var pre = pregame(sport, rows, home, away, pre0);
+    g = {hs: hs, as: as, f: f, pre_margin: pre.margin != null ? pre.margin : pre.home_win != null && sport !== 'nhl' ? (pre.home_win - 0.5) * 2 * SD[sport][0] * 0.8 : 0,
+         pre_total: pre.total != null ? pre.total : DEF_TOTAL[sport], pre_home_win: pre.home_win != null ? pre.home_win : 0.5, home: home, away: away};
+    var M = model(sport, g);
+    var r2 = function (x) { return Math.round(x * 2) / 2; };
+    var pm = M.proj_margin, fair = r2(-pm);
+    return {sport: sport, gid: e.id, home: home, away: away, hs: hs, as: as, detail: ty.shortDetail || ty.detail || '', f: f,
+            home_win: M.win(), proj_total: M.proj_total != null ? Math.round(M.proj_total * 10) / 10 : null,
+            fair_spread: home + ' ' + (fair > 0 ? '+' : fair === 0 ? '' : '') + (fair === 0 ? 'pk' : fair), pre: pre,
+            over_pre: pre.total != null && M.over ? M.over(pre.total) : null, name: away + ' @ ' + home};
+  }
+  // every live game across the sports (optionally only some sports)
+  function games(only) {
+    var L = LEAGUES.filter(function (l) { return !only || only.indexOf(l[0]) >= 0; });
+    return boards().then(function (B) {
+      return Promise.all(L.map(function (l) {
+        return getJSON(ESPN + l[1] + '/scoreboard' + (l[0] === 'cfb' ? '?groups=80' : '')).then(function (j) {
+          var out = [];
+          (j.events || []).forEach(function (e) {
+            if (l[0] === 'tennis') ((e.groupings || []).forEach(function (gr) { (gr.competitions || []).forEach(function (c) { var x = game('tennis', e, c, B.tennis || [], PRE.tennis); if (x) out.push(x); }); }));
+            else { var x = game(l[0], e, (e.competitions || [{}])[0], B[l[0]] || [], PRE[l[0]]); if (x) out.push(x); }
+          });
+          return out;
+        }).catch(function () { return []; });
+      })).then(function (a) { return [].concat.apply([], a); });
+    });
+  }
+
+  window.OnyxLive = {left: left, model: model, plays: plays, noVig: noVig, implied: implied, phi: phi, games: games, pregame: pregame};
 })();
