@@ -163,7 +163,7 @@ def main():
                 g, a, h = match_game(f, slate["next_games"])
                 if g:
                     targets[fid] = (lg, ("next", g, a, h))
-    mk = "".join(f"&market={m}" for m in list(spec["game"]) + list(spec["props"]) + list(spec["yes"]) + list(spec.get("extra", ())))
+    mk = "".join(f"&market={urllib.parse.quote(m)}" for m in list(spec["game"]) + list(spec["props"]) + list(spec["yes"]) + list(spec.get("extra", ())))
     by_league = {}
     for fid, (lg, t) in targets.items():
         by_league.setdefault(lg, []).append(fid)

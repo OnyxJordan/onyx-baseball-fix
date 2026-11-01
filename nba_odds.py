@@ -110,7 +110,7 @@ def onyx_pull(key, slate):
         print("nba onyx: no fixtures to price")
         return {}, {}
     by_fid = {v: k for k, v in fids.items()}
-    mk = "".join(f"&market={m}" for m in list(STATS) + list(EXTRA) + list(GAME_MKTS) + [FB_MKT, Q1_ML] + list(PERIOD_TOTALS))
+    mk = "".join(f"&market={urllib.parse.quote(m)}" for m in list(STATS) + list(EXTRA) + list(GAME_MKTS) + [FB_MKT, Q1_ML] + list(PERIOD_TOTALS))
 
     players, games = {}, {}
     order = list(fids.items())

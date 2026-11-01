@@ -68,7 +68,7 @@ def main():
         d += timedelta(days=1)
     print("completed fixtures", len(games))
 
-    mk = "".join(f"&market={m}" for m in markets)
+    mk = "".join(f"&market={urllib.parse.quote(m)}" for m in markets)   # "+" in a market id must be encoded (11/1)
     n_props = 0
     for fid, g in games.items():
         r = get("/fixtures/odds/historical", f"&fixture_id={urllib.parse.quote(fid)}&sportsbook={book}"
