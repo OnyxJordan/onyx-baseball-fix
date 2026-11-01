@@ -1442,6 +1442,23 @@ model's number on it.
   gpt-4.1-mini). The key is never committed. Set a monthly budget on the OpenAI account: the page
   is public. With `ai.json` live, `node tools/verify_ask.js` runs the 500-query corpus through it.
 
+**Live tab (11/1).** `home.html#live`, plus Ask Onyx for any "live" question or a request whose
+teams are playing now. `live.js` reads every game in progress off ESPN (NFL, college football,
+NBA, NHL, ATP/WTA) and gives our live numbers: the chance each side wins, our spread and total
+from here, and how far the game has swung from Onyx's pregame line. Models: football and NBA
+play the rest of the game as a normal draw around the pregame spread and total (full-game SDs
+NFL 13.5/13.5, college 16/17, NBA 12.5/18) scaled by the share of the game left; NHL is Poisson
+goals for the time left, the rates split to match the pregame moneyline (OT a coin flip); tennis
+plays out the remaining sets from a set-win chance fitted to the pregame match price. Each
+reproduces the pregame price at the start. The pregame line comes from
+`data/<sport>/pregame.json` (`daily_top.keep_pregame`: every game's last line captured before its
+start, kept 36 hours), because the board drops a game once it starts.
+Onyx does not put in-game prices in our feed: `tools/onyx_live_probe.py` (odds_probe job=live,
+11/1 21:38 UTC) found 0 priced rows on all 15 games in progress while not-started games on the
+same call had 1786 (BKN @ IND) and 193 (EDM @ NYR). So the tab shows our numbers, not edges or
+bet buttons, says so, and links to the live price in the Onyx app. The live models are not
+tested against in-game prices, so nothing live is a pick.
+
 **10/31 follow-ups.** A parlay spreads across games first and, when the board is short of
 games, fills its remaining legs from games it already uses (an SGP+, labelled on the ticket,
 never one player twice, one game line of each kind per game). My bets (`onyxMyBets`, ui.js and

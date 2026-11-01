@@ -19,6 +19,7 @@
 <script src="onyx.js" defer></script>
 <script src="saved.js"></script>
 <script src="ask.js"></script>
+<script src="live.js"></script>
 <script>
 if ('serviceWorker' in navigator && location.protocol === 'https:') {
   addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
@@ -78,6 +79,19 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
 .ask-u{font:600 11px monospace;color:#9a93a6;margin:12px 0 10px;line-height:1.5}.ask-u b{color:#d795ff}
 .ask-say{font-size:15px;line-height:1.5;color:#efeaf7;margin:14px 0 4px}.ask-why{font-size:14px;line-height:1.55;color:#cfc7dc;border-left:2px solid #a24bff;padding:2px 0 2px 12px;margin:14px 0}
 .ask-cl{border:1px solid #3a2a55;border-radius:14px;padding:14px 16px;margin:12px 0;background:rgba(162,75,255,.06)}.ask-cl b{display:block;font-size:15px;line-height:1.45;color:#efeaf7;margin-bottom:10px}.ask-cl .ask-ex{flex-wrap:wrap}
+.lv-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-top:12px}
+.lv-card{border:1px solid #2a2236;border-radius:16px;padding:14px 16px;background:#141019;display:flex;flex-direction:column;gap:10px}
+.lv-top{display:flex;justify-content:space-between;align-items:center;gap:8px}.lv-clock{font:700 11px monospace;color:#ff6b9a;display:flex;align-items:center;gap:6px}
+.lv-clock:before{content:"";width:7px;height:7px;border-radius:50%;background:#ff4d7d;box-shadow:0 0 0 0 rgba(255,77,125,.6);animation:lvp 1.6s infinite}
+@keyframes lvp{70%{box-shadow:0 0 0 7px rgba(255,77,125,0)}100%{box-shadow:0 0 0 0 rgba(255,77,125,0)}}
+.lv-score{display:flex;justify-content:space-between;align-items:baseline;font:800 20px/1.2 inherit;color:#fff}.lv-score small{font:600 11px monospace;color:#8f879c}
+.lv-bar{height:8px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden;display:flex}.lv-bar i{display:block;height:100%;background:linear-gradient(90deg,#a24bff,#d795ff)}
+.lv-pct{display:flex;justify-content:space-between;font:700 12px monospace;color:#cfc8da}.lv-pct b{color:#fff}
+.lv-nums{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.lv-nums div{background:rgba(255,255,255,.04);border-radius:10px;padding:8px 9px;min-width:0}
+.lv-nums b{display:block;font:800 13px monospace;color:#efeaf7;overflow-wrap:anywhere;line-height:1.3}
+.ask-ex button.on{background:rgba(162,75,255,.22);border-color:#a24bff;color:#fff}.lv-nums small{font:600 9px monospace;letter-spacing:.06em;text-transform:uppercase;color:#8f879c}
+.lv-swing{font-size:13px;color:#cfc8da;line-height:1.45}.lv-swing b{color:#d795ff}
+.lv-f{display:flex;gap:8px;flex-wrap:wrap}.lv-f a{font:700 11px monospace;color:#d795ff;text-decoration:none;border:1px solid #3a2a55;border-radius:999px;padding:6px 11px}
 .ask-why.wait{color:#7d7590;font:600 11px monospace}.ask-fu{font:600 11px monospace;color:#7d7590;margin:8px 0 0}
 .ask-pl{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;align-items:center;padding:14px;margin-bottom:10px;border-radius:16px;border:1px solid rgba(176,56,249,.55);background:linear-gradient(160deg,rgba(176,56,249,.16),rgba(255,255,255,.03))}
 .ask-pl b{font-size:16px}.ask-pl span{font:600 11px monospace;color:#cfc8da}.ask-pl .t10-bet{margin:0}
@@ -112,6 +126,7 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
     </a>
     <a class="ox-markc" href="#sports" aria-label="All sports"><svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 100 137" aria-hidden="true"><path class="oxMark"></path></svg></a>
     <nav class="ox-acts">
+      <a class="ox-link" href="#live">Live</a>
       <a class="ox-link" href="#sports">Sports</a>
       <a class="ox-link" href="#record">Record</a>
       <a class="ox-btn sm" data-onyx="header" href="#" target="_blank" rel="noopener">Bet on Onyx</a>
@@ -169,6 +184,15 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
       <p>The ten plays our models like most on today's games across every sport: graded and on-trial lanes first, then markets where our model beat Onyx in testing, one play per market, ranked by each model's confidence. Standard Onyx prices only (-150 to +150), and only where the model's chance beats the price.</p></div></div>
     <div class="t10-list" id="t10List"><div class="my-empty">Loading today's plays...</div></div>
     <div class="my-note" id="t10Note"></div>
+  </section>
+
+  <!-- ── Live: every game being played, our live numbers ─────────────── -->
+  <section class="ox-wrap live" id="live">
+    <div class="my-h"><div><span class="ox-eyebrow">Live now</span><h2>Every game in play.<br>Our live numbers.</h2>
+      <p>Every game being played in the NFL, college football, NBA, NHL and tennis: our live chance to win, our spread and total from here, and where Onyx had it before the start. The biggest swings since the start come first. Updates every 20 seconds.</p></div></div>
+    <div class="ask-ex" id="lvTabs"></div>
+    <div class="lv-list" id="lvList"><div class="my-empty">Loading the games in play...</div></div>
+    <div class="my-note" id="lvNote">Our live numbers start from Onyx's pregame line and move with the score and the clock: football and the NBA as the rest of the game played out around the pregame spread and total, NHL as goals for the time left, tennis by sets. They are not tested against Onyx's in-game prices yet, so they are not picks, and Onyx's live prices are not in our data feed: compare them with the live price in the Onyx app.</div>
   </section>
 
   <!-- ── My Onyx: your players, your bets, everything live ─────────── -->
@@ -367,6 +391,27 @@ function askInit() {
   const ex = document.getElementById('askEx'); if (!ex) return;
   ex.innerHTML = ASK_EX.map((q, i) => `<button type="button" onclick="OnyxAsk.reset();document.getElementById('askQ').value=ASK_EX[${i}];askGo(ASK_EX[${i}])">${esc(q)}</button>`).join('');
 }
+// Ask Onyx and live games: "live NBA", "Chiefs live", or a request whose teams are playing now
+// gets our live numbers for those games, above the answer
+async function lvAsk(R, q) {
+  const seq = window.LV_ASK = (window.LV_ASK || 0) + 1;
+  const wants = /\blive\b|in[- ]?game|in[- ]?play|right now|happening now/i.test(q);
+  const started = R.clarify && /already started/.test(R.clarify.question || '');
+  if (!window.OnyxLive || !(wants || started)) return;
+  const sp = (R.spec.sports || []).length ? R.spec.sports : null;
+  const TL = ((R.spec.teams || []).length ? R.spec.teams : R.spec.team ? [R.spec.team] : []).map(x => String(x).toUpperCase());
+  let G = [];
+  try { G = await OnyxLive.games(sp); } catch (e) { return; }
+  G = lvSort(G.filter(g => !TL.length || TL.includes(String(g.home).toUpperCase()) || TL.includes(String(g.away).toUpperCase())));
+  const out = document.getElementById('askOut');
+  if (seq !== window.LV_ASK || !out) return;
+  const html = G.length
+    ? `<div class="ask-u">Live now: our numbers for ${G.length === 1 ? 'the game' : G.length + ' games'} in play${TL.length ? '' : ' (biggest swings first)'}. Onyx's live prices are not in our feed, so check them in the Onyx app.</div><div class="lv-list">${G.slice(0, 6).map(lvCard).join('')}</div>`
+    : wants ? `<div class="ask-u">Nothing that fits is being played right now. Live games show up here and in the Live tab the moment they start.</div>` : '';
+  if (!html) return;
+  const at = out.querySelector('.ask-cl, .ask-pl, .t10-list, .my-empty');
+  if (at) at.insertAdjacentHTML('beforebegin', '<div class="ask-live">' + html + '</div>'); else out.insertAdjacentHTML('beforeend', html);
+}
 function askPick(i) {
   const o = (window.ASK_CL && window.ASK_CL.options || [])[i]; if (!o) return;
   document.getElementById('askQ').value = o.label;
@@ -379,6 +424,7 @@ async function askGo(q, forced) {
   track('ask', {q: String(q).slice(0, 100)});
   let R;
   try { R = await OnyxAsk.ask(q, forced); } catch (e) { out.innerHTML = '<div class="my-empty">Could not load today\'s boards. Try again in a minute.</div>'; return; }
+  lvAsk(R, q);   // live games for a "live" question or teams playing now (fills in after the answer renders)
   const say = R.say ? `<div class="ask-say">${esc(R.say)}</div>` : '';
   const understood = say + `<div class="ask-u">Read as: <b>${esc(R.understood)}</b>${R.via === 'ai' ? ' · AI' : ''}</div>${R.note ? `<div class="ask-u">${esc(R.note)}</div>` : ''}`;
   // a question back instead of a guess (the AI's, or "those games have started"): tap an answer
@@ -421,6 +467,52 @@ async function askGo(q, forced) {
     const seq = window.ASK_SEQ = (window.ASK_SEQ || 0) + 1;
     OnyxAsk.explain(R, q).then(t => { const el = document.getElementById('askWhy'); if (!el || seq !== window.ASK_SEQ) return; if (t) { el.textContent = t; el.classList.remove('wait'); } else el.remove(); });
   }
+}
+// ── Live: every game being played, our live numbers (live.js) ─────────────────────
+var LV = {sport: 'all', games: [], timer: null};
+var LV_NAME = {nfl: 'NFL', cfb: 'NCAAF', nba: 'NBA', nhl: 'NHL', tennis: 'Tennis'};
+var LV_PAGE = {nfl: 'nfl.html', cfb: 'cfb.html', nba: 'nba.html', nhl: 'nhl.html', tennis: 'tennis.html'};
+function lvPct(x) { return x == null ? '-' : (100 * x).toFixed(x > 0.995 || x < 0.005 ? 1 : 0) + '%'; }
+// the card for one game: the score, our live chance, our spread and total from here, Onyx's pregame line
+function lvCard(g) {
+  const hw = g.home_win, aw = 1 - hw, pre = g.pre || {};
+  const swing = pre.home_win != null ? hw - pre.home_win : null;
+  const lead = swing == null ? null : swing >= 0 ? g.home : g.away;
+  const from = swing == null ? null : swing >= 0 ? pre.home_win : 1 - pre.home_win, to = swing == null ? null : swing >= 0 ? hw : aw;
+  const score = g.sport === 'tennis' ? `<span>${esc(g.away)}</span><small>${esc(g.state)}</small><span>${esc(g.home)}</span>`
+    : `<span>${esc(g.away)} ${g.as}</span><span>${g.hs} ${esc(g.home)}</span>`;
+  const nums = g.sport === 'tennis' ? `<div><b>${lvPct(pre.home_win == null ? null : 1 - pre.home_win)} / ${lvPct(pre.home_win)}</b><small>Onyx pregame</small></div>`
+    : `<div><b>${esc(g.fair_spread)}</b><small>Our spread now</small></div><div><b>${g.proj_total != null ? g.proj_total.toFixed(1) : '-'}</b><small>Our total now</small></div>
+       <div><b>${pre.spread_txt ? esc(pre.spread_txt) + (pre.total_txt ? ' · ' + esc(pre.total_txt) : '') : 'not saved'}</b><small>Onyx pregame</small></div>`;
+  const why = swing == null ? `<div class="lv-swing">No pregame Onyx line was saved for this game, so this starts from an even game.</div>`
+    : Math.abs(swing) < 0.03 ? `<div class="lv-swing">About where Onyx had it before the start (${esc(g.home)} ${lvPct(pre.home_win)}).</div>`
+    : `<div class="lv-swing"><b>${esc(lead)}</b> has gone from ${lvPct(from)} before the start to <b>${lvPct(to)}</b> now${g.over_pre != null && g.sport !== 'tennis' ? `, and the pregame total of ${esc(pre.total_txt)} is ${lvPct(g.over_pre)} to go over` : ''}.</div>`;
+  const open = LV_PAGE[g.sport] + (g.sport === 'nba' ? '#games' : '#games:' + g.gid);
+  return `<div class="lv-card"><div class="lv-top"><span class="t10-tag sp">${LV_NAME[g.sport]}</span><span class="lv-clock">${esc(g.sport === 'tennis' ? g.detail || 'Live' : g.detail)}</span></div>
+    <div class="lv-score">${score}</div>
+    <div><div class="lv-bar"><i style="width:${(100 * aw).toFixed(1)}%"></i></div><div class="lv-pct"><span>${esc(g.away)} <b>${lvPct(aw)}</b></span><span><b>${lvPct(hw)}</b> ${esc(g.home)}</span></div></div>
+    <div class="lv-nums">${nums}</div>${why}
+    <div class="lv-f"><a href="${open}">Open the game</a><a href="https://app.onyxodds.com/?referrer=${ONYX_REFERRER}" target="_blank" rel="noopener">Live price on Onyx</a></div></div>`;
+}
+function lvRender() {
+  const list = document.getElementById('lvList'), tabs = document.getElementById('lvTabs');
+  if (!list) return;
+  const sports = ['all'].concat(['nfl', 'nba', 'nhl', 'cfb', 'tennis'].filter(k => LV.games.some(g => g.sport === k)));
+  tabs.innerHTML = sports.map(k => `<button type="button" class="${LV.sport === k ? 'on' : ''}" onclick="LV.sport='${k}';lvRender()">${k === 'all' ? 'All live · ' + LV.games.length : LV_NAME[k] + ' · ' + LV.games.filter(g => g.sport === k).length}</button>`).join('');
+  const G = LV.games.filter(g => LV.sport === 'all' || g.sport === LV.sport);
+  list.innerHTML = G.length ? G.map(lvCard).join('') : '<div class="my-empty">Nothing is being played right now. Live games show up here the moment they start.</div>';
+}
+// biggest swing since the start first (the games where the live picture differs most from Onyx's pregame line)
+function lvSort(G) { return G.sort((a, b) => Math.abs((b.pre || {}).home_win != null ? b.home_win - b.pre.home_win : 0) - Math.abs((a.pre || {}).home_win != null ? a.home_win - a.pre.home_win : 0)); }
+async function lvLoad() {
+  if (!window.OnyxLive) return;
+  try { LV.games = lvSort(await OnyxLive.games()); } catch (e) { LV.games = LV.games || []; }
+  lvRender();
+}
+function lvInit() {
+  lvLoad();
+  clearInterval(LV.timer);
+  LV.timer = setInterval(() => { if (!document.hidden) lvLoad(); }, 20000);
 }
 // ── Top 10 plays of the day: every sport build writes data/<sport>/top.json (daily_top.py)
 var T10_SPORTS = [['nfl', 'NFL', 'nfl.html'], ['nba', 'NBA', 'nba.html'], ['nhl', 'NHL', 'nhl.html'], ['tennis', 'Tennis', 'tennis.html'], ['cfb', 'NCAAF', 'cfb.html']];
@@ -799,7 +891,7 @@ function renderMy() {
 if (location.hash === '#my') setTimeout(() => document.getElementById('my').scrollIntoView(), 50);
 loadMy();
 
-marquees(); sports(); tonight(); top10().catch(() => {}); askInit();
+marquees(); sports(); tonight(); top10().catch(() => {}); askInit(); lvInit();
 if (window.OnyxArt) marks(); else addEventListener('DOMContentLoaded', marks);
 </script>
 </body>
