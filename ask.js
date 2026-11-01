@@ -615,7 +615,7 @@
       var hint = null; try { hint = lf || localSpec(q, B); } catch (e) { hint = null; }
       return fetch(u, {method: 'POST', headers: {'content-type': 'application/json'}, body: JSON.stringify({q: q, ctx: ctx, hint: hint}), signal: ctl.signal})
         .then(function (r) { clearTimeout(tm); if (!r.ok) throw new Error('relay ' + r.status); return r.json(); })
-        .then(function (j) { if (!j || !j.spec) throw new Error('no spec'); return {spec: blend(j.spec, hint, q), say: j.say || '', clarify: j.clarify || null, via: 'ai'}; })
+        .then(function (j) { if (!j || !j.spec) throw new Error('no spec'); return {spec: blend(j.spec, hint, q, !ctx), say: j.say || '', clarify: j.clarify || null, via: 'ai'}; })
         .catch(function () { return {spec: lf || localSpec(q, B), via: 'local'}; });
     });
   }
@@ -655,7 +655,7 @@
   // (tested on 500 phrasings): props only, a price bound the AI left out, and never a sport
   // or a confidence floor nobody asked for
   var SPORTWORD = /\b(nfl|nba|nhl|ncaa[fb]?|cfb|college|football|basketball|hockey|tennis|atp|wta|hoops|pro football)\b/;
-  function blend(ai, h, q) {
+  function blend(ai, h, q, fresh) {
     if (!h) return ai;
     var s = Object.assign({}, ai), t = String(q || '').toLowerCase(), before = JSON.stringify(ai);
     if (h.props_only) s.props_only = true;
@@ -672,6 +672,14 @@
     // (1,000 live-AI requests: all 8 misses were this)
     if ((h.markets || []).length && JSON.stringify((s.markets || []).slice().sort()) !== JSON.stringify(h.markets.slice().sort())) s.markets = h.markets.slice();
     if ((!s.side || s.side === 'any') && (h.side === 'over' || h.side === 'under')) s.side = h.side;
+    // a fresh question (not a follow-up): ticket type, leg count and teams nobody named follow the
+    // reader, so the same words get the same answer every time (60 questions asked 3 times each:
+    // the AI wobbled between 1 and 5 picks on single-player asks and once made a parlay of 3 unnamed teams)
+    if (fresh) {
+      if (s.intent !== h.intent && h.intent === 'list' && !/\b(parlay|parly|legs?|legger|sgp|same[- ]game|round robin|rr|ticket|combo)\b/.test(t)) s.intent = 'list';
+      if (s.intent === h.intent && s.count !== h.count) { s.count = h.count; s.count_set = !!h.count_set; }
+      if (s.player && !h.team && !(h.teams || []).length) { s.team = null; s.teams = []; }
+    }
     // a day nobody named
     if (s.when && !h.when && !/\b(today|tonight|tomorrow|weekend|this week|sunday|monday|tuesday|wednesday|thursday|friday|saturday|sun|mon|tue|wed|thu|fri|sat)\b/.test(t)) s.when = null;
     if (JSON.stringify(s) !== before) s._fixed = true;     // the AI's one-line reply may describe what it misread: drop it
