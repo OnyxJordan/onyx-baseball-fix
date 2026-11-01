@@ -992,6 +992,81 @@ def cfb_prop_lane(lane, prow, slate, C):
                      "On trial until this record says otherwise.")}
 
 
+def nhl_b2b_lane(lane, slate, odds, M):
+    """NHL totals under when the home team played the night before (nhl_model v2), on trial
+    at Onyx's opening price: the first total and under price we see for a game is written
+    once to b2b_opening.json; the under is logged (b2b_trial.json, append-only) while the
+    live total and price are still the opening ones. Who played yesterday is read from the
+    NHL schedule by local date. Graded from the final score."""
+    from datetime import date as _d, datetime, timedelta, timezone
+    import requests
+    ts = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    O = lane.load("b2b_opening.json", None)
+    first_run = O is None
+    O = O or {}
+    ledger = lane.load("b2b_trial.json", []) or []
+    games = {g["gid"]: g for g in slate.get("games") or []}
+    have = {k["key"] for k in ledger}
+    played = None
+    if slate.get("date") and any(g.get("state") == "pre" for g in games.values()):
+        y = (_d.fromisoformat(slate["date"]) - timedelta(days=1)).isoformat()
+        try:
+            d = requests.get(f"https://api-web.nhle.com/v1/schedule/{y}", timeout=20).json()
+            day = next((w for w in d.get("gameWeek") or [] if w.get("date") == y), {})
+            played = set()
+            for gm in day.get("games") or []:
+                if gm.get("gameType") in (2, 3):
+                    for t in (gm.get("homeTeam") or {}, gm.get("awayTeam") or {}):
+                        played.add(nk(f"{(t.get('placeName') or {}).get('default', '')} {(t.get('commonName') or {}).get('default', '')}"))
+        except Exception as ex:          # fail-soft: no schedule, no plays this build
+            print(f"  nhl b2b: schedule {ex}")
+            played = None
+    for gid, g in games.items():
+        o = ((odds or {}).get("games") or {}).get(gid) or {}
+        if g.get("state") != "pre" or o.get("total") is None or o.get("under_price") is None:
+            continue
+        key = f"{gid}|total|under"
+        if key not in O:
+            O[key] = {"line": o["total"], "price": o["under_price"], "ts": ts, **({"baseline": True} if first_run else {})}
+        op = O[key]
+        if op.get("baseline") or key in have or played is None or nk(g.get("home_name")) not in played:
+            continue
+        if (op["line"], op["price"]) != (o["total"], o["under_price"]):
+            continue
+        if not (M.B2B["price_min"] <= o["under_price"] <= M.B2B["price_max"]):
+            continue
+        ledger.append({"date": slate.get("date"), "key": key, "gid": gid, "matchup": f"{g['away']} @ {g['home']}", "kind": "total",
+                       "lane": "b2b_under", "side": "under", "line": o["total"], "price": o["under_price"], "sel": o.get("under_sel"),
+                       "prob": None, "implied": round(L.implied(o["under_price"]), 4),
+                       "detail": f"{g.get('home_short') or g['home']} played last night", "opened_at": op["ts"], "logged_at": ts,
+                       "model": M.VERSION, "result": None, "actual": None})
+    res = {r["id"]: r for r in (lane.load("results.json", {}) or {}).get("games") or []}
+    for k in ledger:
+        if k.get("result"):
+            continue
+        r = res.get(k["gid"])
+        if r and r.get("hs") is not None and r.get("as") is not None:
+            a = r["hs"] + r["as"]
+            k["actual"], k["graded_at"] = a, ts
+            k["result"] = "P" if a == k["line"] else ("W" if a < k["line"] else "L")
+    for k_ in [k_ for k_ in O if k_.split("|")[0] in games and games[k_.split("|")[0]].get("state") == "post"]:
+        O.pop(k_)
+    lane.save("b2b_opening.json", O, indent=1)
+    lane.save("b2b_trial.json", ledger, indent=1)
+    w = sum(1 for k in ledger if k["result"] == "W")
+    l_ = sum(1 for k in ledger if k["result"] == "L")
+    pay = lambda a: a / 100.0 if a > 0 else 100.0 / -a
+    units = sum((pay(k["price"]) if k["result"] == "W" else -1.0 if k["result"] == "L" else 0.0) for k in ledger)
+    return {"w": w, "l": l_, "p": sum(1 for k in ledger if k["result"] == "P"), "pending": sum(1 for k in ledger if not k["result"]),
+            "units": round(units, 2), "roi": round(units / (w + l_), 4) if w + l_ else None, "empty": "home team on a back-to-back",
+            "title": "On trial · unders when the home team played last night",
+            "rows": list(reversed(ledger[-80:])), "started": ledger[0]["date"] if ledger else None,
+            "note": ("Every total under when the home team played the night before, logged at Onyx's opening total and price and graded off "
+                     "the final score. It held in three straight periods: 2024-25 at market prices before Onyx (41-32, +9.6%), Onyx's prices "
+                     "before February (54-35, +16.9%) and after (26-9, +46.2%), and at Onyx's closing price too. Rested home teams' unders "
+                     "lost in every period. On trial until this record says otherwise.")}
+
+
 def team_block(key, lane, slate, odds):
     import importlib
     import team_model as T
@@ -1025,6 +1100,8 @@ def team_block(key, lane, slate, odds):
     if trial:
         rule = trial[0]
         base["open"] = team_open_lane(lane, rule, game_rows(key, M, slate, odds, R, rule["w"])[0], slate, M)
+    if key == "nhl" and getattr(M, "B2B", None):
+        base["open"] = nhl_b2b_lane(lane, slate, odds, M)
     base["_cands"] = rows
     base["proj"] = proj
     base["engine"] = engine_team(key, M, GP, w, bt, base["status"] == "live")
@@ -1047,6 +1124,10 @@ def team_block(key, lane, slate, odds):
                     p["trial"] = True
     else:
         base["projected"] = top_plays(rows)     # leans; a live sport shows them under its tracked picks
+        tsel = {k.get("sel") for k in (base.get("open") or {}).get("rows") or [] if k.get("sel") and not k.get("result")}
+        for p in base["projected"]:
+            if p.get("sel") in tsel:
+                p["trial"] = True
     return base
 
 
