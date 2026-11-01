@@ -1,23 +1,26 @@
-// Ask Onyx relay (Cloudflare Worker). The site is static, so the AI key cannot live in
-// the page: this worker holds it, takes one sentence ("3-leg parlay, NBA points overs,
-// minimum odds -200") and returns a SEARCH SPEC as JSON. It never sees prices or picks
-// and never chooses plays: ask.js runs the spec against today's boards (our models and
-// Onyx's live prices), so an answer can only ever be a real line on the board.
+// Ask Onyx relay (Cloudflare Worker, OpenAI). The site is static, so the AI key cannot live in
+// the page: this worker holds it. Two jobs, and in neither does the AI choose plays:
+//   POST {q, ctx}        one sentence (plus the previous answer, for follow-ups like "swap leg 2"
+//                        or "make it +500") -> {spec, say}. ask.js runs the spec against today's
+//                        boards (our models and Onyx's live prices), so a play is always a real line.
+//   POST {explain: {...}} the legs ask.js already chose, with their numbers -> {text}: a short,
+//                        plain read on why, using only those numbers.
 //
 // Config (set by .github/workflows/ai_worker.yml, never committed):
-//   ANTHROPIC_API_KEY  secret     AI_MODEL  variable     ALLOWED_ORIGINS / AI_FALLBACK  wrangler.toml
-import Anthropic from "@anthropic-ai/sdk";
+//   OPENAI_API_KEY  secret     AI_MODEL  variable     ALLOWED_ORIGINS  wrangler.toml
 
-const MARKETS = ["pts", "reb", "ast", "q1_total", "h1_total", "first_basket", "rec", "rec_yds", "rush_yds", "pass_yds",
-  "anytime_td", "first_td", "two_plus_td", "spread", "total", "ml"];
+const MARKETS = ["pts", "reb", "ast", "q1_total", "h1_total", "first_basket", "first_td", "rec", "rec_yds", "rush_yds",
+  "pass_yds", "pass_td", "pass_att", "rush_rec_yds", "pass_rush_yds", "anytime_td", "two_plus_td", "spread", "total", "ml"];
 const SPORTS = ["nba", "nfl", "cfb", "nhl", "tennis"];
+const OPENAI = "https://api.openai.com/v1/chat/completions";
 
 // the same contract ask.js runs (see its header): every field required, null when unsaid
 const SPEC = {
   type: "object",
   additionalProperties: false,
   required: ["intent", "count", "sports", "markets", "side", "min_price", "max_price", "min_conf",
-    "min_edge", "player", "team", "sort", "one_per_game", "rr_size", "target_price", "count_set", "when", "summary"],
+    "min_edge", "player", "team", "sort", "one_per_game", "rr_size", "target_price", "count_set", "when",
+    "exclude", "summary", "say"],
   properties: {
     intent: { type: "string", enum: ["parlay", "sgp", "rr", "list"] },
     count: { type: "integer" },
@@ -36,8 +39,14 @@ const SPEC = {
     count_set: { type: "boolean" },
     when: { type: ["string", "null"], enum: ["today", "tomorrow", "weekend", "sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", null] },
     one_per_game: { type: "boolean" },
+    exclude: { type: "array", items: { type: "string" } },
     summary: { type: "string" },
+    say: { type: "string" },
   },
+};
+const EXPLAIN = {
+  type: "object", additionalProperties: false, required: ["text"],
+  properties: { text: { type: "string" } },
 };
 
 const SYSTEM = `You turn a sports bettor's request into a search spec for Onyx Sports. You do not pick plays; a program runs your spec against today's priced board.
@@ -60,18 +69,43 @@ Fields:
 - sort "proj" for who will score / catch / rush / rebound the most (the highest projection).
 - first_td (first touchdown scorer), first_basket (NBA first basket), h1_total (NBA 1st-half total).
 - one_per_game: true unless they explicitly want several plays from the same game.
+- pass_td (passing TDs), pass_att (pass attempts), rush_rec_yds (rushing + receiving yards), pass_rush_yds (passing + rushing yards).
+- exclude: names of players or teams to leave out ("not Mahomes", "swap out Irving", "replace leg 2" = the name on leg 2 of the previous answer). Empty when unsaid.
 - summary: one short plain sentence saying what you understood, no odds advice.
+- say: one or two friendly sentences back to the bettor, as a sharp friend would talk, saying what you are building for them. Never invent a player, price or stat; the program picks the plays. No em dashes. Never name a sportsbook other than Onyx.
+
+Conversation: you may get the previous request, its spec and the legs it returned. If the new message changes that answer ("make it +500", "swap leg 2", "only NBA", "one more leg", "same but unders", "what about tomorrow"), start from the previous spec and change only what they asked. If it is a new request, ignore the previous one.
+
+Our built-in reader: you may also get "Built-in reading", the spec our own parser made from the same message (tested on 500 real phrasings). Start from it. Keep every field it got right, and change a field only when the message clearly means something else (a name it missed or mangled, slang, a follow-up it could not see). It is usually right about prices, markets and counts.
+
+Lessons from testing (follow these):
+- "favorite", "your favorites", "who do you like", "best bets", "what should I bet" mean sort "rec". For touchdown scorers that ranks by how much our TD model likes them against their price, which is what "favorite TD scorers" means; never treat it as "shortest odds".
+- "best value" or "most value" for touchdown scorers: sort "edge" (the program ranks TD value by the TD model).
+- A price ceiling: "no odds longer than -150", "nothing longer than +200", "shorter than -120", "-150 or shorter" mean max_price (the longest price allowed). A bare negative price like "-150 odds" with no other word is a ceiling too.
+- The word "odds" alone is not a price floor. Only "minimum odds X", "no worse than X", "no shorter than X", "no juicier than X" set min_price.
+- "players to score", "picks to score today", "who scores a TD" mean anytime_td (football), not points, unless points, goals or runs are named.
+- Do not set min_conf unless they give a percentage; the program already keeps every leg 50%+ unless they ask for dogs, longshots, touchdown scorers or a payout.
+- A college player (e.g. Jeremiah Smith, Ohio State) is sport cfb; an NFL player with a similar name (Geno Smith) is nfl. Use the full name they typed.
+
+Loose phrasing is normal: "who's hot", "give me something safe for tonight", "sweat me a dog", "your favorites to score" (anytime_td, sort rec), "best bets" (sort rec). Read the intent, not keywords.
 
 If the request is not about sports plays, return intent "list", count 5, empty sports and markets, sort "conf", and say in summary that you showed today's most likely plays.`;
 
-// a light per-instance throttle; the real cost cap is the spend limit on the AI account
+const EXPLAIN_SYSTEM = `You explain a bettor's Onyx Sports answer in two to four short sentences, like a sharp friend, using ONLY the numbers given for each leg:
+- conf: the chance the play wins as shown (each sport's model blended with Onyx's price); price: Onyx's American odds; edge: conf minus Onyx's implied chance, in points.
+- model: for touchdown scorers, the TD model's own chance before blending (the shown chance is Onyx's price less its margin, because the TD model has not beaten Onyx's prices in testing).
+- tag: "tracked" = a graded pick on the public record, "trial" = logged at Onyx's opening price while it is tested, "lean" = the model's read, not graded.
+- proj / line: the model's projection against the line, when given.
+Say which leg you like most and why, and be honest about the weakest one. Never invent stats, injuries, news or players. Never promise a win. No em dashes. Never name a sportsbook other than Onyx. Plain text, no lists.`;
+
+// a light per-instance throttle; the real cost cap is the monthly budget on the OpenAI account
 const HITS = new Map();
 function throttled(ip) {
   const now = Date.now(), win = HITS.get(ip) || [];
   const recent = win.filter((t) => now - t < 60000);
   recent.push(now);
   HITS.set(ip, recent);
-  return recent.length > 12;
+  return recent.length > 20;
 }
 
 function cors(origin, env) {
@@ -86,6 +120,34 @@ function cors(origin, env) {
 function json(body, status, headers) {
   return new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json", ...headers } });
 }
+const clean = (s) => String(s || "").replace(/\s*[—–]\s*/g, ", ").replace(/DraftKings|FanDuel|BetMGM|Caesars/gi, "Onyx").trim();
+const cut = (x, n) => JSON.stringify(x == null ? null : x).slice(0, n);
+
+// one structured call; throws {status} on an API error
+async function chat(env, system, user, name, schema, maxTokens) {
+  const ctl = new AbortController();
+  const tm = setTimeout(() => ctl.abort(), 20000);
+  try {
+    const r = await fetch(OPENAI, {
+      method: "POST",
+      signal: ctl.signal,
+      headers: { "authorization": `Bearer ${env.OPENAI_API_KEY}`, "content-type": "application/json" },
+      body: JSON.stringify({
+        model: env.AI_MODEL,
+        max_completion_tokens: maxTokens,
+        messages: [{ role: "system", content: system }, { role: "user", content: user }],
+        response_format: { type: "json_schema", json_schema: { name, strict: true, schema } },
+      }),
+    });
+    if (!r.ok) throw { status: r.status };
+    const j = await r.json();
+    const m = j.choices && j.choices[0] && j.choices[0].message;
+    if (!m || m.refusal) throw { status: 422 };
+    return JSON.parse(m.content);
+  } finally {
+    clearTimeout(tm);
+  }
+}
 
 export default {
   async fetch(req, env) {
@@ -93,33 +155,34 @@ export default {
     if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: h });
     if (req.method === "GET") return json({ ok: true, service: "onyx-ask" }, 200, h);
     if (req.method !== "POST") return json({ error: "method" }, 405, h);
-    if (!env.ANTHROPIC_API_KEY || !env.AI_MODEL) return json({ error: "not configured" }, 503, h);
+    if (!env.OPENAI_API_KEY || !env.AI_MODEL) return json({ error: "not configured" }, 503, h);
     if (throttled(req.headers.get("cf-connecting-ip") || "?")) return json({ error: "slow down" }, 429, h);
 
-    let q = "";
-    try { q = String((await req.json()).q || "").trim().slice(0, 300); } catch { /* empty body */ }
-    if (!q) return json({ error: "empty" }, 400, h);
-
-    const client = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY, maxRetries: 1, timeout: 20000 });
-    const params = {
-      model: env.AI_MODEL,
-      max_tokens: 2048,
-      system: SYSTEM,
-      messages: [{ role: "user", content: q }],
-      output_config: { effort: "low", format: { type: "json_schema", schema: SPEC } },
-    };
+    let body = {};
+    try { body = await req.json(); } catch { /* empty body */ }
     try {
-      const msg = env.AI_FALLBACK === "on"
-        ? await client.beta.messages.create({ ...params, betas: ["server-side-fallback-2026-07-01"], fallbacks: "default" })
-        : await client.messages.create(params);
-      if (msg.stop_reason === "refusal") return json({ error: "declined" }, 422, h);
-      const text = msg.content.filter((b) => b.type === "text").map((b) => b.text).join("");
-      const spec = JSON.parse(text);
-      return json({ spec }, 200, h);
+      if (body.explain) {
+        const x = body.explain;
+        const user = `Request: ${String(x.q || "").slice(0, 300)}\nTicket: ${cut(x.ticket, 300)}\nLegs: ${cut(x.legs, 3000)}\nNote shown: ${String(x.note || "").slice(0, 400)}`;
+        const out = await chat(env, EXPLAIN_SYSTEM, user, "explain", EXPLAIN, 1500);
+        return json({ text: clean(out.text).slice(0, 700) }, 200, h);
+      }
+      const q = String(body.q || "").trim().slice(0, 300);
+      if (!q) return json({ error: "empty" }, 400, h);
+      const c = body.ctx;
+      const hint = body.hint ? `\nBuilt-in reading: ${cut(body.hint, 1500)}` : "";
+      const user = (c && c.q
+        ? `Previous request: ${String(c.q).slice(0, 300)}\nPrevious spec: ${cut(c.spec, 1500)}\nPrevious legs (in order): ${cut(c.legs, 1200)}\n\nNew message: ${q}`
+        : `Message: ${q}`) + hint;
+      const spec = await chat(env, SYSTEM, user, "spec", SPEC, 2000);
+      const say = clean(spec.say);
+      delete spec.say;
+      return json({ spec, say }, 200, h);
     } catch (e) {
-      if (e instanceof Anthropic.RateLimitError) return json({ error: "busy" }, 429, h);
-      if (e instanceof Anthropic.APIError) return json({ error: "ai " + (e.status || "error") }, 502, h);
-      return json({ error: "bad answer" }, 502, h);   // unparseable output: ask.js falls back to its own parser
+      const st = e && e.status;
+      if (st === 429) return json({ error: "busy" }, 429, h);
+      if (st) return json({ error: "ai " + st }, 502, h);
+      return json({ error: "bad answer" }, 502, h);   // unparseable or timed out: ask.js falls back to its own parser
     }
   },
 };

@@ -1428,12 +1428,19 @@ model's number on it.
   Onyx prices SGPs itself.
 - Language: a built-in parser covers the common phrasings with no AI at all. When `ai.json`
   holds a URL, the sentence goes to the relay first and the parser is the fallback.
-- Relay: `ai/worker.js` (Cloudflare Worker, `@anthropic-ai/sdk`, structured output against the
-  same spec schema, low effort, 12 requests a minute per visitor). Deployed by
-  `.github/workflows/ai_worker.yml`, which also writes `ai.json`. Needs, in the repo's Actions
-  settings: secrets `ANTHROPIC_API_KEY`, `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` and the
-  variable `AI_MODEL`. The model and key are never committed. Set a monthly spend limit on the
-  AI account: the page is public.
+- Relay (OpenAI since 11/1): `ai/worker.js` (Cloudflare Worker, plain `fetch` to OpenAI's chat
+  completions with a strict JSON schema, 20 requests a minute per visitor). Two calls per question:
+  the spec (with `say`, one line back to the bettor) and, after the answer renders, `explain`, a
+  short read on the legs from their own numbers (conf, price, edge, TD model, tag). Follow-ups:
+  ask.js sends the previous request, spec and legs (`ctx`), so "swap leg 2", "make it +500" and
+  "same but unders" edit the last answer; `exclude` drops named players. Nothing learned is lost:
+  ask.js also sends the built-in reader's spec (`hint`) and the AI starts from it, and the AI's
+  spec still goes through `normalize()` and `run()` (price floors, 50% legs, one per market, TD
+  favorites by the TD model). Deployed by `.github/workflows/ai_worker.yml`, which also writes
+  `ai.json`. Needs, in the repo's Actions settings: secrets `OPENAI_API_KEY`,
+  `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`; optional variable `AI_MODEL` (default
+  gpt-4.1-mini). The key is never committed. Set a monthly budget on the OpenAI account: the page
+  is public. With `ai.json` live, `node tools/verify_ask.js` runs the 500-query corpus through it.
 
 **10/31 follow-ups.** A parlay spreads across games first and, when the board is short of
 games, fills its remaining legs from games it already uses (an SGP+, labelled on the ticket,
