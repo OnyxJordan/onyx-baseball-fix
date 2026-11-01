@@ -179,6 +179,17 @@ def nfl_open_lane(lane, out, slate, season, rows, M):
     for x in rows:
         box[(x.get("gid"), nk(x["name"]))] = x
     box_games = {x.get("gid") for x in rows}
+    # 11/1: a player with snaps and no box line was never thrown to: 0 catches, the under
+    # wins, exactly as the v6 backtest grades him (and as Onyx settles it). Only a player
+    # with no snaps is a void. nflverse posts snap counts a day or two after the game, so
+    # until that week is in, he stays pending (voided only if it never arrives in 10 days).
+    snaps, snap_weeks = set(), set()
+    for yr, xv in ((lane.load("nflverse.json", {}) or {}).get("seasons") or {}).items():
+        for s_, w_, t_, n_, pct in xv.get("snaps") or []:
+            snap_weeks.add((s_, w_, t_))
+            if pct:
+                snaps.add((s_, w_, t_, n_))
+    vt = getattr(M, "VERSE_TEAM", {})
     for k in ledger:
         if k.get("result"):
             continue
@@ -190,7 +201,15 @@ def nfl_open_lane(lane, out, slate, season, rows, M):
             k["result"] = "P" if a == k["line"] else ("W" if (a > k["line"]) == (k["side"] == "over") else "L")
             k["graded_at"] = ts
         elif k["gid"] in box_games:
-            k["result"], k["actual"], k["graded_at"] = "V", None, ts    # the game is in the box, he is not: void
+            t_ = vt.get(k.get("team"), k.get("team"))
+            if (k.get("season"), k.get("week"), t_, M._vk(k["name"])) in snaps:
+                a = 0     # on the field, no catches
+                k["actual"] = a
+                k["result"] = "P" if a == k["line"] else ("W" if (a > k["line"]) == (k["side"] == "over") else "L")
+                k["graded_at"], k["graded_by"] = ts, "snaps, no box line"
+            elif (k.get("season"), k.get("week"), t_) in snap_weeks or k.get("date", "9") < (
+                    datetime.now(timezone.utc) - timedelta(days=10)).date().isoformat():
+                k["result"], k["actual"], k["graded_at"] = "V", None, ts    # no snaps: did not play, a void
     lane.save("opening.json", O, indent=1)
     lane.save("open_trial.json", ledger, indent=1)
     w = sum(1 for k in ledger if k["result"] == "W"); l_ = sum(1 for k in ledger if k["result"] == "L")
