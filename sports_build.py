@@ -140,9 +140,11 @@ def nfl_open_lane(lane, out, slate, season, rows, M):
     # already up as a baseline (it may have opened before we looked); lines that appear
     # after that are opens.
     v11 = getattr(M, "V11", {})
-    mkts = ("rec",) + tuple(v11)
+    WD = getattr(M, "WIND", None)
+    wx = (lane.load("weather.json", {}) or {}) if WD else {}
+    mkts = tuple(dict.fromkeys(("rec",) + tuple(v11) + (WD["mkts"] if WD else ())))
     starts = O.setdefault("_lane_start", {})
-    new_lanes = [m for m in v11 if m not in starts]
+    new_lanes = [m for m in mkts if m != "rec" and m not in starts]
     for m in new_lanes:
         starts[m] = ts
     for p in (lane.load("odds.json", {}) or {}).get("next_props") or []:
@@ -169,6 +171,18 @@ def nfl_open_lane(lane, out, slate, season, rows, M):
             continue
         if (op["line"], op["over"], op["under"]) != (r["line"], r["over"], r["under"]):
             continue          # moved off the opening price: not bettable as logged
+        # v12: an under in the wind, while Onyx still shows its opening price
+        w_ = wx.get(r["gid"]) or {}
+        if WD and r["mkt"] in WD["mkts"] and w_.get("roof") == "outdoors" and (w_.get("wind") or 0) >= WD["mph"]:
+            cands.append((9.0, {"date": slate.get("date"), "season": season, "week": g.get("week"), "key": key, "gid": r["gid"],
+                                "pid": r["pid"], "name": r["name"], "team": r["team"], "opp": r["opp"],
+                                "matchup": f"{r['team']} {'vs' if r['home'] else '@'} {r['opp']}", "kind": r["mkt"],
+                                "lane": "wind_under", "side": "under", "line": r["line"], "price": r["under"], "sel": r.get("under_sel"),
+                                "proj": r["proj"], "prob": None, "implied": round(L.implied(r["under"]), 4),
+                                "detail": f"Forecast {w_['wind']:.0f} mph wind at kickoff (gusts {w_.get('gust') or 0:.0f})",
+                                "wind": w_.get("wind"), "opened_at": op["ts"], "logged_at": ts, "model": M.VERSION,
+                                "result": None, "actual": None}))
+            continue
         if r["mkt"] in v11:
             if r.get("v11") is None:
                 continue
@@ -245,20 +259,22 @@ def nfl_open_lane(lane, out, slate, season, rows, M):
     pay = lambda a: a / 100.0 if a > 0 else 100.0 / -a
     units = sum((pay(k["price"]) if k["result"] == "W" else -1.0 if k["result"] == "L" else 0.0) for k in ledger)
     LN = {"rec_under": "Receptions unders", "rush_yds_under": "Rushing yards unders", "pass_yds_over": "Passing yards overs",
-          "pass_att_under": "Pass attempts unders"}
+          "pass_att_under": "Pass attempts unders", "wind_under": "Unders in the wind"}
     lanes = []
-    for ln_ in ["rec_under"] + [f"{m}_{v11[m]['side']}" for m in v11]:
+    for ln_ in ["rec_under"] + [f"{m}_{v11[m]['side']}" for m in v11] + (["wind_under"] if WD else []):
         ks = [k for k in ledger if (k.get("lane") or "rec_under") == ln_]
         ww = sum(1 for k in ks if k["result"] == "W"); ll_ = sum(1 for k in ks if k["result"] == "L")
         lanes.append({"lane": ln_, "name": LN.get(ln_, ln_), "w": ww, "l": ll_, "p": sum(1 for k in ks if k["result"] == "P"),
                       "pending": sum(1 for k in ks if not k["result"]),
                       "units": round(sum((pay(k["price"]) if k["result"] == "W" else -1.0 if k["result"] == "L" else 0.0) for k in ks), 2)})
-    note = ("Four NFL lanes, each logged only while Onyx still shows the first price we saw for that line, at that price, and graded off the box score. "
-            "Receptions unders (since 10/31): counting every priced player who played, the model's unders beat Onyx's opening price in both seasons tested (+6.1% and +20.1%). "
-            "Since 11/1 (v11), three market models that start from Onyx's own price and add the statistics that beat it in a season they never saw: "
-            "rushing yards unders (2025 +9.3%, 2026 +11.1%), passing yards overs (+6.9%, +10.0%) and pass attempts unders (+20.0%, +9.1%). "
-            "Each play lists why the model got there. At Onyx's closing price these edges mostly disappear, so they count only at the open. "
-            "They stay on trial until this record says otherwise.") if v11 else None
+    note = ("NFL lanes on trial, each logged only while Onyx still shows the first price we saw for that line, at that price, and graded off the box score. "
+            "Receptions unders (since 10/31): the model's unders beat Onyx's opening price in both seasons tested (+6.1% and +20.1%). "
+            "Rushing yards unders and pass attempts unders (since 11/1): Onyx's price plus the statistics that beat it on a season they never saw "
+            "(2026 +11.1% and +9.1%; rushing yards was weaker on 2024 at market prices, +2.5%). "
+            "Unders in the wind (since 11/1): passing yards, pass attempts, receiving yards and receptions when the kickoff forecast is 15+ mph at an open stadium. "
+            "In 15+ mph games, passing yards unders went 15-4 in 2024 and 28-10 in 2025, but Onyx moves these lines as forecasts firm up, "
+            "so a play counts only while the opening price is still up. Passing yards overs were dropped on 11/1 after losing on 2024. "
+            "Every play lists why. They stay on trial until this record says otherwise.") if v11 else None
     return {"w": w, "l": l_, "p": sum(1 for k in ledger if k["result"] == "P"), "pending": sum(1 for k in ledger if not k["result"]),
             "units": round(units, 2), "roi": round(units / (w + l_), 4) if w + l_ else None, "lanes": lanes,
             **({"note": note, "empty": "line"} if note else {}),
@@ -311,6 +327,12 @@ def nfl_block(lane, slate, odds):
     # v5: nflverse targets per dropback and snap trend (nfl_verse.py), averaged with v4 for receptions
     verse = lane.load("nflverse.json", None)
     vidx = M.verse_index(verse) if hasattr(M, "verse_index") else None
+    if getattr(M, "WIND", None):       # v12: kickoff forecasts for the wind lane (Open-Meteo, fail-soft)
+        try:
+            import nfl_weather
+            nfl_weather.update(lane, slate)
+        except Exception as ex:
+            print(f"  weather: {ex}")
     # v11: the market models' statistics (nflverse weekly stats, nfl_features.py)
     fidx = None
     if getattr(M, "V11", None):
@@ -524,7 +546,7 @@ def nfl_block(lane, slate, odds):
     eng["steps"].insert(0, engine_nfl_props(M))
     if getattr(M, "V11", None):
         import nfl_features as F
-        W = {"rush_yds": "Rushing yards unders", "pass_yds": "Passing yards overs", "pass_att": "Pass attempts unders"}
+        W = {"rush_yds": "Rushing yards unders", "pass_att": "Pass attempts unders"}
         eng["steps"].insert(1, {"t": "Market models (v11) · Onyx's price plus the statistics that beat it", "rows":
             [[W.get(m, m), "; ".join(f"{F.LABEL.get(k, k)} ({'+' if c > 0 else '-'} to the over)" for k, c in zip(S["features"], S["w"][2:]))]
              for m, S in M.V11.items()] + [["How chosen", "about 45 statistics tested on every Onyx line in 2025; one is kept only if it beats Onyx's price on both halves of 2025, then judged on 2026, which it never saw"],

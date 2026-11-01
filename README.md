@@ -543,6 +543,16 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
     (capture `b2b_opening.json`); who played yesterday comes from the NHL schedule API by
     local date (ESPN results are dated in UTC, which misreads late games). Graded off
     `results.json`.
+  - **NFL v12: three seasons and the wind (11/1).** `tools/nfl_feature_screen.py` now reads 2024 at
+    market prices (`bt/nfl_2024_mkt.json`; receptions, receiving / rushing / passing yards) and
+    nflverse play-by-play (`--pbp`: pass rate over expected, neutral pace, the defense's PROE
+    and pace, wind / temperature / roof), trains on any seasons (`--train=2024,2025`) and
+    judges on any (`--test=2024`). Passing yards overs failed on 2024 (7-16, -42.6%) and left
+    the lanes; rushing yards unders held weakly (+2.5%). Wind held in all three seasons; as a
+    rule, unders at 15+ mph won (passing yards 15-4 / 28-10 in 2024 / 2025). Onyx moves those
+    lines as forecasts firm up, so the `wind_under` lane logs only while the kickoff forecast
+    (`nfl_weather.py`, Open-Meteo, one batched request per build, `data/nfl/weather.json`) is
+    15+ mph at an open stadium and Onyx still shows its opening price.
   - **NFL projections from usage, depth charts and injuries (11/1, tested, not adopted).**
     `tools/nfl_proj_test.py`: volume x efficiency (team attempts / carries from Onyx's spread
     and implied points, the player's target / carry / attempt share, regressed efficiency,
