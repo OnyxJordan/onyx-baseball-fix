@@ -150,6 +150,8 @@ async function chat(env, system, user, name, schema, maxTokens) {
       body: JSON.stringify({
         model: env.AI_MODEL,
         max_completion_tokens: maxTokens,
+        // the same question gets the same reading: no sampling noise (reasoning models take no temperature)
+        ...(/^(o\d|gpt-5)/.test(env.AI_MODEL) ? {} : { temperature: 0, seed: 7 }),
         messages: [{ role: "system", content: system }, { role: "user", content: user }],
         response_format: { type: "json_schema", json_schema: { name, strict: true, schema } },
       }),
