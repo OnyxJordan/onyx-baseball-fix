@@ -72,21 +72,23 @@ body{background:#0c0c0c;color:#fff;margin:0}
 </section>
 
 <section class="ox-wrap hw">
-  <div class="sp" id="nfl"><div class="sp-h"><h3>NFL</h3><span class="tag p">On trial · v10</span></div>
-    <p class="one">Receptions unders are graded on trial at Onyx's opening price. Spreads, totals, yards and touchdowns are priced and explained as leans.</p>
+  <div class="sp" id="nfl"><div class="sp-h"><h3>NFL</h3><span class="tag p">On trial · v11</span></div>
+    <p class="one">Four lanes are graded on trial at Onyx's opening price: receptions unders, rushing yards unders, passing yards overs and pass attempts unders. Everything else is priced and explained as a lean.</p>
     <div class="grid2">
       <div class="blk"><h4>What it reads</h4><ul>
         <li>Every box score this season with last season as the prior, recent weeks weighted more.</li>
         <li>Each receiver's share of his team's targets per dropback and his snap-share trend (nflverse play-by-play).</li>
         <li>Onyx's implied team points and spread, so a team expected to trail throws more.</li>
-        <li>ESPN's injury report: ruled-out players are removed before anything is priced; questionable players are marked Q.</li></ul></div>
+        <li>ESPN's injury report: ruled-out players are removed before anything is priced; questionable players are marked Q.</li>
+        <li>v11: about 45 statistics per player from nflverse weekly stats (efficiency per target, carry and dropback, air yards, snap share, what the opponent allows), tested against every Onyx line of 2025 and 2026. Each play lists the ones that moved it, in points.</li></ul></div>
       <div class="blk"><h4>What is graded</h4><ul>
         <li><b>Receptions unders</b> where the model beats the opening price by 3+ points, every one that qualifies.</li>
-        <li>Evidence: counting every priced player who played, unders beat the opening price in 2025 (+6.1%, 468 bets) and 2026 (+20.1%, 187). Overs did not (2025 -14.8%), so they are never plays.</li></ul></div>
+        <li>Evidence: counting every priced player who played, unders beat the opening price in 2025 (+6.1%, 468 bets) and 2026 (+20.1%, 187). Overs did not (2025 -14.8%), so they are never plays.</li>
+        <li><b>Rushing yards unders, passing yards overs, pass attempts unders</b> (v11, since 11/1): Onyx's opening price moved by statistics chosen on 2025 and proven on 2026 (+11.1%, +10.0% and +9.1% on 2026 at 3+ points). At the closing price the edges mostly vanish, so they count only at the open.</li></ul></div>
       <div class="blk"><h4>Tested and left out</h4><ul>
         <li>Team ratings from scores and from every play (expected points per play): no edge over Onyx's spreads or totals.</li>
         <li>1st-half and 1st-quarter totals: the line already matches how scoring splits.</li>
-        <li>Rushing, passing and receiving yards: lost to Onyx's price in seasons they were not tuned on.</li>
+        <li>Receiving yards, passing + rushing yards, rushing + receiving yards and passing touchdowns: no statistic beat Onyx's price on a season it was not chosen on.</li>
         <li>Touchdown scorers: priced players score 17.7% of the time against 22.0% implied, so the chance shown is Onyx's price with the margin removed, never flagged as value.</li></ul></div>
       <div class="blk"><h4>How a price is built</h4><ul>
         <li>Projection, then a chance from a spread fitted to real Onyx lines, then a blend with Onyx's own no-vig price.</li>

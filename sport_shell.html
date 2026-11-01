@@ -147,7 +147,8 @@
 .ot-h{font:700 10px monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin:10px 0 6px}
 .ot-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;align-items:center;padding:7px 10px;margin-bottom:6px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid var(--border2)}
 .ot-who{min-width:0}.ot-who b{display:block;font:700 13px 'Space Grotesk',system-ui,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ot-who span{display:block;font:600 10px monospace;color:var(--text3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ot-px{font:800 13px monospace;color:var(--text2)}.ot-row>b{font:800 10px monospace;min-width:30px;text-align:right}.ot-w{color:#61e970}.ot-l{color:#f87171}
+.pk-why{font:600 11px/1.55 system-ui,sans-serif;color:var(--text3);margin:8px 0 2px}.pk-why b{color:var(--text2)}.pl-why{margin:4px 0 0}
+.ot-why{white-space:normal!important;line-height:1.5}.ot-px{font:800 13px monospace;color:var(--text2)}.ot-row>b{font:800 10px monospace;min-width:30px;text-align:right}.ot-w{color:#61e970}.ot-l{color:#f87171}
 /* golf model */
 .gm-rk{flex-shrink:0;width:24px;height:24px;border-radius:7px;display:flex;align-items:center;justify-content:center;font:800 11px monospace;background:linear-gradient(135deg,#b038f9,#635bff);color:#fff}
 .gw-row{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,2fr) auto;column-gap:10px;row-gap:2px;align-items:center;margin:6px 0;font-size:12px}
@@ -1844,6 +1845,7 @@ function projTable(rows) {
       <div class="pl-who">${r.hs ? `<img class="pl-hs" src="${esc(r.hs)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">` : '<span class="pl-hs"></span>'}
         <div class="pl-nm"><b>${esc(r.name)}${r.inj ? `<span class="inj-q" title="Questionable${r.inj_d ? ' (' + esc(r.inj_d) + ')' : ''} on the injury report">Q</span>` : ''}</b><span>${esc(r.team)} ${r.home ? 'vs' : '@'} ${esc(r.opp)} · ${esc(MKT_NAME[r.mkt] || r.mkt)}</span></div>
         <div class="pl-pj"><b>${num(r.proj)}</b><span>${r.prob != null && side ? pct(r.prob, 0) + ' ' + (side === 'over' ? 'O' : 'U') : 'proj'}</span></div></div>
+      ${r.why ? whyLine(r).replace('pk-why', 'pk-why pl-why') : ''}
       <div class="pl-ev"><span>L3 <b>${esc((r.l3 || []).join(' · ') || '-')}</b></span><span>Szn <b>${num(r.season)}</b></span>${r.pid ? `<button class="fl-btn${isF(r.pid) ? ' on' : ''}" title="Follow live" onclick="toggleF('${esc(r.pid)}','${esc(String(r.name).replace(/'/g, ''))}','${esc(r.gid)}')">${isF(r.pid) ? '★' : '☆'}</button>` : ''}<span class="pl-ln">${lean}</span></div>
     </div>`; }).join('')}</div>`;
 }
@@ -1855,6 +1857,11 @@ function pickLabel(r) {
   if (r.mkt === 'first_td') return `${r.name} first TD`;
   return `${r.name} ${r.side === 'over' ? 'Over' : 'Under'} ${r.line} ${MKT_NAME[r.mkt] || r.mkt}`;
 }
+// v11 NFL market models: each statistic's push on the chance, in points
+function whyLine(r) {
+  const w = (r.why || []).filter(x => Math.abs(x.pp) >= 0.1);
+  return w.length ? `<div class="pk-why">Why: ${w.map(x => `${esc(x.k)} <b>${x.v}</b> (avg ${x.avg}) <b class="${(x.pp > 0) === (r.side === 'over') ? 'edge-pos' : 'dim'}">${x.pp > 0 ? '+' : ''}${x.pp} pts to the over</b>`).join(' · ')}</div>` : '';
+}
 function playCards(rows) {
   return `<div class="pk-grid">${rows.map(r => `<div class="pk${r.projected ? ' lean' : ''}">${r.trial ? '<span class="pk-badge" style="color:#61e970;border-color:rgba(97,233,112,.5)">On trial · graded at the open</span>' : r.projected ? '<span class="pk-badge">Lean · not tracked</span>' : ''}
     <div class="pk-top"><span>${esc(MKT_NAME[r.mkt] || r.mkt)}</span><span>${esc(r.matchup || '')}</span></div>
@@ -1862,6 +1869,7 @@ function playCards(rows) {
     <div class="pk-nums"><div><span>Onyx</span><b>${fmtOdds(r.price)}</b></div><div><span>${r.projected ? 'Confidence' : 'Win chance'}</span><b>${pct(r.prob)}</b></div>
       <div><span>Implied</span><b>${pct(r.implied)}</b></div><div><span>Edge</span><b class="edge-pos">${r.edge != null ? '+' + (r.edge * 100).toFixed(1) + 'pp' : '-'}</b></div>
       ${r.proj != null ? `<div><span>Projection</span><b>${num(r.proj)}</b></div>` : ''}</div>
+    ${whyLine(r)}
     ${r.result ? `<div class="pk-res ${r.result === 'W' ? 'w' : r.result === 'L' ? 'l' : ''}">${r.result === 'W' ? 'Won' : r.result === 'L' ? 'Lost' : r.result === 'P' ? 'Push' : 'Void'}${r.actual != null ? ' · ' + esc(r.actual) : ''}</div>`
       : `<div class="pk-acts"><button class="btn-primary" onclick="bet('${esc(r.sel || '')}','${esc(pickLabel(r)).replace(/'/g, '')}')">⚡ Bet on Onyx</button>${window.OnyxSaved ? OnyxSaved.btn(savePick(r)) : ''}</div>`}
   </div>`).join('')}</div>`;
@@ -1964,14 +1972,17 @@ function openTrialSport(O) {
     const g = (SD.games || []).find(x => x.gid === k.gid) || {};
     const live = g.state === 'pre' && !k.result && k.sel;
     const res = k.result === 'W' ? '<b class="ot-w">Won</b>' : k.result === 'L' ? '<b class="ot-l">Lost</b>' : k.result === 'P' ? '<b>Push</b>' : k.result === 'V' ? '<b>Void</b>' : '<b class="dim">Open</b>';
-    const tot = k.kind === 'total', what = tot ? `${k.side === 'over' ? 'Over' : 'Under'} ${k.line} total` : `${k.name} ${k.side === 'over' ? 'Over' : 'Under'} ${k.line} receptions`;
-    return `<div class="ot-row"><div class="ot-who"><b>${esc(tot ? k.matchup + ' ' + what : what)}</b><span>${tot ? esc(k.detail || '') : esc(k.matchup) + ' · proj ' + num(k.proj)} · model ${(100 * k.prob).toFixed(1)}% vs Onyx ${(100 * k.implied).toFixed(1)}%${k.actual != null ? (tot ? ' · final total ' : ' · caught ') + k.actual : ''}</span></div>
+    const OTW = {rec: 'receptions', rush_yds: 'rushing yards', pass_yds: 'passing yards', pass_att: 'pass attempts'};
+    const tot = k.kind === 'total', what = tot ? `${k.side === 'over' ? 'Over' : 'Under'} ${k.line} total` : `${k.name} ${k.side === 'over' ? 'Over' : 'Under'} ${k.line} ${OTW[k.kind] || 'receptions'}`;
+    const why = (k.why || []).filter(w => Math.abs(w.pp) >= 0.1).map(w => `${esc(w.k)} ${w.v} (avg ${w.avg}) ${w.pp > 0 ? '+' : ''}${w.pp} pts to the over`).join(' · ');
+    return `<div class="ot-row"><div class="ot-who"><b>${esc(tot ? k.matchup + ' ' + what : what)}</b><span>${tot ? esc(k.detail || '') : esc(k.matchup) + (k.kind === 'rec' || !k.kind ? ' · proj ' + num(k.proj) : '')} · model ${(100 * k.prob).toFixed(1)}% vs Onyx ${(100 * k.implied).toFixed(1)}%${k.actual != null ? (tot ? ' · final total ' : k.kind && k.kind !== 'rec' ? ' · final ' : ' · caught ') + k.actual : ''}</span>${why ? `<span class="ot-why">Why: ${why}</span>` : ''}</div>
       ${live ? chip(k.price, tot ? k.matchup + ' ' + what : what, k.sel, fmtOdds(k.price)) : `<span class="ot-px">${fmtOdds(k.price)}</span>`}${res}</div>`;
   };
   const open = rows.filter(k => !k.result), done = rows.filter(k => k.result).slice(0, 12);
   return `<div class="sec-hdr"><span class="sec-title">On trial · Onyx opening prices</span><span class="sec-count">${O.w || 0}-${O.l || 0}${O.p ? '-' + O.p : ''} · ${u(O.units)}</span></div>
+    ${(O.lanes || []).length > 1 ? `<div class="stat-grid">${O.lanes.map(x => `<div><span>${esc(x.name)}</span><b>${x.w}-${x.l}${x.p ? '-' + x.p : ''}</b><div class="dim" style="font-size:11px">${u(x.units)}${x.pending ? ' · ' + x.pending + ' open' : ''}</div></div>`).join('')}</div>` : ''}
     <p class="dim" style="font-size:12px;line-height:1.6;margin:0 0 10px">${O.note ? esc(O.note) : `Receptions unders, logged only while Onyx still shows the first price we saw for that line, at that price, and graded off the box score. Counting every priced player who played, including games he was never thrown to, the model's unders beat Onyx's opening price in both seasons it was tested (+6.1% and +20.1%); its overs did not, so only unders are logged (since 10/31). It stays on trial until this record says otherwise.`}</p>
-    ${open.length ? open.map(row).join('') : `<div class="dim" style="font-size:12px;margin:0 0 10px">No ${O.note ? 'total' : 'receptions line'} at its opening price clears the bar right now.</div>`}
+    ${open.length ? open.map(row).join('') : `<div class="dim" style="font-size:12px;margin:0 0 10px">No ${O.empty || (O.note ? 'total' : 'receptions line')} at its opening price clears the bar right now.</div>`}
     ${done.length ? `<div class="ot-h">Graded</div>${done.map(row).join('')}` : ''}`;
 }
 var ENGINE_ICON = {

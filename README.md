@@ -502,6 +502,18 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
       play now (`VOL_P["rec_yds"]["edge"] = 1.0`).
     - `tools/sports_backtest.py` now uses the snap counts in `data/nfl/nflverse.json` the
       same way, so future NFL prop tests count these games.
+  - **NFL v11 market models (11/1).** `nfl_features.py` computes ~45 pre-kickoff statistics
+    per player from nflverse weekly stats (`nfl_verse.py` now also stores
+    `stats_player_week` as `wk` in `data/nfl/nflverse.json`) and snap shares; the same code
+    runs in `tools/nfl_feature_screen.py` (the backtest) and the live build, so the site
+    computes exactly what was tested. Per market, P(over) = sigmoid(a + b logit(Onyx no-vig)
+    + sum c z(stat)); statistics chosen on 2025 (must help both halves out of fold), judged
+    on 2026, coefficients refit on both (`nfl_model.V11`). Three lanes on trial at the
+    opening price, 3pp+, logged to `open_trial.json` with a `lane` field and the `why`
+    (each statistic's push in points): rushing yards unders, passing yards overs, pass
+    attempts unders. Each new lane's first run marks every line already up as a baseline
+    (`opening.json` `_lane_start`). Closing-price check: the edges mostly vanish, so they
+    are opening-price lanes only. Re-run: `python3 -B tools/nfl_feature_screen.py --select`.
   - **NFL 1st-half and 1st-quarter totals (10/31, tested, not adopted).** Onyx's 1H / 1Q
     lines (nfl_td.json, 391 games with nflverse quarter scores) against a walk-forward
     model: the empirical share of the full-game total each part carried, applied to
