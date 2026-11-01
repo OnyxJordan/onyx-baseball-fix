@@ -257,15 +257,21 @@
     if (un && !ov) s.side = 'under';
     // odds, in any wording. A floor: "-200 or better", "min -200", "nothing worse than -200",
     // "no -200 juice". A ceiling: "+300 or less", "max +300", "under +300".
-    var fl = t.match(/(min(imum)?( odds)?( of)?|no (worse|shorter|juicier) than|nothing (worse|shorter|juicier) than|at least|odds( of)?|better than|above)\s*([+-]?\d{3,4})/)
+    var fl = t.match(/(min(imum)?( odds)?( of)?|no (odds |price |leg )?(worse|shorter|juicier) than|nothing (worse|shorter|juicier) than|at least|odds of at least|better than|above)\s*([+-]?\d{3,4})/)
       || t.match(/([+-]\d{3,4})\s*(or better|or longer|and up|or more|minimum|min\b|floor)/) || t.match(/\bno\s*(-\d{3,4})\s*(juice|or worse)?/);
     if (fl) { var v = +(fl[fl.length - 1] && /\d/.test(fl[fl.length - 1]) ? fl[fl.length - 1] : (fl[1] || fl[fl.length - 1])); if (!isNaN(v)) s.min_price = v; }
     var fl2 = t.match(/([+-]\d{3,4})\s*(or better|or longer|and up|or more|minimum|floor)/); if (fl2) s.min_price = +fl2[1];
     var nojuice = t.match(/\bno\s*(-\d{3,4})/); if (nojuice) s.min_price = +nojuice[1] + 1;
     var btw = t.match(/between\s*([+-]?\d{3,4})\s*(and|to|-)\s*([+-]?\d{3,4})/);
     if (btw) { s.min_price = Math.min(+btw[1], +btw[3]); s.max_price = Math.max(+btw[1], +btw[3]); }
-    var mx = btw ? null : t.match(/(max(imum)?( odds)?|no (longer|better) than|below|at most|or less than)\s*([+-]\d{3,4})/) || t.match(/([+-]\d{3,4})\s*(or less|or shorter|max|cap)/);
+    var mx = btw ? null : t.match(/(max(imum)?( odds)?|no (odds |price |leg |legs )?(longer|bigger|higher|better) than|nothing (longer|bigger|higher) than|(?:^|\s)shorter than|below|at most|or less than)\s*([+-]\d{3,4})/) || t.match(/([+-]\d{3,4})\s*(or less|or shorter|and shorter|or lower|max|cap)/);
     if (mx) { var w = +(mx[mx.length - 1] && /\d/.test(mx[mx.length - 1]) ? mx[mx.length - 1] : mx[1]); if (!isNaN(w)) s.max_price = w; }
+    // a bare price on a parlay or a list ("4 leg NFL parlay -150", "odds -150"): each leg at that
+    // price or shorter. It used to read as a floor, so +575 dogs filled a "-150" parlay.
+    if (!fl && !mx && !btw && s.max_price == null && s.min_price == null && !s.target_price) {
+      var bare = t.match(/(?:^|\s|odds\s*|at\s*)(-\d{3,4})(?!\d)/);
+      if (bare) s.max_price = +bare[1];
+    }
     if (/plus money|plus[\s-]odds|\+ ?odds|underdogs?|\bdogs\b|long ?shots?|\bvalue dogs?\b/.test(t)) s.min_price = Math.max(s.min_price == null ? 100 : s.min_price, 100);
     if (/even money|around even|near even|pick ?em/.test(t)) { s.min_price = -125; s.max_price = 125; }
     if (/\bfavou?rites?\b|\bchalk\b/.test(t) && /\bml\b|money ?line|to win|\bwin\b/.test(t)) s.max_price = Math.min(s.max_price == null ? -101 : s.max_price, -101);
@@ -430,14 +436,24 @@
     if (spec.intent === 'sgp') return sgp(spec, pool, key);
     var n = Math.max(1, Math.min(spec.intent === 'list' ? 25 : 8, spec.count || 5));
     if (spec.intent === 'parlay' && spec.target_price && !spec.count_set) n = 10;   // no leg count asked: add legs until the payout is reached
-    var picked = [], games = {}, who = {};
+    var picked = [], games = {}, who = {}, mkts = {};
+    // a parlay of distinct ideas: one leg per market first (unless the request names one market),
+    // so a ticket is not one read three times; a second pass fills if the board is thin
+    var mcap = (spec.intent === 'parlay' || spec.intent === 'rr') && (spec.markets || []).length !== 1 ? 1 : 99;
+    for (var pass = 0; pass < 2 && picked.length < n; pass++) {
     for (var i = 0; i < pool.length && picked.length < n; i++) {
       var p = pool[i];
       var mine = spec.player && spec.intent === 'list';            // "Mahomes": every line on him
+      if (picked.indexOf(p) >= 0) continue;
       if (who[WHO(p) + (mine ? p.mkt : '')]) continue;
       if (!mine && (spec.one_per_game !== false || spec.intent === 'parlay') && games[p.gid]) continue;
+      var mkey = p.sport + '|' + (p.mkt || p.kind);
+      if (pass === 0 && (mkts[mkey] || 0) >= mcap) continue;
+      mkts[mkey] = (mkts[mkey] || 0) + 1;
       who[WHO(p) + (mine ? p.mkt : '')] = 1; games[p.gid] = 1; picked.push(p);
       if (spec.intent === 'parlay' && spec.target_price && !spec.count_set && picked.length >= 2 && ticket(picked).price >= spec.target_price) break;
+    }
+      if (mcap === 99 || (spec.intent === 'parlay' && spec.target_price && !spec.count_set && picked.length >= 2 && ticket(picked).price >= spec.target_price)) break;
     }
     // a parlay short of its legs (few games left on the board) fills from games it
     // already uses: an SGP+ (same-game legs plus other games), never one player twice
@@ -530,7 +546,7 @@
     if (s.target_price) b.push('pays about +' + s.target_price);
     if (s.min_price != null) b.push((s.default_floor ? 'standard prices, nothing shorter than ' : 'no price shorter than ') + (s.min_price > 0 ? '+' : '') + s.min_price);
     if (s.max_price != null) b.push('no price longer than ' + (s.max_price > 0 ? '+' : '') + s.max_price);
-    if (s.min_conf != null) b.push(Math.round(100 * s.min_conf) + '%+ confidence');
+    if (s.min_conf != null) b.push(s.default_conf ? (s.intent === 'list' ? 'every pick 50%+ to hit' : 'every leg 50%+ to hit') : Math.round(100 * s.min_conf) + '%+ confidence');
     if (s.player) b.push(s.player);
     if (s.when) b.push(s.when === 'today' ? 'tonight' : s.when);
     if (s.team) b.push(s.team);
@@ -553,8 +569,13 @@
   function normalize(spec) {
     var s = Object.assign({intent: 'list', count: 5, sports: [], markets: [], side: 'any', sort: 'conf', one_per_game: true}, spec || {});
     var two = (s.markets || []).indexOf('two_plus_td') >= 0 || s.sort === 'two_td';
-    var longMkt = (s.markets || []).some(function (m) { return m === 'first_td' || m === 'first_basket'; });
+    var longMkt = (s.markets || []).some(function (m) { return m === 'first_td' || m === 'first_basket' || m === 'anytime_td'; });
     // a named team or player: every line on them, at any price ("Buckeyes moneyline" at -400 is still the answer)
+    // a parlay is only as good as its weakest leg: every leg more likely than not, unless the
+    // request asks for dogs, longshots or a payout (then the price filters decide)
+    // (and a list of picks the same: a 17% play is not a pick, unless dogs or longshots were asked for)
+    if ((s.intent === 'parlay' || s.intent === 'list' || s.intent === 'rr') && s.min_conf == null && !s.target_price && s.sort !== 'price' && !(s.min_price != null && s.min_price >= 100) && !longMkt && !two) { s.min_conf = 0.5; s.default_conf = true; }
+    if (s.min_price == null && s.max_price != null && s.max_price < 0) { s.min_price = Math.min(-250, s.max_price - 100); s.default_floor = true; }   // "-150 or shorter": down to -250, no -2800 locks
     if (s.min_price == null && !two && !longMkt && !s.team && !s.player) { s.min_price = s.intent === 'list' ? -200 : -150; s.default_floor = true; }
     if (s.team && s.intent === 'list') s.one_per_game = false;      // "Ohio State player props": several from the one game
     return s;
@@ -571,6 +592,13 @@
         var wide = Object.assign({}, spec, {min_price: -250});
         var r2 = run(wide, a[1]);
         if (r2.rows.length > res.rows.length) { res = r2; spec = wide; res.note = (res.note ? res.note + ' ' : '') + 'Not enough at standard prices (-150 or longer), so this reaches to -250.'; }
+      }
+      // the 50% floor left it short (a thin board, a market that is never 50%): show the most likely
+      // instead, and say so, rather than an empty answer
+      if (spec.default_conf && res.rows.length < want) {
+        var loose = Object.assign({}, spec, {min_conf: null, default_conf: false});
+        var r3 = run(loose, a[1]);
+        if (r3.rows.length > res.rows.length) { res = r3; spec = loose; res.note = (res.note ? res.note + ' ' : '') + 'Nothing here is 50%+ to hit right now, so these are the most likely.'; }
       }
       res.spec = spec; res.via = a[0].via; res.understood = describe(spec);
       return res;
