@@ -188,9 +188,13 @@ def main():
                     c = v.get("c") or [None, None, None]
                     S.append({"season": 2025 if g["date"] < "2026-03-01" else 2026, "date": g["date"], "p": io / (io + iu), "po": po, "pu": pu, "line_": ln,
                               "cl": c[0], "co": c[1], "cu": c[2],
-                              "line": ln, "y": int(act > ln), "f": f})
+                              "line": ln, "y": int(act > ln), "f": f,
+                              **({"act": act, "pid": pid, "team": team, "opp": opp, "season_": season, "week": week, "env": (imp, spr, home)}
+                                 if "--proj" in sys.argv else {})})
         DATA[mkt] = S
         print(f"{mkt}: {sum(1 for s in S if s['season'] == 2025)} lines 2025, {sum(1 for s in S if s['season'] == 2026)} 2026")
+    if "--proj" in sys.argv:      # hand the rows (with actuals) to tools/nfl_proj_test.py
+        return DATA, IX
     if "--select" not in sys.argv:
         screen(DATA)
     select_and_test(DATA)
