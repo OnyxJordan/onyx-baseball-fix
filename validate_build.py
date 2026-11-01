@@ -70,6 +70,8 @@ LEDGER_RETENTION_DAYS = {
     # NFL receptions at Onyx's opening price, on trial (sports_build.nfl_open_lane)
     "nfl/open_trial": None,
     "cfb/open_trial": None,
+    # college rushing yards unders at the open (sports_build.cfb_prop_lane, cfb_players v2)
+    "cfb/prop_trial": None,
     # Onyx Sports ledgers (sports_lab.Ledger): empty until a sport's Onyx price
     # backtest passes, then append-only like every other record
     "nfl/picks_history": None,

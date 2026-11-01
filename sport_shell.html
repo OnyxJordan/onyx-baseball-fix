@@ -1960,7 +1960,7 @@ function renderPlays() {
     ${projTable(shown.slice(0, 120))}`;
   }
   // what to bet first, then what is tracked, then the detail; how the model works last
-  el.innerHTML = pickHtml + openTrialSport(M.open) + recordBlock(M.record) + body + lab;
+  el.innerHTML = pickHtml + openTrialSport(M.open) + openTrialSport(M.open2) + recordBlock(M.record) + body + lab;
 }
 // receptions at Onyx's opening price, on trial (sports_build.nfl_open_lane): logged only
 // while Onyx still shows the first price we saw for that line, graded off the box score
@@ -1972,14 +1972,14 @@ function openTrialSport(O) {
     const g = (SD.games || []).find(x => x.gid === k.gid) || {};
     const live = g.state === 'pre' && !k.result && k.sel;
     const res = k.result === 'W' ? '<b class="ot-w">Won</b>' : k.result === 'L' ? '<b class="ot-l">Lost</b>' : k.result === 'P' ? '<b>Push</b>' : k.result === 'V' ? '<b>Void</b>' : '<b class="dim">Open</b>';
-    const OTW = {rec: 'receptions', rush_yds: 'rushing yards', pass_yds: 'passing yards', pass_att: 'pass attempts'};
+    const OTW = {rec: 'receptions', rush_yds: 'rushing yards', pass_yds: 'passing yards', pass_att: 'pass attempts', rec_yds: 'receiving yards'};
     const tot = k.kind === 'total', what = tot ? `${k.side === 'over' ? 'Over' : 'Under'} ${k.line} total` : `${k.name} ${k.side === 'over' ? 'Over' : 'Under'} ${k.line} ${OTW[k.kind] || 'receptions'}`;
     const why = (k.why || []).filter(w => Math.abs(w.pp) >= 0.1).map(w => `${esc(w.k)} ${w.v} (avg ${w.avg}) ${w.pp > 0 ? '+' : ''}${w.pp} pts to the over`).join(' · ');
     return `<div class="ot-row"><div class="ot-who"><b>${esc(tot ? k.matchup + ' ' + what : what)}</b><span>${tot ? esc(k.detail || '') : esc(k.matchup) + (k.kind === 'rec' || !k.kind ? ' · proj ' + num(k.proj) : '')} · model ${(100 * k.prob).toFixed(1)}% vs Onyx ${(100 * k.implied).toFixed(1)}%${k.actual != null ? (tot ? ' · final total ' : k.kind && k.kind !== 'rec' ? ' · final ' : ' · caught ') + k.actual : ''}</span>${why ? `<span class="ot-why">Why: ${why}</span>` : ''}</div>
       ${live ? chip(k.price, tot ? k.matchup + ' ' + what : what, k.sel, fmtOdds(k.price)) : `<span class="ot-px">${fmtOdds(k.price)}</span>`}${res}</div>`;
   };
   const open = rows.filter(k => !k.result), done = rows.filter(k => k.result).slice(0, 12);
-  return `<div class="sec-hdr"><span class="sec-title">On trial · Onyx opening prices</span><span class="sec-count">${O.w || 0}-${O.l || 0}${O.p ? '-' + O.p : ''} · ${u(O.units)}</span></div>
+  return `<div class="sec-hdr"><span class="sec-title">${esc(O.title || 'On trial · Onyx opening prices')}</span><span class="sec-count">${O.w || 0}-${O.l || 0}${O.p ? '-' + O.p : ''} · ${u(O.units)}</span></div>
     ${(O.lanes || []).length > 1 ? `<div class="stat-grid">${O.lanes.map(x => `<div><span>${esc(x.name)}</span><b>${x.w}-${x.l}${x.p ? '-' + x.p : ''}</b><div class="dim" style="font-size:11px">${u(x.units)}${x.pending ? ' · ' + x.pending + ' open' : ''}</div></div>`).join('')}</div>` : ''}
     <p class="dim" style="font-size:12px;line-height:1.6;margin:0 0 10px">${O.note ? esc(O.note) : `Receptions unders, logged only while Onyx still shows the first price we saw for that line, at that price, and graded off the box score. Counting every priced player who played, including games he was never thrown to, the model's unders beat Onyx's opening price in both seasons it was tested (+6.1% and +20.1%); its overs did not, so only unders are logged (since 10/31). It stays on trial until this record says otherwise.`}</p>
     ${open.length ? open.map(row).join('') : `<div class="dim" style="font-size:12px;margin:0 0 10px">No ${O.empty || (O.note ? 'total' : 'receptions line')} at its opening price clears the bar right now.</div>`}

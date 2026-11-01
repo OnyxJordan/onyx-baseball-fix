@@ -862,10 +862,17 @@ def cfb_player_rows(lane, slate, odds, w):
         if r["season"] == season and r["week"] < wk:
             last_game[r["team"]] = max(last_game.get(r["team"], 0), r["week"])
     props = {(nk(p.get("name")), p.get("mkt")): p for p in (odds or {}).get("props") or []}
+    # v2: market models on Onyx's price (rushing yards), from the same box scores
+    MI = C.MarketIndex(rows) if getattr(C, "V2", None) else None
     out = []
     for g in slate.get("games") or []:
         if g.get("state") != "pre":
             continue
+        o_ = ((odds or {}).get("games") or {}).get(g["gid"]) or {}
+        gdate = None
+        if g.get("start"):
+            from datetime import datetime as _dt, timedelta as _td
+            gdate = (_dt.fromisoformat(g["start"].replace("Z", "+00:00")) - _td(hours=5)).date().isoformat()
         for team, opp, home in ((g["away"], g["home"], False), (g["home"], g["away"], True)):
             lw = last_game.get(team)
             for pid, gs in by.items():
@@ -897,9 +904,92 @@ def cfb_player_rows(lane, slate, odds, w):
                         if ps:
                             r.update(side=ps["side"], price=ps["price"], sel=r["over_sel"] if ps["side"] == "over" else r["under_sel"],
                                      prob=ps["prob"], implied=ps["implied"], edge=ps["edge"], ev=ps["ev"], model_p=ps["model_p"])
+                    # v2: the market model prices its markets whatever the projection says (it was tested on every line)
+                    if MI is not None and st in C.V2 and None not in (r["line"], r["over"], r["under"]) \
+                            and o_.get("total") is not None and gdate:
+                        fo, _ = L.fair_pair(r["over"], r["under"])
+                        hsp = o_.get("home_spread") or 0.0
+                        f = MI.features(pid, team, opp, home, gdate, r["line"], st, hsp if home else -hsp, o_["total"]) if fo else None
+                        if f is not None:
+                            r["v2"] = round(C.prob_v2(st, fo, f), 4)
+                            r["why"] = C.why_v2(st, fo, f)
+                            ps = L.price_side(r["v2"], r["over"], r["under"], 1.0)
+                            if ps:
+                                r.pop("role_flag", None)
+                                r.update(side=ps["side"], price=ps["price"], sel=r["over_sel"] if ps["side"] == "over" else r["under_sel"],
+                                         prob=ps["prob"], implied=ps["implied"], edge=ps["edge"], ev=ps["ev"], model_p=ps["model_p"],
+                                         value_min=C.V2_EDGE if ps["side"] == C.V2[st]["side"] else 1.0)
                     out.append(r)
     out.sort(key=lambda r: (r["line"] is None, -abs(r["proj"] - (r["line"] or r["proj"])) / max(1.0, r["line"] or 1.0)))
     return out
+
+
+def cfb_prop_lane(lane, prow, slate, C):
+    """College rushing yards unders at Onyx's opening price, on trial (cfb_players v2). Its own
+    capture and ledger (prop_opening.json, prop_trial.json, append-only), apart from the totals
+    lane. A play is logged once, when the v2 model beats the opening price by V2_EDGE and the
+    live line and price are still the opening ones. Graded from the box score; a player with no
+    box line once his game's box is in is a void."""
+    from datetime import datetime, timedelta, timezone
+    ts = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    O = lane.load("prop_opening.json", None)
+    first_run = O is None
+    O = O or {}
+    ledger = lane.load("prop_trial.json", []) or []
+    games = {g["gid"]: g for g in slate.get("games") or []}
+    for k in [k for k in O if k.split("|")[0] in games and games[k.split("|")[0]].get("state") == "post"]:
+        O.pop(k)
+    have = {k["key"] for k in ledger}
+    cands = []
+    for r in prow:
+        if r["mkt"] not in C.V2 or None in (r.get("line"), r.get("over"), r.get("under")):
+            continue
+        g = games.get(r["gid"]) or {}
+        key = f"{r['gid']}|{nk(r['name'])}|{r['mkt']}"
+        if key not in O and g.get("state") == "pre":
+            O[key] = {"line": r["line"], "over": r["over"], "under": r["under"], "ts": ts, **({"baseline": True} if first_run else {})}
+        op = O.get(key)
+        if not op or op.get("baseline") or g.get("state") != "pre" or key in have or r.get("v2") is None:
+            continue
+        if (op["line"], op["over"], op["under"]) != (r["line"], r["over"], r["under"]):
+            continue
+        side = C.V2[r["mkt"]]["side"]
+        p = r["v2"] if side == "over" else 1 - r["v2"]
+        price, sel = (r["over"], r.get("over_sel")) if side == "over" else (r["under"], r.get("under_sel"))
+        if p - L.implied(price) >= C.V2_EDGE:
+            cands.append({"date": slate.get("date"), "key": key, "gid": r["gid"], "pid": r["pid"], "name": r["name"], "team": r["team"],
+                          "opp": r["opp"], "matchup": r["matchup"], "kind": r["mkt"], "lane": f"{r['mkt']}_{side}", "side": side,
+                          "line": r["line"], "price": price, "sel": sel, "proj": r.get("proj"), "prob": round(p, 4),
+                          "implied": round(L.implied(price), 4), "why": r.get("why"), "opened_at": op["ts"], "logged_at": ts,
+                          "model": C.VERSION, "result": None, "actual": None})
+    ledger.extend(cands)
+    box, box_games = {}, set()
+    for x in (lane.load("player_games.json", {}) or {}).get("rows") or []:
+        box[(x["gid"], nk(x["name"]))] = x
+        box_games.add(x["gid"])
+    for k in ledger:
+        if k.get("result"):
+            continue
+        x = box.get((k["gid"], nk(k["name"])))
+        if x is not None:
+            a = x.get(k["kind"]) or 0
+            k["actual"], k["graded_at"] = a, ts
+            k["result"] = "P" if a == k["line"] else ("W" if (a > k["line"]) == (k["side"] == "over") else "L")
+        elif k["gid"] in box_games or k.get("date", "9") < (datetime.now(timezone.utc) - timedelta(days=10)).date().isoformat():
+            k["result"], k["actual"], k["graded_at"] = "V", None, ts
+    lane.save("prop_opening.json", O, indent=1)
+    lane.save("prop_trial.json", ledger, indent=1)
+    w = sum(1 for k in ledger if k["result"] == "W"); l_ = sum(1 for k in ledger if k["result"] == "L")
+    pay = lambda a: a / 100.0 if a > 0 else 100.0 / -a
+    units = sum((pay(k["price"]) if k["result"] == "W" else -1.0 if k["result"] == "L" else 0.0) for k in ledger)
+    return {"w": w, "l": l_, "p": sum(1 for k in ledger if k["result"] == "P"), "pending": sum(1 for k in ledger if not k["result"]),
+            "units": round(units, 2), "roi": round(units / (w + l_), 4) if w + l_ else None, "empty": "rushing yards line", "title": "On trial · college rushing yards unders",
+            "rows": list(reversed(ledger[-80:])), "started": ledger[0]["date"] if ledger else None,
+            "note": ("Rushing yards unders, since 11/1: Onyx's opening price moved by the rushing yards and carries the defense allows "
+                     "and how far the line sits from the runner's usual range, logged at 5 points of edge or more while Onyx still shows "
+                     "the first price we saw, and graded off the box score. On weeks the model never saw these unders went 47-20 (+31.7%) "
+                     "at the opening price, and Onyx's college rushing lines go over only 42% of the time. Each play lists why. "
+                     "On trial until this record says otherwise.")}
 
 
 def team_block(key, lane, slate, odds):
@@ -949,6 +1039,12 @@ def team_block(key, lane, slate, odds):
             base["tests"].append({"k": names[st] + " (players)", "v": f"{(1 - mae / avg) * 100:+.1f}%",
                                   "d": f"vs season avg · {(1 - mae / l3) * 100:+.1f}% vs last 3 · {n} games, weeks 7-9"})
         base["projected"] = top_plays(rows + [r for r in prow if r.get("prob") is not None])
+        if getattr(C, "V2", None):
+            base["open2"] = cfb_prop_lane(lane, prow, slate, C)
+            trial2 = {k.get("sel") for k in base["open2"]["rows"] if k.get("sel") and not k.get("result")}
+            for p in base["projected"]:
+                if p.get("sel") in trial2:
+                    p["trial"] = True
     else:
         base["projected"] = top_plays(rows)     # leans; a live sport shows them under its tracked picks
     return base

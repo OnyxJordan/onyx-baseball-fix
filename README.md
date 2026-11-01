@@ -514,6 +514,21 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
     attempts unders. Each new lane's first run marks every line already up as a baseline
     (`opening.json` `_lane_start`). Closing-price check: the edges mostly vanish, so they
     are opening-price lanes only. Re-run: `python3 -B tools/nfl_feature_screen.py --select`.
+  - **College rushing yards unders (11/1, cfb_players v2, on trial).** `tools/cfb_feature_screen.py`
+    runs the NFL v11 method on 2026 Onyx college props (one season, so chosen on lines
+    before 10/1, judged after) with features from `cfb_players.MarketIndex` (shared with the
+    live build). Rushing yards passed: log loss .6794 vs .6916; unders 5pp+ 33-14 before,
+    47-20 (+31.7%) after; 3-5pp flat in both. Logged at 5pp+ at the opening price to its own
+    ledger `data/cfb/prop_trial.json` (capture `prop_opening.json`), graded off the box; a
+    player with no box line is a void (Onyx settles him at 0, so this undercounts unders).
+    Receiving yards failed; receptions and passing yards had too few early lines to choose on.
+  - **NHL points and assists vs Onyx (11/1, tested, not adopted).** `tools/nhl_box_pull.py`
+    pulls NHL API boxscores (ice time, shots, power-play goals, shifts, hits, blocks,
+    position) and `tools/nhl_feature_screen.py` runs the NFL v11 method on 16,484 points and
+    16,430 assists lines (chosen before 2/1/2026, judged after). No statistic passed: the
+    best (opponent goals and shots allowed over 10 games, the team's win chance and the
+    total) improve Onyx's log loss by 0.0003-0.0005, same sign in both periods, far below
+    the margin. Onyx's NHL point prices are efficient; they stay leans.
   - **NFL 1st-half and 1st-quarter totals (10/31, tested, not adopted).** Onyx's 1H / 1Q
     lines (nfl_td.json, 391 games with nflverse quarter scores) against a walk-forward
     model: the empirical share of the full-game total each part carried, applied to
