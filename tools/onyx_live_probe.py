@@ -45,7 +45,7 @@ def main():
 
     now = datetime.now(timezone.utc)
     days = [(now + timedelta(days=d)).strftime("%Y-%m-%d") for d in (-1, 0)]
-    live = []
+    live, controls = [], []
     for sport, lg in LEAGUES:
         leagues = [lg] if lg else [l.get("id") for l in (get(f"{OPTIC}/leagues?sport={sport}") or {}).get("data") or []][:12]
         for league in leagues:
@@ -55,6 +55,8 @@ def main():
                     st = str(f.get("status") or "").lower()
                     if st == "live" or f.get("is_live"):
                         live.append((sport, league, f))
+                    elif st == "unplayed" and not any(c[1] == league for c in controls):
+                        controls.append((sport, league, f))   # control: a game not started yet should show prices
     seen = set()
     live = [x for x in live if not (x[2]["id"] in seen or seen.add(x[2]["id"]))]
     print(f"{len(live)} live fixtures at {now.isoformat(timespec='seconds')}")
@@ -69,7 +71,12 @@ def main():
             rows += row.get("odds") or []
         return rows
 
-    out = {"book": BOOK, "at": now.isoformat(timespec="seconds"), "gap": gap, "fixtures": []}
+    out = {"book": BOOK, "at": now.isoformat(timespec="seconds"), "gap": gap, "fixtures": [], "controls": []}
+    for sport, league, f in controls[:6]:
+        c = pull(sport, league, f["id"])
+        nm = f"{f.get('away_team_display') or ''} @ {f.get('home_team_display') or ''}"
+        print(f"control (not started) {league} {nm} [{f.get('status')}, {f.get('start_date')}]: {len(c)} priced rows")
+        out["controls"].append({"league": league, "name": nm, "rows": len(c)})
     first = {}
     for sport, league, f in live[:14]:
         first[f["id"]] = pull(sport, league, f["id"])
