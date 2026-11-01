@@ -152,6 +152,60 @@ def main():
         return {"depth": float(rank), "depth_up": float(prev - rank), "vac_tgt": vt, "vac_car": vc, "vac_qb": va,
                 "own_q": 1.0 if pid in INJ.get((season, week, team, "q"), set()) else 0.0}
 
+    # --pbp (11/1): play-calling and conditions from nflverse play-by-play: pass rate over
+    # expected (PROE, a coach's tendency), neutral-situation pace (seconds per play with the
+    # game in doubt), the defense's PROE and pace allowed, and the game's wind, temperature
+    # and roof. Team numbers are rolling, last 4 games before tonight.
+    PB_T, PB_G = {}, {}
+    if "--pbp" in sys.argv:
+        for y in (2025, 2026):
+            p_ = f"{BT}nflx/play_by_play_{y}.csv"
+            if not os.path.exists(p_):
+                continue
+            agg = defaultdict(lambda: {"poe": 0.0, "n": 0, "sec": 0.0, "np": 0, "dpoe": 0.0, "dn": 0, "dsec": 0.0, "dnp": 0})
+            last = {}
+            for r in csv.DictReader(open(p_)):
+                if r.get("season_type") not in ("REG", "POST") or not r.get("posteam"):
+                    continue
+                wk_, gid_ = int(r["week"]), r["game_id"]
+                if gid_ not in PB_G:
+                    roof = r.get("roof") or ""
+                    PB_G[gid_] = {"wind": num(r.get("wind")) if roof in ("outdoors", "open") else 0.0,
+                                  "temp": num(r.get("temp")) if roof in ("outdoors", "open") and r.get("temp") not in ("", "NA") else 65.0,
+                                  "dome": 0.0 if roof in ("outdoors", "open") else 1.0, "teams": (r.get("home_team"), r.get("away_team")), "week": wk_, "season": int(r["season"])}
+                if r.get("pass") not in ("1",) and r.get("rush") not in ("1",):
+                    continue
+                o, d_ = agg[(int(r["season"]), wk_, r["posteam"])], agg[(int(r["season"]), wk_, r["defteam"])]
+                if r.get("pass_oe") not in ("", "NA", None):
+                    o["poe"] += num(r["pass_oe"]); o["n"] += 1
+                    d_["dpoe"] += num(r["pass_oe"]); d_["dn"] += 1
+                wp = num(r.get("wp")); hs = num(r.get("half_seconds_remaining")); gs = num(r.get("game_seconds_remaining"))
+                k_ = (gid_, r["posteam"], r.get("drive"))
+                if 0.2 <= wp <= 0.8 and hs > 120 and k_ in last and 0 < last[k_] - gs < 60:
+                    o["sec"] += last[k_] - gs; o["np"] += 1
+                    d_["dsec"] += last[k_] - gs; d_["dnp"] += 1
+                last[k_] = gs
+            for k_, v in agg.items():
+                PB_T[k_] = v
+
+    def pbp_feats(season, week, team, opp, gdate):
+        if not PB_T:
+            return {}
+        def roll(t, key, n_key):
+            ks = sorted((s_, w_) for (s_, w_, t_) in PB_T if t_ == t and (s_, w_) < (season, week))[-4:]
+            num_ = sum(PB_T[(s_, w_, t)][key] for s_, w_ in ks); den = sum(PB_T[(s_, w_, t)][n_key] for s_, w_ in ks)
+            return num_ / den if den else None
+        proe, dproe = roll(team, "poe", "n"), roll(opp, "dpoe", "dn")
+        pace, dpace = roll(team, "sec", "np"), roll(opp, "dsec", "dnp")
+        g_ = next((v for v in PB_G.values() if v["season"] == season and v["week"] == week and team in v["teams"]), None) or {}
+        f_ = {"proe": proe if proe is not None else 0.0, "opp_proe_allowed": dproe if dproe is not None else 0.0,
+              "pace": pace if pace is not None else 29.0, "opp_pace": dpace if dpace is not None else 29.0,
+              "wind": g_.get("wind", 0.0), "temp": g_.get("temp", 65.0), "dome": g_.get("dome", 1.0)}
+        f_["game_pace"] = (f_["pace"] + f_["opp_pace"]) / 2
+        f_["wind_hi"] = 1.0 if f_["wind"] >= 15 else 0.0
+        f_["cold"] = 1.0 if f_["temp"] <= 35 else 0.0
+        return f_
+
     def cross(mkt, fid, nm, f, ln):
         o = XL.get((fid, nm), {})
         g = lambda m: o.get(m, (None, None))[0]
@@ -243,6 +297,8 @@ def main():
                         f.update(cross(mkt, fid, nm, f, ln))
                     if "--role" in sys.argv:
                         f.update(role(pid, season, week, team, g["date"]))
+                    if "--pbp" in sys.argv:
+                        f.update(pbp_feats(season, week, team, opp, g["date"]))
                     c = v.get("c") or [None, None, None]
                     S.append({"season": 2025 if g["date"] < "2026-03-01" else 2026, "date": g["date"], "p": io / (io + iu), "po": po, "pu": pu, "line_": ln,
                               "cl": c[0], "co": c[1], "cu": c[2],
@@ -345,7 +401,7 @@ def screen(DATA, out_path="bt/nfl_screen.json"):
         for d_te, fk, c25, c26, d_tr in rows[:10]:
             same = "same sign" if c25 * c26 > 0 else "FLIPS"
             print(f"   {fk:16s} {d_te:+8.2f}     {d_tr:+8.2f}    {c25:+.3f}    {c26:+.3f}  {same}")
-    json.dump({m: [list(r) for r in rows] for m, rows in out.items()}, open(out_path, "w"))
+    json.dump({m: [list(r) for r in rows] for m, rows in out.items()}, open(out_path.replace(".json", "_pbp.json") if "--pbp" in sys.argv else out_path, "w"))
 
 
 
@@ -457,7 +513,7 @@ def select_and_test(DATA, k_max=4, out="bt/nfl_select.json"):
         print(f"   2026 log loss: model {mdl:.4f} vs Onyx {raw:.4f} (Onyx refit {base:.4f})")
         print(f"   2025 (fit) 3pp+: {r['bets_2025_3pp']}")
         print(f"   2026 (unseen) 3pp+: {r['bets_2026_3pp']}   5pp+: {r['bets_2026_5pp']}")
-    json.dump(res, open(out.replace(".json", "_cross.json") if "--cross" in sys.argv else out.replace(".json", "_role.json") if "--role" in sys.argv else out, "w"), indent=1)
+    json.dump(res, open(out.replace(".json", "_cross.json") if "--cross" in sys.argv else out.replace(".json", "_role.json") if "--role" in sys.argv else out.replace(".json", "_pbp.json") if "--pbp" in sys.argv else out, "w"), indent=1)
     return res
 
 
