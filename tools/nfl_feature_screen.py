@@ -26,10 +26,10 @@ import nfl_features as F   # noqa: E402
 
 BT = "bt/"
 MARKETS = {   # our key: (Onyx market id, nflverse stat column or derived, line files)
-    "rec": ("player_receptions", "receptions", ["nfl_lines.json"]),
-    "rec_yds": ("player_receiving_yards", "receiving_yards", ["nfl_lines.json"]),
-    "rush_yds": ("player_rushing_yards", "rushing_yards", ["nfl_lines.json"]),
-    "pass_yds": ("player_passing_yards", "passing_yards", ["nfl_lines.json"]),
+    "rec": ("player_receptions", "receptions", ["nfl_lines.json", "nfl_2024_mkt.json"]),
+    "rec_yds": ("player_receiving_yards", "receiving_yards", ["nfl_lines.json", "nfl_2024_mkt.json"]),
+    "rush_yds": ("player_rushing_yards", "rushing_yards", ["nfl_lines.json", "nfl_2024_mkt.json"]),
+    "pass_yds": ("player_passing_yards", "passing_yards", ["nfl_lines.json", "nfl_2024_mkt.json"]),
     "pass_att": ("player_passing_attempts", "attempts", ["nfl_combo_a.json", "nfl_combo_b.json"]),
     "pass_td": ("player_passing_touchdowns", "passing_tds", ["nfl_pass_td.json"]),
     "rush_rec_yds": ("player_rushing_+_receiving_yards", "rush_rec_yds", ["nfl_combo_ya.json", "nfl_combo_yb.json"]),
@@ -70,6 +70,10 @@ def main():
     vj = json.load(open("data/nfl/nflverse.json"))
     IX = F.Index(load_stats(), F.snaps_of(vj))
     by_pid, by_name, snaps = IX.by_pid, IX.by_name, IX.snaps
+    if os.path.exists(BT + "nfl24/snap_counts_2024.csv"):
+        for r in csv.DictReader(open(BT + "nfl24/snap_counts_2024.csv")):
+            if r.get("game_type") == "REG" or r.get("game_type") in ("WC", "DIV", "CON", "SB"):
+                snaps[(int(r["season"]), int(r["week"]), r["team"], nk(r["player"]))] = num(r.get("offense_pct"))
     res = json.load(open("data/nfl/results.json"))["games"]
     wk_of = {}
     for r in json.load(open("data/nfl/player_games.json"))["rows"]:
@@ -78,6 +82,10 @@ def main():
     by_day = defaultdict(list)
     for g in res:
         by_day[g["date"]].append(g)
+    if os.path.exists(BT + "nfl24/games.json"):      # 2024 (nflverse game ids and team codes)
+        for g in json.load(open(BT + "nfl24/games.json")):
+            if g.get("season") == 2024:
+                by_day[g["date"]].append({"id": g["gid"], "date": g["date"], "season": 2024, "week": g["week"], "home": g["home"], "away": g["away"]})
     games = json.load(open(BT + "nfl_game.json"))
     ESPN2V = {"WSH": "WAS", "LAR": "LA"}
     ab = lambda s: NICK.get((s or "").split()[-1])
@@ -95,6 +103,116 @@ def main():
                         if v.get("o") and v["o"][0] is not None and None not in v["o"][1:3]:
                             io_, iu_ = L.implied(v["o"][1]), L.implied(v["o"][2])
                             XL[(fid, nm)][mid_] = (v["o"][0], io_ / (io_ + iu_))
+
+    # --role (11/1): who is ahead of him on the depth chart the day before, and how much
+    # volume the teammates ruled Out / Doubtful that week leave behind (nflverse depth charts
+    # and injury reports, both known before kickoff)
+    DEPTH, INJ = {}, defaultdict(set)
+    if "--role" in sys.argv:
+        for y in (2025, 2026):
+            p_ = f"{BT}nflx/depth_charts_{y}.csv"
+            if os.path.exists(p_):
+                for r in csv.DictReader(open(p_)):
+                    if r["pos_abb"] in ("QB", "RB", "WR", "TE") and r["gsis_id"]:
+                        k_ = (r["team"], r["dt"][:10])
+                        DEPTH.setdefault(k_, {})[r["gsis_id"]] = min(int(r["pos_rank"] or 9), DEPTH.get(k_, {}).get(r["gsis_id"], 9))
+            p_ = f"{BT}nflx/injuries_{y}.csv"
+            if os.path.exists(p_):
+                for r in csv.DictReader(open(p_)):
+                    if r["report_status"] in ("Out", "Doubtful"):
+                        INJ[(int(r["season"]), int(r["week"]), r["team"])].add(r["gsis_id"])
+                    elif r["report_status"] == "Questionable":
+                        INJ[(int(r["season"]), int(r["week"]), r["team"], "q")].add(r["gsis_id"])
+    depth_days = defaultdict(list)
+    for (t_, d_) in DEPTH:
+        depth_days[t_].append(d_)
+    for t_ in depth_days:
+        depth_days[t_].sort()
+
+    def role(pid, season, week, team, gdate):
+        if not DEPTH:
+            return {}
+        ds = [d_ for d_ in depth_days.get(team, []) if d_ < gdate]
+        rank = DEPTH[(team, ds[-1])].get(pid, 5) if ds else 5
+        # his rank at his previous game: a move up the chart is a new role
+        h = [g for g in by_pid.get(pid, []) if (g["season"], g["week"]) < (season, week)]
+        prev = 5
+        if h:
+            lg_ = h[-1]
+            pd = [d_ for d_ in depth_days.get(lg_["team"], []) if d_ < gdate and d_ <= f"{lg_['season'] + (1 if lg_['week'] > 17 else 0)}-12-31"]
+            pd = [d_ for d_ in pd if d_ < ds[-1]] if ds else pd
+            # the chart about a week before tonight's
+            if ds:
+                wk_ago = [d_ for d_ in depth_days.get(team, []) if d_ < ds[-1] and d_ <= (date.fromisoformat(ds[-1]) - timedelta(days=6)).isoformat()]
+                if wk_ago:
+                    prev = DEPTH[(team, wk_ago[-1])].get(pid, 5)
+        out_ids = INJ.get((season, week, team), set()) - {pid}
+        vt = vc = va = 0.0
+        for oid in out_ids:
+            oh = [g for g in by_pid.get(oid, []) if (g["season"], g["week"]) < (season, week)][-5:]
+            if not oh:
+                continue
+            for g in oh:
+                tw = IX.team_wk[(g["season"], g["week"], g["team"])]
+                vt += g["targets"] / max(1.0, tw["targets"]) / len(oh)
+                vc += g["carries"] / max(1.0, tw["carries"]) / len(oh)
+                va += g["attempts"] / max(1.0, tw["attempts"]) / len(oh)
+        return {"depth": float(rank), "depth_up": float(prev - rank), "vac_tgt": vt, "vac_car": vc, "vac_qb": va,
+                "own_q": 1.0 if pid in INJ.get((season, week, team, "q"), set()) else 0.0}
+
+    # --pbp (11/1): play-calling and conditions from nflverse play-by-play: pass rate over
+    # expected (PROE, a coach's tendency), neutral-situation pace (seconds per play with the
+    # game in doubt), the defense's PROE and pace allowed, and the game's wind, temperature
+    # and roof. Team numbers are rolling, last 4 games before tonight.
+    PB_T, PB_G = {}, {}
+    if "--pbp" in sys.argv:
+        for y in (2024, 2025, 2026):
+            p_ = f"{BT}nflx/play_by_play_{y}.csv"
+            if not os.path.exists(p_):
+                continue
+            agg = defaultdict(lambda: {"poe": 0.0, "n": 0, "sec": 0.0, "np": 0, "dpoe": 0.0, "dn": 0, "dsec": 0.0, "dnp": 0})
+            last = {}
+            for r in csv.DictReader(open(p_)):
+                if r.get("season_type") not in ("REG", "POST") or not r.get("posteam"):
+                    continue
+                wk_, gid_ = int(r["week"]), r["game_id"]
+                if gid_ not in PB_G:
+                    roof = r.get("roof") or ""
+                    PB_G[gid_] = {"wind": num(r.get("wind")) if roof in ("outdoors", "open") else 0.0,
+                                  "temp": num(r.get("temp")) if roof in ("outdoors", "open") and r.get("temp") not in ("", "NA") else 65.0,
+                                  "dome": 0.0 if roof in ("outdoors", "open") else 1.0, "teams": (r.get("home_team"), r.get("away_team")), "week": wk_, "season": int(r["season"])}
+                if r.get("pass") not in ("1",) and r.get("rush") not in ("1",):
+                    continue
+                o, d_ = agg[(int(r["season"]), wk_, r["posteam"])], agg[(int(r["season"]), wk_, r["defteam"])]
+                if r.get("pass_oe") not in ("", "NA", None):
+                    o["poe"] += num(r["pass_oe"]); o["n"] += 1
+                    d_["dpoe"] += num(r["pass_oe"]); d_["dn"] += 1
+                wp = num(r.get("wp")); hs = num(r.get("half_seconds_remaining")); gs = num(r.get("game_seconds_remaining"))
+                k_ = (gid_, r["posteam"], r.get("drive"))
+                if 0.2 <= wp <= 0.8 and hs > 120 and k_ in last and 0 < last[k_] - gs < 60:
+                    o["sec"] += last[k_] - gs; o["np"] += 1
+                    d_["dsec"] += last[k_] - gs; d_["dnp"] += 1
+                last[k_] = gs
+            for k_, v in agg.items():
+                PB_T[k_] = v
+
+    def pbp_feats(season, week, team, opp, gdate):
+        if not PB_T:
+            return {}
+        def roll(t, key, n_key):
+            ks = sorted((s_, w_) for (s_, w_, t_) in PB_T if t_ == t and (s_, w_) < (season, week))[-4:]
+            num_ = sum(PB_T[(s_, w_, t)][key] for s_, w_ in ks); den = sum(PB_T[(s_, w_, t)][n_key] for s_, w_ in ks)
+            return num_ / den if den else None
+        proe, dproe = roll(team, "poe", "n"), roll(opp, "dpoe", "dn")
+        pace, dpace = roll(team, "sec", "np"), roll(opp, "dsec", "dnp")
+        g_ = next((v for v in PB_G.values() if v["season"] == season and v["week"] == week and team in v["teams"]), None) or {}
+        f_ = {"proe": proe if proe is not None else 0.0, "opp_proe_allowed": dproe if dproe is not None else 0.0,
+              "pace": pace if pace is not None else 29.0, "opp_pace": dpace if dpace is not None else 29.0,
+              "wind": g_.get("wind", 0.0), "temp": g_.get("temp", 65.0), "dome": g_.get("dome", 1.0)}
+        f_["game_pace"] = (f_["pace"] + f_["opp_pace"]) / 2
+        f_["wind_hi"] = 1.0 if f_["wind"] >= 15 else 0.0
+        f_["cold"] = 1.0 if f_["temp"] <= 35 else 0.0
+        return f_
 
     def cross(mkt, fid, nm, f, ln):
         o = XL.get((fid, nm), {})
@@ -146,7 +264,7 @@ def main():
                     g = next((y for y in by_day.get(dd, []) if ESPN2V.get(y["home"], y["home"]) == h_ and ESPN2V.get(y["away"], y["away"]) == a_), None) or g
                 if not g:
                     continue
-                gl = (games.get(fid) or {}).get("game") or {}
+                gl = (games.get(fid) or {}).get("game") or x.get("game") or {}
                 sp, tt = gl.get("point_spread") or {}, gl.get("total_points") or {}
                 hk = next((k for k in sp if ab(k) == h_), None)
                 if not hk or "over" not in tt or tt["over"]["o"][0] is None:
@@ -185,12 +303,20 @@ def main():
                         continue
                     if "--cross" in sys.argv:
                         f.update(cross(mkt, fid, nm, f, ln))
+                    if "--role" in sys.argv:
+                        f.update(role(pid, season, week, team, g["date"]))
+                    if "--pbp" in sys.argv:
+                        f.update(pbp_feats(season, week, team, opp, g["date"]))
                     c = v.get("c") or [None, None, None]
-                    S.append({"season": 2025 if g["date"] < "2026-03-01" else 2026, "date": g["date"], "p": io / (io + iu), "po": po, "pu": pu, "line_": ln,
+                    S.append({"season": 2024 if g["date"] < "2025-03-01" else 2025 if g["date"] < "2026-03-01" else 2026, "date": g["date"], "p": io / (io + iu), "po": po, "pu": pu, "line_": ln,
                               "cl": c[0], "co": c[1], "cu": c[2],
-                              "line": ln, "y": int(act > ln), "f": f})
+                              "line": ln, "y": int(act > ln), "f": f,
+                              **({"act": act, "pid": pid, "team": team, "opp": opp, "season_": season, "week": week, "env": (imp, spr, home)}
+                                 if "--proj" in sys.argv else {})})
         DATA[mkt] = S
-        print(f"{mkt}: {sum(1 for s in S if s['season'] == 2025)} lines 2025, {sum(1 for s in S if s['season'] == 2026)} 2026")
+        print(f"{mkt}: {sum(1 for s in S if s['season'] == 2024)} lines 2024 (market), {sum(1 for s in S if s['season'] == 2025)} 2025, {sum(1 for s in S if s['season'] == 2026)} 2026")
+    if "--proj" in sys.argv:      # hand the rows (with actuals) to tools/nfl_proj_test.py
+        return DATA, IX
     if "--select" not in sys.argv:
         screen(DATA)
     select_and_test(DATA)
@@ -251,7 +377,8 @@ def ll(w, X, y):
 def screen(DATA, out_path="bt/nfl_screen.json"):
     out = {}
     for mkt, S in DATA.items():
-        tr = [s for s in S if s["season"] == 2025]
+        TRAIN = {int(x) for x in ([a.split("=", 1)[1] for a in sys.argv if a.startswith("--train=")] or ["2025"])[0].split(",")}
+        tr = [s for s in S if s["season"] in TRAIN]
         te = [s for s in S if s["season"] == 2026]
         if len(tr) < 150 or len(te) < 60:
             print(f"\n{mkt}: too few lines to screen ({len(tr)} / {len(te)})")
@@ -283,7 +410,7 @@ def screen(DATA, out_path="bt/nfl_screen.json"):
         for d_te, fk, c25, c26, d_tr in rows[:10]:
             same = "same sign" if c25 * c26 > 0 else "FLIPS"
             print(f"   {fk:16s} {d_te:+8.2f}     {d_tr:+8.2f}    {c25:+.3f}    {c26:+.3f}  {same}")
-    json.dump({m: [list(r) for r in rows] for m, rows in out.items()}, open(out_path, "w"))
+    json.dump({m: [list(r) for r in rows] for m, rows in out.items()}, open(out_path.replace(".json", "_pbp.json") if "--pbp" in sys.argv else out_path, "w"))
 
 
 
@@ -293,8 +420,10 @@ def select_and_test(DATA, k_max=4, out="bt/nfl_select.json"):
     log loss against Onyx and value bets at the opening price."""
     res = {}
     for mkt, S in DATA.items():
-        tr = sorted([s for s in S if s["season"] == 2025], key=lambda s: s.get("date", ""))
-        te = [s for s in S if s["season"] == 2026]
+        TRAIN = {int(x) for x in ([a.split("=", 1)[1] for a in sys.argv if a.startswith("--train=")] or ["2025"])[0].split(",")}
+        tr = sorted([s for s in S if s["season"] in TRAIN], key=lambda s: s.get("date", ""))
+        TEST = int(([a.split("=", 1)[1] for a in sys.argv if a.startswith("--test=")] or ["2026"])[0])
+        te = [s for s in S if s["season"] == TEST]
         if len(tr) < 150 or len(te) < 60:
             continue
         keys = list(tr[0]["f"])
@@ -395,7 +524,9 @@ def select_and_test(DATA, k_max=4, out="bt/nfl_select.json"):
         print(f"   2026 log loss: model {mdl:.4f} vs Onyx {raw:.4f} (Onyx refit {base:.4f})")
         print(f"   2025 (fit) 3pp+: {r['bets_2025_3pp']}")
         print(f"   2026 (unseen) 3pp+: {r['bets_2026_3pp']}   5pp+: {r['bets_2026_5pp']}")
-    json.dump(res, open(out.replace(".json", "_cross.json") if "--cross" in sys.argv else out, "w"), indent=1)
+    tag = "_cross" if "--cross" in sys.argv else "_role" if "--role" in sys.argv else "_pbp" if "--pbp" in sys.argv else ""
+    tag += "_3y" if any(a.startswith("--train=") for a in sys.argv) else ""
+    json.dump(res, open(out.replace(".json", tag + ".json"), "w"), indent=1)
     return res
 
 

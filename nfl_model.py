@@ -1,9 +1,31 @@
 """
 nfl_model.py - Onyx NFL player projections.
 
-VERSION v11 (11/1). The lab notebook: every change bumps VERSION and adds an
+VERSION v12 (11/1). The lab notebook: every change bumps VERSION and adds an
 entry here citing its evidence (CLAUDE.md rule 2 applies to this model too).
 
+  v12 11/1   Three seasons, and the wind. tools/nfl_feature_screen.py now reads 2024 at market
+             prices (before Onyx; receptions, receiving, rushing and passing yards) and nflverse
+             play-by-play: pass rate over expected, neutral pace, the defense's PROE and pace,
+             and the wind, temperature and roof of every game.
+             (1) Passing yards overs leave the trial lanes. Run exactly as live (chosen on 2025)
+             on 2024, a season it never saw: 7-16 at 3pp+ (-42.6%), log loss .7090 vs the
+             market's .6932. Rushing yards unders stay, noted as weak: 2024 24-21 (+2.5%), log
+             loss .6881 vs .6850.
+             (2) Wind is the one new statistic that held in all three seasons. Chosen on
+             2024 + 2025, receptions pick wind alone (log loss 2026 .6892 vs Onyx .6899; unders
+             3pp+ 311-257 +10.0% before, 34-29 +16.0% on 2026; judged on 2024 when chosen on
+             2025: 124-106 +7.6%). As a plain rule, unders at 15+ mph at kickoff (2024 / 2025;
+             2026 has had no game that windy yet): passing yards 15-4 +47.6% / 28-10 +39.3%,
+             pass attempts - / 25-13 +22.4%, receiving yards +3.5% / +18.4%, receptions +5.3% /
+             +16.1%. Rushing yards do not move with the wind (-13.0% / -8.7%).
+             The catch: that test knew the wind that blew. Onyx moves these lines as forecasts
+             firm up (2025's windy games: passing yards lines dropped by the close in 32 of 38),
+             so the live lane logs an under only while the kickoff forecast (Open-Meteo,
+             nfl_weather.py) says 15+ mph at an open stadium AND Onyx still shows its opening
+             price. Whether forecasts arrive before Onyx does is what the trial record decides.
+             Tested and not adopted: pass rate over expected and pace (helped some markets in
+             one season, not both), dome overs (+8.8% / +1.0% / -2.7%), temperature.
   v11 11/1   Market models: Onyx's own price plus the statistics that beat it. For every
              Onyx player-prop line in 2025 and 2026 (opening price) the feature screen
              builds ~45 pre-kickoff statistics from nflverse weekly stats, snap shares, the
@@ -231,7 +253,7 @@ player-game: pass_yds, rush_yds, rec_yds, rec, tgt, att, rush_att...).
 import math, re, unicodedata
 from collections import defaultdict
 
-VERSION = "v11"
+VERSION = "v12"
 # game lines (team_model.py), tuned 10/26: see v1
 GAME_P = {"half_life": 240, "ridge": 5, "home": 2.0, "sd_margin": 13.5, "sd_total": 13.0, "min_games": 3}
 GAME_TEST = {"n": 199, "logloss": 0.648, "base_logloss": 0.698, "mae_total": 10.90, "base_mae_total": 11.71,
@@ -590,35 +612,6 @@ V11 = {
    -0.03863
   ]
  },
- "pass_yds": {
-  "side": "over",
-  "features": [
-   "line_vs_l5",
-   "pass_adot",
-   "opp_rec",
-   "spread"
-  ],
-  "mu": [
-   11.81416,
-   7.72369,
-   0.98924,
-   -0.02726
-  ],
-  "sd": [
-   45.33528,
-   1.16945,
-   0.14429,
-   5.7501
-  ],
-  "w": [
-   0.02364,
-   0.03528,
-   0.14525,
-   0.12956,
-   0.13291,
-   -0.09071
-  ]
- },
  "pass_att": {
   "side": "under",
   "features": [
@@ -648,7 +641,7 @@ V11 = {
    -0.12595
   ]
  }
-}
+}  # v12: passing yards overs dropped (failed 2024)
 V11_EDGE = 0.03
 
 
@@ -678,3 +671,8 @@ def why_v11(mkt, p_onyx, f):
         out.append({"k": F.LABEL.get(k, k), "v": round(x, 2), "avg": round(mu, 2),
                     "pp": round(100 * (prob_v11(mkt, p_onyx, g) - base), 1)})
     return sorted(out, key=lambda d: -abs(d["pp"]))
+
+
+# v12: unders in the wind, at Onyx's opening price, when the kickoff forecast says 15+ mph at an
+# open stadium (nfl_weather.py). The plain rule from the three-season test (changelog).
+WIND = {"mkts": ("pass_yds", "pass_att", "rec_yds", "rec"), "mph": 15.0}

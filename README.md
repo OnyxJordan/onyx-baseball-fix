@@ -543,6 +543,28 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
     (capture `b2b_opening.json`); who played yesterday comes from the NHL schedule API by
     local date (ESPN results are dated in UTC, which misreads late games). Graded off
     `results.json`.
+  - **NFL v12: three seasons and the wind (11/1).** `tools/nfl_feature_screen.py` now reads 2024 at
+    market prices (`bt/nfl_2024_mkt.json`; receptions, receiving / rushing / passing yards) and
+    nflverse play-by-play (`--pbp`: pass rate over expected, neutral pace, the defense's PROE
+    and pace, wind / temperature / roof), trains on any seasons (`--train=2024,2025`) and
+    judges on any (`--test=2024`). Passing yards overs failed on 2024 (7-16, -42.6%) and left
+    the lanes; rushing yards unders held weakly (+2.5%). Wind held in all three seasons; as a
+    rule, unders at 15+ mph won (passing yards 15-4 / 28-10 in 2024 / 2025). Onyx moves those
+    lines as forecasts firm up, so the `wind_under` lane logs only while the kickoff forecast
+    (`nfl_weather.py`, Open-Meteo, one batched request per build, `data/nfl/weather.json`) is
+    15+ mph at an open stadium and Onyx still shows its opening price.
+  - **NFL projections from usage, depth charts and injuries (11/1, tested, not adopted).**
+    `tools/nfl_proj_test.py`: volume x efficiency (team attempts / carries from Onyx's spread
+    and implied points, the player's target / carry / attempt share, regressed efficiency,
+    snap-trend role) tuned on 2025, judged on 2026, ties a decayed average and loses to
+    Onyx's own line in every market (MAE 2026: receptions 1.62 vs line 1.58, receiving yards
+    21.7 vs 20.3, rushing 18.9 vs 17.3, passing 62.2 vs 57.8, attempts 7.6 vs 6.6); the snap
+    trend tuned to zero. `nfl_feature_screen.py --role` adds nflverse daily depth charts
+    (rank the day before, move up the chart) and weekly injury reports (targets / carries
+    vacated by teammates ruled Out or Doubtful, own Questionable): no market's selection
+    changed; vacated volume flips sign between seasons everywhere; depth rank for rushing +
+    receiving yards helps both seasons (2026 -3.2 log-loss points) but not enough to pass.
+    Onyx's lines already carry the public role news; the edges left are at the opening price.
   - **NFL cross-market statistics (11/1, tested, not adopted).** `--cross` adds Onyx's own
     opening lines in the player's other markets (a combo vs the sum of its parts, yards vs
     catches, passing TDs vs passing yards). Passing + rushing yards vs its parts sharpens the
