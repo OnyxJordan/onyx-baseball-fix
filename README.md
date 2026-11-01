@@ -522,6 +522,14 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
     ledger `data/cfb/prop_trial.json` (capture `prop_opening.json`), graded off the box; a
     player with no box line is a void (Onyx settles him at 0, so this undercounts unders).
     Receiving yards failed; receptions and passing yards had too few early lines to choose on.
+  - **NBA points / rebounds / assists vs Onyx (11/1, candidate, not built).** `tools/nba_feature_screen.py`
+    runs the v11 method on 49,000 Onyx 2025-26 lines (chosen before 2/1/2026, judged after).
+    Points and rebounds: nothing beat Onyx. **Assists unders pass**: opponent assists allowed
+    (vs league) and the line vs the player's usual range (last-10 sd); log loss .6845 vs Onyx
+    .6857; unders 3pp+ 97-80 (+13.0%) before, 47-35 (+13.8%) after; 5pp+ 14-10. Not wired in
+    yet: it belongs in `open_lanes.py` (the NBA opening-price lanes) and the NBA page, which
+    is the tracked product, so it waits for a reviewed change. NBA home back-to-back unders on
+    game totals: +9% before February, -5% after; not adopted.
   - **NHL unders on a home back-to-back (11/1, nhl_model v2, on trial).** `tools/nhl_game_screen.py`
     screens ~60 team statistics from the NHL API boxscores against Onyx's moneyline, puck
     line and total (chosen before 2/1/2026, judged after). Nothing chosen beat Onyx, but the
