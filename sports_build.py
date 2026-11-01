@@ -416,7 +416,7 @@ def nfl_block(lane, slate, odds):
                     r["v11"] = round(M.prob_v11(r["mkt"], fo, f), 4)
                     r["why"] = M.why_v11(r["mkt"], fo, f)
         if r.get("v11") is not None:     # v11: Onyx's price moved by the statistics that beat it
-            ps = L.price_side(r["v11"], r["over"], r["under"], 1.0)
+            ps = L.price_side(r["v11"], r["over"], r["under"], getattr(M, "V11_SHOW", {}).get(r["mkt"], 1.0))
             side = M.V11[r["mkt"]]["side"]
             r["value_min"] = M.V11_EDGE if ps and ps["side"] == side else 1.0
         elif r.get("ptd"):    # v9: passing touchdowns, Poisson, 30% model

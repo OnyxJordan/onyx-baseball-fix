@@ -163,7 +163,7 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
   <!-- ── Top 10 plays of the day, every sport ─────────────────────── -->
   <section class="ox-wrap t10" id="top10">
     <div class="my-h"><div><span class="ox-eyebrow">Today's top 10</span><h2>Our favorite<br>plays today.</h2>
-      <p>The ten plays our models like most on today's games across every sport, ranked by each model's confidence. Standard Onyx prices only (-150 to +150), and only where the model's chance beats the price.</p></div></div>
+      <p>The ten plays our models like most on today's games across every sport: graded and on-trial lanes first, then markets where our model beat Onyx in testing, one play per market, ranked by each model's confidence. Standard Onyx prices only (-150 to +150), and only where the model's chance beats the price.</p></div></div>
     <div class="t10-list" id="t10List"><div class="my-empty">Loading today's plays...</div></div>
     <div class="my-note" id="t10Note"></div>
   </section>
@@ -401,7 +401,7 @@ async function askGo(q) {
 }
 // ── Top 10 plays of the day: every sport build writes data/<sport>/top.json (daily_top.py)
 var T10_SPORTS = [['nfl', 'NFL', 'nfl.html'], ['nba', 'NBA', 'nba.html'], ['nhl', 'NHL', 'nhl.html'], ['tennis', 'Tennis', 'tennis.html'], ['cfb', 'NCAAF', 'cfb.html']];
-var T10_PER_SPORT = 4, T10_PER_GAME = 2;
+var T10_PER_SPORT = 4, T10_PER_GAME = 2, T10_PER_MKT = 1;   // one play per sport and market: ten ideas, not one idea three times
 function t10When(iso) {
   try {
     const d = new Date(iso), now = new Date();
@@ -423,19 +423,27 @@ async function top10() {
     if (!isNaN(t) && !isToday(p.start)) return;              // today's games only: Sunday's play waits for Sunday
     all.push(Object.assign({}, p, {lg: T10_SPORTS[i][1], href: T10_SPORTS[i][2], t}));
   }));
-  all.sort((a, b) => b.conf - a.conf || b.edge - a.edge);
-  const pick = [], nSport = {}, nGame = {};
-  for (const p of all) {                                     // spread the ten across sports first
-    if ((nSport[p.sport] || 0) >= T10_PER_SPORT || (nGame[p.gid] || 0) >= T10_PER_GAME) continue;
-    nSport[p.sport] = (nSport[p.sport] || 0) + 1; nGame[p.gid] = (nGame[p.gid] || 0) + 1; pick.push(p);
+  // proven first: graded picks, then plays on trial, then model leans; confidence within each
+  // markets whose model beat Onyx in testing (tracked, on trial, or a lane's market); a lean from a
+  // market that lost to Onyx (tennis, NFL and NHL game lines, NFL yards and TDs) only fills empty slots
+  const PROVEN = new Set(['nfl|rec', 'nfl|rush_yds', 'nfl|pass_att', 'nba|pts', 'nba|reb', 'nba|ast', 'nba|q1_total',
+    'nba|first_basket', 'cfb|spread', 'cfb|total', 'cfb|rush_yds', 'nhl|total']);
+  const TR0 = {tracked: 0, trial: 1, lean: 2};
+  const TRr = p => p.tag === 'lean' ? (PROVEN.has(p.sport + '|' + (p.mkt || p.kind)) ? 2 : 3) : (TR0[p.tag] ?? 2);
+  all.sort((a, b) => TRr(a) - TRr(b) || b.conf - a.conf || b.edge - a.edge);
+  const pick = [], nSport = {}, nGame = {}, nMkt = {};
+  const mk = p => p.sport + '|' + (p.mkt || p.kind);
+  for (const p of all) {                                     // spread the ten across sports and markets first
+    if ((nSport[p.sport] || 0) >= T10_PER_SPORT || (nGame[p.gid] || 0) >= T10_PER_GAME || (nMkt[mk(p)] || 0) >= T10_PER_MKT) continue;
+    nSport[p.sport] = (nSport[p.sport] || 0) + 1; nGame[p.gid] = (nGame[p.gid] || 0) + 1; nMkt[mk(p)] = (nMkt[mk(p)] || 0) + 1; pick.push(p);
     if (pick.length >= 10) break;
   }
-  if (pick.length < 10) for (const p of all) {               // a quiet sport night: let the rest fill in
-    if (pick.includes(p) || (nGame[p.gid] || 0) >= T10_PER_GAME) continue;
-    nGame[p.gid] = (nGame[p.gid] || 0) + 1; pick.push(p);
+  if (pick.length < 10) for (const p of all) {               // a quiet night: let a second play per market in
+    if (pick.includes(p) || (nGame[p.gid] || 0) >= T10_PER_GAME || (nMkt[mk(p)] || 0) >= 2) continue;
+    nGame[p.gid] = (nGame[p.gid] || 0) + 1; nMkt[mk(p)] = (nMkt[mk(p)] || 0) + 1; pick.push(p);
     if (pick.length >= 10) break;
   }
-  pick.sort((a, b) => b.conf - a.conf || b.edge - a.edge);
+  pick.sort((a, b) => TRr(a) - TRr(b) || b.conf - a.conf || b.edge - a.edge);
   if (!pick.length) { el.innerHTML = '<div class="my-empty">No play on today\'s games clears the bar right now: games may have started, or the models are waiting on fresh Onyx prices. Ask Onyx below can still build from the rest of the week.</div>'; return; }
   const tagTxt = {tracked: 'Tracked pick', trial: 'On trial', lean: 'Model lean'};
   el.innerHTML = pick.map((p, i) => {
