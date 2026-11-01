@@ -281,6 +281,19 @@ def nfl_open_lane(lane, out, slate, season, rows, M):
             "rows": list(reversed(ledger[-80:])), "started": ledger[0]["date"] if ledger else None}
 
 
+def in_role(cur, team, lw, priced, name, back=8):
+    """Who gets projected: a player who played in his team's latest game, or one coming back
+    (11/1: Jordan Mason missed week 8 hurt, was left out, and his carries and touchdowns went to
+    Aaron Jones): he played for the team this season within `back` weeks and Onyx has a line on
+    him tonight (Onyx prices only players expected to suit up). Ruled-out players are dropped
+    separately, from the injury report."""
+    if not cur or cur[-1]["team"] != team:
+        return False
+    if cur[-1]["week"] == lw:
+        return True
+    return lw is not None and lw - cur[-1]["week"] <= back and nk(name) in priced
+
+
 def nfl_block(lane, slate, odds):
     import nfl_model as M
     pg = lane.load("player_games.json", {}) or {}
@@ -315,6 +328,7 @@ def nfl_block(lane, slate, odds):
             k = r["team"]
             last_game[k] = max(last_game.get(k, 0), r["week"])
     props = {(nk(p.get("name")), p.get("mkt")): p for p in (odds or {}).get("props") or []}
+    priced = {k[0] for k in props}      # players Onyx prices tonight (a returning player's sign he is active)
     # v4 volume inputs: each team's Onyx implied points and spread tonight (+ = underdog)
     team_env = {}
     for g in slate.get("games") or []:
@@ -347,22 +361,44 @@ def nfl_block(lane, slate, odds):
         inj = {}
     dropped = set()
     out = []
+    # v14: tonight's players by team, so a projection is built on the games shared with teammates
+    # coming back from injury (nfl_model.with_teammates)
+    played_g, role_g = M.team_context(rows) if hasattr(M, "team_context") else ({}, {})
     for g in slate.get("games") or []:
         if g.get("state") != "pre":
             continue
         wk = g.get("week") or 0
+        tonight_t = {}
+        for t_ in (g["away"], g["home"]):
+            lw_ = last_game.get(t_)
+            tonight_t[t_] = [pid_ for pid_, gs_ in by.items()
+                             if in_role([x for x in gs_ if x["season"] == season], t_, lw_, priced,
+                                        ([x for x in gs_ if x["season"] == season] or [{"name": ""}])[-1]["name"])
+                             and not ((E.injury_of(inj, pid_, gs_[-1]["name"]) or {}).get("s") == "OUT")]
         for team, opp, home in ((g["away"], g["home"], False), (g["home"], g["away"], True)):
             lw = last_game.get(team)
             for pid, gs in by.items():
                 cur = [x for x in gs if x["season"] == season]
-                if not cur or cur[-1]["team"] != team or cur[-1]["week"] != lw:
-                    continue   # only players who played in the team's latest game
+                if not in_role(cur, team, lw, priced, cur[-1]["name"] if cur else ""):
+                    continue   # played in the team's latest game, or back from injury with an Onyx line tonight
                 it = E.injury_of(inj, pid, cur[-1]["name"])
                 if it and it["s"] == "OUT":
                     dropped.add(pid)
                     continue
+                def hist_for(s):
+                    # v14: a runner's carries and a receiver's targets from the games shared with
+                    # teammates in his role who play tonight (one coming back from injury)
+                    kind = "car" if s in ("rush_yds",) else "tgt" if s in ("rec", "rec_yds") else \
+                        ("car" if (role_g.get(pid, (0, 0))[0] >= role_g.get(pid, (0, 0))[1]) else "tgt") if s == "rush_rec_yds" else None
+                    if not kind or not hasattr(M, "with_teammates"):
+                        return gs
+                    shared = M.with_teammates(cur, pid, tonight_t.get(team, []), played_g, role_g, kind)
+                    return gs if len(shared) == len(cur) else [x for x in gs if x["season"] != season] + shared
                 for s in getattr(M, "PROJ_STATS", M.STATS):
-                    pr, info = M.project(gs, s, season, wk, opp, allowed, M.P, lgc)
+                    gs_t = hist_for(s)
+                    pr, info = M.project(gs_t, s, season, wk, opp, allowed, M.P, lgc)
+                    if pr is None and gs_t is not gs:      # too thin once filtered: as before
+                        pr, info = M.project(gs, s, season, wk, opp, allowed, M.P, lgc)
                     if pr is None:
                         continue
                     vol = False
@@ -459,7 +495,7 @@ def nfl_block(lane, slate, odds):
                     if it and it["s"] == "OUT":
                         dropped.add(pid)
                         continue    # ruled out: his share goes to no one here (redistribution tested, left out in v5)
-                    if cur and cur[-1]["team"] == team and cur[-1]["week"] == lw and \
+                    if cur and in_role(cur, team, lw, priced, cur[-1]["name"]) and \
                             any((x.get("rush_att") or 0) + (x.get("tgt") or 0) > 0 for x in cur[-4:]):
                         players.append((pid, team))
                         meta[pid] = (g, team, opp, home, cur[-1])
@@ -899,8 +935,8 @@ def cfb_player_rows(lane, slate, odds, w):
             lw = last_game.get(team)
             for pid, gs in by.items():
                 cur = [x for x in gs if x["season"] == season and x["week"] < wk]
-                if not cur or cur[-1]["team"] != team or cur[-1]["week"] != lw:
-                    continue   # only players who played in the team's latest game
+                if not in_role(cur, team, lw, {k[0] for k in props}, cur[-1]["name"] if cur else ""):
+                    continue   # played in the team's latest game, or back from injury with an Onyx line tonight
                 for st in C.STATS:
                     pr, info = C.project(gs, st, season, wk, opp, allowed, C.P, lgc)
                     if pr is None:

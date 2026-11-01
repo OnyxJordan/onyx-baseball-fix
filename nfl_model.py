@@ -1,9 +1,22 @@
 """
 nfl_model.py - Onyx NFL player projections.
 
-VERSION v13 (11/1). The lab notebook: every change bumps VERSION and adds an
+VERSION v14 (11/1). The lab notebook: every change bumps VERSION and adds an
 entry here citing its evidence (CLAUDE.md rule 2 applies to this model too).
 
+  v14 11/1   Players coming back from injury take their share back (Jordan: "Mason came back
+             from injury"). The touchdown model gave each player his share of the team's touches
+             over his last 8 games, so a back who carried the load while a teammate was hurt kept
+             that load after the teammate returned: Aaron Jones 49% to score (Onyx 23%) with Jordan
+             Mason back, built on weeks 2-6 without him; in the games they shared Mason out-carried
+             him 15-12 and 15-8. Now, when a teammate in the same role plays tonight (a back with
+             6+ carries a game for a runner, a pass catcher with 5+ targets for a receiver;
+             quarterbacks untouched), the player's touchdown share and his rushing / receiving
+             projections come from the games that teammate also played (at least 2, else as
+             before; a projection too thin once filtered falls back too). Players who missed the team's last
+             game are projected again when Onyx has a line on them tonight (Onyx prices only players
+             expected to suit up). Not a price backtest: the TD model is not in the chance shown
+             (it lost to Onyx's price), it ranks "favorite" scorers and the 2+ TD read.
   v13 11/1   The chance shown for pass attempts is calibrated (Jordan: three pass attempts
              unders in the Top 6 felt wrong). On 2026 the model's pass attempts picks showed
              62.9% on average and won 57.5%: overconfident on its big gaps. Pulling the chance
@@ -261,7 +274,7 @@ player-game: pass_yds, rush_yds, rec_yds, rec, tgt, att, rush_att...).
 import math, re, unicodedata
 from collections import defaultdict
 
-VERSION = "v13"
+VERSION = "v14"
 # game lines (team_model.py), tuned 10/26: see v1
 GAME_P = {"half_life": 240, "ridge": 5, "home": 2.0, "sd_margin": 13.5, "sd_total": 13.0, "min_games": 3}
 GAME_TEST = {"n": 199, "logloss": 0.648, "base_logloss": 0.698, "mae_total": 10.90, "base_mae_total": 11.71,
@@ -431,6 +444,33 @@ TD_P = {"c": 0.7, "w_rush": 0.8, "w_tgt": 1.0, "w_hist": 0.3, "k": 4.0, "n_games
         "w_blend": 0.0, "mkt_scale": 0.82, "value_edge": None}   # v6, see changelog: no TD value flag
 
 
+def with_teammates(h, pid, tonight, played, role, kind="car"):
+    """h restricted to the games in which every teammate playing tonight in the same role also
+    played, so a player returning from injury takes his share back (11/1: Aaron Jones's touchdown
+    share was built on weeks 2-6 without Jordan Mason; with Mason back the split comes from the
+    games they shared). kind "car": backs (6+ carries a game) for a runner (3+); "tgt": pass catchers
+    (5+ targets) for a receiver (3+). Quarterbacks and fringe players are left alone; unchanged when
+    fewer than 2 such games."""
+    i = 0 if kind == "car" else 1
+    if role.get(pid, (0, 0))[i] < 3:
+        return h
+    need = 6 if kind == "car" else 5
+    mates = [q for q in tonight if q != pid and role.get(q, (0, 0))[i] >= need]
+    if not mates:
+        return h
+    keep = [x for x in h if all(q in played.get(x["gid"], ()) for q in mates)]
+    return keep if len(keep) >= 2 else h
+
+
+def team_context(rows):
+    """{gid: set of pids who played}, {pid: (average carries, average targets)} over his last 8"""
+    played, opp = defaultdict(set), defaultdict(list)
+    for r in rows:
+        played[r["gid"]].add(r["pid"])
+        opp[r["pid"]].append((r.get("rush_att") or 0, r.get("tgt") or 0))
+    return played, {k: (sum(a for a, _ in v[-8:]) / len(v[-8:]), sum(b for _, b in v[-8:]) / len(v[-8:])) for k, v in opp.items() if v}
+
+
 def td_lambdas(rows, players, implied, p=TD_P):
     """Expected TDs for each player tonight. rows: every player-game so far;
     players: [(pid, team)] who suit up; implied: {team: Onyx implied points}."""
@@ -443,8 +483,13 @@ def td_lambdas(rows, players, implied, p=TD_P):
     for r in sorted(rows, key=lambda r: r["date"]):
         hist[r["pid"]].append(r)
     out = {}
+    played, role = team_context(rows)
+    tonight = defaultdict(list)
     for pid, team in players:
-        h = hist.get(pid, [])[-p["n_games"]:]
+        tonight[team].append(pid)
+    for pid, team in players:
+        rc = role.get(pid, (0, 0))
+        h = with_teammates(hist.get(pid, [])[-p["n_games"]:], pid, tonight[team], played, role, "car" if rc[0] >= rc[1] else "tgt")
         imp = implied.get(team)
         if len(h) < 2 or not imp:
             continue
