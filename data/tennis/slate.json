@@ -3590,9 +3590,9 @@
     },
     {
      "id": "187349",
-     "start": "2026-11-01T10:00Z",
-     "state": "pre",
-     "detail": "11/1 - 5:00 AM EST",
+     "start": "2026-11-01T10:05Z",
+     "state": "post",
+     "detail": "Final",
      "round": "Qualifying Final",
      "draw": "Men's Singles",
      "court": "Court Central",
@@ -3602,8 +3602,11 @@
        "short": "M. Bellucci",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ita.png",
        "seed": null,
-       "win": false,
-       "sets": [],
+       "win": true,
+       "sets": [
+        6,
+        6
+       ],
        "serve": false
       },
       {
@@ -3612,16 +3615,19 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        4,
+        4
+       ],
        "serve": false
       }
      ]
     },
     {
      "id": "187354",
-     "start": "2026-11-01T10:00Z",
-     "state": "pre",
-     "detail": "11/1 - 5:00 AM EST",
+     "start": "2026-11-01T10:05Z",
+     "state": "in",
+     "detail": "2nd",
      "round": "Qualifying Final",
      "draw": "Men's Singles",
      "court": "Court 1",
@@ -3632,7 +3638,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/cze.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        6,
+        2
+       ],
        "serve": false
       },
       {
@@ -3641,16 +3650,19 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/aus.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        7,
+        5
+       ],
        "serve": false
       }
      ]
     },
     {
      "id": "187348",
-     "start": "2026-11-01T11:00Z",
-     "state": "pre",
-     "detail": "11/1 - 6:00 AM EST",
+     "start": "2026-11-01T11:05Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Qualifying Final",
      "draw": "Men's Singles",
      "court": "Court 2",
@@ -3661,7 +3673,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ser.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        3
+       ],
        "serve": false
       },
       {
@@ -3670,7 +3684,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        4
+       ],
        "serve": false
       }
      ]
@@ -7118,8 +7134,8 @@
     {
      "id": "185735",
      "start": "2026-11-01T08:35Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Final",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -7129,12 +7145,13 @@
        "short": "H. Dart",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/gbr.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         4,
-        0
+        6,
+        6
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Lilli Tagger",
@@ -7144,7 +7161,8 @@
        "win": false,
        "sets": [
         6,
-        0
+        3,
+        4
        ],
        "serve": false
       }
@@ -14558,8 +14576,8 @@
     {
      "id": "187332",
      "start": "2026-11-01T08:30Z",
-     "state": "in",
-     "detail": "1st",
+     "state": "post",
+     "detail": "Final",
      "round": "Qualifying Final",
      "draw": "Women's Singles",
      "court": "Centre Court",
@@ -14571,7 +14589,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        6
+        6,
+        3,
+        3
        ],
        "serve": false
       },
@@ -14580,9 +14600,11 @@
        "short": "K. Okamura",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/jpn.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
-        3
+        3,
+        6,
+        6
        ],
        "serve": false
       }
@@ -14592,7 +14614,7 @@
      "id": "187331",
      "start": "2026-11-01T08:35Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "3rd",
      "round": "Qualifying Final",
      "draw": "Women's Singles",
      "court": "Court 2",
@@ -14604,7 +14626,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        4
+        4,
+        6,
+        5
        ],
        "serve": false
       },
@@ -14615,6 +14639,8 @@
        "seed": null,
        "win": false,
        "sets": [
+        6,
+        4,
         6
        ],
        "serve": false
@@ -14624,8 +14650,8 @@
     {
      "id": "187330",
      "start": "2026-11-01T08:45Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Qualifying Final",
      "draw": "Women's Singles",
      "court": "Court 1",
@@ -14635,10 +14661,11 @@
        "short": "W. Falkowska",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/pol.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        0
+        5,
+        6
        ],
        "serve": false
       },
@@ -14650,7 +14677,8 @@
        "win": false,
        "sets": [
         3,
-        1
+        7,
+        4
        ],
        "serve": false
       }
@@ -14658,9 +14686,9 @@
     },
     {
      "id": "187333",
-     "start": "2026-11-01T09:40Z",
-     "state": "pre",
-     "detail": "11/1 - 4:40 AM EST",
+     "start": "2026-11-01T11:10Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Qualifying Final",
      "draw": "Women's Singles",
      "court": "Centre Court",
@@ -14671,7 +14699,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/kaz.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        1
+       ],
        "serve": false
       },
       {
@@ -14680,8 +14710,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/jpn.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        3
+       ],
+       "serve": true
       }
      ]
     },
@@ -16623,9 +16655,9 @@
    "matches": [
     {
      "id": "187355",
-     "start": "2026-11-01T10:00Z",
-     "state": "pre",
-     "detail": "11/1 - 5:00 AM EST",
+     "start": "2026-11-01T10:05Z",
+     "state": "in",
+     "detail": "2nd",
      "round": "Qualifying 1st Round",
      "draw": "Women's Singles",
      "court": "Lwena Court",
@@ -16636,7 +16668,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ind.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        2,
+        4
+       ],
        "serve": false
       },
       {
@@ -16645,7 +16680,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ind.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        6,
+        5
+       ],
        "serve": false
       }
      ]
@@ -17697,5 +17735,5 @@
    ]
   }
  ],
- "fetched": "2026-11-01T09:29:35+00:00"
+ "fetched": "2026-11-01T11:34:14+00:00"
 }
