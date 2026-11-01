@@ -1363,7 +1363,10 @@ def write_top(key, lane, slate, model):
         c = {"kind": "prop", "mkt": "anytime_td", "name": r["name"], "pid": r.get("pid"), "team": r.get("team"), "side": "over",
              "line": 0.5, "price": r["any_price"], "prob": r["any"], "edge": r.get("any_edge") or 0.0, "sel": r.get("any_sel"),
              "gid": r["gid"], "matchup": r.get("matchup")}
-        board.append(dict(DT.entry(key, c, tag(c), start.get(r["gid"])), lam=round(-math.log(max(1e-6, 1 - r["any"])), 4)))
+        board.append(dict(DT.entry(key, c, tag(c), start.get(r["gid"])), lam=round(-math.log(max(1e-6, 1 - r["any"])), 4),
+                          # the TD model's own chance (not blended into the chance shown: it lost to Onyx's price in testing),
+                          # so Ask Onyx can rank "your favorite TD scorers" by how much the model likes them against their price
+                          **({"model": round(r["any_model"], 4)} if r.get("any_model") is not None else {})))
         if r.get("first_price") is not None:              # first touchdown scorer (shown, never recommended: Onyx won its backtest)
             c1 = dict(c, mkt="first_td", price=r["first_price"], prob=r["first"], edge=r.get("first_edge") or 0.0, sel=r.get("first_sel"))
             board.append(DT.entry(key, c1, "lean", start.get(r["gid"])))

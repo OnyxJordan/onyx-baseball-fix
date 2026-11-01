@@ -204,7 +204,7 @@
       || t.match(/\bparlay of (\d{1,2})\b/) || t.match(/\b(\d{1,2})\s+(nba|nfl|nhl|college|tennis)\b/);
     var nw = t.match(/\b(two|three|four|five|six|seven|eight|nine|ten|couple|few)( of)?[\s-]*(leg|legs|legger|picks?|plays?|bets?|team|man)\b/);
     if (!n && !nw) {
-      var n2 = t.match(/\b(\d{1,2})\s+(?:\w+\s+){0,2}?(overs|unders|props|plays|picks|bets|players|teams|sides|dogs|favorites|favs|scorers|rebounds|assists|points|receptions|touchdowns|tds|totals|spreads)\b/);
+      var n2 = t.match(/\b(\d{1,2})\s+(?:\w+\s+){0,2}?(overs|unders|props|plays|picks|bets|players|teams|sides|dogs|favorites|favs|scorers|rebounds|assists|points|receptions|touchdowns|tds|totals|spreads|parlay|sgp|legger)\b/);
       if (n2 && +n2[1] <= 12 && !/\b\d{1,2}\s+(points|rebounds|assists|receptions|tds|touchdowns)\s+(or|and|in|a|per)\b/.test(t)) n = [n2[0], n2[1]];
       else if (/\b(a )?pair of\b/.test(t)) nw = [null, 'two'];
       else if (/\b(one|a single|1)\s+(\w+\s+){0,2}?(bet|play|pick|prop|leg)\b(?!s)/.test(t)) nw = [null, 'one'];
@@ -277,7 +277,7 @@
     if (/\bfavou?rites?\b|\bchalk\b/.test(t) && /\bml\b|money ?line|to win|\bwin\b/.test(t)) s.max_price = Math.min(s.max_price == null ? -101 : s.max_price, -101);
     // ordering
     if (/most likely|safest|safe\b|locks?\b|highest (chance|confidence|probability|hit rate)|sure ?thing|surest|can.?t lose|banker/.test(t)) s.sort = 'conf';
-    if (/recommend|favou?rite (play|pick|bet|sgp|parlay)|best (picks?|plays?|bets?)|top picks?|your picks?|should i (bet|play)|what do you like|you like|pick of the (day|night)|play of the (day|night)|best bet/.test(t)) s.sort = 'rec';
+    if (/recommend|favou?rite (play|pick|bet|sgp|parlay|td|touchdown|scorer|prop|leg)|your (\d+ |top |four |three |five )?favou?rites?|my favou?rites?|best (picks?|plays?|bets?)|top picks?|your picks?|should i (bet|play)|what do you like|you like|pick of the (day|night)|play of the (day|night)|best bet/.test(t)) s.sort = 'rec';
     if (/\bvalue\b|most value|best value|biggest edge|\bedge\b|beats? (the )?(line|price|onyx|book)|mispriced|soft line|\b\+ev\b|positive ev/.test(t)) s.sort = 'edge';
     if (/biggest payout|longshots?|long shots?|lottery|moonshot|highest odds|big payout/.test(t)) s.sort = 'price';
     if (/lock of the|pick of the|play of the|bet of the|prop of the|best bet\b|the lock\b|(highest|best|top|most likely|safest) (\w+ ){0,3}(prop|play|pick|bet|scorer)\b(?!s)/.test(t) && s.count == null && s.intent === 'list') s.count = 1;
@@ -420,7 +420,11 @@
     var key = spec.sort === 'two_td' || two ? function (p) { return -p.two; } : spec.sort === 'edge' ? function (p) { return -p.edge; }
       : spec.sort === 'price' ? function (p) { return -p.price; }
       : spec.sort === 'proj' ? function (p) { return -(p.proj || 0); }
-      : spec.sort === 'rec' ? function (p) { return -((REC[p.tag] || 0) + p.conf + 2 * Math.max(-0.05, p.edge)); }
+      : spec.sort === 'rec' ? function (p) {
+          // touchdown scorers: every price carries the margin, so the edge shown is always negative;
+          // the favorites are the ones our TD model rates highest against their price
+          if (p.model != null && /td$/.test(p.mkt || '')) return -((REC[p.tag] || 0) + 0.25 * p.conf + Math.max(-0.05, Math.min(0.12, p.model - p.conf)));   // mostly the model's lean against the price, capped (a 25-point gap is usually news the model missed), a little likelihood
+          return -((REC[p.tag] || 0) + p.conf + 2 * Math.max(-0.05, p.edge)); }
       : function (p) { return -p.conf - p.edge / 10; };
     pool.sort(function (a, b) { return key(a) - key(b); });
     // "best value" when nothing in the pool beats Onyx's price (touchdown scorers: none did in
@@ -599,6 +603,12 @@
         var loose = Object.assign({}, spec, {min_conf: null, default_conf: false});
         var r3 = run(loose, a[1]);
         if (r3.rows.length > res.rows.length) { res = r3; spec = loose; res.note = (res.note ? res.note + ' ' : '') + 'Nothing here is 50%+ to hit right now, so these are the most likely.'; }
+      }
+      // touchdown scorers: say why every edge reads negative, and what "favorite" means here
+      if ((res.rows || []).some(function (r) { return /td$/.test(r.mkt || ''); })) {
+        res.note = (res.note ? res.note + ' ' : '') + (spec.sort === 'rec'
+          ? 'Favorites are the scorers our TD model rates highest against their price. Touchdown prices carry a big margin, so every edge reads negative, and the TD model has not beaten Onyx\'s price in testing yet.'
+          : 'Touchdown prices carry a big margin (priced players score about 18% of the time against 22% implied), so every edge reads negative.');
       }
       res.spec = spec; res.via = a[0].via; res.understood = describe(spec);
       return res;
