@@ -42,7 +42,7 @@
     [/\bpass(ing)? (\+|and|&|plus) rush(ing)? (yards|yds)\b|\bpass ?\+ ?rush\b|\btotal qb yards\b/, 'pass_rush_yds'],
     [/\bpass(ing)?\s*(td|tds|touchdowns?)\b|\b(td|touchdown) pass(es)?\b|\b(qb|quarterback)s?('s)? (td|tds|touchdowns?)\b/, 'pass_td'],
     [/\b(2|two)\+?\s*(td|tds|touchdowns?)\b|\bmultiple (td|tds|touchdowns)\b|\bmulti[\s-]?td\b|\bdouble (td|tds|touchdown)/, 'two_plus_td'],
-    [/\b(anytime\s*)?(td|tds|touchdowns?)\b|\b(td|touchdown) scorers?\b|\bfind the end ?zone\b|\bscore a td\b/, 'anytime_td'],
+    [/\b(anytime\s*)?(td|tds|touchdowns?)\b|\b(td|touchdown) scorers?\b|\bfind the end ?zone\b|\bscore a td\b|\b(picks?|players?|guys?|scorers?|favorites?|favs?)( \w+)? to score\b(?!\s*(\d|a goal|goals?|points|pts|runs?|a run|a basket))|\bto score (today|tonight|sunday|this week)\b/, 'anytime_td'],
     [/\b(1st|first)[\s-]*(quarter|q)\b|\b1q\b|\bq1\b/, 'q1_total'],
     [/\brebound(s|ing|er|ers)?\b|\breb\b|\bboards\b|\brebs\b/, 'reb'],
     [/\bassists?\b|\bast\b|\bdimes\b|\bdishes\b/, 'ast'],
@@ -431,7 +431,14 @@
     // testing): ranking by the least-negative edge would just surface longshots, so show the
     // most likely instead and say so
     var note = '';
-    if (spec.sort === 'edge' && !two && pool.length && pool[0].edge <= 0) {
+    var tdOnly = mk.length && mk.every(function (m) { return /td$/.test(m); });
+    if (spec.sort === 'edge' && !two && pool.length && pool[0].edge <= 0 && tdOnly && pool.some(function (p) { return p.model != null; })) {
+      // touchdown "best value": the chance shown is Onyx's price less its margin, so the shown edge is
+      // the same for every player at a price; rank by how much our TD model likes them against it
+      key = function (p) { return -(0.25 * p.conf + Math.max(-0.05, Math.min(0.12, (p.model != null ? p.model : p.conf) - p.conf))); };
+      pool.sort(function (a, b) { return key(a) - key(b); });
+      spec.td_fav = true;
+    } else if (spec.sort === 'edge' && !two && pool.length && pool[0].edge <= 0) {
       key = function (p) { return -p.conf - p.edge / 10; };
       pool.sort(function (a, b) { return key(a) - key(b); });
       note = (mk.length && mk.every(function (m) { return /td$/.test(m); }) ? 'No touchdown scorer beats Onyx\'s price in our testing' : 'Nothing that matches beats Onyx\'s price right now')
@@ -554,7 +561,7 @@
     if (s.player) b.push(s.player);
     if (s.when) b.push(s.when === 'today' ? 'tonight' : s.when);
     if (s.team) b.push(s.team);
-    b.push(s.sort === 'proj' ? 'highest projection first' : s.sort === 'rec' ? 'what we recommend most first' : s.sort === 'price' ? 'biggest payouts first' : s.sort === 'edge' ? 'best value first' : s.sort === 'two_td' ? 'most likely 2+ TDs first' : 'highest confidence first');
+    b.push(s.sort === 'proj' ? 'highest projection first' : s.sort === 'rec' ? 'what we recommend most first' : s.sort === 'price' ? 'biggest payouts first' : s.sort === 'edge' ? (s.td_fav ? 'our TD model\'s favorites against their price first' : 'best value first') : s.sort === 'two_td' ? 'most likely 2+ TDs first' : 'highest confidence first');
     return b.join(' · ');
   }
 
@@ -606,7 +613,7 @@
       }
       // touchdown scorers: say why every edge reads negative, and what "favorite" means here
       if ((res.rows || []).some(function (r) { return /td$/.test(r.mkt || ''); })) {
-        res.note = (res.note ? res.note + ' ' : '') + (spec.sort === 'rec'
+        res.note = (res.note ? res.note + ' ' : '') + (spec.sort === 'rec' || spec.td_fav
           ? 'Favorites are the scorers our TD model rates highest against their price. Touchdown prices carry a big margin, so every edge reads negative, and the TD model has not beaten Onyx\'s price in testing yet.'
           : 'Touchdown prices carry a big margin (priced players score about 18% of the time against 22% implied), so every edge reads negative.');
       }
