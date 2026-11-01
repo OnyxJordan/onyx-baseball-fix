@@ -77,6 +77,7 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
 .ask-ex button{flex-shrink:0;padding:7px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:#cfc8da;font:600 12px var(--ox-body,system-ui);cursor:pointer}
 .ask-u{font:600 11px monospace;color:#9a93a6;margin:12px 0 10px;line-height:1.5}.ask-u b{color:#d795ff}
 .ask-say{font-size:15px;line-height:1.5;color:#efeaf7;margin:14px 0 4px}.ask-why{font-size:14px;line-height:1.55;color:#cfc7dc;border-left:2px solid #a24bff;padding:2px 0 2px 12px;margin:14px 0}
+.ask-cl{border:1px solid #3a2a55;border-radius:14px;padding:14px 16px;margin:12px 0;background:rgba(162,75,255,.06)}.ask-cl b{display:block;font-size:15px;line-height:1.45;color:#efeaf7;margin-bottom:10px}.ask-cl .ask-ex{flex-wrap:wrap}
 .ask-why.wait{color:#7d7590;font:600 11px monospace}.ask-fu{font:600 11px monospace;color:#7d7590;margin:8px 0 0}
 .ask-pl{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;align-items:center;padding:14px;margin-bottom:10px;border-radius:16px;border:1px solid rgba(176,56,249,.55);background:linear-gradient(160deg,rgba(176,56,249,.16),rgba(255,255,255,.03))}
 .ask-pl b{font-size:16px}.ask-pl span{font:600 11px monospace;color:#cfc8da}.ask-pl .t10-bet{margin:0}
@@ -366,15 +367,27 @@ function askInit() {
   const ex = document.getElementById('askEx'); if (!ex) return;
   ex.innerHTML = ASK_EX.map((q, i) => `<button type="button" onclick="OnyxAsk.reset();document.getElementById('askQ').value=ASK_EX[${i}];askGo(ASK_EX[${i}])">${esc(q)}</button>`).join('');
 }
-async function askGo(q) {
+function askPick(i) {
+  const o = (window.ASK_CL && window.ASK_CL.options || [])[i]; if (!o) return;
+  document.getElementById('askQ').value = o.label;
+  askGo(o.label, o.q ? null : o.spec);
+}
+async function askGo(q, forced) {
   const out = document.getElementById('askOut');
   if (!window.OnyxAsk || !String(q || '').trim()) return;
   out.innerHTML = '<div class="my-empty">Building it from today\'s boards...</div>';
   track('ask', {q: String(q).slice(0, 100)});
   let R;
-  try { R = await OnyxAsk.ask(q); } catch (e) { out.innerHTML = '<div class="my-empty">Could not load today\'s boards. Try again in a minute.</div>'; return; }
+  try { R = await OnyxAsk.ask(q, forced); } catch (e) { out.innerHTML = '<div class="my-empty">Could not load today\'s boards. Try again in a minute.</div>'; return; }
   const say = R.say ? `<div class="ask-say">${esc(R.say)}</div>` : '';
   const understood = say + `<div class="ask-u">Read as: <b>${esc(R.understood)}</b>${R.via === 'ai' ? ' · AI' : ''}</div>${R.note ? `<div class="ask-u">${esc(R.note)}</div>` : ''}`;
+  // a question back instead of a guess (the AI's, or "those games have started"): tap an answer
+  if (R.clarify) {
+    window.ASK_CL = R.clarify;
+    out.innerHTML = understood + `<div class="ask-cl"><b>${esc(R.clarify.question)}</b><div class="ask-ex">${R.clarify.options.map((o, i) =>
+      `<button type="button" onclick="askPick(${i})">${esc(o.label)}</button>`).join('')}<button type="button" onclick="document.getElementById('askQ').focus()">Something else</button></div></div>`;
+    return;
+  }
   if (!R.rows.length) { out.innerHTML = understood + `<div class="my-empty">${R.spec.player ? `No Onyx line on ${esc(R.spec.player)} right now: his game may have started already, or he isn't on today's board.`
     : R.spec.team ? `No ${esc(R.spec.team)} line on today's Onyx board${(R.spec.markets || []).length ? ' for that market' : ''}: they may not play today, or their game has started.`
     : `Nothing on today's Onyx board matches that${R.spec.min_price != null || R.spec.max_price != null ? ' at those prices' : ''}. Try loosening it, or a different sport.`}</div>`; return; }

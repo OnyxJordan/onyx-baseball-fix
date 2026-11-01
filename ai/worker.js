@@ -19,8 +19,8 @@ const SPEC = {
   type: "object",
   additionalProperties: false,
   required: ["intent", "count", "sports", "markets", "side", "min_price", "max_price", "min_conf",
-    "min_edge", "player", "team", "sort", "one_per_game", "rr_size", "target_price", "count_set", "when",
-    "exclude", "summary", "say"],
+    "min_edge", "player", "team", "teams", "sort", "one_per_game", "rr_size", "target_price", "count_set", "when",
+    "exclude", "summary", "say", "clarify"],
   properties: {
     intent: { type: "string", enum: ["parlay", "sgp", "rr", "list"] },
     count: { type: "integer" },
@@ -33,6 +33,7 @@ const SPEC = {
     min_edge: { type: ["number", "null"] },
     player: { type: ["string", "null"] },
     team: { type: ["string", "null"] },
+    teams: { type: "array", items: { type: "string" } },
     sort: { type: "string", enum: ["conf", "rec", "edge", "price", "proj", "two_td"] },
     rr_size: { type: ["integer", "null"] },
     target_price: { type: ["integer", "null"] },
@@ -42,6 +43,15 @@ const SPEC = {
     exclude: { type: "array", items: { type: "string" } },
     summary: { type: "string" },
     say: { type: "string" },
+    clarify: {
+      anyOf: [
+        { type: "null" },
+        {
+          type: "object", additionalProperties: false, required: ["question", "options"],
+          properties: { question: { type: "string" }, options: { type: "array", items: { type: "string" } } },
+        },
+      ],
+    },
   },
 };
 const EXPLAIN = {
@@ -70,6 +80,8 @@ Fields:
 - first_td (first touchdown scorer), first_basket (NBA first basket), h1_total (NBA 1st-half total).
 - one_per_game: true unless they explicitly want several plays from the same game.
 - pass_td (passing TDs), pass_att (pass attempts), rush_rec_yds (rushing + receiving yards), pass_rush_yds (passing + rushing yards).
+- teams: when they name two or more teams ("from the Chiefs, Broncos, Patriots or Dolphins"), every one of them as ESPN abbreviations (KC, DEN, NE, MIA, WSH, JAX, LAR, LAC, GB, NO, SF, TB, NYG, NYJ, LV); then team is null. One team goes in team and teams is empty. Never drop a team they named.
+- clarify: null almost always. Set it only when guessing would give them the wrong thing: (a) they ask for live / in-game bets (the board is pregame Onyx prices only), (b) two very different readings are equally likely, (c) something we do not price (a sport other than nba, nfl, cfb, nhl, tennis; a market not listed). Then question is one short, friendly question that says what you can do, and options are 2 to 4 complete requests they can tap, each one a full sentence the program can run on its own (e.g. "3 leg anytime TD parlay from tonight's games", "3 leg anytime TD parlay from KC, DEN, NE or MIA next week"). Still fill every other field with your best reading. For "live" with named teams, ask whether they want pregame plays from games still to come.
 - exclude: names of players or teams to leave out ("not Mahomes", "swap out Irving", "replace leg 2" = the name on leg 2 of the previous answer). Empty when unsaid.
 - summary: one short plain sentence saying what you understood, no odds advice.
 - say: one or two friendly sentences back to the bettor, as a sharp friend would talk, saying what you are building for them. Never invent a player, price or stat; the program picks the plays. No em dashes. Never name a sportsbook other than Onyx.
@@ -170,15 +182,18 @@ export default {
       }
       const q = String(body.q || "").trim().slice(0, 300);
       if (!q) return json({ error: "empty" }, 400, h);
-      const c = body.ctx;
+      const cx = body.ctx;
       const hint = body.hint ? `\nBuilt-in reading: ${cut(body.hint, 1500)}` : "";
-      const user = (c && c.q
-        ? `Previous request: ${String(c.q).slice(0, 300)}\nPrevious spec: ${cut(c.spec, 1500)}\nPrevious legs (in order): ${cut(c.legs, 1200)}\n\nNew message: ${q}`
+      const user = (cx && cx.q
+        ? `Previous request: ${String(cx.q).slice(0, 300)}\nPrevious spec: ${cut(cx.spec, 1500)}\nPrevious legs (in order): ${cut(cx.legs, 1200)}\n\nNew message: ${q}`
         : `Message: ${q}`) + hint;
       const spec = await chat(env, SYSTEM, user, "spec", SPEC, 2000);
       const say = clean(spec.say);
+      const c = spec.clarify && spec.clarify.question && (spec.clarify.options || []).length
+        ? { question: clean(spec.clarify.question), options: spec.clarify.options.slice(0, 4).map(clean) } : null;
       delete spec.say;
-      return json({ spec, say }, 200, h);
+      delete spec.clarify;
+      return json({ spec, say, clarify: c }, 200, h);
     } catch (e) {
       const st = e && e.status;
       if (st === 429) return json({ error: "busy" }, 429, h);

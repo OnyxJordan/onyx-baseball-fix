@@ -317,7 +317,14 @@
         break;
       }
     }
-    if (!s.team) {
+    // several teams: "from the Chiefs, Broncos, Patriots or Dolphins" (one league, nicknames)
+    var many = [];
+    for (var k2 = 0; k2 < keys.length; k2++) {
+      if (new RegExp('\\b' + esc(keys[k2]) + '\\b').test(t) && many.indexOf(NICK[keys[k2]]) < 0
+          && (!s.team || SPORT_OF_NICK[keys[k2]] === SPORT_OF_NICK[keys.filter(function (x) { return NICK[x] === s.team; })[0]])) many.push(NICK[keys[k2]]);
+    }
+    if (many.length > 1) { s.teams = many; s.team = null; }
+    if (!s.team && !(s.teams || []).length) {
       // big college programs by name, any day (today's boards cover the rest)
       var CFBN = {alabama: 'ALA', 'crimson tide': 'ALA', michigan: 'MICH', wolverines: 'MICH', 'notre dame': 'ND', texas: 'TEX', longhorns: 'TEX',
         'ohio state': 'OSU', buckeyes: 'OSU', georgia: 'UGA', bulldogs: 'UGA', clemson: 'CLEM', oregon: 'ORE', ducks: 'ORE', 'penn state': 'PSU',
@@ -400,6 +407,7 @@
     var mk = (spec.markets || []).slice();
     var two = mk.indexOf('two_plus_td') >= 0 || spec.sort === 'two_td';
     if (two && mk.indexOf('anytime_td') < 0) mk.push('anytime_td');
+    var TL = teamList(spec);
     var pool = B.filter(function (p) {
       var t = Date.parse(p.start); if (!isNaN(t) && t <= now) return false;
       if (spec.sports && spec.sports.length && spec.sports.indexOf(p.sport) < 0) return false;
@@ -413,8 +421,8 @@
       if (spec.min_edge != null && p.edge < spec.min_edge) return false;
       if (spec.player && String(p.name || p.label).toLowerCase().indexOf(String(spec.player).toLowerCase()) < 0) return false;
       if (spec.exclude && spec.exclude.length && spec.exclude.some(function (x) { x = String(x || '').toLowerCase().trim(); return x && (String(p.name || '') + ' ' + String(p.label || '')).toLowerCase().indexOf(x) >= 0; })) return false;
-      if (spec.team && !new RegExp('(^|[^A-Z])' + String(spec.team).toUpperCase() + '([^A-Z]|$)').test([p.team, p.matchup, p.name].join(' ').toUpperCase())) return false;
-      if (spec.team && (p.kind === 'spread' || p.kind === 'ml') && String(p.team || p.name).toUpperCase() !== String(spec.team).toUpperCase()) return false;   // "Georgia to cover" is Georgia's side
+      if (TL.length && !onTeams(p, TL)) return false;
+      if (TL.length && (p.kind === 'spread' || p.kind === 'ml') && TL.indexOf(String(p.team || p.name).toUpperCase()) < 0) return false;   // "Georgia to cover" is Georgia's side
       if (spec.when && !whenOk(spec.when, p.start)) return false;
       return true;
     }).map(function (p) { return two ? Object.assign({}, p, {two: p2(p.lam)}) : p; });
@@ -564,7 +572,7 @@
     if (s.min_conf != null) b.push(s.default_conf ? (s.intent === 'list' ? 'every pick 50%+ to hit' : 'every leg 50%+ to hit') : Math.round(100 * s.min_conf) + '%+ confidence');
     if (s.player) b.push(s.player);
     if (s.when) b.push(s.when === 'today' ? 'tonight' : s.when);
-    if (s.team) b.push(s.team);
+    if (s.team && !(s.teams || []).length) b.push(s.team);
     b.push(s.sort === 'proj' ? 'highest projection first' : s.sort === 'rec' ? 'what we recommend most first' : s.sort === 'price' ? 'biggest payouts first' : s.sort === 'edge' ? (s.td_fav ? 'our TD model\'s favorites against their price first' : 'best value first') : s.sort === 'two_td' ? 'most likely 2+ TDs first' : 'highest confidence first');
     return b.join(' · ');
   }
@@ -594,7 +602,7 @@
       var hint = null; try { hint = lf || localSpec(q, B); } catch (e) { hint = null; }
       return fetch(u, {method: 'POST', headers: {'content-type': 'application/json'}, body: JSON.stringify({q: q, ctx: ctx, hint: hint}), signal: ctl.signal})
         .then(function (r) { clearTimeout(tm); if (!r.ok) throw new Error('relay ' + r.status); return r.json(); })
-        .then(function (j) { if (!j || !j.spec) throw new Error('no spec'); return {spec: j.spec, say: j.say || '', via: 'ai'}; })
+        .then(function (j) { if (!j || !j.spec) throw new Error('no spec'); return {spec: blend(j.spec, hint, q), say: j.say || '', clarify: j.clarify || null, via: 'ai'}; })
         .catch(function () { return {spec: lf || localSpec(q, B), via: 'local'}; });
     });
   }
@@ -621,6 +629,65 @@
   }
   // mainstream by default: unless the request names its own odds, no parlay leg
   // shorter than -150 and no single shorter than -200 (no -2800 "locks")
+  // the teams a request names: "teams" (several) or "team" (one), as board abbreviations
+  function teamList(spec) {
+    var a = (spec.teams && spec.teams.length ? spec.teams : spec.team ? [spec.team] : []);
+    return a.map(function (x) { return String(x || '').toUpperCase().trim(); }).filter(Boolean);
+  }
+  function onTeams(p, TL) {
+    var hay = [p.team, p.matchup, p.name].join(' ').toUpperCase();
+    return TL.some(function (T) { return new RegExp('(^|[^A-Z])' + T + '([^A-Z]|$)').test(hay); });
+  }
+  // the AI's reading, kept honest by the built-in reader on what the reader is proven at
+  // (tested on 500 phrasings): props only, a price bound the AI left out, and never a sport
+  // or a confidence floor nobody asked for
+  var SPORTWORD = /\b(nfl|nba|nhl|ncaa[fb]?|cfb|college|football|basketball|hockey|tennis|atp|wta|hoops|pro football)\b/;
+  function blend(ai, h, q) {
+    if (!h) return ai;
+    var s = Object.assign({}, ai), t = String(q || '').toLowerCase(), before = JSON.stringify(ai);
+    if (h.props_only) s.props_only = true;
+    if (s.min_price == null && h.min_price != null) s.min_price = h.min_price;
+    if (s.max_price == null && h.max_price != null) s.max_price = h.max_price;
+    if (s.min_conf != null && h.min_conf == null && !/%|percent/.test(t)) s.min_conf = null;
+    if ((s.sports || []).length && !(h.sports || []).length && !teamList(s).length && !s.player && !SPORTWORD.test(t)) s.sports = [];
+    if (!teamList(s).length && (h.teams || []).length > 1) { s.teams = h.teams; s.team = null; }
+    else if (!teamList(s).length && h.team) s.team = h.team;
+    if (!s.player && h.player && !(s.exclude || []).length) s.player = h.player;
+    if (JSON.stringify(s) !== before) s._fixed = true;     // the AI's one-line reply may describe what it misread: drop it
+    return s;
+  }
+  // nothing to build because the named teams or player have no game left on the board (it has
+  // started, or they don't play): ask what to build instead, with real games to tap
+  function clarifyFor(spec, B) {
+    var TL = teamList(spec), now = Date.now();
+    if (!TL.length && !spec.player) return null;
+    var who = function (p) { return TL.length ? onTeams(p, TL) : String(p.name || p.label).toLowerCase().indexOf(String(spec.player).toLowerCase()) >= 0; };
+    var sp = (spec.sports || []).length ? spec.sports : null;
+    var mine = B.filter(function (p) { return (!sp || sp.indexOf(p.sport) >= 0) && who(p); });
+    if (mine.some(function (p) { return Date.parse(p.start) > now; })) return null;    // they have plays; something else emptied it
+    var g = {}, live = [];
+    mine.forEach(function (p) { if (!g[p.gid]) { g[p.gid] = 1; var mm = String(p.matchup || '').split(' vs '); live.push(mm.length === 2 ? mm[1] + ' @ ' + mm[0] : p.matchup); } });
+    var nm = TL.length ? TL.join(', ') : spec.player;
+    var none = TL.filter(function (T) { return !mine.some(function (p) { return onTeams(p, [T]); }); });
+    var question = (none.length && live.length ? none.join(', ') + (none.length > 1 ? ' have' : ' has') + ' no game on today\'s Onyx board, and ' : '')
+      + (live.length
+        ? (live.length === 1 ? live[0] + ' has' : live.join(' and ') + ' have') + ' already started. We build from Onyx\'s pregame prices, so in-game bets are not on our board yet. What should I build instead?'
+        : 'There is no game for ' + nm + ' on today\'s Onyx board. What should I build instead?');
+    var seen = {}, opts = [];
+    B.filter(function (p) { return Date.parse(p.start) > now && (!sp || sp.indexOf(p.sport) >= 0); })
+      .sort(function (a, b) { return Date.parse(a.start) - Date.parse(b.start); })
+      .forEach(function (p) {
+        if (seen[p.gid] || opts.length >= 3) return; seen[p.gid] = 1;
+        var m = String(p.matchup || '').match(/^([A-Z0-9]+) (?:@|vs) ([A-Z0-9]+)$/);
+        if (!m) return;
+        var day = new Date(p.start).toLocaleDateString('en-US', {weekday: 'long', timeZone: 'America/New_York'});
+        var away = p.matchup.indexOf('@') > 0 ? m[1] : m[2], home = p.matchup.indexOf('@') > 0 ? m[2] : m[1];
+        opts.push({label: 'The same from ' + away + ' @ ' + home + ' (' + day + ')',
+                   spec: Object.assign({}, spec, {teams: [m[1], m[2]], team: null, player: null})});
+      });
+    opts.push({label: 'The same from any game still to play', spec: Object.assign({}, spec, {teams: [], team: null, player: null})});
+    return {question: question, options: opts};
+  }
   function normalize(spec) {
     var s = Object.assign({intent: 'list', count: 5, sports: [], markets: [], side: 'any', sort: 'conf', one_per_game: true}, spec || {});
     var two = (s.markets || []).indexOf('two_plus_td') >= 0 || s.sort === 'two_td';
@@ -631,14 +698,21 @@
     // (and a list of picks the same: a 17% play is not a pick, unless dogs or longshots were asked for)
     if ((s.intent === 'parlay' || s.intent === 'list' || s.intent === 'rr') && s.min_conf == null && !s.target_price && s.sort !== 'price' && !(s.min_price != null && s.min_price >= 100) && !longMkt && !two) { s.min_conf = 0.5; s.default_conf = true; }
     if (s.min_price == null && s.max_price != null && s.max_price < 0) { s.min_price = Math.min(-250, s.max_price - 100); s.default_floor = true; }   // "-150 or shorter": down to -250, no -2800 locks
-    if (s.min_price == null && !two && !longMkt && !s.team && !s.player) { s.min_price = s.intent === 'list' ? -200 : -150; s.default_floor = true; }
-    if (s.team && s.intent === 'list') s.one_per_game = false;      // "Ohio State player props": several from the one game
+    if (s.min_price == null && !two && !longMkt && !teamList(s).length && !s.player) { s.min_price = s.intent === 'list' ? -200 : -150; s.default_floor = true; }
+    if (teamList(s).length === 1 && s.intent === 'list') s.one_per_game = false;      // "Ohio State player props": several from the one game
     return s;
   }
-  function ask(q) {
+  function ask(q, forced) {
     q = String(q || '').trim().slice(0, 300);
     if (!q) return Promise.resolve(null);
-    return loadBoards().then(function (B) { return Promise.all([toSpec(q, B), B]); }).then(function (a) {
+    return loadBoards().then(function (B) { return Promise.all([forced ? {spec: forced, via: 'tap'} : toSpec(q, B), B]); }).then(function (a) {
+      // the AI asked a question instead of guessing: show it, no plays
+      if (a[0].clarify && a[0].clarify.question && (a[0].clarify.options || []).length) {
+        var c0 = normalize(a[0].spec);
+        LAST = {q: q, spec: a[0].spec, legs: []};
+        return {rows: [], pool: 0, spec: c0, via: a[0].via, say: a[0].say || '', understood: describe(c0),
+                clarify: {question: a[0].clarify.question, options: a[0].clarify.options.slice(0, 4).map(function (o) { return {label: o, q: o}; })}};
+      }
       var spec = normalize(a[0].spec);
       var res = run(spec, a[1]);
       // the standard-price floor left the ticket short (favorites, a thin board): widen it once and say so
@@ -662,6 +736,9 @@
           : 'Touchdown prices carry a big margin (priced players score about 18% of the time against 22% implied), so every edge reads negative.');
       }
       res.spec = spec; res.via = a[0].via; res.say = a[0].say || ''; res.understood = describe(spec);
+      if (!res.rows.length) res.clarify = clarifyFor(spec, a[1]);
+      if (res.clarify || a[0].spec._fixed) res.say = '';
+      if (teamList(spec).length > 1) res.understood += ' · ' + teamList(spec).join(', ');
       if (spec.exclude && spec.exclude.length) res.understood += ' · without ' + spec.exclude.join(', ');
       LAST = {q: q, spec: a[0].spec, legs: (res.rows || []).map(function (p) { return {name: p.name || p.label, play: p.label, price: p.price}; })};
       return res;
