@@ -7,9 +7,9 @@
   {
    "gid": "401892624",
    "start": "2026-11-01T18:00Z",
-   "state": "pre",
-   "status": "STATUS_SCHEDULED",
-   "detail": "11/1 - 1:00 PM EST",
+   "state": "in",
+   "status": "STATUS_END_PERIOD",
+   "detail": "End of 2nd",
    "name": "WPG @ CAR",
    "away": "WPG",
    "home": "CAR",
@@ -28,7 +28,7 @@
    "away_rank": null,
    "home_rank": null,
    "away_score": "0",
-   "home_score": "0",
+   "home_score": "5",
    "venue": "Lenovo Center",
    "neutral": false,
    "tv": "NHL Net, CARNHL",
@@ -91,7 +91,7 @@
    "home_score": "0",
    "venue": "Xfinity Mobile Arena",
    "neutral": false,
-   "tv": "ESPN+, NBC Sports Phil, Utah 16",
+   "tv": "ESPN+, NBC Sports Phil, Utah 16, Mammoth",
    "week": null
   },
   {
@@ -156,7 +156,7 @@
   }
  ],
  "events": [],
- "fetched": "2026-11-01T15:23:55+00:00",
+ "fetched": "2026-11-01T19:53:29+00:00",
  "season": null,
  "season_type": null,
  "bye": []
