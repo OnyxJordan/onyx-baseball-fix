@@ -13,7 +13,7 @@ on:
         required: false
         default: ""
       job:
-        description: "probe (markets), lines (historical Onyx lines for a backtest), golf (every golf fixture, now and past 60 days), sources (reach of deeper data sources) or odds (dry run of sports_odds.py)"
+        description: "probe (markets), live (what Onyx prices in-game right now), lines (historical Onyx lines for a backtest), golf (every golf fixture, now and past 60 days), sources (reach of deeper data sources) or odds (dry run of sports_odds.py)"
         required: false
         default: "probe"
       args:
@@ -32,7 +32,12 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install requests
-      - if: ${{ inputs.job != 'lines' && inputs.job != 'golf' && inputs.job != 'sources' }}
+      # job=live: during games, what Onyx prices in-game and how fast it moves (args: seconds between pulls)
+      - if: ${{ inputs.job == 'live' }}
+        run: python3 tools/onyx_live_probe.py ${{ inputs.args || '60' }}
+        env:
+          OPTICODDS_API_KEY: ${{ secrets.OPTICODDS_API_KEY }}
+      - if: ${{ inputs.job != 'lines' && inputs.job != 'golf' && inputs.job != 'sources' && inputs.job != 'live' && inputs.job != 'odds' }}
         run: python3 tools/onyx_markets_probe.py ${{ inputs.sports }}
         env:
           OPTICODDS_API_KEY: ${{ secrets.OPTICODDS_API_KEY }}
