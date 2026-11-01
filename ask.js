@@ -668,6 +668,10 @@
     if (!s.player && h.player && !(s.exclude || []).length) s.player = h.player;
     // a scattershot list of markets nobody named (3+ where the reader found none) is the AI guessing
     if ((s.markets || []).length >= 3 && !(h.markets || []).length) s.markets = [];
+    // a market the reader found by name ("boards" = rebounds) wins over the AI dropping or swapping it
+    // (1,000 live-AI requests: all 8 misses were this)
+    if ((h.markets || []).length && JSON.stringify((s.markets || []).slice().sort()) !== JSON.stringify(h.markets.slice().sort())) s.markets = h.markets.slice();
+    if ((!s.side || s.side === 'any') && (h.side === 'over' || h.side === 'under')) s.side = h.side;
     // a day nobody named
     if (s.when && !h.when && !/\b(today|tonight|tomorrow|weekend|this week|sunday|monday|tuesday|wednesday|thursday|friday|saturday|sun|mon|tue|wed|thu|fri|sat)\b/.test(t)) s.when = null;
     if (JSON.stringify(s) !== before) s._fixed = true;     // the AI's one-line reply may describe what it misread: drop it
