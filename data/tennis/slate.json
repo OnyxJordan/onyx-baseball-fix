@@ -3068,7 +3068,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        0
+        1
        ],
        "serve": true
       },
@@ -3079,7 +3079,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        0
+        3
        ],
        "serve": false
       }
@@ -3781,7 +3781,7 @@
      "id": "187353",
      "start": "2026-11-01T13:40Z",
      "state": "in",
-     "detail": "2nd",
+     "detail": "3rd",
      "round": "Qualifying Final",
      "draw": "Men's Singles",
      "court": "Court 1",
@@ -3794,7 +3794,8 @@
        "win": false,
        "sets": [
         6,
-        3
+        4,
+        1
        ],
        "serve": false
       },
@@ -3806,7 +3807,8 @@
        "win": false,
        "sets": [
         3,
-        5
+        6,
+        0
        ],
        "serve": false
       }
@@ -3816,7 +3818,7 @@
      "id": "187352",
      "start": "2026-11-01T13:55Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Qualifying Final",
      "draw": "Men's Singles",
      "court": "Court 2",
@@ -3828,7 +3830,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        6
+        7,
+        1
        ],
        "serve": false
       },
@@ -3839,7 +3842,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        6
+        6,
+        0
        ],
        "serve": false
       }
@@ -10045,9 +10049,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        4
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Alice Tubello",
@@ -11437,7 +11441,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        6
        ],
        "serve": false
       },
@@ -11448,9 +11452,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        3
        ],
-       "serve": true
+       "serve": false
       }
      ]
     }
@@ -16790,9 +16794,9 @@
        "win": false,
        "sets": [
         6,
-        1
+        2
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Darja Suvirdjonkova",
@@ -16802,7 +16806,7 @@
        "win": false,
        "sets": [
         4,
-        2
+        5
        ],
        "serve": false
       }
@@ -16818,9 +16822,9 @@
      "court": "Lwena Court",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Abigayel Vosloo",
+       "short": "A. Vosloo",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/rsa.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -16876,9 +16880,9 @@
      "court": "Court 1",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Prathyusha Rachapudi",
+       "short": "P. Rachapudi",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ind.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -17797,5 +17801,5 @@
    ]
   }
  ],
- "fetched": "2026-11-01T14:47:11+00:00"
+ "fetched": "2026-11-01T15:03:47+00:00"
 }
