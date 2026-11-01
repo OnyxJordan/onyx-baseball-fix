@@ -12814,8 +12814,8 @@
     {
      "id": "185817",
      "start": "2026-11-01T00:05Z",
-     "state": "in",
-     "detail": "3rd",
+     "state": "post",
+     "detail": "Final",
      "round": "Semifinal",
      "draw": "Women's Singles",
      "court": "Estadio Mexcovery",
@@ -12838,11 +12838,11 @@
        "short": "T. Maria",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ger.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         7,
         3,
-        3
+        6
        ],
        "serve": false
       }
@@ -12850,9 +12850,9 @@
     },
     {
      "id": "185818",
-     "start": "2026-11-01T02:00Z",
+     "start": "2026-11-01T02:20Z",
      "state": "pre",
-     "detail": "10/31 - 10:00 PM EDT",
+     "detail": "10/31 - 10:20 PM EDT",
      "round": "Semifinal",
      "draw": "Women's Singles",
      "court": "Estadio Mexcovery",
@@ -12896,9 +12896,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Tatjana Maria",
+       "short": "T. Maria",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ger.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -13202,39 +13202,10 @@
      ]
     },
     {
-     "id": "187320",
-     "start": "2026-11-01T02:00Z",
-     "state": "pre",
-     "detail": "10/31 - 10:00 PM EDT",
-     "round": "Qualifying Final",
-     "draw": "Women's Singles",
-     "court": "Court 2",
-     "p": [
-      {
-       "name": "Mika Stojsavljevic",
-       "short": "M. Stojsavljevic",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/gbr.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "Tatiana Prozorova",
-       "short": "T. Prozorova",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/rus.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      }
-     ]
-    },
-    {
      "id": "187318",
-     "start": "2026-11-01T02:00Z",
-     "state": "pre",
-     "detail": "10/31 - 10:00 PM EDT",
+     "start": "2026-11-01T02:05Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Qualifying Final",
      "draw": "Women's Singles",
      "court": "Court 1",
@@ -13245,8 +13216,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        1
+       ],
+       "serve": true
       },
       {
        "name": "Aliaksandra Sasnovich",
@@ -13254,7 +13227,42 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/blr.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        1
+       ],
+       "serve": false
+      }
+     ]
+    },
+    {
+     "id": "187320",
+     "start": "2026-11-01T02:10Z",
+     "state": "in",
+     "detail": "1st",
+     "round": "Qualifying Final",
+     "draw": "Women's Singles",
+     "court": "Court 2",
+     "p": [
+      {
+       "name": "Mika Stojsavljevic",
+       "short": "M. Stojsavljevic",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/gbr.png",
+       "seed": null,
+       "win": false,
+       "sets": [
+        0
+       ],
+       "serve": false
+      },
+      {
+       "name": "Tatiana Prozorova",
+       "short": "T. Prozorova",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/rus.png",
+       "seed": null,
+       "win": false,
+       "sets": [
+        2
+       ],
        "serve": false
       }
      ]
@@ -15527,5 +15535,5 @@
    ]
   }
  ],
- "fetched": "2026-11-01T01:49:53+00:00"
+ "fetched": "2026-11-01T02:21:37+00:00"
 }
