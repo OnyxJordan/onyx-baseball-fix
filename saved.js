@@ -259,7 +259,7 @@
         (p.conf ? '<div><b>' + Math.round(100 * p.conf) + '%</b><span>model had it</span></div>' : '') +
       '</div>' +
       '<a class="oxw-go" href="https://app.onyxodds.com/?utm_source=onyxsports&referrer=' + REFERRER + '" target="_blank" rel="noopener">Ride the run: build tonight\'s parlay on Onyx</a>' +
-      '<div class="oxw-row"><a href="' + esc(t.gid && p.sport !== 'nba' && p.sport !== 'mlb' ? page + '#games:' + t.gid : page) + '">Open the game</a><a href="home.html#my">My picks</a>' +
+      '<div class="oxw-row"><a href="' + esc(t.gid && p.sport !== 'nba' && p.sport !== 'mlb' ? page + '#games:' + t.gid : page) + '">Open the game</a><a href="home.html#my" class="oxw-my">My picks</a>' +
       (navigator.share ? '<button class="oxw-sh">Share</button>' : '') + '</div></div>';
     document.body.appendChild(back);
     requestAnimationFrame(function () { back.classList.add('open'); });
@@ -270,6 +270,8 @@
     };
     back.addEventListener('click', function (e) { if (e.target === back) close(); });
     back.querySelector('.oxw-x').addEventListener('click', close);
+    // My picks: the shared tracker (ui.js) on whatever page this is
+    back.querySelector('.oxw-my').addEventListener('click', function (e) { if (window.OnyxUI && OnyxUI.openPicks) { e.preventDefault(); close(); OnyxUI.openPicks(); } });
     var sh = back.querySelector('.oxw-sh');
     if (sh) sh.addEventListener('click', function () {
       try { navigator.share({title: 'Cashed on Onyx', text: 'My Onyx pick cashed: ' + (p.label || '') + (p.price != null ? ' (' + odds(p.price) + ')' : ''), url: location.origin + location.pathname.replace(/[^/]*$/, '') + 'home.html'}); } catch (e) {}

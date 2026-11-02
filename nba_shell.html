@@ -2910,7 +2910,7 @@ function bcRender() {
   el.innerHTML = `${pcHead(p, 'back')}
     <div class="pc-body">
     ${best ? `<button class="bc-best" id="bcBest" onclick="bcTake('${best.s}',${best.i},'${best.side}')">
-        <span class="eb">${best.ev > 0 ? 'Best value' : 'Closest to fair'}</span>
+        <span class="eb">${window.OXC && OXC.isPick && OXC.isPick(best.sel) ? 'Onyx Pick · ' : ''}${best.ev > 0 ? 'Best value' : 'Closest to fair'}</span>
         <span class="bt">${best.side === 'over' ? 'Over' : 'Under'} ${best.line} ${BC_MKTS[best.s][1]} <em>${fmtOdds(best.price)}</em></span>
         <span class="bv ${moneyCls(best.ev)}">${money(10 * best.ev)} <small>per $10</small></span>
         <span class="bw">Across his points, rebounds and assists lines priced ${BC_REC_PRICE[0]} to +${BC_REC_PRICE[1]}, where the model is calibrated</span></button>` : ''}
@@ -2932,7 +2932,7 @@ function bcRender() {
           : BC.s === 'fg3' ? 'Threes: model shape not backtested yet, so no recommendation is made from it.'
           : BC_COMBO[BC.s] ? 'Combined stat: projection is the sum of his points, rebounds and assists projections. Its spread is not backtested yet, so no recommendation is made from it.'
           : 'Not modeled: the Onyx price only, no recommendation.'}</div>
-      <div class="bc-acts"><button class="btn-secondary" id="bcAdd">+ Add to parlay</button><button class="btn-primary" id="bcBet">⚡ Bet on Onyx</button></div>
+      <div class="bc-acts"><button class="btn-secondary" id="bcAdd">+ Add to parlay</button><button class="btn-primary" id="bcBet">⚡ Bet on Onyx</button><span id="bcSave" style="display:inline-flex"></span></div>
     </div>` : '<div class="empty">No Onyx line on this market.</div>'}
     </div>`;
   bcMkts();
@@ -2964,9 +2964,15 @@ function bcMkts() {
   const p = playerOf(BC.pid), box = document.getElementById('bcMkts');
   if (!p || !box) return;
   const q = BC.q.toLowerCase().trim(), bets = p.bets || {};
-  const mk = Object.keys(BC_MKTS).filter(s => bets[s] && (!q || (BC_MKTS[s][0] + ' ' + BC_MKTS[s][1]).toLowerCase().includes(q)));
+  // best value first (11/2, the team card's order): modeled markets by the better side's EV on
+  // Onyx's main line, then the untested shapes, then the price-only markets; an Onyx Pick is badged
+  const val = s => { if (!BC_MODELED[s]) return BC_SHAPED[s] ? -50 : -100; const r = bets[s][bcMain(p, s)] || [];
+    const e = [r[1] != null && r[6] != null ? r[6] * decOf(r[1]) - 1 : null, r[3] != null && r[6] != null ? (1 - r[6]) * decOf(r[3]) - 1 : null].filter(x => x != null);
+    return e.length ? Math.max(...e) : -40; };
+  const pk = s => !!(window.OXC && OXC.isPick && bets[s].some(r => OXC.isPick(r[2]) || OXC.isPick(r[4])));
+  const mk = Object.keys(BC_MKTS).filter(s => bets[s] && (!q || (BC_MKTS[s][0] + ' ' + BC_MKTS[s][1]).toLowerCase().includes(q))).sort((a, b) => val(b) - val(a));
   box.innerHTML = mk.map(s => `<button class="${s === BC.s ? 'on' : ''}" onclick="bcGo(null,'${s}')">
-      ${BC_MKTS[s][0]}${p.proj && p.proj[s] != null ? ` <span>${num(p.proj[s])}</span>` : ''}</button>`).join('')
+      ${pk(s) ? '<i style="font:800 8px monospace;letter-spacing:.1em;font-style:normal;padding:1px 5px;border-radius:999px;background:linear-gradient(135deg,#b038f9,#635bff);color:#fff;margin-right:4px">ONYX PICK</i>' : ''}${BC_MKTS[s][0]}${p.proj && p.proj[s] != null ? ` <span>${num(p.proj[s])}</span>` : ''}</button>`).join('')
     || '<span class="dim" style="font-size:12px">No market matches.</span>';
 }
 // jump to a rung (or a market's main line on the model's side)
@@ -3099,6 +3105,10 @@ function bcUpdate(scrollRung) {
   add.onclick = () => { if (!leg) return; slipToggle(regLeg(leg)); bcUpdate(false); };
   bet.onclick = () => { if (!leg) return; track('onyx_click', {link_type: 'single', market: leg.market, selection: leg.label, odds: String(leg.price), source: 'player_card'});
     window.open(shareUrl([leg.sel]), '_blank', 'noopener'); };
+  // the save star (saved.js), the same as every play card: this exact line follows you in My picks
+  const sv = $('bcSave'), g = gameOf(p.gid) || {};
+  if (sv) sv.innerHTML = leg && window.OnyxSaved ? OnyxSaved.btn({id: leg.sel, sport: 'nba', label: leg.label, matchup: g.away ? g.away + ' @ ' + g.home : '',
+    start: g.start, gid: p.gid, team: p.team, price: leg.price, conf: k.pBl != null ? k.pBl : k.pMod, kind: 'prop', mkt: BC.s, side: k.side, line: k.line, name: p.name}) : '';
 }
 // ── Depth tab: D.depth from nba_build.write_depth (data/nba/depth.json) ──
 var depSel = null;

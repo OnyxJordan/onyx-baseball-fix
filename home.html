@@ -17,6 +17,7 @@
 <meta name="description" content="Onyx Sports Data: models, matchups and live gamecenters for every sport, priced against Onyx. The research desk for your picks.">
 <link rel="stylesheet" href="onyx.css">
 <script src="onyx.js" defer></script>
+<script src="ui.js" defer></script>
 <script src="saved.js"></script>
 <script src="ask.js"></script>
 <script src="live.js"></script>
@@ -136,7 +137,7 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
 .t10-picks{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;align-items:center;margin:0 0 12px;padding:14px 16px;border-radius:16px;border:1px solid rgba(97,233,112,.4);background:linear-gradient(160deg,rgba(97,233,112,.1),rgba(176,56,249,.08));color:#fff;text-decoration:none}
 .t10-picks>div{min-width:0}.t10-picks b{font-size:17px}.t10-picks span{display:block;font:600 11px monospace;color:#b9b2c4;margin-top:3px}
 .t10-picks em{font:800 12px monospace;font-style:normal;padding:7px 11px;border-radius:999px;background:linear-gradient(135deg,#b038f9,#635bff);white-space:nowrap}
-.t10-f .ox-save{width:30px;height:30px;font-size:15px;flex:none}.t10-act{margin-left:auto;display:flex;gap:6px;align-items:center;flex:none}.t10-act .t10-bet{margin-left:0}
+.t10-f .ox-save{flex:none}.t10-act{margin-left:auto;display:flex;gap:6px;align-items:center;flex:none}.t10-act .t10-bet{margin-left:0}
 .t10-bet{margin-left:auto;font:800 12px monospace;padding:6px 10px;border-radius:999px;background:linear-gradient(135deg,#b038f9,#635bff);color:#fff;text-decoration:none;white-space:nowrap}
 </style>
 </head>
@@ -158,7 +159,6 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
       <a class="ox-link" href="#live">Live</a>
       <a class="ox-link" href="#sports">Sports</a>
       <a class="ox-link" href="#record">Record</a>
-      <a class="ox-link" id="acctNav" href="account.html" hidden>Sign in</a>
       <a class="ox-btn sm" data-onyx="header" href="#" target="_blank" rel="noopener">Bet on Onyx</a>
     </nav>
   </div>

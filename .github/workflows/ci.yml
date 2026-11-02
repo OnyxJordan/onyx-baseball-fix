@@ -96,3 +96,9 @@ jobs:
       # bar, and the bottom menu must open, navigate and close.
       - name: Installed app (PWA) check
         run: node tools/verify_pwa.js
+
+      # One account and one tracker on every page (11/2): the header Account
+      # control and My picks on all pages at 390 and 1280px, identical, a save
+      # star that raises the shared count, no errors, no sideways scroll.
+      - name: Account and My picks on every page
+        run: node tools/verify_account_ui.js

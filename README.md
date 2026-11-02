@@ -1467,7 +1467,7 @@ across every sport.
 ## Saved picks (10/31)
 
 Jordan: "save a pick local so you can follow it the rest of the night by clicking it".
-`saved.js` (loaded by `home.html`, `nba_shell.html`, `sport_shell.html`) keeps one
+`saved.js` (loaded by every page, by `ui.js` where a page does not load it itself) keeps one
 localStorage list, `onyxSaved`, and draws the star button (`OnyxSaved.btn(pick)`) on the
 home Top 10, the NBA "Today's best plays" and tracked pick cards, and every sport page's
 play cards. A pick carries what is needed to follow it: sport, game id, team, kind (prop /
@@ -1700,6 +1700,34 @@ anon key; never the service key); (5) run "Accounts (turn on / update)", which w
 `node tools/verify_accounts.js` (a stand-in Supabase, no keys: off, sign-in, first-sign-in merge,
 two devices, removals, privacy between users, session refresh, sign out, delete).
 
+**One account, one tracker on every page (11/2).** Jordan: "the account page and tracking should
+live through all sports and pages ... a uniform experience across the board". `ui.js` now loads on
+every page (home, every sport, picks, account, how, scorecard, cbb-players, mlb-2026) and:
+- puts the same two header controls on each, just left of the menu button (the hub: at the right
+  end of its own header): **My picks** (star + saved count) and **Account** (`.ox-acct`: "Sign in"
+  when accounts are on and you are signed out, "Account" with a green dot when signed in, "Account"
+  when accounts are off). Icon-only below 1100px. `fitHeader()` measures the header: a tab row that
+  does not fit scrolls (`.ox-scroll`); if it still does not fit, the controls go icon-only and the
+  phone sport pill steps aside (`.ox-tight`). The hub's old `#acctNav` link is replaced by this control.
+- gives the pages that are not a sport site (picks, account, how, scorecard, cbb-players) the
+  standard sport header (`nav.nav.ox-stdnav`, built by `stdNav()`), the bottom bar (Home, Picks,
+  Live, My picks, More), the More menu and the Onyx footer. account.html lost its one-off header.
+- **My picks** opens one slide-over everywhere (`OnyxUI.openPicks()`, also from the More menu, the
+  page bottom bar and the win pop-up): sign-in state, your record (`OnyxSaved.stats()`), every saved
+  pick followed live (`OnyxSaved.track`), the same star to take one back, links to
+  `account.html#record` and My Onyx.
+- loads `saved.js` (which loads `accounts.js`) on any page that did not, so sync, the star, win
+  alerts and the sign-in forwarder run on every page. Storage keys are unchanged.
+- the save star (`OnyxSaved.btn`) is now also on Onyx Picks' card, the engine sports' player cards
+  (the exact line on the Bets face) and team cards (every Onyx game line), and the NBA player card;
+  the home Top 10 star is no longer shrunk. Follow (`.fl-btn`, one style from ui.js) is on every
+  engine sport's player card (`cards.js` calls the page's `toggleF`) and on cbb-players.html (same
+  `onyxFollow_cbb` list). MLB is off-season with no Onyx prices, so it has no star yet.
+Gate: `node tools/verify_account_ui.js` (CI): every page at 390 and 1280px, the Account control in
+the header, on screen and identical, My picks from the header and the More menu opens the tracker, a
+save star raises the shared count and the tracker's star takes it back, signed-in state, a sign-in
+link landing on any page forwards to account.html, no errors, no sideways scroll.
+
 ## Similar spots (11/2)
 
 Jordan: "compare similar teams in similar spots, what happens ATS at X points." A card in every
@@ -1888,6 +1916,30 @@ model has a distribution, Add to parlay and Bet on Onyx (share link + `KR680261`
   the rating. NHL skater and college basketball props are priced from the depth projection
   (Poisson; college uses the NBA model's fitted spread) and labelled untested, never recommended;
   NBA sides show Onyx's own no-vig chance (the NBA model prices props, not sides).
+- **Bets tab = best bets (11/2, Jordan: "the bets should be the best bets with this team or players
+  from this team ... with all of the information, the sliding bars, everything").** A team's Bets
+  tab lists every Onyx market on it: its game lines (NFL / CFB / NHL / CBB with the ratings' chance;
+  NBA sides with Onyx's own no-vig chance, plus the NBA 1st-quarter and 1st-half totals and the
+  1st-quarter winner from the qhCard read) and every prop on its players (NBA: every market
+  `bet_ladders` prices, on Onyx's main line; engine sports: every `mk` in the team file). A player's
+  Bets tab is the same list for his markets. Order: logged Onyx Picks (`data/picks/ledger.json`,
+  matched by selection id), then tested markets by expected return at the Onyx price (blended
+  chance x decimal odds - 1, the home Top 10's number), then tested markets priced outside -200 to
+  +200, then Onyx-only lines, then markets not tested against Onyx or that did not beat it (these
+  show the model's chance, never a dollar figure). "Tested" comes from `cards.json` `tests`
+  (`cards.market_tests`: the Onyx Picks backtest verdict per market, `retest` when the live model
+  version differs). Every row is badged **Onyx Pick** or **Projection**. The "Best bet" box on top
+  is the best positive expected return among tested markets in -200 to +200; with none positive it
+  says so and names the closest to fair, never as a best bet. A row opens the full bet card in
+  place (Over / Under, Model / Onyx implied / Blended / EV per $10, the distribution, the slider
+  that snaps to Onyx's lines, line chips with prices, Add to parlay, Bet on Onyx, save star); a
+  spread's chart is the team's margin. NBA player rows open nba.html's own bet card
+  (`openBetCard`, then `BC` set to that line and side) above the team card. Engine sports have no
+  alternate lines (`sports_odds.py` keeps `is_main` only), so their chips hold the one line; the
+  card reads a `lad` ladder (`[line, over, over_sel, under, under_sel, p_model, p_blend]`) if one
+  is ever added. NHL game sides carry no chart (the hockey model is Poisson with an overtime rule,
+  not one distribution). nba.html's own card orders its market chips best value first and badges
+  an Onyx Pick (`OXC.isPick`).
 - **Gate:** `node tools/verify_sports.js` opens a team card from a real tap on a game card's team
   name (it must not open the gamecenter) and the player with the most Onyx markets, both faces,
   scrubs the chart and checks it snaps back; `node tools/verify_nba.js` does the same for an NBA
