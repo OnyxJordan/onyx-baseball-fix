@@ -6,10 +6,16 @@ name: Accounts (turn on / update)
 # One-time setup (Settings -> Secrets and variables -> Actions -> Variables tab):
 #   variable SUPABASE_URL        https://<project>.supabase.co   (Supabase -> Project Settings -> API)
 #   variable SUPABASE_ANON_KEY   the "anon public" key from the same page
-# Then: Actions -> "Accounts (turn on / update)" -> Run workflow. Leave both empty and run it to
-# turn accounts off again (the site goes back to device-only, nothing else changes).
+# (Secrets with the same names work too.) Then: Actions -> "Accounts (turn on / update)" -> Run
+# workflow. To turn accounts off again, run it with "Turn accounts off" ticked (the site goes back
+# to device-only, nothing else changes).
 on:
   workflow_dispatch:
+    inputs:
+      turn_off:
+        description: "Turn accounts off (back to device-only)"
+        type: boolean
+        default: false
 permissions:
   contents: write
 concurrency:
@@ -25,9 +31,17 @@ jobs:
           ref: main
       - name: Write accounts.json
         env:
-          U: ${{ vars.SUPABASE_URL }}
-          K: ${{ vars.SUPABASE_ANON_KEY }}
+          # a repository variable, or a secret by the same name (the anon key is public either way)
+          U: ${{ vars.SUPABASE_URL || secrets.SUPABASE_URL }}
+          K: ${{ vars.SUPABASE_ANON_KEY || secrets.SUPABASE_ANON_KEY }}
+          OFF: ${{ inputs.turn_off }}
         run: |
+          U=$(printf '%s' "$U" | tr -d '[:space:]'); K=$(printf '%s' "$K" | tr -d '[:space:]')
+          if [ "$OFF" = "true" ]; then U=""; K="";
+          elif [ -z "$U" ] || [ -z "$K" ]; then
+            echo "::error::SUPABASE_URL and SUPABASE_ANON_KEY were not found (URL set: $([ -n "$U" ] && echo yes || echo no), key set: $([ -n "$K" ] && echo yes || echo no)). Add them under Settings -> Secrets and variables -> Actions, as Variables or Secrets, with exactly those names, then run this again."
+            exit 1
+          fi
           case "$U" in ""|https://*.supabase.co) ;; *) echo "::error::SUPABASE_URL should look like https://<project>.supabase.co"; exit 1;; esac
           if [ -n "$U" ]; then
             code=$(curl -s -o /dev/null -w '%{http_code}' "$U/auth/v1/settings" -H "apikey: $K")
