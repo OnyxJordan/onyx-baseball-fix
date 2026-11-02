@@ -7,11 +7,15 @@ gets data/<sport>/top.json back: the plays its model likes at a mainstream price
 home.html reads every sport's file and ranks one Top 10 across them.
 
 A candidate must:
-  - be an Onyx main line priced -150 to +150 (no -179 / -195 juice, nothing a
-    casual bettor cannot find on any book)
-  - be value by the sport's own model: its chance at least the price's implied
-    chance (edge >= 0)
-  - be more likely to win than not (confidence 50%+)
+  - be an Onyx main line priced -150 to +200 (no -179 / -195 juice; plus money
+    welcome, nothing a casual bettor cannot find on any book)
+  - be real value by the sport's own model: its chance beats the price's implied
+    chance by 2+ points (edge >= 0.02) and the expected return is +3% or better
+    (11/2: the old edge >= 0 let 0.2% "value" plays like Over 6 at -102 in)
+  - not claim an edge over 12 points (that size is the model missing news, the
+    same cap the live tab uses)
+  - have a real chance to cash: 40%+ (a +150 play needs 44%+ to clear the +3%
+    bar anyway). The old 50% floor shut out every plus-money price.
   - be for a game that has not started
 
 Confidence is the sport's own blended chance (the number its page shows). Each
@@ -24,8 +28,9 @@ import re
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-PRICE = (-150, 150)
-MIN_CONF = 0.50
+PRICE = (-150, 200)
+MIN_CONF = 0.40
+MIN_EDGE, MAX_EDGE, MIN_EV = 0.02, 0.12, 0.03
 KEEP = 30
 WORD = {"pts": "points", "reb": "rebounds", "ast": "assists", "pass_yds": "passing yards", "rush_yds": "rushing yards",
         "rec_yds": "receiving yards", "rec": "receptions", "pass_td": "passing TDs", "pass_att": "pass attempts", "pass_rush_yds": "passing + rushing yards",
@@ -60,7 +65,7 @@ def label(r):
 def entry(sport, r, tag="lean", start=None):
     return {"sport": sport, "label": label(r), "matchup": r.get("matchup") or "", "start": r.get("start") or start,
             "gid": r.get("gid"), "who": r.get("pid") or r.get("name"), "price": r["price"], "conf": round(r["prob"], 4),
-            "edge": round(r["edge"], 4), "sel": r.get("sel"), "tag": tag,
+            "edge": round(r["edge"], 4), "ev": round(ev(r["price"], r["prob"]), 4) if r.get("price") and r.get("prob") is not None else None, "sel": r.get("sel"), "tag": tag,
             # what the home page needs to follow a saved pick live (saved.js / My picks)
             "kind": r.get("kind") or "prop", "mkt": r.get("mkt") or r.get("stat") or r.get("kind"), "side": r.get("side"),
             "line": r.get("line"), "hcap": _hcap(r), "name": r.get("name"), "team": r.get("team")}
@@ -73,22 +78,29 @@ def _hcap(r):
         return None
 
 
+def ev(price, prob):
+    """expected return per unit staked: prob x decimal odds - 1"""
+    dec = 1 + (price / 100.0 if price > 0 else 100.0 / -price)
+    return prob * dec - 1
+
+
 def ok(r):
     return (r.get("price") is not None and r.get("prob") is not None and r.get("edge") is not None
-            and PRICE[0] <= r["price"] <= PRICE[1] and r["edge"] >= 0 and r["prob"] >= MIN_CONF)
+            and PRICE[0] <= r["price"] <= PRICE[1] and MIN_EDGE <= r["edge"] <= MAX_EDGE and r["prob"] >= MIN_CONF
+            and ev(r["price"], r["prob"]) >= MIN_EV)
 
 
 def write(data_dir, sport, date, rows):
-    """rows: entry() dicts. Best first by confidence; one per player or game
+    """rows: entry() dicts. Best value first (expected return); one per player or game
     market. Written every build so a quiet night is an empty list, not a stale one."""
     seen, out = set(), []
-    for e in sorted(rows, key=lambda e: (-{"tracked": 2, "trial": 1}.get(e["tag"], 0), -e["conf"], -e["edge"])):
+    for e in sorted(rows, key=lambda e: (-{"tracked": 2, "trial": 1}.get(e["tag"], 0), -e["ev"], -e["conf"])):
         k = (e["gid"], e["who"])
         if k in seen:
             continue
         seen.add(k)
         out.append(e)
-    out = sorted(out, key=lambda e: (-e["conf"], -e["edge"]))[:KEEP]
+    out = sorted(out, key=lambda e: (-e["ev"], -e["conf"]))[:KEEP]
     p = Path(data_dir) / "top.json"
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(json.dumps({"sport": sport, "date": date, "generated": datetime.now(timezone.utc).isoformat(timespec="seconds"),
