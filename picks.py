@@ -48,7 +48,7 @@ PATH = {"nba": "basketball/nba", "nfl": "football/nfl", "cfb": "football/college
         "cbb": "basketball/mens-college-basketball"}
 # the module whose VERSION a market's backtest was run on
 MODULE = {"nba": "nba_model", "nfl": "nfl_model", "cfb": "cfb_model", "nhl": "nhl_model", "tennis": "tennis_model", "cbb": "cbb_model"}
-MODULE_MKT = {}   # (sport, market) -> module, when a market has its own model module
+MODULE_MKT = {("cfb", m): "cfb_players" for m in ("rush_yds", "pass_yds", "rec", "rec_yds")}   # (sport, market) -> module, when a market has its own model module
 # what the grader can settle (anything else is never logged)
 GAME = ("ml", "spread", "total")
 BOX = {"nba": {"pts": ("", "PTS"), "reb": ("", "REB"), "ast": ("", "AST")},
