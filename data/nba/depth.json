@@ -1,7 +1,7 @@
 {
  "sport": "nba",
  "date": "2026-11-02",
- "generated": "2026-11-02T19:49:36+00:00",
+ "generated": "2026-11-02T20:21:59+00:00",
  "unit": "min",
  "stats": [
   "pts",
@@ -11577,34 +11577,6 @@
      "home": false
     },
     {
-     "id": "44474590AB9A1CAE",
-     "n": "Nate Bittle",
-     "pos": "C",
-     "role": "Bench",
-     "tag": "Questionable: Foot (Leg, Fracture, Right)",
-     "use": 0.0,
-     "proj": {
-      "pts": 0.0,
-      "reb": 0.0,
-      "ast": 0.0,
-      "3pm": 0.0,
-      "pra": 0.0
-     },
-     "model": {
-      "use": 0.0,
-      "pts": 0.0
-     },
-     "last": null,
-     "now": {
-      "gp": 0,
-      "use": null
-     },
-     "hs": "4432586",
-     "gid": "20261103FCAA452C",
-     "opp": "LAC",
-     "home": false
-    },
-    {
      "id": "CB9C1CEF99C26705",
      "n": "Tyson Degenhart",
      "pos": "F",
@@ -11660,6 +11632,31 @@
       "use": 26.0
      },
      "hs": "6450",
+     "gid": "20261103FCAA452C",
+     "opp": "LAC",
+     "home": false
+    },
+    {
+     "id": "44474590AB9A1CAE",
+     "n": "Nate Bittle",
+     "pos": "C",
+     "role": "Out",
+     "tag": "Out: Foot (Leg, Fracture, Right)",
+     "use": 0.0,
+     "proj": {
+      "pts": 0.0,
+      "reb": 0.0,
+      "ast": 0.0,
+      "3pm": 0.0,
+      "pra": 0.0
+     },
+     "model": null,
+     "last": null,
+     "now": {
+      "gp": 0,
+      "use": null
+     },
+     "hs": "4432586",
      "gid": "20261103FCAA452C",
      "opp": "LAC",
      "home": false

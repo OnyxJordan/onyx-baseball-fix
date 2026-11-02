@@ -262,5 +262,137 @@
   "model": "v2",
   "result": null,
   "actual": null
+ },
+ {
+  "date": "2026-11-02",
+  "key": "401856849|devon dampier|rush_yds",
+  "gid": "401856849",
+  "pid": "5105849",
+  "name": "Devon Dampier",
+  "team": "UTAH",
+  "opp": "BYU",
+  "matchup": "UTAH vs BYU",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 46.5,
+  "price": -114,
+  "sel": "18aac4ed-f86d-4564-941f-4eb5e5969654",
+  "proj": 41.7,
+  "prob": 0.5979,
+  "implied": 0.5327,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.65,
+    "avg": 0.77,
+    "pp": -2.9
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.85,
+    "avg": 0.93,
+    "pp": 1.4
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.06,
+    "avg": -0.05,
+    "pp": 0.0
+   }
+  ],
+  "opened_at": "2026-11-02T20:22:27+00:00",
+  "logged_at": "2026-11-02T20:22:27+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-02",
+  "key": "401856849|bear bachmeier|rush_yds",
+  "gid": "401856849",
+  "pid": "5141367",
+  "name": "Bear Bachmeier",
+  "team": "BYU",
+  "opp": "UTAH",
+  "matchup": "BYU @ UTAH",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 32.5,
+  "price": -114,
+  "sel": "d30efb7f-b383-4454-8a16-b78be651d667",
+  "proj": 34.8,
+  "prob": 0.5839,
+  "implied": 0.5327,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.66,
+    "avg": 0.77,
+    "pp": -2.6
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.79,
+    "avg": 0.93,
+    "pp": 2.4
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.28,
+    "avg": -0.05,
+    "pp": 0.2
+   }
+  ],
+  "opened_at": "2026-11-02T20:22:27+00:00",
+  "logged_at": "2026-11-02T20:22:27+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-02",
+  "key": "401856849|wayshawn parker|rush_yds",
+  "gid": "401856849",
+  "pid": "5173431",
+  "name": "Wayshawn Parker",
+  "team": "UTAH",
+  "opp": "BYU",
+  "matchup": "UTAH vs BYU",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 75.5,
+  "price": -114,
+  "sel": "de4ce400-00a2-4425-ae04-2a482ceae46f",
+  "proj": 75.0,
+  "prob": 0.5958,
+  "implied": 0.5327,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.65,
+    "avg": 0.77,
+    "pp": -2.9
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.85,
+    "avg": 0.93,
+    "pp": 1.4
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.28,
+    "avg": -0.05,
+    "pp": 0.2
+   }
+  ],
+  "opened_at": "2026-11-02T20:22:27+00:00",
+  "logged_at": "2026-11-02T20:22:27+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
  }
 ]
