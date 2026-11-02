@@ -518,7 +518,7 @@ function lvCard(g) {
   } else if (g.bets && g.bets.length) {
     lean = `<div class="lv-lean none"><div class="lv-k">No value right now</div><div class="lv-verdict">Every live line on this game pays less than our fair price. We will flag it here the moment one moves past it.</div></div>`;
   } else if (g.bets && g.f != null && g.f < 0.15) {
-    lean = `<div class="lv-lean none"><div class="lv-k">No live bet</div><div class="lv-verdict">Too late in the game for our numbers: the live line now knows things our model does not, like who has the ball, the timeouts and the fouls.</div></div>`;
+    lean = `<div class="lv-lean none"><div class="lv-k">No live bet</div><div class="lv-verdict">Too late in the game for our numbers: the live line now knows things our model does not, like ${g.sport === 'nhl' ? 'a pulled goalie, power plays and empty nets' : g.sport === 'nba' ? 'possession, the fouls and the timeouts' : 'who has the ball, field position and the timeouts'}.</div></div>`;
   } else if (L && L.kind === 'ml') {
     const moved = L.start == null ? 'no Onyx line saved' : L.now >= L.start ? 'up from ' + lvPct(L.start) : 'down from ' + lvPct(L.start);
     lean = `<div class="lv-lean"><div class="lv-k">Our live lean</div>
