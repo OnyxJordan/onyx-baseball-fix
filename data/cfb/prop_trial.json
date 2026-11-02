@@ -262,5 +262,269 @@
   "model": "v2",
   "result": null,
   "actual": null
+ },
+ {
+  "date": "2026-11-02",
+  "key": "401856849|devon dampier|rush_yds",
+  "gid": "401856849",
+  "pid": "5105849",
+  "name": "Devon Dampier",
+  "team": "UTAH",
+  "opp": "BYU",
+  "matchup": "UTAH vs BYU",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 46.5,
+  "price": -114,
+  "sel": "18aac4ed-f86d-4564-941f-4eb5e5969654",
+  "proj": 41.7,
+  "prob": 0.5979,
+  "implied": 0.5327,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.65,
+    "avg": 0.77,
+    "pp": -2.9
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.85,
+    "avg": 0.93,
+    "pp": 1.4
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.06,
+    "avg": -0.05,
+    "pp": 0.0
+   }
+  ],
+  "opened_at": "2026-11-02T20:22:27+00:00",
+  "logged_at": "2026-11-02T20:22:27+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-02",
+  "key": "401856849|bear bachmeier|rush_yds",
+  "gid": "401856849",
+  "pid": "5141367",
+  "name": "Bear Bachmeier",
+  "team": "BYU",
+  "opp": "UTAH",
+  "matchup": "BYU @ UTAH",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 32.5,
+  "price": -114,
+  "sel": "d30efb7f-b383-4454-8a16-b78be651d667",
+  "proj": 34.8,
+  "prob": 0.5839,
+  "implied": 0.5327,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.66,
+    "avg": 0.77,
+    "pp": -2.6
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.79,
+    "avg": 0.93,
+    "pp": 2.4
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.28,
+    "avg": -0.05,
+    "pp": 0.2
+   }
+  ],
+  "opened_at": "2026-11-02T20:22:27+00:00",
+  "logged_at": "2026-11-02T20:22:27+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-02",
+  "key": "401856849|wayshawn parker|rush_yds",
+  "gid": "401856849",
+  "pid": "5173431",
+  "name": "Wayshawn Parker",
+  "team": "UTAH",
+  "opp": "BYU",
+  "matchup": "UTAH vs BYU",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 75.5,
+  "price": -114,
+  "sel": "de4ce400-00a2-4425-ae04-2a482ceae46f",
+  "proj": 75.0,
+  "prob": 0.5958,
+  "implied": 0.5327,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.65,
+    "avg": 0.77,
+    "pp": -2.9
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.85,
+    "avg": 0.93,
+    "pp": 1.4
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.28,
+    "avg": -0.05,
+    "pp": 0.2
+   }
+  ],
+  "opened_at": "2026-11-02T20:22:27+00:00",
+  "logged_at": "2026-11-02T20:22:27+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-02",
+  "key": "401856741|shekai mills knight|rush_yds",
+  "gid": "401856741",
+  "pid": "5214395",
+  "name": "Shekai Mills-Knight",
+  "team": "MISS",
+  "opp": "UGA",
+  "matchup": "MISS vs UGA",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 36.5,
+  "price": -114,
+  "sel": "42b9e615-2e5e-4d28-b863-4aafd7e45f7c",
+  "proj": 44.1,
+  "prob": 0.6173,
+  "implied": 0.5327,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.56,
+    "avg": 0.77,
+    "pp": -5.0
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.98,
+    "avg": -0.05,
+    "pp": 0.9
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.89,
+    "avg": 0.93,
+    "pp": 0.7
+   }
+  ],
+  "opened_at": "2026-11-02T20:55:06+00:00",
+  "logged_at": "2026-11-02T20:55:06+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-02",
+  "key": "401856741|makhi frazier|rush_yds",
+  "gid": "401856741",
+  "pid": "5084286",
+  "name": "Makhi Frazier",
+  "team": "MISS",
+  "opp": "UGA",
+  "matchup": "MISS vs UGA",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 39.5,
+  "price": -114,
+  "sel": "7c43ebd9-51a4-4afb-85d9-ae6c6787fd87",
+  "proj": 40.8,
+  "prob": 0.6227,
+  "implied": 0.5327,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.56,
+    "avg": 0.77,
+    "pp": -5.0
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.89,
+    "avg": 0.93,
+    "pp": 0.7
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.39,
+    "avg": -0.05,
+    "pp": 0.3
+   }
+  ],
+  "opened_at": "2026-11-02T20:55:06+00:00",
+  "logged_at": "2026-11-02T20:55:06+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-02",
+  "key": "401856741|trinidad chambliss|rush_yds",
+  "gid": "401856741",
+  "pid": "4911529",
+  "name": "Trinidad Chambliss",
+  "team": "MISS",
+  "opp": "UGA",
+  "matchup": "MISS vs UGA",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 19.5,
+  "price": -118,
+  "sel": "0ef3bfc5-c41e-40cc-b0fc-2cc8647ed1f0",
+  "proj": 19.5,
+  "prob": 0.625,
+  "implied": 0.5413,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.56,
+    "avg": 0.77,
+    "pp": -5.0
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.89,
+    "avg": 0.93,
+    "pp": 0.7
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.2,
+    "avg": -0.05,
+    "pp": 0.1
+   }
+  ],
+  "opened_at": "2026-11-02T20:55:06+00:00",
+  "logged_at": "2026-11-02T20:55:06+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
  }
 ]
