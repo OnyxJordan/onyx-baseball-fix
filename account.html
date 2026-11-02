@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>Your Onyx Account</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0c0c0c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Onyx Sports">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<meta name="description" content="Sign in to Onyx Sports with your email and your saved picks, followed players and bets follow you to every device.">
+<link rel="stylesheet" href="onyx.css">
+<script src="onyx.js" defer></script>
+<script src="accounts.js"></script>
+<style>
+body{background:#0c0c0c;color:#fff;margin:0}
+.ac{padding-top:28px;padding-bottom:40px;max-width:640px}
+.ac h1{margin:12px 0 0;font-size:clamp(34px,8vw,56px);line-height:1}
+.ac .lead{margin:12px 0 0;color:#b9b2c4;font-size:15px;line-height:1.65}
+.back{display:inline-block;color:#d795ff;font:700 12px monospace;letter-spacing:.06em;text-transform:uppercase;text-decoration:none}
+.box{margin-top:22px;padding:20px;border-radius:18px;border:1px solid rgba(176,56,249,.35);background:linear-gradient(160deg,rgba(162,75,255,.12),rgba(162,75,255,.03))}
+.box label{display:block;font:700 11px monospace;letter-spacing:.1em;text-transform:uppercase;color:#d795ff;margin-bottom:8px}
+.box input{width:100%;box-sizing:border-box;background:#0d0a12;border:1px solid #3a2a55;border-radius:12px;padding:14px;color:#fff;font:inherit;font-size:17px}
+.box input:focus{outline:none;border-color:#a24bff}
+.btn{display:inline-block;margin-top:12px;font:700 13px monospace;letter-spacing:.04em;border:1px solid #a24bff;background:#a24bff;color:#fff;border-radius:999px;padding:12px 20px;cursor:pointer;text-decoration:none}
+.btn.ghost{background:transparent;color:#d795ff;border-color:#3a2a55}
+.btn[disabled]{opacity:.5;cursor:default}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.msg{margin-top:12px;font-size:14px;line-height:1.5}
+.ok{color:#61e970}.bad{color:#ff8a8a}
+.who{font-size:20px;font-weight:800;word-break:break-all}.who small{display:block;font:700 11px monospace;letter-spacing:.1em;text-transform:uppercase;color:#d795ff;margin-bottom:6px}
+.stat{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px}
+.stat div{padding:12px;border-radius:12px;background:rgba(0,0,0,.25);text-align:center}
+.stat b{display:block;font:800 22px monospace}.stat span{font:600 10px monospace;letter-spacing:.06em;text-transform:uppercase;color:#a79fb5}
+.sync{margin-top:12px;font-size:13px;color:#cfc8da}
+.how{margin-top:22px;display:grid;gap:10px}
+.how div{padding:14px;border-radius:14px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);font-size:13.5px;line-height:1.6;color:#b9b2c4}
+.how b{color:#fff}
+.off{margin-top:22px;padding:18px;border-radius:14px;border:1px solid rgba(255,255,255,.1);color:#b9b2c4;font-size:14px;line-height:1.6}
+.danger{margin-top:26px;padding-top:16px;border-top:1px solid rgba(255,255,255,.08)}
+.danger p{color:#9a93a6;font-size:12.5px;line-height:1.6;margin:0 0 8px}
+</style>
+</head>
+<body class="ox-page">
+<main>
+<section class="ox-wrap ac">
+  <a class="back" href="home.html">‹ Onyx Sports</a>
+  <span class="ox-eyebrow" style="display:block;margin-top:16px">Account</span>
+  <h1>Your picks,<br>every device.</h1>
+  <p class="lead">Sign in with your email and the picks you save, the players you follow and the bets you open on Onyx follow you to your phone, tablet and computer. No password: we email you a one-time link.</p>
+  <div id="acBody"><div class="off">Loading...</div></div>
+  <div class="how">
+    <div><b>What we store.</b> Your email (for the sign-in link) and the picks, players and bets you save here. Only so they follow you to your other devices. Nothing is sold or shared.</div>
+    <div><b>Signed out?</b> Everything works as before and stays on this device. Signing in later merges it into your account.</div>
+    <div><b>Leaving?</b> Delete your account any time from this page. Your email and everything synced to it are removed.</div>
+  </div>
+</section>
+</main>
+<script>
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'})[c]); }
+function count(k) { try { const a = JSON.parse(localStorage.getItem(k) || '[]'); return Array.isArray(a) ? a.length : 0; } catch (e) { return 0; } }
+function counts() {
+  const follows = ['onyxNbaFollow', 'onyxFollow_nfl', 'onyxFollow_cfb', 'onyxFollow_nhl', 'onyxFollow_tennis', 'onyxFollow_golf'].reduce((n, k) => n + count(k), 0);
+  return {picks: count('onyxSaved'), players: follows, bets: count('onyxMyBets')};
+}
+let SENT = '';
+function render() {
+  const el = document.getElementById('acBody'), A = window.OnyxAccounts;
+  if (!A) return;
+  const st = A.state();
+  if (!st.enabled) { el.innerHTML = `<div class="off">Accounts are not switched on yet. Your picks, players and bets are saved on this device, and <a class="back" href="home.html#my">My Onyx</a> shows them all.</div>`; return; }
+  if (!st.signedIn) {
+    el.innerHTML = `<div class="box">
+      <label for="acEmail">Your email</label>
+      <input id="acEmail" type="email" inputmode="email" autocomplete="email" placeholder="you@email.com" value="${esc(SENT)}">
+      <div class="row"><button class="btn" id="acSend" type="button">Email me a sign-in link</button></div>
+      <div class="msg" id="acMsg">${SENT ? `<span class="ok">Link sent to ${esc(SENT)}. Open it on this device to sign in. It works once, for an hour.</span>` : st.error ? `<span class="bad">${esc(st.error)}</span>` : ''}</div>
+    </div>`;
+    const go = async () => {
+      const i = document.getElementById('acEmail'), b = document.getElementById('acSend'), m = document.getElementById('acMsg');
+      b.disabled = true;
+      try { await A.signIn(i.value); SENT = i.value.trim(); render(); }
+      catch (e) { b.disabled = false; m.innerHTML = `<span class="bad">${esc(e && e.message ? e.message : 'Could not send the link right now. Try again in a minute.')}</span>`; }
+    };
+    document.getElementById('acSend').onclick = go;
+    document.getElementById('acEmail').onkeydown = e => { if (e.key === 'Enter') go(); };
+    return;
+  }
+  const c = counts(), ago = st.last ? Math.max(0, Math.round((Date.now() - st.last) / 60000)) : null;
+  const sync = st.syncing ? 'Syncing...' : st.error ? `<span class="bad">${esc(st.error)}</span>` : ago == null ? 'Syncing...' : `<span class="ok">Synced</span> ${ago < 1 ? 'just now' : ago + ' min ago'} · syncs every minute and whenever you save something`;
+  el.innerHTML = `<div class="box">
+    <div class="who"><small>Signed in as</small>${esc(st.email || '')}</div>
+    <div class="stat"><div><b>${c.picks}</b><span>Saved picks</span></div><div><b>${c.players}</b><span>Players</span></div><div><b>${c.bets}</b><span>My bets</span></div></div>
+    <div class="sync">${sync}</div>
+    <div class="row"><a class="btn" href="home.html#my">Go to My Onyx</a><button class="btn ghost" type="button" id="acSync">Sync now</button><button class="btn ghost" type="button" id="acOut">Sign out</button></div>
+    <div class="danger"><p>Delete your account: your email and everything synced to it are removed. This device keeps its own picks.</p><button class="btn ghost" type="button" id="acDel">Delete my account</button></div>
+  </div>`;
+  document.getElementById('acSync').onclick = () => A.sync();
+  document.getElementById('acOut').onclick = () => { SENT = ''; A.signOut(); };
+  document.getElementById('acDel').onclick = async () => {
+    if (!confirm('Delete your Onyx account? Your email and everything synced to it are removed. This device keeps its own picks.')) return;
+    try { await A.deleteAccount(); SENT = ''; } catch (e) { alert('Could not delete the account right now. Try again in a minute.'); }
+  };
+}
+addEventListener('onyx-account', render);
+addEventListener('onyx-saved', render);
+(window.OnyxAccounts ? OnyxAccounts.ready : Promise.resolve()).then(render);
+setInterval(() => { if (!document.hidden) render(); }, 30000);
+</script>
+</body>
+</html>

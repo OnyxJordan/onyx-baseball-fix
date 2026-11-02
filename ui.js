@@ -17,12 +17,12 @@
    Site differences live in SITES below. Nothing here throws if a page
    function is missing: every hook is guarded. */
 // a sign-in link that landed on any page but My Onyx (Supabase sends people to the Site URL, the
-// MLB front page, when the link's own address is not on its allow list): carry it to My Onyx,
-// where accounts.js finishes signing in
+// MLB front page, when the link's own address is not on its allow list): carry it to the
+// Account page, where accounts.js finishes signing in
 (function () {
   try {
-    if (/(^|[#&])(access_token|error_description|error_code)=/.test(location.hash) && !/home\.html$/.test(location.pathname))
-      location.replace(location.pathname.replace(/[^\/]*$/, '') + 'home.html' + location.hash);
+    if (/(^|[#&])(access_token|error_description|error_code)=/.test(location.hash) && !/(home|account)\.html$/.test(location.pathname))
+      location.replace(location.pathname.replace(/[^\/]*$/, '') + 'account.html' + location.hash);
   } catch (e) {}
 })();
 
@@ -307,6 +307,7 @@
       }).join('') + '</div>' +
       '<div class="oacts">' +
       '<a class="oact ox-all" href="home.html#my">' + OX_MARK + 'My Onyx: players and bets</a>' +
+      '<a class="oact ox-all" href="account.html">' + OX_MARK + 'Account: sign in, sync every device</a>' +
       '<a class="oact ox-all" href="home.html">' + OX_MARK + 'All Onyx sports</a>' +
       '<button class="oact pri" data-act="slip">' + svg('slip') + 'Parlay builder</button>' +
       '<button class="oact" data-act="share">' + svg('share') + 'Share Onyx</button>' +

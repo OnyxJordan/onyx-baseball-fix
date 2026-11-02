@@ -87,14 +87,16 @@ const BASE = 'http://127.0.0.1:' + site.address().port;
   await pg.context().close();
 
   CFG = { url: SB, anon: 'anon-key' };
-  // 2 sign in form
+  // 2 sign in: the home header and My Onyx point to the Account page, which sends the link
   pg = await device();
   await open(pg);
-  ok(!(await pg.$eval('#acct', e => e.hidden)) && /one-time link/.test(await pg.$eval('#acct', e => e.innerText)), 'signed out: the card offers email sign-in');
-  await pg.fill('#acctEmail', 'jordan@example.com'); await pg.click('#acct button'); await pg.waitForTimeout(300);
-  ok(DB.otp.length === 1 && DB.otp[0].email === 'jordan@example.com' && /home\.html$/.test(DB.otp[0].redirect), 'sign in: magic link requested, back to home.html');
-  ok(/Check your email/.test(await pg.$eval('#acct', e => e.innerText)), 'sign in: tells them to check their email');
-  if (process.env.SHOT) await (await pg.$('#acct')).screenshot({path: path.join(process.env.SHOT, 'acct_signed_out.png')});
+  ok(!(await pg.$eval('#acct', e => e.hidden)) && /Sign in/.test(await pg.$eval('#acct', e => e.innerText)), 'signed out: My Onyx offers sign-in');
+  ok(!(await pg.$eval('#acctNav', e => e.hidden)) && (await pg.$eval('#acctNav', e => e.textContent)) === 'Sign in', 'signed out: the home header has a Sign in link');
+  await pg.click('#acct a.acct-go'); await pg.waitForURL(/account\.html/); await pg.waitForFunction(() => window.OnyxAccounts); await pg.evaluate(() => OnyxAccounts.ready); await pg.waitForTimeout(300);
+  await pg.fill('#acEmail', 'jordan@example.com'); await pg.click('#acSend'); await pg.waitForTimeout(400);
+  ok(DB.otp.length === 1 && DB.otp[0].email === 'jordan@example.com' && /account\.html$/.test(DB.otp[0].redirect), 'Account page: magic link requested, back to account.html');
+  ok(/Link sent to jordan@example.com/.test(await pg.$eval('#acBody', e => e.innerText)), 'Account page: tells them the link is on its way');
+  if (process.env.SHOT) await (await pg.$('main')).screenshot({path: path.join(process.env.SHOT, 'account_page_sent.png')});
   await pg.context().close();
 
   // 3 device A: first sign-in merges its lists into the account
@@ -106,22 +108,23 @@ const BASE = 'http://127.0.0.1:' + site.address().port;
   ok(Object.keys(R().followed_players || {}).sort().join() === 'nba|1628983,nfl|4241', 'device A: followed players (NBA and NFL) reached the account');
   ok(Object.keys(R().bets || {}).join() === 'sel-a', 'device A: My bets reached the account');
   if (process.env.SHOT) await (await A.$('#acct')).screenshot({path: path.join(process.env.SHOT, 'acct_signed_in.png')});
-  ok(/Signed in as jordan@example.com/.test(await A.$eval('#acct', e => e.innerText)) && !/access_token/.test(A.url()), 'device A: card says signed in; the link tokens are cleared from the address');
+  ok(/Signed in as jordan@example.com/.test(await A.$eval('#acct', e => e.innerText)) && !/access_token/.test(A.url()) && (await A.$eval('#acctNav', e => e.textContent)) === 'Account', 'device A: My Onyx and the header say signed in; the link tokens are cleared from the address');
 
   // 3b a link that lands on another page (Supabase's Site URL is the MLB front page) still signs in
   for (const pageName of ['index.html', 'nfl.html']) {
     const X = await device();
     await X.goto(BASE + '/' + pageName + land('jordan@example.com'), { waitUntil: 'domcontentloaded' });
-    await X.waitForURL(/home\.html/, { timeout: 15000 }).catch(() => {});
+    await X.waitForURL(/account\.html/, { timeout: 15000 }).catch(() => {});
     await X.waitForFunction(() => window.OnyxAccounts, null, { timeout: 15000 }).catch(() => {});
-    if (/home\.html/.test(X.url())) { await X.evaluate(() => OnyxAccounts.ready); await X.waitForTimeout(400); }
-    ok(/home\.html/.test(X.url()) && /Signed in as jordan@example.com/.test(await X.$eval('#acct', e => e.innerText).catch(() => '')), `a sign-in link landing on ${pageName} carries on to My Onyx and signs in`);
+    if (/account\.html/.test(X.url())) { await X.evaluate(() => OnyxAccounts.ready); await X.waitForTimeout(500); }
+    ok(/account\.html/.test(X.url()) && /jordan@example.com/.test(await X.$eval('#acBody', e => e.innerText).catch(() => '')), `a sign-in link landing on ${pageName} carries on to the Account page and signs in`);
     await X.context().close();
   }
   // 3c an expired or already-used link says so on the card
   const E = await device();
-  await open(E, '#error=access_denied&error_code=otp_expired&error_description=Email+link+is+invalid+or+has+expired');
-  ok(/expired or was already used/.test(await E.$eval('#acct', e => e.innerText)), 'an expired link: the card says so and offers a new one');
+  await E.goto(BASE + '/account.html#error=access_denied&error_code=otp_expired&error_description=Email+link+is+invalid+or+has+expired', { waitUntil: 'domcontentloaded' });
+  await E.evaluate(() => OnyxAccounts.ready); await E.waitForTimeout(300);
+  ok(/expired or was already used/.test(await E.$eval('#acBody', e => e.innerText)), 'an expired link: the Account page says so and offers a new one');
   await E.context().close();
 
   // 4 device B with its own pick: both end with the union
@@ -153,9 +156,13 @@ const BASE = 'http://127.0.0.1:' + site.address().port;
 
   // 8 sign out keeps the device's lists; delete account empties it
   await A.evaluate(() => OnyxAccounts.signOut()); await A.waitForTimeout(200);
-  ok(!(await ls(A, 'onyxSession')) && (await ls(A, 'onyxSaved')).length === 1 && /one-time link/.test(await A.$eval('#acct', e => e.innerText)), 'sign out: signed out, this device keeps its picks');
+  ok(!(await ls(A, 'onyxSession')) && (await ls(A, 'onyxSaved')).length === 1 && /Sign in/.test(await A.$eval('#acct', e => e.innerText)), 'sign out: signed out, this device keeps its picks');
   B.on('dialog', d => d.accept());
-  await B.evaluate(() => acctDelete()); await B.waitForTimeout(300);
+  await B.goto(BASE + '/account.html', { waitUntil: 'domcontentloaded' }); await B.evaluate(() => OnyxAccounts.ready); await B.waitForTimeout(400);
+  const acTxt = await B.$eval('#acBody', e => e.innerText).catch(() => '');
+  ok(/Signed in as/i.test(acTxt) && /Saved picks/i.test(acTxt), 'Account page: signed in, with what is synced' + (/Signed in as/i.test(acTxt) ? '' : ': ' + acTxt.replace(/\s+/g, ' ').slice(0, 160)));
+  if (process.env.SHOT) await (await B.$('main')).screenshot({path: path.join(process.env.SHOT, 'account_page_in.png')});
+  await B.click('#acDel'); await B.waitForTimeout(500);
   const left = DB.rows[J] || {};
   ok(!Object.values(left).some(t => Object.keys(t || {}).length) && !(await ls(B, 'onyxSession')), 'delete account: the account is emptied and the device signed out' + (Object.keys(left).length ? ' ' + JSON.stringify(Object.fromEntries(Object.entries(left).map(([k, v]) => [k, Object.keys(v)]))) : ''));
 
