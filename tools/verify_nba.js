@@ -4,7 +4,9 @@
  * pipeline). Same rules as verify_shell.js: tabs are switched via gotoTab(),
  * every off-origin request is aborted, and the page fails on any uncaught
  * error or 'undefined' / 'NaN' / '[object Object]' in rendered text. Runs at
- * phone and desktop widths, and opens one player drawer and one team card (cards.js).
+ * phone and desktop widths, and opens one player drawer and one team card (cards.js). The team
+ * card's Bets tab (11/2): ranked best value first, badged, an honest Best bet, a game line's bet
+ * card scrubbed and snapped (BETS_CHECK), and a player prop row opening nba.html's own bet card.
  *
  *   python3 -B nba_build.py && node tools/verify_nba.js
  */
@@ -18,6 +20,52 @@ const CHROMIUM = process.env.PW_CHROMIUM
 const TABS = ['home', 'plays', 'games', 'board', 'scorers', 'depth', 'record', 'model'];
 const PORT = Number(process.env.PROBE_PORT || 8902);
 const ROOT = process.argv[2] || process.cwd();
+
+// the open card's Bets tab (cards.js, 11/2): ranked best value first, an Onyx Pick / Projection
+// badge on every row, an honest "Best bet", and a row's full bet card: chart, slider (the numbers
+// move between lines, release snaps to Onyx's line), Over / Under, Add to parlay, Bet on Onyx
+const BETS_CHECK = async (wantPlayer) => {
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const face = document.getElementById('cxFace'), bad = [], $ = id => document.getElementById(id);
+  const R = OXC._rows();
+  if (!R.length) return 'no rows';
+  if (!face.querySelector('.bc-best')) bad.push('no Best bet summary');
+  if (face.querySelectorAll('.cx-bdg').length < Math.min(R.length, 25)) bad.push('rows without an Onyx Pick / Projection badge');
+  for (let i = 1; i < R.length; i++) {
+    const a = R[i - 1], b = R[i];
+    if (b.rank < a.rank || (b.rank === a.rank && a.rank <= 2 && a.ev != null && b.ev != null && b.ev > a.ev + 1e-9)) { bad.push('not best value first at ' + b.lab); break; }
+  }
+  const bv = face.querySelector('.bc-best .bv');
+  if (bv && /-\$/.test(bv.innerText)) bad.push('a negative play headlined as the best bet');
+  const r = R.find(x => x.player === wantPlayer && x.dist && !x.nba) || R.find(x => x.dist && !x.nba);
+  if (!r) return bad.join(', ') || 'ok (no charted row)';
+  let btn = () => face.querySelector('.cx-bbr[data-k="' + CSS.escape(r.key) + '"]');
+  if (!btn() && face.querySelector('[data-cx="more"]')) { face.querySelector('[data-cx="more"]').click(); await sleep(60); }
+  if (!btn()) return 'row ' + r.lab + ' not listed';
+  if (!btn().closest('.cx-bb').classList.contains('open')) { btn().click(); await sleep(150); }
+  const rg = $('cxRange');
+  if (!rg || !$('cxDist') || !btn().closest('.cx-bb').contains(rg)) return 'row ' + r.lab + ' opened without its chart and slider';
+  const s0 = $('cxStats').innerText, b0 = $('cxBig').innerText;
+  if (!/Onyx/i.test($('cxPrice').innerText)) bad.push('bet card not on an Onyx line');
+  rg.value = +rg.min === +rg.value ? rg.max : rg.min; rg.dispatchEvent(new Event('input', {bubbles: true}));
+  if ($('cxRange') !== rg) bad.push('slider rebuilt mid-drag');
+  if ($('cxBig').innerText === b0) bad.push('slider did not move the line');
+  if ($('cxStats').innerText === s0) bad.push('numbers did not update off the line');
+  if (!/not offered/i.test($('cxPrice').innerText)) bad.push('between lines but shows a price');
+  const th = face.querySelector('.cx-thumb'), mk = face.querySelector('.cx-mark');
+  if (th && mk) { const a = th.getBoundingClientRect(), m = mk.getBoundingClientRect(), gap = Math.abs(a.left + a.width / 2 - (m.left + m.width / 2)); if (gap > 3) bad.push('slider thumb ' + gap.toFixed(0) + 'px from the chart line'); }
+  if (/\bundefined\b|\bNaN\b|\[object Object\]/.test(face.innerText)) bad.push('undefined/NaN while scrubbing');
+  rg.dispatchEvent(new Event('change', {bubbles: true}));
+  await sleep(40);
+  if (!/Onyx/i.test($('cxPrice').innerText) || $('cxBig').innerText !== b0) bad.push('release did not snap back to the Onyx line');
+  const other = [...face.querySelectorAll('#cxSide button')].find(b => !b.classList.contains('on'));
+  if (other && $('cxSide').style.display !== 'none') { other.click(); await sleep(20); if ($('cxBig').innerText === b0 && !/Yes|No/.test(other.innerText)) bad.push('Over / Under did not switch'); }
+  if (/\bundefined\b|\bNaN\b|\[object Object\]/.test(face.innerText)) bad.push('undefined/NaN in the bet card');
+  const bet = $('cxBet');
+  if (!bet || !$('cxAdd')) bad.push('no Add to parlay / Bet on Onyx');
+  else if (!bet.disabled) { const o = window.open; let u = ''; window.open = x => { u = x; return null; }; bet.click(); window.open = o; if (!/app\.onyxodds\.com\/share\?selection=.+referrer=KR680261/.test(u)) bad.push('Bet on Onyx link: ' + u); }
+  return bad.join(', ') || 'ok (' + R.length + ' rows, opened ' + r.lab + ')';
+};
 
 function serve(rootDir) {
   const server = http.createServer((req, res) => {
@@ -143,9 +191,36 @@ function serve(rootDir) {
         const r1 = await page.evaluate(() => /Why this number/i.test(document.getElementById('cx').innerText) && /Team history/i.test(document.getElementById('cx').innerText)) ? await chk() : 'missing sections';
         const after = await page.evaluate(() => typeof gcSel !== 'undefined' ? gcSel : null);
         let r2 = '';
-        if (await page.$('#cx .pc-seg button:nth-child(2)')) { await page.click('#cx .pc-seg button:nth-child(2)'); await page.waitForTimeout(150); r2 = await chk(); }
+        let r3 = '', r4 = '';
+        if (await page.$('#cx .pc-seg button:nth-child(2)')) {
+          await page.click('#cx .pc-seg button:nth-child(2)'); await page.waitForTimeout(150); r2 = await chk();
+          // the Bets tab: ranked, badged, an honest Best bet, a game line's bet card (1st-quarter total)
+          const b3 = await page.evaluate(BETS_CHECK, false);
+          if (!b3.startsWith('ok')) r3 = b3; else r2 = r2 || await chk();
+          // a player prop row opens nba.html's own bet card on that line and side, above the team
+          // card, and closing it leaves the team card open (and the page still locked)
+          r4 = await page.evaluate(async () => {
+            const R = OXC._rows(), r = R.find(x => x.nba);
+            if (!r) return '';
+            const face = document.getElementById('cxFace');
+            if (!face.querySelector('.cx-bbr[data-k="' + CSS.escape(r.key) + '"]') && face.querySelector('[data-cx="more"]')) face.querySelector('[data-cx="more"]').click();
+            const b = face.querySelector('.cx-bbr[data-k="' + CSS.escape(r.key) + '"]');
+            if (!b) return 'prop row not listed';
+            b.click(); await new Promise(z => setTimeout(z, 350));
+            const pc = document.getElementById('pc');
+            if (!pc || !pc.classList.contains('open') || pc.dataset.face !== 'back') return 'prop row did not open the bet card';
+            if (+getComputedStyle(pc).zIndex <= +getComputedStyle(document.getElementById('cx')).zIndex) return 'bet card opened under the team card';
+            const big = document.getElementById('bcBig').innerText, want = r.lab.replace(/^.*?(Over|Under) /, '$1 ');
+            if (!/Double|Triple/.test(r.lab) && big.split(' ').slice(0, 2).join(' ') !== want.split(' ').slice(0, 2).join(' ')) return 'bet card on ' + big + ', row was ' + r.lab;
+            if (/\bundefined\b|\bNaN\b/.test(document.getElementById('pcBack').innerText)) return 'bad bet card text';
+            pcClose(); await new Promise(z => setTimeout(z, 100));
+            if (!document.getElementById('cx').classList.contains('open')) return 'closing the bet card closed the team card';
+            if (document.body.style.overflow !== 'hidden') return 'page unlocked under the team card';
+            return '';
+          });
+        }
         await page.evaluate(() => OXC.close());
-        tc = [r1 && 'team ' + r1, r2 && 'bets ' + r2, after !== before && 'the tap also opened the gamecenter'].filter(Boolean).join('; ') || `ok (${t})`;
+        tc = [r1 && 'team ' + r1, r2 && 'bets ' + r2, r3 && 'bet card ' + r3, r4 && 'prop row ' + r4, after !== before && 'the tap also opened the gamecenter'].filter(Boolean).join('; ') || `ok (${t}, best bets ranked, bet cards open)`;
       }
     }
     console.log(`  ${tc.startsWith('ok') || tc === 'no cards data' ? 'ok  ' : 'FAIL'} team card ${tc}`);

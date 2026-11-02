@@ -15,6 +15,7 @@
 <meta name="description" content="Projected minutes, points, rebounds, assists and threes for every Division I men's basketball player: depth charts, transfers, freshmen and this season's numbers.">
 <link rel="stylesheet" href="onyx.css">
 <script src="onyx.js" defer></script>
+<script src="ui.js" defer></script>
 <script src="saved.js"></script>
 <style>
 body{background:#0c0c0c;color:#fff;margin:0}
@@ -116,11 +117,26 @@ function stats(p) {
   const pr = p.proj || {};
   return `<span class="st">${(D.stats || []).map(s => `<span>${f1(pr[s])}<i>${LBL[s] || esc(s)}</i></span>`).join('')}</span>`;
 }
+// follow a player (the same list and button as the College Basketball page's depth chart): his live line in My Onyx
+const FKEY = 'onyxFollow_cbb';
+function follows() { try { const a = JSON.parse(localStorage.getItem(FKEY) || '[]'); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
+function isF(id) { return follows().some(f => f.id === String(id)); }
+function toggleF(id, name, btn) {
+  id = String(id);
+  const on = !isF(id), a = on ? follows().concat([{id, name, gid: ''}]) : follows().filter(f => f.id !== id);
+  try { localStorage.setItem(FKEY, JSON.stringify(a)); } catch (e) {}
+  if (window.OX_TOAST) OX_TOAST(on ? `Following ${name}: live alerts on` : `Stopped following ${name}`, {rm: !on});
+  if (btn) { btn.classList.toggle('on', on); btn.textContent = on ? '★ Following' : '☆ Follow'; }
+}
+function followBtn(p) {
+  if (!p.id) return '';
+  return `<button class="fl-btn${isF(p.id) ? ' on' : ''}" style="margin-left:8px;padding:3px 9px;vertical-align:1px" onclick="event.stopPropagation();toggleF('${esc(p.id)}','${esc(String(p.n).replace(/'/g, ''))}',this)">${isF(p.id) ? '★ Following' : '☆ Follow'}</button>`;
+}
 function row(p, team) {
   const n = p.now;
   const now = n ? ` · this season ${n.gp} g, ${n.use} min${n.pts != null ? ', ' + n.pts + ' pts' : ''}` : '';
   return `<div class="pr ${esc(p.role)}">${p.hs ? `<img src="${HS(p.id)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">` : '<span class="ph"></span>'}
-    <span class="n">${esc(p.n)}<small>${esc([team, p.pos, p.cls, p.ht].filter(Boolean).join(' · '))}</small></span>
+    <span class="n">${esc(p.n)}${followBtn(p)}<small>${esc([team, p.pos, p.cls, p.ht].filter(Boolean).join(' · '))}</small></span>
     <span class="m">${tags(p)}<br>${last(p)}${now}</span>
     <span class="mp"><b>${f1(p.use)}</b><span>min / game</span></span>${stats(p)}</div>`;
 }

@@ -29,9 +29,19 @@
 (function () {
   'use strict';
   var IS_NBA = /nba\.html/.test(location.pathname) || typeof NBA_DATA !== 'undefined';
+  // the Onyx Sports pages that are not a sport site (the hub, Onyx Picks, Account, How it
+  // works, the scorecard, the college basketball depth charts): no sport header of their own,
+  // so this file gives them the standard one (11/2, "one experience across the board").
+  // The hub keeps its own onyxodds.com header and gets the shared controls in it.
+  var FILE = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
+  var PAGE_KEYS = {'home.html': ['home', 'Sports'], 'picks.html': ['picks', 'Picks'], 'account.html': ['account', 'Account'],
+                   'how.html': ['how', 'How it works'], 'scorecard.html': ['scorecard', 'Scorecard'], 'cbb-players.html': ['cbbp', 'College Basketball']};
+  var IS_PAGE = !window.OX_SITE && !IS_NBA && !document.querySelector('nav.nav');
+  var PAGE = IS_PAGE ? (PAGE_KEYS[FILE] || ['page', 'Sports']) : null;
+  var IS_HUB = IS_PAGE && !!document.querySelector('.ox-head .ox-acts');
   // every Onyx Sports page: the sport pages built from sport_shell.html set
   // window.OX_SITE before this script runs; MLB and NBA are detected
-  var SITE = window.OX_SITE || (IS_NBA ? 'nba' : 'mlb');
+  var SITE = window.OX_SITE || (IS_NBA ? 'nba' : IS_PAGE ? 'page' : 'mlb');
   // ranked by daily importance (10/31): NFL, NBA, NHL, Golf, Tennis, College Football, College Basketball (11/2), MLB
   var ALL = [['nfl', 'NFL', 'nfl.html', 'NFL'], ['nba', 'NBA', 'nba.html', 'Basketball'], ['nhl', 'NHL', 'nhl.html', 'NHL'],
              ['golf', 'Golf', 'golf.html', 'Golf'], ['tennis', 'Tennis', 'tennis.html', 'Tennis'],
@@ -67,6 +77,7 @@
     share: '<path d="M8 2v8M5 5l3-3 3 3"/><path d="M3 9v4h10V9"/>',
     spark: '<path d="M8 1v4M8 11v4M1 8h4M11 8h4M3 3l2.5 2.5M10.5 10.5L13 13M13 3l-2.5 2.5M5.5 10.5L3 13"/>',
     x: '<path d="M4 4l8 8M12 4l-8 8"/>',
+    user: '<circle cx="8" cy="5.5" r="2.8"/><path d="M2.5 14c.8-3 3-4.5 5.5-4.5s4.7 1.5 5.5 4.5"/>',
   };
   function svg(k, cls) { return '<svg class="' + (cls || 'oi') + '" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (I[k] || '') + '</svg>'; }
 
@@ -110,7 +121,20 @@
              ['board', 'Onyx Board', 'board', 'Every Onyx line'], ['plays', 'Plays', 'plays', 'Model leans and picks'],
              ['model', 'Model', 'model', 'How it works, what is tested']]};
   });
+  // the pages that are not a sport site: every entry is a link (5th field), '@my' opens My picks
+  SITES.page = {name: PAGE ? PAGE[1] : 'Sports',
+    bar: [['home', 'Home', 'home', 0, 'home.html'], ['picks', 'Picks', 'plays', 0, 'picks.html'], ['live', 'Live', 'games', 1, 'home.html#live'], ['@my', 'My picks', 'star']],
+    tabs: [['home', 'Onyx Sports', 'home', 'Every sport, tonight at a glance', 'home.html'],
+           ['picks', 'Onyx Picks', 'plays', "Today's card and the record", 'picks.html'],
+           ['ask', 'Ask Onyx', 'search', 'Plays or a parlay, built for you', 'home.html#ask'],
+           ['top10', "Today's top 10", 'trophy', 'Our favorite plays today', 'home.html#top10'],
+           ['live', 'Live now', 'games', 'Every game in play', 'home.html#live'],
+           ['account', 'Account', 'user', 'Sign in, your record', 'account.html'],
+           ['scorecard', 'Scorecard', 'record', 'Every lane, graded', 'scorecard.html'],
+           ['lab', 'Rules lab', 'ranks', 'Test any rule', 'scorecard.html#lab'],
+           ['how', 'How it works', 'model', 'Every model, explained', 'how.html']]};
   var S = SITES[SITE] || SITES.mlb;
+  function goLink(href) { if (href) location.href = href; }
 
   function el(tag, cls, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
   function buzz() { try { navigator.vibrate && navigator.vibrate(8); } catch (e) {} }
@@ -148,7 +172,7 @@
   var CSS = [
     ':root{--sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px)}',
     '.oi{width:18px;height:18px;flex-shrink:0}',
-    '.ogrid[hidden],.ores[hidden]{display:none!important}',
+    '.ogrid[hidden],.ores[hidden],.oact[hidden]{display:none!important}',
     /* bottom bar */
     '.obar{display:none}',
     '@media (max-width:760px){',
@@ -237,6 +261,72 @@
     '.osbtn .oi{width:15px;height:15px}',
     '@media (max-width:760px){.osbtn{display:none}}',
     '@media (max-width:760px){.opill{display:inline-flex}.opill a{padding:5px 10px;font-size:10px}}',
+    /* the shared header controls (11/2): My picks and Account, one component on every page */
+    '.ox-hctl{display:inline-flex;align-items:center;gap:6px;flex-shrink:0}',
+    '.ox-mypk,.ox-acct{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:7px;height:34px;padding:0 11px;margin:0;box-sizing:border-box;',
+    'border-radius:9px;border:1px solid var(--ox-stroke,#2f2f2f);background:rgba(255,255,255,.03);color:var(--ox-white,#fcfcfc);',
+    'font:500 11px/1 var(--ox-mono,ui-monospace,monospace);letter-spacing:.06em;text-transform:uppercase;text-decoration:none;white-space:nowrap;cursor:pointer;flex-shrink:0;',
+    '-webkit-tap-highlight-color:transparent;transition:border-color .15s,color .15s}',
+    '.ox-mypk:hover,.ox-acct:hover{border-color:var(--ox-purple,#b038f9)}',
+    '.ox-mypk .oi,.ox-acct .oi{width:15px;height:15px}.ox-mypk .oi{color:var(--ox-lilac,#d795ff)}.ox-acct .oi{color:var(--ox-lilac,#d795ff)}',
+    '.ox-mypk b{min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--ox-purple,#b038f9);color:#fff;font:700 10.5px/18px var(--ox-mono,monospace);text-align:center;letter-spacing:0;box-sizing:border-box}',
+    '.ox-mypk b[hidden]{display:none}',
+    '.ox-acct i{display:none;width:7px;height:7px;border-radius:50%;background:#61e970;box-shadow:0 0 8px rgba(97,233,112,.8)}',
+    '.ox-acct.in{border-color:rgba(176,56,249,.6)}.ox-acct.in i{display:block}',
+    '@media (max-width:1099px){.ox-mypk,.ox-acct{width:34px;padding:0}.ox-mypk>span,.ox-acct>span{display:none}',
+    '.ox-mypk b{position:absolute;top:-7px;right:-7px;min-width:17px;height:17px;line-height:17px;font-size:10px;padding:0 4px;box-shadow:0 0 0 2px #0c0c0c}',
+    '.ox-acct i{position:absolute;top:5px;right:5px}}',
+    '@media (max-width:374px){.opill{display:none!important}}',
+    /* a header that does not fit (fitHeader): the tab row scrolls; if it still does not fit,
+       the controls go icon-only and the phone sport pill steps aside (it is in the menu too) */
+    '.nav.ox-scroll .nav-tabs{flex:1 1 0;min-width:0;overflow-x:auto;scrollbar-width:none;-webkit-mask:linear-gradient(90deg,#000 90%,transparent);mask:linear-gradient(90deg,#000 90%,transparent)}',
+    '.nav.ox-scroll .nav-tabs::-webkit-scrollbar{display:none}.nav.ox-scroll .nav-tab{flex-shrink:0}.nav.ox-scroll .nav-right{flex-shrink:0}',
+    '.nav.ox-tight .opill{display:none!important}',
+    '.nav.ox-tight .ox-mypk,.nav.ox-tight .ox-acct{width:34px;padding:0}.nav.ox-tight .ox-mypk>span,.nav.ox-tight .ox-acct>span{display:none}',
+    '.nav.ox-tight .ox-mypk b{position:absolute;top:-7px;right:-7px;min-width:17px;height:17px;line-height:17px;font-size:10px;padding:0 4px;box-shadow:0 0 0 2px #0c0c0c}',
+    '.nav.ox-tight .ox-acct i{position:absolute;top:5px;right:5px}',
+    /* the hub header (home.html) keeps its own look: the controls sit at its right end */
+    '.ox-acts .ox-hctl{margin-left:-6px}',
+    '.ox-page .ox-hub{color:var(--ox-purple,#b038f9)}',
+    '@media (max-width:760px){.ox-acts{gap:8px}.ox-acts .ox-hctl{margin-left:0}}',
+    /* the standard Onyx Sports header for pages that are not a sport site (picks, account, ...):
+       the sport pages\' header, rebuilt here because those pages do not carry the sport stylesheet */
+    '.nav.ox-stdnav{height:calc(58px + var(--sat));padding:var(--sat) 20px 0;display:flex;align-items:center;gap:0;box-sizing:border-box;width:100%;',
+    'background:rgba(12,12,12,.92);border-bottom:1px solid rgba(255,255,255,.06);position:sticky;top:0;z-index:200;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);',
+    'box-shadow:0 1px 0 rgba(255,255,255,.03),0 4px 32px rgba(0,0,0,.5);font-family:"Space Grotesk",system-ui,sans-serif;color:#fff}',
+    '.ox-stdnav .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0;margin-right:28px;color:#fff}',
+    '.ox-stdnav .logo-svg{width:34px;height:34px;flex-shrink:0}.ox-stdnav .logo-words{line-height:1}',
+    '.ox-stdnav .logo-onyx{font-size:16px;font-weight:800;letter-spacing:.06em;color:#fff}',
+    '.ox-stdnav .logo-sub{font-size:9px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:#d795ff;margin-top:1px;white-space:nowrap}',
+    '.ox-stdnav .nav-tabs{display:flex;flex:1 1 0;min-width:0;overflow-x:auto;scrollbar-width:none}.ox-stdnav .nav-tabs::-webkit-scrollbar{display:none}',
+    '.nav.ox-stdnav .nav-tabs>a.nav-tab[href]{display:flex!important}',
+    '.ox-stdnav .nav-tab{height:58px;display:flex;align-items:center;padding:0 14px;color:var(--text3,#8a8a99);border-bottom:2px solid transparent;white-space:nowrap;text-decoration:none;flex-shrink:0;box-sizing:border-box}',
+    '.ox-stdnav .nav-tab:hover{color:#ddd}.ox-stdnav .nav-tab.active{color:#fff;border-bottom-color:#b038f9}',
+    '.ox-stdnav .nav-right{margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0;padding-left:10px}',
+    '.ox-stdnav .nav-hamburger{display:none;align-items:center;justify-content:center;width:40px;height:40px;border-radius:8px;background:none;border:1px solid rgba(255,255,255,.12);color:#ccc;cursor:pointer;flex-shrink:0;padding:0}',
+    '.ox-stdnav .nav-hamburger svg{width:18px;height:18px}',
+    '@media (max-width:760px){.nav.ox-stdnav{height:calc(50px + var(--sat));padding-left:14px;padding-right:14px}.ox-stdnav .nav-tabs{display:none}',
+    '.ox-stdnav .nav-hamburger{display:flex;width:36px;height:36px}.ox-stdnav .logo-svg{width:28px;height:28px}.ox-stdnav .logo-onyx{font-size:14px}.ox-stdnav .nav-logo{margin-right:0;min-width:0}.ox-stdnav .nav-right{gap:6px}}',
+    /* follow a player: one button everywhere (sport pages, the NBA card, team and player cards, depth charts) */
+    '.fl-btn{background:none;border:1px solid var(--border2,rgba(255,255,255,.14));border-radius:999px;color:var(--text2,#cfc8da);font:700 11px monospace;padding:6px 11px;cursor:pointer;white-space:nowrap}',
+    '.fl-btn.on{border-color:#b038f9;color:#d795ff;background:rgba(176,56,249,.12)}',
+    /* My picks: the tracker, one slide-over on every page */
+    '.otrk-sum{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);font-size:12.5px;line-height:1.45;color:var(--text3,#b9b2c4);margin-bottom:10px}',
+    '.otrk-sum b{color:#fff}.otrk-sum a{margin-left:auto;color:#d795ff;font-weight:700;text-decoration:none;white-space:nowrap}',
+    '.otrk-rec{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-bottom:12px}',
+    '.otrk-rec div{padding:9px 4px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);text-align:center;min-width:0}',
+    '.otrk-rec b{display:block;font:800 15px monospace;color:#fff}.otrk-rec b.up{color:#61e970}.otrk-rec b.dn{color:#ff8a8a}',
+    '.otrk-rec span{display:block;font:600 9px monospace;letter-spacing:.06em;text-transform:uppercase;color:#8a8399;margin-top:3px}',
+    '.otrk-h{font:700 10px monospace;letter-spacing:.12em;text-transform:uppercase;color:#d795ff;margin:4px 2px 8px}',
+    '.otrk-list{display:flex;flex-direction:column;gap:6px}',
+    '.otrk-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);color:#fff;text-decoration:none;min-width:0}',
+    '.otrk-row.live{border-color:rgba(176,56,249,.5);background:rgba(176,56,249,.07)}',
+    '.otrk-w{flex:1;min-width:0}.otrk-w b{display:block;font-size:13.5px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
+    '.otrk-w span{display:block;font:600 11px monospace;color:#8a8399;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
+    '.otrk-s{text-align:right;flex-shrink:0}.otrk-s em{display:inline-block;font:800 10px monospace;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:999px;background:rgba(255,255,255,.08);color:#cfc8da;font-style:normal}',
+    '.otrk-s em.w{background:rgba(97,233,112,.16);color:#61e970}.otrk-s em.l{background:rgba(255,138,138,.14);color:#ff8a8a}.otrk-s em.live{background:rgba(176,56,249,.22);color:#d795ff}',
+    '.otrk-s small{display:block;font:700 11px monospace;color:#cfc8da;margin-top:4px}',
+    '.otrk-empty{padding:14px;border-radius:12px;border:1px dashed rgba(255,255,255,.16);color:var(--text3,#b9b2c4);font-size:13px;line-height:1.55}',
     '.pane.active{animation:oPane .28s cubic-bezier(.2,.9,.25,1)}',
     '@keyframes oPane{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}',
     'button,.nav-tab,.sb-card,.score-game,.leg-chip{-webkit-tap-highlight-color:transparent}',
@@ -268,7 +358,9 @@
       btn.dataset.tab = b[0];
       btn.addEventListener('click', function () {
         buzz();
+        if (b[0] === '@my') { openPicks(); return; }
         if (current === b[0]) { window.scrollTo({top: 0, behavior: reduce ? 'auto' : 'smooth'}); return; }
+        if (b[4]) { goLink(b[4]); return; }
         go(b[0]);
       });
       bar.appendChild(btn);
@@ -301,30 +393,34 @@
       '<div class="osheet-grip"></div>' +
       '<div class="osheet-head"><div class="osheet-title">Onyx ' + S.name + '</div>' + seg +
       '<button class="osheet-x" aria-label="Close menu">' + svg('x') + '</button></div>' +
-      '<label class="osearch">' + svg('search') + '<input type="search" placeholder="Search pages' + (SITE === 'nba' ? ', players' : SITE === 'mlb' ? ', hitters' : ', teams, players') + '" aria-label="Search" autocomplete="off"><kbd>/</kbd></label>' +
+      '<label class="osearch">' + svg('search') + '<input type="search" placeholder="Search pages' + (SITE === 'nba' ? ', players' : SITE === 'mlb' ? ', hitters' : SITE === 'page' ? '' : ', teams, players') + '" aria-label="Search" autocomplete="off"><kbd>/</kbd></label>' +
       '<div class="ores" hidden></div>' +
       '<div class="ogrid">' + S.tabs.map(function (t, i) {
-        return '<button class="otile" data-tab="' + t[0] + '" style="transition-delay:' + (reduce ? 0 : 25 * i) + 'ms">' + svg(t[2]) +
+        return '<button class="otile" data-tab="' + t[0] + '"' + (t[4] ? ' data-href="' + esc(t[4]) + '"' : '') + ' style="transition-delay:' + (reduce ? 0 : 25 * i) + 'ms">' + svg(t[2]) +
           '<div><b>' + esc(t[1]) + '</b><span>' + esc(t[3]) + '</span></div></button>';
       }).join('') + '</div>' +
       '<div class="oacts">' +
+      // My picks and Account: the same entries on every page (the header has them too)
+      '<button class="oact ox-all" data-act="mypicks">' + OX_MARK + '<span class="oact-my">My picks: saved picks and your record</span></button>' +
+      '<a class="oact ox-all" href="account.html" data-act="acct">' + OX_MARK + '<span class="oact-ac">Account: sign in, sync every device</span></a>' +
       '<a class="oact ox-all" href="picks.html">' + OX_MARK + 'Onyx Picks: today\'s card and the record</a>' +
       '<a class="oact ox-all" href="home.html#my">' + OX_MARK + 'My Onyx: players and bets</a>' +
-      '<a class="oact ox-all" href="account.html">' + OX_MARK + 'Account: sign in, sync every device</a>' +
       '<a class="oact ox-all" href="home.html">' + OX_MARK + 'All Onyx sports</a>' +
-      '<button class="oact pri" data-act="slip">' + svg('slip') + 'Parlay builder</button>' +
+      (SITE === 'page' ? '' : '<button class="oact pri" data-act="slip">' + svg('slip') + 'Parlay builder</button>') +
       '<button class="oact" data-act="share">' + svg('share') + 'Share Onyx</button>' +
       '<button class="oact" data-act="new">' + svg('spark') + "What's new</button>" +
-      (window.OnyxSaved && OnyxSaved.setAlerts ? '<button class="oact" data-act="alerts">' + svg('bell') + '<span class="oact-al">Win alerts: ' + (OnyxSaved.alertsOn() ? 'on' : 'off') + '</span></button>' : '') +
+      '<button class="oact" data-act="alerts" hidden>' + svg('bell') + '<span class="oact-al">Win alerts: off</span></button>' +
       '</div>';
     document.body.appendChild(sheetBg);
     document.body.appendChild(sheet);
     sheetBg.addEventListener('click', closeSheet);
     sheet.querySelector('.osheet-x').addEventListener('click', closeSheet);
     sheet.querySelectorAll('.otile').forEach(function (t) {
-      t.addEventListener('click', function () { buzz(); closeSheet(); go(t.dataset.tab); });
+      t.addEventListener('click', function () { buzz(); closeSheet(); if (t.dataset.href) goLink(t.dataset.href); else go(t.dataset.tab); });
     });
-    sheet.querySelector('[data-act="slip"]').addEventListener('click', function () {
+    sheet.querySelector('[data-act="mypicks"]').addEventListener('click', function () { buzz(); closeSheet(); openPicks(); });
+    var slipBtn = sheet.querySelector('[data-act="slip"]');
+    if (slipBtn) slipBtn.addEventListener('click', function () {
       closeSheet();
       try {
         if (typeof parlayMode !== 'undefined' && !parlayMode && typeof parlayToggle === 'function') parlayToggle();
@@ -345,6 +441,7 @@
     var al = sheet.querySelector('[data-act="alerts"]');
     if (al) al.addEventListener('click', function () {
       // win alerts (saved.js): a pop-up and a phone alert the moment a saved pick cashes
+      if (!window.OnyxSaved || !OnyxSaved.setAlerts) return;
       Promise.resolve(OnyxSaved.setAlerts(!OnyxSaved.alertsOn())).then(function () {
         al.querySelector('.oact-al').textContent = 'Win alerts: ' + (OnyxSaved.alertsOn() ? 'on' : 'off');
       });
@@ -422,7 +519,15 @@
     if (!q) { res.hidden = true; grid.hidden = false; return; }
     var hits = [];
     S.tabs.forEach(function (t) {
-      if (norm(t[1] + ' ' + t[3]).indexOf(q) >= 0) hits.push({label: t[1], sub: 'PAGE', run: function () { go(t[0]); }});
+      if (norm(t[1] + ' ' + t[3]).indexOf(q) >= 0) hits.push({label: t[1], sub: 'PAGE', run: function () { if (t[4]) goLink(t[4]); else go(t[0]); }});
+    });
+    // every Onyx page, from any page: My picks, Account, Onyx Picks, the sports
+    var shared = [['My picks', 'Saved picks and your record', openPicks], ['Account', 'Sign in, sync every device', 'account.html'],
+      ['Onyx Picks', "Today's card and the record", 'picks.html'], ['My Onyx', 'Players and bets', 'home.html#my']]
+      .concat(ALL.filter(function (a) { return a[0] !== SITE; }).map(function (a) { return ['Onyx ' + a[3], a[1], a[2]]; }));
+    shared.forEach(function (x) {
+      if (SITE === 'page' && S.tabs.some(function (t) { return t[1] === x[0]; })) return;
+      if (norm(x[0] + ' ' + x[1]).indexOf(q) >= 0) hits.push({label: x[0], sub: 'ONYX', run: function () { if (typeof x[2] === 'function') x[2](); else goLink(x[2]); }});
     });
     playerIndex().forEach(function (p) { if (norm(p.label).indexOf(q) >= 0) hits.push(p); });
     hits = hits.slice(0, 12);
@@ -471,6 +576,7 @@
     return keep;
   }
   function logBet(url, label) {
+    if (SITE === 'page') return;   // My bets are logged on the sport pages, which know each selection's sport
     var sels = [], m, re = /selection=([^&]+)/g;
     while ((m = re.exec(url))) sels.push(decodeURIComponent(m[1]));
     if (!sels.length) return;
@@ -495,6 +601,189 @@
   };
   window.OX_MYBETS = myBets;
   function parlayCount() { try { return typeof parlaySlip !== 'undefined' && parlaySlip ? parlaySlip.length : 0; } catch (e) { return 0; } }
+
+  // ── 5b. one account and one tracker on every page (11/2) ──────────────
+  // Jordan: "the account page and tracking should live through all sports and pages ... a
+  // uniform experience across the board". Every page gets the same two header controls
+  // (My picks with its count, Account with the signed-in state), the same My picks slide-over
+  // (saved picks followed live + the permanent record, saved.js), and saved.js / accounts.js
+  // are loaded wherever a page did not load them itself, so sync and the save star work everywhere.
+  function needScript(src) {
+    if (document.querySelector('script[src="' + src + '"]')) return;
+    var s = document.createElement('script'); s.src = src; s.async = false;
+    s.onload = function () { refreshControls(); };
+    document.head.appendChild(s);
+  }
+  // the standard header, for the pages that are not a sport site
+  var STD_TABS = [['home', 'Onyx Sports', 'home.html'], ['picks', 'Onyx Picks', 'picks.html'], ['top10', 'Top 10', 'home.html#top10'],
+                  ['live', 'Live', 'home.html#live'], ['scorecard', 'Scorecard', 'scorecard.html'], ['how', 'How it works', 'how.html']];
+  function stdNav() {
+    if (!IS_PAGE || IS_HUB || document.querySelector('nav.nav')) return;
+    var n = el('nav', 'nav ox-stdnav');
+    n.setAttribute('aria-label', 'Onyx Sports');
+    n.innerHTML = '<a class="nav-logo" href="home.html" aria-label="Onyx Sports home">' +
+      '<svg class="logo-svg" viewBox="0 0 64 64" aria-hidden="true"><rect x="2" y="2" width="60" height="60" rx="16" fill="#151018" stroke="rgba(176,56,249,.6)" stroke-width="2"/>' +
+      '<g transform="translate(19,13) scale(0.26)"><path fill="#b038f9" d="m39.041 109.178 18.493 9.863-33.972 17.945L0 124.384v-84.11l39.041-20.411zm21.918-81.37-18.493-9.863L76.438 0 100 12.603v84.246L60.959 117.26z"/></g></svg>' +
+      '<div class="logo-words"><div class="logo-onyx">ONYX</div><div class="logo-sub">' + esc(PAGE[1]) + '</div></div></a>' +
+      '<div class="nav-tabs">' + STD_TABS.map(function (t) {
+        return '<a class="nav-tab' + (t[0] === PAGE[0] ? ' active" aria-current="page' : '') + '" href="' + t[2] + '">' + esc(t[1]) + '</a>';
+      }).join('') + '</div>' +
+      '<div class="nav-right"><button class="nav-hamburger" id="navHamburger" aria-label="Menu">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button></div>';
+    document.body.insertBefore(n, document.body.firstChild);
+  }
+  var ctl = null;
+  function mountControls() {
+    if (document.querySelector('.ox-hctl')) return;
+    ctl = el('span', 'ox-hctl');
+    ctl.innerHTML = '<button class="ox-mypk" type="button" aria-label="My picks" title="My picks: your saved picks, live, and your record">' + svg('star') +
+      '<span>My picks</span><b hidden></b></button>' +
+      '<a class="ox-acct" href="account.html" aria-label="Account">' + svg('user') + '<span>Account</span><i></i></a>';
+    ctl.querySelector('.ox-mypk').addEventListener('click', function (e) { e.preventDefault(); buzz(); openPicks(); });
+    var right = document.querySelector('.nav .nav-right'), acts = document.querySelector('.ox-head .ox-acts');
+    if (right) {
+      var ham = right.querySelector('.nav-hamburger');
+      right.insertBefore(ctl, ham && ham.parentNode === right ? ham : null);
+    } else if (acts) {
+      var old = document.getElementById('acctNav'); if (old) old.remove();   // the hub's own Sign in link: this replaces it
+      acts.appendChild(ctl);
+    } else return;
+    refreshControls();
+    fitHeader();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitHeader);
+  }
+  // keep the header on screen: measured, because each sport's tab row is a different length
+  function fitHeader() {
+    var n = document.querySelector('nav.nav'); if (!n) return;
+    var over = function () {
+      var r = n.querySelector('.nav-right'), vw = document.documentElement.clientWidth;
+      return n.scrollWidth > n.clientWidth + 1 || (r && r.getBoundingClientRect().right > vw + 0.5);
+    };
+    n.classList.remove('ox-scroll', 'ox-tight');
+    if (!over()) return;
+    if (!n.querySelector('.nav-dropdown')) { n.classList.add('ox-scroll'); if (!over()) return; }   // a dropdown menu would be clipped by a scrolling row
+    n.classList.add('ox-tight');
+  }
+  var fitT = 0;
+  addEventListener('resize', function () { clearTimeout(fitT); fitT = setTimeout(fitHeader, 120); });
+  function acctState() {
+    try { return window.OnyxAccounts ? OnyxAccounts.state() : null; } catch (e) { return null; }
+  }
+  function savedCount() { try { return window.OnyxSaved ? OnyxSaved.all().length : 0; } catch (e) { return 0; } }
+  function refreshControls() {
+    var n = savedCount(), st = acctState();
+    // signed in: "Account" with the green dot; accounts on and signed out: "Sign in"; accounts off: "Account" (device only)
+    var signed = !!(st && st.signedIn), word = signed ? 'Account' : st && st.enabled ? 'Sign in' : 'Account';
+    var tip = signed ? 'Signed in as ' + (st.email || '') : st && st.enabled ? 'Sign in: your picks on every device' : 'Account: your picks and record';
+    document.querySelectorAll('.ox-hctl').forEach(function (c) {
+      var b = c.querySelector('.ox-mypk b');
+      b.hidden = !n; b.textContent = n ? String(n) : '';
+      c.querySelector('.ox-mypk').setAttribute('aria-label', 'My picks' + (n ? ', ' + n + ' saved' : ''));
+      var a = c.querySelector('.ox-acct');
+      a.classList.toggle('in', signed);
+      a.querySelector('span').textContent = word;
+      a.setAttribute('aria-label', tip); a.title = tip;
+      a.setAttribute('data-state', signed ? 'in' : st && st.enabled ? 'out' : 'off');
+    });
+    if (sheet) {
+      var my = sheet.querySelector('.oact-my'); if (my) my.textContent = 'My picks' + (n ? ' (' + n + ')' : '') + ': saved picks and your record';
+      var ac = sheet.querySelector('.oact-ac'); if (ac) ac.textContent = signed ? 'Account: signed in as ' + (st.email || '') : st && st.enabled ? 'Sign in: your picks on every device' : 'Account: sign in, sync every device';
+      var al = sheet.querySelector('[data-act="alerts"]');
+      if (al && window.OnyxSaved && OnyxSaved.setAlerts) { al.hidden = false; al.querySelector('.oact-al').textContent = 'Win alerts: ' + (OnyxSaved.alertsOn() ? 'on' : 'off'); }
+    }
+    if (trk && trk.classList.contains('open')) drawPicks();
+    fitHeader();
+  }
+  addEventListener('onyx-saved', function () { refreshControls(); });
+  addEventListener('onyx-account', function () { refreshControls(); });
+  addEventListener('onyx-history', function () { if (trk && trk.classList.contains('open')) drawPicks(); });
+  addEventListener('storage', function (e) { if (e.key === 'onyxSaved' || e.key === 'onyxHistory') refreshControls(); });
+
+  // the tracker: My picks, the same slide-over from every header, More menu and bottom bar
+  var trk = null, trkBg = null, trkLive = {}, trkFocus = null;
+  var PAGE_OF = {}; ALL.forEach(function (a) { PAGE_OF[a[0]] = a[2]; });
+  var SPN = {nfl: 'NFL', nba: 'NBA', nhl: 'NHL', cfb: 'College Football', cbb: 'College Basketball', tennis: 'Tennis', golf: 'Golf', mlb: 'MLB'};
+  function oddsTxt(a) { return a == null ? '' : (a > 0 ? '+' : '') + a; }
+  function gameHref(p) {
+    var pg = PAGE_OF[p.sport] || 'home.html';
+    var gid = (trkLive[p.id] || {}).gid || p.gid;
+    return gid && p.sport !== 'nba' && p.sport !== 'mlb' ? pg + '#games:' + gid : pg;
+  }
+  function whenTxt(iso) {
+    var t = Date.parse(iso); if (isNaN(t)) return '';
+    try { return new Date(t).toLocaleString('en-US', {weekday: 'short', hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York'}) + ' ET'; } catch (e) { return ''; }
+  }
+  function buildPicks() {
+    trkBg = el('div', 'osheet-bg');
+    trk = el('section', 'osheet otrk');
+    trk.setAttribute('role', 'dialog'); trk.setAttribute('aria-modal', 'true'); trk.setAttribute('aria-label', 'My picks');
+    trk.innerHTML = '<div class="osheet-grip"></div><div class="osheet-head"><div class="osheet-title">My picks</div>' +
+      '<button class="osheet-x" aria-label="Close My picks">' + svg('x') + '</button></div><div class="otrk-body"></div>';
+    document.body.appendChild(trkBg); document.body.appendChild(trk);
+    trkBg.addEventListener('click', closePicks);
+    trk.querySelector('.osheet-x').addEventListener('click', closePicks);
+    swipeDown(trk, closePicks);
+  }
+  function drawPicks() {
+    if (!trk) return;
+    var O = window.OnyxSaved, body = trk.querySelector('.otrk-body');
+    if (!O) { body.innerHTML = '<div class="otrk-empty">Loading your picks...</div>'; return; }
+    var P = O.all().slice().sort(function (a, b) { return String(a.start || '').localeCompare(String(b.start || '')); });
+    var st = acctState(), signed = st && st.signedIn;
+    var R = O.stats ? O.stats() : null, u = R ? R.units : 0;
+    var sum = signed ? '<span>Signed in as <b>' + esc(st.email || '') + '</b>. Your picks and record are on every device.</span><a href="account.html">Account</a>'
+      : st && st.enabled ? '<span>Saved on this device. <b>Sign in</b> to keep your picks and record on every device.</span><a href="account.html">Sign in</a>'
+      : '<span>Saved on this device: tap the star on any play, in any sport, and follow it here all night.</span><a href="account.html">Account</a>';
+    var rec = R && R.picks ? '<div class="otrk-h">Your record</div><div class="otrk-rec">' +
+      '<div><b>' + R.w + '-' + R.l + (R.p ? '-' + R.p : '') + '</b><span>Record</span></div>' +
+      '<div><b>' + (R.rate == null ? '-' : R.rate + '%') + '</b><span>Win rate</span></div>' +
+      '<div><b class="' + (u > 0 ? 'up' : u < 0 ? 'dn' : '') + '">' + (u > 0 ? '+' : '') + u.toFixed(2) + '</b><span>Units</span></div>' +
+      '<div><b>' + R.pending + '</b><span>To grade</span></div></div>' : '';
+    var list = P.length ? '<div class="otrk-h">Saved picks · ' + P.length + '</div><div class="otrk-list">' + P.map(function (p) {
+      var t = trkLive[p.id] || {}, lab = {W: ['Won', 'w'], L: ['Lost', 'l'], P: ['Push', ''], up: ['Winning', 'live'], down: ['Losing', 'l']}[t.res];
+      var state = lab ? lab : t.state === 'in' ? ['Live', 'live'] : t.state === 'post' ? ['Final', ''] : ['Upcoming', ''];
+      var sub = [SPN[p.sport] || String(p.sport || '').toUpperCase(), p.matchup, t.state === 'in' || t.state === 'post' ? '' : whenTxt(p.start)].filter(Boolean).join(' · ');
+      return '<a class="otrk-row' + (t.state === 'in' ? ' live' : '') + '" href="' + esc(gameHref(p)) + '">' + (O.btn ? O.btn(p) : '') +
+        '<span class="otrk-w"><b>' + esc(p.label || p.name || '') + '</b><span>' + esc(sub) + '</span></span>' +
+        '<span class="otrk-s"><em class="' + state[1] + '">' + state[0] + '</em>' +
+        '<small>' + (t.cur != null ? 'Now ' + esc(String(t.cur)) : p.price != null ? 'Onyx ' + esc(oddsTxt(p.price)) : '') + '</small></span></a>';
+    }).join('') + '</div>'
+      : '<div class="otrk-empty">No saved picks right now. Tap the star on any play, in any sport (the Top 10, a sport\'s Plays, a player card, Onyx Picks) and follow it here, live, all night. Every pick you save also counts toward your record.</div>';
+    body.innerHTML = '<div class="otrk-sum">' + sum + '</div>' + rec + list +
+      '<div class="oacts"><a class="oact ox-all" href="account.html#record">' + OX_MARK + 'Your full record: every pick you saved, graded</a>' +
+      '<a class="oact ox-all" href="home.html#my">' + OX_MARK + 'My Onyx: players and bets</a></div>';
+  }
+  function trackPicks() {
+    var O = window.OnyxSaved; if (!O || !O.track) return;
+    var now = Date.now();
+    var P = O.all().filter(function (p) { var s = Date.parse(p.start); return isNaN(s) || s - 15 * 60e3 <= now; });
+    if (!P.length) return;
+    Promise.all(P.map(function (p) { return O.track(p).catch(function () { return {p: p}; }); })).then(function (T) {
+      T.forEach(function (t) { if (t && t.p) trkLive[t.p.id] = t; });
+      if (trk && trk.classList.contains('open')) drawPicks();
+    });
+  }
+  var trkTimer = null;
+  function openPicks() {
+    if (!trk) buildPicks();
+    closeSheet();
+    trkFocus = document.activeElement;
+    drawPicks();
+    trkBg.classList.add('open'); trk.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    trackPicks();
+    clearInterval(trkTimer); trkTimer = setInterval(function () { if (!document.hidden) trackPicks(); }, 30e3);
+    if (window.OnyxSaved && OnyxSaved.grade) OnyxSaved.grade();
+    try { if (window.gtag) gtag('event', 'my_picks_open', {sport: SITE}); } catch (e) {}
+  }
+  function closePicks() {
+    if (!trk || !trk.classList.contains('open')) return;
+    trk.classList.remove('open'); trkBg.classList.remove('open');
+    document.body.style.overflow = '';
+    clearInterval(trkTimer);
+    if (trkFocus && trkFocus.focus) try { trkFocus.focus({preventScroll: true}); } catch (e) {}
+  }
+  window.OX_OPEN_PICKS = openPicks;
 
   // ── 6. hooks into the page ────────────────────────────────────────────
   function hook() {
@@ -561,7 +850,7 @@
       requestAnimationFrame(function () { document.body.classList.toggle('o-scrolled', window.scrollY > 8); ticking = false; });
     }, {passive: true});
     document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') closeSheet();
+      if (e.key === 'Escape') { closeSheet(); closePicks(); }
       var typing = /INPUT|TEXTAREA|SELECT/.test((document.activeElement || {}).tagName || '');
       if (!typing && (e.key === '/' || ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k'))) { e.preventDefault(); openSheet(true); }
     });
@@ -569,7 +858,7 @@
 
   // ── 6b. the Onyx footer: the giant raster ONYX (onyx.js) and every sport ─
   function siteFooter() {
-    if (document.querySelector('.ox-sitefoot')) return;
+    if (document.querySelector('.ox-sitefoot, .ox-foot')) return;   // the hub has its own footer
     var sports = ALL.map(function (a) { return [a[3], a[2], a[0] === SITE]; });
     var f = el('footer', 'ox-sitefoot',
       '<div class="row"><div class="links">' + sports.map(function (x) {
@@ -613,14 +902,20 @@
     var st = el('style'); st.id = 'onyx-ui'; st.textContent = CSS; document.head.appendChild(st);
     fixSafeArea();
     window.addEventListener('orientationchange', function () { setTimeout(fixSafeArea, 300); });
+    stdNav();
     buildBar();
     buildSheet();
     siteFooter();
     hook();
+    mountControls();
+    // the save star, My picks and sign-in need saved.js (which loads accounts.js): every page gets them
+    if (!window.OnyxSaved) needScript('saved.js');
+    else if (!window.OnyxAccounts) needScript('accounts.js');
     var t0 = (location.hash || '').slice(1);
-    syncActive(typeof currentTab !== 'undefined' ? currentTab : (typeof curTab !== 'undefined' ? curTab : (t0 || 'home')));
+    syncActive(PAGE ? PAGE[0] : typeof currentTab !== 'undefined' ? currentTab : (typeof curTab !== 'undefined' ? curTab : (t0 || 'home')));
     setTimeout(function () { showWhatsNew(false); }, 1200);
-    window.OnyxUI = {toast: toast, openMenu: openSheet, closeMenu: closeSheet, swipeDown: swipeDown, buzz: buzz};
+    window.OnyxUI = {toast: toast, openMenu: openSheet, closeMenu: closeSheet, swipeDown: swipeDown, buzz: buzz,
+                     openPicks: openPicks, closePicks: closePicks, refresh: refreshControls};
   }
   // ticker pace: every score / picks ticker slides its track -50% (two
   // identical halves), so a fixed duration made a 56-game college football

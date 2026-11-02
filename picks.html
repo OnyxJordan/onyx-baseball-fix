@@ -15,6 +15,8 @@
 <meta name="description" content="Onyx Picks: the plays we would bet today, every one logged at its Onyx price before the game and graded in public.">
 <link rel="stylesheet" href="onyx.css">
 <script src="onyx.js" defer></script>
+<script src="ui.js" defer></script>
+<script src="saved.js"></script>
 <style>
 body{background:#0c0c0c;color:#fff;margin:0;overflow-x:hidden}
 .pk{padding-top:28px;padding-bottom:10px}
@@ -131,6 +133,12 @@ function resTag(r) {
   return '<span class="tg ' + r.result + '">' + ({W: 'Won', L: 'Lost', P: 'Push', V: 'Void'}[r.result] || r.result) +
     (r.actual != null && r.market !== 'ml' && r.market !== 'spread' ? ' · ' + esc(r.actual) : '') + '</span>';
 }
+// the save star (saved.js): the same star as every sport page, so a pick follows you in My picks
+function savePick(r) {
+  var k = r.kind || (/^(ml|spread|total)$/.test(r.market) ? r.market : 'prop');
+  return {id: r.sel, sport: r.sport, label: r.label, matchup: r.matchup, start: r.start, gid: r.gid, team: r.team, price: r.price,
+          conf: r.chance, kind: k, mkt: r.market, side: r.side, line: r.line, hcap: r.hcap, name: r.name};
+}
 function card(r) {
   var url = r.sel ? 'https://app.onyxodds.com/share?selection=' + encodeURIComponent(r.sel) + '&referrer=' + ONYX_REFERRER : null;
   var live = !r.result && Date.parse(r.start) > Date.now();
@@ -140,6 +148,7 @@ function card(r) {
     '<div class="pc-f"><span class="tg sp">' + esc(LG[r.sport] || r.sport) + '</span><span class="tg">' + esc(MK[r.market] || r.market) + '</span>' +
     '<span class="tg">+$' + Math.round(100 * ev) + ' value per $100</span>' + resTag(r) +
     (live && url ? '<a class="bet" href="' + url + '" target="_blank" rel="noopener">' + odds(r.price) + ' on Onyx</a>' : '<span class="bet" style="background:rgba(255,255,255,.08)">' + odds(r.price) + ' logged</span>') +
+    (live && r.sel && window.OnyxSaved ? OnyxSaved.btn(savePick(r)) : '') +
     '</div></div>';
 }
 function row(cells, head) {

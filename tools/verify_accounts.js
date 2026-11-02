@@ -95,7 +95,7 @@ const BASE = 'http://127.0.0.1:' + site.address().port;
   pg = await device();
   await open(pg);
   ok(!(await pg.$eval('#acct', e => e.hidden)) && /Sign in/.test(await pg.$eval('#acct', e => e.innerText)), 'signed out: My Onyx offers sign-in');
-  ok(!(await pg.$eval('#acctNav', e => e.hidden)) && (await pg.$eval('#acctNav', e => e.textContent)) === 'Sign in', 'signed out: the home header has a Sign in link');
+  ok((await pg.$eval('.ox-head .ox-acct', e => e.textContent)) === 'Sign in' && (await pg.$eval('.ox-head .ox-acct', e => e.getAttribute('href'))) === 'account.html', 'signed out: the home header has the shared Sign in control');
   await pg.click('#acct a.acct-go'); await pg.waitForURL(/account\.html/); await pg.waitForFunction(() => window.OnyxAccounts); await pg.evaluate(() => OnyxAccounts.ready); await pg.waitForTimeout(300);
   await pg.fill('#acEmail', 'jordan@example.com'); await pg.click('#acSend'); await pg.waitForTimeout(400);
   ok(DB.otp.length === 1 && DB.otp[0].email === 'jordan@example.com' && /account\.html$/.test(DB.otp[0].redirect), 'Account page: magic link requested, back to account.html');
@@ -120,7 +120,7 @@ const BASE = 'http://127.0.0.1:' + site.address().port;
   ok(Object.keys(R().followed_players || {}).sort().join() === 'nba|1628983,nfl|4241', 'device A: followed players (NBA and NFL) reached the account');
   ok(Object.keys(R().bets || {}).join() === 'sel-a', 'device A: My bets reached the account');
   if (process.env.SHOT) await (await A.$('#acct')).screenshot({path: path.join(process.env.SHOT, 'acct_signed_in.png')});
-  ok(/Signed in as jordan@example.com/.test(await A.$eval('#acct', e => e.innerText)) && !/access_token/.test(A.url()) && (await A.$eval('#acctNav', e => e.textContent)) === 'Account', 'device A: My Onyx and the header say signed in; the link tokens are cleared from the address');
+  ok(/Signed in as jordan@example.com/.test(await A.$eval('#acct', e => e.innerText)) && !/access_token/.test(A.url()) && (await A.$eval('.ox-head .ox-acct', e => e.textContent)) === 'Account', 'device A: My Onyx and the header say signed in; the link tokens are cleared from the address');
 
   // 3b a link that lands on another page (Supabase's Site URL is the MLB front page) still signs in
   for (const pageName of ['index.html', 'nfl.html']) {

@@ -929,11 +929,43 @@ def _dump(p, obj):
     tmp.replace(p)
 
 
+def market_tests(sport):
+    """{market: verdict} from the Onyx Picks backtest (data/picks/backtest.json, the same
+    verdicts picks.py logs by), for the Bets tabs' honesty labels and their "Best bet":
+    "finalized" (beat Onyx at the open and the close, held out), "not enough yet" (tested,
+    under 60 held-out bets), "fails" (did not beat Onyx), "no replay" (never backtested), and
+    "retest" when the verdict was run on another model version than the one live now (a model
+    change sends a market back to testing, as it does for picks). Fail-soft: {}."""
+    try:
+        import picks as PK
+        bt = json.loads(Path(PK.BACKTEST).read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+    out = {}
+    for m in bt.get("markets") or []:
+        if m.get("sport") != sport or not m.get("market"):
+            continue
+        v = m.get("verdict") or "no replay"
+        if v in ("finalized", "not enough yet", "fails") and m.get("version") is not None:
+            try:
+                live = PK.live_version(sport, m["market"])
+            except Exception:
+                live = None
+            # a lane with its own signature ("h1 0.505/18") is not a model module's VERSION:
+            # only picks.live_version's own signatures (the 1st-quarter total) re-gate it
+            own = not str(m["version"]).startswith("v") and m["market"] != "q1_total"
+            if live is not None and not own and live != m.get("version"):
+                v = "retest"
+        out[m["market"]] = v
+    return out
+
+
 def _write(lane_dir, doc):
     """One small index (data/<sport>/cards.json) and one file per team (data/<sport>/cards/
     <team>.json: the team and its players), so a card fetches only its own team. Tennis has
     no teams: its players stay in the index. Team files from earlier slates are removed."""
     lane_dir = Path(lane_dir)
+    doc["tests"] = market_tests(doc.get("sport"))
     teams, players = doc.pop("teams", {}) or {}, doc.pop("players", {}) or {}
     if teams:
         d = lane_dir / "cards"

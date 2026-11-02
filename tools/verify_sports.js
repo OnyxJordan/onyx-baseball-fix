@@ -21,6 +21,10 @@
  * player with the most Onyx markets) open, load their data, show "Why this number", their
  * tables and both faces (Team | Bets, Player | Bets, the line chart scrubbed and snapped back),
  * with no undefined / NaN, nothing wider than the screen and no page errors.
+ * Bets tabs (11/2): ranked best value first, every row badged Onyx Pick or Projection, an honest
+ * "Best bet" (never a negative play), and a player prop row's full bet card: the slider moves the
+ * line and the numbers off Onyx's line, release snaps back, Over / Under switches, Bet on Onyx
+ * carries the share link with KR680261 (BETS_CHECK).
  *
  *   python3 -B sports_build.py nfl   (and the others)
  *   node tools/verify_sports.js [nfl,cfb,cbb,nhl,tennis,golf]
@@ -53,7 +57,9 @@ function cardPick(pg, idx) {
     if (!fs.existsSync(f)) continue;
     const d = JSON.parse(fs.readFileSync(f, 'utf8'));
     const sides = ((d.team || {}).game || {}).sides || [];
-    if (sides.length && (!bt || sides.length > bt[1])) bt = [t, sides.length];
+    // the Bets tab with the most to rank: its game lines plus every prop on its players
+    const nb = sides.length ? sides.length + Object.values(d.players || {}).reduce((a, p) => a + (p.mk || []).length, 0) : 0;
+    if (nb && (!bt || nb > bt[1])) bt = [t, nb];
     Object.values(d.players || {}).forEach(p => { const n = (p.mk || []).length + ((p.mk || []).some(m => m.dist) ? 5 : 0); if (!bp || n > bp[1]) bp = [{ n: p.n, t: p.team }, n]; });
   }
   out.team = bt ? bt[0] : (idx.teams || [])[0] || null;
@@ -87,6 +93,52 @@ async function cardCheck(page, face, need) {
     return bad.join(', ');
   }, need);
 }
+
+// the open card's Bets tab (cards.js, 11/2): ranked best value first, an Onyx Pick / Projection
+// badge on every row, an honest "Best bet", and a row's full bet card: chart, slider (the numbers
+// move between lines, release snaps to Onyx's line), Over / Under, Add to parlay, Bet on Onyx
+const BETS_CHECK = async (wantPlayer) => {
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const face = document.getElementById('cxFace'), bad = [], $ = id => document.getElementById(id);
+  const R = OXC._rows();
+  if (!R.length) return 'no rows';
+  if (!face.querySelector('.bc-best')) bad.push('no Best bet summary');
+  if (face.querySelectorAll('.cx-bdg').length < Math.min(R.length, 25)) bad.push('rows without an Onyx Pick / Projection badge');
+  for (let i = 1; i < R.length; i++) {
+    const a = R[i - 1], b = R[i];
+    if (b.rank < a.rank || (b.rank === a.rank && a.rank <= 2 && a.ev != null && b.ev != null && b.ev > a.ev + 1e-9)) { bad.push('not best value first at ' + b.lab); break; }
+  }
+  const bv = face.querySelector('.bc-best .bv');
+  if (bv && /-\$/.test(bv.innerText)) bad.push('a negative play headlined as the best bet');
+  const r = R.find(x => x.player === wantPlayer && x.dist && !x.nba) || R.find(x => x.dist && !x.nba);
+  if (!r) return bad.join(', ') || 'ok (no charted row)';
+  let btn = () => face.querySelector('.cx-bbr[data-k="' + CSS.escape(r.key) + '"]');
+  if (!btn() && face.querySelector('[data-cx="more"]')) { face.querySelector('[data-cx="more"]').click(); await sleep(60); }
+  if (!btn()) return 'row ' + r.lab + ' not listed';
+  if (!btn().closest('.cx-bb').classList.contains('open')) { btn().click(); await sleep(150); }
+  const rg = $('cxRange');
+  if (!rg || !$('cxDist') || !btn().closest('.cx-bb').contains(rg)) return 'row ' + r.lab + ' opened without its chart and slider';
+  const s0 = $('cxStats').innerText, b0 = $('cxBig').innerText;
+  if (!/Onyx/i.test($('cxPrice').innerText)) bad.push('bet card not on an Onyx line');
+  rg.value = +rg.min === +rg.value ? rg.max : rg.min; rg.dispatchEvent(new Event('input', {bubbles: true}));
+  if ($('cxRange') !== rg) bad.push('slider rebuilt mid-drag');
+  if ($('cxBig').innerText === b0) bad.push('slider did not move the line');
+  if ($('cxStats').innerText === s0) bad.push('numbers did not update off the line');
+  if (!/not offered/i.test($('cxPrice').innerText)) bad.push('between lines but shows a price');
+  const th = face.querySelector('.cx-thumb'), mk = face.querySelector('.cx-mark');
+  if (th && mk) { const a = th.getBoundingClientRect(), m = mk.getBoundingClientRect(), gap = Math.abs(a.left + a.width / 2 - (m.left + m.width / 2)); if (gap > 3) bad.push('slider thumb ' + gap.toFixed(0) + 'px from the chart line'); }
+  if (/\bundefined\b|\bNaN\b|\[object Object\]/.test(face.innerText)) bad.push('undefined/NaN while scrubbing');
+  rg.dispatchEvent(new Event('change', {bubbles: true}));
+  await sleep(40);
+  if (!/Onyx/i.test($('cxPrice').innerText) || $('cxBig').innerText !== b0) bad.push('release did not snap back to the Onyx line');
+  const other = [...face.querySelectorAll('#cxSide button')].find(b => !b.classList.contains('on'));
+  if (other && $('cxSide').style.display !== 'none') { other.click(); await sleep(20); if ($('cxBig').innerText === b0 && !/Yes|No/.test(other.innerText)) bad.push('Over / Under did not switch'); }
+  if (/\bundefined\b|\bNaN\b|\[object Object\]/.test(face.innerText)) bad.push('undefined/NaN in the bet card');
+  const bet = $('cxBet');
+  if (!bet || !$('cxAdd')) bad.push('no Add to parlay / Bet on Onyx');
+  else if (!bet.disabled) { const o = window.open; let u = ''; window.open = x => { u = x; return null; }; bet.click(); window.open = o; if (!/app\.onyxodds\.com\/share\?selection=.+referrer=KR680261/.test(u)) bad.push('Bet on Onyx link: ' + u); }
+  return bad.join(', ') || 'ok (' + R.length + ' rows, opened ' + r.lab + ')';
+};
 
 function serve() {
   const server = http.createServer((req, res) => {
@@ -235,6 +287,7 @@ function serve() {
       if (fs.existsSync(cidx)) {
         const pick = cardPick(pg, JSON.parse(fs.readFileSync(cidx, 'utf8')));
         const cbad = [];
+        let teamBets = '';
         await page.evaluate(() => { if (window.OXC) OXC.close(); });
         if (pick.team) {
           // a real tap on a game card's team name: it must open the team card, not the gamecenter
@@ -246,7 +299,12 @@ function serve() {
             if (r1) cbad.push('team ' + tapped + ': ' + r1);
             if (await page.evaluate(() => typeof OPEN_GAME !== 'undefined' && OPEN_GAME)) cbad.push('team tap also opened the gamecenter');
             const n = await page.evaluate(() => document.querySelectorAll('#cx .pc-seg button').length);
-            if (n === 2) { await page.click('#cx .pc-seg button:nth-child(2)'); const r2 = await cardCheck(page, 'bets', []); if (r2) cbad.push('team bets: ' + r2); }
+            if (n === 2) {
+              await page.click('#cx .pc-seg button:nth-child(2)'); const r2 = await cardCheck(page, 'bets', ['Best bet']); if (r2) cbad.push('team bets: ' + r2);
+              const r3 = await page.evaluate(BETS_CHECK, true);
+              if (!r3.startsWith('ok')) cbad.push('team bets card: ' + r3); else teamBets = r3;
+              const r4 = await cardCheck(page, 'bets', []); if (r4) cbad.push('team bet card open: ' + r4);
+            }
           }
           await page.evaluate(() => OXC.close());
         }
@@ -258,21 +316,25 @@ function serve() {
             await page.click('#cx .pc-seg button:nth-child(2)');
             const r2 = await cardCheck(page, 'bets', []);
             if (r2) cbad.push('player bets: ' + r2);
+            const r3 = await page.evaluate(BETS_CHECK, false);
+            if (!r3.startsWith('ok')) cbad.push('player bets card: ' + r3);
+            const r4 = await cardCheck(page, 'bets', []); if (r4) cbad.push('player bet card open: ' + r4);
             const dist = await page.$('#cxDist');
             if (dist) {   // scrub the chart off Onyx's line, then let go: it must snap back to the line
+              await dist.scrollIntoViewIfNeeded(); await page.waitForTimeout(60);   // the bet card opens inside its row, maybe below the fold
               const b = await dist.boundingBox();
               await page.mouse.move(b.x + b.width * 0.15, b.y + b.height / 2); await page.mouse.down();
               await page.mouse.move(b.x + b.width * 0.2, b.y + b.height / 2, { steps: 3 });
               const mid = await page.evaluate(() => document.getElementById('cxPrice').innerText);
               await page.mouse.up(); await page.waitForTimeout(80);
               const end = await page.evaluate(() => document.getElementById('cxPrice').innerText);
-              if (!/not offered/i.test(mid) && !/Onyx/.test(mid)) cbad.push('chart scrub showed nothing');
+              if (!/not offered/i.test(mid) && !/Onyx/i.test(mid)) cbad.push('chart scrub showed nothing');
               if (!/Onyx|no Onyx price/i.test(end)) cbad.push('did not snap back to the Onyx line');
             }
           }
           await page.evaluate(() => OXC.close());
         }
-        cards = 'cards ' + (cbad.length ? 'FAIL(' + cbad.join('; ') + ')' : `ok(team ${pick.team || '-'}, player ${pick.player ? pick.player.n : '-'})`);
+        cards = 'cards ' + (cbad.length ? 'FAIL(' + cbad.join('; ') + ')' : `ok(team ${pick.team || '-'}${teamBets ? ' bets ' + teamBets : ''}, player ${pick.player ? pick.player.n : '-'})`);
         failures += cbad.length;
       }
       failures += errs.length;

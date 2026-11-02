@@ -74,6 +74,23 @@
   // ── the parlay slip: NBA's own when on nba.html, else a light one shared by this sport's page ──
   var SLIP_KEY = 'onyxCardSlip_' + SPORT, SLIP = [];
   try { SLIP = JSON.parse(localStorage.getItem(SLIP_KEY) || '[]') || []; } catch (e) { SLIP = []; }
+  // the save star (saved.js), the same one as every play card: the pick follows you in My picks
+  var MKEY = {points: 'pts', rebounds: 'reb', assists: 'ast'};
+  function star(pick) { return window.OnyxSaved && pick && pick.id ? OnyxSaved.btn(pick) : ''; }
+  function sidePick(s, gid) {
+    var g = gameOf(gid) || {}, num = parseFloat(String(s.lab || '').split(' ').pop());
+    return {id: s.sel, sport: SPORT, label: s.lab, matchup: g.away && g.home ? g.away + ' @ ' + g.home : '', start: g.start, gid: gid,
+      team: s.team, price: s.price, conf: s.pb, kind: s.k, mkt: s.k, name: s.team || s.lab,
+      side: s.k === 'total' ? (/^Under/.test(s.lab) ? 'under' : 'over') : null, line: s.k === 'total' && !isNaN(num) ? num : null,
+      hcap: s.k === 'spread' && !isNaN(num) ? num : null};
+  }
+  // follow a player from his card: the sport page's own follow list (onyxFollow_<sport>), the same button
+  function canFollow(p) { return !NBA && p && p.id && typeof window.toggleF === 'function' && typeof window.isF === 'function'; }
+  function followBtn(p) {
+    if (!canFollow(p)) return '';
+    var on = window.isF(p.id);
+    return '<button class="fl-btn' + (on ? ' on' : '') + '" data-cx="follow" style="margin-top:6px">' + (on ? '★ Following' : '☆ Follow') + '</button>';
+  }
   function inSlip(sel) {
     if (NBA && typeof window.inSlip === 'function') return window.inSlip(sel);
     return SLIP.some(function (x) { return x.sel === sel; });
@@ -117,7 +134,7 @@
     face.addEventListener('touchstart', function (e) { y0 = face.scrollTop <= 0 && !e.target.closest('.cx-rail,.cx-dist,.cx-tbl,.bc-mkts,input') ? e.touches[0].clientY : null; dy = 0; }, {passive: true});
     face.addEventListener('touchmove', function (e) { if (y0 == null) return; dy = e.touches[0].clientY - y0; if (dy > 0 && matchMedia('(max-width:760px)').matches) { el.style.transition = 'none'; el.style.transform = 'translateY(' + dy + 'px)'; } }, {passive: true});
     face.addEventListener('touchend', function () { if (y0 == null) return; el.style.transition = ''; el.style.transform = ''; if (dy > 110) close(); y0 = null; });
-    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && el.classList.contains('open')) close(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && el.classList.contains('open') && !pcUp()) close(); });
   }
   function show(html) {
     ensure();
@@ -146,11 +163,11 @@
     show(loading(t));
     track('team_card_open', {team: t});
     CX = {type: 'team', key: t, face: 'team'};
-    index().then(function () { return teamFile(t); }).then(function (d) {
+    index().then(function () { return loadPicks(); }).then(function () { return teamFile(t); }).then(function (d) {
       if (!CX || CX.key !== t) return;
       if (!d || !d.team) { show(missing(t, 'No card for this team yet.')); return; }
       CX.data = d.team; CX.players = d.players || {};
-      BS = null; draw();
+      BS = null; CX.open = undefined; draw();
     });
   }
   function openPlayer(name, team, gid, face) {
@@ -158,10 +175,10 @@
     show(loading(name));
     track('player_card_open', {player: name});
     CX = {type: 'player', key: name, face: face || 'front'};
-    findPlayer(name, team, gid).then(function (p) {
+    loadPicks().then(function () { return findPlayer(name, team, gid); }).then(function (p) {
       if (!CX || CX.key !== name) return;
       if (!p) { show(missing(name, 'No card for this player on this slate.')); return; }
-      CX.data = p; BS = null; draw();
+      CX.data = p; BS = null; CX.open = undefined; draw();
     });
   }
   function draw() {
@@ -169,7 +186,7 @@
     var html = CX.type === 'team' ? (CX.face === 'bets' ? teamBets(CX.data) : teamFront(CX.data)) : (CX.face === 'bets' ? playerBets(CX.data) : playerFront(CX.data));
     var f = document.getElementById('cxFace'), top = f ? f.scrollTop : 0;
     show(html);
-    if (CX.type === 'player' && CX.face === 'bets') { bindChart(); update(true); }
+    if (CX.face === 'bets' && BS && document.getElementById('cxMain')) { bindChart(); update(true); }
     if (f && CX.keepScroll) f.scrollTop = top;
     CX.keepScroll = false;
   }
@@ -193,7 +210,7 @@
       : teamLogo(p.team) + ' ' + esc(p.pos || '') + (p.pos ? ' · ' : '') + '<a data-oxt="' + esc(p.team) + '" class="cx-tlink">' + esc(p.team) + '</a> ' + (p.home ? 'vs' : '@') + ' <a data-oxt="' + esc(p.opp) + '" class="cx-tlink">' + esc(p.opp) + '</a> · ' + when(p.start || g.start);
     var n = (p.mk || []).filter(function (x) { return x.over != null || x.under != null; }).length;
     return '<div class="pc-head"><div class="pc-logo">' + (p.team ? teamLogo(p.team) : '') + '</div><div class="pc-hs">' + face_ + '</div>' +
-      '<div class="pc-id"><div class="pc-name">' + esc(p.n) + '</div><div class="sub">' + sub + '</div></div>' +
+      '<div class="pc-id"><div class="pc-name">' + esc(p.n) + '</div><div class="sub">' + sub + '</div>' + followBtn(p) + '</div>' +
       (badge ? '<div class="pc-rate"><b>' + badge[0] + '</b><span>' + esc(badge[1]) + '</span></div>' : '<span></span>') +
       '<button class="pc-x" data-cx="close" aria-label="Close">×</button></div>' + seg(KIND === 'tennis' ? 'Player' : 'Player', 'Bets', n, face);
   }
@@ -280,7 +297,7 @@
     var out = [];
     if (d.t === 'n') {
       var w = d.s <= 4 ? 1 : d.s <= 12 ? 2 : d.s <= 30 ? 5 : d.s <= 60 ? 10 : 20;
-      var lo = Math.max(d.m < 0 ? d.m - 3 * d.s : 0, Math.floor(Math.min(d.m - 2.6 * d.s, line == null ? 1e9 : line - 2 * w) / w) * w);
+      var lo = Math.max(d.m < 0 || d.z ? d.m - 3 * d.s : 0, Math.floor(Math.min(d.m - 2.6 * d.s, line == null ? 1e9 : line - 2 * w) / w) * w);
       var hi = Math.ceil(Math.max(d.m + 2.6 * d.s, line == null ? -1e9 : line + 2 * w) / w) * w;
       for (var a = lo; a < hi; a += w) out.push({a: a, b: a + w, p: ncdf((a + w - d.m) / d.s) - ncdf((a - d.m) / d.s)});
       return out;
@@ -290,71 +307,255 @@
     return out;
   }
 
-  // ── player bets ──
-  function mkList(p) { return (p.mk || []); }
-  function curMk(p) { var L = mkList(p); if (!BS) initBS(p); return L[BS.i] || null; }
-  function initBS(p, i) {
-    var L = mkList(p);
-    if (i == null) {
-      i = L.findIndex(function (m) { return m.pb != null && (m.line != null || m.yes); });
-      if (i < 0) i = L.findIndex(function (m) { return m.over != null || m.under != null; });
-      if (i < 0) i = 0;
-    }
-    var m = L[i] || {};
-    BS = {i: i, side: m.yes ? 'over' : leanOf(m), x: m.line != null ? m.line : m.proj != null ? Math.round(m.proj * 2) / 2 : 0, q: BS ? BS.q : ''};
+  // ── bets: every Onyx market on a player or a team, best value first (11/2) ──
+  // Jordan, 11/2: "the bets should be the best bets with this team or players from this team ...
+  // with all of the information, the sliding bars, everything." One ranked list, for a team (its
+  // game lines and every prop on its players) and for a player (his markets): Onyx Picks first
+  // (logged in data/picks/ledger.json), then the markets the Onyx Picks backtest has tested
+  // (cards.json "tests", cards.market_tests) by the model's expected return at the Onyx price,
+  // the home Top 10's number (blended chance x decimal odds - 1), then long prices, Onyx-only
+  // lines and, last, markets never tested against Onyx or that did not beat it: shown and
+  // labelled, never called value. A row opens the full bet card: Over / Under, Model / Onyx
+  // implied / Blended / EV per $10, the distribution and the line slider that snaps to Onyx's
+  // lines (and its alternate lines, where Onyx posts them). NBA player props open nba.html's own
+  // bet card (openBetCard) on that line, the one implementation of the NBA card.
+  var REC = [-200, 200];       // the NBA card's calibrated range: a long shot's paper EV is not value
+  var PICKS = null, PICKS_P = null;
+  function loadPicks() {
+    if (!PICKS_P) PICKS_P = getJSON('data/picks/ledger.json').then(function (L) {
+      PICKS = {}; (Array.isArray(L) ? L : []).forEach(function (r) { if (r && r.sport === SPORT && r.sel) PICKS[r.sel] = r; });
+      return PICKS;
+    }).catch(function () { PICKS = {}; return PICKS; });
+    return PICKS_P;
+  }
+  function isPick(sel) { return !!(sel && PICKS && PICKS[sel]); }
+  var TKEY = {tennis: {total: 'total_games', spread: 'game_spread'}};
+  // a market's honesty label and its tier: 1 tested, 2 tested at a long price, 3 Onyx's price
+  // only, 4 not tested against Onyx / did not beat it / borrowed shape
+  function testOf(m) {
+    if (m.fails) return {t: 4, lab: m.fails};
+    if (m.nc === 'role') return {t: 4, lab: 'Role change: shown, not priced'};
+    if (m.nc === 'nhl') return {t: 4, lab: 'Did not beat Onyx in testing'};
+    if (m.nc === 'cbb' || m.untested) return {t: 4, lab: 'Not tested against Onyx'};
+    if (m.shape) return {t: 4, lab: m.shape};
+    if (m.pm == null || m.pb == null || m.nc === 'onyx' || m.nc === 'td_info' || m.nc === 'td_any')
+      return {t: 3, lab: m.nc === 'td_any' ? 'Onyx price, margin removed' : m.nc === 'td_info' ? 'Information only' : 'Onyx price only'};
+    var T = (IDX || {}).tests || {}, v = T[(TKEY[SPORT] || {})[m.m] || m.m];
+    if (SPORT === 'cbb' && !m.g && !v) v = T.props;
+    if (v === 'finalized') return {t: 1, lab: 'Beat Onyx in testing'};
+    if (v === 'not enough yet') return {t: 1, lab: 'In testing'};
+    if (v === 'fails') return {t: 4, lab: 'Did not beat Onyx in testing'};
+    if (v === 'retest') return {t: 4, lab: 'Model changed: back in testing'};
+    return {t: 4, lab: 'Not backtested against Onyx'};
+  }
+  function hc(v) { v = Math.round(v * 2) / 2; return (v > 0 ? '+' : '') + v; }
+  function sidesOf(m) {
+    return ['over', 'under'].filter(function (s) { return (s === 'over' ? m.over : m.under) != null && (s === 'over' ? m.over_sel : m.under_sel) && !(m.yes && s === 'under'); });
   }
   function evOf(m, side) {
     var pr = side === 'over' ? m.over : m.under;
-    if (m.pb == null || pr == null) return null;
+    if (m.pb == null || m.pm == null || pr == null) return null;
     return (side === 'over' ? m.pb : 1 - m.pb) * dec(pr) - 1;
   }
-  function best(p) {
-    var c = [];
-    mkList(p).forEach(function (m, i) {
-      if (m.untested || m.pb == null || m.pm == null) return;
-      ['over', 'under'].forEach(function (s) {
-        var pr = s === 'over' ? m.over : m.under, sel = s === 'over' ? m.over_sel : m.under_sel;
-        if (pr == null || !sel || pr < -200 || pr > 200 || (m.yes && s === 'under')) return;
-        c.push({i: i, side: s, ev: evOf(m, s), price: pr, m: m});
+  // one row: the market on the side a logged pick took, else the side with the better expected return
+  function mkRow(p, m, key, who) {
+    var S = sidesOf(m);
+    if (!S.length) return null;
+    var side = S.filter(function (s) { return isPick(s === 'over' ? m.over_sel : m.under_sel); })[0];
+    if (!side) side = m.pb != null && m.pm != null ? S.reduce(function (a, b) { var ea = evOf(m, a), eb = evOf(m, b); return eb != null && (ea == null || eb > ea) ? b : a; })
+      : S.indexOf(leanOf(m)) >= 0 ? leanOf(m) : S[0];
+    var price = side === 'over' ? m.over : m.under, sel = side === 'over' ? m.over_sel : m.under_sel, ts = testOf(m), pk = isPick(sel);
+    if (ts.t === 1 && !pk && (price < REC[0] || price > REC[1])) ts = {t: 2, lab: ts.lab + ' · long price, not ranked as value'};
+    return {key: key, p: p, m: m, side: side, price: price, sel: sel, ev: evOf(m, side), ch: m.pb == null || m.pm == null ? null : side === 'over' ? m.pb : 1 - m.pb,
+      test: ts, pick: pk, rank: pk ? 0 : ts.t, who: who || '', nba: m.nba || null};
+  }
+  function rank(rows) {
+    return rows.filter(Boolean).sort(function (a, b) { return a.rank - b.rank || (b.ev == null ? -9 : b.ev) - (a.ev == null ? -9 : a.ev); });
+  }
+  // the selection in words, at Onyx's line (x null) or a scrubbed one
+  function sideLab(m, side, x) {
+    var exact = x == null || m.line == null || Math.abs(x - m.line) < 1e-9;
+    if (m.g === 'ml') return side === 'over' ? m.lab_o : m.lab_u;
+    if (m.g === 'spread') return exact ? (side === 'over' ? m.lab_o : m.lab_u) : m.sideNames[side === 'over' ? 0 : 1] + ' ' + hc(side === 'over' ? -x : x);
+    if (m.yes) return m.name + (side === 'under' ? ': No' : '');
+    return (side === 'over' ? 'Over ' : 'Under ') + (exact ? m.line : (+x).toFixed(1)) + ' ' + (m.g ? m.name.toLowerCase() : m.name);
+  }
+  function rowLab(r) { return (r.who ? r.who + ' ' : '') + sideLab(r.m, r.side); }
+
+  // the team's game lines as markets: this team (or the over) is "over", the other side "under"
+  function gameMarkets(t) {
+    var G = t.game || {}, S = G.sides || [], M = G.model, out = [], mu = G.home ? G.opp + ' @ ' + t.abbr : t.abbr + ' @ ' + G.opp;
+    var w = Math.round(100 * (G.w || 0)), sdOk = M && M.sd_margin && M.sd_total;
+    ['ml', 'spread', 'total'].forEach(function (k) {
+      var ss = S.filter(function (s) { return s.k === k; });
+      if (!ss.length) return;
+      var a = k === 'total' ? ss.filter(function (s) { return /^Over/.test(s.lab); })[0] : ss.filter(function (s) { return s.team === t.abbr; })[0];
+      a = a || ss[0];
+      var b = ss.filter(function (s) { return s !== a; })[0] || null, n = parseFloat(String(a.lab).split(' ').pop());
+      if (k !== 'ml' && isNaN(n)) return;
+      var m = {m: k, g: k, gid: G.gid, matchup: mu, name: k === 'ml' ? 'Moneyline' : k === 'spread' ? 'Spread' : 'Game total',
+        line: k === 'ml' ? null : k === 'spread' ? -n : n, over: a.price, under: b ? b.price : null, over_sel: a.sel, under_sel: b ? b.sel : null,
+        pm: a.pm, pb: a.pm != null ? a.pb : null, sides: [a, b], lab_o: a.lab, lab_u: b ? b.lab : '',
+        sideNames: k === 'total' ? null : [a.team || 'This side', b ? b.team || 'Other side' : 'Other side']};
+      if (k === 'spread' && sdOk) { m.dist = {t: 'n', m: (a.team === t.abbr ? 1 : -1) * M.margin, s: M.sd_margin, z: 1}; m.proj = m.dist.m; }
+      if (k === 'total' && sdOk) { m.dist = {t: 'n', m: M.total, s: M.sd_total}; m.proj = M.total; }
+      m.note = a.pm == null ? (NBA ? 'The NBA model prices player props and the 1st-quarter total, not sides: this is Onyx\'s own line, ' + esc(a.lab) + ' ' + pct(a.fair, 1) + ' with its margin removed'
+        : 'Not enough games for the ratings to price this one yet: Onyx\'s price only')
+        : 'Model: the team ratings\' chance. Blended: ' + w + '% model, the rest Onyx\'s price with its margin removed. EV per $10 at Onyx\'s price on the blended chance' +
+          (m.dist ? '. Drag the chart or the slider: off Onyx\'s line you see the model\'s chance only, release to snap back' : '');
+      out.push(m);
+    });
+    if (NBA) out = out.concat(nbaPeriods(t));
+    return out;
+  }
+  // NBA 1st quarter and 1st half (nba.html's qhCard read: a share of Onyx's game total, normal spread)
+  function nbaPeriods(t) {
+    var G = t.game || {}, g = gameOf(G.gid), Q = window.QH_P || {q1: .254, q1_sd: 12, h1: .505, h1_sd: 18, q1m: .34, q1m_sd: 11};
+    if (!g || g.total == null || g.state && g.state !== 'pre') return [];
+    var out = [], mu = g.away + ' @ ' + g.home;
+    [['q1', '1st-quarter total', Q.q1, Q.q1_sd, 'q1_total'], ['h1', '1st-half total', Q.h1, Q.h1_sd, 'h1_total']].forEach(function (q) {
+      var line = g[q[0] + '_total'];
+      if (line == null || g[q[0] + '_over_price'] == null) return;
+      var d = {t: 'n', m: g.total * q[2], s: q[3]}, po = pOver(d, line);
+      out.push({m: q[4], g: 'period', gid: g.gid, matchup: mu, name: q[1], line: line, over: g[q[0] + '_over_price'], under: g[q[0] + '_under_price'],
+        over_sel: g[q[0] + '_over_sel'], under_sel: g[q[0] + '_under_sel'], pm: po, pb: po, proj: d.m, dist: d,
+        note: 'The model\'s chance: ' + Math.round(q[2] * 1000) / 10 + '% of Onyx\'s game total (' + g.total + '), spread ' + q[3] + ' points. This lane bets the model\'s chance itself, so Blended is the same number'});
+    });
+    if (g.spread != null && (g.q1_home_ml != null || g.q1_away_ml != null)) {
+      var mm = -g.spread * Q.q1m, pw = 1 - ncdf((.5 - mm) / Q.q1m_sd), pl = ncdf((-.5 - mm) / Q.q1m_sd), ph = pw / (pw + pl), home = g.home === t.abbr;
+      out.push({m: 'q1_ml', g: 'ml', gid: g.gid, matchup: mu, name: '1st-quarter winner', line: null,
+        over: home ? g.q1_home_ml : g.q1_away_ml, under: home ? g.q1_away_ml : g.q1_home_ml, over_sel: home ? g.q1_home_ml_sel : g.q1_away_ml_sel, under_sel: home ? g.q1_away_ml_sel : g.q1_home_ml_sel,
+        pm: home ? ph : 1 - ph, pb: home ? ph : 1 - ph, lab_o: t.abbr + ' 1st quarter', lab_u: (home ? g.away : g.home) + ' 1st quarter', sideNames: [t.abbr, home ? g.away : g.home],
+        fails: 'Did not beat Onyx in testing', note: 'The model\'s chance from 34% of Onyx\'s spread. It did not beat Onyx in testing: shown, never recommended'});
+    }
+    return out;
+  }
+  // NBA props: each market the page's bet card prices (nba_build.bet_ladders), on Onyx's main line
+  var NBA_NAME = {pts: 'Points', reb: 'Rebounds', ast: 'Assists', pra: 'Pts + Reb + Ast', pr: 'Pts + Reb', pa: 'Pts + Ast', fg3: 'Threes made', dd: 'Double-double', td: 'Triple-double'};
+  function nbaRows(abbr) {
+    var out = [], MK = window.BC_MKTS || {};
+    ((NBA || {}).players || []).forEach(function (p) {
+      if (p.team !== abbr || !p.bets) return;
+      Object.keys(p.bets).forEach(function (s) {
+        var L = p.bets[s] || [], i = -1, ml = ((p.props || {})[s] || {}).line;
+        if (ml != null) i = L.findIndex(function (r) { return r[0] === ml; });
+        if (i < 0) i = L.findIndex(function (r) { return r[3] != null; });
+        if (i < 0) i = 0;
+        var r = L[i];
+        if (!r) return;
+        var m = {m: s, name: (MK[s] || [])[0] || NBA_NAME[s] || s, line: r[0], over: r[1], over_sel: r[2], under: r[3], under_sel: r[4], pm: r[5], pb: r[6],
+          nba: {pid: p.pid, s: s, i: i, line: r[0], n: L.length}};
+        if (s === 'dd' || s === 'td') m.yes = true;
+        if (s === 'fg3') m.shape = 'Threes shape not backtested';
+        if (s === 'pra' || s === 'pr' || s === 'pa') m.shape = 'Combined stat, not backtested';
+        out.push(mkRow({n: p.name, team: p.team, gid: p.gid}, m, 'n' + p.pid + s, p.name));
       });
     });
-    return c.length ? c.reduce(function (a, b) { return b.ev > a.ev ? b : a; }) : null;
+    return out;
   }
+  function teamRows(t) {
+    var G = t.game || {}, out = gameMarkets(t).map(function (m, i) { return mkRow({n: '', team: t.abbr, gid: G.gid, start: G.start}, m, 'g' + i, ''); });
+    if (NBA) out = out.concat(nbaRows(t.abbr));
+    else Object.keys(CX.players || {}).forEach(function (k) {
+      var p = CX.players[k];
+      (p.mk || []).forEach(function (m, i) { out.push(mkRow(p, m, k + '#' + i, p.n)); });
+    });
+    return rank(out);
+  }
+  function playerRows(p) { return rank((p.mk || []).map(function (m, i) { return mkRow(p, m, 'p' + i, ''); })); }
+  function curRows() { return !CX || !CX.data ? [] : CX.type === 'team' ? teamRows(CX.data) : playerRows(CX.data); }
+  function openRow(r) {
+    if (!r) { CX.open = null; BS = null; return; }
+    var m = r.m;
+    CX.open = r.key;
+    BS = {key: r.key, p: r.p, m: m, side: r.side, x: m.line != null ? m.line : m.proj != null ? Math.round(m.proj * 2) / 2 : 0};
+  }
+  // NBA: the page's own bet card, on this row's line and side, above the team card
+  function nbaOpen(r) {
+    if (typeof window.openBetCard !== 'function') return;
+    track('bet_card_open', {player: r.who, source: 'team_card'});
+    window.openBetCard(r.nba.pid, r.nba.s);
+    try {
+      var B = window.BC;
+      if (B && B.pid === r.nba.pid && B.s === r.nba.s) { B.i = r.nba.i; B.x = r.nba.line; B.side = r.side; if (typeof window.bcRender === 'function') window.bcRender(); }
+    } catch (e) {}
+    var pc = document.getElementById('pc'), bg = document.getElementById('pcBg');
+    if (pc) pc.style.zIndex = '10095';
+    if (bg) bg.style.zIndex = '10090';
+  }
+  if (NBA && typeof window.pcClose === 'function' && !window.pcClose._cx) {
+    // closing the NBA card over a team card leaves the team card's page lock in place
+    var pcClose0 = window.pcClose;
+    window.pcClose = function () { pcClose0.apply(this, arguments); var el = document.getElementById('cx'); if (el && el.classList.contains('open')) document.body.style.overflow = 'hidden'; };
+    window.pcClose._cx = 1;
+  }
+  function pcUp() { var pc = document.getElementById('pc'); return !!(pc && pc.classList.contains('open')); }
+
+  // ── the list ──
+  function bestBox(rows) {
+    var c = rows.filter(function (r) { return r.test.t === 1 && r.ev != null; });
+    var b = c.length ? c.reduce(function (a, x) { return x.ev > a.ev ? x : a; }) : null;
+    var scope = 'Across ' + c.length + ' tested market' + (c.length === 1 ? '' : 's') + ' priced ' + REC[0] + ' to +' + REC[1] + ': the blended chance at Onyx\'s price.';
+    if (b && b.ev > 0)
+      return '<button class="bc-best" data-cx="bb" data-k="' + esc(b.key) + '"><span class="eb">' + (b.pick ? 'Onyx Pick · best expected value' : 'Best bet by expected value') + '</span>' +
+        '<span class="bt">' + esc(rowLab(b)) + ' <em>' + odds(b.price) + '</em></span>' +
+        '<span class="bv ' + mcls(b.ev) + '">' + money(10 * b.ev) + ' <small>per $10</small></span>' +
+        '<span class="bw">' + esc(scope) + ' ' + (b.pick ? 'Logged on the public Onyx Picks record.' : 'A projection, not a tracked pick.') + '</span></button>';
+    return '<div class="bc-best none"><span class="eb">Best bet</span><span class="bt">' + (c.length ? 'No tested market shows value at Onyx\'s prices right now' : 'No market here has been tested against Onyx yet') + '</span>' +
+      '<span class="bw">' + (b ? esc(scope) + ' Closest to fair: ' + esc(rowLab(b)) + ' ' + odds(b.price) + ', ' + money(10 * b.ev) + ' per $10. Below zero is not a bet we would call value.'
+        : 'Every line below is shown with its numbers, labelled, and none is called value.') + '</span></div>';
+  }
+  function rowHtml(r) {
+    var open = CX.open === r.key && !r.nba, t = r.test.t, ev = r.ev;
+    // untested or failed markets show the model's chance, never a dollar figure that reads as value
+    var pmS = r.m.pm == null ? null : r.side === 'over' ? r.m.pm : 1 - r.m.pm;
+    var right = '<b>' + odds(r.price) + '</b>' + (t === 4 && pmS != null ? '<em class="dim">' + pct(pmS, 0) + '</em><small>model</small>' : ev != null && t !== 3 ? '<em class="' + (t === 1 || r.pick ? mcls(ev) : 'dim') + '">' + money(10 * ev) + '</em><small>per $10</small>'
+      : r.m.sides && r.m.sides[0] && r.m.sides[0].fair != null ? '<em class="dim">' + pct(r.side === 'over' ? r.m.sides[0].fair : (r.m.sides[1] || {}).fair, 0) + '</em><small>no-vig</small>' : '<em class="dim">-</em><small>Onyx only</small>');
+    var sub = [esc(r.test.lab), r.ch != null && t <= 2 ? pct(r.ch, 0) + ' blended' : ''].filter(Boolean).join(' · ');
+    return '<div class="cx-bb' + (open ? ' open' : '') + (t >= 3 && !r.pick ? ' lo' : '') + '"><button class="cx-bbr" data-cx="bb" data-k="' + esc(r.key) + '" aria-expanded="' + (open ? 'true' : 'false') + '">' +
+      '<span class="cx-bbl"><span class="cx-bdg ' + (r.pick ? 'pk' : 'pj') + '">' + (r.pick ? 'Onyx Pick' : 'Projection') + '</span><b>' + esc(rowLab(r)) + '</b><em>' + sub + '</em></span>' +
+      '<span class="cx-bbv">' + right + '</span><span class="cx-bbc">' + (r.nba ? '›' : open ? '−' : '+') + '</span></button>' +
+      (open ? '<div class="cx-bbp">' + panel(r.m) + '</div>' : '') + '</div>';
+  }
+  function betList(rows, whose) {
+    var q = (CX.q || '').toLowerCase().trim();
+    var R = rows.filter(function (r) { return !q || (rowLab(r) + ' ' + r.m.name + ' ' + shortMk(r.m) + ' ' + r.test.lab).toLowerCase().indexOf(q) >= 0; });
+    var lim = CX.more || q ? R.length : 25;
+    return (rows.length > 6 ? '<label class="bc-search"><input type="search" placeholder="Search ' + whose + ' markets" value="' + esc(CX.q || '') + '" data-cx="search" aria-label="Search markets"></label>' : '') +
+      '<div class="cx-bbs">' + (R.slice(0, lim).map(rowHtml).join('') || '<div class="cx-empty">No market matches.</div>') + '</div>' +
+      (R.length > lim ? '<button class="cx-btn cx-more" data-cx="more">Show all ' + R.length + ' markets</button>' : '');
+  }
+  var LEGEND = 'Ranked by expected value: the blended chance at Onyx\'s price, per $10, the number the home Top 10 ranks by. Onyx Pick = logged on the public record (Onyx Picks); Projection = the model\'s number, not a tracked pick. Tested markets come first; long prices, Onyx-only lines and markets not tested against Onyx (or that did not beat it) follow and are never called value. Tap a row for its bet card.';
+  function playerBets(p) {
+    var rows = playerRows(p);
+    if (CX.open === undefined) openRow(rows[0]);
+    return pHead(p, 'bets') + '<div class="pc-body">' +
+      (rows.length ? bestBox(rows) + betList(rows, 'his') + '<div class="cx-note">' + LEGEND + '</div>' : '<div class="cx-empty">No Onyx line on him right now.</div>') + '</div>';
+  }
+
+  // ── the bet card (one market): reads, distribution, slider, Onyx's lines, add / bet ──
+  function rungsOf(m) { return m.lad && m.lad.length ? m.lad : m.line != null ? [[m.line, m.over, m.over_sel, m.under, m.under_sel, m.pm, m.pb]] : []; }
   function rangeOf(m) {
     var d = m.dist;
     if (!d || m.yes) return null;
     var sd = d.t === 'n' ? d.s : Math.sqrt(d.t === 'nb' ? d.v : d.m);
-    var lo = Math.max(d.t === 'n' && d.m < 0 ? -50 : 0, Math.floor((d.m - 2.5 * sd) * 2) / 2 + .5), hi = Math.ceil((d.m + 2.5 * sd) * 2) / 2 - .5;
-    if (m.line != null) { lo = Math.min(lo, m.line); hi = Math.max(hi, m.line); }
+    var lo = Math.max(d.t === 'n' && (d.m < 0 || d.z) ? -1e9 : 0, Math.floor((d.m - 2.5 * sd) * 2) / 2 + .5), hi = Math.ceil((d.m + 2.5 * sd) * 2) / 2 - .5;
+    rungsOf(m).forEach(function (r) { lo = Math.min(lo, r[0]); hi = Math.max(hi, r[0]); });
     if (hi - lo < 1) hi = lo + 1;
     return [lo, hi];
   }
-  function playerBets(p) {
-    var L = mkList(p);
-    if (!BS) initBS(p);
-    var m = L[BS.i];
-    var b = best(p);
-    var q = (BS.q || '').toLowerCase().trim();
-    var chips = L.map(function (x, i) { return [x, i]; }).filter(function (a) { return !q || (a[0].name + ' ' + shortMk(a[0])).toLowerCase().indexOf(q) >= 0; })
-      .map(function (a) { return '<button class="' + (a[1] === BS.i ? 'on' : '') + '" data-cx="mk" data-i="' + a[1] + '">' + esc(a[0].name) + (a[0].proj != null ? ' <span>' + num(a[0].proj) + '</span>' : '') + '</button>'; }).join('');
-    var rg = m ? rangeOf(m) : null;
-    var html = pHead(p, 'bets') + '<div class="pc-body">' +
-      (b ? '<button class="bc-best" data-cx="take" data-i="' + b.i + '" data-s="' + b.side + '"><span class="eb">' + (b.ev > 0 ? 'Best price by the blend' : 'Closest to fair') + '</span>' +
-        '<span class="bt">' + (b.m.yes ? esc(b.m.name) : (b.side === 'over' ? 'Over ' : 'Under ') + b.m.line + ' ' + esc(shortMk(b.m))) + ' <em>' + odds(b.price) + '</em></span>' +
-        '<span class="bv ' + mcls(b.ev) + '">' + money(10 * b.ev) + ' <small>per $10</small></span><span class="bw">A projection, not a tracked pick: across his markets the model prices, Onyx prices -200 to +200</span></button>' : '') +
-      (L.length > 3 ? '<label class="bc-search"><input type="search" placeholder="Search his markets" value="' + esc(BS.q) + '" data-cx="search" aria-label="Search markets"></label>' : '') +
-      '<div class="bc-mkts">' + (chips || '<span class="dim" style="font-size:12px">No market matches.</span>') + '</div>' +
-      (m ? '<div class="bc-main" id="cxMain"><div class="bc-line"><div><div class="bc-big" id="cxBig"></div>' +
-        '<div class="bc-side" id="cxSide"><button data-cx="side" data-s="over">' + (m.yes ? 'Yes' : 'Over') + '</button><button data-cx="side" data-s="under">' + (m.yes ? 'No' : 'Under') + '</button></div><div class="bc-note" id="cxSideNote"></div></div>' +
-        '<div class="bc-price" id="cxPrice"></div></div><div class="bc-stats" id="cxStats"></div>' +
-        (rg && m.dist ? '<div class="cx-dist" id="cxDist"></div><div class="cx-rail" id="cxRail"><div class="cx-rail-fill"></div>' + (m.line != null ? '<i class="main"></i>' : '') + '<b class="cx-thumb"></b>' +
-          '<input id="cxRange" type="range" min="' + rg[0] + '" max="' + rg[1] + '" step="0.5" value="' + BS.x + '" aria-label="Line"></div>' : '') +
-        '<div class="bc-note">' + esc(noteOf(m)) + '</div>' +
-        (m.why && m.why.length ? '<div class="cx-whyl">' + m.why.map(function (w) { return '<span>' + esc(Array.isArray(w) ? w.join(' ') : typeof w === 'object' ? (w.k || w.t || '') + ' ' + (w.v != null ? w.v : '') : w) + '</span>'; }).join('') + '</div>' : '') +
-        '<div class="bc-acts"><button class="cx-btn" id="cxAdd" data-cx="add">+ Add to parlay</button><button class="cx-btn p" id="cxBet" data-cx="bet">⚡ Bet on Onyx</button></div></div>'
-        : '<div class="cx-empty">No Onyx line on him right now.</div>') +
-      '</div>';
-    return html;
+  function panel(m) {
+    var rg = rangeOf(m), R = rungsOf(m), sn = m.sideNames;
+    return '<div class="bc-main" id="cxMain"><div class="bc-line"><div><div class="bc-big" id="cxBig"></div>' +
+      '<div class="bc-side" id="cxSide"><button data-cx="side" data-s="over">' + esc(sn ? sn[0] : m.yes ? 'Yes' : 'Over') + '</button><button data-cx="side" data-s="under">' + esc(sn ? sn[1] : m.yes ? 'No' : 'Under') + '</button></div><div class="bc-note" id="cxSideNote"></div></div>' +
+      '<div class="bc-price" id="cxPrice"></div></div><div class="bc-stats" id="cxStats"></div>' +
+      (rg && m.dist ? '<div class="cx-dist" id="cxDist"></div><div class="cx-rail" id="cxRail"><div class="cx-rail-fill"></div>' + R.map(function (r, j) { return '<i class="main" data-j="' + j + '"></i>'; }).join('') + '<b class="cx-thumb"></b>' +
+        '<input id="cxRange" type="range" min="' + rg[0] + '" max="' + rg[1] + '" step="0.5" value="' + BS.x + '" aria-label="Line"></div>' : '') +
+      (R.length && m.line != null ? '<div class="cx-rungs" id="cxRungs">' + R.map(function (r, j) {
+        return '<button data-cx="rung" data-j="' + j + '"><b>' + esc(m.g === 'spread' ? sn[0] + ' ' + hc(-r[0]) : r[0]) + '</b><span></span></button>'; }).join('') + '</div>' : '') +
+      '<div class="bc-note">' + esc(noteOf(m)) + (R.length === 1 && m.dist ? ' Onyx posts one line on this market, so the chips hold that line; the slider reads the model\'s chance between lines.' : '') + '</div>' +
+      (m.why && m.why.length ? '<div class="cx-whyl">' + m.why.map(function (w) { return '<span>' + esc(Array.isArray(w) ? w.join(' ') : typeof w === 'object' ? (w.k || w.t || '') + ' ' + (w.v != null ? w.v : '') : w) + '</span>'; }).join('') + '</div>' : '') +
+      '<div class="bc-acts"><button class="cx-btn" id="cxAdd" data-cx="add">+ Add to parlay</button><button class="cx-btn p" id="cxBet" data-cx="bet">⚡ Bet on Onyx</button><span id="cxSave" style="display:inline-flex"></span></div></div>';
   }
   // market notes by code (cards.py "nc"), so each team's file does not repeat them
   var NOTES = {onyx: 'Not modeled: Onyx\'s price only.', noline: 'No Onyx line yet: projection only.',
@@ -370,64 +571,93 @@
     if (m.pb != null && m.pm != null) return 'Blended = the model\'s chance weighted with Onyx\'s price with the margin removed, the same math as the board. Drag the chart or the slider: off Onyx\'s line you see the model\'s chance only; release to snap back to the line you can bet.';
     return 'Onyx\'s price only.';
   }
-  function pick(p) {
-    var m = curMk(p);
+  function curMk() { return BS ? BS.m : null; }
+  function nearRung(m, x) { var R = rungsOf(m), j = 0; R.forEach(function (r, i) { if (Math.abs(r[0] - x) < Math.abs(R[j][0] - x)) j = i; }); return R.length ? j : -1; }
+  // the reading at the slider: an Onyx line (its prices), or between lines (the model's chance only)
+  function pick() {
+    var m = curMk();
     if (!m) return null;
-    var x = Math.round(BS.x * 2) / 2, exact = m.line == null || Math.abs(x - m.line) < 1e-9 || !m.dist;
-    if (exact) {
-      var side = BS.side === 'under' && m.under == null ? 'over' : BS.side === 'over' && m.over == null && m.under != null ? 'under' : BS.side;
-      var pr = side === 'over' ? m.over : m.under;
-      return {exact: true, side: side, line: m.line, price: pr, sel: side === 'over' ? m.over_sel : m.under_sel,
-        pm: m.pm == null ? null : side === 'over' ? m.pm : 1 - m.pm, pb: m.pb == null ? null : side === 'over' ? m.pb : 1 - m.pb,
-        imp: imp(pr), ev: evOf(m, side), under: m.under != null};
+    var R = rungsOf(m), x = Math.round(BS.x * 2) / 2, r = null;
+    if (!m.dist || !R.length) r = R[0] || null;
+    else R.forEach(function (q) { if (Math.abs(q[0] - x) < 1e-9) r = q; });
+    if (r || !R.length) {
+      var o = r ? r[1] : m.over, u = r ? r[3] : m.under, pm = r ? r[5] : m.pm, pb = r ? r[6] : m.pb;
+      var side = BS.side === 'under' && u == null ? 'over' : BS.side === 'over' && o == null && u != null ? 'under' : BS.side;
+      var pr = side === 'over' ? o : u, ok = pm != null && pb != null;
+      return {exact: true, side: side, line: r ? r[0] : m.line, price: pr, sel: r ? (side === 'over' ? r[2] : r[4]) : (side === 'over' ? m.over_sel : m.under_sel),
+        pm: pm == null ? null : side === 'over' ? pm : 1 - pm, pb: ok ? (side === 'over' ? pb : 1 - pb) : null,
+        imp: imp(pr), ev: ok && pr != null ? (side === 'over' ? pb : 1 - pb) * dec(pr) - 1 : null, under: u != null, over: o != null};
     }
     var po = pOver(m.dist, x);
     return {exact: false, side: BS.side, line: x, pm: po == null ? null : BS.side === 'over' ? po : 1 - po};
   }
   function update(snap) {
-    if (!CX || CX.type !== 'player' || CX.face !== 'bets') return;
-    var p = CX.data, m = curMk(p), k = pick(p), $ = function (id) { return document.getElementById(id); };
-    if (!m || !k || !$('cxBig')) return;
-    var yes = !!m.yes;
-    $('cxBig').innerHTML = yes ? esc(m.name) + (k.side === 'under' ? ': No' : '') : (k.side === 'over' ? 'Over ' : 'Under ') + (k.line == null ? '' : k.exact ? k.line : k.line.toFixed(1)) + ' <span>' + esc(m.name) + '</span>';
+    var $ = function (id) { return document.getElementById(id); };
+    if (!CX || !BS || !BS.m || !$('cxBig')) return;
+    var p = BS.p || {}, m = BS.m, k = pick(), yes = !!m.yes, R = rungsOf(m);
+    if (!k) return;
+    $('cxBig').innerHTML = m.g === 'ml' ? esc(sideLab(m, k.side)) + ' <span>' + esc(m.name) + '</span>'
+      : m.g === 'spread' ? esc(sideLab(m, k.side, k.exact ? null : k.line)) + ' <span>' + esc(m.name) + '</span>'
+      : yes ? esc(m.name) + (k.side === 'under' ? ': No' : '') : (k.side === 'over' ? 'Over ' : 'Under ') + (k.line == null ? '' : k.exact ? k.line : k.line.toFixed(1)) + ' <span>' + esc(m.name) + '</span>';
     $('cxPrice').innerHTML = k.exact ? (k.price != null ? odds(k.price) + '<span>Onyx</span>' : '<i class="na">no Onyx price</i><span>this side</span>') : '<i class="na">not offered</i><span>scrubbing</span>';
     $('cxPrice').classList.toggle('ghost', !k.exact);
     var sb = $('cxSide');
-    sb.style.display = k.exact && m.over != null && m.under != null ? '' : 'none';
+    sb.style.display = k.exact && k.over && k.under ? '' : 'none';
     sb.querySelectorAll('button').forEach(function (b) { b.classList.toggle('on', b.dataset.s === k.side); });
-    $('cxSideNote').innerHTML = !k.exact ? 'Between lines · Onyx line <b>' + esc(m.line) + '</b> · release to snap' : m.under == null && m.over != null && !yes ? 'Onyx prices the over only here' : '';
+    $('cxSideNote').innerHTML = !k.exact ? 'Between Onyx lines' + (R.length === 1 ? ' · Onyx line <b>' + esc(m.g === 'spread' ? (k.side === 'over' ? m.lab_o : m.lab_u) : m.line) + '</b>' : '') + ' · release to snap'
+      : !k.under && k.over && !yes && !m.g ? 'Onyx prices the over only here' : '';
     $('cxStats').innerHTML = '<div><span>Model</span><b>' + (k.pm != null ? pct(k.pm, 1) : '-') + '</b></div>' +
       '<div><span>Onyx implied</span><b>' + (k.exact && k.imp != null ? pct(k.imp, 1) : '-') + '</b></div>' +
-      '<div><span>Blended</span><b>' + (k.exact && k.pb != null && m.pm != null ? pct(k.pb, 1) : '-') + '</b></div>' +
-      '<div><span>EV per $10</span>' + (k.exact && k.ev != null && m.pm != null ? '<b class="' + mcls(k.ev) + '">' + money(10 * k.ev) + '</b>' : '<b class="dim">-</b>') + '</div>';
+      '<div><span>Blended</span><b>' + (k.exact && k.pb != null ? pct(k.pb, 1) : '-') + '</b></div>' +
+      '<div><span>EV per $10</span>' + (k.exact && k.ev != null ? '<b class="' + (testOf(m).t === 1 ? mcls(k.ev) : '') + '">' + money(10 * k.ev) + '</b>' : '<b class="dim">-</b>') + '</div>';
     var dist = $('cxDist'), rg = rangeOf(m);
+    var a0 = 0, a1 = 1, at = function () { return 0; };
     if (dist && m.dist && rg) {
       var B = dist._b;
-      if (!B || dist.dataset.i !== String(BS.i)) {
+      if (!B || dist.dataset.k !== BS.key) {
         B = bins(m.dist, m.line); var mx = Math.max.apply(null, B.map(function (b) { return b.p; })) || 1;
-        dist._b = B; dist.dataset.i = String(BS.i);
+        dist._b = B; dist.dataset.k = BS.key;
         dist.innerHTML = '<div class="cx-bars">' + B.map(function (b) { return '<i style="height:' + Math.max(2, b.p / mx * 100) + '%" title="' + (b.k != null ? b.k : Math.round(b.a) + ' to ' + Math.round(b.b)) + ': ' + (b.p * 100).toFixed(1) + '%"></i>'; }).join('') + '<b class="cx-mark"><span></span></b></div>' +
-          '<div class="cx-axis"><span>' + fmtStat(B[0].k != null ? B[0].k : B[0].a) + '</span><span>proj ' + num(m.proj != null ? m.proj : m.dist.m) + '</span><span>' + fmtStat(B[B.length - 1].k != null ? B[B.length - 1].k : B[B.length - 1].b) + '</span></div>';
+          '<div class="cx-axis"><span>' + fmtStat(B[0].k != null ? B[0].k : B[0].a) + '</span><span>' + (m.g === 'spread' ? esc(m.sideNames[0]) + ' margin ' + sg(m.dist.m) : 'proj ' + num(m.proj != null ? m.proj : m.dist.m)) + '</span><span>' + fmtStat(B[B.length - 1].k != null ? B[B.length - 1].k : B[B.length - 1].b) + '</span></div>';
       }
-      var a0 = B[0].a, a1 = B[B.length - 1].b, at = function (x) { return Math.min(100, Math.max(0, (x - a0) / (a1 - a0) * 100)); };
+      a0 = B[0].a; a1 = B[B.length - 1].b; at = function (x) { return Math.min(100, Math.max(0, (x - a0) / (a1 - a0) * 100)); };
       var L = k.line;
       [].forEach.call(dist.querySelectorAll('.cx-bars i'), function (el, j) { var b = B[j], mid = (b.a + b.b) / 2; el.className = k.side === 'over' ? (mid > L ? 'ov' : '') : (mid < L ? 'un' : ''); });
       var mk = dist.querySelector('.cx-mark'); mk.style.left = at(BS.x) + '%'; mk.classList.toggle('ghost', !k.exact);
-      mk.querySelector('span').textContent = k.exact ? m.line : (Math.round(BS.x * 2) / 2).toFixed(1);
+      var xs = k.exact ? k.line : Math.round(BS.x * 2) / 2;   // a spread reads from the side shown: CHI +3 / SEA -3
+      mk.querySelector('span').textContent = m.g === 'spread' ? hc(k.side === 'over' ? -xs : xs) : k.exact ? k.line : (Math.round(BS.x * 2) / 2).toFixed(1);
       var rail = $('cxRail');
       if (rail) {
         rail.querySelector('.cx-thumb').style.left = at(BS.x) + '%'; rail.querySelector('.cx-thumb').classList.toggle('ghost', !k.exact);
-        var tick = rail.querySelector('i.main'); if (tick) tick.style.left = at(m.line) + '%';
+        rail.querySelectorAll('i.main').forEach(function (t) { var r = R[+t.dataset.j]; if (r) t.style.left = at(r[0]) + '%'; });
         var f = rail.querySelector('.cx-rail-fill'), z = at(rg[0]); f.style.left = z + '%'; f.style.width = Math.max(0, at(BS.x) - z) + '%';
-        var r = $('cxRange'); if (r && (document.activeElement !== r || snap)) r.value = BS.x;
+        var rn = $('cxRange'); if (rn && (document.activeElement !== rn || snap)) rn.value = BS.x;
       }
     }
-    var leg = k.exact && k.sel && k.price != null ? {sel: k.sel, price: k.price, gid: p.gid, market: 'player_' + m.m,
-      label: p.n + ' ' + (yes ? m.name + (k.side === 'under' ? ' No' : '') : (k.side === 'over' ? 'Over ' : 'Under ') + m.line + ' ' + m.name)} : null;
+    var rungs = $('cxRungs');
+    if (rungs) {
+      var nj = nearRung(m, BS.x);
+      rungs.querySelectorAll('button').forEach(function (b) {
+        var j = +b.dataset.j, r = R[j], u = k.side === 'under' && r[3] != null;
+        b.classList.toggle('on', k.exact && Math.abs(r[0] - k.line) < 1e-9); b.classList.toggle('near', !k.exact && j === nj);
+        if (m.g === 'spread') b.querySelector('b').textContent = m.sideNames[k.side === 'over' ? 0 : 1] + ' ' + hc(k.side === 'over' ? -r[0] : r[0]);
+        b.querySelector('span').textContent = m.g ? odds(u ? r[3] : r[1] != null ? r[1] : r[3]) : (u ? 'U ' : r[1] != null ? 'O ' : 'U ') + odds(u ? r[3] : r[1] != null ? r[1] : r[3]);
+      });
+    }
+    var g0 = gameOf(p.gid || m.gid) || {}, mu = m.matchup || (g0.away && g0.home ? g0.away + ' @ ' + g0.home : '');
+    var leg = k.exact && k.sel && k.price != null ? {sel: k.sel, price: k.price, gid: p.gid || m.gid, market: m.g ? m.m : 'player_' + m.m,
+      label: m.g ? (m.g === 'ml' || m.g === 'spread' ? sideLab(m, k.side) : mu + ' ' + sideLab(m, k.side))
+        : p.n + ' ' + (yes ? m.name + (k.side === 'under' ? ' No' : '') : (k.side === 'over' ? 'Over ' : 'Under ') + k.line + ' ' + m.name)} : null;
     var add = $('cxAdd'), bet = $('cxBet');
     add.disabled = bet.disabled = !leg;
     add.textContent = leg && inSlip(leg.sel) ? '✓ In your parlay' : '+ Add to parlay';
     CX.leg = leg;
+    var sv = $('cxSave');
+    if (!sv) return;
+    if (!leg) { sv.innerHTML = ''; return; }
+    if (m.sides) { var sd0 = m.sides[k.side === 'over' ? 0 : 1]; sv.innerHTML = sd0 ? star(sidePick(sd0, m.gid)) : ''; return; }
+    sv.innerHTML = star({id: leg.sel, sport: SPORT, label: leg.label, matchup: mu, start: p.start || g0.start, gid: p.gid || m.gid, team: p.team, price: k.price, conf: k.pb,
+      kind: 'prop', mkt: MKEY[m.m] || m.m, side: yes ? 'over' : k.side, line: k.line, name: m.g ? mu : p.n});
   }
   function bindChart() {
     ['cxDist', 'cxRail'].forEach(function (id) {
@@ -435,12 +665,12 @@
       if (!s) return;
       var drag = false;
       var at = function (e) {
-        var m = curMk(CX.data), rg = rangeOf(m), B = (document.getElementById('cxDist') || {})._b;
+        var m = curMk(), rg = m && rangeOf(m), B = (document.getElementById('cxDist') || {})._b;
         if (!rg || !B) return;
         var r = s.getBoundingClientRect(), a0 = B[0].a, a1 = B[B.length - 1].b;
         var x = a0 + (e.clientX - r.left) / r.width * (a1 - a0);
         x = Math.min(rg[1], Math.max(rg[0], Math.round(x * 2) / 2));
-        if (x !== BS.x) { BS.x = x; if (m.line != null && x === m.line) buzz(); update(false); }
+        if (x !== BS.x) { BS.x = x; if (rungsOf(m).some(function (q) { return q[0] === x; })) buzz(); update(false); }
       };
       s.addEventListener('pointerdown', function (e) { if (e.target.tagName === 'INPUT') return; drag = true; try { s.setPointerCapture(e.pointerId); } catch (x) {} at(e); });
       s.addEventListener('pointermove', function (e) { if (drag) at(e); });
@@ -451,8 +681,8 @@
     if (rg) { rg.addEventListener('input', function () { BS.x = +rg.value; update(false); }); rg.addEventListener('change', snapBack); }
   }
   function snapBack() {
-    var m = curMk(CX.data);
-    if (m && m.line != null) { BS.x = m.line; var mn = document.getElementById('cxMain'); if (mn) { mn.classList.add('snap'); setTimeout(function () { mn.classList.remove('snap'); }, 260); } }
+    var m = curMk(), j = m ? nearRung(m, BS.x) : -1;
+    if (j >= 0) { BS.x = rungsOf(m)[j][0]; var mn = document.getElementById('cxMain'); if (mn) { mn.classList.add('snap'); setTimeout(function () { mn.classList.remove('snap'); }, 260); } }
     update(true);
   }
 
@@ -462,7 +692,7 @@
     var badge = M ? [sg(M.margin), 'PROJ MARGIN'] : N && N.net != null ? [sg(N.net), 'NET / 100'] : null;
     var sub = esc(rec(t.rec)) + (t.rec && (t.rec.ats[0] + t.rec.ats[1]) ? ' · ' + trip(t.rec.ats, 'ATS') : '') + (t.rec && (t.rec.ou[0] + t.rec.ou[1]) ? ' · O/U ' + trip(t.rec.ou) : '');
     var nx = G.opp ? (G.home ? 'vs ' : '@ ') + '<a data-oxt="' + esc(G.opp) + '" class="cx-tlink">' + esc(G.opp) + '</a> · ' + when(G.start) : '';
-    var n = (G.sides || []).length;
+    var n = teamRows(t).length;
     return '<div class="pc-head"><div class="pc-logo">' + teamLogo(t.abbr, t.logo) + '</div><div class="pc-hs"><span class="hs cx-tl">' + (teamLogo(t.abbr, t.logo) || esc(t.abbr)) + '</span></div>' +
       '<div class="pc-id"><div class="pc-name">' + esc(NBA && window.TEAM_NICK && TEAM_NICK[t.abbr] ? TEAM_NICK[t.abbr] : t.name || t.abbr) + '</div><div class="sub">' + sub + '</div>' + (nx ? '<div class="sub">' + nx + '</div>' : '') + '</div>' +
       (badge ? '<div class="pc-rate"><b>' + badge[0] + '</b><span>' + badge[1] + '</span></div>' : '<span></span>') +
@@ -502,15 +732,16 @@
     return '<tr><td><b>' + esc(s.lab) + '</b></td><td class="r"><button class="cx-odds" data-cx="sidebet" data-i="' + i + '">' + odds(s.price) + '</button></td>' +
       '<td class="r mono">' + (noModel ? '-' : pct(s.pm, 1)) + '</td><td class="r mono' + h + '">' + pct(imp(s.price), 1) + '</td>' +
       '<td class="r mono">' + (noModel ? '-' : pct(s.pb, 1)) + '</td><td class="r mono' + h + ' ' + (noModel ? '' : mcls(ev)) + '">' + (noModel || ev == null ? '-' : money(10 * ev)) + '</td>' +
-      (compact ? '' : '<td class="r"><button class="cx-add" data-cx="sideadd" data-i="' + i + '">' + (inSlip(s.sel) ? '✓' : '+') + '</button></td>') + '</tr>';
+      (compact ? '' : '<td class="r" style="white-space:nowrap"><button class="cx-add" data-cx="sideadd" data-i="' + i + '">' + (inSlip(s.sel) ? '✓' : '+') + '</button> ' + star(sidePick(s, (t0() || {}).gid)) + '</td>') + '</tr>';
   }
+  function t0() { return CX && CX.data ? CX.data.game : null; }
   function sidesTable(t, compact) {
     var S = (t.game || {}).sides || [];
     if (!S.length) return '';
     if (S.every(function (s) { return s.pm == null; }))     // no model on these lines (NBA sides): Onyx's own chances
       return '<div class="cx-tbl"><table><thead><tr><th>Onyx line</th><th class="r">Onyx</th><th class="r">Implied</th><th class="r">No-vig</th>' + (compact ? '' : '<th></th>') + '</tr></thead><tbody>' +
         S.map(function (s, i) { return '<tr><td><b>' + esc(s.lab) + '</b></td><td class="r"><button class="cx-odds" data-cx="sidebet" data-i="' + i + '">' + odds(s.price) + '</button></td><td class="r mono">' + pct(imp(s.price), 1) + '</td><td class="r mono">' + pct(s.fair, 1) + '</td>' +
-          (compact ? '' : '<td class="r"><button class="cx-add" data-cx="sideadd" data-i="' + i + '">' + (inSlip(s.sel) ? '✓' : '+') + '</button></td>') + '</tr>'; }).join('') + '</tbody></table></div>';
+          (compact ? '' : '<td class="r" style="white-space:nowrap"><button class="cx-add" data-cx="sideadd" data-i="' + i + '">' + (inSlip(s.sel) ? '✓' : '+') + '</button> ' + star(sidePick(s, (t.game || {}).gid)) + '</td>') + '</tr>'; }).join('') + '</tbody></table></div>';
     var h = compact ? ' hm' : '';
     return '<div class="cx-tbl"><table><thead><tr><th>Onyx line</th><th class="r">Onyx</th><th class="r">Model</th><th class="r' + h + '">Implied</th><th class="r">Blended</th><th class="r' + h + '">EV/$10</th>' + (compact ? '' : '<th></th>') + '</tr></thead><tbody>' +
       S.map(function (s, i) { return sideRow(s, i, compact); }).join('') + '</tbody></table></div>';
@@ -541,7 +772,7 @@
         '<div class="cx-note">Records in each spot over two seasons; N is the sample, * under 10 games. Context, not a pick: small samples swing on luck, and no spot here feeds the model.</div>' : '') +
       sims(t) + injuries(t) + keyPlayers(t) +
       '<div class="cx-acts">' + (depthOk() ? '<button class="cx-btn" data-cx="depth" data-t="' + esc(t.abbr) + '">Depth chart ›</button>' : '') +
-      (((t.game || {}).sides || []).length ? '<button class="cx-btn p" data-cx="face" data-f="bets">See all ' + t.game.sides.length + ' Onyx game lines ›</button>' : '') + '</div>' +
+      (teamRows(t).length ? '<button class="cx-btn p" data-cx="face" data-f="bets">See the ' + teamRows(t).length + ' best bets ›</button>' : '') + '</div>' +
       '</div>';
     return html;
   }
@@ -568,13 +799,13 @@
   }
   function depthOk() { return typeof window.dpPick === 'function' || (NBA && typeof window.gotoTab === 'function' && (NBA.depth || {}).teams); }
   function teamBets(t) {
-    var G = t.game || {};
+    var G = t.game || {}, rows = teamRows(t);
+    if (CX.open === undefined) openRow(rows[0] && !rows[0].nba ? rows[0] : null);
     return tHead(t, 'bets') + '<div class="pc-body">' +
-      ((G.sides || []).length ? '<div class="cx-hdr"><span>Every Onyx game line</span><em>' + (G.opp ? (G.home ? 'vs ' : '@ ') + esc(G.opp) : '') + '</em></div>' + sidesTable(t, false) +
-        '<div class="cx-note">' + (G.model ? 'Model: the team ratings\' chance. Implied: Onyx\'s price as listed. Blended: ' + Math.round(100 * (G.w || 0)) + '% model and the rest Onyx\'s price with the margin removed. EV per $10 at Onyx\'s price on the blended chance. Game lines are leans for this sport until a backtest against real Onyx prices passes.'
-          : 'No model chance on these lines: Onyx\'s implied chance only.') + ' Tap a price to bet it on Onyx, + to add it to a parlay.</div>' +
+      (rows.length ? bestBox(rows) + '<div class="cx-hdr"><span>Best bets</span><em>' + rows.length + ' Onyx market' + (rows.length === 1 ? '' : 's') + (G.opp ? ' · ' + (G.home ? 'vs ' : '@ ') + esc(G.opp) : '') + '</em></div>' +
+        betList(rows, 'the team\'s') + '<div class="cx-note">' + LEGEND + (NBA ? ' NBA game lines show Onyx\'s own chance with the margin removed: the NBA model prices player props and the 1st-quarter total, not sides. A player row opens his full bet card.' : '') + '</div>' +
         '<div class="cx-acts"><button class="cx-btn p" data-cx="betgame">⚡ Bet this game on Onyx</button></div>'
-        : '<div class="cx-empty">No Onyx game lines on this team right now.</div>') + '</div>';
+        : '<div class="cx-empty">No Onyx lines on this team right now.</div>') + '</div>';
   }
 
   // ── clicks: one delegated handler, capture phase ──
@@ -597,9 +828,21 @@
     if (c === 'slipclear') { SLIP = []; try { localStorage.setItem(SLIP_KEY, '[]'); } catch (x) {} drawSlip(); return; }
     if (c === 'slipgo') { track('onyx_click', {link_type: 'parlay', legs: SLIP.length, source: 'card'}); window.open(share(SLIP.map(function (x) { return x.sel; })), '_blank', 'noopener'); return; }
     if (!p) return;
-    if (c === 'face') { CX.face = a.dataset.f === 'bets' ? 'bets' : CX.type === 'team' ? 'team' : 'front'; buzz(); draw(); return; }
-    if (c === 'mk') { initBS(p, +a.dataset.i); CX.face = 'bets'; draw(); return; }
-    if (c === 'take') { initBS(p, +a.dataset.i); BS.side = a.dataset.s; draw(); return; }
+    if (c === 'follow') { if (canFollow(p)) { window.toggleF(String(p.id), p.n, p.gid || ''); CX.keepScroll = true; draw(); } return; }
+    if (c === 'face') { CX.face = a.dataset.f === 'bets' ? 'bets' : CX.type === 'team' ? 'team' : 'front'; if (CX.face !== 'bets') { CX.open = undefined; BS = null; } buzz(); draw(); return; }
+    if (c === 'mk') { CX.face = 'bets'; openRow(curRows().filter(function (r) { return r.key === 'p' + a.dataset.i; })[0]); draw(); return; }
+    if (c === 'bb') {
+      var row = curRows().filter(function (r) { return r.key === a.dataset.k; })[0];
+      if (!row) return;
+      if (row.nba) { nbaOpen(row); return; }
+      if (CX.open === row.key && !a.classList.contains('bc-best')) openRow(null); else openRow(row);
+      buzz(); CX.keepScroll = true; draw();
+      var el2 = document.querySelector('#cx .cx-bb.open');
+      if (el2 && a.classList.contains('bc-best')) try { el2.scrollIntoView({block: 'nearest', behavior: 'smooth'}); } catch (x) {}
+      return;
+    }
+    if (c === 'more') { CX.more = true; CX.keepScroll = true; draw(); return; }
+    if (c === 'rung') { var mR = curMk(), rR = mR && rungsOf(mR)[+a.dataset.j]; if (rR) { BS.x = rR[0]; snapBack(); buzz(); } return; }
     if (c === 'side') { BS.side = a.dataset.s; update(true); return; }
     if (c === 'add') { if (CX.leg) { slipToggle(CX.leg); update(false); } return; }
     if (c === 'bet') { if (CX.leg) { track('onyx_click', {link_type: 'single', market: CX.leg.market, selection: CX.leg.label, odds: String(CX.leg.price), source: 'player_card'}); window.open(share([CX.leg.sel]), '_blank', 'noopener'); } return; }
@@ -627,7 +870,7 @@
   }, true);
   document.addEventListener('input', function (e) {
     if (e.target && e.target.getAttribute && e.target.getAttribute('data-cx') === 'search' && CX && CX.data) {
-      BS.q = e.target.value; var pos = e.target.selectionStart; draw();
+      CX.q = e.target.value; var pos = e.target.selectionStart; CX.keepScroll = true; draw();
       var i = document.querySelector('[data-cx="search"]'); if (i) { i.focus(); try { i.setSelectionRange(pos, pos); } catch (x) {} }
     }
   });
@@ -724,6 +967,25 @@
     '@media (max-width:420px){.cx .bc-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}',
     '.cx .bc-note{font-size:11px;color:var(--text3,#8b8798);margin-top:8px;line-height:1.45}',
     '.cx .bc-acts{display:flex;gap:8px;margin-top:12px}.cx .bc-acts button{flex:1}',
+    // best bets list (11/2): a row per market, the bet card opens under it
+    '.cx .bc-best.none{cursor:default;background:rgba(255,255,255,.03);border-color:var(--border2,#2c2a36)}.cx .bc-best.none .bt{font-size:14px}',
+    '.cx .cx-bbs{display:flex;flex-direction:column;gap:8px}',
+    '.cx .cx-bb{border:1px solid var(--border,#24222e);border-radius:14px;background:var(--bg2,#14131b);overflow:hidden;transition:border-color .18s}',
+    '.cx .cx-bb.open{border-color:rgba(176,56,249,.55);box-shadow:0 0 0 1px rgba(176,56,249,.2)}.cx .cx-bb.lo .cx-bbl b{color:var(--text2,#c9c6d4)}',
+    '.cx .cx-bbr{width:100%;display:grid;grid-template-columns:minmax(0,1fr) auto 18px;align-items:center;gap:10px;padding:10px 12px;border:0;background:none;color:var(--text,#f4f4f6);text-align:left;cursor:pointer;font-family:inherit}',
+    '.cx .cx-bbl{min-width:0;display:flex;flex-direction:column;gap:3px}.cx .cx-bbl b{font-size:14px;font-weight:800;line-height:1.25;overflow-wrap:anywhere}',
+    '.cx .cx-bbl em{font-style:normal;font-size:11px;color:var(--text3,#8b8798);line-height:1.35}',
+    '.cx .cx-bdg{align-self:flex-start;font:800 9px monospace;letter-spacing:.12em;text-transform:uppercase;padding:2px 7px;border-radius:999px}',
+    '.cx .cx-bdg.pk{background:linear-gradient(135deg,#b038f9,#635bff);color:#fff}.cx .cx-bdg.pj{background:rgba(255,255,255,.06);color:var(--text3,#8b8798);border:1px solid var(--border2,#2c2a36)}',
+    '.cx .cx-bbv{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:1px}.cx .cx-bbv b{font:800 15px monospace}.cx .cx-bbv em{font:800 12px monospace;font-style:normal}.cx .cx-bbv small{font:700 8px monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--text3,#8b8798)}',
+    '.cx .cx-bbc{font:800 16px monospace;color:#d795ff;text-align:center}',
+    '.cx .cx-bbp{padding:0 10px 10px}.cx .cx-bbp .bc-main{background:rgba(255,255,255,.025)}',
+    '.cx .cx-more{width:100%;margin-top:10px}',
+    '.cx .cx-rungs{display:flex;gap:6px;overflow-x:auto;padding:2px 0 4px;margin-top:6px;scrollbar-width:none}.cx .cx-rungs::-webkit-scrollbar{display:none}',
+    '.cx .cx-rungs button{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px 11px;border-radius:10px;border:1px solid var(--border2,#2c2a36);background:rgba(255,255,255,.04);color:var(--text,#f4f4f6);cursor:pointer;font-family:inherit}',
+    '.cx .cx-rungs button b{font:800 12px monospace}.cx .cx-rungs button span{font:700 10px monospace;color:var(--text3,#8b8798)}',
+    '.cx .cx-rungs button.on{background:linear-gradient(135deg,#b038f9,#635bff);border-color:transparent}.cx .cx-rungs button.on span{color:#fff}.cx .cx-rungs button.near{border-color:#d795ff}',
+    '@media (max-width:420px){.cx .cx-bbr{gap:8px;padding:9px 10px}.cx .cx-bbl b{font-size:13px}.cx .cx-bbp{padding:0 6px 8px}.cx .cx-bbp .bc-main{padding:10px}}',
     '.cx .cx-dist{margin:6px 0 4px;touch-action:none;cursor:ew-resize;user-select:none;-webkit-user-select:none}',
     '.cx .cx-bars{position:relative;height:74px;display:flex;align-items:flex-end;gap:2px;padding-top:16px}',
     '.cx .cx-bars i{flex:1;background:rgba(255,255,255,.12);border-radius:2px 2px 0 0;transition:background .15s}',
@@ -762,6 +1024,9 @@
     '}',
     '@media (max-width:400px){.cx .cx-cells{gap:6px}.cx .cx-cell{padding:10px 4px}.cx .cx-cell .v{font-size:19px}}'
   ].join('\n');
-  window.OXC = {team: openTeam, player: openPlayer, close: close, _state: function () { return CX; }};
+  window.OXC = {team: openTeam, player: openPlayer, close: close, isPick: function (sel) { return isPick(sel); }, _state: function () { return CX; },
+    // the gates (tools/verify_sports.js, verify_nba.js): the open card's ranked rows
+    _rows: function () { return curRows().map(function (r) { return {key: r.key, rank: r.rank, ev: r.ev, dist: !!r.m.dist, player: !!r.who, nba: !!r.nba, pick: r.pick, lab: rowLab(r)}; }); }};
+  setTimeout(loadPicks, 2500);   // the Onyx Pick badges (nba.html's own bet card reads OXC.isPick too)
   drawSlip();
 })();
