@@ -130,6 +130,12 @@ def _nk(n):
     return re.sub(r"\s+", " ", n).strip()
 
 
+def baseball_day():
+    """ISO slate date (ET minus 4 hours), never the runner's UTC date"""
+    from sports_common import game_day
+    return str(game_day())
+
+
 def this_season():
     """this season's Torvik player rows so far (games, minutes) and recruit ratings, by name+team"""
     import csv, io
@@ -140,13 +146,18 @@ def this_season():
         if len(r) < 55:
             continue
         try:
-            out[(_nk(r[0]), r[1])] = {"gp": int(float(r[3] or 0)), "mpg": float(r[54] or 0), "rec": float(r[34]) if r[34] not in ("", "NA") else 0.0}
+            gp = int(float(r[3] or 0))
+            f = lambda i: round(float(r[i]), 1) if len(r) > i and r[i] not in ("", "NA") else None
+            out[(_nk(r[0]), r[1])] = {"gp": gp, "mpg": float(r[54] or 0), "rec": float(r[34]) if r[34] not in ("", "NA") else 0.0,
+                                      "pts": f(63), "reb": f(59), "ast": f(60), "stl": f(61), "blk": f(62),
+                                      "3pm": round(float(r[19] or 0) / gp, 1) if gp else None}
         except ValueError:
             pass
     return out
 
 
-def build(out_path=None):
+def build(out_path=None, keep_raw=False):
+    """every D1 roster projected; keep_raw also keeps the fields cbb_stats needs (_ht, _now, last.pid)"""
     from concurrent.futures import ThreadPoolExecutor
     tmap = json.load(open(os.path.join(HIST, "team_map.json")))
     last = load_players(SEASON_LAST)
@@ -194,12 +205,16 @@ def build(out_path=None):
             if prev:
                 p["last"] = {"t": prev["t"], "s": SEASON_LAST if prev in last else SEASON_LAST - 1, "mpg": prev.get("mpg"), "ppg": prev.get("ppg"),
                              "rpg": prev.get("rpg"), "apg": prev.get("apg"), "bpm": prev.get("bpm"), "usg": prev.get("usg"), "ortg": prev.get("ortg"), "gp": prev.get("gp")}
+                if keep_raw:
+                    p["last"]["pid"] = prev.get("pid")
                 if x["transfer"]:
                     p["from"] = prev["t"]; p["lvl"] = round((em.get(tv) or 0) - (em.get(prev["t"]) or 0), 1)
             if cur.get("rec"):
                 p["rec"] = cur["rec"]
             if cur.get("gp"):
                 p["now"] = {"gp": cur["gp"], "mpg": cur.get("mpg")}
+            if keep_raw:
+                p["_ht"], p["_now"] = ht_in, cur
             players.append(p)
         players.sort(key=lambda p: -p["mpg"])
         for i, p in enumerate(players):
@@ -214,6 +229,7 @@ def build(out_path=None):
 
 
 if __name__ == "__main__":
+    # the site reads data/cbb/depth.json (cbb_stats.py, which runs this build); pass a path to dump minutes alone
     import sys
-    o = build(os.path.join(ROOT, "data", "cbb", "minutes.json"))
+    o = build(sys.argv[1] if len(sys.argv) > 1 else None)
     print(f"{len(o['teams'])} teams, {o['matched']} players matched to last season, {o['unmatched_vets']} returning-class players unmatched")
