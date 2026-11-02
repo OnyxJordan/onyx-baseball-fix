@@ -16,6 +16,12 @@
  * wider than the screen (tables scroll inside their card), and a Depth tile in the
  * menu drawer that opens it.
  *
+ * Cards (11/2): where data/<sport>/cards.json exists, a team card (tapped from a game card's
+ * team name, so the tap must open the team and not the gamecenter) and a player card (the
+ * player with the most Onyx markets) open, load their data, show "Why this number", their
+ * tables and both faces (Team | Bets, Player | Bets, the line chart scrubbed and snapped back),
+ * with no undefined / NaN, nothing wider than the screen and no page errors.
+ *
  *   python3 -B sports_build.py nfl   (and the others)
  *   node tools/verify_sports.js [nfl,cfb,cbb,nhl,tennis,golf]
  */
@@ -30,6 +36,57 @@ const ROOT = process.cwd();
 const PAGES = (process.argv[2] || 'nfl,cfb,cbb,nhl,tennis,golf').split(',');
 const BB_FIX = path.join(__dirname, 'fixtures', 'cbb_summary.json');
 const TABS = ['home', 'games', 'board', 'plays', 'model'];
+
+const KIND_OF = { nfl: 'football', cfb: 'football', cbb: 'basketball', nhl: 'hockey', tennis: 'tennis', golf: 'golf' };
+// the team on the slate with the most to show, and the player with the most Onyx markets
+function cardPick(pg, idx) {
+  const out = { team: null, player: null };
+  if (pg === 'tennis') {
+    let best = null;
+    Object.values(idx.players || {}).forEach(p => { if (!best || (p.mk || []).length > (best.mk || []).length) best = p; });
+    if (best) out.player = { n: best.n };
+    return out;
+  }
+  let bt = null, bp = null;
+  for (const t of idx.teams || []) {
+    const f = path.join(ROOT, 'data', pg, 'cards', String(t).replace(/[^A-Za-z0-9]/g, '_') + '.json');
+    if (!fs.existsSync(f)) continue;
+    const d = JSON.parse(fs.readFileSync(f, 'utf8'));
+    const sides = ((d.team || {}).game || {}).sides || [];
+    if (sides.length && (!bt || sides.length > bt[1])) bt = [t, sides.length];
+    Object.values(d.players || {}).forEach(p => { const n = (p.mk || []).length + ((p.mk || []).some(m => m.dist) ? 5 : 0); if (!bp || n > bp[1]) bp = [{ n: p.n, t: p.team }, n]; });
+  }
+  out.team = bt ? bt[0] : (idx.teams || [])[0] || null;
+  out.player = bp ? bp[0] : null;
+  return out;
+}
+// the open card: loaded, its sections present, no undefined / NaN, nothing wider than the screen
+async function cardCheck(page, face, need) {
+  await page.waitForFunction(() => { const c = window.OXC && OXC._state(); return !!document.querySelector('#cx.open .pc-seg') || (c && !c.data && /No card/.test((document.getElementById('cxFace') || {}).innerText || '')); }, null, { timeout: 6000 }).catch(() => {});
+  await page.waitForTimeout(120);
+  return page.evaluate(need => {
+    const el = document.getElementById('cx'), W = document.documentElement.clientWidth;
+    if (!el || !el.classList.contains('open')) return 'card did not open';
+    const txt = el.innerText, bad = [];
+    if (/No card/.test(txt)) return 'no card data';
+    if (/\bundefined\b|\bNaN\b|\[object Object\]/.test(txt)) bad.push('undefined/NaN');
+    need.forEach(s => { if (txt.toLowerCase().indexOf(s.toLowerCase()) < 0) bad.push('no "' + s + '"'); });
+    // the card's face clips sideways, so measure against the face: anything past its edge that is
+    // not inside its own scroller (a table, the market chips) is cut off on screen
+    const face = document.getElementById('cxFace'), R = Math.min(W, face.getBoundingClientRect().right), wide = [];
+    face.querySelectorAll('*').forEach(e => {
+      const b = e.getBoundingClientRect();
+      if (!b.width || b.right <= R + 1 || getComputedStyle(e).position === 'absolute' && e.closest('.pc-logo')) return;
+      let a = e.parentElement;
+      while (a && a !== face) { if (getComputedStyle(a).overflowX !== 'visible') return; a = a.parentElement; }
+      wide.push(String(e.className || e.tagName));
+    });
+    if (wide.length) bad.push('wide: ' + wide.slice(0, 3).join(', '));
+    if (document.documentElement.scrollWidth > W + 1) bad.push('page scrolls sideways');
+    if (/[\u2014]/.test(txt)) bad.push('em dash in copy');
+    return bad.join(', ');
+  }, need);
+}
 
 function serve() {
   const server = http.createServer((req, res) => {
@@ -172,8 +229,54 @@ function serve() {
         gc += ' · box ' + r;
         if (r.includes('FAIL')) failures++;
       }
+      // team and player cards (cards.js + data/<sport>/cards.json)
+      let cards = '';
+      const cidx = path.join(ROOT, 'data', pg, 'cards.json');
+      if (fs.existsSync(cidx)) {
+        const pick = cardPick(pg, JSON.parse(fs.readFileSync(cidx, 'utf8')));
+        const cbad = [];
+        await page.evaluate(() => { if (window.OXC) OXC.close(); });
+        if (pick.team) {
+          // a real tap on a game card's team name: it must open the team card, not the gamecenter
+          await page.evaluate(() => { gotoTab('games'); OPEN_GAME = null; renderGames(); });
+          const tapped = await page.evaluate(t => { const el = document.querySelector(`#pane-games .gm [data-oxt="${t}"]`) || document.querySelector('#pane-games [data-oxt]'); if (!el) return null; el.click(); return el.getAttribute('data-oxt'); }, pick.team);
+          if (!tapped) cbad.push('no tappable team name on the games tab');
+          else {
+            const r1 = await cardCheck(page, 'front', ['Why this number', 'Team history', 'Recent games']);
+            if (r1) cbad.push('team ' + tapped + ': ' + r1);
+            if (await page.evaluate(() => typeof OPEN_GAME !== 'undefined' && OPEN_GAME)) cbad.push('team tap also opened the gamecenter');
+            const n = await page.evaluate(() => document.querySelectorAll('#cx .pc-seg button').length);
+            if (n === 2) { await page.click('#cx .pc-seg button:nth-child(2)'); const r2 = await cardCheck(page, 'bets', []); if (r2) cbad.push('team bets: ' + r2); }
+          }
+          await page.evaluate(() => OXC.close());
+        }
+        if (pick.player) {
+          await page.evaluate(p => OXC.player(p.n, p.t || null), pick.player);
+          const r1 = await cardCheck(page, 'front', KIND_OF[pg] === 'tennis' ? ['Why this number'] : ['Why this number', 'Last']);
+          if (r1) cbad.push('player ' + pick.player.n + ': ' + r1);
+          if (await page.$('#cx .pc-seg button:nth-child(2)')) {
+            await page.click('#cx .pc-seg button:nth-child(2)');
+            const r2 = await cardCheck(page, 'bets', []);
+            if (r2) cbad.push('player bets: ' + r2);
+            const dist = await page.$('#cxDist');
+            if (dist) {   // scrub the chart off Onyx's line, then let go: it must snap back to the line
+              const b = await dist.boundingBox();
+              await page.mouse.move(b.x + b.width * 0.15, b.y + b.height / 2); await page.mouse.down();
+              await page.mouse.move(b.x + b.width * 0.2, b.y + b.height / 2, { steps: 3 });
+              const mid = await page.evaluate(() => document.getElementById('cxPrice').innerText);
+              await page.mouse.up(); await page.waitForTimeout(80);
+              const end = await page.evaluate(() => document.getElementById('cxPrice').innerText);
+              if (!/not offered/i.test(mid) && !/Onyx/.test(mid)) cbad.push('chart scrub showed nothing');
+              if (!/Onyx|no Onyx price/i.test(end)) cbad.push('did not snap back to the Onyx line');
+            }
+          }
+          await page.evaluate(() => OXC.close());
+        }
+        cards = 'cards ' + (cbad.length ? 'FAIL(' + cbad.join('; ') + ')' : `ok(team ${pick.team || '-'}, player ${pick.player ? pick.player.n : '-'})`);
+        failures += cbad.length;
+      }
       failures += errs.length;
-      console.log(`  ${errs.length || out.some(x => x.includes('FAIL')) || (gc && (!gc.startsWith('gamecenter ok') || gc.includes('FAIL'))) ? 'FAIL' : 'ok  '} ${pg.padEnd(7)} ${String(w).padEnd(5)} ${out.join(' ')}${gc ? ' · ' + gc : ''}${errs.length ? '  <- ' + errs.join(' | ') : ''}`);
+      console.log(`  ${errs.length || out.some(x => x.includes('FAIL')) || (gc && (!gc.startsWith('gamecenter ok') || gc.includes('FAIL'))) || cards.includes('FAIL') ? 'FAIL' : 'ok  '} ${pg.padEnd(7)} ${String(w).padEnd(5)} ${out.join(' ')}${gc ? ' · ' + gc : ''}${cards ? ' · ' + cards : ''}${errs.length ? '  <- ' + errs.join(' | ') : ''}`);
       await ctx.close();
     }
   }

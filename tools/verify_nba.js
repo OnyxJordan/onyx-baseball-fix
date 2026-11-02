@@ -4,7 +4,7 @@
  * pipeline). Same rules as verify_shell.js: tabs are switched via gotoTab(),
  * every off-origin request is aborted, and the page fails on any uncaught
  * error or 'undefined' / 'NaN' / '[object Object]' in rendered text. Runs at
- * phone and desktop widths, and opens one player drawer.
+ * phone and desktop widths, and opens one player drawer and one team card (cards.js).
  *
  *   python3 -B nba_build.py && node tools/verify_nba.js
  */
@@ -122,6 +122,34 @@ function serve(rootDir) {
     });
     console.log(`  ${bc === 'ok' || bc === 'no priced players' ? 'ok  ' : 'FAIL'} bet card ${bc}`);
     if (bc !== 'ok' && bc !== 'no priced players') failures++;
+    // team card (cards.js + data/nba/cards/<team>.json): a tap on a game card's team name opens the
+    // team, not the gamecenter; both faces render with no undefined / NaN and nothing cut off
+    let tc = 'no cards data';
+    if (fs.existsSync(path.join(ROOT, 'data', 'nba', 'cards.json'))) {
+      const before = await page.evaluate(() => { gotoTab('games'); return typeof gcSel !== 'undefined' ? gcSel : null; });
+      const t = await page.evaluate(() => { const el = document.querySelector('#pane-games .gm [data-oxt]') || document.querySelector('[data-oxt]'); if (!el) return null; el.click(); return el.getAttribute('data-oxt'); });
+      if (!t) tc = 'no tappable team';
+      else {
+        await page.waitForSelector('#cx.open .pc-seg', { timeout: 6000 }).catch(() => {});
+        const chk = () => page.evaluate(() => {
+          const el = document.getElementById('cx'); if (!el || !el.classList.contains('open')) return 'did not open';
+          const face = document.getElementById('cxFace'), txt = el.innerText, R = face.getBoundingClientRect().right, bad = [];
+          if (/No card/.test(txt)) return 'no card data';
+          if (/\bundefined\b|\bNaN\b|\[object Object\]/.test(txt)) bad.push('undefined/NaN');
+          face.querySelectorAll('*').forEach(e => { const b = e.getBoundingClientRect(); if (!b.width || b.right <= R + 1 || e.closest('.pc-logo')) return;
+            let a = e.parentElement; while (a && a !== face) { if (getComputedStyle(a).overflowX !== 'visible') return; a = a.parentElement; } bad.push('wide ' + (e.className || e.tagName)); });
+          return bad.slice(0, 3).join(', ');
+        });
+        const r1 = await page.evaluate(() => /Why this number/i.test(document.getElementById('cx').innerText) && /Team history/i.test(document.getElementById('cx').innerText)) ? await chk() : 'missing sections';
+        const after = await page.evaluate(() => typeof gcSel !== 'undefined' ? gcSel : null);
+        let r2 = '';
+        if (await page.$('#cx .pc-seg button:nth-child(2)')) { await page.click('#cx .pc-seg button:nth-child(2)'); await page.waitForTimeout(150); r2 = await chk(); }
+        await page.evaluate(() => OXC.close());
+        tc = [r1 && 'team ' + r1, r2 && 'bets ' + r2, after !== before && 'the tap also opened the gamecenter'].filter(Boolean).join('; ') || `ok (${t})`;
+      }
+    }
+    console.log(`  ${tc.startsWith('ok') || tc === 'no cards data' ? 'ok  ' : 'FAIL'} team card ${tc}`);
+    if (!tc.startsWith('ok') && tc !== 'no cards data') failures++;
     console.log(`  page errors: ${errs.length}`); errs.forEach(e => console.log('   ' + e));
     failures += errs.length;
     await page.close();

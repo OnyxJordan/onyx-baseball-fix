@@ -581,6 +581,7 @@ def nfl_block(lane, slate, odds):
     if block.get("status") != "live":
         block["status"] = "trial"       # the receptions unders lane is graded at the opening price
     block["_cands"] = grows + out
+    block["_R"], block["_w"] = R, gw          # for the team and player cards (cards.py), popped before the page
     block["proj"] = proj
     eng = engine_team("nfl", M, M.GAME_P, gw, bt, block["status"] == "live")
     eng["steps"].insert(0, engine_nfl_props(M))
@@ -1177,6 +1178,7 @@ def team_block(key, lane, slate, odds):
     if key == "nhl" and getattr(M, "B2B", None):
         base["open"] = nhl_b2b_lane(lane, slate, odds, M)
     base["_cands"] = rows
+    base["_R"], base["_w"] = R, w             # for the team and player cards (cards.py), popped before the page
     base["proj"] = proj
     base["engine"] = engine_team(key, M, GP, w, bt, base["status"] == "live")
     if key == "cfb":
@@ -1224,6 +1226,7 @@ def tennis_block(lane, slate, odds):
         roadmap=ROADMAP["tennis"])
     base = model_frame("tennis", lane, slate, odds, TM, rows, base, grade_tennis(lane))
     base["_cands"] = rows
+    base["_w"] = w
     base["players"] = tennis_players(lane, slate)
     base["engine"] = engine_tennis(TM, w, bt, base["status"] == "live")
     base["projected"] = top_plays(rows)
@@ -1454,6 +1457,15 @@ def main():
         model = golf_block(lane, slate)
     else:
         model = lab_block(key, cfg)
+    # team and player cards (11/2): data/<sport>/cards.json, fetched by cards.js when a card
+    # opens. Context and the model's own numbers, never a pick. Fail-soft: an error keeps the last file.
+    try:
+        import cards
+        cards.build(key, lane, slate, odds, model)
+    except Exception as ex:
+        print(f"  cards: skipped ({type(ex).__name__}: {str(ex)[:160]})")
+    for k_ in ("_R", "_w"):
+        model.pop(k_, None)
     write_top(key, lane, slate, model)
     # depth charts (11/2): data/<sport>/depth.json, refreshed at most every 3 hours, fail-soft
     # (a failure keeps the last file). College basketball's is written by its own helper.
@@ -1468,6 +1480,19 @@ def main():
         except Exception as ex:
             print(f"  depth: {str(ex)[:160]}")
     depth = lane.load("depth.json", None) if cfg["kind"] in ("football", "hockey", "basketball") else None
+    # Similar spots (11/2): closing-line history of games in this game's spot, context only:
+    # never a pick, never in the Top 10 or a ledger. Fail-soft and time-capped; the page
+    # fetches data/<sport>/situations.json when a gamecenter opens.
+    sit_at = None
+    if key in ("cbb", "cfb", "nfl", "nhl"):
+        try:
+            import situations
+            sit = situations.for_page(key, slate, odds)
+            if sit:
+                sit["generated"] = sit_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
+                lane.save("situations.json", sit)
+        except Exception as ex:
+            print(f"  situations: skipped ({str(ex)[:160]})")
     page_cfg ={"name": cfg["name"], "full": cfg["full"], "kind": cfg["kind"], "espn": cfg["espn"],
                 "espn_q": cfg.get("espn_q", ""), "tone": cfg["tone"], "art": cfg["art"],
                 "onyx_league": ONYX_LEAGUE.get(key)}
@@ -1476,6 +1501,7 @@ def main():
             "next_date": slate.get("next_date"), "next_n": slate.get("next_n"),
             "odds": odds or {}, "model": model,
             "depth_at": (depth or {}).get("generated") if (depth or {}).get("teams") else None,
+            "sit_at": sit_at,
             "generated": datetime.now(timezone.utc).isoformat(timespec="seconds")}
     shell = open("sport_shell.html", encoding="utf-8").read()
     mlb = open("shell.html", encoding="utf-8").read()

@@ -15,6 +15,8 @@
 <!-- shared app shell: bottom menu, search, toasts, status-bar fix (ui.js) -->
 <script src="ui.js" defer></script>
 <script src="saved.js"></script>
+<!-- team cards (cards.js, data/nba/cards/*.json): data-oxt opens one -->
+<script src="cards.js" defer></script>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="preconnect" href="https://site.api.espn.com" crossorigin>
@@ -620,6 +622,16 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
 .dep-empty{padding:28px;text-align:center;color:var(--text3);border:1px dashed var(--border2);border-radius:14px}
 @media (min-width:1100px){.dep-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}}
 @media (max-width:420px){.dep-tbl td,.dep-tbl th{padding:7px 3px;font-size:11.5px}.dep-tbl th:first-child{width:36%}.dep-sub{font-size:10.5px}}
+/* Similar spots (11/2): closing-line history of this game's spot, context only */
+.ss-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:8px}
+.ss-col{background:var(--bg3);border:1px solid var(--border2);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.ss-h{display:flex;align-items:baseline;justify-content:space-between;gap:8px;font-size:13px}.ss-h span{font:700 10px monospace;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+.ss-r{display:flex;flex-direction:column;gap:3px;padding-top:7px;border-top:1px solid var(--border)}
+.ss-t{font-size:12.5px;line-height:1.35;color:var(--text2);overflow-wrap:anywhere}
+.ss-n{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;font-size:12px}.ss-n b{font-family:monospace;font-size:13px;color:var(--text)}.ss-n em{font-style:normal;color:var(--text3);font-family:monospace;font-size:11px}
+.ss-sig{font:700 9.5px monospace;letter-spacing:.05em;text-transform:uppercase;padding:2px 6px;border-radius:6px;background:rgba(255,255,255,.06);color:var(--text3)}
+.ss-sig.u{background:rgba(176,56,249,.16);color:#d795ff}
+.ss-ft{margin-top:8px;font-size:11.5px;line-height:1.45;color:var(--text3)}.ss-ft b{color:var(--text2)}
 </style>
 <link rel="stylesheet" href="onyx.css"><script src="onyx.js" defer></script></head>
 <body>
@@ -1810,7 +1822,7 @@ function sbCard(g, sel) {
   const rows = ['away', 'home'].map(sd => ({sd, cells: nbCells(g, sd)}));
   const odds = rows.some(r => r.cells);
   const id = sd => { const ab = g[sd], lg = (D.logos || {})[ab], rec = g[sd + '_rec'] || '';
-    return `${lg ? `<img class="lg m" src="${esc(lg)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">` : ''}<div class="gm-nm"><b>${esc(TEAM_NICK[ab] || ab)}</b><span>${odds ? esc(rec) : esc(ab) + (rec ? ' · ' + esc(rec) : '')}</span></div>`; };
+    return `${lg ? `<img class="lg m" src="${esc(lg)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">` : ''}<div class="gm-nm" data-oxt="${esc(ab)}"><b>${esc(TEAM_NICK[ab] || ab)}</b><span>${odds ? esc(rec) : esc(ab) + (rec ? ' · ' + esc(rec) : '')}</span></div>`; };
   const lose = sd => fin && (sd === 'away' ? a < h : h < a);
   const head = odds ? `<div class="gm-row gm-oh"><span class="gm-onyx">Onyx</span><span></span><span>Spread</span><span>Total</span><span>Money</span></div>` : '';
   const body = rows.map(r => `<div class="gm-row${lose(r.sd) ? ' lose' : ''}"><div class="gm-id">${id(r.sd)}</div><span class="sc">${live || fin ? esc(g[r.sd + '_score'] ?? '') : ''}</span>${odds ? (r.cells || [nbOc(null, ''), nbOc(null, ''), nbOc(null, '')]).join('') : ''}</div>`).join('');
@@ -1986,7 +1998,7 @@ function renderGames() {
   const stateHtml = live ? `<div class="nb-st live">${esc(g.detail || 'LIVE')}</div>`
     : fin ? '<div class="nb-st">Final</div>'
     : `<div class="nb-st">${tipTime(g.start)}<small>${g.spread != null ? esc(g.home) + ' ' + (g.spread > 0 ? '+' : '') + g.spread : ''}${g.total != null ? ' · O/U ' + g.total : ''}</small></div>`;
-  const tm = (ab, rec, home) => `<div class="nb-tm${home ? ' h' : ''}"><span class="gc-logo" style="background-image:url(${(D.logos || {})[ab] || ''})"></span>
+  const tm = (ab, rec, home) => `<div class="nb-tm${home ? ' h' : ''}" data-oxt="${esc(ab)}"><span class="gc-logo" style="background-image:url(${(D.logos || {})[ab] || ''})"></span>
     <div class="nb-nm"><b><span class="full">${esc(TEAM_NICK[ab] || ab)}</span><span class="ab">${esc(ab)}</span></b><span>${esc(rec || '')}</span></div></div>`;
   const scr = (sc, lose) => `<div class="nb-sc${lose ? ' lose' : ''}">${(live || fin) ? esc(sc) : ''}</div>`;
   const header = `<div class="nb-hd">${tm(g.away, g.away_rec, false)}${scr(g.away_score, fin && a < h)}${stateHtml}${scr(g.home_score, fin && h < a)}${tm(g.home, g.home_rec, true)}</div>`;
@@ -2023,11 +2035,46 @@ function renderGames() {
     <button class="${gcView === 'pbp' ? 'on' : ''}" onclick="gcView='pbp';rerender()">Plays</button>
     <button class="${gcView === 'box' ? 'on' : ''}" onclick="gcView='box';rerender()">Box</button></div>`;
   const court = started(g) ? liveCourt(g, sum) : '';
-  body.innerHTML = nbNav(g.gid) + header + court + betbar + watch + paceCard(g, box) + fbCard(g) + qhCard(g) + sub
+  body.innerHTML = nbNav(g.gid) + header + court + betbar + watch + paceCard(g, box) + fbCard(g) + qhCard(g) + simSpots(g.gid) + sub
     + (gcView === 'box' ? boxView(g, box, sum) : gcView === 'pbp' ? pbpView(g, sum) : overview(g, sum));
   const on = body.querySelector('.gc-strip .on'); if (on) on.parentNode.scrollLeft = on.offsetLeft - 60;
   gcFloatSync();
   if (started(g) && !sum) loadSummary(g);
+}
+// Similar spots (11/2): data/nba/situations.json (situations.py), fetched once when a game
+// card opens. Context, not a pick: past games in this game's spot graded against their
+// closing line, with the sample, a plain significance read and the out-of-sample backtest.
+// Self-contained: simSpots(gid) returns the whole card, or '' when there is none.
+var SIT = null, SIT_ST = null;
+function sitLoad() {
+  if (SIT || SIT_ST || !D.sit_at) return;
+  SIT_ST = 'busy';
+  fetch('data/nba/situations.json?v=' + encodeURIComponent(D.sit_at))
+    .then(r => r.ok ? r.json() : null).catch(() => null)
+    .then(d => { SIT = d && d.games ? d : null; SIT_ST = SIT ? 'ok' : 'err';
+      document.querySelectorAll('[data-sit]').forEach(el => { el.outerHTML = simSpots(el.dataset.sit); }); });
+}
+function sitRow(x, tot) {
+  let rec, pc;
+  let ex = x.exp == null ? .5 : x.exp;   // the closing price's no-vig chance (puck lines are far from 50%)
+  if (tot) { const ov = x.o >= x.u; rec = ov ? `Over ${x.o}-${x.u}` : `Under ${x.u}-${x.o}`; pc = x.pct == null ? '' : ((ov ? x.pct : 1 - x.pct) * 100).toFixed(1) + '%'; if (!ov) ex = 1 - ex; }
+  else { rec = `${x.w}-${x.l}${x.p ? '-' + x.p : ''} ATS`; pc = x.pct == null ? '' : (x.pct * 100).toFixed(1) + '%'; }
+  return `<div class="ss-r"><div class="ss-t">${esc(x.t)}</div><div class="ss-n"><b>${rec}</b><span>${pc}</span>
+    ${Math.abs(ex - .5) > .02 ? `<em>prices implied ${(ex * 100).toFixed(1)}%</em>` : ''}${!tot && x.cov != null ? `<em>avg cover ${x.cov > 0 ? '+' : ''}${x.cov}</em>` : ''}<em>n ${x.n}${x.small ? ' (small)' : ''} · ${esc(x.yrs)}</em>
+    <span class="ss-sig${x.sig !== 'within normal luck' ? ' u' : ''}">${esc(x.sig)}</span></div></div>`;
+}
+function simSpots(gid) {
+  if (!D.sit_at || SIT_ST === 'err') return '';
+  if (!SIT) { sitLoad(); return `<div data-sit="${esc(gid)}"></div>`; }
+  const r = SIT.games[gid], g = gameOf(gid) || {};
+  if (!r || (!(r.home || []).length && !(r.total || []).length)) return '';
+  const m = SIT.meta || {}, rk = r.rank || {};
+  const sg = v => v == null ? '' : (v > 0 ? '+' : '') + v;
+  const col = (side, ab, line) => (r[side] || []).length ? `<div class="ss-col"><div class="ss-h"><b>${esc(ab)} ${sg(line)}</b><span>${rk[side] ? 'rated #' + rk[side] : ''}</span></div>${r[side].map(x => sitRow(x)).join('')}</div>` : '';
+  const cols = col('away', g.away, r.line == null ? null : -r.line) + col('home', g.home, r.line)
+    + ((r.total || []).length ? `<div class="ss-col"><div class="ss-h"><b>Total ${esc(r.tot)}</b><span>over / under</span></div>${r.total.map(x => sitRow(x, true)).join('')}</div>` : '');
+  return `<div class="gc-card"><div class="gc-card-title">Similar spots · closing-line history ${esc(m.seasons || '')}</div><div class="ss-grid">${cols}</div>
+    <div class="ss-ft"><b>Context, not a pick.</b> Every past game in the same spot, graded against its closing line (${(m.lined || 0).toLocaleString()} games). Spots are fixed in advance and ratings use only games before each tip. "Unusual" means luck does that less than 1 time in 20 against the closing prices; with this many spots, some will.${m.bt_short || m.bt ? ' <b>' + esc(m.bt_short || m.bt) + '</b>' : ''}</div></div>`;
 }
 // live pace card: every Onyx line in this game, where it stands, where it finishes at
 // this pace, and the chance the model's side lands from here
@@ -3080,7 +3127,7 @@ function depTeam(t, q) {
   });
   const opp = (D.games || []).find(g => g.away === t || g.home === t);
   const vs = opp ? (opp.home === t ? 'vs ' + opp.away : '@ ' + opp.home) : '';
-  return `<div class="dep-team"><div class="dep-hd">${logo(t)}<b>${esc(T.name || t)}</b><span class="dim">${esc(vs)}${T.pace ? ' · pace ' + num(T.pace) : ''}</span></div>
+  return `<div class="dep-team"><div class="dep-hd" data-oxt="${esc(t)}">${logo(t)}<b>${esc(T.name || t)}</b><span class="dim">${esc(vs)}${T.pace ? ' · pace ' + num(T.pace) : ''}</span></div>
     <div class="tbl dep-tbl"><table><thead><tr><th>Player</th><th class="r">Min</th><th class="r">PTS</th><th class="r">REB</th><th class="r">AST</th><th class="r">3PM</th><th class="r">PRA</th></tr></thead><tbody>${body}</tbody></table></div></div>`;
 }
 function depBT(id) {

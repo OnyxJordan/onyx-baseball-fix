@@ -9,6 +9,7 @@ odds_probe.yml workflow).
     python3 tools/sports_backtest.py cfb  bt/cfb_lines.json
     python3 tools/sports_backtest.py nhl  bt/nhl_lines.json
     python3 tools/sports_backtest.py tennis bt/tennis_atp_lines.json [bt/tennis_wta_lines.json]
+    python3 tools/sports_backtest.py cbb  bt/cbb_lines.json     (samples from tools/cbb_price_backtest.py)
 
 Every game is priced only from results before its date. Prices are Onyx's
 opening line (what a pick logged at the morning build would get) and closing
@@ -26,11 +27,12 @@ from collections import defaultdict
 from datetime import date, timedelta
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import sports_lab as L                       # noqa: E402
 from sports_common import Lane, espn_get, nk  # noqa: E402
 
 MIN_PICKS = 30
-SPLIT = {"nfl": "2026-03-01", "cfb": "2026-03-01", "nhl": "2026-01-15", "tennis": "2026-01-01"}
+SPLIT = {"nfl": "2026-03-01", "cfb": "2026-03-01", "nhl": "2026-01-15", "tennis": "2026-01-01", "cbb": "2026-01-01"}
 W_GRID = (0.0, 0.1, 0.2, 0.3, 0.5)
 EDGE_GRID = ((0.02, 0.06), (0.02, 0.10), (0.03, 0.08), (0.04, 0.12), (0.05, 0.15))
 PRICE_GRID = ((-200, 150), (-250, 250), (-150, 130))
@@ -387,6 +389,14 @@ def main():
         import tennis_model as M
         samples = tennis_samples(files)
         res = evaluate(key, samples, M.VERSION, "Elo against real Onyx match prices")
+        out = {**res, "page": page(res, key)}
+    elif key == "cbb":
+        # college basketball: the live cbb_model.ratings walk-forward (this season only, preseason prior),
+        # Onyx names mapped to ESPN in tools/cbb_price_backtest.py
+        import cbb_model as M
+        import cbb_price_backtest as CPB
+        samples, _ = CPB.samples(files[0] if files else CPB.LINES)
+        res = evaluate(key, samples, M.VERSION, "Team ratings against real Onyx game lines")
         out = {**res, "page": page(res, key)}
     else:
         import importlib
