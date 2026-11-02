@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
-<title>College Basketball Minutes and Depth Charts</title>
+<title>College Basketball Depth Charts</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0c0c0c">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-title" content="Onyx Sports">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<meta name="description" content="Projected minutes and depth charts for every Division I men's basketball team: last season's role, transfers, freshmen and this season's minutes.">
+<meta name="description" content="Projected minutes, points, rebounds, assists and threes for every Division I men's basketball player: depth charts, transfers, freshmen and this season's numbers.">
 <link rel="stylesheet" href="onyx.css">
 <script src="onyx.js" defer></script>
 <script src="saved.js"></script>
@@ -45,6 +45,11 @@ body{background:#0c0c0c;color:#fff;margin:0}
 .role{font:700 10px monospace;letter-spacing:.1em;text-transform:uppercase;color:#d795ff;margin:12px 0 2px}
 .note{color:#9a93a6;font-size:12px;line-height:1.6;margin-top:16px}
 .list{display:flex;flex-direction:column;gap:6px}
+.pr .st{grid-column:2/4;display:flex;flex-wrap:wrap;gap:4px 12px;font:700 12px monospace;color:#e9e4f2;margin-top:2px}.pr .st i{font-style:normal;color:#8f879c;font-weight:600;margin-left:3px}
+.bt{margin-top:22px;border:1px solid rgba(255,255,255,.1);border-radius:12px;overflow:hidden}
+.bt h3{margin:0;padding:12px 14px 4px;font-size:15px}.bt p{margin:0;padding:0 14px 10px;color:#a79fb5;font-size:12px;line-height:1.5}
+.bt table{width:100%;border-collapse:collapse;font:600 12px monospace}.bt th,.bt td{padding:7px 10px;text-align:right;border-top:1px solid rgba(255,255,255,.07)}
+.bt th:first-child,.bt td:first-child{text-align:left}.bt th{color:#8f879c;font-size:10.5px;letter-spacing:.05em;text-transform:uppercase}.bt td b{color:#61e970}
 .more{margin-top:10px;background:none;border:1px solid #3a2a55;color:#d795ff;font:700 12px monospace;border-radius:999px;padding:9px 14px;cursor:pointer}
 </style>
 </head>
@@ -52,12 +57,13 @@ body{background:#0c0c0c;color:#fff;margin:0}
 <main>
 <section class="ox-wrap pp">
   <a class="back" href="cbb.html">‹ College Basketball</a>
-  <span class="ox-eyebrow" style="display:block;margin-top:14px">Minutes and depth charts</span>
+  <span class="ox-eyebrow" style="display:block;margin-top:14px">Depth charts and stat projections</span>
   <h1>Who plays,<br>and how much.</h1>
-  <p class="lead">Every Division I roster, projected: each player's minutes from last season's role, his class, the level of any transfer and the competition on his new roster, with this season's real minutes taking over as games are played.</p>
+  <p class="lead">Every Division I roster, projected: each player's minutes from last season's role, his class, the level of any transfer and the competition on his new roster, then his points, rebounds, assists and made threes from what he produced per minute, with this season's real numbers taking over as games are played.</p>
   <div class="kpis" id="kpis"></div>
-  <div class="tabs" id="tabs"><button class="on" data-v="team">Depth charts</button><button data-v="portal">Portal tracker</button><button data-v="fresh">Freshmen</button></div>
+  <div class="tabs" id="tabs"><button class="on" data-v="team">Depth charts</button><button data-v="score">Top scorers</button><button data-v="portal">Portal tracker</button><button data-v="fresh">Freshmen</button></div>
   <div id="view"></div>
+  <div class="bt" id="bt"></div>
   <p class="note" id="method"></p>
 </section>
 </main>
@@ -65,21 +71,34 @@ body{background:#0c0c0c;color:#fff;margin:0}
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'})[c]);
 let D = null, V = 'team', TEAM = null, LIM = 40;
 const sgn = x => x > 0 ? '+' + x : String(x);
+const LBL = {pts: 'pts', reb: 'reb', ast: 'ast', '3pm': '3PM', stl: 'stl', blk: 'blk', min: 'min'};
+const HS = id => `https://a.espncdn.com/i/headshots/mens-college-basketball/players/full/${encodeURIComponent(id)}.png`;
+const f1 = x => x == null ? '-' : (Math.round(x * 10) / 10).toFixed(1);
 function last(p) {
   const l = p.last; if (!l) return p.rec ? `Recruit rating ${Math.round(p.rec)}` : 'No college minutes last season';
-  return `${esc(l.t)} ${String(l.s - 1).slice(2)}-${String(l.s).slice(2)}: ${l.mpg ?? '-'} min, ${l.ppg ?? '-'} pts, ${l.rpg ?? '-'} reb, ${l.apg ?? '-'} ast${l.bpm != null ? ', BPM ' + sgn(l.bpm) : ''}`;
+  return `${esc(l.t)} ${String(l.s - 1).slice(2)}-${String(l.s).slice(2)}: ${l.use ?? '-'} min, ${l.pts ?? '-'} pts, ${l.reb ?? '-'} reb, ${l.ast ?? '-'} ast${l['3pm'] != null ? ', ' + f1(l['3pm']) + ' 3PM' : ''}${l.bpm != null ? ', BPM ' + sgn(l.bpm) : ''}`;
 }
 function tags(p) {
-  if (p.g === 'transfer') return `<span class="tag t">Transfer</span>from ${esc(p.from)} <span class="${p.lvl > 0 ? 'dn' : 'up'}">(${p.lvl > 0 ? 'step up ' : 'step down '}${Math.abs(p.lvl)})</span>`;
-  if (p.g === 'newcomer') return `<span class="tag f">${(p.cls || '').toUpperCase() === 'FR' ? 'Freshman' : 'Newcomer'}</span>`;
+  const t = p.tag || '';
+  if (p.g === 'transfer') {
+    const m = t.match(/^Transfer from (.*) \((step up|step down) ([\d.]+)\)$/);
+    if (/\(same level\)$/.test(t)) return `<span class="tag t">Transfer</span>${esc(t.replace(/^Transfer /, ''))}`;
+    return m ? `<span class="tag t">Transfer</span>from ${esc(m[1])} <span class="${m[2] === 'step up' ? 'dn' : 'up'}">(${m[2]} ${m[3]})</span>` : `<span class="tag t">Transfer</span>${esc(t.replace(/^Transfer /, ''))}`;
+  }
+  if (p.g === 'newcomer') return `<span class="tag f">${esc(t || 'Newcomer')}</span>`;
   return `<span class="tag r">Returning</span>`;
 }
+function stats(p) {
+  const pr = p.proj || {};
+  return `<span class="st">${(D.stats || []).map(s => `<span>${f1(pr[s])}<i>${LBL[s] || esc(s)}</i></span>`).join('')}</span>`;
+}
 function row(p, team) {
-  const now = p.now ? ` · this season ${p.now.gp} g, ${p.now.mpg} min` : '';
-  return `<div class="pr ${esc(p.role)}">${p.hs ? `<img src="${esc(p.hs)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">` : '<span class="ph"></span>'}
+  const n = p.now;
+  const now = n ? ` · this season ${n.gp} g, ${n.use} min${n.pts != null ? ', ' + n.pts + ' pts' : ''}` : '';
+  return `<div class="pr ${esc(p.role)}">${p.hs ? `<img src="${HS(p.id)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">` : '<span class="ph"></span>'}
     <span class="n">${esc(p.n)}<small>${esc([team, p.pos, p.cls, p.ht].filter(Boolean).join(' · '))}</small></span>
     <span class="m">${tags(p)}<br>${last(p)}${now}</span>
-    <span class="mp"><b>${p.mpg}</b><span>min / game</span></span></div>`;
+    <span class="mp"><b>${f1(p.use)}</b><span>min / game</span></span>${stats(p)}</div>`;
 }
 function teamView() {
   const keys = Object.keys(D.teams).sort((a, b) => D.teams[a].name.localeCompare(D.teams[b].name));
@@ -87,7 +106,8 @@ function teamView() {
   let h = `<input class="find" id="find" placeholder="Find a team or a player" autocomplete="off"><div class="sug" id="sug"></div>`;
   if (pick) {
     const t = D.teams[pick];
-    h += `<div class="th"><h2>${esc(t.name)}</h2><span>${t.em_last != null ? 'last season adjusted margin ' + sgn(t.em_last) : ''}</span></div><div class="dc">`;
+    const sub = [t.pace != null ? `${f1(t.pace)} possessions a game projected` : '', t.em_last != null ? 'last season adjusted margin ' + sgn(t.em_last) : ''].filter(Boolean).join(' · ');
+    h += `<div class="th"><h2>${esc(t.name)}</h2><span>${esc(sub)}</span></div><div class="dc">`;
     let role = '';
     t.players.forEach(p => { if (p.role !== role) { role = p.role; h += `<div class="role">${esc(role === 'Starter' ? 'Projected starters' : role)}</div>`; } h += row(p); });
     h += '</div>';
@@ -96,8 +116,8 @@ function teamView() {
   const f = document.getElementById('find'), sug = document.getElementById('sug');
   f.oninput = () => {
     const q = f.value.trim().toLowerCase(); if (q.length < 2) { sug.innerHTML = ''; return; }
-    const ts = keys.filter(k => D.teams[k].name.toLowerCase().includes(q) || k.toLowerCase() === q).slice(0, 6).map(k => `<button data-t="${k}">${esc(D.teams[k].name)}</button>`);
-    const ps = []; keys.forEach(k => D.teams[k].players.forEach(p => { if (ps.length < 6 && p.n.toLowerCase().includes(q)) ps.push(`<button data-t="${k}">${esc(p.n)} · ${esc(D.teams[k].name)}</button>`); }));
+    const ts = keys.filter(k => D.teams[k].name.toLowerCase().includes(q) || k.toLowerCase() === q).slice(0, 6).map(k => `<button data-t="${esc(k)}">${esc(D.teams[k].name)}</button>`);
+    const ps = []; keys.forEach(k => D.teams[k].players.forEach(p => { if (ps.length < 6 && p.n.toLowerCase().includes(q)) ps.push(`<button data-t="${esc(k)}">${esc(p.n)} · ${esc(D.teams[k].name)}</button>`); }));
     sug.innerHTML = ts.concat(ps).join('');
     sug.querySelectorAll('button').forEach(b => b.onclick = () => { TEAM = b.dataset.t; history.replaceState(null, '', '#' + TEAM); teamView(); });
   };
@@ -110,15 +130,24 @@ function listView(title, sub, items) {
 }
 function render() {
   if (V === 'team') return teamView();
-  if (V === 'portal') return listView('The portal, projected', 'every transfer, by projected minutes', allPlayers(p => p.g === 'transfer').sort((a, b) => b[0].mpg - a[0].mpg));
-  return listView('Freshmen and newcomers', 'by projected minutes', allPlayers(p => p.g === 'newcomer' && p.mpg >= 6).sort((a, b) => b[0].mpg - a[0].mpg));
+  if (V === 'score') return listView('Top scorers, projected', 'points per game', allPlayers(p => (p.proj || {}).pts > 0).sort((a, b) => b[0].proj.pts - a[0].proj.pts));
+  if (V === 'portal') return listView('The portal, projected', 'every transfer, by projected minutes', allPlayers(p => p.g === 'transfer').sort((a, b) => b[0].use - a[0].use));
+  return listView('Freshmen and newcomers', 'by projected minutes', allPlayers(p => p.g === 'newcomer' && p.use >= 6).sort((a, b) => b[0].use - a[0].use));
+}
+function btTable(b) {
+  if (!b || !b.stats) return '';
+  const rows = [['min', b.minutes_mae, b.minutes_naive]].concat(Object.keys(b.stats).map(s => [s, b.stats[s].model, b.stats[s].naive]));
+  return `<h3>Tested on ${esc(b.season)}, a season it never saw</h3><p>Average miss per player per game (${(b.n || 0).toLocaleString()} players with 5+ games), against using last season's line again.</p>
+    <table><thead><tr><th>Per game</th><th>Model</th><th>Last season</th><th>Better by</th></tr></thead><tbody>${rows.map(([s, m, n]) =>
+    `<tr><td>${LBL[s] || esc(s)}</td><td><b>${m.toFixed(2)}</b></td><td>${n.toFixed(2)}</td><td>${Math.round(100 * (1 - m / n))}%</td></tr>`).join('')}</tbody></table>`;
 }
 document.querySelectorAll('#tabs button').forEach(b => b.onclick = () => { V = b.dataset.v; LIM = 40; document.querySelectorAll('#tabs button').forEach(x => x.classList.toggle('on', x === b)); render(); });
-fetch('data/cbb/minutes.json', {cache: 'no-cache'}).then(r => r.json()).then(d => {
+fetch('data/cbb/depth.json', {cache: 'no-cache'}).then(r => r.json()).then(d => {
   D = d; TEAM = decodeURIComponent((location.hash || '').slice(1)) || null;
   const all = allPlayers(() => true), tr = all.filter(x => x[0].g === 'transfer').length, nw = all.filter(x => x[0].g === 'newcomer').length;
   document.getElementById('kpis').innerHTML = `<div><b>${Object.keys(d.teams).length}</b><span>Division I teams</span></div><div><b>${all.length.toLocaleString()}</b><span>players projected</span></div><div><b>${tr}</b><span>transfers on new rosters</span></div><div><b>${nw}</b><span>freshmen and newcomers</span></div>`;
-  document.getElementById('method').textContent = 'How it is built: a separate model for returning players, transfers and newcomers, fitted on four seasons of Torvik player data and tested on 2025-26 without seeing it: 6.0 minutes per game off on average against 7.4 for "same minutes as last season", and 5.9 against 8.6 for transfers. In season, each game of real minutes counts as much as a third of the projection. Freshmen without a recruit rating start low and move with their real minutes. Research, not tracked picks.';
+  const bt = btTable(d.backtest); const el = document.getElementById('bt'); if (bt) el.innerHTML = bt; else el.remove();
+  document.getElementById('method').textContent = 'How it is built: ' + (d.method || '');
   render();
 }).catch(() => { document.getElementById('view').innerHTML = '<p class="lead">Could not load the projections right now.</p>'; });
 </script>

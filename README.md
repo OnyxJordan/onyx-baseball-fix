@@ -418,12 +418,23 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
   attempts, rebounds, assists, steals, blocks, turnovers, fouls), newest first, at most
   260 games or 120 seconds a run, so cbb runs LAST in the sports loop (the step has a
   12-minute cap). An empty slate stores `next_date` and the page says when play resumes.
-  `cbb_model.py` (v1, leans: no `backtest.json`) fits this season only, every rating
+  `cbb_model.py` (v2, leans: no `backtest.json`) fits this season only, every rating
   pulled toward a preseason prior: last season's Torvik adjusted efficiency from
   `data/cbb/history/teams.json` (Torvik names mapped to ESPN abbreviations in
   `cbb_model.ALIAS`) kept at 85%, or, without that file, last season's own fitted
   ratings (ridge 1). `team_model.fit` takes the prior as `carry_off` / `carry_def`
-  (and `mu0` / `mu_k`); without them it is unchanged. Onyx league `ncaab`: moneyline,
+  (and `mu0` / `mu_k`); without them it is unchanged. v2 adds pace to the total only:
+  `cbb_model.fit_pace` fits log points = level + pace[home] + pace[away] + off - opp def,
+  pace pulled toward last season's Torvik tempo (kept 50%, 30 games of prior), and
+  `ratings()` hands `team_model.expect` an `R["expect"]` that takes the margin from the
+  v1 additive fit and the total from possessions x efficiency (`tools/cbb_model_backtest.py`:
+  total error 13.62 vs 13.76 on 1/1-4/9/2026; the closing total is 13.38, so it does not
+  beat the market). Depth charts: `cbb_stats.py` (runs `cbb_minutes.build` on every ESPN
+  roster, then minutes x per-40 production; weights from `tools/cbb_stats_backtest.py`)
+  writes `data/cbb/depth.json`, the shared depth schema read by `cbb-players.html`, once a
+  day from both pipeline workflows (`--if-older 20`, fail-soft). Per-game threes, steals and
+  blocks come from `data/cbb/history/box_{YEAR}.json` (Torvik CSV columns 3, 19, 54, 59-63).
+  Onyx league `ncaab`: moneyline,
   spread, total, player points / rebounds / assists / made threes (NBA market ids, not
   yet confirmed by a markets probe). Gate: `tools/verify_sports.js` renders a real
   finished-game box score from `tools/fixtures/cbb_summary.json`.
@@ -1159,15 +1170,24 @@ ESPN's resizing CDN, matched to OpticOdds players by team + name once a day
 scores, quarter line scores, box scores and win probability are polled
 client-side from ESPN's public scoreboard / summary (15s while a game is
 live). **First basket** (`fbModel` / `fbCard` / `fbLeans` in `nba_shell.html`, lean only): the
-team that wins the opening tip scores first 65% of the time (2,428 games); each team's jumper is
+team that wins the opening tip scores first 66% of the time (2,424 games); each team's jumper is
 the starter with the most tips in `data/nba/jumps.json` (`nba_jumps.py`, seeded from the 2024-26
 play-by-play, updated by both NBA fetch paths), tip chance (won+2)/(jumped+4) against the other;
 the five starters (ESPN's posted lineup, else the most regular starters) split the team's share
-by ((FGA x games + 0.9) / (minutes x games + 30))^0.75 (`season.fga` from the box rows). Onyx's
+by ((FGA x games + 0.9) / (minutes x games + 30))^0.5 x ((first shots + 1.6) / (starts + 8))^0.25,
+the jumper x1.22 (`season.fga` from the box rows). Onyx's
 `first_basket_including_ft` price rides along in `nba_odds.py` (`props.json` players[].fb).
-Value = model at least 20% over Onyx's implied chance. Backtest (fit 2024-25, 1,075 Onyx-priced
-2025-26 games): +41.3% ROI on 421 bets at the opening price, +19.8% at the close, but -4.4% at
-the close after mid-January (open-v2 with the first-shot share: +38.3% on 533 at the open); Onyx's price is slightly sharper on log loss. Shown in the
+**open-v4 (11/2): opportunity first, then the price.** A lean is one of his team's two likeliest,
+priced +800 or shorter, expected return (model x decimal - 1) 10%+, the best one a game, shown
+with the reason ("BOS wins the tip 58% (Horford 41-19) · takes BOS's first shot 38% of starts").
+`tools/nba_first_basket_backtest.py` found every earlier number (+41% on 421, +38% on 533, the
+old "20% over implied" rule) was graded on a wrong label: the scratch study took the first m2 /
+m3 / ft event as the first score, and m2 / m3 are MISSED shots, so it matched the real first
+scorer 12% of the time. On the real one, 2025-26 Onyx prices: the old ratio rule 46-501, -1.4%
+at the open, -14.9% at the close (median +1120); the opportunity rule 14-96, +1.9% at the open,
+-8.7% at the close (median +730). Neither has an edge; Onyx's no-vig price is as sharp as the
+model on log loss. The only pattern: Onyx's opening long shots (+1201 and up) hit 8.8% vs 6.8%
+implied (+27.6% blind at the open) but are cut by the close; the old rule was harvesting that. Shown in the
 gamecenter and as "First basket leans" on the Picks tab, never tracked. **On trial at Onyx's opening price** (`open_lanes.py`, `data/nba/open_trial.json`, append-only
 and in validate_build's ledger list): every edge we found beats Onyx's first price far more
 often than its last, so the full refresh (never the 10-minute lines-only run) writes the
@@ -1175,7 +1195,7 @@ first price it sees for each 1st-quarter total and first-basket market to
 `data/nba/opening.json` (once, timestamped) and logs a play only when the model beats that
 opening price AND the live Onyx price is still the opening one, so every logged play was
 bettable at its logged odds. Lanes: 1Q total (25.4% of the game total, sd 12, 3pp+) and
-first basket (20%+ over implied, two per game at most). Graded from ESPN (1Q line score;
+first basket (open-v4 opportunity rule above, one per game, each with its "why"). Graded from ESPN (1Q line score;
 first scoring play's athlete id). Shown on the Picks tab as "On trial · Onyx opening prices"
 with its own record. **NBA deep dive (10/30, open-v2):** ESPN's play-by-play carries every
 shot's type and distance, the three referees and the venue, so 2,435 games (2024-26) were
@@ -1184,7 +1204,8 @@ prices (fit before February, judged after): shot-quality "luck" (made vs expecte
 shot type and distance), referee crews (free throws, pace), rest / travel / altitude, and
 for first basket each starter's share of his team's FIRST shot. Only the last one earned its
 place: first-basket log loss 2.2760 -> 2.2694 on unseen games, and at the opening price
-(edge 20%+) 57-476 +38% (~204u) against 45-376 +41% (~174u) before. Shot luck improved points
+(edge 20%+) 57-476 +38% (~204u) against 45-376 +41% (~174u) before. (Superseded 11/2, open-v4:
+those were graded on the wrong first scorer; see First basket above.) Shot luck improved points
 MAE slightly (5.354 -> 5.343) but did not move the props lane beyond noise; referees, rest and
 travel did nothing for props or for game totals (refs called totals 45% before February, 58%
 after: noise). Production: `nba_jumps.py` now also records each final's ten starters and both
@@ -1613,3 +1634,61 @@ anon key; never the service key); (5) run "Accounts (turn on / update)", which w
 `accounts.json` on main. Empty the variables and rerun to turn accounts off. Gate:
 `node tools/verify_accounts.js` (a stand-in Supabase, no keys: off, sign-in, first-sign-in merge,
 two devices, removals, privacy between users, session refresh, sign out, delete).
+
+## Onyx Picks (11/2)
+
+Jordan: "we need to track plays what it recommends not leans and trials this is who I'd pick
+today with tracking and visibility there's too much obscurity right now". **Decision: markets
+that pass the test below are posted as tracked Onyx Picks; every other market shows projections
+only and is never labeled a pick.** The sport pages' own lanes (tracked, on trial) keep running
+and keep their records; the Onyx Picks record is the one public card across sports.
+
+- **One rule** (the home Top 10, `daily_top.ok`): Onyx main line -150 to +200, our chance beats
+  the implied chance by 2 to 12 points, expected return +3%+, chance 40%+, game not started.
+- **The test** (`tools/picks_backtest.py`, dev only, needs `bt/`; writes `data/picks/backtest.json`):
+  replays that rule on every market where the live chance can be rebuilt walk-forward, at Onyx's
+  real opening and closing prices, as the card logs it (one per player or game market a game, best
+  expected return first, up to 5 a day). **Finalized** = on the held-out period: 60+ bets, ROI > 0
+  at the open AND at the close. Fewer than 60 is "not enough yet", never a pass (60 bets at -110
+  still carry about +/-13 points of ROI noise). Each verdict records the model version
+  (`nba_model.VERSION` etc.; the 1Q total uses its own signature, `picks.q1_signature`, so a
+  first-basket change does not re-gate it); a version change sends the market back to projections.
+- **Result of the 11/2 run** (held out, open / close):
+
+  | Market | Held out | Open | Close | Verdict |
+  |---|---|---|---|---|
+  | NBA 1st-quarter total | Feb-Apr 2026 | 101-71, +12.5% | 99-85, +3.4% | **finalized** |
+  | NBA points (28+ min) | Feb-Apr 2026 | 27-18, +15.7% | 19-21, -9.1% | not enough yet |
+  | NBA rebounds / assists | Feb-Apr 2026 | 7-2 / 9-13 | | not enough yet |
+  | CFB spread / total / ml | fall 2026 | 27-19 +12.0% / 23-15 +15.6% / 7-8 | +6.7% / +19.4% / | not enough yet |
+  | NFL spread / ml / total | fall 2026 | 9-5 / 3-5 / 4-5 | | not enough yet |
+  | NFL rushing yds unders, pass att unders (v11) | fall 2026 | 22-15 +12.8%, 25-18 +10.7% | -23% (5), -5% (10) | not enough yet |
+  | NHL moneyline / puck line | Jan 15 2026 on | 38-59 -4.6% / 64-62 -8.8% | -17.3% / -8.5% | fails |
+  | NHL total | Jan 15 2026 on | 8-9 | | not enough yet |
+  | Tennis moneyline | 2026 | 154-225 -7.3% | -5.1% | fails |
+
+  No replay of the live chance (never picks): NBA first basket (corrected open-v4 backtest loses at
+  the close) and 1st-half total (board only), NFL receptions v5, passing TDs, rec / passing yards and
+  TDs (excluded by their own tests), college player props, tennis games markets, college
+  basketball (no Onyx history), golf (no Onyx prices), MLB (season closed).
+- **Live** (`picks.py`, pipeline-safe): `daily_top.write` calls `picks.hook(sport, plays)`: grade
+  the sport's finished picks, then log each play in a finalized market once (key: sport, game,
+  player or side), at the Onyx price shown, before its start, up to 5 a sport a day by expected
+  return, and mark it `"pick": true` in `top.json`. The NBA lines-only run (`NBA_LINES_ONLY=1`)
+  only marks; it commits no ledger. `ONYX_PICKS_DRY=1` does the same for local testing.
+  Rows: id, sport, date (baseball day of the start), logged_at, start, gid, matchup, label, market,
+  name, who, side, line, hcap, price, chance, edge, ev, sel, model version, then result (W / L / P /
+  V), actual, profit (units at the logged price), graded_at. Grading reads ESPN's summary (NBA's
+  game found on ESPN's scoreboard by the two teams, since its gid comes from the odds feed): scores,
+  1st-quarter line scores, box scores (a player who did not play is a void; an NFL / college
+  player who played without a carry or catch is a 0). A game with no final 4 days after its start
+  is void. `data/picks/ledger.json` is append-only, in validate_build's ledger list; daily_build
+  and refresh_build commit `data/` so it rides along.
+- **Page** `picks.html`: today's card (Onyx price at logging, bet link with referral KR680261),
+  the record (overall, by sport, by market, units, ROI), every graded pick newest first, and how
+  picks are chosen with the backtest numbers. Linked from the hub (hero, a banner on top of the Top
+  10, footer) and the shared menu and footer in `ui.js`. Home Top 10: "Onyx Pick" (logged) vs
+  "Projection" (everything else), picks ranked first.
+- **Gate:** `python3 tools/verify_picks.py`: one finished game per sport (NBA, NFL, CFB, NHL), logged
+  into a temporary ledger and graded against ESPN, every result checked against the score read
+  independently; logged once, never after the start, the daily cap, nothing unfinalized logged.

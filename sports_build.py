@@ -1455,13 +1455,27 @@ def main():
     else:
         model = lab_block(key, cfg)
     write_top(key, lane, slate, model)
-    page_cfg = {"name": cfg["name"], "full": cfg["full"], "kind": cfg["kind"], "espn": cfg["espn"],
+    # depth charts (11/2): data/<sport>/depth.json, refreshed at most every 3 hours, fail-soft
+    # (a failure keeps the last file). College basketball's is written by its own helper.
+    if key in ("nfl", "cfb", "nhl"):
+        try:
+            if key == "nhl":
+                import depth_hockey
+                depth_hockey.build(lane, slate)
+            else:
+                import depth_football
+                depth_football.build(key, lane, slate)
+        except Exception as ex:
+            print(f"  depth: {str(ex)[:160]}")
+    depth = lane.load("depth.json", None) if cfg["kind"] in ("football", "hockey", "basketball") else None
+    page_cfg ={"name": cfg["name"], "full": cfg["full"], "kind": cfg["kind"], "espn": cfg["espn"],
                 "espn_q": cfg.get("espn_q", ""), "tone": cfg["tone"], "art": cfg["art"],
                 "onyx_league": ONYX_LEAGUE.get(key)}
     data = {"sport": key, "cfg": page_cfg, "date": slate.get("date"), "label": slate.get("label"),
             "season": slate.get("season"), "games": slate.get("games") or [], "events": slate.get("events") or [],
             "next_date": slate.get("next_date"), "next_n": slate.get("next_n"),
             "odds": odds or {}, "model": model,
+            "depth_at": (depth or {}).get("generated") if (depth or {}).get("teams") else None,
             "generated": datetime.now(timezone.utc).isoformat(timespec="seconds")}
     shell = open("sport_shell.html", encoding="utf-8").read()
     mlb = open("shell.html", encoding="utf-8").read()

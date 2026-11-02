@@ -363,6 +363,31 @@
   .gc-hd .ssc{display:block;font:800 30px monospace;text-align:right}.gc-hd .ssc.a{grid-area:as}.gc-hd .ssc.h{grid-area:hs}.gc-hd .gc-mid .sc{display:none}
   .gc-hd .gc-side b{font-size:16px}}
 .gc-hd .ssc{display:none}
+/* Depth tab (11/2): data/<sport>/depth.json in one schema for every team sport */
+.dp-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:4px 0 12px}
+.dp-bar select{flex:1 1 220px;min-width:0;max-width:100%;padding:10px 12px;border-radius:12px;border:1px solid var(--border2);background:var(--bg2);color:var(--text);font:700 14px inherit}
+.dp-bar .gc-sub{flex:1 1 260px;margin:0;min-width:0}
+.dp-team{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:6px 0 4px}
+.dp-team .lg{width:34px;height:34px}
+.dp-team b{font-size:18px}.dp-team .dp-meta{display:flex;gap:6px;flex-wrap:wrap}
+.dp-meta span{font:700 10px monospace;letter-spacing:.06em;text-transform:uppercase;padding:4px 8px;border-radius:999px;border:1px solid var(--border2);color:var(--text2);white-space:nowrap}
+.dp-grp h4{margin:18px 0 8px;font:700 11px monospace;letter-spacing:.12em;text-transform:uppercase;color:#d795ff}
+.dp .tbl table{min-width:0;font-size:12.5px}
+.dp .tbl th,.dp .tbl td{padding:8px 8px;white-space:nowrap}
+.dp .tbl td.pl{white-space:normal;min-width:150px;max-width:230px;position:sticky;left:0;background:var(--bg2);z-index:1}
+.dp .tbl th.pl{position:sticky;left:0;background:var(--bg2);z-index:1}
+.dp .pl b{font-weight:700}.dp .pl small{display:block;font-size:11px;color:var(--text3);margin-top:2px;line-height:1.35}
+.dp .pl small.out{color:#f87171}.dp .pl small.q{color:#d795ff}
+.dp-role{display:inline-block;min-width:30px;margin-right:6px;padding:2px 6px;border-radius:7px;font:800 10px monospace;text-align:center;vertical-align:1px;border:1px solid var(--border2);color:var(--text2)}
+.dp-role.st{background:rgba(176,56,249,.22);border-color:rgba(176,56,249,.6);color:#fff}
+.dp tr.out td:not(.pl){opacity:.45}.dp tr.out .pl b{opacity:.6;text-decoration:line-through}
+.dp tr.bench td{color:var(--text3)}
+.dp tr.brk td{border-top:2px solid var(--border2)}
+.dp .use{font-weight:800;font-family:monospace}
+.dp-bt{width:100%;border-collapse:collapse;font-size:12px;margin:8px 0 4px}
+.dp-bt th,.dp-bt td{padding:6px 6px;border-bottom:1px solid var(--border);text-align:right;white-space:nowrap}
+.dp-bt th:first-child,.dp-bt td:first-child{text-align:left;white-space:normal}
+.dp-bt td.dp-win{color:#61e970;font-weight:800;background:none}
 </style>
 <link rel="stylesheet" href="onyx.css"><script src="onyx.js" defer></script>
 </head>
@@ -400,6 +425,7 @@
 <div class="pane" id="pane-board"><div class="sp-wrap" id="boardBody"></div></div>
 <div class="pane" id="pane-plays"><div class="sp-wrap" id="playsBody"></div></div>
 <div class="pane" id="pane-model"><div class="sp-wrap" id="modelBody"></div></div>
+<div class="pane" id="pane-depth"><div class="sp-wrap dp" id="depthBody"></div></div>
 
 <script>
 // Injected by sports_build.py. `var`, read before any other script line (CLAUDE.md rule 5).
@@ -410,6 +436,7 @@ var C = SD.cfg || {};
 var KIND = C.kind || 'football';
 var TEAMK = KIND === 'football' || KIND === 'hockey' || KIND === 'basketball';   // team sports: scoreboard, gamecenter, followed players
 var TABS = [['home', 'Home'], ['games', 'Games'], ['board', 'Onyx Board'], ['plays', 'Plays'], ['model', 'Model']];
+if (TEAMK) TABS.splice(4, 0, ['depth', 'Depth']);   // depth charts (11/2): every team sport
 var currentTab = 'home', OPEN_GAME = null, LIVE = {}, LIVE_EV = null;
 
 function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'})[c]); }
@@ -2086,6 +2113,110 @@ function renderModel() {
     ${recordBlock(M.record)}`;
 }
 
+// ── Depth: data/<sport>/depth.json, one schema for every team sport (11/2) ──
+// {unit, use_label, stats, labels, groups, group_names, pace_label, method, backtest,
+//  teams: {abbr: {name, logo, pace, next, players: [{id, n, pos, grp, role, tier, tag, use, proj, now, last}]}}}
+var DEPTH = null, DEPTH_ERR = false, DEPTH_TEAM = null, DEPTH_VIEW = 'proj';
+var DP_TIERS = ['Starter', 'Rotation', 'Bench', 'Out'];
+var DP_GN = {G: 'Guards', F: 'Forwards', C: 'Centers', 'G-F': 'Wings', 'F-C': 'Bigs'};   // when the file names no groups
+function dpLoad() {
+  if (DEPTH || DEPTH_ERR === 'busy') return;
+  DEPTH_ERR = 'busy';
+  fetch('data/' + SD.sport + '/depth.json' + (SD.depth_at ? '?v=' + encodeURIComponent(SD.depth_at) : ''))
+    .then(r => r.ok ? r.json() : null).catch(() => null)
+    .then(d => { DEPTH = d && d.teams ? d : null; DEPTH_ERR = !DEPTH; if (currentTab === 'depth') renderDepth(); });
+}
+function dpUse(v, unit) {
+  if (v == null || isNaN(v)) return '-';
+  return /%/.test(unit || '') ? Math.round(v) + '%' : (+v).toFixed(1);
+}
+function dpVal(v, k) {
+  if (v == null || isNaN(v)) return '-';
+  if (k === 'gp') return String(Math.round(v));
+  return Math.abs(v) >= 10 ? (+v).toFixed(1) : (+v).toFixed(2).replace(/0$/, '');
+}
+function dpTier(p) { return p.tier || (DP_TIERS.includes(p.role) ? p.role : ''); }
+function dpDefaultTeam(T) {
+  const h = (location.hash || '').split(':');
+  if (h[0] === '#depth' && h[1] && T[decodeURIComponent(h[1])]) return decodeURIComponent(h[1]);
+  for (const g of SD.games || []) for (const t of [g.away, g.home]) if (T[t]) return t;
+  return Object.keys(T).sort()[0];
+}
+function dpPick(t) { DEPTH_TEAM = t; renderDepth(); try { history.replaceState(null, '', '#depth:' + encodeURIComponent(t)); } catch (e) {} }
+function dpView(v) { DEPTH_VIEW = v; renderDepth(); }
+function renderDepth() {
+  const el = document.getElementById('depthBody');
+  if (!DEPTH) {
+    el.innerHTML = `<div class="sec-hdr"><h2>Depth chart</h2></div>` + (DEPTH_ERR === true
+      ? `<div class="empty">Depth charts for ${esc(C.name)} arrive with the next data build. Every team's order, roles and projected usage will show here.</div>`
+      : `<div class="empty">Loading every ${esc(C.name)} depth chart, with roles, projected usage and per-game projections...</div>`);
+    dpLoad();
+    return;
+  }
+  const D = DEPTH, T = D.teams || {};
+  if (!DEPTH_TEAM || !T[DEPTH_TEAM]) DEPTH_TEAM = dpDefaultTeam(T);
+  const tm = T[DEPTH_TEAM] || {players: []};
+  const lab = Object.assign({gp: 'GP'}, D.labels || {});
+  const useHd = ({'snap%': 'Snap%', 'use%': 'Use%', min: 'Min', toi: 'TOI'})[D.unit] || 'Use';
+  const views = [['proj', 'Projected'], ['now', 'This season'], ['last', 'Last season']];
+  const keys = Object.keys(T).sort((a, b) => String(T[a].name || a).localeCompare(String(T[b].name || b)));
+  // groups in the file's order, else first appearance
+  const gk = p => p.grp || p.pos || 'Other';
+  const order = (D.groups || []).slice();
+  tm.players.forEach(p => { if (!order.includes(gk(p))) order.push(gk(p)); });
+  const V = DEPTH_VIEW;
+  const body = order.map(g => {
+    const ps = tm.players.filter(p => gk(p) === g);
+    if (!ps.length) return '';
+    const obj = p => (V === 'proj' ? p.proj : p[V]) || {};
+    const cols = (D.stats || []).concat(D.extra || []).filter(k => ps.some(p => obj(p)[k] != null));
+    const showGp = V !== 'proj' && ps.some(p => obj(p).gp != null);
+    const gu = (D.group_units || {})[g] || D.unit, gHd = ({'snap%': 'Snap%', 'use%': 'Use%', 'start%': 'Starts', min: 'Min', toi: 'TOI'})[gu] || useHd;
+    let prev = null;
+    const rows = ps.map(p => {
+      const o = obj(p), tier = dpTier(p);
+      const u = V === 'proj' ? p.use : o.use;
+      const brk = prev != null && String(p.role || '').replace(/\d+$/, '') === String(prev).replace(/\d+$/, '') && p.role !== prev && /^[LDG]\d$/.test(p.role || '');
+      prev = p.role;
+      const tag = p.tag ? `<small class="${tier === 'Out' ? 'out' : p.q || /question/i.test(p.tag) ? 'q' : ''}">${esc(p.tag)}</small>` : '';
+      return `<tr class="${tier === 'Out' ? 'out' : tier === 'Bench' ? 'bench' : ''}${brk ? ' brk' : ''}"><td class="pl"><span class="dp-role${tier === 'Starter' ? ' st' : ''}">${esc(p.role || tier || p.pos || '')}</span><b>${esc(p.n || '')}</b>${p.pos && p.pos !== g ? ` <span class="dim mono" style="font-size:10px">${esc(p.pos)}</span>` : ''}${tag}</td>
+        <td class="r use">${dpUse(u, gu)}</td>${showGp ? `<td class="r mono">${dpVal(o.gp, 'gp')}</td>` : ''}${cols.map(k => `<td class="r mono">${dpVal(o[k], k)}</td>`).join('')}</tr>`;
+    }).join('');
+    return `<div class="dp-grp"><h4>${esc((D.group_names || {})[g] || DP_GN[g] || g)}</h4><div class="tbl"><table><thead><tr><th class="pl">Player</th><th class="r">${esc(gHd)}</th>${showGp ? '<th class="r">GP</th>' : ''}${cols.map(k => `<th class="r">${esc(lab[k] || k)}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div></div>`;
+  }).join('');
+  const bt = D.backtest || {};
+  // two backtest shapes: rows [{k, n, mae, avg, l3}] (football, hockey) or {minutes_mae, minutes_naive, stats: {k: {model, naive}}}
+  const btR = (bt.rows || []).length ? bt.rows : bt.stats ? [{k: useHd === 'Min' ? 'Minutes' : (D.use_label || 'Usage'), mae: bt.minutes_mae, base: bt.minutes_naive, n: bt.n}]
+    .concat(Object.keys(bt.stats).map(k => ({k: lab[k] || k, mae: bt.stats[k].model, base: bt.stats[k].naive, n: bt.n}))) : [];
+  const two = btR.some(r => r.avg != null);
+  const btRows = btR.filter(r => r.mae != null).map(r => {
+    const best = two ? Math.min(r.avg, r.l3) : r.base;
+    const f = v => v == null || isNaN(v) ? '-' : String(+v);   // as tested: the differences live in the third decimal
+    return `<tr><td>${esc(r.k)}</td><td class="${r.mae < best * 0.995 ? 'dp-win' : ''}">${f(r.mae)}</td>${two ? `<td>${f(r.avg)}</td><td>${f(r.l3)}</td>` : `<td>${f(r.base)}</td>`}<td>${r.n ? (+r.n).toLocaleString('en-US') : '-'}</td></tr>`;
+  }).join('');
+  const btHead = two ? '<th>Model</th><th>Season avg</th><th>Last 3</th>' : '<th>Model</th><th>Baseline</th>';
+  const btWin = bt.window || (bt.season ? bt.season + ' season' : '');
+  const nx = tm.next && tm.next.opp ? `<span>next ${tm.next.wk ? 'wk ' + esc(tm.next.wk) + ' ' : ''}vs ${esc(tm.next.opp)}</span>` : '';
+  el.innerHTML = `<div class="sec-hdr"><h2>Depth chart</h2><span class="dim mono" style="font-size:11px">${D.generated ? 'updated ' + esc(new Date(D.generated).toLocaleString('en-US', {month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York'})) + ' ET' : ''}</span></div>
+    <div class="dp-bar"><select aria-label="Team" onchange="dpPick(this.value)">${keys.map(k => `<option value="${esc(k)}"${k === DEPTH_TEAM ? ' selected' : ''}>${esc(T[k].name || k)}</option>`).join('')}</select>
+      <div class="gc-sub">${views.map(([k, t]) => `<button class="${k === V ? 'on' : ''}" onclick="dpView('${k}')">${t}</button>`).join('')}</div></div>
+    <div class="dp-team">${lg(tm.logo)}<b>${esc(tm.name || DEPTH_TEAM)}</b><div class="dp-meta">${tm.pace != null ? `<span>${esc(D.pace_label || 'Pace')} ${esc(dpVal(tm.pace))}</span>` : ''}${nx}<span>${esc(D.use_label || useHd)}: ${V === 'proj' ? 'projected' : V === 'now' ? 'this season' : 'last season'}</span></div></div>
+    <p class="dim" style="font-size:12px;margin:4px 0 0">${V === 'proj' ? 'Projected per game. Tap This season or Last season for what each player has done.' : V === 'now' ? 'Per game this season.' : 'Per game last season.'} A dash means no role in that number.</p>
+    ${body || '<div class="empty">No players listed for this team yet.</div>'}
+    <div class="lab" style="margin-top:20px"><div class="eb">How the depth chart works</div><p>${esc(D.method || '')}</p>
+      ${btRows ? `<div style="overflow-x:auto"><table class="dp-bt"><thead><tr><th>Backtest${btWin ? ' · ' + esc(btWin) : ''}</th>${btHead}<th>Games</th></tr></thead><tbody>${btRows}</tbody></table></div><p class="dim" style="font-size:11px">Average miss per game; lower is better, green where the projection beats ${two ? 'both baselines' : 'the baseline'}.</p>` : ''}</div>`;
+}
+function dpMenuTile() {   // the menu drawer (ui.js) lists the sport tabs; add Depth to it
+  const grid = document.querySelector('.osheet .ogrid');
+  if (!TEAMK || !grid || grid.querySelector('[data-tab="depth"]')) return;
+  const b = document.createElement('button');
+  b.className = 'otile'; b.dataset.tab = 'depth';
+  b.innerHTML = '<svg class="oi" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h12M2 6.5h9M2 10h12M2 13.5h7"/></svg><div><b>Depth</b><span>Depth charts, roles and usage</span></div>';
+  b.addEventListener('click', () => { try { window.OnyxUI && OnyxUI.closeMenu(); } catch (e) {} gotoTab('depth'); });
+  const model = grid.querySelector('[data-tab="model"]');
+  grid.insertBefore(b, model || null);
+}
+
 // ── live: ESPN scoreboard every 30s (15s while anything is live) ────
 var _poll = null;
 function pollLive() {
@@ -2140,6 +2271,14 @@ window.OX_SEARCH = function (go) {
   (SD.games || []).forEach(g => out.push({label: `${g.away_name || g.away} @ ${g.home_name || g.home}`, sub: tipTime(g.start), run: () => openGame(g.gid)}));
   ((SD.model || {}).rows || []).slice(0, 300).forEach(r => out.push({label: r.name, sub: `${r.team} · ${MKT_NAME[r.mkt] || r.mkt} ${num(r.proj)}`, run: () => { go('plays'); }}));
   (SD.events || []).forEach(e => (e.board || []).slice(0, 150).forEach(r => out.push({label: r.name, sub: `${e.name} · ${r.pos} · ${r.to_par}`, run: () => { GQ = String(r.name).toLowerCase(); go('games'); }})));
+  if (TEAMK) {   // depth charts: the page, and each team on the slate
+    out.push({label: 'Depth charts', sub: 'PAGE', run: () => go('depth')});
+    const seen = {};
+    (SD.games || []).forEach(g => [[g.away, g.away_name], [g.home, g.home_name]].forEach(([t, n]) => {
+      if (seen[t]) return; seen[t] = 1;
+      out.push({label: `${n || t} depth chart`, sub: 'DEPTH', run: () => { DEPTH_TEAM = t; go('depth'); }});
+    }));
+  }
   return out;
 };
 
@@ -2151,12 +2290,15 @@ function initAnalytics() {
   const s = document.createElement('script'); s.async = true; s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_MEASUREMENT_ID; document.head.appendChild(s);
 }
 RENDER = {home: renderHome, games: renderGames, board: renderBoard, plays: renderPlays, model: renderModel};
+if (TEAMK) RENDER.depth = renderDepth;
 (function boot() {
   buildNav(); ticker(); initAnalytics();
   const art = document.getElementById('heroArt');
   if (art) { art.dataset.oxArt = C.art || 'field'; art.dataset.oxTone = C.tone || 'purple'; art.dataset.oxFade = '0'; }
   const h = (location.hash || '').replace('#', '').split(':');
   if (h[0] === 'games' && h[1]) OPEN_GAME = h[1];
+  if (h[0] === 'depth' && h[1]) DEPTH_TEAM = decodeURIComponent(h[1]);
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => setTimeout(dpMenuTile, 0)); else setTimeout(dpMenuTile, 0);
   gotoTab(RENDER[h[0]] ? h[0] : 'home');
   pollLive();
   setTimeout(ypLoop, 2500);

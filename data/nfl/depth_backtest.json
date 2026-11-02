@@ -1,0 +1,134 @@
+{
+ "window": "2026 weeks 3 to 8, tuned on 2025",
+ "rows": [
+  {
+   "k": "Snap share (points)",
+   "n": 6340,
+   "mae": 10.6,
+   "avg": 11.0,
+   "l3": 10.9,
+   "rmse": 17.2,
+   "rmse_avg": 17.8,
+   "rmse_l3": 17.7
+  },
+  {
+   "k": "Passing yards",
+   "n": 166,
+   "mae": 64.9,
+   "avg": 67.9,
+   "l3": 71.6
+  },
+  {
+   "k": "Rushing yards",
+   "n": 257,
+   "mae": 27.4,
+   "avg": 27.9,
+   "l3": 27.7
+  },
+  {
+   "k": "Receptions",
+   "n": 739,
+   "mae": 1.76,
+   "avg": 1.85,
+   "l3": 1.92
+  },
+  {
+   "k": "Receiving yards",
+   "n": 739,
+   "mae": 24.7,
+   "avg": 26.0,
+   "l3": 26.9
+  },
+  {
+   "k": "Touchdowns",
+   "n": 1049,
+   "mae": 0.438,
+   "avg": 0.438,
+   "l3": 0.437,
+   "rmse": 0.636,
+   "rmse_avg": 0.636,
+   "rmse_l3": 0.647
+  },
+  {
+   "k": "Passing touchdowns",
+   "n": 166,
+   "mae": 0.965,
+   "avg": 0.965,
+   "l3": 0.981,
+   "rmse": 1.198,
+   "rmse_avg": 1.198,
+   "rmse_l3": 1.228
+  }
+ ],
+ "tune": [
+  {
+   "k": "Snap share (points)",
+   "n": 18141,
+   "mae": 11.9,
+   "avg": 12.9,
+   "l3": 12.4,
+   "rmse": 18.9,
+   "rmse_avg": 20.0,
+   "rmse_l3": 19.5
+  },
+  {
+   "k": "Passing yards",
+   "n": 461,
+   "mae": 65.1,
+   "avg": 66.4,
+   "l3": 69.5
+  },
+  {
+   "k": "Rushing yards",
+   "n": 752,
+   "mae": 25.8,
+   "avg": 25.8,
+   "l3": 27.8
+  },
+  {
+   "k": "Receptions",
+   "n": 1994,
+   "mae": 1.7,
+   "avg": 1.71,
+   "l3": 1.78
+  },
+  {
+   "k": "Receiving yards",
+   "n": 1994,
+   "mae": 23.3,
+   "avg": 23.3,
+   "l3": 24.9
+  },
+  {
+   "k": "Touchdowns",
+   "n": 2990,
+   "mae": 0.437,
+   "avg": 0.437,
+   "l3": 0.446,
+   "rmse": 0.618,
+   "rmse_avg": 0.618,
+   "rmse_l3": 0.661
+  },
+  {
+   "k": "Passing touchdowns",
+   "n": 461,
+   "mae": 1.021,
+   "avg": 1.021,
+   "l3": 1.072,
+   "rmse": 1.236,
+   "rmse_avg": 1.236,
+   "rmse_l3": 1.326
+  }
+ ],
+ "params": {
+  "snap": {
+   "dec": 0.5,
+   "k": 0.0
+  },
+  "td": {
+   "dec": 1.0,
+   "k": 0.0
+  }
+ },
+ "run": "2026-11-02T16:00:19+00:00"
+}

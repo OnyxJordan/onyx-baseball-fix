@@ -307,6 +307,7 @@
           '<div><b>' + esc(t[1]) + '</b><span>' + esc(t[3]) + '</span></div></button>';
       }).join('') + '</div>' +
       '<div class="oacts">' +
+      '<a class="oact ox-all" href="picks.html">' + OX_MARK + 'Onyx Picks: today\'s card and the record</a>' +
       '<a class="oact ox-all" href="home.html#my">' + OX_MARK + 'My Onyx: players and bets</a>' +
       '<a class="oact ox-all" href="account.html">' + OX_MARK + 'Account: sign in, sync every device</a>' +
       '<a class="oact ox-all" href="home.html">' + OX_MARK + 'All Onyx sports</a>' +
@@ -569,7 +570,7 @@
       '<div class="row"><div class="links">' + sports.map(function (x) {
         return x[1] ? '<a href="' + x[1] + '"' + (x[2] ? ' class="on" aria-current="page"' : '') + '>Onyx ' + x[0] + '</a>'
                     : '<a class="soon" aria-disabled="true">Onyx ' + x[0] + ' · soon</a>';
-      }).join('') + '</div><a class="ox-btn sm" href="home.html">Onyx Sports</a></div>' +
+      }).join('') + '<a href="picks.html">Onyx Picks</a></div><a class="ox-btn sm" href="home.html">Onyx Sports</a></div>' +
       '<div class="ox-giant" data-ox-host><canvas data-ox-art="wordmark" data-ox-tone="purple" aria-label="Onyx"></canvas></div>' +
       '<small>Onyx Sports Data is research: projections are estimates, not guarantees. All prices are Onyx prices. Must be of legal age in your state to play; if you or someone you know has a gambling problem, call 1-800-GAMBLER.</small>');
     document.body.appendChild(f);

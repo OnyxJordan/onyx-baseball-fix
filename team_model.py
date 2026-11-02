@@ -80,7 +80,10 @@ def fit(games, as_of, P, iters=12):
 
 
 def expect(R, home, away, neutral=False):
-    """Expected points (goals) for home and away."""
+    """Expected points (goals) for home and away. A model whose ratings are not additive
+    (college basketball v2: possessions x efficiency) hands its own expect in R."""
+    if callable(R.get("expect")):
+        return R["expect"](home, away, neutral)
     h = 0.0 if neutral else R["home"]
     eh = R["mu"] + h / 2 + R["off"].get(home, 0.0) - R["def"].get(away, 0.0)
     ea = R["mu"] - h / 2 + R["off"].get(away, 0.0) - R["def"].get(home, 0.0)

@@ -278,6 +278,134 @@ def engine_card(slate, tg, lg, hist=None, th=None):
             "aging": aging_card(hist)}
 
 
+# ── depth chart (data/nba/depth.json + the Depth tab) ───────────────────
+DEPTH = "depth.json"
+DEPTH_ROT_MIN = 12.0     # projected minutes that make a non-starter "Rotation" (else "Bench")
+# Weight on the model's number; the rest goes on the player's last-10 average (games he
+# played). Chosen on Oct-Jan 2025-26 and judged on Feb-Apr by tools/nba_minutes_backtest.py
+# (--fit prints this dict). The model alone lost to a plain last-10 average on minutes for
+# rotation and bench players (it hedges every bench player toward a DNP); the blend beats
+# the model and both naive guesses in every group. Returning players lean on the model:
+# a last-10 from before the injury is stale. Display only: props are priced off the model.
+DEPTH_W = {"Starter": {"min": 0.75, "pts": 0.85, "reb": 1.0, "ast": 0.85, "fg3": 1.0},
+           "Rotation": {"min": 0.5, "pts": 0.65, "reb": 0.75, "ast": 0.8, "fg3": 0.9},
+           "Bench": {"min": 0.3, "pts": 0.7, "reb": 0.6, "ast": 0.85, "fg3": 1.0},
+           # Oct-Jan chose ~0.5 here too, but on Feb-Apr that blend lost to the model alone
+           # (minutes 5.47 vs 5.26 over 565 games): a pre-injury last 10 is stale. Model alone.
+           "Returning": {"min": 1.0, "pts": 1.0, "reb": 1.0, "ast": 1.0, "fg3": 1.0}}
+
+
+def depth_line(model, l10, role, returning=False, W=None):
+    """The depth chart's projection: model x w + last-10 x (1 - w), per stat, by role
+    (DEPTH_W). l10 values may be None (no game yet): the model alone. PRA is the sum."""
+    w = (W or DEPTH_W).get("Returning" if returning else role) or {}
+    out = {}
+    for s in ("min", "pts", "reb", "ast", "fg3"):
+        v, b = model.get(s) or 0.0, l10.get(s)
+        k = w.get(s, 1.0)
+        out[s] = v if b is None else k * v + (1 - k) * b
+    out["pra"] = out["pts"] + out["reb"] + out["ast"]
+    return out
+
+
+def write_depth(rows, slate, pg, today, engine):
+    """Every rostered player on tonight's slate, by team, ordered by projected minutes:
+    role, injury tag, projected minutes and pts / reb / ast / 3PM / PRA, last-10 and season
+    actuals. Writes data/nba/depth.json (the shared depth schema) and returns the page's copy.
+    Teams not playing tonight keep their last depth chart (marked with its date)."""
+    old = load(DEPTH, {}) or {}
+    bt = old.get("backtest") or {}   # written by tools/nba_minutes_backtest.py, carried forward
+    team_days = {}
+    for rec in pg.values():
+        if isinstance(rec, dict):
+            for x in rec.get("g") or []:
+                team_days.setdefault(rec.get("t"), set()).add(x[0])
+    by_team = {}
+    for r in rows:
+        by_team.setdefault(r["team"], []).append(r)
+    pace = {t["team"]: t for t in (engine or {}).get("teams") or []}
+    st = {p["pid"]: p.get("starter") for p in slate.get("players", [])}   # confirmed fives (attach_lineups)
+    names = nba_common.TEAM_NAMES
+    teams = {}
+    for team, rs in by_team.items():
+        live = [r for r in rs if not r["out"]]
+        starter_known = any(st.get(r["pid"]) is not None for r in rs)
+        live.sort(key=lambda r: -r["min"])
+        rank = {id(r): i for i, r in enumerate(live)}
+        players = []
+        for r in rs:
+            games = [x for x in ((pg.get(r["pid"]) or {}).get("g") or []) if x[4] and x[4] > 0]
+            last = games[-10:]
+            l10 = None
+            if last:
+                l10 = {"min": sum(x[4] for x in last) / len(last), "pts": sum(x[5] for x in last) / len(last),
+                       "reb": sum(x[6] for x in last) / len(last), "ast": sum(x[7] for x in last) / len(last),
+                       "fg3": sum((x[8] or 0) for x in last) / len(last)}
+            # returning from injury: missed his team's last 3+ games (or a season debut after 3+)
+            tdays = sorted(team_days.get(team, ()))
+            last_d = games[-1][0] if games else None
+            ret = len([d for d in tdays if d < today and (last_d is None or d > last_d)]) >= 3
+            inj = (r.get("inj") or "").upper()
+            if r["out"]:
+                role = "Out"
+            elif starter_known:
+                role = "Starter" if st.get(r["pid"]) else ("Rotation" if r["min"] >= DEPTH_ROT_MIN else "Bench")
+            else:
+                role = "Starter" if rank[id(r)] < 5 else ("Rotation" if r["min"] >= DEPTH_ROT_MIN else "Bench")
+            if r["out"]:
+                q = {s: 0.0 for s in ("min", "pts", "reb", "ast", "fg3", "pra")}
+            else:
+                model = {"min": r["min"], **{s: r["proj"].get(s, 0.0) for s in ("pts", "reb", "ast", "fg3")}}
+                q = depth_line(model, l10 or {}, role, ret)
+            detail = (r.get("inj_detail") or "").strip()
+            if r["out"]:
+                tag = "Out" + (": " + detail if detail else "")
+            elif inj in M.RISK_STATUSES:
+                tag = "Questionable" + (": " + detail if detail else "")
+            elif ret and games:
+                tag = "Returning"
+            else:
+                tag = ""
+            szn = r.get("season") or {}
+            players.append({
+                "id": r["pid"], "n": r["name"], "pos": r.get("pos") or "", "role": role, "tag": tag,
+                "use": round(q["min"], 1),
+                "proj": {"pts": round(q["pts"], 1), "reb": round(q["reb"], 1), "ast": round(q["ast"], 1),
+                         "3pm": round(q["fg3"], 1), "pra": round(q["pra"], 1)},
+                "model": None if r["out"] else {"use": round(r["min"], 1), "pts": round(r["proj"].get("pts", 0), 1)},
+                "last": {"use": round(l10["min"], 1), "pts": round(l10["pts"], 1), "reb": round(l10["reb"], 1),
+                         "ast": round(l10["ast"], 1), "3pm": round(l10["fg3"], 1), "gp": len(last)} if l10 else None,
+                "now": {"gp": szn.get("gp") or 0, "use": szn.get("min")},
+                "hs": r.get("hs"), "gid": r["gid"], "opp": r["opp"], "home": r["home"],
+            })
+        order = {"Starter": 0, "Rotation": 1, "Bench": 2, "Out": 3}
+        players.sort(key=lambda p: (order[p["role"]], -p["use"], -(p["now"]["use"] or 0)))
+        tp = pace.get(team) or {}
+        teams[team] = {"name": names.get(team, team), "date": today,
+                       "pace": tp.get("game_poss") or tp.get("pace"),
+                       "min_sum": round(sum(p["use"] for p in players), 1), "players": players}
+    for t, v in ((old.get("teams") or {}).items()):
+        if t not in teams and v.get("date") and v["date"] >= str(date.fromisoformat(today) - timedelta(days=4)):
+            teams[t] = v   # off tonight: the last chart, dated
+    out = {"sport": "nba", "date": today,
+           "generated": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+           "unit": "min", "stats": ["pts", "reb", "ast", "3pm"], "model": VERSION,
+           "method": ("Minutes come from the NBA model: a three-season history prior, this season's box "
+                      "scores weighted toward recent games, a pull toward starter minutes once a player starts, "
+                      "and a team fit to 240 minutes in which an OUT player's minutes are shared across everyone "
+                      "left. Each stat is minutes times a per-minute rate (history, recent form, pace, opponent, "
+                      "usage and on/off splits with teammates out). The depth chart then blends the model with "
+                      "each player's last-10 average, by role, with weights chosen on October to January and "
+                      "tested on February to April 2026; players back from a 3+ game absence use the model alone "
+                      "on most stats. Minutes are minutes if he plays, so a team's chart can add up past 240 (deep "
+                      "benches rarely all play; forcing 240 made the backtest worse, 5.01 to 5.22 minutes MAE). "
+                      "Starter means the team's five highest projected minutes (the confirmed five "
+                      "once posted), Rotation 12+ projected minutes, Bench the rest, Out on the injury report."),
+           "backtest": bt, "teams": teams}
+    save(DEPTH, out, indent=1)
+    return out
+
+
 def aging_card(hist):
     """The fitted age curve as the Model tab shows it: per-year change in
     points per minute and in minutes per game at a few ages, at the strength
@@ -817,6 +945,20 @@ def main():
         # plays at Onyx's opening price, on trial (open_lanes.py)
         "open": open_lanes.summarize(open_led),
     }
+    # the depth chart: every rostered player by team (data/nba/depth.json + the Depth tab)
+    try:
+        dep = write_depth(rows, slate, pg, today, data["engine"])
+        bt = dep.get("backtest") or {}
+        keep = ("id", "n", "pos", "role", "tag", "use", "proj", "last", "now")
+        data["depth"] = {"teams": {t: {"name": v["name"], "pace": v.get("pace"),
+                                       "players": [{k: p[k] for k in keep} for p in v["players"]]}
+                                   for t, v in dep["teams"].items() if v.get("date") == today},
+                         "method": dep["method"], "rot_min": DEPTH_ROT_MIN,
+                         "bt": {"test": bt.get("test"), "meta": bt.get("meta")}}
+        print(f"  depth chart: {len(dep['teams'])} teams, {sum(len(v['players']) for v in dep['teams'].values())} players")
+    except Exception as x:   # fail-soft: the depth chart never blocks the NBA build
+        print(f"  depth chart: skipped ({str(x)[:160]})")
+        data["depth"] = None
     # today's best plays (home page Top 10 and the top of the Plays tab)
     data["top"] = write_top(rows, games, today_rows, open_led, today, jp, fshots)[:10]
     shell = open(SHELL, encoding="utf-8").read()

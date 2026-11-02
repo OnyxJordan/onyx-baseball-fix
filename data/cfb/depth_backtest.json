@@ -1,0 +1,57 @@
+{
+ "window": "2026 weeks 7 to 9, tuned on weeks 4 to 6",
+ "rows": [
+  {
+   "k": "Usage share (points)",
+   "n": 4579,
+   "mae": 9.2,
+   "avg": 10.1,
+   "l3": 9.6,
+   "rmse": 15.2,
+   "rmse_avg": 16.7,
+   "rmse_l3": 16.1
+  },
+  {
+   "k": "Passing yards",
+   "n": 331,
+   "mae": 67.0,
+   "avg": 68.6,
+   "l3": 73.2
+  },
+  {
+   "k": "Rushing yards",
+   "n": 948,
+   "mae": 29.1,
+   "avg": 30.3,
+   "l3": 31.3
+  },
+  {
+   "k": "Receptions",
+   "n": 1768,
+   "mae": 1.44,
+   "avg": 1.45,
+   "l3": 1.51
+  },
+  {
+   "k": "Receiving yards",
+   "n": 1768,
+   "mae": 22.7,
+   "avg": 22.8,
+   "l3": 23.8
+  },
+  {
+   "k": "Touchdowns",
+   "n": 2023,
+   "mae": 0.502,
+   "avg": 0.502,
+   "l3": 0.498,
+   "rmse": 0.7,
+   "rmse_avg": 0.7,
+   "rmse_l3": 0.729
+  }
+ ],
+ "params": {
+  "share_dec": 0.4
+ },
+ "run": "2026-11-02T16:08:18+00:00"
+}
