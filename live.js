@@ -175,11 +175,41 @@
     if (tot != null) { out.total = tot; out.total_txt = String(tot); }
     var mh = Object.keys(ml).filter(function (n) { return n === home || nk(n) === nk(home); })[0];
     var ma = Object.keys(ml).filter(function (n) { return n === away || nk(n) === nk(away); })[0];
+    out.home_ml = mh != null ? ml[mh] : null; out.away_ml = ma != null ? ml[ma] : null;
     if (mh != null) out.home_win = noVig(ml[mh], ma != null ? ml[ma] : null);
     else if (ma != null) out.home_win = 1 - noVig(ml[ma], null);
     return out;
   }
   function team(c) { var t = c.team || {}; return t.abbreviation || (c.athlete || {}).displayName || t.displayName; }
+  function logo(c) { var t = c.team || {}, a = c.athlete || {}; return t.logo || (t.logos && t.logos[0] && t.logos[0].href) || (a.flag && a.flag.href) || null; }
+  // a probability as an American price, rounded to 5
+  function american(p) {
+    if (p == null || p <= 0 || p >= 1) return null;
+    var x = p >= 0.5 ? -100 * p / (1 - p) : 100 * (1 - p) / p;
+    x = Math.round(x / 5) * 5;
+    return x === -100 ? 100 : x;
+  }
+  // the one bet the card leads with: the side whose chance moved our way since the start (moneyline,
+  // while it is still a bettable price), else the total against Onyx's pregame number. Started (Onyx
+  // before the game), now (our live number), fair (the price or line where it turns into a good bet).
+  function lean(x) {
+    var pre = x.pre || {}, hw = x.home_win;
+    if (hw == null || isNaN(hw)) return null;
+    if (pre.home_win == null && pre.total == null) return {kind: 'none', why: 'nopre'};   // no starting line: nothing to measure from
+    var up = pre.home_win != null ? (hw >= pre.home_win ? 'home' : 'away') : (hw >= 0.5 ? 'home' : 'away');
+    var p = up === 'home' ? hw : 1 - hw;
+    if (pre.home_win != null && p >= 0.08 && p <= 0.93) {
+      var p0 = pre.home_win == null ? null : up === 'home' ? pre.home_win : 1 - pre.home_win;
+      return {kind: 'ml', side: up, team: up === 'home' ? x.home : x.away, logo: up === 'home' ? x.hl : x.al,
+              start: p0, start_price: up === 'home' ? pre.home_ml : pre.away_ml, now: p, fair: american(p)};
+    }
+    if (x.proj_total != null && pre.total != null && Math.abs(x.proj_total - pre.total) >= 1) {
+      var under = x.proj_total < pre.total, fl = Math.round(x.proj_total * 2) / 2;
+      return {kind: 'total', side: under ? 'under' : 'over', start: pre.total, now: x.hs + x.as, fair: fl,
+              chance: x.over_pre == null ? null : under ? 1 - x.over_pre : x.over_pre};
+    }
+    return null;
+  }
   // one live game -> what the page shows
   function game(sport, e, c, rows, pre0) {
     var st = (c.status || e.status || {}), ty = st.type || {};
@@ -196,8 +226,9 @@
       g = {hs: sets(H.home, H.away), as: sets(H.away, H.home), best: /grand slam|open/i.test(e.name || '') && (e.groupings || [{}])[0] && /men/i.test(((e.groupings || [{}])[0].grouping || {}).displayName || '') ? 5 : 3,
            pre_home_win: pg.home_win, home: home, away: away};
       var m = model('tennis', g);
-      return {sport: sport, gid: e.id, home: home, away: away, state: (H.away.linescores || []).map(function (l, i) { return l.value + '-' + (((H.home.linescores || [])[i] || {}).value || 0); }).join(' '),
+      var tx = {sport: sport, gid: e.id, home: home, away: away, hl: logo(H.home), al: logo(H.away), hs: g.hs, as: g.as, state: (H.away.linescores || []).map(function (l, i) { return l.value + '-' + (((H.home.linescores || [])[i] || {}).value || 0); }).join(' '),
               detail: ty.shortDetail || ty.detail || '', home_win: m.win(), pre: pg, f: null, name: away + ' vs ' + home};
+      tx.lean = lean(tx); return tx;
     }
     var hs = +H.home.score || 0, as = +H.away.score || 0, f = left(sport, st.period, st.clock);
     if (f == null) return null;
@@ -207,10 +238,11 @@
     var M = model(sport, g);
     var r2 = function (x) { return Math.round(x * 2) / 2; };
     var pm = M.proj_margin, fair = r2(-pm);
-    return {sport: sport, gid: e.id, home: home, away: away, hs: hs, as: as, detail: ty.shortDetail || ty.detail || '', f: f,
+    var gx = {sport: sport, gid: e.id, home: home, away: away, hl: logo(H.home), al: logo(H.away), hs: hs, as: as, detail: ty.shortDetail || ty.detail || '', f: f,
             home_win: M.win(), proj_total: M.proj_total != null ? Math.round(M.proj_total * 10) / 10 : null,
             fair_spread: home + ' ' + (fair > 0 ? '+' : fair === 0 ? '' : '') + (fair === 0 ? 'pk' : fair), pre: pre,
             over_pre: pre.total != null && M.over ? M.over(pre.total) : null, name: away + ' @ ' + home};
+    gx.lean = lean(gx); return gx;
   }
   // every live game across the sports (optionally only some sports)
   function games(only) {
@@ -229,5 +261,5 @@
     });
   }
 
-  window.OnyxLive = {left: left, model: model, plays: plays, noVig: noVig, implied: implied, phi: phi, games: games, pregame: pregame};
+  window.OnyxLive = {left: left, model: model, plays: plays, noVig: noVig, implied: implied, phi: phi, games: games, pregame: pregame, american: american, lean: lean};
 })();
