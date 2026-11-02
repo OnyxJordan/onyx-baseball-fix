@@ -1,16 +1,18 @@
 #!/usr/bin/env node
 /**
  * verify_sports.js - the gate for the sport pages built from sport_shell.html
- * (nfl, cfb, nhl, tennis, golf). Dev + CI only.
+ * (nfl, cfb, cbb, nhl, tennis, golf). Dev + CI only.
  *
  * Every page, every tab (home, games, board, plays, model) at 390px and
  * 1280px: renders, no uncaught errors, no "undefined" / "NaN" /
- * "[object Object]", nothing wider than the screen. For football and hockey
- * it opens a game's gamecenter too. Off-origin requests (ESPN live polling)
+ * "[object Object]", nothing wider than the screen. For football, hockey and
+ * basketball it opens a game's gamecenter too; basketball also renders a
+ * finished game's box score from tools/fixtures/cbb_summary.json (a real
+ * ESPN summary, trimmed) in both the Live and Box score views. Off-origin requests (ESPN live polling)
  * are aborted, so this checks the built page, not today's feed.
  *
  *   python3 -B sports_build.py nfl   (and the others)
- *   node tools/verify_sports.js [nfl,cfb,nhl,tennis,golf]
+ *   node tools/verify_sports.js [nfl,cfb,cbb,nhl,tennis,golf]
  */
 const { chromium } = require('playwright-core');
 const http = require('http');
@@ -20,7 +22,8 @@ const path = require('path');
 const CHROMIUM = process.env.PW_CHROMIUM || (fs.existsSync('/opt/pw-browsers/chromium') ? '/opt/pw-browsers/chromium' : null);
 const PORT = Number(process.env.PROBE_PORT || 8913);
 const ROOT = process.cwd();
-const PAGES = (process.argv[2] || 'nfl,cfb,nhl,tennis,golf').split(',');
+const PAGES = (process.argv[2] || 'nfl,cfb,cbb,nhl,tennis,golf').split(',');
+const BB_FIX = path.join(__dirname, 'fixtures', 'cbb_summary.json');
 const TABS = ['home', 'games', 'board', 'plays', 'model'];
 
 function serve() {
@@ -80,13 +83,44 @@ function serve() {
         failures += bad.length;
       }
       let gc = '';
-      const team = await page.evaluate(() => (typeof KIND !== 'undefined') && (KIND === 'football' || KIND === 'hockey') && (SD.games || []).length);
+      const team = await page.evaluate(() => (typeof KIND !== 'undefined') && (KIND === 'football' || KIND === 'hockey' || KIND === 'basketball') && (SD.games || []).length);
       if (team) {
         gc = await page.evaluate(() => { gotoTab('games'); openGame(SD.games[0].gid); return !!document.getElementById('gc') ? 'gamecenter ok' : 'gamecenter did not open'; });
         if (gc !== 'gamecenter ok') failures++;
       }
+      if (team && await page.evaluate(() => KIND === 'basketball') && fs.existsSync(BB_FIX)) {
+        // a finished game's gamecenter from a real ESPN summary: live view, then the box score with minutes
+        const fix = JSON.parse(fs.readFileSync(BB_FIX, 'utf8'));
+        const r = await page.evaluate(fix => {
+          const g = SD.games[0], W = document.documentElement.clientWidth, res = [];
+          LIVE[g.gid] = Object.assign({}, LIVE[g.gid] || {}, {state: 'post', detail: 'Final', away_score: '80', home_score: '75'});
+          GC_CACHE[g.gid] = fix; OPEN_GAME = g.gid;
+          for (const sub of ['live', 'box']) {
+            GC_SUB = sub; drawGame(g.gid);
+            const gc = document.getElementById('gc'), txt = gc ? gc.innerText : '';
+            const wide = [];
+            (gc ? gc.querySelectorAll('*') : []).forEach(e => {
+              const b = e.getBoundingClientRect();
+              if (!b.width || b.right <= W + 1) return;
+              let a = e.parentElement;
+              while (a && a !== document.body) { if (getComputedStyle(a).overflowX !== 'visible') return; a = a.parentElement; }
+              wide.push(String(e.className || e.tagName));
+            });
+            const bad = [];
+            if (/\bundefined\b|\bNaN\b|\[object Object\]/.test(txt)) bad.push('undefined/NaN');
+            if (wide.length) bad.push('wide: ' + wide.slice(0, 3).join(', '));
+            if (sub === 'box' && !(/MIN/.test(txt) && /PTS/.test(txt) && /3PM/.test(txt) && /starters/i.test(txt) && /bench/i.test(txt))) bad.push('box columns missing');
+            if (sub === 'live' && !/by half/i.test(txt)) bad.push('no score by half');
+            res.push(sub + (bad.length ? ' FAIL(' + bad.join('; ') + ')' : ' ok'));
+          }
+          GC_SUB = 'live'; OPEN_GAME = null; delete LIVE[g.gid]; delete GC_CACHE[g.gid];
+          return res.join(', ');
+        }, fix);
+        gc += ' · box ' + r;
+        if (r.includes('FAIL')) failures++;
+      }
       failures += errs.length;
-      console.log(`  ${errs.length || out.some(x => x.includes('FAIL')) || (gc && gc !== 'gamecenter ok') ? 'FAIL' : 'ok  '} ${pg.padEnd(7)} ${String(w).padEnd(5)} ${out.join(' ')}${gc ? ' · ' + gc : ''}${errs.length ? '  <- ' + errs.join(' | ') : ''}`);
+      console.log(`  ${errs.length || out.some(x => x.includes('FAIL')) || (gc && (!gc.startsWith('gamecenter ok') || gc.includes('FAIL'))) ? 'FAIL' : 'ok  '} ${pg.padEnd(7)} ${String(w).padEnd(5)} ${out.join(' ')}${gc ? ' · ' + gc : ''}${errs.length ? '  <- ' + errs.join(' | ') : ''}`);
       await ctx.close();
     }
   }
