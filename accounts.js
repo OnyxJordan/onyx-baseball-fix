@@ -26,6 +26,7 @@
     {key: 'onyxNbaFollow', table: 'followed_players', sport: 'nba', id: function (x) { return x == null ? null : String(typeof x === 'object' ? x.pid || x.id : x); }},
     {key: 'onyxFollow_nfl', table: 'followed_players', sport: 'nfl', id: function (x) { return x && x.id; }},
     {key: 'onyxFollow_cfb', table: 'followed_players', sport: 'cfb', id: function (x) { return x && x.id; }},
+    {key: 'onyxFollow_cbb', table: 'followed_players', sport: 'cbb', id: function (x) { return x && x.id; }},
     {key: 'onyxFollow_nhl', table: 'followed_players', sport: 'nhl', id: function (x) { return x && x.id; }},
     {key: 'onyxFollow_tennis', table: 'followed_players', sport: 'tennis', id: function (x) { return x && x.id; }},
     {key: 'onyxFollow_golf', table: 'followed_players', sport: 'golf', id: function (x) { return x && x.id; }}

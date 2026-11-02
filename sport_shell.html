@@ -2091,7 +2091,9 @@ var _poll = null;
 function pollLive() {
   if (location.protocol === 'file:' || !(C.espn || []).length) return;
   const paths = C.espn;
-  Promise.all(paths.map(p => fetch('https://site.api.espn.com/apis/site/v2/sports/' + p + '/scoreboard' + (C.espn_q ? '?' + C.espn_q : '')).then(r => r.json()).catch(() => null))).then(js => {
+  // college basketball's default scoreboard is not today's games: ask for the slate's day
+  const q = [C.espn_q, KIND === 'basketball' && SD.date ? 'dates=' + SD.date.replace(/-/g, '') : ''].filter(Boolean).join('&');
+  Promise.all(paths.map(p => fetch('https://site.api.espn.com/apis/site/v2/sports/' + p + '/scoreboard' + (q ? '?' + q : '')).then(r => r.json()).catch(() => null))).then(js => {
     let anyLive = false;
     js.forEach((j, pi) => {
       if (!j) return;

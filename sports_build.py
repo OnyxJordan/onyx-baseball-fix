@@ -771,6 +771,7 @@ def engine_team(key, M, GP, w, bt, live):
     """The Model tab's breakdown for a team-ratings sport, from the live
     parameters: each step of a price, the factors, the lane."""
     hockey = getattr(M, "KIND", "football") == "hockey"
+    prior = hasattr(M, "PRIOR_KEEP")     # college basketball: ratings pulled toward last season's, not toward average
     unit = "goals" if hockey else "points"
     T = M.GAME_TEST if key == "nfl" else M.TEST
     steps = [
@@ -778,9 +779,11 @@ def engine_team(key, M, GP, w, bt, live):
             ["Built from", ("this season's finals, started from last season's ratings" if hasattr(M, "PRIOR_KEEP") else "every final this season and last")
              + (f" ({T['n']:,} games held out to test it)" if T.get("n") else "")],
             ["Recency", f"a game {GP['half_life']} days old counts half as much as tonight's (half-life)"],
+            ["Pull to prior", f"each rating starts with {GP['ridge']:g} games' worth of its preseason prior, so a hot start is not a rating"] if prior else
             ["Pull to average", f"each rating starts with {GP['ridge']:g} {'game' if GP['ridge'] == 1 else 'games'}' worth of league average, so a hot start is not a rating".replace("1 game' worth", "1 game's worth")],
             ["Home edge", f"{GP['home']:g} {unit} to the home side, none at a neutral site"],
-            ["Needs", f"{GP.get('min_games', 3)} games for both teams before a line is priced"]]},
+            ["Needs", "a preseason prior for both teams, or {0} games this season".format(GP.get('min_games', 3)) if prior else
+             f"{GP.get('min_games', 3)} games for both teams before a line is priced"]]},
         {"t": "2 · From ratings to a price", "rows": (
             [["Goals", "each side's goals are Poisson around its expected goals"],
              ["Overtime", f"a regulation tie goes to the home side {GP['p_ot_home'] * 100:.0f}% of the time"],
@@ -795,8 +798,8 @@ def engine_team(key, M, GP, w, bt, live):
                   "The backtest gave the model the larger say.")}]
     factors = [
         ["chart", "Offense and defense", f"Every team carries two ratings in {unit}: what it scores above average and what it allows. Tonight's projection is league average plus the home edge plus one side's offense minus the other's defense.", "Foundation", ""],
-        ["clock", "Recency", f"Half-life {GP['half_life']} days: rosters and form move, so last month counts more than last season. The summer break decays last season on its own.", "Tuned", "purple"],
-        ["shield", "Pull to average", f"Ridge {GP['ridge']:g}: ratings are shrunk toward average until a team has earned it, which is what stops a 3-game sample from looking elite.", "Tuned", "blue"],
+        ["clock", "Recency", f"Half-life {GP['half_life']} days: rosters and form move, so last month counts more than last season." + (" Only this season's games are fitted; last season enters through the prior." if prior else " The summer break decays last season on its own."), "Tuned", "purple"],
+        ["shield", "Pull to prior" if prior else "Pull to average", f"Ridge {GP['ridge']:g}: ratings are shrunk toward " + ("the preseason prior" if prior else "average") + f" until a team has earned it, which is what stops a 3-game sample from looking elite.", "Tuned", "blue"],
         ["scale", "Market blend", f"{round(w * 100)}% model, {round((1 - w) * 100)}% Onyx market. Chosen by the backtest against real Onyx prices.", "Market", "blue"],
     ]
     if hasattr(M, "PRIOR_KEEP"):

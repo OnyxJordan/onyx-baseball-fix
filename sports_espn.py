@@ -268,6 +268,7 @@ BB_COLS = ["gid", "season", "date", "team", "opp", "home", "pid", "name", "pos",
            "min", "pts", "fgm", "fga", "tpm", "tpa", "ftm", "fta", "reb", "oreb", "dreb", "ast", "to", "stl", "blk", "pf"]
 BB_BOX_VER = 1
 BB_MAX_GAMES = 260      # summaries read per run; ~180 games on a busy day, the chain catches up across runs
+BB_BUDGET_S = 120       # and at most this long: the workflow step that builds every sport has a 12-minute cap
 
 
 def bb_box_rows(summary, gid, season, date):
@@ -310,8 +311,10 @@ def ingest_bb_box(lane, path, season):
     res = (lane.load("results.json", {}) or {}).get("games") or []
     todo = [g for g in res if g.get("season") == season and g.get("id") and g["id"] not in seen]
     todo.sort(key=lambda g: g["date"], reverse=True)     # newest first: what the page and model want soonest
-    added = 0
+    added, t0 = 0, time.time()
     for g in todo[:BB_MAX_GAMES]:
+        if time.time() - t0 > BB_BUDGET_S:
+            break
         s = espn_get(path + "/summary", f"event={g['id']}")
         if not s:
             continue

@@ -32,10 +32,11 @@
   // every Onyx Sports page: the sport pages built from sport_shell.html set
   // window.OX_SITE before this script runs; MLB and NBA are detected
   var SITE = window.OX_SITE || (IS_NBA ? 'nba' : 'mlb');
-  // ranked by daily importance (10/31): NFL, NBA, NHL, Golf, Tennis, College Football, MLB
+  // ranked by daily importance (10/31): NFL, NBA, NHL, Golf, Tennis, College Football, College Basketball (11/2), MLB
   var ALL = [['nfl', 'NFL', 'nfl.html', 'NFL'], ['nba', 'NBA', 'nba.html', 'Basketball'], ['nhl', 'NHL', 'nhl.html', 'NHL'],
              ['golf', 'Golf', 'golf.html', 'Golf'], ['tennis', 'Tennis', 'tennis.html', 'Tennis'],
-             ['cfb', 'CFB', 'cfb.html', 'College Football'], ['mlb', 'MLB', './', 'Baseball']];
+             ['cfb', 'CFB', 'cfb.html', 'College Football'], ['cbb', 'CBB', 'cbb.html', 'College Basketball'],
+             ['mlb', 'MLB', './', 'Baseball']];
   function sportSeg(cls) {
     return '<div class="oseg ' + (cls || '') + '" role="tablist" aria-label="Sport">' + ALL.map(function (a) {
       return '<a href="' + a[2] + '"' + (a[0] === SITE ? ' class="on" aria-current="page"' : '') + '>' + a[1] + '</a>';
@@ -531,7 +532,7 @@
     var right = document.querySelector('.nav-right');
     if (right) {
       // the phone header pill: this sport and its closest sibling
-      var pair = SITE === 'nba' || SITE === 'mlb' ? ['mlb', 'nba'] : SITE === 'nfl' || SITE === 'cfb' ? ['nfl', 'cfb'] : null;
+      var pair = SITE === 'nba' || SITE === 'mlb' ? ['mlb', 'nba'] : SITE === 'nfl' || SITE === 'cfb' ? ['nfl', 'cfb'] : SITE === 'cbb' ? ['nba', 'cbb'] : null;
       if (pair) {
         var pill = el('div', 'oseg opill', ALL.filter(function (a) { return pair.indexOf(a[0]) > -1; }).map(function (a) {
           return '<a href="' + a[2] + '"' + (a[0] === SITE ? ' class="on" aria-current="page"' : '') + '>' + a[1] + '</a>';

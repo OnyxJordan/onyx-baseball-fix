@@ -62,6 +62,21 @@ Favorite = side with the negative spread (pick'em = no favorite).
 Over when home + away > total. Only D1-vs-anything FINAL games with a
 spread are graded; per-team records count from that team's side.
 
+Measured 2026-11-02: every stored closing spread and total is a half point
+(provider mix: ESPN BET ~58%, DraftKings ~42% of lined games), so there are
+no pushes in either season. ~8% of final games (mostly vs non-D1 or low-
+major openers) have no line.
+
+Outputs (data/cbb/history/)
+  teams.json              {season: [{team, conf, rec, adj_o, adj_d, adj_em, tempo, barthag, wab, rank}]}
+  players_{Y}.json        {"cols": PCOLS, "rows": [[...]]}  one row per player-team-season
+  player_index.json       {"cols", "teams": [names], "players": {pid: [name, [yy, team_idx, min%, usage, ortg, class], ...]}}
+  transfers_{Y}.json      team in Y differs from the player's latest earlier season (Y-1, or
+                          Y-2 for pre-2021 sit-out transfers; `gap` says which)
+  games_{S}.json          S = 2025 (2024-25), 2026 (2025-26); final games incl. non-lined
+  team_map.json           {espn_id: {abbr, espn, torvik}}
+  ats.json                {"league": {S: ...}, "teams": {S: {torvik_name: {...}}}}; records are "W-L-P"
+
 Team names differ between Torvik and ESPN; team_map.json maps every ESPN
 team (from the D1 team list plus every team seen in a lined game) to its
 Torvik name via normalization ("State" -> "St.") plus the ALIASES table.
