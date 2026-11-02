@@ -2,7 +2,7 @@
 """
 sports_espn.py - ESPN slate (and, for the NFL, box scores) for one sport.
 
-    python3 sports_espn.py nfl|cfb|nhl|tennis|golf
+    python3 sports_espn.py nfl|cfb|cbb|nhl|tennis|golf
 
 Writes under data/<sport>/:
   slate.json         the current slate in one shape for every sport:
@@ -14,6 +14,8 @@ Writes under data/<sport>/:
   player_games.json  NFL only: one row per player-game, box scores read
                      once and remembered in ["_games"]; the first run
                      backfills last season (the model's prior) and this one
+                     college basketball: this season's finals, one row per
+                     player with minutes, starter and DNP (bb_box_rows)
 
 The page polls ESPN live on its own; this file is the pre-game snapshot the
 model and the Onyx prices attach to.
@@ -255,6 +257,89 @@ def ingest_box(lane, path, q, cur_week, year, prior_weeks=()):
     print(f"  box scores: +{added} games, {len(pg['_games'])} total, {len(pg['rows'])} player rows")
 
 
+# ── college basketball box scores (11/2) ─────────────────────────────────
+# ESPN's basketball summary has ONE statistics block per team; its keys:
+BB_KEYS = {"minutes": "min", "points": "pts", "rebounds": "reb", "offensiveRebounds": "oreb",
+           "defensiveRebounds": "dreb", "assists": "ast", "turnovers": "to", "steals": "stl", "blocks": "blk", "fouls": "pf"}
+BB_PAIRS = {"fieldGoalsMade-fieldGoalsAttempted": ("fgm", "fga"),
+            "threePointFieldGoalsMade-threePointFieldGoalsAttempted": ("tpm", "tpa"),
+            "freeThrowsMade-freeThrowsAttempted": ("ftm", "fta")}
+BB_COLS = ["gid", "season", "date", "team", "opp", "home", "pid", "name", "pos", "starter", "dnp",
+           "min", "pts", "fgm", "fga", "tpm", "tpa", "ftm", "fta", "reb", "oreb", "dreb", "ast", "to", "stl", "blk", "pf"]
+BB_BOX_VER = 1
+BB_MAX_GAMES = 260      # summaries read per run; ~180 games on a busy day, the chain catches up across runs
+
+
+def bb_box_rows(summary, gid, season, date):
+    """One row per player per game (BB_COLS order), DNPs included with no stats."""
+    teams = {}
+    for comp in ((summary.get("header") or {}).get("competitions") or [{}])[:1]:
+        for c in comp.get("competitors") or []:
+            teams[c.get("homeAway")] = (c.get("team") or {}).get("abbreviation")
+    out = []
+    for side in (summary.get("boxscore") or {}).get("players") or []:
+        team = (side.get("team") or {}).get("abbreviation")
+        opp = teams.get("home") if teams.get("away") == team else teams.get("away")
+        home = teams.get("home") == team
+        for cat in (side.get("statistics") or [])[:1]:
+            keys = cat.get("keys") or []
+            for ath in cat.get("athletes") or []:
+                a = ath.get("athlete") or {}
+                if not a.get("id"):
+                    continue
+                r = {"gid": gid, "season": season, "date": date, "team": team, "opp": opp, "home": home,
+                     "pid": a.get("id"), "name": a.get("displayName"), "pos": (a.get("position") or {}).get("abbreviation"),
+                     "starter": bool(ath.get("starter")), "dnp": bool(ath.get("didNotPlay")) or not ath.get("stats")}
+                for k, v in zip(keys, ath.get("stats") or []):
+                    if k in BB_KEYS:
+                        r[BB_KEYS[k]] = _num(v)
+                    elif k in BB_PAIRS:
+                        m, t = (str(v).split("-") + ["0"])[:2]
+                        r[BB_PAIRS[k][0]], r[BB_PAIRS[k][1]] = _num(m), _num(t)
+                out.append([r.get(c) for c in BB_COLS])
+    return out
+
+
+def ingest_bb_box(lane, path, season):
+    """This season's college basketball finals (from results.json) into player_games.json,
+    columnar ({"cols": BB_COLS, "rows": [[...]]}) to keep a full season small."""
+    pg = lane.load("player_games.json", {}) or {}
+    if pg.get("_ver") != BB_BOX_VER or pg.get("cols") != BB_COLS:
+        pg = {"_ver": BB_BOX_VER, "cols": BB_COLS, "_games": [], "rows": []}
+    seen = set(pg["_games"])
+    res = (lane.load("results.json", {}) or {}).get("games") or []
+    todo = [g for g in res if g.get("season") == season and g.get("id") and g["id"] not in seen]
+    todo.sort(key=lambda g: g["date"], reverse=True)     # newest first: what the page and model want soonest
+    added = 0
+    for g in todo[:BB_MAX_GAMES]:
+        s = espn_get(path + "/summary", f"event={g['id']}")
+        if not s:
+            continue
+        rows = bb_box_rows(s, g["id"], season, g["date"])
+        if not rows:
+            continue
+        pg["rows"].extend(rows)
+        pg["_games"].append(g["id"])
+        added += 1
+        time.sleep(0.12)
+    if added or not lane.load("player_games.json"):
+        lane.save("player_games.json", pg)
+    print(f"  box scores: +{added} games ({max(0, len(todo) - added)} still to read), {len(pg['_games'])} total, "
+          f"{len(pg['rows'])} player rows")
+
+
+def next_slate_date(path, q, today, days=45):
+    """The next day with games on it, for an empty day slate ("next games on ...")."""
+    d = datetime.strptime(today, "%Y-%m-%d")
+    for i in range(1, days + 1):
+        day = d + timedelta(days=i)
+        sb = espn_get(path, (q + "&" if q else "") + "dates=" + day.strftime("%Y%m%d")) or {}
+        if sb.get("events"):
+            return day.strftime("%Y-%m-%d"), len(sb["events"])
+        time.sleep(0.1)
+    return None, 0
+
+
 def main():
     key = (sys.argv[1:] or ["nfl"])[0]
     lane = Lane(key)
@@ -262,7 +347,7 @@ def main():
     today = str(game_day())
     slate = {"date": today, "sport": key, "name": cfg["name"], "label": None, "games": [], "events": [],
              "fetched": datetime.now(timezone.utc).isoformat(timespec="seconds")}
-    if cfg["kind"] in ("football", "hockey"):
+    if cfg["kind"] in ("football", "hockey", "basketball"):
         path = cfg["espn"][0] + "/scoreboard"
         q = cfg.get("espn_q", "")
         if cfg["slate"] == "day":
@@ -271,8 +356,15 @@ def main():
         slate["games"] = team_games(sb)
         wk = (sb.get("week") or {}).get("number")
         slate["label"] = f"Week {wk}" if wk else datetime.strptime(today, "%Y-%m-%d").strftime("%a %b %-d")
-        slate["season"] = (sb.get("season") or {}).get("year")
-        slate["season_type"] = (sb.get("season") or {}).get("type")
+        season = sb.get("season") or {}
+        if cfg["kind"] == "basketball" and not season:   # college basketball names its season under leagues[0]
+            season = ((sb.get("leagues") or [{}])[0].get("season") or {})
+            season = {"year": season.get("year"), "type": (season.get("type") or {}).get("type")}
+        slate["season"] = season.get("year")
+        slate["season_type"] = season.get("type")
+        if cfg["kind"] == "basketball" and not slate["games"]:
+            nd, nn = next_slate_date(path, cfg.get("espn_q", ""), today)
+            slate["next_date"], slate["next_n"] = nd, nn
         slate["bye"] = [t.get("abbreviation") for t in (sb.get("week") or {}).get("teamsOnBye") or []]
         if key == "nfl" and wk:
             # next week's games, for opening-price capture only (11/1): Onyx posts receptions
@@ -284,7 +376,7 @@ def main():
                 slate["next_games"] = [g for g in team_games(nx) if g.get("state") == "pre"]
             except Exception as x:
                 print(f"  next week: {str(x)[:120]}")
-        if cfg.get("box") and slate["season"]:
+        if cfg.get("box") and slate["season"] and cfg["kind"] == "football":
             if key == "nfl":
                 ingest_nfl(lane, wk, slate["season"])
             else:
@@ -308,6 +400,11 @@ def main():
         sports_history.ingest(lane, slate)
     except Exception as e:   # history feeds the model; the slate above already saved
         print(f"  results: {str(e)[:160]}")
+    if cfg["kind"] == "basketball" and cfg.get("box") and slate.get("season"):
+        try:   # box scores read the finals sports_history just wrote
+            ingest_bb_box(lane, cfg["espn"][0], slate["season"])
+        except Exception as e:
+            print(f"  box scores: {str(e)[:160]}")
     n = len(slate["games"]) or sum(len(e.get("matches") or e.get("board") or []) for e in slate["events"])
     print(f"=== {cfg['full']} slate {today}: {slate['label']} · {len(slate['games'])} games, "
           f"{len(slate['events'])} events, {n} rows")

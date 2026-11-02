@@ -1,6 +1,6 @@
 """
-team_model.py - the team-strength engine shared by the NHL, college football
-and NFL game-line models. Not a model by itself: each sport's module
+team_model.py - the team-strength engine shared by the NHL, college football,
+college basketball and NFL game-line models. Not a model by itself: each sport's module
 (nhl_model.py, cfb_model.py, nfl_model.py) owns its parameters, version and
 changelog, and calls in here.
 
@@ -31,15 +31,20 @@ def _days(a, b):
 
 def fit(games, as_of, P, iters=12):
     """Ratings from games played before as_of (an ISO date). P: half_life,
-    ridge, home (fixed home edge, points), carry (dict team -> (off, def)
-    prior centre, optional)."""
+    ridge, home (fixed home edge, points). Optional (college basketball,
+    11/2): carry_off / carry_def, dicts team -> prior centre the ridge pulls
+    toward instead of zero; mu0 with mu_k, a prior league mean worth mu_k
+    games of weight. Without them the fit is exactly as before."""
     rows = [g for g in games if g["date"] < as_of]
+    co, cd = P.get("carry_off") or {}, P.get("carry_def") or {}
     if not rows:
-        return {"mu": P.get("mu0", 0.0), "off": {}, "def": {}, "home": P["home"], "n": {}}
+        return {"mu": P.get("mu0", 0.0), "off": dict(co), "def": dict(cd), "home": P["home"], "n": {}}
     hl = P["half_life"]
     w = [0.5 ** (_days(g["date"], as_of) / hl) for g in rows]
     sw = sum(w)
     mu = sum(wi * (g["hs"] + g["as"]) / 2 for wi, g in zip(w, rows)) / sw
+    if P.get("mu_k"):
+        mu = (sw * mu + P["mu_k"] * P.get("mu0", mu)) / (sw + P["mu_k"])
     home = P["home"]
     off, de = {}, {}
     n = {}
@@ -51,7 +56,7 @@ def fit(games, as_of, P, iters=12):
     lam = P["ridge"]
     for _ in range(iters):
         # offense: residual of points scored after mean, home and opponent defense
-        num, den = {t: 0.0 for t in off}, {t: lam for t in off}
+        num, den = {t: lam * co.get(t, 0.0) for t in off}, {t: lam for t in off}
         for wi, g in zip(w, rows):
             h = 0.0 if g.get("neutral") else home
             num[g["home"]] += wi * (g["hs"] - mu - h / 2 + de[g["away"]])
@@ -59,7 +64,7 @@ def fit(games, as_of, P, iters=12):
             num[g["away"]] += wi * (g["as"] - mu + h / 2 + de[g["home"]])
             den[g["away"]] += wi
         off = {t: num[t] / den[t] for t in off}
-        num, den = {t: 0.0 for t in de}, {t: lam for t in de}
+        num, den = {t: lam * cd.get(t, 0.0) for t in de}, {t: lam for t in de}
         for wi, g in zip(w, rows):
             h = 0.0 if g.get("neutral") else home
             num[g["away"]] += wi * (mu + h / 2 + off[g["home"]] - g["hs"])
@@ -67,6 +72,10 @@ def fit(games, as_of, P, iters=12):
             num[g["home"]] += wi * (mu - h / 2 + off[g["away"]] - g["as"])
             den[g["home"]] += wi
         de = {t: num[t] / den[t] for t in de}
+    for t, v in co.items():          # a prior team with no game yet keeps its prior
+        off.setdefault(t, v)
+    for t, v in cd.items():
+        de.setdefault(t, v)
     return {"mu": mu, "off": off, "def": de, "home": home, "n": n}
 
 
