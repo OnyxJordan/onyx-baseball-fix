@@ -53,11 +53,14 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPTICODDS_API_KEY: ${{ secrets.OPTICODDS_API_KEY }}
           AI_MODEL: ${{ vars.AI_MODEL || 'gpt-4.1-mini' }}
         run: |
           npm install --no-audit --no-fund
           npx wrangler deploy --var "AI_MODEL:$AI_MODEL" | tee deploy.log
           printf '%s' "$OPENAI_API_KEY" | npx wrangler secret put OPENAI_API_KEY
+          # the live line on the Live tab (GET /live): the odds feed key, held only by Cloudflare
+          if [ -n "$OPTICODDS_API_KEY" ]; then printf '%s' "$OPTICODDS_API_KEY" | npx wrangler secret put OPTICODDS_API_KEY; fi
           url=$(grep -oE 'https://[a-z0-9.-]+\.workers\.dev' deploy.log | head -1)
           [ -n "$url" ] || { echo "::error::could not read the relay address from the deploy log"; exit 1; }
           echo "RELAY=$url" >> "$GITHUB_ENV"
@@ -68,6 +71,7 @@ jobs:
           curl -sS -X POST "$RELAY" -H 'origin: https://onyxjordan.github.io' -H 'content-type: application/json' \
             -d '{"q":"3 leg parlay nba points overs minimum odds -200"}' | tee answer.json
           grep -q '"spec"' answer.json || { echo "::error::relay did not return a spec (check the OpenAI key, its budget, and AI_MODEL)"; exit 1; }
+          for sp in nba nhl nfl; do curl -sS "$RELAY/live?sport=$sp" -H 'origin: https://onyxjordan.github.io' | head -c 600; echo; done
       - name: Point the site at the relay (ai.json)
         if: steps.chk.outputs.ready == 'yes'
         run: |
