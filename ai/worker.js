@@ -212,21 +212,36 @@ async function liveSport(env, sport) {
       const j = await optic(env, `/fixtures/odds?sport=${sp}&league=${lg}&odds_format=AMERICAN${ids}${mq}`).catch(() => ({}));
       for (const row of j.data || []) {
         const f = fx.find((x) => x.id === row.id) || row;
-        // one line per selection: the first book in LIVE_BOOKS order that has it, main lines only
-        const best = new Map();
+        // each market (and each player's market) from ONE book, the first in LIVE_BOOKS order that has
+        // its main line, so an over and its under share a number and a spread's two sides match
+        const groups = new Map();
         for (const od of row.odds || []) {
           const m = LIVE_MK[od.market_id], price = american(od.price);
           if (!m || price == null) continue;
-          if (od.is_main === false && m !== "anytime_td") continue;
-          const sel = String(od.selection || od.name || ""), side = String(od.selection_line || "").toLowerCase();
-          const key = m + "|" + sel + "|" + side;
-          const rank = LIVE_BOOKS.indexOf(String(od.sportsbook || "").toLowerCase());
-          const prev = best.get(key);
-          if (prev && prev.rank <= (rank < 0 ? 99 : rank)) continue;
-          best.set(key, { rank: rank < 0 ? 99 : rank, m, sel, side: side || null, pt: od.points == null ? null : Number(od.points), price });
+          const player = !["ml", "spread", "total"].includes(m);
+          const gk = m + "|" + (player ? String(od.selection || od.name || "") : "");
+          const bk = LIVE_BOOKS.indexOf(String(od.sportsbook || "").toLowerCase());
+          if (!groups.has(gk)) groups.set(gk, []);
+          groups.get(gk).push({ od, m, price, bk: bk < 0 ? 99 : bk });
+        }
+        const lines = [];
+        for (const arr of groups.values()) {
+          const main = arr.filter((x) => x.od.is_main !== false || x.m === "anytime_td");
+          if (!main.length) continue;
+          const bk = Math.min(...main.map((x) => x.bk));
+          let pick = main.filter((x) => x.bk === bk);
+          if (pick.some((x) => x.od.is_main === true)) pick = pick.filter((x) => x.od.is_main === true);
+          const seen = new Set();
+          for (const x of pick) {
+            const side = String(x.od.selection_line || "").toLowerCase() || null, sel = String(x.od.selection || x.od.name || "");
+            const k = (x.m === "total" ? side : sel + "|" + side);
+            if (seen.has(k)) continue;
+            seen.add(k);
+            lines.push({ m: x.m, sel, side, pt: x.od.points == null ? null : Number(x.od.points), price: x.price });
+          }
         }
         games.push({ home: f.home_team_display || "", away: f.away_team_display || "", start: f.start_date || null,
-          lines: [...best.values()].map(({ rank, ...x }) => x) });
+          lines });
       }
     }
   }
