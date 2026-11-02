@@ -1137,7 +1137,7 @@
        "sets": [
         6,
         4,
-        2
+        4
        ],
        "serve": false
       },
@@ -1150,9 +1150,9 @@
        "sets": [
         4,
         6,
-        3
+        5
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
@@ -1173,9 +1173,9 @@
        "win": false,
        "sets": [
         6,
-        1
+        6
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Denis Shapovalov",
@@ -1185,9 +1185,9 @@
        "win": false,
        "sets": [
         3,
-        3
+        5
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
@@ -5391,9 +5391,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        1
+        4
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Laura Samson",
@@ -5402,9 +5402,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        1
+        5
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
@@ -5424,7 +5424,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        0
+        3
        ],
        "serve": false
       },
@@ -5435,9 +5435,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        0
+        3
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -7344,5 +7344,5 @@
    ]
   }
  ],
- "fetched": "2026-11-02T19:17:48+00:00"
+ "fetched": "2026-11-02T19:50:09+00:00"
 }
