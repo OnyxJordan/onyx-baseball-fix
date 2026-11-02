@@ -51,6 +51,8 @@ const srv = http.createServer((q, r) => { const p = path.join(root, decodeURICom
       if (e.player && String(s.player || '').toLowerCase() !== e.player.toLowerCase()) why.push(`player ${s.player} want ${e.player}`);
       if (e.teams) { const got = ((s.teams || []).length ? s.teams : s.team ? [s.team] : []).map(x => String(x).toUpperCase()).sort(); if (!same(got, e.teams)) why.push(`teams ${JSON.stringify(got)} want ${JSON.stringify(e.teams)}`); }
       if (e.props_only && !s.props_only) why.push('props_only not set');
+      if (e.sort && s.sort !== e.sort) why.push(`sort ${s.sort} want ${e.sort}`);
+      if (e.target_price != null && s.target_price !== e.target_price) why.push(`target_price ${s.target_price} want ${e.target_price}`);
       // every play returned must honor the reading
       const legs = (R.rows || []);
       for (const p of legs) {
@@ -59,7 +61,7 @@ const srv = http.createServer((q, r) => { const p = path.join(root, decodeURICom
         if (mk.length && mk.indexOf(p.mkt) < 0 && mk.indexOf(p.kind) < 0) { why.push(`play market ${p.mkt}`); break; }
         if (s.props_only && p.kind !== 'prop') { why.push('game line in a props answer'); break; }
         if (s.side && s.side !== 'any' && (p.kind === 'prop' || p.kind === 'total') && p.side !== s.side) { why.push(`play side ${p.side}`); break; }
-        if (!R.two && s.min_price != null && p.price < s.min_price) { why.push(`price ${p.price} under ${s.min_price}`); break; }
+        if (!R.two && s.min_price != null && p.price < s.min_price && !(s.target_price && s.default_floor)) { why.push(`price ${p.price} under ${s.min_price}`); break; }   // a payout target moves the default floor
         if (!R.two && s.max_price != null && p.price > s.max_price) { why.push(`price ${p.price} over ${s.max_price}`); break; }
         if (Date.parse(p.start) <= now) { why.push('started game'); break; }
         if (s.player && String(p.name || p.label).toLowerCase().indexOf(String(s.player).toLowerCase()) < 0) { why.push(`play not on ${s.player}`); break; }

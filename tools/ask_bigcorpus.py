@@ -16,6 +16,7 @@ import json, os, random, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 N = int((sys.argv[1:] or ["3000"])[0])
 SEED = int((sys.argv[2:] or ["11"])[0])
+NEW = "--new" in sys.argv   # add the 11/2 kinds (TD favorites, payout targets, misspellings, last names, two markets, live)
 R = random.Random(SEED)
 
 SPORT = {
@@ -85,7 +86,77 @@ def market_word(sp, m):
     return R.choice(MKT[sp][m])
 
 
+def onelett(w):
+    """the name one letter off, the way people misspell it: a dropped, doubled or swapped letter"""
+    i = R.randrange(1, len(w) - 1)
+    k = R.choice(["drop", "double", "swap"])
+    if k == "drop":
+        return w[:i] + w[i + 1:]
+    if k == "double":
+        return w[:i] + w[i] + w[i:]
+    return w[:i] + w[i + 1] + w[i] + w[i + 2:]
+
+
+def compose_new():
+    """11/2 kinds: TD favorites, payout targets, misspelled and last-name players, two markets, live"""
+    kind = R.choice(["td", "td", "target", "typo", "last", "two", "live"])
+    e = {}
+    if kind == "td":
+        ph, srt = R.choice([("favorite td scorers", "rec"), ("your favorite picks to score", "rec"), ("who do you like to score a td", "rec"),
+                            ("most likely td scorers", "conf"), ("safest anytime td", "conf"), ("best value td scorers", "edge"),
+                            ("anytime td longshots", "price")])
+        sp = R.choice(["nfl", "nfl", None])
+        q = ph + (" " + R.choice(SPORT[sp]) if sp else "")
+        e.update(markets=["anytime_td"], sort=srt)
+        if sp:
+            e["sports"] = [sp]
+        return q, e
+    if kind == "target":
+        tp = R.choice([300, 500, 1000, 2000])
+        sp = R.choice(["nba", "nfl"])
+        q = R.choice([f"+{tp} parlay {R.choice(SPORT[sp])}", f"build me a parlay that pays +{tp} {R.choice(SPORT[sp])}",
+                      f"{R.choice(SPORT[sp])} parlay to win {tp // 100}x"])
+        e.update(intent="parlay", sports=[sp])
+        if "x" not in q:
+            e["target_price"] = tp
+        return q, e
+    P = players()
+    if kind in ("typo", "last") and P:
+        sp, name, m = R.choice(P)
+        parts = name.split()
+        if kind == "typo":
+            if len(parts[-1]) < 6:
+                return None
+            nm = " ".join(parts[:-1] + [onelett(parts[-1].lower())])
+        else:
+            core = [w for w in parts if w.lower().strip(".") not in ("jr", "sr", "ii", "iii", "iv")]
+            last = core[-1].lower()
+            # only last names one player on the boards has, so there is one right answer
+            if len(last) < 5 or sum(1 for _, n, _ in P if last in n.lower().split() and n != name):
+                return None
+            nm = last
+        q = f"{nm} {market_word(sp, m)}"
+        e.update(player=name, markets=[m])
+        return q, e
+    if kind == "two":
+        sp = R.choice(["nba", "nfl"])
+        a, b = R.sample(list(MKT[sp]) if sp == "nfl" else ["pts", "reb", "ast"], 2)
+        if "anytime_td" in (a, b) or "q1_total" in (a, b):
+            return None
+        q = f"{R.choice(SPORT[sp])} {market_word(sp, a)} and {market_word(sp, b)} {R.choice(['overs', 'unders'])}"
+        e.update(sports=[sp], markets=sorted([a, b]), side="over" if "overs" in q else "under")
+        return q, e
+    if kind == "live":
+        sp = R.choice(["nba", "nfl", "nhl"])
+        q = R.choice([f"live {R.choice(SPORT[sp])} bets", f"best live bets {R.choice(SPORT[sp])}", f"in game {R.choice(SPORT[sp])} value"])
+        e.update(sports=[sp])
+        return q, e
+    return None
+
+
 def compose():
+    if NEW and R.random() < 0.45:
+        return compose_new()
     kind = R.choices(["list", "parlay", "parlay", "rr", "player", "team", "teams", "conf", "sgp"], k=1)[0]
     e, words = {}, []
     sp = R.choice(["nba", "nfl", "nhl", "cfb", "tennis"])
@@ -184,8 +255,9 @@ def main():
             continue
         seen.add(q.lower())
         out.append({"q": q, "e": e})
-    json.dump(out, open(os.path.join(ROOT, "tools", "ask_big.json"), "w"), ensure_ascii=False)
-    print(f"wrote tools/ask_big.json: {len(out)} requests")
+    dest = os.environ.get("ASK_OUT") or os.path.join(ROOT, "tools", "ask_big.json")
+    json.dump(out, open(dest, "w"), ensure_ascii=False)
+    print(f"wrote {dest}: {len(out)} requests")
 
 
 if __name__ == "__main__":
