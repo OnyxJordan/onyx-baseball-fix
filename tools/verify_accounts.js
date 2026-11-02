@@ -108,6 +108,22 @@ const BASE = 'http://127.0.0.1:' + site.address().port;
   if (process.env.SHOT) await (await A.$('#acct')).screenshot({path: path.join(process.env.SHOT, 'acct_signed_in.png')});
   ok(/Signed in as jordan@example.com/.test(await A.$eval('#acct', e => e.innerText)) && !/access_token/.test(A.url()), 'device A: card says signed in; the link tokens are cleared from the address');
 
+  // 3b a link that lands on another page (Supabase's Site URL is the MLB front page) still signs in
+  for (const pageName of ['index.html', 'nfl.html']) {
+    const X = await device();
+    await X.goto(BASE + '/' + pageName + land('jordan@example.com'), { waitUntil: 'domcontentloaded' });
+    await X.waitForURL(/home\.html/, { timeout: 15000 }).catch(() => {});
+    await X.waitForFunction(() => window.OnyxAccounts, null, { timeout: 15000 }).catch(() => {});
+    if (/home\.html/.test(X.url())) { await X.evaluate(() => OnyxAccounts.ready); await X.waitForTimeout(400); }
+    ok(/home\.html/.test(X.url()) && /Signed in as jordan@example.com/.test(await X.$eval('#acct', e => e.innerText).catch(() => '')), `a sign-in link landing on ${pageName} carries on to My Onyx and signs in`);
+    await X.context().close();
+  }
+  // 3c an expired or already-used link says so on the card
+  const E = await device();
+  await open(E, '#error=access_denied&error_code=otp_expired&error_description=Email+link+is+invalid+or+has+expired');
+  ok(/expired or was already used/.test(await E.$eval('#acct', e => e.innerText)), 'an expired link: the card says so and offers a new one');
+  await E.context().close();
+
   // 4 device B with its own pick: both end with the union
   const B = await device({ onyxSaved: [pick('p2')] });
   await open(B, land('jordan@example.com')); await settle(B);
