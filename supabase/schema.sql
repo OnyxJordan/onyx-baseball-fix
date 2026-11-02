@@ -1,4 +1,5 @@
--- Onyx Sports accounts: run once in the Supabase SQL editor (Project -> SQL Editor -> New query).
+-- Onyx Sports accounts: run in the Supabase SQL editor (Project -> SQL Editor -> New query). Safe to
+-- run again after an update (every statement checks first): 11/2 added pick_history.
 -- Sign-in is Supabase Auth (email magic link, no passwords). Every table below holds one person's
 -- rows only: row-level security lets a signed-in user read and write their own rows and nothing
 -- else, so the public (anon) key in accounts.json can safely sit in the page. The service key is
@@ -43,10 +44,21 @@ create table if not exists public.bets (
   primary key (user_id, item_id)
 );
 
+-- the permanent pick history (saved.js, localStorage onyxHistory): every pick saved, graded W / L / P
+-- when its game ends. Never cleared by the 24-hour clean-up of the saved list.
+create table if not exists public.pick_history (
+  user_id uuid not null default auth.uid() references auth.users (id) on delete cascade,
+  item_id text not null,
+  data jsonb not null,
+  updated_at timestamptz not null default now(),
+  primary key (user_id, item_id)
+);
+
 alter table public.profiles enable row level security;
 alter table public.saved_picks enable row level security;
 alter table public.followed_players enable row level security;
 alter table public.bets enable row level security;
+alter table public.pick_history enable row level security;
 
 -- each person: their own rows, every operation; nobody else's, ever
 drop policy if exists "own profile" on public.profiles;
@@ -57,6 +69,8 @@ drop policy if exists "own follows" on public.followed_players;
 create policy "own follows" on public.followed_players for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 drop policy if exists "own bets" on public.bets;
 create policy "own bets" on public.bets for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+drop policy if exists "own history" on public.pick_history;
+create policy "own history" on public.pick_history for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
 -- the profile row, made when someone signs in for the first time
 create or replace function public.handle_new_user() returns trigger
