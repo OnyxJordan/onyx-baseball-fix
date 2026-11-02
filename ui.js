@@ -73,7 +73,8 @@
   var SITES = {
     mlb: {
       name: 'Baseball', other: {label: 'NBA', href: 'nba.html'},
-      bar: [['board', 'Board', 'board'], ['power', 'Plays', 'plays'], ['gamecenter', 'Games', 'games', 1], ['markets', 'Markets', 'markets']],
+      // the same bar as every Onyx Sports page: Home, Plays, Games, Board, More (11/2)
+      bar: [['home', 'Home', 'home'], ['power', 'Plays', 'plays'], ['gamecenter', 'Games', 'games', 1], ['board', 'Board', 'board']],
       tabs: [
         ['home', 'Home', 'home', 'Tonight at a glance'],
         ['gamecenter', 'Games', 'games', 'Live gamecasts and box scores'],
@@ -89,7 +90,7 @@
     },
     nba: {
       name: 'Basketball', other: {label: 'MLB', href: './'},
-      bar: [['home', 'Home', 'home'], ['plays', 'Plays', 'plays'], ['games', 'Games', 'games', 1], ['board', 'Props', 'board']],
+      bar: [['home', 'Home', 'home'], ['plays', 'Plays', 'plays'], ['games', 'Games', 'games', 1], ['board', 'Board', 'board']],
       tabs: [
         ['home', 'Home', 'home', "Tonight's picks and the Model's Parlay"],
         ['plays', 'Plays', 'plays', 'Recommended plays, ranked, with the why'],
@@ -525,6 +526,10 @@
     }
     // the NBA player card handles its own swipe-down (it flips, so it needs both faces)
     var ham = document.getElementById('navHamburger');
+    // one header on every sport page (11/2): the menu button sits last in the
+    // right-hand controls, as on the engine pages (MLB and NBA had it before them)
+    var navRight = document.querySelector('.nav .nav-right');
+    if (ham && navRight && ham.parentNode !== navRight) navRight.appendChild(ham);
     if (ham) {
       ham.removeAttribute('onclick');
       ham.addEventListener('click', function (e) { e.preventDefault(); buzz(); openSheet(); });

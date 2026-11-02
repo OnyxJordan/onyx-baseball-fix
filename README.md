@@ -390,6 +390,14 @@ so old links and the pipeline are unchanged.
 - **`ui.js`** adds three things to each sport site: the Onyx mark in the header (links to
   the hub), "All Onyx sports" in the More menu, and the Onyx footer (sport links plus the
   giant raster ONYX).
+- **One look on every sport page (11/2).** MLB and NBA use the engine pages' header and
+  hero: the Onyx square logo (not a sport ball), text-only tabs, no MLB / NBA link in the tab
+  row (switch sports with the Onyx mark, the More menu or the phone pill), no "updated" stamp
+  or gradient line, the hamburger last on the right (ui.js moves it), a two-line hero
+  ("Every ___. / Every Onyx line.") with the raster ball behind it, and the same three buttons
+  and bottom bar (Home, Plays, Games, Board, More). The CSS is the "one header" block at the
+  end of `onyx.css`. MLB's `index.html` is not rebuilt on days with no games, so its hero and
+  logo edits were made in `index.html` too; keep the two in step until opening day.
 - **`verify_pwa.js`** also checks the hub at 320px and 393px: manifest, status bar,
   header, all seven sports, no sideways scroll, and that the wordmark draws.
 
