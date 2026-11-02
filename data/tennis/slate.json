@@ -1209,7 +1209,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        6
        ],
        "serve": false
       },
@@ -1220,9 +1220,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        6
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -5455,7 +5455,7 @@
      "id": "186713",
      "start": "2026-11-02T21:00Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Campo 1",
@@ -5467,9 +5467,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        6,
+        3
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Polona Hercog",
@@ -5478,6 +5479,7 @@
        "seed": null,
        "win": false,
        "sets": [
+        0,
         0
        ],
        "serve": false
@@ -7358,5 +7360,5 @@
    ]
   }
  ],
- "fetched": "2026-11-02T21:15:16+00:00"
+ "fetched": "2026-11-02T21:49:33+00:00"
 }
