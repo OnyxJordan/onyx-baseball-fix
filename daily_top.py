@@ -102,9 +102,13 @@ BOARD_KEEP = 1500
 _NUM = re.compile(r"([+-]?\d+(?:\.\d+)?)\s*$")
 
 
+LIVE_PROPS = {"anytime_td", "rec", "rec_yds", "rush_yds", "pass_yds", "pts", "reb", "ast", "goals", "sog", "points"}
+
+
 def keep_pregame(data_dir, rows, hours=36):
     """data/<sport>/pregame.json: every game's last pregame Onyx line (spread by team, total,
-    moneyline by side), captured only while the game has not started and kept 36 hours after.
+    moneyline by side, and "pp": each player prop the live tab can price, line, our
+    projection, and the over "o" and under "u" prices), captured only while the game has not started and kept 36 hours after.
     The board drops a game at its start; the live tab (live.js) starts each live chance from
     this line. Fail-soft: a bad file is rebuilt."""
     p = Path(data_dir) / "pregame.json"
@@ -122,10 +126,20 @@ def keep_pregame(data_dir, rows, hours=36):
     for e in rows:
         k = e.get("kind")
         st = when(e.get("start"))
-        if k not in ("spread", "total", "ml") or not st or st <= now or not e.get("matchup"):
+        if k not in ("spread", "total", "ml", "prop") or not st or st <= now or not e.get("matchup"):
+            continue
+        if k == "prop" and e.get("mkt") not in LIVE_PROPS:
             continue
         g = P.setdefault(str(e.get("gid")), {"m": e["matchup"], "start": e.get("start"), "sp": {}, "ml": {}})
         g["m"], g["start"] = e["matchup"], e.get("start")
+        if k == "prop":
+            # the player's pregame Onyx price and our projection: where a live player bet "started"
+            if e.get("name") and e.get("price") is not None and e.get("side") in ("over", "under"):
+                q = g.setdefault("pp", {}).setdefault(f"{e['name']}|{e['mkt']}", {})
+                if q.get("l") != e.get("line"):
+                    q.clear()
+                q.update({"l": e.get("line"), "j": e.get("proj"), "lam": e.get("lam"), e["side"][0]: e["price"]})
+            continue
         if k == "total" and e.get("line") is not None:
             g["tot"] = e["line"]
         elif k == "spread":
