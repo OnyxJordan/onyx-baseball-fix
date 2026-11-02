@@ -1459,6 +1459,28 @@ same call had 1786 (BKN @ IND) and 193 (EDM @ NYR). So the tab shows our numbers
 bet buttons, says so, and links to the live price in the Onyx app. The live models are not
 tested against in-game prices, so nothing live is a pick.
 
+**Live line and value (11/2).** The relay's `GET /live?sport=` serves the feed's in-game lines
+(DraftKings first, each market from one book, never named on the site: "Live line"), and every
+card prices them: Started (Onyx pregame), Live line, Our fair, Value when our chance beats the
+line's implied chance by 3+ points. Player props use the live box line plus our pregame
+projection (`pregame.json` "pp"). No game-line bet in the last 15% of a game and none where we
+disagree with the line by more than 12 points (the first night's 20-50 point "edges" were all
+late football games the model could not see).
+Tested two ways. `tools/live_backtest.js` replays finished games (ESPN play-by-play and pregame
+lines, 2025-26 and 2026-27 so far): 1,891 games and 23,000+ frozen moments (NBA 500, NFL 391,
+NHL 500, college 400), graded against the final and against ESPN's own live win probability.
+It showed the old margin SDs overconfident (we said 15%, underdogs won 23-33%), so
+`tools/live_fit.js` refit them on half the games and checked the other half: NBA 17 / 21.6 with
+the game's own pace weighted 0.2, NFL 16.5 / 17.5 with pace 0.4 and the points still to come
+x1.02, college unchanged (already fit). Our live win chance now scores better than ESPN's
+model at every stage where bets show (NBA first half Brier 0.1875 / 0.1674 vs ESPN 0.1958 /
+0.1733). NHL now adds the overtime or shootout goal to the final score for totals and puck
+lines (over/under log loss 0.5973 -> 0.5877). `tools/verify_live.js` stress-tests the cards on
+generated games (5,000 per seed; run on 5 seeds, 277,425 bets): chances in range, fair price =
+our chance, edge math, every gate, model shape (a bigger lead never lowers the chance), no
+NaN / em dash / book names on a card, no sideways scroll at 390px. Player-prop live pricing is
+the one part not yet backtested: ESPN keeps no pregame projections to replay it against.
+
 **10/31 follow-ups.** A parlay spreads across games first and, when the board is short of
 games, fills its remaining legs from games it already uses (an SGP+, labelled on the ticket,
 never one player twice, one game line of each kind per game). My bets (`onyxMyBets`, ui.js and
