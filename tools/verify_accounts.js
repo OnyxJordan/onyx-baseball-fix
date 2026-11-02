@@ -28,6 +28,7 @@ const sb = http.createServer((q, r) => {
     if (q.headers.apikey !== 'anon-key') return send(401, { msg: 'no apikey' });
     const tok = String(q.headers.authorization || '').replace(/^Bearer /, ''), sess = DB.tokens[tok];
     if (u.pathname === '/auth/v1/settings') return send(200, {});
+    if (u.pathname === '/auth/v1/otp' && JSON.parse(body).email === 'limited@example.com') return send(429, { code: 429, error_code: 'over_email_send_rate_limit', msg: 'email rate limit exceeded' });
     if (u.pathname === '/auth/v1/otp') { DB.otp.push({ email: JSON.parse(body).email, redirect: u.searchParams.get('redirect_to') }); return send(200, {}); }
     if (u.pathname === '/auth/v1/token') { const b = JSON.parse(body); const e = b.refresh_token && b.refresh_token.split(':')[1]; if (!e) return send(400, {}); DB.refreshed++; return send(200, { access_token: token(e), refresh_token: 'r:' + e, expires_in: 3600 }); }
     if (!sess || sess.exp < Date.now()) return send(401, { msg: 'jwt expired' });
@@ -100,6 +101,14 @@ const BASE = 'http://127.0.0.1:' + site.address().port;
   ok(DB.otp.length === 1 && DB.otp[0].email === 'jordan@example.com' && /account\.html$/.test(DB.otp[0].redirect), 'Account page: magic link requested, back to account.html');
   ok(/Link sent to jordan@example.com/.test(await pg.$eval('#acBody', e => e.innerText)), 'Account page: tells them the link is on its way');
   if (process.env.SHOT) await (await pg.$('main')).screenshot({path: path.join(process.env.SHOT, 'account_page_sent.png')});
+  ok(await pg.$eval('#acSend', b => b.disabled) && /send another link in \d+s/.test(await pg.$eval('#acWait', e => e.textContent)), 'Account page: a resend waits a minute, with a countdown');
+  // Supabase's hourly email cap: said in plain words
+  const RL = await device();
+  await RL.goto(BASE + '/account.html', { waitUntil: 'domcontentloaded' }); await RL.evaluate(() => OnyxAccounts.ready); await RL.waitForTimeout(300);
+  await RL.fill('#acEmail', 'limited@example.com'); await RL.click('#acSend'); await RL.waitForTimeout(400);
+  ok(/Too many sign-in emails went out in the last hour/.test(await RL.$eval('#acBody', e => e.innerText)), 'Account page: the email limit is explained in plain words');
+  if (process.env.SHOT) { await RL.setViewportSize({ width: 1280, height: 900 }); await RL.waitForTimeout(200); await RL.screenshot({ path: path.join(process.env.SHOT, 'account_page_limit_desk.png') }); }
+  await RL.context().close();
   await pg.context().close();
 
   // 3 device A: first sign-in merges its lists into the account

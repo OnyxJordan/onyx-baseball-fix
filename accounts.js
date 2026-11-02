@@ -157,7 +157,19 @@
     email = String(email || '').trim();
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return Promise.reject(new Error('Enter your email address'));
     var back = location.origin + location.pathname.replace(/[^\/]*$/, '') + 'account.html';   // links land on the Account page
-    return call('/auth/v1/otp?redirect_to=' + encodeURIComponent(back), {method: 'POST', body: JSON.stringify({email: email, create_user: true})});
+    return call('/auth/v1/otp?redirect_to=' + encodeURIComponent(back), {method: 'POST', body: JSON.stringify({email: email, create_user: true})})
+      .catch(function (e) {
+        // Supabase's reasons, in plain words
+        var b = (e && e.body) || {}, code = String(b.error_code || b.code || ''), msg = String(b.msg || b.message || b.error_description || '');
+        var err = new Error(
+          /over_email_send_rate_limit/.test(code) || /email rate limit/i.test(msg) ? 'Too many sign-in emails went out in the last hour, so Supabase is holding new ones. Try again later.' :
+          /over_request_rate_limit/.test(code) || (e && e.status === 429) ? 'Too many tries in a row. Wait a minute, then send the link again.' :
+          /email_address_not_authorized/.test(code) ? 'Sign-in emails are only going to the Onyx team for now. They open to everyone once Onyx\'s email sender is connected.' :
+          /signup_disabled|otp_disabled/.test(code) ? 'New sign-ups are switched off right now.' :
+          /email_address_invalid|validation_failed/.test(code) ? 'That email address does not look right. Check it and try again.' :
+          'Could not send the link right now' + (msg ? ' (' + msg + ')' : '') + '. Try again in a minute.');
+        err.code = code; err.status = e && e.status; throw err;
+      });
   }
   function signOut() {
     var s = S;
