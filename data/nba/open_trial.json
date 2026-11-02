@@ -915,5 +915,45 @@
   "model": "open-v3",
   "result": null,
   "actual": null
+ },
+ {
+  "date": "2026-11-02",
+  "kind": "ast_under",
+  "key": "20261103F0B44FA2|2D2D92B4841E",
+  "gid": "20261103F0B44FA2",
+  "matchup": "NO @ MEM",
+  "away": "NO",
+  "home": "MEM",
+  "pid": "2D2D92B4841E",
+  "hs": "4277813",
+  "name": "Herbert Jones",
+  "team": "NO",
+  "data_src": "optic",
+  "side": "under",
+  "line": 1.5,
+  "price": 122,
+  "sel": "a76c16a2-f8bf-40d9-af6c-cafc88de2d08",
+  "prob": 0.5215,
+  "implied": 0.4505,
+  "proj": 0.7,
+  "why": [
+   {
+    "k": "line vs his usual range",
+    "v": 1.02,
+    "avg": -0.04,
+    "pp": -4.1
+   },
+   {
+    "k": "assists the opponent allows",
+    "v": 0.9,
+    "avg": 1.0,
+    "pp": -3.1
+   }
+  ],
+  "opened_at": "2026-11-02T23:01:19+00:00",
+  "logged_at": "2026-11-02T23:01:19+00:00",
+  "model": "open-v5",
+  "result": null,
+  "actual": null
  }
 ]
