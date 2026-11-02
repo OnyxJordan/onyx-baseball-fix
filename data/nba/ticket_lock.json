@@ -3,21 +3,6 @@
  "locked": false,
  "legs": [
   {
-   "pid": "F2D7DA1A1728",
-   "player": "Kris Dunn",
-   "team": "LAC",
-   "opp": "TOR",
-   "gid": "20261103FCAA452C",
-   "stat": "reb",
-   "side": "under",
-   "line": 4.5,
-   "odds": -148,
-   "prob": 0.6066,
-   "proj": 3.49,
-   "sel": "9f725e25-2a08-409c-b27d-2ecd3fefadb3",
-   "hit": null
-  },
-  {
    "pid": "F440F34A2C39194A",
    "player": "Caleb Wilson",
    "team": "CHI",
@@ -26,9 +11,9 @@
    "stat": "reb",
    "side": "over",
    "line": 5.5,
-   "odds": -150,
-   "prob": 0.5844,
-   "proj": 7.17,
+   "odds": -148,
+   "prob": 0.5836,
+   "proj": 7.18,
    "sel": "38955610-05a2-4ce4-bf22-8d47aa644366",
    "hit": null
   },
@@ -42,9 +27,24 @@
    "side": "under",
    "line": 5.5,
    "odds": -147,
-   "prob": 0.5821,
-   "proj": 4.64,
+   "prob": 0.5834,
+   "proj": 4.6,
    "sel": "4ce99870-2eb1-49b7-ae7e-1a533e9e7015",
+   "hit": null
+  },
+  {
+   "pid": "5B826F86AC85",
+   "player": "Immanuel Quickley",
+   "team": "TOR",
+   "opp": "LAC",
+   "gid": "20261103FCAA452C",
+   "stat": "ast",
+   "side": "under",
+   "line": 6.5,
+   "odds": -144,
+   "prob": 0.5758,
+   "proj": 5.66,
+   "sel": "59fd4258-e799-4da4-a0ac-ca64f11beaf0",
    "hit": null
   }
  ]

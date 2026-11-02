@@ -394,5 +394,137 @@
   "model": "v2",
   "result": null,
   "actual": null
+ },
+ {
+  "date": "2026-11-02",
+  "key": "401856741|shekai mills knight|rush_yds",
+  "gid": "401856741",
+  "pid": "5214395",
+  "name": "Shekai Mills-Knight",
+  "team": "MISS",
+  "opp": "UGA",
+  "matchup": "MISS vs UGA",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 36.5,
+  "price": -114,
+  "sel": "42b9e615-2e5e-4d28-b863-4aafd7e45f7c",
+  "proj": 44.1,
+  "prob": 0.6173,
+  "implied": 0.5327,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.56,
+    "avg": 0.77,
+    "pp": -5.0
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.98,
+    "avg": -0.05,
+    "pp": 0.9
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.89,
+    "avg": 0.93,
+    "pp": 0.7
+   }
+  ],
+  "opened_at": "2026-11-02T20:55:06+00:00",
+  "logged_at": "2026-11-02T20:55:06+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-02",
+  "key": "401856741|makhi frazier|rush_yds",
+  "gid": "401856741",
+  "pid": "5084286",
+  "name": "Makhi Frazier",
+  "team": "MISS",
+  "opp": "UGA",
+  "matchup": "MISS vs UGA",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 39.5,
+  "price": -114,
+  "sel": "7c43ebd9-51a4-4afb-85d9-ae6c6787fd87",
+  "proj": 40.8,
+  "prob": 0.6227,
+  "implied": 0.5327,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.56,
+    "avg": 0.77,
+    "pp": -5.0
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.89,
+    "avg": 0.93,
+    "pp": 0.7
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.39,
+    "avg": -0.05,
+    "pp": 0.3
+   }
+  ],
+  "opened_at": "2026-11-02T20:55:06+00:00",
+  "logged_at": "2026-11-02T20:55:06+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-02",
+  "key": "401856741|trinidad chambliss|rush_yds",
+  "gid": "401856741",
+  "pid": "4911529",
+  "name": "Trinidad Chambliss",
+  "team": "MISS",
+  "opp": "UGA",
+  "matchup": "MISS vs UGA",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 19.5,
+  "price": -118,
+  "sel": "0ef3bfc5-c41e-40cc-b0fc-2cc8647ed1f0",
+  "proj": 19.5,
+  "prob": 0.625,
+  "implied": 0.5413,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.56,
+    "avg": 0.77,
+    "pp": -5.0
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.89,
+    "avg": 0.93,
+    "pp": 0.7
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.2,
+    "avg": -0.05,
+    "pp": 0.1
+   }
+  ],
+  "opened_at": "2026-11-02T20:55:06+00:00",
+  "logged_at": "2026-11-02T20:55:06+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
  }
 ]
