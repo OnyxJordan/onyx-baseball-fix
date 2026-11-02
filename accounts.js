@@ -20,6 +20,9 @@
   var LISTS = [
     {key: 'onyxSaved', table: 'saved_picks', id: function (x) { return x && x.id; }},
     {key: 'onyxMyBets', table: 'bets', id: function (x) { return x && x.key; }},
+    // the permanent history: grades travel both ways, and only a pick taken back before its game
+    // (never graded) is ever deleted from the account
+    {key: 'onyxHistory', table: 'pick_history', id: function (x) { return x && x.id; }, merge: true},
     {key: 'onyxNbaFollow', table: 'followed_players', sport: 'nba', id: function (x) { return x == null ? null : String(typeof x === 'object' ? x.pid || x.id : x); }},
     {key: 'onyxFollow_nfl', table: 'followed_players', sport: 'nfl', id: function (x) { return x && x.id; }},
     {key: 'onyxFollow_cfb', table: 'followed_players', sport: 'cfb', id: function (x) { return x && x.id; }},
@@ -90,14 +93,25 @@
     var local = lsGet(L.key, []); if (!Array.isArray(local)) local = [];
     var snap = lsGet(SNAP + L.key, null), first = snap == null; snap = snap || [];
     var ids = {}; local.forEach(function (x) { var i = L.id(x); if (i) ids[i] = x; });
-    return rows(L).then(function (R) {
+    return rows(L).catch(function (e) {
+      if (L.merge && e && (e.status === 404 || (e.body && /PGRST205|42P01|does not exist|schema cache/.test(JSON.stringify(e.body))))) return null;   // table not created yet
+      throw e;
+    }).then(function (R) {
+      if (R == null) return {changed: 0, first: first};
       var remote = {}; R.forEach(function (r) { remote[r.item_id] = r.data; });
       var gone = snap.filter(function (i) { return !ids[i]; });                         // removed on this device
+      if (L.merge) gone = gone.filter(function (i) { return !(remote[i] && remote[i].res); });   // a graded pick is never removed
       var lost = snap.filter(function (i) { return ids[i] && !(i in remote); });          // removed on another device
+      if (L.merge) lost = lost.filter(function (i) { return !(ids[i] && ids[i].res); });
       var merged = local.filter(function (x) { return lost.indexOf(L.id(x)) < 0; });
       var added = 0;
+      if (L.merge) merged = merged.map(function (x) { var r = remote[L.id(x)]; if (r && r.res && !x.res) { added++; return r; } return x; });   // graded elsewhere
       Object.keys(remote).forEach(function (i) { if (!ids[i] && gone.indexOf(i) < 0) { merged.push(remote[i]); added++; } });
-      var up = merged.filter(function (x) { var i = L.id(x); return i && !(i in remote); }).map(function (x) {
+      var up = merged.filter(function (x) {
+        var i = L.id(x); if (!i) return false;
+        if (!(i in remote)) return true;
+        return L.merge && x.res && !(remote[i] && remote[i].res);                       // graded here: send the grade
+      }).map(function (x) {
         var r = {user_id: S.user.id, item_id: String(L.id(x)), data: x, updated_at: new Date().toISOString()};
         if (L.sport) r.sport = L.sport;
         return r;

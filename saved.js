@@ -39,14 +39,70 @@
     return keep;
   }
   function has(id) { return !!id && read().some(function (p) { return p.id === id; }); }
-  function remove(id) { write(read().filter(function (p) { return p.id !== id; })); }
+  function remove(id) { write(read().filter(function (p) { return p.id !== id; })); unrecord(id); }
+
+  // ── the permanent pick history (onyxHistory): every pick saved, graded when its game ends.
+  // Kept on this device for good (the newest 2,000), synced to the account when signed in
+  // (accounts.js), and never cleared by the 24-hour clean-up of the saved list. A pick taken back
+  // before its game starts leaves the history; after the start it stays (that pick was ridden).
+  var HKEY = 'onyxHistory', HMAX = 2000;
+  function history() { var a = lsGet(HKEY, []); return Array.isArray(a) ? a : []; }
+  function hWrite(a) { lsSet(HKEY, a.slice(-HMAX)); try { dispatchEvent(new Event('onyx-history')); } catch (e) {} }
+  function record(p) {
+    if (!p || !p.id) return;
+    var a = history();
+    if (a.some(function (h) { return h.id === p.id; })) return;
+    var keep = ['id', 'sport', 'label', 'matchup', 'start', 'gid', 'team', 'price', 'conf', 'kind', 'mkt', 'side', 'line', 'hcap', 'name', 'saved'];
+    var h = {}; keep.forEach(function (k) { if (p[k] != null) h[k] = p[k]; });
+    h.saved = h.saved || new Date().toISOString(); h.res = null;
+    a.push(h); hWrite(a);
+  }
+  function unrecord(id) {
+    var a = history(), h = a.filter(function (x) { return x.id === id; })[0];
+    if (!h || h.res) return;
+    var s = Date.parse(h.start);
+    if (isNaN(s) || s > Date.now()) hWrite(a.filter(function (x) { return x.id !== id; }));
+  }
+  // grade what has finished: picks started 2.5+ hours ago (or reported final), up to 10 days back
+  var grading = false;
+  function grade() {
+    if (grading) return Promise.resolve();
+    var now = Date.now(), due = history().filter(function (h) {
+      var s = Date.parse(h.start); return !h.res && !isNaN(s) && s < now - 30 * 60e3 && now - s < 10 * 864e5;
+    }).slice(-25);
+    if (!due.length) return Promise.resolve();
+    grading = true;
+    return Promise.all(due.map(function (h) { return track(h).catch(function () { return {p: h}; }); })).then(function (T) {
+      var by = {}; T.forEach(function (t) { if (t.res === 'W' || t.res === 'L' || t.res === 'P') by[t.p.id] = t; });
+      if (!Object.keys(by).length) return;
+      var a = history().map(function (h) {
+        var t = by[h.id]; if (!t || h.res) return h;
+        return Object.assign({}, h, {res: t.res, final: t.cur, graded: new Date().toISOString()});
+      });
+      hWrite(a);
+    }).then(function () { grading = false; }, function () { grading = false; });
+  }
+  // a pick graded "W" early (an over that cleared) is final; everything else waits for the final whistle
+  function stats(a) {
+    a = a || history();
+    var g = a.filter(function (h) { return h.res; }), w = 0, l = 0, p = 0, units = 0, risked = 0, by = {};
+    g.forEach(function (h) {
+      var s = by[h.sport] = by[h.sport] || {w: 0, l: 0, p: 0, units: 0};
+      if (h.res === 'W') { w++; s.w++; var u = h.price == null ? 1 : h.price > 0 ? h.price / 100 : 100 / -h.price; units += u; s.units += u; }
+      else if (h.res === 'L') { l++; s.l++; units -= 1; s.units -= 1; }
+      else { p++; s.p++; }
+      if (h.res !== 'P') risked += 1;
+    });
+    return {picks: a.length, graded: g.length, pending: a.length - g.length, w: w, l: l, p: p, units: Math.round(units * 100) / 100,
+            roi: risked ? Math.round(units / risked * 1000) / 10 : null, rate: w + l ? Math.round(w / (w + l) * 1000) / 10 : null, by: by};
+  }
   function toast(msg, opts) { if (window.OX_TOAST) { try { window.OX_TOAST(msg, opts || {}); return; } catch (e) {} } }
   function alertsOn() { return lsGet(ALERTS, 0) === 1 && typeof Notification !== 'undefined' && Notification.permission === 'granted'; }
   function canAsk() { return typeof Notification !== 'undefined' && Notification.permission !== 'denied'; }
   function toggle(p) {
     if (!p || !p.id) return false;
     if (has(p.id)) { remove(p.id); toast('Removed from My picks'); return false; }
-    var a = read(); a.push(Object.assign({}, p, {saved: new Date().toISOString()})); write(a);
+    var a = read(), sp = Object.assign({}, p, {saved: new Date().toISOString()}); a.push(sp); write(a); record(sp);
     if (!alertsOn() && canAsk()) toast('Saved. We will pop up the moment it wins', {action: 'Alert me', onAction: function () { setAlerts(true); }});
     else toast('Saved. We will pop up the moment it wins');
     try { if (window.gtag) gtag('event', 'pick_save', {sport: p.sport}); } catch (e) {}
@@ -69,17 +125,23 @@
   var SB = {}, SUM = {}, TN = {t: 0, c: []};
   function nk(n) { return String(n || '').normalize('NFKD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[.'’-]/g, ' ').replace(/\b(jr|sr|ii|iii|iv)\b/g, ' ').replace(/\s+/g, ' ').trim(); }
   function getJSON(u) { return fetch(u).then(function (r) { return r.json(); }); }
-  function scoreboard(k) {
-    var L = LG[k], s = SB[k];
-    if (s && Date.now() - s.t < 30e3) return Promise.resolve(s.ev);
-    return getJSON(ESPN + L.path + '/scoreboard' + (L.q ? '?' + L.q : '')).then(function (j) {
+  // the game's ET calendar day (ESPN's scoreboard date), so a pick from an earlier day still grades
+  function etDay(start) {
+    var t = Date.parse(start); if (isNaN(t)) return '';
+    try { return new Date(t).toLocaleDateString('en-CA', {timeZone: 'America/New_York'}).replace(/-/g, ''); } catch (e) { return ''; }
+  }
+  function scoreboard(k, day) {
+    var L = LG[k], key = k + (day || ''), s = SB[key];
+    if (s && (s.done || Date.now() - s.t < 30e3)) return Promise.resolve(s.ev);
+    var qs = [L.q, day ? 'dates=' + day : ''].filter(Boolean).join('&');
+    return getJSON(ESPN + L.path + '/scoreboard' + (qs ? '?' + qs : '')).then(function (j) {
       var ev = (j.events || []).map(function (e) {
         var c = (e.competitions || [{}])[0], st = (e.status || {}).type || {}, t = {};
         (c.competitors || []).forEach(function (x) { t[x.homeAway] = x; });
         var T = function (x) { return {ab: ((x || {}).team || {}).abbreviation, sc: (x || {}).score}; };
         return {id: e.id, state: st.state, detail: st.shortDetail || st.detail, a: T(t.away), h: T(t.home)};
       });
-      SB[k] = {t: Date.now(), ev: ev};
+      SB[key] = {t: Date.now(), ev: ev, done: !!day && day < etDay(new Date().toISOString()) && ev.every(function (x) { return x.state === 'post'; })};
       return ev;
     }).catch(function () { return (s || {}).ev || []; });
   }
@@ -133,7 +195,8 @@
     }
     var L = LG[p.sport];
     if (!L) return Promise.resolve(out);
-    return scoreboard(p.sport).then(function (E) {
+    var today = etDay(new Date().toISOString()), day = etDay(p.start);
+    return scoreboard(p.sport, day && day < today ? day : '').then(function (E) {
       var away = String(p.matchup || '').split(/ @ | vs /)[0];
       var e = p.sport === 'nba' ? E.filter(function (x) { return x.a.ab === (p.team || away) || x.h.ab === (p.team || away); })[0]
         : (E.filter(function (x) { return x.id === p.gid; })[0] || (p.team ? E.filter(function (x) { return x.a.ab === p.team || x.h.ab === p.team; })[0] : null));
@@ -255,8 +318,10 @@
   }
   function start() {
     clearInterval(timer);
-    timer = setInterval(watch, 45e3);
-    setTimeout(watch, 2500);
+    // the saved picks from before the history existed join it
+    all().forEach(record);
+    timer = setInterval(function () { watch(); grade(); }, 45e3);
+    setTimeout(function () { watch(); grade(); }, 2500);
   }
   addEventListener('visibilitychange', function () { if (!document.hidden) setTimeout(watch, 800); });
 
@@ -290,6 +355,7 @@
     '@media (prefers-reduced-motion: reduce){.oxw,.oxw-big,.oxw-fx i{animation:none!important;transition:none!important}.oxw-fx{display:none}}';
   var st = document.createElement('style'); st.textContent = css; (document.head || document.documentElement).appendChild(st);
   window.OnyxSaved = {all: all, has: has, remove: remove, toggle: toggle, tap: tap, btn: btn,
-    track: track, celebrate: celebrate, watch: watch, alertsOn: alertsOn, setAlerts: setAlerts};
+    track: track, celebrate: celebrate, watch: watch, alertsOn: alertsOn, setAlerts: setAlerts,
+    history: history, grade: grade, stats: stats, record: record};
   if (document.readyState === 'loading') addEventListener('DOMContentLoaded', start); else start();
 })();

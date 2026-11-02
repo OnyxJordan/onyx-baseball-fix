@@ -67,7 +67,10 @@ const BASE = 'http://127.0.0.1:' + site.address().port;
     const ctx = await b.newContext({ viewport: { width: 390, height: 844 } });
     const pg = await ctx.newPage();
     pg.on('pageerror', e => errs.push(String(e)));
-    await pg.route('**/*', rt => { const u = rt.request().url(); return u.startsWith(BASE) || u.startsWith(SB) ? rt.continue() : rt.abort(); });
+    await pg.route('**/*', rt => { const u = rt.request().url();
+      if (/site\.api\.espn\.com\/.*football\/nfl\/scoreboard/.test(u)) return rt.fulfill({ contentType: 'application/json', body: JSON.stringify({ events: [{ id: 'g9',
+        status: { type: { state: 'post', shortDetail: 'Final' } }, competitions: [{ competitors: [{ homeAway: 'home', score: '24', team: { abbreviation: 'DEN' } }, { homeAway: 'away', score: '20', team: { abbreviation: 'KC' } }] }] }] }) });
+      return u.startsWith(BASE) || u.startsWith(SB) ? rt.continue() : rt.abort(); });
     if (local) await pg.addInitScript(L => { if (!sessionStorage.getItem('seeded')) { for (const k in L) localStorage.setItem(k, JSON.stringify(L[k])); sessionStorage.setItem('seeded', '1'); } }, local);
     return pg;
   }
@@ -141,6 +144,26 @@ const BASE = 'http://127.0.0.1:' + site.address().port;
   ok(!(R().saved_picks || {}).p1, 'removal: device A\'s removal left the account (auto-sync after the edit)');
   await settle(B);
   ok((await ls(B, 'onyxSaved')).map(x => x.id).join() === 'p2', 'removal: device B drops it too');
+
+  // 5b the permanent history: a saved pick on a finished game is graded, kept past the 24-hour
+  // clean-up, synced to the account, and shows on the other device's record
+  const done = new Date(Date.now() - 4 * 3600e3).toISOString();
+  await A.evaluate(st => OnyxSaved.toggle({ id: 'h1', sport: 'nfl', label: 'Over 40.5', matchup: 'KC @ DEN', gid: 'g9', start: st, kind: 'total', side: 'over', line: 40.5, price: -110, name: 'Total' }), done);
+  await A.evaluate(() => OnyxSaved.grade()); await A.waitForTimeout(300);
+  const h1 = (await ls(A, 'onyxHistory') || []).find(h => h.id === 'h1');
+  ok(h1 && h1.res === 'W' && h1.final === 44, 'history: the saved over 40.5 graded Won (final total 44)');
+  await A.evaluate(() => { localStorage.setItem('onyxSaved', JSON.stringify(JSON.parse(localStorage.getItem('onyxSaved')).filter(x => x.id !== 'h1'))); });
+  await settle(A);
+  ok(((R().pick_history || {}).h1 || {}).data && R().pick_history.h1.data.res === 'W', 'history: the graded pick reached the account, and stays after it leaves the saved list');
+  await settle(B);
+  await B.goto(BASE + '/account.html', { waitUntil: 'domcontentloaded' }); await B.evaluate(() => OnyxAccounts.ready); await B.waitForTimeout(700);
+  const recTxt = await B.$eval('#record', e => e.hidden ? '' : e.innerText).catch(() => '');
+  ok(/1-0/.test(recTxt) && /Over 40\.5/.test(recTxt) && /won/i.test(recTxt) && /\+0\.91/.test(recTxt), 'history: device B\'s Account page shows the record 1-0, +0.91 units, and the pick as Won');
+  if (process.env.SHOT) await (await B.$('#record')).screenshot({path: path.join(process.env.SHOT, 'account_record.png')});
+  await B.goto(BASE + '/home.html', { waitUntil: 'domcontentloaded' }); await B.evaluate(() => OnyxAccounts.ready);
+  // a pick taken back before its game leaves the history
+  await A.evaluate(st => { OnyxSaved.toggle({ id: 'h2', sport: 'nfl', label: 'Later pick', start: st, kind: 'ml', name: 'KC', price: 120 }); OnyxSaved.toggle({ id: 'h2' }); }, new Date(Date.now() + 5 * 3600e3).toISOString());
+  ok(!(await ls(A, 'onyxHistory')).some(h => h.id === 'h2'), 'history: a pick taken back before its game leaves the history');
 
   // 6 another person
   const C = await device({ onyxSaved: [pick('c1')] });

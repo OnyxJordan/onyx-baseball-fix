@@ -16,6 +16,7 @@
 <link rel="stylesheet" href="onyx.css">
 <script src="onyx.js" defer></script>
 <script src="accounts.js"></script>
+<script src="saved.js"></script>
 <style>
 body{background:#0c0c0c;color:#fff;margin:0}
 .ac{padding-top:28px;padding-bottom:40px;max-width:640px}
@@ -41,6 +42,19 @@ body{background:#0c0c0c;color:#fff;margin:0}
 .how div{padding:14px;border-radius:14px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);font-size:13.5px;line-height:1.6;color:#b9b2c4}
 .how b{color:#fff}
 .off{margin-top:22px;padding:18px;border-radius:14px;border:1px solid rgba(255,255,255,.1);color:#b9b2c4;font-size:14px;line-height:1.6}
+.rec{margin-top:28px}.rec h2{margin:0;font-size:clamp(26px,6vw,40px);line-height:1}
+.rec .sub{color:#9a93a6;font-size:13px;line-height:1.6;margin:8px 0 0}
+.kp{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px}
+.kp div{padding:12px 8px;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);text-align:center}
+.kp b{display:block;font:800 20px monospace}.kp span{font:600 9px monospace;letter-spacing:.06em;text-transform:uppercase;color:#a79fb5}
+.kp .up{color:#61e970}.kp .dn{color:#ff8a8a}
+.sp{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}.sp span{padding:5px 10px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);font:700 11px monospace;color:#cfc8da}
+.hl{margin-top:14px;display:flex;flex-direction:column;gap:6px}
+.hr{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07)}
+.hr .l{font-size:14px;color:#fff;line-height:1.35}.hr .m{grid-column:1;font:600 11px monospace;color:#8f879c}
+.hr .r{grid-column:2;grid-row:1/3;align-self:center;font:800 11px monospace;letter-spacing:.06em;padding:5px 9px;border-radius:999px;text-transform:uppercase}
+.r.W{background:rgba(97,233,112,.16);color:#61e970}.r.L{background:rgba(255,138,138,.12);color:#ff8a8a}.r.P{background:rgba(255,255,255,.08);color:#cfc8da}.r.N{background:rgba(176,56,249,.14);color:#d795ff}
+.more{margin-top:10px;background:none;border:1px solid #3a2a55;color:#d795ff;font:700 12px monospace;border-radius:999px;padding:9px 14px;cursor:pointer}
 .danger{margin-top:26px;padding-top:16px;border-top:1px solid rgba(255,255,255,.08)}
 .danger p{color:#9a93a6;font-size:12.5px;line-height:1.6;margin:0 0 8px}
 </style>
@@ -53,8 +67,17 @@ body{background:#0c0c0c;color:#fff;margin:0}
   <h1>Your picks,<br>every device.</h1>
   <p class="lead">Sign in with your email and the picks you save, the players you follow and the bets you open on Onyx follow you to your phone, tablet and computer. No password: we email you a one-time link.</p>
   <div id="acBody"><div class="off">Loading...</div></div>
+  <section class="rec" id="record" hidden>
+    <span class="ox-eyebrow">Your record</span>
+    <h2>Every pick you saved.</h2>
+    <p class="sub" id="recSub"></p>
+    <div class="kp" id="recKp"></div>
+    <div class="sp" id="recSp"></div>
+    <div class="hl" id="recList"></div>
+    <button class="more" id="recMore" type="button" hidden>Show more</button>
+  </section>
   <div class="how">
-    <div><b>What we store.</b> Your email (for the sign-in link) and the picks, players and bets you save here. Only so they follow you to your other devices. Nothing is sold or shared.</div>
+    <div><b>What we store.</b> Your email (for the sign-in link) and the picks, players and bets you save here, with each saved pick's result for your record. Only so they follow you to your other devices. Nothing is sold or shared.</div>
     <div><b>Signed out?</b> Everything works as before and stays on this device. Signing in later merges it into your account.</div>
     <div><b>Leaving?</b> Delete your account any time from this page. Your email and everything synced to it are removed.</div>
   </div>
@@ -110,6 +133,40 @@ addEventListener('onyx-account', render);
 addEventListener('onyx-saved', render);
 (window.OnyxAccounts ? OnyxAccounts.ready : Promise.resolve()).then(render);
 setInterval(() => { if (!document.hidden) render(); }, 30000);
+
+// ── your record: the permanent pick history (saved.js), graded as games end ──
+const SPN = {nfl: 'NFL', nba: 'NBA', nhl: 'NHL', cfb: 'College', tennis: 'Tennis', golf: 'Golf', mlb: 'MLB'};
+let SHOW = 30;
+function fmtP(x) { return x == null ? '' : x > 0 ? '+' + x : String(x); }
+function recRender() {
+  const O = window.OnyxSaved, sec = document.getElementById('record');
+  if (!O || !O.history) return;
+  const H = O.history().slice().sort((a, b) => Date.parse(b.start || b.saved) - Date.parse(a.start || a.saved));
+  if (!H.length) { sec.hidden = true; return; }
+  sec.hidden = false;
+  const st = O.stats(H), A = window.OnyxAccounts, signed = A && A.state().signedIn;
+  document.getElementById('recSub').textContent = `${st.picks} pick${st.picks === 1 ? '' : 's'} saved, ${st.graded} graded${st.pending ? ', ' + st.pending + ' still to play or finishing' : ''}. Units: 1 unit on each pick at the Onyx price when you saved it. ` +
+    (signed ? 'Kept in your account, on every device.' : 'Kept on this device. Sign in above to keep it on every device.');
+  const u = st.units;
+  document.getElementById('recKp').innerHTML = `<div><b>${st.w}-${st.l}${st.p ? '-' + st.p : ''}</b><span>Record</span></div>
+    <div><b>${st.rate == null ? '-' : st.rate + '%'}</b><span>Win rate</span></div>
+    <div><b class="${u > 0 ? 'up' : u < 0 ? 'dn' : ''}">${u > 0 ? '+' : ''}${u.toFixed(2)}</b><span>Units</span></div>
+    <div><b class="${st.roi > 0 ? 'up' : st.roi < 0 ? 'dn' : ''}">${st.roi == null ? '-' : (st.roi > 0 ? '+' : '') + st.roi + '%'}</b><span>ROI</span></div>`;
+  document.getElementById('recSp').innerHTML = Object.keys(st.by).map(k => { const b = st.by[k]; return `<span>${esc(SPN[k] || k)} ${b.w}-${b.l}${b.p ? '-' + b.p : ''} · ${b.units > 0 ? '+' : ''}${b.units.toFixed(1)}u</span>`; }).join('');
+  const now = Date.now();
+  document.getElementById('recList').innerHTML = H.slice(0, SHOW).map(h => {
+    const t = Date.parse(h.start || h.saved), day = isNaN(t) ? '' : new Date(t).toLocaleDateString('en-US', {month: 'short', day: 'numeric', timeZone: 'America/New_York'});
+    const res = h.res || 'N', word = {W: 'Won', L: 'Lost', P: 'Push'}[h.res] || (t > now ? 'Upcoming' : 'Pending');
+    const fin = h.final != null && h.res ? ` · final ${esc(String(h.final))}` : '';
+    return `<div class="hr"><span class="l">${esc(h.label || h.name || '')}</span><span class="m">${esc(day)} · ${esc(SPN[h.sport] || h.sport || '')}${h.matchup ? ' · ' + esc(h.matchup) : ''}${h.price != null ? ' · Onyx ' + fmtP(h.price) : ''}${fin}</span><span class="r ${res}">${word}</span></div>`;
+  }).join('');
+  const more = document.getElementById('recMore'); more.hidden = H.length <= SHOW;
+  more.onclick = () => { SHOW += 50; recRender(); };
+}
+addEventListener('onyx-history', recRender);
+addEventListener('onyx-account', recRender);
+addEventListener('onyx-saved', recRender);
+setTimeout(() => { recRender(); if (window.OnyxSaved && OnyxSaved.grade) OnyxSaved.grade().then(recRender); }, 300);
 </script>
 </body>
 </html>
