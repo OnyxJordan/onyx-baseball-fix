@@ -945,8 +945,8 @@
     {
      "id": "186444",
      "start": "2026-11-02T13:35Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 1",
      "draw": "Men's Singles",
      "court": "Court 2",
@@ -959,19 +959,19 @@
        "win": false,
        "sets": [
         4,
-        1
+        2
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Daniel Merida",
        "short": "D. Merida",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        5
+        6
        ],
        "serve": false
       }
@@ -981,7 +981,7 @@
      "id": "186448",
      "start": "2026-11-02T13:50Z",
      "state": "in",
-     "detail": "2nd",
+     "detail": "3rd",
      "round": "Round 1",
      "draw": "Men's Singles",
      "court": "Court 1",
@@ -994,7 +994,8 @@
        "win": false,
        "sets": [
         4,
-        4
+        6,
+        0
        ],
        "serve": false
       },
@@ -1006,17 +1007,18 @@
        "win": false,
        "sets": [
         6,
-        1
+        1,
+        0
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
     {
      "id": "186469",
      "start": "2026-11-02T14:00Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 1",
      "draw": "Men's Singles",
      "court": "Court Central",
@@ -1029,7 +1031,7 @@
        "win": false,
        "sets": [
         3,
-        0
+        2
        ],
        "serve": false
       },
@@ -1038,10 +1040,10 @@
        "short": "C. Ruud",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/nor.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        4
+        6
        ],
        "serve": false
       }
@@ -1049,9 +1051,9 @@
     },
     {
      "id": "186447",
-     "start": "2026-11-02T15:00Z",
+     "start": "2026-11-02T15:10Z",
      "state": "pre",
-     "detail": "11/2 - 10:00 AM EST",
+     "detail": "11/2 - 10:10 AM EST",
      "round": "Round 1",
      "draw": "Men's Singles",
      "court": "Court 2",
@@ -1078,9 +1080,9 @@
     },
     {
      "id": "186460",
-     "start": "2026-11-02T15:00Z",
+     "start": "2026-11-02T15:30Z",
      "state": "pre",
-     "detail": "11/2 - 10:00 AM EST",
+     "detail": "11/2 - 10:30 AM EST",
      "round": "Round 1",
      "draw": "Men's Singles",
      "court": "Court 1",
@@ -1762,9 +1764,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Casper Ruud",
+       "short": "C. Ruud",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/nor.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -1840,9 +1842,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Daniel Merida",
+       "short": "D. Merida",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -7282,5 +7284,5 @@
    ]
   }
  ],
- "fetched": "2026-11-02T14:49:31+00:00"
+ "fetched": "2026-11-02T15:04:53+00:00"
 }
