@@ -57,7 +57,7 @@
     var h = String(location.hash || '');
     if (!/access_token=|error_description=/.test(h)) return false;
     var p = {}; h.replace(/^#/, '').split('&').forEach(function (kv) { var i = kv.indexOf('='); if (i > 0) p[decodeURIComponent(kv.slice(0, i))] = decodeURIComponent(kv.slice(i + 1).replace(/\+/g, ' ')); });
-    try { history.replaceState(null, '', location.pathname + location.search + '#my'); } catch (e) {}
+    try { history.replaceState(null, '', location.pathname + location.search + (/account\.html$/.test(location.pathname) ? '' : '#my')); } catch (e) {}
     if (p.error_description || p.error_code) {
       // the usual one: an email app or scanner opened the one-time link first, or it is over an hour old
       ERR = /expired|invalid/i.test(p.error_code + ' ' + p.error_description) ? 'That sign-in link expired or was already used. Send yourself a new one.' : 'Sign-in link problem: ' + (p.error_description || p.error_code);
@@ -142,7 +142,7 @@
   function signIn(email) {
     email = String(email || '').trim();
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return Promise.reject(new Error('Enter your email address'));
-    var back = location.origin + location.pathname;
+    var back = location.origin + location.pathname.replace(/[^\/]*$/, '') + 'account.html';   // links land on the Account page
     return call('/auth/v1/otp?redirect_to=' + encodeURIComponent(back), {method: 'POST', body: JSON.stringify({email: email, create_user: true})});
   }
   function signOut() {

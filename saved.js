@@ -15,7 +15,7 @@
 // phone while the app is open or in the background; a fully closed app needs push (OneSignal),
 // as on Onyx Baseball.
 // a sign-in link that landed on a page other than My Onyx: carry it there (see ui.js)
-(function () { try { if (/(^|[#&])(access_token|error_description|error_code)=/.test(location.hash) && !/home\.html$/.test(location.pathname)) location.replace(location.pathname.replace(/[^\/]*$/, '') + 'home.html' + location.hash); } catch (e) {} })();
+(function () { try { if (/(^|[#&])(access_token|error_description|error_code)=/.test(location.hash) && !/(home|account)\.html$/.test(location.pathname)) location.replace(location.pathname.replace(/[^\/]*$/, '') + 'account.html' + location.hash); } catch (e) {} })();
 // optional accounts (accounts.js): sign-in and cross-device sync, off until accounts.json is filled in
 (function () { try { if (!document.querySelector('script[src="accounts.js"]')) { var a = document.createElement('script'); a.src = 'accounts.js'; a.defer = true; document.head.appendChild(a); } } catch (e) {} })();
 (function () {

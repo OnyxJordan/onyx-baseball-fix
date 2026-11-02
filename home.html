@@ -110,6 +110,7 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
 .acct button{font:700 12px monospace;letter-spacing:.04em;border:1px solid #a24bff;background:#a24bff;color:#fff;border-radius:999px;padding:9px 14px;cursor:pointer}
 .acct button.ghost{background:transparent;color:#d795ff;border-color:#3a2a55}.acct .acct-t{flex:1 1 100%}.acct small{flex:1 1 100%;color:#8f879c;font-size:11px;line-height:1.45}
 .acct .ok{color:#61e970}.acct .bad{color:#ff8a8a}
+.acct .acct-t{flex:1 1 220px}.acct-go{font:700 12px monospace;letter-spacing:.04em;border:1px solid #a24bff;background:#a24bff;color:#fff;border-radius:999px;padding:9px 16px;text-decoration:none;white-space:nowrap}.acct-go.ghost{background:transparent;color:#d795ff;border-color:#3a2a55}
 .lv-val{margin-left:auto;font:800 10px monospace;letter-spacing:.05em;color:#0b0710;background:#61e970;border-radius:999px;padding:3px 8px;white-space:nowrap}
 .lv-bets{display:flex;flex-direction:column;gap:6px;border-top:1px solid rgba(255,255,255,.08);padding-top:9px}
 .lv-bet{display:grid;grid-template-columns:1fr auto;gap:2px 8px;align-items:center;font-size:13px;color:#e8e2f1}.lv-bet .s{grid-column:1;font:600 11px monospace;color:#a79fb5}.lv-bet .s b{color:#fff}
@@ -153,6 +154,7 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
       <a class="ox-link" href="#live">Live</a>
       <a class="ox-link" href="#sports">Sports</a>
       <a class="ox-link" href="#record">Record</a>
+      <a class="ox-link" id="acctNav" href="account.html" hidden>Sign in</a>
       <a class="ox-btn sm" data-onyx="header" href="#" target="_blank" rel="noopener">Bet on Onyx</a>
     </nav>
   </div>
@@ -915,33 +917,19 @@ function pickCard(t) {
 }
 // ── Accounts (accounts.js): optional sign-in that syncs picks, players and bets across devices ──
 function acctRender() {
-  const el = document.getElementById('acct'), A = window.OnyxAccounts;
+  const el = document.getElementById('acct'), nav = document.getElementById('acctNav'), A = window.OnyxAccounts;
   if (!el || !A) return;
   const st = A.state();
+  if (nav) { nav.hidden = !st.enabled; nav.textContent = st.signedIn ? 'Account' : 'Sign in'; }
   if (!st.enabled) { el.hidden = true; return; }
   el.hidden = false;
-  const note = `<small>Signing in stores your email and the picks, players and bets you save here, only so they follow you to your other devices. Nothing is sold or shared. Signed out, everything stays on this device as before.</small>`;
   if (!st.signedIn) {
-    el.innerHTML = `<span class="acct-t"><b>Keep your picks on every device.</b> Sign in with your email: we send a one-time link, no password.</span>
-      <input id="acctEmail" type="email" inputmode="email" autocomplete="email" placeholder="you@email.com" onkeydown="if(event.key==='Enter')acctSend()">
-      <button type="button" onclick="acctSend()">Email me a link</button><span id="acctMsg">${st.error ? `<span class="bad">${esc(st.error)}</span>` : ''}</span>${note}`;
+    el.innerHTML = `<span class="acct-t"><b>Keep your picks on every device.</b> Sign in with your email, no password.</span><a class="acct-go" href="account.html">Sign in</a>`;
     return;
   }
   const ago = st.last ? Math.max(0, Math.round((Date.now() - st.last) / 60000)) : null;
-  const sync = st.syncing ? 'Syncing...' : st.error ? `<span class="bad">${esc(st.error)}</span>` : ago == null ? 'Not synced yet' : `<span class="ok">Synced</span> ${ago < 1 ? 'just now' : ago + ' min ago'}`;
-  el.innerHTML = `<span class="acct-t">Signed in as <b>${esc(st.email || '')}</b> · ${sync}</span>
-    <button type="button" class="ghost" onclick="OnyxAccounts.sync()">Sync now</button>
-    <button type="button" class="ghost" onclick="OnyxAccounts.signOut()">Sign out</button>
-    <button type="button" class="ghost" onclick="acctDelete()">Delete my account</button>${note}`;
-}
-async function acctSend() {
-  const i = document.getElementById('acctEmail'), m = document.getElementById('acctMsg');
-  try { await OnyxAccounts.signIn(i.value); m.innerHTML = `<span class="ok">Check your email for the sign-in link.</span>`; }
-  catch (e) { m.innerHTML = `<span class="bad">${esc(e && e.message ? e.message : 'Could not send the link right now.')}</span>`; }
-}
-async function acctDelete() {
-  if (!confirm('Delete your Onyx account? Your email and everything synced to it are removed. This device keeps its own picks.')) return;
-  try { await OnyxAccounts.deleteAccount(); if (window.OX_TOAST) OX_TOAST('Account deleted.', {}); } catch (e) { if (window.OX_TOAST) OX_TOAST('Could not delete the account right now.', {}); }
+  const sync = st.syncing ? 'Syncing...' : st.error ? `<span class="bad">${esc(st.error)}</span>` : ago == null ? 'Syncing...' : `<span class="ok">Synced</span> ${ago < 1 ? 'just now' : ago + ' min ago'}`;
+  el.innerHTML = `<span class="acct-t">Signed in as <b>${esc(st.email || '')}</b> · ${sync}</span><a class="acct-go ghost" href="account.html">Account</a>`;
 }
 addEventListener('onyx-account', acctRender);
 addEventListener('onyx-saved', () => { myPicks().then(T => { MY_PK = T; if (T.length) MY.tab = 'picks'; renderMy(); }); });
