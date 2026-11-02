@@ -614,5 +614,49 @@
   "model": "v2",
   "result": null,
   "actual": null
+ },
+ {
+  "date": "2026-11-02",
+  "key": "401858510|aidan laughery|rush_yds",
+  "gid": "401858510",
+  "pid": "4827047",
+  "name": "Aidan Laughery",
+  "team": "ILL",
+  "opp": "NEB",
+  "matchup": "ILL vs NEB",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 58.5,
+  "price": -118,
+  "sel": "41a3f28e-1d1e-48d4-8393-41a6b6e12a9a",
+  "proj": 56.4,
+  "prob": 0.607,
+  "implied": 0.5413,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.59,
+    "avg": 0.77,
+    "pp": -4.2
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.83,
+    "avg": 0.93,
+    "pp": 1.7
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.32,
+    "avg": -0.05,
+    "pp": 0.3
+   }
+  ],
+  "opened_at": "2026-11-02T23:45:45+00:00",
+  "logged_at": "2026-11-02T23:45:45+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
  }
 ]
