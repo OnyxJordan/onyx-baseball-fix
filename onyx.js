@@ -90,6 +90,14 @@
         c.closePath(); c.fill(); c.restore();
       });
     },
+    cbb: function (c) {          // the basketball with the college star (cfb's), for college basketball
+      SHAPES.basketball(c);
+      ball(c, function (c) {
+        c.save(); c.translate(0.72, -0.72); c.scale(0.24, 0.24); c.beginPath();
+        for (var i = 0; i < 10; i++) { var a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? 0.45 : 1; c.lineTo(Math.cos(a) * rr, Math.sin(a) * rr); }
+        c.closePath(); c.fill(); c.restore();
+      });
+    },
     hockey: function (c) {
       ball(c, function (c) {
         c.save(); c.rotate(-0.55);

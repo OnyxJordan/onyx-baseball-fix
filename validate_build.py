@@ -78,6 +78,7 @@ LEDGER_RETENTION_DAYS = {
     # backtest passes, then append-only like every other record
     "nfl/picks_history": None,
     "cfb/picks_history": None,
+    "cbb/picks_history": None,
     "nhl/picks_history": None,
     "tennis/picks_history": None,
 }

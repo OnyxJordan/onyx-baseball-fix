@@ -104,9 +104,9 @@ jobs:
       # the step is continue-on-error, so no sport can block MLB, NBA or
       # another sport. sports_espn.py refreshes the slate (and the NFL box
       # scores the model reads); sports_build.py builds the page.
-      - name: Sports pages (NFL, college football, NHL, tennis, golf)
+      - name: Sports pages (NFL, college football, NHL, tennis, golf, college basketball)
         run: |
-          for s in nfl cfb nhl tennis golf; do
+          for s in nfl cfb nhl tennis golf cbb; do
             python3 sports_espn.py $s || echo "::warning::$s slate failed"
             python3 sports_odds.py $s || echo "::warning::$s Onyx prices failed"
             python3 sports_build.py $s || echo "::warning::$s build failed"
@@ -128,7 +128,7 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -A data index.html nba.html nfl.html cfb.html nhl.html tennis.html golf.html
+          git add -A data index.html nba.html nfl.html cfb.html cbb.html nhl.html tennis.html golf.html
           if git diff --cached --quiet; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
             echo "nothing to commit"

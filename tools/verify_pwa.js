@@ -163,8 +163,8 @@ function serve() {
     });
     if (st.bar !== 'black') bad.push(`status bar style "${st.bar}"`);
     if (st.headTop < 0 || st.headTop > 40) bad.push(`header at ${Math.round(st.headTop)}px`);
-    if (st.cards !== 7) bad.push(`${st.cards} sport cards, want 7`);
-    const want = ['nba.html', 'index.html', 'nfl.html', 'cfb.html', 'nhl.html', 'tennis.html', 'golf.html'];
+    if (st.cards !== 8) bad.push(`${st.cards} sport cards, want 8`);
+    const want = ['nba.html', 'index.html', 'nfl.html', 'cfb.html', 'cbb.html', 'nhl.html', 'tennis.html', 'golf.html'];
     const miss = want.filter(h => !st.live.includes(h));
     if (miss.length) bad.push(`sports not linked: ${miss.join(', ')}`);
     if (st.sw > st.vw) bad.push(`page scrolls sideways (${st.sw}px > ${st.vw}px)`);

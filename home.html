@@ -139,7 +139,7 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
 <body class="ox-page">
 
 <div class="ox-bar" id="oxBar">
-  <span>Onyx Sports Data · seven sports live · NBA and MLB models graded in public · NFL projections in testing</span>
+  <span>Onyx Sports Data · eight sports live · NBA and MLB models graded in public · NFL projections in testing</span>
   <button onclick="this.parentNode.remove()" aria-label="Dismiss">×</button>
 </div>
 
@@ -331,7 +331,7 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
   <div class="ox-wrap">
     <div class="ox-foot-cols">
       <div class="ox-foot-col"><div class="ox-rule"></div><h5>Picks graded or on trial</h5><a href="nfl.html">Onyx NFL</a><a href="nba.html">Onyx Basketball</a><a href="cfb.html">Onyx College Football</a></div>
-      <div class="ox-foot-col"><div class="ox-rule"></div><h5>Live, model leans</h5><a href="nhl.html">Onyx NHL</a><a href="golf.html">Onyx Golf</a><a href="tennis.html">Onyx Tennis</a><a href="index.html">Onyx Baseball (2026 closed)</a></div>
+      <div class="ox-foot-col"><div class="ox-rule"></div><h5>Live, model leans</h5><a href="nhl.html">Onyx NHL</a><a href="cbb.html">Onyx College Basketball</a><a href="golf.html">Onyx Golf</a><a href="tennis.html">Onyx Tennis</a><a href="index.html">Onyx Baseball (2026 closed)</a></div>
       <div class="ox-foot-col"><div class="ox-rule"></div><h5>The desk</h5><a href="#about">What this is</a><a href="#gamecenter">Gamecenter</a><a href="#record">The record</a><a href="scorecard.html">Scorecard</a><a href="scorecard.html#lab">Rules lab</a><a href="how.html">How it works</a></div>
       <div class="ox-foot-col"><div class="ox-rule"></div><h5>Onyx</h5><a data-onyx="footer" href="#" target="_blank" rel="noopener">Bet on Onyx</a><a href="https://onyxodds.com" target="_blank" rel="noopener">onyxodds.com</a></div>
     </div>
@@ -353,7 +353,7 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
 // ── Onyx Sports hub ─────────────────────────────────────────────
 var ONYX_REFERRER = 'KR680261';
 var ONYX_HOME = 'https://app.onyxodds.com/leagues/NBA?utm_source=onyxsports&referrer=' + ONYX_REFERRER;
-var SPORTS = [   // ranked by daily importance: NFL, NBA, NHL, Golf, Tennis, College Football, MLB
+var SPORTS = [   // ranked by daily importance: NFL, NBA, NHL, Golf, Tennis, College Football, College Basketball, MLB
   {k: 'football', name: 'NFL', lg: 'NFL', live: true, href: 'nfl.html', tone: 'green', big: true, state: 'trial',
    d: 'Live drives, down and distance and win probability. Four prop lanes graded on trial at the opening price, each play with its reasons; projections, touchdown chances and injuries for every game.'},
   {k: 'basketball', name: 'Basketball', lg: 'NBA', live: true, href: 'nba.html', tone: 'purple', big: true, state: 'graded',
@@ -363,6 +363,8 @@ var SPORTS = [   // ranked by daily importance: NFL, NBA, NHL, Golf, Tennis, Col
   {k: 'tennis', name: 'Tennis', lg: 'ATP · WTA', live: true, href: 'tennis.html', tone: 'green', state: 'leans', d: 'Every ATP and WTA singles match, live set by set, with Elo match chances against Onyx prices.'},
   {k: 'cfb', name: 'College Football', lg: 'NCAAF', live: true, href: 'cfb.html', tone: 'lilac', state: 'graded',
    d: 'Every FBS game with the football gamecenter. Spreads graded in public, totals and rushing yards unders on trial, player projections for every starter.'},
+  {k: 'cbb', name: 'College Basketball', lg: 'NCAAB', live: true, href: 'cbb.html', tone: 'blue', state: 'leans',
+   d: 'Every Division I game live by the half, with box scores and minutes. Team ratings priced against every Onyx spread, total and moneyline, as leans until they are tested.'},
   {k: 'baseball', name: 'Baseball', lg: 'MLB', live: true, href: 'index.html', tone: 'blue', state: 'closed',
    d: 'The home run model, strikeout and edge plays and pitch-by-pitch gamecasts. 2026 season closed; the full record stays public.'},
 ];
@@ -388,9 +390,10 @@ function marquees() {
 }
 
 function sports() {
-  const SIZE = ['big', 'mid', '', '', '', 'half', 'half'];
+  // 12-column rows: 7 tiles = 7+5 | 4+4+4 | 6+6; 8 tiles = 7+5 | 4+4+4 | 4+4+4
+  const SIZE = SPORTS.length === 8 ? ['big', 'mid', '', '', '', '', '', ''] : ['big', 'mid', '', '', '', 'half', 'half'];
   document.getElementById('oxSports').innerHTML = SPORTS.map((s, i) => {
-    const sz = SPORTS.length === 7 ? SIZE[i] : (s.big ? 'big' : s.mid ? 'mid' : '');
+    const sz = SPORTS.length === 7 || SPORTS.length === 8 ? SIZE[i] : (s.big ? 'big' : s.mid ? 'mid' : '');
     const tag = !s.live ? '<span class="ox-pill soon">Coming soon</span>' : '<span class="ox-pill live">' + ({graded: 'Live · picks graded', trial: 'Live · picks on trial', leans: 'Live · model leans', closed: 'Season closed · record public'}[s.state] || 'Live') + '</span>';
     const inner = `<div class="ox-sport-top"><span class="n">${String(i + 1).padStart(2, '0')} / ${String(SPORTS.length).padStart(2, '0')}</span>${tag}</div>
       <canvas data-ox-art="${s.k}" data-ox-tone="${s.tone}" data-ox-fade="0" aria-hidden="true"></canvas>
@@ -581,7 +584,7 @@ function lvInit() {
   LV.timer = setInterval(() => { if (!document.hidden) lvLoad(); }, 20000);
 }
 // ── Top 10 plays of the day: every sport build writes data/<sport>/top.json (daily_top.py)
-var T10_SPORTS = [['nfl', 'NFL', 'nfl.html'], ['nba', 'NBA', 'nba.html'], ['nhl', 'NHL', 'nhl.html'], ['tennis', 'Tennis', 'tennis.html'], ['cfb', 'NCAAF', 'cfb.html']];
+var T10_SPORTS = [['nfl', 'NFL', 'nfl.html'], ['nba', 'NBA', 'nba.html'], ['nhl', 'NHL', 'nhl.html'], ['tennis', 'Tennis', 'tennis.html'], ['cfb', 'NCAAF', 'cfb.html'], ['cbb', 'NCAAB', 'cbb.html']];
 var T10_PER_SPORT = 4, T10_PER_GAME = 2, T10_PER_MKT = 1;   // one play per sport and market: ten ideas, not one idea three times
 function t10When(iso) {
   try {
@@ -714,6 +717,8 @@ var LG = [
   {k: 'nba', lg: 'NBA', path: 'basketball/nba', page: 'nba.html', kind: 'basketball'},
   {k: 'nhl', lg: 'NHL', path: 'hockey/nhl', page: 'nhl.html', kind: 'hockey'},
   {k: 'cfb', lg: 'NCAAF', path: 'football/college-football', page: 'cfb.html', kind: 'football', q: 'groups=80&limit=300'},
+  // college basketball's default scoreboard is not today's: ask for the site's day (ET - 4h)
+  {k: 'cbb', lg: 'NCAAB', path: 'basketball/mens-college-basketball', page: 'cbb.html', kind: 'basketball', get q() { return 'groups=50&limit=400&dates=' + siteDay(Date.now()).replace(/-/g, ''); }},
   {k: 'mlb', lg: 'MLB', path: 'baseball/mlb', page: 'index.html', kind: 'baseball'},
 ];
 var MY = {tab: 'live', sb: {}, sum: {}, tn: [], gf: null, nba: null, timer: null};
@@ -773,11 +778,11 @@ async function myPlayers() {
     }
   }
   // NFL, college football, NHL: ESPN athlete ids and game ids
-  for (const L of LG.slice(1, 4)) {
+  for (const L of LG.slice(1, 4).concat(LG.filter(x => x.k === 'cbb'))) {
     for (const f of ls('onyxFollow_' + L.k, [])) {
       const e = evFor(L.k, f.gid);
       const line = e && e.state !== 'pre' ? statLine(L.kind, await sumOf(L, e.id), f.id, f.name) : '';
-      out.push({lg: L.lg, name: f.name, hs: /^\d+$/.test(f.id) ? `https://a.espncdn.com/i/headshots/${L.k === 'cfb' ? 'college-football' : L.k}/players/full/${f.id}.png` : '', live: e && e.state === 'in',
+      out.push({lg: L.lg, name: f.name, hs: /^\d+$/.test(f.id) ? `https://a.espncdn.com/i/headshots/${L.k === 'cfb' ? 'college-football' : L.k === 'cbb' ? 'mens-college-basketball' : L.k}/players/full/${f.id}.png` : '', live: e && e.state === 'in',
                 st: evState(e) || 'Not on this week\'s slate', line, href: `${L.page}#games:${f.gid}`, order: e ? (e.state === 'in' ? 0 : e.state === 'pre' ? 1 : 2) : 3});
     }
   }
@@ -951,7 +956,8 @@ async function loadMy() {
   clearTimeout(MY.timer); MY.timer = setTimeout(loadMy, anyLive ? 20000 : 60000);
 }
 function renderMy() {
-  const live = LG.flatMap(L => evs(L.k).filter(e => e.state === 'in').map(e => [L, e]));
+  // college basketball has ~150 games on a busy night: a dozen of them, not the whole board
+  const live = LG.flatMap(L => evs(L.k).filter(e => e.state === 'in').slice(0, L.k === 'cbb' ? 12 : 99).map(e => [L, e]));
   const next = LG.flatMap(L => evs(L.k).filter(e => e.state === 'pre').map(e => [L, e])).sort((a, b) => String(a[1].start).localeCompare(String(b[1].start))).slice(0, 8);
   const nb = myBetList().length + (ls('onyxNbaSlip', []).length ? 1 : 0);
   const tabs = [['picks', 'My picks', MY_PK.length], ['live', 'Live now', live.length], ['players', 'My players', MY_P.length], ['bets', 'My bets', nb]];

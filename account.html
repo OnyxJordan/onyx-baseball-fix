@@ -114,7 +114,7 @@ body{background:#0c0c0c;color:#fff;margin:0}
 function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'})[c]); }
 function count(k) { try { const a = JSON.parse(localStorage.getItem(k) || '[]'); return Array.isArray(a) ? a.length : 0; } catch (e) { return 0; } }
 function counts() {
-  const follows = ['onyxNbaFollow', 'onyxFollow_nfl', 'onyxFollow_cfb', 'onyxFollow_nhl', 'onyxFollow_tennis', 'onyxFollow_golf'].reduce((n, k) => n + count(k), 0);
+  const follows = ['onyxNbaFollow', 'onyxFollow_nfl', 'onyxFollow_cfb', 'onyxFollow_cbb', 'onyxFollow_nhl', 'onyxFollow_tennis', 'onyxFollow_golf'].reduce((n, k) => n + count(k), 0);
   return {picks: count('onyxSaved'), players: follows, bets: count('onyxMyBets')};
 }
 let SENT = '', ERRM = '', WAIT = 0, TICK = null, TYPED = '';
@@ -176,7 +176,7 @@ addEventListener('onyx-saved', render);
 setInterval(() => { if (!document.hidden) render(); }, 30000);
 
 // ── your record: the permanent pick history (saved.js), graded as games end ──
-const SPN = {nfl: 'NFL', nba: 'NBA', nhl: 'NHL', cfb: 'College', tennis: 'Tennis', golf: 'Golf', mlb: 'MLB'};
+const SPN = {nfl: 'NFL', nba: 'NBA', nhl: 'NHL', cfb: 'College', cbb: 'NCAAB', tennis: 'Tennis', golf: 'Golf', mlb: 'MLB'};
 let SHOW = 30;
 function fmtP(x) { return x == null ? '' : x > 0 ? '+' + x : String(x); }
 function recRender() {

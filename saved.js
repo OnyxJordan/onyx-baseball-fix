@@ -24,6 +24,7 @@
   var ESPN = 'https://site.api.espn.com/apis/site/v2/sports/';
   var LG = {nfl: {path: 'football/nfl', page: 'nfl.html'}, nba: {path: 'basketball/nba', page: 'nba.html'},
     nhl: {path: 'hockey/nhl', page: 'nhl.html'}, cfb: {path: 'football/college-football', page: 'cfb.html', q: 'groups=80&limit=300'},
+    cbb: {path: 'basketball/mens-college-basketball', page: 'cbb.html', q: 'groups=50&limit=400'},
     mlb: {path: 'baseball/mlb', page: 'index.html'}};
   var STAT = {pts: ['basketball', 'PTS'], reb: ['basketball', 'REB'], ast: ['basketball', 'AST'],
     rec: ['receiving', 'REC'], rec_yds: ['receiving', 'YDS'], rush_yds: ['rushing', 'YDS'], pass_yds: ['passing', 'YDS']};

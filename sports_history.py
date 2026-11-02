@@ -64,19 +64,36 @@ def _merge(res, games):
     return n
 
 
-def ingest_daily(lane, path, start, q=""):
-    """Team sports keyed by day (NHL): every day from start to today."""
+def _names(sb, names):
+    """abbreviation -> ESPN names, for matching outside ratings (college basketball's prior)."""
+    for e in sb.get("events") or []:
+        for c in ((e.get("competitions") or [{}])[0]).get("competitors") or []:
+            t = c.get("team") or {}
+            if t.get("abbreviation"):
+                names[t["abbreviation"]] = {"id": t.get("id"), "name": t.get("displayName"), "loc": t.get("location"),
+                                            "short": t.get("shortDisplayName")}
+
+
+def ingest_daily(lane, path, start, q="", months=None, names=None):
+    """Team sports keyed by day (NHL, college basketball): every day from start to
+    today. months: only these calendar months are read (college basketball skips the
+    summer). names: a dict filled with abbreviation -> team names as days are read."""
     res = _load(lane)
     seen = set(res["_seen"])
     today = game_day()
     d, added, calls = start, 0, 0
     while d <= today:
         key = d.isoformat()
+        if months and d.month not in months:
+            d += timedelta(days=1)
+            continue
         if key not in seen or (today - d).days <= RECENT_DAYS:
             sb = espn_get(path + "/scoreboard", (q + "&" if q else "") + "dates=" + d.strftime("%Y%m%d")) or {}
             calls += 1
             season = d.year + 1 if d.month >= 9 else d.year     # ESPN names a hockey season by the year it ends
             added += _merge(res, [_team_game(e, season, (e.get("season") or {}).get("type")) for e in sb.get("events") or []])
+            if names is not None and sb:
+                _names(sb, names)
             if (today - d).days > RECENT_DAYS and sb:
                 seen.add(key)
             time.sleep(0.12)
@@ -187,6 +204,17 @@ def ingest(lane, slate):
     if key == "nhl":
         # last season from its October start, then this one
         return ingest_daily(lane, "hockey/nhl", date(today.year - 1 if today.month >= 9 else today.year - 2, 10, 1))
+    if key == "cbb":
+        # last season from November (the prior), then this one; ESPN names it by the year it ends
+        names = lane.load("teams_espn.json", {}) or {}
+        res = ingest_daily(lane, lane.cfg["espn"][0], date(today.year - 1 if today.month >= 7 else today.year - 2, 11, 1),
+                           lane.cfg.get("espn_q", ""), months=(11, 12, 1, 2, 3, 4), names=names)
+        for g in slate.get("games") or []:
+            for side in ("home", "away"):
+                if g.get(side):
+                    names.setdefault(g[side], {"name": g.get(side + "_name"), "loc": g.get(side + "_loc"), "short": g.get(side + "_short")})
+        lane.save("teams_espn.json", names)
+        return res
     if key in ("cfb", "nfl"):
         season = slate.get("season") or today.year
         wk = None

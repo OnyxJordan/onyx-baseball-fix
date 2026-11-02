@@ -2,7 +2,7 @@
 """
 sports_build.py - build <sport>.html from sport_shell.html.
 
-    python3 sports_build.py nfl|cfb|nhl|tennis|golf
+    python3 sports_build.py nfl|cfb|cbb|nhl|tennis|golf
 
 Reads data/<sport>/slate.json (sports_espn.py), odds.json (sports_odds.py,
 optional) and, for the NFL, player_games.json for nfl_model. Injects the MLB
@@ -17,7 +17,7 @@ from datetime import datetime, timezone
 from sports_common import Lane, SPORTS, game_day, nk
 import sports_lab as L
 
-ONYX_LEAGUE = {"nfl": "NFL", "cfb": "NCAAF", "nhl": "NHL"}
+ONYX_LEAGUE = {"nfl": "NFL", "cfb": "NCAAF", "cbb": "NCAAB", "nhl": "NHL"}
 
 ROADMAP = {
     "nfl": ["Tested 10/26 to 10/31 against two seasons of real Onyx lines (440 games), counting every priced player who played, including games he was never thrown to: receptions unders beat Onyx's opening price in both seasons (+6.1% and +20.1%), so they run on trial at the open; overs did not",
@@ -30,6 +30,9 @@ ROADMAP = {
     "cfb": ["Backtest the team ratings against a season of real Onyx spreads and moneylines before any pick",
             "Drive efficiency and tempo in the ratings, so totals beat the league average",
             "Player projections, built on the NFL engine"],
+    "cbb": ["Backtest the team ratings against a season of real Onyx spreads, totals and moneylines before any pick",
+            "Tempo in the ratings, so totals know a fast team from a slow one",
+            "Player points, rebounds and assists from minutes, built on the box scores this page already keeps"],
     "nhl": ["Tested 10/29 against a season of real Onyx prices: team ratings, skater points and assists from ice time, and starting goalies. None beat Onyx on games they never saw, so NHL stays leans",
             "Tested 10/31: shot-quality (expected goals) ratings from every NHL shot since 2024 (3,008 games). They helped before mid-January 2025-26 but made Onyx's price worse after it and in the first weeks of 2026-27 (moneyline, puck line and total all lost), so they are not used",
             "Skater shots on goal, if Onyx starts pricing them"],
@@ -43,6 +46,7 @@ ROADMAP = {
 METHOD = {
     "football": "Scores, drives, down and distance, win probability and team stats come from ESPN's public feed, refreshed through the day and polled live on this page every 15 to 30 seconds.",
     "hockey": "Scores, periods, goals and team stats come from ESPN's public feed, polled live on this page every 15 to 30 seconds.",
+    "basketball": "Every Division I game comes from ESPN's public feed: scores by the half, every play, box scores with minutes and team stats, polled live on this page every 10 to 30 seconds.",
     "tennis": "Every ATP and WTA singles match this week comes from ESPN's public feed, polled live: set scores, who is serving, rounds and results.",
     "golf": "The leaderboard comes from ESPN's public feed, polled live: position, score to par and every round.",
 }
@@ -604,7 +608,7 @@ def nfl_block(lane, slate, odds):
                 p["trial"] = True
     return block
 
-TEAM_MODELS = {"nfl": "nfl_model", "cfb": "cfb_model", "nhl": "nhl_model"}
+TEAM_MODELS = {"nfl": "nfl_model", "cfb": "cfb_model", "cbb": "cbb_model", "nhl": "nhl_model"}
 DEFAULT_W = 0.3        # model share of the blend until a backtest sets it
 
 
@@ -643,7 +647,7 @@ def game_rows(key, M, slate, odds, R, w):
         if R["n"].get(g["home"], 0) < GP.get("min_games", 3) or R["n"].get(g["away"], 0) < GP.get("min_games", 3):
             continue
         eh, ea = T.expect(R, g["home"], g["away"], g.get("neutral"))
-        pr = (T.fb_probs if kind == "football" else T.hk_probs)(eh, ea, GP)
+        pr = (T.hk_probs if kind == "hockey" else T.fb_probs)(eh, ea, GP)    # basketball: normal margin and total, like football
         unit = "goals" if kind == "hockey" else "pts"
         detail = f"model {g['away']} {ea:.1f} {g['home']} {eh:.1f}"
         proj[g["gid"]] = {"home": round(eh, 2), "away": round(ea, 2), "home_win": round(pr["home_win"], 4), "unit": unit}
@@ -767,15 +771,19 @@ def engine_team(key, M, GP, w, bt, live):
     """The Model tab's breakdown for a team-ratings sport, from the live
     parameters: each step of a price, the factors, the lane."""
     hockey = getattr(M, "KIND", "football") == "hockey"
+    prior = hasattr(M, "PRIOR_KEEP")     # college basketball: ratings pulled toward last season's, not toward average
     unit = "goals" if hockey else "points"
     T = M.GAME_TEST if key == "nfl" else M.TEST
     steps = [
         {"t": "1 · Team ratings", "rows": [
-            ["Built from", f"every final this season and last ({T['n']:,} games held out to test it)" if T.get("n") else "every final this season and last"],
+            ["Built from", ("this season's finals, started from last season's ratings" if hasattr(M, "PRIOR_KEEP") else "every final this season and last")
+             + (f" ({T['n']:,} games held out to test it)" if T.get("n") else "")],
             ["Recency", f"a game {GP['half_life']} days old counts half as much as tonight's (half-life)"],
+            ["Pull to prior", f"each rating starts with {GP['ridge']:g} games' worth of its preseason prior, so a hot start is not a rating"] if prior else
             ["Pull to average", f"each rating starts with {GP['ridge']:g} {'game' if GP['ridge'] == 1 else 'games'}' worth of league average, so a hot start is not a rating".replace("1 game' worth", "1 game's worth")],
             ["Home edge", f"{GP['home']:g} {unit} to the home side, none at a neutral site"],
-            ["Needs", f"{GP.get('min_games', 3)} games for both teams before a line is priced"]]},
+            ["Needs", "a preseason prior for both teams, or {0} games this season".format(GP.get('min_games', 3)) if prior else
+             f"{GP.get('min_games', 3)} games for both teams before a line is priced"]]},
         {"t": "2 · From ratings to a price", "rows": (
             [["Goals", "each side's goals are Poisson around its expected goals"],
              ["Overtime", f"a regulation tie goes to the home side {GP['p_ot_home'] * 100:.0f}% of the time"],
@@ -790,10 +798,12 @@ def engine_team(key, M, GP, w, bt, live):
                   "The backtest gave the model the larger say.")}]
     factors = [
         ["chart", "Offense and defense", f"Every team carries two ratings in {unit}: what it scores above average and what it allows. Tonight's projection is league average plus the home edge plus one side's offense minus the other's defense.", "Foundation", ""],
-        ["clock", "Recency", f"Half-life {GP['half_life']} days: rosters and form move, so last month counts more than last season. The summer break decays last season on its own.", "Tuned", "purple"],
-        ["shield", "Pull to average", f"Ridge {GP['ridge']:g}: ratings are shrunk toward average until a team has earned it, which is what stops a 3-game sample from looking elite.", "Tuned", "blue"],
+        ["clock", "Recency", f"Half-life {GP['half_life']} days: rosters and form move, so last month counts more than last season." + (" Only this season's games are fitted; last season enters through the prior." if prior else " The summer break decays last season on its own."), "Tuned", "purple"],
+        ["shield", "Pull to prior" if prior else "Pull to average", f"Ridge {GP['ridge']:g}: ratings are shrunk toward " + ("the preseason prior" if prior else "average") + f" until a team has earned it, which is what stops a 3-game sample from looking elite.", "Tuned", "blue"],
         ["scale", "Market blend", f"{round(w * 100)}% model, {round((1 - w) * 100)}% Onyx market. Chosen by the backtest against real Onyx prices.", "Market", "blue"],
     ]
+    if hasattr(M, "PRIOR_KEEP"):
+        factors.insert(1, ["clock", "Preseason prior", f"Opening night starts from last season's adjusted efficiency, each team kept at {M.PRIOR_KEEP * 100:.0f}% of its distance from average (rosters turn over), and this season's games move it from there.", "Tuned", "purple"])
     if getattr(M, "NO_TOTALS", False):
         factors.append(["eye", "Totals held back", f"The ratings' totals did not beat a flat league average ({T['mae_total']:.2f} vs {T['base_mae_total']:.2f} {unit} of error), so totals are never leaned or picked.", "Guardrail", "blue"])
     elif T.get("mae_total") is not None:
@@ -1134,19 +1144,25 @@ def team_block(key, lane, slate, odds):
     bt = lane.load("backtest.json", None) or {}
     w = ((bt.get("lane") or {}).get("w")) or DEFAULT_W
     games = (lane.load("results.json", {}) or {}).get("games") or []
-    R = T.fit(games, slate.get("date") or "9999", GP)
+    if hasattr(M, "ratings"):    # college basketball: this season only, pulled toward a preseason prior
+        R = M.ratings(str(lane.data), games, slate.get("date") or str(game_day()), lane.load("teams_espn.json", {}) or {})
+    else:
+        R = T.fit(games, slate.get("date") or "9999", GP)
     rows, proj = game_rows(key, M, slate, odds, R, w)
     cfg = lane.cfg
     unit = "goals" if cfg["kind"] == "hockey" else "points"
     base = L.model_block(
         title="Team ratings against every Onyx game line",
-        note=(f"Every team carries an offense and a defense rating in {unit}, fitted on every final this season and last, "
-              f"recent games weighing more. Each Onyx moneyline, spread and total is priced from them and blended with the Onyx "
+        note=(f"Every team carries an offense and a defense rating in {unit}, fitted on "
+              + ("this season's finals, starting from last season's ratings pulled toward average, " if hasattr(M, "PRIOR_KEEP") else "every final this season and last, ")
+              + f"recent games weighing more. Each Onyx moneyline, spread and total is priced from them and blended with the Onyx "
               f"market. Tracked picks switch on only after the ratings beat real Onyx prices in a backtest."),
         method=[METHOD[cfg["kind"]],
                 f"Ratings: {unit} scored = league average + home edge + the team's offense - the opponent's defense, fitted by weighted "
                 f"least squares with a pull toward average so a team with three games is not rated off three games.",
                 ("Hockey prices: each side's goals are Poisson; a regulation tie goes to overtime. " if cfg["kind"] == "hockey" else
+                 "Basketball prices: the margin and the total are normal around the ratings' projection; the season starts from last "
+                 "season's ratings pulled toward average. " if cfg["kind"] == "basketball" else
                  "Football prices: the margin and the total are normal around the ratings' projection. ") +
                 f"The blend gives the model {round(w * 100)}% and the Onyx market the rest; edge is the blended chance minus the price's implied chance."],
         tests=[{"k": "Win log loss", "v": f"{TEST['logloss']:.3f}", "d": f"vs {TEST['base_logloss']:.3f} home base rate · {TEST['n']} games from {TEST['window']}"},
@@ -1444,6 +1460,7 @@ def main():
                 "onyx_league": ONYX_LEAGUE.get(key)}
     data = {"sport": key, "cfg": page_cfg, "date": slate.get("date"), "label": slate.get("label"),
             "season": slate.get("season"), "games": slate.get("games") or [], "events": slate.get("events") or [],
+            "next_date": slate.get("next_date"), "next_n": slate.get("next_n"),
             "odds": odds or {}, "model": model,
             "generated": datetime.now(timezone.utc).isoformat(timespec="seconds")}
     shell = open("sport_shell.html", encoding="utf-8").read()

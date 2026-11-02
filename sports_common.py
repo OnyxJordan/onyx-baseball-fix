@@ -1,6 +1,6 @@
 """
 sports_common.py - shared helpers for the Onyx Sports lanes beyond MLB and NBA:
-NFL, college football, NHL, tennis and golf.
+NFL, college football, men's college basketball, NHL, tennis and golf.
 
 One engine, one config per sport. Every sport reads and writes only under
 data/<sport>/ and builds only <sport>.html, so a failure in one never touches
@@ -25,7 +25,8 @@ UA = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)"}
 ESPN_SITE = "https://site.api.espn.com/apis/site/v2/sports/"
 
 # kind picks the page's gamecenter: football (field, drives), hockey
-# (periods, shots), tennis (sets), golf (leaderboard).
+# (periods, shots), basketball (halves, plays, box with minutes), tennis
+# (sets), golf (leaderboard).
 # slate: "week" = ESPN's current week, "day" = the game day, "event" = the
 # current tournament(s). optic: OpticOdds sport / league ids for Onyx prices.
 SPORTS = {
@@ -35,6 +36,10 @@ SPORTS = {
     "cfb": {"name": "College Football", "full": "Onyx College Football", "espn": ["football/college-football"],
             "kind": "football", "slate": "week", "optic": ("football", "ncaaf"), "tone": "lilac", "art": "cfb",
             "espn_q": "groups=80&limit=300", "box": True},
+    "cbb": {"name": "College Basketball", "full": "Onyx College Basketball",
+            "espn": ["basketball/mens-college-basketball"], "kind": "basketball", "slate": "day",
+            "optic": ("basketball", "ncaab"), "tone": "lilac", "art": "cbb",
+            "espn_q": "groups=50&limit=400", "box": True},
     "nhl": {"name": "NHL", "full": "Onyx NHL", "espn": ["hockey/nhl"], "kind": "hockey", "slate": "day",
             "optic": ("hockey", "nhl"), "tone": "blue", "art": "hockey"},
     "tennis": {"name": "Tennis", "full": "Onyx Tennis", "espn": ["tennis/atp", "tennis/wta"], "kind": "tennis",

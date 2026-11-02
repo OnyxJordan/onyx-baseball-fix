@@ -153,9 +153,9 @@
 .ox-sport .go span{display:inline-flex;align-items:center;gap:8px}
 .ox-sport .go span::after{content:"\2192";transition:transform .25s}
 .ox-sport:hover .go span::after{transform:translateX(5px)}
-@media (max-width:1000px){.ox-sport,.ox-sport.big,.ox-sport.mid,.ox-sport.half{grid-column:span 6;min-height:380px}.ox-sport:last-child{grid-column:span 12}}
+@media (max-width:1000px){.ox-sport,.ox-sport.big,.ox-sport.mid,.ox-sport.half{grid-column:span 6;min-height:380px}.ox-sport:last-child:nth-child(odd){grid-column:span 12}}
 @media (max-width:620px){
-  .ox-sports{grid-template-columns:1fr}.ox-sport,.ox-sport.big,.ox-sport.mid,.ox-sport.half,.ox-sport:last-child{grid-column:auto;min-height:330px}
+  .ox-sports{grid-template-columns:1fr}.ox-sport,.ox-sport.big,.ox-sport.mid,.ox-sport.half,.ox-sport:last-child,.ox-sport:last-child:nth-child(odd){grid-column:auto;min-height:330px}
   .ox-sport canvas{min-height:140px}
 }
 

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>College Basketball Minutes and Depth Charts</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0c0c0c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Onyx Sports">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<meta name="description" content="Projected minutes and depth charts for every Division I men's basketball team: last season's role, transfers, freshmen and this season's minutes.">
+<link rel="stylesheet" href="onyx.css">
+<script src="onyx.js" defer></script>
+<script src="saved.js"></script>
+<style>
+body{background:#0c0c0c;color:#fff;margin:0}
+.pp{padding-top:22px;padding-bottom:40px}
+.pp h1{margin:12px 0 0;font-size:clamp(32px,7.5vw,54px);line-height:1}
+.lead{margin:10px 0 0;color:#b9b2c4;font-size:15px;line-height:1.65;max-width:760px}
+.back{display:inline-block;color:#d795ff;font:700 12px monospace;letter-spacing:.06em;text-transform:uppercase;text-decoration:none}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:16px}
+.kpis div{padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03)}
+.kpis b{display:block;font:800 18px monospace}.kpis span{font-size:11.5px;color:#a79fb5;line-height:1.4}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:20px 0 10px}
+.tabs button{padding:9px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:#ddd;font:700 12px monospace;letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
+.tabs button.on{background:rgba(162,75,255,.22);border-color:#a24bff;color:#fff}
+.find{width:100%;box-sizing:border-box;background:#0d0a12;border:1px solid #3a2a55;border-radius:12px;padding:12px 14px;color:#fff;font:inherit;font-size:16px}
+.sug{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.sug button{padding:6px 10px;border-radius:999px;border:1px solid #3a2a55;background:none;color:#d795ff;font:700 11px monospace;cursor:pointer}
+.th{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:18px 0 8px}.th h2{margin:0;font-size:26px}.th span{color:#a79fb5;font:600 12px monospace}
+.dc{display:flex;flex-direction:column;gap:6px}
+.pr{display:grid;grid-template-columns:44px 1fr auto;gap:4px 10px;align-items:center;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07)}
+.pr.Starter{border-color:rgba(176,56,249,.35);background:rgba(162,75,255,.06)}
+.pr img,.pr .ph{width:44px;height:44px;border-radius:10px;object-fit:cover;background:rgba(255,255,255,.06);grid-row:1/3}
+.pr .n{font-weight:700;font-size:14.5px;line-height:1.25}.pr .n small{font:600 11px monospace;color:#8f879c;margin-left:6px}
+.pr .m{grid-column:2;font:600 11px monospace;color:#a79fb5;line-height:1.5}
+.pr .mp{grid-column:3;grid-row:1/3;text-align:right}.pr .mp b{display:block;font:800 20px monospace}.pr .mp span{font:600 9px monospace;letter-spacing:.06em;text-transform:uppercase;color:#8f879c}
+.tag{display:inline-block;padding:2px 7px;border-radius:999px;font:700 9.5px monospace;letter-spacing:.05em;text-transform:uppercase;margin-right:4px;vertical-align:1px}
+.tag.t{background:rgba(99,91,255,.2);color:#b7b2ff}.tag.f{background:rgba(97,233,112,.14);color:#61e970}.tag.r{background:rgba(255,255,255,.08);color:#cfc8da}
+.tag.s{background:rgba(176,56,249,.22);color:#e9c8ff}
+.up{color:#61e970}.dn{color:#ff8a8a}
+.role{font:700 10px monospace;letter-spacing:.1em;text-transform:uppercase;color:#d795ff;margin:12px 0 2px}
+.note{color:#9a93a6;font-size:12px;line-height:1.6;margin-top:16px}
+.list{display:flex;flex-direction:column;gap:6px}
+.more{margin-top:10px;background:none;border:1px solid #3a2a55;color:#d795ff;font:700 12px monospace;border-radius:999px;padding:9px 14px;cursor:pointer}
+</style>
+</head>
+<body class="ox-page">
+<main>
+<section class="ox-wrap pp">
+  <a class="back" href="cbb.html">‹ College Basketball</a>
+  <span class="ox-eyebrow" style="display:block;margin-top:14px">Minutes and depth charts</span>
+  <h1>Who plays,<br>and how much.</h1>
+  <p class="lead">Every Division I roster, projected: each player's minutes from last season's role, his class, the level of any transfer and the competition on his new roster, with this season's real minutes taking over as games are played.</p>
+  <div class="kpis" id="kpis"></div>
+  <div class="tabs" id="tabs"><button class="on" data-v="team">Depth charts</button><button data-v="portal">Portal tracker</button><button data-v="fresh">Freshmen</button></div>
+  <div id="view"></div>
+  <p class="note" id="method"></p>
+</section>
+</main>
+<script>
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'})[c]);
+let D = null, V = 'team', TEAM = null, LIM = 40;
+const sgn = x => x > 0 ? '+' + x : String(x);
+function last(p) {
+  const l = p.last; if (!l) return p.rec ? `Recruit rating ${Math.round(p.rec)}` : 'No college minutes last season';
+  return `${esc(l.t)} ${String(l.s - 1).slice(2)}-${String(l.s).slice(2)}: ${l.mpg ?? '-'} min, ${l.ppg ?? '-'} pts, ${l.rpg ?? '-'} reb, ${l.apg ?? '-'} ast${l.bpm != null ? ', BPM ' + sgn(l.bpm) : ''}`;
+}
+function tags(p) {
+  if (p.g === 'transfer') return `<span class="tag t">Transfer</span>from ${esc(p.from)} <span class="${p.lvl > 0 ? 'dn' : 'up'}">(${p.lvl > 0 ? 'step up ' : 'step down '}${Math.abs(p.lvl)})</span>`;
+  if (p.g === 'newcomer') return `<span class="tag f">${(p.cls || '').toUpperCase() === 'FR' ? 'Freshman' : 'Newcomer'}</span>`;
+  return `<span class="tag r">Returning</span>`;
+}
+function row(p, team) {
+  const now = p.now ? ` · this season ${p.now.gp} g, ${p.now.mpg} min` : '';
+  return `<div class="pr ${esc(p.role)}">${p.hs ? `<img src="${esc(p.hs)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">` : '<span class="ph"></span>'}
+    <span class="n">${esc(p.n)}<small>${esc([team, p.pos, p.cls, p.ht].filter(Boolean).join(' · '))}</small></span>
+    <span class="m">${tags(p)}<br>${last(p)}${now}</span>
+    <span class="mp"><b>${p.mpg}</b><span>min / game</span></span></div>`;
+}
+function teamView() {
+  const keys = Object.keys(D.teams).sort((a, b) => D.teams[a].name.localeCompare(D.teams[b].name));
+  const pick = TEAM && D.teams[TEAM] ? TEAM : null;
+  let h = `<input class="find" id="find" placeholder="Find a team or a player" autocomplete="off"><div class="sug" id="sug"></div>`;
+  if (pick) {
+    const t = D.teams[pick];
+    h += `<div class="th"><h2>${esc(t.name)}</h2><span>${t.em_last != null ? 'last season adjusted margin ' + sgn(t.em_last) : ''}</span></div><div class="dc">`;
+    let role = '';
+    t.players.forEach(p => { if (p.role !== role) { role = p.role; h += `<div class="role">${esc(role === 'Starter' ? 'Projected starters' : role)}</div>`; } h += row(p); });
+    h += '</div>';
+  } else h += `<p class="lead" style="margin-top:14px">Type a team (Duke, Purdue, Gonzaga) or a player.</p>`;
+  document.getElementById('view').innerHTML = h;
+  const f = document.getElementById('find'), sug = document.getElementById('sug');
+  f.oninput = () => {
+    const q = f.value.trim().toLowerCase(); if (q.length < 2) { sug.innerHTML = ''; return; }
+    const ts = keys.filter(k => D.teams[k].name.toLowerCase().includes(q) || k.toLowerCase() === q).slice(0, 6).map(k => `<button data-t="${k}">${esc(D.teams[k].name)}</button>`);
+    const ps = []; keys.forEach(k => D.teams[k].players.forEach(p => { if (ps.length < 6 && p.n.toLowerCase().includes(q)) ps.push(`<button data-t="${k}">${esc(p.n)} · ${esc(D.teams[k].name)}</button>`); }));
+    sug.innerHTML = ts.concat(ps).join('');
+    sug.querySelectorAll('button').forEach(b => b.onclick = () => { TEAM = b.dataset.t; history.replaceState(null, '', '#' + TEAM); teamView(); });
+  };
+  if (!pick) f.focus();
+}
+function allPlayers(filter) { const a = []; Object.keys(D.teams).forEach(k => D.teams[k].players.forEach(p => { if (filter(p)) a.push([p, D.teams[k].name, k]); })); return a; }
+function listView(title, sub, items) {
+  document.getElementById('view').innerHTML = `<div class="th"><h2>${title}</h2><span>${sub}</span></div><div class="list">${items.slice(0, LIM).map(([p, tn, k]) => row(p, tn)).join('')}</div>${items.length > LIM ? '<button class="more" id="more">Show more</button>' : ''}`;
+  const m = document.getElementById('more'); if (m) m.onclick = () => { LIM += 60; render(); };
+}
+function render() {
+  if (V === 'team') return teamView();
+  if (V === 'portal') return listView('The portal, projected', 'every transfer, by projected minutes', allPlayers(p => p.g === 'transfer').sort((a, b) => b[0].mpg - a[0].mpg));
+  return listView('Freshmen and newcomers', 'by projected minutes', allPlayers(p => p.g === 'newcomer' && p.mpg >= 6).sort((a, b) => b[0].mpg - a[0].mpg));
+}
+document.querySelectorAll('#tabs button').forEach(b => b.onclick = () => { V = b.dataset.v; LIM = 40; document.querySelectorAll('#tabs button').forEach(x => x.classList.toggle('on', x === b)); render(); });
+fetch('data/cbb/minutes.json', {cache: 'no-cache'}).then(r => r.json()).then(d => {
+  D = d; TEAM = decodeURIComponent((location.hash || '').slice(1)) || null;
+  const all = allPlayers(() => true), tr = all.filter(x => x[0].g === 'transfer').length, nw = all.filter(x => x[0].g === 'newcomer').length;
+  document.getElementById('kpis').innerHTML = `<div><b>${Object.keys(d.teams).length}</b><span>Division I teams</span></div><div><b>${all.length.toLocaleString()}</b><span>players projected</span></div><div><b>${tr}</b><span>transfers on new rosters</span></div><div><b>${nw}</b><span>freshmen and newcomers</span></div>`;
+  document.getElementById('method').textContent = 'How it is built: a separate model for returning players, transfers and newcomers, fitted on four seasons of Torvik player data and tested on 2025-26 without seeing it: 6.0 minutes per game off on average against 7.4 for "same minutes as last season", and 5.9 against 8.6 for transfers. In season, each game of real minutes counts as much as a third of the projection. Freshmen without a recruit rating start low and move with their real minutes. Research, not tracked picks.';
+  render();
+}).catch(() => { document.getElementById('view').innerHTML = '<p class="lead">Could not load the projections right now.</p>'; });
+</script>
+</body>
+</html>

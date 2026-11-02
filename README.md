@@ -408,6 +408,25 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
   - `sports_build.py <sport>` builds the page from `sport_shell.html`. It injects the MLB
     stylesheet (like `nba_build.py`), the sport key (`window.OX_SITE`, which `ui.js`
     reads for the bar, menu, search and footer) and `SD`.
+- **College basketball (`cbb`, 11/2):** men's Division I on the same engine, `kind:
+  "basketball"`, a day slate (ESPN `basketball/mens-college-basketball`, `groups=50`;
+  ESPN's undated scoreboard is NOT today's games, so the page, the hub and the slate
+  always pass `dates=`). `sports_history` reads finals by day from last November,
+  skipping May to October, and keeps `teams_espn.json` (abbreviation to names).
+  `sports_espn.ingest_bb_box` reads this season's finals into a columnar
+  `player_games.json` (`cols` + `rows`: minutes, starter, DNP, points, makes and
+  attempts, rebounds, assists, steals, blocks, turnovers, fouls), newest first, at most
+  260 games or 120 seconds a run, so cbb runs LAST in the sports loop (the step has a
+  12-minute cap). An empty slate stores `next_date` and the page says when play resumes.
+  `cbb_model.py` (v1, leans: no `backtest.json`) fits this season only, every rating
+  pulled toward a preseason prior: last season's Torvik adjusted efficiency from
+  `data/cbb/history/teams.json` (Torvik names mapped to ESPN abbreviations in
+  `cbb_model.ALIAS`) kept at 85%, or, without that file, last season's own fitted
+  ratings (ridge 1). `team_model.fit` takes the prior as `carry_off` / `carry_def`
+  (and `mu0` / `mu_k`); without them it is unchanged. Onyx league `ncaab`: moneyline,
+  spread, total, player points / rebounds / assists / made threes (NBA market ids, not
+  yet confirmed by a markets probe). Gate: `tools/verify_sports.js` renders a real
+  finished-game box score from `tools/fixtures/cbb_summary.json`.
 - **Template:** Home, Games, Onyx Board, Plays and Model tabs. The page polls ESPN's
   scoreboard live: every 15s while anything is live, otherwise every 30s. Gamecenters
   by kind:
@@ -415,6 +434,9 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
     down and distance, win probability, scoring plays, drives, team stats and leaders.
     All from ESPN's `summary`.
   - **Hockey:** by-period scores, goals and team stats.
+  - **Basketball:** score by half, the latest plays, win probability, team stats,
+    leaders, and a box score (starters, bench, DNP, team totals) with MIN PTS REB AST
+    3PM FG FT STL BLK TO PF that scrolls sideways inside its card on a phone.
   - **Tennis:** live and finished singles matches by tournament, set scores and who is
     serving.
   - **Golf:** a searchable leaderboard with every round.
