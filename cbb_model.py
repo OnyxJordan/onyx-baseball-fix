@@ -5,6 +5,18 @@ started each season from last season's ratings pulled toward average.
 
 Changelog (newest first; each entry cites its evidence)
 
+  Tested 11/2, NOT adopted (still v2): the transfer-aware preseason blend
+    (data/cbb/team_prior.json's method; ratings(blend=...)) as the prior in place of last
+    season's Torvik kept 85%. Walk-forward on 5,489 games with real Onyx 2025-26 prices
+    (tools/cbb_price_backtest.py; 2025-26 prior from tools/cbb_transfers_backtest.py --prior
+    2026, weights fitted on earlier seasons only). Keep 1.0 chosen on Nov-Dec (win log loss
+    .4460 vs .4504 at .85). Judged on 1/1-4/9/2026 (3,248 priced games): log loss .5789 vs
+    .5811, margin error 8.890 vs 8.920, total error 13.507 vs 13.511, all slightly better.
+    Onyx ROI under the Top 10 rule (blend 30%), held out, open / close: spread +2.3% / -9.7%
+    (v2 -7.6% / -6.6%), total -0.3% / +0.7% (v2 +6.8% / +9.4%), moneyline +25.0% / +6.1%
+    (v2 -7.1% / +6.4%); pooled +6.6% / -3.1% against v2's -3.3% / +1.9%. Better at the
+    open, worse at the close: not a clear win, so v2's prior stays live.
+
   v2  11/2  Pace in totals. Still LEANS ONLY (sports_lab.gate: no Onyx price
       backtest; this version bump would send it back to the lab anyway).
       The total now comes from possessions x efficiency: a second fit on log
@@ -68,6 +80,7 @@ P = {"half_life": 120, "ridge": 6, "home": 3.5, "sd_margin": 11.0, "sd_total": 1
 # season to season, efficiency margin .82); ridge_pace is how many games' worth of that prior each
 # pace rating carries (final scores alone barely separate pace from offense and defense)
 PACE_KEEP = 0.5
+BLEND_KEEP = 1.0      # share of the transfer-aware blend's distance from average a team starts with (tested 11/2, not live)
 P2 = {"half_life": 120, "ridge": 6, "ridge_pace": 30, "home": 3.5, "mu0": 72.0, "mu_k": 40, "iters": 15}
 TEST = {"n": 3528, "logloss": 0.585, "base_logloss": 0.697, "mae_total": 13.62, "base_mae_total": 15.42,
         "mae_total_v1": 13.76, "mae_total_close": 13.38, "window": "1/1/2026 on"}
@@ -180,6 +193,35 @@ def prior_pace(lane_dir, season, names):
     return (o, d, pc, tm, eo) if o else None
 
 
+def prior_blend_rows(teams):
+    """{ESPN abbr: (adj_o, adj_d)} per 100 possessions from a team_prior.json "teams" table: the
+    player-based rating's offense / defense split (adj_o, adj_d sum to "ours") moved half each way
+    so the margin is the "blend" with Torvik's preseason rating. Teams without a blend are left out."""
+    out = {}
+    for ab, t in (teams or {}).items():
+        b, o, ao, ad = t.get("blend"), t.get("ours"), t.get("adj_o"), t.get("adj_d")
+        if b is None or o is None or ao is None or ad is None:
+            continue
+        out[ab] = (ao + (b - o) / 2.0, ad - (b - o) / 2.0)
+    return out
+
+
+def prior_from_blend(teams, keep=None):
+    """v3 priors from the transfer-aware blend: ((carry_off, carry_def) in points, log-scale
+    (off, def)) or None. keep: the share of each team's distance from average it starts with."""
+    keep = BLEND_KEEP if keep is None else keep
+    rows = prior_blend_rows(teams)
+    if len(rows) < 100:
+        return None
+    eo = sum(v[0] for v in rows.values()) / len(rows)
+    ed = sum(v[1] for v in rows.values()) / len(rows)
+    co = {ab: keep * (o - eo) * TEMPO / 100 for ab, (o, d) in rows.items()}
+    cd = {ab: keep * (ed - d) * TEMPO / 100 for ab, (o, d) in rows.items()}
+    lo = {ab: keep * math.log(o / eo) for ab, (o, d) in rows.items()}
+    ld = {ab: keep * math.log(ed / d) for ab, (o, d) in rows.items()}
+    return (co, cd), (lo, ld)
+
+
 def _days(a, b):
     return (date.fromisoformat(b) - date.fromisoformat(a)).days
 
@@ -248,16 +290,19 @@ def fit_pace(games, as_of, prior, Q=None):
             "expect": expect}
 
 
-def ratings(lane_dir, games, as_of, names=None, P_=None, pace=True):
+def ratings(lane_dir, games, as_of, names=None, P_=None, pace=True, blend=None):
     """This season's ratings as of an ISO date, pulled toward the preseason prior.
     A team with a prior counts as min_games played, so it is priced from opening night.
     v2: with Torvik's file the total comes from the pace ratings (fit_pace), the margin from v1's
-    additive ratings; without the file (or pace=False) it is v1 exactly."""
+    additive ratings; without the file (or pace=False) it is v1 exactly.
+    blend: a team_prior.json "teams" table; its transfer-aware blend replaces last season's Torvik
+    efficiency as the prior (offense and defense, both fits; tempo still from last season)."""
     import team_model as T
     P_ = dict(P_ or P)
     season = season_of(as_of)
-    pr = prior_torvik(lane_dir, season, names) or prior_results(games, season, P_)
-    P_["_prior"] = None if not pr else "torvik" if (Path(lane_dir) / "history" / "teams.json").exists() else "results"
+    pb = prior_from_blend(blend) if blend else None
+    pr = (pb[0] if pb else None) or prior_torvik(lane_dir, season, names) or prior_results(games, season, P_)
+    P_["_prior"] = None if not pr else "blend" if pb else "torvik" if (Path(lane_dir) / "history" / "teams.json").exists() else "results"
     if pr:
         P_["carry_off"], P_["carry_def"] = pr
     cur = [g for g in games if g.get("season") == season]
@@ -267,6 +312,11 @@ def ratings(lane_dir, games, as_of, names=None, P_=None, pace=True):
         for t in pr[0]:
             R["n"][t] = max(R["n"].get(t, 0), P_.get("min_games", 3))
     pp = prior_pace(lane_dir, season, names) if pace else None
+    if pp and pb:
+        # the blend's offense and defense; last season's tempo for pace (no preseason tempo in the blend);
+        # a team new to the blend but in Torvik's table keeps its Torvik prior
+        lo, ld = pb[1]
+        pp = (dict(pp[0], **lo), dict(pp[1], **ld), pp[2], pp[3], pp[4])
     if pp:
         # v2: the margin stays v1's additive ratings (pace did not improve it: 8.966 vs 8.955), the
         # total comes from possessions x efficiency (13.62 vs 13.76 on games it never saw)

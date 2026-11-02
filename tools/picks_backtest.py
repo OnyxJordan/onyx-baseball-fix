@@ -33,7 +33,8 @@ the market back to projections until this is re-run.
 
 Sources (all local, see tools/rules_lab_build.py for how bt/ is pulled):
   team game lines  tools/sports_backtest.team_samples on bt/nfl_game.json, bt/cfb_lines.json,
-                   bt/nhl_lines.json; chance = the live blend at the backtest lane weight
+                   bt/nhl_lines.json; college basketball from tools/cbb_price_backtest.samples on
+                   bt/cbb_lines.json; chance = the live blend at the backtest lane weight
   tennis moneyline tools/sports_backtest.tennis_samples (Elo), same blend
   NBA props        tools/nba_backtest.walk (v8, confirmed lineups, simulated roster), the live
                    20/80 model / Onyx blend, 28+ projected minutes like the Top 10
@@ -172,6 +173,26 @@ def team_markets():
                 (ro if r["when"] == "o" else rc).append(c)
             out.append(market(key, mk, M.VERSION, f"team ratings blended {round(w * 100)}% with Onyx's no-vig price",
                               f"{f}, ESPN finals", SB.SPLIT[key], ro, rc))
+    if os.path.exists("bt/cbb_lines.json"):
+        # college basketball: cbb_model.ratings walk-forward (tools/cbb_price_backtest.py maps Onyx's names to ESPN)
+        import cbb_model as CM
+        import cbb_price_backtest as CPB
+        bt = (json.load(open("data/cbb/backtest.json")) if os.path.exists("data/cbb/backtest.json") else {})
+        w = (bt.get("lane") or {}).get("w") or 0.3          # sports_build.team_block: the live blend weight (DEFAULT_W without a backtest)
+        S, _ = CPB.samples("bt/cbb_lines.json")
+        for mk in ("ml", "spread", "total"):
+            ro, rc = [], []
+            for r in S:
+                if r["mkt"] != mk:
+                    continue
+                ps = L.price_side(r["p"], r["over"], r["under"], w)
+                if not ps:
+                    continue
+                c = cand(r["date"], (r["gid"], mk), ps["side"], ps["prob"], ps["price"], (r["y"] == 1) == (ps["side"] == "over"))
+                (ro if r["when"] == "o" else rc).append(c)
+            out.append(market("cbb", mk, CM.VERSION, f"team ratings blended {round(w * 100)}% with Onyx's no-vig price",
+                              "bt/cbb_lines.json (Onyx 2025-26), ESPN finals", CPB.SPLIT, ro, rc,
+                              held="Jan 1 to Apr 9 2026 (Nov-Dec 2025 tuned the blend weight)"))
     if os.path.exists("bt/tennis_atp_lines.json"):
         import tennis_model as TM
         bt = json.load(open("data/tennis/backtest.json"))
@@ -337,8 +358,8 @@ NO_REPLAY = [
     ("nfl", "pass_yds", "Nothing to replay: excluded from plays by the model's own re-test (v7, v12 dropped the v11 overs), so the Top 10 rule can never pick one."),
     ("nfl", "anytime_td", "Nothing to replay: the chance shown is Onyx's own price x .82 (v6), always below the price, so it is never value and never a pick."),
     ("cfb", "anytime_td", "Nothing to replay: the chance shown is Onyx's own price x .82, on the Ask Onyx board only, never value."),
-    ("cbb", "all", "No Onyx college basketball price history on file (cbb_model's own backtest grades against ESPN closing lines, "
-                   "not Onyx prices). Needs an Onyx lines pull for 2025-26 (odds_probe.yml, job=lines) before it can be replayed."),
+    ("cbb", "props", "College basketball player props have no Onyx price history on file and no backtested projection, so they "
+                     "stay projections. Game lines (moneyline, spread, total) are replayed above."),
     ("golf", "all", "Onyx prices no golf markets."),
     ("mlb", "all", "Season closed 10/29; MLB markets return with the 2027 season (HR and K lanes keep their own records)."),
 ]

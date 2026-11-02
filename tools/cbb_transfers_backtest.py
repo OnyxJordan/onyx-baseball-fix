@@ -237,6 +237,52 @@ def z_vs(w, l, p0):
 ALLG = {}
 
 
+def prior_season(Y, out_path):
+    """The preseason team prior for season Y exactly as cbb_transfers.build makes it live (ours, the
+    offense / defense split, the blend with Torvik's preseason rating), but with every weight fitted
+    on seasons before Y only: what the live file would have said the day before Y began. Written as
+    {"season": Y, "teams": {ESPN abbr: {ours, blend, torvik_pre, adj_o, adj_d}}} for
+    tools/cbb_price_backtest.py (the cbb_model v3 test). Rosters are the players who actually played
+    that season (the same small look-ahead the team backtest notes)."""
+    PFY = {y: fit_players(range(FIRST, y)) for y in range(2012, Y + 1)}
+    TR_ = {y: team_rows(y, team_sums(y, PFY[y])) for y in range(2012, Y + 1)}
+    train = [r for y in range(2012, Y) for r in TR_[y]]
+    a_ours = lstsq([[1, r["o"], r["d"], r["last"]] for r in train], [r["act"] for r in train])
+    a_off = lstsq([[1, r["o"], r["last_o"]] for r in train], [r["act_o"] for r in train])
+    a_def = lstsq([[1, r["d"], r["last_d"]] for r in train], [r["act_d"] for r in train])
+    cache = {}
+
+    def ow(r):          # each earlier season projected with the fit it would have had
+        if r["Y"] not in cache:
+            cache[r["Y"]] = lstsq([[1, q["o"], q["d"], q["last"]] for y in range(2012, r["Y"]) for q in TR_[y]],
+                                  [q["act"] for y in range(2012, r["Y"]) for q in TR_[y]])
+        at = cache[r["Y"]]
+        return at[0] + at[1] * r["o"] + at[2] * r["d"] + at[3] * r["last"]
+    btrain = [r for y in range(2019, Y) for r in TR_[y] if r["pre"] is not None]
+    bl = lstsq([[1, ow(r), r["pre"]] for r in btrain], [r["act"] for r in btrain])
+    mo1 = float(np.mean([v["adj_o"] for v in TT[Y - 1].values()]))
+    md1 = float(np.mean([v["adj_d"] for v in TT[Y - 1].values()]))
+    tmap = json.load(open(os.path.join(CT.HIST, "team_map.json")))
+    ab_of = {v["torvik"]: v["abbr"] for v in tmap.values()}
+    teams = {}
+    for r in TR_[Y]:
+        ab = ab_of.get(r["team"])
+        if not ab:
+            continue
+        ours = a_ours[0] + a_ours[1] * r["o"] + a_ours[2] * r["d"] + a_ours[3] * r["last"]
+        po = a_off[0] + a_off[1] * r["o"] + a_off[2] * r["last_o"]
+        pdf = a_def[0] + a_def[1] * r["d"] + a_def[2] * r["last_d"]
+        share = (ours - po - pdf) / 2.0
+        blend = (bl[0] + bl[1] * ours + bl[2] * r["pre"]) if r["pre"] is not None else None
+        teams[ab] = {"torvik": r["team"], "ours": round(float(ours), 2), "blend": None if blend is None else round(float(blend), 2),
+                     "torvik_pre": None if r["pre"] is None else round(float(r["pre"]), 2),
+                     "adj_o": round(mo1 + po + share, 2), "adj_d": round(md1 - (pdf + share), 2)}
+    json.dump({"season": Y, "generated": "tools/cbb_transfers_backtest.py --prior", "blend_w": [round(float(v), 4) for v in bl],
+               "teams": teams}, open(out_path, "w"), indent=1)
+    print(f"wrote {out_path}: {len(teams)} teams, {sum(1 for t in teams.values() if t['blend'] is not None)} with a blend, "
+          f"blend weights {[round(float(v), 3) for v in bl]}")
+
+
 def main():
     print("== player fits, walk-forward ==")
     PF = {}
@@ -419,4 +465,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    if "--prior" in sys.argv:      # --prior 2026 bt/cbb_prior_2026.json: one season's walk-forward prior only
+        i = sys.argv.index("--prior")
+        prior_season(int(sys.argv[i + 1]), sys.argv[i + 2])
+    else:
+        main()
