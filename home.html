@@ -76,7 +76,7 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
 .ask-box button{flex-shrink:0;padding:0 18px;border-radius:16px;border:0;background:linear-gradient(135deg,#b038f9,#635bff);color:#fff;font:800 13px monospace;letter-spacing:.06em;cursor:pointer}
 .ask-ex{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:10px 0 4px}.ask-ex::-webkit-scrollbar{display:none}
 .ask-ex button{flex-shrink:0;padding:7px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:#cfc8da;font:600 12px var(--ox-body,system-ui);cursor:pointer}
-.ask-u{font:600 11px monospace;color:#9a93a6;margin:12px 0 10px;line-height:1.5}.ask-u b{color:#d795ff}
+.ask-u{font:600 11px monospace;color:#9a93a6;margin:12px 0 10px;line-height:1.5}.ask-u b{color:#d795ff}.ask-u a{color:#d795ff}
 .ask-say{font-size:15px;line-height:1.5;color:#efeaf7;margin:14px 0 4px}.ask-why{font-size:14px;line-height:1.55;color:#cfc7dc;border-left:2px solid #a24bff;padding:2px 0 2px 12px;margin:14px 0}
 .ask-cl{border:1px solid #3a2a55;border-radius:14px;padding:14px 16px;margin:12px 0;background:rgba(162,75,255,.06)}.ask-cl b{display:block;font-size:15px;line-height:1.45;color:#efeaf7;margin-bottom:10px}.ask-cl .ask-ex{flex-wrap:wrap}
 .lv-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-top:12px}
@@ -423,7 +423,7 @@ async function getJSON(u) { const r = await fetch(u, {cache: 'no-cache'}); if (!
 // ── Ask Onyx (ask.js does the work; this draws it) ──
 var ASK_EX = ['3-leg parlay NBA points overs minimum odds -200', 'Round robin 4 picks by 2s', 'Parlay that pays +500', 'First TD scorer Sunday', 'Player most likely to score 2 TDs', 'Your favorite correlated SGP',
               'What do you like tonight', 'Lock of the day', 'Mahomes', 'Lakers game SGP', 'Give me a 4 legger for Sunday',
-              'Most value in college football', 'Underdogs to win this weekend', 'Who scores the most points tonight'];
+              'Most value in college football', 'College basketball best bets tonight', 'Duke spread', 'Who starts for Kentucky', 'Underdogs to win this weekend', 'Who scores the most points tonight'];
 function askInit() {
   const ex = document.getElementById('askEx'); if (!ex) return;
   ex.innerHTML = ASK_EX.map((q, i) => `<button type="button" onclick="OnyxAsk.reset();document.getElementById('askQ').value=ASK_EX[${i}];askGo(ASK_EX[${i}])">${esc(q)}</button>`).join('');
@@ -471,8 +471,18 @@ async function askGo(q, forced) {
       `<button type="button" onclick="askPick(${i})">${esc(o.label)}</button>`).join('')}<button type="button" onclick="document.getElementById('askQ').focus()">Something else</button></div></div>`;
     return;
   }
+  // a depth question (who starts, minutes, pace): our depth model's numbers, with the full chart a tap away
+  if (R.depth) {
+    const nth = n => n + ([, 'st', 'nd', 'rd'][n % 100 >> 3 ^ 1 && n % 10] || 'th');
+    out.innerHTML = understood + (R.depth.length ? R.depth.map(d => `<div class="ask-u"><b>${esc(d.team)}</b> · ${esc(d.lg)}${d.pace != null ? ` · ${esc(d.pace_label)}: ${esc(String(d.pace))}${d.pace_rank ? ` (${nth(d.pace_rank[0])} fastest of ${d.pace_rank[1]})` : ''}` : ''} · <a href="${esc(d.link)}">Full depth chart</a></div>
+      <div class="t10-list">${d.rows.map((p, i) => `<div class="t10-r${p.n === d.focus ? ' top' : ''}"><div class="t10-n">${i + 1}</div>
+        <div class="t10-w"><b>${esc(p.n)}</b><span>${esc([p.pos, p.role, p.tag].filter(Boolean).join(' · '))}</span></div>
+        <div class="t10-c"><b>${p.use != null ? esc(String(p.use)) : '-'}</b><small>${esc(d.unit)}</small></div>
+        <div class="t10-f">${p.stats.map(s => `<span class="t10-tag proj">${esc(s[1] + ' ' + s[0])}</span>`).join('')}</div></div>`).join('')}</div>`).join('') : '');
+    return;
+  }
   if (!R.rows.length) { out.innerHTML = understood + `<div class="my-empty">${R.spec.player ? `No Onyx line on ${esc(R.spec.player)} right now: his game may have started already, or he isn't on today's board.`
-    : R.spec.team ? `No ${esc(R.spec.team)} line on today's Onyx board${(R.spec.markets || []).length ? ' for that market' : ''}: they may not play today, or their game has started.`
+    : R.spec.team ? `No ${esc(R.spec.school || R.spec.team)} line on today's Onyx board${(R.spec.markets || []).length ? ' for that market' : ''}: they may not play today, or their game has started.`
     : `Nothing on today's Onyx board matches that${R.spec.min_price != null || R.spec.max_price != null ? ' at those prices' : ''}. Try loosening it, or a different sport.`}</div>`; return; }
   const short = R.spec.intent !== 'list' && R.rows.length < (R.spec.count || 3) ? ` · only ${R.rows.length} leg${R.rows.length > 1 ? 's' : ''} on today's board fit what you asked` : '';
   const SG = R.parlay && R.parlay.same_game;
