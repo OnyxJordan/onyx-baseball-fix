@@ -1,1 +1,46 @@
-[]
+[
+ {
+  "date": "2026-11-02",
+  "key": "401858512|darius taylor|rush_yds",
+  "gid": "401858512",
+  "pid": "4920901",
+  "name": "Darius Taylor",
+  "team": "MINN",
+  "opp": "UCLA",
+  "matchup": "MINN vs UCLA",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 40.5,
+  "price": -114,
+  "sel": "8eaa4906-ee4a-475d-9fdb-542fbfee662a",
+  "proj": 23.9,
+  "prob": 0.6339,
+  "implied": 0.5327,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.57,
+    "avg": 0.77,
+    "pp": -4.8
+   },
+   {
+    "k": "line vs his usual range",
+    "v": 0.62,
+    "avg": -0.05,
+    "pp": -0.6
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.91,
+    "avg": 0.93,
+    "pp": 0.3
+   }
+  ],
+  "opened_at": "2026-11-02T13:40:58+00:00",
+  "logged_at": "2026-11-02T13:40:58+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ }
+]
