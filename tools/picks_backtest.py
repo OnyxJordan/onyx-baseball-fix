@@ -41,7 +41,11 @@ Sources (all local, see tools/rules_lab_build.py for how bt/ is pulled):
                    graded off ESPN play-by-play (bt/nba_periods.json)
   NFL v11 lanes    tools/nfl_feature_screen.py rows; statistics as live (nfl_model.V11),
                    coefficients refit on 2025 only, judged on 2026
+  more replays     tools/picks_replays.py: NBA 1st-half total, tennis total games and game
+                   spread, NFL receptions (unders), college football player props
 Markets with no replay of the live chance are listed with the reason and never finalized.
+A market whose numbers pass but that picks.py cannot grade, or that the live Top 10 never
+shows, is marked "passes, not offered" and is not finalized: nothing would ever be logged.
 """
 import json, math, os, sys
 from collections import defaultdict
@@ -327,16 +331,14 @@ def nfl_v11():
 NO_REPLAY = [
     ("nba", "first_basket", "Board only, never a Top 10 play. The corrected first-basket backtest (open-v4, 11/2: the earlier +38% "
                             "used a wrong first-scorer label) found no rule that beats Onyx's closing price (-8.7%), so it is never a pick."),
-    ("nba", "h1_total", "Board only, never a Top 10 play."),
-    ("nfl", "rec", "Receptions v5 (volume + nflverse targets) has no per-bet replay under this rule yet; its trial lane tested 3pp+ unders at the open only."),
-    ("nfl", "pass_td", "Passing TDs (Poisson, v9) has no per-bet replay yet."),
-    ("nfl", "rec_yds", "Excluded from plays by the model's own re-test (v6/v7): never a pick."),
-    ("nfl", "pass_yds", "Excluded from plays by the model's own re-test (v7, v12 dropped the v11 overs): never a pick."),
-    ("nfl", "anytime_td", "Shown chance is Onyx's price x .82 (v6): never value, never a pick."),
-    ("cfb", "props", "College player projections (cfb_players v2) have no replay against Onyx history at the live chance; leans only."),
-    ("tennis", "total_games", "Elo games model (v2) has no per-bet replay against Onyx history yet."),
-    ("tennis", "game_spread", "Elo games model (v2) has no per-bet replay against Onyx history yet."),
-    ("cbb", "all", "College basketball v1 started 11/2 with no Onyx price history: nothing to replay."),
+    ("nfl", "pass_td", "Nothing to replay: the live build marks passing TDs never-value (nfl_model NO_VALUE, v9: value bets too few, "
+                       "blanket sides lost), so the Top 10 rule can never pick one."),
+    ("nfl", "rec_yds", "Nothing to replay: excluded from plays by the model's own re-test (v6/v7, value_min 1.0), so the Top 10 rule can never pick one."),
+    ("nfl", "pass_yds", "Nothing to replay: excluded from plays by the model's own re-test (v7, v12 dropped the v11 overs), so the Top 10 rule can never pick one."),
+    ("nfl", "anytime_td", "Nothing to replay: the chance shown is Onyx's own price x .82 (v6), always below the price, so it is never value and never a pick."),
+    ("cfb", "anytime_td", "Nothing to replay: the chance shown is Onyx's own price x .82, on the Ask Onyx board only, never value."),
+    ("cbb", "all", "No Onyx college basketball price history on file (cbb_model's own backtest grades against ESPN closing lines, "
+                   "not Onyx prices). Needs an Onyx lines pull for 2025-26 (odds_probe.yml, job=lines) before it can be replayed."),
     ("golf", "all", "Onyx prices no golf markets."),
     ("mlb", "all", "Season closed 10/29; MLB markets return with the 2027 season (HR and K lanes keep their own records)."),
 ]
@@ -349,6 +351,16 @@ def main():
     res += nba_q1()
     res += team_markets()
     res += nfl_v11()
+    import picks_replays as PR
+    res += PR.nba_h1()
+    res += PR.nfl_rec()
+    res += PR.cfb_props()
+    res += PR.tennis_games()
+    for r in res:      # a pass that could never be logged is not a finalized market
+        if r["verdict"] == "finalized" and (not PK.gradable(r["sport"], r["market"]) or r.get("board_only")):
+            r["verdict"] = "passes, not offered"
+            r["why"] += ("; not finalized: " + ("picks.py has no grader for it" if not PK.gradable(r["sport"], r["market"])
+                                                else "the live Top 10 never shows it"))
     for sp, mk, why in NO_REPLAY:
         res.append({"sport": sp, "market": mk, "name": NAME.get(mk, mk), "verdict": "no replay", "why": why})
     fin = [f"{r['sport']}:{r['market']}" for r in res if r["verdict"] == "finalized"]

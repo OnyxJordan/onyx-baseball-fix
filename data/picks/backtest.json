@@ -18,7 +18,8 @@
   "text": "held-out period: 60+ bets, ROI above 0 at Onyx's opening price AND at its closing price"
  },
  "finalized": [
-  "nba:q1_total"
+  "nba:q1_total",
+  "cfb:rush_yds"
  ],
  "markets": [
   {
@@ -348,21 +349,21 @@
      "last": "2026-10-19"
     },
     "close": {
-     "n": 6,
+     "n": 7,
      "w": 3,
-     "l": 3,
+     "l": 4,
      "p": 0,
-     "units": 0.88,
-     "roi": 0.1467,
-     "avg_price": 131,
-     "claimed": 0.4688,
-     "hit": 0.5,
+     "units": -0.12,
+     "roi": -0.0171,
+     "avg_price": 138,
+     "claimed": 0.4608,
+     "hit": 0.4286,
      "first": "2026-09-27",
-     "last": "2026-10-25"
+     "last": "2026-10-27"
     }
    },
    "verdict": "not enough yet",
-   "why": "only 8 held-out bets (needs 60); ROI -18.0% at the open, +14.7% at the close so far"
+   "why": "only 8 held-out bets (needs 60); ROI -18.0% at the open, -1.7% at the close so far"
   },
   {
    "sport": "nfl",
@@ -416,21 +417,21 @@
      "last": "2026-10-19"
     },
     "close": {
-     "n": 8,
+     "n": 9,
      "w": 5,
-     "l": 3,
+     "l": 4,
      "p": 0,
-     "units": 1.69,
-     "roi": 0.2114,
-     "avg_price": -84,
-     "claimed": 0.5518,
-     "hit": 0.625,
+     "units": 0.69,
+     "roi": 0.0768,
+     "avg_price": -87,
+     "claimed": 0.554,
+     "hit": 0.5556,
      "first": "2026-09-27",
-     "last": "2026-10-25"
+     "last": "2026-10-27"
     }
    },
    "verdict": "not enough yet",
-   "why": "only 14 held-out bets (needs 60); ROI +23.7% at the open, +21.1% at the close so far"
+   "why": "only 14 held-out bets (needs 60); ROI +23.7% at the open, +7.7% at the close so far"
   },
   {
    "sport": "nfl",
@@ -743,34 +744,34 @@
    },
    "test": {
     "open": {
-     "n": 97,
-     "w": 38,
-     "l": 59,
+     "n": 100,
+     "w": 39,
+     "l": 61,
      "p": 0,
-     "units": -4.48,
-     "roi": -0.0462,
+     "units": -4.84,
+     "roi": -0.0484,
      "avg_price": 142,
-     "claimed": 0.4456,
-     "hit": 0.3918,
+     "claimed": 0.4455,
+     "hit": 0.39,
      "first": "2026-01-15",
-     "last": "2026-10-26"
+     "last": "2026-10-28"
     },
     "close": {
-     "n": 113,
+     "n": 115,
      "w": 39,
-     "l": 74,
+     "l": 76,
      "p": 0,
-     "units": -19.56,
-     "roi": -0.1731,
+     "units": -21.56,
+     "roi": -0.1875,
      "avg_price": 144,
-     "claimed": 0.4467,
-     "hit": 0.3451,
+     "claimed": 0.4468,
+     "hit": 0.3391,
      "first": "2026-01-15",
-     "last": "2026-10-26"
+     "last": "2026-10-28"
     }
    },
    "verdict": "fails",
-   "why": "lost at the opening price (-4.6% on 97)"
+   "why": "lost at the opening price (-4.8% on 100)"
   },
   {
    "sport": "nhl",
@@ -811,34 +812,34 @@
    },
    "test": {
     "open": {
-     "n": 126,
-     "w": 64,
+     "n": 127,
+     "w": 65,
      "l": 62,
      "p": 0,
-     "units": -11.1,
-     "roi": -0.0881,
+     "units": -10.29,
+     "roi": -0.081,
      "avg_price": -94,
      "claimed": 0.6027,
-     "hit": 0.5079,
+     "hit": 0.5118,
      "first": "2026-01-17",
-     "last": "2026-10-26"
+     "last": "2026-10-28"
     },
     "close": {
-     "n": 120,
-     "w": 61,
+     "n": 121,
+     "w": 62,
      "l": 59,
      "p": 0,
-     "units": -10.16,
-     "roi": -0.0846,
+     "units": -9.39,
+     "roi": -0.0776,
      "avg_price": -98,
-     "claimed": 0.6014,
-     "hit": 0.5083,
+     "claimed": 0.6015,
+     "hit": 0.5124,
      "first": "2026-01-17",
-     "last": "2026-10-26"
+     "last": "2026-10-28"
     }
    },
    "verdict": "fails",
-   "why": "lost at the opening price (-8.8% on 126)"
+   "why": "lost at the opening price (-8.1% on 127)"
   },
   {
    "sport": "nhl",
@@ -1084,35 +1085,587 @@
    },
    "test": {
     "open": {
-     "n": 43,
+     "n": 44,
      "w": 25,
-     "l": 18,
+     "l": 19,
      "p": 0,
-     "units": 4.6,
-     "roi": 0.1069,
+     "units": 3.6,
+     "roi": 0.0817,
      "avg_price": -106,
      "claimed": 0.5827,
-     "hit": 0.5814,
+     "hit": 0.5682,
      "first": "2026-09-13",
-     "last": "2026-10-26"
+     "last": "2026-10-27"
     },
     "close": {
-     "n": 10,
+     "n": 11,
      "w": 5,
-     "l": 5,
+     "l": 6,
      "p": 0,
-     "units": -0.49,
-     "roi": -0.0489,
-     "avg_price": -110,
-     "claimed": 0.5853,
-     "hit": 0.5,
+     "units": -1.49,
+     "roi": -0.1354,
+     "avg_price": -112,
+     "claimed": 0.5861,
+     "hit": 0.4545,
      "first": "2026-09-21",
-     "last": "2026-10-25"
+     "last": "2026-10-27"
     }
    },
    "verdict": "not enough yet",
-   "why": "only 43 held-out bets (needs 60); ROI +10.7% at the open, -4.9% at the close so far",
+   "why": "only 44 held-out bets (needs 60); ROI +8.2% at the open, -13.5% at the close so far",
    "notes": "Close only where the closing line equals the opening line."
+  },
+  {
+   "sport": "nba",
+   "market": "h1_total",
+   "name": "1st-half total",
+   "version": "h1 0.505/18",
+   "chance": "50.5% of Onyx's game total, normal sd 18 (nba_build)",
+   "source": "bt/nba_*_lines.json (Onyx), ESPN play-by-play 1st-half scores",
+   "held_out_from": "2026-02-01",
+   "held_out": "Feb to Jun 2026 (the 50.5% share and sd 18 were tuned on Oct 2025 to Jan 2026)",
+   "tune": {
+    "open": {
+     "n": 378,
+     "w": 210,
+     "l": 168,
+     "p": 0,
+     "units": 24.36,
+     "roi": 0.0645,
+     "avg_price": -106,
+     "claimed": 0.5825,
+     "hit": 0.5556,
+     "first": "2025-10-21",
+     "last": "2026-01-31"
+    },
+    "close": {
+     "n": 399,
+     "w": 215,
+     "l": 184,
+     "p": 0,
+     "units": 11.98,
+     "roi": 0.03,
+     "avg_price": -107,
+     "claimed": 0.5798,
+     "hit": 0.5388,
+     "first": "2025-10-21",
+     "last": "2026-01-31"
+    }
+   },
+   "test": {
+    "open": {
+     "n": 191,
+     "w": 101,
+     "l": 90,
+     "p": 0,
+     "units": 1.22,
+     "roi": 0.0064,
+     "avg_price": -109,
+     "claimed": 0.5798,
+     "hit": 0.5288,
+     "first": "2026-02-01",
+     "last": "2026-04-10"
+    },
+    "close": {
+     "n": 208,
+     "w": 110,
+     "l": 98,
+     "p": 0,
+     "units": 1.88,
+     "roi": 0.009,
+     "avg_price": -108,
+     "claimed": 0.5764,
+     "hit": 0.5288,
+     "first": "2026-02-01",
+     "last": "2026-04-10"
+    }
+   },
+   "verdict": "passes, not offered",
+   "why": "101-90 at the open, ROI +0.6%; ROI +0.9% at the close; not finalized: picks.py has no grader for it",
+   "notes": "On the board for Ask Onyx only: nba_build never puts it in the Top 10 and picks.py cannot grade it."
+  },
+  {
+   "sport": "nfl",
+   "market": "rec",
+   "name": "Receptions",
+   "version": "v14",
+   "chance": "volume + nflverse projection blended 50% with Onyx's no-vig price (unders only)",
+   "source": "data/nfl/player_games.json + nflverse.json (known before kickoff), bt/nfl_lines.json (Onyx open and close)",
+   "held_out_from": "2026-03-01",
+   "held_out": "2026 season (v4 / v5 parameters and the unders-only rule chosen on 2025)",
+   "tune": {
+    "open": {
+     "n": 116,
+     "w": 53,
+     "l": 63,
+     "p": 0,
+     "units": -1.36,
+     "roi": -0.0117,
+     "avg_price": 89,
+     "claimed": 0.5015,
+     "hit": 0.4569,
+     "first": "2025-09-21",
+     "last": "2026-01-05"
+    },
+    "close": {
+     "n": 89,
+     "w": 43,
+     "l": 46,
+     "p": 0,
+     "units": 1.47,
+     "roi": 0.0166,
+     "avg_price": 64,
+     "claimed": 0.5175,
+     "hit": 0.4831,
+     "first": "2025-09-21",
+     "last": "2026-01-04"
+    }
+   },
+   "test": {
+    "open": {
+     "n": 44,
+     "w": 27,
+     "l": 17,
+     "p": 0,
+     "units": 15.34,
+     "roi": 0.3486,
+     "avg_price": 92,
+     "claimed": 0.519,
+     "hit": 0.6136,
+     "first": "2026-09-13",
+     "last": "2026-10-27"
+    },
+    "close": {
+     "n": 28,
+     "w": 13,
+     "l": 15,
+     "p": 0,
+     "units": -1.55,
+     "roi": -0.0553,
+     "avg_price": 35,
+     "claimed": 0.5234,
+     "hit": 0.4643,
+     "first": "2026-09-18",
+     "last": "2026-10-27"
+    }
+   },
+   "verdict": "not enough yet",
+   "why": "only 44 held-out bets (needs 60); ROI +34.9% at the open, -5.5% at the close so far",
+   "notes": "Close only where the closing line equals the opening line. Players with snaps and no catch count as 0."
+  },
+  {
+   "sport": "cfb",
+   "market": "rec",
+   "name": "Receptions",
+   "version": "v2",
+   "chance": "projection blended 30% with Onyx's no-vig price, live role guard",
+   "source": "data/cfb/player_games.json (ESPN box), bt/cfb_props.json (Onyx open and close)",
+   "held_out_from": "2026-10-05",
+   "held_out": "games on or after 2026-10-05 (v1 projection parameters tuned on weeks 4-6 (to 10/4))",
+   "tune": {
+    "open": {
+     "n": 27,
+     "w": 14,
+     "l": 13,
+     "p": 0,
+     "units": 1.98,
+     "roi": 0.0735,
+     "avg_price": 18,
+     "claimed": 0.5335,
+     "hit": 0.5185,
+     "first": "2026-09-17",
+     "last": "2026-10-03"
+    },
+    "close": {
+     "n": 17,
+     "w": 8,
+     "l": 9,
+     "p": 0,
+     "units": -0.56,
+     "roi": -0.0329,
+     "avg_price": 19,
+     "claimed": 0.5181,
+     "hit": 0.4706,
+     "first": "2026-09-17",
+     "last": "2026-10-04"
+    }
+   },
+   "test": {
+    "open": {
+     "n": 29,
+     "w": 15,
+     "l": 14,
+     "p": 0,
+     "units": 1.04,
+     "roi": 0.036,
+     "avg_price": -30,
+     "claimed": 0.5544,
+     "hit": 0.5172,
+     "first": "2026-10-10",
+     "last": "2026-10-30"
+    },
+    "close": {
+     "n": 31,
+     "w": 8,
+     "l": 23,
+     "p": 0,
+     "units": -13.06,
+     "roi": -0.4213,
+     "avg_price": 62,
+     "claimed": 0.512,
+     "hit": 0.2581,
+     "first": "2026-10-07",
+     "last": "2026-10-30"
+    }
+   },
+   "verdict": "not enough yet",
+   "why": "only 29 held-out bets (needs 60); ROI +3.6% at the open, -42.1% at the close so far",
+   "notes": "Players with no box line are voids here (Onyx settles them at 0)."
+  },
+  {
+   "sport": "cfb",
+   "market": "rec_yds",
+   "name": "Receiving yards",
+   "version": "v2",
+   "chance": "projection blended 30% with Onyx's no-vig price, live role guard",
+   "source": "data/cfb/player_games.json (ESPN box), bt/cfb_props.json (Onyx open and close)",
+   "held_out_from": "2026-10-05",
+   "held_out": "games on or after 2026-10-05 (v1 projection parameters tuned on weeks 4-6 (to 10/4))",
+   "tune": {
+    "open": {
+     "n": 39,
+     "w": 15,
+     "l": 24,
+     "p": 0,
+     "units": -10.04,
+     "roi": -0.2575,
+     "avg_price": -27,
+     "claimed": 0.555,
+     "hit": 0.3846,
+     "first": "2026-09-17",
+     "last": "2026-10-04"
+    },
+    "close": {
+     "n": 30,
+     "w": 13,
+     "l": 17,
+     "p": 0,
+     "units": -4.81,
+     "roi": -0.1602,
+     "avg_price": -46,
+     "claimed": 0.556,
+     "hit": 0.4333,
+     "first": "2026-09-18",
+     "last": "2026-10-04"
+    }
+   },
+   "test": {
+    "open": {
+     "n": 49,
+     "w": 27,
+     "l": 22,
+     "p": 0,
+     "units": 4.15,
+     "roi": 0.0847,
+     "avg_price": -31,
+     "claimed": 0.5509,
+     "hit": 0.551,
+     "first": "2026-10-07",
+     "last": "2026-10-31"
+    },
+    "close": {
+     "n": 40,
+     "w": 20,
+     "l": 20,
+     "p": 0,
+     "units": -1.38,
+     "roi": -0.0346,
+     "avg_price": -67,
+     "claimed": 0.5545,
+     "hit": 0.5,
+     "first": "2026-10-08",
+     "last": "2026-10-29"
+    }
+   },
+   "verdict": "not enough yet",
+   "why": "only 49 held-out bets (needs 60); ROI +8.5% at the open, -3.5% at the close so far",
+   "notes": "Players with no box line are voids here (Onyx settles them at 0)."
+  },
+  {
+   "sport": "cfb",
+   "market": "rush_yds",
+   "name": "Rushing yards",
+   "version": "v2",
+   "chance": "Onyx's price moved by the v2 statistics (unders only)",
+   "source": "data/cfb/player_games.json (ESPN box), bt/cfb_props.json (Onyx open and close)",
+   "held_out_from": "2026-10-01",
+   "held_out": "games on or after 2026-10-01 (v2 market model chosen on lines before 10/1)",
+   "tune": {
+    "open": {
+     "n": 28,
+     "w": 17,
+     "l": 11,
+     "p": 0,
+     "units": 3.91,
+     "roi": 0.1397,
+     "avg_price": -114,
+     "claimed": 0.6172,
+     "hit": 0.6071,
+     "first": "2026-09-17",
+     "last": "2026-09-27"
+    },
+    "close": {
+     "n": 25,
+     "w": 10,
+     "l": 15,
+     "p": 0,
+     "units": -6.09,
+     "roi": -0.2435,
+     "avg_price": -113,
+     "claimed": 0.6115,
+     "hit": 0.4,
+     "first": "2026-09-17",
+     "last": "2026-09-27"
+    }
+   },
+   "test": {
+    "open": {
+     "n": 75,
+     "w": 55,
+     "l": 20,
+     "p": 0,
+     "units": 28.32,
+     "roi": 0.3777,
+     "avg_price": -114,
+     "claimed": 0.6091,
+     "hit": 0.7333,
+     "first": "2026-10-02",
+     "last": "2026-10-31"
+    },
+    "close": {
+     "n": 69,
+     "w": 46,
+     "l": 23,
+     "p": 0,
+     "units": 18.08,
+     "roi": 0.262,
+     "avg_price": -109,
+     "claimed": 0.61,
+     "hit": 0.6667,
+     "first": "2026-10-02",
+     "last": "2026-10-27"
+    }
+   },
+   "verdict": "finalized",
+   "why": "55-20 at the open, ROI +37.8%; ROI +26.2% at the close",
+   "notes": "Players with no box line are voids here (Onyx settles them at 0)."
+  },
+  {
+   "sport": "cfb",
+   "market": "pass_yds",
+   "name": "Passing yards",
+   "version": "v2",
+   "chance": "projection blended 30% with Onyx's no-vig price, live role guard",
+   "source": "data/cfb/player_games.json (ESPN box), bt/cfb_props.json (Onyx open and close)",
+   "held_out_from": "2026-10-05",
+   "held_out": "games on or after 2026-10-05 (v1 projection parameters tuned on weeks 4-6 (to 10/4))",
+   "tune": {
+    "open": {
+     "n": 31,
+     "w": 10,
+     "l": 21,
+     "p": 0,
+     "units": -11.82,
+     "roi": -0.3811,
+     "avg_price": -36,
+     "claimed": 0.5604,
+     "hit": 0.3226,
+     "first": "2026-09-13",
+     "last": "2026-10-04"
+    },
+    "close": {
+     "n": 25,
+     "w": 11,
+     "l": 14,
+     "p": 0,
+     "units": -3.96,
+     "roi": -0.1584,
+     "avg_price": -76,
+     "claimed": 0.5622,
+     "hit": 0.44,
+     "first": "2026-09-13",
+     "last": "2026-10-04"
+    }
+   },
+   "test": {
+    "open": {
+     "n": 34,
+     "w": 21,
+     "l": 13,
+     "p": 0,
+     "units": 6.44,
+     "roi": 0.1893,
+     "avg_price": -62,
+     "claimed": 0.5635,
+     "hit": 0.6176,
+     "first": "2026-10-07",
+     "last": "2026-10-31"
+    },
+    "close": {
+     "n": 26,
+     "w": 11,
+     "l": 15,
+     "p": 0,
+     "units": -4.99,
+     "roi": -0.1921,
+     "avg_price": -70,
+     "claimed": 0.5603,
+     "hit": 0.4231,
+     "first": "2026-10-08",
+     "last": "2026-10-30"
+    }
+   },
+   "verdict": "not enough yet",
+   "why": "only 34 held-out bets (needs 60); ROI +18.9% at the open, -19.2% at the close so far",
+   "notes": "Players with no box line are voids here (Onyx settles them at 0)."
+  },
+  {
+   "sport": "tennis",
+   "market": "total_games",
+   "name": "Total games",
+   "version": "v2",
+   "chance": "Elo games model (v2) blended 30% with Onyx's no-vig price",
+   "source": "bt/tennis_*_games.json (Onyx), ATP/WTA final games",
+   "held_out_from": "2026-01-01",
+   "held_out": "2026 matches (Elo tuned on 2025; GAME_P form set on 10/29/2026 against Onyx's own prices, not results)",
+   "tune": {
+    "open": {
+     "n": 245,
+     "w": 120,
+     "l": 125,
+     "p": 0,
+     "units": -17.65,
+     "roi": -0.072,
+     "avg_price": -111,
+     "claimed": 0.6295,
+     "hit": 0.4898,
+     "first": "2025-05-10",
+     "last": "2025-11-23"
+    },
+    "close": {
+     "n": 264,
+     "w": 130,
+     "l": 134,
+     "p": 0,
+     "units": -19.41,
+     "roi": -0.0735,
+     "avg_price": -109,
+     "claimed": 0.6264,
+     "hit": 0.4924,
+     "first": "2025-05-10",
+     "last": "2025-12-11"
+    }
+   },
+   "test": {
+    "open": {
+     "n": 341,
+     "w": 154,
+     "l": 187,
+     "p": 0,
+     "units": -52.4,
+     "roi": -0.1537,
+     "avg_price": -105,
+     "claimed": 0.6275,
+     "hit": 0.4516,
+     "first": "2026-01-10",
+     "last": "2026-10-24"
+    },
+    "close": {
+     "n": 329,
+     "w": 152,
+     "l": 177,
+     "p": 0,
+     "units": -43.28,
+     "roi": -0.1316,
+     "avg_price": -102,
+     "claimed": 0.6275,
+     "hit": 0.462,
+     "first": "2026-01-10",
+     "last": "2026-10-24"
+    }
+   },
+   "verdict": "fails",
+   "why": "lost at the opening price (-15.4% on 341)",
+   "notes": "picks.py has no tennis grader yet, so a pass here would still need one before tennis is logged."
+  },
+  {
+   "sport": "tennis",
+   "market": "game_spread",
+   "name": "Game spread",
+   "version": "v2",
+   "chance": "Elo games model (v2) blended 30% with Onyx's no-vig price",
+   "source": "bt/tennis_*_games.json (Onyx), ATP/WTA final games",
+   "held_out_from": "2026-01-01",
+   "held_out": "2026 matches (Elo tuned on 2025; GAME_P form set on 10/29/2026 against Onyx's own prices, not results)",
+   "tune": {
+    "open": {
+     "n": 509,
+     "w": 244,
+     "l": 265,
+     "p": 0,
+     "units": -48.62,
+     "roi": -0.0955,
+     "avg_price": -71,
+     "claimed": 0.5681,
+     "hit": 0.4794,
+     "first": "2025-01-25",
+     "last": "2025-12-11"
+    },
+    "close": {
+     "n": 585,
+     "w": 271,
+     "l": 314,
+     "p": 0,
+     "units": -73.7,
+     "roi": -0.126,
+     "avg_price": -68,
+     "claimed": 0.5682,
+     "hit": 0.4632,
+     "first": "2025-01-25",
+     "last": "2025-12-11"
+    }
+   },
+   "test": {
+    "open": {
+     "n": 386,
+     "w": 191,
+     "l": 195,
+     "p": 0,
+     "units": -24.2,
+     "roi": -0.0627,
+     "avg_price": -61,
+     "claimed": 0.5643,
+     "hit": 0.4948,
+     "first": "2026-01-03",
+     "last": "2026-10-24"
+    },
+    "close": {
+     "n": 393,
+     "w": 183,
+     "l": 210,
+     "p": 0,
+     "units": -49.32,
+     "roi": -0.1255,
+     "avg_price": -75,
+     "claimed": 0.5675,
+     "hit": 0.4656,
+     "first": "2026-01-03",
+     "last": "2026-10-24"
+    }
+   },
+   "verdict": "fails",
+   "why": "lost at the opening price (-6.3% on 386)",
+   "notes": "picks.py has no tennis grader yet, so a pass here would still need one before tennis is logged."
   },
   {
    "sport": "nba",
@@ -1122,74 +1675,46 @@
    "why": "Board only, never a Top 10 play. The corrected first-basket backtest (open-v4, 11/2: the earlier +38% used a wrong first-scorer label) found no rule that beats Onyx's closing price (-8.7%), so it is never a pick."
   },
   {
-   "sport": "nba",
-   "market": "h1_total",
-   "name": "1st-half total",
-   "verdict": "no replay",
-   "why": "Board only, never a Top 10 play."
-  },
-  {
-   "sport": "nfl",
-   "market": "rec",
-   "name": "Receptions",
-   "verdict": "no replay",
-   "why": "Receptions v5 (volume + nflverse targets) has no per-bet replay under this rule yet; its trial lane tested 3pp+ unders at the open only."
-  },
-  {
    "sport": "nfl",
    "market": "pass_td",
    "name": "Passing TDs",
    "verdict": "no replay",
-   "why": "Passing TDs (Poisson, v9) has no per-bet replay yet."
+   "why": "Nothing to replay: the live build marks passing TDs never-value (nfl_model NO_VALUE, v9: value bets too few, blanket sides lost), so the Top 10 rule can never pick one."
   },
   {
    "sport": "nfl",
    "market": "rec_yds",
    "name": "Receiving yards",
    "verdict": "no replay",
-   "why": "Excluded from plays by the model's own re-test (v6/v7): never a pick."
+   "why": "Nothing to replay: excluded from plays by the model's own re-test (v6/v7, value_min 1.0), so the Top 10 rule can never pick one."
   },
   {
    "sport": "nfl",
    "market": "pass_yds",
    "name": "Passing yards",
    "verdict": "no replay",
-   "why": "Excluded from plays by the model's own re-test (v7, v12 dropped the v11 overs): never a pick."
+   "why": "Nothing to replay: excluded from plays by the model's own re-test (v7, v12 dropped the v11 overs), so the Top 10 rule can never pick one."
   },
   {
    "sport": "nfl",
    "market": "anytime_td",
    "name": "Anytime TD",
    "verdict": "no replay",
-   "why": "Shown chance is Onyx's price x .82 (v6): never value, never a pick."
+   "why": "Nothing to replay: the chance shown is Onyx's own price x .82 (v6), always below the price, so it is never value and never a pick."
   },
   {
    "sport": "cfb",
-   "market": "props",
-   "name": "Player props",
+   "market": "anytime_td",
+   "name": "Anytime TD",
    "verdict": "no replay",
-   "why": "College player projections (cfb_players v2) have no replay against Onyx history at the live chance; leans only."
-  },
-  {
-   "sport": "tennis",
-   "market": "total_games",
-   "name": "Total games",
-   "verdict": "no replay",
-   "why": "Elo games model (v2) has no per-bet replay against Onyx history yet."
-  },
-  {
-   "sport": "tennis",
-   "market": "game_spread",
-   "name": "Game spread",
-   "verdict": "no replay",
-   "why": "Elo games model (v2) has no per-bet replay against Onyx history yet."
+   "why": "Nothing to replay: the chance shown is Onyx's own price x .82, on the Ask Onyx board only, never value."
   },
   {
    "sport": "cbb",
    "market": "all",
    "name": "Every market",
    "verdict": "no replay",
-   "why": "College basketball v1 started 11/2 with no Onyx price history: nothing to replay."
+   "why": "No Onyx college basketball price history on file (cbb_model's own backtest grades against ESPN closing lines, not Onyx prices). Needs an Onyx lines pull for 2025-26 (odds_probe.yml, job=lines) before it can be replayed."
   },
   {
    "sport": "golf",
