@@ -21,7 +21,13 @@ A candidate must:
 Confidence is the sport's own blended chance (the number its page shows). Each
 row says what it is: "tracked" (a graded pick on its page), "trial" (logged at
 Onyx's opening price, on trial) or "lean" (the model's read, not graded).
-Pipeline-safe: json only.
+
+Onyx Picks (11/2, picks.py): write() hands its plays to picks.hook, which logs a
+play in a market finalized by tools/picks_backtest.py (this rule, held out, won at
+Onyx's opening and closing prices on 60+ bets) once, at the price shown, and marks
+it "pick": true. The home Top 10 labels those "Onyx Pick"; everything else is a
+projection, not a pick.
+Pipeline-safe: json only (picks.py adds requests for grading, fail-soft).
 """
 import json
 import re
@@ -101,6 +107,13 @@ def write(data_dir, sport, date, rows):
         seen.add(k)
         out.append(e)
     out = sorted(out, key=lambda e: (-e["ev"], -e["conf"]))[:KEEP]
+    # Onyx Picks (picks.py): grade this sport's finished picks, then log a play in a
+    # finalized market once, at this price, before its start; marks logged ones "pick"
+    try:
+        import picks
+        picks.hook(sport, out)
+    except Exception as x:
+        print(f"  picks: skipped ({str(x)[:120]})")
     p = Path(data_dir) / "top.json"
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(json.dumps({"sport": sport, "date": date, "generated": datetime.now(timezone.utc).isoformat(timespec="seconds"),

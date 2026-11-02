@@ -3,13 +3,18 @@
  * verify_sports.js - the gate for the sport pages built from sport_shell.html
  * (nfl, cfb, cbb, nhl, tennis, golf). Dev + CI only.
  *
- * Every page, every tab (home, games, board, plays, model) at 390px and
+ * Every page, every tab (home, games, board, plays, model; depth on team sports) at 390px and
  * 1280px: renders, no uncaught errors, no "undefined" / "NaN" /
  * "[object Object]", nothing wider than the screen. For football, hockey and
  * basketball it opens a game's gamecenter too; basketball also renders a
  * finished game's box score from tools/fixtures/cbb_summary.json (a real
  * ESPN summary, trimmed) in both the Live and Box score views. Off-origin requests (ESPN live polling)
  * are aborted, so this checks the built page, not today's feed.
+ * Depth (11/2): for every sport whose data/<sport>/depth.json exists, the Depth tab
+ * loads it, shows a team's chart in all three views (projected, this season, last
+ * season) and a second team, with the usage column and the method note, nothing
+ * wider than the screen (tables scroll inside their card), and a Depth tile in the
+ * menu drawer that opens it.
  *
  *   python3 -B sports_build.py nfl   (and the others)
  *   node tools/verify_sports.js [nfl,cfb,cbb,nhl,tennis,golf]
@@ -81,6 +86,54 @@ function serve() {
         if (r.wide.length) bad.push('wider than the screen: ' + r.wide.join(', '));
         out.push(`${t}${bad.length ? ' FAIL(' + bad.join('; ') + ')' : ''}`);
         failures += bad.length;
+      }
+      // depth charts: data/<sport>/depth.json in the shared schema
+      if (fs.existsSync(path.join(ROOT, 'data', pg, 'depth.json'))) {
+        const dbad = [];
+        const tile = await page.evaluate(() => !!document.querySelector('.osheet .otile[data-tab="depth"]'));
+        if (!tile) dbad.push('no Depth tile in the menu');
+        else {
+          await page.evaluate(() => { window.OnyxUI.openMenu(); document.querySelector('.osheet .otile[data-tab="depth"]').click(); });
+          await page.waitForTimeout(300);
+          if (!(await page.evaluate(() => currentTab === 'depth' && !document.querySelector('.osheet').classList.contains('open')))) dbad.push('menu tile did not open Depth');
+        }
+        await page.evaluate(() => gotoTab('depth'));
+        await page.waitForFunction(() => typeof DEPTH !== 'undefined' && (DEPTH || DEPTH_ERR === true), null, { timeout: 8000 }).catch(() => {});
+        const r = await page.evaluate(() => {
+          const res = [], W = document.documentElement.clientWidth;
+          if (!DEPTH) return { err: 'depth.json did not load' };
+          const teams = Object.keys(DEPTH.teams), check = [];
+          for (const [t, v] of [[DEPTH_TEAM, 'proj'], [DEPTH_TEAM, 'now'], [DEPTH_TEAM, 'last'], [teams[teams.length - 1], 'proj']]) {
+            DEPTH_TEAM = t; DEPTH_VIEW = v; renderDepth();
+            const pane = document.getElementById('pane-depth'), txt = pane.innerText;
+            const wide = [];
+            pane.querySelectorAll('*').forEach(e => {
+              const b = e.getBoundingClientRect();
+              if (!b.width || b.right <= W + 1) return;
+              let a = e.parentElement;
+              while (a && a !== document.body) { if (getComputedStyle(a).overflowX !== 'visible') return; a = a.parentElement; }
+              wide.push(String(e.className || e.tagName));
+            });
+            const bad = [];
+            if (/\bundefined\b|\bNaN\b|\[object Object\]/.test(txt)) bad.push('undefined/NaN');
+            if (wide.length) bad.push('wide: ' + wide.slice(0, 3).join(', '));
+            if (document.documentElement.scrollWidth > W + 1) bad.push('page scrolls sideways');
+            const nrow = pane.querySelectorAll('.dp-grp tbody tr').length;
+            if (!nrow) bad.push('no players');
+            if (!pane.querySelector('.dp-grp th.r')) bad.push('no usage column');
+            if (!/How the depth chart works/i.test(txt) || !(DEPTH.method || '').length) bad.push('no method note');
+            check.push(`${t}/${v} ${nrow}${bad.length ? ' FAIL(' + bad.join('; ') + ')' : ''}`);
+          }
+          DEPTH_VIEW = 'proj';
+          return { teams: teams.length, check, bt: document.querySelectorAll('#pane-depth .dp-bt tbody tr').length };
+        });
+        if (r.err) dbad.push(r.err);
+        else {
+          if (!r.bt) dbad.push('no backtest rows');
+          r.check.filter(c => c.includes('FAIL')).forEach(c => dbad.push(c));
+        }
+        out.push(`depth${dbad.length ? ' FAIL(' + dbad.join('; ') + ')' : ` ok(${r.teams} teams, ${r.check.map(c => c.split(' ')[1]).join('/')} rows)`}`);
+        failures += dbad.length;
       }
       let gc = '';
       const team = await page.evaluate(() => (typeof KIND !== 'undefined') && (KIND === 'football' || KIND === 'hockey' || KIND === 'basketball') && (SD.games || []).length);

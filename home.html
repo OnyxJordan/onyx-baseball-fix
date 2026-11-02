@@ -132,6 +132,10 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
 .t10-f{grid-column:2/span 2;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 .t10-tag{font:800 9px monospace;letter-spacing:.08em;padding:3px 7px;border-radius:999px;background:rgba(255,255,255,.08);color:#cfc8da;text-transform:uppercase}
 .t10-tag.sp{background:rgba(176,56,249,.18);color:#d795ff}.t10-tag.tracked{background:rgba(97,233,112,.16);color:#61e970}.t10-tag.trial{background:rgba(99,91,255,.2);color:#b7b2ff}.t10-tag.val{background:rgba(97,233,112,.12);color:#61e970}
+.t10-tag.pick{background:rgba(97,233,112,.22);color:#61e970}.t10-tag.proj{background:rgba(255,255,255,.07);color:#b9b2c4}.t10-r.pk{border-color:rgba(97,233,112,.5)}
+.t10-picks{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;align-items:center;margin:0 0 12px;padding:14px 16px;border-radius:16px;border:1px solid rgba(97,233,112,.4);background:linear-gradient(160deg,rgba(97,233,112,.1),rgba(176,56,249,.08));color:#fff;text-decoration:none}
+.t10-picks>div{min-width:0}.t10-picks b{font-size:17px}.t10-picks span{display:block;font:600 11px monospace;color:#b9b2c4;margin-top:3px}
+.t10-picks em{font:800 12px monospace;font-style:normal;padding:7px 11px;border-radius:999px;background:linear-gradient(135deg,#b038f9,#635bff);white-space:nowrap}
 .t10-f .ox-save{width:30px;height:30px;font-size:15px;flex:none}.t10-act{margin-left:auto;display:flex;gap:6px;align-items:center;flex:none}.t10-act .t10-bet{margin-left:0}
 .t10-bet{margin-left:auto;font:800 12px monospace;padding:6px 10px;border-radius:999px;background:linear-gradient(135deg,#b038f9,#635bff);color:#fff;text-decoration:none;white-space:nowrap}
 </style>
@@ -174,6 +178,7 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
       <p>Onyx Sports Data compiles the best numbers across the industry, runs them through models we test in public and prices every one against the live Onyx line.</p>
       <div class="ox-hero-cta">
         <a class="ox-btn fill" href="#ask">Ask Onyx</a>
+        <a class="ox-btn" href="picks.html">Onyx Picks</a>
         <a class="ox-btn" href="#top10">Today's top 10</a>
         <a class="ox-btn" href="#my">My Onyx</a>
         <a class="ox-btn" href="#sports">Choose a sport</a>
@@ -207,7 +212,8 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
   <!-- ── Top 10 plays of the day, every sport ─────────────────────── -->
   <section class="ox-wrap t10" id="top10">
     <div class="my-h"><div><span class="ox-eyebrow">Today's top 10</span><h2>Our favorite<br>plays today.</h2>
-      <p>The ten plays our models like most on today's games across every sport: graded and on-trial lanes first, then markets where our model beat Onyx in testing, one play per market, ranked by value: the return the play is expected to make at its Onyx price. Plus money is in play (-150 to +200), every play needs a real edge (2+ points over the price, +3% expected return) and a real chance to cash.</p></div></div>
+      <p>The ten plays our models like most on today's games across every sport, ranked by value: the return the play is expected to make at its Onyx price. Plus money is in play (-150 to +200), every play needs a real edge (2+ points over the price, +3% expected return) and a real chance to cash. Plays marked Onyx Pick are our picks, logged at their Onyx price and graded in public. The rest are projections, not picks.</p></div></div>
+    <a class="t10-picks" id="t10Picks" href="picks.html"><div><b>Onyx Picks</b><span id="t10PicksTxt">What we'd bet today, every pick logged before the game and graded in public.</span></div><em>See the card</em></a>
     <div class="t10-list" id="t10List"><div class="my-empty">Loading today's plays...</div></div>
     <div class="my-note" id="t10Note"></div>
   </section>
@@ -330,7 +336,7 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
 <footer class="ox-foot">
   <div class="ox-wrap">
     <div class="ox-foot-cols">
-      <div class="ox-foot-col"><div class="ox-rule"></div><h5>Picks graded or on trial</h5><a href="nfl.html">Onyx NFL</a><a href="nba.html">Onyx Basketball</a><a href="cfb.html">Onyx College Football</a></div>
+      <div class="ox-foot-col"><div class="ox-rule"></div><h5>Picks graded or on trial</h5><a href="picks.html">Onyx Picks</a><a href="nfl.html">Onyx NFL</a><a href="nba.html">Onyx Basketball</a><a href="cfb.html">Onyx College Football</a></div>
       <div class="ox-foot-col"><div class="ox-rule"></div><h5>Live, model leans</h5><a href="nhl.html">Onyx NHL</a><a href="cbb.html">Onyx College Basketball</a><a href="golf.html">Onyx Golf</a><a href="tennis.html">Onyx Tennis</a><a href="index.html">Onyx Baseball (2026 closed)</a></div>
       <div class="ox-foot-col"><div class="ox-rule"></div><h5>The desk</h5><a href="#about">What this is</a><a href="#gamecenter">Gamecenter</a><a href="#record">The record</a><a href="scorecard.html">Scorecard</a><a href="scorecard.html#lab">Rules lab</a><a href="how.html">How it works</a></div>
       <div class="ox-foot-col"><div class="ox-rule"></div><h5>Onyx</h5><a data-onyx="footer" href="#" target="_blank" rel="noopener">Bet on Onyx</a><a href="https://onyxodds.com" target="_blank" rel="noopener">onyxodds.com</a></div>
@@ -473,7 +479,6 @@ async function askGo(q, forced) {
   const pl = R.parlay ? `<div class="ask-pl"><div><b>${R.rows.length}-leg ${SG ? 'same-game parlay · ' + esc(R.parlay.matchup) : R.parlay.sgp_plus ? 'SGP+' : 'parlay'} · ${fmtOdds(R.parlay.price)}${SG || R.parlay.sgp_plus ? '*' : ''}</b><br>
       ${SG ? `<span>${esc(R.parlay.story)}</span><br>` : ''}<span>Model chance all ${R.rows.length} hit: ${SG ? 'at least ' : ''}${(100 * R.parlay.prob).toFixed(1)}%${esc(short)}</span></div>
       <a class="t10-bet" href="https://app.onyxodds.com/share?${R.parlay.sels.map(s => 'selection=' + encodeURIComponent(s)).join('&')}&referrer=${ONYX_REFERRER}" target="_blank" rel="noopener" onclick="track('ask_parlay_bet',{legs:${R.rows.length}})">Bet parlay on Onyx</a></div>` : '';
-  const tagTxt = {tracked: 'Tracked pick', trial: 'On trial', lean: 'Model lean'};
   const rows = R.rows.map((p, i) => {
     const url = p.sel ? 'https://app.onyxodds.com/share?selection=' + encodeURIComponent(p.sel) + '&referrer=' + ONYX_REFERRER : (OnyxAsk.PAGE[p.sport] || '#');
     const conf = R.two ? p.two : p.conf;
@@ -482,7 +487,7 @@ async function askGo(q, forced) {
     return `<div class="t10-r${i === 0 ? ' top' : ''}"><div class="t10-n">${i + 1}</div>
       <div class="t10-w"><b>${esc(label)}</b><span>${esc(p.matchup)}${p.start ? ' · ' + esc(t10When(p.start)) : ''}${R.two ? ' · anytime TD ' + Math.round(100 * p.conf) + '%' : p.edge != null ? ' · edge ' + (p.edge >= 0 ? '+' : '') + (100 * p.edge).toFixed(1) : ''}${!R.two && p.model != null && /td$/.test(p.mkt || '') ? ' · TD model ' + Math.round(100 * p.model) + '%' : ''}</span></div>
       <div class="t10-c"><b>${Math.round(100 * conf)}%</b><small>${R.two ? '2+ TD CHANCE' : 'CONFIDENCE'}</small></div>
-      <div class="t10-f"><span class="t10-tag sp">${esc(OnyxAsk.LG[p.sport] || p.sport)}</span><span class="t10-tag ${p.tag}">${tagTxt[p.tag] || 'Model lean'}</span>
+      <div class="t10-f"><span class="t10-tag sp">${esc(OnyxAsk.LG[p.sport] || p.sport)}</span>${p.pick ? '<span class="t10-tag pick">Onyx Pick</span>' : '<span class="t10-tag proj">Projection</span>'}
         <a class="t10-bet" href="${url}" target="_blank" rel="noopener">${R.two ? 'Anytime TD ' : ''}${fmtOdds(p.price)} on Onyx</a>${save}</div></div>`;
   }).join('');
   // a round robin: every combination of the picks as its own ticket, $1 each
@@ -490,7 +495,7 @@ async function askGo(q, forced) {
       <span>$1 on each = $${R.rr.combos.length} total · average ticket hits ${(100 * R.rr.hit).toFixed(1)}% by the models</span><br>
       <span>${R.rr.combos.map(c => 'Legs ' + c.legs.join('+') + ' ' + fmtOdds(c.price)).join(' · ')}</span></div>
       <a class="t10-bet" href="https://app.onyxodds.com/share?${R.rows.map(p => p.sel).filter(Boolean).map(s => 'selection=' + encodeURIComponent(s)).join('&')}&referrer=${ONYX_REFERRER}" target="_blank" rel="noopener">Open the picks on Onyx</a></div>` : '';
-  out.innerHTML = understood + pl + rr + `<div class="ask-why wait" id="askWhy" hidden>Reading the legs...</div><div class="t10-list">${rows}</div><div class="my-note">${R.two ? 'Onyx prices anytime TD; the 2+ chance is from the model\'s expected touchdowns. ' : ''}Confidence is each sport model's chance blended with Onyx's price. Model leans are not graded. ${SG || (R.parlay && R.parlay.sgp_plus) ? '*Onyx prices same-game legs itself and usually pays less than the legs multiplied, because the legs are tied together; the same tie is why the true chance sits above the floor shown. ' : ''}${R.pool > R.rows.length ? R.pool + ' plays matched; the best ' + R.rows.length + ' shown.' : ''}</div>`;
+  out.innerHTML = understood + pl + rr + `<div class="ask-why wait" id="askWhy" hidden>Reading the legs...</div><div class="t10-list">${rows}</div><div class="my-note">${R.two ? 'Onyx prices anytime TD; the 2+ chance is from the model\'s expected touchdowns. ' : ''}Confidence is each sport model's chance blended with Onyx's price. Projections are not picks and are not graded; Onyx Picks are on the Onyx Picks page. ${SG || (R.parlay && R.parlay.sgp_plus) ? '*Onyx prices same-game legs itself and usually pays less than the legs multiplied, because the legs are tied together; the same tie is why the true chance sits above the floor shown. ' : ''}${R.pool > R.rows.length ? R.pool + ' plays matched; the best ' + R.rows.length + ' shown.' : ''}</div>`;
   // the AI's read on these legs, from their own numbers (only with the relay on); a follow-up hint either way
   out.insertAdjacentHTML('beforeend', `<div class="ask-fu">Follow up: "swap leg 2"${R.via === 'ai' ? ', "make it +500", "same but unders"' : ''}</div>`);
   if (R.via === 'ai') {
@@ -597,7 +602,22 @@ function t10When(iso) {
 // the site's day: ET, rolling over at 4 AM (a 1 AM ET tip still belongs to last night)
 function siteDay(t) { return new Date(t - 4 * 3600e3).toLocaleDateString('en-CA', {timeZone: 'America/New_York'}); }
 function isToday(iso) { const t = Date.parse(iso); return !isNaN(t) && siteDay(t) === siteDay(Date.now()); }
+// the Onyx Picks banner over the Top 10: today's card and the record (data/picks/ledger.json, picks.py)
+async function t10PicksBanner() {
+  const t = document.getElementById('t10PicksTxt');
+  if (!t) return;
+  const led = await getJSON('data/picks/ledger.json').catch(() => null);
+  if (!Array.isArray(led)) return;
+  const pay = p => p > 0 ? p / 100 : 100 / -p;
+  const today = siteDay(Date.now());
+  const on = led.filter(r => r.date === today || (!r.result && Date.parse(r.start) > Date.now())).length;
+  let w = 0, l = 0, u = 0;
+  led.forEach(r => { if (r.result === 'W') { w++; u += pay(r.price); } else if (r.result === 'L') { l++; u -= 1; } });
+  t.textContent = (on ? on + ' pick' + (on === 1 ? '' : 's') + ' on today\'s card' : 'No pick on today\'s card yet') +
+    (w + l ? ' · record ' + w + '-' + l + ', ' + (u >= 0 ? '+' : '') + u.toFixed(2) + ' units' : ' · every pick logged before the game and graded in public');
+}
 async function top10() {
+  t10PicksBanner().catch(() => {});
   const el = document.getElementById('t10List');
   const files = await Promise.all(T10_SPORTS.map(([k]) => getJSON('data/' + k + '/top.json').catch(() => null)));
   const now = Date.now(), all = [];
@@ -618,7 +638,9 @@ async function top10() {
     'nba|first_basket', 'cfb|spread', 'cfb|total', 'cfb|rush_yds', 'nhl|total']);
   const TR0 = {tracked: 0, trial: 1, lean: 2};
   const TRr = p => p.tag === 'lean' ? (PROVEN.has(p.sport + '|' + (p.mkt || p.kind)) ? 2 : 3) : (TR0[p.tag] ?? 2);
-  all.sort((a, b) => TRr(a) - TRr(b) || EV(b) - EV(a) || b.conf - a.conf);
+  // Onyx Picks (logged in a market that passed its test, picks.py) lead, then the rest by proven lane and value
+  const RK = p => p.pick ? -1 : TRr(p);
+  all.sort((a, b) => RK(a) - RK(b) || EV(b) - EV(a) || b.conf - a.conf);
   const pick = [], nSport = {}, nGame = {}, nMkt = {};
   const mk = p => p.sport + '|' + (p.mkt || p.kind);
   for (const p of all) {                                     // spread the ten across sports and markets first
@@ -631,18 +653,17 @@ async function top10() {
     nGame[p.gid] = (nGame[p.gid] || 0) + 1; nMkt[mk(p)] = (nMkt[mk(p)] || 0) + 1; pick.push(p);
     if (pick.length >= 10) break;
   }
-  pick.sort((a, b) => TRr(a) - TRr(b) || EV(b) - EV(a) || b.conf - a.conf);
+  pick.sort((a, b) => RK(a) - RK(b) || EV(b) - EV(a) || b.conf - a.conf);
   if (!pick.length) { el.innerHTML = '<div class="my-empty">No play on today\'s games clears the bar right now: games may have started, or the models are waiting on fresh Onyx prices. Ask Onyx below can still build from the rest of the week.</div>'; return; }
-  const tagTxt = {tracked: 'Tracked pick', trial: 'On trial', lean: 'Model lean'};
   el.innerHTML = pick.map((p, i) => {
     const url = p.sel ? 'https://app.onyxodds.com/share?selection=' + encodeURIComponent(p.sel) + '&referrer=' + ONYX_REFERRER : p.href;
-    return `<div class="t10-r${i < 3 ? ' top' : ''}"><div class="t10-n">${i + 1}</div>
+    return `<div class="t10-r${i < 3 ? ' top' : ''}${p.pick ? ' pk' : ''}"><div class="t10-n">${i + 1}</div>
       <div class="t10-w"><b>${esc(p.label)}</b><span>${esc(p.matchup)}${p.start ? ' · ' + esc(t10When(p.start)) : ''}</span></div>
       <div class="t10-c"><b>${Math.round(100 * p.conf)}%</b><small>TO HIT</small></div>
-      <div class="t10-f"><a class="t10-tag sp" href="${p.href}">${esc(p.lg)}</a><span class="t10-tag ${p.tag}">${tagTxt[p.tag] || 'Model lean'}</span><span class="t10-tag val" title="Expected profit per $100 at this Onyx price">+$${Math.round(100 * EV(p))} value</span>
+      <div class="t10-f"><a class="t10-tag sp" href="${p.href}">${esc(p.lg)}</a>${p.pick ? '<a class="t10-tag pick" href="picks.html">Onyx Pick</a>' : '<span class="t10-tag proj">Projection</span>'}<span class="t10-tag val" title="Expected profit per $100 at this Onyx price">+$${Math.round(100 * EV(p))} value</span>
         <span class="t10-act"><a class="t10-bet" href="${url}" target="_blank" rel="noopener" onclick="track('top10_bet',{sport:'${p.sport}',rank:${i + 1}})">${fmtOdds(p.price)} on Onyx</a>${window.OnyxSaved ? OnyxSaved.btn(Object.assign({id: p.sel}, p)) : ''}</span></div></div>`;
   }).join('');
-  document.getElementById('t10Note').textContent = 'To hit is the chance the play wins by that sport\'s model, blended with the Onyx market. Value is the expected profit per $100 at that price over the long run: proven lanes first, then the best value. "Tracked pick" plays are graded on their sport\'s record; "On trial" plays are logged at Onyx\'s opening price; "Model lean" plays are the model\'s read and are not graded.';
+  document.getElementById('t10Note').textContent = 'To hit is the chance the play wins by that sport\'s model, blended with the Onyx market. Value is the expected profit per $100 at that price over the long run. "Onyx Pick" plays are our picks: a market that beat Onyx\'s real prices on games its model never saw, logged once at its Onyx price before the start and graded on the Onyx Picks record. "Projection" plays are the model\'s read in a market that has not passed that test: shown, never graded, not picks.';
 }
 
 // the strip under the hero, for every sport: today's games, priced plays, first start, graded models

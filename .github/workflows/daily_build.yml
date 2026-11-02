@@ -76,6 +76,14 @@ jobs:
         run: python3 nba_build.py
         continue-on-error: true
         timeout-minutes: 3
+      # College basketball depth charts and stat projections: cbb_stats.py runs
+      # the minutes model on every ESPN roster (~370 requests, ~20 s) and writes
+      # data/cbb/depth.json for cbb-players.html. Once a day (--if-older skips a
+      # file under 20 hours old); fail-soft, it can never block a build.
+      - name: College basketball depth charts (once a day)
+        run: python3 cbb_stats.py --if-older 20 || echo "::warning::cbb depth charts failed"
+        continue-on-error: true
+        timeout-minutes: 4
       # Onyx Sports pages beyond MLB and NBA (sport_shell.html, one engine):
       # each sport reads and writes only data/<sport>/ and <sport>.html, and
       # the step is continue-on-error, so no sport can block MLB, NBA or

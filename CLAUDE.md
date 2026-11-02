@@ -71,6 +71,18 @@ That bar is code: `sports_lab.gate` turns picks on only when `data/<sport>/backt
 model's current `VERSION`, so bumping a model's version sends it back to leans until it
 is re-tested. Sport ledgers (`data/<sport>/picks_history.json`) are sacred like the rest.
 
+## Onyx Picks (Jordan's decision, 11/2)
+
+"Track plays what it recommends, not leans and trials." **Finalized markets are posted as
+tracked Onyx Picks; every other market shows projections only, never labeled a pick.** One
+rule for every sport (the home Top 10 rule, `daily_top.ok`). A market is finalized only when
+`tools/picks_backtest.py` (-> `data/picks/backtest.json`) shows, on held-out games, 60+ bets
+and ROI above 0 at Onyx's opening AND closing prices, for the live model version; a model
+change sends it back to projections until re-run. `picks.py` logs a finalized play once, at
+the Onyx price shown, before its start (up to 5 a sport a day) into `data/picks/ledger.json`
+(append-only, sacred, in validate_build's list) and grades it off ESPN. Page: `picks.html`.
+Gate: `python3 tools/verify_picks.py`. Never finalize a market by hand-editing the backtest.
+
 ## Dates
 
 Everything runs on the **baseball day = ET − 4h** (rolls at 4 AM ET). Never date anything
