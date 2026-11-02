@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """Dev-only: walk-forward backtest of the Similar spots engine (situations.py).
 
-  python3 tools/situations_backtest.py cbb|nfl|cfb|nba|nhl|all [--write]
+  python3 tools/situations_backtest.py cbb|nfl|cfb|nba|nhl|all [--write] [--team]
+
+--team re-runs only the team-recent rules (situations v2) and merges them into the
+existing data/<sport>/situations_bt.json.
 
 For each test season S, the trend tables are built ONLY from seasons before S. Every
 game of S is then matched exactly as the page matches it (same templates, same backoff,
@@ -32,6 +35,7 @@ os.chdir(ROOT)
 import situations as S
 
 RULES = [(.55, 50), (.55, 100), (.58, 50), (.58, 100)]
+WINDOW = 2        # seasons of league history behind each test season (the page's league row, v2)
 BE = 110 / 210
 
 
@@ -71,9 +75,10 @@ def run(sport):
     by_season = defaultdict(list)
     for g, fh, fa, fg in feats:
         by_season[g["s"]].append((g, fh, fa, fg))
-    T = S.build_table([x for x in feats if x[0]["s"] < tests[0]]) if tests else None
     for s in tests:
-        # the tables hold earlier seasons only
+        # the tables hold earlier seasons only; since v2 the page's league row uses the
+        # last two seasons, so the test does too (WINDOW)
+        T = S.build_table([x for x in feats if s - WINDOW <= x[0]["s"] < s])
         for g, fh, fa, fg in by_season[s]:
             eh = S.novig(g.get("hpr"), g.get("apr"))
             sides = {}
@@ -119,7 +124,6 @@ def run(sport):
                             pick = side.pop()
                             bet(res[f"{sc}|{t}|{n}"][s], ou == pick, eo if pick else 1 - eo,
                                 S.price(g.get("opr") if pick else g.get("upr")))
-        T = S.build_table([x for x in feats if x[0]["s"] <= s])
     out_rules = []
     for key, per in res.items():
         sc, t, n = key.split("|")
@@ -151,6 +155,115 @@ def run(sport):
             "rules": out_rules, "held": held, "spots_tried": len(tried)}
 
 
+# ---------------------------------------------------------------- team-recent rows (v2)
+# The card's team rows (situations.team_side / team_total) are built from each team's own
+# games before the tip, so a game-by-game walk is already out of sample. Rules fixed up
+# front: back a side that is hot, or one that is cold, by its own recent closing-line
+# record, and grade the NEXT game at its closing price. A game where both sides trigger
+# the same rule is skipped.
+TEAM_RULES = [
+    ("hot10", "8-2 or better ATS in the last 10"), ("hot20", "15-5 or better ATS in the last 20"),
+    ("role", "70%+ ATS in today's role (home / road / neutral, favorite / dog), 10+ games"),
+    ("cold10", "2-8 or worse ATS in the last 10"), ("cold20", "5-15 or worse ATS in the last 20"),
+    ("over10", "8-2 or better to the over in the last 10 (bet the over)"),
+    ("under10", "8-2 or better to the under in the last 10 (bet the under)"),
+]
+
+
+def team_flags(sport, logs, g, f):
+    rs = S.recent(logs.get(f["t"]) or [], g["s"])
+    lined = [r for r in rs if r["cov"] is not None]
+    out = set()
+    for n, hi, key in ((10, 8, "10"), (20, 15, "20")):
+        x = lined[:n]
+        if len(x) == n:
+            w, l, _ = S.ats_rec(x)
+            if w >= hi:
+                out.add("hot" + key)
+            if l >= hi:
+                out.add("cold" + key)
+    if f.get("fd") and f.get("ven"):
+        role = [r for r in lined if r["ven"] == f["ven"] and r["fd"] == f["fd"]][:S.TEAM_N]
+        w, l, _ = S.ats_rec(role)
+        if w + l >= 10 and w / (w + l) >= .7:
+            out.add("role")
+    t10 = [r for r in rs if r["ou"] is not None][:10]
+    if len(t10) == 10:
+        o, u, _ = S.ou_rec(t10)
+        if o >= 8:
+            out.add("over10")
+        if u >= 8:
+            out.add("under10")
+    return out
+
+
+def run_team(sport):
+    rows = S.load_history(sport)
+    if not rows:
+        return None
+    if sport in ("cbb", "cfb"):
+        S.CONF_PAIRS[sport] = {}
+    W, feats = S.featurize(sport, rows)
+    logs = {}
+    res = {k: defaultdict(acc) for k, _ in TEAM_RULES}
+    for g, fh, fa, fg in feats:
+        fl = {True: team_flags(sport, logs, g, fh), False: team_flags(sport, logs, g, fa)}
+        eh = S.novig(g.get("hpr"), g.get("apr"))
+        for k, _ in TEAM_RULES:
+            if k.startswith(("over", "under")):
+                continue
+            if (k in fl[True]) == (k in fl[False]):
+                continue
+            home = k in fl[True]
+            ats, cov = S.outcome(g, home)
+            if ats is None:
+                continue
+            bet(res[k][g["s"]], ats == 1, eh if home else 1 - eh, S.price(g.get("hpr") if home else g.get("apr")))
+        ou = S.tot_outcome(g)
+        if ou is not None:
+            eo = S.novig(g.get("opr"), g.get("upr"))
+            for k, pick in (("over10", 1), ("under10", 0)):
+                other = "under10" if pick else "over10"
+                if (k in fl[True] or k in fl[False]) and not (other in fl[True] or other in fl[False]):
+                    bet(res[k][g["s"]], ou == pick, eo if pick else 1 - eo, S.price(g.get("opr") if pick else g.get("upr")))
+        S.log_game(logs, g, fh, fa)
+    seasons = sorted({g["s"] for g, *_ in feats})
+    out = {}
+    for k, txt in TEAM_RULES:
+        tot = acc()
+        for v in res[k].values():
+            for i in range(5):
+                tot[i] += v[i]
+        rec2 = acc()
+        for s in seasons[-2:]:
+            for i in range(5):
+                rec2[i] += res[k][s][i] if s in res[k] else 0
+        out[k] = {"txt": txt, **grade(tot), "last2": grade(rec2),
+                  "seasons": {str(s): grade(v) for s, v in sorted(res[k].items())}}
+    return {"rules": out, "span": S.yrs(sport, seasons[0], seasons[-1]) if seasons else "",
+            "last2": S.yrs(sport, seasons[-2], seasons[-1]) if len(seasons) > 1 else ""}
+
+
+def team_line(sport, tb):
+    """The one honest line under the card about the team rows."""
+    R = tb["rules"]
+    f = lambda x: f"{x['w']:,}-{x['l']:,} ({x['roi'] * 100:+.1f}%)"
+    bits = []
+    for k, lab in (("hot10", "8-2+ ATS in their last 10 went"), ("hot20", "15-5+ in their last 20"),
+                   ("role", "70%+ in today's role"), ("cold10", "2-8 or worse")):
+        x = R.get(k)
+        if x and x["n"]:
+            bits.append(f"{lab} {f(x)}")
+    if not bits:
+        return None
+    ats = [R[k] for k in ("hot10", "hot20", "role", "cold10", "cold20") if R.get(k) and R[k]["n"]]
+    beat = [x for x in ats if x["roi"] > 0 and x["p"] < .05]
+    verdict = ("Team ATS streaks are noise against the closing line" if not beat else
+               "One rule cleared p < .05 out of several tried, about what luck alone does; still context, not a pick")
+    return (f"Team rows tested on every game {tb['span']}, each judged only on games before it: teams "
+            + "; ".join(bits) + f" the next game at closing prices. {verdict}.")
+
+
 def summary_line(sport, bt):
     get = lambda sc, t, n: next((x for x in bt["rules"] if x["scope"] == sc and x["thr"] == t and x["nmin"] == n), None)
     r, r2, c, tt = get("any", .55, 50), get("any", .58, 100), get("spot", .55, 50), get("tany", .55, 50)
@@ -180,23 +293,47 @@ def summary_line(sport, bt):
 
 def short_line(sport, bt):
     """The one line under the card."""
-    r = next((x for x in bt["rules"] if x["scope"] == "any" and x["thr"] == .55 and x["nmin"] == 50), None)
+    r = next((x for x in bt["rules"] if x["scope"] == "spot" and x["thr"] == .55 and x["nmin"] == 50), None)
     if not r or not r["n"]:
         return None
     t = bt["tests"]
     span = t[0] if len(t) == 1 else f"{t[0]} to {t[-1]}"
     v = ("held up so far" if r["roi"] > 0 and r["p"] < .05 else
          "about break-even, inside normal luck" if r["roi"] > -.03 else "lost against the closing line")
-    return (f"Out of sample ({span}, trends from earlier seasons only): sides whose spot ran 55%+ (5+ points over the "
-            f"price) on 50+ games went {r['w']:,}-{r['l']:,} ({r['pct'] * 100:.1f}%, {r['roi'] * 100:+.1f}% return), {v}.")
+    return (f"League row out of sample ({span}, each season judged on the two seasons before it): sides whose spot ran "
+            f"55%+ (5+ points over the price) on 50+ games went {r['w']:,}-{r['l']:,} ({r['pct'] * 100:.1f}%, "
+            f"{r['roi'] * 100:+.1f}% return), {v}.")
 
 
 def main():
     a = sys.argv[1:]
     sports = ["cbb", "nfl", "cfb", "nba", "nhl"] if not a or a[0] == "all" else [a[0]]
     for sp in sports:
-        bt = run(sp)
+        if "--team" in a:       # team rows only, merged into the existing file
+            try:
+                bt = json.loads((ROOT / "data" / sp / "situations_bt.json").read_text(encoding="utf-8"))
+            except Exception:
+                bt = None
+            if not bt:
+                print(f"{sp}: run the full backtest first")
+                continue
+        else:
+            bt = run(sp)
         if not bt:
+            continue
+        tb = run_team(sp)
+        if tb:
+            bt["team"], bt["team_line"] = tb, team_line(sp, tb)
+            bt["v"] = S.VERSION
+            print(f"\n=== {sp} team rows ({tb['span']}; last two seasons {tb['last2']})")
+            for k, x in tb["rules"].items():
+                l2 = x["last2"]
+                print(f"  {k:8} {x['w']:>5}-{x['l']:<5} {(x['pct'] or 0) * 100:5.1f}% (exp {(x['exp'] or 0) * 100:4.1f}) "
+                      f"roi {(x['roi'] or 0) * 100:+5.1f}% p={x['p']}   last2 {l2['w']}-{l2['l']} roi {(l2['roi'] or 0) * 100:+.1f}%")
+            print("  " + (bt["team_line"] or ""))
+        if "--team" in a:
+            if "--write" in a:
+                (ROOT / "data" / sp / "situations_bt.json").write_text(json.dumps(bt, separators=(",", ":")), encoding="utf-8")
             continue
         bt["line"] = summary_line(sp, bt)
         bt["short"] = short_line(sp, bt)

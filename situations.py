@@ -15,6 +15,12 @@ the closing spread and total from ESPN's line providers (pulled once by
 tools/situations_pull.py; this module only appends finished games, fail-soft and
 time-capped). Those are not Onyx's prices, so the page calls them "closing line".
 
+Version 2 (Jordan, 11/2, "relevant to the team ... last 10-20, more recent trends"): the
+card leads with THIS team's own recent games (team_side / team_total: this season plus
+last, at most the last 20 of each kind) and keeps one league-wide spot per side and total,
+built from the last two seasons only. tools/situations_backtest.py also tests the team
+rows walk-forward (team_bt: does a team 8-2 ATS in its last 10 cover the next one?).
+
 Fixed up front, never tuned on results (so nothing is cherry-picked):
   * the features (computed only from what was known before tip):
       spread bucket, home / road / neutral, both teams' rating tier (a walk-forward
@@ -33,7 +39,7 @@ import json, math, sys, time
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
-VERSION = 1
+VERSION = 2       # 2 (11/2): team-recent rows lead; league spot is one row from the last two seasons
 HCOLS = ["d", "id", "s", "pt", "h", "a", "hs", "as", "neu", "cg", "sp", "sp_open", "tot", "tot_open", "hml",
          "hpr", "apr", "opr", "upr"]   # closing prices: home / away spread, over / under (American)
 
@@ -785,6 +791,188 @@ def total_spots(T, sport, f, nmin, limit=3):
     return out
 
 
+# ---------------------------------------------------------------- this team, recently
+# Jordan, 11/2: "this should be relevant to the team and more situational, maybe last 10-20,
+# we don't need to date back 10 years". The card leads with the team's OWN recent games
+# (this season plus last season, at most the last 20 of each kind), graded against the
+# closing line; the league-wide spot is one secondary line from the last two seasons.
+# The rows are fixed (never chosen by how they look): ATS last 10 / 20, in today's role,
+# in today's spread range, off today's last result (this season only), vs today's
+# opponent tier; totals: each team's O/U last 10 / 20 and both combined.
+TEAM_N = 20
+TEAM_MIN = 5          # a situational row needs at least this many games to show
+ROLE_TXT = {("H", "F"): "As a home favorite", ("A", "F"): "As a road favorite", ("N", "F"): "As a neutral-site favorite",
+            ("H", "D"): "As a home dog", ("A", "D"): "As a road dog", ("N", "D"): "As a neutral-site dog",
+            ("H", "P"): "In home pick'em games", ("A", "P"): "In road pick'em games", ("N", "P"): "In neutral pick'em games"}
+MON = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split()
+
+
+def team_logs(feats):
+    """team -> its past games, oldest first, built from the featurized history (so the
+    opponent tier is the one known before that tip). Rebuilt each run from
+    situations_hist.json, which the pipeline appends to as games finish."""
+    logs = {}
+    for g, fh, fa, fg in feats:
+        log_game(logs, g, fh, fa)
+    return logs
+
+
+def log_game(logs, g, fh, fa):
+    """Append one finished game to both teams' logs (the backtest calls this game by game)."""
+    if g.get("hs") is None or g.get("as") is None:
+        return
+    eh, eo = novig(g.get("hpr"), g.get("apr")), novig(g.get("opr"), g.get("upr"))
+    ou = tot_outcome(g)
+    if ou is None and g.get("tot") is not None:
+        ou = -1                                     # push on the total
+    for f, home in ((fh, True), (fa, False)):
+        L = logs.setdefault(f["t"], [])
+        ats, cov = outcome(g, home)
+        m = (g["hs"] - g["as"]) * (1 if home else -1)
+        L.append({"d": g["d"], "s": g["s"], "id": str(g["id"]), "ven": f["ven"], "fd": f["fd"], "sb": f["sb"],
+                  "opp": f["opp"], "ats": ats, "cov": cov, "e": eh if home else 1 - eh, "ou": ou, "eo": eo,
+                  "res": "W" if m > 0 else "L" if m < 0 else "T", "prev": L[-1]["res"] if L else None})
+
+
+def recent(log, s_now, upto=None):
+    """The team's games this season and last, most recent first (before `upto` games of the log)."""
+    L = log if upto is None else log[:upto]
+    out = []
+    for r in reversed(L):
+        if r["s"] < s_now - 1:
+            break
+        if r["s"] <= s_now:
+            out.append(r)
+    return out
+
+
+def ats_rec(rs):
+    w = sum(1 for r in rs if r["ats"] == 1)
+    l = sum(1 for r in rs if r["ats"] == 0)
+    return w, l, len(rs) - w - l
+
+
+def ou_rec(rs):
+    o = sum(1 for r in rs if r["ou"] == 1)
+    u = sum(1 for r in rs if r["ou"] == 0)
+    return o, u, len(rs) - o - u
+
+
+def luck_txt(w, l, pv):
+    rec = f"{w}-{l}"
+    if pv >= .2:
+        return f"{rec} is common luck at this sample"
+    if pv >= .05:
+        return f"luck alone lands {rec} or wider about 1 in {max(2, round(1 / pv))}"
+    return f"luck alone lands {rec} or wider less than 1 in 20"
+
+
+def win_txt(rs, s_now):
+    n, this = len(rs), sum(1 for r in rs if r["s"] == s_now)
+    d = rs[-1]["d"]
+    since = f"since {MON[int(d[4:6]) - 1]} {d[:4]}"
+    if this == 0:
+        return f"last season, last {n}"
+    if this == n:
+        return f"last {n}, {since}"
+    return f"last {n}, {since}, {this} this season"
+
+
+def team_row(k, t, rs, s_now, tot=False, l10=False, nmax=TEAM_N):
+    """One team row: record, %, avg cover, the window, and an honest luck read against
+    what the closing prices implied (binomial, like the league rows)."""
+    rs = [r for r in rs if (r["ou"] is not None if tot else r["cov"] is not None)][:nmax]
+    if not rs:
+        return None
+    if tot:
+        w, l, p = ou_rec(rs)
+        ex = [r["eo"] for r in rs if r["ou"] in (0, 1)]
+    else:
+        w, l, p = ats_rec(rs)
+        ex = [r["e"] for r in rs if r["ats"] is not None]
+    n = w + l
+    e = sum(ex) / len(ex) if ex else .5
+    hi, lo = (w, l) if (not tot or w >= l) else (l, w)
+    pv = binom_p(w, n, e)
+    o = {"k": k, "t": t, "tm": 1, "n": len(rs), "w": w, "l": l, "p": p, "pct": round(w / n, 3) if n else None,
+         "exp": round(e, 3), "pv": round(pv, 4), "win": win_txt(rs, s_now),
+         "sig": "small sample" if n < 10 else "unusual" if pv < .05 else "within normal luck",
+         "luck": luck_txt(hi, lo, pv)}
+    if not tot:
+        o["cov"] = round(sum(r["cov"] for r in rs) / len(rs), 1)
+    if l10 and len(rs) > 10:
+        a, b, c = (ou_rec if tot else ats_rec)(rs[:10])
+        o["l10"] = [a, b, c]
+    return o
+
+
+def team_side(sport, log, f, s_now):
+    """The team rows for one side of today's game, in a fixed order."""
+    rs = recent(log or [], s_now)
+    if not rs:
+        return []
+    out = []
+    lined = [r for r in rs if r["cov"] is not None]
+    r0 = team_row("ats", "Puck line" if sport == "nhl" else "ATS", lined, s_now, l10=True)
+    if r0:
+        out.append(r0)
+    if f.get("fd") and f.get("ven"):
+        role = [r for r in lined if r["ven"] == f["ven"] and r["fd"] == f["fd"]]
+        if len(role) >= TEAM_MIN:
+            out.append(team_row("role", ROLE_TXT[(f["ven"], f["fd"])], role, s_now))
+    if f.get("sb") and f["sb"] != "PK":
+        sz = [r for r in lined if r["sb"] == f["sb"]]
+        if len(sz) >= TEAM_MIN:
+            txt = sb_txt(sport, f["sb"]).replace("favorites", "favorite").replace("dogs", "dog")
+            out.append(team_row("size", "As a " + txt, sz, s_now))
+    last = rs[0]
+    if last["s"] == s_now and last["res"] in ("W", "L"):      # off a result only inside this season
+        pr = [r for r in lined if r["prev"] == last["res"] and r["s"] == s_now]
+        if len(pr) >= TEAM_MIN:
+            out.append(team_row("prev", "Off a win" if last["res"] == "W" else "Off a loss", pr, s_now))
+    if f.get("opp"):
+        ti = [r for r in lined if r["opp"] == f["opp"]]
+        if len(ti) >= TEAM_MIN:
+            out.append(team_row("tier", (f"Vs {tier_txt(sport, 1)} teams" if f["opp"] == 1 else f"Vs teams rated {tier_txt(sport, f['opp'])}"), ti, s_now))
+    return [x for x in out if x]
+
+
+def team_total(logs, h, a, s_now):
+    rh, ra = recent(logs.get(h) or [], s_now), recent(logs.get(a) or [], s_now)
+    out = []
+    for ab, rs in ((a, ra), (h, rh)):
+        x = team_row("ou", f"{ab} games", rs, s_now, tot=True, l10=True)
+        if x:
+            out.append(x)
+    th = [r for r in rh if r["ou"] is not None][:TEAM_N]
+    ta = [r for r in ra if r["ou"] is not None][:TEAM_N]
+    seen = {r["id"] for r in th}
+    both = sorted(th + [r for r in ta if r["id"] not in seen], key=lambda r: r["d"], reverse=True)
+    if th and ta:
+        x = team_row("both", "Both teams combined", both, s_now, tot=True, nmax=2 * TEAM_N)
+        if x:
+            x["win"] = f"each team's last {max(len(th), len(ta))}, {len(both)} games"
+            out.append(x)
+    return out
+
+
+def cbb_turnover():
+    """College basketball: share of each team's projected rotation minutes (top 8) that are
+    new this season (transfers in and freshmen), from the depth model. {} when unavailable."""
+    try:
+        d = json.loads((DATA / "cbb" / "depth.json").read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+    out = {}
+    for ab, t in (d.get("teams") or {}).items():
+        ps = sorted((p for p in t.get("players") or [] if isinstance(p.get("use"), (int, float))),
+                    key=lambda p: -p["use"])[:8]                  # the projected rotation
+        tot = sum(p["use"] for p in ps)
+        if tot > 0:
+            out[ab] = sum(p["use"] for p in ps if p.get("g") != "returning") / tot
+    return out
+
+
 def build_table(feats, before_season=None, before_day=None):
     T = Table()
     for g, fh, fa, fg in feats:
@@ -827,10 +1015,13 @@ def build(sport, slate, odds=None, today=None, refresh=True, budget=25.0):
     cut = today.strftime("%Y%m%d")
     rows = [r for r in rows if r["d"] < cut]
     W, feats = featurize(sport, rows)
-    T = build_table(feats)
+    s_now = season_of(sport, cut)
+    recent_s = sorted({r["s"] for r in rows if r["s"] <= s_now})[-2:]      # the league row: last two seasons only
+    T = build_table([x for x in feats if x[0]["s"] in recent_s])
+    logs = team_logs(feats)
+    turn = cbb_turnover() if sport == "cbb" else {}
     cfg = CFG[sport]
     og = ((odds or {}).get("games") or {}) if isinstance((odds or {}).get("games"), dict) else {}
-    s_now = season_of(sport, cut)
     out = {}
     W.new_day(cut, s_now)
     for g in games:
@@ -859,13 +1050,25 @@ def build(sport, slate, odds=None, today=None, refresh=True, budget=25.0):
             x["cg"] = 1 if CONF_PAIRS.get(sport, {}).get(frozenset((x["h"], x["a"]))) else 0
         fh, fa = W.side_feats(x, True), W.side_feats(x, False)
         fg = W.game_feats(x, fh, fa)
-        rec = {}
+        rec, tm = {}, {}
         if sp is not None:
-            rec["home"], rec["away"] = side_spots(T, sport, fh, cfg["nmin"]), side_spots(T, sport, fa, cfg["nmin"])
+            rec["home"], rec["away"] = side_spots(T, sport, fh, cfg["nmin"], 1), side_spots(T, sport, fa, cfg["nmin"], 1)
             rec["line"] = sp
+            tm["home"] = team_side(sport, logs.get(x["h"]), fh, s_now)
+            tm["away"] = team_side(sport, logs.get(x["a"]), fa, s_now)
         if tot is not None:
-            rec["total"] = total_spots(T, sport, fg, cfg["nmin"])
+            rec["total"] = total_spots(T, sport, fg, cfg["nmin"], 1)
             rec["tot"] = tot
+            tm["total"] = team_total(logs, x["h"], x["a"], s_now)
+        rec["team"] = tm
+        note = {}
+        for side, ab in (("home", x["h"]), ("away", x["a"])):
+            rs = tm.get(side) or []
+            if rs and turn.get(ab, 0) >= .5 and "season" in (rs[0].get("win") or ""):
+                note[side] = (f"Roster turnover: about {round(turn[ab] * 100)}% of the projected rotation minutes are new "
+                              f"(transfers and freshmen), so last season's games say less about this team.")
+        if note:
+            rec["note"] = note
         rec["rank"] = {"home": W.rank(x["h"], s_now), "away": W.rank(x["a"], s_now)}
         out[gid] = rec
     seasons = sorted({r["s"] for r in rows})
@@ -876,6 +1079,7 @@ def build(sport, slate, odds=None, today=None, refresh=True, budget=25.0):
     except Exception:
         pass
     meta = {"v": VERSION, "games": len(rows), "lined": lined, "seasons": yrs(sport, seasons[0], seasons[-1]) if seasons else "",
+            "recent": yrs(sport, recent_s[0], recent_s[-1]) if recent_s else "", "bt_team": (bt or {}).get("team_line"),
             "nmin": cfg["nmin"], "added": added, "ms": int((time.time() - t0) * 1000),
             "bt": (bt or {}).get("line"), "bt_short": (bt or {}).get("short"), "bt_held": (bt or {}).get("held_line")}
     return {"meta": meta, "games": out}
