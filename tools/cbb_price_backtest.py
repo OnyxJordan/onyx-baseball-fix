@@ -125,7 +125,7 @@ def walk(matched, games, names, blend=None):
 
 def samples(lines_path=LINES, prior="v2", prior_path=PRIOR, quiet=False):
     """sports_backtest-style rows: {date, gid, mkt, when, p (home / home cover / over), over, under, y, line}."""
-    lines = json.load(open(lines_path))
+    lines = lines_path if isinstance(lines_path, dict) else json.load(open(lines_path))   # a dict: tools/picks_lines.lines
     names, team_of = namer()
     games = (json.load(open(os.path.join(LANE, "results.json"))) or {}).get("games") or []
     matched, rep = match(lines, games, team_of)

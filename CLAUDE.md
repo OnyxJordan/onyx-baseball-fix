@@ -82,6 +82,10 @@ change sends it back to projections until re-run. `picks.py` logs a finalized pl
 the Onyx price shown, before its start (up to 5 a sport a day) into `data/picks/ledger.json`
 (append-only, sacred, in validate_build's list) and grades it off ESPN. Page: `picks.html`.
 Gate: `python3 tools/verify_picks.py`. Never finalize a market by hand-editing the backtest.
+Re-testing is automatic: `.github/workflows/picks_retest.yml` (weekly, Tuesdays) appends the last 8 days of
+Onyx lines to `data/picks/lines/<sport>.json` (`tools/picks_lines.py`; a price on file is never changed),
+re-runs `tools/picks_backtest.py` and commits the verdicts. Finalization follows the tool, never a hand edit;
+a market whose inputs live only in `bt/` keeps its last verdict, marked `"carried"`.
 
 ## Dates
 
