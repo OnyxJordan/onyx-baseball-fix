@@ -434,6 +434,22 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
   writes `data/cbb/depth.json`, the shared depth schema read by `cbb-players.html`, once a
   day from both pipeline workflows (`--if-older 20`, fail-soft). Per-game threes, steals and
   blocks come from `data/cbb/history/box_{YEAR}.json` (Torvik CSV columns 3, 19, 54, 59-63).
+  Transfer impact (11/2): `cbb_transfers.py` runs right after the depth build (from
+  `cbb_stats.py`, fail-soft, under a second) and writes `data/cbb/transfers.json` (every
+  2026-27 transfer: level change = new team's last-season adj_em minus the old team's, step
+  up / down / lateral at 5 points, conference change, last and projected line, impact = projected
+  BPM above replacement x minutes x pace, confidence, and the historical note for that kind of
+  move) and `data/cbb/team_prior.json` (a player-based preseason adj_em / adj_o / adj_d per team,
+  Torvik's preseason rating, a fitted blend, portal in / out). Weights, the 2019-2026 translation
+  table and the backtest live in `data/cbb/history/transfer_fit.json`, written by
+  `tools/cbb_transfers_backtest.py <cache> --write` (needs Torvik's time-machine preseason files
+  `tm_YYYYMMDD.gz` in the cache). Walk-forward result: team MAE on final adj_em 4.65 / 4.86
+  (2025 / 2026) vs 5.94 / 6.00 for last season carried over (what `cbb_model` v2 uses as its
+  prior) and 4.72 / 4.83 for Torvik's preseason; the blend 4.56 / 4.69. Against the close,
+  Nov-Dec games 5+ points off: 644-544 (54.2%), not significant over 52.4% (z 1.26), Torvik's
+  own preseason 53.7%; flat by February. It is NOT wired into `cbb_model.py`: adopting the blend
+  as the v2 prior's replacement is a v3 decision for the price backtest. Page: the Transfer
+  impact and Team ratings tabs of `cbb-players.html`.
   Onyx league `ncaab`: moneyline,
   spread, total, player points / rebounds / assists / made threes (NBA market ids, not
   yet confirmed by a markets probe). Gate: `tools/verify_sports.js` renders a real

@@ -195,6 +195,16 @@ def _age_hours(path):
         return None
 
 
+def _transfers():
+    """transfer impact and the player-based team prior (cbb_transfers.py) from depth.json; fail-soft"""
+    try:
+        import cbb_transfers
+        tj, pj = cbb_transfers.build()
+        print(f"cbb transfers: {tj['n']} transfers, {len(pj['teams'])} team priors")
+    except (Exception, SystemExit) as e:
+        print(f"cbb transfers: skipped ({e})")
+
+
 if __name__ == "__main__":
     import sys
     out = os.path.join(ROOT, "data", "cbb", "depth.json")
@@ -202,7 +212,11 @@ if __name__ == "__main__":
         age, lim = _age_hours(out), float(sys.argv[sys.argv.index("--if-older") + 1])
         if age is not None and age < lim:
             print(f"cbb depth: {age:.1f} h old, under {lim:g} h, kept")
+            ta = _age_hours(os.path.join(ROOT, "data", "cbb", "transfers.json"))
+            if ta is None or ta > age + 0.5:      # transfers lag the depth chart: catch up
+                _transfers()
             sys.exit(0)
     o = build(out)
     n = sum(len(t["players"]) for t in o["teams"].values())
     print(f"cbb depth: {len(o['teams'])} teams, {n} players, {o['matched']} matched to a college season")
+    _transfers()

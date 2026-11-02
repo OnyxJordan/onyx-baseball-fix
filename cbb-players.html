@@ -50,6 +50,30 @@ body{background:#0c0c0c;color:#fff;margin:0}
 .bt h3{margin:0;padding:12px 14px 4px;font-size:15px}.bt p{margin:0;padding:0 14px 10px;color:#a79fb5;font-size:12px;line-height:1.5}
 .bt table{width:100%;border-collapse:collapse;font:600 12px monospace}.bt th,.bt td{padding:7px 10px;text-align:right;border-top:1px solid rgba(255,255,255,.07)}
 .bt th:first-child,.bt td:first-child{text-align:left}.bt th{color:#8f879c;font-size:10.5px;letter-spacing:.05em;text-transform:uppercase}.bt td b{color:#61e970}
+.sc{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sc table{min-width:560px}
+.ctl{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:12px 0 10px}
+.ctl button{padding:7px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:#ddd;font:700 11px monospace;letter-spacing:.05em;text-transform:uppercase;cursor:pointer}
+.ctl button.on{background:rgba(162,75,255,.22);border-color:#a24bff;color:#fff}
+.ctl select{background:#0d0a12;border:1px solid #3a2a55;border-radius:999px;padding:7px 10px;color:#fff;font:700 11px monospace;max-width:100%}
+.lv{display:inline-block;padding:2px 8px;border-radius:999px;font:800 10px monospace;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+.lv.up{background:rgba(162,75,255,.24);color:#e9c8ff}.lv.down{background:rgba(64,170,255,.18);color:#9fd4ff}.lv.lateral{background:rgba(255,255,255,.09);color:#cfc8da}
+.cf{font:700 9.5px monospace;letter-spacing:.06em;text-transform:uppercase;color:#8f879c}.cf.High{color:#61e970}.cf.Medium{color:#d795ff}
+.tx{display:grid;grid-template-columns:1fr auto;gap:4px 10px;padding:11px 12px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07)}
+.tx .n{font-weight:700;font-size:14.5px;line-height:1.3;min-width:0}.tx .n small{display:block;font:600 11px monospace;color:#a79fb5;margin-top:3px}
+.tx .im{text-align:right}.tx .im b{display:block;font:800 19px monospace}.tx .im span{font:600 9px monospace;letter-spacing:.06em;text-transform:uppercase;color:#8f879c}
+.tx .ln{grid-column:1/3;display:grid;grid-template-columns:auto 1fr;gap:2px 10px;font:600 11.5px monospace;color:#e9e4f2;line-height:1.5}
+.tx .ln i{font-style:normal;color:#8f879c;font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding-top:1px}
+.tx .hn{grid-column:1/3;color:#9a93a6;font-size:12px;line-height:1.5}
+.tm td.nm{white-space:nowrap;max-width:190px;overflow:hidden;text-overflow:ellipsis}
+.tm th:nth-child(2),.tm td:nth-child(2){text-align:left}.tm td b{color:#fff}
+.tm tbody tr{cursor:pointer}.tm tbody tr:hover td{background:rgba(162,75,255,.06)}
+.tm th[data-k]{cursor:pointer}.tm th.on{color:#d795ff}
+.plain{padding:0 14px 12px;color:#cfc8da;font-size:13px;line-height:1.6}.plain b{color:#fff}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:8px;margin-top:10px}
+.two>div{padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.02)}
+.two h4{margin:0 0 6px;font:700 11px monospace;letter-spacing:.08em;text-transform:uppercase;color:#d795ff}
+.two p{margin:3px 0;font:600 12px monospace;color:#e9e4f2;display:flex;justify-content:space-between;gap:10px}.two p span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .more{margin-top:10px;background:none;border:1px solid #3a2a55;color:#d795ff;font:700 12px monospace;border-radius:999px;padding:9px 14px;cursor:pointer}
 </style>
 </head>
@@ -59,9 +83,9 @@ body{background:#0c0c0c;color:#fff;margin:0}
   <a class="back" href="cbb.html">‹ College Basketball</a>
   <span class="ox-eyebrow" style="display:block;margin-top:14px">Depth charts and stat projections</span>
   <h1>Who plays,<br>and how much.</h1>
-  <p class="lead">Every Division I roster, projected: each player's minutes from last season's role, his class, the level of any transfer and the competition on his new roster, then his points, rebounds, assists and made threes from what he produced per minute, with this season's real numbers taking over as games are played.</p>
+  <p class="lead">Every Division I roster, projected: each player's minutes from last season's role, his class, the level of any transfer and the competition on his new roster, then his points, rebounds, assists and made threes from what he produced per minute, with this season's real numbers taking over as games are played. Plus every transfer's step up or step down in level, and team ratings built from the roster.</p>
   <div class="kpis" id="kpis"></div>
-  <div class="tabs" id="tabs"><button class="on" data-v="team">Depth charts</button><button data-v="score">Top scorers</button><button data-v="portal">Portal tracker</button><button data-v="fresh">Freshmen</button></div>
+  <div class="tabs" id="tabs"><button class="on" data-v="team">Depth charts</button><button data-v="score">Top scorers</button><button data-v="portal">Transfer impact</button><button data-v="teams">Team ratings</button><button data-v="fresh">Freshmen</button></div>
   <div id="view"></div>
   <div class="bt" id="bt"></div>
   <p class="note" id="method"></p>
@@ -131,8 +155,108 @@ function listView(title, sub, items) {
 function render() {
   if (V === 'team') return teamView();
   if (V === 'score') return listView('Top scorers, projected', 'points per game', allPlayers(p => (p.proj || {}).pts > 0).sort((a, b) => b[0].proj.pts - a[0].proj.pts));
-  if (V === 'portal') return listView('The portal, projected', 'every transfer, by projected minutes', allPlayers(p => p.g === 'transfer').sort((a, b) => b[0].use - a[0].use));
+  if (V === 'portal') return need('transfers.json', 'TR', transferView);
+  if (V === 'teams') return need('team_prior.json', 'PRI', teamsView);
   return listView('Freshmen and newcomers', 'by projected minutes', allPlayers(p => p.g === 'newcomer' && p.use >= 6).sort((a, b) => b[0].use - a[0].use));
+}
+// ── transfer impact and the player-based team ratings (cbb_transfers.py) ──
+let TR = null, PRI = null, TDIR = 'all', TSORT = 'impact', TQ = '', TMS = 'ours', TMT = null;
+const DATA = {};
+function need(file, key, fn) {
+  if (DATA[key]) return fn();
+  document.getElementById('view').innerHTML = '<p class="lead">Loading.</p>';
+  fetch('data/cbb/' + file, {cache: 'no-cache'}).then(r => r.json()).then(d => { DATA[key] = d; if (key === 'TR') TR = d; else PRI = d; fn(); })
+    .catch(() => { document.getElementById('view').innerHTML = '<p class="lead">Transfer projections are not built yet. They refresh once a day.</p>'; });
+}
+const s1 = x => x == null ? '-' : (x > 0 ? '+' : '') + (Math.round(x * 10) / 10).toFixed(1);
+function lvBadge(x) {
+  const w = x.dir === 'up' ? 'Step up' : x.dir === 'down' ? 'Step down' : 'Lateral';
+  return `<span class="lv ${x.dir}">${w} ${s1(x.lvl)}</span>`;
+}
+function tline(l, ps) {
+  if (!l) return '-';
+  return `${f1(l.mpg)} min, ${f1(l.ppg)} pts, ${f1(l.rpg)} reb, ${f1(l.apg)} ast · BPM ${s1(l.bpm)} · ORtg ${f1(l.ortg)} · usage ${f1(l.usg)}`;
+}
+function txRow(x) {
+  const conf = x.conf_lvl != null && Math.abs(x.conf_lvl) >= 1 ? ` · conference ${x.conf_lvl > 0 ? 'stronger' : 'weaker'} by ${Math.abs(x.conf_lvl).toFixed(1)}` : '';
+  const note = (TR.notes || {})[x.nk];
+  return `<div class="tx"><span class="n">${esc(x.n)} ${lvBadge(x)}<small>${esc(x.from)} (${esc(x.from_conf || '')}) to ${esc(x.to_name || x.to)} (${esc(x.to_conf || '')})${conf} · ${esc([x.pos, x.cls].filter(Boolean).join(' '))}</small></span>
+    <span class="im"><b>${s1(x.impact)}</b><span>pts / game added</span><br><span class="cf ${esc(x.conf)}">${esc(x.conf)} confidence</span></span>
+    <span class="ln"><i>${esc(String((x.last || {}).s - 1).slice(2))}-${esc(String((x.last || {}).s).slice(2))}</i><span>${tline(x.last)}</span><i>26-27</i><span>${tline(x.proj)}</span></span>
+    ${note ? `<span class="hn">${esc(note)}</span>` : ''}</div>`;
+}
+function transferView() {
+  const keyf = {impact: x => x.impact ?? -99, lvl: x => x.lvl ?? 0, down: x => -(x.lvl ?? 0), ppg: x => (x.proj || {}).ppg ?? 0, last: x => (x.last || {}).ppg ?? 0}[TSORT];
+  const q = TQ.trim().toLowerCase();
+  const items = TR.transfers.filter(x => (TDIR === 'all' || x.dir === TDIR) && (!q || (x.n + ' ' + x.from + ' ' + (x.to_name || '')).toLowerCase().includes(q))).sort((a, b) => keyf(b) - keyf(a));
+  const cnt = d => TR.transfers.filter(x => d === 'all' || x.dir === d).length;
+  const chips = [['all', 'All'], ['up', 'Step up'], ['down', 'Step down'], ['lateral', 'Lateral']].map(([k, l]) => `<button data-d="${k}" class="${TDIR === k ? 'on' : ''}">${l} ${cnt(k)}</button>`).join('');
+  const sorts = [['impact', 'Projected impact'], ['lvl', 'Biggest step up'], ['down', 'Biggest step down'], ['ppg', 'Projected points'], ['last', 'Last season points']].map(([k, l]) => `<option value="${k}"${TSORT === k ? ' selected' : ''}>${l}</option>`).join('');
+  document.getElementById('view').innerHTML = `<div class="th"><h2>Transfer impact</h2><span>${TR.n} transfers on ${esc(TR.season)} rosters</span></div>
+    <p class="lead" style="margin-top:0">Level change is the new team's adjusted efficiency margin last season minus the old team's, in points per 100 possessions. Moving up costs minutes, shots and usage; moving down adds them. Impact is projected points per game added over a bench replacement (projected BPM above ${esc(TR.repl_bpm)} x minutes x pace).</p>
+    <input class="find" id="tq" placeholder="Find a player or a school" autocomplete="off" value="${esc(TQ)}">
+    <div class="ctl" id="tchips">${chips}<select id="tsort" aria-label="Sort">${sorts}</select></div>
+    <div class="list">${items.slice(0, LIM).map(txRow).join('')}</div>${items.length > LIM ? '<button class="more" id="more">Show more</button>' : ''}${histCard()}`;
+  const m = document.getElementById('more'); if (m) m.onclick = () => { LIM += 60; transferView(); };
+  document.querySelectorAll('#tchips button').forEach(b => b.onclick = () => { TDIR = b.dataset.d; LIM = 40; transferView(); });
+  document.getElementById('tsort').onchange = e => { TSORT = e.target.value; LIM = 40; transferView(); };
+  const f = document.getElementById('tq'); f.oninput = () => { TQ = f.value; clearTimeout(f._t); f._t = setTimeout(() => { LIM = 40; transferView(); const g = document.getElementById('tq'); g.focus(); g.setSelectionRange(g.value.length, g.value.length); }, 250); };
+}
+function histCard() {
+  const t = TR.table; if (!t) return '';
+  const order = [['up|20+', 'Step up 20+'], ['up|10-20', 'Step up 10-20'], ['up|5-10', 'Step up 5-10'], ['lateral|lateral', 'Lateral (within 5)'], ['down|5-10', 'Step down 5-10'], ['down|10-20', 'Step down 10-20'], ['down|20+', 'Step down 20+']];
+  const r = (lbl, a) => a ? `<tr><td>${lbl}</td><td>${a.n}</td><td>${f1(a.ppg0)} to ${f1(a.ppg1)}</td><td>${s1(a.dmpg)}</td><td>${s1(a.dusg)}</td><td>${s1(a.dortg)}</td><td>${s1(a.defg)}</td></tr>` : '';
+  const head = '<thead><tr><th>Move</th><th>Players</th><th>Points / game</th><th>Minutes</th><th>Usage</th><th>ORtg</th><th>eFG%</th></tr></thead>';
+  const sc = [['low>low|15+', '151+ to 151+'], ['low>mid|15+', '151+ to 51-150'], ['low>top50|15+', '151+ to top 50'], ['mid>mid|15+', '51-150 to 51-150'], ['mid>top50|15+', '51-150 to top 50'], ['top50>top50|15+', 'Top 50 to top 50']];
+  const pb = (TR.player_backtest || {})['2026'];
+  const bt = pb ? `<p class="plain">Tested on 2025-26 transfers it never saw (${pb.bpm.n} players): the projection missed BPM by <b>${pb.bpm.model}</b> on average against ${pb.bpm.naive} for last season's number, ORtg by <b>${pb.ortg.model}</b> against ${pb.ortg.naive}, usage by <b>${pb.usg.model}</b> against ${pb.usg.naive}, points per 40 by <b>${pb.pts40.model}</b> against ${pb.pts40.naive}.</p>` : '';
+  return `<div class="bt"><h3>What history says: ${t.n.toLocaleString()} transfers, 2018-19 to 2025-26</h3>
+    <p>Every Division I transfer with 10+ games and 10+ minutes a game before the move who played 5+ games after it. Changes are the average after minus before. Team tiers are by last season's adjusted margin rank.</p>
+    <div class="sc"><table>${head}<tbody>${order.map(([k, l]) => r(l, (t.size || {})[k])).join('')}</tbody></table></div>
+    <p style="padding-top:10px">15+ ppg scorers by where they came from and where they went. Even a same-level move costs a big scorer points (he regresses toward average), so compare each row with the same-level one.</p>
+    <div class="sc"><table>${head}<tbody>${sc.map(([k, l]) => r(l, (t.tier_band || {})[k])).join('')}</tbody></table></div>${bt}</div>`;
+}
+function teamsView() {
+  const T = PRI.teams, keys = Object.keys(T).filter(k => T[k].ours != null);
+  if (TMT && T[TMT]) return teamDetail(TMT);
+  const kf = {ours: k => T[k].ours, chg: k => T[k].chg ?? -99, blend: k => T[k].blend ?? -99, torvik: k => T[k].torvik_pre ?? -99, net: k => (T[k].portal_in || 0) - (T[k].portal_out || 0), last: k => T[k].em_last ?? -99}[TMS];
+  keys.sort((a, b) => kf(b) - kf(a));
+  const th = (k, l) => `<th data-k="${k}" class="${TMS === k ? 'on' : ''}">${l}</th>`;
+  document.getElementById('view').innerHTML = `<div class="th"><h2>Team ratings, ${esc(PRI.season)}</h2><span>built from the roster, tap a column to sort, a team for its portal</span></div>
+    ${teamBt()}
+    <div class="bt tm" style="margin-top:12px"><div class="sc"><table><thead><tr><th>#</th><th>Team</th>${th('ours', 'Roster')}${th('last', 'Last')}${th('chg', 'Change')}${th('torvik', 'Torvik')}${th('blend', 'Blend')}${th('net', 'Portal net')}</tr></thead><tbody>
+    ${keys.slice(0, LIM * 3).map((k, i) => { const t = T[k]; const net = (t.portal_in || 0) - (t.portal_out || 0); return `<tr data-t="${esc(k)}"><td>${i + 1}</td><td class="nm">${esc(t.name)}</td><td><b>${s1(t.ours)}</b></td><td>${s1(t.em_last)}</td><td class="${(t.chg || 0) >= 0 ? 'up' : 'dn'}">${s1(t.chg)}</td><td>${s1(t.torvik_pre)}</td><td>${s1(t.blend)}</td><td class="${net >= 0 ? 'up' : 'dn'}">${s1(net)}</td></tr>`; }).join('')}
+    </tbody></table></div></div>${keys.length > LIM * 3 ? '<button class="more" id="more">Show more</button>' : ''}
+    <p class="note">Ratings are adjusted efficiency margin: points per 100 possessions better than an average Division I team. Roster = our player-based projection. Last = last season's final Torvik margin. Torvik = Torvik's own preseason rating. Blend = ours and Torvik's combined with weights fitted on past seasons. Portal net = projected points per game added by incoming transfers minus what departing transfers produced last season. Research, not tracked picks.</p>`;
+  document.querySelectorAll('.tm th[data-k]').forEach(h => h.onclick = () => { TMS = h.dataset.k; teamsView(); });
+  document.querySelectorAll('.tm tbody tr').forEach(r => r.onclick = () => { TMT = r.dataset.t; teamsView(); window.scrollTo(0, 0); });
+  const m = document.getElementById('more'); if (m) m.onclick = () => { LIM += 60; teamsView(); };
+}
+function teamDetail(k) {
+  const t = PRI.teams[k];
+  const li = (a, fmt) => a.length ? a.slice(0, 8).map(fmt).join('') : '<p><span>None on a Division I roster</span></p>';
+  document.getElementById('view').innerHTML = `<button class="more" id="tback" style="margin-top:14px">‹ All teams</button>
+    <div class="th"><h2>${esc(t.name)}</h2><span>${esc(t.conf || '')}${t.rk ? ' · #' + t.rk + ' by roster rating' : ''}</span></div>
+    <div class="kpis"><div><b>${s1(t.ours)}</b><span>roster rating, ${esc(PRI.season)}</span></div><div><b>${s1(t.em_last)}</b><span>last season's final margin</span></div><div><b class="${(t.chg || 0) >= 0 ? 'up' : 'dn'}">${s1(t.chg)}</b><span>change</span></div><div><b>${s1(t.torvik_pre)}</b><span>Torvik preseason</span></div></div>
+    <p class="plain" style="padding:12px 0 0">Projected offense ${f1(t.adj_o)} and defense ${f1(t.adj_d)} points per 100 possessions (adjusted). Blend with Torvik: ${s1(t.blend)}.</p>
+    <div class="two"><div><h4>Portal in: ${s1(t.portal_in)} pts / game</h4>${li(t.in || [], z => `<p><span>${esc(z[0])} · from ${esc(z[1])}</span><b class="${(z[2] || 0) >= 0 ? 'up' : 'dn'}">${s1(z[2])}</b></p>`)}</div>
+    <div><h4>Portal out: ${s1(t.portal_out)} pts / game</h4>${li(t.out || [], z => `<p><span>${esc(z[0])} · to ${esc((PRI.teams[z[1]] || {}).name || z[1])}</span><b>${s1(z[2])}</b></p>`)}</div></div>
+    <p class="note">Portal in is each newcomer's projected points per game over a bench replacement at the new school; portal out is what each departing transfer produced over replacement here last season. Graduations and pro departures are in the roster rating, not these lists. <a href="#${esc(k)}" id="todc" style="color:#d795ff">See the ${esc(t.name)} depth chart</a>.</p>`;
+  document.getElementById('tback').onclick = () => { TMT = null; teamsView(); };
+  document.getElementById('todc').onclick = e => { e.preventDefault(); TEAM = k; history.replaceState(null, '', '#' + k); V = 'team'; document.querySelectorAll('#tabs button').forEach(x => x.classList.toggle('on', x.dataset.v === 'team')); render(); };
+}
+function teamBt() {
+  const b = PRI.backtest; if (!b || !b.seasons) return '';
+  const s5 = b.seasons['2025'], s6 = b.seasons['2026'], mk = b.market || {}, pool = (mk.nov_dec_pooled || {});
+  [s5, s6].forEach(s => Object.values(s).forEach(v => { if (v && v.mae != null) v.mae = Number(v.mae).toFixed(2); }));
+  const pct = v => v && v[2] != null ? `${v[0]}-${v[1]} (${v[2]}%)` : '-';
+  const mo = (src, m, th) => { const a = (mk['2025'] || {})[src], c = (mk['2026'] || {})[src]; if (!a || !c) return null; const w = a[m]['ats' + th][0] + c[m]['ats' + th][0], l = a[m]['ats' + th][1] + c[m]['ats' + th][1]; return [w, l, w + l ? Math.round(1000 * w / (w + l)) / 10 : null]; };
+  const months = ['Nov', 'Dec', 'Jan', 'Feb-Apr'];
+  const row = (lbl, src) => `<tr><td>${lbl}</td>${months.map(m => `<td>${pct(mo(src, m, 5))}</td>`).join('')}</tr>`;
+  return `<div class="bt"><h3>Does it work? Tested on seasons it never saw</h3>
+    <p class="plain">Each season was projected only from earlier seasons, then checked against how good every team actually was. Average miss on a team's final margin, in points per 100 possessions: <b>${s6.ours.mae}</b> for this roster rating in 2025-26 (${s5.ours.mae} in 2024-25), against ${s6.naive.mae} (${s5.naive.mae}) for last season's margin carried over and ${s6.torvik_pre.mae} (${s5.torvik_pre.mae}) for Torvik's own preseason rating. Blending the two was best: <b>${s6.blend.mae}</b> (${s5.blend.mae}).</p>
+    <p class="plain">Against the closing spread in November and December of both seasons, when the roster rating disagreed with the close by 5+ points it covered <b>${pct((pool.ours || {}).ats5)}</b>; at 3+ points, ${pct((pool.ours || {}).ats3)}. Breakeven at -110 is 52.4%. Torvik's preseason rating did ${pct((pool.torvik_pre || {}).ats5)} on the same test, so most of that is what any good preseason rating does, not the transfers alone. It is not enough games to call it a proven edge, and it fades to a coin flip by February as the market catches up.</p>
+    <div class="sc"><table><thead><tr><th>5+ points off the close</th>${months.map(m => `<th>${m}</th>`).join('')}</tr></thead><tbody>${row('Roster rating', 'ours')}${row('Torvik preseason', 'torvik_pre')}${row('Blend', 'blend')}${row('Last season', 'naive')}</tbody></table></div></div>`;
 }
 function btTable(b) {
   if (!b || !b.stats) return '';
@@ -141,7 +265,7 @@ function btTable(b) {
     <table><thead><tr><th>Per game</th><th>Model</th><th>Last season</th><th>Better by</th></tr></thead><tbody>${rows.map(([s, m, n]) =>
     `<tr><td>${LBL[s] || esc(s)}</td><td><b>${m.toFixed(2)}</b></td><td>${n.toFixed(2)}</td><td>${Math.round(100 * (1 - m / n))}%</td></tr>`).join('')}</tbody></table>`;
 }
-document.querySelectorAll('#tabs button').forEach(b => b.onclick = () => { V = b.dataset.v; LIM = 40; document.querySelectorAll('#tabs button').forEach(x => x.classList.toggle('on', x === b)); render(); });
+document.querySelectorAll('#tabs button').forEach(b => b.onclick = () => { V = b.dataset.v; LIM = 40; TMT = null; document.querySelectorAll('#tabs button').forEach(x => x.classList.toggle('on', x === b)); render(); });
 fetch('data/cbb/depth.json', {cache: 'no-cache'}).then(r => r.json()).then(d => {
   D = d; TEAM = decodeURIComponent((location.hash || '').slice(1)) || null;
   const all = allPlayers(() => true), tr = all.filter(x => x[0].g === 'transfer').length, nw = all.filter(x => x[0].g === 'newcomer').length;
