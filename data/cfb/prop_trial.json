@@ -42,5 +42,225 @@
   "model": "v2",
   "result": null,
   "actual": null
+ },
+ {
+  "date": "2026-11-02",
+  "key": "401856740|keelon russell|rush_yds",
+  "gid": "401856740",
+  "pid": "5141629",
+  "name": "Keelon Russell",
+  "team": "ALA",
+  "opp": "LSU",
+  "matchup": "ALA @ LSU",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 19.5,
+  "price": -114,
+  "sel": "1d05ecd5-2e38-499d-9ff6-fe0232484953",
+  "proj": 23.2,
+  "prob": 0.6241,
+  "implied": 0.5327,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.55,
+    "avg": 0.77,
+    "pp": -5.1
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.89,
+    "avg": 0.93,
+    "pp": 0.7
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.39,
+    "avg": -0.05,
+    "pp": 0.3
+   }
+  ],
+  "opened_at": "2026-11-02T17:15:03+00:00",
+  "logged_at": "2026-11-02T17:15:03+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-02",
+  "key": "401856740|trae shawn brown|rush_yds",
+  "gid": "401856740",
+  "pid": "5327659",
+  "name": "Trae'shawn Brown",
+  "team": "ALA",
+  "opp": "LSU",
+  "matchup": "ALA @ LSU",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 27.5,
+  "price": -114,
+  "sel": "7585fb05-d871-4b75-b901-1859bb43c2fc",
+  "proj": 31.2,
+  "prob": 0.6243,
+  "implied": 0.5327,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.55,
+    "avg": 0.77,
+    "pp": -5.1
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.89,
+    "avg": 0.93,
+    "pp": 0.7
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.38,
+    "avg": -0.05,
+    "pp": 0.3
+   }
+  ],
+  "opened_at": "2026-11-02T17:15:03+00:00",
+  "logged_at": "2026-11-02T17:15:03+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-02",
+  "key": "401856740|dilin jones|rush_yds",
+  "gid": "401856740",
+  "pid": "5079482",
+  "name": "Dilin Jones",
+  "team": "LSU",
+  "opp": "ALA",
+  "matchup": "LSU vs ALA",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 78.5,
+  "price": -114,
+  "sel": "0fb9e968-6a38-4509-b7e2-0321f731d19f",
+  "proj": 69.0,
+  "prob": 0.6053,
+  "implied": 0.5327,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.7,
+    "avg": 0.77,
+    "pp": -1.6
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.98,
+    "avg": 0.93,
+    "pp": -0.8
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.18,
+    "avg": -0.05,
+    "pp": 0.1
+   }
+  ],
+  "opened_at": "2026-11-02T17:15:03+00:00",
+  "logged_at": "2026-11-02T17:15:03+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-02",
+  "key": "401856740|daniel hill|rush_yds",
+  "gid": "401856740",
+  "pid": "5079506",
+  "name": "Daniel Hill",
+  "team": "ALA",
+  "opp": "LSU",
+  "matchup": "ALA @ LSU",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 32.5,
+  "price": -114,
+  "sel": "8c2485f2-353a-446d-897e-92f9f0ba42a2",
+  "proj": 30.8,
+  "prob": 0.625,
+  "implied": 0.5327,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.55,
+    "avg": 0.77,
+    "pp": -5.1
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.89,
+    "avg": 0.93,
+    "pp": 0.7
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.3,
+    "avg": -0.05,
+    "pp": 0.2
+   }
+  ],
+  "opened_at": "2026-11-02T17:15:03+00:00",
+  "logged_at": "2026-11-02T17:15:03+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-02",
+  "key": "401856740|sam leavitt|rush_yds",
+  "gid": "401856740",
+  "pid": "5078810",
+  "name": "Sam Leavitt",
+  "team": "LSU",
+  "opp": "ALA",
+  "matchup": "LSU vs ALA",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 34.5,
+  "price": -112,
+  "sel": "1d459851-73f9-40ff-8ccb-cbd3dea4274b",
+  "proj": 32.9,
+  "prob": 0.6049,
+  "implied": 0.5283,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.7,
+    "avg": 0.77,
+    "pp": -1.6
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.98,
+    "avg": 0.93,
+    "pp": -0.8
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.17,
+    "avg": -0.05,
+    "pp": 0.1
+   }
+  ],
+  "opened_at": "2026-11-02T17:15:03+00:00",
+  "logged_at": "2026-11-02T17:15:03+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
  }
 ]

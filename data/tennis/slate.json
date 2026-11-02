@@ -1087,8 +1087,8 @@
     {
      "id": "186460",
      "start": "2026-11-02T15:55Z",
-     "state": "in",
-     "detail": "1st",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 1",
      "draw": "Men's Singles",
      "court": "Court 1",
@@ -1098,8 +1098,9 @@
        "short": "T. Machac",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/cze.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
+        7,
         6
        ],
        "serve": false
@@ -1111,7 +1112,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        6
+        6,
+        1
        ],
        "serve": false
       }
@@ -1119,9 +1121,9 @@
     },
     {
      "id": "186459",
-     "start": "2026-11-02T17:00Z",
-     "state": "pre",
-     "detail": "11/2 - 12:00 PM EST",
+     "start": "2026-11-02T17:35Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 1",
      "draw": "Men's Singles",
      "court": "Court 1",
@@ -1132,8 +1134,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        0
+       ],
+       "serve": true
       },
       {
        "name": "Alex Molcan",
@@ -1141,7 +1145,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/svk.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        0
+       ],
        "serve": false
       }
      ]
@@ -1968,9 +1974,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Tomas Machac",
+       "short": "T. Machac",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/cze.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -5256,7 +5262,7 @@
      "id": "186711",
      "start": "2026-11-02T16:05Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Campo 3",
@@ -5268,7 +5274,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        4
+        7,
+        3
        ],
        "serve": false
       },
@@ -5279,7 +5286,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        5
+        6,
+        3
        ],
        "serve": false
       }
@@ -5288,8 +5296,8 @@
     {
      "id": "186718",
      "start": "2026-11-02T16:05Z",
-     "state": "in",
-     "detail": "1st",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Campo 1",
@@ -5299,9 +5307,10 @@
        "short": "L. Giovannini",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
-        5
+        6,
+        6
        ],
        "serve": false
       },
@@ -5312,7 +5321,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        3
+        3,
+        0
        ],
        "serve": false
       }
@@ -5320,9 +5330,9 @@
     },
     {
      "id": "186709",
-     "start": "2026-11-02T17:30Z",
+     "start": "2026-11-02T17:45Z",
      "state": "pre",
-     "detail": "11/2 - 12:30 PM EST",
+     "detail": "11/2 - 12:45 PM EST",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Campo 1",
@@ -5349,9 +5359,9 @@
     },
     {
      "id": "186712",
-     "start": "2026-11-02T17:30Z",
+     "start": "2026-11-02T17:50Z",
      "state": "pre",
-     "detail": "11/2 - 12:30 PM EST",
+     "detail": "11/2 - 12:50 PM EST",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Campo 3",
@@ -5821,9 +5831,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Luisina Giovannini",
+       "short": "L. Giovannini",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -6491,7 +6501,7 @@
      "id": "186665",
      "start": "2026-11-02T15:30Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Lwena Court",
@@ -6503,7 +6513,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        5
+        5,
+        2
        ],
        "serve": false
       },
@@ -6514,7 +6525,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        6
+        7,
+        5
        ],
        "serve": true
       }
@@ -7306,5 +7318,5 @@
    ]
   }
  ],
- "fetched": "2026-11-02T16:49:22+00:00"
+ "fetched": "2026-11-02T17:42:35+00:00"
 }
