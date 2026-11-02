@@ -107,17 +107,18 @@
   // prominence = points a game last season, plus a little for each line Onyx prices on him
   function names(B, P) {
     var C = {};
-    function add(name, score, sp) {
+    function add(name, score, sp, mkt) {
       var k = clean(name); if (!k || k.split(' ').length < 2) return;
-      var c = C[k] || (C[k] = {name: name, score: 0, sp: {}});
+      var c = C[k] || (C[k] = {name: name, score: 0, sp: {}, mk: {}});
       c.score += score;
       if (sp) c.sp[sp] = 1;
+      if (mkt) c.mk[mkt] = 1;
     }
     // NFL / college players have no points-a-game on file: their lines say how big a part they are
     var YW = {pass_yds: 0.1, rush_yds: 0.25, rec_yds: 0.25, rec: 3};
     (B || []).forEach(function (p) {
       if (p.kind !== 'prop' || !p.name || /_total$/.test(p.mkt) || /\bD\/ST\b|\bdefense\b/i.test(p.name)) return;
-      add(p.name, 0.5 + (YW[p.mkt] && p.side === 'over' ? YW[p.mkt] * (p.line || 0) : 0), p.sport);
+      add(p.name, 0.5 + (YW[p.mkt] && p.side === 'over' ? YW[p.mkt] * (p.line || 0) : 0), p.sport, p.mkt);
     });
     (P || []).forEach(function (r) { add(r.n, r.ppg, 'nba'); });
     return C;
@@ -146,8 +147,9 @@
     TIDX = {b: B, i: I};
     return I;
   }
-  function lev1(a, b) {                    // true when a and b are at most one edit apart
+  function lev1(a, b) {                    // true when a and b are at most one edit apart (a swap of two letters counts as one)
     if (a === b) return true;
+    if (a.length === b.length) { var df = []; for (var q = 0; q < a.length; q++) if (a[q] !== b[q]) df.push(q); if (df.length === 2 && df[1] === df[0] + 1 && a[df[0]] === b[df[1]] && a[df[1]] === b[df[0]]) return true; }
     if (Math.abs(a.length - b.length) > 1) return false;
     var i = 0, j = 0, d = 0;
     while (i < a.length && j < b.length) {
@@ -158,28 +160,56 @@
     return d + (a.length - i) + (b.length - j) <= 1;
   }
   var NOT_NAMES = /^(gimme|gimmie|lemme|pls|plz|yo|build|hit|show|whats|wanna|gonna|tonite|please|need|want|give|can|you|me|my|some|good|best|top|safest|what|about|is|going|his|her|for|the|a|an|and|or|from|with|i|will|wills|rebound|rebounds|assist|catch|rush|pass|likely|likes|half|halves|quarter|quarters|scorer|scorers|rusher|rushers|receiver|receivers|passer|leading|leader|top|round|robin|basket|bucket|touchdown|touchdowns|totals|chance|chances|safest|lock|locks|tonight|tomorrow|night|slate|card|board|sharp|steam|juice|payout|pays|winner|winners|underdog|underdogs|favorite|favorites|again|every|other|their|there|these|those|about|around|would|could|should|shot|shots|star|stars|over|under|overs|unders|most|plus|game|games|best|safe|safest|team|teams|with|tonight|today|points|value|parlay|legs|leg|lock|bets|plays|picks|money|line|lines|odds|total|totals|spread|score|scores|win|wins|first|anytime|rebounds|assists|yards|receptions|sunday|monday|tuesday|wednesday|thursday|friday|saturday|week|weekend|give|what|which|who|like|need|want|good|more|less|than|from|this|that|the|and|for|nba|nfl|nhl|tennis|college|longshots|dogs|favorites|fade|stack|sgp|props|prop|player|players|ticket|double|triple|edge|bet|play|pick|side|sides|only|just|ats|ml|moneyline|moneylines|spreads|run|runs|puck|goal|goals|alt|alts|alternate|ladder|live|hedge|cover|covers|dog|fav|favs|chalk|lean|leans|model|onyx|parlays|sgps|plus|minus|even|safe|hammer|nuke|banker|bankers|longshot|sleeper|sleepers|fades|tail|tails|boost|boosts|power|prime|primetime|early|late|slate|main|night|afternoon|morning|home|away|road|big|small|low|high|long|short|hot|cold|streak|streaks|trend|trends|units|unit|bankroll|book|books|price|prices|number|numbers|key|keys|half|full|period|periods|inning|innings|set|sets|match|matches|fight|fights|card|cards|round|rounds|teaser|teasers|correlated|stacked|same|different|any|all|both|each|either|neither|one|two|three|four|five|six|seven|eight|nine|ten|twelve|dozen|couple|few|some|many|much|pair|guard|guards|center|centers|forward|forwards|wing|wings|qb|qbs|rb|rbs|wr|wrs|te|tes|upset|upsets|value|sharp|sharpest|night|monday|sunday)$/;
-  function findPlayer(t, C) {
+  function findPlayer(t, C, mk) {
     var keys = Object.keys(C), words = t.trim().split(/\s+/);
-    var best = function (cands) { return cands.sort(function (a, b) { return C[b].score - C[a].score; })[0]; };
+    // two players share a name ("george", "drake"): the one with a line in the asked market today wins,
+    // then anyone with a line today, then the more prominent (11/2: 15,000 generated questions)
+    var tier = function (k) { var c = C[k], m = c.mk || {}; return ((mk || []).some(function (x) { return m[x]; }) ? 2 : 0) + (Object.keys(m).length ? 1 : 0); };
+    var best = function (cands) { return cands.sort(function (a, b) { return (tier(b) - tier(a)) || (C[b].score - C[a].score); })[0]; };
     // 1. a full name ("Luka Garza" is Garza, even though "Luka" alone is Doncic)
     var full = keys.filter(function (k) { return t.indexOf(' ' + k + ' ') >= 0; });
     if (full.length) return C[best(full)].name;
-    // 2. a nickname or a star's one word name
-    var fam = Object.keys(FAMOUS).sort(function (a, b) { return b.length - a.length; });
-    for (var f = 0; f < fam.length; f++) if (new RegExp('(^|\\s)' + esc(fam[f]) + 's?(\\s|$)').test(t)) return FAMOUS[fam[f]];
-    // 3. a last name: the most prominent player who has it
-    var lastHit = keys.filter(function (k) { var l = k.split(' ').pop(); return l.length >= 3 && !NICK[l] && !NOT_NAMES.test(l) && words.some(function (w) { return !NOT_NAMES.test(w) && (w === l || w === l + 's'); }); });
-    if (lastHit.length) return C[best(lastHit)].name;
-    // 4. a first name, or a name one letter off ("luke", "jokick"): every player it could
-    // mean competes and the most prominent wins, so "luke" is Luka Doncic, not a bench Luke
-    var loose = keys.filter(function (k) {
-      var parts = k.split(' ');
-      return words.some(function (w) {
-        if (w.length < 3 || NOT_NAMES.test(w) || NICK[w] || NICK[w.replace(/s$/, '')]) return false;
-        if (w === parts[0]) return true;
-        return w.length >= 5 && parts.some(function (n) { return n.length >= 5 && lev1(w, n); });
+    // 3. every other way a name is typed, scored by how much of it matches: each name part said
+    // exactly counts 2 (the last name a little more), one letter off counts 1. "Mason talor" is Mason
+    // Taylor (first exact + last close) over Jordan Mason (last exact only); "caleb dougllas" is Caleb
+    // Douglas over DeMario Douglas. A bare first name still finds the most prominent player with it.
+    // Ties go to a line in the asked market today, then a line today, then prominence. (11/2: 15,000
+    // generated questions)
+    var ok = function (w) { return w.length >= 3 && !NOT_NAMES.test(w) && !NICK[w] && !NICK[w.replace(/s$/, '')]; };
+    var W = words.filter(ok), fit = {}, typed = null;
+    keys.forEach(function (k) {
+      var parts = k.split(' '), sc = 0, exact = 0;
+      parts.forEach(function (n, pi) {
+        var last = pi === parts.length - 1;
+        if (n.length < 2) return;
+        if (W.some(function (w) { return w === n || (last && w === n + 's'); })) {
+          // a last name typed after a different first name is a different player ("jeremiah smith" is
+          // not Geno Smith): remember the name as typed instead
+          var at = words.indexOf(n) >= 0 ? words.indexOf(n) : words.indexOf(n + 's'), prev = at > 0 ? words[at - 1] : '';
+          if (last && parts.length > 1 && prev && ok(prev) && prev.length >= 3 && prev !== parts[0] && !lev1(prev, parts[0]) && !W.some(function (w) { return w === parts[0]; })) { typed = prev + ' ' + n; return; }
+          sc += last ? 2.1 : 2; exact++;
+        }
+        else if (n.length >= 5 && W.some(function (w) { return w.length >= 5 && lev1(w, n); })) sc += 1;
       });
+      var l = parts[parts.length - 1];
+      if (exact === 1 && sc < 3 && parts.length && W.indexOf(l) >= 0 && (l.length < 3)) return;
+      if (sc >= 2) fit[k] = sc;
     });
+    var fk = Object.keys(fit), top0 = fk.length ? Math.max.apply(null, fk.map(function (k) { return fit[k]; })) : 0;
+    // 2. a nickname or a star's one word name, unless more of another player's name was typed
+    // ("jalen" is Jalen Hurts, "jalen naillor" is Jalen Nailor)
+    if (top0 < 3) {
+      var fam = Object.keys(FAMOUS).sort(function (a, b) { return b.length - a.length; });
+      for (var f = 0; f < fam.length; f++) if (new RegExp('(^|\\s)' + esc(fam[f]) + 's?(\\s|$)').test(t)) return FAMOUS[fam[f]];
+    }
+    if (fk.length) {
+      var top = Math.max.apply(null, fk.map(function (k) { return fit[k]; }));
+      return C[best(fk.filter(function (k) { return fit[k] === top; }))].name;
+    }
+    // a full name nobody on today's boards has: keep it, so the answer can say they have no game today
+    if (typed && !fk.some(function (k) { return fit[k] >= 2; })) return typed.replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+    // 4. one name part one letter off and nothing else ("jokick"): the most prominent such player
+    var loose = keys.filter(function (k) { return k.split(' ').some(function (n) { return n.length >= 5 && W.some(function (w) { return w.length >= 5 && lev1(w, n); }); }); });
     if (loose.length) return C[best(loose)].name;
     return null;
   }
@@ -230,8 +260,10 @@
     if (/tennis|\batp\b|\bwta\b/.test(t)) s.sports.push('tennis');
     // which markets
     for (var i = 0; i < WORDS.length; i++) if (WORDS[i][0].test(t) && s.markets.indexOf(WORDS[i][1]) < 0) {
+      // "parlay of two td scorers" is two legs of TD scorers, not 2+ touchdowns ("2+ td scorers" still is)
+      if (WORDS[i][1] === 'two_plus_td' && /\b(2|two)\s+(td|tds|touchdown)\s+scorers\b/.test(t) && !/\+/.test(t) && /\b(parlay|parly|legs?|legger|of)\b/.test(t)) continue;
       if (WORDS[i][1] === 'anytime_td' && (s.markets.indexOf('two_plus_td') >= 0 || s.markets.indexOf('first_td') >= 0 || s.markets.indexOf('pass_td') >= 0)) continue;
-      if (WORDS[i][1] === 'pass_yds' && s.markets.indexOf('pass_td') >= 0 && !/\byards\b|\byds\b/.test(t)) continue;
+      if (WORDS[i][1] === 'pass_yds' && s.markets.indexOf('pass_td') >= 0 && !/\bpass(ing)? (yards|yds)\b/.test(t)) continue;
       if (/^(pass_yds|rush_yds|rec_yds)$/.test(WORDS[i][1]) && (s.markets.indexOf('rush_rec_yds') >= 0 || s.markets.indexOf('pass_rush_yds') >= 0)) continue;
       if (WORDS[i][1] === 'pass_yds' && s.markets.indexOf('pass_att') >= 0 && !/\byards\b|\byds\b/.test(t)) continue;
       if (WORDS[i][1] === 'q1_total' && (s.markets.indexOf('first_td') >= 0 || s.markets.indexOf('first_basket') >= 0)) continue;
@@ -367,7 +399,7 @@
     var PC = names(B, PRIOR), FOOT = /^(rec|rec_yds|rush_yds|pass_yds|pass_td|pass_att|anytime_td|first_td|two_plus_td|rush_rec_yds|pass_rush_yds)$/, HOOP = /^(pts|reb|ast|threes|first_basket)$/;
     var mk = s.markets || [], want = mk.length && mk.every(function (m) { return FOOT.test(m); }) ? ['nfl', 'cfb'] : mk.length && mk.every(function (m) { return HOOP.test(m); }) ? ['nba'] : null;
     if (want) Object.keys(PC).forEach(function (k) { var sp = Object.keys(PC[k].sp || {}); if (sp.length && !sp.some(function (x) { return want.indexOf(x) >= 0; })) delete PC[k]; });
-    s.player = findPlayer(tPlayer, PC);
+    s.player = findPlayer(tPlayer, PC, s.markets);
     if (s.player) {
       s.team = null; if (s.intent === 'list' && s.count == null && !/props|plays|lines|bets/.test(t)) s.count = 5;
       if (!s.sports.length) {
@@ -432,11 +464,14 @@
       if (mk.length && mk.indexOf(p.mkt) < 0 && mk.indexOf(p.kind) < 0) return false;
       if (spec.props_only && p.kind !== 'prop') return false;
       if (spec.side && spec.side !== 'any' && (p.kind === 'prop' || p.kind === 'total') && p.side !== spec.side) return false;
-      if (two) return p.lam != null;
-      if (spec.min_price != null && p.price < spec.min_price) return false;
-      if (spec.max_price != null && p.price > spec.max_price) return false;
-      if (spec.min_conf != null && p.conf < spec.min_conf) return false;
-      if (spec.min_edge != null && p.edge < spec.min_edge) return false;
+      // 2+ touchdowns: priced off the TD model (lam), so the anytime price and its floors do not apply;
+      // the player, team, day and exclusions still do (11/2: "two touchdowns for kelce" answered with
+      // the whole board)
+      if (two && p.lam == null) return false;
+      if (!two && spec.min_price != null && p.price < spec.min_price) return false;
+      if (!two && spec.max_price != null && p.price > spec.max_price) return false;
+      if (!two && spec.min_conf != null && p.conf < spec.min_conf) return false;
+      if (!two && spec.min_edge != null && p.edge < spec.min_edge) return false;
       if (spec.player && String(p.name || p.label).toLowerCase().indexOf(String(spec.player).toLowerCase()) < 0) return false;
       if (spec.exclude && spec.exclude.length && spec.exclude.some(function (x) { x = String(x || '').toLowerCase().trim(); return x && (String(p.name || '') + ' ' + String(p.label || '')).toLowerCase().indexOf(x) >= 0; })) return false;
       if (TL.length && !onTeams(p, TL)) return false;

@@ -51,6 +51,8 @@ const srv = http.createServer((q, r) => { const p = path.join(root, decodeURICom
       if (e.player && String(s.player || '').toLowerCase() !== e.player.toLowerCase()) why.push(`player ${s.player} want ${e.player}`);
       if (e.teams) { const got = ((s.teams || []).length ? s.teams : s.team ? [s.team] : []).map(x => String(x).toUpperCase()).sort(); if (!same(got, e.teams)) why.push(`teams ${JSON.stringify(got)} want ${JSON.stringify(e.teams)}`); }
       if (e.props_only && !s.props_only) why.push('props_only not set');
+      if (e.sort && s.sort !== e.sort) why.push(`sort ${s.sort} want ${e.sort}`);
+      if (e.target_price != null && s.target_price !== e.target_price) why.push(`target_price ${s.target_price} want ${e.target_price}`);
       // every play returned must honor the reading
       const legs = (R.rows || []);
       for (const p of legs) {
