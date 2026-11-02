@@ -19,7 +19,10 @@
 <script src="saved.js"></script>
 <style>
 body{background:#0c0c0c;color:#fff;margin:0}
-.ac{padding-top:28px;padding-bottom:40px;max-width:640px}
+.ac{padding-top:26px;padding-bottom:40px}
+.ac-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:28px;align-items:start;margin-top:6px}
+@media (max-width:860px){.ac-grid{grid-template-columns:1fr;gap:0}}
+.ac-side .how{margin-top:22px}
 .ac h1{margin:12px 0 0;font-size:clamp(34px,8vw,56px);line-height:1}
 .ac .lead{margin:12px 0 0;color:#b9b2c4;font-size:15px;line-height:1.65}
 .back{display:inline-block;color:#d795ff;font:700 12px monospace;letter-spacing:.06em;text-transform:uppercase;text-decoration:none}
@@ -32,6 +35,10 @@ body{background:#0c0c0c;color:#fff;margin:0}
 .btn[disabled]{opacity:.5;cursor:default}
 .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
 .msg{margin-top:12px;font-size:14px;line-height:1.5}
+.sent{margin-top:14px;padding:14px;border-radius:12px;background:rgba(97,233,112,.08);border:1px solid rgba(97,233,112,.3);font-size:14px;line-height:1.55;color:#dff7e2}
+.sent b{color:#61e970}.sent small{display:block;color:#a7c9ab;font-size:12.5px;margin-top:4px}
+.errb{margin-top:14px;padding:14px;border-radius:12px;background:rgba(255,138,138,.08);border:1px solid rgba(255,138,138,.3);font-size:14px;line-height:1.55;color:#ffd9d9}
+.hint{margin-top:10px;font-size:12.5px;color:#8f879c}
 .ok{color:#61e970}.bad{color:#ff8a8a}
 .who{font-size:20px;font-weight:800;word-break:break-all}.who small{display:block;font:700 11px monospace;letter-spacing:.1em;text-transform:uppercase;color:#d795ff;margin-bottom:6px}
 .stat{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px}
@@ -60,14 +67,38 @@ body{background:#0c0c0c;color:#fff;margin:0}
 </style>
 </head>
 <body class="ox-page">
+<header class="ox-head">
+  <div class="ox-wrap ox-head-in">
+    <a class="ox-brand" href="home.html" aria-label="Onyx Sports Data">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 218 47" aria-hidden="true"><path id="oxWord"></path></svg>
+      <span>Sports Data</span>
+    </a>
+    <a class="ox-markc" href="home.html#sports" aria-label="All sports"><svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 100 137" aria-hidden="true"><path class="oxMark"></path></svg></a>
+    <nav class="ox-acts">
+      <a class="ox-link" href="home.html#my">My Onyx</a>
+      <a class="ox-link" href="home.html#sports">Sports</a>
+    </nav>
+  </div>
+</header>
 <main>
 <section class="ox-wrap ac">
   <a class="back" href="home.html">‹ Onyx Sports</a>
+  <div class="ac-grid">
+  <div class="ac-main">
   <span class="ox-eyebrow" style="display:block;margin-top:16px">Account</span>
   <h1>Your picks,<br>every device.</h1>
   <p class="lead">Sign in with your email and the picks you save, the players you follow and the bets you open on Onyx follow you to your phone, tablet and computer. No password: we email you a one-time link.</p>
   <div id="acBody"><div class="off">Loading...</div></div>
-  <section class="rec" id="record" hidden>
+  </div>
+  <aside class="ac-side">
+  <div class="how">
+    <div><b>What we store.</b> Your email (for the sign-in link) and the picks, players and bets you save here, with each saved pick's result for your record. Only so they follow you to your other devices. Nothing is sold or shared.</div>
+    <div><b>Signed out?</b> Everything works as before and stays on this device. Signing in later merges it into your account.</div>
+    <div><b>Leaving?</b> Delete your account any time from this page. Your email and everything synced to it are removed.</div>
+  </div>
+  </aside>
+  </div>
+  <section class="rec" id="record" hidden style="max-width:900px">
     <span class="ox-eyebrow">Your record</span>
     <h2>Every pick you saved.</h2>
     <p class="sub" id="recSub"></p>
@@ -76,11 +107,7 @@ body{background:#0c0c0c;color:#fff;margin:0}
     <div class="hl" id="recList"></div>
     <button class="more" id="recMore" type="button" hidden>Show more</button>
   </section>
-  <div class="how">
-    <div><b>What we store.</b> Your email (for the sign-in link) and the picks, players and bets you save here, with each saved pick's result for your record. Only so they follow you to your other devices. Nothing is sold or shared.</div>
-    <div><b>Signed out?</b> Everything works as before and stays on this device. Signing in later merges it into your account.</div>
-    <div><b>Leaving?</b> Delete your account any time from this page. Your email and everything synced to it are removed.</div>
-  </div>
+
 </section>
 </main>
 <script>
@@ -90,7 +117,16 @@ function counts() {
   const follows = ['onyxNbaFollow', 'onyxFollow_nfl', 'onyxFollow_cfb', 'onyxFollow_nhl', 'onyxFollow_tennis', 'onyxFollow_golf'].reduce((n, k) => n + count(k), 0);
   return {picks: count('onyxSaved'), players: follows, bets: count('onyxMyBets')};
 }
-let SENT = '';
+let SENT = '', ERRM = '', WAIT = 0, TICK = null, TYPED = '';
+// a resend waits a minute (Supabase limits how often a link can be sent)
+function tick() {
+  clearInterval(TICK);
+  const run = () => { const w = document.getElementById('acWait'), b = document.getElementById('acSend'), left = Math.ceil((WAIT - Date.now()) / 1000);
+    if (!w || !b) return clearInterval(TICK);
+    if (left > 0) { w.textContent = `You can send another link in ${left}s.`; b.disabled = true; } else { w.textContent = ''; b.disabled = false; clearInterval(TICK); } };
+  run(); TICK = setInterval(run, 1000);
+}
+addEventListener('load', () => { try { document.getElementById('oxWord').setAttribute('d', OnyxArt.word); document.querySelectorAll('.oxMark').forEach(p => p.setAttribute('d', OnyxArt.mark)); } catch (e) {} });
 function render() {
   const el = document.getElementById('acBody'), A = window.OnyxAccounts;
   if (!A) return;
@@ -99,15 +135,20 @@ function render() {
   if (!st.signedIn) {
     el.innerHTML = `<div class="box">
       <label for="acEmail">Your email</label>
-      <input id="acEmail" type="email" inputmode="email" autocomplete="email" placeholder="you@email.com" value="${esc(SENT)}">
-      <div class="row"><button class="btn" id="acSend" type="button">Email me a sign-in link</button></div>
-      <div class="msg" id="acMsg">${SENT ? `<span class="ok">Link sent to ${esc(SENT)}. Open it on this device to sign in. It works once, for an hour.</span>` : st.error ? `<span class="bad">${esc(st.error)}</span>` : ''}</div>
+      <input id="acEmail" type="email" inputmode="email" autocomplete="email" placeholder="you@email.com" value="${esc(SENT || TYPED)}">
+      <div class="row"><button class="btn" id="acSend" type="button">${SENT ? 'Send it again' : 'Email me a sign-in link'}</button></div>
+      <div id="acMsg">${SENT ? `<div class="sent"><b>Link sent to ${esc(SENT)}.</b> Open the email on this device and tap the link to sign in.<small>It works once, for an hour. Nothing after a couple of minutes? Check spam or promotions.</small></div>`
+        : ERRM ? `<div class="errb">${esc(ERRM)}</div>` : st.error ? `<div class="errb">${esc(st.error)}</div>` : ''}</div>
+      <div class="hint" id="acWait"></div>
     </div>`;
     const go = async () => {
-      const i = document.getElementById('acEmail'), b = document.getElementById('acSend'), m = document.getElementById('acMsg');
-      b.disabled = true;
-      try { await A.signIn(i.value); SENT = i.value.trim(); render(); }
-      catch (e) { b.disabled = false; m.innerHTML = `<span class="bad">${esc(e && e.message ? e.message : 'Could not send the link right now. Try again in a minute.')}</span>`; }
+      const i = document.getElementById('acEmail'), b = document.getElementById('acSend');
+      TYPED = i.value.trim();
+      if (Date.now() < WAIT) return;
+      b.disabled = true; b.textContent = 'Sending...';
+      try { await A.signIn(i.value); SENT = i.value.trim(); ERRM = ''; WAIT = Date.now() + 60e3; }
+      catch (e) { ERRM = e && e.message ? e.message : 'Could not send the link right now. Try again in a minute.'; SENT = ''; if (e && e.status === 429) WAIT = Date.now() + 60e3; }
+      render(); tick();
     };
     document.getElementById('acSend').onclick = go;
     document.getElementById('acEmail').onkeydown = e => { if (e.key === 'Enter') go(); };
@@ -123,7 +164,7 @@ function render() {
     <div class="danger"><p>Delete your account: your email and everything synced to it are removed. This device keeps its own picks.</p><button class="btn ghost" type="button" id="acDel">Delete my account</button></div>
   </div>`;
   document.getElementById('acSync').onclick = () => A.sync();
-  document.getElementById('acOut').onclick = () => { SENT = ''; A.signOut(); };
+  document.getElementById('acOut').onclick = () => { SENT = ''; ERRM = ''; A.signOut(); };
   document.getElementById('acDel').onclick = async () => {
     if (!confirm('Delete your Onyx account? Your email and everything synced to it are removed. This device keeps its own picks.')) return;
     try { await A.deleteAccount(); SENT = ''; } catch (e) { alert('Could not delete the account right now. Try again in a minute.'); }
