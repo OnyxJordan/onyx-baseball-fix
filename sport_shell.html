@@ -15,6 +15,8 @@
 <!-- shared app shell: bottom menu, search, toasts, status-bar fix (ui.js) -->
 <script src="ui.js" defer></script>
 <script src="saved.js"></script>
+<!-- team and player cards (cards.js, data/<sport>/cards/*.json): data-oxt / data-oxp open them -->
+<script src="cards.js" defer></script>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="preconnect" href="https://site.api.espn.com" crossorigin>
@@ -388,6 +390,16 @@
 .dp-bt th,.dp-bt td{padding:6px 6px;border-bottom:1px solid var(--border);text-align:right;white-space:nowrap}
 .dp-bt th:first-child,.dp-bt td:first-child{text-align:left;white-space:normal}
 .dp-bt td.dp-win{color:#61e970;font-weight:800;background:none}
+/* Similar spots (11/2): closing-line history of this game's spot, context only */
+.ss-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:8px}
+.ss-col{background:var(--bg3);border:1px solid var(--border2);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.ss-h{display:flex;align-items:baseline;justify-content:space-between;gap:8px;font-size:13px}.ss-h span{font:700 10px monospace;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+.ss-r{display:flex;flex-direction:column;gap:3px;padding-top:7px;border-top:1px solid var(--border)}
+.ss-t{font-size:12.5px;line-height:1.35;color:var(--text2);overflow-wrap:anywhere}
+.ss-n{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;font-size:12px}.ss-n b{font-family:monospace;font-size:13px;color:var(--text)}.ss-n em{font-style:normal;color:var(--text3);font-family:monospace;font-size:11px}
+.ss-sig{font:700 9.5px monospace;letter-spacing:.05em;text-transform:uppercase;padding:2px 6px;border-radius:6px;background:rgba(255,255,255,.06);color:var(--text3)}
+.ss-sig.u{background:rgba(176,56,249,.16);color:#d795ff}
+.ss-ft{margin-top:8px;font-size:11.5px;line-height:1.45;color:var(--text3)}.ss-ft b{color:var(--text2)}
 </style>
 <link rel="stylesheet" href="onyx.css"><script src="onyx.js" defer></script>
 </head>
@@ -486,7 +498,7 @@ function oddsRows(rows) {
 }
 function teamId(g, side, full) {
   const rk = g[side + '_rank'] ? `<span class="rk">#${esc(g[side + '_rank'])}</span> ` : '';
-  return `${lg(g[side + '_logo'], 'm')}<div class="gm-nm"><b>${rk}${esc(full ? (g[side + '_name'] || g[side]) : (g[side + '_short'] || g[side]))}</b><span>${esc(g[side + '_rec'] || '')}</span></div>`;
+  return `${lg(g[side + '_logo'], 'm')}<div class="gm-nm" data-oxt="${esc(g[side])}"><b>${rk}${esc(full ? (g[side + '_name'] || g[side]) : (g[side + '_short'] || g[side]))}</b><span>${esc(g[side + '_rec'] || '')}</span></div>`;
 }
 function gameBoard(g) {
   const b = oddsRows(['away', 'home'].map(sd => ({id: teamId(g, sd, true), cells: gameCells(g, sd)})));
@@ -670,13 +682,14 @@ function drawGame(gid) {
   if (!box) return;
   const g = live(game(gid) || {});
   const head = `<div class="gc-hd">
-    <div class="gc-side">${lg(g.away_logo, 'l')}<div><b>${esc(g.away_name || g.away)}</b><span>${esc(g.away_rec || '')}</span></div></div>
+    <div class="gc-side" data-oxt="${esc(g.away)}">${lg(g.away_logo, 'l')}<div><b>${esc(g.away_name || g.away)}</b><span>${esc(g.away_rec || '')}</span></div></div>
     <div class="gc-mid"><div class="sc">${g.state === 'pre' ? 'vs' : esc(g.away_score) + ' - ' + esc(g.home_score)}</div><div class="st ${g.state === 'in' ? 'live' : ''}">${stateTxt(g)}</div></div>
-    <div class="gc-side h"><div><b>${esc(g.home_name || g.home)}</b><span>${esc(g.home_rec || '')}</span></div>${lg(g.home_logo, 'l')}</div>
+    <div class="gc-side h" data-oxt="${esc(g.home)}"><div><b>${esc(g.home_name || g.home)}</b><span>${esc(g.home_rec || '')}</span></div>${lg(g.home_logo, 'l')}</div>
     ${g.state !== 'pre' ? `<div class="ssc a">${esc(g.away_score)}</div><div class="ssc h">${esc(g.home_score)}</div>` : ''}</div>`;
   const s = GC_CACHE[gid];
   box.innerHTML = `<div class="gc" id="gc">${gameNav(gid)}${head}
     ${gameBoard(g) ? `<div class="gc-sec"><h4>Onyx lines</h4>${gameBoard(g)}</div>` : ''}
+    ${simSpots(g.gid)}
     ${((SD.model || {}).td || []).some(r => r.gid === g.gid) ? `<div class="gc-sec">${tdTable(SD.model.td.filter(r => r.gid === g.gid).slice(0, 14), 'Touchdown scorers')}</div>` : ''}
     <div class="gc-sec" style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-primary" onclick="bet(null,'game ${esc(g.away)} @ ${esc(g.home)}')">⚡ Bet this game on Onyx</button>
       <button class="btn-secondary" onclick="OPEN_GAME=null;renderGames()">Close</button></div>
@@ -792,6 +805,41 @@ function injuries(s, g) {
         <b>${esc(a.shortName || a.displayName || '')}</b><span class="dim">${esc(((a.position || {}).abbreviation) || '')}${d.type ? ' · ' + esc(d.type) : ''}</span></div>`; }).join('')}</div>`;
   const side = ab => I.find(t => (t.team || {}).abbreviation === ab);
   return `<div class="gc-sec"><h4>Injury report</h4><div class="l5-grid">${[side(g.away), side(g.home)].filter(Boolean).map(col).join('')}</div></div>`;
+}
+// Similar spots (11/2): data/<sport>/situations.json (situations.py), fetched once when a
+// gamecenter opens. Context, not a pick: past games in this game's spot graded against
+// their closing line, with the sample, a plain significance read and the out-of-sample
+// backtest. Self-contained: simSpots(gid) returns the whole card, or '' when there is none.
+var SIT = null, SIT_ST = null;
+function sitLoad() {
+  if (SIT || SIT_ST || !SD.sit_at) return;
+  SIT_ST = 'busy';
+  fetch('data/' + SD.sport + '/situations.json?v=' + encodeURIComponent(SD.sit_at))
+    .then(r => r.ok ? r.json() : null).catch(() => null)
+    .then(d => { SIT = d && d.games ? d : null; SIT_ST = SIT ? 'ok' : 'err';
+      document.querySelectorAll('[data-sit]').forEach(el => { el.outerHTML = simSpots(el.dataset.sit); }); });
+}
+function sitRow(x, tot) {
+  let rec, pc;
+  let ex = x.exp == null ? .5 : x.exp;   // the closing price's no-vig chance (puck lines are far from 50%)
+  if (tot) { const ov = x.o >= x.u; rec = ov ? `Over ${x.o}-${x.u}` : `Under ${x.u}-${x.o}`; pc = x.pct == null ? '' : ((ov ? x.pct : 1 - x.pct) * 100).toFixed(1) + '%'; if (!ov) ex = 1 - ex; }
+  else { rec = `${x.w}-${x.l}${x.p ? '-' + x.p : ''} ATS`; pc = x.pct == null ? '' : (x.pct * 100).toFixed(1) + '%'; }
+  return `<div class="ss-r"><div class="ss-t">${esc(x.t)}</div><div class="ss-n"><b>${rec}</b><span>${pc}</span>
+    ${Math.abs(ex - .5) > .02 ? `<em>prices implied ${(ex * 100).toFixed(1)}%</em>` : ''}${!tot && x.cov != null ? `<em>avg cover ${x.cov > 0 ? '+' : ''}${x.cov}</em>` : ''}<em>n ${x.n}${x.small ? ' (small)' : ''} · ${esc(x.yrs)}</em>
+    <span class="ss-sig${x.sig !== 'within normal luck' ? ' u' : ''}">${esc(x.sig)}</span></div></div>`;
+}
+function simSpots(gid) {
+  if (!SD.sit_at || SIT_ST === 'err') return '';
+  if (!SIT) { sitLoad(); return `<div data-sit="${esc(gid)}"></div>`; }
+  const r = SIT.games[gid], g = game(gid) || {};
+  if (!r || (!(r.home || []).length && !(r.total || []).length)) return '';
+  const m = SIT.meta || {}, rk = r.rank || {};
+  const sg = v => v == null ? '' : (v > 0 ? '+' : '') + v;
+  const col = (side, ab, line) => (r[side] || []).length ? `<div class="ss-col"><div class="ss-h"><b>${esc(ab)} ${sg(line)}</b><span>${rk[side] ? 'rated #' + rk[side] : ''}</span></div>${r[side].map(x => sitRow(x)).join('')}</div>` : '';
+  const cols = col('away', g.away, r.line == null ? null : -r.line) + col('home', g.home, r.line)
+    + ((r.total || []).length ? `<div class="ss-col"><div class="ss-h"><b>Total ${esc(r.tot)}</b><span>over / under</span></div>${r.total.map(x => sitRow(x, true)).join('')}</div>` : '');
+  return `<div class="gc-sec"><h4>Similar spots · closing-line history ${esc(m.seasons || '')}</h4><div class="ss-grid">${cols}</div>
+    <div class="ss-ft"><b>Context, not a pick.</b> Every past game in the same spot, graded against its closing line (${(m.lined || 0).toLocaleString()} games). Spots are fixed in advance and ratings use only games before each tip. "Unusual" means luck does that less than 1 time in 20 against the closing prices; with this many spots, some will.${m.bt_short || m.bt ? ' <b>' + esc(m.bt_short || m.bt) + '</b>' : ''}</div></div>`;
 }
 function preview(s, g) {
   if (g.state !== 'pre') return '';
@@ -1457,7 +1505,7 @@ function matchCenter(id) {
   const sit = tnSituation(e, m, st, cal.need);
   const row = (x, i) => { const P = tnPlayer(x.name);
     return `<div class="mc-p${x.win ? ' w' : ''}">${x.flag ? `<img src="${esc(x.flag)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">` : '<i></i>'}
-      <div class="mc-nm"><b>${esc(x.name)}</b><span>${x.seed ? 'Seed ' + esc(x.seed) + ' · ' : ''}${P && P.elo ? 'Elo ' + P.elo : 'unrated'}</span></div>
+      <div class="mc-nm"><b data-oxp="${esc(x.name)}">${esc(x.name)}</b><span>${x.seed ? 'Seed ' + esc(x.seed) + ' · ' : ''}${P && P.elo ? 'Elo ' + P.elo : 'unrated'}</span></div>
       ${m.state === 'in' && x.serve ? '<i class="sv" title="Serving"></i>' : '<i></i>'}
       <div class="mc-sets">${x.sets.map((v, j) => `<span class="${(m.p[1 - i].sets[j] || 0) < v ? 'won' : ''}">${v}</span>`).join('')}</div>
       <div class="mc-sw">${m.state === 'pre' ? '' : S[i]}</div></div>`; };
@@ -1899,7 +1947,7 @@ function renderBoard() {
       <input placeholder="Search players, teams" value="${esc(BQ)}" oninput="BQ=this.value.toLowerCase();renderBoard();this.focus();this.setSelectionRange(this.value.length,this.value.length)" style="width:100%;padding:10px 12px;margin-bottom:10px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid var(--border2);color:var(--text);font:500 14px 'Space Grotesk',sans-serif">
       <div class="sp-tabs-seg"><button class="${BMKT === 'all' ? 'on' : ''}" onclick="BMKT='all';renderBoard()">All</button>${mk.map(m => `<button class="${BMKT === m ? 'on' : ''}" onclick="BMKT='${esc(m)}';renderBoard()">${esc(MKT_NAME[m] || m)}</button>`).join('')}</div>
       <div class="tbl"><table><thead><tr><th>Player</th><th>Market</th><th class="r">Line</th>${(SD.model || {}).status ? '<th class="r">Proj</th>' : ''}<th class="r">Over</th><th class="r">Under</th></tr></thead><tbody>
-      ${P.slice(0, 400).map(p => { const g = game(p.gid) || {}; return `<tr><td><b>${esc(p.name)}</b> <span class="dim">${esc(g.away ? g.away + ' @ ' + g.home : '')}</span></td><td class="dim">${esc(MKT_NAME[p.mkt] || p.mkt)}</td><td class="r mono">${esc(lineOf(p))}</td>
+      ${P.slice(0, 400).map(p => { const g = game(p.gid) || {}; return `<tr><td><b data-oxp="${esc(p.name)}" data-oxg="${esc(p.gid || '')}" data-oxf="bets">${esc(p.name)}</b> <span class="dim">${esc(g.away ? g.away + ' @ ' + g.home : '')}</span></td><td class="dim">${esc(MKT_NAME[p.mkt] || p.mkt)}</td><td class="r mono">${esc(lineOf(p))}</td>
         ${(SD.model || {}).status ? `<td class="r mono ${p.proj != null ? (p.proj > p.line ? 'lean-o' : 'lean-u') : 'dim'}">${p.proj != null ? num(p.proj) : '-'}</td>` : ''}
         <td class="r">${chip(p.over, p.name + (p.mkt === 'anytime_td' ? ' anytime TD' : ' Over ' + p.line), p.over_sel, p.mkt === 'anytime_td' ? 'Yes' : 'Over')}</td><td class="r">${p.under != null ? chip(p.under, p.name + ' Under ' + p.line, p.under_sel, 'Under') : '<span class="dim">-</span>'}</td></tr>`; }).join('')}
       </tbody></table></div>`);
@@ -1924,7 +1972,7 @@ function projTable(rows) {
       ? chip(r.over, r.name + ' Over ' + r.line, r.over_sel, 'Over ' + r.line) : chip(r.under, r.name + ' Under ' + r.line, r.under_sel, 'Under ' + r.line);
     return `<div class="pl-row">
       <div class="pl-who">${r.hs ? `<img class="pl-hs" src="${esc(r.hs)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">` : '<span class="pl-hs"></span>'}
-        <div class="pl-nm"><b>${esc(r.name)}${r.inj ? `<span class="inj-q" title="Questionable${r.inj_d ? ' (' + esc(r.inj_d) + ')' : ''} on the injury report">Q</span>` : ''}</b><span>${esc(r.team)} ${r.home ? 'vs' : '@'} ${esc(r.opp)} · ${esc(MKT_NAME[r.mkt] || r.mkt)}</span></div>
+        <div class="pl-nm"><b data-oxp="${esc(r.name)}" data-oxpt="${esc(r.team || '')}">${esc(r.name)}${r.inj ? `<span class="inj-q" title="Questionable${r.inj_d ? ' (' + esc(r.inj_d) + ')' : ''} on the injury report">Q</span>` : ''}</b><span>${esc(r.team)} ${r.home ? 'vs' : '@'} ${esc(r.opp)} · ${esc(MKT_NAME[r.mkt] || r.mkt)}</span></div>
         <div class="pl-pj"><b>${num(r.proj)}</b><span>${r.prob != null && side ? pct(r.prob, 0) + ' ' + (side === 'over' ? 'O' : 'U') : 'proj'}</span></div></div>
       ${r.why ? whyLine(r).replace('pk-why', 'pk-why pl-why') : ''}
       <div class="pl-ev"><span>L3 <b>${esc((r.l3 || []).join(' · ') || '-')}</b></span><span>Szn <b>${num(r.season)}</b></span>${r.pid ? `<button class="fl-btn${isF(r.pid) ? ' on' : ''}" title="Follow live" onclick="toggleF('${esc(r.pid)}','${esc(String(r.name).replace(/'/g, ''))}','${esc(r.gid)}')">${isF(r.pid) ? '★' : '☆'}</button>` : ''}<span class="pl-ln">${lean}</span></div>
@@ -2179,7 +2227,7 @@ function renderDepth() {
       const brk = prev != null && String(p.role || '').replace(/\d+$/, '') === String(prev).replace(/\d+$/, '') && p.role !== prev && /^[LDG]\d$/.test(p.role || '');
       prev = p.role;
       const tag = p.tag ? `<small class="${tier === 'Out' ? 'out' : p.q || /question/i.test(p.tag) ? 'q' : ''}">${esc(p.tag)}</small>` : '';
-      return `<tr class="${tier === 'Out' ? 'out' : tier === 'Bench' ? 'bench' : ''}${brk ? ' brk' : ''}"><td class="pl"><span class="dp-role${tier === 'Starter' ? ' st' : ''}">${esc(p.role || tier || p.pos || '')}</span><b>${esc(p.n || '')}</b>${p.pos && p.pos !== g ? ` <span class="dim mono" style="font-size:10px">${esc(p.pos)}</span>` : ''}${tag}</td>
+      return `<tr class="${tier === 'Out' ? 'out' : tier === 'Bench' ? 'bench' : ''}${brk ? ' brk' : ''}"><td class="pl"><span class="dp-role${tier === 'Starter' ? ' st' : ''}">${esc(p.role || tier || p.pos || '')}</span><b data-oxp="${esc(p.n || '')}" data-oxpt="${esc(DEPTH_TEAM)}">${esc(p.n || '')}</b>${p.pos && p.pos !== g ? ` <span class="dim mono" style="font-size:10px">${esc(p.pos)}</span>` : ''}${tag}</td>
         <td class="r use">${dpUse(u, gu)}</td>${showGp ? `<td class="r mono">${dpVal(o.gp, 'gp')}</td>` : ''}${cols.map(k => `<td class="r mono">${dpVal(o[k], k)}</td>`).join('')}</tr>`;
     }).join('');
     return `<div class="dp-grp"><h4>${esc((D.group_names || {})[g] || DP_GN[g] || g)}</h4><div class="tbl"><table><thead><tr><th class="pl">Player</th><th class="r">${esc(gHd)}</th>${showGp ? '<th class="r">GP</th>' : ''}${cols.map(k => `<th class="r">${esc(lab[k] || k)}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div></div>`;
@@ -2200,7 +2248,7 @@ function renderDepth() {
   el.innerHTML = `<div class="sec-hdr"><h2>Depth chart</h2><span class="dim mono" style="font-size:11px">${D.generated ? 'updated ' + esc(new Date(D.generated).toLocaleString('en-US', {month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York'})) + ' ET' : ''}</span></div>
     <div class="dp-bar"><select aria-label="Team" onchange="dpPick(this.value)">${keys.map(k => `<option value="${esc(k)}"${k === DEPTH_TEAM ? ' selected' : ''}>${esc(T[k].name || k)}</option>`).join('')}</select>
       <div class="gc-sub">${views.map(([k, t]) => `<button class="${k === V ? 'on' : ''}" onclick="dpView('${k}')">${t}</button>`).join('')}</div></div>
-    <div class="dp-team">${lg(tm.logo)}<b>${esc(tm.name || DEPTH_TEAM)}</b><div class="dp-meta">${tm.pace != null ? `<span>${esc(D.pace_label || 'Pace')} ${esc(dpVal(tm.pace))}</span>` : ''}${nx}<span>${esc(D.use_label || useHd)}: ${V === 'proj' ? 'projected' : V === 'now' ? 'this season' : 'last season'}</span></div></div>
+    <div class="dp-team" data-oxt="${esc(DEPTH_TEAM)}">${lg(tm.logo)}<b>${esc(tm.name || DEPTH_TEAM)}</b><div class="dp-meta">${tm.pace != null ? `<span>${esc(D.pace_label || 'Pace')} ${esc(dpVal(tm.pace))}</span>` : ''}${nx}<span>${esc(D.use_label || useHd)}: ${V === 'proj' ? 'projected' : V === 'now' ? 'this season' : 'last season'}</span></div></div>
     <p class="dim" style="font-size:12px;margin:4px 0 0">${V === 'proj' ? 'Projected per game. Tap This season or Last season for what each player has done.' : V === 'now' ? 'Per game this season.' : 'Per game last season.'} A dash means no role in that number.</p>
     ${body || '<div class="empty">No players listed for this team yet.</div>'}
     <div class="lab" style="margin-top:20px"><div class="eb">How the depth chart works</div><p>${esc(D.method || '')}</p>

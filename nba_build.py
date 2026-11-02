@@ -959,6 +959,25 @@ def main():
     except Exception as x:   # fail-soft: the depth chart never blocks the NBA build
         print(f"  depth chart: skipped ({str(x)[:160]})")
         data["depth"] = None
+    # Similar spots (11/2): closing-line history of games in this game's spot, context only
+    # (situations.py): never a pick, never in the Top 10, a ledger or the props model.
+    # Fail-soft and time-capped; the page fetches data/nba/situations.json in the game card.
+    data["sit_at"] = None
+    try:
+        import situations
+        sit = situations.for_page("nba", slate, refresh=not LINES_ONLY)   # the 10-minute line runs skip the history fetch
+        if sit:
+            sit["generated"] = data["sit_at"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
+            (DATA / "situations.json").write_text(json.dumps(sit, separators=(",", ":"), ensure_ascii=False), encoding="utf-8")
+    except Exception as x:
+        print(f"  situations: skipped ({str(x)[:160]})")
+    # team cards (11/2, cards.py): data/nba/cards/<team>.json, fetched when a team is tapped.
+    # Records, closing-line history, trends and the environment the props model uses. Fail-soft.
+    try:
+        import cards
+        cards.build_nba(slate, tg, lg, th, hist, data["engine"])
+    except Exception as x:
+        print(f"  cards: skipped ({type(x).__name__}: {str(x)[:160]})")
     # today's best plays (home page Top 10 and the top of the Plays tab)
     data["top"] = write_top(rows, games, today_rows, open_led, today, jp, fshots)[:10]
     shell = open(SHELL, encoding="utf-8").read()
