@@ -1729,6 +1729,29 @@ or Onyx Picks.
   but that whole bucket went 125-125 from 2023 on, so it is not a rule.
 - Changing a feature, bucket or template is a model change: bump `situations.VERSION` and
   re-run the backtest.
+- **v2 (11/2), team first.** Jordan: "relevant to the team and more situational, maybe last
+  10-20 ... more recent trends." Each side now leads with THAT team's own games this season
+  and last (at most the last 20 of each kind, `situations.team_side`), in a fixed order: ATS
+  last 20 with last 10 (NHL: puck line), in today's role (road dog, home favorite...), in
+  today's spread range, off today's last result (this season only), vs today's opponent tier;
+  a situational row needs 5+ games (`TEAM_MIN`). Totals: each team's O/U last 20 with last 10,
+  and both combined (`team_total`). Each row: W-L-P, %, avg cover, the window ("last 20, since
+  Jan 2026, 6 this season"; early in a college season "last season, last 20"), and a luck read:
+  binomial against the closing prices' no-vig chance, tag `small sample` (under 10 decided
+  games) / `within normal luck` / `unusual` (p < .05), plus "7-3 is common luck at this sample".
+  College basketball adds a roster-turnover note when 50%+ of the projected top-8 minutes are
+  new (`data/cbb/depth.json`). The league-wide spot is ONE row per side and total, built from
+  the last two seasons only. Payload: `games[gid].team` / `.note` beside the old keys; logs are
+  rebuilt every build from `situations_hist.json`, which the builds append to.
+- **Team-row backtest** (`tools/situations_backtest.py all --write`, or `--team` to re-run only
+  that part): game by game, each team's record from earlier games only, next game graded at
+  the closing price. Teams 8-2+ ATS in their last 10: CBB 1,979-1,976 (-5.4%), NBA 421-408
+  (-3.3%), NHL 532-509 (-6.4%), CFB 248-249 (-4.6%), NFL 83-104 (-14.7%). 15-5+ in the last 20,
+  70%+ in role and 2-8 or worse cold teams: none beat the close at p < .05 in any sport (best:
+  NFL 15-5+ 45-35, +7.1%, p .27). Team ATS streaks are noise; the card's footer says so. The
+  league row's backtest now also uses a two-season window and the first (only shown) spot:
+  CBB 1,479-1,438 (-4.1%), CFB 345-345 (-4.6%), NFL 293-267 (+0.0%), NBA 608-599 (-4.1%),
+  NHL 271-279 (-9.2%).
 
 ## Onyx Picks (11/2)
 

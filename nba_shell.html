@@ -632,6 +632,8 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
 .ss-sig{font:700 9.5px monospace;letter-spacing:.05em;text-transform:uppercase;padding:2px 6px;border-radius:6px;background:rgba(255,255,255,.06);color:var(--text3)}
 .ss-sig.u{background:rgba(176,56,249,.16);color:#d795ff}
 .ss-ft{margin-top:8px;font-size:11.5px;line-height:1.45;color:var(--text3)}.ss-ft b{color:var(--text2)}
+.ss-lk{font-size:11px;line-height:1.5;color:var(--text3)}.ss-lk .ss-sig{margin-right:4px}.ss-nt{font-size:11px;line-height:1.4;color:var(--text3);padding:6px 8px;border-radius:8px;background:rgba(255,255,255,.04)}
+.ss-lg{padding-top:8px;border-top:1px solid var(--border2);font:700 9.5px monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--text3)}.ss-lg+.ss-r{border-top:0;padding-top:0}
 </style>
 <link rel="stylesheet" href="onyx.css"><script src="onyx.js" defer></script></head>
 <body>
@@ -2055,6 +2057,7 @@ function sitLoad() {
       document.querySelectorAll('[data-sit]').forEach(el => { el.outerHTML = simSpots(el.dataset.sit); }); });
 }
 function sitRow(x, tot) {
+  if (x.tm) return sitTeam(x, tot);
   let rec, pc;
   let ex = x.exp == null ? .5 : x.exp;   // the closing price's no-vig chance (puck lines are far from 50%)
   if (tot) { const ov = x.o >= x.u; rec = ov ? `Over ${x.o}-${x.u}` : `Under ${x.u}-${x.o}`; pc = x.pct == null ? '' : ((ov ? x.pct : 1 - x.pct) * 100).toFixed(1) + '%'; if (!ov) ex = 1 - ex; }
@@ -2063,18 +2066,30 @@ function sitRow(x, tot) {
     ${Math.abs(ex - .5) > .02 ? `<em>prices implied ${(ex * 100).toFixed(1)}%</em>` : ''}${!tot && x.cov != null ? `<em>avg cover ${x.cov > 0 ? '+' : ''}${x.cov}</em>` : ''}<em>n ${x.n}${x.small ? ' (small)' : ''} · ${esc(x.yrs)}</em>
     <span class="ss-sig${x.sig !== 'within normal luck' ? ' u' : ''}">${esc(x.sig)}</span></div></div>`;
 }
+// v2 (11/2): this team's own recent games lead (x.tm), one league-wide spot follows
+function sitTeam(x, tot) {
+  const ov = !tot || x.w >= x.l, a = ov ? x.w : x.l, b = ov ? x.l : x.w;
+  let ex = x.exp == null ? .5 : x.exp; if (!ov) ex = 1 - ex;
+  const rec = tot ? `${ov ? 'Over' : 'Under'} ${a}-${b}${x.p ? '-' + x.p : ''}` : `${a}-${b}${x.p ? '-' + x.p : ''}`;
+  const pc = x.pct == null ? '' : ((ov ? x.pct : 1 - x.pct) * 100).toFixed(0) + '%';
+  const l10 = x.l10 ? `<em>last 10 ${tot ? (x.l10[0] >= x.l10[1] ? 'over ' + x.l10[0] + '-' + x.l10[1] : 'under ' + x.l10[1] + '-' + x.l10[0]) : x.l10[0] + '-' + x.l10[1]}${x.l10[2] ? '-' + x.l10[2] : ''}</em>` : '';
+  return `<div class="ss-r"><div class="ss-t">${esc(x.t)} <span class="dim">· ${esc(x.win)}</span></div><div class="ss-n"><b>${rec}</b><span>${pc}</span>${l10}
+    ${Math.abs(ex - .5) > .02 ? `<em>prices implied ${(ex * 100).toFixed(0)}%</em>` : ''}${!tot && x.cov != null ? `<em>avg cover ${x.cov > 0 ? '+' : ''}${x.cov}</em>` : ''}
+    </div><div class="ss-lk"><span class="ss-sig${x.sig === 'unusual' ? ' u' : ''}">${esc(x.sig)}</span> ${esc(x.luck)}</div></div>`;
+}
 function simSpots(gid) {
   if (!D.sit_at || SIT_ST === 'err') return '';
   if (!SIT) { sitLoad(); return `<div data-sit="${esc(gid)}"></div>`; }
-  const r = SIT.games[gid], g = gameOf(gid) || {};
-  if (!r || (!(r.home || []).length && !(r.total || []).length)) return '';
-  const m = SIT.meta || {}, rk = r.rank || {};
+  const r = SIT.games[gid], g = gameOf(gid) || {}, T = (r && r.team) || {};
+  if (!r || ![r.home, r.total, T.home, T.away, T.total].some(v => (v || []).length)) return '';
+  const m = SIT.meta || {}, rk = r.rank || {}, nt = r.note || {};
   const sg = v => v == null ? '' : (v > 0 ? '+' : '') + v;
-  const col = (side, ab, line) => (r[side] || []).length ? `<div class="ss-col"><div class="ss-h"><b>${esc(ab)} ${sg(line)}</b><span>${rk[side] ? 'rated #' + rk[side] : ''}</span></div>${r[side].map(x => sitRow(x)).join('')}</div>` : '';
+  const lg = (xs, tot) => (xs || []).length ? `<div class="ss-lg">League spot · ${esc(m.recent || '')}</div>${sitRow(xs[0], tot)}` : '';
+  const col = (side, ab, line) => ((T[side] || []).length || (r[side] || []).length) ? `<div class="ss-col"><div class="ss-h"><b>${esc(ab)} ${sg(line)}</b><span>${rk[side] ? 'rated #' + rk[side] : ''}</span></div>${(T[side] || []).map(x => sitRow(x)).join('')}${nt[side] ? `<div class="ss-nt">${esc(nt[side])}</div>` : ''}${lg(r[side])}</div>` : '';
   const cols = col('away', g.away, r.line == null ? null : -r.line) + col('home', g.home, r.line)
-    + ((r.total || []).length ? `<div class="ss-col"><div class="ss-h"><b>Total ${esc(r.tot)}</b><span>over / under</span></div>${r.total.map(x => sitRow(x, true)).join('')}</div>` : '');
-  return `<div class="gc-card"><div class="gc-card-title">Similar spots · closing-line history ${esc(m.seasons || '')}</div><div class="ss-grid">${cols}</div>
-    <div class="ss-ft"><b>Context, not a pick.</b> Every past game in the same spot, graded against its closing line (${(m.lined || 0).toLocaleString()} games). Spots are fixed in advance and ratings use only games before each tip. "Unusual" means luck does that less than 1 time in 20 against the closing prices; with this many spots, some will.${m.bt_short || m.bt ? ' <b>' + esc(m.bt_short || m.bt) + '</b>' : ''}</div></div>`;
+    + (((T.total || []).length || (r.total || []).length) ? `<div class="ss-col"><div class="ss-h"><b>Total ${esc(r.tot)}</b><span>over / under</span></div>${(T.total || []).map(x => sitRow(x, true)).join('')}${lg(r.total, true)}</div>` : '');
+  return `<div class="gc-card"><div class="gc-card-title">Similar spots · recent form vs the closing line</div><div class="ss-grid">${cols}</div>
+    <div class="ss-ft"><b>Context, not a pick.</b> Team rows are each team's own games this season and last (at most the last 20), graded against the closing line, not Onyx prices. Samples this small swing on luck: a coin flip goes 7-3 or more lopsided about 1 time in 3. The league spot is every game in the same spot over ${esc(m.recent || 'the last two seasons')}.${m.bt_team ? ' <b>' + esc(m.bt_team) + '</b>' : ''}${m.bt_short ? ' ' + esc(m.bt_short) : ''}</div></div>`;
 }
 // live pace card: every Onyx line in this game, where it stands, where it finishes at
 // this pace, and the chance the model's side lands from here
