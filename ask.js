@@ -107,18 +107,19 @@
   // prominence = points a game last season, plus a little for each line Onyx prices on him
   function names(B, P) {
     var C = {};
-    function add(name, score) {
+    function add(name, score, sp) {
       var k = clean(name); if (!k || k.split(' ').length < 2) return;
-      var c = C[k] || (C[k] = {name: name, score: 0});
+      var c = C[k] || (C[k] = {name: name, score: 0, sp: {}});
       c.score += score;
+      if (sp) c.sp[sp] = 1;
     }
     // NFL / college players have no points-a-game on file: their lines say how big a part they are
     var YW = {pass_yds: 0.1, rush_yds: 0.25, rec_yds: 0.25, rec: 3};
     (B || []).forEach(function (p) {
       if (p.kind !== 'prop' || !p.name || /_total$/.test(p.mkt) || /\bD\/ST\b|\bdefense\b/i.test(p.name)) return;
-      add(p.name, 0.5 + (YW[p.mkt] && p.side === 'over' ? YW[p.mkt] * (p.line || 0) : 0));
+      add(p.name, 0.5 + (YW[p.mkt] && p.side === 'over' ? YW[p.mkt] * (p.line || 0) : 0), p.sport);
     });
-    (P || []).forEach(function (r) { add(r.n, r.ppg); });
+    (P || []).forEach(function (r) { add(r.n, r.ppg, 'nba'); });
     return C;
   }
   // team names on today's boards (daily_top.write_board adds "tn": the full name): the full
@@ -362,7 +363,11 @@
       if (tm) s.team = ({GSW: 'GS', NOP: 'NO', NYK: 'NY', SAS: 'SA', UTA: 'UTAH', WAS: 'WSH'})[tm[1]] || tm[1];
     }
     // a player: a nickname, a full name, a last or first name (the most prominent one), or one letter off
-    s.player = findPlayer(tPlayer, names(B, PRIOR));
+    // only players of the sport the named market belongs to ("receiving yards" is never an NBA player)
+    var PC = names(B, PRIOR), FOOT = /^(rec|rec_yds|rush_yds|pass_yds|pass_td|pass_att|anytime_td|first_td|two_plus_td|rush_rec_yds|pass_rush_yds)$/, HOOP = /^(pts|reb|ast|threes|first_basket)$/;
+    var mk = s.markets || [], want = mk.length && mk.every(function (m) { return FOOT.test(m); }) ? ['nfl', 'cfb'] : mk.length && mk.every(function (m) { return HOOP.test(m); }) ? ['nba'] : null;
+    if (want) Object.keys(PC).forEach(function (k) { var sp = Object.keys(PC[k].sp || {}); if (sp.length && !sp.some(function (x) { return want.indexOf(x) >= 0; })) delete PC[k]; });
+    s.player = findPlayer(tPlayer, PC);
     if (s.player) {
       s.team = null; if (s.intent === 'list' && s.count == null && !/props|plays|lines|bets/.test(t)) s.count = 5;
       if (!s.sports.length) {

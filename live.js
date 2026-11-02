@@ -15,8 +15,14 @@
 // These are LEANS: no live model has been tested against Onyx's in-game prices yet, so the page
 // says so and never calls one a pick.
 (function () {
-  var SD = {nfl: [13.5, 13.5], cfb: [16, 17], nba: [12.5, 18]};
+  // fitted 11/2 on 19,508 frozen moments from 1,391 finished games (tools/live_backtest.js, live_fit.js,
+  // held-out half): the old 12.5 / 13.5 margin spreads were overconfident (we said 15%, underdogs won
+  // 23-33%). NBA: worst calibration bucket 17% off -> 9%; NFL 18.5% -> 10%.
+  var SD = {nfl: [16.5, 17.5], cfb: [16, 17], nba: [17, 21.6]};
   var LEN = {nfl: [4, 15], cfb: [4, 15], nba: [4, 12], nhl: [3, 20]};
+  var PACE = {nfl: 0.4, cfb: 0.6, nba: 0.2};
+  var ML_PTS = {nfl: 10.8, cfb: 12.8, nba: 10};   // points per unit of moneyline chance, when only a moneyline was saved
+  var TOTK = {nfl: 1.02, cfb: 1, nba: 1};   // scale on the points still to come   // most weight the game's own scoring pace gets on the total, late
 
   function erf(x) {   // Abramowitz-Stegun 7.1.26
     var s = x < 0 ? -1 : 1; x = Math.abs(x);
@@ -49,8 +55,8 @@
     var cur = g.hs - g.as, tot = g.hs + g.as;
     // scoring for the time left: the pregame total's pace blended with the pace this game has shown,
     // trusted more as the game goes on (60% by the end); a 158-point pace in a 230 game is information
-    var pace = f < 1 ? tot / (1 - f) : g.pre_total || 0, wo = Math.min(0.6, (1 - f) * 0.6);
-    var mt = ((g.pre_total || 0) * (1 - wo) + pace * wo) * f, sT = sd[1] * Math.sqrt(f);
+    var pace = f < 1 ? tot / (1 - f) : g.pre_total || 0, wo = Math.min(PACE[sport] || 0.6, (1 - f) * (PACE[sport] || 0.6));
+    var mt = ((g.pre_total || 0) * (1 - wo) + pace * wo) * f * (TOTK[sport] || 1), sT = sd[1] * Math.sqrt(f);
     return {
       win: function () { return 1 - phi((-cur - mu) / sM); },                              // home wins
       cover: function (homeLine) { return 1 - phi((-homeLine - cur - mu) / sM); },        // home + line > 0
@@ -77,16 +83,24 @@
       }
       return w + 0.5 * t;
     }
+    // final-score margin and total: a game tied after regulation goes to overtime or a shootout, and
+    // the winner (a coin flip) gets one more goal on the final score, which decides puck lines and
+    // totals (11/2 backtest on 500 games: without it, over and puck-line chances were up to 25% off)
+    function tieP() { var s = 0; for (var i = 0; i < 12; i++) { var j = i + d; if (j >= 0 && j < 12) s += pois(rh, i) * pois(ra, j); } return s; }   // regulation ends level
     function distMargin(fn) {
       var s = 0;
-      for (var i = 0; i < 12; i++) for (var j = 0; j < 12; j++) { var p = pois(rh, i) * pois(ra, j); if (fn(d + i - j, g.hs + g.as + i + j)) s += p; }
+      for (var i = 0; i < 12; i++) for (var j = 0; j < 12; j++) {
+        var p = pois(rh, i) * pois(ra, j), m = d + i - j, t = g.hs + g.as + i + j;
+        if (m !== 0) { if (fn(m, t)) s += p; }
+        else { if (fn(1, t + 1)) s += p / 2; if (fn(-1, t + 1)) s += p / 2; }
+      }
       return s;
     }
     return {
       win: function () { return winP(rh, ra, d); },
       cover: function (homeLine) { return distMargin(function (m) { return m + homeLine > 0; }) + 0.5 * distMargin(function (m) { return m + homeLine === 0; }); },
       over: function (line) { return distMargin(function (m, t) { return t > line; }); },
-      proj_total: g.hs + g.as + rh + ra, proj_margin: d + rh - ra,
+      proj_total: g.hs + g.as + rh + ra + tieP(), proj_margin: d + rh - ra,
     };
   }
 
@@ -238,7 +252,7 @@
     var hs = +H.home.score || 0, as = +H.away.score || 0, f = left(sport, st.period, st.clock);
     if (f == null) return null;
     var pre = pregame(sport, rows, home, away, pre0);
-    g = {hs: hs, as: as, f: f, pre_margin: pre.margin != null ? pre.margin : pre.home_win != null && sport !== 'nhl' ? (pre.home_win - 0.5) * 2 * SD[sport][0] * 0.8 : 0,
+    g = {hs: hs, as: as, f: f, pre_margin: pre.margin != null ? pre.margin : pre.home_win != null && sport !== 'nhl' ? (pre.home_win - 0.5) * 2 * ML_PTS[sport] : 0,
          pre_total: pre.total != null ? pre.total : DEF_TOTAL[sport], pre_home_win: pre.home_win != null ? pre.home_win : 0.5, home: home, away: away};
     var M = model(sport, g);
     var r2 = function (x) { return Math.round(x * 2) / 2; };
@@ -264,7 +278,14 @@
       .then(function (j) { return (j && j.games) || []; }).catch(function () { return []; });
   }
   function pn(n) { return nk(n).replace(/\b(jr|sr|ii|iii|iv)\b/g, '').replace(/\s+/g, ' ').trim(); }
-  function sameTeam(a, b) { a = nk(a); b = nk(b); return !!a && !!b && (a === b || a.indexOf(b) >= 0 || b.indexOf(a) >= 0); }
+  function sameTeam(a, b) {
+    a = nk(a); b = nk(b);
+    if (!a || !b) return false;
+    if (a === b || a.indexOf(b) >= 0 || b.indexOf(a) >= 0) return true;
+    // "LA Clippers" / "Los Angeles Clippers": same nickname, both multi-word team names
+    var x = a.split(' '), y = b.split(' ');
+    return x.length > 1 && y.length > 1 && x[x.length - 1] === y[y.length - 1] && x[x.length - 1].length > 3;
+  }
   // the live box: player name -> stats we price ({pts, reb, ast, threes} or {rec, rec_yds, rush_yds, pass_yds, td})
   var SUMPATH = {nfl: 'football/nfl', cfb: 'football/college-football', nba: 'basketball/nba'};
   function box(sport, gid) {
@@ -390,5 +411,5 @@
     });
   }
 
-  window.OnyxLive = {left: left, model: model, plays: plays, noVig: noVig, implied: implied, phi: phi, games: games, pregame: pregame, american: american, lean: lean, bets: bets, propP: propP};
+  window.OnyxLive = {left: left, model: model, plays: plays, noVig: noVig, implied: implied, phi: phi, games: games, pregame: pregame, american: american, lean: lean, bets: bets, propP: propP, SD: SD, PACE: PACE, TOTK: TOTK};
 })();
