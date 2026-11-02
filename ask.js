@@ -238,6 +238,9 @@
     // a payout target: "parlay that pays +500", "to win around +1000", "a +300 parlay"
     var tg = t.match(/\b(pays?|paying|payout( of)?|to (win|pay)|around|about|returns?)\s*\+?(\d{3,5})\b/) || t.match(/\+(\d{3,5})\s*(parlay|ticket|sgp|legger)\b/);
     var tgv = tg ? +(tg.slice(1).filter(function (x) { return x && /^\d+$/.test(x); })[0]) : null;
+    // "to win 3x", "a 5x parlay": that many times the stake back, so 3x is +200
+    var mx3 = !tgv && t.match(/\b(\d{1,2})\s*x\b/);
+    if (mx3 && +mx3[1] >= 2) tgv = (+mx3[1] - 1) * 100;
     if (tgv && /parlay|ticket|legs?\b|legger|sgp|round/.test(t)) { if (s.intent === 'list') s.intent = 'parlay'; s.target_price = tgv; }
     // how many
     var n = t.match(/\b(\d{1,2})[\s-]*(leg|legs|legger|picks?|plays?|players?|bets?|team|man|teamer)\b/) || t.match(/\btop\s*(\d{1,2})\b/)
@@ -708,6 +711,10 @@
     if (!teamList(s).length && (h.teams || []).length > 1) { s.teams = h.teams; s.team = null; }
     else if (!teamList(s).length && h.team) s.team = h.team;
     if (!s.player && h.player && !(s.exclude || []).length) s.player = h.player;
+    // the AI kept part of the name ("Cameron"): the reader's full name ("Josh Cameron")
+    if (s.player && h.player && s.player !== h.player && String(h.player).toLowerCase().split(/\s+/).indexOf(String(s.player).toLowerCase()) >= 0) s.player = h.player;
+    // a payout the reader read ("3x" is +200) wins over the AI's reading of it
+    if (h.target_price != null) s.target_price = h.target_price;
     // a scattershot list of markets nobody named (3+ where the reader found none) is the AI guessing
     if ((s.markets || []).length >= 3 && !(h.markets || []).length) s.markets = [];
     // a market the reader found by name ("boards" = rebounds) wins over the AI dropping or swapping it

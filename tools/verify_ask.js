@@ -61,7 +61,7 @@ const srv = http.createServer((q, r) => { const p = path.join(root, decodeURICom
         if (mk.length && mk.indexOf(p.mkt) < 0 && mk.indexOf(p.kind) < 0) { why.push(`play market ${p.mkt}`); break; }
         if (s.props_only && p.kind !== 'prop') { why.push('game line in a props answer'); break; }
         if (s.side && s.side !== 'any' && (p.kind === 'prop' || p.kind === 'total') && p.side !== s.side) { why.push(`play side ${p.side}`); break; }
-        if (!R.two && s.min_price != null && p.price < s.min_price) { why.push(`price ${p.price} under ${s.min_price}`); break; }
+        if (!R.two && s.min_price != null && p.price < s.min_price && !(s.target_price && s.default_floor)) { why.push(`price ${p.price} under ${s.min_price}`); break; }   // a payout target moves the default floor
         if (!R.two && s.max_price != null && p.price > s.max_price) { why.push(`price ${p.price} over ${s.max_price}`); break; }
         if (Date.parse(p.start) <= now) { why.push('started game'); break; }
         if (s.player && String(p.name || p.label).toLowerCase().indexOf(String(s.player).toLowerCase()) < 0) { why.push(`play not on ${s.player}`); break; }
