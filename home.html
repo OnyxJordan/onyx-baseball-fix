@@ -128,11 +128,11 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
 .t10-n{font:800 20px monospace;color:#d795ff;text-align:center;grid-row:span 2}
 .t10-w{min-width:0}.t10-w b{display:block;font-size:15px;line-height:1.25}
 .t10-w span{display:block;font:600 11px monospace;color:#9a93a6;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.t10-c{text-align:right;grid-row:span 2}.t10-c b{display:block;font:800 22px monospace;color:#61e970;line-height:1}.t10-c small{display:block;font:700 9px monospace;color:#9a93a6;letter-spacing:.06em;margin-top:3px}.t10-c em{display:block;font:700 10px monospace;font-style:normal;color:#c9a7ff;margin-top:5px;white-space:nowrap}
-.t10-f{grid-column:2;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.t10-c{text-align:right;align-self:start}.t10-c b{display:block;font:800 22px monospace;color:#61e970;line-height:1}.t10-c small{display:block;font:700 9px monospace;color:#9a93a6;letter-spacing:.06em;margin-top:3px}
+.t10-f{grid-column:2/span 2;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 .t10-tag{font:800 9px monospace;letter-spacing:.08em;padding:3px 7px;border-radius:999px;background:rgba(255,255,255,.08);color:#cfc8da;text-transform:uppercase}
-.t10-tag.sp{background:rgba(176,56,249,.18);color:#d795ff}.t10-tag.tracked{background:rgba(97,233,112,.16);color:#61e970}.t10-tag.trial{background:rgba(99,91,255,.2);color:#b7b2ff}
-.t10-f .ox-save{width:30px;height:30px;font-size:15px}
+.t10-tag.sp{background:rgba(176,56,249,.18);color:#d795ff}.t10-tag.tracked{background:rgba(97,233,112,.16);color:#61e970}.t10-tag.trial{background:rgba(99,91,255,.2);color:#b7b2ff}.t10-tag.val{background:rgba(97,233,112,.12);color:#61e970}
+.t10-f .ox-save{width:30px;height:30px;font-size:15px;flex:none}.t10-act{margin-left:auto;display:flex;gap:6px;align-items:center;flex:none}.t10-act .t10-bet{margin-left:0}
 .t10-bet{margin-left:auto;font:800 12px monospace;padding:6px 10px;border-radius:999px;background:linear-gradient(135deg,#b038f9,#635bff);color:#fff;text-decoration:none;white-space:nowrap}
 </style>
 </head>
@@ -638,9 +638,9 @@ async function top10() {
     const url = p.sel ? 'https://app.onyxodds.com/share?selection=' + encodeURIComponent(p.sel) + '&referrer=' + ONYX_REFERRER : p.href;
     return `<div class="t10-r${i < 3 ? ' top' : ''}"><div class="t10-n">${i + 1}</div>
       <div class="t10-w"><b>${esc(p.label)}</b><span>${esc(p.matchup)}${p.start ? ' · ' + esc(t10When(p.start)) : ''}</span></div>
-      <div class="t10-c"><b>${Math.round(100 * p.conf)}%</b><small>TO HIT</small><em>+$${Math.round(100 * EV(p))} value per $100</em></div>
-      <div class="t10-f"><a class="t10-tag sp" href="${p.href}">${esc(p.lg)}</a><span class="t10-tag ${p.tag}">${tagTxt[p.tag] || 'Model lean'}</span>
-        <a class="t10-bet" href="${url}" target="_blank" rel="noopener" onclick="track('top10_bet',{sport:'${p.sport}',rank:${i + 1}})">${fmtOdds(p.price)} on Onyx</a>${window.OnyxSaved ? OnyxSaved.btn(Object.assign({id: p.sel}, p)) : ''}</div></div>`;
+      <div class="t10-c"><b>${Math.round(100 * p.conf)}%</b><small>TO HIT</small></div>
+      <div class="t10-f"><a class="t10-tag sp" href="${p.href}">${esc(p.lg)}</a><span class="t10-tag ${p.tag}">${tagTxt[p.tag] || 'Model lean'}</span><span class="t10-tag val" title="Expected profit per $100 at this Onyx price">+$${Math.round(100 * EV(p))} value</span>
+        <span class="t10-act"><a class="t10-bet" href="${url}" target="_blank" rel="noopener" onclick="track('top10_bet',{sport:'${p.sport}',rank:${i + 1}})">${fmtOdds(p.price)} on Onyx</a>${window.OnyxSaved ? OnyxSaved.btn(Object.assign({id: p.sel}, p)) : ''}</span></div></div>`;
   }).join('');
   document.getElementById('t10Note').textContent = 'To hit is the chance the play wins by that sport\'s model, blended with the Onyx market. Value is the expected profit per $100 at that price over the long run: proven lanes first, then the best value. "Tracked pick" plays are graded on their sport\'s record; "On trial" plays are logged at Onyx\'s opening price; "Model lean" plays are the model\'s read and are not graded.';
 }
