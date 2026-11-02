@@ -32,6 +32,11 @@ Lanes:
                expected return (model x decimal price - 1) is 10%+, one a game
 
 CHANGELOG
+  open-v5 (2026-11-02) FIRST BASKET OFF THE ON-TRIAL LIST (Jordan's call). open-v4's corrected
+     backtest found no first-basket rule beats Onyx's closing price (opportunity rule 14-96,
+     -8.7% at the close; old ratio rule 46-501, -14.9%), so the lane logs nothing new
+     (P["fb_lane"] = False). The page keeps the opportunity-first lean on each game; rows
+     already in open_trial.json stay and are still graded.
   open-v4 (2026-11-02) FIRST BASKET: OPPORTUNITY FIRST, THEN THE PRICE; AND A LABEL FIX.
      Jordan: the leans "just post long lines". The rule was ratio value (model >= Onyx
      implied x 1.2), which a +1500 at 6% vs 5% passes and a +350 at 22% vs 22% never does.
@@ -113,10 +118,11 @@ from nba_common import DATA, ESPN, espn_get, load, save, team_abbr
 
 OPENING = "opening.json"
 LEDGER = "open_trial.json"
-VERSION = "open-v4"
+VERSION = "open-v5"
 P = {"q1": .254, "q1_sd": 12.0, "q1_edge": .03,
      "fb_g": .5, "fb_q": .66, "fb_a0": .9, "fb_m0": 30.0, "fb_h": .25, "fb_fs0": 8.0, "fb_jb": .2,
-     "fb_top": 2, "fb_cap": 800, "fb_ev": .10, "fb_per_game": 1}
+     "fb_top": 2, "fb_cap": 800, "fb_ev": .10, "fb_per_game": 1,
+     "fb_lane": False}   # open-v5: first basket is a lean only, never logged
 VOID_AFTER_DAYS = 3
 
 
@@ -288,7 +294,7 @@ def run(rows, slate, props, today, jumps, fshots=None, games_log=None, tg=None, 
             if not op or op.get("baseline") or fb.get("yes") != op["yes"]:
                 continue
             cands.append({"p": probs[r["pid"]], "price": op["yes"], "rank": fbd[r["pid"]]["rank"], "r": r, "op": op, "fb": fb})
-        cands = fb_pick(cands)
+        cands = fb_pick(cands) if P.get("fb_lane") else []   # open-v5: lean only
         # assists unders (open-v3)
         for r in rows:
             if r["gid"] != g["gid"] or r.get("out") or lg_allowed is None:

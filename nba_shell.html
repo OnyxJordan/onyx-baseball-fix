@@ -1448,7 +1448,7 @@ function trackStrip() {
   const rec = (w, l) => `${w || 0}-${l || 0}`;
   return `<div class="tk-strip">
     <button onclick="gotoTab('record')"><i>Tracked picks</i><b>${rec(R.w, R.l)}</b><em>Graded nightly. Strict screens, so most nights have none.</em></button>
-    <button onclick="document.getElementById('plOpen').scrollIntoView({behavior:'smooth'})"><i>On trial</i><b>${rec(O.w, O.l)}</b><em>1st-quarter totals, first basket and assists unders, at Onyx's opening price.</em></button>
+    <button onclick="document.getElementById('plOpen').scrollIntoView({behavior:'smooth'})"><i>On trial</i><b>${rec(O.w, O.l)}</b><em>1st-quarter totals and assists unders, at Onyx's opening price.</em></button>
     <button onclick="gotoTab('home')"><i>The Model's Parlay</i><b>${rec(K.w, K.l)}</b><em>Three starters on standard prices, one ticket a night.</em></button></div>`;
 }
 function renderPlays() {
@@ -1678,7 +1678,7 @@ function openTrial() {
   const O = D.open || {}, K = O.kinds || {}, A = K.all || {};
   const rows = O.rows || [];
   if (!rows.length && !O.started) return `<div class="pl-div"><i></i><span>On trial · Onyx opening prices</span><i></i></div>
-    <div class="ot-note">Three lanes on trial: the 1st-quarter total and assists unders beat Onyx's first price in the backtests; first basket (since 11/2: his team's tip chance and his share of its first shots, priced +800 or shorter) was about even, so this record decides it. They log a play only while Onyx still shows the first price we saw for that market, and every play is graded here. None has qualified yet.</div>`;
+    <div class="ot-note">Two lanes on trial: the 1st-quarter total and assists unders beat Onyx's first price in the backtests. First basket is a lean on each game, not on trial: its corrected backtest did not beat Onyx. They log a play only while Onyx still shows the first price we saw for that market, and every play is graded here. None has qualified yet.</div>`;
   const rec = k => { const x = K[k] || {}; return `${x.w || 0}-${x.l || 0}${x.p ? '-' + x.p : ''}`; };
   const u = v => (v > 0 ? '+' : '') + (v || 0).toFixed(2) + 'u';
   const label = k => k.kind === 'q1_total' ? `${esc(k.matchup)} · 1st quarter ${k.side === 'over' ? 'Over' : 'Under'} ${k.line}`
@@ -1694,8 +1694,8 @@ function openTrial() {
   };
   return `<div class="pl-div"><i></i><span>On trial · Onyx opening prices</span><i></i></div>
     <div class="ot-rec"><span><b>${rec('all')}</b><i>record</i></span><span><b class="${(A.units || 0) >= 0 ? 'up' : 'dn'}">${u(A.units)}</b><i>units, 1 per play</i></span>
-      <span><b>${rec('q1_total')}</b><i>1st-quarter totals</i></span><span><b>${rec('first_basket')}</b><i>first basket</i></span><span><b>${rec('ast_under')}</b><i>assists unders</i></span></div>
-    <div class="ot-note">Logged only while Onyx still shows the first price we saw for that market, at that price, then graded after the game. The 1st-quarter total beat Onyx's first price in the backtest (+7.5%) but not its closing price. First basket (since 11/2) logs one of a team's two likeliest first scorers, from the opening tip and who takes the first shot, at +800 or shorter with a 10%+ expected return: on 2025-26 that was about even at the first price (+1.9%) and behind at the close (-8.7%), so it has no edge until this record shows one. Assists unders (since 11/1) start from Onyx's opening price and add the assists the opponent allows and how far the line sits from the player's usual range: on games the model never saw they went 47-37 (+11.1%) at 3+ points of edge. Each lists why. All stay on trial until this record says otherwise.</div>
+      <span><b>${rec('q1_total')}</b><i>1st-quarter totals</i></span>${(K.first_basket || {}).w + (K.first_basket || {}).l + (K.first_basket || {}).p + (K.first_basket || {}).pending ? `<span><b>${rec('first_basket')}</b><i>first basket (retired)</i></span>` : ''}<span><b>${rec('ast_under')}</b><i>assists unders</i></span></div>
+    <div class="ot-note">Logged only while Onyx still shows the first price we saw for that market, at that price, then graded after the game. The 1st-quarter total beat Onyx's first price in the backtest (+7.5%) but not its closing price. First basket came off this list on 11/2: its corrected 2025-26 backtest lost to Onyx's closing price (-8.7%), so it stays a lean on each game and is not logged. Assists unders (since 11/1) start from Onyx's opening price and add the assists the opponent allows and how far the line sits from the player's usual range: on games the model never saw they went 47-37 (+11.1%) at 3+ points of edge. Each lists why. All stay on trial until this record says otherwise.</div>
     ${today.length ? `<div class="ot-h">Today</div>${today.map(row).join('')}` : '<div class="ot-note dim">No play at the opening prices yet today.</div>'}
     ${past.length ? `<div class="ot-h">Recent</div>${past.map(row).join('')}` : ''}`;
 }
