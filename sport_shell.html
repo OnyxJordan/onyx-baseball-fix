@@ -20,7 +20,7 @@
 <link rel="preconnect" href="https://site.api.espn.com" crossorigin>
 <meta property="og:title" content="Onyx /*SPORT_TITLE*/">
 <!-- sport_shell.html: one template for every Onyx Sports page beyond MLB and
-     NBA (NFL, college football, NHL, tennis, golf). sports_build.py injects
+     NBA (NFL, college football, college basketball, NHL, tennis, golf). sports_build.py injects
      the MLB stylesheet (one design system), the sport's data and its key. -->
 <style>/*MLB_CSS*/</style>
 <style>
@@ -304,6 +304,11 @@
 .bx tr.tot td{font-weight:800;color:var(--text2);border-bottom:0}
 .bx-cap{font:800 10px monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin:12px 0 4px}
 .bx-team{display:flex;align-items:center;gap:8px;font-weight:800;font-size:13px;margin:4px 0 2px}
+.bx-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -2px}
+.bx.bk{table-layout:fixed;width:auto;min-width:100%}
+.bx.bk td.nm small{font:600 9px monospace;color:var(--text3)}
+.bx.bk td.dnp{color:var(--text3);font:700 10px monospace;letter-spacing:.1em;text-align:left;padding-left:10px}
+.bx.bk tr.cap td{font:800 9px monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);padding:10px 2px 4px;border-bottom:1px solid var(--border2);text-align:left}
 .bx-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:14px}
 .fx{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-bottom:10px}
 .fx div{background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:7px 8px}
@@ -403,6 +408,7 @@ var ONYX_REFERRER = 'KR680261';
 var GA_MEASUREMENT_ID = 'G-03T8V1N52E';
 var C = SD.cfg || {};
 var KIND = C.kind || 'football';
+var TEAMK = KIND === 'football' || KIND === 'hockey' || KIND === 'basketball';   // team sports: scoreboard, gamecenter, followed players
 var TABS = [['home', 'Home'], ['games', 'Games'], ['board', 'Onyx Board'], ['plays', 'Plays'], ['model', 'Model']];
 var currentTab = 'home', OPEN_GAME = null, LIVE = {}, LIVE_EV = null;
 
@@ -505,6 +511,7 @@ function ticker() {
 var HERO = {
   football: ['Every snap.', 'Every Onyx line.', 'Live drives, down and distance, win probability and every Onyx line on the slate, with player projections built from the box scores.'],
   hockey: ['Every shift.', 'Every Onyx line.', 'Live scores, period by period, shots and scoring plays, with every Onyx line on the slate.'],
+  basketball: ['Every possession.', 'Every Onyx line.', 'Every Division I game, live by the half, with full box scores, minutes and every Onyx line on the slate.'],
   tennis: ['Every set.', 'Every Onyx line.', 'Every ATP and WTA singles match on the tour this week, live set by set, with every Onyx line as it posts.'],
   golf: ['Every round.', 'Every chance.', "This week's leaderboard, round by round, with the model's win, top 10 and make-the-cut chances, live as it plays."],
 };
@@ -541,14 +548,20 @@ function renderHome() {
     const order = g => g.state === 'in' ? 0 : g.state === 'pre' ? 1 : 2;
     const up = games.slice().sort((a, b) => order(a) - order(b) || (a.start || '').localeCompare(b.start || '')).slice(0, 6);
     body = `<div class="sec-hdr"><span class="sec-title">${games.some(g => g.state === 'in') ? 'Live now and up next' : 'Up next'}</span><span class="sec-count">${games.length} games</span></div>
-      <div class="gm-grid">${up.map(gameCard).join('') || '<div class="empty">No games on the slate.</div>'}</div>`;
+      <div class="gm-grid">${up.map(gameCard).join('') || `<div class="empty">${noGames()}</div>`}</div>`;
     const top = (SD.model || {}).top || [];
     if (top.length) body += `<div class="sec-hdr"><span class="sec-title">Top projections</span></div>${projTable(top.slice(0, 8))}`;
   }
-  document.getElementById('homeBody').innerHTML = ((KIND === 'football' || KIND === 'hockey' || KIND === 'tennis' || KIND === 'golf') ? `<div id="ypHome">${yourPlayers()}</div>` : '') + body;
+  document.getElementById('homeBody').innerHTML = ((TEAMK || KIND === 'tennis' || KIND === 'golf') ? `<div id="ypHome">${yourPlayers()}</div>` : '') + body;
 }
 
 // ── games + gamecenter ─────────────────────────────────────────────
+// an empty day slate says when play resumes (sports_espn.next_slate_date)
+function noGames() {
+  if (!SD.next_date) return 'No games on the slate.';
+  const d = new Date(SD.next_date + 'T12:00:00').toLocaleDateString('en-US', {weekday: 'long', month: 'long', day: 'numeric'});
+  return `No games today. Next games on ${esc(d)}${SD.next_n ? ` (${SD.next_n} on the schedule)` : ''}.`;
+}
 function gameCard(g0) {
   const g = live(g0);
   const fin = g.state === 'post', aw = +g.away_score > +g.home_score;
@@ -572,7 +585,7 @@ function renderGames() {
     <div class="sp-tabs-seg">${segs.map(([k, t]) => `<button class="${GFILTER === k ? 'on' : ''}" onclick="GFILTER='${k}';renderGames()">${t} ${k === 'all' ? '' : games.filter(g => g.state === k).length}</button>`).join('')}</div>
     <div id="ypGames">${yourPlayers()}</div>
     <div id="gcBox"></div>
-    <div class="gm-grid">${shown.map(gameCard).join('') || '<div class="empty">Nothing here right now.</div>'}</div>`;
+    <div class="gm-grid">${shown.map(gameCard).join('') || `<div class="empty">${games.length ? 'Nothing here right now.' : noGames()}</div>`}</div>`;
   if (OPEN_GAME) drawGame(OPEN_GAME);
 }
 function openGame(gid) {
@@ -670,6 +683,8 @@ function teamStatsCmp(s, g) {
   const a = byHA.away || T[0], h = byHA.home || T[1];
   const keys = (a.statistics || []).map(x => x.name);
   const pick = KIND === 'hockey' ? ['shotsTotal', 'powerPlayGoals', 'faceoffsWon', 'hits', 'blockedShots', 'takeaways', 'giveaways', 'penaltyMinutes']
+    : KIND === 'basketball' ? ['fieldGoalsMade-fieldGoalsAttempted', 'fieldGoalPct', 'threePointFieldGoalsMade-threePointFieldGoalsAttempted', 'threePointFieldGoalPct',
+       'freeThrowsMade-freeThrowsAttempted', 'totalRebounds', 'offensiveRebounds', 'assists', 'steals', 'blocks', 'turnovers', 'pointsInPaint', 'fastBreakPoints', 'largestLead', 'fouls']
     : ['totalYards', 'netPassingYards', 'rushingYards', 'firstDowns', 'thirdDownEff', 'turnovers', 'totalPenaltiesYards', 'possessionTime'];
   const pre = g.state === 'pre';   // before the game ESPN's team box is season per-game averages
   const rows = (pre ? keys : pick.filter(k => keys.includes(k))).map(k => {
@@ -759,7 +774,7 @@ function gcDetail(s, g) {
   const B = boxOf(s, g);
   const sub = g.state === 'pre' ? '' : `<div class="gc-sub"><button class="${GC_SUB === 'live' ? 'on' : ''}" onclick="GC_SUB='live';drawGame('${esc(g.gid)}')">Live</button>
     <button class="${GC_SUB === 'box' ? 'on' : ''}" onclick="GC_SUB='box';drawGame('${esc(g.gid)}')">Box score</button></div>`;
-  const body = GC_SUB === 'box' && g.state !== 'pre' ? boxView(s, g, B) : (KIND === 'hockey' ? hockeyDetail(s, g, B) : footballDetail(s, g));
+  const body = GC_SUB === 'box' && g.state !== 'pre' ? boxView(s, g, B) : (KIND === 'hockey' ? hockeyDetail(s, g, B) : KIND === 'basketball' ? basketballDetail(s, g) : footballDetail(s, g));
   return focusPanel(s, g, B) + sub + body;
 }
 function footballDetail(s, g) {
@@ -795,6 +810,26 @@ function hockeyDetail(s, g, B) {
     ${!sp.length && g.state === 'pre' ? `<div class="empty">Puck drop ${esc(tipTime(g.start))}${g.venue ? ' · ' + esc(g.venue) : ''}. Goals and shots appear here live.</div>` : ''}`;
 }
 
+// basketball: the score by half, the latest plays, win probability, team stats, leaders
+function basketballDetail(s, g) {
+  const comp = ((s.header || {}).competitions || [{}])[0];
+  const ls = (comp.competitors || []).slice().sort((a, b) => (a.homeAway === 'away' ? 0 : 1) - (b.homeAway === 'away' ? 0 : 1))
+    .map(c => ({abbr: (c.team || {}).abbreviation, logo: ((c.team || {}).logos || [{}])[0].href, ls: (c.linescores || []).map(x => x.displayValue), sc: c.score}));
+  const per = Math.max(2, ...ls.map(x => x.ls.length));
+  const pl = (s.plays || []).slice(-14).reverse();
+  return `${ls.length === 2 && g.state !== 'pre' ? `<div class="gc-sec"><h4>By half</h4><div class="tbl"><table style="min-width:0"><thead><tr><th></th>${Array.from({length: per}, (_, i) => `<th class="r">${i < 2 ? (i ? '2nd' : '1st') : 'OT' + (i > 2 ? i - 1 : '')}</th>`).join('')}<th class="r">T</th></tr></thead>
+      <tbody>${ls.map(x => `<tr><td>${lg(x.logo)} <b>${esc(x.abbr)}</b></td>${Array.from({length: per}, (_, i) => `<td class="r mono">${esc(x.ls[i] == null ? '-' : x.ls[i])}</td>`).join('')}<td class="r mono"><b>${esc(x.sc)}</b></td></tr>`).join('')}</tbody></table></div></div>` : ''}
+    ${pl.length ? `<div class="gc-sec"><h4>${g.state === 'in' ? 'Latest plays' : 'Last plays'}</h4><div class="plays">${pl.map(p => `<div class="play"><span class="t">${esc((p.period || {}).displayValue || ('H' + ((p.period || {}).number || '')))} ${esc((p.clock || {}).displayValue || '')}</span>
+      <span>${esc(p.text || '')}</span><span class="r ${p.scoringPlay ? 'td' : ''}">${p.scoringPlay ? esc(p.awayScore) + '-' + esc(p.homeScore) : ''}</span></div>`).join('')}</div></div>` : ''}
+    ${wpChart(s, g)}
+    ${teamStatsCmp(s, g)}
+    ${(s.leaders || []).length && g.state !== 'pre' ? `<div class="gc-sec"><h4>Leaders</h4><div class="lines-row">${(s.leaders || []).flatMap(t => (t.leaders || []).slice(0, 3).map(c => {
+      const l = (c.leaders || [])[0] || {}; return `<div class="ld"><span>${esc((t.team || {}).abbreviation)} · ${esc(c.displayName)}</span><b>${esc((l.athlete || {}).shortName || '')}</b><em>${esc(l.displayValue || '')}</em></div>`;
+    })).join('')}</div></div>` : ''}
+    ${preview(s, g)}
+    ${g.state === 'pre' ? `<div class="empty">Tip-off ${esc(tipTime(g.start))}${g.venue ? ' · ' + esc(g.venue) : ''}. The score by half, every play and the box score with minutes appear here live.</div>` : ''}`;
+}
+
 // ── live tracker: box score, player focus, your players, tappable plays ──
 var GC_SUB = 'live', GC_SEL = null, GC_PLAY = null, RINK_POS = {};
 function nk(n) { return String(n || '').normalize('NFKD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[.'’-]/g, ' ').replace(/\b(jr|sr|ii|iii|iv)\b/g, ' ').replace(/\s+/g, ' ').trim(); }
@@ -802,7 +837,8 @@ function shortNm(n) { const w = String(n || '').trim().split(/\s+/); while (w.le
 // the stat each Onyx market settles on, read off ESPN's box
 var FB_MAP = {passing: {YDS: 'pass_yds', TD: 'pass_td'}, rushing: {YDS: 'rush_yds', TD: 'rush_td'}, receiving: {REC: 'rec', YDS: 'rec_yds', TD: 'rec_td'}};
 var HK_MAP = {G: 'goals', A: 'assists', SOG: 'shots', SV: 'saves'};
-var STAT_AB = {pass_yds: 'PASS YDS', rush_yds: 'RUSH YDS', rec_yds: 'REC YDS', rec: 'REC', pass_td: 'PASS TD', pass_att: 'PASS ATT', pass_rush_yds: 'PASS+RUSH', rush_rec_yds: 'RUSH+REC', two_td: '2+ TD', anytime_td: 'TD', points: 'PTS', assists: 'AST', goals: 'G', shots: 'SOG', saves: 'SV'};
+var BK_MAP = {PTS: 'points', REB: 'rebounds', AST: 'assists', '3PT': 'threes', STL: 'steals', BLK: 'blocks', MIN: 'minutes'};
+var STAT_AB = {rebounds: 'REB', threes: '3PM', steals: 'STL', blocks: 'BLK', minutes: 'MIN', pass_yds: 'PASS YDS', rush_yds: 'RUSH YDS', rec_yds: 'REC YDS', rec: 'REC', pass_td: 'PASS TD', pass_att: 'PASS ATT', pass_rush_yds: 'PASS+RUSH', rush_rec_yds: 'RUSH+REC', two_td: '2+ TD', anytime_td: 'TD', points: 'PTS', assists: 'AST', goals: 'G', shots: 'SOG', saves: 'SV'};
 function boxOf(s, g) {
   const teams = [], byId = {};
   const ids = {};
@@ -819,9 +855,9 @@ function boxOf(s, g) {
         const id = String(at.id || '');
         const P = byId[id] = byId[id] || {id, name: at.displayName, short: at.shortName || shortNm(at.displayName), jersey: at.jersey || '', team: ab,
                                             hs: (at.headshot || {}).href, pos: ((at.position || {}).abbreviation) || '', st: {}};
-        const m = KIND === 'hockey' ? HK_MAP : (FB_MAP[b.name] || {});
+        const m = KIND === 'hockey' ? HK_MAP : KIND === 'basketball' ? BK_MAP : (FB_MAP[b.name] || {});
         Object.entries(m).forEach(([lab, key]) => { if (L.includes(lab)) P.st[key] = (P.st[key] || 0) + n(lab); });
-        return {P, v};
+        return {P, v, starter: !!a.starter, dnp: !!a.didNotPlay || !st.length};
       });
       T.cats.push({name: b.name, labels: L, rows, totals: b.totals || null});
     });
@@ -829,6 +865,7 @@ function boxOf(s, g) {
   });
   Object.values(byId).forEach(P => {
     if (KIND === 'hockey') P.st.points = (P.st.goals || 0) + (P.st.assists || 0);
+    else if (KIND === 'basketball') ['pts_reb_ast', 'pts_reb', 'pts_ast'].forEach(k => { P.st[k] = (P.st.points || 0) + (/reb/.test(k) ? P.st.rebounds || 0 : 0) + (/ast/.test(k) ? P.st.assists || 0 : 0); });
     else P.st.anytime_td = (P.st.rush_td || 0) + (P.st.rec_td || 0);
   });
   return {teams, byId};
@@ -883,6 +920,21 @@ function focusPanel(s, g, B) {
 // box score: football passing / rushing / receiving, hockey skaters and goalies
 var FB_COLS = {passing: ['C/ATT', 'YDS', 'TD', 'INT'], rushing: ['CAR', 'YDS', 'TD', 'LONG'], receiving: ['REC', 'YDS', 'TD', 'TGTS']};
 var HK_COLS = {skaters: ['G', 'A', 'SOG', '+/-', 'TOI'], goalies: ['SA', 'SV', 'SV%', 'TOI']};
+// basketball: [column, ESPN label, made-only]; 3PM is the made half of ESPN's 3PT "m-a"
+var BK_COLS = [['MIN', 'MIN'], ['PTS', 'PTS'], ['REB', 'REB'], ['AST', 'AST'], ['3PM', '3PT', 1], ['FG', 'FG'], ['FT', 'FT'], ['STL', 'STL'], ['BLK', 'BLK'], ['TO', 'TO'], ['PF', 'PF']];
+function bkBox(t, g) {
+  const c = t.cats[0]; if (!c) return '';
+  const cell = (v, col) => { const x = v(col[1]); return x == null || x === '' ? '-' : col[2] ? String(x).split('-')[0] : x; };
+  const row = r => `<tr class="tap${GC_SEL === r.P.id ? ' sel' : ''}" onclick="GC_SEL='${esc(r.P.id)}';drawGame('${esc(g.gid)}');document.getElementById('gc').scrollIntoView({behavior:'smooth'})">
+      <td class="nm">${esc(r.P.short)}${r.P.pos ? `<small> ${esc(r.P.pos)}</small>` : ''}${isF(r.P.id) ? '<em>★</em>' : ''}</td>${r.dnp ? `<td colspan="${BK_COLS.length}" class="dnp">DNP</td>` : BK_COLS.map(col => `<td>${esc(cell(r.v, col))}</td>`).join('')}</tr>`;
+  const sec = (title, rows) => !rows.length ? '' : `<tr class="cap"><td colspan="${BK_COLS.length + 1}">${title}</td></tr>${rows.map(row).join('')}`;
+  const played = c.rows.filter(r => !r.dnp), st = played.filter(r => r.starter), bn = played.filter(r => !r.starter), dnp = c.rows.filter(r => r.dnp);
+  const L = c.labels || [], T = c.totals || [];
+  const tot = T.length ? `<tr class="tot"><td>Team</td>${BK_COLS.map(col => { const i = L.indexOf(col[1]); const x = i < 0 ? '' : T[i]; return `<td>${esc(x === '' || x == null ? '' : col[2] ? String(x).split('-')[0] : x)}</td>`; }).join('')}</tr>` : '';
+  return `<div class="bx-scroll"><table class="bx bk"><colgroup><col style="width:118px">${BK_COLS.map(col => `<col style="width:${col[1] === 'FG' || col[1] === 'FT' ? 46 : 34}px">`).join('')}</colgroup>
+    <thead><tr><th>Player</th>${BK_COLS.map(col => `<th>${col[0]}</th>`).join('')}</tr></thead><tbody>
+    ${sec(st.length ? 'Starters' : 'Players', st.length ? st : played)}${st.length ? sec('Bench', bn) : ''}${sec('Did not play', dnp)}${tot}</tbody></table></div>`;
+}
 function boxView(s, g, B) {
   const onIce = new Set(((s.onIce || []).flatMap(t => (t.entries || []).map(e => String(e.athleteid)))));
   const tbl = (title, rows, cols) => !rows.length ? '' : `<div class="bx-cap">${title}</div><table class="bx"><colgroup><col style="width:${cols.length > 4 ? 32 : 38}%">${cols.map(() => '<col>').join('')}</colgroup>
@@ -891,7 +943,8 @@ function boxView(s, g, B) {
       <td class="nm">${onIce.has(P.id) && g.state === 'in' ? '<i title="On the ice"></i>' : ''}${esc(P.short)}${isF(P.id) ? '<em>★</em>' : ''}</td>${cols.map(c => `<td>${esc(v(c) ?? '-')}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
   return `<div class="bx-grid">${B.teams.map(t => {
     let h = `<div><div class="bx-team">${lg(t.logo)} ${esc(t.ab)}</div>`;
-    if (KIND === 'hockey') {
+    if (KIND === 'basketball') h += bkBox(t, g);
+    else if (KIND === 'hockey') {
       const sk = t.cats.filter(c => c.name === 'forwards' || c.name === 'defenses').flatMap(c => c.rows)
         .sort((a, b) => (b.P.st.points || 0) - (a.P.st.points || 0) || (b.P.st.shots || 0) - (a.P.st.shots || 0));
       h += tbl('Skaters', sk, HK_COLS.skaters) + tbl('Goalies', (t.cats.find(c => c.name === 'goalies') || {rows: []}).rows, HK_COLS.goalies);
@@ -1006,7 +1059,7 @@ function trackedPlayers() {
     const BB = s ? boxOf(s, g) : null;
     const P = BB ? (BB.byId[f.id] || Object.values(BB.byId).find(x => nk(x.name) === nk(f.name)) || null) : null;
     let legs = linesFor(f.gid, f.name);
-    if (!legs.length) legs = (KIND === 'hockey' ? ['points', 'shots'] : ['rec_yds', 'rush_yds', 'pass_yds']).map(m => ({mkt: m, line: null, side: 'over'}));
+    if (!legs.length) legs = (KIND === 'hockey' ? ['points', 'shots'] : KIND === 'basketball' ? ['points', 'rebounds', 'assists'] : ['rec_yds', 'rush_yds', 'pass_yds']).map(m => ({mkt: m, line: null, side: 'over'}));
     return {f, g, P, legs};
   });
 }
@@ -1060,7 +1113,7 @@ function ypAlerts() {
 var _ypTimer = null;
 function ypLoop() {
   clearTimeout(_ypTimer);
-  if (location.protocol === 'file:' || !(KIND === 'football' || KIND === 'hockey')) return;
+  if (location.protocol === 'file:' || !TEAMK) return;
   const gids = [...new Set(FOLLOW.map(f => f.gid))].filter(gid => { const g = game(gid); return g && (live(g).state === 'in' || (!GC_CACHE[gid] && live(g).state === 'post')); });
   Promise.all(gids.filter(gid => OPEN_GAME !== gid || currentTab !== 'games').map(gid =>
     fetch('https://site.api.espn.com/apis/site/v2/sports/' + C.espn[0] + '/summary?event=' + gid).then(r => r.json()).then(j => { GC_CACHE[gid] = j; }).catch(() => {})))
@@ -1831,7 +1884,8 @@ function renderBoard() {
   el.innerHTML = out.join('');
 }
 var MKT_NAME = {ml: 'Moneyline', spread: 'Spread', total: 'Total', pass_yds: 'Passing yards', rush_yds: 'Rushing yards', rec_yds: 'Receiving yards', rec: 'Receptions',
-                pass_td: 'Passing TDs', pass_att: 'Pass attempts', pass_rush_yds: 'Passing + rushing yards', rush_rec_yds: 'Rushing + receiving yards', two_td: '2+ touchdowns', anytime_td: 'Anytime TD', first_td: 'First TD', goals: 'Goals', shots: 'Shots on goal', points: 'Points', assists: 'Assists', saves: 'Saves'};
+                pass_td: 'Passing TDs', pass_att: 'Pass attempts', pass_rush_yds: 'Passing + rushing yards', rush_rec_yds: 'Rushing + receiving yards', two_td: '2+ touchdowns', anytime_td: 'Anytime TD', first_td: 'First TD', goals: 'Goals', shots: 'Shots on goal', points: 'Points', assists: 'Assists', saves: 'Saves',
+                rebounds: 'Rebounds', threes: '3-pointers made', pts_reb_ast: 'Pts + reb + ast'};
 
 // ── plays (model) ───────────────────────────────────────────────────
 // player projections as list rows (phone first): who and what, the projection big on the
@@ -2041,7 +2095,7 @@ function pollLive() {
     let anyLive = false;
     js.forEach((j, pi) => {
       if (!j) return;
-      if (KIND === 'football' || KIND === 'hockey') {
+      if (TEAMK) {
         (j.events || []).forEach(e => {
           const c = (e.competitions || [{}])[0], st = (e.status || {}).type || {};
           const t = {}; (c.competitors || []).forEach(x => { t[x.homeAway] = x; });
@@ -2073,7 +2127,7 @@ function pollLive() {
     if (KIND === 'tennis') { tnAlerts(); ['ypHome', 'ypGames'].forEach(i => { const y = document.getElementById(i); if (y) y.innerHTML = yourPlayers(); }); }
     ticker();
     if (currentTab === 'games' && !(document.activeElement && document.activeElement.tagName === 'INPUT')) {
-      if (KIND === 'football' || KIND === 'hockey') { if (OPEN_GAME) { drawGame(OPEN_GAME); } else renderGames(); } else renderGames();
+      if (TEAMK) { if (OPEN_GAME) { drawGame(OPEN_GAME); } else renderGames(); } else renderGames();
     } else if (currentTab === 'home') renderHome();
     clearTimeout(_poll); _poll = setTimeout(pollLive, anyLive ? 10000 : 30000);
   });

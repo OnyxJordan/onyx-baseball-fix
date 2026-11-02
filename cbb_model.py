@@ -14,9 +14,19 @@ Changelog (newest first; each entry cites its evidence)
       per 100 possessions x 68 possessions, the average D1 tempo), kept at
       PRIOR_KEEP of its distance from average; without that file it is last
       season's own fitted ratings (results.json), kept the same share.
-      Parameters chosen on the 2025-26 season (6,300 ESPN finals), each game
-      predicted only from games before its week, prior from 2024-25:
-      see TEST. Totals ride on the same ratings; tempo is not modelled yet.
+      Parameters chosen on the 2025-26 season (6,300 ESPN finals), every game
+      predicted only from games before its week, prior from 2024-25 ratings.
+      Tuned on D1-vs-D1 games 11/3-12/31/2025 (2,419): keep 0.5 / 0.7 / 0.85
+      / 1.0 gave win log loss .4839 / .4748 / .4702 / .4697 (ridge 6, home
+      3.5); 0.85 taken, within .0005 of no pull at all, because rosters turn
+      over and one season's tuning is thin evidence for none. Ridge 6 beat 3,
+      4, 8, 12; half-life 120 beat 30 and 60; home 3.5 beat 2.5 and 3.0;
+      margin spread 11 (10.5 to 12 within .002).
+      Judged on 1/1-4/9/2026 games it never tuned on (3,528): win log loss
+      .585 against .697 for the tuning window's home win rate (.697); margin
+      error 8.94 points; total error 13.77 against 15.42 for the tuning
+      window's average total (150.6). Totals ride on the same ratings; tempo
+      is not modelled yet.
 """
 
 import json, re, unicodedata
@@ -25,10 +35,11 @@ from pathlib import Path
 VERSION = "v1"
 KIND = "basketball"
 TEMPO = 68.0          # possessions per 40 minutes, D1 average, turns per-100 efficiency into points
-PRIOR_KEEP = 0.7      # share of last season's distance from average a team starts with
-P = {"half_life": 60, "ridge": 6, "home": 3.0, "sd_margin": 11.0, "sd_total": 16.0, "min_games": 3,
-     "mu0": 72.5, "mu_k": 40}
-TEST = {"n": 0, "logloss": 0.0, "base_logloss": 0.0, "mae_total": 0.0, "base_mae_total": 0.0, "window": "2025-26"}
+PRIOR_KEEP = 0.85     # share of last season's distance from average a team starts with
+P = {"half_life": 120, "ridge": 6, "home": 3.5, "sd_margin": 11.0, "sd_total": 17.0, "min_games": 3,
+     "mu0": 75.0, "mu_k": 40}
+TEST = {"n": 3528, "logloss": 0.585, "base_logloss": 0.697, "mae_total": 13.77, "base_mae_total": 15.42,
+        "window": "1/1/2026 on"}
 
 # Torvik team names that do not match an ESPN location / short name after the
 # usual folding ("St." -> "State"); value is the ESPN abbreviation
@@ -104,7 +115,10 @@ def prior_results(games, season, P_):
     last = [g for g in games if g.get("season") == season - 1]
     if not last:
         return None
-    R = T.fit(last, "9999-12-31", dict(P_, half_life=10 ** 6))
+    # ridge 1, not the in-season 6: with no prior to pull toward, a heavy ridge flattens whole
+    # conferences (they meet only in November and December): Michigan 2025-26 rated +9.9 at
+    # ridge 6 against +24.8 at ridge 1 and +17.8 by raw scoring margin
+    R = T.fit(last, "9999-12-31", dict(P_, half_life=10 ** 6, ridge=1))
     return ({t: PRIOR_KEEP * v for t, v in R["off"].items()}, {t: PRIOR_KEEP * v for t, v in R["def"].items()})
 
 
@@ -115,12 +129,13 @@ def ratings(lane_dir, games, as_of, names=None, P_=None):
     P_ = dict(P_ or P)
     season = season_of(as_of)
     pr = prior_torvik(lane_dir, season, names) or prior_results(games, season, P_)
+    P_["_prior"] = None if not pr else "torvik" if (Path(lane_dir) / "history" / "teams.json").exists() else "results"
     if pr:
         P_["carry_off"], P_["carry_def"] = pr
     cur = [g for g in games if g.get("season") == season]
     R = T.fit(cur, as_of, P_)
+    R["prior"] = P_["_prior"]
     if pr:
         for t in pr[0]:
             R["n"][t] = max(R["n"].get(t, 0), P_.get("min_games", 3))
-    R["prior"] = "torvik" if pr and P_.get("carry_off") and prior_torvik(lane_dir, season, names) else ("results" if pr else None)
     return R

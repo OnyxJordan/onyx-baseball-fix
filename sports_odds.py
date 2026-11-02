@@ -2,13 +2,17 @@
 """
 sports_odds.py - Onyx book prices for one sport (OpticOdds, OPTICODDS_API_KEY).
 
-    python3 sports_odds.py nfl|cfb|nhl|tennis
+    python3 sports_odds.py nfl|cfb|cbb|nhl|tennis
 
 Markets per sport are the ones the Onyx book actually prices, from the
 markets probe (tools/onyx_markets_probe.py, run 10/26):
   NFL / college football  moneyline, point_spread, total_points; player
                           passing / rushing / receiving yards, receptions,
                           passing touchdowns, anytime touchdown scorer
+  college basketball      moneyline, point_spread, total_points; player points,
+                          rebounds, assists and made threes when Onyx posts them
+                          (the NBA market ids, nba_odds.py; added 11/2, not yet
+                          confirmed by a markets probe on ncaab)
   NHL                     moneyline, puck_line, total_goals; player points,
                           assists (Onyx prices no shots on goal)
   tennis (ATP main tour)  moneyline, game_spread, total_games
@@ -38,6 +42,9 @@ MARKETS = {
             "yes": {"anytime_touchdown_scorer": "anytime_td", "first_touchdown_scorer": "first_td"}, "extra": ("player_touchdowns",)},
     "cfb": {"game": ("moneyline", "point_spread", "total_points"), "props": FOOTBALL_PROPS,
             "yes": {"anytime_touchdown_scorer": "anytime_td", "first_touchdown_scorer": "first_td"}},
+    "cbb": {"game": ("moneyline", "point_spread", "total_points"),
+            "props": {"player_points": "points", "player_rebounds": "rebounds", "player_assists": "assists",
+                      "player_made_threes": "threes"}, "yes": {}},
     "nhl": {"game": ("moneyline", "puck_line", "total_goals"), "props": {"player_points": "points", "player_assists": "assists"}, "yes": {}},
     "tennis": {"game": ("moneyline", "game_spread", "total_games"), "props": {}, "yes": {}, "leagues": ("atp", "wta")},
 }
