@@ -1574,3 +1574,20 @@ exact scores, promos, other sports), which now say so and offer what we do price
 997 / 1,000 through the live AI (the 3, "even money" read as exactly +100, fixed: a price rule the
 reader finds now wins in the blend). Test against full boards: on a thin night, shift a past
 board's start times forward locally and restore `data/` after.
+
+**Accounts (11/2, off until set up).** Optional sign-in so saved picks, followed players and My
+bets follow a person to every device. Supabase: email magic link (no passwords) plus Postgres with
+row-level security; the site stays static and, signed out or with accounts off, works exactly as
+before (device-only). `accounts.js` (loaded by `saved.js` on every page that has picks or
+follows) syncs the same localStorage lists the pages already use (`onyxSaved`, `onyxMyBets`,
+`onyxNbaFollow`, `onyxFollow_<sport>`): a removal on one device is removed everywhere, everything
+else is the union, and the first sign-in merges the device into the account. My Onyx shows the
+account card (sign in, synced time, sign out, delete my account) and a short privacy note.
+Turn on: (1) create a Supabase project; (2) run `supabase/schema.sql` in its SQL editor;
+(3) Authentication -> URL Configuration: Site URL `https://onyxjordan.github.io/onyx-baseball-fix/`
+and add `https://onyxjordan.github.io/onyx-baseball-fix/home.html` (and the other pages) to the
+redirect URLs; (4) GitHub Actions variables `SUPABASE_URL` and `SUPABASE_ANON_KEY` (the public
+anon key; never the service key); (5) run "Accounts (turn on / update)", which writes
+`accounts.json` on main. Empty the variables and rerun to turn accounts off. Gate:
+`node tools/verify_accounts.js` (a stand-in Supabase, no keys: off, sign-in, first-sign-in merge,
+two devices, removals, privacy between users, session refresh, sign out, delete).

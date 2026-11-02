@@ -14,6 +14,8 @@
 // menu, or "Alert me" after saving) a phone notification fires too. Alerts reach the
 // phone while the app is open or in the background; a fully closed app needs push (OneSignal),
 // as on Onyx Baseball.
+// optional accounts (accounts.js): sign-in and cross-device sync, off until accounts.json is filled in
+(function () { try { if (!document.querySelector('script[src="accounts.js"]')) { var a = document.createElement('script'); a.src = 'accounts.js'; a.defer = true; document.head.appendChild(a); } } catch (e) {} })();
 (function () {
   var KEY = 'onyxSaved', KEEP_H = 24, REG = [];
   var SHOWN = 'onyxWinShown', ALERTS = 'onyxWinAlerts', REFERRER = 'KR680261';

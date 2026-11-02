@@ -105,6 +105,11 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
 .lv-verdict{font-size:13px;line-height:1.45;color:#cfc8da}.lv-verdict b{color:#fff}
 .lv-more{display:flex;flex-wrap:wrap;gap:4px 14px;font:600 11px monospace;color:#8f879c}.lv-more b{color:#cfc8da}
 .lv-f a.go{background:#a24bff;border-color:#a24bff;color:#fff}
+.acct{border:1px solid #3a2a55;border-radius:14px;padding:12px 14px;margin:12px 0;background:rgba(162,75,255,.06);display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;font-size:13px;color:#cfc8da}
+.acct b{color:#fff}.acct input{flex:1 1 200px;min-width:0;background:#0d0a12;border:1px solid #3a2a55;border-radius:10px;padding:10px 12px;color:#fff;font:inherit;font-size:16px}
+.acct button{font:700 12px monospace;letter-spacing:.04em;border:1px solid #a24bff;background:#a24bff;color:#fff;border-radius:999px;padding:9px 14px;cursor:pointer}
+.acct button.ghost{background:transparent;color:#d795ff;border-color:#3a2a55}.acct .acct-t{flex:1 1 100%}.acct small{flex:1 1 100%;color:#8f879c;font-size:11px;line-height:1.45}
+.acct .ok{color:#61e970}.acct .bad{color:#ff8a8a}
 .lv-val{margin-left:auto;font:800 10px monospace;letter-spacing:.05em;color:#0b0710;background:#61e970;border-radius:999px;padding:3px 8px;white-space:nowrap}
 .lv-bets{display:flex;flex-direction:column;gap:6px;border-top:1px solid rgba(255,255,255,.08);padding-top:9px}
 .lv-bet{display:grid;grid-template-columns:1fr auto;gap:2px 8px;align-items:center;font-size:13px;color:#e8e2f1}.lv-bet .s{grid-column:1;font:600 11px monospace;color:#a79fb5}.lv-bet .s b{color:#fff}
@@ -219,6 +224,7 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
   <section class="ox-wrap my" id="my">
     <div class="my-h"><div><span class="ox-eyebrow">My Onyx</span><h2>Your players.<br>Your bets. Live.</h2>
       <p>Every pick you save with the star, everyone you follow and every Onyx bet you open from the app, across every sport, with live scores and stat lines in one place.</p></div></div>
+    <div class="acct" id="acct" hidden></div>
     <div class="my-tabs" id="myTabs"></div>
     <div id="myBody"><div class="my-empty">Loading live scores across every sport...</div></div>
   </section>
@@ -907,7 +913,39 @@ function pickCard(t) {
     ${bar != null ? `<div class="pk-bar"><i style="width:${bar.toFixed(0)}%"></i><em style="left:${tick.toFixed(0)}%"></em></div>` : ''}
     <button class="pk-x" aria-label="Remove" onclick="event.preventDefault();event.stopPropagation();OnyxSaved.remove('${esc(p.id)}')">×</button></a>`;
 }
+// ── Accounts (accounts.js): optional sign-in that syncs picks, players and bets across devices ──
+function acctRender() {
+  const el = document.getElementById('acct'), A = window.OnyxAccounts;
+  if (!el || !A) return;
+  const st = A.state();
+  if (!st.enabled) { el.hidden = true; return; }
+  el.hidden = false;
+  const note = `<small>Signing in stores your email and the picks, players and bets you save here, only so they follow you to your other devices. Nothing is sold or shared. Signed out, everything stays on this device as before.</small>`;
+  if (!st.signedIn) {
+    el.innerHTML = `<span class="acct-t"><b>Keep your picks on every device.</b> Sign in with your email: we send a one-time link, no password.</span>
+      <input id="acctEmail" type="email" inputmode="email" autocomplete="email" placeholder="you@email.com" onkeydown="if(event.key==='Enter')acctSend()">
+      <button type="button" onclick="acctSend()">Email me a link</button><span id="acctMsg"></span>${note}`;
+    return;
+  }
+  const ago = st.last ? Math.max(0, Math.round((Date.now() - st.last) / 60000)) : null;
+  const sync = st.syncing ? 'Syncing...' : st.error ? `<span class="bad">${esc(st.error)}</span>` : ago == null ? 'Not synced yet' : `<span class="ok">Synced</span> ${ago < 1 ? 'just now' : ago + ' min ago'}`;
+  el.innerHTML = `<span class="acct-t">Signed in as <b>${esc(st.email || '')}</b> · ${sync}</span>
+    <button type="button" class="ghost" onclick="OnyxAccounts.sync()">Sync now</button>
+    <button type="button" class="ghost" onclick="OnyxAccounts.signOut()">Sign out</button>
+    <button type="button" class="ghost" onclick="acctDelete()">Delete my account</button>${note}`;
+}
+async function acctSend() {
+  const i = document.getElementById('acctEmail'), m = document.getElementById('acctMsg');
+  try { await OnyxAccounts.signIn(i.value); m.innerHTML = `<span class="ok">Check your email for the sign-in link.</span>`; }
+  catch (e) { m.innerHTML = `<span class="bad">${esc(e && e.message ? e.message : 'Could not send the link right now.')}</span>`; }
+}
+async function acctDelete() {
+  if (!confirm('Delete your Onyx account? Your email and everything synced to it are removed. This device keeps its own picks.')) return;
+  try { await OnyxAccounts.deleteAccount(); if (window.OX_TOAST) OX_TOAST('Account deleted.', {}); } catch (e) { if (window.OX_TOAST) OX_TOAST('Could not delete the account right now.', {}); }
+}
+addEventListener('onyx-account', acctRender);
 addEventListener('onyx-saved', () => { myPicks().then(T => { MY_PK = T; if (T.length) MY.tab = 'picks'; renderMy(); }); });
+addEventListener('onyx-saved', async () => { if (!MY.picked && !MY_P) return; try { MY_P = await myPlayers(); renderMy(); } catch (e) {} });   // a sync brought follows or bets from another device
 var MY_P = [];
 async function loadMy() {
   await Promise.all(LG.map(sbOf).concat([
