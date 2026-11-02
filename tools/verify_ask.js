@@ -29,7 +29,8 @@ const srv = http.createServer((q, r) => { const p = path.join(root, decodeURICom
     const B = await OnyxAsk.loadBoards(), now = Date.now(), out = [];
     const same = (a, b) => a.length === b.length && a.every(x => b.indexOf(x) >= 0);
     // does today's board hold anything this reading could answer with (sport, market, day, price, side)?
-    const avail = (sp, mk, s) => B.some(p => Date.parse(p.start) > now && (!sp || sp.indexOf(p.sport) >= 0)
+    // checked at each question's own time: a 40-minute --ai run outlasts kickoffs
+    const avail = (sp, mk, s) => B.some(p => Date.parse(p.start) > Date.now() && (!sp || sp.indexOf(p.sport) >= 0)
       && (!mk || mk.some(m => p.mkt === m || p.kind === m || (m === 'two_plus_td' && p.lam != null)))
       && (!s.when || OnyxAsk.whenOk(s.when, p.start)) && (s.min_price == null || p.price >= s.min_price) && (s.max_price == null || p.price <= s.max_price) && (s.min_conf == null || p.conf >= s.min_conf)
       && (!s.side || s.side === 'any' || !(p.kind === 'prop' || p.kind === 'total') || p.side === s.side) && (!s.props_only || p.kind === 'prop'));
