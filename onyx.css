@@ -336,3 +336,29 @@
   .spec-table th,.spec-table td{padding:8px 7px}
   .spec-table td:first-child{width:auto}
 }
+
+/* ── one header and one hero on every sport page (11/2) ─────────────
+   Basketball and Baseball used to look different from the engine pages
+   (sport_shell.html): icons in every tab, an MLB / NBA link in the tab row,
+   the "updated" stamp and the gradient line under the bar, a bigger hero.
+   The engine look is the one look: text tabs, the Onyx mark, search and the
+   date pill on the right, the Onyx Sports mark back to the hub (ui.js). */
+.nav .nav-tab>svg{display:none}
+.nav .nav-tab{gap:0}
+/* sport switching lives on the Onyx mark (the hub), the More menu and the phone pill */
+.nav .nav-sport,.nav .nav-tabs>a.nav-tab[href]{display:none!important}
+.nav .nav-date{display:none!important}
+.nav .nav-badge{white-space:nowrap}
+.brand-line{display:none}
+.home-cta-row button>svg{display:none}
+/* the raster sport art behind every hero (onyx.js) */
+.home-hero .sp-art{position:absolute;right:-2%;top:6%;width:min(46vw,520px);height:min(46vw,520px);opacity:.55;pointer-events:none}
+@media (max-width:760px){.home-hero .sp-art{width:72vw;height:72vw;right:-18%;top:0;opacity:.28}}
+/* MLB's home run alert bell: the Onyx Sports link's box, a stroke icon, no emoji */
+.notif-bell{position:relative;width:34px;height:34px;border-radius:9px;border:1px solid var(--ox-stroke);font-size:0;color:var(--ox-400);display:inline-flex;align-items:center;justify-content:center}
+.notif-bell::before{content:"";width:15px;height:15px;background:currentColor;
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='1.5' stroke-linejoin='round'%3E%3Cpath d='M4 11V7a4 4 0 0 1 8 0v4l1.2 1.5H2.8z'/%3E%3Cpath d='M6.5 14a1.6 1.6 0 0 0 3 0'/%3E%3C/svg%3E") center/contain no-repeat;
+          mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='1.5' stroke-linejoin='round'%3E%3Cpath d='M4 11V7a4 4 0 0 1 8 0v4l1.2 1.5H2.8z'/%3E%3Cpath d='M6.5 14a1.6 1.6 0 0 0 3 0'/%3E%3C/svg%3E") center/contain no-repeat}
+.notif-bell:hover{border-color:var(--ox-purple);color:var(--ox-white)}
+.notif-bell.on{color:var(--ox-green);border-color:rgba(97,233,112,.45);box-shadow:none}
+@media (max-width:760px){.nav .notif-bell{display:none}}
