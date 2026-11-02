@@ -5,7 +5,8 @@
 // from what the market thought before kickoff and moves only with what has happened since:
 //   football (NFL, college) and NBA: the rest of the game as a normal draw. Remaining home
 //     margin ~ N(pregame expected margin x f, SD^2 x f) and remaining points ~ N(pregame total
-//     x f, SD^2 x f), f = share of the game left; SDs are each sport's full-game spread of
+//     x f, SD^2 x f), f = share of the game left (the total's pace blends in the pace this game has
+//     shown, up to 60% late); SDs are each sport's full-game spread of
 //     results (NFL 13.5 / 13.5, college 16 / 17, NBA 12.5 / 18).
 //   NHL: goals for each side are Poisson for the time left; the two rates split the pregame
 //     total so the pregame moneyline is matched (overtime a coin flip).
@@ -45,8 +46,11 @@
   function normal(sport, g) {
     var sd = SD[sport], f = g.f;
     var mu = (g.pre_margin || 0) * f, sM = sd[0] * Math.sqrt(f);
-    var mt = (g.pre_total || 0) * f, sT = sd[1] * Math.sqrt(f);
     var cur = g.hs - g.as, tot = g.hs + g.as;
+    // scoring for the time left: the pregame total's pace blended with the pace this game has shown,
+    // trusted more as the game goes on (60% by the end); a 158-point pace in a 230 game is information
+    var pace = f < 1 ? tot / (1 - f) : g.pre_total || 0, wo = Math.min(0.6, (1 - f) * 0.6);
+    var mt = ((g.pre_total || 0) * (1 - wo) + pace * wo) * f, sT = sd[1] * Math.sqrt(f);
     return {
       win: function () { return 1 - phi((-cur - mu) / sM); },                              // home wins
       cover: function (homeLine) { return 1 - phi((-homeLine - cur - mu) / sM); },        // home + line > 0
@@ -161,7 +165,7 @@
     var hit = null;
     Object.keys(pre || {}).forEach(function (k) { if (sameGame(pre[k].m, home, away)) hit = pre[k]; });
     var sp = {}, ml = {}, tot = null;
-    if (hit) { sp = hit.sp || {}; ml = hit.ml || {}; tot = hit.tot; }
+    if (hit) { sp = hit.sp || {}; ml = hit.ml || {}; tot = hit.tot; out.pp = hit.pp || null; }
     else rows.forEach(function (p) {
       if (p.kind === 'prop' || !sameGame(p.matchup, home, away)) return;
       if (p.kind === 'spread') { var m = NUM.exec(String(p.label || '')); if (m) sp[p.name] = +m[1]; }
@@ -181,6 +185,7 @@
     return out;
   }
   function team(c) { var t = c.team || {}; return t.abbreviation || (c.athlete || {}).displayName || t.displayName; }
+  function full(c) { var t = c.team || {}, a = c.athlete || {}; return t.displayName || a.displayName || t.abbreviation || ''; }
   function logo(c) { var t = c.team || {}, a = c.athlete || {}; return t.logo || (t.logos && t.logos[0] && t.logos[0].href) || (a.flag && a.flag.href) || null; }
   // a probability as an American price, rounded to 5
   function american(p) {
@@ -228,7 +233,7 @@
       var m = model('tennis', g);
       var tx = {sport: sport, gid: e.id, home: home, away: away, hl: logo(H.home), al: logo(H.away), hs: g.hs, as: g.as, state: (H.away.linescores || []).map(function (l, i) { return l.value + '-' + (((H.home.linescores || [])[i] || {}).value || 0); }).join(' '),
               detail: ty.shortDetail || ty.detail || '', home_win: m.win(), pre: pg, f: null, name: away + ' vs ' + home};
-      tx.lean = lean(tx); return tx;
+      tx.M = m; tx.hn = full(H.home); tx.an = full(H.away); tx.lean = lean(tx); return tx;
     }
     var hs = +H.home.score || 0, as = +H.away.score || 0, f = left(sport, st.period, st.clock);
     if (f == null) return null;
@@ -242,8 +247,132 @@
             home_win: M.win(), proj_total: M.proj_total != null ? Math.round(M.proj_total * 10) / 10 : null,
             fair_spread: home + ' ' + (fair > 0 ? '+' : fair === 0 ? '' : '') + (fair === 0 ? 'pk' : fair), pre: pre,
             over_pre: pre.total != null && M.over ? M.over(pre.total) : null, name: away + ' @ ' + home};
-    gx.lean = lean(gx); return gx;
+    gx.M = M; gx.hn = full(H.home); gx.an = full(H.away); gx.lean = lean(gx); return gx;
   }
+
+  // ── the live line (relay GET /live, the odds feed's in-game prices, never named) and every bet
+  // we can price against it: sides, spreads and totals from the game models; player props from
+  // the player's live box line plus our pregame projection for the time left ──
+  var RELAY = null;
+  function relay() {
+    if (RELAY) return RELAY;
+    RELAY = getJSON('ai.json').then(function (j) { return (j && j.url) || null; }).catch(function () { return null; });
+    return RELAY;
+  }
+  function lines(sport) {
+    return relay().then(function (u) { return u ? getJSON(u.replace(/\/$/, '') + '/live?sport=' + sport) : {games: []}; })
+      .then(function (j) { return (j && j.games) || []; }).catch(function () { return []; });
+  }
+  function pn(n) { return nk(n).replace(/\b(jr|sr|ii|iii|iv)\b/g, '').replace(/\s+/g, ' ').trim(); }
+  function sameTeam(a, b) { a = nk(a); b = nk(b); return !!a && !!b && (a === b || a.indexOf(b) >= 0 || b.indexOf(a) >= 0); }
+  // the live box: player name -> stats we price ({pts, reb, ast, threes} or {rec, rec_yds, rush_yds, pass_yds, td})
+  var SUMPATH = {nfl: 'football/nfl', cfb: 'football/college-football', nba: 'basketball/nba'};
+  function box(sport, gid) {
+    if (!SUMPATH[sport]) return Promise.resolve({});
+    return getJSON(ESPN + SUMPATH[sport] + '/summary?event=' + gid).then(function (j) {
+      var out = {};
+      ((j.boxscore || {}).players || []).forEach(function (t) {
+        (t.statistics || []).forEach(function (cat) {
+          var keys = cat.keys || [], lab = (cat.labels || []).map(function (x) { return String(x).toUpperCase(); }), nm = String(cat.name || '').toLowerCase();
+          (cat.athletes || []).forEach(function (a) {
+            var n = pn((a.athlete || {}).displayName), st = a.stats || [], o = out[n] || (out[n] = {});
+            var at = function (k, l) { var i = keys.indexOf(k); if (i < 0 && l) i = lab.indexOf(l); return i >= 0 ? st[i] : null; };
+            var num = function (v) { var x = parseFloat(String(v == null ? '' : v).split('-')[0]); return isNaN(x) ? null : x; };
+            if (sport === 'nba') {
+              if (a.didNotPlay) return;
+              o.pts = num(at('points', 'PTS')); o.reb = num(at('rebounds', 'REB')); o.ast = num(at('assists', 'AST'));
+              o.threes = num(at('threePointFieldGoalsMade-threePointFieldGoalsAttempted', '3PT'));
+              o.fouls = num(at('fouls', 'PF'));
+            } else if (nm === 'passing') { o.pass_yds = num(at('passingYards', 'YDS')); o.td = (o.td || 0); }
+            else if (nm === 'rushing') { o.rush_yds = num(at('rushingYards', 'YDS')); o.td = (o.td || 0) + (num(at('rushingTouchdowns', 'TD')) || 0); }
+            else if (nm === 'receiving') { o.rec = num(at('receptions', 'REC')); o.rec_yds = num(at('receivingYards', 'YDS')); o.td = (o.td || 0) + (num(at('receivingTouchdowns', 'TD')) || 0); }
+          });
+        });
+      });
+      return out;
+    }).catch(function () { return {}; });
+  }
+  // variance of what a player adds per unit of their pregame projection (a count-like stat), and a
+  // floor; football yards use a wider, proportional spread
+  var FMIN = {nfl: 0.15, cfb: 0.15, nba: 0.15, nhl: 0.15};
+  var PVAR = {pts: 2.4, reb: 1.6, ast: 1.6, threes: 1.3, rec: 1.3};
+  function propP(mkt, cur, proj, f, line) {
+    var rem = Math.max(0, proj * f), mean = cur + rem, sd;
+    if (/yds$/.test(mkt)) sd = (0.45 * proj + 12) * Math.sqrt(f);
+    else sd = Math.sqrt(Math.max(0.15, rem * (PVAR[mkt] || 1.5)));
+    sd = Math.max(sd, 0.35);
+    return 1 - phi((line - mean) / sd);       // lines are x.5, so this is P(stat >= line + 0.5)
+  }
+  function price(p) { return american(p); }
+  // all bets on one game against the live line, best value first
+  function bets(g, L, bx) {
+    var out = [], M = g.M, pre = g.pre || {}, f = g.f;
+    if (!M || !L) return out;
+    function add(o) {
+      if (o.p == null || isNaN(o.p) || o.price == null) return;
+      o.p = Math.min(0.995, Math.max(0.005, o.p));
+      o.fair = price(o.p); o.edge = Math.round((o.p - implied(o.price)) * 1000) / 1000;
+      if (o.p < 0.03 || o.p > 0.97) return;               // decided: nothing worth betting
+      if (o.price < -500 || o.price > 500) return;
+      // where the model is blind: late in a game (who has the ball, timeouts and fouls decide it, and
+      // the live line sees them) and anywhere we disagree with the live line by more than 12 points
+      // (11/1 first run: every 20-50 point "edge" was a late football game the model misread)
+      if (f != null && f < (o.kind === 'prop' ? 0.08 : FMIN[g.sport] || 0.15)) return;
+      if (o.edge > 0.12) return;
+      out.push(o);
+    }
+    var homeSel = function (sel) { return sameTeam(sel, g.hn) || sameTeam(sel, g.home); };
+    L.lines.forEach(function (x) {
+      if (x.m === 'ml' && M.win) {
+        var h = homeSel(x.sel), pw = M.win();
+        add({kind: 'ml', team: h ? g.home : g.away, logo: h ? g.hl : g.al, label: (h ? g.home : g.away) + ' to win', p: h ? pw : 1 - pw, price: x.price,
+             start: h ? pre.home_ml : pre.away_ml, start_txt: (h ? pre.home_ml : pre.away_ml) != null ? fmt(h ? pre.home_ml : pre.away_ml) : null});
+      } else if (x.m === 'spread' && M.cover && x.pt != null && g.sport !== 'tennis') {
+        var hs = homeSel(x.sel), hl = hs ? x.pt : -x.pt, pc = M.cover(hl);
+        var hp = pre.margin != null ? -pre.margin : null, sp0 = hp == null ? null : hs ? hp : -hp;
+        add({kind: 'spread', team: hs ? g.home : g.away, logo: hs ? g.hl : g.al, label: (hs ? g.home : g.away) + ' ' + sgn(x.pt), p: hs ? pc : 1 - pc, price: x.price,
+             start_txt: sp0 == null ? null : (hs ? g.home : g.away) + ' ' + sgn(sp0)});
+      } else if (x.m === 'total' && M.over && x.pt != null && g.sport !== 'tennis' && (x.side === 'over' || x.side === 'under')) {
+        var po = M.over(x.pt);
+        add({kind: 'total', label: (x.side === 'over' ? 'Over ' : 'Under ') + x.pt, p: x.side === 'over' ? po : 1 - po, price: x.price,
+             start_txt: pre.total != null ? (x.side === 'over' ? 'o' : 'u') + pre.total : null});
+      } else if (bx && pre.pp && f != null) {
+        var key = Object.keys(pre.pp).filter(function (k) { var a = k.split('|'); return a[1] === x.m && pn(a[0]) === pn(x.sel); })[0];
+        if (!key) return;
+        var q = pre.pp[key], me = bx[pn(x.sel)] || {}, nm = key.split('|')[0];
+        if (x.m === 'anytime_td') {
+          if ((me.td || 0) >= 1 || q.lam == null) return;     // already scored: the bet is settled
+          add({kind: 'prop', mkt: x.m, player: nm, label: nm + ' anytime TD', p: 1 - Math.exp(-q.lam * f), price: x.price,
+               start: q.o, start_txt: q.o != null ? fmt(q.o) : null});
+          return;
+        }
+        if (q.j == null || x.pt == null || (x.side !== 'over' && x.side !== 'under')) return;
+        var cur = me[x.m]; if (cur == null) cur = 0;
+        if (me.fouls != null && me.fouls >= 6) return;          // fouled out
+        var pov = propP(x.m, cur, q.j, f, x.pt), sd0 = x.side === 'over' ? q.o : q.u;
+        add({kind: 'prop', mkt: x.m, player: nm, label: nm + ' ' + (x.side === 'over' ? 'over ' : 'under ') + x.pt + ' ' + MKN[x.m], p: x.side === 'over' ? pov : 1 - pov,
+             price: x.price, cur: cur, start: sd0, start_txt: q.l != null && sd0 != null ? (x.side === 'over' ? 'o' : 'u') + q.l + ' ' + fmt(sd0) : null});
+      }
+    });
+    return out.sort(function (a, b) { return b.edge - a.edge; });
+  }
+  var MKN = {pts: 'points', reb: 'rebounds', ast: 'assists', threes: 'threes', rec: 'catches', rec_yds: 'receiving yds', rush_yds: 'rushing yds', pass_yds: 'passing yds'};
+  function fmt(x) { return x == null ? '' : x > 0 ? '+' + x : String(x); }
+  function sgn(x) { return x > 0 ? '+' + x : x === 0 ? 'pk' : String(x); }
+  // attach .bets (best value first) to every live game; games without a live line keep bets = null
+  function withBets(G) {
+    var sports = G.map(function (g) { return g.sport; }).filter(function (s, i, a) { return a.indexOf(s) === i; });
+    return Promise.all(sports.map(lines)).then(function (LS) {
+      var all = [].concat.apply([], LS);
+      return Promise.all(G.map(function (g) {
+        var L = all.filter(function (x) { return (sameTeam(x.home, g.hn) && sameTeam(x.away, g.an)) || (sameTeam(x.home, g.an) && sameTeam(x.away, g.hn)); })[0];
+        if (!L) { g.bets = null; return g; }
+        var needBox = g.pre && g.pre.pp && L.lines.some(function (x) { return !/^(ml|spread|total)$/.test(x.m); });
+        return (needBox ? box(g.sport, g.gid) : Promise.resolve(null)).then(function (bx) { g.bets = bets(g, L, bx); return g; });
+      }));
+    });
+  }
+
   // every live game across the sports (optionally only some sports)
   function games(only) {
     var L = LEAGUES.filter(function (l) { return !only || only.indexOf(l[0]) >= 0; });
@@ -257,9 +386,9 @@
           });
           return out;
         }).catch(function () { return []; });
-      })).then(function (a) { return [].concat.apply([], a); });
+      })).then(function (a) { return withBets([].concat.apply([], a)); });
     });
   }
 
-  window.OnyxLive = {left: left, model: model, plays: plays, noVig: noVig, implied: implied, phi: phi, games: games, pregame: pregame, american: american, lean: lean};
+  window.OnyxLive = {left: left, model: model, plays: plays, noVig: noVig, implied: implied, phi: phi, games: games, pregame: pregame, american: american, lean: lean, bets: bets, propP: propP};
 })();

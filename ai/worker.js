@@ -127,7 +127,7 @@ function cors(origin, env) {
   const ok = String(env.ALLOWED_ORIGINS || "").split(",").map((s) => s.trim()).filter(Boolean);
   return {
     "access-control-allow-origin": ok.includes(origin) ? origin : ok[0] || "null",
-    "access-control-allow-methods": "POST, OPTIONS",
+    "access-control-allow-methods": "GET, POST, OPTIONS",
     "access-control-allow-headers": "content-type",
     "vary": "origin",
   };
@@ -166,10 +166,106 @@ async function chat(env, system, user, name, schema, maxTokens) {
   }
 }
 
+
+// ── GET /live?sport=nba: the live line on every game being played ─────────────────────────────
+// Onyx does not send in-game prices to the odds feed (11/1 probe: 0 rows on every live game, while
+// other books had hundreds), so the live tab compares our numbers with the live line from the
+// feed: DraftKings first, the next book only where it has no line. The book is never named on the
+// site ("Live line"). Cached 20 seconds per sport, so every visitor shares one pull.
+const OPTIC = "https://api.opticodds.com/api/v3";
+const LIVE_LG = { nfl: [["football", "nfl"]], cfb: [["football", "ncaaf"]], nba: [["basketball", "nba"]], nhl: [["hockey", "nhl"]],
+  tennis: [["tennis", "atp"], ["tennis", "wta"]] };
+const LIVE_BOOKS = ["draftkings", "fanduel", "betmgm", "caesars", "pinnacle"];
+const LIVE_MK = {
+  moneyline: "ml", point_spread: "spread", puck_line: "spread", game_spread: "spread", total_points: "total", total_goals: "total", total_games: "total",
+  anytime_touchdown_scorer: "anytime_td", player_points: "pts", player_rebounds: "reb", player_assists: "ast", player_made_threes: "threes",
+  player_receptions: "rec", player_receiving_yards: "rec_yds", player_rushing_yards: "rush_yds", player_passing_yards: "pass_yds",
+  player_goals: "goals", player_shots_on_goal: "sog",
+};
+const LIVE_PROPS = { nfl: ["anytime_touchdown_scorer", "player_receptions", "player_receiving_yards", "player_rushing_yards", "player_passing_yards"],
+  cfb: ["anytime_touchdown_scorer", "player_receiving_yards", "player_rushing_yards", "player_passing_yards"],
+  nba: ["player_points", "player_rebounds", "player_assists", "player_made_threes"], nhl: ["player_goals", "player_shots_on_goal"], tennis: [] };
+function american(v) {
+  const x = Number(v);
+  if (!isFinite(x) || x === 0) return null;
+  return Math.round(x);
+}
+async function optic(env, path) {
+  const r = await fetch(OPTIC + path, { headers: { "X-Api-Key": env.OPTICODDS_API_KEY } });
+  if (!r.ok) throw { status: r.status };
+  return r.json();
+}
+async function liveSport(env, sport) {
+  const games = [];
+  for (const [sp, lg] of LIVE_LG[sport] || []) {
+    const now = new Date(), days = [new Date(now - 864e5), now].map((d) => d.toISOString().slice(0, 10));
+    const fx = [];
+    for (const d of days) {
+      const j = await optic(env, `/fixtures?sport=${sp}&league=${lg}&start_date=${d}`).catch(() => ({}));
+      for (const f of j.data || []) if (String(f.status || "").toLowerCase() === "live" || f.is_live) fx.push(f);
+    }
+    const mk = ["moneyline", sport === "nhl" ? "puck_line" : sport === "tennis" ? "game_spread" : "point_spread",
+      sport === "nhl" ? "total_goals" : sport === "tennis" ? "total_games" : "total_points"].concat(LIVE_PROPS[sport] || []);
+    const mq = mk.map((m) => "&market=" + encodeURIComponent(m)).join("") + LIVE_BOOKS.map((b) => "&sportsbook=" + b).join("");
+    for (let i = 0; i < fx.length && i < 20; i += 5) {
+      const ids = fx.slice(i, i + 5).map((f) => "&fixture_id=" + encodeURIComponent(f.id)).join("");
+      const j = await optic(env, `/fixtures/odds?sport=${sp}&league=${lg}&odds_format=AMERICAN${ids}${mq}`).catch(() => ({}));
+      for (const row of j.data || []) {
+        const f = fx.find((x) => x.id === row.id) || row;
+        // each market (and each player's market) from ONE book, the first in LIVE_BOOKS order that has
+        // its main line, so an over and its under share a number and a spread's two sides match
+        const groups = new Map();
+        for (const od of row.odds || []) {
+          const m = LIVE_MK[od.market_id], price = american(od.price);
+          if (!m || price == null) continue;
+          const player = !["ml", "spread", "total"].includes(m);
+          const gk = m + "|" + (player ? String(od.selection || od.name || "") : "");
+          const bk = LIVE_BOOKS.indexOf(String(od.sportsbook || "").toLowerCase());
+          if (!groups.has(gk)) groups.set(gk, []);
+          groups.get(gk).push({ od, m, price, bk: bk < 0 ? 99 : bk });
+        }
+        const lines = [];
+        for (const arr of groups.values()) {
+          const main = arr.filter((x) => x.od.is_main !== false || x.m === "anytime_td");
+          if (!main.length) continue;
+          const bk = Math.min(...main.map((x) => x.bk));
+          let pick = main.filter((x) => x.bk === bk);
+          if (pick.some((x) => x.od.is_main === true)) pick = pick.filter((x) => x.od.is_main === true);
+          const seen = new Set();
+          for (const x of pick) {
+            const side = String(x.od.selection_line || "").toLowerCase() || null, sel = String(x.od.selection || x.od.name || "");
+            const k = (x.m === "total" ? side : sel + "|" + side);
+            if (seen.has(k)) continue;
+            seen.add(k);
+            lines.push({ m: x.m, sel, side, pt: x.od.points == null ? null : Number(x.od.points), price: x.price });
+          }
+        }
+        games.push({ home: f.home_team_display || "", away: f.away_team_display || "", start: f.start_date || null,
+          lines });
+      }
+    }
+  }
+  return games;
+}
+async function live(req, env, h) {
+  const sport = new URL(req.url).searchParams.get("sport") || "";
+  if (!LIVE_LG[sport]) return json({ error: "sport" }, 400, h);
+  if (!env.OPTICODDS_API_KEY) return json({ error: "not configured" }, 503, h);
+  const cache = caches.default, key = new Request("https://onyx-live.cache/" + sport);
+  const hit = await cache.match(key);
+  if (hit) return new Response(hit.body, { status: 200, headers: { "content-type": "application/json", ...h } });
+  let games = [];
+  try { games = await liveSport(env, sport); } catch (e) { return json({ error: "feed " + ((e && e.status) || "") }, 502, h); }
+  const body = JSON.stringify({ sport, at: new Date().toISOString(), games });
+  await cache.put(key, new Response(body, { headers: { "content-type": "application/json", "cache-control": "max-age=20" } }));
+  return new Response(body, { status: 200, headers: { "content-type": "application/json", ...h } });
+}
+
 export default {
   async fetch(req, env) {
     const h = cors(req.headers.get("origin") || "", env);
     if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: h });
+    if (req.method === "GET" && new URL(req.url).pathname === "/live") return live(req, env, h);
     if (req.method === "GET") return json({ ok: true, service: "onyx-ask" }, 200, h);
     if (req.method !== "POST") return json({ error: "method" }, 405, h);
     if (!env.OPENAI_API_KEY || !env.AI_MODEL) return json({ error: "not configured" }, 503, h);
