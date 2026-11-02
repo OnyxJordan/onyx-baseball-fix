@@ -1,7 +1,7 @@
 {
  "sport": "nba",
  "date": "2026-11-02",
- "generated": "2026-11-02T18:39:18+00:00",
+ "generated": "2026-11-02T18:43:47+00:00",
  "unit": "min",
  "stats": [
   "pts",
@@ -6317,7 +6317,7 @@
    "name": "Washington Wizards",
    "date": "2026-11-02",
    "pace": 102.4,
-   "min_sum": 239.7,
+   "min_sum": 236.9,
    "players": [
     {
      "id": "2A95E890DFCB",
@@ -6327,15 +6327,15 @@
      "tag": "",
      "use": 35.9,
      "proj": {
-      "pts": 21.6,
+      "pts": 21.5,
       "reb": 3.7,
       "ast": 10.8,
       "3pm": 2.4,
-      "pra": 36.1
+      "pra": 36.0
      },
      "model": {
       "use": 35.8,
-      "pts": 21.8
+      "pts": 21.7
      },
      "last": {
       "use": 36.3,
@@ -6362,15 +6362,15 @@
      "tag": "",
      "use": 33.6,
      "proj": {
-      "pts": 21.5,
+      "pts": 21.4,
       "reb": 10.3,
       "ast": 2.5,
       "3pm": 0.8,
-      "pra": 34.3
+      "pra": 34.2
      },
      "model": {
       "use": 33.6,
-      "pts": 21.4
+      "pts": 21.2
      },
      "last": {
       "use": 33.5,
@@ -6397,15 +6397,15 @@
      "tag": "",
      "use": 31.6,
      "proj": {
-      "pts": 14.3,
+      "pts": 14.2,
       "reb": 5.0,
       "ast": 4.3,
       "3pm": 1.8,
-      "pra": 23.7
+      "pra": 23.6
      },
      "model": {
       "use": 31.6,
-      "pts": 14.1
+      "pts": 14.0
      },
      "last": {
       "use": 31.7,
@@ -6432,7 +6432,7 @@
      "tag": "",
      "use": 28.5,
      "proj": {
-      "pts": 14.8,
+      "pts": 14.7,
       "reb": 5.3,
       "ast": 2.1,
       "3pm": 1.4,
@@ -6440,7 +6440,7 @@
      },
      "model": {
       "use": 28.5,
-      "pts": 14.2
+      "pts": 14.1
      },
      "last": {
       "use": 28.5,
@@ -6510,7 +6510,7 @@
      },
      "model": {
       "use": 21.3,
-      "pts": 10.3
+      "pts": 10.2
      },
      "last": {
       "use": 20.8,
@@ -6545,7 +6545,7 @@
      },
      "model": {
       "use": 22.1,
-      "pts": 7.8
+      "pts": 7.7
      },
      "last": {
       "use": 19.8,
@@ -6603,19 +6603,19 @@
      "id": "0B985F4C90D5",
      "n": "Khris Middleton",
      "pos": "SF",
-     "role": "Bench",
+     "role": "Rotation",
      "tag": "",
-     "use": 12.9,
+     "use": 13.7,
      "proj": {
-      "pts": 3.4,
-      "reb": 1.6,
-      "ast": 1.1,
-      "3pm": 0.4,
-      "pra": 6.1
+      "pts": 3.9,
+      "reb": 1.9,
+      "ast": 1.2,
+      "3pm": 0.5,
+      "pra": 7.1
      },
      "model": {
-      "use": 10.8,
-      "pts": 3.8
+      "use": 13.5,
+      "pts": 4.8
      },
      "last": {
       "use": 13.8,
@@ -6635,50 +6635,22 @@
      "home": false
     },
     {
-     "id": "7002094D0540",
-     "n": "Reece Beekman",
-     "pos": "PG",
-     "role": "Bench",
-     "tag": "",
-     "use": 5.0,
-     "proj": {
-      "pts": 1.1,
-      "reb": 0.4,
-      "ast": 0.7,
-      "3pm": 0.1,
-      "pra": 2.2
-     },
-     "model": {
-      "use": 5.0,
-      "pts": 1.1
-     },
-     "last": null,
-     "now": {
-      "gp": 0,
-      "use": null
-     },
-     "hs": "4432187",
-     "gid": "202611030FB97336",
-     "opp": "ORL",
-     "home": false
-    },
-    {
      "id": "FED9966897B63E09",
      "n": "Will Riley",
      "pos": "SF",
      "role": "Bench",
      "tag": "",
-     "use": 4.8,
+     "use": 5.2,
      "proj": {
-      "pts": 2.3,
-      "reb": 0.4,
-      "ast": 0.4,
+      "pts": 2.7,
+      "reb": 0.5,
+      "ast": 0.5,
       "3pm": 0.3,
-      "pra": 3.1
+      "pra": 3.7
      },
      "model": {
-      "use": 5.4,
-      "pts": 2.5
+      "use": 6.7,
+      "pts": 3.0
      },
      "last": {
       "use": 4.5,
@@ -6703,17 +6675,17 @@
      "pos": "PG",
      "role": "Bench",
      "tag": "",
-     "use": 3.7,
+     "use": 4.7,
      "proj": {
-      "pts": 1.6,
-      "reb": 0.5,
-      "ast": 0.5,
+      "pts": 2.1,
+      "reb": 0.6,
+      "ast": 0.7,
       "3pm": 0.3,
-      "pra": 2.7
+      "pra": 3.4
      },
      "model": {
-      "use": 3.7,
-      "pts": 1.6
+      "use": 4.7,
+      "pts": 2.1
      },
      "last": null,
      "now": {
@@ -6947,6 +6919,31 @@
       "use": null
      },
      "hs": "4606840",
+     "gid": "202611030FB97336",
+     "opp": "ORL",
+     "home": false
+    },
+    {
+     "id": "7002094D0540",
+     "n": "Reece Beekman",
+     "pos": "PG",
+     "role": "Out",
+     "tag": "Out: Shoulder (Arm)",
+     "use": 0.0,
+     "proj": {
+      "pts": 0.0,
+      "reb": 0.0,
+      "ast": 0.0,
+      "3pm": 0.0,
+      "pra": 0.0
+     },
+     "model": null,
+     "last": null,
+     "now": {
+      "gp": 0,
+      "use": null
+     },
+     "hs": "4432187",
      "gid": "202611030FB97336",
      "opp": "ORL",
      "home": false
