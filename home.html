@@ -924,7 +924,7 @@ function acctRender() {
   if (!st.signedIn) {
     el.innerHTML = `<span class="acct-t"><b>Keep your picks on every device.</b> Sign in with your email: we send a one-time link, no password.</span>
       <input id="acctEmail" type="email" inputmode="email" autocomplete="email" placeholder="you@email.com" onkeydown="if(event.key==='Enter')acctSend()">
-      <button type="button" onclick="acctSend()">Email me a link</button><span id="acctMsg"></span>${note}`;
+      <button type="button" onclick="acctSend()">Email me a link</button><span id="acctMsg">${st.error ? `<span class="bad">${esc(st.error)}</span>` : ''}</span>${note}`;
     return;
   }
   const ago = st.last ? Math.max(0, Math.round((Date.now() - st.last) / 60000)) : null;

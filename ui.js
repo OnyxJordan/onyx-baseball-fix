@@ -16,6 +16,16 @@
 
    Site differences live in SITES below. Nothing here throws if a page
    function is missing: every hook is guarded. */
+// a sign-in link that landed on any page but My Onyx (Supabase sends people to the Site URL, the
+// MLB front page, when the link's own address is not on its allow list): carry it to My Onyx,
+// where accounts.js finishes signing in
+(function () {
+  try {
+    if (/(^|[#&])(access_token|error_description|error_code)=/.test(location.hash) && !/home\.html$/.test(location.pathname))
+      location.replace(location.pathname.replace(/[^\/]*$/, '') + 'home.html' + location.hash);
+  } catch (e) {}
+})();
+
 (function () {
   'use strict';
   var IS_NBA = /nba\.html/.test(location.pathname) || typeof NBA_DATA !== 'undefined';

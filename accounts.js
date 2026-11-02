@@ -58,7 +58,11 @@
     if (!/access_token=|error_description=/.test(h)) return false;
     var p = {}; h.replace(/^#/, '').split('&').forEach(function (kv) { var i = kv.indexOf('='); if (i > 0) p[decodeURIComponent(kv.slice(0, i))] = decodeURIComponent(kv.slice(i + 1).replace(/\+/g, ' ')); });
     try { history.replaceState(null, '', location.pathname + location.search + '#my'); } catch (e) {}
-    if (p.error_description) { ERR = p.error_description; toast('Sign-in link problem: ' + p.error_description); return false; }
+    if (p.error_description || p.error_code) {
+      // the usual one: an email app or scanner opened the one-time link first, or it is over an hour old
+      ERR = /expired|invalid/i.test(p.error_code + ' ' + p.error_description) ? 'That sign-in link expired or was already used. Send yourself a new one.' : 'Sign-in link problem: ' + (p.error_description || p.error_code);
+      toast(ERR); return false;
+    }
     S = {access_token: p.access_token, refresh_token: p.refresh_token, expires_at: Date.now() + (+p.expires_in || 3600) * 1000};
     lsSet(SESSION, S);
     return true;
