@@ -594,6 +594,32 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
   #pane-record .tbl table{min-width:640px}
   .hs.m{width:38px;height:38px}
 }
+/* depth chart */
+.dep-note{font-size:13px;color:var(--text2);line-height:1.6;margin:10px 0 16px;max-width:820px}
+.dep-team{margin:0 0 18px;min-width:0}
+.dep-hd{display:flex;align-items:center;gap:10px;margin:0 0 8px;flex-wrap:wrap}
+.dep-hd .tlogo{width:28px;height:28px}
+.dep-hd b{font-size:16px}
+.dep-hd .dim{font-size:12px;margin-left:auto}
+.dep-tbl{overflow-x:hidden}
+.dep-tbl table{min-width:0!important;table-layout:fixed;width:100%}
+.dep-tbl th{cursor:default}
+.dep-tbl th:first-child{width:40%}
+.dep-tbl td,.dep-tbl th{padding:8px 6px}
+.dep-tbl td{white-space:normal}
+.dep-tbl .r{text-align:right;font-family:monospace}
+.dep-tbl .nm{color:var(--text);font-weight:700;cursor:pointer}
+.dep-g td{font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#d795ff;background:rgba(176,56,249,.06);padding:6px}
+.dep-sub{font-size:11px;color:var(--text3);margin-top:2px;line-height:1.35}
+.dep-tag{display:inline-block;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:4px;vertical-align:1px}
+.dep-tag.out{color:var(--red);background:var(--red-dim)}
+.dep-tag.q{color:#d795ff;background:rgba(176,56,249,.14)}
+.dep-tag.ret{color:var(--green);background:var(--green-dim)}
+.dep-out td{opacity:.62}
+.dep-bt th:first-child{width:28%}
+.dep-empty{padding:28px;text-align:center;color:var(--text3);border:1px dashed var(--border2);border-radius:14px}
+@media (min-width:1100px){.dep-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}}
+@media (max-width:420px){.dep-tbl td,.dep-tbl th{padding:7px 3px;font-size:11.5px}.dep-tbl th:first-child{width:36%}.dep-sub{font-size:10.5px}}
 </style>
 <link rel="stylesheet" href="onyx.css"><script src="onyx.js" defer></script></head>
 <body>
@@ -626,6 +652,8 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12M2 8h12M2 12h8"/></svg>Props Board</button>
     <button class="nav-tab" data-tab="scorers" onclick="gotoTab('scorers')">
       <svg viewBox="0 0 16 16" fill="currentColor"><rect x="2" y="10" width="3" height="5" rx="1"/><rect x="6.5" y="6" width="3" height="9" rx="1"/><rect x="11" y="2" width="3" height="13" rx="1"/></svg>Top Scorers</button>
+    <button class="nav-tab" data-tab="depth" onclick="gotoTab('depth')">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 3h12M2 6.5h9M2 10h6M2 13.5h4"/></svg>Depth</button>
     <button class="nav-tab" data-tab="record" onclick="gotoTab('record')">
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 2h10v12H3z"/><path d="M5.5 6l1.5 1.5L10.5 4M5.5 11h5"/></svg>Record</button>
     <button class="nav-tab" data-tab="model" onclick="gotoTab('model')">
@@ -661,6 +689,7 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
       <button class="drawer-item" data-tab="games" onclick="gotoTab('games');closeNav()">Games</button>
       <button class="drawer-item" data-tab="board" onclick="gotoTab('board');closeNav()">Props Board</button>
       <button class="drawer-item" data-tab="scorers" onclick="gotoTab('scorers');closeNav()">Top Scorers</button>
+      <button class="drawer-item" data-tab="depth" onclick="gotoTab('depth');closeNav()">Depth Chart</button>
       <button class="drawer-item" data-tab="record" onclick="gotoTab('record');closeNav()">Record</button>
       <button class="drawer-item" data-tab="model" onclick="gotoTab('model');closeNav()">Model</button>
       <div class="drawer-divider"></div>
@@ -780,6 +809,20 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
   </table></div>
 </div></div>
 
+<!-- ═══ DEPTH CHART: every rotation by projected minutes (nba_build.write_depth) ═══ -->
+<div class="pane" id="pane-depth"><div class="nba-wrap">
+  <div class="sec-hdr"><div><span class="sec-title">Depth Chart · every rotation by projected minutes</span></div><span class="sec-count" id="depCount"></span></div>
+  <div class="toolbar">
+    <select class="sel" id="depGame" onchange="depSel=this.value;renderDepth()" aria-label="Game"></select>
+    <div class="nsearch"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="7" cy="7" r="5"/><path d="M11 11l3 3"/></svg>
+      <input id="depSearch" placeholder="Find a player..." oninput="renderDepth()"></div>
+  </div>
+  <p class="dep-note" id="depNote"></p>
+  <div class="dep-grid" id="depBody"></div>
+  <div class="sec-hdr" style="margin-top:22px"><div><span class="sec-title">How accurate is it? · backtest, Feb to Apr 2026</span></div></div>
+  <div id="depBT"></div>
+</div></div>
+
 <!-- ═══ RECORD ═════════════════════════════════════════════════ -->
 <div class="pane" id="pane-record"><div class="nba-wrap">
   <div class="sec-hdr"><div><span class="sec-title">Onyx Picks Record · every pick graded against the final box score</span></div><span class="sec-count" id="recSince"></span></div>
@@ -847,6 +890,13 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
       <div class="home-section-tag">The Evidence</div>
       <h2 class="home-section-title">Backtested before it shipped</h2>
       <div class="home-section-body" id="engEvidence"></div>
+    </div>
+
+    <div class="home-section">
+      <div class="home-section-tag">Minutes &amp; Depth</div>
+      <h2 class="home-section-title">How close the depth chart lands</h2>
+      <div class="home-section-body"><p>The <a href="#depth" onclick="gotoTab('depth');return false" style="color:#d795ff">Depth Chart</a> projects minutes, points, rebounds, assists, made threes and PRA for every rostered player. Here is how those numbers did on games the model had never seen, against the two guesses anyone can make: his season average and his last 10 games.</p></div>
+      <div id="engDepth"></div>
     </div>
 
     <div class="home-section">
@@ -1469,16 +1519,19 @@ function renderPlays() {
     }).join('')}</div>` : '';
 }
 // ── first basket (free throws count, Onyx's market): who scores the game's first points ──
-// Team half: the team that wins the opening tip scores first 65% of the time (2,428
+// Opportunity first, then the price (open-v4, tools/nba_first_basket_backtest.py).
+// Team half: the team that wins the opening tip scores first 66% of the time (2,424
 // games, 2024-26); each team's jumper is the starter with the most opening tips on
 // record, and his chance to win it is (won + 2) / (jumped + 4) against the other's.
 // Player half: the five starters split it by shot volume, (FGA + 0.9) / (minutes + 30)
-// to the 0.5 power, times his share of his team's first shots, ((first + .4) / (starts
-// + 2)) to the 0.25 (open-v2, data D.fshots from nba_jumps.first_shots). Fit on
-// 2024-25; on 1,075 2025-26 games Onyx priced it went 57-476 at +38% ROI where it beat
-// the opening price by 20%+, but -16% against the closing price after mid-January.
-// A lean on this card; the on-trial lane logs it only at the opening price.
-var FB_P = {g: .5, q: .65, a0: .9, m0: 30, h: .25, fs0: 2, value: .20};   // open_lanes.P (open-v2)
+// to the 0.5 power, times his share of his team's first shots, ((first + 1.6) / (starts
+// + 8)) to the 0.25 (D.fshots from nba_jumps.first_shots), the jumper x1.22.
+// A lean: one of his team's two likeliest, priced +800 or shorter, expected return
+// (model x decimal price - 1) of 10%+, the best one a game. The old rule (20% over
+// Onyx's implied chance) picked long shots (median +1120) and was graded on the wrong
+// first scorer; on the real one, 2025-26: old -1.4% at the open, -14.9% at the close;
+// this +1.9% and -8.7% at a median +730. No proven edge; the lane stays on trial.
+var FB_P = {g: .5, q: .66, a0: .9, m0: 30, h: .25, fs0: 8, jb: .2, top: 2, cap: 800, ev: .10};   // open_lanes.P (open-v4)
 function fbStarters(g) {
   const posted = {};
   (((SUMMARY[g.gid] || {}).boxscore || {}).players || []).forEach(t => {
@@ -1509,18 +1562,26 @@ function fbModel(g) {
   const rows = [];
   [g.away, g.home].forEach(ab => {
     const pt = ab === g.away ? tipA : 1 - tipA, first = pt * FB_P.q + (1 - pt) * (1 - FB_P.q);
+    const jm = ab === g.away ? ja : jh, jr = J[jm && jm.hs] || [0, 0];
     const w = T[ab].players.map(p => { const s = p.season || {}, gp = s.gp || 0, f = FS[p.hs] || [0, 0];
       return Math.pow(((s.fga || 0) * gp + FB_P.a0) / ((s.min || 0) * gp + FB_P.m0), FB_P.g)
-        * Math.pow((f[1] + FB_P.fs0 * .2) / (f[0] + FB_P.fs0), FB_P.h); });
+        * Math.pow((f[1] + FB_P.fs0 * .2) / (f[0] + FB_P.fs0), FB_P.h) * (p === jm ? Math.exp(FB_P.jb) : 1); });
     const W = w.reduce((a, b) => a + b, 0) || 1;
+    const team = [];
     T[ab].players.forEach((p, i) => {
-      const prob = first * w[i] / W, fb = p.fb || {};
-      const imp = fb.yes != null ? 1 / (fb.yes > 0 ? 1 + fb.yes / 100 : 1 + 100 / -fb.yes) : null;
-      rows.push({p, team: ab, prob, price: fb.yes, sel: fb.sel, imp, value: imp != null && prob >= imp * (1 + FB_P.value)});
+      const prob = first * w[i] / W, fb = p.fb || {}, f = FS[p.hs] || [0, 0];
+      const dec = fb.yes != null ? (fb.yes > 0 ? 1 + fb.yes / 100 : 1 + 100 / -fb.yes) : null;
+      team.push({p, team: ab, prob, price: fb.yes, sel: fb.sel, imp: dec ? 1 / dec : null, ev: dec ? prob * dec - 1 : null,
+        tip: pt, jumper: jm, jr, fs: f[0] >= 3 ? f[1] / f[0] : null, value: false});
     });
+    team.sort((a, b) => b.prob - a.prob).forEach((x, k) => { x.rank = k + 1; });
+    rows.push(...team);
   });
+  // the opportunity rule (open_lanes.fb_pick): a realistic candidate at a fair-or-better price, best one a game
+  const lean = rows.filter(x => x.ev != null && x.rank <= FB_P.top && x.price <= FB_P.cap && x.ev >= FB_P.ev).sort((a, b) => b.ev - a.ev)[0];
+  if (lean) lean.value = true;
   rows.sort((a, b) => b.prob - a.prob);
-  return {rows, ja, jh, tipA, lineup: T[g.away].lineup && T[g.home].lineup};
+  return {rows, ja, jh, tipA, lean, lineup: T[g.away].lineup && T[g.home].lineup};
 }
 // who actually scored first, from the play-by-play once the game is on
 function fbScored(g) {
@@ -1529,10 +1590,22 @@ function fbScored(g) {
   const id = String((((pl.participants || [])[0] || {}).athlete || {}).id || '');
   return {id, p: (D.players || []).find(p => String(p.hs) === id && p.gid === g.gid), text: pl.text};
 }
-function fbRow(g, x, done) {
+// the reason behind a lean: "BOS wins the tip 58% (Horford 41-19) · takes BOS's first shot 38% of starts"
+function fbWhy(x) {
+  const j = x.jumper, jr = x.jr || [0, 0];
+  let s = `${x.team} wins the tip ${Math.round(100 * x.tip)}%${j && jr[1] ? ` (${lastName(j.name)} ${jr[0]}-${jr[1] - jr[0]})` : ''}`;
+  if (x.fs != null) s += ` · takes ${x.team}'s first shot ${Math.round(100 * x.fs)}% of starts`;
+  return s;
+}
+function fbRow(g, x, done, lean) {
   const leg = x.price != null && x.sel ? {sel: x.sel, price: x.price, gid: g.gid, market: 'first basket', label: x.p.name + ' first basket'} : null;
+  const tip = `tip ${Math.round(100 * x.tip)}%${x.fs != null ? ' · 1st shot ' + Math.round(100 * x.fs) + '%' : ''}`;
+  if (lean) return `<div class="fb-row val">
+    <div class="fb-who" onclick="openGame('${esc(g.gid)}')" style="cursor:pointer"><b>${esc(x.p.name)}</b><span>${esc(g.away)} @ ${esc(g.home)} · Onyx ${Math.round(100 * x.imp)}% · return ${x.ev >= 0 ? '+' : ''}${Math.round(100 * x.ev)}%</span><span style="white-space:normal;line-height:1.45;color:var(--text2)">${esc(fbWhy(x))}</span></div>
+    <div class="fb-pct"><b>${(100 * x.prob).toFixed(1)}%</b><span>model</span></div>
+    ${leg && g.state === 'pre' ? nbOc(x.price, '', leg) : `<span class="oc dead"><b>${x.price != null ? fmtOdds(x.price) : '-'}</b></span>`}</div>`;
   return `<div class="fb-row${done && done.id === String(x.p.hs) ? ' hit' : ''}${x.value ? ' val' : ''}">
-    <div class="fb-who"><b>${esc(lastName(x.p.name))}</b><span>${esc(x.team)}${x.imp != null ? ' · Onyx ' + Math.round(100 * x.imp) + '%' : ''}${x.value ? ' · value' : ''}</span></div>
+    <div class="fb-who"><b>${esc(lastName(x.p.name))}</b><span>${esc(x.team)}${x.value ? ' · lean' : ''} · ${tip}${x.imp != null ? ' · Onyx ' + Math.round(100 * x.imp) + '%' : ''}</span></div>
     <div class="fb-pct"><b>${(100 * x.prob).toFixed(1)}%</b><span>model</span></div>
     ${leg && g.state === 'pre' ? nbOc(x.price, '', leg) : `<span class="oc dead"><b>${x.price != null ? fmtOdds(x.price) : '-'}</b></span>`}</div>`;
 }
@@ -1545,16 +1618,18 @@ function fbCard(g) {
     <div class="fb-tip">Opening tip: <b>${esc(nm(M.ja))}</b> vs <b>${esc(nm(M.jh))}</b> · ${esc(g.away)} wins it ${Math.round(100 * M.tipA)}%, ${esc(g.home)} ${Math.round(100 * (1 - M.tipA))}%</div>
     ${done ? `<div class="fb-done">First basket: <b>${esc(done.p ? done.p.name : (done.text || '').split(' makes')[0])}</b>${done.p ? ` · the model had him at ${(100 * (M.rows.find(x => String(x.p.hs) === done.id) || {prob: 0}).prob).toFixed(1)}%` : ''}</div>` : ''}
     <div class="fb-list">${M.rows.map(x => fbRow(g, x, done)).join('')}</div>
-    <div class="dim" style="font-size:11px;margin-top:8px">Lean, not a tracked pick. The team that wins the opening tip scores first 65% of the time; within a team the starters split it by shot volume and by how often each one takes his team's first shot (the opening set play). Value = the model's chance at least 20% above Onyx's. On 2025-26 that beat Onyx's opening prices (+38% ROI on 533 bets) but not the closing prices after mid-January (-16%).</div></div>`;
+    ${M.lean ? `<div class="fb-tip" style="margin:8px 0 0">Lean: <b>${esc(M.lean.p.name)}</b> ${fmtOdds(M.lean.price)} · ${esc(fbWhy(M.lean))}</div>` : ''}
+    <div class="dim" style="font-size:11px;margin-top:8px">Lean, not a tracked pick. Opportunity first: the team that wins the opening tip scores first 66% of the time, and within a team the starters split it by shot volume and by how often each one takes his team's first shot (the opening set play). Tip % = his team's chance to win the tip; 1st shot = how often he took his team's first shot when he started. A lean must be one of his team's two likeliest, priced +800 or shorter, with an expected return of 10% or more at Onyx's price; the best one a game. On 2025-26 Onyx prices that was about even at the opening price (+1.9%, 110 plays) and behind at the closing price (-8.7%): no proven edge yet.</div></div>`;
 }
-// the Picks tab: every untipped game's first-basket value, best first
+// the Picks tab: each untipped game's first-basket lean (opportunity first, then the price), best expected return first
 function fbLeans() {
-  const rows = (D.games || []).filter(g => g.state === 'pre').flatMap(g => { const M = fbModel(g); return M ? M.rows.filter(x => x.value).map(x => ({g, x})) : []; })
-    .sort((a, b) => b.x.prob / b.x.imp - a.x.prob / a.x.imp).slice(0, 8);
-  if (!rows.length) return '';
+  const rows = (D.games || []).filter(g => g.state === 'pre').map(g => { const M = fbModel(g); return M && M.lean ? {g, x: M.lean} : null; })
+    .filter(Boolean).sort((a, b) => b.x.ev - a.x.ev).slice(0, 8);
+  if (!rows.length) return (D.games || []).some(g => g.state === 'pre') ? `<div class="pl-div"><i></i><span>First basket leans · not picks · not graded</span><i></i></div>
+    <div class="dim" style="font-size:11px;margin:0 0 14px">No lean yet today: no team's two likeliest first scorers are priced +800 or shorter with a 10% expected return at Onyx's price. In the 2025-26 backtest 70 of 151 nights had one or more. The full ten for each game are on its card in Games.</div>` : '';
   return `<div class="pl-div"><i></i><span>First basket leans · not picks · not graded</span><i></i></div>
-    <div class="fb-list">${rows.map(({g, x}) => fbRow(g, x, null).replace('<div class="fb-who"><b>', `<div class="fb-who" onclick="openGame('${esc(g.gid)}')" style="cursor:pointer"><b>`).replace(`<span>${esc(x.team)}`, `<span>${esc(g.away)} @ ${esc(g.home)} · ${esc(x.team)}`)).join('')}</div>
-    <div class="dim" style="font-size:11px;margin:6px 0 14px">Where the model's chance is at least 20% above Onyx's price, from projected starters until lineups post. Beat Onyx's opening prices in the 2025-26 backtest, not the closing ones late in the season.</div>`;
+    <div class="fb-list">${rows.map(({g, x}) => fbRow(g, x, null, true)).join('')}</div>
+    <div class="dim" style="font-size:11px;margin:6px 0 14px">One a game at most: one of his team's two likeliest first scorers (the tip and who takes the first shot), priced +800 or shorter, with an expected return of 10% or more at Onyx's price, best return first. From projected starters until lineups post. About even with Onyx's opening prices in the 2025-26 backtest and behind its closing prices: a lean, not a proven edge.</div>`;
 }
 // ── quarters and halves: the model's 1st-quarter / 1st-half reads against Onyx ──
 // Each scales Onyx's own full-game line down to the period: the 1Q total is 25.4% of the
@@ -1603,12 +1678,12 @@ function openTrial() {
   const O = D.open || {}, K = O.kinds || {}, A = K.all || {};
   const rows = O.rows || [];
   if (!rows.length && !O.started) return `<div class="pl-div"><i></i><span>On trial · Onyx opening prices</span><i></i></div>
-    <div class="ot-note">Three lanes beat Onyx's first price in the backtests: the 1st-quarter total, first basket and assists unders. They log a play only while Onyx still shows the first price we saw for that market, and every play is graded here. None has qualified yet.</div>`;
+    <div class="ot-note">Three lanes on trial: the 1st-quarter total and assists unders beat Onyx's first price in the backtests; first basket (since 11/2: his team's tip chance and his share of its first shots, priced +800 or shorter) was about even, so this record decides it. They log a play only while Onyx still shows the first price we saw for that market, and every play is graded here. None has qualified yet.</div>`;
   const rec = k => { const x = K[k] || {}; return `${x.w || 0}-${x.l || 0}${x.p ? '-' + x.p : ''}`; };
   const u = v => (v > 0 ? '+' : '') + (v || 0).toFixed(2) + 'u';
   const label = k => k.kind === 'q1_total' ? `${esc(k.matchup)} · 1st quarter ${k.side === 'over' ? 'Over' : 'Under'} ${k.line}`
     : k.kind === 'ast_under' ? `${esc(k.name)} Under ${k.line} assists · ${esc(k.matchup)}` : `${esc(k.name)} first basket · ${esc(k.matchup)}`;
-  const why = k => (k.why || []).filter(w => Math.abs(w.pp) >= 0.1).map(w => `${esc(w.k)} ${w.v} (avg ${w.avg}) ${w.pp > 0 ? '+' : ''}${w.pp} pts to the over`).join(' · ');
+  const why = k => typeof k.why === 'string' ? esc(k.why) : (k.why || []).filter(w => Math.abs(w.pp) >= 0.1).map(w => `${esc(w.k)} ${w.v} (avg ${w.avg}) ${w.pp > 0 ? '+' : ''}${w.pp} pts to the over`).join(' · ');
   const today = rows.filter(k => k.date === D.date), past = rows.filter(k => k.date !== D.date).slice(0, 12);
   const row = k => {
     const g = (D.games || []).find(x => x.gid === k.gid) || {};
@@ -1620,7 +1695,7 @@ function openTrial() {
   return `<div class="pl-div"><i></i><span>On trial · Onyx opening prices</span><i></i></div>
     <div class="ot-rec"><span><b>${rec('all')}</b><i>record</i></span><span><b class="${(A.units || 0) >= 0 ? 'up' : 'dn'}">${u(A.units)}</b><i>units, 1 per play</i></span>
       <span><b>${rec('q1_total')}</b><i>1st-quarter totals</i></span><span><b>${rec('first_basket')}</b><i>first basket</i></span><span><b>${rec('ast_under')}</b><i>assists unders</i></span></div>
-    <div class="ot-note">Logged only while Onyx still shows the first price we saw for that market, at that price, then graded after the game. The backtests beat Onyx's first price (1st-quarter total +7.5%, first basket +38%) but not its closing price. Assists unders (since 11/1) start from Onyx's opening price and add the assists the opponent allows and how far the line sits from the player's usual range: on games the model never saw they went 47-37 (+11.1%) at 3+ points of edge. Each lists why. All stay on trial until this record says otherwise.</div>
+    <div class="ot-note">Logged only while Onyx still shows the first price we saw for that market, at that price, then graded after the game. The 1st-quarter total beat Onyx's first price in the backtest (+7.5%) but not its closing price. First basket (since 11/2) logs one of a team's two likeliest first scorers, from the opening tip and who takes the first shot, at +800 or shorter with a 10%+ expected return: on 2025-26 that was about even at the first price (+1.9%) and behind at the close (-8.7%), so it has no edge until this record shows one. Assists unders (since 11/1) start from Onyx's opening price and add the assists the opponent allows and how far the line sits from the player's usual range: on games the model never saw they went 47-37 (+11.1%) at 3+ points of edge. Each lists why. All stay on trial until this record says otherwise.</div>
     ${today.length ? `<div class="ot-h">Today</div>${today.map(row).join('')}` : '<div class="ot-note dim">No play at the opening prices yet today.</div>'}
     ${past.length ? `<div class="ot-h">Recent</div>${past.map(row).join('')}` : ''}`;
 }
@@ -2973,9 +3048,99 @@ function bcUpdate(scrollRung) {
   bet.onclick = () => { if (!leg) return; track('onyx_click', {link_type: 'single', market: leg.market, selection: leg.label, odds: String(leg.price), source: 'player_card'});
     window.open(shareUrl([leg.sel]), '_blank', 'noopener'); };
 }
+// ── Depth tab: D.depth from nba_build.write_depth (data/nba/depth.json) ──
+var depSel = null;
+var DEP_ROLE = {Starter: 'Starters', Rotation: 'Rotation', Bench: 'Bench', Out: 'Out tonight'};
+function depTag(p) {
+  const t = p.tag || '';
+  if (!t) return '';
+  const cls = p.role === 'Out' ? 'out' : /^Returning/.test(t) ? 'ret' : 'q';
+  const short = p.role === 'Out' ? 'Out' : /^Questionable/.test(t) ? 'Q' : t;
+  return `<span class="dep-tag ${cls}" title="${esc(t)}">${esc(short)}</span>`;
+}
+function depTeam(t, q) {
+  const T = (D.depth.teams || {})[t];
+  if (!T) return '';
+  const ps = (T.players || []).filter(p => !q || p.n.toLowerCase().includes(q));
+  if (q && !ps.length) return '';
+  const known = new Set((D.players || []).map(p => p.pid));
+  let body = '', cur = '';
+  ps.forEach(p => {
+    if (p.role !== cur) { cur = p.role; body += `<tr class="dep-g"><td colspan="7">${DEP_ROLE[cur] || esc(cur)}</td></tr>`; }
+    const nm = known.has(p.id) ? `<span class="nm" onclick="openPlayer('${esc(p.id)}')">${esc(p.n)}</span>` : `<span class="nm" style="cursor:default">${esc(p.n)}</span>`;
+    const l = p.last, s = p.now || {};
+    const sub = p.role === 'Out'
+      ? esc((p.tag || '').replace(/^Out:?\s*/, '') || 'injury report')
+      : (l ? `L10 ${num(l.use)} min · ${num(l.pts)} pts` : 'no games yet') + (s.gp ? ` · ${s.gp} gp` : '');
+    const P = p.proj || {};
+    const c = v => p.role === 'Out' ? '<td class="r dim">-</td>' : `<td class="r">${num(v)}</td>`;
+    body += `<tr${p.role === 'Out' ? ' class="dep-out"' : ''}><td>${nm} <span class="dim" style="font-size:11px">${esc(p.pos || '')}</span>${depTag(p)}<div class="dep-sub">${sub}</div></td>`
+      + (p.role === 'Out' ? '<td class="r dim">0</td>' : `<td class="r"><b>${num(p.use)}</b></td>`)
+      + c(P.pts) + c(P.reb) + c(P.ast) + c(P['3pm']) + c(P.pra) + '</tr>';
+  });
+  const opp = (D.games || []).find(g => g.away === t || g.home === t);
+  const vs = opp ? (opp.home === t ? 'vs ' + opp.away : '@ ' + opp.home) : '';
+  return `<div class="dep-team"><div class="dep-hd">${logo(t)}<b>${esc(T.name || t)}</b><span class="dim">${esc(vs)}${T.pace ? ' · pace ' + num(T.pace) : ''}</span></div>
+    <div class="tbl dep-tbl"><table><thead><tr><th>Player</th><th class="r">Min</th><th class="r">PTS</th><th class="r">REB</th><th class="r">AST</th><th class="r">3PM</th><th class="r">PRA</th></tr></thead><tbody>${body}</tbody></table></div></div>`;
+}
+function depBT(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const B = ((D.depth || {}).bt || {}), T = B.test || {}, M = B.meta || {};
+  const groups = Object.keys(T).filter(g => T[g] && T[g].min);
+  if (!groups.length) { el.innerHTML = '<div class="dep-empty">The backtest summary appears after tools/nba_minutes_backtest.py runs.</div>'; return; }
+  const cols = [['min', 'Min'], ['pts', 'PTS'], ['reb', 'REB'], ['ast', 'AST'], ['fg3', '3PM'], ['pra', 'PRA']];
+  const cell = (r, i) => i < 0 ? '-' : num(r[i], 2);
+  el.innerHTML = `<p class="dep-note">Average miss per player-game (lower is better) when every night of ${esc(M.season || '2025-26')} is replayed with only what was known before tip: ${(M.player_games || 0).toLocaleString()} player-games, settings chosen on ${esc(M.train || 'October to January')} and judged on ${esc(M.test || 'February to April')}, months the tuner never saw. The big number is the depth chart; under it, the season-to-date average and the last-10 average for the same games. The model alone lost to a plain last-10 average on minutes for rotation and bench players, so the depth chart blends the two by role; with the blend it beats both naive guesses in every group below.</p>
+    <div class="tbl dep-tbl dep-bt"><table><thead><tr><th>Group</th>${cols.map(c => `<th class="r">${c[1]}</th>`).join('')}</tr></thead><tbody>`
+    + groups.map(g => { const r = T[g]; return `<tr><td><b>${esc(g)}</b><div class="dep-sub">${(r.n || 0).toLocaleString()} games</div></td>`
+      + cols.map(c => { const v = r[c[0]] || []; return `<td class="r"><b>${cell(v, 0)}</b><div class="dep-sub">${cell(v, 2)}<br>${cell(v, 3)}</div></td>`; }).join('') + '</tr>'; }).join('')
+    + `</tbody></table></div><p class="dep-sub" style="margin-top:8px">Each cell: depth chart, then season average, then last 10. Scored on players who logged a minute; DNPs are not in these numbers.</p>`;
+}
+function renderDepth() {
+  const DP = D.depth || {}, teams = DP.teams || {};
+  const body = document.getElementById('depBody'), sel = document.getElementById('depGame');
+  const games = (D.games || []).filter(g => teams[g.away] || teams[g.home]);
+  document.getElementById('depNote').innerHTML = games.length
+    ? `Every rostered player, ordered by projected minutes. <b>Starters</b> are the five highest projected minutes (the confirmed five once posted), <b>Rotation</b> ${num(DP.rot_min || 12, 0)}+ projected minutes, <b>Bench</b> the rest, <b>Out</b> on the injury report, with his minutes shared across the rest of the roster. Minutes are minutes if he plays, so a deep bench can push a team past 240. L10 is his last 10 games played. Tap a name for the full player card.`
+    : '';
+  depBT('depBT');
+  if (!games.length) {
+    sel.innerHTML = ''; sel.style.display = 'none';
+    document.getElementById('depCount').textContent = '';
+    body.innerHTML = '<div class="dep-empty">The depth chart fills in once tonight\'s rosters are loaded.</div>';
+    return;
+  }
+  sel.style.display = '';
+  if (depSel !== 'all' && !games.some(g => g.gid === depSel)) depSel = games[0].gid;
+  sel.innerHTML = `<option value="all"${depSel === 'all' ? ' selected' : ''}>All games</option>` + games.map(g =>
+    `<option value="${esc(g.gid)}"${g.gid === depSel ? ' selected' : ''}>${esc(g.away)} @ ${esc(g.home)}${g.start ? ' · ' + esc(tipTime(g.start)) : ''}</option>`).join('');
+  const q = (document.getElementById('depSearch').value || '').trim().toLowerCase();
+  const show = q || depSel === 'all' ? games : games.filter(g => g.gid === depSel);
+  const html = show.map(g => depTeam(g.away, q) + depTeam(g.home, q)).join('');
+  const n = show.reduce((a, g) => a + [g.away, g.home].reduce((b, t) => b + ((teams[t] || {}).players || []).length, 0), 0);
+  document.getElementById('depCount').textContent = `${n} players`;
+  body.innerHTML = html || '<div class="dep-empty">No player matches that search.</div>';
+}
+// the phone menu (ui.js) lists its tiles itself: add the Depth Chart tile beside Top Scorers
+function depTile() {
+  const g = document.querySelector('.osheet .ogrid');
+  if (!g) return false;
+  if (g.querySelector('.otile[data-tab="depth"]')) return true;
+  const b = document.createElement('button');
+  b.className = 'otile'; b.dataset.tab = 'depth';
+  b.innerHTML = '<svg class="oi" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M2 3h12M2 6.5h9M2 10h6M2 13.5h4"/></svg><div><b>Depth Chart</b><span>Every rotation, minutes and stat lines</span></div>';
+  b.addEventListener('click', function () { try { window.OnyxUI && OnyxUI.closeMenu(); } catch (e) {} gotoTab('depth'); });
+  const ref = g.querySelector('.otile[data-tab="scorers"]');
+  if (ref && ref.nextSibling) g.insertBefore(b, ref.nextSibling); else g.appendChild(b);
+  if (currentTab === 'depth') b.classList.add('on');
+  return true;
+}
+window.addEventListener('load', function () { if (!depTile()) setTimeout(depTile, 800); });
+
 // ── tabs ───────────────────────────────────────────────────────────
 var currentTab = 'home';
-var RENDER = {home: renderHome, plays: renderPlays, games: renderGames, board: renderBoard, scorers: renderScorers, record: renderRecord, model: renderModel};
+var RENDER = {home: renderHome, plays: renderPlays, games: renderGames, board: renderBoard, scorers: renderScorers, depth: renderDepth, record: renderRecord, model: renderModel};
 
 // ── Model tab: reads the live weights from D.engine (nba_build.engine_card) ──
 // Evidence and history are the lab notebook (nba_model.py CHANGELOG) in plain
@@ -3108,6 +3273,7 @@ function renderModel() {
     <div class="tbl-wrap"><table class="spec-table"><thead><tr><th>Test window (Feb to Apr 2026)</th><th>Points</th><th>Rebounds</th><th>Assists</th></tr></thead><tbody>
     ${EV.rows.map(r => `<tr><td>${r[0]}</td><td class="mono">${r[1]}</td><td class="mono">${r[2]}</td><td class="mono">${r[3]}</td></tr>`).join('')}</tbody></table></div>
     ${EV.after.map(x => `<p>${x}</p>`).join('')}`;
+  depBT('engDepth');
   document.getElementById('engTimeline').innerHTML = ENGINE_NOTES.history.map((h, i) =>
     `<div class="tl-item"><div class="tl-dot${i ? '' : ' active'}"></div><div class="tl-date">${h[0]}</div><div class="tl-title">${h[1]}</div><div class="tl-body">${h[2]}</div></div>`).join('');
   document.getElementById('engRoadmap').innerHTML = ENGINE_NOTES.roadmap.map(x => factorCard(...x)).join('');

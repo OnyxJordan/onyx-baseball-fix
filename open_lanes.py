@@ -3,8 +3,8 @@
 open_lanes.py - NBA plays at Onyx's opening price, tracked in public "on trial".
 
 The backtests found Onyx beatable at its first price and rarely at its last
-(first basket +41% at the open on 421 bets, -4% at the close after mid-January;
-the 1st-quarter total +7.5% at the open, +3.3% at the close). So:
+(the 1st-quarter total +7.5% at the open, +3.3% at the close; first basket: see
+open-v4, the earlier +41% was graded on the wrong first scorer). So:
 
   capture   the first Onyx price we ever see for each market is written once to
             data/nba/opening.json and never overwritten (timestamped)
@@ -24,12 +24,45 @@ Lanes:
   ast_under    assists unders (nba_market.py): Onyx's opening price moved by the
                assists the opponent allows and the line vs his usual range; logged
                when the under beats the opening price by 3+ points
-  first_basket tip winner scores first 65%; jumper record (won+2)/(jumped+4); the
-               five starters split it by ((FGA x gp + .9) / (min x gp + 30))^.5
-               x ((first shots + .4) / (starts + 2))^.25; value when the model
-               is 20%+ above Onyx's implied chance
+  first_basket opportunity first, then the price (open-v4). Tip winner scores first
+               66%; jumper record (won+2)/(jumped+4); the five starters split it
+               by ((FGA x gp + .9) / (min x gp + 30))^.5 x ((first shots + 1.6) /
+               (starts + 8))^.25, the team's jumper x1.22. A candidate is one of
+               his team's two likeliest at +800 or shorter; logged when the
+               expected return (model x decimal price - 1) is 10%+, one a game
 
 CHANGELOG
+  open-v4 (2026-11-02) FIRST BASKET: OPPORTUNITY FIRST, THEN THE PRICE; AND A LABEL FIX.
+     Jordan: the leans "just post long lines". The rule was ratio value (model >= Onyx
+     implied x 1.2), which a +1500 at 6% vs 5% passes and a +350 at 22% vs 22% never does.
+     tools/nba_first_basket_backtest.py rebuilt the study from the play-by-play and found
+     the open-v1/v2 label was wrong: it took the first m2 / m3 / ft event as the first
+     score, and m2 / m3 are MISSED shots in that format, so the "first scorer" matched the
+     real one in 12% of games. Every earlier first-basket number (57-476 +38%, 45-376 +41%)
+     was graded on that label. On the real first points (2,435 games 2024-26):
+       tip winner scores first 66.0% (2,424 games); the first scorer took his team's first
+       shot 69%; a bench player never scored first (0 games)
+       refit on 2024-25, tested on 2025-26 (log loss, ten starters, uniform 2.3026):
+         open-v3 2.2916 -> open-v4 2.2837 (q .65 -> .66, first-shot prior 2 -> 8 starts,
+         the team's jumper x1.22; recency, home/away and a share/usage mixture added nothing)
+       vs Onyx no-vig over the ten starters: open Oct-Jan model 2.2760 / Onyx 2.2677,
+         Feb-Apr 2.2624 / 2.2697; close 2.2767 / 2.2664 and 2.2624 / 2.2603. Even, not better.
+       every priced starter blind, by opening price: <=+400 15.6% hit vs 21.3% implied
+         (-26.6%), +401-700 -11.6%, +701-1200 -20.7%, +1201 and up +27.6% at the open but
+         +8.0% at the close: Onyx's opening long shots are stale, and that is all the old
+         rule was harvesting.
+     Rules on 2025-26 Onyx prices (plays chosen at the open; tuned Oct-Jan, judged Feb-Apr):
+       old ratio (open-v3, never tuned on 2025-26), whole season: 46-501 at med +1120,
+         open -1.4%, close -14.9%; Feb-Apr open +24.0% (+/-30), close +6.8%
+       opportunity (top 2 on his team, <= +800, expected return 10%+, one a game; the cell
+         with the best neighbour-averaged Oct-Jan ROI): Oct-Jan 8-52 open +7.7%, close -5.7%;
+         Feb-Apr 6-44 open -5.1%, close -12.4%; season 14-96 med +730, open +1.9% (+/-26),
+         close -8.7%
+       cap +700 (the brief's guess): season 6-39, open -2.8%, close -12.4%
+     Neither rule beats Onyx's closing price and neither has a real edge at the open: the
+     gaps are inside one standard error. The lane moves to the opportunity rule because it
+     posts realistic candidates (median +730, not +1120) at a fraction of the volume, and
+     stays on trial on the public record; the backtest no longer argues for it.
   open-v3 (2026-11-01) ASSISTS UNDERS. tools/nba_feature_screen.py tested ~30 statistics
      (minutes and their trend, usage, per-36 rates, starter share, pace, what the
      opponent allows, Onyx's total and spread, rest, back-to-backs) against 49,000
@@ -80,10 +113,10 @@ from nba_common import DATA, ESPN, espn_get, load, save, team_abbr
 
 OPENING = "opening.json"
 LEDGER = "open_trial.json"
-VERSION = "open-v3"
+VERSION = "open-v4"
 P = {"q1": .254, "q1_sd": 12.0, "q1_edge": .03,
-     "fb_g": .5, "fb_q": .65, "fb_a0": .9, "fb_m0": 30.0, "fb_h": .25, "fb_fs0": 2.0,
-     "fb_rel": .20, "fb_per_game": 2}
+     "fb_g": .5, "fb_q": .66, "fb_a0": .9, "fb_m0": 30.0, "fb_h": .25, "fb_fs0": 8.0, "fb_jb": .2,
+     "fb_top": 2, "fb_cap": 800, "fb_ev": .10, "fb_per_game": 1}
 VOID_AFTER_DAYS = 3
 
 
@@ -110,8 +143,9 @@ def starters(rows, gid, team):
     return sorted(roster, key=lambda r: (-rate(r), -r["min"]))[:5]
 
 
-def fb_probs(rows, game, jumps, fshots=None):
-    """{pid: probability} for the ten projected starters, or {} without two full fives."""
+def fb_probs(rows, game, jumps, fshots=None, detail=None):
+    """{pid: probability} for the ten projected starters, or {} without two full fives.
+    Pass a dict as detail to get {pid: {tip, jumper, jr, fs, rank}} for the "why" line."""
     T = {t: starters(rows, game["gid"], t) for t in (game["away"], game["home"])}
     if any(len(v) < 5 for v in T.values()):
         return {}
@@ -130,11 +164,34 @@ def fb_probs(rows, game, jumps, fshots=None):
             gp = s.get("gp") or 0
             n, f = fsh(r)
             w.append((((s.get("fga") or 0) * gp + P["fb_a0"]) / ((s.get("min") or 0) * gp + P["fb_m0"])) ** P["fb_g"]
-                     * ((f + P["fb_fs0"] * .2) / (n + P["fb_fs0"])) ** P["fb_h"])
+                     * ((f + P["fb_fs0"] * .2) / (n + P["fb_fs0"])) ** P["fb_h"]
+                     * math.exp(P["fb_jb"] * (r is jumper[t])))
         W = sum(w) or 1
         for r, wi in zip(five, w):
             out[r["pid"]] = first * wi / W
+        if detail is not None:
+            for k, r in enumerate(sorted(five, key=lambda r: -out[r["pid"]])):
+                n, f = fsh(r)
+                detail[r["pid"]] = {"team": t, "tip": tip[t], "jumper": jumper[t]["name"], "jr": jp(jumper[t]),
+                                    "fs": (f / n) if n else None, "starts": n, "rank": k + 1}
     return out
+
+
+def fb_why(d):
+    """'BOS wins the tip 58% (Horford 41-19) · takes BOS's first shot 38% of starts'"""
+    jr = d["jr"]
+    out = f"{d['team']} wins the tip {round(100 * d['tip'])}% ({d['jumper'].split(' ')[-1]} {int(jr[0])}-{int(jr[1] - jr[0])})"
+    if d.get("fs") is not None and d.get("starts", 0) >= 3:
+        out += f" · takes {d['team']}'s first shot {round(100 * d['fs'])}% of starts"
+    return out
+
+
+def fb_pick(cands):
+    """The opportunity rule (open-v4). cands: [{p, price, rank}, ...]; returns the ones
+    that qualify, best expected return first."""
+    q = [c for c in cands if c["rank"] <= P["fb_top"] and c["price"] <= P["fb_cap"]
+         and c["p"] * (1 + payout(c["price"])) - 1 >= P["fb_ev"]]
+    return sorted(q, key=lambda c: -(c["p"] * (1 + payout(c["price"])) - 1))
 
 
 # ── capture, then log at the opening price ──────────────────────────────────
@@ -220,7 +277,8 @@ def run(rows, slate, props, today, jumps, fshots=None, games_log=None, tg=None, 
                     have.add((today, "q1_total", g["gid"]))
                     added += 1
         # first basket
-        probs = fb_probs(rows, g, jumps, fshots)
+        fbd = {}
+        probs = fb_probs(rows, g, jumps, fshots, fbd)
         n_game = sum(1 for k in ledger if k["date"] == today and k["kind"] == "first_basket" and k["gid"] == g["gid"])
         cands = []
         for r in rows:
@@ -229,9 +287,8 @@ def run(rows, slate, props, today, jumps, fshots=None, games_log=None, tg=None, 
             op = O["fb"].get(f"{r['gid']}|{r['pid']}"); fb = r.get("fb") or {}
             if not op or op.get("baseline") or fb.get("yes") != op["yes"]:
                 continue
-            p = probs[r["pid"]]
-            if p >= implied(op["yes"]) * (1 + P["fb_rel"]):
-                cands.append((p / implied(op["yes"]), r, p, op, fb))
+            cands.append({"p": probs[r["pid"]], "price": op["yes"], "rank": fbd[r["pid"]]["rank"], "r": r, "op": op, "fb": fb})
+        cands = fb_pick(cands)
         # assists unders (open-v3)
         for r in rows:
             if r["gid"] != g["gid"] or r.get("out") or lg_allowed is None:
@@ -258,7 +315,8 @@ def run(rows, slate, props, today, jumps, fshots=None, games_log=None, tg=None, 
                            "result": None, "actual": None})
             have.add((today, "ast_under", key))
             added += 1
-        for rel, r, p, op, fb in sorted(cands, key=lambda c: -c[0]):
+        for c in cands:
+            r, p, op, fb = c["r"], c["p"], c["op"], c["fb"]
             key = f"{r['gid']}|{r['pid']}"
             if n_game >= P["fb_per_game"] or (today, "first_basket", key) in have:
                 continue
@@ -267,6 +325,7 @@ def run(rows, slate, props, today, jumps, fshots=None, games_log=None, tg=None, 
                            "pid": r["pid"], "hs": r.get("hs"), "name": r["name"], "team": r["team"],
                            "side": "yes", "line": None, "price": op["yes"], "sel": fb.get("sel"),
                            "prob": round(p, 4), "implied": round(implied(op["yes"]), 4),
+                           "ev": round(p * (1 + payout(op["yes"])) - 1, 4), "why": fb_why(fbd[r["pid"]]),
                            "opened_at": op["ts"], "logged_at": ts, "model": VERSION, "result": None, "actual": None})
             have.add((today, "first_basket", key))
             n_game += 1
