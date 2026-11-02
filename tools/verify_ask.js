@@ -52,15 +52,20 @@ const srv = http.createServer((q, r) => { const p = path.join(root, decodeURICom
       if (e.teams) { const got = ((s.teams || []).length ? s.teams : s.team ? [s.team] : []).map(x => String(x).toUpperCase()).sort(); if (!same(got, e.teams)) why.push(`teams ${JSON.stringify(got)} want ${JSON.stringify(e.teams)}`); }
       if (e.props_only && !s.props_only) why.push('props_only not set');
       if (e.sort && s.sort !== e.sort) why.push(`sort ${s.sort} want ${e.sort}`);
+      if (e.when && s.when !== e.when) why.push(`when ${s.when} want ${e.when}`);
+      if (e.exclude && !e.exclude.every(x => (s.exclude || []).some(y => String(y).toLowerCase() === String(x).toLowerCase()))) why.push(`exclude ${JSON.stringify(s.exclude || [])} want ${JSON.stringify(e.exclude)}`);
+      if (e.unsupported && !s.unsupported) why.push('should say we do not price this');
+      if (!e.unsupported && s.unsupported && Object.keys(e).length) why.push(`wrongly says not priced: ${s.unsupported}`);
+      if (e.unsupported && !R.clarify) why.push('no follow-up offered for a bet we do not price');
       if (e.target_price != null && s.target_price !== e.target_price) why.push(`target_price ${s.target_price} want ${e.target_price}`);
       // every play returned must honor the reading
       const legs = (R.rows || []);
       for (const p of legs) {
         if ((s.sports || []).length && s.sports.indexOf(p.sport) < 0) { why.push(`play from ${p.sport}`); break; }
         const mk = (s.markets || []).slice(); if (mk.indexOf('two_plus_td') >= 0) mk.push('anytime_td');
-        if (mk.length && mk.indexOf(p.mkt) < 0 && mk.indexOf(p.kind) < 0) { why.push(`play market ${p.mkt}`); break; }
+        if (mk.length && !R.widened && mk.indexOf(p.mkt) < 0 && mk.indexOf(p.kind) < 0) { why.push(`play market ${p.mkt}`); break; }   // a widened SGP says so
         if (s.props_only && p.kind !== 'prop') { why.push('game line in a props answer'); break; }
-        if (s.side && s.side !== 'any' && (p.kind === 'prop' || p.kind === 'total') && p.side !== s.side) { why.push(`play side ${p.side}`); break; }
+        if (!R.widened && s.side && s.side !== 'any' && (p.kind === 'prop' || p.kind === 'total') && p.side !== s.side) { why.push(`play side ${p.side}`); break; }
         if (!R.two && s.min_price != null && p.price < s.min_price && !(s.target_price && s.default_floor)) { why.push(`price ${p.price} under ${s.min_price}`); break; }   // a payout target moves the default floor
         if (!R.two && s.max_price != null && p.price > s.max_price) { why.push(`price ${p.price} over ${s.max_price}`); break; }
         if (Date.parse(p.start) <= now) { why.push('started game'); break; }
@@ -68,7 +73,7 @@ const srv = http.createServer((q, r) => { const p = path.join(root, decodeURICom
       }
       // an empty answer is a failure when today's boards have something that fits
       const want = (e.sports || s.sports || []).length ? (e.sports || s.sports) : null, wm = (e.markets || s.markets || []).length ? (e.markets || s.markets) : null;
-      const exists = !e.team && !e.player && !s.team && !(s.teams || []).length && !s.player && avail(want, wm, s);
+      const exists = !e.team && !e.player && !s.team && !(s.teams || []).length && !s.player && s.intent !== 'sgp' && avail(want, wm, s);   // an SGP needs it all in one game
       if (!legs.length && exists && !R.clarify) why.push('empty answer while the board has plays that fit');   // a question back (R.clarify) is an answer
       if (s.intent === 'parlay' && legs.length > 1 && R.parlay && R.parlay.price == null) why.push('parlay without a price');
       out.push({q: c.q, ok: !why.length, why, ms: Math.round(ms), n: legs.length, read: R.understood, via: R.via, spec: JSON.stringify(Object.assign({}, s, {summary: undefined}))});

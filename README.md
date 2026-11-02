@@ -1561,3 +1561,16 @@ to his minutes as a starter (or 29) and a usual starter left out of the five hal
 minutes (or 18), before the 240-minute refill. Backtest (`SIM_LINEUP` in tools/nba_backtest.py):
 Feb-Apr minutes MAE 5.45 -> 5.30, points 4.604 -> 4.559, lane open +2.5% -> +8.7%, close +13.0% ->
 +23.4%. Fail-soft: a lineup error leaves the slate as it was.
+
+**Ask Onyx: every kind of request (11/2).** `tools/ask_taxonomy.py` builds requests from a map of
+what bettors ask: bet type (straight, parlay of N in leg / legger / team / pick / fold / acca /
+multi / double / treble, SGP, round robin, payouts as +500, 10 to 1, "turn $10 into $100", "$20
+to win $100", 3x), what to see (safest, recommended, value, longshots), every market in bettor
+words, sides, price rules, confidence, days, teams, matchups ("KC @ DEN"), players, exclusions
+("no Kelce", "except the Lakers") and bets search does not cover (teasers, futures, golf, MLB,
+NHL goal scorers, threes, double-doubles, combined stats, team totals, quarter spreads, hedging,
+exact scores, promos, other sports), which now say so and offer what we do price. First run
+94.4% of 20,000; after the fixes 80,000 / 80,000 on four seeds with the built-in reader and
+997 / 1,000 through the live AI (the 3, "even money" read as exactly +100, fixed: a price rule the
+reader finds now wins in the blend). Test against full boards: on a thin night, shift a past
+board's start times forward locally and restore `data/` after.
