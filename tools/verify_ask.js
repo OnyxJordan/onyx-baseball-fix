@@ -2,6 +2,12 @@
 // Each query passes when the reading matches what the phrase means (sport, market, intent,
 // count, side, prices, team, player) AND every play returned honors it AND, when today's boards
 // hold anything that fits, the answer is not empty. Prints the pass rate, the failures and timing.
+// The default run adds tools/ask_college_cases.js (hand-written college and team-name cases;
+// --college runs them alone). Every answer, in every corpus, is also checked for (11/2):
+//   - every play on today's board file (data/<sport>/board.json, read here on its own) at the
+//     same Onyx price, selection and sport, and tagged an Onyx Pick only if it is in the ledger
+//   - no cross-league leak: no play outside the sports read, none on a team that was not named
+//   - no em dash and no other sportsbook's name in anything the answer says
 //   node tools/verify_ask.js [--show]          exits 1 below 95%
 const { chromium } = require('playwright');
 const http = require('http'), fs = require('fs'), path = require('path');
@@ -10,7 +16,8 @@ const root = path.join(__dirname, '..');
 // the live AI relay (curl, paced by --pace=ms, default 3400: under the relay's 20 a minute); --sample=N
 const arg = k => (process.argv.find(a => a.startsWith('--' + k + '=')) || '').split('=').slice(1).join('=');
 const CORPUS = arg('corpus') ? path.resolve(arg('corpus')) : path.join(__dirname, process.argv.includes('--holdout2') ? 'ask_holdout2.json' : process.argv.includes('--holdout') ? 'ask_holdout.json' : 'ask_corpus.json');
-let C = JSON.parse(fs.readFileSync(CORPUS, 'utf8'));
+let C = process.argv.includes('--college') ? [] : JSON.parse(fs.readFileSync(CORPUS, 'utf8'));
+if (process.argv.includes('--college') || (!arg('corpus') && !process.argv.includes('--holdout') && !process.argv.includes('--holdout2'))) C = C.concat(require('./ask_college_cases.js'));
 if (arg('sample')) { const n = +arg('sample'), step = C.length / n; C = Array.from({length: Math.min(n, C.length)}, (_, i) => C[Math.floor(i * step)]); }
 const AI = arg('ai'), PACE = +(arg('pace') || (AI ? 3400 : 0));
 const srv = http.createServer((q, r) => { const p = path.join(root, decodeURIComponent(q.url.split('?')[0])); fs.readFile(p, (e, b) => { if (e) { r.statusCode = 404; return r.end(); } r.end(b); }); }).listen(0);
@@ -27,6 +34,12 @@ const srv = http.createServer((q, r) => { const p = path.join(root, decodeURICom
   const load = await pg.evaluate(async () => { const t = performance.now(); await OnyxAsk.loadBoards(); return performance.now() - t; });
   const res = await pg.evaluate(async ([C, PACE]) => {
     const B = await OnyxAsk.loadBoards(), now = Date.now(), out = [];
+    // today's boards and the Onyx Picks ledger, read straight from the files: every play shown must be one of these rows
+    const FILE = {}, LEDGER = {};
+    for (const sp of Object.keys(OnyxAsk.LG)) { try { const j = await (await fetch('data/' + sp + '/board.json', {cache: 'no-cache'})).json(); (j.plays || []).forEach(p => { FILE[sp + '|' + p.sel + '|' + p.label] = p; }); } catch (e) {} }
+    try { const L = await (await fetch('data/picks/ledger.json', {cache: 'no-cache'})).json(); (Array.isArray(L) ? L : []).forEach(r => { if (r && r.sel) LEDGER[r.sel] = 1; }); } catch (e) {}
+    const teamsFor = (s, sp) => s.tabbr ? (s.tabbr[sp] || []) : ((s.teams || []).length ? s.teams : s.team ? [s.team] : []);
+    const onT = (p, T) => { const hay = [p.team, p.matchup, p.name].join(' ').toUpperCase(); return T.some(x => new RegExp('(^|[^A-Z])' + String(x).toUpperCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '([^A-Z]|$)').test(hay)); };
     const same = (a, b) => a.length === b.length && a.every(x => b.indexOf(x) >= 0);
     // does today's board hold anything this reading could answer with (sport, market, day, price, side)?
     // checked at each question's own time: a 40-minute --ai run outlasts kickoffs
@@ -43,6 +56,7 @@ const srv = http.createServer((q, r) => { const p = path.join(root, decodeURICom
       if (e.markets && !same(s.markets || [], e.markets)) why.push(`markets ${JSON.stringify(s.markets)} want ${JSON.stringify(e.markets)}`);
       if (e.intent && s.intent !== e.intent) why.push(`intent ${s.intent} want ${e.intent}`);
       if (e.count != null && s.count !== e.count) why.push(`count ${s.count} want ${e.count}`);
+      if (e.count_not != null && s.count === e.count_not) why.push(`count ${s.count}: a conference number read as a count`);
       if (e.side && s.side !== e.side) why.push(`side ${s.side} want ${e.side}`);
       if (e.min_price != null && s.min_price !== e.min_price) why.push(`min_price ${s.min_price} want ${e.min_price}`);
       if (e.max_price != null && s.max_price !== e.max_price) why.push(`max_price ${s.max_price} want ${e.max_price}`);
@@ -58,6 +72,29 @@ const srv = http.createServer((q, r) => { const p = path.join(root, decodeURICom
       if (!e.unsupported && s.unsupported && Object.keys(e).length) why.push(`wrongly says not priced: ${s.unsupported}`);
       if (e.unsupported && !R.clarify) why.push('no follow-up offered for a bet we do not price');
       if (e.target_price != null && s.target_price !== e.target_price) why.push(`target_price ${s.target_price} want ${e.target_price}`);
+      // college and team-name expectations (tools/ask_college_cases.js, tools/ask_taxonomy.py)
+      if (e.school && s.school !== e.school) why.push(`school ${s.school} want ${e.school}`);
+      if (e.ambig && !R.ambig) why.push(`should ask which team (read: ${R.understood})`);
+      if (!e.ambig && R.ambig && Object.keys(e).length && !e.ambig_ok) why.push(`asked which team: ${(R.clarify && R.clarify.options || []).map(o => o.label).join(' | ')}`);
+      if (e.ambig_has) { const labs = (R.clarify && R.clarify.options || []).map(o => o.label).join(' | '); e.ambig_has.forEach(n => { if (labs.indexOf(n) < 0) why.push(`no button for ${n}`); }); }
+      if (e.conf && s.conf !== e.conf) why.push(`conf ${s.conf} want ${e.conf}`);
+      if (e.depth && !R.depth) why.push('not answered from the depth charts');
+      if (e.depth && R.depth && !R.depth.length) why.push('depth chart found nothing');
+      if (e.depth_team && !(R.depth || []).some(d => d.team === e.depth_team)) why.push(`depth team ${(R.depth || []).map(d => d.team)} want ${e.depth_team}`);
+      if (e.depth_player && !(R.depth || []).some(d => d.focus === e.depth_player)) why.push(`depth player ${(R.depth || []).map(d => d.focus)} want ${e.depth_player}`);
+      if (!e.depth && R.depth && Object.keys(e).length) why.push('answered as a depth chart');
+      if (e.onyx_picks && !s.onyx_picks) why.push('not read as Onyx Picks');
+      if (e.min_rows) { const g = {}; Object.values(FILE).forEach(f => { if (Date.parse(f.start) > Date.now() && (!e.sports || e.sports.indexOf(f.sport) >= 0) && (!e.markets || e.markets.indexOf(f.mkt) >= 0) && (!s.min_price || f.price >= s.min_price) && (!s.min_conf || f.conf >= s.min_conf) && (!s.when || OnyxAsk.whenOk(s.when, f.start))) g[f.gid] = 1; });
+        const need = Math.min(e.min_rows, Object.keys(g).length); if ((R.rows || []).length < need) why.push(`${(R.rows || []).length} plays, want ${need} (the board has ${Object.keys(g).length} games)`); }
+      if (e.sports_in && !R.ambig && !((s.sports || []).length && s.sports.every(x => e.sports_in.indexOf(x) >= 0))) why.push(`sports ${JSON.stringify(s.sports)} want within ${JSON.stringify(e.sports_in)}`);
+      if (e.no_sports && (s.sports || []).some(x => e.no_sports.indexOf(x) >= 0)) why.push(`read as ${JSON.stringify(s.sports)}, never ${JSON.stringify(e.no_sports)}`);
+      if (e.no_sports && (R.rows || []).some(p => e.no_sports.indexOf(p.sport) >= 0)) why.push('a play from a league it must not touch');
+      if (e.no_sports && R.clarify && (R.clarify.options || []).some(o => o.spec && (o.spec.sports || []).some(x => e.no_sports.indexOf(x) >= 0)) && !R.ambig && !/Did you mean/.test(R.clarify.question || '')) why.push('offered a team from a league it must not touch');
+      if (e.team_in && !(e.team_in.indexOf(s.team) >= 0 || R.clarify)) why.push(`team ${s.team} want one of ${e.team_in}`);
+      // nothing the answer says has an em dash or another book's name
+      const said = [R.understood, R.note, R.say, R.clarify && R.clarify.question].concat((R.clarify && R.clarify.options || []).map(o => o.label)).join(' ');
+      if (/\u2014/.test(said)) why.push('em dash in the answer');
+      if (/draftkings|fanduel|betmgm|caesars|bet365|espn ?bet|fanatics/i.test(said)) why.push('another sportsbook named');
       // every play returned must honor the reading
       const legs = (R.rows || []);
       for (const p of legs) {
@@ -70,10 +107,24 @@ const srv = http.createServer((q, r) => { const p = path.join(root, decodeURICom
         if (!R.two && s.max_price != null && p.price > s.max_price) { why.push(`price ${p.price} over ${s.max_price}`); break; }
         if (Date.parse(p.start) <= now) { why.push('started game'); break; }
         if (s.player && String(p.name || p.label).toLowerCase().indexOf(String(s.player).toLowerCase()) < 0) { why.push(`play not on ${s.player}`); break; }
+        // on today's board file, at the same Onyx price, with its league's tag
+        const f = FILE[p.sport + '|' + p.sel + '|' + p.label];
+        if (!f) { why.push(`play not on the ${p.sport} board file: ${p.label}`); break; }
+        if (f.price !== p.price || f.sport !== p.sport || f.matchup !== p.matchup) { why.push(`price or game differs from the board file: ${p.label} ${p.price} vs ${f.price}`); break; }
+        if (!OnyxAsk.LG[p.sport]) { why.push(`no league tag for ${p.sport}`); break; }
+        if (p.pick && !LEDGER[p.sel]) { why.push(`tagged an Onyx Pick but not in the ledger: ${p.label}`); break; }
+        if (s.onyx_picks && !p.pick) { why.push(`not an Onyx Pick: ${p.label}`); break; }
+        // no cross-league or wrong-team leak: a play is on a team the request named (each sport's own abbreviations)
+        const T = teamsFor(s, p.sport);
+        if ((s.tabbr || (s.teams || []).length || s.team) && !s.player && !R.widened) {
+          if (!T.length) { why.push(`play from ${p.sport}, a league no named team is in`); break; }
+          if (!onT(p, T)) { why.push(`play not on a named team: ${p.label} [${p.matchup}]`); break; }
+          if ((p.kind === 'spread' || p.kind === 'ml') && T.map(x => String(x).toUpperCase()).indexOf(String(p.team || p.name).toUpperCase()) < 0) { why.push(`the other side of a named team's game: ${p.label}`); break; }
+        }
       }
       // an empty answer is a failure when today's boards have something that fits
       const want = (e.sports || s.sports || []).length ? (e.sports || s.sports) : null, wm = (e.markets || s.markets || []).length ? (e.markets || s.markets) : null;
-      const exists = !e.team && !e.player && !s.team && !(s.teams || []).length && !s.player && s.intent !== 'sgp' && avail(want, wm, s);   // an SGP needs it all in one game
+      const exists = !e.team && !e.player && !s.team && !(s.teams || []).length && !s.player && !s.conf && !s.tabbr && !s.onyx_picks && !R.depth && !R.ambig && s.intent !== 'sgp' && avail(want, wm, s);   // an SGP needs it all in one game
       if (!legs.length && exists && !R.clarify) why.push('empty answer while the board has plays that fit');   // a question back (R.clarify) is an answer
       if (s.intent === 'parlay' && legs.length > 1 && R.parlay && R.parlay.price == null) why.push('parlay without a price');
       out.push({q: c.q, ok: !why.length, why, ms: Math.round(ms), n: legs.length, read: R.understood, via: R.via, spec: JSON.stringify(Object.assign({}, s, {summary: undefined}))});

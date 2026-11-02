@@ -11,7 +11,7 @@
 
 const MARKETS = ["pts", "reb", "ast", "q1_total", "h1_total", "first_basket", "first_td", "rec", "rec_yds", "rush_yds",
   "pass_yds", "pass_td", "pass_att", "rush_rec_yds", "pass_rush_yds", "anytime_td", "two_plus_td", "spread", "total", "ml"];
-const SPORTS = ["nba", "nfl", "cfb", "nhl", "tennis"];
+const SPORTS = ["nba", "nfl", "cfb", "cbb", "nhl", "tennis"];
 const OPENAI = "https://api.openai.com/v1/chat/completions";
 
 // the same contract ask.js runs (see its header): every field required, null when unsaid
@@ -64,7 +64,7 @@ const SYSTEM = `You turn a sports bettor's request into a search spec for Onyx S
 Fields:
 - intent: "sgp" for a same-game parlay or correlated legs from one game (SGP), "parlay" for any other ticket of combined legs, including an SGP+ (same-game legs plus other games; the program fills short tickets from games already used), else "list".
 - count: legs for a parlay or SGP (default 3), else how many plays to show (default 5; 1 when they ask for "the" single most likely player or play).
-- sports: any of nba, nfl, cfb (college football), nhl, tennis. Empty = every sport.
+- sports: any of nba, nfl, cfb (college football: NCAAF, CFB, FBS), cbb (college basketball: NCAAB, CBB, college hoops, men's college basketball, NCAA basketball), nhl, tennis. Empty = every sport. "College" alone with no market named means both cfb and cbb; with a football market cfb, with a basketball market cbb. "Basketball" or "hoops" alone is nba; "football" alone is nfl.
 - markets: pts, reb, ast (NBA points, rebounds, assists), q1_total (NBA 1st-quarter total), rec (NFL receptions), rec_yds, rush_yds, pass_yds, anytime_td, two_plus_td (2 or more touchdowns), spread, total, ml (moneyline / to win). Empty = all.
 - side: "over" or "under" when they say so, else "any".
 - min_price / max_price: American odds bounds on each play. "minimum odds -200", "nothing worse than -200", "no juicier than -200" mean min_price -200 (a -250 leg is excluded, -150 and +120 are fine). "plus money" or "underdogs" mean min_price 100. "+300 or shorter" means max_price 300. Null when unsaid.
@@ -83,7 +83,12 @@ Fields:
 - when: null unless they mention a day or "tonight" / "today".
 - pass_td (passing TDs), pass_att (pass attempts), rush_rec_yds (rushing + receiving yards), pass_rush_yds (passing + rushing yards).
 - teams: when they name two or more teams ("from the Chiefs, Broncos, Patriots or Dolphins"), every one of them as ESPN abbreviations (KC, DEN, NE, MIA, WSH, JAX, LAR, LAC, GB, NO, SF, TB, NYG, NYJ, LV); then team is null. One team goes in team and teams is empty. Never drop a team they named.
-- clarify: null almost always. Set it only when guessing would give them the wrong thing: (a) two very different readings are equally likely, (b) something we do not price (a sport other than nba, nfl, cfb, nhl, tennis; a market not listed). Then question is one short, friendly question that says what you can do, and options are 2 to 4 complete requests they can tap, each one a full sentence the program can run on its own (e.g. "3 leg anytime TD parlay from tonight's games", "3 leg anytime TD parlay from KC, DEN, NE or MIA next week"). Still fill every other field with your best reading. Do not ask just because they say "live" or "in-game": the page shows our live numbers for the games being played by itself; fill the sport and teams they named.
+- College teams (11/2): a college team is never a pro team. Duke, Kentucky, UConn, Gonzaga, Michigan State, St. John's are college (team as ESPN's abbreviation: DUKE, UK, CONN, GONZ, MSU, SJU; sports cfb and/or cbb). A city or state alone (Houston, Miami, Utah, Kansas City, Denver, Washington, Arizona, Florida) or a pro nickname alone (Panthers, Hurricanes, Bruins, Kings, Wolves) is the pro team unless the request is about college. Miami (FL) is MIA, Miami (OH) is M-OH; USC is Southern California, South Carolina is SC. A nickname several colleges share (Wildcats, Huskies, Bulldogs, Tigers, Spartans, Cougars, Aggies, Rebels, Miami in college) is a question: set clarify with the schools as options, never pick one.
+- College conferences (SEC, Big Ten, Big 12, ACC, Big East, Pac-12, Mountain West, WCC, A-10, American, MAC, Sun Belt, C-USA, Ivy, Missouri Valley): leave team and teams empty; the built-in reader filters by conference itself.
+- College basketball on our board is spreads, totals and moneylines. Its player props are not on our board: put the markets they named and the program says so.
+- Depth questions (who starts, starters, minutes, rotation, pace, usage): intent "list" with the team or player; the program answers from our depth charts.
+- "Onyx picks", "official picks", "tracked picks": intent "list", sort "rec"; the program shows only the logged Onyx Picks and says so when there are none. Everything else it shows is a projection, never call it a pick.
+- clarify: null almost always. Set it only when guessing would give them the wrong thing: (a) two very different readings are equally likely, (b) something we do not price (a sport other than nba, nfl, cfb, cbb, nhl, tennis; a market not listed). Then question is one short, friendly question that says what you can do, and options are 2 to 4 complete requests they can tap, each one a full sentence the program can run on its own (e.g. "3 leg anytime TD parlay from tonight's games", "3 leg anytime TD parlay from KC, DEN, NE or MIA next week"). Still fill every other field with your best reading. Do not ask just because they say "live" or "in-game": the page shows our live numbers for the games being played by itself; fill the sport and teams they named.
 - exclude: names of players or teams to leave out ("not Mahomes", "swap out Irving", "replace leg 2" = the name on leg 2 of the previous answer). Empty when unsaid.
 - summary: one short plain sentence saying what you understood, no odds advice.
 - say: one or two friendly sentences back to the bettor, as a sharp friend would talk, saying what you are building for them. Never invent a player, price or stat; the program picks the plays. No em dashes. Never name a sportsbook other than Onyx.

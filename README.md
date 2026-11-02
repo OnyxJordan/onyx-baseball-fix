@@ -418,7 +418,7 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
   attempts, rebounds, assists, steals, blocks, turnovers, fouls), newest first, at most
   260 games or 120 seconds a run, so cbb runs LAST in the sports loop (the step has a
   12-minute cap). An empty slate stores `next_date` and the page says when play resumes.
-  `cbb_model.py` (v2, leans: no `backtest.json`) fits this season only, every rating
+  `cbb_model.py` (v2) fits this season only, every rating
   pulled toward a preseason prior: last season's Torvik adjusted efficiency from
   `data/cbb/history/teams.json` (Torvik names mapped to ESPN abbreviations in
   `cbb_model.ALIAS`) kept at 85%, or, without that file, last season's own fitted
@@ -450,6 +450,18 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
   own preseason 53.7%; flat by February. It is NOT wired into `cbb_model.py`: adopting the blend
   as the v2 prior's replacement is a v3 decision for the price backtest. Page: the Transfer
   impact and Team ratings tabs of `cbb-players.html`.
+  Onyx price backtest (11/2): `tools/cbb_price_backtest.py` replays 5,489 college basketball games
+  with Onyx's 2025-26 opening and closing moneyline / spread / total (`bt/cbb_lines.json`; all 365
+  OpticOdds names map to ESPN via `team_map.json`, `cbb_model`'s Torvik folding and 10 aliases in
+  the tool; every game matched to its ESPN final), priced exactly as `sports_build.game_rows` does,
+  ratings as of each game's date. It feeds `tools/sports_backtest.py cbb` (writes
+  `data/cbb/backtest.json`, the `sports_lab.gate`; passed on its rule with a thin 35 held-out lane
+  picks, blend weight 20%) and the cbb rows of `tools/picks_backtest.py` (Onyx Picks: all three
+  game lines "not enough yet" at 20%). The transfer-aware blend as the prior
+  (`cbb_model.ratings(blend=...)`, 2025-26 prior from `tools/cbb_transfers_backtest.py <cache>
+  --prior 2026 bt/cbb_prior_2026.json`) was slightly better on log loss and margin error but
+  better only at the opening price and worse at the close, so `cbb_model` stays v2 (numbers in
+  its docstring).
   Onyx league `ncaab`: moneyline,
   spread, total, player points / rebounds / assists / made threes (NBA market ids, not
   yet confirmed by a markets probe). Gate: `tools/verify_sports.js` renders a real
@@ -1285,6 +1297,7 @@ why a local `auto_build.py` still produces a full board.
 | `home.html` | Onyx Sports hub, the PWA start page (static, hand-edited) |
 | `sport_shell.html`, `sports_*.py`, `nfl_model.py` | NFL, college football, NHL, tennis and golf pages: one template, one engine; `data/<sport>/` |
 | `nfl.html` … `golf.html` | built sport pages (generated every run; never hand-edit) |
+| `cards.py`, `cards.js` | team and player cards (11/2): `data/<sport>/cards.json` + `cards/<team>.json`, opened from any `data-oxt` / `data-oxp` element |
 | `onyx.css`, `onyx.js` | Onyx design layer and raster art, shared by every page |
 | `model.py` | v41 HR model + pitcher K projections; changelog at top is the lab notebook |
 | `career_db.json`, `pitcher_db.json` | canonical hitter/pitcher DBs — **never regenerate** outside `rebuild.yml` |
@@ -1634,6 +1647,32 @@ exact scores, promos, other sports), which now say so and offer what we do price
 reader finds now wins in the blend). Test against full boards: on a thin night, shift a past
 board's start times forward locally and restore `data/` after.
 
+**Ask Onyx: college basketball and every team name (11/2).** Jordan: "make sure all of these college
+terms now all work in Ask Onyx". `ask.js` now loads `data/cbb/board.json` (NCAAB, `cbb.html`) and reads
+college basketball in every wording (college hoops, NCAAB, NCAA basketball, CBB, NCAAM, men's college
+basketball); "college" alone is both college sports unless a market says which. Teams come from one directory
+(`teamDir`): every Division I school (`D1`: cbb abbr, cfb abbr, school, mascot, from `data/cbb/depth.json`,
+`data/cbb/teams_espn.json`, `data/cfb/depth.json`), every NBA / NFL / NHL team (`PRO`), aliases (`CALIAS`: Zags,
+Nova, UConn, the U, K-State...) and abbreviations. Rules: the longest name wins ("boston college" is not Boston);
+a full player name beats a team word in it (LaMelo Ball, PJ Washington, Jalen Green); a pro city or nickname is
+the pro team unless the request is about college ("Houston", "Bruins"); a college name is never a pro team; a
+name several teams share (Wildcats, Huskies, Bulldogs, Tigers, college "Miami", Kings when both play) asks which,
+with a button per team, never a guess; a pro city with no game when its college plays asks "Did you mean ...".
+Teams filter per sport (`tabbr`), since abbreviations collide across leagues (DEN is the Nuggets and the Denver
+Pioneers). Conferences (`CONF`, 2026-27 membership: SEC, Big Ten, Big 12, ACC, Big East, Pac-12, Mountain West,
+WCC, A-10, American, MAC, Sun Belt, C-USA, Ivy, Missouri Valley; update on realignment) filter to their teams;
+the others say they are not listed. Depth questions (who starts, minutes, rotation, pace, usage) answer from
+`data/<sport>/depth.json` with a link to the team's depth chart. "Onyx picks" shows only logged picks
+(`data/picks/ledger.json`, every pick, no default floors) and says plainly when there are none; "best bets" ranks
+logged picks first and says when what it shows are projections. College basketball player props and halves are
+not on our board: the answer says so. March Madness out of season says when it starts. Tests: hand-written
+`tools/ask_college_cases.js` (237 cases, run with the default `verify_ask.js` and alone with `--college`);
+`tools/ask_taxonomy.py` adds a college category built from `ask.js`'s own tables (schools by every safe name, shared
+mascots, pro names, conferences, depth, props, picks). `verify_ask.js` now checks every answer in every corpus:
+each play is on the board file at the same Onyx price, Onyx Pick tags match the ledger, no play outside the
+sports read or off the named teams, no em dash or other book's name. `ai/worker.js` knows `cbb` and these rules
+(needs the ai_worker.yml deploy); the reader's teams, sports, conferences, depth and picks readings win in `blend()`.
+
 **Accounts (11/2, off until set up).** Optional sign-in so saved picks, followed players and My
 bets follow a person to every device. Supabase: email magic link (no passwords) plus Postgres with
 row-level security; the site stays static and, signed out or with accounts off, works exactly as
@@ -1650,6 +1689,46 @@ anon key; never the service key); (5) run "Accounts (turn on / update)", which w
 `accounts.json` on main. Empty the variables and rerun to turn accounts off. Gate:
 `node tools/verify_accounts.js` (a stand-in Supabase, no keys: off, sign-in, first-sign-in merge,
 two devices, removals, privacy between users, session refresh, sign out, delete).
+
+## Similar spots (11/2)
+
+Jordan: "compare similar teams in similar spots, what happens ATS at X points." A card in every
+gamecenter (CBB, CFB, NFL, NHL in `sport_shell.html`; the NBA game card in `nba_shell.html`):
+for each side and the total, how past games in the same spot did against their CLOSING line,
+with W-L, %, average cover, n, seasons, a significance tag and one line of out-of-sample
+backtest. **Context, not a pick:** nothing here creates a play or touches a ledger, the Top 10
+or Onyx Picks.
+
+- **History:** `data/<sport>/situations_hist.json` (columnar), every final game with ESPN's
+  closing spread / total / prices (its line providers: ESPN BET, DraftKings, Caesars...), so the
+  page says "closing line", never Onyx. Coverage: CBB 47,124 games 2018-19 to 2025-26 (43,335
+  lined), NBA 8,808 (2019-20 on; the 2020 bubble and July 2021 playoff games are outside the pull
+  window), NHL 9,266 (2019-20 on), NFL 2,086 (2019 on), CFB 7,017 FBS games (2019 on).
+  Built once by `tools/situations_pull.py <sport> --write` (dev, cached; CBB reuses
+  `tools/cbb_history.py`'s pull and cache). The builds append finished games
+  (`situations.update_history`: ESPN scoreboard + core odds, `requests` only, 25 s cap,
+  skipped on pull-request CI).
+- **Engine:** `situations.py`. Features from what was known before tip: spread bucket (NHL:
+  by the favorite's moneyline, the puck line is always 1.5), home / road / neutral, both teams'
+  rating tier (a walk-forward margin rating seeded from last season, CBB from last season's
+  Torvik adj_em; never the final-season rating), conference (NFL: division) game, rest and rest
+  edge, previous result (win / loss / upset loss / blowout), 3-game ATS streak, rematch, season
+  phase, total bucket, line move from the open. Templates and their backoff are fixed in
+  `TEMPLATES` / `TTEMPLATES`; a game shows the core spot plus the first three that apply in a
+  fixed order, never the best looking ones. Significance is a binomial test against what the
+  closing prices implied (50% at -110; puck lines far from it). Page payload:
+  `data/<sport>/situations.json`, fetched when a gamecenter opens (`simSpots(gid)` in both
+  shells, self-contained).
+- **Backtest:** `python3 tools/situations_backtest.py all --write` -> `data/<sport>/situations_bt.json`.
+  Walk-forward by season (tables from earlier seasons only), bet every side whose matched
+  spot beat its price by 5+ / 8+ points of cover rate (55% / 58% at -110) on 50+ / 100+ games,
+  graded at the closing price. Result (55%, 50+, any shown spot): CBB 1,777-1,754 (-4.9%),
+  CFB 976-956 (-3.8%), NFL 527-486 (-0.7%), NBA 1,028-950 (-1.0%), NHL 515-516 (-0.6%).
+  Trends do not beat the closing line out of sample; the card says so. One spot survived a
+  multiple-comparison correction: NFL road dogs of 3.5-7, 77-40 when the rule bet it (2021-24),
+  but that whole bucket went 125-125 from 2023 on, so it is not a rule.
+- Changing a feature, bucket or template is a model change: bump `situations.VERSION` and
+  re-run the backtest.
 
 ## Onyx Picks (11/2)
 
@@ -1708,3 +1787,40 @@ and keep their records; the Onyx Picks record is the one public card across spor
 - **Gate:** `python3 tools/verify_picks.py`: one finished game per sport (NBA, NFL, CFB, NHL), logged
   into a temporary ledger and graded against ESPN, every result checked against the score read
   independently; logged once, never after the start, the daily cap, nothing unfinalized logged.
+
+## Team and player cards (11/2)
+
+Jordan: "every sport needs this for every team as a whole and player ... everything we need to
+explain why we are getting to the number." One card for every sport, built like the NBA player
+card: header (face, matchup, the model's number), a Player | Bets or Team | Bets switch, "Why this
+number" from the model's own inputs, seasons with the model's baseline row, last 5, and every Onyx
+line with Model / Onyx implied / Blended / EV per $10, a distribution and line scrubber where the
+model has a distribution, Add to parlay and Bet on Onyx (share link + `KR680261`).
+
+- **Data:** `cards.py`, called fail-soft by `sports_build.py` (after the model block, before
+  `write_top`; the block carries `_R` ratings and `_w` blend weight, popped before the page) and by
+  `nba_build.py` (teams only: the NBA player card stays in `nba_shell.html`). Writes a small index
+  `data/<sport>/cards.json` and one file per team `data/<sport>/cards/<team>.json` (team + its
+  rotation players); an unchanged file is not rewritten, and files of teams off the slate are
+  removed. Tennis keeps its players in the index. Golf has none (Onyx does not price golf; its
+  player view is the leaderboard row).
+- **Page:** `cards.js` (loaded deferred by `sport_shell.html` and `nba_shell.html`) fetches only
+  the index and the tapped team's file. Any element with `data-oxt="<abbr>"` opens a team,
+  `data-oxp="<name>"` (+ `data-oxpt` team, `data-oxg` game, `data-oxf="bets"`) a player. Hooks:
+  game card team names, the gamecenter header, depth chart team and player names, Plays and Board
+  player names, the tennis match center. The click is taken in the capture phase, so a team name
+  in a game card opens the team, the rest of the card the gamecenter. Non-NBA pages get a light
+  parlay slip (`#cxSlip`, localStorage `onyxCardSlip_<sport>`); nba.html uses its own slip.
+- **Honesty rules in code:** only numbers the model uses (team ratings, projections, the depth
+  model, Torvik, blend weights) and facts (scores, box scores). ATS and O/U are graded against
+  the **closing line** from `data/<sport>/situations_hist.json` (situations.py; ESPN's line
+  providers, labelled "closing line", never Onyx; college basketball falls back to
+  `data/cbb/history/games_*.json`). Rest and injuries are shown as context and say they are not in
+  the rating. NHL skater and college basketball props are priced from the depth projection
+  (Poisson; college uses the NBA model's fitted spread) and labelled untested, never recommended;
+  NBA sides show Onyx's own no-vig chance (the NBA model prices props, not sides).
+- **Gate:** `node tools/verify_sports.js` opens a team card from a real tap on a game card's team
+  name (it must not open the gamecenter) and the player with the most Onyx markets, both faces,
+  scrubs the chart and checks it snaps back; `node tools/verify_nba.js` does the same for an NBA
+  team card.
+
