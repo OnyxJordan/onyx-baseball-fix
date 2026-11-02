@@ -1,0 +1,77 @@
+name: Onyx Picks re-test (weekly)
+# Keeps the Onyx Picks backtest current without anyone remembering to run it
+# (Jordan, 11/2: "keep backtesting everything"). Once a week it pulls the last
+# 8 days of Onyx's historical lines (tools/onyx_lines_pull.py, the same pull the
+# manual odds_probe.yml job=lines runs) for nfl, cfb, nhl, nba and cbb, appends
+# them to the committed history data/picks/lines/<sport>.json
+# (tools/picks_lines.py: only what the replays read, a price on file is never
+# changed), fills NBA 1st-quarter / 1st-half scores from ESPN, then re-runs
+# tools/picks_backtest.py. Finalization follows the tool: held out, 60+ bets,
+# ROI above 0 at Onyx's opening AND closing prices, for the live model version.
+# It commits only data/picks/backtest.json and data/picks/lines/ (files no
+# other workflow writes), after tools/verify_picks.py and validate_build.py pass.
+# picks.py reads the new verdicts on the next refresh, which also deploys them.
+on:
+  schedule:
+    - cron: "17 10 * * 2"       # Tuesdays 10:17 UTC: after Monday night football
+  workflow_dispatch:
+    inputs:
+      days:
+        description: "Baseball days of Onyx lines to pull (ending today)"
+        required: false
+        default: "8"
+permissions:
+  contents: write
+# its own group, like nba_lines.yml: the full refresh (onyx-build) cancels in
+# progress, which would kill a re-test mid-pull. No ledger or page is in this
+# commit, so it can never race the refresh on one; the push rebases and retries.
+concurrency:
+  group: onyx-picks-retest
+  cancel-in-progress: false
+jobs:
+  retest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install requests
+      - name: Pull the last days of Onyx lines into data/picks/lines
+        env:
+          OPTICODDS_API_KEY: ${{ secrets.OPTICODDS_API_KEY }}
+          DAYS: ${{ inputs.days || '8' }}
+        run: |
+          for s in nfl cfb nhl nba cbb; do
+            python3 tools/onyx_lines_pull.py $(python3 tools/picks_lines.py pullargs $s "$DAYS") || echo "::warning::$s Onyx pull failed"
+            python3 tools/picks_lines.py merge $s pulls/$s.json
+          done
+      - name: NBA 1st-quarter / 1st-half scores (ESPN line scores)
+        run: python3 tools/picks_lines.py periods || echo "::warning::ESPN line scores failed; those games wait for next week"
+      - name: Re-test every market (tools/picks_backtest.py)
+        run: python3 -B tools/picks_backtest.py
+      - name: Onyx Picks gate (blocks commit on failure)
+        run: python3 -B tools/verify_picks.py
+      - name: Validate build (blocks commit on failure)
+        run: python3 -B validate_build.py
+      - name: Commit the re-test (only if something changed)
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/picks/backtest.json data/picks/lines
+          if git diff --cached --quiet; then
+            echo "nothing to commit"
+            exit 0
+          fi
+          MSG=$(python3 -c "import json; b = json.load(open('data/picks/backtest.json')); print('Onyx Picks re-test ' + b['built'] + ': finalized ' + (', '.join(b['finalized']) or 'none'))")
+          git commit -m "$MSG"
+          for i in 1 2 3 4; do
+            if git push; then exit 0; fi
+            git pull --rebase -X theirs origin main || { git rebase --abort || true; git pull --rebase -s ours origin main || true; }
+            sleep $((i * 5))
+          done
+          git push || { echo "::error::push lost the race 4x; re-run this workflow"; exit 1; }

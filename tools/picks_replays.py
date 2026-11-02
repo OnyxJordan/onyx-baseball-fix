@@ -2,6 +2,9 @@
 """
 picks_replays.py - more replays of the live site's chance for tools/picks_backtest.py. Dev only.
 
+Every Onyx line is read through tools/picks_lines.lines (the committed data/picks/lines/<sport>.json,
+merged with the local bt/ caches when present), so these run on a fresh checkout too.
+
 Each function rebuilds, walk-forward, the exact chance a live build would show for one
 market (the same module, the same parameters, the same blend with Onyx's price), and hands
 every priced side to picks_backtest.cand / .market, so the one pick rule (daily_top.ok), the
@@ -9,7 +12,7 @@ card (one per player or game market a day, best expected return first, picks.CAP
 the finalize test are the same as every other market.
 
   nba h1_total     50.5% of Onyx's game total, sd 18 (nba_build's qhCard read), Onyx 1st-half
-                   lines (bt/nba_*_lines.json), graded off ESPN play-by-play (bt/nba_periods.json)
+                   lines (data/picks/lines/nba.json), graded off ESPN's official line scores
   tennis games     tennis_model v2 games_markets on the walk-forward Elo chance, blended at the
                    live tennis weight, Onyx total-games and game-spread lines
                    (bt/tennis_*_games.json), graded off the final games (bt/tennis_results_full.json)
@@ -28,6 +31,7 @@ from datetime import date, timedelta
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT); sys.path.insert(0, os.path.join(ROOT, "tools"))
 import sports_lab as L      # noqa: E402
+import picks_lines as PL    # noqa: E402  data/picks/lines (committed), merged with bt/ when present
 
 
 def _pb():
@@ -39,39 +43,34 @@ def _pb():
 def nba_h1():
     from statistics import NormalDist
     from nba_common import team_abbr
-    from rules_lab_build import et_day
-    import nba_model as M
+    from picks_lines import et_day
     PB = _pb()
-    if not os.path.exists("bt/nba_periods.json"):
+    per = {(g["d"], tuple(g["teams"])): g for g in PL.nba_periods()}
+    if not per:
         return []
-    per = {(g["d"], tuple(g["teams"])): g for g in json.load(open("bt/nba_periods.json"))}
-    ro, rc, seen = [], [], set()
-    for f in ("bt/nba_2425_lines.json", "bt/nba_lines_full.json"):
-        if not os.path.exists(f):
+    ro, rc = [], []
+    for fid, x in PL.lines("nba", *PL.BT["nba"]).items():
+        if not x.get("start"):
             continue
-        for fid, x in json.load(open(f)).items():
-            if not x.get("start") or fid in seen:
+        d = et_day(x["start"])
+        g = per.get((d, tuple(sorted([team_abbr(x.get("home")) or "", team_abbr(x.get("away")) or ""]))))
+        gm = x.get("game") or {}
+        q, t = gm.get("1st_half_total_points") or {}, gm.get("total_points") or {}
+        if not g or g.get("h1") is None or "over" not in q or "under" not in q or "over" not in t:
+            continue
+        for when, dst in (("o", ro), ("c", rc)):
+            ln, po = q["over"][when]
+            pu = q["under"][when][1]
+            tot = t["over"][when][0]
+            if ln is None or tot is None or po is None or pu is None or g["h1"] == ln:
                 continue
-            seen.add(fid)
-            d = et_day(x["start"])
-            g = per.get((d, tuple(sorted([team_abbr(x.get("home")) or "", team_abbr(x.get("away")) or ""]))))
-            gm = x.get("game") or {}
-            q, t = gm.get("1st_half_total_points") or {}, gm.get("total_points") or {}
-            if not g or g.get("h1") is None or "over" not in q or "under" not in q or "over" not in t:
-                continue
-            for when, dst in (("o", ro), ("c", rc)):
-                ln, po = q["over"][when]
-                pu = q["under"][when][1]
-                tot = t["over"][when][0]
-                if ln is None or tot is None or po is None or pu is None or g["h1"] == ln:
-                    continue
-                pov = 1 - NormalDist(tot * 0.505, 18).cdf(ln)
-                for side, p, price in (("over", pov, po), ("under", 1 - pov, pu)):
-                    dst.append(PB.cand(d, (fid, "h1"), side, p, price, (g["h1"] > ln) == (side == "over")))
+            pov = 1 - NormalDist(tot * 0.505, 18).cdf(ln)
+            for side, p, price in (("over", pov, po), ("under", 1 - pov, pu)):
+                dst.append(PB.cand(d, (fid, "h1"), side, p, price, (g["h1"] > ln) == (side == "over")))
     # the 50.5% share and sd 18 were tuned on Oct-Jan 2025-26 (README, qhCard): held out from Feb, as the 1Q total
     return [PB.market("nba", "h1_total", "h1 0.505/18", "50.5% of Onyx's game total, normal sd 18 (nba_build)",
-                      "bt/nba_*_lines.json (Onyx), ESPN play-by-play 1st-half scores", "2026-02-01", ro, rc,
-                      held="Feb to Jun 2026 (the 50.5% share and sd 18 were tuned on Oct 2025 to Jan 2026)",
+                      "Onyx lines (data/picks/lines/nba.json), ESPN official 1st-half line scores", "2026-02-01", ro, rc,
+                      held="Feb 2026 on: Feb to Jun 2026 and 2026-27 to date (the 50.5% share and sd 18 were tuned on Oct 2025 to Jan 2026)",
                       notes="On the board for Ask Onyx only: nba_build never puts it in the Top 10 and picks.py cannot grade it.")]
 
 
@@ -185,12 +184,12 @@ def nfl_rec():
     import nfl_feature_screen as NFS
     from sports_common import nk
     PB = _pb()
-    if not os.path.exists("bt/nfl_lines.json") or not os.path.exists("data/nfl/player_games.json"):
+    lines = PL.lines("nfl", "bt/nfl_lines.json")
+    if not lines or not os.path.exists("data/nfl/player_games.json"):
         return []
     rows = json.load(open("data/nfl/player_games.json"))["rows"]
     vidx = M.verse_index(json.load(open("data/nfl/nflverse.json")))
-    games = json.load(open("bt/nfl_game.json"))
-    lines = json.load(open("bt/nfl_lines.json"))
+    games = PL.lines("nfl", "bt/nfl_game.json")
     by_game = defaultdict(list)
     for r in rows:
         by_game[r["gid"]].append(r)
@@ -282,11 +281,11 @@ def cfb_props():
     import nfl_model as N
     from sports_common import nk
     PB = _pb()
-    if not os.path.exists("bt/cfb_props.json") or not os.path.exists("data/cfb/player_games.json"):
+    props = PL.lines("cfb", "bt/cfb_props.json")
+    if not props or not os.path.exists("data/cfb/player_games.json"):
         return []
     rows = json.load(open("data/cfb/player_games.json"))["rows"]
-    lines = json.load(open("bt/cfb_lines.json")) if os.path.exists("bt/cfb_lines.json") else {}
-    props = json.load(open("bt/cfb_props.json"))
+    lines = PL.lines("cfb", "bt/cfb_lines.json")
     by_day_name = {(r["date"], nk(r["name"])): r for r in rows}
     by = N._games_by_player(rows)
     MI = C.MarketIndex(rows)

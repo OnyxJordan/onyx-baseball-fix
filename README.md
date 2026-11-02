@@ -463,9 +463,11 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
   OpticOdds names map to ESPN via `team_map.json`, `cbb_model`'s Torvik folding and 10 aliases in
   the tool; every game matched to its ESPN final), priced exactly as `sports_build.game_rows` does,
   ratings as of each game's date. It feeds `tools/sports_backtest.py cbb` (writes
-  `data/cbb/backtest.json`, the `sports_lab.gate`; passed on its rule with a thin 35 held-out lane
-  picks, blend weight 20%) and the cbb rows of `tools/picks_backtest.py` (Onyx Picks: all three
-  game lines "not enough yet" at 20%). The transfer-aware blend as the prior
+  `data/cbb/backtest.json`, the `sports_lab.gate`; it passed on its rule with a thin 35 held-out
+  lane picks at a 20% blend, and that file is deliberately NOT committed (11/2: it would have
+  started a tracked cbb ledger against the Onyx Picks rule), so the live site blends cbb at
+  `sports_build.DEFAULT_W` 30%) and the cbb rows of `tools/picks_backtest.py` (Onyx Picks,
+  replayed at the live 30%). The transfer-aware blend as the prior
   (`cbb_model.ratings(blend=...)`, 2025-26 prior from `tools/cbb_transfers_backtest.py <cache>
   --prior 2026 bt/cbb_prior_2026.json`) was slightly better on log loss and margin error but
   better only at the opening price and worse at the close, so `cbb_model` stays v2 (numbers in
@@ -1771,7 +1773,8 @@ and keep their records; the Onyx Picks record is the one public card across spor
 
 - **One rule** (the home Top 10, `daily_top.ok`): Onyx main line -150 to +200, our chance beats
   the implied chance by 2 to 12 points, expected return +3%+, chance 40%+, game not started.
-- **The test** (`tools/picks_backtest.py`, dev only, needs `bt/`; writes `data/picks/backtest.json`):
+- **The test** (`tools/picks_backtest.py`, dev only; reads the committed Onyx lines history
+  `data/picks/lines/<sport>.json`, merged with the local `bt/` caches when present; writes `data/picks/backtest.json`):
   replays that rule on every market where the live chance can be rebuilt walk-forward, at Onyx's
   real opening and closing prices, as the card logs it (one per player or game market a game, best
   expected return first, up to 5 a day). **Finalized** = on the held-out period: 60+ bets, ROI > 0
@@ -1793,6 +1796,41 @@ and keep their records; the Onyx Picks record is the one public card across spor
   | NHL total | Jan 15 2026 on | 8-9 | | not enough yet |
   | Tennis moneyline | 2026 | 154-225 -7.3% | -5.1% | fails |
 
+- **Re-run of 11/2 evening** (fresh Onyx pulls: NFL 10/28-11/2 +13 games, CFB 10/29-11/2 +111 games / +103
+  with props, NHL 10/29-11/2 +32, NBA 2026-27 10/20-11/2 92 games with 1st-quarter / half lines and props; no
+  CBB games yet). NBA 1st-quarter / 1st-half totals are now graded on ESPN's official line scores (the
+  play-by-play quarters differed in 164 of 2,460 games) and include the 2026 play-in / playoffs. NBA props add
+  the 2026-27 walk (v8 was chosen on Oct 2025 to Jan 2026, so all of 2026-27 is held out).
+
+  | Market | Held out | Open | Close | Verdict |
+  |---|---|---|---|---|
+  | NBA 1st-quarter total | Feb 2026 on | 148-106, +11.7% | 144-120, +4.8% | **finalized** (2026-27 so far: 27-18 open, 22-23 -6.4% close) |
+  | CFB rushing yards (v2 unders) | Oct 2026 on | 67-23, +39.8% | 58-27, +29.1% | **finalized** |
+  | CBB total | Jan-Apr 2026 | 52-41, +6.8% | 90-67, +9.4% | **finalized** (at the live 30% blend: no `data/cbb/backtest.json` on main) |
+  | CBB moneyline / spread | Jan-Apr 2026 | 35-43 -7.1% / 73-79 -7.6% | +6.4% / -6.6% | fails |
+  | NBA 1st-half total | Feb 2026 on | 147-139, -1.8% | 154-138, +1.0% | fails (was "passes, not offered") |
+  | NBA points / reb / ast | Feb 2026 on | 30-22 +11.5% / 8-4 / 12-21 | -6.7% / +2.4% / -25.5% | not enough yet |
+  | CFB spread / total / ml | fall 2026 | 27-19 +12.0% / 24-17 +11.9% / 7-8 | +8.7% / +14.6% / +24.4% | not enough yet |
+  | NFL v11 rush yds / pass att unders | fall 2026 | 25-19 +8.1% / 28-19 +13.9% | -45% (7) / -5% (12) | not enough yet |
+  | NFL receptions unders | fall 2026 | 31-18 +40.3% | 14-18 -11.0% | not enough yet |
+
+  The CBB rows moved from 6-27 bets to 78-152 because the earlier run read a lane weight of 20% from a
+  `data/cbb/backtest.json` that is not on main; the live site blends CBB at `sports_build.DEFAULT_W` (30%), and
+  the test replays what the site shows. `picks.py` re-gates on a model VERSION change only, not a blend weight
+  change: if a CBB lane backtest lands, re-run this (or wait for the weekly re-test).
+- **Weekly re-test** (`.github/workflows/picks_retest.yml`, Tuesdays 10:17 UTC + Run workflow): pulls the
+  last 8 baseball days of Onyx lines for nfl, cfb, nhl, nba, cbb (`tools/onyx_lines_pull.py`, the
+  `OPTICODDS_API_KEY` secret), appends them to `data/picks/lines/<sport>.json` (`tools/picks_lines.py merge`:
+  only the markets the replays read, a price on file is never changed, a disagreeing pull is reported as a
+  conflict), fills NBA quarter / half scores from ESPN (`periods`), re-runs `tools/picks_backtest.py`, gates on
+  `tools/verify_picks.py` and `validate_build.py`, and commits only `data/picks/backtest.json` and
+  `data/picks/lines/` (own concurrency group `onyx-picks-retest`, rebase-and-retry push like `nba_lines.yml`).
+  **Finalization follows the tool**: same rule (60+ held-out bets, ROI > 0 at the open AND the close, live
+  model version). On a fresh runner every replay runs from the committed history except the ones whose inputs
+  are only in `bt/` (NFL v11 rows, tennis): those keep their last computed verdict, marked `"carried"` with the
+  day it was computed. NBA props replay 2026-27 from the live box scores (`data/nba/player_games.json`,
+  `data/nba/prior.json`) and take 2025-26 from its card frozen in `data/picks/lines/nba_frozen.json`, used only
+  while its rule signature (model version, blend, price / edge / EV / chance limits) matches.
   No replay of the live chance (never picks): NBA first basket (corrected open-v4 backtest loses at
   the close) and 1st-half total (board only), NFL receptions v5, passing TDs, rec / passing yards and
   TDs (excluded by their own tests), college player props, tennis games markets, college

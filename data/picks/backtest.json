@@ -19,6 +19,7 @@
  },
  "finalized": [
   "nba:q1_total",
+  "cbb:total",
   "cfb:rush_yds"
  ],
  "markets": [
@@ -28,9 +29,9 @@
    "name": "Points",
    "version": "v8",
    "chance": "projection blended 20% with Onyx's no-vig price",
-   "source": "tools/nba_backtest.py walk-forward replay (2025-26), Onyx open and close",
+   "source": "tools/nba_backtest.py walk-forward replay: 2025-26 on bt/nba, 2026-27 on the live box scores (data/nba/player_games.json); Onyx open and close",
    "held_out_from": "2026-02-01",
-   "held_out": "games on or after 2026-02-01",
+   "held_out": "Feb to Apr 2026, then 2026-27 to date (v8 was chosen on Oct 2025 to Jan 2026)",
    "tune": {
     "open": {
      "n": 46,
@@ -61,35 +62,35 @@
    },
    "test": {
     "open": {
-     "n": 45,
-     "w": 27,
-     "l": 18,
+     "n": 52,
+     "w": 30,
+     "l": 22,
      "p": 0,
-     "units": 7.06,
-     "roi": 0.157,
-     "avg_price": -63,
-     "claimed": 0.5449,
-     "hit": 0.6,
+     "units": 5.97,
+     "roi": 0.1148,
+     "avg_price": -60,
+     "claimed": 0.5436,
+     "hit": 0.5769,
      "first": "2026-02-03",
-     "last": "2026-04-10"
+     "last": "2026-11-01"
     },
     "close": {
-     "n": 40,
-     "w": 19,
-     "l": 21,
+     "n": 47,
+     "w": 23,
+     "l": 24,
      "p": 0,
-     "units": -3.62,
-     "roi": -0.0905,
-     "avg_price": -84,
-     "claimed": 0.5495,
-     "hit": 0.475,
+     "units": -3.15,
+     "roi": -0.0671,
+     "avg_price": -88,
+     "claimed": 0.5505,
+     "hit": 0.4894,
      "first": "2026-02-03",
-     "last": "2026-04-10"
+     "last": "2026-10-27"
     }
    },
    "verdict": "not enough yet",
-   "why": "only 45 held-out bets (needs 60); ROI +15.7% at the open, -9.0% at the close so far",
-   "notes": "Model tuned on Oct 2025 to Jan 2026; held out Feb to Apr 2026."
+   "why": "only 52 held-out bets (needs 60); ROI +11.5% at the open, -6.7% at the close so far",
+   "notes": "Model tuned on Oct 2025 to Jan 2026; held out Feb to Apr 2026 and every 2026-27 game."
   },
   {
    "sport": "nba",
@@ -97,9 +98,9 @@
    "name": "Rebounds",
    "version": "v8",
    "chance": "projection blended 20% with Onyx's no-vig price",
-   "source": "tools/nba_backtest.py walk-forward replay (2025-26), Onyx open and close",
+   "source": "tools/nba_backtest.py walk-forward replay: 2025-26 on bt/nba, 2026-27 on the live box scores (data/nba/player_games.json); Onyx open and close",
    "held_out_from": "2026-02-01",
-   "held_out": "games on or after 2026-02-01",
+   "held_out": "Feb to Apr 2026, then 2026-27 to date (v8 was chosen on Oct 2025 to Jan 2026)",
    "tune": {
     "open": {
      "n": 9,
@@ -130,35 +131,35 @@
    },
    "test": {
     "open": {
-     "n": 9,
-     "w": 7,
-     "l": 2,
+     "n": 12,
+     "w": 8,
+     "l": 4,
      "p": 0,
-     "units": 4.73,
-     "roi": 0.5252,
-     "avg_price": 32,
-     "claimed": 0.5362,
-     "hit": 0.7778,
+     "units": 3.91,
+     "roi": 0.3256,
+     "avg_price": 51,
+     "claimed": 0.5287,
+     "hit": 0.6667,
      "first": "2026-02-04",
-     "last": "2026-04-07"
+     "last": "2026-10-24"
     },
     "close": {
-     "n": 4,
-     "w": 3,
-     "l": 1,
+     "n": 10,
+     "w": 5,
+     "l": 5,
      "p": 0,
-     "units": 1.95,
-     "roi": 0.4881,
-     "avg_price": -55,
-     "claimed": 0.5432,
-     "hit": 0.75,
+     "units": 0.24,
+     "roi": 0.0242,
+     "avg_price": -24,
+     "claimed": 0.539,
+     "hit": 0.5,
      "first": "2026-02-03",
-     "last": "2026-03-21"
+     "last": "2026-10-26"
     }
    },
    "verdict": "not enough yet",
-   "why": "only 9 held-out bets (needs 60); ROI +52.5% at the open, +48.8% at the close so far",
-   "notes": "Model tuned on Oct 2025 to Jan 2026; held out Feb to Apr 2026."
+   "why": "only 12 held-out bets (needs 60); ROI +32.6% at the open, +2.4% at the close so far",
+   "notes": "Model tuned on Oct 2025 to Jan 2026; held out Feb to Apr 2026 and every 2026-27 game."
   },
   {
    "sport": "nba",
@@ -166,9 +167,9 @@
    "name": "Assists",
    "version": "v8",
    "chance": "projection blended 20% with Onyx's no-vig price",
-   "source": "tools/nba_backtest.py walk-forward replay (2025-26), Onyx open and close",
+   "source": "tools/nba_backtest.py walk-forward replay: 2025-26 on bt/nba, 2026-27 on the live box scores (data/nba/player_games.json); Onyx open and close",
    "held_out_from": "2026-02-01",
-   "held_out": "games on or after 2026-02-01",
+   "held_out": "Feb to Apr 2026, then 2026-27 to date (v8 was chosen on Oct 2025 to Jan 2026)",
    "tune": {
     "open": {
      "n": 24,
@@ -199,35 +200,35 @@
    },
    "test": {
     "open": {
-     "n": 22,
-     "w": 9,
-     "l": 13,
+     "n": 33,
+     "w": 12,
+     "l": 21,
      "p": 0,
-     "units": -3.27,
-     "roi": -0.1486,
-     "avg_price": 59,
-     "claimed": 0.5027,
-     "hit": 0.4091,
+     "units": -7.97,
+     "roi": -0.2416,
+     "avg_price": 64,
+     "claimed": 0.5038,
+     "hit": 0.3636,
      "first": "2026-02-01",
-     "last": "2026-04-09"
+     "last": "2026-10-26"
     },
     "close": {
-     "n": 20,
-     "w": 10,
-     "l": 10,
+     "n": 31,
+     "w": 12,
+     "l": 19,
      "p": 0,
-     "units": -0.78,
-     "roi": -0.0392,
-     "avg_price": -29,
-     "claimed": 0.5466,
-     "hit": 0.5,
+     "units": -7.9,
+     "roi": -0.2549,
+     "avg_price": -15,
+     "claimed": 0.5381,
+     "hit": 0.3871,
      "first": "2026-02-02",
-     "last": "2026-04-10"
+     "last": "2026-10-28"
     }
    },
    "verdict": "not enough yet",
-   "why": "only 22 held-out bets (needs 60); ROI -14.9% at the open, -3.9% at the close so far",
-   "notes": "Model tuned on Oct 2025 to Jan 2026; held out Feb to Apr 2026."
+   "why": "only 33 held-out bets (needs 60); ROI -24.2% at the open, -25.5% at the close so far",
+   "notes": "Model tuned on Oct 2025 to Jan 2026; held out Feb to Apr 2026 and every 2026-27 game."
   },
   {
    "sport": "nba",
@@ -235,67 +236,67 @@
    "name": "1st-quarter total",
    "version": "q1 0.254/12.0",
    "chance": "25.4% of Onyx's game total, normal sd 12 (open_lanes)",
-   "source": "bt/nba_*_lines.json (Onyx), ESPN play-by-play 1st-quarter scores",
+   "source": "Onyx lines (data/picks/lines/nba.json), ESPN official 1st-quarter line scores",
    "held_out_from": "2026-02-01",
-   "held_out": "Feb to Jun 2026 (the 25.4% share and sd 12 were tuned on Oct 2025 to Jan 2026)",
+   "held_out": "Feb 2026 on: Feb to Jun 2026 and 2026-27 to date (the 25.4% share and sd 12 were tuned on Oct 2025 to Jan 2026)",
    "tune": {
     "open": {
-     "n": 307,
+     "n": 315,
      "w": 174,
-     "l": 133,
+     "l": 141,
      "p": 0,
-     "units": 26.1,
-     "roi": 0.085,
+     "units": 18.11,
+     "roi": 0.0575,
      "avg_price": -101,
-     "claimed": 0.572,
-     "hit": 0.5668,
+     "claimed": 0.5723,
+     "hit": 0.5524,
      "first": "2025-10-21",
      "last": "2026-01-31"
     },
     "close": {
-     "n": 324,
-     "w": 171,
-     "l": 153,
+     "n": 333,
+     "w": 178,
+     "l": 155,
      "p": 0,
-     "units": 4.22,
-     "roi": 0.013,
-     "avg_price": -96,
-     "claimed": 0.5633,
-     "hit": 0.5278,
+     "units": 8.57,
+     "roi": 0.0257,
+     "avg_price": -95,
+     "claimed": 0.5634,
+     "hit": 0.5345,
      "first": "2025-10-21",
      "last": "2026-01-31"
     }
    },
    "test": {
     "open": {
-     "n": 172,
-     "w": 101,
-     "l": 71,
+     "n": 254,
+     "w": 148,
+     "l": 106,
      "p": 0,
-     "units": 21.52,
-     "roi": 0.1251,
-     "avg_price": -103,
-     "claimed": 0.5669,
-     "hit": 0.5872,
+     "units": 29.64,
+     "roi": 0.1167,
+     "avg_price": -101,
+     "claimed": 0.5692,
+     "hit": 0.5827,
      "first": "2026-02-01",
-     "last": "2026-04-10"
+     "last": "2026-11-01"
     },
     "close": {
-     "n": 184,
-     "w": 99,
-     "l": 85,
+     "n": 264,
+     "w": 144,
+     "l": 120,
      "p": 0,
-     "units": 6.33,
-     "roi": 0.0344,
+     "units": 12.73,
+     "roi": 0.0482,
      "avg_price": -102,
-     "claimed": 0.5619,
-     "hit": 0.538,
+     "claimed": 0.5628,
+     "hit": 0.5455,
      "first": "2026-02-01",
-     "last": "2026-04-10"
+     "last": "2026-11-01"
     }
    },
    "verdict": "finalized",
-   "why": "101-71 at the open, ROI +12.5%; ROI +3.4% at the close"
+   "why": "148-106 at the open, ROI +11.7%; ROI +4.8% at the close"
   },
   {
    "sport": "nfl",
@@ -303,7 +304,7 @@
    "name": "Moneyline",
    "version": "v14",
    "chance": "team ratings blended 30% with Onyx's no-vig price",
-   "source": "bt/nfl_game.json, ESPN finals",
+   "source": "Onyx lines (data/picks/lines/nfl.json), ESPN finals",
    "held_out_from": "2026-03-01",
    "held_out": "games on or after 2026-03-01",
    "tune": {
@@ -336,17 +337,17 @@
    },
    "test": {
     "open": {
-     "n": 8,
+     "n": 9,
      "w": 3,
-     "l": 5,
+     "l": 6,
      "p": 0,
-     "units": -1.44,
-     "roi": -0.18,
-     "avg_price": 68,
-     "claimed": 0.501,
-     "hit": 0.375,
+     "units": -2.44,
+     "roi": -0.2711,
+     "avg_price": 78,
+     "claimed": 0.4918,
+     "hit": 0.3333,
      "first": "2026-09-13",
-     "last": "2026-10-19"
+     "last": "2026-11-02"
     },
     "close": {
      "n": 7,
@@ -363,7 +364,7 @@
     }
    },
    "verdict": "not enough yet",
-   "why": "only 8 held-out bets (needs 60); ROI -18.0% at the open, -1.7% at the close so far"
+   "why": "only 9 held-out bets (needs 60); ROI -27.1% at the open, -1.7% at the close so far"
   },
   {
    "sport": "nfl",
@@ -371,7 +372,7 @@
    "name": "Spread",
    "version": "v14",
    "chance": "team ratings blended 30% with Onyx's no-vig price",
-   "source": "bt/nfl_game.json, ESPN finals",
+   "source": "Onyx lines (data/picks/lines/nfl.json), ESPN finals",
    "held_out_from": "2026-03-01",
    "held_out": "games on or after 2026-03-01",
    "tune": {
@@ -417,21 +418,21 @@
      "last": "2026-10-19"
     },
     "close": {
-     "n": 9,
+     "n": 10,
      "w": 5,
-     "l": 4,
+     "l": 5,
      "p": 0,
-     "units": 0.69,
-     "roi": 0.0768,
-     "avg_price": -87,
+     "units": -0.31,
+     "roi": -0.0309,
+     "avg_price": -90,
      "claimed": 0.554,
-     "hit": 0.5556,
+     "hit": 0.5,
      "first": "2026-09-27",
-     "last": "2026-10-27"
+     "last": "2026-11-02"
     }
    },
    "verdict": "not enough yet",
-   "why": "only 14 held-out bets (needs 60); ROI +23.7% at the open, +7.7% at the close so far"
+   "why": "only 14 held-out bets (needs 60); ROI +23.7% at the open, -3.1% at the close so far"
   },
   {
    "sport": "nfl",
@@ -439,7 +440,7 @@
    "name": "Game total",
    "version": "v14",
    "chance": "team ratings blended 30% with Onyx's no-vig price",
-   "source": "bt/nfl_game.json, ESPN finals",
+   "source": "Onyx lines (data/picks/lines/nfl.json), ESPN finals",
    "held_out_from": "2026-03-01",
    "held_out": "games on or after 2026-03-01",
    "tune": {
@@ -507,7 +508,7 @@
    "name": "Moneyline",
    "version": "v2",
    "chance": "team ratings blended 20% with Onyx's no-vig price",
-   "source": "bt/cfb_lines.json, ESPN finals",
+   "source": "Onyx lines (data/picks/lines/cfb.json), ESPN finals",
    "held_out_from": "2026-03-01",
    "held_out": "games on or after 2026-03-01",
    "tune": {
@@ -575,7 +576,7 @@
    "name": "Spread",
    "version": "v2",
    "chance": "team ratings blended 20% with Onyx's no-vig price",
-   "source": "bt/cfb_lines.json, ESPN finals",
+   "source": "Onyx lines (data/picks/lines/cfb.json), ESPN finals",
    "held_out_from": "2026-03-01",
    "held_out": "games on or after 2026-03-01",
    "tune": {
@@ -621,21 +622,21 @@
      "last": "2026-10-17"
     },
     "close": {
-     "n": 43,
-     "w": 24,
+     "n": 44,
+     "w": 25,
      "l": 19,
      "p": 0,
-     "units": 2.9,
-     "roi": 0.0674,
+     "units": 3.82,
+     "roi": 0.0869,
      "avg_price": -110,
-     "claimed": 0.572,
-     "hit": 0.5581,
+     "claimed": 0.5714,
+     "hit": 0.5682,
      "first": "2026-08-29",
-     "last": "2026-10-17"
+     "last": "2026-10-31"
     }
    },
    "verdict": "not enough yet",
-   "why": "only 46 held-out bets (needs 60); ROI +12.0% at the open, +6.7% at the close so far"
+   "why": "only 46 held-out bets (needs 60); ROI +12.0% at the open, +8.7% at the close so far"
   },
   {
    "sport": "cfb",
@@ -643,7 +644,7 @@
    "name": "Game total",
    "version": "v2",
    "chance": "team ratings blended 20% with Onyx's no-vig price",
-   "source": "bt/cfb_lines.json, ESPN finals",
+   "source": "Onyx lines (data/picks/lines/cfb.json), ESPN finals",
    "held_out_from": "2026-03-01",
    "held_out": "games on or after 2026-03-01",
    "tune": {
@@ -676,34 +677,34 @@
    },
    "test": {
     "open": {
-     "n": 38,
-     "w": 23,
-     "l": 15,
+     "n": 41,
+     "w": 24,
+     "l": 17,
      "p": 0,
-     "units": 5.94,
-     "roi": 0.1562,
+     "units": 4.89,
+     "roi": 0.1192,
      "avg_price": -110,
-     "claimed": 0.5574,
-     "hit": 0.6053,
+     "claimed": 0.5579,
+     "hit": 0.5854,
      "first": "2026-09-05",
-     "last": "2026-10-24"
+     "last": "2026-10-31"
     },
     "close": {
-     "n": 24,
+     "n": 25,
      "w": 15,
-     "l": 9,
+     "l": 10,
      "p": 0,
-     "units": 4.65,
-     "roi": 0.1937,
+     "units": 3.65,
+     "roi": 0.1459,
      "avg_price": -110,
-     "claimed": 0.5547,
-     "hit": 0.625,
+     "claimed": 0.5548,
+     "hit": 0.6,
      "first": "2026-09-20",
-     "last": "2026-10-24"
+     "last": "2026-10-31"
     }
    },
    "verdict": "not enough yet",
-   "why": "only 38 held-out bets (needs 60); ROI +15.6% at the open, +19.4% at the close so far"
+   "why": "only 41 held-out bets (needs 60); ROI +11.9% at the open, +14.6% at the close so far"
   },
   {
    "sport": "nhl",
@@ -711,7 +712,7 @@
    "name": "Moneyline",
    "version": "v2",
    "chance": "team ratings blended 50% with Onyx's no-vig price",
-   "source": "bt/nhl_lines.json, ESPN finals",
+   "source": "Onyx lines (data/picks/lines/nhl.json), ESPN finals",
    "held_out_from": "2026-01-15",
    "held_out": "games on or after 2026-01-15",
    "tune": {
@@ -744,34 +745,34 @@
    },
    "test": {
     "open": {
-     "n": 100,
-     "w": 39,
-     "l": 61,
+     "n": 102,
+     "w": 40,
+     "l": 62,
      "p": 0,
-     "units": -4.84,
-     "roi": -0.0484,
+     "units": -4.39,
+     "roi": -0.043,
      "avg_price": 142,
-     "claimed": 0.4455,
-     "hit": 0.39,
+     "claimed": 0.4453,
+     "hit": 0.3922,
      "first": "2026-01-15",
-     "last": "2026-10-28"
+     "last": "2026-10-31"
     },
     "close": {
-     "n": 115,
-     "w": 39,
-     "l": 76,
+     "n": 119,
+     "w": 40,
+     "l": 79,
      "p": 0,
-     "units": -21.56,
-     "roi": -0.1875,
+     "units": -23.06,
+     "roi": -0.1938,
      "avg_price": 144,
-     "claimed": 0.4468,
-     "hit": 0.3391,
+     "claimed": 0.4469,
+     "hit": 0.3361,
      "first": "2026-01-15",
-     "last": "2026-10-28"
+     "last": "2026-10-31"
     }
    },
    "verdict": "fails",
-   "why": "lost at the opening price (-4.8% on 100)"
+   "why": "lost at the opening price (-4.3% on 102)"
   },
   {
    "sport": "nhl",
@@ -779,7 +780,7 @@
    "name": "Spread",
    "version": "v2",
    "chance": "team ratings blended 50% with Onyx's no-vig price",
-   "source": "bt/nhl_lines.json, ESPN finals",
+   "source": "Onyx lines (data/picks/lines/nhl.json), ESPN finals",
    "held_out_from": "2026-01-15",
    "held_out": "games on or after 2026-01-15",
    "tune": {
@@ -812,34 +813,34 @@
    },
    "test": {
     "open": {
-     "n": 127,
-     "w": 65,
-     "l": 62,
+     "n": 134,
+     "w": 67,
+     "l": 67,
      "p": 0,
-     "units": -10.29,
-     "roi": -0.081,
+     "units": -13.88,
+     "roi": -0.1036,
      "avg_price": -94,
-     "claimed": 0.6027,
-     "hit": 0.5118,
+     "claimed": 0.602,
+     "hit": 0.5,
      "first": "2026-01-17",
-     "last": "2026-10-28"
+     "last": "2026-11-01"
     },
     "close": {
-     "n": 121,
-     "w": 62,
-     "l": 59,
+     "n": 128,
+     "w": 64,
+     "l": 64,
      "p": 0,
-     "units": -9.39,
-     "roi": -0.0776,
+     "units": -12.73,
+     "roi": -0.0995,
      "avg_price": -98,
-     "claimed": 0.6015,
-     "hit": 0.5124,
+     "claimed": 0.6006,
+     "hit": 0.5,
      "first": "2026-01-17",
-     "last": "2026-10-28"
+     "last": "2026-11-01"
     }
    },
    "verdict": "fails",
-   "why": "lost at the opening price (-8.1% on 127)"
+   "why": "lost at the opening price (-10.4% on 134)"
   },
   {
    "sport": "nhl",
@@ -847,7 +848,7 @@
    "name": "Game total",
    "version": "v2",
    "chance": "team ratings blended 50% with Onyx's no-vig price",
-   "source": "bt/nhl_lines.json, ESPN finals",
+   "source": "Onyx lines (data/picks/lines/nhl.json), ESPN finals",
    "held_out_from": "2026-01-15",
    "held_out": "games on or after 2026-01-15",
    "tune": {
@@ -914,204 +915,204 @@
    "market": "ml",
    "name": "Moneyline",
    "version": "v2",
-   "chance": "team ratings blended 20% with Onyx's no-vig price",
-   "source": "bt/cbb_lines.json (Onyx 2025-26), ESPN finals",
+   "chance": "team ratings blended 30% with Onyx's no-vig price",
+   "source": "Onyx lines (data/picks/lines/cbb.json, 2025-26 on), ESPN finals",
    "held_out_from": "2026-01-01",
    "held_out": "Jan 1 to Apr 9 2026 (Nov-Dec 2025 tuned the blend weight)",
    "tune": {
     "open": {
-     "n": 68,
-     "w": 29,
-     "l": 39,
+     "n": 145,
+     "w": 60,
+     "l": 85,
      "p": 0,
-     "units": -5.3,
-     "roi": -0.0779,
-     "avg_price": 52,
-     "claimed": 0.4938,
-     "hit": 0.4265,
-     "first": "2025-11-04",
-     "last": "2025-12-30"
+     "units": -16.31,
+     "roi": -0.1125,
+     "avg_price": 45,
+     "claimed": 0.5088,
+     "hit": 0.4138,
+     "first": "2025-11-03",
+     "last": "2025-12-31"
     },
     "close": {
-     "n": 74,
-     "w": 28,
-     "l": 46,
+     "n": 142,
+     "w": 55,
+     "l": 87,
      "p": 0,
-     "units": -13.88,
-     "roi": -0.1875,
-     "avg_price": 70,
-     "claimed": 0.4947,
-     "hit": 0.3784,
-     "first": "2025-11-04",
-     "last": "2025-12-28"
+     "units": -24.67,
+     "roi": -0.1737,
+     "avg_price": 51,
+     "claimed": 0.5139,
+     "hit": 0.3873,
+     "first": "2025-11-03",
+     "last": "2025-12-31"
     }
    },
    "test": {
     "open": {
-     "n": 15,
-     "w": 8,
-     "l": 7,
+     "n": 78,
+     "w": 35,
+     "l": 43,
      "p": 0,
-     "units": 2.4,
-     "roi": 0.1602,
-     "avg_price": 70,
-     "claimed": 0.4818,
-     "hit": 0.5333,
-     "first": "2026-01-03",
-     "last": "2026-02-28"
+     "units": -5.57,
+     "roi": -0.0714,
+     "avg_price": 21,
+     "claimed": 0.5162,
+     "hit": 0.4487,
+     "first": "2026-01-01",
+     "last": "2026-03-21"
     },
     "close": {
-     "n": 11,
-     "w": 8,
-     "l": 3,
+     "n": 70,
+     "w": 35,
+     "l": 35,
      "p": 0,
-     "units": 6.78,
-     "roi": 0.6163,
-     "avg_price": 65,
-     "claimed": 0.4889,
-     "hit": 0.7273,
-     "first": "2026-01-03",
-     "last": "2026-03-03"
+     "units": 4.49,
+     "roi": 0.0641,
+     "avg_price": 52,
+     "claimed": 0.5046,
+     "hit": 0.5,
+     "first": "2026-01-01",
+     "last": "2026-03-21"
     }
    },
-   "verdict": "not enough yet",
-   "why": "only 15 held-out bets (needs 60); ROI +16.0% at the open, +61.6% at the close so far"
+   "verdict": "fails",
+   "why": "lost at the opening price (-7.1% on 78)"
   },
   {
    "sport": "cbb",
    "market": "spread",
    "name": "Spread",
    "version": "v2",
-   "chance": "team ratings blended 20% with Onyx's no-vig price",
-   "source": "bt/cbb_lines.json (Onyx 2025-26), ESPN finals",
+   "chance": "team ratings blended 30% with Onyx's no-vig price",
+   "source": "Onyx lines (data/picks/lines/cbb.json, 2025-26 on), ESPN finals",
    "held_out_from": "2026-01-01",
    "held_out": "Jan 1 to Apr 9 2026 (Nov-Dec 2025 tuned the blend weight)",
    "tune": {
     "open": {
-     "n": 220,
-     "w": 119,
-     "l": 101,
+     "n": 247,
+     "w": 131,
+     "l": 116,
      "p": 0,
-     "units": 7.2,
-     "roi": 0.0327,
+     "units": 3.04,
+     "roi": 0.0123,
      "avg_price": -108,
-     "claimed": 0.5639,
-     "hit": 0.5409,
+     "claimed": 0.5923,
+     "hit": 0.5304,
      "first": "2025-11-03",
      "last": "2025-12-31"
     },
     "close": {
-     "n": 224,
-     "w": 123,
-     "l": 101,
+     "n": 251,
+     "w": 141,
+     "l": 110,
      "p": 0,
-     "units": 11.06,
-     "roi": 0.0494,
-     "avg_price": -106,
-     "claimed": 0.5649,
-     "hit": 0.5491,
+     "units": 19.55,
+     "roi": 0.0779,
+     "avg_price": -105,
+     "claimed": 0.5934,
+     "hit": 0.5618,
      "first": "2025-11-03",
      "last": "2025-12-31"
     }
    },
    "test": {
     "open": {
-     "n": 27,
-     "w": 15,
-     "l": 12,
+     "n": 152,
+     "w": 73,
+     "l": 79,
      "p": 0,
-     "units": 2.53,
-     "roi": 0.0936,
-     "avg_price": -74,
-     "claimed": 0.5363,
-     "hit": 0.5556,
-     "first": "2026-01-03",
-     "last": "2026-03-22"
+     "units": -11.63,
+     "roi": -0.0765,
+     "avg_price": -97,
+     "claimed": 0.5534,
+     "hit": 0.4803,
+     "first": "2026-01-01",
+     "last": "2026-03-27"
     },
     "close": {
-     "n": 28,
-     "w": 19,
-     "l": 9,
+     "n": 174,
+     "w": 85,
+     "l": 89,
      "p": 0,
-     "units": 8.23,
-     "roi": 0.2939,
-     "avg_price": -95,
-     "claimed": 0.5469,
-     "hit": 0.6786,
-     "first": "2026-01-03",
-     "last": "2026-03-22"
+     "units": -11.46,
+     "roi": -0.0658,
+     "avg_price": -100,
+     "claimed": 0.5553,
+     "hit": 0.4885,
+     "first": "2026-01-01",
+     "last": "2026-03-27"
     }
    },
-   "verdict": "not enough yet",
-   "why": "only 27 held-out bets (needs 60); ROI +9.4% at the open, +29.4% at the close so far"
+   "verdict": "fails",
+   "why": "lost at the opening price (-7.6% on 152)"
   },
   {
    "sport": "cbb",
    "market": "total",
    "name": "Game total",
    "version": "v2",
-   "chance": "team ratings blended 20% with Onyx's no-vig price",
-   "source": "bt/cbb_lines.json (Onyx 2025-26), ESPN finals",
+   "chance": "team ratings blended 30% with Onyx's no-vig price",
+   "source": "Onyx lines (data/picks/lines/cbb.json, 2025-26 on), ESPN finals",
    "held_out_from": "2026-01-01",
    "held_out": "Jan 1 to Apr 9 2026 (Nov-Dec 2025 tuned the blend weight)",
    "tune": {
     "open": {
-     "n": 71,
-     "w": 32,
-     "l": 39,
+     "n": 175,
+     "w": 81,
+     "l": 94,
      "p": 0,
-     "units": -10.06,
-     "roi": -0.1417,
+     "units": -20.38,
+     "roi": -0.1164,
      "avg_price": -110,
-     "claimed": 0.5559,
-     "hit": 0.4507,
+     "claimed": 0.565,
+     "hit": 0.4629,
      "first": "2025-11-03",
-     "last": "2025-12-06"
+     "last": "2025-12-31"
     },
     "close": {
-     "n": 102,
-     "w": 40,
-     "l": 62,
+     "n": 221,
+     "w": 101,
+     "l": 120,
      "p": 0,
-     "units": -25.58,
-     "roi": -0.2508,
-     "avg_price": -108,
-     "claimed": 0.554,
-     "hit": 0.3922,
+     "units": -28.22,
+     "roi": -0.1277,
+     "avg_price": -109,
+     "claimed": 0.5677,
+     "hit": 0.457,
      "first": "2025-11-03",
      "last": "2025-12-31"
     }
    },
    "test": {
     "open": {
-     "n": 6,
-     "w": 3,
-     "l": 3,
+     "n": 93,
+     "w": 52,
+     "l": 41,
      "p": 0,
-     "units": -0.27,
-     "roi": -0.0448,
-     "avg_price": -111,
-     "claimed": 0.5501,
-     "hit": 0.5,
-     "first": "2026-01-19",
-     "last": "2026-03-08"
+     "units": 6.32,
+     "roi": 0.0679,
+     "avg_price": -110,
+     "claimed": 0.5514,
+     "hit": 0.5591,
+     "first": "2026-01-01",
+     "last": "2026-03-20"
     },
     "close": {
-     "n": 10,
-     "w": 5,
-     "l": 5,
+     "n": 157,
+     "w": 90,
+     "l": 67,
      "p": 0,
-     "units": -0.44,
-     "roi": -0.0444,
+     "units": 14.7,
+     "roi": 0.0937,
      "avg_price": -110,
-     "claimed": 0.5467,
-     "hit": 0.5,
-     "first": "2026-01-03",
-     "last": "2026-03-13"
+     "claimed": 0.5522,
+     "hit": 0.5732,
+     "first": "2026-01-01",
+     "last": "2026-03-23"
     }
    },
-   "verdict": "not enough yet",
-   "why": "only 6 held-out bets (needs 60); ROI -4.5% at the open, -4.4% at the close so far"
+   "verdict": "finalized",
+   "why": "52-41 at the open, ROI +6.8%; ROI +9.4% at the close"
   },
   {
    "sport": "tennis",
@@ -1220,34 +1221,34 @@
    },
    "test": {
     "open": {
-     "n": 37,
-     "w": 22,
-     "l": 15,
+     "n": 44,
+     "w": 25,
+     "l": 19,
      "p": 0,
-     "units": 4.72,
-     "roi": 0.1275,
-     "avg_price": -107,
-     "claimed": 0.5827,
-     "hit": 0.5946,
+     "units": 3.55,
+     "roi": 0.0807,
+     "avg_price": -103,
+     "claimed": 0.5801,
+     "hit": 0.5682,
      "first": "2026-09-10",
-     "last": "2026-10-25"
+     "last": "2026-11-01"
     },
     "close": {
-     "n": 5,
+     "n": 7,
      "w": 2,
-     "l": 3,
+     "l": 5,
      "p": 0,
-     "units": -1.15,
-     "roi": -0.2296,
-     "avg_price": -109,
-     "claimed": 0.5647,
-     "hit": 0.4,
+     "units": -3.15,
+     "roi": -0.4497,
+     "avg_price": -108,
+     "claimed": 0.5689,
+     "hit": 0.2857,
      "first": "2026-09-11",
-     "last": "2026-10-18"
+     "last": "2026-11-01"
     }
    },
    "verdict": "not enough yet",
-   "why": "only 37 held-out bets (needs 60); ROI +12.8% at the open, -23.0% at the close so far",
+   "why": "only 44 held-out bets (needs 60); ROI +8.1% at the open, -45.0% at the close so far",
    "notes": "Close only where the closing line equals the opening line."
   },
   {
@@ -1289,34 +1290,34 @@
    },
    "test": {
     "open": {
-     "n": 44,
-     "w": 25,
+     "n": 47,
+     "w": 28,
      "l": 19,
      "p": 0,
-     "units": 3.6,
-     "roi": 0.0817,
-     "avg_price": -106,
-     "claimed": 0.5827,
-     "hit": 0.5682,
+     "units": 6.55,
+     "roi": 0.1393,
+     "avg_price": -102,
+     "claimed": 0.5807,
+     "hit": 0.5957,
      "first": "2026-09-13",
-     "last": "2026-10-27"
+     "last": "2026-11-01"
     },
     "close": {
-     "n": 11,
-     "w": 5,
+     "n": 12,
+     "w": 6,
      "l": 6,
      "p": 0,
-     "units": -1.49,
-     "roi": -0.1354,
+     "units": -0.6,
+     "roi": -0.0497,
      "avg_price": -112,
-     "claimed": 0.5861,
-     "hit": 0.4545,
+     "claimed": 0.5848,
+     "hit": 0.5,
      "first": "2026-09-21",
-     "last": "2026-10-27"
+     "last": "2026-11-01"
     }
    },
    "verdict": "not enough yet",
-   "why": "only 44 held-out bets (needs 60); ROI +8.2% at the open, -13.5% at the close so far",
+   "why": "only 47 held-out bets (needs 60); ROI +13.9% at the open, -5.0% at the close so far",
    "notes": "Close only where the closing line equals the opening line."
   },
   {
@@ -1325,67 +1326,67 @@
    "name": "1st-half total",
    "version": "h1 0.505/18",
    "chance": "50.5% of Onyx's game total, normal sd 18 (nba_build)",
-   "source": "bt/nba_*_lines.json (Onyx), ESPN play-by-play 1st-half scores",
+   "source": "Onyx lines (data/picks/lines/nba.json), ESPN official 1st-half line scores",
    "held_out_from": "2026-02-01",
-   "held_out": "Feb to Jun 2026 (the 50.5% share and sd 18 were tuned on Oct 2025 to Jan 2026)",
+   "held_out": "Feb 2026 on: Feb to Jun 2026 and 2026-27 to date (the 50.5% share and sd 18 were tuned on Oct 2025 to Jan 2026)",
    "tune": {
     "open": {
-     "n": 378,
-     "w": 210,
-     "l": 168,
+     "n": 384,
+     "w": 208,
+     "l": 176,
      "p": 0,
-     "units": 24.36,
-     "roi": 0.0645,
+     "units": 14.45,
+     "roi": 0.0376,
      "avg_price": -106,
-     "claimed": 0.5825,
-     "hit": 0.5556,
+     "claimed": 0.5834,
+     "hit": 0.5417,
      "first": "2025-10-21",
      "last": "2026-01-31"
     },
     "close": {
-     "n": 399,
+     "n": 403,
      "w": 215,
-     "l": 184,
+     "l": 188,
      "p": 0,
-     "units": 11.98,
-     "roi": 0.03,
-     "avg_price": -107,
-     "claimed": 0.5798,
-     "hit": 0.5388,
+     "units": 8.08,
+     "roi": 0.0201,
+     "avg_price": -106,
+     "claimed": 0.5805,
+     "hit": 0.5335,
      "first": "2025-10-21",
      "last": "2026-01-31"
     }
    },
    "test": {
     "open": {
-     "n": 191,
-     "w": 101,
-     "l": 90,
+     "n": 286,
+     "w": 147,
+     "l": 139,
      "p": 0,
-     "units": 1.22,
-     "roi": 0.0064,
-     "avg_price": -109,
-     "claimed": 0.5798,
-     "hit": 0.5288,
+     "units": -5.12,
+     "roi": -0.0179,
+     "avg_price": -107,
+     "claimed": 0.5806,
+     "hit": 0.514,
      "first": "2026-02-01",
-     "last": "2026-04-10"
+     "last": "2026-11-01"
     },
     "close": {
-     "n": 208,
-     "w": 110,
-     "l": 98,
+     "n": 292,
+     "w": 154,
+     "l": 138,
      "p": 0,
-     "units": 1.88,
-     "roi": 0.009,
-     "avg_price": -108,
-     "claimed": 0.5764,
-     "hit": 0.5288,
+     "units": 2.99,
+     "roi": 0.0102,
+     "avg_price": -106,
+     "claimed": 0.5776,
+     "hit": 0.5274,
      "first": "2026-02-01",
-     "last": "2026-04-10"
+     "last": "2026-11-01"
     }
    },
-   "verdict": "passes, not offered",
-   "why": "101-90 at the open, ROI +0.6%; ROI +0.9% at the close; not finalized: picks.py has no grader for it",
+   "verdict": "fails",
+   "why": "lost at the opening price (-1.8% on 286)",
    "notes": "On the board for Ask Onyx only: nba_build never puts it in the Top 10 and picks.py cannot grade it."
   },
   {
@@ -1427,34 +1428,34 @@
    },
    "test": {
     "open": {
-     "n": 44,
-     "w": 27,
-     "l": 17,
+     "n": 49,
+     "w": 31,
+     "l": 18,
      "p": 0,
-     "units": 15.34,
-     "roi": 0.3486,
-     "avg_price": 92,
-     "claimed": 0.519,
-     "hit": 0.6136,
+     "units": 19.75,
+     "roi": 0.403,
+     "avg_price": 96,
+     "claimed": 0.5178,
+     "hit": 0.6327,
      "first": "2026-09-13",
-     "last": "2026-10-27"
+     "last": "2026-11-01"
     },
     "close": {
-     "n": 28,
-     "w": 13,
-     "l": 15,
+     "n": 32,
+     "w": 14,
+     "l": 18,
      "p": 0,
-     "units": -1.55,
-     "roi": -0.0553,
-     "avg_price": 35,
-     "claimed": 0.5234,
-     "hit": 0.4643,
+     "units": -3.52,
+     "roi": -0.11,
+     "avg_price": 45,
+     "claimed": 0.5207,
+     "hit": 0.4375,
      "first": "2026-09-18",
-     "last": "2026-10-27"
+     "last": "2026-11-02"
     }
    },
    "verdict": "not enough yet",
-   "why": "only 44 held-out bets (needs 60); ROI +34.9% at the open, -5.5% at the close so far",
+   "why": "only 49 held-out bets (needs 60); ROI +40.3% at the open, -11.0% at the close so far",
    "notes": "Close only where the closing line equals the opening line. Players with snaps and no catch count as 0."
   },
   {
@@ -1496,34 +1497,34 @@
    },
    "test": {
     "open": {
-     "n": 29,
-     "w": 15,
-     "l": 14,
+     "n": 34,
+     "w": 18,
+     "l": 16,
      "p": 0,
-     "units": 1.04,
-     "roi": 0.036,
-     "avg_price": -30,
-     "claimed": 0.5544,
-     "hit": 0.5172,
+     "units": 2.51,
+     "roi": 0.0737,
+     "avg_price": -14,
+     "claimed": 0.5478,
+     "hit": 0.5294,
      "first": "2026-10-10",
-     "last": "2026-10-30"
+     "last": "2026-10-31"
     },
     "close": {
-     "n": 31,
-     "w": 8,
-     "l": 23,
+     "n": 35,
+     "w": 11,
+     "l": 24,
      "p": 0,
-     "units": -13.06,
-     "roi": -0.4213,
-     "avg_price": 62,
-     "claimed": 0.512,
-     "hit": 0.2581,
+     "units": -10.53,
+     "roi": -0.3008,
+     "avg_price": 63,
+     "claimed": 0.5098,
+     "hit": 0.3143,
      "first": "2026-10-07",
-     "last": "2026-10-30"
+     "last": "2026-10-31"
     }
    },
    "verdict": "not enough yet",
-   "why": "only 29 held-out bets (needs 60); ROI +3.6% at the open, -42.1% at the close so far",
+   "why": "only 34 held-out bets (needs 60); ROI +7.4% at the open, -30.1% at the close so far",
    "notes": "Players with no box line are voids here (Onyx settles them at 0)."
   },
   {
@@ -1565,34 +1566,34 @@
    },
    "test": {
     "open": {
-     "n": 49,
-     "w": 27,
-     "l": 22,
+     "n": 55,
+     "w": 30,
+     "l": 25,
      "p": 0,
-     "units": 4.15,
-     "roi": 0.0847,
-     "avg_price": -31,
-     "claimed": 0.5509,
-     "hit": 0.551,
+     "units": 3.99,
+     "roi": 0.0726,
+     "avg_price": -28,
+     "claimed": 0.5514,
+     "hit": 0.5455,
      "first": "2026-10-07",
-     "last": "2026-10-31"
+     "last": "2026-11-01"
     },
     "close": {
-     "n": 40,
-     "w": 20,
-     "l": 20,
+     "n": 49,
+     "w": 25,
+     "l": 24,
      "p": 0,
-     "units": -1.38,
-     "roi": -0.0346,
-     "avg_price": -67,
-     "claimed": 0.5545,
-     "hit": 0.5,
+     "units": -0.51,
+     "roi": -0.0104,
+     "avg_price": -70,
+     "claimed": 0.5534,
+     "hit": 0.5102,
      "first": "2026-10-08",
-     "last": "2026-10-29"
+     "last": "2026-11-01"
     }
    },
    "verdict": "not enough yet",
-   "why": "only 49 held-out bets (needs 60); ROI +8.5% at the open, -3.5% at the close so far",
+   "why": "only 55 held-out bets (needs 60); ROI +7.3% at the open, -1.0% at the close so far",
    "notes": "Players with no box line are voids here (Onyx settles them at 0)."
   },
   {
@@ -1634,34 +1635,34 @@
    },
    "test": {
     "open": {
-     "n": 75,
-     "w": 55,
-     "l": 20,
-     "p": 0,
-     "units": 28.32,
-     "roi": 0.3777,
-     "avg_price": -114,
-     "claimed": 0.6091,
-     "hit": 0.7333,
-     "first": "2026-10-02",
-     "last": "2026-10-31"
-    },
-    "close": {
-     "n": 69,
-     "w": 46,
+     "n": 90,
+     "w": 67,
      "l": 23,
      "p": 0,
-     "units": 18.08,
-     "roi": 0.262,
-     "avg_price": -109,
-     "claimed": 0.61,
-     "hit": 0.6667,
+     "units": 35.85,
+     "roi": 0.3983,
+     "avg_price": -114,
+     "claimed": 0.6096,
+     "hit": 0.7444,
      "first": "2026-10-02",
-     "last": "2026-10-27"
+     "last": "2026-11-01"
+    },
+    "close": {
+     "n": 85,
+     "w": 58,
+     "l": 27,
+     "p": 0,
+     "units": 24.78,
+     "roi": 0.2915,
+     "avg_price": -109,
+     "claimed": 0.6069,
+     "hit": 0.6824,
+     "first": "2026-10-02",
+     "last": "2026-11-01"
     }
    },
    "verdict": "finalized",
-   "why": "55-20 at the open, ROI +37.8%; ROI +26.2% at the close",
+   "why": "67-23 at the open, ROI +39.8%; ROI +29.1% at the close",
    "notes": "Players with no box line are voids here (Onyx settles them at 0)."
   },
   {
@@ -1703,34 +1704,34 @@
    },
    "test": {
     "open": {
-     "n": 34,
-     "w": 21,
-     "l": 13,
-     "p": 0,
-     "units": 6.44,
-     "roi": 0.1893,
-     "avg_price": -62,
-     "claimed": 0.5635,
-     "hit": 0.6176,
-     "first": "2026-10-07",
-     "last": "2026-10-31"
-    },
-    "close": {
-     "n": 26,
-     "w": 11,
+     "n": 41,
+     "w": 26,
      "l": 15,
      "p": 0,
-     "units": -4.99,
-     "roi": -0.1921,
-     "avg_price": -70,
-     "claimed": 0.5603,
-     "hit": 0.4231,
+     "units": 9.04,
+     "roi": 0.2205,
+     "avg_price": -65,
+     "claimed": 0.5647,
+     "hit": 0.6341,
+     "first": "2026-10-07",
+     "last": "2026-11-01"
+    },
+    "close": {
+     "n": 33,
+     "w": 17,
+     "l": 16,
+     "p": 0,
+     "units": -0.71,
+     "roi": -0.0216,
+     "avg_price": -79,
+     "claimed": 0.5614,
+     "hit": 0.5152,
      "first": "2026-10-08",
-     "last": "2026-10-30"
+     "last": "2026-11-01"
     }
    },
    "verdict": "not enough yet",
-   "why": "only 34 held-out bets (needs 60); ROI +18.9% at the open, -19.2% at the close so far",
+   "why": "only 41 held-out bets (needs 60); ROI +22.1% at the open, -2.2% at the close so far",
    "notes": "Players with no box line are voids here (Onyx settles them at 0)."
   },
   {
