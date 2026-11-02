@@ -570,5 +570,49 @@
   "model": "v2",
   "result": null,
   "actual": null
+ },
+ {
+  "date": "2026-11-02",
+  "key": "401858510|katin houser|rush_yds",
+  "gid": "401858510",
+  "pid": "4795295",
+  "name": "Katin Houser",
+  "team": "ILL",
+  "opp": "NEB",
+  "matchup": "ILL vs NEB",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 12.5,
+  "price": -114,
+  "sel": "c4bc9348-2aa0-4bd9-be89-8e9aeb3aa39e",
+  "proj": 15.6,
+  "prob": 0.604,
+  "implied": 0.5327,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.59,
+    "avg": 0.77,
+    "pp": -4.2
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.83,
+    "avg": 0.93,
+    "pp": 1.7
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.58,
+    "avg": -0.05,
+    "pp": 0.5
+   }
+  ],
+  "opened_at": "2026-11-02T23:38:08+00:00",
+  "logged_at": "2026-11-02T23:38:08+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
  }
 ]
