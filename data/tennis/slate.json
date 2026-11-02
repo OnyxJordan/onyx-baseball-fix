@@ -946,7 +946,7 @@
      "id": "186444",
      "start": "2026-11-02T13:35Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 1",
      "draw": "Men's Singles",
      "court": "Court 2",
@@ -958,7 +958,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        3
+        4,
+        1
        ],
        "serve": true
       },
@@ -969,6 +970,7 @@
        "seed": null,
        "win": false,
        "sets": [
+        6,
         5
        ],
        "serve": false
@@ -979,7 +981,7 @@
      "id": "186448",
      "start": "2026-11-02T13:50Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 1",
      "draw": "Men's Singles",
      "court": "Court 1",
@@ -991,7 +993,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        1
+        4,
+        4
        ],
        "serve": false
       },
@@ -1002,9 +1005,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        6,
+        1
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -1012,7 +1016,7 @@
      "id": "186469",
      "start": "2026-11-02T14:00Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 1",
      "draw": "Men's Singles",
      "court": "Court Central",
@@ -1024,9 +1028,10 @@
        "seed": null,
        "win": false,
        "sets": [
+        3,
         0
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Casper Ruud",
@@ -1035,7 +1040,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        1
+        6,
+        4
        ],
        "serve": false
       }
@@ -1043,9 +1049,9 @@
     },
     {
      "id": "186447",
-     "start": "2026-11-02T14:30Z",
+     "start": "2026-11-02T15:00Z",
      "state": "pre",
-     "detail": "11/2 - 9:30 AM EST",
+     "detail": "11/2 - 10:00 AM EST",
      "round": "Round 1",
      "draw": "Men's Singles",
      "court": "Court 2",
@@ -1072,9 +1078,9 @@
     },
     {
      "id": "186460",
-     "start": "2026-11-02T14:30Z",
+     "start": "2026-11-02T15:00Z",
      "state": "pre",
-     "detail": "11/2 - 9:30 AM EST",
+     "detail": "11/2 - 10:00 AM EST",
      "round": "Round 1",
      "draw": "Men's Singles",
      "court": "Court 1",
@@ -6429,8 +6435,8 @@
     {
      "id": "186672",
      "start": "2026-11-02T12:55Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Court 1",
@@ -6440,10 +6446,10 @@
        "short": "K. Novak",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/slo.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        5
+        6
        ],
        "serve": false
       },
@@ -6455,9 +6461,9 @@
        "win": false,
        "sets": [
         1,
-        2
+        3
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -6964,9 +6970,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Kristina Novak",
+       "short": "K. Novak",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/slo.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -7276,5 +7282,5 @@
    ]
   }
  ],
- "fetched": "2026-11-02T14:06:29+00:00"
+ "fetched": "2026-11-02T14:49:31+00:00"
 }
