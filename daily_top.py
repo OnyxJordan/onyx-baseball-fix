@@ -148,6 +148,18 @@ def keep_pregame(data_dir, rows, hours=36):
                 g["sp"][e.get("name")] = float(m.group(1))
         elif k == "ml" and e.get("price") is not None:
             g["ml"][e.get("name")] = e["price"]
+    # the archive the live player-prop backtest replays (tools/live_props_backtest.py): every game's
+    # pregame props, kept 21 days (pregame.json itself keeps 36 hours, and the page loads it)
+    a = Path(data_dir) / "prop_archive.json"
+    try:
+        A = json.loads(a.read_text(encoding="utf-8"))
+    except Exception:
+        A = {}
+    for k, v in P.items():
+        if v.get("pp"):
+            A[k] = {"m": v["m"], "start": v.get("start"), "pp": v["pp"], "tot": v.get("tot"), "sp": v.get("sp")}
+    A = {k: v for k, v in A.items() if (when(v.get("start")) or now) > now - timedelta(days=21)}
+    a.write_text(json.dumps(A, separators=(",", ":")), encoding="utf-8")
     P = {k: v for k, v in P.items() if (when(v.get("start")) or now) > now - timedelta(hours=hours)}
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(json.dumps(P, separators=(",", ":")), encoding="utf-8")
