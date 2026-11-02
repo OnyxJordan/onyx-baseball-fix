@@ -1135,9 +1135,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        0
+        3
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Alex Molcan",
@@ -1146,17 +1146,17 @@
        "seed": null,
        "win": false,
        "sets": [
-        0
+        2
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
     {
      "id": "186466",
-     "start": "2026-11-02T18:00Z",
+     "start": "2026-11-02T18:10Z",
      "state": "pre",
-     "detail": "11/2 - 1:00 PM EST",
+     "detail": "11/2 - 1:10 PM EST",
      "round": "Round 1",
      "draw": "Men's Singles",
      "court": "Court Central",
@@ -5275,7 +5275,7 @@
        "win": false,
        "sets": [
         7,
-        3
+        4
        ],
        "serve": false
       },
@@ -5287,7 +5287,7 @@
        "win": false,
        "sets": [
         6,
-        3
+        6
        ],
        "serve": false
       }
@@ -5330,9 +5330,9 @@
     },
     {
      "id": "186709",
-     "start": "2026-11-02T17:45Z",
-     "state": "pre",
-     "detail": "11/2 - 12:45 PM EST",
+     "start": "2026-11-02T17:50Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Campo 1",
@@ -5343,7 +5343,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/col.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        0
+       ],
        "serve": false
       },
       {
@@ -5352,16 +5354,18 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/bra.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        0
+       ],
        "serve": false
       }
      ]
     },
     {
      "id": "186712",
-     "start": "2026-11-02T17:50Z",
+     "start": "2026-11-02T18:10Z",
      "state": "pre",
-     "detail": "11/2 - 12:50 PM EST",
+     "detail": "11/2 - 1:10 PM EST",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Campo 3",
@@ -6500,8 +6504,8 @@
     {
      "id": "186665",
      "start": "2026-11-02T15:30Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Lwena Court",
@@ -6523,12 +6527,12 @@
        "short": "D. Martynov",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         7,
-        5
+        6
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -7073,9 +7077,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Diana Martynov",
+       "short": "D. Martynov",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -7318,5 +7322,5 @@
    ]
   }
  ],
- "fetched": "2026-11-02T17:42:35+00:00"
+ "fetched": "2026-11-02T18:06:51+00:00"
 }
