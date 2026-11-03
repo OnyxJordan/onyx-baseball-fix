@@ -83,6 +83,8 @@ LEDGER_RETENTION_DAYS = {
     "tennis/picks_history": None,
     # Onyx Picks (picks.py): every sport's tracked picks, logged once at the price shown
     "picks/ledger": None,
+    # live value record, on trial (live_log.py): every live value play, logged once, graded off the final
+    "live/ledger": None,
 }
 LEDGERS = tuple(LEDGER_RETENTION_DAYS)
 

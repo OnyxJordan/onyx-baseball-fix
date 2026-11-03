@@ -74,7 +74,27 @@ def entry(sport, r, tag="lean", start=None):
             "edge": round(r["edge"], 4), "ev": round(ev(r["price"], r["prob"]), 4) if r.get("price") and r.get("prob") is not None else None, "sel": r.get("sel"), "tag": tag,
             # what the home page needs to follow a saved pick live (saved.js / My picks)
             "kind": r.get("kind") or "prop", "mkt": r.get("mkt") or r.get("stat") or r.get("kind"), "side": r.get("side"),
-            "line": r.get("line"), "hcap": _hcap(r), "name": r.get("name"), "team": r.get("team")}
+            "line": r.get("line"), "hcap": _hcap(r), "name": r.get("name"), "team": r.get("team"),
+            # the one-line reason the sport page's "Best plays today" shows (live.js spotHTML), from the model's own inputs
+            "why": why(r)}
+
+
+def why(r):
+    """One line from the model inputs: a prop's biggest drivers and its projection, else the game
+    model's own detail (ratings, form, rest), else the projection against the line. None when the
+    row carries none of them (the page then says our chance against Onyx's)."""
+    try:
+        parts = []
+        if r.get("proj") is not None and r.get("line") is not None and (r.get("kind") or "prop") == "prop":
+            parts.append(f"Projects {float(r['proj']):.1f} against the {r['line']:g} line")
+        drv = sorted([w for w in r.get("why") or [] if isinstance(w, dict) and w.get("k")], key=lambda w: -abs(w.get("pp") or 0))[:2]
+        parts += [f"{w['k']} {w.get('v')} (avg {w.get('avg')})" for w in drv]
+        if not parts and r.get("detail"):
+            parts.append(str(r["detail"]))
+        s = "; ".join(str(p) for p in parts if p).replace("\u2014", "-").strip()
+        return (s[:157] + "...") if len(s) > 160 else (s or None)
+    except Exception:
+        return None
 
 
 def _hcap(r):

@@ -1563,6 +1563,40 @@ our chance, edge math, every gate, model shape (a bigger lead never lowers the c
 NaN / em dash / book names on a card, no sideways scroll at 390px. Player-prop live pricing is
 the one part not yet backtested: ESPN keeps no pregame projections to replay it against.
 
+**Live on every sport page, tennis live model, live value record (11/3).** Jordan: "live picks on
+each sports page... there's X or Y value right now, take this pick."
+- `live.js` is the one implementation: models, pricing (`bets`) and rendering (`card`, `block`,
+  `spot`, `recordHTML`, `mount`, CSS injected once). `home.html`'s Live tab and Ask Onyx call
+  `OnyxLive.card`; `sport_shell.html` (nfl, cfb, cbb, nhl, tennis; golf gets only the spot plays)
+  and `nba_shell.html` mount it with `OnyxLive.mount({sport, home: 'oxLiveHome', games: 'oxLiveGames'})`.
+  The Live block leads with "Value right now: X at +120 live. Our chance 52%, the live line says
+  45%: +7 points." and the Onyx link, then the live game cards; with nothing at value it says "No live
+  value right now" and lists the closest lines. Refresh: 30 s while live, 2 min otherwise, paused
+  when the tab is hidden. Label on every block: "Live value, not a tracked pick, untested against
+  live prices."
+- Home "Best plays today" (`spotHTML`, from `data/<sport>/top.json`): Onyx Picks first, then the best
+  value, each with a reason (`daily_top.why`: a prop's projection and biggest drivers, else the game
+  model's detail). NBA Home already leads with the Model's Parlay and Onyx Picks, so it gets the Live
+  block only.
+- College basketball live: normal model, SDs 15.4 / 20.2 (closing-line residuals 11.3 / 16.8 on
+  5,344 games x the in-game inflation NBA's fit needed); not replayed in-game yet. Relay `/live`
+  gains `cbb` (ncaab) and prices up to 40 fixtures for cbb and tennis.
+- Tennis live model: the point -> game -> set chain (`OnyxLive.tn`, which the tennis match center now
+  calls too) from the sets, games and server, pregame chance = Onyx's no-vig moneyline (the blended
+  chance, tennis blend weight 0), Elo (`data/tennis/elo.json`) when unpriced. Serve baselines refit
+  on ESPN set scores (`tools/tennis_live_backtest.py`, `bt/tennis_sets.json`): ATP .62 / form .02,
+  WTA .54 / .034. Held-out 2026 (4,000 matches, `data/tennis/live_backtest.json`), Elo start: every
+  set boundary Brier .1695 / log loss .514 vs pregame-only .2244 / .640 and the old sets-only model
+  .1704 / .517; inside sets (game order reconstructed, server unknown) .1622 / .488 vs .2217 / .634
+  and sets-only .1898 / .561; every 10% band within 3 points. At 1-1 in sets it is no better than
+  sets-only (.2426 vs .2401). No historical live prices exist, so value against live lines is untested.
+- `live_model.py` is the same math in Python (verify_live checks parity to 5e-5). `live_log.py` runs
+  in `refresh_build.yml` (fail-soft) and appends each live value play once (game, market, side) to
+  `data/live/ledger.json` with the price, our chance, the edge and the score, then grades it off
+  ESPN's final. Game lines only (props are shown, not logged). In validate_build's ledger list. Shown
+  as "Live value record (on trial)" on each sport's Live block, the home Live tab and `picks.html`.
+  Not Onyx Picks.
+
 **10/31 follow-ups.** A parlay spreads across games first and, when the board is short of
 games, fills its remaining legs from games it already uses (an SGP+, labelled on the ticket,
 never one player twice, one game line of each kind per game). My bets (`onyxMyBets`, ui.js and

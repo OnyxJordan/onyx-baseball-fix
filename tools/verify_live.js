@@ -13,7 +13,17 @@
 //   cards     no NaN / undefined / null / Infinity, no em dash, no other book's name, Started / Live
 //             line / Our fair present whenever a bet is shown, and a phone-width page with no
 //             sideways scroll
-//   node tools/verify_live.js [--n=5000] [--seed=7]
+//   tennis    (11/3) the point -> game -> set chain: at 0-0 it reproduces the pregame chance, winning
+//             the next game never lowers the chance, the games distribution sums to 1, totals and
+//             spreads move the right way, best of 3 and 5
+//   parity    live_model.py (the live logger) gives the same chances as live.js (to 5e-5, the serve-rate fit's resolution) on a sample
+//             of every sport's states
+//   pages     (11/3) the Live block on tennis.html and nba.html (the built pages) with a stubbed relay
+//             and a live-game fixture (tools/fixtures/live_tennis.json, a real ESPN + relay snapshot;
+//             live_nba.json, a game set in play): cards, the value sentence, the untested label, the
+//             Onyx link with the referral, no em dash, no book name, no sideways scroll, no page
+//             errors, at 390 and 1280px, screenshots to --shots=<dir>
+//   node tools/verify_live.js [--n=5000] [--seed=7] [--shots=dir] [--pages=0]
 const { chromium } = require('playwright-core');
 const http = require('http'), fs = require('fs'), path = require('path');
 const arg = (k, d) => { const a = process.argv.find(x => x.startsWith('--' + k + '=')); return a ? a.split('=')[1] : d; };
@@ -34,16 +44,18 @@ const srv = http.createServer((q, r) => { const p = path.join(root, decodeURICom
   const res = await pg.evaluate(([N, SEED]) => {
     let x = SEED >>> 0; const R = () => ((x = (x * 1664525 + 1013904223) >>> 0) / 4294967296);
     const pick = a => a[Math.floor(R() * a.length)], O = OnyxLive;
-    const SP = ['nba', 'nfl', 'cfb', 'nhl', 'tennis'];
+    const SP = ['nba', 'nfl', 'cfb', 'nhl', 'cbb', 'tennis'];
     const TEAMS = { nba: [['BOS', 'Boston Celtics'], ['LAL', 'Los Angeles Lakers'], ['DEN', 'Denver Nuggets'], ['NY', 'New York Knicks']],
       nfl: [['KC', 'Kansas City Chiefs'], ['DEN', 'Denver Broncos'], ['PHI', 'Philadelphia Eagles'], ['WSH', 'Washington Commanders']],
       cfb: [['UGA', 'Georgia Bulldogs'], ['OSU', 'Ohio State Buckeyes'], ['ORE', 'Oregon Ducks'], ['TEX', 'Texas Longhorns']],
       nhl: [['EDM', 'Edmonton Oilers'], ['NYR', 'New York Rangers'], ['OTT', 'Ottawa Senators'], ['ANA', 'Anaheim Ducks']],
+      cbb: [['DUKE', 'Duke Blue Devils'], ['UK', 'Kentucky Wildcats'], ['UNC', 'North Carolina Tar Heels'], ['KU', 'Kansas Jayhawks']],
       tennis: [['Iga Swiatek', 'Iga Swiatek'], ['Coco Gauff', 'Coco Gauff'], ['Jannik Sinner', 'Jannik Sinner'], ['Carlos Alcaraz', 'Carlos Alcaraz']] };
-    const TOT = { nba: [205, 245], nfl: [36, 54], cfb: [40, 70], nhl: [5.5, 6.5] }, LEN = { nba: [4, 12], nfl: [4, 15], cfb: [4, 15], nhl: [3, 20] };
-    const PROPS = { nba: ['pts', 'reb', 'ast', 'threes'], nfl: ['anytime_td', 'rec', 'rec_yds', 'rush_yds', 'pass_yds'], cfb: ['anytime_td', 'rush_yds', 'rec_yds'], nhl: [], tennis: [] };
+    const TOT = { nba: [205, 245], nfl: [36, 54], cfb: [40, 70], nhl: [5.5, 6.5], cbb: [130, 165] }, LEN = { nba: [4, 12], nfl: [4, 15], cfb: [4, 15], nhl: [3, 20], cbb: [2, 20] };
+    const PROPS = { nba: ['pts', 'reb', 'ast', 'threes'], nfl: ['anytime_td', 'rec', 'rec_yds', 'rush_yds', 'pass_yds'], cfb: ['anytime_td', 'rush_yds', 'rec_yds'], nhl: [], cbb: [], tennis: [] };
+    const SETS = [[6, 0], [6, 1], [6, 2], [6, 3], [6, 4], [7, 5], [7, 6]], PAR = [];
     const PROJ = { pts: [8, 32], reb: [3, 13], ast: [2, 10], threes: [0.8, 4], rec: [2, 8], rec_yds: [20, 95], rush_yds: [15, 110], pass_yds: [180, 300] };
-    const FMIN = { nfl: 0.15, cfb: 0.15, nba: 0.15, nhl: 0.15 };
+    const FMIN = { nfl: 0.15, cfb: 0.15, nba: 0.15, nhl: 0.15, cbb: 0.15 };
     const BOOKS = /DraftKings|FanDuel|BetMGM|Caesars|Pinnacle|ESPN ?Bet|bet365/i;
     // letter-only names (live.js matches names by their letters, like real box scores)
     const SYL = ['ka', 'lo', 'mi', 'ren', 'to', 'va', 'shi', 'den', 'ro', 'zu'];
@@ -57,10 +69,33 @@ const srv = http.createServer((q, r) => { const p = path.join(root, decodeURICom
       const havePre = R() < 0.8;
       const g = { sport, gid: 'g' + i, home, away, hn, an, hl: R() < 0.9 ? 'https://a.espncdn.com/x.png' : null, al: null, detail: 'Q', pre: {} };
       if (sport === 'tennis') {
-        g.hs = Math.floor(R() * 2); g.as = Math.floor(R() * 2); g.state = '6-4 3-6'; g.f = null;
-        g.pre = havePre ? { home_win: rnd(0.15, 0.85), home_ml: -150, away_ml: 130 } : {};
-        g.M = O.model('tennis', { hs: g.hs, as: g.as, best: 3, pre_home_win: g.pre.home_win });
-        g.home_win = g.M.win();
+        // a legal score: finished sets (nobody has won yet), the set in play, the server
+        const need = R() < 0.2 ? 3 : 2, tour = R() < 0.5 ? 'ATP' : 'WTA', sets = [], w = [0, 0];
+        const nf = Math.floor(R() * (2 * need - 1));
+        for (let k = 0; k < nf; k++) { const who = R() < 0.5 ? 0 : 1; if (w[who] + 1 >= need) break; w[who]++; const sc = pick(SETS); sets.push(who === 0 ? sc.slice() : [sc[1], sc[0]]); }
+        let ga = Math.floor(R() * 7), gb = Math.floor(R() * 7);
+        while (O.tn.done(ga, gb)) { ga = Math.floor(R() * 6); gb = Math.floor(R() * 6); }
+        if (sets.length === 0 || R() < 0.9) sets.push([ga, gb]); else { ga = 0; gb = 0; }
+        const srv = R() < 0.15 ? null : R() < 0.5 ? 0 : 1, st = O.tn.state(sets, srv);
+        g.f = null; g.need = need; g.srv = srv; g.state = sets.map(x => x[1] + '-' + x[0]).join(' '); g.hs = st.sa; g.as = st.sb;
+        g.pre = havePre ? { home_win: rnd(0.12, 0.88), home_ml: -150, away_ml: 130, margin: rnd(-5, 5), total: Math.round(rnd(19, 26)) + 0.5 } : {};
+        g.M = O.model('tennis', { st, need, tour, pre_home_win: g.pre.home_win });
+        g.home_win = g.M.win(); g.proj_total = g.M.proj_total; g.fair_spread = home + ' ' + Math.round(-g.M.proj_margin * 2) / 2 + ' games';
+        counts.models++;
+        const p0 = g.pre.home_win == null ? 0.5 : g.pre.home_win;
+        const M0 = O.model('tennis', { st: O.tn.state([]), need, tour, pre_home_win: p0 });
+        if (Math.abs(M0.win() - p0) > 0.002) fail(g, 'tennis chain at 0-0 is not the pregame chance: ' + M0.win() + ' vs ' + p0);
+        if (Math.abs(g.M.over(-1) - 1) > 1e-6) fail(g, 'tennis games distribution does not sum to 1');
+        if (!(g.home_win > 0 && g.home_win < 1)) fail(g, 'tennis chance out of range');
+        if (srv != null && sets.length && !O.tn.done(ga, gb) && sets[sets.length - 1][0] === ga && sets[sets.length - 1][1] === gb) {
+          const base = sets.slice(0, -1), won = O.model('tennis', { st: O.tn.state(base.concat([[ga + 1, gb]]), 1 - srv), need, tour, pre_home_win: p0 }).win(),
+            lost = O.model('tennis', { st: O.tn.state(base.concat([[ga, gb + 1]]), 1 - srv), need, tour, pre_home_win: p0 }).win();
+          if (won < lost - 1e-9) fail(g, 'winning the next game lowered the tennis chance');
+        }
+        const tl = Math.round(g.M.proj_total) + 0.5;
+        if (g.M.over(tl + 1) > g.M.over(tl) + 1e-9) fail(g, 'tennis over chance rose with a higher line');
+        if (g.M.cover(1.5) < g.M.cover(-1.5) - 1e-9) fail(g, 'tennis cover chance fell with more games');
+        if (PAR.length < 400) PAR.push({ sport, sets, srv, need, tour, pre: g.pre.home_win == null ? null : g.pre.home_win, win: g.home_win, cover: g.M.cover(-2.5), over: g.M.over(tl), tl });
       } else {
         const L = LEN[sport], per = 1 + Math.floor(R() * L[0]), clk = Math.floor(R() * L[1] * 60);
         g.f = O.left(sport, per, clk);
@@ -81,6 +116,8 @@ const srv = http.createServer((q, r) => { const p = path.join(root, decodeURICom
         const tl = Math.round(g.M.proj_total) + 0.5;
         if (g.M.over(tl + 1) > g.M.over(tl) + 1e-9) fail(g, 'over chance rose with a higher line');
         if (g.M.cover(1.5) < g.M.cover(-1.5) - 1e-9) fail(g, 'cover chance fell with more points');
+        if (PAR.filter(p => p.sport === sport).length < 120) PAR.push({ sport, hs: g.hs, as: g.as, f: g.f, pm, pt: g.pre.total || pt, phw: g.pre.home_win != null ? g.pre.home_win : 0.5,
+          win: g.home_win, hl: Math.round(-g.M.proj_margin * 2) / 2 + 0.5, cover: g.M.cover(Math.round(-g.M.proj_margin * 2) / 2 + 0.5), tl, over: g.M.over(tl) });
         const Mend = O.model(sport, { hs: g.hs, as: g.as, f: 0.004, pre_margin: pm, pre_total: g.pre.total || pt, pre_home_win: 0.5 });
         if (Math.abs(g.hs - g.as) >= 3 && Math.abs(Mend.win() - (g.hs > g.as ? 1 : 0)) > 0.02) fail(g, 'a 3+ point leader does not win at the final whistle');
       }
@@ -89,10 +126,10 @@ const srv = http.createServer((q, r) => { const p = path.join(root, decodeURICom
       const lines = [];
       const pml = R() < 0.5 ? 1 : 0, hw = Math.min(0.97, Math.max(0.03, g.home_win + (R() - 0.5) * 0.3));
       lines.push({ m: 'ml', sel: hn, price: am(hw) }, { m: 'ml', sel: an, price: am(1 - hw) });
-      if (sport !== 'tennis') {
+      {
         const ln = Math.round((-g.M.proj_margin + (R() - 0.5) * 6) * 2) / 2 + 0.5;
         lines.push({ m: 'spread', sel: hn, pt: ln, price: pick([-125, -115, -110, -105, 100]) }, { m: 'spread', sel: an, pt: -ln, price: pick([-115, -110, -105]) });
-        const tl = Math.floor(g.M.proj_total + (R() - 0.5) * (sport === 'nhl' ? 2 : 12)) + 0.5;
+        const tl = Math.floor(g.M.proj_total + (R() - 0.5) * (sport === 'nhl' || sport === 'tennis' ? 2 : 12)) + 0.5;
         lines.push({ m: 'total', sel: 'Over ' + tl, side: 'over', pt: tl, price: pick([-125, -110, 100, 120]) }, { m: 'total', sel: 'Under ' + tl, side: 'under', pt: tl, price: pick([-125, -110, -105]) });
       }
       // player props, pregame captures and the live box
@@ -150,15 +187,122 @@ const srv = http.createServer((q, r) => { const p = path.join(root, decodeURICom
     // a real page of cards at phone width
     LV.games = lvSort(window.__keep); LV.sport = 'all'; lvRender();
     const over = document.documentElement.scrollWidth > innerWidth;
-    return { counts, fails, over, rendered: document.querySelectorAll('#lvList .lv-card').length };
+    return { counts, fails, over, rendered: document.querySelectorAll('#lvList .lv-card').length, par: PAR };
   }, [N, SEED]);
+  // parity: live_model.py (the live logger) against live.js on the same states
+  const py = require('child_process').spawnSync('python3', ['-c', `
+import json, sys
+sys.path.insert(0, ${JSON.stringify(root)})
+import live_model as LM
+bad, n = [], 0
+for p in json.load(sys.stdin):
+    if p['sport'] == 'tennis':
+        M = LM.Tennis(p['pre'], p['need'], LM.tn_state([tuple(x) for x in p['sets']], p['srv']), p['tour'])
+        got = (M.win(), M.cover(-2.5), M.over(p['tl']))
+        want = (p['win'], p['cover'], p['over'])
+    else:
+        g = {'hs': p['hs'], 'as': p['as'], 'f': p['f'], 'pre_margin': p['pm'], 'pre_total': p['pt'], 'pre_home_win': p['phw']}
+        M = LM.Hockey(g) if p['sport'] == 'nhl' else LM.Normal(p['sport'], g)
+        got = (M.win(), M.cover(p['hl']), M.over(p['tl']))
+        want = (p['win'], p['cover'], p['over'])
+    n += 1
+    if max(abs(a - b) for a, b in zip(got, want)) > 5e-5:   # the serve-rate bisection's resolution (a tie at exactly 50% can split either way)
+        bad.append({'sport': p['sport'], 'js': want, 'py': got, 'in': {k: v for k, v in p.items() if k not in ('win', 'cover', 'over')}})
+print(json.dumps({'n': n, 'bad': bad[:5], 'nbad': len(bad)}))
+`], { input: JSON.stringify(res.par), encoding: 'utf8' });
+  let par = { n: 0, nbad: 1, bad: [py.stderr] };
+  try { par = JSON.parse(py.stdout); } catch (e) {}
+  console.log(`parity live_model.py vs live.js: ${par.n} states, ${par.nbad} differ by more than 5e-5`);
+  par.bad.forEach(x => console.log('FAIL parity', JSON.stringify(x)));
+  // the Live block on the built pages, a stubbed relay and a live-game fixture
+  const pageFails = [];
+  if (arg('pages', '1') !== '0') {
+    const FX = { tennis: JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures', 'live_tennis.json'), 'utf8')),
+                 nba: JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures', 'live_nba.json'), 'utf8')) };
+    const shots = arg('shots', '');
+    for (const [pageName, sport] of [['tennis.html', 'tennis'], ['nba.html', 'nba']]) {
+      for (const w of [390, 1280]) {
+        const p2 = await b.newPage({ viewport: { width: w, height: 900 } });
+        const e2 = []; p2.on('pageerror', e => e2.push(String(e)));
+        await p2.route('**/*', rt => { const u = rt.request().url();
+          if (u.startsWith(base + '/ai.json')) return rt.fulfill({ contentType: 'application/json', body: '{"url":"http://relay.stub"}' });
+          if (u.startsWith('http://relay.stub/live')) { const sp = new URL(u).searchParams.get('sport');
+            return rt.fulfill({ contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify(FX[sp] ? FX[sp].relay : { games: [] }) }); }
+          const m = /espn\.com\/apis\/site\/v2\/sports\/(tennis\/(atp|wta)|basketball\/nba)\/scoreboard/.exec(u);
+          if (m) return rt.fulfill({ contentType: 'application/json', headers: { 'access-control-allow-origin': '*' },
+            body: JSON.stringify(m[2] ? FX.tennis[m[2]] : { leagues: FX.nba.leagues, events: FX.nba.events }) });
+          return u.startsWith(base) ? rt.continue() : rt.abort(); });
+        await p2.goto(base + '/' + pageName + '#home', { waitUntil: 'domcontentloaded' });
+        const ok = await p2.waitForFunction(() => document.querySelector('#oxLiveHome .lv-card'), null, { timeout: 20000 }).then(() => true, () => false);
+        const r = await p2.evaluate(() => {
+          const el = document.getElementById('oxLiveHome'), t = el ? el.innerText : '';
+          const links = [...(el ? el.querySelectorAll('a') : [])].map(a => a.href);
+          return { text: t, html: el ? el.innerHTML : '', cards: el ? el.querySelectorAll('.lv-card').length : 0, val: el ? el.querySelectorAll('.lvb-v:not(.none)').length : 0,
+                   onyx: links.filter(h => /app\.onyxodds\.com/.test(h) && /KR680261/.test(h)).length, over: document.documentElement.scrollWidth > innerWidth + 1 };
+        });
+        const tag = `${pageName} ${w}px`;
+        const bad = x => pageFails.push(`${tag}: ${x}`);
+        if (!ok) bad('no live card in the Home Live block');
+        if (!/untested against live prices/.test(r.text)) bad('missing the untested label');
+        if (!/Value right now|No live value right now/.test(r.text)) bad('no value line');
+        if (r.val && !/Our chance \d+%, the live line says \d+%: [+-]?\d+ points?\./.test(r.text)) bad('value sentence not worded "Our chance X%, the live line says Y%: +Z points."');
+        if (!r.onyx) bad('no Onyx link with the referral');
+        if (/—/.test(r.html)) bad('em dash in the block');
+        if (/\b(NaN|undefined|Infinity)\b/.test(r.text)) bad('NaN / undefined in the block');
+        if (/DraftKings|FanDuel|BetMGM|Caesars|Pinnacle|bet365/i.test(r.text)) bad('a book named in the block');
+        if (r.over) bad('sideways scroll');
+        // the Games tab carries the same block
+        await p2.evaluate(() => gotoTab('games'));
+        const gOk = await p2.waitForFunction(() => document.querySelector('#oxLiveGames .lv-card'), null, { timeout: 8000 }).then(() => true, () => false);
+        if (!gOk) bad('no live card on the Games tab');
+        if (e2.length) bad('page errors: ' + e2.slice(0, 3).join(' | '));
+        console.log(`${tag}: ${r.cards} live cards, ${r.val} value lines, Onyx links ${r.onyx}, sideways scroll ${r.over}`);
+        // tennis match center (owner report 11/3, Linette vs Falei): win chance after every game, labels inside
+        // the plot and clear of the dots, the card's font, the set-score grid with headers
+        if (sport === 'tennis') {
+          const id = await p2.evaluate(() => { const ids = ['186587'].concat((SD.events || []).flatMap(e => e.matches.filter(m => m.state === 'in').map(m => m.id)));
+            for (const i of ids) if ((SD.events || []).some(e => e.matches.some(m => m.id === i && m.state === 'in'))) return i; return null; });
+          if (!id) bad('no live fixture match on the tennis slate');
+          else {
+            await p2.evaluate(i => openMatch(i), id);
+            await p2.waitForSelector('#gc .tc-chart', { timeout: 8000 }).catch(() => bad('match center chart missing'));
+            const c = await p2.evaluate(() => {
+              const svg = document.querySelector('#gc .tc-chart'); if (!svg) return null;
+              const R = svg.getBoundingClientRect(), pts = JSON.parse(svg.dataset.pts);
+              const txt = [...svg.querySelectorAll('text')].map(t => { const b = t.getBoundingClientRect(); return { t: t.textContent, l: b.left, r: b.right, tp: b.top, bt: b.bottom }; });
+              const outside = txt.filter(b => b.l < R.left - 0.5 || b.r > R.right + 0.5 || b.tp < R.top - 0.5 || b.bt > R.bottom + 0.5).map(b => b.t);
+              const nowT = svg.querySelector('.tc-now').getBoundingClientRect(), dots = [...svg.querySelectorAll('circle')].map(d => d.getBoundingClientRect());
+              const hit = dots.filter(d => !(d.right < nowT.left || d.left > nowT.right || d.bottom < nowT.top || d.top > nowT.bottom)).length;
+              const games = (window.SD.events || []).flatMap(e => e.matches).find(m => m.id === OPEN_MATCH).p.reduce((a, p) => a + p.sets.reduce((x, y) => x + y, 0), 0) / 1;
+              const ff = getComputedStyle(svg.querySelector('.tc-ax')).fontFamily, cf = getComputedStyle(document.querySelector('#gc')).fontFamily;
+              return { n: pts.length, games, outside, hit, ff, cf, head: !!document.querySelector('#gc .mc-h'), heads: [...document.querySelectorAll('#gc .mc-h .mc-sets span')].map(x => x.textContent) };
+            });
+            if (c) {
+              if (c.n < c.games + 1) bad(`chart has ${c.n} points for ${c.games} games`);
+              if (c.outside.length) bad('chart labels outside the plot: ' + c.outside.join(', '));
+              if (c.hit) bad('the Now label overlaps a dot');
+              if (c.ff !== c.cf) bad(`chart font ${c.ff} is not the card font ${c.cf}`);
+              if (!c.head) bad('set-score grid has no header');
+              console.log(`${tag} match center ${id}: ${c.n} chart points for ${c.games} games, set columns ${c.heads.join(' ')}`);
+              if (shots) { const gc = await p2.$('#gc'); fs.mkdirSync(shots, { recursive: true }); if (gc) await gc.screenshot({ path: path.join(shots, `tennis_match_${w}.png`) }); }
+            }
+          }
+        }
+        if (shots) { fs.mkdirSync(shots, { recursive: true }); await p2.evaluate(() => gotoTab('home'));
+          await p2.waitForTimeout(400);
+          const h = await p2.$('#oxLiveHome'); if (h) await h.screenshot({ path: path.join(shots, `${sport}_live_${w}.png`) }); }
+        await p2.close();
+      }
+    }
+    pageFails.forEach(f => console.log('FAIL', f));
+  }
   const c = res.counts;
   console.log(`${c.games} games, ${c.bets} bets priced (${c.ml} moneyline, ${c.spread} spread, ${c.total} total, ${c.props} player props), ${c.value} marked Value`);
   console.log(`${c.models} model shape checks, ${c.cards} cards rendered as text, ${res.rendered} rendered on a 390px page (sideways scroll: ${res.over})`);
   if (errs.length) console.log('page errors:', errs.slice(0, 5));
   res.fails.forEach(f => console.log('FAIL', JSON.stringify(f)));
-  const bad = res.fails.length + errs.length + (res.over ? 1 : 0);
-  console.log(bad ? `\n${res.fails.length} failures` : '\nALL CHECKS PASSED');
+  const bad = res.fails.length + errs.length + (res.over ? 1 : 0) + par.nbad + pageFails.length;
+  console.log(bad ? `\n${bad} failures` : '\nALL CHECKS PASSED');
   await b.close(); srv.close();
   process.exit(bad ? 1 : 0);
 })();

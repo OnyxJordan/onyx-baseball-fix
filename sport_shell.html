@@ -15,6 +15,8 @@
 <!-- shared app shell: bottom menu, search, toasts, status-bar fix (ui.js) -->
 <script src="ui.js" defer></script>
 <script src="saved.js"></script>
+<!-- live value (live.js): the Live block on Home and Games, today's spot plays, the tennis chain -->
+<script src="live.js"></script>
 <!-- team and player cards (cards.js, data/<sport>/cards/*.json): data-oxt / data-oxp open them -->
 <script src="cards.js" defer></script>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -213,8 +215,11 @@
 .mc-nm{min-width:0}.mc-nm b{display:block;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mc-nm span{font:600 10px monospace;color:var(--text3)}
 .mc-p.w .mc-nm b{color:#61e970}
 .mc-p .sv{width:8px;height:8px;border-radius:50%;background:#61e970;box-shadow:0 0 8px #61e970}
-.mc-sets{display:flex;gap:6px;font:800 18px monospace}.mc-sets span{min-width:14px;text-align:center;opacity:.55}.mc-sets span.won{opacity:1}
+.mc-sets{display:flex;gap:6px;font:800 18px monospace}.mc-sets span{min-width:26px;text-align:center;opacity:.55}.mc-sets span.won{opacity:1}
 .mc-sw{font:800 20px monospace;text-align:right;color:#d795ff}
+.mc-h{padding:2px 0;border-bottom:0}.mc-h .mc-sets{font:700 10px monospace;letter-spacing:.06em}.mc-h .mc-sets span{opacity:1;color:var(--text3)}.mc-h .mc-sets span.cur{color:#ff6b9a}
+.mc-h .mc-sw{font:700 10px monospace;letter-spacing:.06em;color:var(--text3)}
+.mc-p:not(.mc-h) .mc-sets span:last-child.live{color:#ff6b9a}
 .mc-form{background:var(--bg3);border:1px solid var(--border2);border-radius:12px;padding:10px 12px;font-size:12px;line-height:1.7}
 .mc-form b{display:block;font:800 10px monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--text3)}
 .mc-form .r{font:800 11px monospace}.mc-form .r.w{color:#61e970}.mc-form .r.l{color:#f87171}
@@ -247,8 +252,10 @@
 .tn-wp{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center}
 .tn-wp b{display:block;font-size:13px}.tn-wp span{font:800 22px monospace}.tn-wp .r{text-align:right}
 .tn-wpbar{height:10px;border-radius:999px;background:rgba(155,150,255,.25);overflow:hidden}.tn-wpbar i{display:block;height:100%;background:linear-gradient(90deg,#635bff,#b038f9);border-radius:999px;transition:width .6s}
-.tc-chart{display:block;width:100%;height:150px;margin-top:10px;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:12px}
-.tc-ax{font:700 10px monospace;fill:rgba(255,255,255,.55)}
+.tc-chart{display:block;width:100%;height:auto;margin-top:10px;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:12px;touch-action:pan-y;cursor:crosshair}
+.tc-ax{font:600 12px var(--ox-body,inherit);font-family:inherit;fill:rgba(255,255,255,.6)}.tc-now{font-weight:800;fill:#fff}
+.tc-tip{font-size:12px;line-height:1.45;color:var(--text2);margin-top:6px;min-height:18px}.tc-tip b{color:#fff}
+.tc-note{font-size:11px;line-height:1.45;color:var(--text3);margin-top:2px}
 .tn-kp{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin-top:10px}
 .tn-kp>div{background:var(--bg3);border:1px solid var(--border2);border-radius:12px;padding:9px 11px}
 .tn-kp span{display:block;font:700 9px monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)}.tn-kp b{font:800 14px monospace}.tn-kp em{font-style:normal;color:#d795ff;font-size:11px;margin-left:4px}
@@ -433,9 +440,10 @@
     </div>
   </div>
   <div class="home-stats-grid" id="homeStats"></div>
+  <div class="sp-wrap" id="oxLiveHome"></div>
   <div class="sp-wrap" id="homeBody"></div>
 </div>
-<div class="pane" id="pane-games"><div class="sp-wrap" id="gamesBody"></div></div>
+<div class="pane" id="pane-games"><div class="sp-wrap" id="oxLiveGames"></div><div class="sp-wrap" id="gamesBody"></div></div>
 <div class="pane" id="pane-board"><div class="sp-wrap" id="boardBody"></div></div>
 <div class="pane" id="pane-plays"><div class="sp-wrap" id="playsBody"></div></div>
 <div class="pane" id="pane-model"><div class="sp-wrap" id="modelBody"></div></div>
@@ -1266,73 +1274,12 @@ function tnSurface(e) {
   if (/roland|french open|madrid|rome|internazionali|monte|barcelona|hamburg|gstaad|kitzb|umag|bastad|estoril|munich|geneva|lyon|houston|marrakech|buenos|rio|santiago|bogota|charleston|parma|palermo|prague|rabat|strasbourg|cluj|lausanne|budapest/i.test(n)) return 'clay';
   return 'hard';
 }
-function tnHold(p) { const q = 1 - p; return p ** 4 * (1 + 4 * q + 10 * q * q) + 20 * p ** 3 * q ** 3 * (p * p / (1 - 2 * p * q)); }
-function tnTB(a, b) {   // first server wins the tiebreak; a, b: each server's point-on-serve chance
-  const M = {};
-  const f = (x, y) => {
-    if (x >= 7 && x - y >= 2) return 1; if (y >= 7 && y - x >= 2) return 0;
-    if (x >= 6 && x === y) { const w = a * (1 - b), l = (1 - a) * b; return w / (w + l); }
-    const k = x * 20 + y; if (k in M) return M[k];
-    const pw = Math.floor((x + y + 1) / 2) % 2 === 0 ? a : 1 - b;
-    return (M[k] = pw * f(x + 1, y) + (1 - pw) * f(x, y + 1));
-  };
-  return f(0, 0);
-}
-// every way a set can finish from (a, b) with s serving: winner, set games, its game margin, next set's server
-function tnSet(a0, b0, s0, pt, H) {
-  const M = {}, tb = [tnTB(pt[0], pt[1]), tnTB(pt[1], pt[0])];
-  const f = (a, b, s) => {
-    const k = a * 100 + b * 10 + s; if (M[k]) return M[k];
-    let o;
-    if (((a >= 6 || b >= 6) && Math.abs(a - b) >= 2) || a === 7 || b === 7) o = {[(a > b ? 0 : 1) + '|' + (a + b) + '|' + (a - b) + '|' + s]: 1};
-    else if (a === 6 && b === 6) { const w0 = s === 0 ? tb[0] : 1 - tb[1]; o = {['0|13|1|' + (1 - s)]: w0, ['1|13|-1|' + (1 - s)]: 1 - w0}; }
-    else {
-      const h = H[s], A = s === 0 ? f(a + 1, b, 1) : f(a + 1, b, 0), B = s === 0 ? f(a, b + 1, 1) : f(a, b + 1, 0), pa = s === 0 ? h : 1 - h;
-      o = {}; for (const [kk, p] of Object.entries(A)) o[kk] = (o[kk] || 0) + pa * p; for (const [kk, p] of Object.entries(B)) o[kk] = (o[kk] || 0) + (1 - pa) * p;
-    }
-    return (M[k] = o);
-  };
-  return Object.entries(f(a0, b0, s0)).map(([k, p]) => { const [w, g, d, nx] = k.split('|').map(Number); return {w, g, d, nx, p}; });
-}
-// from sets (sa, sb) and games (ga, gb) with srv serving: P(player 0 wins) and the distribution of the rest of the match
-function tnRun(sa, sb, ga, gb, srv, pt, need) {
-  const H = [tnHold(pt[0]), tnHold(pt[1])], fresh = {};
-  const setD = (a, b, s) => (a || b) ? tnSet(a, b, s, pt, H) : (fresh[s] = fresh[s] || tnSet(0, 0, s, pt, H));
-  if (srv == null) {   // server unknown (before the first ball): average both
-    const r0 = tnRun(sa, sb, ga, gb, 0, pt, need), r1 = tnRun(sa, sb, ga, gb, 1, pt, need);
-    return {win: (r0.win + r1.win) / 2, dist: r0.dist.map(x => [x[0], x[1], x[2] / 2]).concat(r1.dist.map(x => [x[0], x[1], x[2] / 2]))};
-  }
-  // set by set, merging equal states (sets, server, games so far, margin) so best of five stays small
-  const res = {win: 0, dist: []}, end = {};
-  let cur = {[sa + '|' + sb + '|' + srv + '|0|0']: 1}, first = true;
-  while (Object.keys(cur).length) {
-    const nxt = {};
-    for (const [k, p] of Object.entries(cur)) {
-      const [x, y, s, g0, d0] = k.split('|').map(Number);
-      for (const o of setD(first ? ga : 0, first ? gb : 0, s)) {
-        const nx = x + (o.w === 0), ny = y + (o.w === 1), q = p * o.p, g = g0 + o.g, d = d0 + o.d;
-        if (nx === need || ny === need) { if (nx === need) res.win += q; const ek = g + '|' + d; end[ek] = (end[ek] || 0) + q; }
-        else { const k2 = nx + '|' + ny + '|' + o.nx + '|' + g + '|' + d; nxt[k2] = (nxt[k2] || 0) + q; }
-      }
-    }
-    cur = nxt; first = false;
-  }
-  res.dist = Object.entries(end).map(([k, p]) => { const [g, d] = k.split('|').map(Number); return [g, d, p]; });
-  return res;
-}
-// win chance only, from the start of a set (fast: used to calibrate)
-function tnWin(pt, need) {
-  const H = [tnHold(pt[0]), tnHold(pt[1])], T = [0, 1].map(s => {
-    const o = {}; tnSet(0, 0, s, pt, H).forEach(x => { const k = x.w + '|' + x.nx; o[k] = (o[k] || 0) + x.p; }); return o; });
-  const M = {};
-  const f = (x, y, s) => {
-    if (x === need) return 1; if (y === need) return 0;
-    const k = x * 100 + y * 10 + s; if (k in M) return M[k];
-    let v = 0; for (const [kk, p] of Object.entries(T[s])) { const [w, nx] = kk.split('|').map(Number); v += p * f(x + (w === 0), y + (w === 1), nx); }
-    return (M[k] = v);
-  };
-  return (f(0, 0, 0) + f(0, 0, 1)) / 2;
-}
+// the chain itself lives in live.js (OnyxLive.tn), shared with every page's Live block and live_model.py
+function tnHold(p) { return OnyxLive.tn.hold(p); }
+function tnTB(a, b) { return OnyxLive.tn.tb(a, b); }
+function tnSet(a0, b0, s0, pt, H) { return OnyxLive.tn.set(a0, b0, s0, pt, H); }
+function tnRun(sa, sb, ga, gb, srv, pt, need) { return OnyxLive.tn.run(sa, sb, ga, gb, srv, pt, need); }
+function tnWin(pt, need) { return OnyxLive.tn.win(pt, need); }
 var TN_CAL = {};
 function tnPre(m) {   // pre-match chance player 0 wins: Onyx's moneyline, else Elo
   const mo = ((SD.odds || {}).matches || {})[m.id];
@@ -1349,13 +1296,13 @@ function tnPre(m) {   // pre-match chance player 0 wins: Onyx's moneyline, else 
 // 60% against Onyx's 49%), because real matches are more lopsided than coin-flip points.
 function tnCal(e, m) {
   if (TN_CAL[m.id]) return TN_CAL[m.id];
-  const pre = tnPre(m), need = Math.ceil(tnBestOf(e) / 2), base = e && e.tour === 'WTA' ? 0.56 : 0.64;
+  const pre = tnPre(m), need = Math.ceil(tnBestOf(e) / 2), bs = OnyxLive.tn.base(e && e.tour), base = bs[0];   // fitted tour baselines (live.js TN_P)
   const mo = ((SD.odds || {}).matches || {})[m.id] || {};
   const imp = o => o == null ? null : o > 0 ? 100 / (o + 100) : -o / (-o + 100);
   const fit = sg => { let lo = -0.3, hi = 0.3;
     for (let i = 0; i < 18; i++) { const d = (lo + hi) / 2; if ((tnWin([base + d + sg, base - d - sg], need) + tnWin([base + d - sg, base - d + sg], need)) / 2 < pre.p) lo = d; else hi = d; }
     const d = (lo + hi) / 2; return [[base + d + sg, base - d - sg], [base + d - sg, base - d + sg]]; };
-  let sg = 0.025, src = 'tour default';
+  let sg = bs[1], src = 'tour default';
   if (mo.total != null && mo.over != null && mo.under != null) {
     const want = imp(mo.over) / (imp(mo.over) + imp(mo.under));
     const pov = g => fit(g).reduce((a, pt) => a + tnRun(0, 0, 0, 0, null, pt, need).dist.reduce((x, q) => x + (q[0] > mo.total ? q[2] : 0), 0) / 2, 0);
@@ -1486,33 +1433,95 @@ function tnRecord(e, m, prev, mine) {
   }
 }
 // win chance path: the pre-match price, the start of each set (from the set scores), then every game seen live
-function tnPath(e, m, live) {
-  const cal = live.cal, st = live.st, pts = [{x: 0, p: cal.pre.p, l: 'Start'}];
-  let sa = 0, sb = 0, g = 0;
-  st.sets.forEach((x, j) => {
-    if (!x.fin) return;
-    g += x.a + x.b; if (x.a > x.b) sa++; else sb++;
-    if (sa === cal.need || sb === cal.need) { pts.push({x: g, p: sa === cal.need ? 1 : 0, l: 'Final'}); return; }
-    const srvNext = st.srv == null ? null : ((st.G - g) % 2 === 0 ? st.srv : 1 - st.srv);
-    pts.push({x: g, p: tnMix(cal, st, tnPost(cal, st, j + 1, false), sa, sb, 0, 0, srvNext).win, l: 'Set ' + (j + 1)});
-  });
-  ((TN_LOG[m.id] || {}).wp || []).forEach(w => { if (w[2] > g) pts.push({x: w[2], p: w[1] / 100, l: ''}); });
-  if (m.state === 'in') pts.push({x: st.G, p: live.win, l: 'Now'});
-  const seen = {}; return pts.filter(q => { const k = q.x + ':' + q.l; if (seen[k] || (seen[q.x] && !q.l)) return false; seen[k] = seen[q.x] = 1; return true; }).sort((a, b) => a.x - b.x);
+// the win chance after every game. ESPN gives each set's games, not their order, so the order inside a
+// set is rebuilt: the server of each game comes from the server now and the games played, the server
+// takes his game while he still has games left in that set, and the set is never over before its last
+// game (holds first, the breaks late). Set ends are exact; the games inside a set are that rebuild.
+var TN_PATH = {};
+function tnSeq(a, b, s0, last) {   // one set's games in a rebuilt order: 0 / 1 = who won each game
+  const out = []; let x = 0, y = 0, s = s0 == null ? 0 : s0;
+  while (x + y < a + b) {
+    const left = [a - x, b - y], ok = w => left[w] > 0 && (x + y + 1 === a + b || !OnyxLive.tn.done(x + (w === 0), y + (w === 1)));
+    let w = x + y + 1 === a + b && last != null ? last : left[s] > 0 ? s : 1 - s;
+    if (!ok(w) && ok(1 - w)) w = 1 - w;
+    out.push(w); if (w === 0) x++; else y++; s = 1 - s;
+  }
+  return out;
 }
-function tnChart(m, pts) {
-  if (pts.length < 2) return '';
-  const W = 640, Hh = 150, X = Math.max(1, pts[pts.length - 1].x), x = v => 30 + v / X * (W - 50), y = p => 12 + (1 - p) * (Hh - 30);
+function tnPath(e, m, live) {
+  const cal = live.cal, st = live.st, key = m.id + '|' + st.G + '|' + st.srv + '|' + m.state + '|' + cal.pre.p;
+  if (TN_PATH[key]) return TN_PATH[key];
+  const srvAt = k => st.srv == null ? null : ((st.G - k) % 2 === 0 ? st.srv : 1 - st.srv);
+  const pts = [{x: 0, p: cal.pre.p, l: 'Start', sc: '0-0'}], div = [];
+  const done = [];   // finished sets so far, as {a, b, fin}
+  let k = 0, sa = 0, sb = 0;
+  st.sets.forEach((x, j) => {
+    const seq = tnSeq(x.a, x.b, srvAt(k), x.fin ? (x.a > x.b ? 0 : 1) : null);
+    let a = 0, b = 0;
+    seq.forEach((w, i) => {
+      if (w === 0) a++; else b++; k++;
+      const fin = i === seq.length - 1 && x.fin;
+      if (fin) { if (a > b) sa++; else sb++; }
+      const over = sa === cal.need || sb === cal.need, setsNow = done.concat([{a, b, fin}]);
+      const sc = setsNow.map(q => q.a + '-' + q.b).join(' ');
+      if (over) { pts.push({x: k, p: sa === cal.need ? 1 : 0, l: 'Final', sc}); return; }
+      const stk = {sets: setsNow, srv: srvAt(k), G: k};
+      const w2 = tnPost(cal, stk, setsNow.length, true);
+      const p = tnMix(cal, stk, w2, sa, sb, fin ? 0 : a, fin ? 0 : b, srvAt(k)).win;
+      pts.push({x: k, p, sc, l: fin ? 'S' + (j + 1) : ''});
+    });
+    if (x.fin) { done.push({a: x.a, b: x.b, fin: true}); div.push({x: k, l: 'S' + (j + 1)}); }
+  });
+  if (m.state === 'in') { const q = pts[pts.length - 1]; q.p = live.win; q.l = 'Now'; }
+  return (TN_PATH[key] = {pts, div});
+}
+// the chart: each player's chance (top = the player shown first), a 50% midline, set dividers S1 / S2 / S3,
+// a dot per game, tap or hover for the value. Drawn at the size it is shown (no stretched text).
+function tnChart(m, P) {
+  const pts = P.pts; if (pts.length < 2) return '';
+  // drawn at the width it is shown, so its text is the card's size at 390px and 1280px alike
+  const box = document.getElementById('gcBox'), cw = box && box.clientWidth ? box.clientWidth - 34 : innerWidth - 50;
+  const W = Math.round(Math.max(280, Math.min(760, cw))), Hh = W < 420 ? 170 : 200, L = 62, Rr = 12, T = 14, B = 22, X = Math.max(1, pts[pts.length - 1].x);
+  const x = v => L + v / X * (W - L - Rr), y = p => T + (1 - p) * (Hh - T - B);
   const path = pts.map((q, i) => (i ? 'L' : 'M') + x(q.x).toFixed(1) + ' ' + y(q.p).toFixed(1)).join(' ');
-  const area = path + ` L ${x(pts[pts.length - 1].x).toFixed(1)} ${y(0.5)} L ${x(0)} ${y(0.5)} Z`;
-  const last = String(m.p[0].name).split(' ').pop(), last1 = String(m.p[1].name).split(' ').pop();
-  return `<svg class="tc-chart" viewBox="0 0 ${W} ${Hh}" preserveAspectRatio="none">
-    <defs><linearGradient id="wpG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b038f9" stop-opacity=".45"/><stop offset="1" stop-color="#635bff" stop-opacity=".05"/></linearGradient></defs>
-    <line x1="30" x2="${W - 20}" y1="${y(0.5)}" y2="${y(0.5)}" stroke="rgba(255,255,255,.18)" stroke-dasharray="4 4"/>
-    <text x="4" y="${y(1) + 4}" class="tc-ax">${esc(last)}</text><text x="4" y="${y(0) + 4}" class="tc-ax">${esc(last1)}</text>
-    <path d="${area}" fill="url(#wpG)"/><path d="${path}" fill="none" stroke="#c77dff" stroke-width="2.5" stroke-linejoin="round"/>
-    ${pts.filter(q => q.l).map(q => `<circle cx="${x(q.x)}" cy="${y(q.p)}" r="${q.l === 'Now' ? 5 : 3.5}" fill="${q.l === 'Now' ? '#61e970' : '#fff'}"/><text x="${Math.min(W - 24, x(q.x) + 4)}" y="${Math.max(10, y(q.p) - 7)}" class="tc-ax">${esc(q.l)}</text>`).join('')}
-  </svg>`;
+  const last = i => String(m.p[i].name).split(' ').pop();
+  const now = pts[pts.length - 1], nx = x(now.x);
+  // the "Now" value sits in a corner of the plot no point is in (top or bottom, right or left)
+  const nowTxt = (now.l === 'Now' ? 'Now ' : now.l === 'Final' ? 'Final ' : '') + (now.p >= 0.5 ? last(0) : last(1)) + ' ' + Math.round(100 * Math.max(now.p, 1 - now.p)) + '%';
+  const tw = nowTxt.length * 7.2 + 8, th = 16, spots = [[W - Rr - 6 - tw, Hh - B - 6 - th], [W - Rr - 6 - tw, T + 6], [L + 8, Hh - B - 6 - th], [L + 8, T + 6]];
+  if (now.p < 0.5) spots.unshift(spots.splice(1, 1)[0]);
+  const clear = ([bx, by]) => pts.every(q => { const px = x(q.x), py = y(q.p); return px < bx - 7 || px > bx + tw + 7 || py < by - 7 || py > by + th + 7; });
+  const spot = spots.find(clear) || spots[0];
+  const data = esc(JSON.stringify(pts.map(q => [q.x, Math.round(q.p * 1000) / 10, q.sc || '', q.l || ''])));
+  return `<div class="tc-wrap"><svg class="tc-chart" viewBox="0 0 ${W} ${Hh}" data-pts="${data}" data-x0="${L}" data-x1="${W - Rr}" data-n="${X}" data-p0="${esc(last(0))}" data-p1="${esc(last(1))}"
+      onpointermove="tnTip(event,this)" onpointerdown="tnTip(event,this)" onpointerleave="tnTip(null,this)">
+    <defs><linearGradient id="wpG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b038f9" stop-opacity=".40"/><stop offset="1" stop-color="#635bff" stop-opacity=".04"/></linearGradient></defs>
+    <rect x="${L}" y="${T}" width="${W - L - Rr}" height="${Hh - T - B}" fill="rgba(255,255,255,.015)"/>
+    ${P.div.filter(d => d.x < X).map(d => `<line x1="${x(d.x)}" x2="${x(d.x)}" y1="${T}" y2="${Hh - B}" stroke="rgba(255,255,255,.14)"/><text x="${x(d.x) + 4}" y="${Hh - 7}" class="tc-ax">${d.l}</text>`).join('')}
+    <line x1="${L}" x2="${W - Rr}" y1="${y(0.5)}" y2="${y(0.5)}" stroke="rgba(255,255,255,.22)" stroke-dasharray="4 4"/>
+    <text x="${L - 8}" y="${y(1) + 4}" class="tc-ax" text-anchor="end">${esc(last(0))}</text>
+    <text x="${L - 8}" y="${y(0.5) + 4}" class="tc-ax" text-anchor="end">50%</text>
+    <text x="${L - 8}" y="${y(0) + 4}" class="tc-ax" text-anchor="end">${esc(last(1))}</text>
+    <path d="${path} L ${nx.toFixed(1)} ${y(0.5)} L ${x(0)} ${y(0.5)} Z" fill="url(#wpG)"/>
+    <path d="${path}" fill="none" stroke="#c77dff" stroke-width="2.5" stroke-linejoin="round"/>
+    ${pts.length <= 90 ? pts.slice(0, -1).map(q => `<circle cx="${x(q.x).toFixed(1)}" cy="${y(q.p).toFixed(1)}" r="${/^S/.test(q.l) ? 3.6 : 2.2}" fill="${/^S/.test(q.l) ? '#fff' : '#c77dff'}"/>`).join('') : ''}
+    <circle cx="${nx.toFixed(1)}" cy="${y(now.p).toFixed(1)}" r="5.5" fill="${now.l === 'Now' ? '#61e970' : '#fff'}"/>
+    <text x="${(spot[0] + 4).toFixed(1)}" y="${(spot[1] + th - 4).toFixed(1)}" class="tc-ax tc-now">${esc(nowTxt)}</text>
+    <line class="tc-cur" x1="0" x2="0" y1="${T}" y2="${Hh - B}" stroke="rgba(255,255,255,.5)" visibility="hidden"/>
+  </svg><div class="tc-tip">Tap or hover the chart for the chance after each game.</div>
+  <div class="tc-note">After every game. ESPN sends each set's score, not the order of its games, so games inside a set are placed in serve order (set ends are exact).</div></div>`;
+}
+function tnTip(ev, svg) {
+  const tip = svg.parentNode.querySelector('.tc-tip'), cur = svg.querySelector('.tc-cur');
+  if (!ev) { if (cur) cur.setAttribute('visibility', 'hidden'); return; }
+  const pts = JSON.parse(svg.dataset.pts), r = svg.getBoundingClientRect(), vb = svg.viewBox.baseVal;
+  const vx = (ev.clientX - r.left) / r.width * vb.width, x0 = +svg.dataset.x0, x1 = +svg.dataset.x1, n = +svg.dataset.n;
+  const g = Math.round(Math.max(0, Math.min(1, (vx - x0) / (x1 - x0))) * n);
+  const q = pts.reduce((b, p) => Math.abs(p[0] - g) < Math.abs(b[0] - g) ? p : b, pts[0]);
+  const xx = x0 + q[0] / n * (x1 - x0);
+  if (cur) { cur.setAttribute('x1', xx); cur.setAttribute('x2', xx); cur.setAttribute('visibility', 'visible'); }
+  const p = q[1];
+  tip.innerHTML = `<b>${q[3] === 'Start' ? 'Start' : q[3] === 'Now' ? 'Now' : 'After game ' + q[0]}</b>${q[2] ? ' · ' + esc(q[2]) : ''} · ${esc(svg.dataset.p0)} <b>${p.toFixed(0)}%</b> · ${esc(svg.dataset.p1)} <b>${(100 - p).toFixed(0)}%</b>`;
 }
 function matchCenter(id) {
   const [e, m] = tnFind(id); if (!m) return '';
@@ -1540,6 +1549,7 @@ function matchCenter(id) {
   const log = ((TN_LOG[m.id] || {}).g || []).slice().reverse().slice(0, 14);
   const setsTbl = st.sets.length ? `<div class="tn-sets-t">${st.sets.map((x, j) => `<div><span>Set ${j + 1}</span><b>${x.a}-${x.b}${x.tb ? '<sup>TB</sup>' : ''}</b><em>${x.net == null ? (x.fin ? (x.a > x.b ? last(0) : last(1)) : 'in play') : x.net === 0 ? (x.tb ? 'no breaks to TB' : 'on serve') : last(x.net > 0 ? 0 : 1) + ' +' + Math.abs(x.net) + ' break' + (Math.abs(x.net) > 1 ? 's' : '')}</em></div>`).join('')}</div>` : '';
   return `<div class="gc" id="gc">${nav}<div class="mc-top"><span>${esc(e.tour)} · ${esc(e.name)} · ${esc(m.round || '')}${tnBestOf(e) === 5 ? ' · best of 5' : ''}</span><span class="${m.state === 'in' ? 'live' : ''}">${m.state === 'in' ? '● ' + esc(m.detail || 'Live') : m.state === 'post' ? esc(m.detail || 'Final') : esc(tipTime(m.start))}</span></div>
+    <div class="mc-p mc-h"><i></i><div class="mc-nm"></div><i></i><div class="mc-sets">${(m.p[0].sets.length ? m.p[0].sets : [0]).map((v, j) => `<span class="${m.state === 'in' && j === m.p[0].sets.length - 1 ? 'cur' : ''}">${m.state === 'in' && j === m.p[0].sets.length - 1 ? 'Now' : 'S' + (j + 1)}</span>`).join('')}</div><div class="mc-sw">Sets</div></div>
     ${row(m.p[0], 0)}${row(m.p[1], 1)}
     ${sit ? `<div class="tn-sit${/serving for|Tiebreak/.test(sit) ? ' hot' : ''}">${esc(sit)}</div>` : ''}
     ${tnCourt(e, m, st)}
@@ -2364,6 +2374,7 @@ if (TEAMK) RENDER.depth = renderDepth;
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => setTimeout(dpMenuTile, 0)); else setTimeout(dpMenuTile, 0);
   gotoTab(RENDER[h[0]] ? h[0] : 'home');
   pollLive();
+  if (window.OnyxLive) OnyxLive.mount({sport: SD.sport, home: 'oxLiveHome', games: 'oxLiveGames'});   // live value + spot plays (live.js)
   setTimeout(ypLoop, 2500);
   if ('serviceWorker' in navigator && location.protocol === 'https:') addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 })();

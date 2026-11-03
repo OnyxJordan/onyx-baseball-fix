@@ -179,7 +179,9 @@ async function chat(env, system, user, name, schema, maxTokens) {
 // site ("Live line"). Cached 20 seconds per sport, so every visitor shares one pull.
 const OPTIC = "https://api.opticodds.com/api/v3";
 const LIVE_LG = { nfl: [["football", "nfl"]], cfb: [["football", "ncaaf"]], nba: [["basketball", "nba"]], nhl: [["hockey", "nhl"]],
-  tennis: [["tennis", "atp"], ["tennis", "wta"]] };
+  cbb: [["basketball", "ncaab"]], tennis: [["tennis", "atp"], ["tennis", "wta"]] };
+// fixtures priced per call: college basketball and tennis run many games at once (11/3)
+const LIVE_MAX = { cbb: 40, tennis: 40 };
 const LIVE_BOOKS = ["draftkings", "fanduel", "betmgm", "caesars", "pinnacle"];
 const LIVE_MK = {
   moneyline: "ml", point_spread: "spread", puck_line: "spread", game_spread: "spread", total_points: "total", total_goals: "total", total_games: "total",
@@ -189,7 +191,7 @@ const LIVE_MK = {
 };
 const LIVE_PROPS = { nfl: ["anytime_touchdown_scorer", "player_receptions", "player_receiving_yards", "player_rushing_yards", "player_passing_yards"],
   cfb: ["anytime_touchdown_scorer", "player_receiving_yards", "player_rushing_yards", "player_passing_yards"],
-  nba: ["player_points", "player_rebounds", "player_assists", "player_made_threes"], nhl: ["player_goals", "player_shots_on_goal"], tennis: [] };
+  nba: ["player_points", "player_rebounds", "player_assists", "player_made_threes"], nhl: ["player_goals", "player_shots_on_goal"], cbb: [], tennis: [] };
 function american(v) {
   const x = Number(v);
   if (!isFinite(x) || x === 0) return null;
@@ -212,7 +214,7 @@ async function liveSport(env, sport) {
     const mk = ["moneyline", sport === "nhl" ? "puck_line" : sport === "tennis" ? "game_spread" : "point_spread",
       sport === "nhl" ? "total_goals" : sport === "tennis" ? "total_games" : "total_points"].concat(LIVE_PROPS[sport] || []);
     const mq = mk.map((m) => "&market=" + encodeURIComponent(m)).join("") + LIVE_BOOKS.map((b) => "&sportsbook=" + b).join("");
-    for (let i = 0; i < fx.length && i < 20; i += 5) {
+    for (let i = 0; i < fx.length && i < (LIVE_MAX[sport] || 20); i += 5) {
       const ids = fx.slice(i, i + 5).map((f) => "&fixture_id=" + encodeURIComponent(f.id)).join("");
       const j = await optic(env, `/fixtures/odds?sport=${sp}&league=${lg}&odds_format=AMERICAN${ids}${mq}`).catch(() => ({}));
       for (const row of j.data || []) {
