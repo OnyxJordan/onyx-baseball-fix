@@ -658,5 +658,93 @@
   "model": "v2",
   "result": null,
   "actual": null
+ },
+ {
+  "date": "2026-11-03",
+  "key": "401856744|rueben owens|rush_yds",
+  "gid": "401856744",
+  "pid": "4870934",
+  "name": "Rueben Owens II",
+  "team": "TA&M",
+  "opp": "SC",
+  "matchup": "TA&M @ SC",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 43.5,
+  "price": -114,
+  "sel": "3c964706-5cd1-4a62-9061-5247812b1f9f",
+  "proj": 34.0,
+  "prob": 0.5937,
+  "implied": 0.5327,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.75,
+    "avg": 0.77,
+    "pp": -0.5
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.96,
+    "avg": 0.93,
+    "pp": -0.5
+   },
+   {
+    "k": "line vs his usual range",
+    "v": 0.07,
+    "avg": -0.05,
+    "pp": -0.1
+   }
+  ],
+  "opened_at": "2026-11-03T10:11:46+00:00",
+  "logged_at": "2026-11-03T10:11:46+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-03",
+  "key": "401856744|marcel reed|rush_yds",
+  "gid": "401856744",
+  "pid": "4870971",
+  "name": "Marcel Reed",
+  "team": "TA&M",
+  "opp": "SC",
+  "matchup": "TA&M @ SC",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 26.5,
+  "price": -114,
+  "sel": "39eba80a-b08e-43d1-90c8-f3ca043aa65a",
+  "proj": 21.0,
+  "prob": 0.5935,
+  "implied": 0.5327,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.75,
+    "avg": 0.77,
+    "pp": -0.5
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.96,
+    "avg": 0.93,
+    "pp": -0.5
+   },
+   {
+    "k": "line vs his usual range",
+    "v": 0.05,
+    "avg": -0.05,
+    "pp": -0.1
+   }
+  ],
+  "opened_at": "2026-11-03T10:11:46+00:00",
+  "logged_at": "2026-11-03T10:11:46+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
  }
 ]
