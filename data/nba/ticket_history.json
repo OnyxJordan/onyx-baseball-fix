@@ -411,5 +411,60 @@
   "pnl": -10.0,
   "locked_at": "2026-11-01T20:54:29+00:00",
   "graded_at": "2026-11-02T04:38:20+00:00"
+ },
+ {
+  "date": "2026-11-02",
+  "stake": 10.0,
+  "data_src": "optic",
+  "legs": [
+   {
+    "pid": "DE0B19290551",
+    "player": "Dyson Daniels",
+    "team": "ATL",
+    "opp": "IND",
+    "gid": "20261103AF3A7292",
+    "stat": "ast",
+    "side": "under",
+    "line": 6.5,
+    "odds": -141,
+    "prob": 0.5901,
+    "proj": 5.0,
+    "sel": "c3f9a103-1662-4d64-bdcf-6fb3a8969075",
+    "hit": null
+   },
+   {
+    "pid": "4D75B4BFBA80",
+    "player": "Shai Gilgeous-Alexander",
+    "team": "OKC",
+    "opp": "CLE",
+    "gid": "2026110356FAE6C4",
+    "stat": "reb",
+    "side": "over",
+    "line": 3.5,
+    "odds": -149,
+    "prob": 0.5791,
+    "proj": 4.72,
+    "sel": "f2325ba8-1ca5-45b2-933d-d8f79907d212",
+    "hit": null
+   },
+   {
+    "pid": "F440F34A2C39194A",
+    "player": "Caleb Wilson",
+    "team": "CHI",
+    "opp": "PHI",
+    "gid": "20261103A01EB797",
+    "stat": "reb",
+    "side": "over",
+    "line": 5.5,
+    "odds": -144,
+    "prob": 0.579,
+    "proj": 7.24,
+    "sel": "38955610-05a2-4ce4-bf22-8d47aa644366",
+    "hit": null
+   }
+  ],
+  "result": null,
+  "pnl": null,
+  "locked_at": "2026-11-03T00:18:46+00:00"
  }
 ]
