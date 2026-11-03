@@ -922,5 +922,49 @@
   "model": "v2",
   "result": null,
   "actual": null
+ },
+ {
+  "date": "2026-11-03",
+  "key": "401860912|cornell hatcher|rush_yds",
+  "gid": "401860912",
+  "pid": "5167313",
+  "name": "Cornell Hatcher Jr.",
+  "team": "ORST",
+  "opp": "TXST",
+  "matchup": "ORST vs TXST",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 37.5,
+  "price": -114,
+  "sel": "345eb381-1ce8-4c37-b165-f2356ce8f463",
+  "proj": 31.1,
+  "prob": 0.5836,
+  "implied": 0.5327,
+  "why": [
+   {
+    "k": "line vs his usual range",
+    "v": 0.2,
+    "avg": -0.05,
+    "pp": -0.2
+   },
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.77,
+    "avg": 0.77,
+    "pp": 0.1
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.93,
+    "avg": 0.93,
+    "pp": 0.0
+   }
+  ],
+  "opened_at": "2026-11-03T18:24:44+00:00",
+  "logged_at": "2026-11-03T18:24:44+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
  }
 ]
