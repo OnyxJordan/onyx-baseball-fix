@@ -110,10 +110,10 @@
    "need": 2
   },
   "model": "live-v1",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "9-13",
+  "profit": 0.7874,
+  "graded_at": "2026-11-03T18:58:53+00:00"
  },
  {
   "id": "tennis-186719-ml-home",
@@ -310,6 +310,35 @@
   "state": {
    "sets": "1-6 0-4",
    "srv": "home",
+   "need": 2
+  },
+  "model": "live-v1",
+  "result": "L",
+  "actual": "12-1",
+  "profit": -1.0,
+  "graded_at": "2026-11-03T18:58:54+00:00"
+ },
+ {
+  "id": "tennis-186580-total-under",
+  "sport": "tennis",
+  "gid": "186580",
+  "date": "2026-11-03",
+  "logged_at": "2026-11-03T18:58:52+00:00",
+  "matchup": "Simona Waltert vs Sahaja Yamalapalli",
+  "home": "Sahaja Yamalapalli",
+  "away": "Simona Waltert",
+  "label": "Under 22.5 games",
+  "kind": "total",
+  "side": "under",
+  "line": 22.5,
+  "price": -110,
+  "chance": 0.5535,
+  "implied": 0.5238,
+  "edge": 0.03,
+  "fair": -125,
+  "state": {
+   "sets": "6-4 1-2",
+   "srv": "away",
    "need": 2
   },
   "model": "live-v1",

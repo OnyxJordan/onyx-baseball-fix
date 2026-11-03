@@ -966,5 +966,181 @@
   "model": "v2",
   "result": null,
   "actual": null
+ },
+ {
+  "date": "2026-11-03",
+  "key": "401856855|noah fifita|rush_yds",
+  "gid": "401856855",
+  "pid": "4801717",
+  "name": "Noah Fifita",
+  "team": "ARIZ",
+  "opp": "TCU",
+  "matchup": "ARIZ vs TCU",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 10.5,
+  "price": -114,
+  "sel": "90c8f561-b369-4f8d-a5a3-e191a7cd79eb",
+  "proj": 9.2,
+  "prob": 0.5995,
+  "implied": 0.5327,
+  "why": [
+   {
+    "k": "carries the defense allows",
+    "v": 0.98,
+    "avg": 0.93,
+    "pp": -0.9
+   },
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.73,
+    "avg": 0.77,
+    "pp": -0.8
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.09,
+    "avg": -0.05,
+    "pp": 0.0
+   }
+  ],
+  "opened_at": "2026-11-03T18:58:16+00:00",
+  "logged_at": "2026-11-03T18:58:16+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-03",
+  "key": "401856855|kedrick reescano|rush_yds",
+  "gid": "401856855",
+  "pid": "4899361",
+  "name": "Kedrick Reescano",
+  "team": "ARIZ",
+  "opp": "TCU",
+  "matchup": "ARIZ vs TCU",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 37.5,
+  "price": -114,
+  "sel": "5b828cd5-18c0-4427-a0e8-393d92e13a7a",
+  "proj": 34.1,
+  "prob": 0.5983,
+  "implied": 0.5327,
+  "why": [
+   {
+    "k": "carries the defense allows",
+    "v": 0.98,
+    "avg": 0.93,
+    "pp": -0.9
+   },
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.73,
+    "avg": 0.77,
+    "pp": -0.8
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.21,
+    "avg": -0.05,
+    "pp": 0.2
+   }
+  ],
+  "opened_at": "2026-11-03T18:58:16+00:00",
+  "logged_at": "2026-11-03T18:58:16+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-03",
+  "key": "401856856|michael hawkins|rush_yds",
+  "gid": "401856856",
+  "pid": "5079465",
+  "name": "Michael Hawkins Jr.",
+  "team": "WVU",
+  "opp": "TTU",
+  "matchup": "WVU @ TTU",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 79.5,
+  "price": -114,
+  "sel": "142800b7-5b3c-46b9-8dd9-7b3cd49831dc",
+  "proj": 83.4,
+  "prob": 0.5959,
+  "implied": 0.5327,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.61,
+    "avg": 0.77,
+    "pp": -3.6
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.85,
+    "avg": 0.93,
+    "pp": 1.4
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -1.12,
+    "avg": -0.05,
+    "pp": 1.0
+   }
+  ],
+  "opened_at": "2026-11-03T18:58:16+00:00",
+  "logged_at": "2026-11-03T18:58:16+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-03",
+  "key": "401856856|cam cook|rush_yds",
+  "gid": "401856856",
+  "pid": "4918103",
+  "name": "Cam Cook",
+  "team": "WVU",
+  "opp": "TTU",
+  "matchup": "WVU @ TTU",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 89.5,
+  "price": -114,
+  "sel": "3735fd60-49b9-4fbf-8778-ebb6c2b95030",
+  "proj": 91.6,
+  "prob": 0.6017,
+  "implied": 0.5327,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.61,
+    "avg": 0.77,
+    "pp": -3.6
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.85,
+    "avg": 0.93,
+    "pp": 1.4
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.5,
+    "avg": -0.05,
+    "pp": 0.4
+   }
+  ],
+  "opened_at": "2026-11-03T18:58:16+00:00",
+  "logged_at": "2026-11-03T18:58:16+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
  }
 ]
