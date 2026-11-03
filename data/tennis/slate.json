@@ -1667,8 +1667,8 @@
     {
      "id": "186484",
      "start": "2026-11-03T20:00Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 2",
      "draw": "Men's Singles",
      "court": "Court Central",
@@ -1690,10 +1690,10 @@
        "short": "C. Ruud",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/nor.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        4
+        6
        ],
        "serve": false
       }
@@ -2144,9 +2144,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Casper Ruud",
+       "short": "C. Ruud",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/nor.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -5920,8 +5920,8 @@
     {
      "id": "186721",
      "start": "2026-11-03T18:25Z",
-     "state": "in",
-     "detail": "3rd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Campo 3",
@@ -5931,11 +5931,11 @@
        "short": "D. Papamichail",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/gre.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
         5,
-        3
+        6
        ],
        "serve": false
       },
@@ -5948,9 +5948,9 @@
        "sets": [
         2,
         7,
-        3
+        4
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -5993,7 +5993,7 @@
      "id": "186710",
      "start": "2026-11-03T20:10Z",
      "state": "in",
-     "detail": "2nd",
+     "detail": "3rd",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Campo 5",
@@ -6006,7 +6006,8 @@
        "win": false,
        "sets": [
         6,
-        2
+        3,
+        0
        ],
        "serve": false
       },
@@ -6018,17 +6019,18 @@
        "win": false,
        "sets": [
         3,
-        3
+        6,
+        0
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
     {
      "id": "186706",
-     "start": "2026-11-03T21:30Z",
+     "start": "2026-11-03T21:45Z",
      "state": "pre",
-     "detail": "11/3 - 4:30 PM EST",
+     "detail": "11/3 - 4:45 PM EST",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Campo 3",
@@ -6101,9 +6103,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Despina Papamichail",
+       "short": "D. Papamichail",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/gre.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -7732,5 +7734,5 @@
    ]
   }
  ],
- "fetched": "2026-11-03T21:15:06+00:00"
+ "fetched": "2026-11-03T21:44:00+00:00"
 }
