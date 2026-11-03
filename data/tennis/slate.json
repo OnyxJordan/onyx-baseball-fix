@@ -3097,9 +3097,9 @@
     },
     {
      "id": "186626",
-     "start": "2026-11-03T06:00Z",
+     "start": "2026-11-03T06:10Z",
      "state": "pre",
-     "detail": "11/3 - 1:00 AM EST",
+     "detail": "11/3 - 1:10 AM EST",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Court 1",
@@ -3126,9 +3126,9 @@
     },
     {
      "id": "186623",
-     "start": "2026-11-03T06:00Z",
+     "start": "2026-11-03T06:10Z",
      "state": "pre",
-     "detail": "11/3 - 1:00 AM EST",
+     "detail": "11/3 - 1:10 AM EST",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Centre Court",
@@ -4264,8 +4264,8 @@
     {
      "id": "186581",
      "start": "2026-11-03T05:35Z",
-     "state": "pre",
-     "detail": "11/3 - 12:35 AM EST",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Court 1",
@@ -4276,7 +4276,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ser.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        3
+       ],
        "serve": false
       },
       {
@@ -4285,7 +4287,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        4
+       ],
        "serve": false
       }
      ]
@@ -4293,8 +4297,8 @@
     {
      "id": "186583",
      "start": "2026-11-03T05:35Z",
-     "state": "pre",
-     "detail": "11/3 - 12:35 AM EST",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Centre Court",
@@ -4305,8 +4309,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/tpo.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        4
+       ],
+       "serve": true
       },
       {
        "name": "Jil Teichmann",
@@ -4314,16 +4320,18 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/sui.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        2
+       ],
        "serve": false
       }
      ]
     },
     {
      "id": "186577",
-     "start": "2026-11-03T05:35Z",
-     "state": "pre",
-     "detail": "11/3 - 12:35 AM EST",
+     "start": "2026-11-03T05:40Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Court 2",
@@ -4334,7 +4342,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        3
+       ],
        "serve": false
       },
       {
@@ -4343,8 +4353,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/hun.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        3
+       ],
+       "serve": true
       }
      ]
     },
@@ -7364,5 +7376,5 @@
    ]
   }
  ],
- "fetched": "2026-11-03T05:33:59+00:00"
+ "fetched": "2026-11-03T06:07:00+00:00"
 }
