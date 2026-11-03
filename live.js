@@ -641,7 +641,17 @@
   function logoImg(u, cls) { return u ? '<img class="' + (cls || 'lv-lg') + '" src="' + esc(u) + '" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">' : '<span class="' + (cls || 'lv-lg') + ' lv-nolg"></span>'; }
   var ONYX = 'https://app.onyxodds.com/?referrer=' + REF;
   function onyxSel(sel) { return sel ? 'https://app.onyxodds.com/share?selection=' + encodeURIComponent(sel) + '&referrer=' + REF : ONYX; }
-  function gameHref(g) { return (PAGE[g.sport] || 'home.html') + (g.sport === 'nba' || g.sport === 'tennis' ? '#games' : '#games:' + g.gid); }
+  // "Open the game": the sport page's Games tab on this game (#games:<ESPN id>). On that sport's own page the
+  // click is handled in place by the opener the page registers in mount() (a same-page hash change alone does
+  // nothing); from another page the target page reads the hash when it loads.
+  function gameHref(g) { return (PAGE[g.sport] || 'home.html') + '#games:' + encodeURIComponent(g.gid || ''); }
+  var OPEN = {};
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('[data-lv-open]'); if (!a) return;
+    var f = OPEN[a.getAttribute('data-lv-sport')]; if (!f) return;      // another sport's page: follow the link
+    e.preventDefault();
+    try { f(a.getAttribute('data-lv-open'), a.getAttribute('data-lv-a') || '', a.getAttribute('data-lv-h') || ''); } catch (x) { location.href = a.href; }
+  });
   // the card for one game: the best live bet first (started, live line, our fair), then the score and the rest of our numbers
   function card(g) {
     var hw = g.home_win, aw = 1 - hw, pre = g.pre || {}, L = g.lean, ten = g.sport === 'tennis';
@@ -682,7 +692,7 @@
     var more = '<div class="lv-more"><span>Our ' + (ten ? 'game spread' : 'spread') + ' now <b>' + esc(g.fair_spread || '-') + '</b></span><span>Our total now <b>' + (g.proj_total != null ? g.proj_total.toFixed(1) : '-') + (ten ? ' games' : '') + '</b></span>' + (pre.spread_txt ? '<span>Onyx pregame <b>' + esc(pre.spread_txt) + (pre.total_txt ? ' · ' + esc(pre.total_txt) : '') + '</b></span>' : '') + '</div>';
     return '<div class="lv-card"><div class="lv-top"><span class="lv-tag">' + (NAME[g.sport] || '') + '</span><span class="lv-clock">' + esc(g.detail || 'Live') + '</span></div>'
       + teams + '<div class="lv-bar"><i style="width:' + (100 * aw).toFixed(1) + '%"></i></div>' + lean + more
-      + '<div class="lv-f"><a class="go" href="' + ONYX + '" target="_blank" rel="noopener">Bet it live on Onyx</a><a href="' + gameHref(g) + '">Open the game</a></div></div>';
+      + '<div class="lv-f"><a class="go" href="' + ONYX + '" target="_blank" rel="noopener">Bet it live on Onyx</a><a href="' + gameHref(g) + '" data-lv-open="' + esc(g.gid || '') + '" data-lv-sport="' + esc(g.sport) + '" data-lv-a="' + esc(g.away || '') + '" data-lv-h="' + esc(g.home || '') + '">Open the game</a></div></div>';
   }
   // the sentence a play leads with: "Value right now: Sinner to win at +120 live. Our chance 52%, the live line says 45%: +7 points."
   function sentence(b, g) {
@@ -751,6 +761,7 @@
   function mount(o) {
     css();
     var sport = o.sport, live = LIVE_SPORTS.indexOf(sport) >= 0;
+    if (typeof o.open === 'function') OPEN[sport] = o.open;
     var st = {G: [], all: false, timer: null, rows: null, led: [], sport: sport};
     function draw() {
       var rec = recordHTML(st.led, sport), lb = live ? '<div class="lvb">' + blockHTML(sport, st.G, {all: st.all, rec: rec}) + '</div>' : '';

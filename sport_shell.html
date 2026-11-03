@@ -1220,6 +1220,15 @@ function ypLoop() {
 }
 // ── tennis live tracker: match center, followed players, alerts ──
 var OPEN_MATCH = null, TN_PREV = {};
+// a live card's match (ESPN competition id, or the two names) -> this page's match id, or null
+function tnLiveId(id, a, h) {
+  if (tnFind(id)[1]) return id;
+  const k = x => String(x || '').toLowerCase().normalize('NFD').replace(/[^a-z]/g, '');
+  if (a || h) for (const e of SD.events || []) for (const m of e.matches || []) {
+    const n = (m.p || []).map(x => k(x.name)); if (n.includes(k(a)) && n.includes(k(h))) return m.id;
+  }
+  return null;
+}
 function tnFind(id) { for (const e of SD.events || []) for (const m of e.matches || []) if (m.id === id) return [e, m]; return [null, null]; }
 function tnGames(m) { return m.p.map(x => x.sets.reduce((a, b) => a + (+b || 0), 0)); }
 function tnSetsWon(m, sets, state) {
@@ -2369,12 +2378,13 @@ if (TEAMK) RENDER.depth = renderDepth;
   const art = document.getElementById('heroArt');
   if (art) { art.dataset.oxArt = C.art || 'field'; art.dataset.oxTone = C.tone || 'purple'; art.dataset.oxFade = '0'; }
   const h = (location.hash || '').replace('#', '').split(':');
-  if (h[0] === 'games' && h[1]) OPEN_GAME = h[1];
+  if (h[0] === 'games' && h[1]) { if (KIND === 'tennis') OPEN_MATCH = tnLiveId(decodeURIComponent(h[1])); else OPEN_GAME = decodeURIComponent(h[1]); }
   if (h[0] === 'depth' && h[1]) DEPTH_TEAM = decodeURIComponent(h[1]);
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => setTimeout(dpMenuTile, 0)); else setTimeout(dpMenuTile, 0);
   gotoTab(RENDER[h[0]] ? h[0] : 'home');
   pollLive();
-  if (window.OnyxLive) OnyxLive.mount({sport: SD.sport, home: 'oxLiveHome', games: 'oxLiveGames'});   // live value + spot plays (live.js)
+  if (window.OnyxLive) OnyxLive.mount({sport: SD.sport, home: 'oxLiveHome', games: 'oxLiveGames',
+    open: (id, a, h) => { if (KIND === 'tennis') { const m = tnLiveId(id, a, h); if (m) openMatch(m); else gotoTab('games'); } else openGame(id); }});   // live value + spot plays (live.js)
   setTimeout(ypLoop, 2500);
   if ('serviceWorker' in navigator && location.protocol === 'https:') addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 })();

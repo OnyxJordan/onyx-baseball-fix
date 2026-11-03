@@ -1790,6 +1790,14 @@ var gcSel = null, gcView = 'overview';
 var LIVE = {};          // gid -> {espn event id, linescores, clock}
 var SUMMARY = {};       // gid -> ESPN summary (box + win probability)
 function openGame(gid) { gcSel = gid; gotoTab('games'); }
+// a live card's game (ESPN event id) -> this page's game id (LIVE maps gid -> ESPN id once the scoreboard polls)
+function nbaGid(id, a, h) {
+  if ((D.games || []).some(g => g.gid === id)) return id;
+  for (const k in LIVE) if (String((LIVE[k] || {}).eid) === String(id)) return k;
+  const t = x => String(x || '').toUpperCase();
+  const g = (a || h) && (D.games || []).find(g => t(g.away) === t(a) && t(g.home) === t(h));   // by teams, when ids differ
+  return g ? g.gid : null;
+}
 function gcPick() {
   const gs = D.games || [];
   if (gcSel && gameOf(gcSel)) return gameOf(gcSel);
@@ -3420,11 +3428,17 @@ document.addEventListener('DOMContentLoaded', function () {
   renderHeader();
   renderTicker();
   renderParlaySlip();
-  const h = (location.hash || '').slice(1);
-  gotoTab(RENDER[h] ? h : 'home');
+  const h = (location.hash || '').slice(1), hg = h.split(':');
+  if (hg[0] === 'games' && hg[1]) {
+    const want = decodeURIComponent(hg[1]), g = nbaGid(want);
+    if (g) gcSel = g;
+    else { let n = 0; const t = setInterval(() => { const x = nbaGid(want); if (x || ++n > 20) { clearInterval(t); if (x) openGame(x); } }, 1000); }   // ESPN ids map after the first poll
+  }
+  gotoTab(RENDER[hg[0]] ? hg[0] : 'home');
   pollLive();
   // live value (live.js); Home already leads with the Model's Parlay and Onyx Picks, so no spot list here
-  if (window.OnyxLive) OnyxLive.mount({sport: 'nba', home: 'oxLiveHome', games: 'oxLiveGames', spot: false});
+  if (window.OnyxLive) OnyxLive.mount({sport: 'nba', home: 'oxLiveHome', games: 'oxLiveGames', spot: false,
+    open: (id, a, h) => { const g = nbaGid(id, a, h); if (g) openGame(g); else gotoTab('games'); }});
   setTimeout(ypLoop, 2500);   // after the first scoreboard poll maps ESPN event ids
 });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') { closePlayer(); closeNav(); } });
