@@ -473,8 +473,8 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
   better only at the opening price and worse at the close, so `cbb_model` stays v2 (numbers in
   its docstring).
   Onyx league `ncaab`: moneyline,
-  spread, total, player points / rebounds / assists / made threes (NBA market ids, not
-  yet confirmed by a markets probe). Gate: `tools/verify_sports.js` renders a real
+  spread, total, player points / rebounds / assists / made threes / PRA (NBA market ids;
+  confirmed by the 11/3 history pull, over-only lines; tested in Onyx Picks, see below). Gate: `tools/verify_sports.js` renders a real
   finished-game box score from `tools/fixtures/cbb_summary.json`.
 - **Template:** Home, Games, Onyx Board, Plays and Model tabs. The page polls ESPN's
   scoreboard live: every 15s while anything is live, otherwise every 30s. Gamecenters
@@ -1881,6 +1881,31 @@ and keep their records; the Onyx Picks record is the one public card across spor
   `data/cbb/backtest.json` that is not on main; the live site blends CBB at `sports_build.DEFAULT_W` (30%), and
   the test replays what the site shows. `picks.py` re-gates on a model VERSION change only, not a blend weight
   change: if a CBB lane backtest lands, re-run this (or wait for the weekly re-test).
+- **College basketball player props (11/3)**: `tools/cbb_props_backtest.py`, rows `cbb` `pts` / `reb` / `ast` / `3pm`
+  / `pra` via `tools/picks_replays.cbb_props`. Onyx's 2025-26 ncaab props pulled with `odds_probe.yml` job=lines
+  (748 games with props, Nov 3 2025 to Mar 2026: points 3,491, rebounds 1,372, made threes 516, assists 156, PRA 62;
+  merged into `data/picks/lines/cbb.json`, which the weekly re-test now extends with these markets), graded on ESPN box
+  scores of all 6,300 games (`bt/cbb_box_2026.json`, 36 did-not-play voids). Walk-forward: the `cbb_stats` preseason
+  projection from 2024-25 only (weights fitted on 2022-2025, minutes on 2023-2025), blended in season (KMIN 1 game,
+  KRATE 50-150 minutes, chosen on Nov-Dec), negative binomial (sd fitted on Nov-Dec player-games), blended with
+  Onyx per stat (weight chosen on Nov-Dec log loss). **Onyx lists the over only** (every line from Jan 2026; 143 of
+  1,155 Nov-Dec lines had an under), and those overs cashed 45.2% against 52.2% implied (points), 39.5% vs 50.4%
+  (rebounds), so the fair over is the implied chance x 0.878 (Nov-Dec). Held out Jan 1 to Apr 9 2026:
+
+  | Stat | Blend (Nov-Dec) | Held out open / close | Model alone (100%) open / close | Verdict |
+  |---|---|---|---|---|
+  | Points | 0% (the projection lost to Onyx's price on Nov-Dec log loss) | no bets | 64-73 -9.8% / 65-72 -8.6% | no bets |
+  | Rebounds | 50% | 4-3 / 0-3 | 32-34 +1.7% / 29-31 +0.5% | not enough yet |
+  | Assists | 100% | 4-3 +16.7% / 5-2 +51.5% | same | not enough yet |
+  | Made threes / PRA | 0% / 70% | no bets | 2-3 / 1-2 | no bets |
+
+  The transfer-aware projection beats "last season's per-minute rate x minutes" only slightly once games are played
+  (held-out points MAE 5.07 vs 5.09, rebounds 2.33 vs 2.33; transfers 4.97 vs 5.01) and does not turn a profit on these
+  prices either (naive, model alone: points -11.1% / -13.9%, rebounds +7.4% / +6.7% on 66). Nothing is close to the bar,
+  so the live site still does not price college props with a model chance and `picks.py` has no made-threes grader.
+  The rows carry their own version (`cbb-props-v1`, not `cbb_model.VERSION`), so even a pass would not log until the
+  live site prices them under that version. The 2025-26 card is kept in `data/picks/lines/cbb_props_frozen.json` for
+  runners without `bt/`, used while its rule signature matches; a 2026-27 walk (live box scores) is not built yet.
 - **Weekly re-test** (`.github/workflows/picks_retest.yml`, Tuesdays 10:17 UTC + Run workflow): pulls the
   last 8 baseball days of Onyx lines for nfl, cfb, nhl, nba, cbb (`tools/onyx_lines_pull.py`, the
   `OPTICODDS_API_KEY` secret), appends them to `data/picks/lines/<sport>.json` (`tools/picks_lines.py merge`:
@@ -1896,8 +1921,7 @@ and keep their records; the Onyx Picks record is the one public card across spor
   while its rule signature (model version, blend, price / edge / EV / chance limits) matches.
   No replay of the live chance (never picks): NBA first basket (corrected open-v4 backtest loses at
   the close) and 1st-half total (board only), NFL receptions v5, passing TDs, rec / passing yards and
-  TDs (excluded by their own tests), college player props, tennis games markets, college
-  basketball (no Onyx history), golf (no Onyx prices), MLB (season closed).
+  TDs (excluded by their own tests), tennis games markets, golf (no Onyx prices), MLB (season closed).
 - **Live** (`picks.py`, pipeline-safe): `daily_top.write` calls `picks.hook(sport, plays)`: grade
   the sport's finished picks, then log each play in a finalized market once (key: sport, game,
   player or side), at the Onyx price shown, before its start, up to 5 a sport a day by expected

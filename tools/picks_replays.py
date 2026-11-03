@@ -23,6 +23,10 @@ the finalize test are the same as every other market.
   cfb props        cfb_players: v1 projections (receptions, receiving and passing yards, 30% blend,
                    the live role guard) and the v2 rushing-yards market model, ESPN box scores
                    (data/cfb/player_games.json), Onyx college props (bt/cfb_props.json)
+  cbb props        tools/cbb_props_backtest.py: the cbb_stats preseason projection (2024-25 only) blended
+                   with this season's games, negative binomial chance, blended per stat with Onyx's over
+                   price (over only in 2025-26), ESPN box scores (bt/cbb_box_2026.json); without bt/ the
+                   2025-26 card comes from data/picks/lines/cbb_props_frozen.json while its signature matches
 """
 import json, math, os, sys
 from collections import defaultdict
@@ -356,4 +360,51 @@ def cfb_props():
                              "data/cfb/player_games.json (ESPN box), bt/cfb_props.json (Onyx open and close)", split, *R[st],
                              held=f"games on or after {split} ({why})",
                              notes="Players with no box line are voids here (Onyx settles them at 0)."))
+    return out
+
+
+# ── college basketball player props (11/3) ──────────────────────────────────────────────
+FROZEN_CBB = os.path.join(ROOT, "data", "picks", "lines", "cbb_props_frozen.json")
+
+
+def cbb_props():
+    """Points, rebounds, assists, made threes, PRA: the 2025-26 walk (tools/cbb_props_backtest.py) when bt/
+    holds its inputs, else its card kept in data/picks/lines/cbb_props_frozen.json while the rule matches."""
+    import cbb_props_backtest as CP
+    PB = _pb()
+    DT = PB.DT
+    sig = f"{CP.RULE_SIG} price{list(DT.PRICE)} edge{DT.MIN_EDGE}-{DT.MAX_EDGE} ev{DT.MIN_EV} conf{DT.MIN_CONF} cap{PB.PK.CAP}"
+    if CP.have_inputs():
+        S = CP.samples()
+        C = {}
+        for st in CP.STATS:
+            C[st] = tuple([c for c in (PB.cand(x["date"], x["key"], x["side"], x["prob"], x["price"], x["won"])
+                                       for x in S if x["s"] == st and x["when"] == w) if c] for w in ("o", "c"))
+        frozen = {"note": "2025-26 Onyx Picks card candidates for college basketball player props (tools/picks_backtest.py "
+                          "via tools/cbb_props_backtest.py), kept so a runner without bt/ can re-test; used only while the "
+                          "rule signature matches", "sig": sig,
+                  "cands": {st: {w: [[c["date"], c["key"][0], c["key"][1], c["side"], c["price"], c["prob"], c["won"]] for c in cs]
+                                 for w, cs in zip(("o", "c"), C[st])} for st in C}}
+        body = json.dumps(frozen, separators=(",", ":"))
+        if not os.path.exists(FROZEN_CBB) or open(FROZEN_CBB).read() != body:
+            open(FROZEN_CBB, "w").write(body)
+    elif os.path.exists(FROZEN_CBB) and json.load(open(FROZEN_CBB)).get("sig") == sig:
+        F = json.load(open(FROZEN_CBB))["cands"]
+        mk = lambda r: {"date": r[0], "key": (r[1], r[2]), "side": r[3], "price": r[4], "prob": r[5],
+                        "ev": DT.ev(r[4], r[5]), "won": r[6]}
+        C = {st: tuple([mk(r) for r in F[st][w]] for w in ("o", "c")) for st in F}
+    else:
+        return []          # no replay for this rule here: carried from the last run
+    out = []
+    for st in CP.STATS:
+        w = CP.W[st]
+        chance = ("Onyx's over price only (the projection did not help on Nov-Dec 2025 log loss)" if w == 0 else
+                  f"projection blended {round(w * 100)}% with Onyx's over price (implied x {CP.ONE_SIDED}, over-only lines)")
+        out.append(PB.market("cbb", st, CP.VERSION, chance,
+                             "tools/cbb_props_backtest.py walk-forward: cbb_stats preseason projection + 2025-26 ESPN box "
+                             "scores; Onyx open and close (data/picks/lines/cbb.json)", CP.SPLIT, *C[st],
+                             held="Jan 1 to Apr 9 2026 (blend weight, in-season weights and spread chosen on Nov-Dec 2025)",
+                             notes="Onyx listed only the over on college props from Jan 2026 (143 of 1,155 Nov-Dec lines had an "
+                                   "under); overs cashed 45% against 52% implied. Model alone (100%): points 64-73 -9.8% open / "
+                                   "-8.6% close, rebounds 32-34 +1.7% / +0.5% held out. Live site does not price these yet."))
     return out
