@@ -200,6 +200,10 @@ def row_id(sport, gid, b):
 
 def log_live(led, url):
     have = {r["id"] for r in led}
+    # one side per market per game (11/3: Waltert and Yamalapalli to win, and Over 20.5 and Under 22.5,
+    # were both logged in one match as the live line swung, so one of each pair was a sure loss): once a
+    # game's moneyline, spread or total is logged, the other side of that market is never logged
+    taken = {(r["sport"], str(r["gid"]), r["kind"]) for r in led}
     now = datetime.now(timezone.utc).isoformat(timespec="seconds")
     added = 0
     for sport in LEAGUES:
@@ -216,9 +220,10 @@ def log_live(led, url):
                 if b["edge"] < LM.VALUE:
                     continue
                 rid = row_id(sport, g["gid"], b)
-                if rid in have:
+                mk = (sport, str(g["gid"]), b["kind"])
+                if rid in have or mk in taken:
                     continue
-                have.add(rid)
+                have.add(rid); taken.add(mk)
                 led.append({"id": rid, "sport": sport, "gid": g["gid"], "date": game_day(), "logged_at": now,
                             "matchup": f"{g['away']} {'vs' if sport == 'tennis' else '@'} {g['home']}", "home": g["home"], "away": g["away"],
                             "label": b["label"], "kind": b["kind"], "side": b["side"], "line": b["pt"], "price": b["price"],
