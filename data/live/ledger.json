@@ -636,5 +636,63 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186706-spread-home",
+  "sport": "tennis",
+  "gid": "186706",
+  "date": "2026-11-03",
+  "logged_at": "2026-11-03T22:18:53+00:00",
+  "matchup": "Marina Bassols Ribera vs Sofia Costoulas",
+  "home": "Sofia Costoulas",
+  "away": "Marina Bassols Ribera",
+  "label": "Sofia Costoulas +6.5 games",
+  "kind": "spread",
+  "side": "home",
+  "line": 6.5,
+  "price": -135,
+  "chance": 0.6269,
+  "implied": 0.5745,
+  "edge": 0.052,
+  "fair": -170,
+  "state": {
+   "sets": "3-1",
+   "srv": "away",
+   "need": 2
+  },
+  "model": "live-v1",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "tennis-186706-total-over",
+  "sport": "tennis",
+  "gid": "186706",
+  "date": "2026-11-03",
+  "logged_at": "2026-11-03T22:18:53+00:00",
+  "matchup": "Marina Bassols Ribera vs Sofia Costoulas",
+  "home": "Sofia Costoulas",
+  "away": "Marina Bassols Ribera",
+  "label": "Over 18.5 games",
+  "kind": "total",
+  "side": "over",
+  "line": 18.5,
+  "price": -120,
+  "chance": 0.596,
+  "implied": 0.5455,
+  "edge": 0.051,
+  "fair": -150,
+  "state": {
+   "sets": "3-1",
+   "srv": "away",
+   "need": 2
+  },
+  "model": "live-v1",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
