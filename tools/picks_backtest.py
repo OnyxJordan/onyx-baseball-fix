@@ -19,8 +19,12 @@ market) a game, best expected return first, at most picks.CAP a day.
 
 FINALIZE (a market's picks go live as tracked Onyx Picks) when, on the held-out
 period only:
-    n >= MIN_N bets at the opening price, ROI > 0 at the opening price,
-    AND ROI > 0 at the closing price (a logged price lands between the two).
+    n >= MIN_N bets at the opening price, ROI >= MIN_ROI (+2%) at the opening price
+    AND at the closing price (a logged price lands between the two), AND the market did
+    not lose badly in its own tuning months (ROI above TUNE_FLOOR, -5%, at the open and at
+    the close, when the tuning period has TUNE_N+ bets).
+Tightened 11/3 (Jordan): CBB moneylines had passed the old "ROI > 0" bar at +0.4% on 87
+bets after losing -11% / -17% in their tuning months; a pass that thin is noise.
 Fewer bets than MIN_N is "not enough yet", never a pass. 60 bets at -110 still
 carry about +/-13 points of ROI noise, so a pass is "worth tracking in public",
 not proof: the public ledger decides from here.
@@ -71,6 +75,8 @@ import picks as PK          # noqa: E402  the card cap
 import picks_lines as PL    # noqa: E402  data/picks/lines: the committed Onyx lines (merged with bt/ when present)
 
 MIN_N = 60
+MIN_ROI = 0.02      # a pass needs a real margin, not a hair above zero (11/3)
+TUNE_FLOOR, TUNE_N = -0.05, 30   # and must not have lost badly where its weights were chosen
 OUT = "data/picks/backtest.json"
 NAME = {"ml": "Moneyline", "spread": "Spread", "total": "Game total", "pts": "Points", "reb": "Rebounds", "ast": "Assists",
         "q1_total": "1st-quarter total", "rush_yds": "Rushing yards", "pass_att": "Pass attempts", "pass_yds": "Passing yards",
@@ -123,7 +129,7 @@ def tally(bets):
             "hit": round(w / (w + l_), 4) if w + l_ else None, "first": days[0] if days else None, "last": days[-1] if days else None}
 
 
-def judge(test_o, test_c):
+def judge(test_o, test_c, tune_o=None, tune_c=None):
     n, ro, rc = test_o["n"], test_o["roi"], test_c["roi"]
     if not n:
         return "no bets", "the pick rule found no bet in the held-out period"
@@ -136,6 +142,12 @@ def judge(test_o, test_c):
         return "not enough yet", "no closing prices to check"
     if rc <= 0:
         return "fails", f"won at the open ({ro * 100:+.1f}%) but lost at the close ({rc * 100:+.1f}% on {test_c['n']})"
+    if ro < MIN_ROI or rc < MIN_ROI:
+        return "fails", f"too thin to trust: {ro * 100:+.1f}% at the open, {rc * 100:+.1f}% at the close (needs {MIN_ROI * 100:+.0f}% at both)"
+    for lab, t in (("open", tune_o), ("close", tune_c)):
+        if t and (t.get("n") or 0) >= TUNE_N and t.get("roi") is not None and t["roi"] < TUNE_FLOOR:
+            return "fails", f"held-out {ro * 100:+.1f}% / {rc * 100:+.1f}%, but lost {t['roi'] * 100:+.1f}% at the {lab} in its tuning months " \
+                            f"({t['n']} bets), so the held-out profit looks like luck"
     return "finalized", f"{test_o['w']}-{test_o['l']}{'-' + str(test_o['p']) if test_o['p'] else ''} at the open, ROI {ro * 100:+.1f}%; " \
                         f"ROI {rc * 100:+.1f}% at the close"
 
@@ -147,7 +159,7 @@ def market(sport, mkt, version, chance, source, split, rows_o, rows_c, held="", 
     res = {"sport": sport, "market": mkt, "name": NAME.get(mkt, mkt), "version": version, "chance": chance, "source": source,
            "held_out_from": split, "held_out": held or f"games on or after {split}",
            "tune": {"open": T(co, False), "close": T(cc, False)}, "test": {"open": T(co, True), "close": T(cc, True)}}
-    res["verdict"], res["why"] = judge(res["test"]["open"], res["test"]["close"])
+    res["verdict"], res["why"] = judge(res["test"]["open"], res["test"]["close"], res["tune"]["open"], res["tune"]["close"])
     if notes:
         res["notes"] = notes
     t = res["test"]["open"]
@@ -500,6 +512,10 @@ def main():
             continue
         r = dict(r)
         r["carried"] = r.get("carried") or prev.get("built")
+        if r.get("test") and r["verdict"] in ("finalized", "fails", "not enough yet"):   # its numbers are kept; today's rule judges them
+            v, w = judge(r["test"]["open"], r["test"]["close"], (r.get("tune") or {}).get("open"), (r.get("tune") or {}).get("close"))
+            if v != r["verdict"]:
+                r["verdict"], r["why"] = v, w
         res.append(r)
         print(f"  {r['sport']:6s} {r['market']:10s} not replayable here (inputs in bt/ only): kept from {r['carried']} -> {r['verdict']}")
     order = {(r["sport"], r["market"]): i for i, r in enumerate(prev.get("markets") or [])}
@@ -510,7 +526,8 @@ def main():
     out = {"built": today,
            "rule": {"price": list(DT.PRICE), "edge": [DT.MIN_EDGE, DT.MAX_EDGE], "ev": DT.MIN_EV, "chance": DT.MIN_CONF,
                     "card": f"one per player or game market, best expected return first, up to {PK.CAP} a sport a day"},
-           "finalize": {"min_n": MIN_N, "text": f"held-out period: {MIN_N}+ bets, ROI above 0 at Onyx's opening price AND at its closing price"},
+           "finalize": {"min_n": MIN_N, "min_roi": MIN_ROI, "tune_floor": TUNE_FLOOR,
+                        "text": f"held-out period: {MIN_N}+ bets and ROI of {MIN_ROI * 100:+.0f}% or better at Onyx's opening price AND at its closing price, and no loss worse than {TUNE_FLOOR * 100:.0f}% in its own tuning months"},
            "finalized": fin, "markets": res}
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     json.dump(out, open(OUT, "w"), indent=1)

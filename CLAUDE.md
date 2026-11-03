@@ -77,7 +77,9 @@ is re-tested. Sport ledgers (`data/<sport>/picks_history.json`) are sacred like 
 tracked Onyx Picks; every other market shows projections only, never labeled a pick.** One
 rule for every sport (the home Top 10 rule, `daily_top.ok`). A market is finalized only when
 `tools/picks_backtest.py` (-> `data/picks/backtest.json`) shows, on held-out games, 60+ bets
-and ROI above 0 at Onyx's opening AND closing prices, for the live model version; a model
+and ROI of +2% or better at Onyx's opening AND closing prices, and no loss worse than -5%
+in the market's own tuning months (30+ bets), for the live model version (tightened 11/3 by
+Jordan: CBB moneylines had passed at +0.4% after losing -11% in tuning); a model
 change sends it back to projections until re-run. `picks.py` logs a finalized play once, at
 the Onyx price shown, before its start (up to 5 a sport a day) into `data/picks/ledger.json`
 (append-only, sacred, in validate_build's list) and grades it off ESPN. Page: `picks.html`.

@@ -1839,8 +1839,9 @@ and keep their records; the Onyx Picks record is the one public card across spor
   `data/picks/lines/<sport>.json`, merged with the local `bt/` caches when present; writes `data/picks/backtest.json`):
   replays that rule on every market where the live chance can be rebuilt walk-forward, at Onyx's
   real opening and closing prices, as the card logs it (one per player or game market a game, best
-  expected return first, up to 5 a day). **Finalized** = on the held-out period: 60+ bets, ROI > 0
-  at the open AND at the close. Fewer than 60 is "not enough yet", never a pass (60 bets at -110
+  expected return first, up to 5 a day). **Finalized** = on the held-out period: 60+ bets, ROI of +2% or
+  better at the open AND at the close, and no loss worse than -5% in the market's own tuning months
+  (30+ bets; tightened 11/3, see CLAUDE.md). Fewer than 60 is "not enough yet", never a pass (60 bets at -110
   still carry about +/-13 points of ROI noise). Each verdict records the model version
   (`nba_model.VERSION` etc.; the 1Q total uses its own signature, `picks.q1_signature`, so a
   first-basket change does not re-gate it); a version change sends the market back to projections.
@@ -1887,7 +1888,7 @@ and keep their records; the Onyx Picks record is the one public card across spor
   conflict), fills NBA quarter / half scores from ESPN (`periods`), re-runs `tools/picks_backtest.py`, gates on
   `tools/verify_picks.py` and `validate_build.py`, and commits only `data/picks/backtest.json` and
   `data/picks/lines/` (own concurrency group `onyx-picks-retest`, rebase-and-retry push like `nba_lines.yml`).
-  **Finalization follows the tool**: same rule (60+ held-out bets, ROI > 0 at the open AND the close, live
+  **Finalization follows the tool**: same rule (60+ held-out bets, +2% ROI or better at the open AND the close, no -5% tuning loss, live
   model version). On a fresh runner every replay runs from the committed history except the ones whose inputs
   are only in `bt/` (NFL v11 rows, tennis): those keep their last computed verdict, marked `"carried"` with the
   day it was computed. NBA props replay 2026-27 from the live box scores (`data/nba/player_games.json`,
