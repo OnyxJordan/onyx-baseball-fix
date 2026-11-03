@@ -5992,8 +5992,8 @@
     {
      "id": "186710",
      "start": "2026-11-03T20:10Z",
-     "state": "in",
-     "detail": "3rd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Campo 5",
@@ -6007,20 +6007,20 @@
        "sets": [
         6,
         3,
-        1
+        2
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Julia Grabher",
        "short": "J. Grabher",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/aut.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         3,
         6,
-        4
+        6
        ],
        "serve": false
       }
@@ -6030,7 +6030,7 @@
      "id": "186706",
      "start": "2026-11-03T21:50Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Campo 3",
@@ -6042,7 +6042,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        3
+        6,
+        2
        ],
        "serve": true
       },
@@ -6053,7 +6054,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        1
+        2,
+        0
        ],
        "serve": false
       }
@@ -6063,7 +6065,7 @@
      "id": "186708",
      "start": "2026-11-03T22:00Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Campo 1",
@@ -6075,9 +6077,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        6,
+        4
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Valentina Mediorreal Arias",
@@ -6086,6 +6089,7 @@
        "seed": null,
        "win": false,
        "sets": [
+        1,
         1
        ],
        "serve": false
@@ -6314,9 +6318,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Julia Grabher",
+       "short": "J. Grabher",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/aut.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -7742,5 +7746,5 @@
    ]
   }
  ],
- "fetched": "2026-11-03T22:18:28+00:00"
+ "fetched": "2026-11-03T22:52:06+00:00"
 }
