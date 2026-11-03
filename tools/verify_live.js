@@ -255,6 +255,27 @@ print(json.dumps({'n': n, 'bad': bad[:5], 'nbad': len(bad)}))
         await p2.evaluate(() => gotoTab('games'));
         const gOk = await p2.waitForFunction(() => document.querySelector('#oxLiveGames .lv-card'), null, { timeout: 8000 }).then(() => true, () => false);
         if (!gOk) bad('no live card on the Games tab');
+        // owner report 11/3: "Open the game" did nothing on tennis. Clicking it on the page's own Live block
+        // must open that game in place (tennis: its match center; others: the gamecenter) without leaving the page
+        {
+          await p2.evaluate(() => gotoTab('home'));
+          const before = p2.url();
+          const lk = await p2.$('#oxLiveHome .lv-card a[data-lv-open]');
+          if (!lk) bad('no Open the game link on a live card');
+          else {
+            await lk.click(); await p2.waitForTimeout(700);
+            const o = await p2.evaluate(sp => ({ url: location.href, tab: typeof currentTab !== 'undefined' ? currentTab : (document.querySelector('.tab.active, [data-tab].on') || {}).dataset,
+              open: sp === 'tennis' ? (typeof OPEN_MATCH !== 'undefined' && OPEN_MATCH) : (typeof gcSel !== 'undefined' && gcSel),
+              gc: !!document.querySelector(sp === 'tennis' ? '#gc' : '#pane-games .gc, #pane-games [class*=gc]') }), sport);
+            // nba: when the fixture's game is not on the built page's slate (an off night), the honest fallback is the Games tab
+            const onSlate = sport !== 'nba' || await p2.evaluate(() => { const l = document.querySelector('#oxLiveHome .lv-card a[data-lv-open]');
+              return !!nbaGid(l.getAttribute('data-lv-open'), l.getAttribute('data-lv-a'), l.getAttribute('data-lv-h')); });
+            if (!onSlate) { const tb = await p2.evaluate(() => typeof currentTab !== 'undefined' ? currentTab : ''); if (tb !== 'games') bad('Open the game (game not on the slate) did not fall back to the Games tab'); else console.log(`${tag}: Open the game: game not on this slate, opened the Games tab`); }
+            else if (!o.open) bad('Open the game did not open the game');
+            else if (o.url.split('#')[0] !== before.split('#')[0]) bad('Open the game left the page');
+            else console.log(`${tag}: Open the game opened ${o.open}`);
+          }
+        }
         if (e2.length) bad('page errors: ' + e2.slice(0, 3).join(' | '));
         console.log(`${tag}: ${r.cards} live cards, ${r.val} value lines, Onyx links ${r.onyx}, sideways scroll ${r.over}`);
         // tennis match center (owner report 11/3, Linette vs Falei): win chance after every game, labels inside
