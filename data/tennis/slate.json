@@ -1597,8 +1597,8 @@
     {
      "id": "186477",
      "start": "2026-11-03T18:05Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 2",
      "draw": "Men's Singles",
      "court": "Court Central",
@@ -1611,7 +1611,7 @@
        "win": false,
        "sets": [
         3,
-        1
+        4
        ],
        "serve": false
       },
@@ -1620,12 +1620,12 @@
        "short": "B. Shelton",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        2
+        6
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -1633,7 +1633,7 @@
      "id": "186470",
      "start": "2026-11-03T18:30Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 1",
      "draw": "Men's Singles",
      "court": "Court 1",
@@ -1645,7 +1645,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        4
+        6,
+        1
        ],
        "serve": true
       },
@@ -1656,7 +1657,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        4
+        7,
+        2
        ],
        "serve": false
       }
@@ -1664,9 +1666,9 @@
     },
     {
      "id": "186484",
-     "start": "2026-11-03T19:30Z",
+     "start": "2026-11-03T19:40Z",
      "state": "pre",
-     "detail": "11/3 - 2:30 PM EST",
+     "detail": "11/3 - 2:40 PM EST",
      "round": "Round 2",
      "draw": "Men's Singles",
      "court": "Court Central",
@@ -2203,9 +2205,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Ben Shelton",
+       "short": "B. Shelton",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -4947,7 +4949,7 @@
        "win": false,
        "sets": [
         6,
-        1
+        3
        ],
        "serve": false
       },
@@ -4959,7 +4961,7 @@
        "win": false,
        "sets": [
         4,
-        2
+        6
        ],
        "serve": false
       }
@@ -5876,7 +5878,7 @@
      "id": "186707",
      "start": "2026-11-03T18:25Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Campo 5",
@@ -5888,7 +5890,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        3
+        6,
+        1
        ],
        "serve": false
       },
@@ -5899,9 +5902,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        3,
+        0
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -5909,7 +5913,7 @@
      "id": "186721",
      "start": "2026-11-03T18:25Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Campo 3",
@@ -5921,9 +5925,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        3
+        6,
+        2
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Maria Lourdes Carle",
@@ -5932,9 +5937,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        2,
+        0
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
@@ -5942,7 +5948,7 @@
      "id": "186716",
      "start": "2026-11-03T18:45Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Campo 1",
@@ -5954,7 +5960,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        3
+        6,
+        1
        ],
        "serve": false
       },
@@ -5965,6 +5972,7 @@
        "seed": null,
        "win": false,
        "sets": [
+        2,
         0
        ],
        "serve": false
@@ -5973,9 +5981,9 @@
     },
     {
      "id": "186706",
-     "start": "2026-11-03T19:30Z",
+     "start": "2026-11-03T19:50Z",
      "state": "pre",
-     "detail": "11/3 - 2:30 PM EST",
+     "detail": "11/3 - 2:50 PM EST",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Campo 3",
@@ -6002,9 +6010,9 @@
     },
     {
      "id": "186710",
-     "start": "2026-11-03T19:30Z",
+     "start": "2026-11-03T20:00Z",
      "state": "pre",
-     "detail": "11/3 - 2:30 PM EST",
+     "detail": "11/3 - 3:00 PM EST",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Campo 5",
@@ -7708,5 +7716,5 @@
    ]
   }
  ],
- "fetched": "2026-11-03T18:58:26+00:00"
+ "fetched": "2026-11-03T19:32:34+00:00"
 }

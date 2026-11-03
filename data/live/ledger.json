@@ -346,5 +346,34 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186580-ml-home",
+  "sport": "tennis",
+  "gid": "186580",
+  "date": "2026-11-03",
+  "logged_at": "2026-11-03T19:33:02+00:00",
+  "matchup": "Simona Waltert vs Sahaja Yamalapalli",
+  "home": "Sahaja Yamalapalli",
+  "away": "Simona Waltert",
+  "label": "Sahaja Yamalapalli to win",
+  "kind": "ml",
+  "side": "home",
+  "line": null,
+  "price": 258,
+  "chance": 0.3091,
+  "implied": 0.2793,
+  "edge": 0.03,
+  "fair": 225,
+  "state": {
+   "sets": "6-4 3-6 0-0",
+   "srv": "away",
+   "need": 2
+  },
+  "model": "live-v1",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]

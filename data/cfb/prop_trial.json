@@ -1142,5 +1142,49 @@
   "model": "v2",
   "result": null,
   "actual": null
+ },
+ {
+  "date": "2026-11-03",
+  "key": "401856743|arch manning|rush_yds",
+  "gid": "401856743",
+  "pid": "4870906",
+  "name": "Arch Manning",
+  "team": "TEX",
+  "opp": "MIZ",
+  "matchup": "TEX @ MIZ",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 16.5,
+  "price": -114,
+  "sel": "b388cfcf-6008-4c75-b71b-c5f6d5e9c0b0",
+  "proj": 11.7,
+  "prob": 0.6161,
+  "implied": 0.5327,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.64,
+    "avg": 0.77,
+    "pp": -3.1
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.93,
+    "avg": 0.93,
+    "pp": -0.1
+   },
+   {
+    "k": "line vs his usual range",
+    "v": 0.09,
+    "avg": -0.05,
+    "pp": -0.1
+   }
+  ],
+  "opened_at": "2026-11-03T19:32:27+00:00",
+  "logged_at": "2026-11-03T19:32:27+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
  }
 ]
