@@ -462,5 +462,63 @@
   "actual": "5-12",
   "profit": 0.3257,
   "graded_at": "2026-11-03T20:22:26+00:00"
+ },
+ {
+  "id": "tennis-186484-ml-home",
+  "sport": "tennis",
+  "gid": "186484",
+  "date": "2026-11-03",
+  "logged_at": "2026-11-03T20:51:59+00:00",
+  "matchup": "Rafael Jodar vs Casper Ruud",
+  "home": "Casper Ruud",
+  "away": "Rafael Jodar",
+  "label": "Casper Ruud to win",
+  "kind": "ml",
+  "side": "home",
+  "line": null,
+  "price": -194,
+  "chance": 0.7062,
+  "implied": 0.6599,
+  "edge": 0.046,
+  "fair": -240,
+  "state": {
+   "sets": "3-6 1-1",
+   "srv": "away",
+   "need": 2
+  },
+  "model": "live-v1",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "tennis-186710-total-over",
+  "sport": "tennis",
+  "gid": "186710",
+  "date": "2026-11-03",
+  "logged_at": "2026-11-03T20:51:59+00:00",
+  "matchup": "Laura Pigossi vs Julia Grabher",
+  "home": "Julia Grabher",
+  "away": "Laura Pigossi",
+  "label": "Over 24.5 games",
+  "kind": "total",
+  "side": "over",
+  "line": 24.5,
+  "price": -110,
+  "chance": 0.5752,
+  "implied": 0.5238,
+  "edge": 0.051,
+  "fair": -135,
+  "state": {
+   "sets": "6-3",
+   "srv": "home",
+   "need": 2
+  },
+  "model": "live-v1",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
