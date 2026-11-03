@@ -834,5 +834,93 @@
   "model": "v2",
   "result": null,
   "actual": null
+ },
+ {
+  "date": "2026-11-03",
+  "key": "401858513|caleb komolafe|rush_yds",
+  "gid": "401858513",
+  "pid": "5078244",
+  "name": "Caleb Komolafe",
+  "team": "NU",
+  "opp": "IOWA",
+  "matchup": "NU vs IOWA",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 51.5,
+  "price": -114,
+  "sel": "90952e6e-b4ae-4057-acfa-d4ca9c897b67",
+  "proj": 59.8,
+  "prob": 0.6374,
+  "implied": 0.5327,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.51,
+    "avg": 0.77,
+    "pp": -6.1
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.43,
+    "avg": -0.05,
+    "pp": 0.4
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.91,
+    "avg": 0.93,
+    "pp": 0.3
+   }
+  ],
+  "opened_at": "2026-11-03T14:17:26+00:00",
+  "logged_at": "2026-11-03T14:17:26+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-03",
+  "key": "401858513|aidan chiles|rush_yds",
+  "gid": "401858513",
+  "pid": "5075805",
+  "name": "Aidan Chiles",
+  "team": "NU",
+  "opp": "IOWA",
+  "matchup": "NU vs IOWA",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 25.5,
+  "price": -114,
+  "sel": "d67276eb-909d-4d1e-a871-078b2deb37be",
+  "proj": 28.3,
+  "prob": 0.639,
+  "implied": 0.5327,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.51,
+    "avg": 0.77,
+    "pp": -6.1
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.91,
+    "avg": 0.93,
+    "pp": 0.3
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.25,
+    "avg": -0.05,
+    "pp": 0.2
+   }
+  ],
+  "opened_at": "2026-11-03T14:17:26+00:00",
+  "logged_at": "2026-11-03T14:17:26+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
  }
 ]
