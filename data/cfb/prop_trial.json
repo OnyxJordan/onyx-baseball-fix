@@ -1186,5 +1186,137 @@
   "model": "v2",
   "result": null,
   "actual": null
+ },
+ {
+  "date": "2026-11-03",
+  "key": "401856743|raleek brown|rush_yds",
+  "gid": "401856743",
+  "pid": "4685268",
+  "name": "Raleek Brown",
+  "team": "TEX",
+  "opp": "MIZ",
+  "matchup": "TEX @ MIZ",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 60.5,
+  "price": -114,
+  "sel": "fe7ae222-a621-4365-9e16-e0a472d71ef4",
+  "proj": 47.3,
+  "prob": 0.6162,
+  "implied": 0.5327,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.64,
+    "avg": 0.77,
+    "pp": -3.1
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.93,
+    "avg": 0.93,
+    "pp": -0.1
+   },
+   {
+    "k": "line vs his usual range",
+    "v": 0.09,
+    "avg": -0.05,
+    "pp": -0.1
+   }
+  ],
+  "opened_at": "2026-11-03T20:46:52+00:00",
+  "logged_at": "2026-11-03T20:46:52+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-03",
+  "key": "401856743|jamal roberts|rush_yds",
+  "gid": "401856743",
+  "pid": "4921116",
+  "name": "Jamal Roberts",
+  "team": "MIZ",
+  "opp": "TEX",
+  "matchup": "MIZ vs TEX",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 99.5,
+  "price": -114,
+  "sel": "3e70d936-f322-49ef-ab63-90450aad3c42",
+  "proj": 105.5,
+  "prob": 0.6171,
+  "implied": 0.5327,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.66,
+    "avg": 0.77,
+    "pp": -2.5
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 1.01,
+    "avg": 0.93,
+    "pp": -1.3
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.39,
+    "avg": -0.05,
+    "pp": 0.3
+   }
+  ],
+  "opened_at": "2026-11-03T20:46:52+00:00",
+  "logged_at": "2026-11-03T20:46:52+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-03",
+  "key": "401856743|michael terry|rush_yds",
+  "gid": "401856743",
+  "pid": "5141729",
+  "name": "Michael Terry III",
+  "team": "TEX",
+  "opp": "MIZ",
+  "matchup": "TEX @ MIZ",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 22.5,
+  "price": -114,
+  "sel": "ca370ea5-58b6-4d68-abad-01e6e5bd9a47",
+  "proj": 21.3,
+  "prob": 0.6133,
+  "implied": 0.5327,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.64,
+    "avg": 0.77,
+    "pp": -3.1
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.21,
+    "avg": -0.05,
+    "pp": 0.2
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.93,
+    "avg": 0.93,
+    "pp": -0.1
+   }
+  ],
+  "opened_at": "2026-11-03T20:46:52+00:00",
+  "logged_at": "2026-11-03T20:46:52+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
  }
 ]
