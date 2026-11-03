@@ -300,10 +300,17 @@ function serve() {
             if (await page.evaluate(() => typeof OPEN_GAME !== 'undefined' && OPEN_GAME)) cbad.push('team tap also opened the gamecenter');
             const n = await page.evaluate(() => document.querySelectorAll('#cx .pc-seg button').length);
             if (n === 2) {
-              await page.click('#cx .pc-seg button:nth-child(2)'); const r2 = await cardCheck(page, 'bets', ['Best bet']); if (r2) cbad.push('team bets: ' + r2);
-              const r3 = await page.evaluate(BETS_CHECK, true);
-              if (!r3.startsWith('ok')) cbad.push('team bets card: ' + r3); else teamBets = r3;
-              const r4 = await cardCheck(page, 'bets', []); if (r4) cbad.push('team bet card open: ' + r4);
+              await page.click('#cx .pc-seg button:nth-child(2)');
+              // a team with no Onyx lines yet (e.g. NFL on a Tuesday, before next week's lines post) shows the
+              // honest empty state; anything else must be the full ranked list with a Best bet
+              const empty = await page.evaluate(() => { const f = document.getElementById('cxFace'); return !!(f && f.querySelector('.cx-empty')) && !(f && f.querySelector('.bc-row, .bc-best')); });
+              if (empty) teamBets = 'no Onyx lines on this team yet';
+              else {
+                const r2 = await cardCheck(page, 'bets', ['Best bet']); if (r2) cbad.push('team bets: ' + r2);
+                const r3 = await page.evaluate(BETS_CHECK, true);
+                if (!r3.startsWith('ok')) cbad.push('team bets card: ' + r3); else teamBets = r3;
+                const r4 = await cardCheck(page, 'bets', []); if (r4) cbad.push('team bet card open: ' + r4);
+              }
             }
           }
           await page.evaluate(() => OXC.close());

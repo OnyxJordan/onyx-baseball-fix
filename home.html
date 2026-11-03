@@ -80,44 +80,13 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
 .ask-u{font:600 11px monospace;color:#9a93a6;margin:12px 0 10px;line-height:1.5}.ask-u b{color:#d795ff}.ask-u a{color:#d795ff}
 .ask-say{font-size:15px;line-height:1.5;color:#efeaf7;margin:14px 0 4px}.ask-why{font-size:14px;line-height:1.55;color:#cfc7dc;border-left:2px solid #a24bff;padding:2px 0 2px 12px;margin:14px 0}
 .ask-cl{border:1px solid #3a2a55;border-radius:14px;padding:14px 16px;margin:12px 0;background:rgba(162,75,255,.06)}.ask-cl b{display:block;font-size:15px;line-height:1.45;color:#efeaf7;margin-bottom:10px}.ask-cl .ask-ex{flex-wrap:wrap}
-.lv-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-top:12px}
-.lv-card{border:1px solid #2a2236;border-radius:16px;padding:14px 16px;background:#141019;display:flex;flex-direction:column;gap:10px}
-.lv-top{display:flex;justify-content:space-between;align-items:center;gap:8px}.lv-clock{font:700 11px monospace;color:#ff6b9a;display:flex;align-items:center;gap:6px}
-.lv-clock:before{content:"";width:7px;height:7px;border-radius:50%;background:#ff4d7d;box-shadow:0 0 0 0 rgba(255,77,125,.6);animation:lvp 1.6s infinite}
-@keyframes lvp{70%{box-shadow:0 0 0 7px rgba(255,77,125,0)}100%{box-shadow:0 0 0 0 rgba(255,77,125,0)}}
-.lv-score{display:flex;justify-content:space-between;align-items:baseline;font:800 20px/1.2 inherit;color:#fff}.lv-score small{font:600 11px monospace;color:#8f879c}
-.lv-bar{height:8px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden;display:flex}.lv-bar i{display:block;height:100%;background:linear-gradient(90deg,#a24bff,#d795ff)}
-.lv-pct{display:flex;justify-content:space-between;font:700 12px monospace;color:#cfc8da}.lv-pct b{color:#fff}
-.lv-nums{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.lv-nums div{background:rgba(255,255,255,.04);border-radius:10px;padding:8px 9px;min-width:0}
-.lv-nums b{display:block;font:800 13px monospace;color:#efeaf7;overflow-wrap:anywhere;line-height:1.3}
-.ask-ex button.on{background:rgba(162,75,255,.22);border-color:#a24bff;color:#fff}.lv-nums small{font:600 9px monospace;letter-spacing:.06em;text-transform:uppercase;color:#8f879c}
-.lv-swing{font-size:13px;color:#cfc8da;line-height:1.45}.lv-swing b{color:#d795ff}
-.lv-teams{display:flex;flex-direction:column;gap:6px}.lv-row{display:grid;grid-template-columns:28px 1fr auto 74px;align-items:center;gap:10px;color:#a79fb5}
-.lv-row.up{color:#fff}.lv-lg{width:28px;height:28px;object-fit:contain;border-radius:6px}.lv-lg.sm{width:22px;height:22px}.lv-nolg{display:inline-block;background:rgba(255,255,255,.06)}
-.lv-nm{font:700 16px/1.2 inherit;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.lv-sc{font:800 22px/1 inherit}.lv-wp{font:700 12px monospace;text-align:right;color:#8f879c}.lv-row.up .lv-wp{color:#d795ff}
-.lv-sets{font:600 11px monospace;color:#8f879c}
-.lv-lean{border:1px solid #4a2d7a;background:linear-gradient(160deg,rgba(162,75,255,.16),rgba(162,75,255,.04));border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:9px}
-.lv-lean.none{border-color:#2a2236;background:rgba(255,255,255,.03)}.lv-k{font:700 10px monospace;letter-spacing:.1em;text-transform:uppercase;color:#d795ff}
-.lv-pick{display:flex;align-items:center;gap:8px;font-size:18px;color:#fff}
-.lv-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.lv-steps div{background:rgba(0,0,0,.25);border-radius:10px;padding:8px;min-width:0;position:relative}
-.lv-steps div+div:before{content:"";position:absolute;left:-6px;top:50%;width:6px;height:2px;background:#4a2d7a}
-.lv-steps small{display:block;font:600 9px monospace;letter-spacing:.08em;text-transform:uppercase;color:#8f879c}.lv-steps b{display:block;font:800 18px/1.3 monospace;color:#efeaf7}
-.lv-steps span{display:block;font:600 10px/1.3 monospace;color:#a79fb5;overflow-wrap:anywhere}.lv-steps .fair{background:rgba(162,75,255,.22)}.lv-steps .fair b{color:#e9c8ff}
-.lv-verdict{font-size:13px;line-height:1.45;color:#cfc8da}.lv-verdict b{color:#fff}
-.lv-more{display:flex;flex-wrap:wrap;gap:4px 14px;font:600 11px monospace;color:#8f879c}.lv-more b{color:#cfc8da}
-.lv-f a.go{background:#a24bff;border-color:#a24bff;color:#fff}
+.ask-ex button.on{background:rgba(162,75,255,.22);border-color:#a24bff;color:#fff}
 .acct{border:1px solid #3a2a55;border-radius:14px;padding:12px 14px;margin:12px 0;background:rgba(162,75,255,.06);display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;font-size:13px;color:#cfc8da}
 .acct b{color:#fff}.acct input{flex:1 1 200px;min-width:0;background:#0d0a12;border:1px solid #3a2a55;border-radius:10px;padding:10px 12px;color:#fff;font:inherit;font-size:16px}
 .acct button{font:700 12px monospace;letter-spacing:.04em;border:1px solid #a24bff;background:#a24bff;color:#fff;border-radius:999px;padding:9px 14px;cursor:pointer}
 .acct button.ghost{background:transparent;color:#d795ff;border-color:#3a2a55}.acct .acct-t{flex:1 1 100%}.acct small{flex:1 1 100%;color:#8f879c;font-size:11px;line-height:1.45}
 .acct .ok{color:#61e970}.acct .bad{color:#ff8a8a}
 .acct .acct-t{flex:1 1 220px}.acct-go{font:700 12px monospace;letter-spacing:.04em;border:1px solid #a24bff;background:#a24bff;color:#fff;border-radius:999px;padding:9px 16px;text-decoration:none;white-space:nowrap}.acct-go.ghost{background:transparent;color:#d795ff;border-color:#3a2a55}
-.lv-val{margin-left:auto;font:800 10px monospace;letter-spacing:.05em;color:#0b0710;background:#61e970;border-radius:999px;padding:3px 8px;white-space:nowrap}
-.lv-bets{display:flex;flex-direction:column;gap:6px;border-top:1px solid rgba(255,255,255,.08);padding-top:9px}
-.lv-bet{display:grid;grid-template-columns:1fr auto;gap:2px 8px;align-items:center;font-size:13px;color:#e8e2f1}.lv-bet .s{grid-column:1;font:600 11px monospace;color:#a79fb5}.lv-bet .s b{color:#fff}
-.lv-bet .lv-val{grid-column:2;grid-row:1/3}
-.lv-best{display:flex;flex-direction:column;gap:8px;margin-top:12px}.lv-best .lv-bet{background:#141019;border:1px solid #4a2d7a;border-radius:12px;padding:10px 12px}
-.lv-f{display:flex;gap:8px;flex-wrap:wrap}.lv-f a{font:700 11px monospace;color:#d795ff;text-decoration:none;border:1px solid #3a2a55;border-radius:999px;padding:6px 11px}
 .ask-why.wait{color:#7d7590;font:600 11px monospace}.ask-fu{font:600 11px monospace;color:#7d7590;margin:8px 0 0}
 .ask-pl{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;align-items:center;padding:14px;margin-bottom:10px;border-radius:16px;border:1px solid rgba(176,56,249,.55);background:linear-gradient(160deg,rgba(176,56,249,.16),rgba(255,255,255,.03))}
 .ask-pl b{font-size:16px}.ask-pl span{font:600 11px monospace;color:#cfc8da}.ask-pl .t10-bet{margin:0}
@@ -221,11 +190,12 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
   <!-- ── Live: every game being played, our live numbers ─────────────── -->
   <section class="ox-wrap live" id="live">
     <div class="my-h"><div><span class="ox-eyebrow">Live now</span><h2>Every game in play.<br>Our live leans.</h2>
-      <p>Every game being played in the NFL, college football, NBA, NHL and tennis, and the bets worth making on it: where Onyx had it before the start, the live line now, and our fair price. When the live line pays more than our fair price, it is marked Value. Teams, sides, totals and player props. Updates every 20 seconds.</p></div></div>
+      <p>Every game being played in the NFL, college football, NBA, college basketball, NHL and tennis, and the bets worth making on it: where Onyx had it before the start, the live line now, and our fair price. When the live line pays more than our fair price, it is marked Value. Teams, sides, totals and player props. Updates every 20 seconds.</p></div></div>
     <div class="lv-best" id="lvBest"></div>
     <div class="ask-ex" id="lvTabs"></div>
     <div class="lv-list" id="lvList"><div class="my-empty">Loading the games in play...</div></div>
-    <div class="my-note" id="lvNote">Our live numbers start from Onyx's pregame line and move with the score and the clock: football and the NBA as the rest of the game played out around the pregame spread and total, NHL as goals for the time left, tennis by sets. Player props add the player's live box line to our pregame projection for the time left. The live line comes from the in-game market, because Onyx's in-game prices are not in our data feed yet, so confirm the price in the Onyx app before you bet. These are leans, not tracked picks, until they are tested against real in-game results.</div>
+    <div class="my-note" id="lvNote">Our live numbers start from Onyx's pregame line and move with the score and the clock: football and basketball as the rest of the game played out around the pregame spread and total, NHL as goals for the time left, tennis point by point through the games and sets still to play, from the current score and server. Player props add the player's live box line to our pregame projection for the time left. The live line comes from the in-game market, because Onyx's in-game prices are not in our data feed yet, so confirm the price in the Onyx app before you bet. Live value, not a tracked pick, untested against live prices: every value play is logged and graded in the live value record below, so it becomes provable.</div>
+    <div id="lvRec"></div>
   </section>
 
   <!-- ── My Onyx: your players, your bets, everything live ─────────── -->
@@ -516,66 +486,19 @@ async function askGo(q, forced) {
 }
 // ── Live: every game being played, our live numbers (live.js) ─────────────────────
 var LV = {sport: 'all', games: [], timer: null};
-var LV_NAME = {nfl: 'NFL', cfb: 'NCAAF', nba: 'NBA', nhl: 'NHL', tennis: 'Tennis'};
-var LV_PAGE = {nfl: 'nfl.html', cfb: 'cfb.html', nba: 'nba.html', nhl: 'nhl.html', tennis: 'tennis.html'};
+var LV_NAME = {nfl: 'NFL', cfb: 'NCAAF', nba: 'NBA', nhl: 'NHL', cbb: 'NCAAB', tennis: 'Tennis'};
+var LV_PAGE = {nfl: 'nfl.html', cfb: 'cfb.html', nba: 'nba.html', nhl: 'nhl.html', cbb: 'cbb.html', tennis: 'tennis.html'};
 function lvPct(x) { return x == null ? '-' : x < 0.01 ? 'under 1%' : x > 0.99 ? 'over 99%' : Math.round(100 * x) + '%'; }
 var LV_VALUE = 0.03;   // our chance at least 3 points over the live line's implied chance
 function lvBadge(b) { return b.edge >= LV_VALUE ? `<span class="lv-val">Value +${Math.round(b.edge * 100)}%</span>` : ''; }
 function lvPrice(x) { return x == null ? '-' : x > 0 ? '+' + x : String(x); }
 function lvLogo(u, cls) { return u ? `<img class="${cls || 'lv-lg'}" src="${esc(u)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">` : `<span class="${cls || 'lv-lg'} lv-nolg"></span>`; }
-// the card for one game: the lean first (started, now, fair price), then the score and the rest of our numbers
-function lvCard(g) {
-  const hw = g.home_win, aw = 1 - hw, pre = g.pre || {}, L = g.lean, ten = g.sport === 'tennis';
-  const row = (nm, lg, sc, p, win) => `<div class="lv-row${win ? ' up' : ''}">${lvLogo(lg)}<span class="lv-nm">${esc(nm)}</span><b class="lv-sc">${sc}</b><span class="lv-wp">${lvPct(p)}</span></div>`;
-  const teams = `<div class="lv-teams">${row(g.away, g.al, g.as, aw, aw > hw)}${row(g.home, g.hl, g.hs, hw, hw > aw)}</div>`
-    + (ten && g.state ? `<div class="lv-sets">Sets ${esc(g.state)}</div>` : '');
-  let lean = '';
-  const B = (g.bets || []).filter(b => b.edge > -0.02);
-  if (g.bets && g.bets.length && g.bets[0].edge > -0.05) {
-    const top = B[0] || g.bets[0], rest = (B.length ? B : g.bets).slice(1, 4);
-    lean = `<div class="lv-lean${top.edge >= LV_VALUE ? '' : ' none'}"><div class="lv-k">${top.edge >= LV_VALUE ? 'Best live bet' : 'No value right now'}</div>
-      <div class="lv-pick">${top.logo ? lvLogo(top.logo, 'lv-lg sm') : ''}<b>${esc(top.label)}</b>${lvBadge(top)}</div>
-      <div class="lv-steps">
-        <div><small>Started</small><b>${esc(top.start_txt || '-')}</b><span>Onyx pregame</span></div>
-        <div><small>Live line</small><b>${lvPrice(top.price)}</b><span>${lvPct(OnyxLive.implied(top.price))} implied</span></div>
-        <div class="fair"><small>Our fair</small><b>${lvPrice(top.fair)}</b><span>${lvPct(top.p)} to hit</span></div></div>
-      <div class="lv-verdict">${top.edge >= LV_VALUE ? `A good live bet: the live line of <b>${lvPrice(top.price)}</b> pays more than our fair price of <b>${lvPrice(top.fair)}</b>.` : `The closest one: the live line of ${lvPrice(top.price)} pays less than our fair price of ${lvPrice(top.fair)}. It turns into value at ${lvPrice(top.fair)} or better.`}</div>
-      ${rest.length ? `<div class="lv-bets">${rest.map(b => `<div class="lv-bet"><span class="n">${esc(b.label)}</span><span class="s">${b.start_txt ? esc(b.start_txt) + ' &rarr; ' : ''}<b>${lvPrice(b.price)}</b> &middot; fair ${lvPrice(b.fair)}</span>${lvBadge(b)}</div>`).join('')}</div>` : ''}</div>`;
-  } else if (g.bets && g.bets.length) {
-    lean = `<div class="lv-lean none"><div class="lv-k">No value right now</div><div class="lv-verdict">Every live line on this game pays less than our fair price. We will flag it here the moment one moves past it.</div></div>`;
-  } else if (g.bets && g.f != null && g.f < 0.15) {
-    lean = `<div class="lv-lean none"><div class="lv-k">No live bet</div><div class="lv-verdict">Too late in the game for our numbers: the live line now knows things our model does not, like ${g.sport === 'nhl' ? 'a pulled goalie, power plays and empty nets' : g.sport === 'nba' ? 'possession, the fouls and the timeouts' : 'who has the ball, field position and the timeouts'}.</div></div>`;
-  } else if (L && L.kind === 'ml') {
-    const moved = L.start == null ? 'no Onyx line saved' : L.now >= L.start ? 'up from ' + lvPct(L.start) : 'down from ' + lvPct(L.start);
-    lean = `<div class="lv-lean"><div class="lv-k">Our live lean</div>
-      <div class="lv-pick">${lvLogo(L.logo, 'lv-lg sm')}<b>${esc(L.team)} to win</b></div>
-      <div class="lv-steps">
-        <div><small>Started</small><b>${L.start == null ? '-' : lvPct(L.start)}</b><span>${L.start_price != null ? 'Onyx ' + lvPrice(L.start_price) : 'Onyx pregame'}</span></div>
-        <div><small>Now</small><b>${lvPct(L.now)}</b><span>${esc(moved)}</span></div>
-        <div class="fair"><small>Fair price</small><b>${lvPrice(L.fair)}</b><span>our number</span></div></div>
-      <div class="lv-verdict">${L.fair < 0 ? `A good live bet at any Onyx price better than <b>${lvPrice(L.fair)}</b>, like ${lvPrice(Math.round(L.fair * 0.85 / 5) * 5)}.` : `A good live bet at any Onyx price of <b>${lvPrice(L.fair)} or longer</b>.`}</div></div>`;
-  } else if (L && L.kind === 'total') {
-    const u = L.side === 'under';
-    lean = `<div class="lv-lean"><div class="lv-k">Our live lean</div>
-      <div class="lv-pick"><b>${u ? 'Under' : 'Over'} the total</b></div>
-      <div class="lv-steps">
-        <div><small>Started</small><b>${L.start}</b><span>Onyx total</span></div>
-        <div><small>Now</small><b>${L.now}</b><span>scored so far</span></div>
-        <div class="fair"><small>Fair total</small><b>${L.fair}</b><span>our number</span></div></div>
-      <div class="lv-verdict">A good live bet: the <b>${u ? 'under' : 'over'}</b> at any Onyx live total ${u ? 'above' : 'below'} <b>${L.fair}</b>.</div></div>`;
-  } else {
-    lean = `<div class="lv-lean none"><div class="lv-k">Our live lean</div><div class="lv-verdict">${L && L.why === 'nopre' ? 'No lean: Onyx\'s line from before the start was not saved for this game, so there is nothing to measure the move from.' : 'No lean on this one: the game is close to decided.'}</div></div>`;
-  }
-  const more = ten ? '' : `<div class="lv-more"><span>Our spread now <b>${esc(g.fair_spread)}</b></span><span>Our total now <b>${g.proj_total != null ? g.proj_total.toFixed(1) : '-'}</b></span>${pre.spread_txt ? `<span>Onyx pregame <b>${esc(pre.spread_txt)}${pre.total_txt ? ' · ' + esc(pre.total_txt) : ''}</b></span>` : ''}</div>`;
-  const open = LV_PAGE[g.sport] + (g.sport === 'nba' ? '#games' : '#games:' + g.gid);
-  return `<div class="lv-card"><div class="lv-top"><span class="t10-tag sp">${LV_NAME[g.sport]}</span><span class="lv-clock">${esc(ten ? g.detail || 'Live' : g.detail)}</span></div>
-    ${teams}<div class="lv-bar"><i style="width:${(100 * aw).toFixed(1)}%"></i></div>${lean}${more}
-    <div class="lv-f"><a class="go" href="https://app.onyxodds.com/?referrer=${ONYX_REFERRER}" target="_blank" rel="noopener">Bet it live on Onyx</a><a href="${open}">Open the game</a></div></div>`;
-}
+// the card for one game: live.js draws it, so the Live tab, Ask Onyx and every sport page's Live block match
+function lvCard(g) { return OnyxLive.card(g); }
 function lvRender() {
   const list = document.getElementById('lvList'), tabs = document.getElementById('lvTabs');
   if (!list) return;
-  const sports = ['all'].concat(['nfl', 'nba', 'nhl', 'cfb', 'tennis'].filter(k => LV.games.some(g => g.sport === k)));
+  const sports = ['all'].concat(['nfl', 'nba', 'nhl', 'cfb', 'cbb', 'tennis'].filter(k => LV.games.some(g => g.sport === k)));
   tabs.innerHTML = sports.map(k => `<button type="button" class="${LV.sport === k ? 'on' : ''}" onclick="LV.sport='${k}';lvRender()">${k === 'all' ? 'All live · ' + LV.games.length : LV_NAME[k] + ' · ' + LV.games.filter(g => g.sport === k).length}</button>`).join('');
   const best = document.getElementById('lvBest');
   if (best) {
@@ -592,8 +515,10 @@ async function lvLoad() {
   if (!window.OnyxLive) return;
   try { LV.games = lvSort(await OnyxLive.games()); } catch (e) { LV.games = LV.games || []; }
   lvRender();
+  OnyxLive.ledger().then(rows => { const el = document.getElementById('lvRec'); if (el) el.innerHTML = '<div class="lvb">' + OnyxLive.recordHTML(rows, 'all') + '</div>'; }).catch(() => {});
 }
 function lvInit() {
+  if (window.OnyxLive) OnyxLive.css();
   lvLoad();
   clearInterval(LV.timer);
   LV.timer = setInterval(() => { if (!document.hidden) lvLoad(); }, 20000);

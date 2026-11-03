@@ -125,6 +125,13 @@ jobs:
           OPTICODDS_API_KEY: ${{ secrets.OPTICODDS_API_KEY }}
         continue-on-error: true
         timeout-minutes: 12
+      # Live value record, on trial (live_log.py): every live value play the pages show (our live
+      # chance at least 3 points over the live line), logged once and graded off the final.
+      # Fail-soft by design (exits 0 on any error) and never touches another ledger.
+      - name: Live value record (on trial)
+        run: python3 live_log.py
+        continue-on-error: true
+        timeout-minutes: 4
       # ROADMAP Phase 2, finally built. Blocks the commit when the page is
       # structurally broken, a batting slot is duplicated or missing, or a
       # graded ledger shrank. A non-zero exit here means yesterday's page stays

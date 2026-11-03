@@ -15,6 +15,8 @@
 <!-- shared app shell: bottom menu, search, toasts, status-bar fix (ui.js) -->
 <script src="ui.js" defer></script>
 <script src="saved.js"></script>
+<!-- live value (live.js): the Live block on Home and Games, shared with every sport page -->
+<script src="live.js"></script>
 <!-- team cards (cards.js, data/nba/cards/*.json): data-oxt opens one -->
 <script src="cards.js" defer></script>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -727,6 +729,7 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
   </div>
   <div class="home-stats-grid" id="homeStats"></div>
   <div class="home-body">
+    <div id="oxLiveHome"></div>
     <div id="homeYP" style="padding:0 0 4px"></div>
     <div class="home-section">
       <div class="home-section-tag">The Model's Parlay</div>
@@ -767,6 +770,7 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
 <!-- ═══ GAMES (gamecenter, MLB components) ═════════════════════ -->
 <div class="pane" id="pane-games">
   <div class="gc-wrap">
+    <div id="oxLiveGames"></div>
     <div id="gcGrid"></div>
     <div id="gcBody"></div>
   </div>
@@ -3419,6 +3423,8 @@ document.addEventListener('DOMContentLoaded', function () {
   const h = (location.hash || '').slice(1);
   gotoTab(RENDER[h] ? h : 'home');
   pollLive();
+  // live value (live.js); Home already leads with the Model's Parlay and Onyx Picks, so no spot list here
+  if (window.OnyxLive) OnyxLive.mount({sport: 'nba', home: 'oxLiveHome', games: 'oxLiveGames', spot: false});
   setTimeout(ypLoop, 2500);   // after the first scoreboard poll maps ESPN event ids
 });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') { closePlayer(); closeNav(); } });
