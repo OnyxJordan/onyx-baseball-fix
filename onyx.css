@@ -304,7 +304,7 @@
    count until you start building, so it stops covering the page */
 .pb-fab{font-family:var(--ox-mono);text-transform:uppercase;letter-spacing:.05em;font-weight:700;border-radius:4px;background:var(--ox-purple);box-shadow:0 6px 22px rgba(176,56,249,.45)}
 .pb-fab.on{background:var(--ox-green);color:#0c0c0c}
-@media (max-width:760px){
+@media (max-width:760px),(max-width:1024px) and (pointer:coarse){
   .pb-fab:not(.on){position:relative;width:50px;height:50px;padding:0;font-size:0;display:flex;align-items:center;justify-content:center;border-radius:12px}
   .pb-fab:not(.on)::before{content:"";width:20px;height:22px;background:#fff;
     -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='1.6'%3E%3Crect x='3' y='1.5' width='10' height='13' rx='1.5'/%3E%3Cpath d='M6 5.5h4M6 8.5h4M6 11.5h2'/%3E%3C/svg%3E") center/contain no-repeat;
@@ -361,4 +361,31 @@
           mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='1.5' stroke-linejoin='round'%3E%3Cpath d='M4 11V7a4 4 0 0 1 8 0v4l1.2 1.5H2.8z'/%3E%3Cpath d='M6.5 14a1.6 1.6 0 0 0 3 0'/%3E%3C/svg%3E") center/contain no-repeat}
 .notif-bell:hover{border-color:var(--ox-purple);color:var(--ox-white)}
 .notif-bell.on{color:var(--ox-green);border-color:rgba(97,233,112,.45);box-shadow:none}
-@media (max-width:760px){.nav .notif-bell{display:none}}
+@media (max-width:760px),(max-width:1024px) and (pointer:coarse){.nav .notif-bell{display:none}}
+
+/* ── iPhone Duo (11/3) ───────────────────────────────────────────────
+   The Duo's cover screen is 466x678 and its inner screen opens wider than
+   tall at 890x626. Touch screens up to 1024px wide get the phone app's
+   header (hamburger, no tab strip) to go with ui.js's bottom bar, instead
+   of the desktop header that cut its tabs off; content layouts stay
+   width-based so the unfolded screen still uses its room. */
+@media (min-width:761px) and (max-width:1024px) and (pointer:coarse){
+  .nav{height:calc(50px + var(--sat));padding:var(--sat) 16px 0}
+  .nav .nav-tabs{display:none}
+  .nav .nav-hamburger{display:flex;width:36px;height:36px}
+  .nav .nav-badge,.nav .nav-date{display:none!important}
+  .nav .nav-logo{margin-right:0}
+  .nav .nav-right{gap:6px;flex-shrink:0;margin-left:auto}
+  .nav .logo-svg{width:28px!important;height:28px!important}
+  .nav .logo-onyx{font-size:14px}
+}
+/* short screens (the Duo's cover and its unfolded inner screen, phones in
+   landscape): the hero no longer fills the first screen on its own, so the
+   numbers and today's plays start above the fold */
+@media (max-height:720px){
+  .home-hero{min-height:auto;padding-top:28px;padding-bottom:32px;justify-content:flex-start}
+  .home-hero-title{font-size:clamp(34px,min(7.2vw,10vh),92px)}
+  .ox-hero{min-height:auto;padding:12px 0 28px}
+  .ox-hero-in{padding-top:44px;gap:16px}
+  .ox-hero h1{font-size:clamp(40px,min(9.6vw,12vh),148px)}
+}

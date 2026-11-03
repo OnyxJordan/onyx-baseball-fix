@@ -168,6 +168,14 @@
       root.style.setProperty('--sab', '34px');   // home indicator
   }
 
+  /* the app chrome (bottom bar, hamburger header, bottom sheets) runs on phones AND on
+     touch screens up to 1024px wide: the iPhone Duo opens to an 890x626 inner screen, which
+     used to get the desktop header with its tabs cut off and no bottom bar. Content layouts
+     stay width-based; only the navigation follows the hand. */
+  var APP = '(max-width:760px),(max-width:1024px) and (pointer:coarse)';
+  var DESK = '(min-width:1025px),(min-width:761px) and (pointer:fine)';
+  window.OnyxAppQuery = APP;
+
   // ── 2. styles ─────────────────────────────────────────────────────────
   var CSS = [
     ':root{--sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px)}',
@@ -175,7 +183,7 @@
     '.ogrid[hidden],.ores[hidden],.oact[hidden]{display:none!important}',
     /* bottom bar */
     '.obar{display:none}',
-    '@media (max-width:760px){',
+    '@media '+APP+'{',
     '.bnav,.nav-drawer{display:none!important}',
     '.nav>.nav-tab{display:none!important}',
     '.obar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:9000;padding:6px 6px calc(6px + var(--sab));',
@@ -200,11 +208,13 @@
     'background:linear-gradient(180deg,rgba(28,22,40,.98),rgba(14,14,18,.99));border:1px solid rgba(176,56,249,.28);border-bottom:0;border-radius:22px 22px 0 0;',
     'padding:8px 16px calc(18px + var(--sab));transform:translateY(105%);transition:transform .32s cubic-bezier(.2,.9,.25,1);box-shadow:0 -20px 60px rgba(0,0,0,.55)}',
     '.osheet.open{transform:translateY(0)}',
+    /* unfolded iPhone Duo and other touch screens 761-1024px: the bottom sheet, centered at a readable width */
+    '@media (min-width:761px) and (max-width:1024px) and (pointer:coarse){.osheet{left:50%;right:auto;width:640px;margin-left:-320px}}',
     /* closed = hidden from view, taps, Tab and screen readers; visibility flips
        after the slide-out so the closing animation still plays */
     '.osheet{visibility:hidden;transition:transform .32s cubic-bezier(.2,.9,.25,1),opacity .2s,visibility 0s linear .32s}',
     '.osheet.open{visibility:visible;transition:transform .32s cubic-bezier(.2,.9,.25,1),opacity .2s,visibility 0s}',
-    '@media (min-width:761px){.osheet{left:50%;right:auto;width:560px;margin-left:-280px;bottom:auto;top:calc(80px + var(--sat));border-radius:18px;border-bottom:1px solid rgba(176,56,249,.28);transform:translateY(-12px) scale(.98);opacity:0;pointer-events:none;transition:transform .2s,opacity .2s}',
+    '@media '+DESK+'{.osheet{left:50%;right:auto;width:560px;margin-left:-280px;bottom:auto;top:calc(80px + var(--sat));border-radius:18px;border-bottom:1px solid rgba(176,56,249,.28);transform:translateY(-12px) scale(.98);opacity:0;pointer-events:none;transition:transform .2s,opacity .2s}',
     '.osheet.open{transform:none;opacity:1;pointer-events:auto}.osheet-grip{display:none}}',
     '.osheet-grip{width:40px;height:5px;border-radius:3px;background:rgba(255,255,255,.22);margin:2px auto 12px}',
     '.osheet-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}',
@@ -217,7 +227,7 @@
     '.osearch input{flex:1;background:none;border:0;outline:0;color:var(--text,#fff);font:500 15px "Space Grotesk",system-ui,sans-serif;min-width:0}',
     '.osearch kbd{font:700 10px monospace;padding:2px 6px;border-radius:5px;border:1px solid rgba(255,255,255,.15);color:var(--text3,#888)}',
     '.ogrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}',
-    '@media (min-width:761px){.ogrid{grid-template-columns:repeat(3,minmax(0,1fr))}}',
+    '@media '+DESK+'{.ogrid{grid-template-columns:repeat(3,minmax(0,1fr))}}',
     '.otile{display:flex;gap:10px;align-items:flex-start;text-align:left;padding:12px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);',
     'color:var(--text,#fff);cursor:pointer;transition:transform .12s,border-color .15s,background .15s;-webkit-tap-highlight-color:transparent;opacity:0;transform:translateY(8px)}',
     '.osheet.open .otile{opacity:1;transform:none;transition:opacity .3s,transform .3s,border-color .15s,background .15s}',
@@ -239,7 +249,7 @@
     '.ores .none{color:var(--text3,#888);font-size:13px;padding:8px 2px}',
     /* toasts */
     '.otoasts{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + var(--sab));z-index:10100;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none;width:min(420px,calc(100vw - 24px))}',
-    '@media (max-width:760px){.otoasts{bottom:auto;top:calc(var(--sat) + 60px)}}',
+    '@media '+APP+'{.otoasts{bottom:auto;top:calc(var(--sat) + 60px)}}',
     '.otoast{pointer-events:auto;display:flex;align-items:center;gap:10px;width:100%;padding:12px 14px;border-radius:14px;background:rgba(22,18,32,.97);border:1px solid rgba(176,56,249,.4);',
     'box-shadow:0 10px 34px rgba(0,0,0,.5);color:#fff;font:600 13px "Space Grotesk",system-ui,sans-serif;animation:otIn .3s cubic-bezier(.2,.9,.25,1)}',
     '.otoast.out{animation:otOut .25s ease forwards}',
@@ -247,7 +257,7 @@
     '.otoast i.rm{background:#8a8a99;box-shadow:none}',
     '.otoast button{margin-left:auto;background:none;border:0;color:#d795ff;font:800 11px "Space Grotesk",system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;padding:4px}',
     '@keyframes otIn{from{opacity:0;transform:translateY(14px) scale(.96)}to{opacity:1;transform:none}}',
-    '@media (max-width:760px){.otoast{animation-name:otInTop}}',
+    '@media '+APP+'{.otoast{animation-name:otInTop}}',
     '@keyframes otInTop{from{opacity:0;transform:translateY(-14px) scale(.96)}to{opacity:1;transform:none}}',
     '@keyframes otOut{to{opacity:0;transform:translateY(10px)}}',
     /* header, panes, press feedback */
@@ -259,8 +269,8 @@
     '.osbtn:hover{border-color:rgba(176,56,249,.5);color:var(--text,#fff)}',
     '.osbtn kbd{font:700 10px monospace;padding:1px 5px;border-radius:4px;border:1px solid rgba(255,255,255,.15)}',
     '.osbtn .oi{width:15px;height:15px}',
-    '@media (max-width:760px){.osbtn{display:none}}',
-    '@media (max-width:760px){.opill{display:inline-flex}.opill a{padding:5px 10px;font-size:10px}}',
+    '@media '+APP+'{.osbtn{display:none}}',
+    '@media '+APP+'{.opill{display:inline-flex}.opill a{padding:5px 10px;font-size:10px}}',
     /* the shared header controls (11/2): My picks and Account, one component on every page */
     '.ox-hctl{display:inline-flex;align-items:center;gap:6px;flex-shrink:0}',
     '.ox-mypk,.ox-acct{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:7px;height:34px;padding:0 11px;margin:0;box-sizing:border-box;',
@@ -288,7 +298,7 @@
     /* the hub header (home.html) keeps its own look: the controls sit at its right end */
     '.ox-acts .ox-hctl{margin-left:-6px}',
     '.ox-page .ox-hub{color:var(--ox-purple,#b038f9)}',
-    '@media (max-width:760px){.ox-acts{gap:8px}.ox-acts .ox-hctl{margin-left:0}}',
+    '@media '+APP+'{.ox-acts{gap:8px}.ox-acts .ox-hctl{margin-left:0}}',
     /* the standard Onyx Sports header for pages that are not a sport site (picks, account, ...):
        the sport pages\' header, rebuilt here because those pages do not carry the sport stylesheet */
     '.nav.ox-stdnav{height:calc(58px + var(--sat));padding:var(--sat) 20px 0;display:flex;align-items:center;gap:0;box-sizing:border-box;width:100%;',
@@ -305,7 +315,7 @@
     '.ox-stdnav .nav-right{margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0;padding-left:10px}',
     '.ox-stdnav .nav-hamburger{display:none;align-items:center;justify-content:center;width:40px;height:40px;border-radius:8px;background:none;border:1px solid rgba(255,255,255,.12);color:#ccc;cursor:pointer;flex-shrink:0;padding:0}',
     '.ox-stdnav .nav-hamburger svg{width:18px;height:18px}',
-    '@media (max-width:760px){.nav.ox-stdnav{height:calc(50px + var(--sat));padding-left:14px;padding-right:14px}.ox-stdnav .nav-tabs{display:none}',
+    '@media '+APP+'{.nav.ox-stdnav{height:calc(50px + var(--sat));padding-left:14px;padding-right:14px}.ox-stdnav .nav-tabs{display:none}',
     '.ox-stdnav .nav-hamburger{display:flex;width:36px;height:36px}.ox-stdnav .logo-svg{width:28px;height:28px}.ox-stdnav .logo-onyx{font-size:14px}.ox-stdnav .nav-logo{margin-right:0;min-width:0}.ox-stdnav .nav-right{gap:6px}}',
     /* follow a player: one button everywhere (sport pages, the NBA card, team and player cards, depth charts) */
     '.fl-btn{background:none;border:1px solid var(--border2,rgba(255,255,255,.14));border-radius:999px;color:var(--text2,#cfc8da);font:700 11px monospace;padding:6px 11px;cursor:pointer;white-space:nowrap}',
@@ -335,9 +345,9 @@
     '.sb-card:active,.score-game:active{transform:scale(.98)}',
     /* what's new */
     '.onew{position:fixed;inset:0;z-index:10200;display:flex;align-items:flex-end;justify-content:center;background:rgba(4,4,8,.6);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);padding:0 0 var(--sab);animation:oFade .25s}',
-    '@media (min-width:761px){.onew{align-items:center}}',
+    '@media '+DESK+'{.onew{align-items:center}}',
     '.onew-card{width:min(460px,100vw);border-radius:22px 22px 0 0;padding:22px 20px 20px;background:linear-gradient(180deg,rgba(32,22,48,.99),rgba(14,14,18,.99));border:1px solid rgba(176,56,249,.35);animation:otIn .35s cubic-bezier(.2,.9,.25,1)}',
-    '@media (min-width:761px){.onew-card{border-radius:20px}}',
+    '@media '+DESK+'{.onew-card{border-radius:20px}}',
     '.onew-card h3{margin:6px 0 4px;font-size:21px}',
     '.onew-card .eb{font:800 10px monospace;letter-spacing:.16em;color:#d795ff;text-transform:uppercase}',
     '.onew-card ul{list-style:none;padding:0;margin:14px 0 18px;display:flex;flex-direction:column;gap:10px}',
