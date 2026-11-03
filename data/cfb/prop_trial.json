@@ -746,5 +746,93 @@
   "model": "v2",
   "result": null,
   "actual": null
+ },
+ {
+  "date": "2026-11-03",
+  "key": "401858288|kevin jennings|rush_yds",
+  "gid": "401858288",
+  "pid": "5084084",
+  "name": "Kevin Jennings",
+  "team": "SMU",
+  "opp": "VT",
+  "matchup": "SMU vs VT",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 14.5,
+  "price": -114,
+  "sel": "4156c169-b94f-4635-a145-c8c1a5e05e00",
+  "proj": 11.1,
+  "prob": 0.6116,
+  "implied": 0.5327,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.61,
+    "avg": 0.77,
+    "pp": -3.9
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.86,
+    "avg": 0.93,
+    "pp": 1.1
+   },
+   {
+    "k": "line vs his usual range",
+    "v": 0.0,
+    "avg": -0.05,
+    "pp": -0.0
+   }
+  ],
+  "opened_at": "2026-11-03T12:14:26+00:00",
+  "logged_at": "2026-11-03T12:14:26+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-03",
+  "key": "401858288|kendrick raphael|rush_yds",
+  "gid": "401858288",
+  "pid": "4899368",
+  "name": "Kendrick Raphael",
+  "team": "SMU",
+  "opp": "VT",
+  "matchup": "SMU vs VT",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 73.5,
+  "price": -114,
+  "sel": "6c32ca47-9725-4d18-8d91-bca88b83e92b",
+  "proj": 69.2,
+  "prob": 0.6095,
+  "implied": 0.5327,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.61,
+    "avg": 0.77,
+    "pp": -3.9
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.86,
+    "avg": 0.93,
+    "pp": 1.1
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.22,
+    "avg": -0.05,
+    "pp": 0.2
+   }
+  ],
+  "opened_at": "2026-11-03T12:14:26+00:00",
+  "logged_at": "2026-11-03T12:14:26+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
  }
 ]
