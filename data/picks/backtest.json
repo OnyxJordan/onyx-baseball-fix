@@ -1874,6 +1874,351 @@
    "notes": "picks.py has no tennis grader yet, so a pass here would still need one before tennis is logged."
   },
   {
+   "sport": "cbb",
+   "market": "pts",
+   "name": "Points",
+   "version": "cbb-props-v1",
+   "chance": "Onyx's over price only (the projection did not help on Nov-Dec 2025 log loss)",
+   "source": "tools/cbb_props_backtest.py walk-forward: cbb_stats preseason projection + 2025-26 ESPN box scores; Onyx open and close (data/picks/lines/cbb.json)",
+   "held_out_from": "2026-01-01",
+   "held_out": "Jan 1 to Apr 9 2026 (blend weight, in-season weights and spread chosen on Nov-Dec 2025)",
+   "tune": {
+    "open": {
+     "n": 1,
+     "w": 1,
+     "l": 0,
+     "p": 0,
+     "units": 1.0,
+     "roi": 1.0,
+     "avg_price": 100,
+     "claimed": 0.5763,
+     "hit": 1.0,
+     "first": "2025-11-15",
+     "last": "2025-11-15"
+    },
+    "close": {
+     "n": 1,
+     "w": 0,
+     "l": 1,
+     "p": 0,
+     "units": -1.0,
+     "roi": -1.0,
+     "avg_price": -108,
+     "claimed": 0.5837,
+     "hit": 0.0,
+     "first": "2025-11-17",
+     "last": "2025-11-17"
+    }
+   },
+   "test": {
+    "open": {
+     "n": 0,
+     "w": 0,
+     "l": 0,
+     "p": 0,
+     "units": 0,
+     "roi": null,
+     "avg_price": null,
+     "claimed": null,
+     "hit": null,
+     "first": null,
+     "last": null
+    },
+    "close": {
+     "n": 0,
+     "w": 0,
+     "l": 0,
+     "p": 0,
+     "units": 0,
+     "roi": null,
+     "avg_price": null,
+     "claimed": null,
+     "hit": null,
+     "first": null,
+     "last": null
+    }
+   },
+   "verdict": "no bets",
+   "why": "the pick rule found no bet in the held-out period",
+   "notes": "Onyx listed only the over on college props from Jan 2026 (143 of 1,155 Nov-Dec lines had an under); overs cashed 45% against 52% implied. Model alone (100%): points 64-73 -9.8% open / -8.6% close, rebounds 32-34 +1.7% / +0.5% held out. Live site does not price these yet."
+  },
+  {
+   "sport": "cbb",
+   "market": "reb",
+   "name": "Rebounds",
+   "version": "cbb-props-v1",
+   "chance": "projection blended 50% with Onyx's over price (implied x 0.878, over-only lines)",
+   "source": "tools/cbb_props_backtest.py walk-forward: cbb_stats preseason projection + 2025-26 ESPN box scores; Onyx open and close (data/picks/lines/cbb.json)",
+   "held_out_from": "2026-01-01",
+   "held_out": "Jan 1 to Apr 9 2026 (blend weight, in-season weights and spread chosen on Nov-Dec 2025)",
+   "tune": {
+    "open": {
+     "n": 8,
+     "w": 7,
+     "l": 1,
+     "p": 0,
+     "units": 5.22,
+     "roi": 0.6524,
+     "avg_price": -39,
+     "claimed": 0.5799,
+     "hit": 0.875,
+     "first": "2025-11-12",
+     "last": "2025-12-09"
+    },
+    "close": {
+     "n": 7,
+     "w": 6,
+     "l": 1,
+     "p": 0,
+     "units": 4.42,
+     "roi": 0.6317,
+     "avg_price": -25,
+     "claimed": 0.5689,
+     "hit": 0.8571,
+     "first": "2025-11-12",
+     "last": "2025-12-09"
+    }
+   },
+   "test": {
+    "open": {
+     "n": 7,
+     "w": 4,
+     "l": 3,
+     "p": 0,
+     "units": 2.1,
+     "roi": 0.3,
+     "avg_price": 53,
+     "claimed": 0.5089,
+     "hit": 0.5714,
+     "first": "2026-01-15",
+     "last": "2026-03-22"
+    },
+    "close": {
+     "n": 3,
+     "w": 0,
+     "l": 3,
+     "p": 0,
+     "units": -3.0,
+     "roi": -1.0,
+     "avg_price": 31,
+     "claimed": 0.5288,
+     "hit": 0.0,
+     "first": "2026-01-15",
+     "last": "2026-03-22"
+    }
+   },
+   "verdict": "not enough yet",
+   "why": "only 7 held-out bets (needs 60); ROI +30.0% at the open, -100.0% at the close so far",
+   "notes": "Onyx listed only the over on college props from Jan 2026 (143 of 1,155 Nov-Dec lines had an under); overs cashed 45% against 52% implied. Model alone (100%): points 64-73 -9.8% open / -8.6% close, rebounds 32-34 +1.7% / +0.5% held out. Live site does not price these yet."
+  },
+  {
+   "sport": "cbb",
+   "market": "ast",
+   "name": "Assists",
+   "version": "cbb-props-v1",
+   "chance": "projection blended 100% with Onyx's over price (implied x 0.878, over-only lines)",
+   "source": "tools/cbb_props_backtest.py walk-forward: cbb_stats preseason projection + 2025-26 ESPN box scores; Onyx open and close (data/picks/lines/cbb.json)",
+   "held_out_from": "2026-01-01",
+   "held_out": "Jan 1 to Apr 9 2026 (blend weight, in-season weights and spread chosen on Nov-Dec 2025)",
+   "tune": {
+    "open": {
+     "n": 14,
+     "w": 10,
+     "l": 4,
+     "p": 0,
+     "units": 5.91,
+     "roi": 0.4224,
+     "avg_price": -7,
+     "claimed": 0.5739,
+     "hit": 0.7143,
+     "first": "2025-11-09",
+     "last": "2025-12-13"
+    },
+    "close": {
+     "n": 9,
+     "w": 6,
+     "l": 3,
+     "p": 0,
+     "units": 3.61,
+     "roi": 0.401,
+     "avg_price": 62,
+     "claimed": 0.5495,
+     "hit": 0.6667,
+     "first": "2025-11-09",
+     "last": "2025-12-06"
+    }
+   },
+   "test": {
+    "open": {
+     "n": 7,
+     "w": 4,
+     "l": 3,
+     "p": 0,
+     "units": 1.17,
+     "roi": 0.1671,
+     "avg_price": 83,
+     "claimed": 0.5225,
+     "hit": 0.5714,
+     "first": "2026-02-24",
+     "last": "2026-03-23"
+    },
+    "close": {
+     "n": 7,
+     "w": 5,
+     "l": 2,
+     "p": 0,
+     "units": 3.6,
+     "roi": 0.5146,
+     "avg_price": 54,
+     "claimed": 0.5276,
+     "hit": 0.7143,
+     "first": "2026-02-24",
+     "last": "2026-02-28"
+    }
+   },
+   "verdict": "not enough yet",
+   "why": "only 7 held-out bets (needs 60); ROI +16.7% at the open, +51.5% at the close so far",
+   "notes": "Onyx listed only the over on college props from Jan 2026 (143 of 1,155 Nov-Dec lines had an under); overs cashed 45% against 52% implied. Model alone (100%): points 64-73 -9.8% open / -8.6% close, rebounds 32-34 +1.7% / +0.5% held out. Live site does not price these yet."
+  },
+  {
+   "sport": "cbb",
+   "market": "3pm",
+   "name": "Made threes",
+   "version": "cbb-props-v1",
+   "chance": "Onyx's over price only (the projection did not help on Nov-Dec 2025 log loss)",
+   "source": "tools/cbb_props_backtest.py walk-forward: cbb_stats preseason projection + 2025-26 ESPN box scores; Onyx open and close (data/picks/lines/cbb.json)",
+   "held_out_from": "2026-01-01",
+   "held_out": "Jan 1 to Apr 9 2026 (blend weight, in-season weights and spread chosen on Nov-Dec 2025)",
+   "tune": {
+    "open": {
+     "n": 0,
+     "w": 0,
+     "l": 0,
+     "p": 0,
+     "units": 0,
+     "roi": null,
+     "avg_price": null,
+     "claimed": null,
+     "hit": null,
+     "first": null,
+     "last": null
+    },
+    "close": {
+     "n": 0,
+     "w": 0,
+     "l": 0,
+     "p": 0,
+     "units": 0,
+     "roi": null,
+     "avg_price": null,
+     "claimed": null,
+     "hit": null,
+     "first": null,
+     "last": null
+    }
+   },
+   "test": {
+    "open": {
+     "n": 0,
+     "w": 0,
+     "l": 0,
+     "p": 0,
+     "units": 0,
+     "roi": null,
+     "avg_price": null,
+     "claimed": null,
+     "hit": null,
+     "first": null,
+     "last": null
+    },
+    "close": {
+     "n": 0,
+     "w": 0,
+     "l": 0,
+     "p": 0,
+     "units": 0,
+     "roi": null,
+     "avg_price": null,
+     "claimed": null,
+     "hit": null,
+     "first": null,
+     "last": null
+    }
+   },
+   "verdict": "no bets",
+   "why": "the pick rule found no bet in the held-out period",
+   "notes": "Onyx listed only the over on college props from Jan 2026 (143 of 1,155 Nov-Dec lines had an under); overs cashed 45% against 52% implied. Model alone (100%): points 64-73 -9.8% open / -8.6% close, rebounds 32-34 +1.7% / +0.5% held out. Live site does not price these yet."
+  },
+  {
+   "sport": "cbb",
+   "market": "pra",
+   "name": "Points + rebounds + assists",
+   "version": "cbb-props-v1",
+   "chance": "projection blended 70% with Onyx's over price (implied x 0.878, over-only lines)",
+   "source": "tools/cbb_props_backtest.py walk-forward: cbb_stats preseason projection + 2025-26 ESPN box scores; Onyx open and close (data/picks/lines/cbb.json)",
+   "held_out_from": "2026-01-01",
+   "held_out": "Jan 1 to Apr 9 2026 (blend weight, in-season weights and spread chosen on Nov-Dec 2025)",
+   "tune": {
+    "open": {
+     "n": 0,
+     "w": 0,
+     "l": 0,
+     "p": 0,
+     "units": 0,
+     "roi": null,
+     "avg_price": null,
+     "claimed": null,
+     "hit": null,
+     "first": null,
+     "last": null
+    },
+    "close": {
+     "n": 0,
+     "w": 0,
+     "l": 0,
+     "p": 0,
+     "units": 0,
+     "roi": null,
+     "avg_price": null,
+     "claimed": null,
+     "hit": null,
+     "first": null,
+     "last": null
+    }
+   },
+   "test": {
+    "open": {
+     "n": 0,
+     "w": 0,
+     "l": 0,
+     "p": 0,
+     "units": 0,
+     "roi": null,
+     "avg_price": null,
+     "claimed": null,
+     "hit": null,
+     "first": null,
+     "last": null
+    },
+    "close": {
+     "n": 0,
+     "w": 0,
+     "l": 0,
+     "p": 0,
+     "units": 0,
+     "roi": null,
+     "avg_price": null,
+     "claimed": null,
+     "hit": null,
+     "first": null,
+     "last": null
+    }
+   },
+   "verdict": "no bets",
+   "why": "the pick rule found no bet in the held-out period",
+   "notes": "Onyx listed only the over on college props from Jan 2026 (143 of 1,155 Nov-Dec lines had an under); overs cashed 45% against 52% implied. Model alone (100%): points 64-73 -9.8% open / -8.6% close, rebounds 32-34 +1.7% / +0.5% held out. Live site does not price these yet."
+  },
+  {
    "sport": "nba",
    "market": "first_basket",
    "name": "First basket",
@@ -1914,13 +2259,6 @@
    "name": "Anytime TD",
    "verdict": "no replay",
    "why": "Nothing to replay: the chance shown is Onyx's own price x .82, on the Ask Onyx board only, never value."
-  },
-  {
-   "sport": "cbb",
-   "market": "props",
-   "name": "Player props",
-   "verdict": "no replay",
-   "why": "College basketball player props have no Onyx price history on file and no backtested projection, so they stay projections. Game lines (moneyline, spread, total) are replayed above."
   },
   {
    "sport": "golf",

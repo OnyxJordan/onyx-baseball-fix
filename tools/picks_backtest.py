@@ -57,7 +57,9 @@ Sources (data/picks/lines/ committed; bt/ local, see tools/rules_lab_build.py fo
   NFL v11 lanes    tools/nfl_feature_screen.py rows; statistics as live (nfl_model.V11),
                    coefficients refit on 2025 only, judged on 2026
   more replays     tools/picks_replays.py: NBA 1st-half total, tennis total games and game
-                   spread, NFL receptions (unders), college football player props
+                   spread, NFL receptions (unders), college football player props, college basketball
+                   player props (tools/cbb_props_backtest.py; 2025-26 card frozen in
+                   data/picks/lines/cbb_props_frozen.json for a runner without bt/)
 Markets with no replay of the live chance are listed with the reason and never finalized.
 A market whose numbers pass but that picks.py cannot grade, or that the live Top 10 never
 shows, is marked "passes, not offered" and is not finalized: nothing would ever be logged.
@@ -82,7 +84,8 @@ NAME = {"ml": "Moneyline", "spread": "Spread", "total": "Game total", "pts": "Po
         "q1_total": "1st-quarter total", "rush_yds": "Rushing yards", "pass_att": "Pass attempts", "pass_yds": "Passing yards",
         "rec": "Receptions", "rec_yds": "Receiving yards", "anytime_td": "Anytime TD", "first_td": "First TD", "pass_td": "Passing TDs",
         "first_basket": "First basket", "h1_total": "1st-half total", "total_games": "Total games", "game_spread": "Game spread",
-        "props": "Player props", "all": "Every market", "hr": "Home runs", "k": "Strikeouts"}
+        "props": "Player props", "all": "Every market", "hr": "Home runs", "k": "Strikeouts", "3pm": "Made threes",
+        "pra": "Points + rebounds + assists"}
 
 
 def payout(price):
@@ -478,8 +481,6 @@ NO_REPLAY = [
     ("nfl", "pass_yds", "Nothing to replay: excluded from plays by the model's own re-test (v7, v12 dropped the v11 overs), so the Top 10 rule can never pick one."),
     ("nfl", "anytime_td", "Nothing to replay: the chance shown is Onyx's own price x .82 (v6), always below the price, so it is never value and never a pick."),
     ("cfb", "anytime_td", "Nothing to replay: the chance shown is Onyx's own price x .82, on the Ask Onyx board only, never value."),
-    ("cbb", "props", "College basketball player props have no Onyx price history on file and no backtested projection, so they "
-                     "stay projections. Game lines (moneyline, spread, total) are replayed above."),
     ("golf", "all", "Onyx prices no golf markets."),
     ("mlb", "all", "Season closed 10/29; MLB markets return with the 2027 season (HR and K lanes keep their own records)."),
 ]
@@ -497,6 +498,7 @@ def main():
     res += PR.nfl_rec()
     res += PR.cfb_props()
     res += PR.tennis_games()
+    res += PR.cbb_props()
     for r in res:      # a pass that could never be logged is not a finalized market
         if r["verdict"] == "finalized" and (not PK.gradable(r["sport"], r["market"]) or r.get("board_only")):
             r["verdict"] = "passes, not offered"

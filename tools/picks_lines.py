@@ -35,7 +35,10 @@ SPORTS = {
     # NBA props only for 2026-27 on: 2025-26 is replayed once from bt/ and kept as its card (nba_frozen.json)
     "nba": ("basketball", "nba", ("point_spread", "total_points", "1st_quarter_total_points", "1st_half_total_points"),
             ("player_points", "player_rebounds", "player_assists"), "2026-08-01"),
-    "cbb": ("basketball", "ncaab", ("moneyline", "point_spread", "total_points"), (), ""),
+    # college player props (11/3): Onyx prices them over only; tools/cbb_props_backtest.py
+    "cbb": ("basketball", "ncaab", ("moneyline", "point_spread", "total_points"),
+            ("player_points", "player_rebounds", "player_assists", "player_made_threes",
+             "player_points_+_rebounds_+_assists"), ""),
 }
 # the research caches the store was seeded from (and that a local run still reads, merged with the store)
 BT = {
@@ -43,7 +46,7 @@ BT = {
     "cfb": ("bt/cfb_lines.json", "bt/cfb_props.json"),
     "nhl": ("bt/nhl_lines.json",),
     "nba": ("bt/nba_2425_lines.json", "bt/nba_lines_full.json"),
-    "cbb": ("bt/cbb_lines.json",),
+    "cbb": ("bt/cbb_lines.json", "bt/cbb_props.json"),
 }
 FIELDS = ("start", "home", "away", "hs", "as")
 
