@@ -176,7 +176,9 @@ function serve(rootDir) {
     if (fs.existsSync(path.join(ROOT, 'data', 'nba', 'cards.json'))) {
       const before = await page.evaluate(() => { gotoTab('games'); return typeof gcSel !== 'undefined' ? gcSel : null; });
       const t = await page.evaluate(() => { const el = document.querySelector('#pane-games .gm [data-oxt]') || document.querySelector('[data-oxt]'); if (!el) return null; el.click(); return el.getAttribute('data-oxt'); });
-      if (!t) tc = 'no tappable team';
+      // an empty slate (no NBA games today, e.g. CI on an off day) has no team to tap: not a failure
+      const nGames = await page.evaluate(() => ((typeof D !== 'undefined' && D && D.games) || []).length);
+      if (!t) tc = nGames ? 'no tappable team' : 'no games today';
       else {
         await page.waitForSelector('#cx.open .pc-seg', { timeout: 6000 }).catch(() => {});
         const chk = () => page.evaluate(() => {
@@ -223,8 +225,8 @@ function serve(rootDir) {
         tc = [r1 && 'team ' + r1, r2 && 'bets ' + r2, r3 && 'bet card ' + r3, r4 && 'prop row ' + r4, after !== before && 'the tap also opened the gamecenter'].filter(Boolean).join('; ') || `ok (${t}, best bets ranked, bet cards open)`;
       }
     }
-    console.log(`  ${tc.startsWith('ok') || tc === 'no cards data' ? 'ok  ' : 'FAIL'} team card ${tc}`);
-    if (!tc.startsWith('ok') && tc !== 'no cards data') failures++;
+    console.log(`  ${tc.startsWith('ok') || tc === 'no cards data' || tc === 'no games today' ? 'ok  ' : 'FAIL'} team card ${tc}`);
+    if (!tc.startsWith('ok') && tc !== 'no cards data' && tc !== 'no games today') failures++;
     console.log(`  page errors: ${errs.length}`); errs.forEach(e => console.log('   ' + e));
     failures += errs.length;
     await page.close();
