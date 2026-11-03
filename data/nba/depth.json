@@ -1,7 +1,7 @@
 {
  "sport": "nba",
  "date": "2026-11-02",
- "generated": "2026-11-03T05:29:33+00:00",
+ "generated": "2026-11-03T05:33:25+00:00",
  "unit": "min",
  "stats": [
   "pts",
@@ -4086,6 +4086,34 @@
      "home": false
     },
     {
+     "id": "A7D96D6676317E30",
+     "n": "Thomas Sorber",
+     "pos": "C",
+     "role": "Bench",
+     "tag": "Questionable: Knee (Leg)",
+     "use": 0.0,
+     "proj": {
+      "pts": 0.0,
+      "reb": 0.0,
+      "ast": 0.0,
+      "3pm": 0.0,
+      "pra": 0.0
+     },
+     "model": {
+      "use": 0.0,
+      "pts": 0.0
+     },
+     "last": null,
+     "now": {
+      "gp": 0,
+      "use": null
+     },
+     "hs": "5061603",
+     "gid": "2026110356FAE6C4",
+     "opp": "CLE",
+     "home": false
+    },
+    {
      "id": "7935817DC4F2",
      "n": "Jalen Williams",
      "pos": "SF",
@@ -4177,31 +4205,6 @@
       "use": 16.3
      },
      "hs": "4683692",
-     "gid": "2026110356FAE6C4",
-     "opp": "CLE",
-     "home": false
-    },
-    {
-     "id": "A7D96D6676317E30",
-     "n": "Thomas Sorber",
-     "pos": "C",
-     "role": "Out",
-     "tag": "Out: Knee (Leg)",
-     "use": 0.0,
-     "proj": {
-      "pts": 0.0,
-      "reb": 0.0,
-      "ast": 0.0,
-      "3pm": 0.0,
-      "pra": 0.0
-     },
-     "model": null,
-     "last": null,
-     "now": {
-      "gp": 0,
-      "use": null
-     },
-     "hs": "5061603",
      "gid": "2026110356FAE6C4",
      "opp": "CLE",
      "home": false
@@ -20552,7 +20555,7 @@
    "name": "Cleveland Cavaliers",
    "date": "2026-11-02",
    "pace": 102.3,
-   "min_sum": 234.7,
+   "min_sum": 264.8,
    "players": [
     {
      "id": "CC707B1EADE5",
@@ -20562,15 +20565,15 @@
      "tag": "",
      "use": 33.0,
      "proj": {
-      "pts": 18.1,
+      "pts": 17.7,
       "reb": 4.6,
-      "ast": 6.6,
+      "ast": 6.9,
       "3pm": 2.7,
-      "pra": 29.3
+      "pra": 29.2
      },
      "model": {
       "use": 32.9,
-      "pts": 18.4
+      "pts": 18.0
      },
      "last": {
       "use": 33.4,
@@ -20597,15 +20600,15 @@
      "tag": "",
      "use": 32.6,
      "proj": {
-      "pts": 22.5,
-      "reb": 4.8,
-      "ast": 5.4,
+      "pts": 22.3,
+      "reb": 4.7,
+      "ast": 5.6,
       "3pm": 2.9,
-      "pra": 32.7
+      "pra": 32.6
      },
      "model": {
       "use": 32.4,
-      "pts": 22.6
+      "pts": 22.4
      },
      "last": {
       "use": 33.1,
@@ -20632,15 +20635,15 @@
      "tag": "",
      "use": 32.1,
      "proj": {
-      "pts": 17.8,
-      "reb": 8.8,
-      "ast": 3.5,
+      "pts": 18.3,
+      "reb": 8.5,
+      "ast": 3.6,
       "3pm": 1.6,
-      "pra": 30.2
+      "pra": 30.4
      },
      "model": {
       "use": 31.9,
-      "pts": 17.6
+      "pts": 18.1
      },
      "last": {
       "use": 32.9,
@@ -20667,15 +20670,15 @@
      "tag": "",
      "use": 27.6,
      "proj": {
-      "pts": 13.9,
-      "reb": 9.3,
+      "pts": 14.2,
+      "reb": 9.2,
       "ast": 1.8,
       "3pm": 0.1,
-      "pra": 24.9
+      "pra": 25.1
      },
      "model": {
       "use": 27.6,
-      "pts": 13.6
+      "pts": 14.0
      },
      "last": {
       "use": 27.7,
@@ -20695,22 +20698,57 @@
      "home": true
     },
     {
+     "id": "795DC4A7C148",
+     "n": "Peyton Watson",
+     "pos": "SF",
+     "role": "Starter",
+     "tag": "Questionable: Hamstring (Leg, Soreness, Right)",
+     "use": 27.3,
+     "proj": {
+      "pts": 10.9,
+      "reb": 4.3,
+      "ast": 2.4,
+      "3pm": 1.0,
+      "pra": 17.7
+     },
+     "model": {
+      "use": 26.9,
+      "pts": 10.9
+     },
+     "last": {
+      "use": 28.3,
+      "pts": 10.8,
+      "reb": 4.0,
+      "ast": 3.0,
+      "3pm": 0.7,
+      "gp": 6
+     },
+     "now": {
+      "gp": 6,
+      "use": 28.3
+     },
+     "hs": "4576087",
+     "gid": "2026110356FAE6C4",
+     "opp": "OKC",
+     "home": true
+    },
+    {
      "id": "566CEDEB3B34",
      "n": "Sam Merrill",
      "pos": "SG",
-     "role": "Starter",
+     "role": "Rotation",
      "tag": "",
-     "use": 23.8,
+     "use": 21.4,
      "proj": {
-      "pts": 9.2,
-      "reb": 2.8,
-      "ast": 2.2,
-      "3pm": 2.2,
-      "pra": 14.1
+      "pts": 7.7,
+      "reb": 2.3,
+      "ast": 1.8,
+      "3pm": 1.8,
+      "pra": 11.9
      },
      "model": {
-      "use": 23.7,
-      "pts": 9.3
+      "use": 18.7,
+      "pts": 7.4
      },
      "last": {
       "use": 24.0,
@@ -20735,17 +20773,17 @@
      "pos": "SG",
      "role": "Rotation",
      "tag": "",
-     "use": 22.1,
+     "use": 19.8,
      "proj": {
-      "pts": 12.7,
-      "reb": 3.0,
-      "ast": 1.8,
-      "3pm": 2.1,
-      "pra": 17.6
+      "pts": 11.1,
+      "reb": 2.6,
+      "ast": 1.4,
+      "3pm": 1.7,
+      "pra": 15.1
      },
      "model": {
-      "use": 22.3,
-      "pts": 12.1
+      "use": 17.6,
+      "pts": 9.6
      },
      "last": {
       "use": 22.0,
@@ -20765,22 +20803,57 @@
      "home": true
     },
     {
+     "id": "708EEEB44C85",
+     "n": "Jaylon Tyson",
+     "pos": "SG",
+     "role": "Rotation",
+     "tag": "Questionable: Ankle (Leg, Sprain, Right)",
+     "use": 18.6,
+     "proj": {
+      "pts": 7.3,
+      "reb": 3.2,
+      "ast": 2.0,
+      "3pm": 1.0,
+      "pra": 12.5
+     },
+     "model": {
+      "use": 16.5,
+      "pts": 7.1
+     },
+     "last": {
+      "use": 20.8,
+      "pts": 7.8,
+      "reb": 3.6,
+      "ast": 2.8,
+      "3pm": 1.0,
+      "gp": 5
+     },
+     "now": {
+      "gp": 5,
+      "use": 20.8
+     },
+     "hs": "4683747",
+     "gid": "2026110356FAE6C4",
+     "opp": "OKC",
+     "home": true
+    },
+    {
      "id": "81E84049A029FCE7",
      "n": "Mario Hezonja",
      "pos": "F",
      "role": "Rotation",
      "tag": "",
-     "use": 19.6,
+     "use": 17.5,
      "proj": {
-      "pts": 7.9,
-      "reb": 5.5,
-      "ast": 2.1,
-      "3pm": 1.3,
-      "pra": 15.5
+      "pts": 6.9,
+      "reb": 4.6,
+      "ast": 1.7,
+      "3pm": 1.1,
+      "pra": 13.2
      },
      "model": {
-      "use": 19.9,
-      "pts": 7.8
+      "use": 15.7,
+      "pts": 6.2
      },
      "last": {
       "use": 19.3,
@@ -20803,19 +20876,19 @@
      "id": "1F8E9E8C672500C0",
      "n": "Tyrese Proctor",
      "pos": "SG",
-     "role": "Rotation",
+     "role": "Bench",
      "tag": "",
-     "use": 13.8,
+     "use": 11.0,
      "proj": {
-      "pts": 6.4,
-      "reb": 2.4,
-      "ast": 2.2,
-      "3pm": 1.3,
-      "pra": 11.0
+      "pts": 3.6,
+      "reb": 1.7,
+      "ast": 1.1,
+      "3pm": 0.5,
+      "pra": 6.3
      },
      "model": {
-      "use": 14.5,
-      "pts": 6.8
+      "use": 5.9,
+      "pts": 2.7
      },
      "last": {
       "use": 13.2,
@@ -20840,17 +20913,17 @@
      "pos": "PG",
      "role": "Bench",
      "tag": "",
-     "use": 8.7,
+     "use": 6.9,
      "proj": {
-      "pts": 2.1,
-      "reb": 2.0,
-      "ast": 1.6,
-      "3pm": 0.3,
-      "pra": 5.7
+      "pts": 1.1,
+      "reb": 1.3,
+      "ast": 0.8,
+      "3pm": 0.1,
+      "pra": 3.2
      },
      "model": {
-      "use": 10.0,
-      "pts": 2.6
+      "use": 4.0,
+      "pts": 1.1
      },
      "last": {
       "use": 8.2,
@@ -20875,17 +20948,17 @@
      "pos": "C",
      "role": "Bench",
      "tag": "",
-     "use": 8.6,
+     "use": 6.8,
      "proj": {
-      "pts": 5.6,
-      "reb": 2.1,
-      "ast": 0.4,
-      "3pm": 0.6,
-      "pra": 8.1
+      "pts": 3.6,
+      "reb": 1.1,
+      "ast": 0.2,
+      "3pm": 0.2,
+      "pra": 4.8
      },
      "model": {
-      "use": 10.1,
-      "pts": 4.7
+      "use": 4.1,
+      "pts": 1.9
      },
      "last": {
       "use": 8.0,
@@ -20910,17 +20983,17 @@
      "pos": "SF",
      "role": "Bench",
      "tag": "",
-     "use": 6.7,
+     "use": 5.2,
      "proj": {
-      "pts": 2.9,
-      "reb": 1.3,
-      "ast": 0.5,
-      "3pm": 0.3,
-      "pra": 4.8
+      "pts": 1.5,
+      "reb": 0.8,
+      "ast": 0.2,
+      "3pm": 0.1,
+      "pra": 2.5
      },
      "model": {
-      "use": 8.3,
-      "pts": 3.3
+      "use": 3.4,
+      "pts": 1.4
      },
      "last": {
       "use": 6.0,
@@ -20945,17 +21018,17 @@
      "pos": "SF",
      "role": "Bench",
      "tag": "",
-     "use": 6.1,
+     "use": 5.0,
      "proj": {
-      "pts": 2.2,
-      "reb": 1.8,
-      "ast": 0.4,
-      "3pm": 0.4,
-      "pra": 4.4
+      "pts": 0.9,
+      "reb": 1.4,
+      "ast": 0.2,
+      "3pm": 0.1,
+      "pra": 2.5
      },
      "model": {
-      "use": 6.4,
-      "pts": 3.1
+      "use": 2.6,
+      "pts": 1.2
      },
      "last": {
       "use": 6.0,
@@ -21082,70 +21155,6 @@
       "use": null
      },
      "hs": null,
-     "gid": "2026110356FAE6C4",
-     "opp": "OKC",
-     "home": true
-    },
-    {
-     "id": "795DC4A7C148",
-     "n": "Peyton Watson",
-     "pos": "SF",
-     "role": "Out",
-     "tag": "Out: Hamstring (Leg, Soreness, Right)",
-     "use": 0.0,
-     "proj": {
-      "pts": 0.0,
-      "reb": 0.0,
-      "ast": 0.0,
-      "3pm": 0.0,
-      "pra": 0.0
-     },
-     "model": null,
-     "last": {
-      "use": 28.3,
-      "pts": 10.8,
-      "reb": 4.0,
-      "ast": 3.0,
-      "3pm": 0.7,
-      "gp": 6
-     },
-     "now": {
-      "gp": 6,
-      "use": 28.3
-     },
-     "hs": "4576087",
-     "gid": "2026110356FAE6C4",
-     "opp": "OKC",
-     "home": true
-    },
-    {
-     "id": "708EEEB44C85",
-     "n": "Jaylon Tyson",
-     "pos": "SG",
-     "role": "Out",
-     "tag": "Out: Ankle (Leg, Sprain, Right)",
-     "use": 0.0,
-     "proj": {
-      "pts": 0.0,
-      "reb": 0.0,
-      "ast": 0.0,
-      "3pm": 0.0,
-      "pra": 0.0
-     },
-     "model": null,
-     "last": {
-      "use": 20.8,
-      "pts": 7.8,
-      "reb": 3.6,
-      "ast": 2.8,
-      "3pm": 1.0,
-      "gp": 5
-     },
-     "now": {
-      "gp": 5,
-      "use": 20.8
-     },
-     "hs": "4683747",
      "gid": "2026110356FAE6C4",
      "opp": "OKC",
      "home": true
