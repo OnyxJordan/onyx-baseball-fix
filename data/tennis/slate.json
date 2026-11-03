@@ -1681,9 +1681,9 @@
        "win": false,
        "sets": [
         3,
-        1
+        3
        ],
-       "serve": false
+       "serve": true
       },
       {
        "name": "Casper Ruud",
@@ -1693,7 +1693,7 @@
        "win": false,
        "sets": [
         6,
-        1
+        3
        ],
        "serve": false
       }
@@ -5948,7 +5948,7 @@
        "sets": [
         2,
         7,
-        0
+        3
        ],
        "serve": false
       }
@@ -5993,7 +5993,7 @@
      "id": "186710",
      "start": "2026-11-03T20:10Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Campo 5",
@@ -6005,7 +6005,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        5
+        6,
+        1
        ],
        "serve": false
       },
@@ -6016,7 +6017,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        3
+        3,
+        2
        ],
        "serve": true
       }
@@ -6024,9 +6026,9 @@
     },
     {
      "id": "186706",
-     "start": "2026-11-03T21:00Z",
+     "start": "2026-11-03T21:15Z",
      "state": "pre",
-     "detail": "11/3 - 4:00 PM EST",
+     "detail": "11/3 - 4:15 PM EST",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Campo 3",
@@ -7730,5 +7732,5 @@
    ]
   }
  ],
- "fetched": "2026-11-03T20:51:34+00:00"
+ "fetched": "2026-11-03T21:09:29+00:00"
 }
