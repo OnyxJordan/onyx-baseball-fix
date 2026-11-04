@@ -2058,8 +2058,8 @@
     {
      "id": "186489",
      "start": "2026-11-04T17:35Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 2",
      "draw": "Men's Singles",
      "court": "Court 1",
@@ -2072,7 +2072,7 @@
        "win": false,
        "sets": [
         6,
-        1
+        5
        ],
        "serve": false
       },
@@ -2081,10 +2081,10 @@
        "short": "M. Berrettini",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ita.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         7,
-        4
+        7
        ],
        "serve": false
       }
@@ -2094,7 +2094,7 @@
      "id": "186480",
      "start": "2026-11-04T18:10Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 2",
      "draw": "Men's Singles",
      "court": "Court Central",
@@ -2106,9 +2106,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        5
+        7,
+        2
        ],
-       "serve": false
+       "serve": true
       },
       {
        "name": "Alex Michelsen",
@@ -2117,7 +2118,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        6
+        6,
+        2
        ],
        "serve": false
       }
@@ -2127,7 +2129,7 @@
      "id": "186485",
      "start": "2026-11-04T18:10Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 2",
      "draw": "Men's Singles",
      "court": "Court 2",
@@ -2139,7 +2141,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        6
+        6,
+        5
        ],
        "serve": false
       },
@@ -2150,7 +2153,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        6
+        7,
+        2
        ],
        "serve": false
       }
@@ -2158,9 +2162,9 @@
     },
     {
      "id": "186491",
-     "start": "2026-11-04T19:30Z",
+     "start": "2026-11-04T19:45Z",
      "state": "pre",
-     "detail": "11/4 - 2:30 PM EST",
+     "detail": "11/4 - 2:45 PM EST",
      "round": "Round 2",
      "draw": "Men's Singles",
      "court": "Court Central",
@@ -2378,9 +2382,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Matteo Berrettini",
+       "short": "M. Berrettini",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ita.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -6362,7 +6366,7 @@
        "win": false,
        "sets": [
         6,
-        1
+        5
        ],
        "serve": false
       },
@@ -6374,17 +6378,17 @@
        "win": false,
        "sets": [
         2,
-        1
+        4
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
     {
      "id": "186732",
      "start": "2026-11-04T18:10Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Campo 5",
@@ -6399,17 +6403,17 @@
         1,
         1
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Alice Tubello",
        "short": "A. Tubello",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        1
+        6
        ],
        "serve": false
       }
@@ -6417,9 +6421,9 @@
     },
     {
      "id": "186722",
-     "start": "2026-11-04T19:00Z",
-     "state": "pre",
-     "detail": "11/4 - 2:00 PM EST",
+     "start": "2026-11-04T19:05Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Campo 3",
@@ -6430,8 +6434,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/mex.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        2
+       ],
+       "serve": true
       },
       {
        "name": "Despina Papamichail",
@@ -6439,16 +6445,18 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/gre.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        2
+       ],
        "serve": false
       }
      ]
     },
     {
      "id": "186724",
-     "start": "2026-11-04T19:30Z",
+     "start": "2026-11-04T19:40Z",
      "state": "pre",
-     "detail": "11/4 - 2:30 PM EST",
+     "detail": "11/4 - 2:40 PM EST",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Campo 1",
@@ -6512,9 +6520,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Alice Tubello",
+       "short": "A. Tubello",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -7956,5 +7964,5 @@
    ]
   }
  ],
- "fetched": "2026-11-04T18:59:10+00:00"
+ "fetched": "2026-11-04T19:32:45+00:00"
 }

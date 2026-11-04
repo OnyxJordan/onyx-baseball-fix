@@ -2856,10 +2856,10 @@
    "need": 2
   },
   "model": "live-v1",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "14-11",
+  "profit": -1.0,
+  "graded_at": "2026-11-04T19:33:17+00:00"
  },
  {
   "id": "tennis-186489-total-under",
@@ -2885,10 +2885,10 @@
    "need": 2
   },
   "model": "live-v1",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "25",
+  "profit": 0.7407,
+  "graded_at": "2026-11-04T19:33:17+00:00"
  },
  {
   "id": "tennis-186489-spread-away",
@@ -2914,10 +2914,10 @@
    "need": 2
   },
   "model": "live-v1",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "14-11",
+  "profit": -1.0,
+  "graded_at": "2026-11-04T19:33:17+00:00"
  },
  {
   "id": "tennis-186485-ml-away",
@@ -3059,10 +3059,10 @@
    "need": 2
   },
   "model": "live-v1",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "12-2",
+  "profit": -1.0,
+  "graded_at": "2026-11-04T19:33:18+00:00"
  },
  {
   "id": "tennis-186732-total-over",
@@ -3088,10 +3088,10 @@
    "need": 2
   },
   "model": "live-v1",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "14",
+  "profit": -1.0,
+  "graded_at": "2026-11-04T19:33:18+00:00"
  },
  {
   "id": "tennis-186480-ml-home",
@@ -3172,6 +3172,93 @@
   "state": {
    "sets": "6-2 1-1",
    "srv": "home",
+   "need": 2
+  },
+  "model": "live-v1",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "tennis-186722-spread-home",
+  "sport": "tennis",
+  "gid": "186722",
+  "date": "2026-11-04",
+  "logged_at": "2026-11-04T19:33:10+00:00",
+  "matchup": "Renata Zarazua vs Despina Papamichail",
+  "home": "Despina Papamichail",
+  "away": "Renata Zarazua",
+  "label": "Despina Papamichail +5.5 games",
+  "kind": "spread",
+  "side": "home",
+  "line": 5.5,
+  "price": -120,
+  "chance": 0.6352,
+  "implied": 0.5455,
+  "edge": 0.09,
+  "fair": -175,
+  "state": {
+   "sets": "2-2",
+   "srv": "away",
+   "need": 2
+  },
+  "model": "live-v1",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "tennis-186722-total-over",
+  "sport": "tennis",
+  "gid": "186722",
+  "date": "2026-11-04",
+  "logged_at": "2026-11-04T19:33:10+00:00",
+  "matchup": "Renata Zarazua vs Despina Papamichail",
+  "home": "Despina Papamichail",
+  "away": "Renata Zarazua",
+  "label": "Over 19.5 games",
+  "kind": "total",
+  "side": "over",
+  "line": 19.5,
+  "price": -120,
+  "chance": 0.5992,
+  "implied": 0.5455,
+  "edge": 0.054,
+  "fair": -150,
+  "state": {
+   "sets": "2-2",
+   "srv": "away",
+   "need": 2
+  },
+  "model": "live-v1",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "tennis-186722-ml-home",
+  "sport": "tennis",
+  "gid": "186722",
+  "date": "2026-11-04",
+  "logged_at": "2026-11-04T19:33:10+00:00",
+  "matchup": "Renata Zarazua vs Despina Papamichail",
+  "home": "Despina Papamichail",
+  "away": "Renata Zarazua",
+  "label": "Despina Papamichail to win",
+  "kind": "ml",
+  "side": "home",
+  "line": null,
+  "price": 421,
+  "chance": 0.2314,
+  "implied": 0.1919,
+  "edge": 0.039,
+  "fair": 330,
+  "state": {
+   "sets": "2-2",
+   "srv": "away",
    "need": 2
   },
   "model": "live-v1",
