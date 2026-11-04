@@ -3382,5 +3382,34 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186491-spread-away",
+  "sport": "tennis",
+  "gid": "186491",
+  "date": "2026-11-04",
+  "logged_at": "2026-11-04T21:03:41+00:00",
+  "matchup": "Tomas Machac vs Arthur Fils",
+  "home": "Arthur Fils",
+  "away": "Tomas Machac",
+  "label": "Tomas Machac +5.5 games",
+  "kind": "spread",
+  "side": "away",
+  "line": 5.5,
+  "price": -175,
+  "chance": 0.7399,
+  "implied": 0.6364,
+  "edge": 0.104,
+  "fair": -285,
+  "state": {
+   "sets": "3-6 0-0",
+   "srv": "away",
+   "need": 2
+  },
+  "model": "live-v1",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]

@@ -2178,7 +2178,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        3
        ],
        "serve": false
       },
@@ -2189,7 +2189,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        4
+        6
        ],
        "serve": false
       }
@@ -6429,7 +6429,7 @@
      "id": "186722",
      "start": "2026-11-04T19:05Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Campo 3",
@@ -6441,9 +6441,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        7
+        7,
+        2
        ],
-       "serve": false
+       "serve": true
       },
       {
        "name": "Despina Papamichail",
@@ -6452,7 +6453,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        6
+        6,
+        1
        ],
        "serve": false
       }
@@ -6475,7 +6477,7 @@
        "win": false,
        "sets": [
         4,
-        0
+        1
        ],
        "serve": false
       },
@@ -6487,9 +6489,9 @@
        "win": false,
        "sets": [
         6,
-        1
+        6
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -7976,5 +7978,5 @@
    ]
   }
  ],
- "fetched": "2026-11-04T20:43:49+00:00"
+ "fetched": "2026-11-04T21:03:18+00:00"
 }
