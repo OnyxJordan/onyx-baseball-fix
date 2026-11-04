@@ -271,10 +271,24 @@ function serve() {
     if (st.hits.length) bad.push(`${st.hits.length} text on the hinge (${st.hits.slice(0, 3).join(' | ')})`);
     if (st.bar) bad.push(`${st.bar} bottom-bar item(s) on the hinge`);
     if (st.sw > st.vw + 1) bad.push(`scrolls sideways (${st.sw}px > ${st.vw}px)`);
+    // two live pick cards (Jordan's photo, 11/4): one per page, the same width, meeting at the crease
+    const ev = await p.evaluate(async () => {
+      const host = document.querySelector('main, .pane.active, body'), list = document.createElement('div');
+      list.className = 'lv-list'; list.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr));gap:12px';
+      list.innerHTML = '<div class="lv-card" style="height:80px"></div><div class="lv-card" style="height:80px"></div>';
+      host.insertBefore(list, host.firstChild); window.OnyxFoldFit && OnyxFoldFit();
+      const cs = getComputedStyle(document.documentElement), X = parseFloat(cs.getPropertyValue('--fold-x'));
+      const [a, b] = [...list.children].map(c => c.getBoundingClientRect()); list.remove();
+      return { l: [a.left, a.right], r: [b.left, b.right], X, top: Math.abs(a.top - b.top) };
+    });
+    if (ev.top > 1 || ev.l[1] > ev.X - 4 || ev.r[0] < ev.X + 4 || ev.X - ev.l[1] > 12 || ev.r[0] - ev.X > 12)
+      bad.push(`live picks not split at the crease (left ${Math.round(ev.l[0])}-${Math.round(ev.l[1])}, right ${Math.round(ev.r[0])}-${Math.round(ev.r[1])}, hinge ${ev.X})`);
+    if (Math.abs((ev.l[1] - ev.l[0]) - (ev.r[1] - ev.r[0])) > 2) bad.push(`live picks uneven (${Math.round(ev.l[1] - ev.l[0])} vs ${Math.round(ev.r[1] - ev.r[0])}px)`);
     await p.click('.obar .obar-i:last-child', { timeout: 3000 }).catch(() => bad.push('no More button'));
     await p.waitForTimeout(450);
-    const sh = await p.evaluate(() => { const s = document.querySelector('.osheet.open'); if (!s) return null; const b = s.getBoundingClientRect(); return [b.left, b.right]; });
-    if (!sh) bad.push('More did not open the menu'); else if (sh[0] < 458 || sh[1] > 812) bad.push(`menu not on the right page (${Math.round(sh[0])}..${Math.round(sh[1])})`);
+    const sh = await p.evaluate(() => { const s = document.querySelector('.osheet.open'); if (!s) return null; const b = s.getBoundingClientRect();
+      return [b.left, b.right, parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--fold-r'))]; });
+    if (!sh) bad.push('More did not open the menu'); else if (sh[0] < sh[2] - 1 || sh[1] > 812) bad.push(`menu not on the right page (${Math.round(sh[0])}..${Math.round(sh[1])})`);
     for (const [w, h, name] of [[382, 678, 'folded'], [1280, 800, 'laptop width']]) {
       await p.setViewportSize({ width: w, height: h }); await p.waitForTimeout(450);
       const on = await p.evaluate(() => document.documentElement.classList.contains('ox-fold') || !!document.querySelector('[data-oxf]'));

@@ -194,7 +194,7 @@
     try {
       var sg = window.viewport && window.viewport.segments;
       if (sg && sg.length === 2 && Math.abs(sg[0].top - sg[1].top) < 2 && sg[1].left > sg[0].left)
-        return {x: (sg[0].right + sg[1].left) / 2, gap: Math.max(28, sg[1].left - sg[0].right + 24)};
+        return {x: (sg[0].right + sg[1].left) / 2, gap: Math.max(16, sg[1].left - sg[0].right + 12)};
     } catch (e) {}
     if (!TOUCH || w < 700 || w > 1024 || w <= h || h < 500) return null;
     var long = Math.max(screen.width || 0, screen.height || 0), x = w / 2;
@@ -203,7 +203,7 @@
       x = ang === 180 ? w - long / 2 : long / 2;
     }
     if (x < w * 0.35 || x > w * 0.65) x = w / 2;
-    return {x: x, gap: 28};
+    return {x: x, gap: 16};
   }
   function applyFold() {
     var g = foldGeom(), r = document.documentElement;
@@ -245,16 +245,6 @@
       e.__oxf = null; e.removeAttribute('data-oxf');
     });
   }
-  // a header, a tab strip, a filter row or anything wide (a table, a split grid) runs across both pages;
-  // everything else on a page takes one page, and the next one goes on the facing page
-  var FOLD_SPAN = /(^|\s)(sec-hdr|sec-head|sp-tabs|seg|tabs|filters|toolbar|ox-eyebrow|lead)/;
-  function spansBoth(k) {
-    var cs = getComputedStyle(k);
-    if (/^h[1-4]$/i.test(k.tagName) || FOLD_SPAN.test(String(k.className)) || /seg|tabs|filter/i.test(k.id)) return true;
-    if (cs.display === 'grid' || cs.display === 'flex' && cs.flexWrap === 'wrap') return true;
-    if (k.querySelector('table,.tbl,.tbl-wrap,h1,h2,canvas')) return true;
-    return false;
-  }
   function foldFit() {
     var root = document.documentElement;
     if (!root.classList.contains('ox-fold')) { foldUndo(); return; }
@@ -271,34 +261,11 @@
       foldSet(e, 'columnGap', gap + 'px');
       return true;
     };
-    // 1. a page section that stacks full-width blocks (a tab's body, a model write-up) is laid out as
-    // a spread: headers and wide things across both pages, each other block on one page, filling
-    // left then right, so the right page is never left empty while the left one runs on
-    for (i = 0; i < all.length; i++) {
-      e = all[i];
-      if (e.hasAttribute('data-oxf') || /^(MAIN|BODY|HEADER|NAV|SECTION|FORM|UL|OL|TBODY|TABLE|BUTTON|A)$/.test(e.tagName)) continue;
-      st = getComputedStyle(e); if (st.display !== 'block' || st.position === 'fixed' || st.position === 'absolute') continue;
-      // never an element the page shows and hides itself (a tab's pane, one of a set of views): an
-      // inline display would keep it on screen after the page hides it (11/4: every tab showed home)
-      if (/(^|\s)(pane|view|tab-pane|panel)(\s|$)/.test(String(e.className)) || /^pane-/.test(e.id) || e.hasAttribute('hidden')) continue;
-      var c0 = String(e.className).split(' ')[0];
-      if (c0 && e.parentElement && [].some.call(e.parentElement.children, function (sb) { return sb !== e && String(sb.className).split(' ')[0] === c0 && getComputedStyle(sb).display === 'none'; })) continue;
-      b = e.getBoundingClientRect(); if (!crosses(b) || b.width < R - L + 400 || e.closest(FOLD_SKIP) || e.closest('[data-oxf]') || e.closest('.home-hero,.ox-hero')) continue;
-      var kids = [].filter.call(e.children, function (k) { return k.getBoundingClientRect().height > 0 && !/^(SCRIPT|STYLE|BR)$/.test(k.tagName); });
-      if (kids.length < 2) continue;
-      var wide = kids.filter(function (k) { var kb = k.getBoundingClientRect(); return kb.width > b.width * 0.8; });
-      var flow = wide.filter(function (k) { return !spansBoth(k) && getComputedStyle(k).display === 'block'; });
-      if (wide.length < kids.length * 0.8 || flow.length < 2) continue;
-      if (!twoCols(e, st, b, 2)) continue;
-      foldSet(e, 'display', 'grid'); foldSet(e, 'alignItems', 'start');
-      kids.forEach(function (k) { if (spansBoth(k)) foldSet(k, 'gridColumn', '1 / -1'); else foldSet(k, 'minWidth', '0'); });
-    }
-    // 2. grids that span the hinge split their columns at the fold; a one-column list of like cards
+    // grids that span the hinge split their columns at the fold; a one-column list of like cards
     // (the record, today's picks) becomes two columns, one per page
     for (i = 0; i < all.length; i++) {
       e = all[i]; st = getComputedStyle(e);
       if (st.display !== 'grid' && st.display !== 'inline-grid') continue;
-      if (e.__oxf && e.__oxf.display) continue;
       b = e.getBoundingClientRect(); if (!crosses(b) || st.position === 'fixed' || e.closest(FOLD_SKIP)) continue;
       var n = st.gridTemplateColumns.split(' ').filter(function (t) { return /px$/.test(t); }).length;
       if (n < 2) {
@@ -308,7 +275,7 @@
       }
       twoCols(e, st, b, n);
     }
-    // 3. text that still crosses, and rows of buttons that wrap, stay on the left page
+    // text that still crosses, and rows of buttons that wrap, stay on the left page
     var tw = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT), t, seen = [];
     while ((t = tw.nextNode())) {
       if (!t.textContent.trim()) continue;
