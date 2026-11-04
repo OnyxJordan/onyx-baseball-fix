@@ -400,6 +400,14 @@ so old links and the pipeline are unchanged.
   logo edits were made in `index.html` too; keep the two in step until opening day.
 - **`verify_pwa.js`** also checks the hub at 320px and 393px: manifest, status bar,
   header, all seven sports, no sideways scroll, and that the wordmark draws.
+- **iPhone Duo (11/3).** The foldable has a 466x678 cover screen and an inner screen that opens
+  wider than tall at 890x626. The app chrome (ui.js bottom bar, More sheet, hamburger header)
+  now runs on phones AND on touch screens up to 1024px (`(max-width:760px),(max-width:1024px)
+  and (pointer:coarse)`, `APP`/`DESK` in ui.js; the header half is the iPhone Duo block at the
+  end of `onyx.css`). Before, the unfolded screen got the desktop header with its tabs cut off
+  and no bottom bar. Content layouts stay width-based. Screens under 720px tall get a shorter
+  hero. `verify_pwa.js` loads six pages on the cover screen, unfolds, folds and unfolds again,
+  and fails on a missing bottom bar or menu button, a desktop tab strip, or sideways scroll.
 
 ## Onyx Sports pages: NFL, college football, NHL, tennis, golf (10/26)
 

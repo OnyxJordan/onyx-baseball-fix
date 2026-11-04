@@ -17,7 +17,8 @@
  * hamburger opens the same menu, search finds something, no page errors.
  * Then the Onyx Sports hub (home.html, the manifest's start page) at 320
  * and 393px: solid status bar, header in place, all seven sports linked
- * to their sites, no sideways scroll, the raster ONYX drawn.
+ * to their sites, no sideways scroll, the raster ONYX drawn. Then the iPhone
+ * Duo: cover (466x678) and inner (890x626) screens, folded and unfolded live.
  *
  *   python3 -B nba_build.py && node tools/verify_pwa.js
  */
@@ -171,6 +172,54 @@ function serve() {
     if (!inked) bad.push('ONYX raster wordmark did not draw');
     bad.push(...errs);
     console.log(`  ${bad.length ? 'FAIL' : 'ok  '} home.html  ${String(w).padEnd(11)} ${st.cards} sports, live: ${st.live.join(' ')}${bad.length ? '  <- ' + bad.join('; ') : ''}`);
+    failures += bad.length;
+    await ctx.close();
+  }
+  // iPhone Duo (11/3): the 466x678 cover screen and the 890x626 inner screen, which
+  // opens wider than tall. Both must run the app chrome (bottom bar + hamburger, no
+  // desktop tab strip, no sideways scroll), including after folding and unfolding
+  // mid-session, and the hamburger must open the menu as a sheet on screen.
+  for (const page of ['home.html', 'index.html', 'nba.html', 'cbb.html', 'tennis.html', 'picks.html']) {
+    const ctx = await browser.newContext({ viewport: { width: 466, height: 678 }, isMobile: true, hasTouch: true, userAgent: UA });
+    await ctx.addInitScript(() => { Object.defineProperty(navigator, 'standalone', { get: () => true }); });
+    const p = await ctx.newPage();
+    const errs = [];
+    p.on('pageerror', e => errs.push(e.constructor.name + ': ' + e.message));
+    await p.route('**/*', r => {
+      const u = r.request().url();
+      return (u.startsWith(`http://127.0.0.1:${PORT}`) || u.startsWith('data:')) ? r.continue() : r.abort();
+    });
+    await p.goto(`http://127.0.0.1:${PORT}/${page}`, { waitUntil: 'domcontentloaded' });
+    await p.waitForTimeout(1500);
+    const bad = [];
+    for (const [name, w, h] of [['cover', 466, 678], ['unfolded', 890, 626], ['folded', 466, 678], ['unfolded', 890, 626]]) {
+      await p.setViewportSize({ width: w, height: h });
+      await p.waitForTimeout(350);
+      const st = await p.evaluate(() => {
+        const vis = s => [...document.querySelectorAll(s)].some(e => e.getBoundingClientRect().width > 0 && getComputedStyle(e).display !== 'none' && getComputedStyle(e).visibility !== 'hidden');
+        return { sw: document.documentElement.scrollWidth, vw: document.documentElement.clientWidth,
+          obar: vis('.obar'), tabs: vis('.nav .nav-tabs'), ham: vis('.nav .nav-hamburger') };
+      });
+      if (!st.obar) bad.push(`${name}: no bottom bar`);
+      if (st.tabs) bad.push(`${name}: desktop tab strip showing`);
+      if (page !== 'home.html' && !st.ham) bad.push(`${name}: no menu button`);
+      if (st.sw > st.vw + 1) bad.push(`${name}: scrolls sideways (${st.sw}px > ${st.vw}px)`);
+    }
+    const more = await p.$('.obar .obar-i:last-child');
+    if (more && await more.isVisible()) {
+      await more.click({ timeout: 3000 });
+      await p.waitForTimeout(450);
+      const sh = await p.evaluate(() => {
+        const s = document.querySelector('.osheet.open');
+        if (!s) return null;
+        const r = s.getBoundingClientRect();
+        return { l: r.left, r: r.right, b: r.bottom, vw: innerWidth, vh: innerHeight };
+      });
+      if (!sh) bad.push('More did not open the menu');
+      else if (sh.l < -1 || sh.r > sh.vw + 1 || sh.b > sh.vh + 1) bad.push(`menu off screen (${Math.round(sh.l)}..${Math.round(sh.r)}, bottom ${Math.round(sh.b)})`);
+    } else bad.push('no More button on screen');
+    bad.push(...errs);
+    console.log(`  ${bad.length ? 'FAIL' : 'ok  '} ${page.padEnd(11)} iPhone Duo cover 466x678 <-> inner 890x626${bad.length ? '  <- ' + bad.join('; ') : ''}`);
     failures += bad.length;
     await ctx.close();
   }
