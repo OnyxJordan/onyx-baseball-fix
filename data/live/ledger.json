@@ -960,10 +960,10 @@
    "f": 0.667
   },
   "model": "live-v1",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "4-5",
+  "profit": 1.14,
+  "graded_at": "2026-11-04T03:14:12+00:00"
  },
  {
   "id": "nhl-401892639-spread-home",
@@ -1080,10 +1080,10 @@
    "f": 0.693
   },
   "model": "live-v1",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "149",
+  "profit": 0.9091,
+  "graded_at": "2026-11-04T03:14:12+00:00"
  },
  {
   "id": "cbb-401921801-spread-home",
@@ -1260,10 +1260,10 @@
    "f": 0.4
   },
   "model": "live-v1",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "2-3",
+  "profit": 0.8333,
+  "graded_at": "2026-11-04T03:14:12+00:00"
  },
  {
   "id": "nhl-401892635-spread-away",
@@ -1350,10 +1350,10 @@
    "f": 0.434
   },
   "model": "live-v1",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "3-1",
+  "profit": -1.0,
+  "graded_at": "2026-11-04T03:14:12+00:00"
  },
  {
   "id": "nhl-401892641-spread-home",
@@ -1410,10 +1410,10 @@
    "f": 0.5
   },
   "model": "live-v1",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "89-60",
+  "profit": -1.0,
+  "graded_at": "2026-11-04T03:14:12+00:00"
  },
  {
   "id": "cbb-401929372-total-under",
@@ -1560,10 +1560,10 @@
    "f": 0.608
   },
   "model": "live-v1",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "111-50",
+  "profit": 0.8333,
+  "graded_at": "2026-11-04T03:14:13+00:00"
  },
  {
   "id": "cbb-401921165-total-under",
@@ -1590,10 +1590,10 @@
    "f": 0.608
   },
   "model": "live-v1",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "161",
+  "profit": -1.0,
+  "graded_at": "2026-11-04T03:14:13+00:00"
  },
  {
   "id": "cbb-401920806-total-under",
@@ -1650,10 +1650,10 @@
    "f": 0.698
   },
   "model": "live-v1",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "130",
+  "profit": 0.9091,
+  "graded_at": "2026-11-04T03:14:13+00:00"
  },
  {
   "id": "cbb-401909796-total-under",
@@ -1680,10 +1680,10 @@
    "f": 0.595
   },
   "model": "live-v1",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "134",
+  "profit": 0.9091,
+  "graded_at": "2026-11-04T03:14:13+00:00"
  },
  {
   "id": "cfb-401866453-ml-away",
@@ -1740,10 +1740,10 @@
    "f": 0.281
   },
   "model": "live-v1",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "5",
+  "profit": 0.5556,
+  "graded_at": "2026-11-04T03:14:13+00:00"
  },
  {
   "id": "nhl-401892637-total-under",
@@ -1770,10 +1770,10 @@
    "f": 0.317
   },
   "model": "live-v1",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "4",
+  "profit": -1.0,
+  "graded_at": "2026-11-04T03:14:13+00:00"
  },
  {
   "id": "nhl-401892638-total-under",
@@ -1888,6 +1888,66 @@
    "period": 1,
    "clock": "3:01",
    "f": 0.717
+  },
+  "model": "live-v1",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "nhl-401892642-spread-away",
+  "sport": "nhl",
+  "gid": "401892642",
+  "date": "2026-11-03",
+  "logged_at": "2026-11-04T03:14:10+00:00",
+  "matchup": "CAR @ NSH",
+  "home": "NSH",
+  "away": "CAR",
+  "label": "CAR +2.5",
+  "kind": "spread",
+  "side": "away",
+  "line": 2.5,
+  "price": -180,
+  "chance": 0.7433,
+  "implied": 0.6429,
+  "edge": 0.1,
+  "fair": -290,
+  "state": {
+   "score": "CAR 1 - 3 NSH",
+   "period": 3,
+   "clock": "13:52",
+   "f": 0.231
+  },
+  "model": "live-v1",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "cbb-401920343-ml-away",
+  "sport": "cbb",
+  "gid": "401920343",
+  "date": "2026-11-03",
+  "logged_at": "2026-11-04T03:14:10+00:00",
+  "matchup": "UNF @ CBU",
+  "home": "CBU",
+  "away": "UNF",
+  "label": "UNF to win",
+  "kind": "ml",
+  "side": "away",
+  "line": null,
+  "price": 360,
+  "chance": 0.2605,
+  "implied": 0.2174,
+  "edge": 0.043,
+  "fair": 285,
+  "state": {
+   "score": "UNF 4 - 4 CBU",
+   "period": 1,
+   "clock": "15:26",
+   "f": 0.886
   },
   "model": "live-v1",
   "result": null,
