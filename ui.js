@@ -172,8 +172,16 @@
      touch screens up to 1024px wide: the iPhone Duo opens to an 890x626 inner screen, which
      used to get the desktop header with its tabs cut off and no bottom bar. Content layouts
      stay width-based; only the navigation follows the hand. */
-  var APP = '(max-width:760px),(max-width:1024px) and (pointer:coarse)';
-  var DESK = '(min-width:1025px),(min-width:761px) and (pointer:fine)';
+  /* 11/4: the real Duo's inner screen (about 811x626 once iOS puts the status bar down the
+     right edge) still showed the desktop header, so pointer:coarse alone is not trusted:
+     any touch signal (coarse or no-hover pointer, touch points, the installed app) counts,
+     and html.ox-touch carries the answer to onyx.css. */
+  var mm = function (q) { try { return matchMedia(q).matches; } catch (e) { return false; } };
+  var TOUCH = mm('(pointer:coarse)') || mm('(any-pointer:coarse)') || mm('(hover:none)') ||
+    (navigator.maxTouchPoints || 0) > 0 || navigator.standalone === true || mm('(display-mode: standalone)');
+  if (TOUCH) document.documentElement.classList.add('ox-touch');
+  var APP = TOUCH ? '(max-width:1024px)' : '(max-width:760px)';
+  var DESK = TOUCH ? '(min-width:1025px)' : '(min-width:761px)';
   window.OnyxAppQuery = APP;
 
   // ── 2. styles ─────────────────────────────────────────────────────────
@@ -209,7 +217,7 @@
     'padding:8px 16px calc(18px + var(--sab));transform:translateY(105%);transition:transform .32s cubic-bezier(.2,.9,.25,1);box-shadow:0 -20px 60px rgba(0,0,0,.55)}',
     '.osheet.open{transform:translateY(0)}',
     /* unfolded iPhone Duo and other touch screens 761-1024px: the bottom sheet, centered at a readable width */
-    '@media (min-width:761px) and (max-width:1024px) and (pointer:coarse){.osheet{left:50%;right:auto;width:640px;margin-left:-320px}}',
+    '@media (min-width:761px) and (max-width:1024px){html.ox-touch .osheet{left:50%;right:auto;width:640px;margin-left:-320px}}',
     /* closed = hidden from view, taps, Tab and screen readers; visibility flips
        after the slide-out so the closing animation still plays */
     '.osheet{visibility:hidden;transition:transform .32s cubic-bezier(.2,.9,.25,1),opacity .2s,visibility 0s linear .32s}',
@@ -667,7 +675,16 @@
     var n = document.querySelector('nav.nav'); if (!n) return;
     var over = function () {
       var r = n.querySelector('.nav-right'), vw = document.documentElement.clientWidth;
-      return n.scrollWidth > n.clientWidth + 1 || (r && r.getBoundingClientRect().right > vw + 0.5);
+      if (n.scrollWidth > n.clientWidth + 1 || (r && r.getBoundingClientRect().right > vw + 0.5)) return true;
+      // 11/4: on the Duo's 382px cover screen the logo words ran into the first control
+      // without overflowing; under 6px of air counts as not fitting
+      var lg = n.querySelector('.nav-logo .logo-words') || n.querySelector('.nav-logo');
+      if (!lg || !r) return false;
+      var lr = lg.getBoundingClientRect().right, first = Infinity;
+      [].forEach.call(r.children, function (e) {
+        var b = e.getBoundingClientRect(); if (b.width > 0 && b.left < first) first = b.left;
+      });
+      return first - lr < 6;
     };
     n.classList.remove('ox-scroll', 'ox-tight');
     if (!over()) return;

@@ -408,6 +408,14 @@ so old links and the pipeline are unchanged.
   and no bottom bar. Content layouts stay width-based. Screens under 720px tall get a shorter
   hero. `verify_pwa.js` loads six pages on the cover screen, unfolds, folds and unfolds again,
   and fails on a missing bottom bar or menu button, a desktop tab strip, or sideways scroll.
+  **11/4, from Jordan's screenshots of the real phone:** iOS puts the Duo's status bar down the
+  right edge, so pages get about 382x678 folded and 811x626 unfolded, and the inner screen still
+  drew the desktop header with no bottom bar (the device did not match `pointer:coarse`). ui.js
+  now decides touch from any signal (coarse or no-hover pointer, touch points, the installed
+  app) and sets `html.ox-touch`, which the onyx.css header and parlay-button rules key off.
+  fitHeader also treats under 6px between the logo and the first control as not fitting (the
+  NBA/MLB switch hides on the 382px cover screen). verify_pwa runs the Duo at the real sizes
+  with a touch pointer and with a misreported fine pointer.
 
 ## Onyx Sports pages: NFL, college football, NHL, tennis, golf (10/26)
 

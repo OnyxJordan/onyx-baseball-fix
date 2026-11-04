@@ -18,7 +18,8 @@
  * Then the Onyx Sports hub (home.html, the manifest's start page) at 320
  * and 393px: solid status bar, header in place, all seven sports linked
  * to their sites, no sideways scroll, the raster ONYX drawn. Then the iPhone
- * Duo: cover (466x678) and inner (890x626) screens, folded and unfolded live.
+ * Duo: cover (382x678) and inner (811x626) screens, folded and unfolded live,
+ * with a touch pointer and with a misreported fine pointer.
  *
  *   python3 -B nba_build.py && node tools/verify_pwa.js
  */
@@ -179,9 +180,17 @@ function serve() {
   // opens wider than tall. Both must run the app chrome (bottom bar + hamburger, no
   // desktop tab strip, no sideways scroll), including after folding and unfolding
   // mid-session, and the hamburger must open the menu as a sheet on screen.
-  for (const page of ['home.html', 'index.html', 'nba.html', 'cbb.html', 'tennis.html', 'picks.html']) {
-    const ctx = await browser.newContext({ viewport: { width: 466, height: 678 }, isMobile: true, hasTouch: true, userAgent: UA });
-    await ctx.addInitScript(() => { Object.defineProperty(navigator, 'standalone', { get: () => true }); });
+  // 11/4, from Jordan's screenshots: iOS puts the Duo's status bar down the right edge, so the
+  // page gets about 382x678 folded and 811x626 unfolded, and the real inner screen still drew the
+  // desktop header. The second flavor reports a fine, hovering pointer with touch points (what
+  // the device appears to do): the app chrome must still run.
+  for (const flavor of ['touch', 'fine-pointer']) for (const page of ['home.html', 'index.html', 'nba.html', 'cbb.html', 'tennis.html', 'picks.html']) {
+    const ctx = await browser.newContext({ viewport: { width: 382, height: 678 }, userAgent: UA,
+      ...(flavor === 'touch' ? { isMobile: true, hasTouch: true } : {}) });
+    await ctx.addInitScript(() => {
+      Object.defineProperty(navigator, 'standalone', { get: () => true });
+      Object.defineProperty(navigator, 'maxTouchPoints', { get: () => 5 });
+    });
     const p = await ctx.newPage();
     const errs = [];
     p.on('pageerror', e => errs.push(e.constructor.name + ': ' + e.message));
@@ -192,7 +201,7 @@ function serve() {
     await p.goto(`http://127.0.0.1:${PORT}/${page}`, { waitUntil: 'domcontentloaded' });
     await p.waitForTimeout(1500);
     const bad = [];
-    for (const [name, w, h] of [['cover', 466, 678], ['unfolded', 890, 626], ['folded', 466, 678], ['unfolded', 890, 626]]) {
+    for (const [name, w, h] of [['cover', 382, 678], ['unfolded', 811, 626], ['folded', 382, 678], ['unfolded', 811, 626], ['unfolded 890', 890, 626]]) {
       await p.setViewportSize({ width: w, height: h });
       await p.waitForTimeout(350);
       const st = await p.evaluate(() => {
@@ -219,7 +228,7 @@ function serve() {
       else if (sh.l < -1 || sh.r > sh.vw + 1 || sh.b > sh.vh + 1) bad.push(`menu off screen (${Math.round(sh.l)}..${Math.round(sh.r)}, bottom ${Math.round(sh.b)})`);
     } else bad.push('no More button on screen');
     bad.push(...errs);
-    console.log(`  ${bad.length ? 'FAIL' : 'ok  '} ${page.padEnd(11)} iPhone Duo cover 466x678 <-> inner 890x626${bad.length ? '  <- ' + bad.join('; ') : ''}`);
+    console.log(`  ${bad.length ? 'FAIL' : 'ok  '} ${page.padEnd(11)} iPhone Duo ${flavor.padEnd(12)} cover 382x678 <-> inner 811x626${bad.length ? '  <- ' + bad.join('; ') : ''}`);
     failures += bad.length;
     await ctx.close();
   }
