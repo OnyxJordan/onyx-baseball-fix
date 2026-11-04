@@ -438,8 +438,8 @@ so old links and the pipeline are unchanged.
     867x669, `screen` reports the COVER screen (466x678), angle 270, the status strip on the right,
     and the posture and segments APIs are off. So `foldGeom` treats a touch page 820-890 wide and
     600-700 tall as the Duo's 890-point inner screen: the crease is 445 from the left (measured from
-    the right at angle 90). The readout line ("Screen check: ...") at the top of the More menu stays
-    until the split is confirmed on the phone. The Duo can't tell a web app it is half-folded
+    the right at angle 90). The "Screen check" readout that gave these numbers was removed once Jordan
+    confirmed the split on the phone (11/4). The Duo can't tell a web app it is half-folded
     (Polymarket's native app can), so the book layout holds whenever the screen is unfolded.
   - **The rule (Jordan, 11/4): "full screen where it works and halves when it has to."** Wide pieces
     (art, the stats strip, game boards, stat tables, charts, tickers, the footer) span the screen.
