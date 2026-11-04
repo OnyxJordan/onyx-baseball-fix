@@ -18,7 +18,7 @@
  * Then the Onyx Sports hub (home.html, the manifest's start page) at 320
  * and 393px: solid status bar, header in place, all seven sports linked
  * to their sites, no sideways scroll, the raster ONYX drawn. Then the iPhone
- * Duo: cover (382x678) and inner (811x626) screens, folded and unfolded live,
+ * Duo: cover (382x678) and inner (867x669, the installed app's real page) screens, folded and unfolded live,
  * with a touch pointer and with a misreported fine pointer. Then the fold:
  * unfolded, the page is a book with nothing on the hinge.
  *
@@ -202,7 +202,7 @@ function serve() {
     await p.goto(`http://127.0.0.1:${PORT}/${page}`, { waitUntil: 'domcontentloaded' });
     await p.waitForTimeout(1500);
     const bad = [];
-    for (const [name, w, h] of [['cover', 382, 678], ['unfolded', 811, 626], ['folded', 382, 678], ['unfolded', 811, 626], ['unfolded 890', 890, 626]]) {
+    for (const [name, w, h] of [['cover', 382, 678], ['unfolded', 867, 669], ['folded', 382, 678], ['unfolded', 867, 669], ['unfolded 890', 890, 626]]) {
       await p.setViewportSize({ width: w, height: h });
       await p.waitForTimeout(350);
       const st = await p.evaluate(() => {
@@ -229,17 +229,22 @@ function serve() {
       else if (sh.l < -1 || sh.r > sh.vw + 1 || sh.b > sh.vh + 1) bad.push(`menu off screen (${Math.round(sh.l)}..${Math.round(sh.r)}, bottom ${Math.round(sh.b)})`);
     } else bad.push('no More button on screen');
     bad.push(...errs);
-    console.log(`  ${bad.length ? 'FAIL' : 'ok  '} ${page.padEnd(11)} iPhone Duo ${flavor.padEnd(12)} cover 382x678 <-> inner 811x626${bad.length ? '  <- ' + bad.join('; ') : ''}`);
+    console.log(`  ${bad.length ? 'FAIL' : 'ok  '} ${page.padEnd(11)} iPhone Duo ${flavor.padEnd(12)} cover 382x678 <-> inner 867x669${bad.length ? '  <- ' + bad.join('; ') : ''}`);
     failures += bad.length;
     await ctx.close();
   }
-  // the fold (11/4): unfolded, the Duo is a book. The page is 811x626 on an 890-wide screen,
+  // the fold (11/4): unfolded, the Duo is a book. The page is 867x669 on the 890-wide inner screen,
   // so the hinge sits 445px in. Nothing that reads or taps may straddle it (tables, tickers and
   // art excepted), the bottom bar splits around it, and the menu opens on the right page.
   // Folded (382 wide) and on a laptop the book layout must be off.
   for (const page of ['home.html', 'picks.html', 'index.html', 'nba.html', 'cbb.html', 'tennis.html']) {
-    const ctx = await browser.newContext({ viewport: { width: 811, height: 626 }, screen: { width: 890, height: 626 }, isMobile: true, hasTouch: true, userAgent: UA });
-    await ctx.addInitScript(() => { Object.defineProperty(navigator, 'standalone', { get: () => true }); });
+    const ctx = await browser.newContext({ viewport: { width: 867, height: 669 }, screen: { width: 466, height: 678 }, isMobile: true, hasTouch: true, userAgent: UA });
+    // the installed app on the real Duo (Jordan's readout, 11/4): page 867x669, screen reported as
+    // the cover's 466x678, angle 270, status strip on the right: the crease is 445 from the left
+    await ctx.addInitScript(() => {
+      Object.defineProperty(navigator, 'standalone', { get: () => true });
+      Object.defineProperty(screen, 'orientation', { get: () => ({ angle: 270, type: 'landscape-secondary', addEventListener() {} }) });
+    });
     const p = await ctx.newPage();
     const errs = [];
     p.on('pageerror', e => errs.push(e.constructor.name + ': ' + e.message));
@@ -287,8 +292,8 @@ function serve() {
     await p.click('.obar .obar-i:last-child', { timeout: 3000 }).catch(() => bad.push('no More button'));
     await p.waitForTimeout(450);
     const sh = await p.evaluate(() => { const s = document.querySelector('.osheet.open'); if (!s) return null; const b = s.getBoundingClientRect();
-      return [b.left, b.right, parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--fold-r'))]; });
-    if (!sh) bad.push('More did not open the menu'); else if (sh[0] < sh[2] - 1 || sh[1] > 812) bad.push(`menu not on the right page (${Math.round(sh[0])}..${Math.round(sh[1])})`);
+      return [b.left, b.right, parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--fold-r')), innerWidth]; });
+    if (!sh) bad.push('More did not open the menu'); else if (sh[0] < sh[2] - 1 || sh[1] > sh[3] + 1) bad.push(`menu not on the right page (${Math.round(sh[0])}..${Math.round(sh[1])})`);
     for (const [w, h, name] of [[382, 678, 'folded'], [1280, 800, 'laptop width']]) {
       await p.setViewportSize({ width: w, height: h }); await p.waitForTimeout(450);
       const on = await p.evaluate(() => document.documentElement.classList.contains('ox-fold') || !!document.querySelector('[data-oxf]'));

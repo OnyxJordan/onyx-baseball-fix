@@ -197,10 +197,18 @@
         return {x: (sg[0].right + sg[1].left) / 2, gap: Math.max(16, sg[1].left - sg[0].right + 12)};
     } catch (e) {}
     if (!TOUCH || w < 700 || w > 1024 || w <= h || h < 500) return null;
-    var long = Math.max(screen.width || 0, screen.height || 0), x = w / 2;
-    if (long > w && long - w < 160) {
+    // the physical inner screen: what screen reports when it is the inner screen; but the installed
+    // app on the Duo reports the COVER screen (466x678) while unfolded, so a page 820-890 wide and
+    // 600-700 tall is the Duo's 890-point inner screen (Jordan's readout, 11/4: page 867x669,
+    // screen 466x678, angle 270, the status strip on the right, the crease 445 from the left)
+    var long = Math.max(screen.width || 0, screen.height || 0), x = w / 2, P = 0;
+    if (long > w && long - w < 160) P = long;
+    else if (w > 820 && w <= 890 && h >= 600 && h <= 700) P = 890;
+    if (P) {
       var ang = (screen.orientation && screen.orientation.angle) || 0;
-      x = ang === 180 ? w - long / 2 : long / 2;
+      // angle 270: the status strip is on the right, the page starts at the screen's left edge;
+      // turned the other way (90) the strip is on the left, so the crease is measured from the right
+      x = ang === 90 ? w - P / 2 : P / 2;
     }
     if (x < w * 0.35 || x > w * 0.65) x = w / 2;
     return {x: x, gap: 16};

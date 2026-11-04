@@ -434,6 +434,13 @@ so old links and the pipeline are unchanged.
     `foldFit` re-runs after taps and `gotoTab`, and undo compares styles as the browser stores them.
     The gutter is now 16px (8 either side of the crease), so two cards meet right at the fold, the
     same width. `verify_pwa` checks that split on every page.
+  - **The real phone (Jordan's More-menu readout, 11/4):** the installed app gets a page of
+    867x669, `screen` reports the COVER screen (466x678), angle 270, the status strip on the right,
+    and the posture and segments APIs are off. So `foldGeom` treats a touch page 820-890 wide and
+    600-700 tall as the Duo's 890-point inner screen: the crease is 445 from the left (measured from
+    the right at angle 90). The readout line ("Screen check: ...") at the top of the More menu stays
+    until the split is confirmed on the phone. The Duo can't tell a web app it is half-folded
+    (Polymarket's native app can), so the book layout holds whenever the screen is unfolded.
 
 ## Onyx Sports pages: NFL, college football, NHL, tennis, golf (10/26)
 
