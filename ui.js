@@ -211,10 +211,12 @@
       var ang = (screen.orientation && screen.orientation.angle) || 0;
       // angle 270: the status strip is on the right, the page starts at the screen's left edge;
       // turned the other way (90) the strip is on the left, so the crease is measured from the right
-      x = ang === 90 ? w - P / 2 : P / 2;
+      // + 3: on the phone the crease sits a hair right of the screen's exact middle (Jordan's photos,
+      // 11/4: the right-hand card started a touch early)
+      x = ang === 90 ? w - P / 2 - 3 : P / 2 + 3;
     }
     if (x < w * 0.35 || x > w * 0.65) x = w / 2;
-    return {x: x, gap: 16};
+    return {x: x, gap: 24};
   }
   function applyFold() {
     var g = foldGeom(), r = document.documentElement;
@@ -280,7 +282,13 @@
       e = all[i]; st = getComputedStyle(e);
       if (st.display !== 'grid' && st.display !== 'inline-grid') continue;
       b = e.getBoundingClientRect(); if (!crosses(b) || st.position === 'fixed' || e.closest(FOLD_SKIP)) continue;
-      var n = st.gridTemplateColumns.split(' ').filter(function (t) { return /px$/.test(t); }).length;
+      var cols = st.gridTemplateColumns.split(' ').filter(function (t) { return /px$/.test(t); }).map(parseFloat), n = cols.length;
+      var vis = [].filter.call(e.children, function (k) { return k.offsetParent !== null; }).length;
+      // one card on its own, or a card's own layout (words and a button, one column much wider than
+      // the other): keep the whole thing on the left page, never split it across the crease
+      // (11/4: a lone "projection" card and the live "value right now" row had their button smeared
+      // over the right page)
+      if (vis === 1 || (n === 2 && Math.max(cols[0], cols[1]) > 1.8 * Math.min(cols[0], cols[1]))) { leftPage(e, st); continue; }
       if (n < 2) {
         var ks = [].filter.call(e.children, function (k) { return k.offsetParent !== null; });
         if (ks.length < 2 || ks.some(function (k) { return k.tagName !== ks[0].tagName || String(k.className).split(' ')[0] !== String(ks[0].className).split(' ')[0]; })) continue;
