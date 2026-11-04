@@ -231,11 +231,29 @@
      change is marked and undone when the screen is no longer a book (folded shut). */
   var FOLD_SKIP = 'header,.ox-head,.ox-head-in,nav,.nav,.obar,.osheet,.osheet-bg,.cx,.cx-bg,.pc,.pc-bg,table,.tbl,.tbl-wrap,svg,canvas,select,input,textarea,' +
     '[class*="ticker"],[class*="marq"],.tk-strip,.ox-marquee,.ox-giant,.sp-art,.ox-hero-art';
+  // every style foldFit sets is recorded with what was there, and put back only if it is still ours
+  function foldSet(e, k, v) {
+    var o = e.__oxf || (e.__oxf = {});
+    if (!(k in o)) o[k] = [e.style[k], ''];
+    e.style[k] = v; o[k][1] = e.style[k];      // as the browser stores it ("0" reads back "0px")
+    e.setAttribute('data-oxf', '');
+  }
   function foldUndo() {
     document.querySelectorAll('[data-oxf]').forEach(function (e) {
-      ['gridTemplateColumns', 'columnGap', 'maxWidth', 'marginLeft', 'marginRight', 'alignSelf', 'textAlign', 'justifyContent'].forEach(function (k) { e.style[k] = ''; });
-      e.removeAttribute('data-oxf');
+      var o = e.__oxf || {};
+      Object.keys(o).forEach(function (k) { if (e.style[k] === o[k][1]) e.style[k] = o[k][0]; });
+      e.__oxf = null; e.removeAttribute('data-oxf');
     });
+  }
+  // a header, a tab strip, a filter row or anything wide (a table, a split grid) runs across both pages;
+  // everything else on a page takes one page, and the next one goes on the facing page
+  var FOLD_SPAN = /(^|\s)(sec-hdr|sec-head|sp-tabs|seg|tabs|filters|toolbar|ox-eyebrow|lead)/;
+  function spansBoth(k) {
+    var cs = getComputedStyle(k);
+    if (/^h[1-4]$/i.test(k.tagName) || FOLD_SPAN.test(String(k.className)) || /seg|tabs|filter/i.test(k.id)) return true;
+    if (cs.display === 'grid' || cs.display === 'flex' && cs.flexWrap === 'wrap') return true;
+    if (k.querySelector('table,.tbl,.tbl-wrap,h1,h2,canvas')) return true;
+    return false;
   }
   function foldFit() {
     var root = document.documentElement;
@@ -244,24 +262,53 @@
     if (!(R > L)) return;
     var gap = R - L, crosses = function (b) { return b.width > 0 && b.left < R - 1 && b.right > L + 1; };
     var all = document.body.getElementsByTagName('*'), i, e, st, b;
+    var twoCols = function (e, st, b, n) {
+      var cl = b.left + parseFloat(st.paddingLeft) + parseFloat(st.borderLeftWidth), cr = b.right - parseFloat(st.paddingRight) - parseFloat(st.borderRightWidth);
+      var lw = L - cl, rw = cr - R; if (lw < 90 || rw < 90) return false;
+      var h = Math.max(1, Math.floor(n / 2));
+      var cw = function (w) { return 'minmax(0,' + Math.floor((w - (h - 1) * gap) / h) + 'px)'; };
+      foldSet(e, 'gridTemplateColumns', 'repeat(' + h + ',' + cw(lw) + ') repeat(' + h + ',' + cw(rw) + ')');
+      foldSet(e, 'columnGap', gap + 'px');
+      return true;
+    };
+    // 1. a page section that stacks full-width blocks (a tab's body, a model write-up) is laid out as
+    // a spread: headers and wide things across both pages, each other block on one page, filling
+    // left then right, so the right page is never left empty while the left one runs on
+    for (i = 0; i < all.length; i++) {
+      e = all[i];
+      if (e.hasAttribute('data-oxf') || /^(MAIN|BODY|HEADER|NAV|SECTION|FORM|UL|OL|TBODY|TABLE|BUTTON|A)$/.test(e.tagName)) continue;
+      st = getComputedStyle(e); if (st.display !== 'block' || st.position === 'fixed' || st.position === 'absolute') continue;
+      // never an element the page shows and hides itself (a tab's pane, one of a set of views): an
+      // inline display would keep it on screen after the page hides it (11/4: every tab showed home)
+      if (/(^|\s)(pane|view|tab-pane|panel)(\s|$)/.test(String(e.className)) || /^pane-/.test(e.id) || e.hasAttribute('hidden')) continue;
+      var c0 = String(e.className).split(' ')[0];
+      if (c0 && e.parentElement && [].some.call(e.parentElement.children, function (sb) { return sb !== e && String(sb.className).split(' ')[0] === c0 && getComputedStyle(sb).display === 'none'; })) continue;
+      b = e.getBoundingClientRect(); if (!crosses(b) || b.width < R - L + 400 || e.closest(FOLD_SKIP) || e.closest('[data-oxf]') || e.closest('.home-hero,.ox-hero')) continue;
+      var kids = [].filter.call(e.children, function (k) { return k.getBoundingClientRect().height > 0 && !/^(SCRIPT|STYLE|BR)$/.test(k.tagName); });
+      if (kids.length < 2) continue;
+      var wide = kids.filter(function (k) { var kb = k.getBoundingClientRect(); return kb.width > b.width * 0.8; });
+      var flow = wide.filter(function (k) { return !spansBoth(k) && getComputedStyle(k).display === 'block'; });
+      if (wide.length < kids.length * 0.8 || flow.length < 2) continue;
+      if (!twoCols(e, st, b, 2)) continue;
+      foldSet(e, 'display', 'grid'); foldSet(e, 'alignItems', 'start');
+      kids.forEach(function (k) { if (spansBoth(k)) foldSet(k, 'gridColumn', '1 / -1'); else foldSet(k, 'minWidth', '0'); });
+    }
+    // 2. grids that span the hinge split their columns at the fold; a one-column list of like cards
+    // (the record, today's picks) becomes two columns, one per page
     for (i = 0; i < all.length; i++) {
       e = all[i]; st = getComputedStyle(e);
       if (st.display !== 'grid' && st.display !== 'inline-grid') continue;
+      if (e.__oxf && e.__oxf.display) continue;
       b = e.getBoundingClientRect(); if (!crosses(b) || st.position === 'fixed' || e.closest(FOLD_SKIP)) continue;
       var n = st.gridTemplateColumns.split(' ').filter(function (t) { return /px$/.test(t); }).length;
       if (n < 2) {
-        // a one-column list of like cards (the record, today's picks) becomes two columns, one per page
-        var kids = [].filter.call(e.children, function (k) { return k.offsetParent !== null; });
-        if (kids.length < 2 || kids.some(function (k) { return k.tagName !== kids[0].tagName || k.className.split(' ')[0] !== kids[0].className.split(' ')[0]; })) continue;
+        var ks = [].filter.call(e.children, function (k) { return k.offsetParent !== null; });
+        if (ks.length < 2 || ks.some(function (k) { return k.tagName !== ks[0].tagName || String(k.className).split(' ')[0] !== String(ks[0].className).split(' ')[0]; })) continue;
         n = 2;
       }
-      var cl = b.left + parseFloat(st.paddingLeft) + parseFloat(st.borderLeftWidth), cr = b.right - parseFloat(st.paddingRight) - parseFloat(st.borderRightWidth);
-      var lw = L - cl, rw = cr - R; if (lw < 90 || rw < 90) continue;
-      var h = Math.max(1, Math.floor(n / 2));
-      var cw = function (w) { return 'minmax(0,' + Math.floor((w - (h - 1) * gap) / h) + 'px)'; };
-      e.style.gridTemplateColumns = 'repeat(' + h + ',' + cw(lw) + ') repeat(' + h + ',' + cw(rw) + ')';
-      e.style.columnGap = gap + 'px'; e.setAttribute('data-oxf', '');
+      twoCols(e, st, b, n);
     }
+    // 3. text that still crosses, and rows of buttons that wrap, stay on the left page
     var tw = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT), t, seen = [];
     while ((t = tw.nextNode())) {
       if (!t.textContent.trim()) continue;
@@ -273,10 +320,9 @@
       st = getComputedStyle(p); if (st.position === 'fixed' || st.position === 'absolute') continue;
       seen.push(p); leftPage(p, st);
     }
-    // rows of buttons and chips that wrap (hero calls to action, filters) stay on the left page too
     for (i = 0; i < all.length; i++) {
       e = all[i]; st = getComputedStyle(e);
-      if ((st.display !== 'flex' && st.display !== 'inline-flex') || st.flexWrap !== 'wrap' || e.hasAttribute('data-oxf')) continue;
+      if ((st.display !== 'flex' && st.display !== 'inline-flex') || st.flexWrap !== 'wrap' || (e.__oxf && e.__oxf.maxWidth)) continue;
       b = e.getBoundingClientRect(); if (!crosses(b) || st.position === 'fixed' || st.position === 'absolute' || e.closest(FOLD_SKIP)) continue;
       leftPage(e, st);
     }
@@ -285,10 +331,9 @@
       var par = p.parentElement, pb = par.getBoundingClientRect(), ps = getComputedStyle(par);
       var x0 = pb.left + parseFloat(ps.paddingLeft) + parseFloat(ps.borderLeftWidth);
       if (L - x0 < 140) return;                 // the parent itself starts at the hinge: leave it
-      p.style.maxWidth = Math.floor(L - x0) + 'px'; p.style.marginLeft = '0'; p.style.marginRight = 'auto';
-      p.style.alignSelf = 'flex-start'; if (st.textAlign === 'center') p.style.textAlign = 'left';
-      if (st.justifyContent === 'center') p.style.justifyContent = 'flex-start';
-      p.setAttribute('data-oxf', '');
+      foldSet(p, 'maxWidth', Math.floor(L - x0) + 'px'); foldSet(p, 'marginLeft', '0'); foldSet(p, 'marginRight', 'auto');
+      foldSet(p, 'alignSelf', 'flex-start'); if (st.textAlign === 'center') foldSet(p, 'textAlign', 'left');
+      if (st.justifyContent === 'center') foldSet(p, 'justifyContent', 'flex-start');
     }
   }
   var foldT = 0;
@@ -300,6 +345,12 @@
   try { new MutationObserver(function () { if (document.documentElement.classList.contains('ox-fold')) foldSoon(); })
     .observe(document.documentElement, {childList: true, subtree: true}); } catch (e) {}
   foldSoon();
+  // a tab switch only flips which pane shows (no new content), so refit after taps and route changes too
+  document.addEventListener('click', function () { if (document.documentElement.classList.contains('ox-fold')) foldSoon(); }, true);
+  addEventListener('hashchange', foldSoon);
+  if (typeof window.gotoTab === 'function' && !window.gotoTab.__oxf) {
+    var gt0 = window.gotoTab; window.gotoTab = function () { var r = gt0.apply(this, arguments); foldSoon(); return r; }; window.gotoTab.__oxf = 1;
+  }
   addEventListener('resize', applyFold);
   addEventListener('orientationchange', function () { setTimeout(applyFold, 250); });
   try { if (navigator.devicePosture) navigator.devicePosture.addEventListener('change', applyFold); } catch (e) {}
