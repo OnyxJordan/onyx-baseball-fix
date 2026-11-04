@@ -6513,9 +6513,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        0
+        5
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Jazmin Ortenzi",
@@ -6524,78 +6524,20 @@
        "seed": null,
        "win": false,
        "sets": [
-        0
+        2
        ],
-       "serve": false
-      }
-     ]
-    },
-    {
-     "id": "186730",
-     "start": "2026-11-05T05:00Z",
-     "state": "pre",
-     "detail": "TBD",
-     "round": "Quarterfinal",
-     "draw": "Women's Singles",
-     "court": "",
-     "p": [
-      {
-       "name": "Alice Tubello",
-       "short": "A. Tubello",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "Leolia Jeanjean",
-       "short": "L. Jeanjean",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      }
-     ]
-    },
-    {
-     "id": "186729",
-     "start": "2026-11-05T05:00Z",
-     "state": "pre",
-     "detail": "TBD",
-     "round": "Quarterfinal",
-     "draw": "Women's Singles",
-     "court": "",
-     "p": [
-      {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "Luisina Giovannini",
-       "short": "L. Giovannini",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
+       "serve": true
       }
      ]
     },
     {
      "id": "186728",
-     "start": "2026-11-05T05:00Z",
+     "start": "2026-11-05T17:00Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "11/5 - 12:00 PM EST",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
-     "court": "",
+     "court": "Campo 3",
      "p": [
       {
        "name": "Leyre Romero Gormaz",
@@ -6619,12 +6561,12 @@
     },
     {
      "id": "186727",
-     "start": "2026-11-05T05:00Z",
+     "start": "2026-11-05T17:00Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "11/5 - 12:00 PM EST",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
-     "court": "",
+     "court": "Campo 1",
      "p": [
       {
        "name": "Renata Zarazua",
@@ -6638,6 +6580,64 @@
       {
        "name": "Julia Riera",
        "short": "J. Riera",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      }
+     ]
+    },
+    {
+     "id": "186730",
+     "start": "2026-11-05T18:30Z",
+     "state": "pre",
+     "detail": "11/5 - 1:30 PM EST",
+     "round": "Quarterfinal",
+     "draw": "Women's Singles",
+     "court": "Campo 3",
+     "p": [
+      {
+       "name": "Alice Tubello",
+       "short": "A. Tubello",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      },
+      {
+       "name": "Leolia Jeanjean",
+       "short": "L. Jeanjean",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      }
+     ]
+    },
+    {
+     "id": "186729",
+     "start": "2026-11-05T19:00Z",
+     "state": "pre",
+     "detail": "11/5 - 2:00 PM EST",
+     "round": "Quarterfinal",
+     "draw": "Women's Singles",
+     "court": "Campo 1",
+     "p": [
+      {
+       "name": "TBD",
+       "short": "TBD",
+       "flag": null,
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      },
+      {
+       "name": "Luisina Giovannini",
+       "short": "L. Giovannini",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
        "seed": null,
        "win": false,
@@ -7984,5 +7984,5 @@
    ]
   }
  ],
- "fetched": "2026-11-04T22:07:15+00:00"
+ "fetched": "2026-11-04T22:41:12+00:00"
 }

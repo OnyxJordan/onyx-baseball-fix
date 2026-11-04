@@ -3411,5 +3411,34 @@
   "actual": "13-9",
   "profit": 0.5714,
   "graded_at": "2026-11-04T22:07:43+00:00"
+ },
+ {
+  "id": "tennis-186726-spread-home",
+  "sport": "tennis",
+  "gid": "186726",
+  "date": "2026-11-04",
+  "logged_at": "2026-11-04T22:41:37+00:00",
+  "matchup": "Bianca Andreescu vs Jazmin Ortenzi",
+  "home": "Jazmin Ortenzi",
+  "away": "Bianca Andreescu",
+  "label": "Jazmin Ortenzi +7.5 games",
+  "kind": "spread",
+  "side": "home",
+  "line": 7.5,
+  "price": -165,
+  "chance": 0.7013,
+  "implied": 0.6226,
+  "edge": 0.079,
+  "fair": -235,
+  "state": {
+   "sets": "5-2",
+   "srv": "home",
+   "need": 2
+  },
+  "model": "live-v2",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
