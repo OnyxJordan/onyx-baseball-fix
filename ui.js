@@ -189,8 +189,11 @@
      recognised (touch, landscape, 700-1024 wide, 500+ tall) and the hinge sits at the
      physical center: iOS puts the status bar strip down the right edge, so on an 811px
      page it is about 445px in, not at 405. */
+  // the visible width: innerWidth grows with anything wider than the screen (13px on the hub in a
+  // test), which would move the crease; the visual viewport is the screen itself (867 on the Duo)
+  function foldW() { var v = window.visualViewport; return Math.round(v && v.width ? Math.min(v.width * (v.scale || 1), innerWidth) : innerWidth); }
   function foldGeom() {
-    var w = innerWidth, h = innerHeight;
+    var w = foldW(), h = innerHeight;
     try {
       var sg = window.viewport && window.viewport.segments;
       if (sg && sg.length === 2 && Math.abs(sg[0].top - sg[1].top) < 2 && sg[1].left > sg[0].left)
@@ -221,7 +224,7 @@
     r.style.setProperty('--fold-x', x + 'px');
     r.style.setProperty('--fold-l', (x - half) + 'px');
     r.style.setProperty('--fold-r', (x + half) + 'px');
-    r.style.setProperty('--fold-rw', (innerWidth - x - half) + 'px');
+    r.style.setProperty('--fold-rw', (foldW() - x - half) + 'px');
     r.style.setProperty('--fold-gap', (2 * half) + 'px');
     // pad the page so its content is symmetric around the hinge: equal-column grids then
     // split right on the fold, and the left margin mirrors iOS's status strip on the right
@@ -229,7 +232,7 @@
     r.style.setProperty('--ob-l', lft); r.style.setProperty('--ob-r', items - lft);
     var fs = document.getElementById('oxFoldBar') || document.head.appendChild(Object.assign(document.createElement('style'), {id: 'oxFoldBar'}));
     fs.textContent = 'html.ox-fold .obar>.obar-i:nth-child(' + (lft + 1) + '){grid-column-start:' + (lft + 2) + '}';
-    var sh = 2 * x - innerWidth;
+    var sh = 2 * x - foldW();
     r.style.setProperty('--fold-pl', Math.max(0, sh) + 'px');
     r.style.setProperty('--fold-pr', Math.max(0, -sh) + 'px');
   }
@@ -262,6 +265,8 @@
     var all = document.body.getElementsByTagName('*'), i, e, st, b;
     var twoCols = function (e, st, b, n) {
       var cl = b.left + parseFloat(st.paddingLeft) + parseFloat(st.borderLeftWidth), cr = b.right - parseFloat(st.paddingRight) - parseFloat(st.borderRightWidth);
+      // already a spread on the crease (two equal columns, a gap that covers it): leave it
+      if (n === 2 && parseFloat(st.columnGap) >= gap && Math.abs((cl + cr) / 2 - (L + R) / 2) < 3) return false;
       var lw = L - cl, rw = cr - R; if (lw < 90 || rw < 90) return false;
       var h = Math.max(1, Math.floor(n / 2));
       var cw = function (w) { return 'minmax(0,' + Math.floor((w - (h - 1) * gap) / h) + 'px)'; };

@@ -441,6 +441,14 @@ so old links and the pipeline are unchanged.
     the right at angle 90). The readout line ("Screen check: ...") at the top of the More menu stays
     until the split is confirmed on the phone. The Duo can't tell a web app it is half-folded
     (Polymarket's native app can), so the book layout holds whenever the screen is unfolded.
+  - **The rule (Jordan, 11/4): "full screen where it works and halves when it has to."** Wide pieces
+    (art, the stats strip, game boards, stat tables, charts, tickers, the footer) span the screen.
+    Things that come in pairs or lists (picks, live cards, Top 10, sport tiles, record cards) split
+    one per page on the crease. On the hub (`home.html`) each section is a spread: its title and words
+    on the left page, the thing you use (buttons, the Ask box, the Onyx Picks card, the live and
+    tracker panels, the parlay ticket) on the right, lists below across both (end of `onyx.css`).
+    `foldFit` leaves a grid alone when it already splits on the crease. The fold uses the visible
+    width (visual viewport), not `innerWidth`, which grows with anything wider than the screen.
 
 ## Onyx Sports pages: NFL, college football, NHL, tennis, golf (10/26)
 

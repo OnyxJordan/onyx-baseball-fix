@@ -416,3 +416,38 @@ html.ox-fold #pcBg,html.ox-fold .cx-bg,html.ox-fold .osheet-bg{backdrop-filter:n
 html.ox-fold .ox-hero h1{font-size:clamp(30px,4.6vw,44px)}
 html.ox-fold .home-hero-title{font-size:clamp(28px,4.2vw,40px)}
 html.ox-fold .hero-live-badge{white-space:normal;flex-wrap:wrap;max-width:100%}
+
+/* ── the hub on the unfolded Duo (11/4, Jordan: "still all off even on the homepage") ──
+   Every section is a two-page spread around the crease: the title and its words on the
+   left page, the thing you use (buttons, the Ask box, the Onyx Picks card, the live and
+   tracker panels, the parlay) on the right page, and lists of cards below across both
+   pages, one column per page. The body is already padded symmetric around the crease
+   (ui.js), so two equal columns put their gap right on it. */
+html.ox-fold{--spread-gap:calc(var(--fold-gap,16px) + 40px)}
+html.ox-fold .ox-hero-in{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:var(--spread-gap);row-gap:14px;align-items:center;text-align:left;padding-top:28px}
+html.ox-fold .ox-hero-in>*{grid-column:1;margin-left:0!important;margin-right:0!important;max-width:none!important;text-align:left!important;justify-self:start}
+html.ox-fold .ox-hero-in>.ox-hero-cta{grid-column:2;grid-row:1 / span 3;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;width:100%;margin:0;justify-content:stretch}
+html.ox-fold .ox-hero-in>.ox-hero-cta .ox-btn{width:100%;padding-left:8px;padding-right:8px;text-align:center;justify-content:center;box-sizing:border-box}
+html.ox-fold .ox-hero .ox-hero-art{opacity:.22}
+html.ox-fold section.ox-wrap.ask,html.ox-fold section.ox-wrap.t10,html.ox-fold section.ox-wrap.live,html.ox-fold section.ox-wrap.my{
+  display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:var(--spread-gap);align-items:start;align-content:start}
+html.ox-fold section.ox-wrap>.my-h{grid-column:1;grid-row:1 / span 4;margin-bottom:0}
+html.ox-fold section.ox-wrap>.my-h p{max-width:none}
+html.ox-fold section.ox-wrap.ask>*,html.ox-fold section.ox-wrap.t10>*,html.ox-fold section.ox-wrap.live>*,html.ox-fold section.ox-wrap.my>*{grid-column:2;min-width:0}
+html.ox-fold section.ox-wrap>.my-h{grid-column:1!important}
+html.ox-fold #askOut,html.ox-fold #t10List,html.ox-fold #t10Note,html.ox-fold #lvList,html.ox-fold #lvNote,html.ox-fold #lvRec,html.ox-fold #myBody{grid-column:1 / -1!important}
+html.ox-fold .ask-box{margin-top:6px}
+/* the feature (gamecenter) and the parlay: art or words on the left page, the rest on the right */
+html.ox-fold .ox-feature{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;column-gap:var(--spread-gap)}
+html.ox-fold .ox-feature-mid{display:none!important}
+html.ox-fold .ox-feature-art{min-height:380px;border-bottom:0}
+html.ox-fold .ox-feature-copy{align-items:flex-start;text-align:left;padding:32px 0}
+html.ox-fold .ox-feature-copy .ox-hero-cta{justify-content:flex-start}
+html.ox-fold .ox-cta-in{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:var(--spread-gap);row-gap:14px;align-items:center;text-align:left}
+html.ox-fold .ox-cta-in>*{grid-column:1;justify-self:start;text-align:left}
+html.ox-fold .ox-cta-in>.ox-legs,html.ox-fold .ox-cta-in>.ox-hero-cta{grid-column:2;width:100%}
+html.ox-fold .ox-cta-in>.ox-legs{grid-row:1 / span 3}
+html.ox-fold .ox-cta-in>.ox-hero-cta{justify-content:flex-start}
+html.ox-fold .ox-sec-h{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:var(--spread-gap);align-items:end}
+html.ox-fold .ox-sec-h>*{max-width:none!important;margin:0!important}
+html.ox-fold .ox-about{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;column-gap:var(--spread-gap)!important}
