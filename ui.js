@@ -379,7 +379,6 @@
     'html.ox-fold body{padding-left:var(--fold-pl)!important;padding-right:var(--fold-pr)!important;box-sizing:border-box}',
     'html.ox-fold .obar{display:grid;padding-left:6px;padding-right:6px;grid-template-columns:repeat(var(--ob-l,3),calc((var(--fold-l) - 6px) / var(--ob-l,3))) var(--fold-gap) repeat(var(--ob-r,2),calc((var(--fold-rw) - 6px) / var(--ob-r,2)))}',
     'html.ox-fold .obar-i{min-width:0}',
-    '.ofold-dbg{margin:0 2px 10px;font:500 10.5px/1.5 monospace;color:#8f879c;word-break:break-word}',
     /* the hub header: Live, Sports and Record are in the bottom bar and the menu; on the book they would sit in the crease */
     'html.ox-fold .ox-head .ox-link,html.ox-fold .ox-head .ox-markc{display:none!important}',
     'html.ox-fold .ox-head-in{display:flex!important;justify-content:space-between;align-items:center}',
@@ -666,20 +665,6 @@
     sheetBg.classList.add('open');
     sheet.classList.add('open');
     document.body.style.overflow = 'hidden';
-    // the unfolded Duo (11/4): a one-line readout of what this screen reports, so a screenshot of
-    // the menu says exactly where the hinge is on the real phone (installed app sizes differ)
-    if (TOUCH && innerWidth >= 700) {
-      var dbg = sheet.querySelector('.ofold-dbg') || sheet.insertBefore(el('div', 'ofold-dbg'), sheet.querySelector('.osearch'));
-      var pr = document.createElement('div');
-      pr.style.cssText = 'position:fixed;visibility:hidden;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)';
-      document.body.appendChild(pr); var ps = getComputedStyle(pr), ins = [ps.paddingTop, ps.paddingRight, ps.paddingBottom, ps.paddingLeft].map(parseFloat).join('/'); pr.remove();
-      var sg = (window.viewport && window.viewport.segments) ? window.viewport.segments.length : 'off', g = foldGeom();
-      dbg.textContent = 'Screen check: page ' + innerWidth + 'x' + innerHeight + ' · screen ' + screen.width + 'x' + screen.height +
-        ' · avail ' + screen.availWidth + 'x' + screen.availHeight + ' · vv ' + Math.round(window.visualViewport ? visualViewport.width : 0) +
-        ' · angle ' + ((screen.orientation && screen.orientation.angle) || 0) + ' · insets ' + ins + ' · dpr ' + devicePixelRatio +
-        ' · app ' + (navigator.standalone === true || matchMedia('(display-mode: standalone)').matches ? 'yes' : 'no') +
-        ' · segments ' + sg + ' · posture ' + (navigator.devicePosture ? navigator.devicePosture.type : 'off') + ' · fold ' + (g ? Math.round(g.x) : 'none');
-    }
     var input = sheet.querySelector('input');
     input.value = ''; search('');
     if (focusSearch) setTimeout(function () { input.focus(); }, 60);
