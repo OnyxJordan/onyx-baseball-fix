@@ -441,6 +441,21 @@ so old links and the pipeline are unchanged.
     the right at angle 90). The readout line ("Screen check: ...") at the top of the More menu stays
     until the split is confirmed on the phone. The Duo can't tell a web app it is half-folded
     (Polymarket's native app can), so the book layout holds whenever the screen is unfolded.
+  - **The rule (Jordan, 11/4): "full screen where it works and halves when it has to."** Wide pieces
+    (art, the stats strip, game boards, stat tables, charts, tickers, the footer) span the screen.
+    Things that come in pairs or lists (picks, live cards, Top 10, sport tiles, record cards) split
+    one per page on the crease. On the hub (`home.html`) each section is a spread: its title and words
+    on the left page, the thing you use (buttons, the Ask box, the Onyx Picks card, the live and
+    tracker panels, the parlay ticket) on the right, lists below across both (end of `onyx.css`).
+    `foldFit` leaves a grid alone when it already splits on the crease. The fold uses the visible
+    width (visual viewport), not `innerWidth`, which grows with anything wider than the screen.
+
+- **Tennis live picks need 60%+ to hit (11/4, Jordan: "only when it's confident").** Graded tennis
+  live plays to then: 28-32 (-6.46u). Under 60% to hit 12-25 (-8.62u; the 50-60% band 8-18), 60%+
+  16-7 (+2.16u), better on both days. A tennis live bet now counts as value only with 3+ points of
+  edge AND a 60%+ chance (`live.js` TN_CONF/isVal, `live_model.TN_CONF`, `live_log.py`, which logs as
+  `live-v2`; v1 rows stay as logged). Below it the card reads "Too close to call". 60 graded plays is a
+  small sample: the lane stays on trial and the bar is revisited as rows come in.
 
 ## Onyx Sports pages: NFL, college football, NHL, tennis, golf (10/26)
 

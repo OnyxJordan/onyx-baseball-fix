@@ -41,7 +41,7 @@ LEAGUES = {"nfl": ["football/nfl"], "cfb": ["football/college-football"], "nba":
            "cbb": ["basketball/mens-college-basketball"], "tennis": ["tennis/atp", "tennis/wta"]}
 SBQ = {"cfb": "groups=80", "cbb": "groups=50&limit=400"}
 UA = {"User-Agent": "Mozilla/5.0 (onyx live log)"}
-VERSION = "live-v1"
+VERSION = "live-v2"   # v2 (11/4): tennis needs 60%+ to hit to log; v1 rows stay as logged
 
 
 def get(url, tries=2):
@@ -218,6 +218,10 @@ def log_live(led, url):
                 continue
             for b in LM.bets(sport, g, g["M"], x.get("lines") or [], g["pre"]):
                 if b["edge"] < LM.VALUE:
+                    continue
+                # tennis: only when the model is confident (11/4, Jordan). Graded tennis live plays to then:
+                # under 60% to hit 12-25 (-8.62u; the 50-60% band 8-18), 60%+ 16-7 (+2.16u)
+                if sport == "tennis" and b["p"] < LM.TN_CONF:
                     continue
                 rid = row_id(sport, g["gid"], b)
                 mk = (sport, str(g["gid"]), b["kind"])

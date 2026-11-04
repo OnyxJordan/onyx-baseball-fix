@@ -500,6 +500,7 @@
       // (11/1 first run: every 20-50 point "edge" was a late football game the model misread)
       if (f != null && f < (o.kind === 'prop' ? 0.08 : FMIN[g.sport] || 0.15)) return;
       if (o.edge > 0.12) return;
+      o.ok = !ten || o.p >= TN_CONF;
       out.push(o);
     }
     var homeSel = function (sel) { return sameTeam(sel, g.hn) || sameTeam(sel, g.home); };
@@ -535,7 +536,7 @@
              price: x.price, cur: cur, start: sd0, start_txt: q.l != null && sd0 != null ? (x.side === 'over' ? 'o' : 'u') + q.l + ' ' + fmt(sd0) : null});
       }
     });
-    return out.sort(function (a, b) { return b.edge - a.edge; });
+    return out.sort(function (a, b) { return (isVal(b) - isVal(a)) || b.edge - a.edge; });
   }
   var MKN = {pts: 'points', reb: 'rebounds', ast: 'assists', threes: 'threes', rec: 'catches', rec_yds: 'receiving yds', rush_yds: 'rushing yds', pass_yds: 'passing yds'};
   function fmt(x) { return x == null ? '' : x > 0 ? '+' + x : String(x); }
@@ -577,6 +578,10 @@
   // the live value record. home.html (the Live tab and Ask Onyx), every sport page (sport_shell.html)
   // and nba.html all draw these, so a card reads the same everywhere. ──
   var REF = 'KR680261', VALUE = 0.03;
+  // tennis posts a live pick only when the model is confident (11/4, Jordan): 60%+ to hit. Its graded
+  // live plays: under 60% went 12-25 (-8.6u, the coin-flip band 50-60% 8-18), 60%+ went 16-7 (+2.2u)
+  var TN_CONF = 0.60;
+  function isVal(b) { return b.edge >= VALUE && b.ok !== false; }
   var NAME = {nfl: 'NFL', cfb: 'NCAAF', nba: 'NBA', nhl: 'NHL', cbb: 'NCAAB', tennis: 'Tennis'};
   var PAGE = {nfl: 'nfl.html', cfb: 'cfb.html', nba: 'nba.html', nhl: 'nhl.html', cbb: 'cbb.html', tennis: 'tennis.html'};
   var LIVE_SPORTS = ['nfl', 'cfb', 'nba', 'nhl', 'cbb', 'tennis'];
@@ -637,7 +642,7 @@
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]; }); }
   function pct(x) { return x == null ? '-' : x < 0.01 ? 'under 1%' : x > 0.99 ? 'over 99%' : Math.round(100 * x) + '%'; }
   function pr(x) { return x == null ? '-' : x > 0 ? '+' + x : String(x); }
-  function badge(b) { return b.edge >= VALUE ? '<span class="lv-val">Value +' + Math.round(b.edge * 100) + '%</span>' : ''; }
+  function badge(b) { return isVal(b) ? '<span class="lv-val">Value +' + Math.round(b.edge * 100) + '%</span>' : ''; }
   function logoImg(u, cls) { return u ? '<img class="' + (cls || 'lv-lg') + '" src="' + esc(u) + '" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">' : '<span class="' + (cls || 'lv-lg') + ' lv-nolg"></span>'; }
   var ONYX = 'https://app.onyxodds.com/?referrer=' + REF;
   function onyxSel(sel) { return sel ? 'https://app.onyxodds.com/share?selection=' + encodeURIComponent(sel) + '&referrer=' + REF : ONYX; }
@@ -661,12 +666,12 @@
     var lean = '', B = (g.bets || []).filter(function (b) { return b.edge > -0.02; });
     if (g.bets && g.bets.length && g.bets[0].edge > -0.05) {
       var top = B[0] || g.bets[0], rest = (B.length ? B : g.bets).slice(1, 4);
-      lean = '<div class="lv-lean' + (top.edge >= VALUE ? '' : ' none') + '"><div class="lv-k">' + (top.edge >= VALUE ? 'Best live bet' : 'No value right now') + '</div>'
+      lean = '<div class="lv-lean' + (isVal(top) ? '' : ' none') + '"><div class="lv-k">' + (isVal(top) ? 'Best live bet' : top.ok === false && top.edge >= VALUE ? 'Too close to call' : 'No value right now') + '</div>'
         + '<div class="lv-pick">' + (top.logo ? logoImg(top.logo, 'lv-lg sm') : '') + '<b>' + esc(top.label) + '</b>' + badge(top) + '</div>'
         + '<div class="lv-steps"><div><small>Started</small><b>' + esc(top.start_txt || '-') + '</b><span>Onyx pregame</span></div>'
         + '<div><small>Live line</small><b>' + pr(top.price) + '</b><span>' + pct(implied(top.price)) + ' implied</span></div>'
         + '<div class="fair"><small>Our fair</small><b>' + pr(top.fair) + '</b><span>' + pct(top.p) + ' to hit</span></div></div>'
-        + '<div class="lv-verdict">' + (top.edge >= VALUE ? 'A good live bet: the live line of <b>' + pr(top.price) + '</b> pays more than our fair price of <b>' + pr(top.fair) + '</b>.' : 'The closest one: the live line of ' + pr(top.price) + ' pays less than our fair price of ' + pr(top.fair) + '. It turns into value at ' + pr(top.fair) + ' or better.') + '</div>'
+        + '<div class="lv-verdict">' + (top.ok === false && top.edge >= VALUE ? 'The price has value, but our chance is only ' + pct(top.p) + ': tennis picks post at 60% or better, so this one is a pass.' : isVal(top) ? 'A good live bet: the live line of <b>' + pr(top.price) + '</b> pays more than our fair price of <b>' + pr(top.fair) + '</b>.' : 'The closest one: the live line of ' + pr(top.price) + ' pays less than our fair price of ' + pr(top.fair) + '. It turns into value at ' + pr(top.fair) + ' or better.') + '</div>'
         + (rest.length ? '<div class="lv-bets">' + rest.map(function (b) { return '<div class="lv-bet"><span class="n">' + esc(b.label) + '</span><span class="s">' + (b.start_txt ? esc(b.start_txt) + ' &rarr; ' : '') + '<b>' + pr(b.price) + '</b> &middot; fair ' + pr(b.fair) + '</span>' + badge(b) + '</div>'; }).join('') + '</div>' : '') + '</div>';
     } else if (g.bets && g.bets.length) {
       lean = '<div class="lv-lean none"><div class="lv-k">No value right now</div><div class="lv-verdict">Every live line on this game pays less than our fair price. We will flag it here the moment one moves past it.</div></div>';
@@ -697,7 +702,7 @@
   // the sentence a play leads with: "Value right now: Sinner to win at +120 live. Our chance 52%, the live line says 45%: +7 points."
   function sentence(b, g) {
     var pts = Math.round(b.edge * 100);
-    return (b.edge >= VALUE ? 'Value right now: ' : 'Closest: ') + '<b>' + esc(b.label) + '</b> at <b>' + pr(b.price) + '</b> live. Our chance ' + pct(b.p) + ', the live line says ' + pct(implied(b.price)) + ': '
+    return (isVal(b) ? 'Value right now: ' : 'Closest: ') + '<b>' + esc(b.label) + '</b> at <b>' + pr(b.price) + '</b> live. Our chance ' + pct(b.p) + ', the live line says ' + pct(implied(b.price)) + ': '
       + (pts > 0 ? '+' : '') + pts + ' point' + (Math.abs(pts) === 1 ? '' : 's') + '.<small>' + esc(g.away) + (g.sport === 'tennis' ? ' vs ' : ' @ ') + esc(g.home) + ' &middot; ' + esc(g.detail || 'Live') + (b.start_txt ? ' &middot; started ' + esc(b.start_txt) : '') + ' &middot; our fair ' + pr(b.fair) + '</small>';
   }
   function topEdge(g) { return (g.bets || []).reduce(function (m, b) { return Math.max(m, b.edge); }, -1); }
@@ -707,7 +712,7 @@
   function blockHTML(sport, G, opt) {
     opt = opt || {};
     var all = [].concat.apply([], G.map(function (g) { return (g.bets || []).map(function (b) { return {b: b, g: g}; }); })).sort(function (x, y) { return y.b.edge - x.b.edge; });
-    var val = all.filter(function (x) { return x.b.edge >= VALUE; }).slice(0, 4), near = all.filter(function (x) { return x.b.edge < VALUE; }).slice(0, 3);
+    var val = all.filter(function (x) { return isVal(x.b); }).slice(0, 4), near = all.filter(function (x) { return !isVal(x.b); }).slice(0, 3);
     var priced = G.some(function (g) { return g.bets; });
     var h = '<div class="lvb-h"><div><span class="lvb-eb' + (G.length ? '' : ' off') + '"><i></i>' + (G.length ? 'Live now &middot; ' + G.length + ' ' + (sport === 'tennis' ? 'match' + (G.length === 1 ? '' : 'es') : 'game' + (G.length === 1 ? '' : 's')) + ' in play' : 'Live') + '</span>'
       + '<h3>' + (!G.length ? 'Nothing live right now' : val.length ? 'Value right now' : 'No live value right now') + '</h3></div></div>';
@@ -783,6 +788,6 @@
   }
 
   window.OnyxLive = {left: left, model: model, plays: plays, noVig: noVig, implied: implied, phi: phi, games: games, pregame: pregame, american: american, lean: lean, bets: bets, propP: propP,
-    SD: SD, PACE: PACE, TOTK: TOTK, LEN: LEN, ML_PTS: ML_PTS, DEF_TOTAL: DEF_TOTAL, FMIN: FMIN, tn: tn, VALUE: VALUE, card: card, block: blockHTML, spot: spotHTML, sentence: sentence, sortGames: sortGames,
+    SD: SD, PACE: PACE, TOTK: TOTK, LEN: LEN, ML_PTS: ML_PTS, DEF_TOTAL: DEF_TOTAL, FMIN: FMIN, tn: tn, VALUE: VALUE, TN_CONF: TN_CONF, isVal: isVal, card: card, block: blockHTML, spot: spotHTML, sentence: sentence, sortGames: sortGames,
     css: css, mount: mount, ledger: ledger, record: record, recordHTML: recordHTML, NAME: NAME, PAGE: PAGE, SPORTS: LIVE_SPORTS};
 })();
