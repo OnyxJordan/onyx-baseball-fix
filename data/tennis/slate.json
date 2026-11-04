@@ -2071,7 +2071,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        3
+        6
        ],
        "serve": false
       },
@@ -2082,17 +2082,17 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        6
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
     {
      "id": "186480",
-     "start": "2026-11-04T18:05Z",
-     "state": "pre",
-     "detail": "11/4 - 1:05 PM EST",
+     "start": "2026-11-04T18:10Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 2",
      "draw": "Men's Singles",
      "court": "Court Central",
@@ -2103,7 +2103,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        2
+       ],
        "serve": false
       },
       {
@@ -2112,16 +2114,18 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        2
+       ],
+       "serve": true
       }
      ]
     },
     {
      "id": "186485",
-     "start": "2026-11-04T18:15Z",
-     "state": "pre",
-     "detail": "11/4 - 1:15 PM EST",
+     "start": "2026-11-04T18:10Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 2",
      "draw": "Men's Singles",
      "court": "Court 2",
@@ -2132,7 +2136,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ger.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        2
+       ],
        "serve": false
       },
       {
@@ -2141,7 +2147,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        4
+       ],
        "serve": false
       }
      ]
@@ -2176,71 +2184,13 @@
      ]
     },
     {
-     "id": "186494",
-     "start": "2026-11-05T05:00Z",
-     "state": "pre",
-     "detail": "TBD",
-     "round": "Round 3",
-     "draw": "Men's Singles",
-     "court": "",
-     "p": [
-      {
-       "name": "Ignacio Buse",
-       "short": "I. Buse",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/per.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "Nuno Borges",
-       "short": "N. Borges",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/por.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      }
-     ]
-    },
-    {
-     "id": "186495",
-     "start": "2026-11-05T05:00Z",
-     "state": "pre",
-     "detail": "TBD",
-     "round": "Round 3",
-     "draw": "Men's Singles",
-     "court": "",
-     "p": [
-      {
-       "name": "Casper Ruud",
-       "short": "C. Ruud",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/nor.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      }
-     ]
-    },
-    {
      "id": "186496",
-     "start": "2026-11-05T05:00Z",
+     "start": "2026-11-05T10:00Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "11/5 - 5:00 AM EST",
      "round": "Round 3",
      "draw": "Men's Singles",
-     "court": "",
+     "court": "Court Central",
      "p": [
       {
        "name": "Quentin Halys",
@@ -2264,12 +2214,12 @@
     },
     {
      "id": "186497",
-     "start": "2026-11-05T05:00Z",
+     "start": "2026-11-05T11:30Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "11/5 - 6:30 AM EST",
      "round": "Round 3",
      "draw": "Men's Singles",
-     "court": "",
+     "court": "Court Central",
      "p": [
       {
        "name": "Arthur Rinderknech",
@@ -2293,12 +2243,12 @@
     },
     {
      "id": "186498",
-     "start": "2026-11-05T05:00Z",
+     "start": "2026-11-05T13:00Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "11/5 - 8:00 AM EST",
      "round": "Round 3",
      "draw": "Men's Singles",
-     "court": "",
+     "court": "Court 1",
      "p": [
       {
        "name": "Tomas Martin Etcheverry",
@@ -2322,12 +2272,12 @@
     },
     {
      "id": "186499",
-     "start": "2026-11-05T05:00Z",
+     "start": "2026-11-05T13:00Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "11/5 - 8:00 AM EST",
      "round": "Round 3",
      "draw": "Men's Singles",
-     "court": "",
+     "court": "Court Central",
      "p": [
       {
        "name": "Luca Van Assche",
@@ -2350,13 +2300,71 @@
      ]
     },
     {
-     "id": "186502",
-     "start": "2026-11-05T05:00Z",
+     "id": "186494",
+     "start": "2026-11-05T14:30Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "11/5 - 9:30 AM EST",
      "round": "Round 3",
      "draw": "Men's Singles",
-     "court": "",
+     "court": "Court 1",
+     "p": [
+      {
+       "name": "Ignacio Buse",
+       "short": "I. Buse",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/per.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      },
+      {
+       "name": "Nuno Borges",
+       "short": "N. Borges",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/por.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      }
+     ]
+    },
+    {
+     "id": "186495",
+     "start": "2026-11-05T16:00Z",
+     "state": "pre",
+     "detail": "11/5 - 11:00 AM EST",
+     "round": "Round 3",
+     "draw": "Men's Singles",
+     "court": "Court 1",
+     "p": [
+      {
+       "name": "Casper Ruud",
+       "short": "C. Ruud",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/nor.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      },
+      {
+       "name": "TBD",
+       "short": "TBD",
+       "flag": null,
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      }
+     ]
+    },
+    {
+     "id": "186502",
+     "start": "2026-11-05T18:00Z",
+     "state": "pre",
+     "detail": "11/5 - 1:00 PM EST",
+     "round": "Round 3",
+     "draw": "Men's Singles",
+     "court": "Court Central",
      "p": [
       {
        "name": "TBD",
@@ -2380,12 +2388,12 @@
     },
     {
      "id": "186503",
-     "start": "2026-11-05T05:00Z",
+     "start": "2026-11-05T19:30Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "11/5 - 2:30 PM EST",
      "round": "Round 3",
      "draw": "Men's Singles",
-     "court": "",
+     "court": "Court Central",
      "p": [
       {
        "name": "Taylor Fritz",
@@ -6267,7 +6275,7 @@
      "id": "186725",
      "start": "2026-11-04T16:05Z",
      "state": "in",
-     "detail": "2nd",
+     "detail": "3rd",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Campo 3",
@@ -6280,9 +6288,10 @@
        "win": false,
        "sets": [
         3,
-        7
+        7,
+        1
        ],
-       "serve": false
+       "serve": true
       },
       {
        "name": "Laura Samson",
@@ -6292,7 +6301,8 @@
        "win": false,
        "sets": [
         6,
-        6
+        6,
+        3
        ],
        "serve": false
       }
@@ -6336,8 +6346,8 @@
     {
      "id": "186723",
      "start": "2026-11-04T18:00Z",
-     "state": "pre",
-     "detail": "11/4 - 1:00 PM EST",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Campo 1",
@@ -6348,7 +6358,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        4
+       ],
        "serve": false
       },
       {
@@ -6357,16 +6369,18 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/aut.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        1
+       ],
        "serve": false
       }
      ]
     },
     {
      "id": "186732",
-     "start": "2026-11-04T18:05Z",
-     "state": "pre",
-     "detail": "11/4 - 1:05 PM EST",
+     "start": "2026-11-04T18:10Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Campo 5",
@@ -6377,7 +6391,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        1
+       ],
        "serve": false
       },
       {
@@ -6386,16 +6402,18 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        3
+       ],
+       "serve": true
       }
      ]
     },
     {
      "id": "186722",
-     "start": "2026-11-04T18:10Z",
+     "start": "2026-11-04T18:40Z",
      "state": "pre",
-     "detail": "11/4 - 1:10 PM EST",
+     "detail": "11/4 - 1:40 PM EST",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Campo 3",
@@ -7932,5 +7950,5 @@
    ]
   }
  ],
- "fetched": "2026-11-04T18:04:23+00:00"
+ "fetched": "2026-11-04T18:30:44+00:00"
 }
