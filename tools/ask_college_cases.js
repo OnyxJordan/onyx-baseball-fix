@@ -173,8 +173,10 @@ module.exports = [
   C('golden state spread', {team: 'GS', sports: ['nba'], no_sports: COL}),
   C('wolves spread', {team: 'MIN', sports: ['nba'], no_sports: COL}),
   C('timberwolves moneyline', {team: 'MIN', sports: ['nba'], no_sports: COL}),
-  C('kings moneyline', {team_in: ['SAC', 'LA'], no_sports: COL}),
-  C('panthers moneyline', {team_in: ['CAR', 'FLA'], no_sports: COL}),
+  // both share a name across leagues: one playing today is that team; both playing today, Ask asks
+  // which (the DUPN rule in ask.js), so a question back is a right answer here (11/4: both Kings played)
+  C('kings moneyline', {team_in: ['SAC', 'LA'], no_sports: COL, ambig_ok: true}),
+  C('panthers moneyline', {team_in: ['CAR', 'FLA'], no_sports: COL, ambig_ok: true}),
   C('hurricanes moneyline', {team: 'CAR', sports: ['nhl'], no_sports: COL}),
   C('carolina hurricanes', {team: 'CAR', sports: ['nhl'], no_sports: COL}),
   C('bruins', {team: 'BOS', sports: ['nhl'], no_sports: COL}),

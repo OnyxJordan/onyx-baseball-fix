@@ -408,7 +408,12 @@
     // a full player name wins over a team word inside it ("LaMelo Ball", "PJ Washington", "Jalen Green")
     Object.keys(PCall).forEach(function (k) {
       var c = PCall[k], kk = ' ' + cnorm(k).replace(/-/g, ' ') + ' ';
-      if (Object.keys(c.mk || {}).length || c.score >= 8) cnorm(k).split(' ').forEach(function (w) { if (w.length >= 4) PW[w] = 1; });
+      // only the last name: "butler points" is Jimmy Butler, but "duke basketball" is the Blue Devils even
+      // with a Duke Watson on the slate (11/4: a first name took Duke away from the school)
+      if (Object.keys(c.mk || {}).length || c.score >= 8) {
+        var np = cnorm(k).split(' ').filter(function (w) { return !/^(jr|sr|ii|iii|iv|v)$/.test(w); }), lw = np[np.length - 1];
+        if (lw && lw.length >= 4) PW[lw] = 1;
+      }
       if (k.indexOf(' ') > 0 && tq.indexOf(kk) >= 0) tq = tq.split(kk).join(' ' + kk.trim().replace(/[a-z0-9]/g, '_') + ' ');
     });
     var mk = s.markets || [], gameMk = mk.length && mk.every(function (m) { return /^(spread|total|ml)$/.test(m); });
