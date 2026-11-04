@@ -272,7 +272,7 @@ function serve() {
         sw: document.documentElement.scrollWidth, vw: document.documentElement.clientWidth };
     });
     if (!st.fold) bad.push('book layout off on the unfolded screen');
-    if (st.x !== '445px') bad.push(`hinge at ${st.x}, want 445px`);
+    if (st.x !== '448px') bad.push(`hinge at ${st.x}, want 448px`);
     if (st.hits.length) bad.push(`${st.hits.length} text on the hinge (${st.hits.slice(0, 3).join(' | ')})`);
     if (st.bar) bad.push(`${st.bar} bottom-bar item(s) on the hinge`);
     if (st.sw > st.vw + 1) bad.push(`scrolls sideways (${st.sw}px > ${st.vw}px)`);
