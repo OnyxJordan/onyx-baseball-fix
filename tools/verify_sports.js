@@ -323,9 +323,12 @@ function serve() {
             await page.click('#cx .pc-seg button:nth-child(2)');
             const r2 = await cardCheck(page, 'bets', []);
             if (r2) cbad.push('player bets: ' + r2);
-            const r3 = await page.evaluate(BETS_CHECK, false);
+            // a player with no Onyx line on the slate right now (CBB props come and go) shows the
+            // honest empty state, like the team card above; anything else must be the full list
+            const pEmpty = await page.evaluate(() => { const f = document.getElementById('cxFace'); return !!(f && f.querySelector('.cx-empty')) && !(f && f.querySelector('.bc-row, .bc-best')); });
+            const r3 = pEmpty ? 'ok (no Onyx line on him right now)' : await page.evaluate(BETS_CHECK, false);
             if (!r3.startsWith('ok')) cbad.push('player bets card: ' + r3);
-            const r4 = await cardCheck(page, 'bets', []); if (r4) cbad.push('player bet card open: ' + r4);
+            const r4 = pEmpty ? '' : await cardCheck(page, 'bets', []); if (r4) cbad.push('player bet card open: ' + r4);
             const dist = await page.$('#cxDist');
             if (dist) {   // scrub the chart off Onyx's line, then let go: it must snap back to the line
               await dist.scrollIntoViewIfNeeded(); await page.waitForTimeout(60);   // the bet card opens inside its row, maybe below the fold
