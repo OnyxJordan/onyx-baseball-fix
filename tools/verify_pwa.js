@@ -276,6 +276,10 @@ function serve() {
     if (st.hits.length) bad.push(`${st.hits.length} text on the hinge (${st.hits.slice(0, 3).join(' | ')})`);
     if (st.bar) bad.push(`${st.bar} bottom-bar item(s) on the hinge`);
     if (st.sw > st.vw + 1) bad.push(`scrolls sideways (${st.sw}px > ${st.vw}px)`);
+    // 11/4: the NBA player card's fold rule (.pc) also caught Onyx Picks' cards (.pc), each one stretched
+    // to the full screen height with its title pushed out of view: a card on the page stays card-sized
+    const tall = await p.evaluate(() => [...document.querySelectorAll('.cards .pc, .pk-grid > *, .lv-card')].filter(c => c.getBoundingClientRect().height > innerHeight * 0.7).length);
+    if (tall) bad.push(`${tall} card(s) stretched to the screen height`);
     // two live pick cards (Jordan's photo, 11/4): one per page, the same width, meeting at the crease
     const ev = await p.evaluate(async () => {
       const host = document.querySelector('main, .pane.active, body'), list = document.createElement('div');

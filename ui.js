@@ -379,8 +379,8 @@
     'html.ox-fold .ox-head .ox-link,html.ox-fold .ox-head .ox-markc{display:none!important}',
     'html.ox-fold .ox-head-in{display:flex!important;justify-content:space-between;align-items:center}',
     'html.ox-fold .osheet{left:var(--fold-r)!important;right:auto!important;width:var(--fold-rw)!important;margin-left:0!important}',
-    'html.ox-fold .cx,html.ox-fold .pc{left:calc(var(--fold-r) + 8px)!important;right:auto!important;width:calc(var(--fold-rw) - 16px)!important;height:calc(100vh - var(--sat,0px) - 24px)!important;top:calc(var(--sat,0px) + 12px)!important;bottom:auto!important;transform:translateY(16px) scale(.97)!important;border-radius:20px}',
-    'html.ox-fold .cx.open,html.ox-fold .pc.open{transform:none!important}',
+    'html.ox-fold #cx.cx,html.ox-fold #pc.pc{left:calc(var(--fold-r) + 8px)!important;right:auto!important;width:calc(var(--fold-rw) - 16px)!important;height:calc(100vh - var(--sat,0px) - 24px)!important;top:calc(var(--sat,0px) + 12px)!important;bottom:auto!important;transform:translateY(16px) scale(.97)!important;border-radius:20px}',
+    'html.ox-fold #cx.cx.open,html.ox-fold #pc.pc.open{transform:none!important}',
     /* closed = hidden from view, taps, Tab and screen readers; visibility flips
        after the slide-out so the closing animation still plays */
     '.osheet{visibility:hidden;transition:transform .32s cubic-bezier(.2,.9,.25,1),opacity .2s,visibility 0s linear .32s}',

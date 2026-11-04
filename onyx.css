@@ -402,16 +402,16 @@
 /* ── the fold (11/4): iPhone Duo unfolded, laid out as a book (ui.js sets html.ox-fold).
    Player cards open on the right page at phone width, so they take the phone card's
    tighter stat tiles; the backdrop dims without blurring so the left page stays readable */
-html.ox-fold .pc .pdr-grid{gap:6px}
-html.ox-fold .pc .pdr-grid .nba-card{padding:10px 4px}
-html.ox-fold .pc .pdr-grid .nba-card .sub{font-size:10px!important}
-html.ox-fold .pc .pdr-grid .nba-card>div[style*="display:flex"]{gap:4px!important}
-html.ox-fold .pc .pdr-grid .chip{flex:1 1 0;min-width:0;padding:6px 2px}
-html.ox-fold .pc .pdr-grid .chip .o{font-size:11.5px}
-html.ox-fold .pc .pc-hs .hs{width:54px;height:54px}
-html.ox-fold .pc .pc-name{font-size:18px}
-html.ox-fold .pc .pc-rate b{font-size:19px}
-html.ox-fold .pc-bg,html.ox-fold .cx-bg,html.ox-fold .osheet-bg{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:rgba(4,4,8,.42)!important}
+html.ox-fold #pc.pc .pdr-grid{gap:6px}
+html.ox-fold #pc.pc .pdr-grid .nba-card{padding:10px 4px}
+html.ox-fold #pc.pc .pdr-grid .nba-card .sub{font-size:10px!important}
+html.ox-fold #pc.pc .pdr-grid .nba-card>div[style*="display:flex"]{gap:4px!important}
+html.ox-fold #pc.pc .pdr-grid .chip{flex:1 1 0;min-width:0;padding:6px 2px}
+html.ox-fold #pc.pc .pdr-grid .chip .o{font-size:11.5px}
+html.ox-fold #pc.pc .pc-hs .hs{width:54px;height:54px}
+html.ox-fold #pc.pc .pc-name{font-size:18px}
+html.ox-fold #pc.pc .pc-rate b{font-size:19px}
+html.ox-fold #pcBg,html.ox-fold .cx-bg,html.ox-fold .osheet-bg{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:rgba(4,4,8,.42)!important}
 /* headlines sized so their longest word fits one page of the book */
 html.ox-fold .ox-hero h1{font-size:clamp(30px,4.6vw,44px)}
 html.ox-fold .home-hero-title{font-size:clamp(28px,4.2vw,40px)}
