@@ -240,7 +240,7 @@
      Grids that span it get their columns split at the fold; a block of text that crosses it
      is kept to the left page. Tables, tickers and the app chrome are left alone. Every
      change is marked and undone when the screen is no longer a book (folded shut). */
-  var FOLD_SKIP = 'header,.ox-head,.ox-head-in,nav,.nav,.obar,.osheet,.osheet-bg,.cx,.cx-bg,.pc,.pc-bg,table,.tbl,.tbl-wrap,svg,canvas,select,input,textarea,' +
+  var FOLD_SKIP = 'header,.ox-head,.ox-head-in,.ox-bar,nav,.nav,.obar,.osheet,.osheet-bg,.cx,.cx-bg,.pc,.pc-bg,table,.tbl,.tbl-wrap,svg,canvas,select,input,textarea,' +
     '[class*="ticker"],[class*="marq"],.tk-strip,.ox-marquee,.ox-giant,.sp-art,.ox-hero-art';
   // every style foldFit sets is recorded with what was there, and put back only if it is still ours
   function foldSet(e, k, v) {

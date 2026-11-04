@@ -413,7 +413,7 @@ html.ox-fold #pc.pc .pc-name{font-size:18px}
 html.ox-fold #pc.pc .pc-rate b{font-size:19px}
 html.ox-fold #pcBg,html.ox-fold .cx-bg,html.ox-fold .osheet-bg{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:rgba(4,4,8,.42)!important}
 /* headlines sized so their longest word fits one page of the book */
-html.ox-fold .ox-hero h1{font-size:clamp(30px,4.6vw,44px)}
+html.ox-fold .ox-hero h1{font-size:clamp(34px,5.4vw,50px)}
 html.ox-fold .home-hero-title{font-size:clamp(28px,4.2vw,40px)}
 html.ox-fold .hero-live-badge{white-space:normal;flex-wrap:wrap;max-width:100%}
 
@@ -424,10 +424,10 @@ html.ox-fold .hero-live-badge{white-space:normal;flex-wrap:wrap;max-width:100%}
    pages, one column per page. The body is already padded symmetric around the crease
    (ui.js), so two equal columns put their gap right on it. */
 html.ox-fold{--spread-gap:calc(var(--fold-gap,16px) + 40px)}
-html.ox-fold .ox-hero-in{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:var(--spread-gap);row-gap:14px;align-items:center;text-align:left;padding-top:28px}
+html.ox-fold .ox-hero-in{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:var(--spread-gap);row-gap:16px;align-items:center;align-content:center;text-align:left;padding-top:58px;padding-bottom:20px}
 html.ox-fold .ox-hero-in>*{grid-column:1;margin-left:0!important;margin-right:0!important;max-width:none!important;text-align:left!important;justify-self:start}
-html.ox-fold .ox-hero-in>.ox-hero-cta{grid-column:2;grid-row:1 / span 3;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;width:100%;margin:0;justify-content:stretch}
-html.ox-fold .ox-hero-in>.ox-hero-cta .ox-btn{width:100%;padding-left:8px;padding-right:8px;text-align:center;justify-content:center;box-sizing:border-box}
+html.ox-fold .ox-hero-in>.ox-hero-cta{grid-column:2;grid-row:1 / span 3;align-self:center;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 12px;width:100%;margin:0;justify-content:stretch}
+html.ox-fold .ox-hero-in>.ox-hero-cta .ox-btn{width:100%;min-height:40px;padding:0 8px;font-size:11px;text-align:center;justify-content:center;box-sizing:border-box}
 html.ox-fold .ox-hero .ox-hero-art{opacity:.22}
 html.ox-fold section.ox-wrap.ask,html.ox-fold section.ox-wrap.t10,html.ox-fold section.ox-wrap.live,html.ox-fold section.ox-wrap.my{
   display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:var(--spread-gap);align-items:start;align-content:start}
@@ -451,3 +451,16 @@ html.ox-fold .ox-cta-in>.ox-hero-cta{justify-content:flex-start}
 html.ox-fold .ox-sec-h{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:var(--spread-gap);align-items:end}
 html.ox-fold .ox-sec-h>*{max-width:none!important;margin:0!important}
 html.ox-fold .ox-about{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;column-gap:var(--spread-gap)!important}
+/* spacing on the unfolded hub (11/4, Jordan: "don't love the layout and spacing"): the banner is
+   one line across the screen, section titles sized to their page, room between sections */
+html.ox-fold .ox-bar{font-size:11px;padding-left:20px;padding-right:44px}
+html.ox-fold .ox-bar>span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html.ox-fold .ox-hero-in>p{font-size:12px;line-height:1.7;margin:0}
+html.ox-fold .ox-hero-in>.ox-eyebrow{font-size:10.5px}
+html.ox-fold .ox-tonight{margin-top:4px}
+html.ox-fold section.ox-wrap.ask,html.ox-fold section.ox-wrap.t10,html.ox-fold section.ox-wrap.live,html.ox-fold section.ox-wrap.my{padding-top:36px;row-gap:12px}
+html.ox-fold .my-h h2{font-size:clamp(28px,4vw,36px)}
+html.ox-fold .my-h p{font-size:13px;line-height:1.6}
+html.ox-fold section.ox-wrap>.my-h{align-self:start}
+html.ox-fold .ask-box{margin-top:30px}
+html.ox-fold .t10-picks{margin-top:30px}

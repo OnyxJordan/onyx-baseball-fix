@@ -258,7 +258,7 @@ function serve() {
     const st = await p.evaluate(() => {
       const r = document.documentElement, cs = getComputedStyle(r);
       const L = parseFloat(cs.getPropertyValue('--fold-l')), R = parseFloat(cs.getPropertyValue('--fold-r'));
-      const skip = 'table,.tbl,.tbl-wrap,[class*="ticker"],[class*="marq"],.tk-strip,.ox-marquee,.ox-giant,svg,canvas,.sp-art,.ox-hero-art,.osheet,.cx,.pc';
+      const skip = '.ox-bar,table,.tbl,.tbl-wrap,[class*="ticker"],[class*="marq"],.tk-strip,.ox-marquee,.ox-giant,svg,canvas,.sp-art,.ox-hero-art,.osheet,.cx,.pc';
       const H = innerHeight, hits = [];
       const tw = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT); let t;
       while ((t = tw.nextNode())) {
