@@ -720,10 +720,10 @@
    "f": 0.81
   },
   "model": "live-v1",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "48",
+  "profit": -1.0,
+  "graded_at": "2026-11-04T03:47:04+00:00"
  },
  {
   "id": "nhl-401892638-spread-home",
@@ -1230,10 +1230,10 @@
    "f": 0.5
   },
   "model": "live-v1",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "20-28",
+  "profit": 0.9615,
+  "graded_at": "2026-11-04T03:47:04+00:00"
  },
  {
   "id": "nhl-401892633-spread-home",
@@ -1440,10 +1440,10 @@
    "f": 0.699
   },
   "model": "live-v1",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "167",
+  "profit": -1.0,
+  "graded_at": "2026-11-04T03:47:04+00:00"
  },
  {
   "id": "cbb-401925779-spread-away",
@@ -1620,10 +1620,10 @@
    "f": 0.712
   },
   "model": "live-v1",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "163",
+  "profit": -1.0,
+  "graded_at": "2026-11-04T03:47:04+00:00"
  },
  {
   "id": "cbb-401920702-total-under",
@@ -1710,10 +1710,10 @@
    "f": 0.406
   },
   "model": "live-v1",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "20-28",
+  "profit": 0.6849,
+  "graded_at": "2026-11-04T03:47:04+00:00"
  },
  {
   "id": "nhl-401892633-total-under",
@@ -1830,10 +1830,10 @@
    "f": 0.356
   },
   "model": "live-v1",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "7",
+  "profit": 0.7692,
+  "graded_at": "2026-11-04T03:47:04+00:00"
  },
  {
   "id": "cbb-401929372-spread-home",
@@ -1860,10 +1860,10 @@
    "f": 0.5
   },
   "model": "live-v1",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "106-61",
+  "profit": 0.9524,
+  "graded_at": "2026-11-04T03:47:04+00:00"
  },
  {
   "id": "nhl-401892643-spread-home",
@@ -1920,10 +1920,10 @@
    "f": 0.231
   },
   "model": "live-v1",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "4-1",
+  "profit": -1.0,
+  "graded_at": "2026-11-04T03:47:04+00:00"
  },
  {
   "id": "cbb-401920343-ml-away",
@@ -1948,6 +1948,186 @@
    "period": 1,
    "clock": "15:26",
    "f": 0.886
+  },
+  "model": "live-v1",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "nhl-401892643-total-under",
+  "sport": "nhl",
+  "gid": "401892643",
+  "date": "2026-11-03",
+  "logged_at": "2026-11-04T03:47:02+00:00",
+  "matchup": "ANA @ VAN",
+  "home": "VAN",
+  "away": "ANA",
+  "label": "Under 8.5",
+  "kind": "total",
+  "side": "under",
+  "line": 8.5,
+  "price": 100,
+  "chance": 0.5371,
+  "implied": 0.5,
+  "edge": 0.037,
+  "fair": -115,
+  "state": {
+   "score": "ANA 4 - 2 VAN",
+   "period": 2,
+   "clock": "0:00",
+   "f": 0.333
+  },
+  "model": "live-v1",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "cbb-401924911-total-under",
+  "sport": "cbb",
+  "gid": "401924911",
+  "date": "2026-11-03",
+  "logged_at": "2026-11-04T03:47:02+00:00",
+  "matchup": "NAU @ UNLV",
+  "home": "UNLV",
+  "away": "NAU",
+  "label": "Under 166.5",
+  "kind": "total",
+  "side": "under",
+  "line": 166.5,
+  "price": -110,
+  "chance": 0.6095,
+  "implied": 0.5238,
+  "edge": 0.086,
+  "fair": -155,
+  "state": {
+   "score": "NAU 40 - 30 UNLV",
+   "period": 1,
+   "clock": "3:43",
+   "f": 0.593
+  },
+  "model": "live-v1",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "cbb-401924911-ml-away",
+  "sport": "cbb",
+  "gid": "401924911",
+  "date": "2026-11-03",
+  "logged_at": "2026-11-04T03:47:02+00:00",
+  "matchup": "NAU @ UNLV",
+  "home": "UNLV",
+  "away": "NAU",
+  "label": "NAU to win",
+  "kind": "ml",
+  "side": "away",
+  "line": null,
+  "price": 180,
+  "chance": 0.4279,
+  "implied": 0.3571,
+  "edge": 0.071,
+  "fair": 135,
+  "state": {
+   "score": "NAU 40 - 30 UNLV",
+   "period": 1,
+   "clock": "3:43",
+   "f": 0.593
+  },
+  "model": "live-v1",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "cbb-401924911-spread-away",
+  "sport": "cbb",
+  "gid": "401924911",
+  "date": "2026-11-03",
+  "logged_at": "2026-11-04T03:47:02+00:00",
+  "matchup": "NAU @ UNLV",
+  "home": "UNLV",
+  "away": "NAU",
+  "label": "NAU +4.5",
+  "kind": "spread",
+  "side": "away",
+  "line": 4.5,
+  "price": -115,
+  "chance": 0.5784,
+  "implied": 0.5349,
+  "edge": 0.044,
+  "fair": -135,
+  "state": {
+   "score": "NAU 40 - 30 UNLV",
+   "period": 1,
+   "clock": "3:43",
+   "f": 0.593
+  },
+  "model": "live-v1",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "cbb-401920343-total-under",
+  "sport": "cbb",
+  "gid": "401920343",
+  "date": "2026-11-03",
+  "logged_at": "2026-11-04T03:47:02+00:00",
+  "matchup": "UNF @ CBU",
+  "home": "CBU",
+  "away": "UNF",
+  "label": "Under 147.5",
+  "kind": "total",
+  "side": "under",
+  "line": 147.5,
+  "price": -110,
+  "chance": 0.6147,
+  "implied": 0.5238,
+  "edge": 0.091,
+  "fair": -160,
+  "state": {
+   "score": "UNF 28 - 29 CBU",
+   "period": 1,
+   "clock": "2:28",
+   "f": 0.562
+  },
+  "model": "live-v1",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "cbb-401920155-total-under",
+  "sport": "cbb",
+  "gid": "401920155",
+  "date": "2026-11-03",
+  "logged_at": "2026-11-04T03:47:02+00:00",
+  "matchup": "CSUF @ SDSU",
+  "home": "SDSU",
+  "away": "CSUF",
+  "label": "Under 171.5",
+  "kind": "total",
+  "side": "under",
+  "line": 171.5,
+  "price": -110,
+  "chance": 0.613,
+  "implied": 0.5238,
+  "edge": 0.089,
+  "fair": -160,
+  "state": {
+   "score": "CSUF 34 - 37 SDSU",
+   "period": 1,
+   "clock": "4:22",
+   "f": 0.609
   },
   "model": "live-v1",
   "result": null,
