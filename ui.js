@@ -180,6 +180,130 @@
   var TOUCH = mm('(pointer:coarse)') || mm('(any-pointer:coarse)') || mm('(hover:none)') ||
     (navigator.maxTouchPoints || 0) > 0 || navigator.standalone === true || mm('(display-mode: standalone)');
   if (TOUCH) document.documentElement.classList.add('ox-touch');
+
+  /* the fold (11/4): on the iPhone Duo's unfolded screen the page is laid out as a book, two
+     panes with a gutter over the hinge, so nothing sits in the crease flat or half-folded.
+     html.ox-fold + --fold-x (the hinge, px from the left), --fold-l (left pane width),
+     --fold-r (right pane start) and --fold-rw (right pane width). The exact hinge comes from
+     the Viewport Segments API when Safari has it on; otherwise the Duo's inner screen is
+     recognised (touch, landscape, 700-1024 wide, 500+ tall) and the hinge sits at the
+     physical center: iOS puts the status bar strip down the right edge, so on an 811px
+     page it is about 445px in, not at 405. */
+  function foldGeom() {
+    var w = innerWidth, h = innerHeight;
+    try {
+      var sg = window.viewport && window.viewport.segments;
+      if (sg && sg.length === 2 && Math.abs(sg[0].top - sg[1].top) < 2 && sg[1].left > sg[0].left)
+        return {x: (sg[0].right + sg[1].left) / 2, gap: Math.max(28, sg[1].left - sg[0].right + 24)};
+    } catch (e) {}
+    if (!TOUCH || w < 700 || w > 1024 || w <= h || h < 500) return null;
+    var long = Math.max(screen.width || 0, screen.height || 0), x = w / 2;
+    if (long > w && long - w < 160) {
+      var ang = (screen.orientation && screen.orientation.angle) || 0;
+      x = ang === 180 ? w - long / 2 : long / 2;
+    }
+    if (x < w * 0.35 || x > w * 0.65) x = w / 2;
+    return {x: x, gap: 28};
+  }
+  function applyFold() {
+    var g = foldGeom(), r = document.documentElement;
+    r.classList.toggle('ox-fold', !!g);
+    if (!g) return;
+    var x = Math.round(g.x), half = Math.round(g.gap / 2);
+    r.style.setProperty('--fold-x', x + 'px');
+    r.style.setProperty('--fold-l', (x - half) + 'px');
+    r.style.setProperty('--fold-r', (x + half) + 'px');
+    r.style.setProperty('--fold-rw', (innerWidth - x - half) + 'px');
+    r.style.setProperty('--fold-gap', (2 * half) + 'px');
+    // pad the page so its content is symmetric around the hinge: equal-column grids then
+    // split right on the fold, and the left margin mirrors iOS's status strip on the right
+    var items = document.querySelectorAll('.obar > .obar-i').length || 5, lft = Math.ceil(items / 2);
+    r.style.setProperty('--ob-l', lft); r.style.setProperty('--ob-r', items - lft);
+    var fs = document.getElementById('oxFoldBar') || document.head.appendChild(Object.assign(document.createElement('style'), {id: 'oxFoldBar'}));
+    fs.textContent = 'html.ox-fold .obar>.obar-i:nth-child(' + (lft + 1) + '){grid-column-start:' + (lft + 2) + '}';
+    var sh = 2 * x - innerWidth;
+    r.style.setProperty('--fold-pl', Math.max(0, sh) + 'px');
+    r.style.setProperty('--fold-pr', Math.max(0, -sh) + 'px');
+  }
+  /* foldFit: after the page draws (and whenever it changes), nothing may straddle the hinge.
+     Grids that span it get their columns split at the fold; a block of text that crosses it
+     is kept to the left page. Tables, tickers and the app chrome are left alone. Every
+     change is marked and undone when the screen is no longer a book (folded shut). */
+  var FOLD_SKIP = 'header,.ox-head,.ox-head-in,nav,.nav,.obar,.osheet,.osheet-bg,.cx,.cx-bg,.pc,.pc-bg,table,.tbl,.tbl-wrap,svg,canvas,select,input,textarea,' +
+    '[class*="ticker"],[class*="marq"],.tk-strip,.ox-marquee,.ox-giant,.sp-art,.ox-hero-art';
+  function foldUndo() {
+    document.querySelectorAll('[data-oxf]').forEach(function (e) {
+      ['gridTemplateColumns', 'columnGap', 'maxWidth', 'marginLeft', 'marginRight', 'alignSelf', 'textAlign', 'justifyContent'].forEach(function (k) { e.style[k] = ''; });
+      e.removeAttribute('data-oxf');
+    });
+  }
+  function foldFit() {
+    var root = document.documentElement;
+    if (!root.classList.contains('ox-fold')) { foldUndo(); return; }
+    var cs = getComputedStyle(root), L = parseFloat(cs.getPropertyValue('--fold-l')), R = parseFloat(cs.getPropertyValue('--fold-r'));
+    if (!(R > L)) return;
+    var gap = R - L, crosses = function (b) { return b.width > 0 && b.left < R - 1 && b.right > L + 1; };
+    var all = document.body.getElementsByTagName('*'), i, e, st, b;
+    for (i = 0; i < all.length; i++) {
+      e = all[i]; st = getComputedStyle(e);
+      if (st.display !== 'grid' && st.display !== 'inline-grid') continue;
+      b = e.getBoundingClientRect(); if (!crosses(b) || st.position === 'fixed' || e.closest(FOLD_SKIP)) continue;
+      var n = st.gridTemplateColumns.split(' ').filter(function (t) { return /px$/.test(t); }).length;
+      if (n < 2) {
+        // a one-column list of like cards (the record, today's picks) becomes two columns, one per page
+        var kids = [].filter.call(e.children, function (k) { return k.offsetParent !== null; });
+        if (kids.length < 2 || kids.some(function (k) { return k.tagName !== kids[0].tagName || k.className.split(' ')[0] !== kids[0].className.split(' ')[0]; })) continue;
+        n = 2;
+      }
+      var cl = b.left + parseFloat(st.paddingLeft) + parseFloat(st.borderLeftWidth), cr = b.right - parseFloat(st.paddingRight) - parseFloat(st.borderRightWidth);
+      var lw = L - cl, rw = cr - R; if (lw < 90 || rw < 90) continue;
+      var h = Math.max(1, Math.floor(n / 2));
+      var cw = function (w) { return 'minmax(0,' + Math.floor((w - (h - 1) * gap) / h) + 'px)'; };
+      e.style.gridTemplateColumns = 'repeat(' + h + ',' + cw(lw) + ') repeat(' + h + ',' + cw(rw) + ')';
+      e.style.columnGap = gap + 'px'; e.setAttribute('data-oxf', '');
+    }
+    var tw = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT), t, seen = [];
+    while ((t = tw.nextNode())) {
+      if (!t.textContent.trim()) continue;
+      var p = t.parentElement; if (!p || seen.indexOf(p) >= 0) continue;
+      var rg = document.createRange(); rg.selectNodeContents(t);
+      var hit = [].some.call(rg.getClientRects(), crosses); if (!hit) continue;
+      while (p && p !== document.body && /^inline/.test(getComputedStyle(p).display)) p = p.parentElement;
+      if (!p || p === document.body || seen.indexOf(p) >= 0 || p.closest(FOLD_SKIP)) continue;
+      st = getComputedStyle(p); if (st.position === 'fixed' || st.position === 'absolute') continue;
+      seen.push(p); leftPage(p, st);
+    }
+    // rows of buttons and chips that wrap (hero calls to action, filters) stay on the left page too
+    for (i = 0; i < all.length; i++) {
+      e = all[i]; st = getComputedStyle(e);
+      if ((st.display !== 'flex' && st.display !== 'inline-flex') || st.flexWrap !== 'wrap' || e.hasAttribute('data-oxf')) continue;
+      b = e.getBoundingClientRect(); if (!crosses(b) || st.position === 'fixed' || st.position === 'absolute' || e.closest(FOLD_SKIP)) continue;
+      leftPage(e, st);
+    }
+    function leftPage(p, st) {
+      // measured from where the block will sit once it is aligned left: its parent's content edge
+      var par = p.parentElement, pb = par.getBoundingClientRect(), ps = getComputedStyle(par);
+      var x0 = pb.left + parseFloat(ps.paddingLeft) + parseFloat(ps.borderLeftWidth);
+      if (L - x0 < 140) return;                 // the parent itself starts at the hinge: leave it
+      p.style.maxWidth = Math.floor(L - x0) + 'px'; p.style.marginLeft = '0'; p.style.marginRight = 'auto';
+      p.style.alignSelf = 'flex-start'; if (st.textAlign === 'center') p.style.textAlign = 'left';
+      if (st.justifyContent === 'center') p.style.justifyContent = 'flex-start';
+      p.setAttribute('data-oxf', '');
+    }
+  }
+  var foldT = 0;
+  function foldSoon() { clearTimeout(foldT); foldT = setTimeout(foldFit, 250); }
+  window.OnyxFoldFit = foldFit;
+  applyFold();
+  addEventListener('resize', function () { foldUndo(); foldSoon(); });
+  addEventListener('load', foldSoon);
+  try { new MutationObserver(function () { if (document.documentElement.classList.contains('ox-fold')) foldSoon(); })
+    .observe(document.documentElement, {childList: true, subtree: true}); } catch (e) {}
+  foldSoon();
+  addEventListener('resize', applyFold);
+  addEventListener('orientationchange', function () { setTimeout(applyFold, 250); });
+  try { if (navigator.devicePosture) navigator.devicePosture.addEventListener('change', applyFold); } catch (e) {}
+  window.OnyxFold = applyFold;
   var APP = TOUCH ? '(max-width:1024px)' : '(max-width:760px)';
   var DESK = TOUCH ? '(min-width:1025px)' : '(min-width:761px)';
   window.OnyxAppQuery = APP;
@@ -218,6 +342,18 @@
     '.osheet.open{transform:translateY(0)}',
     /* unfolded iPhone Duo and other touch screens 761-1024px: the bottom sheet, centered at a readable width */
     '@media (min-width:761px) and (max-width:1024px){html.ox-touch .osheet{left:50%;right:auto;width:640px;margin-left:-320px}}',
+    /* the fold (iPhone Duo unfolded): the page is a book. Content symmetric around the hinge,
+       the bottom bar split into two groups with the hinge between them, and sheets and cards
+       open on the right page so the left page stays readable behind them */
+    'html.ox-fold body{padding-left:var(--fold-pl)!important;padding-right:var(--fold-pr)!important;box-sizing:border-box}',
+    'html.ox-fold .obar{display:grid;padding-left:6px;padding-right:6px;grid-template-columns:repeat(var(--ob-l,3),calc((var(--fold-l) - 6px) / var(--ob-l,3))) var(--fold-gap) repeat(var(--ob-r,2),calc((var(--fold-rw) - 6px) / var(--ob-r,2)))}',
+    'html.ox-fold .obar-i{min-width:0}',
+    /* the hub header: Live, Sports and Record are in the bottom bar and the menu; on the book they would sit in the crease */
+    'html.ox-fold .ox-head .ox-link,html.ox-fold .ox-head .ox-markc{display:none!important}',
+    'html.ox-fold .ox-head-in{display:flex!important;justify-content:space-between;align-items:center}',
+    'html.ox-fold .osheet{left:var(--fold-r)!important;right:auto!important;width:var(--fold-rw)!important;margin-left:0!important}',
+    'html.ox-fold .cx,html.ox-fold .pc{left:calc(var(--fold-r) + 8px)!important;right:auto!important;width:calc(var(--fold-rw) - 16px)!important;height:calc(100vh - var(--sat,0px) - 24px)!important;top:calc(var(--sat,0px) + 12px)!important;bottom:auto!important;transform:translateY(16px) scale(.97)!important;border-radius:20px}',
+    'html.ox-fold .cx.open,html.ox-fold .pc.open{transform:none!important}',
     /* closed = hidden from view, taps, Tab and screen readers; visibility flips
        after the slide-out so the closing animation still plays */
     '.osheet{visibility:hidden;transition:transform .32s cubic-bezier(.2,.9,.25,1),opacity .2s,visibility 0s linear .32s}',
@@ -930,7 +1066,7 @@
     fixSafeArea();
     window.addEventListener('orientationchange', function () { setTimeout(fixSafeArea, 300); });
     stdNav();
-    buildBar();
+    buildBar(); applyFold(); foldSoon();
     buildSheet();
     siteFooter();
     hook();

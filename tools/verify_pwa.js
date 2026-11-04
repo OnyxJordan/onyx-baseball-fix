@@ -19,7 +19,8 @@
  * and 393px: solid status bar, header in place, all seven sports linked
  * to their sites, no sideways scroll, the raster ONYX drawn. Then the iPhone
  * Duo: cover (382x678) and inner (811x626) screens, folded and unfolded live,
- * with a touch pointer and with a misreported fine pointer.
+ * with a touch pointer and with a misreported fine pointer. Then the fold:
+ * unfolded, the page is a book with nothing on the hinge.
  *
  *   python3 -B nba_build.py && node tools/verify_pwa.js
  */
@@ -229,6 +230,58 @@ function serve() {
     } else bad.push('no More button on screen');
     bad.push(...errs);
     console.log(`  ${bad.length ? 'FAIL' : 'ok  '} ${page.padEnd(11)} iPhone Duo ${flavor.padEnd(12)} cover 382x678 <-> inner 811x626${bad.length ? '  <- ' + bad.join('; ') : ''}`);
+    failures += bad.length;
+    await ctx.close();
+  }
+  // the fold (11/4): unfolded, the Duo is a book. The page is 811x626 on an 890-wide screen,
+  // so the hinge sits 445px in. Nothing that reads or taps may straddle it (tables, tickers and
+  // art excepted), the bottom bar splits around it, and the menu opens on the right page.
+  // Folded (382 wide) and on a laptop the book layout must be off.
+  for (const page of ['home.html', 'picks.html', 'index.html', 'nba.html', 'cbb.html', 'tennis.html']) {
+    const ctx = await browser.newContext({ viewport: { width: 811, height: 626 }, screen: { width: 890, height: 626 }, isMobile: true, hasTouch: true, userAgent: UA });
+    await ctx.addInitScript(() => { Object.defineProperty(navigator, 'standalone', { get: () => true }); });
+    const p = await ctx.newPage();
+    const errs = [];
+    p.on('pageerror', e => errs.push(e.constructor.name + ': ' + e.message));
+    await p.route('**/*', r => {
+      const u = r.request().url();
+      return (u.startsWith(`http://127.0.0.1:${PORT}`) || u.startsWith('data:')) ? r.continue() : r.abort();
+    });
+    await p.goto(`http://127.0.0.1:${PORT}/${page}`, { waitUntil: 'domcontentloaded' });
+    await p.waitForTimeout(1800);
+    const bad = [];
+    const st = await p.evaluate(() => {
+      const r = document.documentElement, cs = getComputedStyle(r);
+      const L = parseFloat(cs.getPropertyValue('--fold-l')), R = parseFloat(cs.getPropertyValue('--fold-r'));
+      const skip = 'table,.tbl,.tbl-wrap,[class*="ticker"],[class*="marq"],.tk-strip,.ox-marquee,.ox-giant,svg,canvas,.sp-art,.ox-hero-art,.osheet,.cx,.pc';
+      const H = innerHeight, hits = [];
+      const tw = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT); let t;
+      while ((t = tw.nextNode())) {
+        if (!t.textContent.trim()) continue;
+        const el = t.parentElement; if (!el || el.closest(skip) || getComputedStyle(el).visibility === 'hidden') continue;
+        const rg = document.createRange(); rg.selectNodeContents(t);
+        for (const b of rg.getClientRects()) if (b.width > 0 && b.top < H && b.bottom > 0 && b.left < R - 2 && b.right > L + 2) { hits.push((el.className || el.tagName) + ': ' + t.textContent.trim().slice(0, 24)); break; }
+      }
+      const bar = [...document.querySelectorAll('.obar > .obar-i')].filter(b => { const x = b.getBoundingClientRect(); return x.left < R - 1 && x.right > L + 1; }).length;
+      return { fold: r.classList.contains('ox-fold'), x: cs.getPropertyValue('--fold-x').trim(), hits, bar,
+        sw: document.documentElement.scrollWidth, vw: document.documentElement.clientWidth };
+    });
+    if (!st.fold) bad.push('book layout off on the unfolded screen');
+    if (st.x !== '445px') bad.push(`hinge at ${st.x}, want 445px`);
+    if (st.hits.length) bad.push(`${st.hits.length} text on the hinge (${st.hits.slice(0, 3).join(' | ')})`);
+    if (st.bar) bad.push(`${st.bar} bottom-bar item(s) on the hinge`);
+    if (st.sw > st.vw + 1) bad.push(`scrolls sideways (${st.sw}px > ${st.vw}px)`);
+    await p.click('.obar .obar-i:last-child', { timeout: 3000 }).catch(() => bad.push('no More button'));
+    await p.waitForTimeout(450);
+    const sh = await p.evaluate(() => { const s = document.querySelector('.osheet.open'); if (!s) return null; const b = s.getBoundingClientRect(); return [b.left, b.right]; });
+    if (!sh) bad.push('More did not open the menu'); else if (sh[0] < 458 || sh[1] > 812) bad.push(`menu not on the right page (${Math.round(sh[0])}..${Math.round(sh[1])})`);
+    for (const [w, h, name] of [[382, 678, 'folded'], [1280, 800, 'laptop width']]) {
+      await p.setViewportSize({ width: w, height: h }); await p.waitForTimeout(450);
+      const on = await p.evaluate(() => document.documentElement.classList.contains('ox-fold') || !!document.querySelector('[data-oxf]'));
+      if (on) bad.push(`book layout still on when ${name}`);
+    }
+    bad.push(...errs);
+    console.log(`  ${bad.length ? 'FAIL' : 'ok  '} ${page.padEnd(11)} the fold: book layout, hinge ${st.x}${bad.length ? '  <- ' + bad.join('; ') : ''}`);
     failures += bad.length;
     await ctx.close();
   }
