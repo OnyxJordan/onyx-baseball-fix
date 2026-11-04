@@ -840,10 +840,10 @@
    "f": 0.672
   },
   "model": "live-v1",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "142",
+  "profit": 0.9091,
+  "graded_at": "2026-11-04T02:09:23+00:00"
  },
  {
   "id": "cbb-401925779-total-under",
@@ -870,10 +870,10 @@
    "f": 0.682
   },
   "model": "live-v1",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "149",
+  "profit": 0.8333,
+  "graded_at": "2026-11-04T02:09:23+00:00"
  },
  {
   "id": "cbb-401920061-total-under",
@@ -900,10 +900,10 @@
    "f": 0.69
   },
   "model": "live-v1",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "162",
+  "profit": -1.0,
+  "graded_at": "2026-11-04T02:09:23+00:00"
  },
  {
   "id": "cbb-401909551-total-under",
@@ -930,10 +930,10 @@
    "f": 0.698
   },
   "model": "live-v1",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "126",
+  "profit": 0.9091,
+  "graded_at": "2026-11-04T02:09:23+00:00"
  },
  {
   "id": "nhl-401892634-spread-away",
@@ -1110,10 +1110,10 @@
    "f": 0.5
   },
   "model": "live-v1",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "85-57",
+  "profit": -1.0,
+  "graded_at": "2026-11-04T02:09:23+00:00"
  },
  {
   "id": "cbb-401920376-total-under",
@@ -1470,10 +1470,10 @@
    "f": 0.229
   },
   "model": "live-v1",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "78-71",
+  "profit": -1.0,
+  "graded_at": "2026-11-04T02:09:24+00:00"
  },
  {
   "id": "cbb-401925779-ml-away",
@@ -1500,10 +1500,10 @@
    "f": 0.229
   },
   "model": "live-v1",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "78-71",
+  "profit": -1.0,
+  "graded_at": "2026-11-04T02:09:24+00:00"
  },
  {
   "id": "cbb-401920061-spread-home",
@@ -1530,10 +1530,10 @@
    "f": 0.252
   },
   "model": "live-v1",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "103-59",
+  "profit": 0.8333,
+  "graded_at": "2026-11-04T02:09:25+00:00"
  },
  {
   "id": "cbb-401921165-spread-home",
@@ -1678,6 +1678,186 @@
    "period": 1,
    "clock": "3:49",
    "f": 0.595
+  },
+  "model": "live-v1",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "cfb-401866453-ml-away",
+  "sport": "cfb",
+  "gid": "401866453",
+  "date": "2026-11-03",
+  "logged_at": "2026-11-04T02:09:20+00:00",
+  "matchup": "OHIO @ AKR",
+  "home": "AKR",
+  "away": "OHIO",
+  "label": "OHIO to win",
+  "kind": "ml",
+  "side": "away",
+  "line": null,
+  "price": -146,
+  "chance": 0.6262,
+  "implied": 0.5935,
+  "edge": 0.033,
+  "fair": -170,
+  "state": {
+   "score": "OHIO 7 - 9 AKR",
+   "period": 3,
+   "clock": "9:23",
+   "f": 0.406
+  },
+  "model": "live-v1",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "nhl-401892633-total-under",
+  "sport": "nhl",
+  "gid": "401892633",
+  "date": "2026-11-03",
+  "logged_at": "2026-11-04T02:09:20+00:00",
+  "matchup": "UTA @ TOR",
+  "home": "TOR",
+  "away": "UTA",
+  "label": "Under 5.5",
+  "kind": "total",
+  "side": "under",
+  "line": 5.5,
+  "price": -180,
+  "chance": 0.6864,
+  "implied": 0.6429,
+  "edge": 0.044,
+  "fair": -220,
+  "state": {
+   "score": "UTA 2 - 1 TOR",
+   "period": 3,
+   "clock": "16:50",
+   "f": 0.281
+  },
+  "model": "live-v1",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "nhl-401892637-total-under",
+  "sport": "nhl",
+  "gid": "401892637",
+  "date": "2026-11-03",
+  "logged_at": "2026-11-04T02:09:20+00:00",
+  "matchup": "STL @ NYR",
+  "home": "NYR",
+  "away": "STL",
+  "label": "Under 3.5",
+  "kind": "total",
+  "side": "under",
+  "line": 3.5,
+  "price": -195,
+  "chance": 0.7037,
+  "implied": 0.661,
+  "edge": 0.043,
+  "fair": -240,
+  "state": {
+   "score": "STL 0 - 1 NYR",
+   "period": 3,
+   "clock": "19:00",
+   "f": 0.317
+  },
+  "model": "live-v1",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "nhl-401892638-total-under",
+  "sport": "nhl",
+  "gid": "401892638",
+  "date": "2026-11-03",
+  "logged_at": "2026-11-04T02:09:20+00:00",
+  "matchup": "MIN @ PHI",
+  "home": "PHI",
+  "away": "MIN",
+  "label": "Under 6.5",
+  "kind": "total",
+  "side": "under",
+  "line": 6.5,
+  "price": 210,
+  "chance": 0.4307,
+  "implied": 0.3226,
+  "edge": 0.108,
+  "fair": 130,
+  "state": {
+   "score": "MIN 3 - 2 PHI",
+   "period": 3,
+   "clock": "14:22",
+   "f": 0.239
+  },
+  "model": "live-v1",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "nhl-401892636-total-under",
+  "sport": "nhl",
+  "gid": "401892636",
+  "date": "2026-11-03",
+  "logged_at": "2026-11-04T02:09:20+00:00",
+  "matchup": "EDM @ NJ",
+  "home": "NJ",
+  "away": "EDM",
+  "label": "Under 7.5",
+  "kind": "total",
+  "side": "under",
+  "line": 7.5,
+  "price": -130,
+  "chance": 0.6406,
+  "implied": 0.5652,
+  "edge": 0.075,
+  "fair": -180,
+  "state": {
+   "score": "EDM 2 - 3 NJ",
+   "period": 2,
+   "clock": "1:20",
+   "f": 0.356
+  },
+  "model": "live-v1",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "cbb-401929372-spread-home",
+  "sport": "cbb",
+  "gid": "401929372",
+  "date": "2026-11-03",
+  "logged_at": "2026-11-04T02:09:20+00:00",
+  "matchup": "UAPB @ ARK",
+  "home": "ARK",
+  "away": "UAPB",
+  "label": "ARK -38.5",
+  "kind": "spread",
+  "side": "home",
+  "line": -38.5,
+  "price": -105,
+  "chance": 0.5457,
+  "implied": 0.5122,
+  "edge": 0.033,
+  "fair": -120,
+  "state": {
+   "score": "UAPB 28 - 47 ARK",
+   "period": 1,
+   "clock": "0:00",
+   "f": 0.5
   },
   "model": "live-v1",
   "result": null,
