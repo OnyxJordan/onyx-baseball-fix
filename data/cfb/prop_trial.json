@@ -1362,5 +1362,93 @@
   "model": "v2",
   "result": null,
   "actual": null
+ },
+ {
+  "date": "2026-11-04",
+  "key": "401856853|jaylen raynor|rush_yds",
+  "gid": "401856853",
+  "pid": "5080403",
+  "name": "Jaylen Raynor",
+  "team": "ISU",
+  "opp": "BAY",
+  "matchup": "ISU @ BAY",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 16.5,
+  "price": -114,
+  "sel": "b010f50e-12fd-4b2e-a87c-174698aeaa33",
+  "proj": 19.2,
+  "prob": 0.6207,
+  "implied": 0.5327,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.64,
+    "avg": 0.77,
+    "pp": -3.0
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 1.0,
+    "avg": 0.93,
+    "pp": -1.1
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.31,
+    "avg": -0.05,
+    "pp": 0.3
+   }
+  ],
+  "opened_at": "2026-11-04T18:04:18+00:00",
+  "logged_at": "2026-11-04T18:04:18+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-04",
+  "key": "401856853|aiden flora|rush_yds",
+  "gid": "401856853",
+  "pid": "5219258",
+  "name": "Aiden Flora",
+  "team": "ISU",
+  "opp": "BAY",
+  "matchup": "ISU @ BAY",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 91.5,
+  "price": -112,
+  "sel": "1e17ff75-4ab3-410a-bf18-1896483d0535",
+  "proj": 98.0,
+  "prob": 0.6201,
+  "implied": 0.5283,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.64,
+    "avg": 0.77,
+    "pp": -3.0
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 1.0,
+    "avg": 0.93,
+    "pp": -1.1
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.33,
+    "avg": -0.05,
+    "pp": 0.3
+   }
+  ],
+  "opened_at": "2026-11-04T18:04:18+00:00",
+  "logged_at": "2026-11-04T18:04:18+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
  }
 ]

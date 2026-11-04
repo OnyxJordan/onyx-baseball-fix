@@ -2566,10 +2566,10 @@
    "need": 2
   },
   "model": "live-v1",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "18-20",
+  "profit": -1.0,
+  "graded_at": "2026-11-04T18:04:50+00:00"
  },
  {
   "id": "tennis-186682-spread-home",
@@ -2653,10 +2653,10 @@
    "need": 2
   },
   "model": "live-v1",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "38",
+  "profit": -1.0,
+  "graded_at": "2026-11-04T18:04:50+00:00"
  },
  {
   "id": "tennis-186490-ml-home",
@@ -2682,10 +2682,10 @@
    "need": 2
   },
   "model": "live-v1",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "18-20",
+  "profit": -1.0,
+  "graded_at": "2026-11-04T18:04:50+00:00"
  },
  {
   "id": "tennis-186476-spread-away",
@@ -2852,6 +2852,35 @@
   "fair": -130,
   "state": {
    "sets": "1-0",
+   "srv": "home",
+   "need": 2
+  },
+  "model": "live-v1",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "tennis-186489-total-under",
+  "sport": "tennis",
+  "gid": "186489",
+  "date": "2026-11-04",
+  "logged_at": "2026-11-04T18:04:48+00:00",
+  "matchup": "Ugo Humbert vs Matteo Berrettini",
+  "home": "Matteo Berrettini",
+  "away": "Ugo Humbert",
+  "label": "Under 27.5 games",
+  "kind": "total",
+  "side": "under",
+  "line": 27.5,
+  "price": -135,
+  "chance": 0.6062,
+  "implied": 0.5745,
+  "edge": 0.032,
+  "fair": -155,
+  "state": {
+   "sets": "3-2",
    "srv": "home",
    "need": 2
   },
