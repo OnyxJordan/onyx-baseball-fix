@@ -2166,7 +2166,7 @@
      "id": "186491",
      "start": "2026-11-04T20:15Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 2",
      "draw": "Men's Singles",
      "court": "Court Central",
@@ -2178,7 +2178,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        3
+        3,
+        2
        ],
        "serve": false
       },
@@ -2189,9 +2190,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        6
+        6,
+        1
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
@@ -6442,7 +6444,7 @@
        "win": false,
        "sets": [
         7,
-        2
+        3
        ],
        "serve": true
       },
@@ -6454,7 +6456,7 @@
        "win": false,
        "sets": [
         6,
-        1
+        2
        ],
        "serve": false
       }
@@ -6463,8 +6465,8 @@
     {
      "id": "186724",
      "start": "2026-11-04T19:50Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Campo 1",
@@ -6486,7 +6488,7 @@
        "short": "L. Romero Gormaz",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
         6
@@ -6592,9 +6594,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Leyre Romero Gormaz",
+       "short": "L. Romero Gormaz",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -7978,5 +7980,5 @@
    ]
   }
  ],
- "fetched": "2026-11-04T21:03:18+00:00"
+ "fetched": "2026-11-04T21:16:19+00:00"
 }

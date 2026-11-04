@@ -1,7 +1,7 @@
 {
  "sport": "nba",
  "date": "2026-11-04",
- "generated": "2026-11-04T21:02:17+00:00",
+ "generated": "2026-11-04T21:15:15+00:00",
  "unit": "min",
  "stats": [
   "pts",
@@ -8396,7 +8396,7 @@
    "name": "Sacramento Kings",
    "date": "2026-11-04",
    "pace": 101.7,
-   "min_sum": 255.5,
+   "min_sum": 247.9,
    "players": [
     {
      "id": "13EF407D545CCEE4",
@@ -8406,8 +8406,8 @@
      "tag": "",
      "use": 36.5,
      "proj": {
-      "pts": 25.4,
-      "reb": 4.2,
+      "pts": 25.5,
+      "reb": 4.3,
       "ast": 6.7,
       "3pm": 3.0,
       "pra": 36.4
@@ -8441,15 +8441,15 @@
      "tag": "",
      "use": 35.5,
      "proj": {
-      "pts": 15.8,
+      "pts": 15.7,
       "reb": 12.9,
-      "ast": 6.6,
+      "ast": 6.7,
       "3pm": 0.4,
-      "pra": 35.4
+      "pra": 35.3
      },
      "model": {
       "use": 35.2,
-      "pts": 16.0
+      "pts": 15.9
      },
      "last": {
       "use": 36.3,
@@ -8476,15 +8476,15 @@
      "tag": "",
      "use": 31.8,
      "proj": {
-      "pts": 21.4,
+      "pts": 21.6,
       "reb": 3.0,
       "ast": 3.1,
       "3pm": 2.7,
-      "pra": 27.5
+      "pra": 27.6
      },
      "model": {
       "use": 31.4,
-      "pts": 21.1
+      "pts": 21.2
      },
      "last": {
       "use": 33.1,
@@ -8515,11 +8515,11 @@
       "reb": 4.7,
       "ast": 1.6,
       "3pm": 2.3,
-      "pra": 21.4
+      "pra": 21.3
      },
      "model": {
       "use": 30.6,
-      "pts": 15.4
+      "pts": 15.5
      },
      "last": {
       "use": 30.3,
@@ -8543,18 +8543,18 @@
      "n": "Precious Achiuwa",
      "pos": "PF",
      "role": "Starter",
-     "tag": "Questionable: Ankle (Leg, Soreness, Left)",
+     "tag": "",
      "use": 28.2,
      "proj": {
-      "pts": 11.1,
-      "reb": 7.2,
-      "ast": 1.5,
+      "pts": 11.0,
+      "reb": 7.0,
+      "ast": 1.4,
       "3pm": 0.3,
-      "pra": 19.8
+      "pra": 19.3
      },
      "model": {
       "use": 28.0,
-      "pts": 11.0
+      "pts": 10.9
      },
      "last": {
       "use": 28.7,
@@ -8579,17 +8579,17 @@
      "pos": "SG",
      "role": "Rotation",
      "tag": "",
-     "use": 18.3,
+     "use": 18.5,
      "proj": {
-      "pts": 5.1,
+      "pts": 5.2,
       "reb": 1.3,
       "ast": 1.2,
       "3pm": 1.1,
-      "pra": 7.7
+      "pra": 7.8
      },
      "model": {
-      "use": 18.5,
-      "pts": 5.4
+      "use": 18.9,
+      "pts": 5.5
      },
      "last": {
       "use": 18.1,
@@ -8614,17 +8614,17 @@
      "pos": "PF",
      "role": "Rotation",
      "tag": "",
-     "use": 17.2,
+     "use": 17.4,
      "proj": {
-      "pts": 4.3,
-      "reb": 3.4,
+      "pts": 4.4,
+      "reb": 3.5,
       "ast": 1.6,
       "3pm": 0.2,
-      "pra": 9.3
+      "pra": 9.5
      },
      "model": {
-      "use": 17.2,
-      "pts": 4.6
+      "use": 17.6,
+      "pts": 4.7
      },
      "last": {
       "use": 17.2,
@@ -8649,17 +8649,17 @@
      "pos": "SG",
      "role": "Rotation",
      "tag": "",
-     "use": 16.0,
+     "use": 16.1,
      "proj": {
-      "pts": 8.3,
+      "pts": 8.4,
       "reb": 1.4,
-      "ast": 3.5,
+      "ast": 3.4,
       "3pm": 1.3,
       "pra": 13.2
      },
      "model": {
-      "use": 17.1,
-      "pts": 8.9
+      "use": 17.4,
+      "pts": 9.1
      },
      "last": {
       "use": 14.8,
@@ -8684,17 +8684,17 @@
      "pos": "SF",
      "role": "Bench",
      "tag": "",
-     "use": 13.2,
+     "use": 13.6,
      "proj": {
-      "pts": 3.1,
-      "reb": 1.3,
-      "ast": 0.4,
+      "pts": 3.4,
+      "reb": 1.5,
+      "ast": 0.5,
       "3pm": 0.3,
-      "pra": 4.9
+      "pra": 5.3
      },
      "model": {
-      "use": 5.4,
-      "pts": 1.5
+      "use": 6.7,
+      "pts": 1.8
      },
      "last": {
       "use": 16.5,
@@ -8714,57 +8714,22 @@
      "home": true
     },
     {
-     "id": "A99C8FE684E765E3",
-     "n": "Daeqwon Plowden",
-     "pos": "SG",
-     "role": "Bench",
-     "tag": "",
-     "use": 10.1,
-     "proj": {
-      "pts": 2.0,
-      "reb": 0.9,
-      "ast": 0.3,
-      "3pm": 0.3,
-      "pra": 3.1
-     },
-     "model": {
-      "use": 5.3,
-      "pts": 1.7
-     },
-     "last": {
-      "use": 12.2,
-      "pts": 2.5,
-      "reb": 1.3,
-      "ast": 0.3,
-      "3pm": 0.3,
-      "gp": 6
-     },
-     "now": {
-      "gp": 6,
-      "use": 12.2
-     },
-     "hs": "4279318",
-     "gid": "20261105B57864C8",
-     "opp": "LAL",
-     "home": true
-    },
-    {
      "id": "7D2D7966E68210E2",
      "n": "Alex Karaban",
      "pos": "SF",
      "role": "Bench",
      "tag": "",
-     "use": 7.8,
+     "use": 8.1,
      "proj": {
-      "pts": 1.4,
-      "reb": 0.7,
-      "ast": 0.3,
+      "pts": 1.7,
+      "reb": 0.8,
+      "ast": 0.4,
       "3pm": 0.2,
-      "pra": 2.5
+      "pra": 2.9
      },
      "model": {
-      "use": 4.0,
-      "pts": 1.3
+      "use": 4.9,
+      "pts": 1.6
      },
      "last": {
       "use": 9.5,
@@ -8789,17 +8754,17 @@
      "pos": "SG",
      "role": "Bench",
      "tag": "",
-     "use": 6.1,
+     "use": 6.4,
      "proj": {
-      "pts": 1.4,
-      "reb": 0.5,
+      "pts": 1.5,
+      "reb": 0.6,
       "ast": 0.5,
-      "3pm": 0.1,
-      "pra": 2.4
+      "3pm": 0.2,
+      "pra": 2.7
      },
      "model": {
-      "use": 4.0,
-      "pts": 1.4
+      "use": 4.9,
+      "pts": 1.6
      },
      "last": {
       "use": 7.0,
@@ -8824,17 +8789,17 @@
      "pos": "C",
      "role": "Bench",
      "tag": "",
-     "use": 2.4,
+     "use": 3.0,
      "proj": {
-      "pts": 0.7,
-      "reb": 0.9,
+      "pts": 0.8,
+      "reb": 1.1,
       "ast": 0.2,
       "3pm": 0.0,
-      "pra": 1.7
+      "pra": 2.1
      },
      "model": {
-      "use": 2.4,
-      "pts": 0.7
+      "use": 3.0,
+      "pts": 0.8
      },
      "last": null,
      "now": {
@@ -8852,17 +8817,17 @@
      "pos": "PG",
      "role": "Bench",
      "tag": "",
-     "use": 1.9,
+     "use": 2.3,
      "proj": {
-      "pts": 0.7,
+      "pts": 0.9,
       "reb": 0.2,
       "ast": 0.3,
-      "3pm": 0.1,
-      "pra": 1.2
+      "3pm": 0.2,
+      "pra": 1.5
      },
      "model": {
-      "use": 1.9,
-      "pts": 0.7
+      "use": 2.3,
+      "pts": 0.9
      },
      "last": null,
      "now": {
@@ -9042,6 +9007,38 @@
       "use": 27.0
      },
      "hs": "4594327",
+     "gid": "20261105B57864C8",
+     "opp": "LAL",
+     "home": true
+    },
+    {
+     "id": "A99C8FE684E765E3",
+     "n": "Daeqwon Plowden",
+     "pos": "SG",
+     "role": "Out",
+     "tag": "Out: Illness (Other)",
+     "use": 0.0,
+     "proj": {
+      "pts": 0.0,
+      "reb": 0.0,
+      "ast": 0.0,
+      "3pm": 0.0,
+      "pra": 0.0
+     },
+     "model": null,
+     "last": {
+      "use": 12.2,
+      "pts": 2.5,
+      "reb": 1.3,
+      "ast": 0.3,
+      "3pm": 0.3,
+      "gp": 6
+     },
+     "now": {
+      "gp": 6,
+      "use": 12.2
+     },
+     "hs": "4279318",
      "gid": "20261105B57864C8",
      "opp": "LAL",
      "home": true
