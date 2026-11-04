@@ -461,5 +461,57 @@
   "model": "v14",
   "result": null,
   "actual": null
+ },
+ {
+  "date": "2026-11-04",
+  "season": 2026,
+  "week": 9,
+  "key": "401873044|tanner mckee|pass_att",
+  "gid": "401873044",
+  "pid": "4685201",
+  "name": "Tanner McKee",
+  "team": "PHI",
+  "opp": "NYG",
+  "matchup": "PHI vs NYG",
+  "kind": "pass_att",
+  "lane": "pass_att_under",
+  "side": "under",
+  "line": 34.5,
+  "price": -119,
+  "sel": "54db45b0-b7e6-495f-a246-c15dbacb2cb0",
+  "proj": 28.0,
+  "prob": 0.6664,
+  "implied": 0.5434,
+  "why": [
+   {
+    "k": "game-to-game swings",
+    "v": 20.39,
+    "avg": 8.59,
+    "pp": -17.1
+   },
+   {
+    "k": "recent trend",
+    "v": 15.57,
+    "avg": 0.62,
+    "pp": 7.2
+   },
+   {
+    "k": "opponent catches allowed",
+    "v": 0.91,
+    "avg": 0.99,
+    "pp": -3.7
+   },
+   {
+    "k": "yards per carry",
+    "v": 2.43,
+    "avg": 4.11,
+    "pp": 2.8
+   }
+  ],
+  "opened_at": "2026-11-04T16:27:14+00:00",
+  "logged_at": "2026-11-04T16:27:14+00:00",
+  "model": "v14",
+  "result": null,
+  "actual": null
  }
 ]
