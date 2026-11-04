@@ -2134,5 +2134,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "cbb-401920155-spread-home",
+  "sport": "cbb",
+  "gid": "401920155",
+  "date": "2026-11-03",
+  "logged_at": "2026-11-04T04:19:32+00:00",
+  "matchup": "CSUF @ SDSU",
+  "home": "SDSU",
+  "away": "CSUF",
+  "label": "SDSU -14.5",
+  "kind": "spread",
+  "side": "home",
+  "line": -14.5,
+  "price": -110,
+  "chance": 0.5818,
+  "implied": 0.5238,
+  "edge": 0.058,
+  "fair": -140,
+  "state": {
+   "score": "CSUF 43 - 53 SDSU",
+   "period": 1,
+   "clock": "0:00",
+   "f": 0.5
+  },
+  "model": "live-v1",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
