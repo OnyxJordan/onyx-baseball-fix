@@ -728,5 +728,82 @@
   "model": "v14",
   "result": null,
   "actual": null
+ },
+ {
+  "date": "2026-11-04",
+  "season": 2026,
+  "week": 9,
+  "key": "401873039|tyler shough|pass_att",
+  "gid": "401873039",
+  "pid": "4360689",
+  "name": "Tyler Shough",
+  "team": "NO",
+  "opp": "CLE",
+  "matchup": "NO vs CLE",
+  "kind": "pass_att",
+  "lane": "pass_att_under",
+  "side": "under",
+  "line": 33.5,
+  "price": -117,
+  "sel": "3c045b19-a1ed-430c-bdd9-61d72e0000c2",
+  "proj": 36.6,
+  "prob": 0.6581,
+  "implied": 0.5392,
+  "why": [
+   {
+    "k": "recent trend",
+    "v": -7.5,
+    "avg": 0.62,
+    "pp": -3.8
+   },
+   {
+    "k": "opponent catches allowed",
+    "v": 0.92,
+    "avg": 0.99,
+    "pp": -3.3
+   },
+   {
+    "k": "game-to-game swings",
+    "v": 9.97,
+    "avg": 8.59,
+    "pp": -2.2
+   },
+   {
+    "k": "yards per carry",
+    "v": 5.37,
+    "avg": 4.11,
+    "pp": -2.1
+   }
+  ],
+  "opened_at": "2026-11-04T20:42:55+00:00",
+  "logged_at": "2026-11-04T20:42:55+00:00",
+  "model": "v14",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-04",
+  "season": 2026,
+  "week": 9,
+  "key": "401873049|savion williams|rec_yds",
+  "gid": "401873049",
+  "pid": "4431487",
+  "name": "Savion Williams",
+  "team": "GB",
+  "opp": "NE",
+  "matchup": "GB @ NE",
+  "kind": "rec",
+  "side": "under",
+  "line": 21.5,
+  "price": -115,
+  "sel": "1bdd3cbf-f776-495c-b6be-16124f29ab63",
+  "proj": 17.3,
+  "prob": 0.6318,
+  "implied": 0.5349,
+  "opened_at": "2026-11-04T20:42:55+00:00",
+  "logged_at": "2026-11-04T20:42:55+00:00",
+  "model": "v14",
+  "result": null,
+  "actual": null
  }
 ]

@@ -3291,10 +3291,10 @@
    "need": 2
   },
   "model": "live-v1",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "35",
+  "profit": -1.0,
+  "graded_at": "2026-11-04T20:44:20+00:00"
  },
  {
   "id": "tennis-186724-total-over",
@@ -3317,6 +3317,64 @@
   "state": {
    "sets": "2-2",
    "srv": "away",
+   "need": 2
+  },
+  "model": "live-v1",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "tennis-186491-total-over",
+  "sport": "tennis",
+  "gid": "186491",
+  "date": "2026-11-04",
+  "logged_at": "2026-11-04T20:44:17+00:00",
+  "matchup": "Tomas Machac vs Arthur Fils",
+  "home": "Arthur Fils",
+  "away": "Tomas Machac",
+  "label": "Over 19.5 games",
+  "kind": "total",
+  "side": "over",
+  "line": 19.5,
+  "price": -135,
+  "chance": 0.6075,
+  "implied": 0.5745,
+  "edge": 0.033,
+  "fair": -155,
+  "state": {
+   "sets": "2-4",
+   "srv": "home",
+   "need": 2
+  },
+  "model": "live-v1",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "tennis-186724-spread-away",
+  "sport": "tennis",
+  "gid": "186724",
+  "date": "2026-11-04",
+  "logged_at": "2026-11-04T20:44:17+00:00",
+  "matchup": "Solana Sierra vs Leyre Romero Gormaz",
+  "home": "Leyre Romero Gormaz",
+  "away": "Solana Sierra",
+  "label": "Solana Sierra +5.5 games",
+  "kind": "spread",
+  "side": "away",
+  "line": 5.5,
+  "price": -140,
+  "chance": 0.675,
+  "implied": 0.5833,
+  "edge": 0.092,
+  "fair": -210,
+  "state": {
+   "sets": "4-6 0-1",
+   "srv": "home",
    "need": 2
   },
   "model": "live-v1",
