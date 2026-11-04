@@ -2059,7 +2059,7 @@
      "id": "186489",
      "start": "2026-11-04T17:35Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 2",
      "draw": "Men's Singles",
      "court": "Court 1",
@@ -2071,7 +2071,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        6
+        6,
+        1
        ],
        "serve": false
       },
@@ -2082,7 +2083,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        6
+        7,
+        4
        ],
        "serve": false
       }
@@ -2104,7 +2106,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        5
        ],
        "serve": false
       },
@@ -2115,9 +2117,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        6
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -2137,7 +2139,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        6
        ],
        "serve": false
       },
@@ -2148,7 +2150,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        4
+        6
        ],
        "serve": false
       }
@@ -6274,8 +6276,8 @@
     {
      "id": "186725",
      "start": "2026-11-04T16:05Z",
-     "state": "in",
-     "detail": "3rd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Campo 3",
@@ -6285,13 +6287,13 @@
        "short": "C. Monnet",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         3,
         7,
-        1
+        6
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Laura Samson",
@@ -6347,7 +6349,7 @@
      "id": "186723",
      "start": "2026-11-04T18:00Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Campo 1",
@@ -6359,7 +6361,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        4
+        6,
+        1
        ],
        "serve": false
       },
@@ -6370,9 +6373,10 @@
        "seed": null,
        "win": false,
        "sets": [
+        2,
         1
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
@@ -6380,7 +6384,7 @@
      "id": "186732",
      "start": "2026-11-04T18:10Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Campo 5",
@@ -6392,9 +6396,10 @@
        "seed": null,
        "win": false,
        "sets": [
+        1,
         1
        ],
-       "serve": false
+       "serve": true
       },
       {
        "name": "Alice Tubello",
@@ -6403,17 +6408,18 @@
        "seed": null,
        "win": false,
        "sets": [
-        3
+        6,
+        1
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
     {
      "id": "186722",
-     "start": "2026-11-04T18:40Z",
+     "start": "2026-11-04T19:00Z",
      "state": "pre",
-     "detail": "11/4 - 1:40 PM EST",
+     "detail": "11/4 - 2:00 PM EST",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Campo 3",
@@ -6573,9 +6579,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Carole Monnet",
+       "short": "C. Monnet",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -7950,5 +7956,5 @@
    ]
   }
  ],
- "fetched": "2026-11-04T18:30:44+00:00"
+ "fetched": "2026-11-04T18:59:10+00:00"
 }

@@ -2740,10 +2740,10 @@
    "need": 2
   },
   "model": "live-v1",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "31",
+  "profit": 0.9091,
+  "graded_at": "2026-11-04T18:59:40+00:00"
  },
  {
   "id": "tennis-186725-spread-away",
@@ -2769,10 +2769,10 @@
    "need": 2
   },
   "model": "live-v1",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "15-16",
+  "profit": 0.8696,
+  "graded_at": "2026-11-04T18:59:40+00:00"
  },
  {
   "id": "tennis-186731-spread-home",
@@ -3085,6 +3085,93 @@
   "state": {
    "sets": "1-4",
    "srv": null,
+   "need": 2
+  },
+  "model": "live-v1",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "tennis-186480-ml-home",
+  "sport": "tennis",
+  "gid": "186480",
+  "date": "2026-11-04",
+  "logged_at": "2026-11-04T18:59:38+00:00",
+  "matchup": "Carlos Alcaraz vs Alex Michelsen",
+  "home": "Alex Michelsen",
+  "away": "Carlos Alcaraz",
+  "label": "Alex Michelsen to win",
+  "kind": "ml",
+  "side": "home",
+  "line": null,
+  "price": 363,
+  "chance": 0.287,
+  "implied": 0.216,
+  "edge": 0.071,
+  "fair": 250,
+  "state": {
+   "sets": "5-6",
+   "srv": null,
+   "need": 2
+  },
+  "model": "live-v1",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "tennis-186480-spread-home",
+  "sport": "tennis",
+  "gid": "186480",
+  "date": "2026-11-04",
+  "logged_at": "2026-11-04T18:59:38+00:00",
+  "matchup": "Carlos Alcaraz vs Alex Michelsen",
+  "home": "Alex Michelsen",
+  "away": "Carlos Alcaraz",
+  "label": "Alex Michelsen +3.5 games",
+  "kind": "spread",
+  "side": "home",
+  "line": 3.5,
+  "price": -125,
+  "chance": 0.5896,
+  "implied": 0.5556,
+  "edge": 0.034,
+  "fair": -145,
+  "state": {
+   "sets": "5-6",
+   "srv": null,
+   "need": 2
+  },
+  "model": "live-v1",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "tennis-186723-ml-away",
+  "sport": "tennis",
+  "gid": "186723",
+  "date": "2026-11-04",
+  "logged_at": "2026-11-04T18:59:38+00:00",
+  "matchup": "Julia Riera vs Julia Grabher",
+  "home": "Julia Grabher",
+  "away": "Julia Riera",
+  "label": "Julia Riera to win",
+  "kind": "ml",
+  "side": "away",
+  "line": null,
+  "price": -310,
+  "chance": 0.8028,
+  "implied": 0.7561,
+  "edge": 0.047,
+  "fair": -405,
+  "state": {
+   "sets": "6-2 1-1",
+   "srv": "home",
    "need": 2
   },
   "model": "live-v1",
