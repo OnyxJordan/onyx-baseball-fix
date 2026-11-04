@@ -2107,9 +2107,9 @@
        "win": false,
        "sets": [
         7,
-        2
+        3
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Alex Michelsen",
@@ -2119,7 +2119,7 @@
        "win": false,
        "sets": [
         6,
-        2
+        3
        ],
        "serve": false
       }
@@ -2128,8 +2128,8 @@
     {
      "id": "186485",
      "start": "2026-11-04T18:10Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Suspended",
      "round": "Round 2",
      "draw": "Men's Singles",
      "court": "Court 2",
@@ -2142,7 +2142,7 @@
        "win": false,
        "sets": [
         6,
-        5
+        6
        ],
        "serve": false
       },
@@ -2154,7 +2154,7 @@
        "win": false,
        "sets": [
         7,
-        2
+        3
        ],
        "serve": false
       }
@@ -6352,8 +6352,8 @@
     {
      "id": "186723",
      "start": "2026-11-04T18:00Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Campo 1",
@@ -6363,10 +6363,10 @@
        "short": "J. Riera",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        5
+        6
        ],
        "serve": false
       },
@@ -6435,9 +6435,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        3
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Despina Papamichail",
@@ -6448,15 +6448,15 @@
        "sets": [
         2
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
     {
      "id": "186724",
-     "start": "2026-11-04T19:40Z",
+     "start": "2026-11-04T19:45Z",
      "state": "pre",
-     "detail": "11/4 - 2:40 PM EST",
+     "detail": "11/4 - 2:45 PM EST",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Campo 1",
@@ -6616,9 +6616,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Julia Riera",
+       "short": "J. Riera",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -7964,5 +7964,5 @@
    ]
   }
  ],
- "fetched": "2026-11-04T19:32:45+00:00"
+ "fetched": "2026-11-04T19:40:58+00:00"
 }
