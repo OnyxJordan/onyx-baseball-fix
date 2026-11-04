@@ -429,6 +429,14 @@ so old links and the pipeline are unchanged.
     and art are left alone. Every change is marked `data-oxf` and undone when the book layout turns off.
   - `verify_pwa.js` checks six pages: no text or bottom-bar item on the hinge, and the menu on the
     right page. Folded and at laptop width the book layout must be off.
+  - **11/4 pass two (Jordan: "still doesn't look right", Tennis).** Pushing text onto the left page
+    left the right page empty. Sections that stack full-width blocks (a tab body, the model write-up)
+    are now laid out as a spread: headers, filters, grids and tables run across both pages, and
+    each other block takes one page, left then right in reading order. Tab panes and anything the
+    page shows and hides itself are never touched, because an inline display kept the home tab on
+    screen. `foldFit` also re-runs after taps and `gotoTab`: a tab switch changes no DOM, so the
+    observer alone missed it. Every style it sets is recorded as the browser stores it ("0"
+    reads back "0px"), so folding shut restores the page exactly.
 
 ## Onyx Sports pages: NFL, college football, NHL, tennis, golf (10/26)
 
