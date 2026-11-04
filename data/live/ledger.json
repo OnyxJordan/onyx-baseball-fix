@@ -2189,10 +2189,10 @@
    "need": 2
   },
   "model": "live-v1",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "14-18",
+  "profit": 0.7634,
+  "graded_at": "2026-11-04T15:46:13+00:00"
  },
  {
   "id": "tennis-186633-spread-away",
@@ -2218,10 +2218,10 @@
    "need": 2
   },
   "model": "live-v1",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "14-18",
+  "profit": 0.7407,
+  "graded_at": "2026-11-04T15:46:13+00:00"
  },
  {
   "id": "tennis-186638-spread-home",
@@ -2247,10 +2247,10 @@
    "need": 2
   },
   "model": "live-v1",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "13-9",
+  "profit": 1.55,
+  "graded_at": "2026-11-04T15:46:13+00:00"
  },
  {
   "id": "tennis-186638-ml-home",
@@ -2276,10 +2276,10 @@
    "need": 2
   },
   "model": "live-v1",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "13-9",
+  "profit": 0.5405,
+  "graded_at": "2026-11-04T15:46:14+00:00"
  },
  {
   "id": "tennis-186638-total-under",
@@ -2305,10 +2305,10 @@
    "need": 2
   },
   "model": "live-v1",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "22",
+  "profit": 0.8696,
+  "graded_at": "2026-11-04T15:46:14+00:00"
  },
  {
   "id": "tennis-186574-ml-away",
@@ -2334,10 +2334,10 @@
    "need": 2
   },
   "model": "live-v1",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "3-12",
+  "profit": 0.6061,
+  "graded_at": "2026-11-04T15:46:14+00:00"
  },
  {
   "id": "tennis-186574-spread-away",
@@ -2359,6 +2359,151 @@
   "fair": -145,
   "state": {
    "sets": "4-3",
+   "srv": "home",
+   "need": 2
+  },
+  "model": "live-v1",
+  "result": "W",
+  "actual": "3-12",
+  "profit": 0.8333,
+  "graded_at": "2026-11-04T15:46:14+00:00"
+ },
+ {
+  "id": "tennis-186482-total-over",
+  "sport": "tennis",
+  "gid": "186482",
+  "date": "2026-11-04",
+  "logged_at": "2026-11-04T15:46:11+00:00",
+  "matchup": "Rinky Hijikata vs Novak Djokovic",
+  "home": "Novak Djokovic",
+  "away": "Rinky Hijikata",
+  "label": "Over 20.5 games",
+  "kind": "total",
+  "side": "over",
+  "line": 20.5,
+  "price": 100,
+  "chance": 0.5443,
+  "implied": 0.5,
+  "edge": 0.044,
+  "fair": -120,
+  "state": {
+   "sets": "2-6 2-1",
+   "srv": null,
+   "need": 2
+  },
+  "model": "live-v1",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "tennis-186570-ml-away",
+  "sport": "tennis",
+  "gid": "186570",
+  "date": "2026-11-04",
+  "logged_at": "2026-11-04T15:46:11+00:00",
+  "matchup": "Maaya Rajeshwaran Revathi vs Weronika Falkowska",
+  "home": "Weronika Falkowska",
+  "away": "Maaya Rajeshwaran Revathi",
+  "label": "Maaya Rajeshwaran Revathi to win",
+  "kind": "ml",
+  "side": "away",
+  "line": null,
+  "price": 256,
+  "chance": 0.3819,
+  "implied": 0.2809,
+  "edge": 0.101,
+  "fair": 160,
+  "state": {
+   "sets": "3-4",
+   "srv": null,
+   "need": 2
+  },
+  "model": "live-v1",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "tennis-186570-spread-away",
+  "sport": "tennis",
+  "gid": "186570",
+  "date": "2026-11-04",
+  "logged_at": "2026-11-04T15:46:11+00:00",
+  "matchup": "Maaya Rajeshwaran Revathi vs Weronika Falkowska",
+  "home": "Weronika Falkowska",
+  "away": "Maaya Rajeshwaran Revathi",
+  "label": "Maaya Rajeshwaran Revathi +4.5 games",
+  "kind": "spread",
+  "side": "away",
+  "line": 4.5,
+  "price": -150,
+  "chance": 0.6732,
+  "implied": 0.6,
+  "edge": 0.073,
+  "fair": -205,
+  "state": {
+   "sets": "3-4",
+   "srv": null,
+   "need": 2
+  },
+  "model": "live-v1",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "tennis-186570-total-over",
+  "sport": "tennis",
+  "gid": "186570",
+  "date": "2026-11-04",
+  "logged_at": "2026-11-04T15:46:11+00:00",
+  "matchup": "Maaya Rajeshwaran Revathi vs Weronika Falkowska",
+  "home": "Weronika Falkowska",
+  "away": "Maaya Rajeshwaran Revathi",
+  "label": "Over 21.5 games",
+  "kind": "total",
+  "side": "over",
+  "line": 21.5,
+  "price": -110,
+  "chance": 0.5912,
+  "implied": 0.5238,
+  "edge": 0.067,
+  "fair": -145,
+  "state": {
+   "sets": "3-4",
+   "srv": null,
+   "need": 2
+  },
+  "model": "live-v1",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "tennis-186682-total-over",
+  "sport": "tennis",
+  "gid": "186682",
+  "date": "2026-11-04",
+  "logged_at": "2026-11-04T15:46:11+00:00",
+  "matchup": "Yasmine Kabbaj vs Diana Martynov",
+  "home": "Diana Martynov",
+  "away": "Yasmine Kabbaj",
+  "label": "Over 20.5 games",
+  "kind": "total",
+  "side": "over",
+  "line": 20.5,
+  "price": -120,
+  "chance": 0.5765,
+  "implied": 0.5455,
+  "edge": 0.031,
+  "fair": -135,
+  "state": {
+   "sets": "0-1",
    "srv": "home",
    "need": 2
   },
