@@ -416,6 +416,19 @@ so old links and the pipeline are unchanged.
   fitHeader also treats under 6px between the logo and the first control as not fitting (the
   NBA/MLB switch hides on the 382px cover screen). verify_pwa runs the Duo at the real sizes
   with a touch pointer and with a misreported fine pointer.
+  **The fold (11/4).** Unfolded, the Duo is laid out as a book so it reads flat and half-folded.
+  `ui.js` sets `html.ox-fold` plus `--fold-x/-l/-r/-rw/-gap/-pl/-pr`. The hinge comes from the
+  Viewport Segments API when Safari has it switched on; that API and Device Posture are behind
+  developer flags in Safari 27.1. Otherwise the inner screen is recognised (touch, landscape,
+  700-1024 wide, 500+ tall) and the hinge is the physical center, about 445px into an 811px page.
+  - The body is padded so content is symmetric around the hinge, and equal-column grids split on it.
+  - The bottom bar splits 3 + 2 around the hinge.
+  - The More sheet, My picks and team/player cards open on the right page over a light, unblurred dim.
+  - `foldFit` splits any grid that spans the hinge (one-column lists of like cards become two
+    columns) and keeps crossing text and wrapping button rows on the left page. Tables, tickers
+    and art are left alone. Every change is marked `data-oxf` and undone when the book layout turns off.
+  - `verify_pwa.js` checks six pages: no text or bottom-bar item on the hinge, and the menu on the
+    right page. Folded and at laptop width the book layout must be off.
 
 ## Onyx Sports pages: NFL, college football, NHL, tennis, golf (10/26)
 
