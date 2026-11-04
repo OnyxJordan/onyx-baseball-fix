@@ -450,6 +450,13 @@ so old links and the pipeline are unchanged.
     `foldFit` leaves a grid alone when it already splits on the crease. The fold uses the visible
     width (visual viewport), not `innerWidth`, which grows with anything wider than the screen.
 
+- **Tennis live picks need 60%+ to hit (11/4, Jordan: "only when it's confident").** Graded tennis
+  live plays to then: 28-32 (-6.46u). Under 60% to hit 12-25 (-8.62u; the 50-60% band 8-18), 60%+
+  16-7 (+2.16u), better on both days. A tennis live bet now counts as value only with 3+ points of
+  edge AND a 60%+ chance (`live.js` TN_CONF/isVal, `live_model.TN_CONF`, `live_log.py`, which logs as
+  `live-v2`; v1 rows stay as logged). Below it the card reads "Too close to call". 60 graded plays is a
+  small sample: the lane stays on trial and the bar is revisited as rows come in.
+
 ## Onyx Sports pages: NFL, college football, NHL, tennis, golf (10/26)
 
 One engine, one template, one config per sport (`sports_common.SPORTS`). Each sport reads
