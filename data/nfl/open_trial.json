@@ -805,5 +805,57 @@
   "model": "v14",
   "result": null,
   "actual": null
+ },
+ {
+  "date": "2026-11-04",
+  "season": 2026,
+  "week": 9,
+  "key": "401873048|drew lock|pass_att",
+  "gid": "401873048",
+  "pid": "3924327",
+  "name": "Drew Lock",
+  "team": "SEA",
+  "opp": "ARI",
+  "matchup": "SEA vs ARI",
+  "kind": "pass_att",
+  "lane": "pass_att_under",
+  "side": "under",
+  "line": 28.5,
+  "price": -107,
+  "sel": "528d21d4-f92e-4577-837b-20823d14fb54",
+  "proj": 23.0,
+  "prob": 0.5879,
+  "implied": 0.5169,
+  "why": [
+   {
+    "k": "game-to-game swings",
+    "v": 12.74,
+    "avg": 8.59,
+    "pp": -6.4
+   },
+   {
+    "k": "opponent catches allowed",
+    "v": 0.87,
+    "avg": 0.99,
+    "pp": -5.5
+   },
+   {
+    "k": "yards per carry",
+    "v": 1.0,
+    "avg": 4.11,
+    "pp": 5.2
+   },
+   {
+    "k": "recent trend",
+    "v": 5.8,
+    "avg": 0.62,
+    "pp": 2.5
+   }
+  ],
+  "opened_at": "2026-11-04T23:46:24+00:00",
+  "logged_at": "2026-11-04T23:46:24+00:00",
+  "model": "v14",
+  "result": null,
+  "actual": null
  }
 ]
