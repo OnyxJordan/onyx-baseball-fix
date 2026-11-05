@@ -5524,10 +5524,10 @@
    "need": 2
   },
   "model": "live-v4",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "14",
+  "profit": -1.0,
+  "graded_at": "2026-11-05T21:12:37+00:00"
  },
  {
   "id": "tennis-186495-ml-away",
@@ -5553,9 +5553,38 @@
    "need": 2
   },
   "model": "live-v4",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "6-12",
+  "profit": 0.4762,
+  "graded_at": "2026-11-05T21:12:37+00:00"
+ },
+ {
+  "id": "tennis-186730-spread-home",
+  "sport": "tennis",
+  "gid": "186730",
+  "date": "2026-11-05",
+  "logged_at": "2026-11-05T20:41:04+00:00",
+  "matchup": "Alice Tubello vs Leolia Jeanjean",
+  "home": "Leolia Jeanjean",
+  "away": "Alice Tubello",
+  "label": "Leolia Jeanjean +4.5 games",
+  "kind": "spread",
+  "side": "home",
+  "line": 4.5,
+  "price": -125,
+  "chance": 0.6299,
+  "implied": 0.5556,
+  "edge": 0.074,
+  "fair": -170,
+  "state": {
+   "sets": "1-0",
+   "srv": "home",
+   "need": 2
+  },
+  "model": "live-v4",
+  "result": "W",
+  "actual": "0-2",
+  "profit": 0.8,
+  "graded_at": "2026-11-05T21:12:37+00:00"
  }
 ]
