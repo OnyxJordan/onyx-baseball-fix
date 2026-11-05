@@ -36,9 +36,7 @@ GAME = {"moneyline", "point_spread", "puck_line", "game_spread", "run_line",
 
 def main():
     sport, league, d0, d1, markets, out = sys.argv[1:7]
-    # Onyx's id changed on 11/5 (onyx_odds -> onyx_predictions): without a named book, each fixture
-    # tries the id it most likely sits under first, then the other
-    books = [sys.argv[7]] if len(sys.argv) > 7 else None
+    book = sys.argv[7] if len(sys.argv) > 7 else "onyx_odds"
     markets = [m for m in markets.split(",") if m]
     q = f"sport={sport}&league={league}"
 
@@ -73,13 +71,9 @@ def main():
     mk = "".join(f"&market={urllib.parse.quote(m)}" for m in markets)   # "+" in a market id must be encoded (11/1)
     n_props = 0
     for fid, g in games.items():
-        rows = []
-        for book in books or (["onyx_predictions", "onyx_odds"] if str(g.get("start") or "") >= "2026-11-05T15" else ["onyx_odds", "onyx_predictions"]):
-            r = get("/fixtures/odds/historical", f"&fixture_id={urllib.parse.quote(fid)}&sportsbook={book}"
-                                                 f"&odds_format=AMERICAN{mk}")
-            rows = (r or {}).get("data") or []
-            if rows and rows[0].get("odds"):
-                break
+        r = get("/fixtures/odds/historical", f"&fixture_id={urllib.parse.quote(fid)}&sportsbook={book}"
+                                             f"&odds_format=AMERICAN{mk}")
+        rows = (r or {}).get("data") or []
         props, game = {}, {}
         for od in (rows[0].get("odds") if rows else None) or []:
             m, side, who = od.get("market_id"), str(od.get("selection_line") or "").lower(), od.get("selection")

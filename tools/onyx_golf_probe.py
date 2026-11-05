@@ -21,7 +21,7 @@ from datetime import datetime, timedelta, timezone
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from fetch_onyx import http_json, OPTIC   # noqa: E402
 
-BOOK = os.environ.get("ONYX_SPORTSBOOK", "").strip() or "onyx_predictions"   # 11/5: Onyx moved off onyx_odds
+BOOK = os.environ.get("ONYX_SPORTSBOOK", "").strip() or "onyx_odds"
 
 
 def main():

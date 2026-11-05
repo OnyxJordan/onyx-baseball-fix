@@ -404,36 +404,9 @@ def harvest_players(key):
 GAMELINES = "data/game_lines.json"
 ODDS_JSON = "data/odds.json"
 ODDS_META = "data/odds_meta.json"
-# Onyx's book ids on OpticOdds, newest first. 11/5: between 14:11 and 16:01 UTC every price moved from
-# onyx_odds (still listed, prices nothing) to onyx_predictions ("Onyx Predictions"); every sport went
-# to 0 Onyx lines until the fetchers followed it (odds_probe.yml job=books).
-ONYX_BOOKS = ("onyx_predictions", "onyx_odds")
-
-
-def onyx_book(key=None, sport=None, league=None):
-    """The Onyx book id to price from: ONYX_SPORTSBOOK if set, else the first Onyx id OpticOdds lists
-    as active for this sport and league, else the newest known id."""
-    env = (os.environ.get("ONYX_SPORTSBOOK") or "").strip()
-    if env:
-        return env
-    if key and sport:
-        try:
-            q = f"{OPTIC}/sportsbooks/active?sport={urllib.parse.quote(sport)}" + (f"&league={urllib.parse.quote(league)}" if league else "")
-            ids = [str(b.get("id") or "") for b in (http_json(q, headers={"X-Api-Key": key}) or {}).get("data") or []]
-            for b in ONYX_BOOKS:
-                if b in ids:
-                    return b
-            other = [i for i in ids if "onyx" in i.lower()]
-            if other:
-                return other[0]
-        except Exception as e:
-            print(f"onyx book: active list failed ({str(e)[:120]}); using {ONYX_BOOKS[0]}")
-    return ONYX_BOOKS[0]
-
-
 # the Onyx book's identity on OpticOdds; overridable without a code change
 BOOK_CANDIDATES = [b for b in [
-    (os.environ.get("ONYX_SPORTSBOOK") or "").strip(), *ONYX_BOOKS, "onyx", "Onyx", "o_default_v8",
+    (os.environ.get("ONYX_SPORTSBOOK") or "").strip(), "onyx", "Onyx", "o_default_v8",
 ] if b]
 
 

@@ -28,7 +28,7 @@ import json, os, re, sys, time, urllib.parse, urllib.request
 from datetime import datetime, timedelta, timezone
 
 from nba_common import ET, game_day, load, save, team_abbr, nk, american_from_any
-from fetch_onyx import http_json, OPTIC, onyx_book
+from fetch_onyx import http_json, OPTIC
 
 STATS = {"player_points": "pts", "player_rebounds": "reb", "player_assists": "ast"}
 GAME_MKTS = ("moneyline", "point_spread", "total_points")
@@ -85,7 +85,11 @@ def onyx_pull(key, slate):
             finally:
                 time.sleep(0.4)
 
-    book = onyx_book(key, "basketball", "nba")   # 11/5: onyx_odds -> onyx_predictions
+    try:
+        book = json.load(open("data/onyx_games.json", encoding="utf-8")).get("book") or "onyx_odds"
+    except Exception:
+        book = "onyx_odds"
+    book = os.environ.get("ONYX_SPORTSBOOK", "").strip() or book
 
     # fixture ids: an OpticOdds slate already carries them; the ESPN backup
     # slate needs them looked up by team pair
