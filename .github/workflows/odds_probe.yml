@@ -13,7 +13,7 @@ on:
         required: false
         default: ""
       job:
-        description: "probe (markets), live (what Onyx prices in-game right now), lines (historical Onyx lines for a backtest), golf (every golf fixture, now and past 60 days), sources (reach of deeper data sources) or odds (dry run of sports_odds.py)"
+        description: "probe (markets), live (what Onyx prices in-game right now), lines (historical Onyx lines for a backtest), books (is the Onyx book on the feed), golf (every golf fixture, now and past 60 days), sources (reach of deeper data sources) or odds (dry run of sports_odds.py)"
         required: false
         default: "probe"
       args:
@@ -37,7 +37,7 @@ jobs:
         run: python3 tools/onyx_live_probe.py ${{ inputs.args || '60' }}
         env:
           OPTICODDS_API_KEY: ${{ secrets.OPTICODDS_API_KEY }}
-      - if: ${{ inputs.job != 'lines' && inputs.job != 'golf' && inputs.job != 'sources' && inputs.job != 'live' }}
+      - if: ${{ inputs.job != 'lines' && inputs.job != 'golf' && inputs.job != 'sources' && inputs.job != 'live' && inputs.job != 'books' }}
         run: python3 tools/onyx_markets_probe.py ${{ inputs.sports }}
         env:
           OPTICODDS_API_KEY: ${{ secrets.OPTICODDS_API_KEY }}
@@ -65,6 +65,39 @@ jobs:
           probe nhl_api -A "$UA" "https://api-web.nhle.com/v1/gamecenter/2025020500/play-by-play"
           probe moneypuck -A "$UA" "https://moneypuck.com/moneypuck/playerData/seasonSummary/2025/regular/skaters.csv"
           probe bbref -A "$UA" "https://www.basketball-reference.com/leagues/NBA_2027_per_game.html"
+      # job=books: is the Onyx book still on the feed, under which id, and does it price
+      # anything right now? (11/5: onyx_odds went from 15 NFL games to 0 between 14:11 and
+      # 16:01 UTC in every sport, while other books kept pricing the same fixtures)
+      - if: ${{ inputs.job == 'books' }}
+        run: |
+          mkdir -p probe
+          python3 - <<'PY'
+          import json, os, urllib.parse
+          from fetch_onyx import http_json, OPTIC
+          H = {"X-Api-Key": os.environ["OPTICODDS_API_KEY"]}
+          def get(u):
+              try:
+                  return http_json(u, headers=H)
+              except Exception as e:
+                  print("  !", u.split("?")[0], str(e)[:300]); return {}
+          sb = get(f"{OPTIC}/sportsbooks").get("data") or []
+          print(f"sportsbooks on the feed: {len(sb)}")
+          hits = [b for b in sb if "onyx" in json.dumps(b).lower()]
+          print("onyx entries:", json.dumps(hits)[:1500] or "NONE")
+          act = get(f"{OPTIC}/sportsbooks/active?sport=football&league=nfl").get("data") or []
+          print("active for nfl:", len(act), [b.get("id") for b in act if "onyx" in json.dumps(b).lower()] or "no onyx")
+          fx = [f for f in (get(f"{OPTIC}/fixtures?sport=football&league=nfl").get("data") or []) if str(f.get("status")).lower() == "unplayed"][:2]
+          for f in fx:
+              print("fixture", f.get("id"), f.get("away_team_display"), "@", f.get("home_team_display"), f.get("start_date"))
+              for bk in [b.get("id") for b in hits] + ["onyx_odds", "draftkings"]:
+                  r = get(f"{OPTIC}/fixtures/odds?sport=football&league=nfl&sportsbook={urllib.parse.quote(str(bk))}&fixture_id={urllib.parse.quote(f['id'])}&market=moneyline")
+                  rows = r.get("data") or []
+                  n = sum(len(x.get("odds") or []) for x in rows)
+                  print(f"   {bk}: {n} moneyline rows", json.dumps((rows[0].get("odds") or [])[:2])[:300] if rows else "")
+          json.dump({"sportsbooks": sb, "active_nfl": act}, open("probe/books.json", "w"), indent=1)
+          PY
+        env:
+          OPTICODDS_API_KEY: ${{ secrets.OPTICODDS_API_KEY }}
       # job=odds: a dry run of the live Onyx fetcher (sports_odds.py) for each
       # sport against today's slate; the odds files go to the artifact only
       - if: ${{ inputs.job == 'odds' }}
