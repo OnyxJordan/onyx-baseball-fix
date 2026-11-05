@@ -5383,5 +5383,34 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186494-total-over",
+  "sport": "tennis",
+  "gid": "186494",
+  "date": "2026-11-05",
+  "logged_at": "2026-11-05T17:02:35+00:00",
+  "matchup": "Ignacio Buse vs Nuno Borges",
+  "home": "Nuno Borges",
+  "away": "Ignacio Buse",
+  "label": "Over 15.5 games",
+  "kind": "total",
+  "side": "over",
+  "line": 15.5,
+  "price": -120,
+  "chance": 0.6056,
+  "implied": 0.5455,
+  "edge": 0.06,
+  "fair": -155,
+  "state": {
+   "sets": "0-6 1-2",
+   "srv": "home",
+   "need": 2
+  },
+  "model": "live-v3",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
