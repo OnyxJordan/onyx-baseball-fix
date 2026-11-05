@@ -18,7 +18,7 @@ from datetime import datetime, timedelta, timezone
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from fetch_onyx import http_json, OPTIC   # noqa: E402
 
-BOOK = os.environ.get("ONYX_SPORTSBOOK", "").strip() or "onyx_odds"
+BOOK = os.environ.get("ONYX_SPORTSBOOK", "").strip() or "onyx_predictions"   # 11/5: Onyx moved off onyx_odds
 ALT = [b for b in os.environ.get("ALT_BOOKS", "draftkings,fanduel,pinnacle").split(",") if b]
 LEAGUES = [("football", "nfl"), ("football", "ncaaf"), ("basketball", "nba"), ("hockey", "nhl"), ("tennis", None)]
 

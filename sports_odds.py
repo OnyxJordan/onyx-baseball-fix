@@ -30,7 +30,7 @@ from datetime import datetime, timedelta, timezone
 from sports_common import Lane, american, game_day, nk
 
 sys.path.insert(0, ".")
-from fetch_onyx import http_json, OPTIC   # noqa: E402
+from fetch_onyx import http_json, OPTIC, onyx_book   # noqa: E402
 
 SEL_RE = re.compile(r"selection=([0-9a-fA-F-]{36})")
 FOOTBALL_PROPS = {"player_passing_yards": "pass_yds", "player_rushing_yards": "rush_yds",
@@ -133,11 +133,7 @@ def main():
             finally:
                 time.sleep(0.3)
 
-    try:
-        book = json.load(open("data/onyx_games.json", encoding="utf-8")).get("book") or "onyx_odds"
-    except Exception:
-        book = "onyx_odds"
-    book = os.environ.get("ONYX_SPORTSBOOK", "").strip() or book
+    book = onyx_book(okey, sport, (spec.get("leagues") or (league,))[0])   # 11/5: onyx_odds -> onyx_predictions
 
     days = 9 if lane.cfg["slate"] == "week" else 2   # 9: reaches next Sunday from Sunday and Monday (next-week capture)
     start = datetime.strptime(slate.get("date") or str(game_day()), "%Y-%m-%d")
