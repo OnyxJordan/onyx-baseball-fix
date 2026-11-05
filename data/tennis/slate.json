@@ -6718,7 +6718,7 @@
      "id": "186729",
      "start": "2026-11-05T19:25Z",
      "state": "post",
-     "detail": "Suspended",
+     "detail": "Final",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Campo 1",
@@ -6728,10 +6728,10 @@
        "short": "B. Andreescu",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/can.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        5
+        6
        ],
        "serve": false
       },
@@ -6743,7 +6743,7 @@
        "win": false,
        "sets": [
         1,
-        2
+        3
        ],
        "serve": false
       }
@@ -6752,8 +6752,8 @@
     {
      "id": "186730",
      "start": "2026-11-05T20:25Z",
-     "state": "post",
-     "detail": "Suspended",
+     "state": "in",
+     "detail": "1st",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Campo 3",
@@ -6765,7 +6765,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        4
        ],
        "serve": false
       },
@@ -6776,9 +6776,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        0
+        3
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
@@ -6821,9 +6821,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Bianca Andreescu",
+       "short": "B. Andreescu",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/can.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -8146,5 +8146,5 @@
    ]
   }
  ],
- "fetched": "2026-11-05T22:44:45+00:00"
+ "fetched": "2026-11-05T23:17:47+00:00"
 }
