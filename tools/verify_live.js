@@ -166,7 +166,7 @@ const srv = http.createServer((q, r) => { const p = path.join(root, decodeURICom
         if (Math.abs(bt.edge - (bt.p - O.implied(bt.price))) > 0.0011) fail(g, 'edge is not our chance minus the implied');
         // best first: bets that can post come first (tennis needs 60%+ to hit, 11/4), then by edge
         const okv = x => O.isVal ? O.isVal(x) : x.edge >= O.VALUE;
-        if (k && (okv(B[k - 1]) - okv(bt) || B[k - 1].edge - bt.edge) < 0) fail(g, 'bets not sorted best first');
+        if (k && (okv(B[k - 1]) - okv(bt) || (g.sport === 'tennis' ? B[k - 1].p - bt.p : 0) || B[k - 1].edge - bt.edge) < 0) fail(g, 'bets not sorted best first');
         if (g.sport === 'tennis' && bt.ok !== (bt.p >= O.TN_CONF)) fail(g, 'tennis confidence flag wrong');
         if (g.sport === 'tennis' && O.isVal && O.isVal(bt) && bt.p < O.TN_CONF) fail(g, 'tennis pick under 60% to hit');
         if (bt.price < -500 || bt.price > 500) fail(g, 'price outside -500..+500');

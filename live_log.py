@@ -41,7 +41,7 @@ LEAGUES = {"nfl": ["football/nfl"], "cfb": ["football/college-football"], "nba":
            "cbb": ["basketball/mens-college-basketball"], "tennis": ["tennis/atp", "tennis/wta"]}
 SBQ = {"cfb": "groups=80", "cbb": "groups=50&limit=400"}
 UA = {"User-Agent": "Mozilla/5.0 (onyx live log)"}
-VERSION = "live-v2"   # v2 (11/4): tennis needs 60%+ to hit to log; v1 rows stay as logged
+VERSION = "live-v3"   # v3 (11/5): one tennis pick per match, the most confident; v2 (11/4): tennis needs 60%+; earlier rows stay as logged
 
 
 def get(url, tries=2):
@@ -216,7 +216,16 @@ def log_live(led, url):
             x = match(L, g)
             if not x:
                 continue
-            for b in LM.bets(sport, g, g["M"], x.get("lines") or [], g["pre"]):
+            B = LM.bets(sport, g, g["M"], x.get("lines") or [], g["pre"])
+            if sport == "tennis":
+                # one pick per tennis match (11/4, Jordan: a Musetti match showed three different picks as the
+                # live line moved): a match already in the record gets nothing more, and a new one logs only
+                # its most confident value play, never a second market or the other side
+                if any(r["sport"] == "tennis" and str(r["gid"]) == str(g["gid"]) for r in led):
+                    continue
+                C = [b for b in B if b["edge"] >= LM.VALUE and b["p"] >= LM.TN_CONF]
+                B = [max(C, key=lambda b: (b["p"], b["edge"]))] if C else []
+            for b in B:
                 if b["edge"] < LM.VALUE:
                     continue
                 # tennis: only when the model is confident (11/4, Jordan). Graded tennis live plays to then:

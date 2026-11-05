@@ -536,7 +536,8 @@
              price: x.price, cur: cur, start: sd0, start_txt: q.l != null && sd0 != null ? (x.side === 'over' ? 'o' : 'u') + q.l + ' ' + fmt(sd0) : null});
       }
     });
-    return out.sort(function (a, b) { return (isVal(b) - isVal(a)) || b.edge - a.edge; });
+    // tennis: the most confident pick first (11/4, Jordan), every other sport the biggest edge
+    return out.sort(function (a, b) { return (isVal(b) - isVal(a)) || (ten ? b.p - a.p : 0) || b.edge - a.edge; });
   }
   var MKN = {pts: 'points', reb: 'rebounds', ast: 'assists', threes: 'threes', rec: 'catches', rec_yds: 'receiving yds', rush_yds: 'rushing yds', pass_yds: 'passing yds'};
   function fmt(x) { return x == null ? '' : x > 0 ? '+' + x : String(x); }
@@ -544,7 +545,8 @@
   // attach .bets (best value first) to every live game; games without a live line keep bets = null
   function withBets(G) {
     var sports = G.map(function (g) { return g.sport; }).filter(function (s, i, a) { return a.indexOf(s) === i; });
-    return Promise.all(sports.map(lines)).then(function (LS) {
+    var led = sports.indexOf('tennis') >= 0 ? ledger() : Promise.resolve(null);
+    return led.then(function () { return Promise.all(sports.map(lines)); }).then(function (LS) {
       var all = [].concat.apply([], LS);
       return Promise.all(G.map(function (g) {
         var L = all.filter(function (x) { return (sameTeam(x.home, g.hn) && sameTeam(x.away, g.an)) || (sameTeam(x.home, g.an) && sameTeam(x.away, g.hn)); })[0];
@@ -664,6 +666,20 @@
     var teams = '<div class="lv-teams">' + row(g.away, g.al, g.as, aw, aw > hw, ten && g.srv === 1) + row(g.home, g.hl, g.hs, hw, hw > aw, ten && g.srv === 0) + '</div>'
       + (ten && g.state ? '<div class="lv-sets">Sets ' + esc(g.state) + (g.need === 3 ? ' &middot; best of 5' : '') + (g.pre_src === 'Elo' ? ' &middot; started from Elo (no Onyx price saved)' : '') + '</div>' : '');
     var lean = '', B = (g.bets || []).filter(function (b) { return b.edge > -0.02; });
+    // tennis: one pick per match (11/4, Jordan: three different picks showed on one Musetti match as the
+    // live line moved). Once the record has logged this match's pick, that pick is the card's pick,
+    // locked, and no other side is suggested.
+    var LP = ten && LEDGER ? LEDGER.filter(function (r) { return r.sport === 'tennis' && String(r.gid) === String(g.gid); })
+      .sort(function (a, b) { return String(a.logged_at).localeCompare(String(b.logged_at)); })[0] : null;
+    if (LP) {
+      var nowB = (g.bets || []).filter(function (b) { return b.label === LP.label; })[0];
+      lean = '<div class="lv-lean"><div class="lv-k">Our pick &middot; logged</div>'
+        + '<div class="lv-pick"><b>' + esc(LP.label) + '</b><span class="lv-val">' + pct(LP.chance) + ' to hit</span></div>'
+        + '<div class="lv-steps"><div><small>Logged at</small><b>' + pr(LP.price) + '</b><span>' + esc(String(LP.logged_at).slice(11, 16)) + ' UTC</span></div>'
+        + '<div><small>Live line</small><b>' + (nowB ? pr(nowB.price) : '-') + '</b><span>' + (nowB ? pct(implied(nowB.price)) + ' implied' : 'not quoted now') + '</span></div>'
+        + '<div class="fair"><small>Our chance now</small><b>' + (nowB ? pct(nowB.p) : '-') + '</b><span>' + (LP.result ? (LP.result === 'W' ? 'won' : LP.result === 'L' ? 'lost' : 'push') : 'in play') + '</span></div></div>'
+        + '<div class="lv-verdict">This match\'s one pick, logged once when it was the most confident value on the board. We stick with it: no second pick, no other side.</div></div>';
+    } else
     if (g.bets && g.bets.length && g.bets[0].edge > -0.05) {
       var top = B[0] || g.bets[0], rest = (B.length ? B : g.bets).slice(1, 4);
       lean = '<div class="lv-lean' + (isVal(top) ? '' : ' none') + '"><div class="lv-k">' + (isVal(top) ? 'Best live bet' : top.ok === false && top.edge >= VALUE ? 'Too close to call' : 'No value right now') + '</div>'
@@ -733,7 +749,22 @@
     return getJSON('data/live/ledger.json').then(function (j) { LEDGER = Array.isArray(j) ? j : (j && j.plays) || []; LEDGER_AT = Date.now(); return LEDGER; })
       .catch(function () { LEDGER = LEDGER || []; return LEDGER; });
   }
+  // the record counts at most one pick per tennis match (11/5, Jordan). The ledger keeps every row it
+  // ever logged (append-only); before v3 a match could log a moneyline, a spread and a total, or both
+  // sides as the line moved. The pick that counts is the one the v3 rule would have taken at the time:
+  // from the match's first logging run, the most confident play. Later rows are not counted. Nothing is
+  // chosen by result.
+  function onePerMatch(rows) {
+    var first = {};
+    rows.forEach(function (r) {
+      if (r.sport !== 'tennis') return;
+      var k = String(r.gid), f = first[k], t = String(r.logged_at || '');
+      if (!f || t < String(f.logged_at || '') || (t === String(f.logged_at || '') && ((r.chance || 0) > (f.chance || 0) || ((r.chance || 0) === (f.chance || 0) && (r.edge || 0) > (f.edge || 0))))) first[k] = r;
+    });
+    return rows.filter(function (r) { return r.sport !== 'tennis' || first[String(r.gid)] === r; });
+  }
   function record(rows, sport) {
+    rows = onePerMatch(rows || []);
     var R = rows.filter(function (r) { return !sport || sport === 'all' || r.sport === sport; }), a = {w: 0, l: 0, p: 0, pend: 0, units: 0, n: R.length};
     R.forEach(function (r) { if (r.result === 'W') { a.w++; a.units += r.price > 0 ? r.price / 100 : 100 / -r.price; } else if (r.result === 'L') { a.l++; a.units -= 1; } else if (r.result === 'P' || r.result === 'V') a.p++; else a.pend++; });
     a.units = Math.round(a.units * 100) / 100; a.roi = a.w + a.l ? a.units / (a.w + a.l) : null; return a;
@@ -789,5 +820,5 @@
 
   window.OnyxLive = {left: left, model: model, plays: plays, noVig: noVig, implied: implied, phi: phi, games: games, pregame: pregame, american: american, lean: lean, bets: bets, propP: propP,
     SD: SD, PACE: PACE, TOTK: TOTK, LEN: LEN, ML_PTS: ML_PTS, DEF_TOTAL: DEF_TOTAL, FMIN: FMIN, tn: tn, VALUE: VALUE, TN_CONF: TN_CONF, isVal: isVal, card: card, block: blockHTML, spot: spotHTML, sentence: sentence, sortGames: sortGames,
-    css: css, mount: mount, ledger: ledger, record: record, recordHTML: recordHTML, NAME: NAME, PAGE: PAGE, SPORTS: LIVE_SPORTS};
+    css: css, mount: mount, ledger: ledger, onePerMatch: onePerMatch, record: record, recordHTML: recordHTML, NAME: NAME, PAGE: PAGE, SPORTS: LIVE_SPORTS};
 })();
