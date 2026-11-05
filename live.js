@@ -743,11 +743,23 @@
     return h + (opt.rec || '');
   }
   // the live value record (data/live/ledger.json, live_log.py): every value play the pipeline saw, graded
-  var LEDGER = null, LEDGER_AT = 0;
+  // Tennis picks are logged the minute they qualify (live_watch.yml) into data/live/tennis_now.json, read
+  // straight from the repo so a pick locks on the card within minutes, before the next build copies it
+  // into the ledger. The ledger's row wins where both have the match.
+  var LEDGER = null, LEDGER_AT = 0, LED0 = null, LED0_AT = 0, NOWROWS = [], NOW_AT = 0;
+  var NOW_URL = 'https://raw.githubusercontent.com/OnyxJordan/onyx-baseball-fix/main/data/live/tennis_now.json';
   function ledger() {
-    if (LEDGER && Date.now() - LEDGER_AT < 5 * 60e3) return Promise.resolve(LEDGER);
-    return getJSON('data/live/ledger.json').then(function (j) { LEDGER = Array.isArray(j) ? j : (j && j.plays) || []; LEDGER_AT = Date.now(); return LEDGER; })
-      .catch(function () { LEDGER = LEDGER || []; return LEDGER; });
+    if (LEDGER && Date.now() - LEDGER_AT < 60e3) return Promise.resolve(LEDGER);
+    var base = LED0 && Date.now() - LED0_AT < 5 * 60e3 ? Promise.resolve(LED0)
+      : getJSON('data/live/ledger.json').then(function (j) { LED0 = Array.isArray(j) ? j : (j && j.plays) || []; LED0_AT = Date.now(); return LED0; }).catch(function () { return LED0 || []; });
+    var now = Date.now() - NOW_AT < 60e3 ? Promise.resolve(NOWROWS)
+      : fetch(NOW_URL).then(function (r) { if (!r.ok) throw r; return r.json(); }).then(function (j) { NOWROWS = Array.isArray(j) ? j : []; NOW_AT = Date.now(); return NOWROWS; }).catch(function () { return NOWROWS; });
+    return Promise.all([base, now]).then(function (r) {
+      var have = {};
+      r[0].forEach(function (x) { if (x.sport === 'tennis') have[String(x.gid)] = 1; });
+      LEDGER = r[0].concat(r[1].filter(function (x) { return x.sport === 'tennis' && !have[String(x.gid)]; }));
+      LEDGER_AT = Date.now(); return LEDGER;
+    });
   }
   // the record counts at most one pick per tennis match (11/5, Jordan). The ledger keeps every row it
   // ever logged (append-only); before v3 a match could log a moneyline, a spread and a total, or both

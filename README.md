@@ -1663,6 +1663,18 @@ each sports page... there's X or Y value right now, take this pick."
   ESPN's final. Game lines only (props are shown, not logged). In validate_build's ledger list. Shown
   as "Live value record (on trial)" on each sport's Live block, the home Live tab and `picks.html`.
   Not Onyx Picks.
+- **Tennis logs the minute it qualifies (11/5, `live-v4`).** `live_watch.yml` is one long GitHub job
+  (~5h40m, then it dispatches its successor; an hourly cron restarts it if a hand-off is lost and
+  exits at once while one is running) that runs `live_log.py --tennis-now` every 60 seconds against
+  the same relay live line the page reads, and commits each new match pick to
+  `data/live/tennis_now.json`. Only the watcher writes that file, so the build's `-X theirs` rebase
+  can never drop one of its rows (it is in validate_build's ledger list too). Every build copies its
+  rows into `data/live/ledger.json` unchanged (`merge_now`, one pick per match, the ledger row wins),
+  then logs tennis itself only for matches still missing, as a fallback. `live.js` reads the file
+  from raw.githubusercontent.com (cached ~5 min there) so the card locks before the next build.
+  Why not the Cloudflare relay: the tennis Markov chain costs ~4 ms of CPU per match cold, and a
+  free Worker gets 10 ms per run; 20 live matches would not fit. Onyx itself sends no tennis prices
+  to OpticOdds (11/5 probe: 0 rows on 14 live matches and on matches about to start).
 
 **10/31 follow-ups.** A parlay spreads across games first and, when the board is short of
 games, fills its remaining legs from games it already uses (an SGP+, labelled on the ticket,

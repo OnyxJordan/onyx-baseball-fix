@@ -1,0 +1,74 @@
+name: Tennis live watch (every minute)
+# Logs a tennis live pick the minute it qualifies (11/5, Jordan: the 30-minute refresh build logged
+# picks long after the page showed them, at a different price). One long job checks every 60 seconds
+# with the same live line the page reads (live_log.py --tennis-now) and commits each new pick to
+# data/live/tennis_now.json, which only this job writes. Every refresh build copies those rows into
+# data/live/ledger.json and grades them.
+#
+# One watcher at a time: a run loops for ~5h40m, then dispatches its successor and exits. The hourly
+# cron is the backup that restarts the loop if a hand-off is lost; it exits in seconds while a
+# watcher is already running.
+on:
+  schedule:
+    - cron: "11 * * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: write
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: One watcher at a time
+        id: one
+        run: |
+          # a fresh hand-off waits up to 3 minutes for its predecessor to finish; the cron backup never waits
+          tries=1; [ "${{ github.event_name }}" = "workflow_dispatch" ] && tries=10
+          for i in $(seq 1 $tries); do
+            n=$(gh run list --repo ${{ github.repository }} --workflow live_watch.yml --status in_progress --json databaseId \
+                --jq '[.[] | select(.databaseId != ${{ github.run_id }})] | length' || echo 0)
+            if [ "${n:-0}" = "0" ]; then echo "go=yes" >> "$GITHUB_OUTPUT"; exit 0; fi
+            [ $i -lt $tries ] && sleep 20
+          done
+          echo "a watcher is already running; exiting"
+          echo "go=no" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v4
+        if: steps.one.outputs.go == 'yes'
+      - uses: actions/setup-python@v5
+        if: steps.one.outputs.go == 'yes'
+        with:
+          python-version: "3.11"
+      - if: steps.one.outputs.go == 'yes'
+        run: pip install requests
+      - name: Watch live tennis
+        if: steps.one.outputs.go == 'yes'
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          end=$(( $(date +%s) + 340 * 60 ))
+          while [ "$(date +%s)" -lt "$end" ]; do
+            # fresh ledger and pregame lines from the builds; this job's own commits only touch tennis_now.json
+            git pull -q --rebase origin main || { git rebase --abort || true; }
+            python3 live_log.py --tennis-now || true
+            if ! git diff --quiet -- data/live/tennis_now.json; then
+              git add data/live/tennis_now.json
+              git commit -q -m "Live tennis pick $(date -u +%Y-%m-%dT%H:%M)"
+              for i in 1 2 3 4; do
+                git push -q origin HEAD:main && break
+                git pull -q --rebase origin main || { git rebase --abort || true; }
+                sleep $((i * 3))
+              done
+            fi
+            sleep 60
+          done
+      - name: Hand off to the next watcher
+        if: ${{ !cancelled() && steps.one.outputs.go == 'yes' }}
+        run: |
+          for i in 1 2 3; do
+            gh workflow run live_watch.yml --repo ${{ github.repository }} --ref main && exit 0
+            sleep $((i * 10))
+          done
+          echo "::warning::could not dispatch the next watcher; the hourly cron restarts it"

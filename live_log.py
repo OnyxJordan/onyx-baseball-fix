@@ -4,6 +4,14 @@ first time it shows and graded off the final, so live value becomes provable.
 
     python3 live_log.py            # log what is live now, grade what has finished
     python3 live_log.py --grade    # grade only
+    python3 live_log.py --tennis-now   # the minute watcher (live_watch.yml): log tennis picks only
+
+Tennis is logged the minute it qualifies (11/5, Jordan: the 30-minute build logged picks long after the
+page showed them, at a different price). live_watch.yml runs `--tennis-now` every 60 seconds all day:
+it reads the same live line the page reads and writes each new match pick to data/live/tennis_now.json
+(append-only, only the watcher writes it, so the build's rebase can never drop a row). Every build run
+copies those rows into data/live/ledger.json untouched, then grades them like every other row. The
+build still logs tennis itself as a fallback when the watcher is down; a match is never logged twice.
 
 Runs inside the refresh build (refresh_build.yml, every ~30 minutes through the slate), fail-soft:
 any error prints a warning and exits 0, so it can never block a build.
@@ -41,7 +49,8 @@ LEAGUES = {"nfl": ["football/nfl"], "cfb": ["football/college-football"], "nba":
            "cbb": ["basketball/mens-college-basketball"], "tennis": ["tennis/atp", "tennis/wta"]}
 SBQ = {"cfb": "groups=80", "cbb": "groups=50&limit=400"}
 UA = {"User-Agent": "Mozilla/5.0 (onyx live log)"}
-VERSION = "live-v3"   # v3 (11/5): one tennis pick per match, the most confident; v2 (11/4): tennis needs 60%+; earlier rows stay as logged
+NOW = Path("data/live/tennis_now.json")
+VERSION = "live-v4"   # v4 (11/5): tennis logged by the minute watcher at the price the page shows   # v3 (11/5): one tennis pick per match, the most confident; v2 (11/4): tennis needs 60%+; earlier rows stay as logged
 
 
 def get(url, tries=2):
@@ -198,15 +207,17 @@ def row_id(sport, gid, b):
     return f"{sport}-{gid}-{b['kind']}-{b['side']}"
 
 
-def log_live(led, url):
-    have = {r["id"] for r in led}
+def log_live(led, url, sports=None, also=()):
+    """Append new value plays to `led`. `also`: rows logged elsewhere that count as already logged."""
+    seen = list(led) + list(also)
+    have = {r["id"] for r in seen}
     # one side per market per game (11/3: Waltert and Yamalapalli to win, and Over 20.5 and Under 22.5,
     # were both logged in one match as the live line swung, so one of each pair was a sure loss): once a
     # game's moneyline, spread or total is logged, the other side of that market is never logged
-    taken = {(r["sport"], str(r["gid"]), r["kind"]) for r in led}
+    taken = {(r["sport"], str(r["gid"]), r["kind"]) for r in seen}
     now = datetime.now(timezone.utc).isoformat(timespec="seconds")
     added = 0
-    for sport in LEAGUES:
+    for sport in sports or LEAGUES:
         G = live_games(sport)
         if not G:
             continue
@@ -221,7 +232,7 @@ def log_live(led, url):
                 # one pick per tennis match (11/4, Jordan: a Musetti match showed three different picks as the
                 # live line moved): a match already in the record gets nothing more, and a new one logs only
                 # its most confident value play, never a second market or the other side
-                if any(r["sport"] == "tennis" and str(r["gid"]) == str(g["gid"]) for r in led):
+                if any(r["sport"] == "tennis" and str(r["gid"]) == str(g["gid"]) for r in seen):
                     continue
                 C = [b for b in B if b["edge"] >= LM.VALUE and b["p"] >= LM.TN_CONF]
                 B = [max(C, key=lambda b: (b["p"], b["edge"]))] if C else []
@@ -237,11 +248,12 @@ def log_live(led, url):
                 if rid in have or mk in taken:
                     continue
                 have.add(rid); taken.add(mk)
-                led.append({"id": rid, "sport": sport, "gid": g["gid"], "date": game_day(), "logged_at": now,
+                row = {"id": rid, "sport": sport, "gid": g["gid"], "date": game_day(), "logged_at": now,
                             "matchup": f"{g['away']} {'vs' if sport == 'tennis' else '@'} {g['home']}", "home": g["home"], "away": g["away"],
                             "label": b["label"], "kind": b["kind"], "side": b["side"], "line": b["pt"], "price": b["price"],
                             "chance": round(b["p"], 4), "implied": round(LM.implied(b["price"]), 4), "edge": b["edge"], "fair": b["fair"],
-                            "state": g["state"], "model": VERSION, "result": None, "actual": None, "profit": None, "graded_at": None})
+                            "state": g["state"], "model": VERSION, "result": None, "actual": None, "profit": None, "graded_at": None}
+                led.append(row); seen.append(row)
                 added += 1
     return added
 
@@ -310,7 +322,46 @@ def grade(led):
     return n
 
 
+def save(path, rows):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(".tmp")
+    tmp.write_text(json.dumps(rows, indent=1, ensure_ascii=False), encoding="utf-8")
+    tmp.replace(path)
+
+
+def merge_now(led, now):
+    """Copy the watcher's tennis picks into the ledger as they were logged; a match already in the
+    ledger keeps its row (one pick per match). -> rows copied."""
+    gids = {str(r["gid"]) for r in led if r.get("sport") == "tennis"}
+    n = 0
+    for r in sorted(now, key=lambda r: str(r.get("logged_at"))):
+        if r.get("sport") != "tennis" or str(r.get("gid")) in gids:
+            continue
+        led.append(dict(r))
+        gids.add(str(r["gid"]))
+        n += 1
+    return n
+
+
+def watch():
+    """--tennis-now: one pass of the minute watcher. Writes only data/live/tennis_now.json."""
+    led = load_json(LEDGER, [])
+    now = load_json(NOW, None)
+    if not isinstance(now, list) or not isinstance(led, list):
+        print("::warning::tennis_now or the live ledger does not parse; not touching it")
+        return
+    before = len(now)
+    added = log_live(now, relay_url(), sports=["tennis"], also=led)
+    if added and len(now) > before:
+        save(NOW, now)
+        for r in now[before:]:
+            print(f"  logged {r['matchup']}: {r['label']} {r['price']:+d} ({round(100 * r['chance'])}% to hit, edge {round(100 * r['edge'])} pts)")
+    print(f"tennis now: {added} new pick(s), {len(now)} rows")
+
+
 def main():
+    if "--tennis-now" in sys.argv:
+        return watch()
     led = load_json(LEDGER, None)
     if not isinstance(led, list):
         if LEDGER.exists():
@@ -318,16 +369,15 @@ def main():
             return
         led = []
     before = len(led)
+    now = load_json(NOW, [])
+    copied = merge_now(led, now if isinstance(now, list) else [])
     added = 0 if "--grade" in sys.argv else log_live(led, relay_url())
     graded = grade(led)
     if len(led) < before:      # append-only, belt and braces (validate_build checks it too)
         print("::warning::live ledger would shrink; not writing")
         return
-    LEDGER.parent.mkdir(parents=True, exist_ok=True)
-    tmp = LEDGER.with_suffix(".tmp")
-    tmp.write_text(json.dumps(led, indent=1, ensure_ascii=False), encoding="utf-8")
-    tmp.replace(LEDGER)
-    print(f"live ledger: {added} new value play(s) logged, {graded} graded, {len(led)} rows")
+    save(LEDGER, led)
+    print(f"live ledger: {copied} tennis pick(s) from the minute watcher, {added} new value play(s) logged, {graded} graded, {len(led)} rows")
 
 
 if __name__ == "__main__":
