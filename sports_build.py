@@ -1443,6 +1443,18 @@ def _priced(o):
     return bool(o and ((o.get("games") or {}) or (o.get("props") or []) or (o.get("matches") or {})))
 
 
+class _ReadOnlyLane:
+    """A Lane whose save() writes nothing: the market-line pass must never touch a file."""
+    def __init__(self, lane):
+        self._lane = lane
+
+    def __getattr__(self, name):
+        return getattr(self._lane, name)
+
+    def save(self, *a, **k):
+        return None
+
+
 def market_leans(key, lane, slate, odds, model):
     """11/5 (Jordan): when Onyx prices nothing (its feed went silent at 10 AM ET that day in every sport),
     every game still gets a lean, priced against the fallback market line (market.json, sports_odds.py).
@@ -1472,13 +1484,30 @@ def market_leans(key, lane, slate, odds, model):
     except Exception as ex:
         print(f"  market leans: skipped ({type(ex).__name__}: {str(ex)[:160]})")
         return
+    # player props (11/5, Jordan: "picks across all lines"): the sport's own block runs a second time on
+    # the market prices through a read-only lane (every file the block writes goes through lane.save,
+    # which is a no-op here: no opening, trial, ledger or Elo file can change), and only its player-prop
+    # rows are kept. Its picks, trial plays and records are thrown away; the real ones came from the
+    # first run, which saw no prices.
+    if mkt.get("props") and key in ("nfl", *TEAM_MODELS):
+        try:
+            blk = nfl_block if key == "nfl" else (lambda ln, sl, od: team_block(key, ln, sl, od))
+            m2 = blk(_ReadOnlyLane(lane), slate, mkt)
+            props = [r for r in (m2.get("_cands") or []) if (r.get("kind") or "prop") not in ("ml", "spread", "total")]
+            for r in props:
+                for k_ in ("trial", "pick", "tracked", "result", "actual"):
+                    r.pop(k_, None)
+            rows += props
+        except Exception as ex:
+            print(f"  market leans: player props skipped ({type(ex).__name__}: {str(ex)[:160]})")
     for r in rows:
         r["src"], r["sel"] = "market", None      # never an Onyx bet link, never a tracked pick
     model["rows"] = list(model.get("rows") or []) + rows
     model["projected"] = list(model.get("projected") or []) + top_plays(rows)
     model["_cands"] = list(model.get("_cands") or []) + rows
     model["market"] = {"fetched": mkt.get("fetched"), "n": len(rows)}
-    print(f"  market leans: {len(rows)} game-line leans against the market line (Onyx priced nothing)")
+    print(f"  market leans: {len(rows)} leans against the market line, "
+          f"{sum(1 for r in rows if (r.get('kind') or 'prop') not in ('ml', 'spread', 'total'))} of them player props (Onyx priced nothing)")
 
 
 def main():

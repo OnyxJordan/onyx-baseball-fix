@@ -175,6 +175,8 @@ def keep_pregame(data_dir, rows, hours=36):
         st = when(e.get("start"))
         if k not in ("spread", "total", "ml", "prop") or not st or st <= now or not e.get("matchup"):
             continue
+        if e.get("src") == "market":
+            continue      # 11/5: the "Onyx pregame line" and the props archive hold Onyx prices only
         if k == "prop" and e.get("mkt") not in LIVE_PROPS:
             continue
         g = P.setdefault(str(e.get("gid")), {"m": e["matchup"], "start": e.get("start"), "sp": {}, "ml": {}})
