@@ -238,18 +238,19 @@ def run(rows, slate, props, today, jumps, fshots=None, games_log=None, tg=None, 
     def ast_line(r):
         rec = (by_optic.get(r["pid"]) if source == "optic" else None) or book.get(nk(r["name"])) or {}
         m = rec.get("ast") or {}
-        return m if None not in (m.get("line"), m.get("over"), m.get("under")) else None
+        # 11/5: an opening is an Onyx price only; a market-line fallback price (src "market") is never one
+        return m if None not in (m.get("line"), m.get("over"), m.get("under")) and m.get("src", "onyx") == "onyx" else None
     pg = (props or {}).get("games") or {}
     ts = _now()
     for g in slate.get("games", []):
         gl = pg.get(f"{g['away']}_{g['home']}") or {}
-        if gl.get("q1_total") is not None and g["gid"] not in O["q1"] and g.get("state", "pre") == "pre":
+        if gl.get("q1_total") is not None and gl.get("src", "onyx") == "onyx" and g["gid"] not in O["q1"] and g.get("state", "pre") == "pre":
             O["q1"][g["gid"]] = {"line": gl["q1_total"], "over": gl.get("q1_over_price"), "under": gl.get("q1_under_price"),
                                  "total": gl.get("total"), "ts": ts, **({"baseline": True} if first_run else {})}
     for r in rows:
         fb = r.get("fb") or {}
         key = f"{r['gid']}|{r['pid']}"
-        if fb.get("yes") is not None and key not in O["fb"]:
+        if fb.get("yes") is not None and fb.get("src", "onyx") == "onyx" and key not in O["fb"]:
             O["fb"][key] = {"yes": fb["yes"], "ts": ts, **({"baseline": True} if first_run else {})}
         m = ast_line(r) if not r.get("out") else None
         if m and key not in O["ast"]:

@@ -1411,7 +1411,7 @@ function plCard(k, i) {
       <span class="pl-conv">${cv.i} ${cv.t}</span>
     </div>
     <div class="pl-call"><div><b>${over ? 'Over' : 'Under'} ${k.line}</b> ${STAT_NAME[s]} <small>proj ${num(proj)}</small></div>
-      <span class="pl-price" onclick="event.stopPropagation();betLeg(${li})">${fmtOdds(k.price)}<i>Onyx</i></span></div>
+      <span class="pl-price" onclick="event.stopPropagation();betLeg(${li})">${fmtOdds(k.price)}<i>${k.src === 'market' ? 'Market line' : 'Onyx'}</i></span></div>
     ${moved != null ? `<div class="pl-moved">Logged at ${fmtOdds(k.price)} when it qualified · Onyx now ${fmtOdds(moved)}</div>` : ''}
     <div class="pl-nums">
       <div><span>Win chance</span><b>${pct(k.prob, 1)}</b></div>
@@ -1473,7 +1473,7 @@ function renderPlays() {
   const ageMin = la ? Math.max(0, Math.round((Date.now() - la.getTime()) / 60000)) : null;
   const old = ageMin != null && ageMin > (M_.lines_max_age || 20) + 10;
   document.getElementById('plLines').className = 'pl-lines' + (old ? ' old' : '');
-  document.getElementById('plLines').innerHTML = la ? `<i></i>Onyx prices as of ${esc(tipTime(M_.lines_at))} · ${ageMin < 1 ? 'just now' : ageMin + ' min ago'}${old
+  document.getElementById('plLines').innerHTML = M_.market ? `<i></i>Onyx prices are down, so these plays are priced against the market line as of ${la ? esc(tipTime(M_.lines_at)) : 'now'}. Leans only: nothing priced off the market line is tracked or graded. Check the price in the Onyx app before you bet.` : la ? `<i></i>Onyx prices as of ${esc(tipTime(M_.lines_at))} · ${ageMin < 1 ? 'just now' : ageMin + ' min ago'}${old
     ? ' · lines may have moved since: tap through for the live Onyx price' : ''}` : '';
   const R = D.record || {};
   document.getElementById('plRec').innerHTML = `<button class="pl-rec-in" onclick="gotoTab('record')">

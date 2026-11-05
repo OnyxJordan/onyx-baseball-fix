@@ -69,7 +69,13 @@ def current_slate():
     return {}
 
 
-def onyx_pull(key, slate):
+MARKET_BOOK = "draftkings"   # the fallback when Onyx prices nothing (never named on the site)
+
+
+def onyx_pull(key, slate, book=None):
+    """book: None for Onyx; MARKET_BOOK for the fallback (rows tagged src "market", no selection ids)."""
+    src = "market" if book else "onyx"
+    sel = (lambda od: None) if book else _sel    # never an Onyx bet link on a market price
     hdr = {"X-Api-Key": key}
     def get(url):
         for attempt in range(5):
@@ -90,6 +96,8 @@ def onyx_pull(key, slate):
     except Exception:
         book = "onyx_odds"
     book = os.environ.get("ONYX_SPORTSBOOK", "").strip() or book
+    if src == "market":
+        book = MARKET_BOOK
 
     # fixture ids: an OpticOdds slate already carries them; the ESPN backup
     # slate needs them looked up by team pair
@@ -124,7 +132,7 @@ def onyx_pull(key, slate):
             if not gk:
                 continue
             away, home = gk.split("_")
-            gl = {"gid": row.get("id"), "slug": slugs.get(gk) or row.get("game_id"), "src": "onyx"}
+            gl = {"gid": row.get("id"), "slug": slugs.get(gk) or row.get("game_id"), "src": src}
             ladders, ladders_all, extras = {}, {}, {}
             for od in row.get("odds") or []:
                 m = od.get("market_id")
@@ -142,11 +150,11 @@ def onyx_pull(key, slate):
                     # the whole ladder (alternates are over-only), for the bet card
                     lad = ladders_all.setdefault((name, stat), {})
                     rung = lad.setdefault(pts_, {})
-                    rung[side], rung[side + "_sel"] = price, _sel(od)
+                    rung[side], rung[side + "_sel"] = price, sel(od)
                     if m in EXTRA or not od.get("is_main"):
                         if m in EXTRA and od.get("is_main"):
                             ex = extras.setdefault((name, stat), {"line": pts_, "pid": od.get("player_id")})
-                            ex[side], ex[side + "_sel"] = price, _sel(od)
+                            ex[side], ex[side + "_sel"] = price, sel(od)
                         continue   # alternates (the 9.5 ... 39.5 ladder) never set the main line
                     if od.get("points") is None:
                         continue
@@ -154,41 +162,41 @@ def onyx_pull(key, slate):
                                                              "pid": od.get("player_id")})
                     if float(od["points"]) != e["line"]:
                         continue
-                    e[side], e[side + "_sel"] = price, _sel(od)
+                    e[side], e[side + "_sel"] = price, sel(od)
                 elif m == FB_MKT:
                     name = od.get("selection") or od.get("name") or ""
                     if name and str(od.get("selection_line") or "yes").lower() in ("yes", ""):
                         rec = players.setdefault(nk(name), {"name": name})
-                        rec["fb"] = {"yes": price, "sel": _sel(od), "src": "onyx"}
+                        rec["fb"] = {"yes": price, "sel": sel(od), "src": src}
                 elif m in PERIOD_TOTALS and od.get("points") is not None and od.get("is_main", True):
                     ts = str(od.get("selection_line") or "").lower()
                     if ts in ("over", "under"):
                         pre = PERIOD_TOTALS[m]
                         gl[f"{pre}_total"] = float(od["points"])
-                        gl[f"{pre}_{ts}_price"], gl[f"{pre}_{ts}_sel"] = price, _sel(od)
+                        gl[f"{pre}_{ts}_price"], gl[f"{pre}_{ts}_sel"] = price, sel(od)
                 elif m == Q1_ML:
                     t = team_abbr(od.get("selection") or od.get("name"))
                     if t in (away, home):
                         side = "away" if t == away else "home"
-                        gl[f"q1_{side}_ml"], gl[f"q1_{side}_ml_sel"] = price, _sel(od)
+                        gl[f"q1_{side}_ml"], gl[f"q1_{side}_ml_sel"] = price, sel(od)
                 elif m == "moneyline":
                     t = team_abbr(od.get("selection") or od.get("name"))
                     if t in (away, home):
                         side = "away" if t == away else "home"
-                        gl[f"{side}_ml"], gl[f"{side}_ml_sel"] = price, _sel(od)
+                        gl[f"{side}_ml"], gl[f"{side}_ml_sel"] = price, sel(od)
                 elif m == "point_spread" and od.get("is_main"):
                     # both sides, priced and tappable on the scoreboard (like every other sport)
                     t = team_abbr(od.get("selection"))
                     if t in (away, home) and od.get("points") is not None:
                         side = "away" if t == away else "home"
-                        gl[f"{side}_spread"], gl[f"{side}_spread_price"], gl[f"{side}_spread_sel"] = float(od["points"]), price, _sel(od)
+                        gl[f"{side}_spread"], gl[f"{side}_spread_price"], gl[f"{side}_spread_sel"] = float(od["points"]), price, sel(od)
                         if t == home:
                             gl["spread"] = float(od["points"])
                 elif m == "total_points" and od.get("is_main") and od.get("points") is not None:
                     gl["total"] = float(od["points"])
                     ts = str(od.get("selection_line") or "").lower()
                     if ts in ("over", "under"):
-                        gl[f"{ts}_price"], gl[f"{ts}_sel"] = price, _sel(od)
+                        gl[f"{ts}_price"], gl[f"{ts}_sel"] = price, sel(od)
             for (name, stat), e in list(ladders.items()) + list(extras.items()):
                 if e.get("over") is None and e.get("under") is None:
                     continue
@@ -196,7 +204,7 @@ def onyx_pull(key, slate):
                 if e.get("pid"):
                     rec["optic_pid"] = e["pid"]
                 rec[stat] = {"line": e["line"], "over": e.get("over"), "under": e.get("under"),
-                             "over_sel": e.get("over_sel"), "under_sel": e.get("under_sel"), "src": "onyx"}
+                             "over_sel": e.get("over_sel"), "under_sel": e.get("under_sel"), "src": src}
             # ladder rows: [line, over, over_sel, under, under_sel], low to high
             for (name, stat), lad in ladders_all.items():
                 rec = players.get(nk(name))
@@ -303,6 +311,31 @@ def main():
     else:
         print("nba onyx: OPTICODDS_API_KEY not set; no Onyx prices this run")
 
+    # 11/5 (Jordan): Onyx's feed went silent (10 AM ET, every sport). When it prices nothing this run,
+    # the market line (MARKET_BOOK) stands in, tagged src "market": shown as a lean labelled "Market
+    # line", never a tracked pick, ticket leg or trial play (those read src "onyx" only). Onyx prices
+    # left from an earlier run are dropped first, so a stale Onyx price never sits on the board.
+    if okey and not n_onyx:
+        try:
+            m_players, m_games = onyx_pull(okey, slate, book=MARKET_BOOK)
+            if m_players or m_games:
+                ALL = list(STATS.values()) + list(EXTRA.values())
+                for cur in players.values():
+                    for s in ALL:
+                        if (cur.get(s) or {}).get("src") == "onyx":
+                            cur.pop(s, None)
+                    if (cur.get("fb") or {}).get("src") == "onyx":
+                        cur.pop("fb", None)
+                games = {}
+                for k, rec in m_players.items():
+                    cur = players.setdefault(k, {"name": rec["name"]})
+                    cur.update({kk: vv for kk, vv in rec.items() if kk != "name"})
+                for gk, gl in m_games.items():
+                    games.setdefault(gk, {}).update({k: v for k, v in gl.items() if v is not None})
+                print(f"nba odds: Onyx priced nothing; market line fallback for {len(m_players)} players, {len(m_games)} games")
+        except Exception as ex:
+            print(f"nba market fallback: failed ({ex})")
+
     akey = os.environ.get("ODDS_API_KEY", "").strip()
     if akey and n_onyx < 40:
         try:
@@ -317,9 +350,11 @@ def main():
 
     # "fetched" is when ONYX prices were last pulled: a failed or empty pull
     # keeps the earlier time, so the page and the pick guard see their real age
-    fetched = datetime.now(timezone.utc).isoformat(timespec="seconds") if n_onyx else (prev.get("fetched") if same else None)
+    mk_now = any((v or {}).get("src") == "market" for r in players.values() for v in r.values() if isinstance(v, dict))
+    fetched = datetime.now(timezone.utc).isoformat(timespec="seconds") if (n_onyx or mk_now) else (prev.get("fetched") if same else None)
+    mk = any((v or {}).get("src") == "market" for r in players.values() for v in r.values() if isinstance(v, dict))
     save("props.json", {"date": slate["date"],
-                        "fetched": fetched,
+                        "fetched": fetched, "fallback": mk,
                         "players": players, "games": games})
     n = sum(1 for r in players.values() for s in STATS.values() if s in r)
     print(f"nba odds: {n} priced player-markets for {slate['date']} ({n_onyx} from Onyx this run)")

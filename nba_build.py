@@ -549,17 +549,23 @@ def write_top(rows, games, today_rows, open_led, today, jumps=None, fshots=None)
         if r["out"] or r["inj"] or g.get("state") != "pre":
             continue
         for s_, pr in (r.get("props") or {}).items():
-            if pr.get("src") != "onyx" or pr.get("closed"):
+            # 11/5: a market-line price (Onyx priced nothing, nba_odds fallback) is a lean on the board and
+            # in the Top 10, labelled "Market line"; never tracked, never a ticket leg, never logged
+            mkt_src = pr.get("src") == "market"
+            if (pr.get("src") != "onyx" and not mkt_src) or pr.get("closed"):
                 continue
             for side, a in (pr.get("all") or {}).items():
                 c = {"kind": "prop", "mkt": s_, "name": r["name"], "pid": r["pid"], "team": r["team"], "side": side, "line": pr["line"],
-                     "price": a.get("price"), "prob": a.get("prob"), "edge": a.get("edge"), "sel": a.get("sel"),
+                     "price": a.get("price"), "prob": a.get("prob"), "edge": a.get("edge"), "sel": None if mkt_src else a.get("sel"),
                      "gid": r["gid"], "matchup": f"{g.get('away')} @ {g.get('home')}", "start": g.get("start")}
-                if not a.get("sel") or c["price"] is None or c["prob"] is None:
+                if mkt_src:
+                    c["src"] = "market"
+                if (not a.get("sel") and not mkt_src) or c["price"] is None or c["prob"] is None:
                     continue
-                board.append(dict(DT.entry("nba", c, tag(a.get("sel"))), proj=(r.get("proj") or {}).get(s_), min=r["min"]))
+                tg = "lean" if mkt_src else tag(a.get("sel"))
+                board.append(dict(DT.entry("nba", c, tg), proj=(r.get("proj") or {}).get(s_), min=r["min"]))
                 if r["min"] >= TICKET_MIN_MIN and DT.ok(c):
-                    out.append(DT.entry("nba", c, tag(a.get("sel"))))
+                    out.append(DT.entry("nba", c, tg))
     for g in games.values():
         if g.get("state") != "pre" or g.get("q1_total") is None or not g.get("total"):
             continue
@@ -929,7 +935,9 @@ def main():
                  # games whose picks wait for the last PICK_LOCK_H hours (the page's watchlist says so)
                  "unsettled": sorted(unsettled), "lock_h": PICK_LOCK_H,
                  # when these Onyx prices were pulled: the page shows their age
-                 "lines_at": props.get("fetched"), "lines_max_age": PICK_MAX_LINE_AGE_MIN},
+                 "lines_at": props.get("fetched"), "lines_max_age": PICK_MAX_LINE_AGE_MIN,
+                 # 11/5: Onyx priced nothing and the market line stands in (nba_odds fallback): leans only
+                 "market": bool(props.get("fallback"))},
         "games": slate["games"], "players": players_out,
         "picks": today_rows, "record": record, "tickets": tickets,
         # 80px team logos baked in (tools/nba_make_logos.py): no third-party
