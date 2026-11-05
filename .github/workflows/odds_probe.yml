@@ -37,7 +37,7 @@ jobs:
         run: python3 tools/onyx_live_probe.py ${{ inputs.args || '60' }}
         env:
           OPTICODDS_API_KEY: ${{ secrets.OPTICODDS_API_KEY }}
-      - if: ${{ inputs.job != 'lines' && inputs.job != 'golf' && inputs.job != 'sources' && inputs.job != 'live' && inputs.job != 'books' && inputs.job != 'compare' }}
+      - if: ${{ inputs.job != 'lines' && inputs.job != 'golf' && inputs.job != 'sources' && inputs.job != 'live' && inputs.job != 'books' && inputs.job != 'compare' && inputs.job != 'find' }}
         run: python3 tools/onyx_markets_probe.py ${{ inputs.sports }}
         env:
           OPTICODDS_API_KEY: ${{ secrets.OPTICODDS_API_KEY }}
@@ -96,6 +96,11 @@ jobs:
                   print(f"   {bk}: {n} moneyline rows", json.dumps((rows[0].get("odds") or [])[:2])[:300] if rows else "")
           json.dump({"sportsbooks": sb, "active_nfl": act}, open("probe/books.json", "w"), indent=1)
           PY
+        env:
+          OPTICODDS_API_KEY: ${{ secrets.OPTICODDS_API_KEY }}
+      # job=find: which sportsbook id carries the prices the Onyx app shows (a fingerprint)
+      - if: ${{ inputs.job == 'find' }}
+        run: python3 tools/onyx_find_book.py
         env:
           OPTICODDS_API_KEY: ${{ secrets.OPTICODDS_API_KEY }}
       # job=compare: do onyx_odds (sweeps) and onyx_predictions price the same? (args: days back)

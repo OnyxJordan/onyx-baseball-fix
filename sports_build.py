@@ -1443,22 +1443,60 @@ def _priced(o):
     return bool(o and ((o.get("games") or {}) or (o.get("props") or []) or (o.get("matches") or {})))
 
 
+def fallback_market(lane, slate, odds):
+    """market.json when Onyx priced nothing and the fallback is today's and under 3 hours old, else None."""
+    if _priced(odds):
+        return None
+    mkt = lane.load("market.json", None)
+    if not _priced(mkt) or not mkt.get("fallback") or mkt.get("date") != slate.get("date"):
+        return None
+    try:
+        if (datetime.now(timezone.utc) - datetime.fromisoformat(mkt["fetched"])).total_seconds() > 3 * 3600:
+            return None
+    except Exception:
+        return None
+    return mkt
+
+
+def _page_market(lane, slate, odds):
+    m = fallback_market(lane, slate, odds)
+    if not m:
+        return None
+    m = json.loads(json.dumps(m))
+    for g in (m.get("games") or {}).values():
+        for k in [k for k in g if k.endswith("_sel")]:
+            g[k] = None
+    for p in m.get("props") or []:
+        p["over_sel"] = p["under_sel"] = None
+    for mo in (m.get("matches") or {}).values():
+        for k in [k for k in mo if k.endswith("_sel")]:
+            mo[k] = None
+    m["market"] = True
+    return m
+
+
+class _ReadOnlyLane:
+    """A Lane whose save() writes nothing: the market-line pass must never touch a file."""
+    def __init__(self, lane):
+        self._lane = lane
+
+    def __getattr__(self, name):
+        return getattr(self._lane, name)
+
+    def save(self, *a, **k):
+        return None
+
+
 def market_leans(key, lane, slate, odds, model):
     """11/5 (Jordan): when Onyx prices nothing (its feed went silent at 10 AM ET that day in every sport),
     every game still gets a lean, priced against the fallback market line (market.json, sports_odds.py).
     The model ran with no Onyx prices, so no ledger, trial lane or pick saw these lines; the rows built
     here are leans only, flagged src "market" (the page labels the price "Market line", never Onyx, and
     picks.py never logs one). Game lines only, from the same pricing as Onyx's (game_rows / tennis_rows)."""
-    if _priced(odds) or key not in ("nfl", "tennis", *TEAM_MODELS):
+    if key not in ("nfl", "tennis", *TEAM_MODELS):
         return
-    mkt = lane.load("market.json", None)
-    if not _priced(mkt) or not mkt.get("fallback") or mkt.get("date") != slate.get("date"):
-        return
-    try:
-        age = datetime.now(timezone.utc) - datetime.fromisoformat(mkt["fetched"])
-        if age.total_seconds() > 3 * 3600:
-            return
-    except Exception:
+    mkt = fallback_market(lane, slate, odds)
+    if not mkt:
         return
     try:
         if key == "tennis":
@@ -1472,13 +1510,30 @@ def market_leans(key, lane, slate, odds, model):
     except Exception as ex:
         print(f"  market leans: skipped ({type(ex).__name__}: {str(ex)[:160]})")
         return
+    # player props (11/5, Jordan: "picks across all lines"): the sport's own block runs a second time on
+    # the market prices through a read-only lane (every file the block writes goes through lane.save,
+    # which is a no-op here: no opening, trial, ledger or Elo file can change), and only its player-prop
+    # rows are kept. Its picks, trial plays and records are thrown away; the real ones came from the
+    # first run, which saw no prices.
+    if mkt.get("props") and key in ("nfl", *TEAM_MODELS):
+        try:
+            blk = nfl_block if key == "nfl" else (lambda ln, sl, od: team_block(key, ln, sl, od))
+            m2 = blk(_ReadOnlyLane(lane), slate, mkt)
+            props = [r for r in (m2.get("_cands") or []) if (r.get("kind") or "prop") not in ("ml", "spread", "total")]
+            for r in props:
+                for k_ in ("trial", "pick", "tracked", "result", "actual"):
+                    r.pop(k_, None)
+            rows += props
+        except Exception as ex:
+            print(f"  market leans: player props skipped ({type(ex).__name__}: {str(ex)[:160]})")
     for r in rows:
         r["src"], r["sel"] = "market", None      # never an Onyx bet link, never a tracked pick
     model["rows"] = list(model.get("rows") or []) + rows
     model["projected"] = list(model.get("projected") or []) + top_plays(rows)
     model["_cands"] = list(model.get("_cands") or []) + rows
     model["market"] = {"fetched": mkt.get("fetched"), "n": len(rows)}
-    print(f"  market leans: {len(rows)} game-line leans against the market line (Onyx priced nothing)")
+    print(f"  market leans: {len(rows)} leans against the market line, "
+          f"{sum(1 for r in rows if (r.get('kind') or 'prop') not in ('ml', 'spread', 'total'))} of them player props (Onyx priced nothing)")
 
 
 def main():
@@ -1542,7 +1597,10 @@ def main():
     data = {"sport": key, "cfg": page_cfg, "date": slate.get("date"), "label": slate.get("label"),
             "season": slate.get("season"), "games": slate.get("games") or [], "events": slate.get("events") or [],
             "next_date": slate.get("next_date"), "next_n": slate.get("next_n"),
-            "odds": odds or {}, "model": model,
+            # 11/5 (Jordan: "no lines on games in the gamecenter"): with Onyx down the page's odds board,
+            # game cards and gamecenter show the fallback market line, flagged market (labelled "Market
+            # line", no bet selections). Only the page gets it: the model, ledgers and cards used `odds`.
+            "odds": odds if _priced(odds) else (_page_market(lane, slate, odds) or odds or {}), "model": model,
             "depth_at": (depth or {}).get("generated") if (depth or {}).get("teams") else None,
             "sit_at": sit_at,
             "generated": datetime.now(timezone.utc).isoformat(timespec="seconds")}

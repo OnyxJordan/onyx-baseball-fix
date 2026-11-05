@@ -349,8 +349,11 @@
     return {t: 4, lab: 'Not backtested against Onyx'};
   }
   function hc(v) { v = Math.round(v * 2) / 2; return (v > 0 ? '+' : '') + v; }
+  // 11/5: while Onyx prices are down the page runs on the market line (no Onyx selection ids), and a
+  // card still lists every priced market, labelled as the market line
+  function mkt() { var D = window.NBA_DATA || window.D, S = window.SD; return !!((D && D.meta && D.meta.market) || (S && S.odds && S.odds.market)); }
   function sidesOf(m) {
-    return ['over', 'under'].filter(function (s) { return (s === 'over' ? m.over : m.under) != null && (s === 'over' ? m.over_sel : m.under_sel) && !(m.yes && s === 'under'); });
+    return ['over', 'under'].filter(function (s) { return (s === 'over' ? m.over : m.under) != null && ((s === 'over' ? m.over_sel : m.under_sel) || mkt()) && !(m.yes && s === 'under'); });
   }
   function evOf(m, side) {
     var pr = side === 'over' ? m.over : m.under;
@@ -599,7 +602,7 @@
     $('cxBig').innerHTML = m.g === 'ml' ? esc(sideLab(m, k.side)) + ' <span>' + esc(m.name) + '</span>'
       : m.g === 'spread' ? esc(sideLab(m, k.side, k.exact ? null : k.line)) + ' <span>' + esc(m.name) + '</span>'
       : yes ? esc(m.name) + (k.side === 'under' ? ': No' : '') : (k.side === 'over' ? 'Over ' : 'Under ') + (k.line == null ? '' : k.exact ? k.line : k.line.toFixed(1)) + ' <span>' + esc(m.name) + '</span>';
-    $('cxPrice').innerHTML = k.exact ? (k.price != null ? odds(k.price) + '<span>Onyx</span>' : '<i class="na">no Onyx price</i><span>this side</span>') : '<i class="na">not offered</i><span>scrubbing</span>';
+    $('cxPrice').innerHTML = k.exact ? (k.price != null ? odds(k.price) + '<span>' + (mkt() ? 'Market line (Onyx prices are down)' : 'Onyx') + '</span>' : '<i class="na">no Onyx price</i><span>this side</span>') : '<i class="na">not offered</i><span>scrubbing</span>';
     $('cxPrice').classList.toggle('ghost', !k.exact);
     var sb = $('cxSide');
     sb.style.display = k.exact && k.over && k.under ? '' : 'none';

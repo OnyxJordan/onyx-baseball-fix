@@ -479,6 +479,8 @@ function stateTxt(g) { return g.state === 'in' ? `<span class="live">${esc(g.det
 
 // ── odds chips (SD.odds from sports_odds.py: Onyx prices, labelled Onyx) ──
 function gameOdds(gid) { return ((SD.odds || {}).games || {})[gid] || null; }
+// 11/5: with Onyx down the build hands the page the fallback market line (SD.odds.market): every price says so
+const OXN = (SD.odds || {}).market ? 'Market line' : 'Onyx';
 function chip(price, label, sel, sub) {
   if (price == null) return `<span class="chipx dead"><b>-</b><span>${esc(sub || label)}</span></span>`;
   return `<button class="chipx" onclick="event.stopPropagation();bet(${sel ? `'${esc(sel)}'` : 'null'},'${esc(label)}')"><b>${fmtOdds(price)}</b><span>${esc(sub || label)}</span></button>`;
@@ -503,7 +505,7 @@ function gameCells(g, side) {
 // the board: an "Onyx" header row, then one row per side; rows = [{id, sc, cells, lose}]
 function oddsRows(rows) {
   const odds = rows.some(r => r.cells);
-  const head = odds ? `<div class="gm-row gm-oh"><span class="gm-onyx">Onyx</span><span></span><span>Spread</span><span>Total</span><span>Money</span></div>` : '';
+  const head = odds ? `<div class="gm-row gm-oh"><span class="gm-onyx">${OXN}</span><span></span><span>Spread</span><span>Total</span><span>Money</span></div>` : '';
   return {odds, html: head + rows.map(r => `<div class="gm-row${r.lose ? ' lose' : ''}"><div class="gm-id">${r.id}</div><span class="sc">${r.sc || ''}</span>${odds ? (r.cells || [oc(null, ''), oc(null, ''), oc(null, '')]).join('') : ''}</div>`).join('')};
 }
 function teamId(g, side, full) {
@@ -577,7 +579,7 @@ function renderHome() {
   const stat = (v, l, c) => `<div class="home-stat"><div class="home-stat-val ${c || ''}">${v}</div><div class="home-stat-label">${l}</div></div>`;
   const n = KIND === 'tennis' ? (SD.events || []).reduce((a, e) => a + e.matches.length, 0) : KIND === 'golf' ? (SD.events || []).reduce((a, e) => a + e.board.length, 0) : games.length;
   document.getElementById('homeStats').innerHTML = stat(n, KIND === 'tennis' ? 'Matches' : KIND === 'golf' ? 'Players' : 'Games', 'purple')
-    + stat(nLive, 'Live now', 'green') + stat(priced || '-', 'Onyx lines') + stat({live: 'Live', trial: 'On trial'}[(SD.model || {}).status] || 'Leans', 'Model');
+    + stat(nLive, 'Live now', 'green') + stat(priced || '-', OXN + ' lines') + stat({live: 'Live', trial: 'On trial'}[(SD.model || {}).status] || 'Leans', 'Model');
   let body = '';
   if (KIND === 'tennis') {
     const lv = (SD.events || []).flatMap(e => e.matches.filter(m => m.state === 'in').map(m => [e, m]));
@@ -619,7 +621,7 @@ function gameCard(g0) {
   return `<div class="gm${b.odds ? ' odds' : ''}${OPEN_GAME === g.gid ? ' sel' : ''}" onclick="openGame('${g.gid}')" tabindex="0" onkeydown="if(event.key==='Enter')openGame('${g.gid}')">
     <div class="gm-top"><span>${stateTxt(g)}</span><span>${esc(g.tv || '')}</span></div>
     ${b.html}
-    <div class="gm-ft"><span>${b.odds ? 'Tap a price to bet on Onyx' : g.state === 'pre' ? 'Lines post on Onyx soon' : g.state === 'in' ? 'Follow it live in the gamecenter' : ''}</span><b>Gamecenter ›</b></div>
+    <div class="gm-ft"><span>${b.odds ? ((SD.odds || {}).market ? 'Market line while Onyx prices are down: check Onyx before you bet' : 'Tap a price to bet on Onyx') : g.state === 'pre' ? 'Lines post on Onyx soon' : g.state === 'in' ? 'Follow it live in the gamecenter' : ''}</span><b>Gamecenter ›</b></div>
   </div>`;
 }
 var GFILTER = 'all';
@@ -698,7 +700,7 @@ function drawGame(gid) {
     ${g.state !== 'pre' ? `<div class="ssc a">${esc(g.away_score)}</div><div class="ssc h">${esc(g.home_score)}</div>` : ''}</div>`;
   const s = GC_CACHE[gid];
   box.innerHTML = `<div class="gc" id="gc">${gameNav(gid)}${head}
-    ${gameBoard(g) ? `<div class="gc-sec"><h4>Onyx lines</h4>${gameBoard(g)}</div>` : ''}
+    ${gameBoard(g) ? `<div class="gc-sec"><h4>${OXN} lines</h4>${gameBoard(g)}</div>` : ''}
     ${simSpots(g.gid)}
     ${((SD.model || {}).td || []).some(r => r.gid === g.gid) ? `<div class="gc-sec">${tdTable(SD.model.td.filter(r => r.gid === g.gid).slice(0, 14), 'Touchdown scorers')}</div>` : ''}
     <div class="gc-sec" style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-primary" onclick="bet(null,'game ${esc(g.away)} @ ${esc(g.home)}')">⚡ Bet this game on Onyx</button>
@@ -788,9 +790,9 @@ function gameLeans(g) {
   if (pj) out += `<div class="gc-sec"><h4>Model projection</h4><div class="stat-grid"><div><span>${esc(g.away)}</span><b>${num(pj.away)}</b></div><div><span>${esc(g.home)}</span><b>${num(pj.home)}</b></div>
     <div><span>${esc(g.home)} win</span><b>${pct(pj.home_win)}</b></div><div><span>Total</span><b>${num(pj.home + pj.away)}</b></div></div></div>`;
   const gr = rows.filter(r => r.kind), pr = rows.filter(r => !r.kind);
-  if (gr.length) out += `<div class="gc-sec"><h4>Model vs Onyx game lines${lab}</h4>${gameLeanTable(gr, true)}</div>`;
+  if (gr.length) out += `<div class="gc-sec"><h4>Model vs ${OXN === 'Onyx' ? 'Onyx' : 'market'} game lines${lab}</h4>${gameLeanTable(gr, true)}</div>`;
   if (pr.length) out += `<div class="gc-sec"><h4>Player projections${lab}</h4>${projTable(pr.slice(0, 12))}</div>`;
-  if (props.length) out += `<div class="gc-sec"><h4>More Onyx player lines${props.length > 12 ? ` · top 12 of ${props.length}, all on the <a href="#" onclick="gotoTab('board');return false" style="color:#d795ff">Onyx Board</a>` : ''}</h4><div class="tbl"><table><thead><tr><th>Player</th><th>Market</th><th class="r">Line</th><th class="r">Over</th><th class="r">Under</th></tr></thead><tbody>
+  if (props.length) out += `<div class="gc-sec"><h4>More ${OXN} player lines${props.length > 12 ? ` · top 12 of ${props.length}, all on the <a href="#" onclick="gotoTab('board');return false" style="color:#d795ff">Onyx Board</a>` : ''}</h4><div class="tbl"><table><thead><tr><th>Player</th><th>Market</th><th class="r">Line</th><th class="r">Over</th><th class="r">Under</th></tr></thead><tbody>
     ${props.slice(0, 12).map(p => `<tr><td><b>${esc(p.name)}</b></td><td class="dim">${esc(MKT_NAME[p.mkt] || p.mkt)}</td><td class="r mono">${p.mkt === 'anytime_td' ? '' : esc(p.line)}</td>
       <td class="r">${chip(p.over, p.name + (p.mkt === 'anytime_td' ? ' anytime TD' : ' Over ' + p.line), p.over_sel, p.mkt === 'anytime_td' ? 'Yes' : 'Over')}</td>
       <td class="r">${p.under != null ? chip(p.under, p.name + ' Under ' + p.line, p.under_sel, 'Under') : '<span class="dim">-</span>'}</td></tr>`).join('')}</tbody></table></div></div>`;
@@ -1011,7 +1013,7 @@ function focusPanel(s, g, B) {
       return `<div class="${st}"><span>${l.mkt === 'anytime_td' ? 'Anytime TD' : (l.side === 'over' ? 'O ' : 'U ') + l.line + ' ' + STAT_AB[l.mkt]}</span><b>${v ?? 0}</b><small>${l.proj != null ? 'proj ' + num(l.proj) : fmtOdds(l.price)}</small></div>`; }).join('')
     : Object.entries(P.st).filter(([k, v]) => STAT_AB[k] && (v || ['rec_yds', 'rush_yds', 'pass_yds', 'points', 'shots'].includes(k))).slice(0, 6)
       .map(([k, v]) => `<div><span>${STAT_AB[k]}</span><b>${v}</b><small>no Onyx line</small></div>`).join('');
-  return `<div class="gc-sec"><h4>${esc(P.name)} · ${esc(P.team)} ${esc(P.pos)} · live vs his Onyx lines</h4><div class="fx">${cells}</div>
+  return `<div class="gc-sec"><h4>${esc(P.name)} · ${esc(P.team)} ${esc(P.pos)} · live vs his ${OXN} lines</h4><div class="fx">${cells}</div>
     <div style="display:flex;gap:8px;margin-bottom:6px">${followBtn(P.id, P.name, g.gid)}${L[0] && L[0].sel ? `<button class="btn-primary" style="flex:1" onclick="bet('${esc(L[0].sel)}','${esc(P.name)}')">⚡ Bet ${esc(shortNm(P.name))} on Onyx</button>` : ''}
     <button class="fl-btn" onclick="GC_SEL=null;drawGame('${esc(g.gid)}')">×</button></div></div>`;
 }
@@ -1571,7 +1573,7 @@ function matchCenter(id) {
         ${m.state !== 'post' ? `<div><span>Projected total games</span><b>${expT.toFixed(1)}${mo.total != null ? ` <em>Onyx line ${mo.total}</em>` : ''}</b></div>
         <div><span>Projected margin</span><b>${esc(expD >= 0 ? last(0) : last(1))} by ${Math.abs(expD).toFixed(1)} games</b></div>` : ''}
       </div>
-      <div class="dim" style="font-size:11px;line-height:1.5;margin-top:6px">Game by game from the score: serve strength is fitted so the start matches ${cal.pre.src === 'Onyx price' ? "Onyx's moneyline" : cal.pre.src === 'Elo' ? 'the Elo ratings' : 'an even match'}${cal.src === 'Onyx total' ? ' and game total' : ''}, the score so far shows how sharp each player is today, then every hold, break, tiebreak and set is played out from here.</div></div>
+      <div class="dim" style="font-size:11px;line-height:1.5;margin-top:6px">Game by game from the score: serve strength is fitted so the start matches ${cal.pre.src === 'Onyx price' ? ((SD.odds || {}).market ? 'the market moneyline' : "Onyx's moneyline") : cal.pre.src === 'Elo' ? 'the Elo ratings' : 'an even match'}${cal.src === 'Onyx total' ? ' and game total' : ''}, the score so far shows how sharp each player is today, then every hold, break, tiebreak and set is played out from here.</div></div>
     ${setsTbl ? `<div class="gc-sec"><h4>Set by set · breaks</h4>${setsTbl}</div>` : ''}
     ${L.length ? `<div class="gc-sec"><h4>Onyx lines · live</h4><div class="fx">${L.map(l => { const c = chance(l); return `<div class="${l.st}" ${l.sel ? `onclick="bet('${esc(l.sel)}','${esc(l.label)}')" style="cursor:pointer"` : ''}>
       <span>${esc(l.label)}</span><b>${fmtOdds(l.price)}</b><small>${esc(l.now || (l.st === 'win' ? 'cashed' : ''))}${c != null && m.state !== 'post' && !l.st ? ` · <i class="tn-ch">${pc(c)} to cash</i>` : c != null && l.st === 'pend' && m.state !== 'post' ? ` · <i class="tn-ch">${pc(c)}</i>` : ''}</small>
@@ -1767,7 +1769,7 @@ function tnMatch(e, m) {
   return `<div class="gm${bd.odds ? ' odds' : ''}${OPEN_MATCH === m.id ? ' sel' : ''}" onclick="openMatch('${esc(m.id)}')" tabindex="0" onkeydown="if(event.key==='Enter')openMatch('${esc(m.id)}')">
     <div class="gm-top"><span>${st}</span><span>${esc(e.tour)} · ${esc(m.round || '')}</span></div>
     ${bd.html}
-    <div class="gm-ft"><span>${bd.odds ? 'Tap a price to bet on Onyx' : m.state === 'pre' ? 'Lines post on Onyx soon' : m.state === 'in' ? 'Follow it live in the match center' : ''}</span><b>Match center ›</b></div>
+    <div class="gm-ft"><span>${bd.odds ? ((SD.odds || {}).market ? 'Market line while Onyx prices are down: check Onyx before you bet' : 'Tap a price to bet on Onyx') : m.state === 'pre' ? 'Lines post on Onyx soon' : m.state === 'in' ? 'Follow it live in the match center' : ''}</span><b>Match center ›</b></div>
   </div>`;
 }
 function tnAll() {
@@ -1960,7 +1962,7 @@ function renderBoard() {
   const O = SD.odds || {};
   const games = (SD.games || []).map(live);
   const props = O.props || [];
-  const out = [`<div class="sec-hdr"><span class="sec-title">Onyx board · every Onyx line on the slate</span><span class="sec-count">${O.fetched ? 'prices ' + esc(new Date(O.fetched).toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York'})) + ' ET' : ''}</span></div>`];
+  const out = [`<div class="sec-hdr"><span class="sec-title">${(SD.odds || {}).market ? 'Market line board · Onyx prices are down, so the market line stands in' : 'Onyx board · every Onyx line on the slate'}</span><span class="sec-count">${O.fetched ? 'prices ' + esc(new Date(O.fetched).toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York'})) + ' ET' : ''}</span></div>`];
   if (!Object.keys(O.games || {}).length && !props.length && !Object.keys(O.matches || {}).length && !(O.outrights || []).length) {
     out.push(`<div class="lab"><div class="eb">Onyx prices</div><h3>The Onyx feed for ${esc(C.name)} is being wired</h3>
       <p>Every price on this site comes straight from Onyx, never another book. The Onyx lines for ${esc(C.name)} switch on here as soon as the feed is connected, game lines first, then player markets.</p>

@@ -105,6 +105,10 @@ def match_tennis(fx, events):
     return None
 
 
+def american_prob(p):
+    return 100 / (p + 100) if p > 0 else -p / (-p + 100)
+
+
 MARKET_BOOK = "draftkings"   # the fallback when Onyx prices nothing (never named on the site)
 
 
@@ -228,7 +232,7 @@ def main():
                         out["next_props"] += [e for e in nxt.values() if e["over"] is not None and e["under"] is not None]
                         continue
                     gl = out["games"].setdefault(g["gid"], {})
-                    props = {}
+                    props, alt = {}, {}
                     for od in row.get("odds") or []:
                         price = american(od.get("price"))
                         if price is None:
@@ -248,6 +252,11 @@ def main():
                                                      "over_sel": _sel(od), "under": None, "under_sel": None, "gid": g["gid"]})
                             continue
                         if mid in spec["props"]:
+                            if book == MARKET_BOOK and side in ("over", "under") and od.get("points") is not None and sel:
+                                # the fallback book flags one side of a line as main (college lines, 11/5): pair
+                                # both sides at every line, then keep the main line if it is two-sided, else the
+                                # closest two-sided line to it (below)
+                                alt.setdefault((sel, mid), {}).setdefault(float(od["points"]), {})[side] = (price, bool(od.get("is_main")))
                             if not od.get("is_main") or side not in ("over", "under") or od.get("points") is None or not sel:
                                 continue
                             e = props.setdefault((sel, mid), {"name": sel, "mkt": spec["props"][mid], "line": float(od["points"]),
@@ -273,6 +282,18 @@ def main():
                         elif mid in TOTAL and od.get("points") is not None and side in ("over", "under"):
                             gl["total"] = float(od["points"])
                             gl[side + "_price"], gl[side + "_sel"] = price, _sel(od)
+                    for (sel_, mid_), lines in alt.items():
+                        e = props.get((sel_, mid_))
+                        if e and e["over"] is not None and e["under"] is not None:
+                            continue
+                        two = [(ln, v) for ln, v in lines.items() if "over" in v and "under" in v]
+                        if not two:
+                            continue
+                        main = next((ln for ln, v in lines.items() if any(x[1] for x in v.values())), None)
+                        ln, v = min(two, key=lambda t: (abs(t[0] - main) if main is not None else 0,
+                                                        abs(american_prob(t[1]["over"][0]) - 0.5)))
+                        props[(sel_, mid_)] = {"name": sel_, "mkt": spec["props"][mid_], "line": ln, "gid": g["gid"],
+                                               "over": v["over"][0], "under": v["under"][0], "over_sel": None, "under_sel": None}
                     out["props"] += [e for e in props.values() if e["over"] is not None or e["under"] is not None]
         out["games"] = {k: v for k, v in out["games"].items() if v}
         out["matches"] = {k: v for k, v in out["matches"].items() if len(v) > 1}   # drop matches Onyx has not priced

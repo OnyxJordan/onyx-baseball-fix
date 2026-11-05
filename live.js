@@ -787,12 +787,19 @@
       + (a.n ? a.n + ' logged' + (a.pend ? ', ' + a.pend + ' open' : '') + ', each at the live line when it first showed as value' : 'Nothing logged yet: every live value play is logged at the live line when it first shows, then graded off the final') + '. Not Onyx Picks.</span></div>';
   }
   // today's spot plays (data/<sport>/top.json, daily_top.py): Onyx Picks first, then the best value, each with its reason
+  // the site's day (rolls at 4 AM ET), the same day home.html's Top 10 uses
+  function siteDay(t) { return new Date(t - 4 * 3600e3).toLocaleDateString('en-CA', {timeZone: 'America/New_York'}); }
   function spotHTML(sport, rows) {
-    var now = Date.now();
-    var R = (rows || []).filter(function (r) { return !r.start || Date.parse(r.start) > now - 5 * 60e3; })
+    var now = Date.now(), today = siteDay(now);
+    // today's games only (11/5, Jordan: NFL and college football showed Sunday's plays on a Thursday)
+    var up = (rows || []).filter(function (r) { return !r.start || Date.parse(r.start) > now - 5 * 60e3; });
+    var nextT = up.reduce(function (m, r) { var t = r.start ? Date.parse(r.start) : NaN; return !isNaN(t) && siteDay(t) !== today && (m == null || t < m) ? t : m; }, null);
+    var R = up.filter(function (r) { return !r.start || siteDay(Date.parse(r.start)) === today; })
       .sort(function (a, b) { return ((b.pick || b.tag === 'tracked') ? 1 : 0) - ((a.pick || a.tag === 'tracked') ? 1 : 0) || (b.ev || 0) - (a.ev || 0); }).slice(0, 5);
     var h = '<div class="lvb-h"><div><span class="lvb-eb off"><i></i>Before the start</span><h3>Best plays today</h3></div></div>';
-    if (!R.length) return h + '<div class="lvb-note">No Onyx line on the slate beats our number right now. Plays show here as Onyx posts lines.</div>';
+    if (!R.length) return h + '<div class="lvb-note">' + (nextT != null && !up.some(function (r) { return r.start && siteDay(Date.parse(r.start)) === today; })
+      ? 'No ' + (NAME[sport] || '') + ' games today. The best plays for the next slate post here on game day (' + esc(new Date(nextT).toLocaleDateString('en-US', {weekday: 'long', month: 'short', day: 'numeric', timeZone: 'America/New_York'})) + ').'
+      : 'No line on today\'s slate beats our number right now. Plays show here as lines post.') + '</div>';
     var tag = function (r) { return r.pick || r.tag === 'tracked' ? 'Onyx Pick' : r.tag === 'trial' ? 'On trial' : 'Projection, not a pick'; };
     var t = function (iso) { try { return new Date(iso).toLocaleString('en-US', {weekday: 'short', hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York'}) + ' ET'; } catch (e) { return ''; } };
     return h + '<div class="lvb-note">Onyx Picks first (finalized markets, logged and graded), then the model\'s best value on today\'s Onyx lines, each with the reason it shows.</div><div class="sp-list">' + R.map(function (r) {
