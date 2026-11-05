@@ -582,6 +582,12 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
     `picks.log` refuses `src: "market"`. Ignored when older than 3 hours or from another day.
     When Onyx answers again, the next run writes an empty `market.json` and the leans go back
     to Onyx prices.
+  - NBA (its own pipeline) follows the same rule: `nba_odds.py` pulls the market line with the
+    same parser when Onyx prices nothing (rows `src: "market"`, no selection ids; earlier Onyx
+    prices are dropped so none goes stale on the board) and flags `props.json` `"fallback"`.
+    `nba_build` shows them as leans on the board and Top 10 and says so above the plays; picks,
+    the Model's Parlay ticket and every trial lane read `src: "onyx"` only, and `open_lanes`
+    never captures a market price as an opening.
 
   `tools/onyx_markets_probe.py` (the manual `odds_probe.yml` workflow, `job=probe`)
   reports what the Onyx book prices.
