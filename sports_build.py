@@ -1443,6 +1443,38 @@ def _priced(o):
     return bool(o and ((o.get("games") or {}) or (o.get("props") or []) or (o.get("matches") or {})))
 
 
+def fallback_market(lane, slate, odds):
+    """market.json when Onyx priced nothing and the fallback is today's and under 3 hours old, else None."""
+    if _priced(odds):
+        return None
+    mkt = lane.load("market.json", None)
+    if not _priced(mkt) or not mkt.get("fallback") or mkt.get("date") != slate.get("date"):
+        return None
+    try:
+        if (datetime.now(timezone.utc) - datetime.fromisoformat(mkt["fetched"])).total_seconds() > 3 * 3600:
+            return None
+    except Exception:
+        return None
+    return mkt
+
+
+def _page_market(lane, slate, odds):
+    m = fallback_market(lane, slate, odds)
+    if not m:
+        return None
+    m = json.loads(json.dumps(m))
+    for g in (m.get("games") or {}).values():
+        for k in [k for k in g if k.endswith("_sel")]:
+            g[k] = None
+    for p in m.get("props") or []:
+        p["over_sel"] = p["under_sel"] = None
+    for mo in (m.get("matches") or {}).values():
+        for k in [k for k in mo if k.endswith("_sel")]:
+            mo[k] = None
+    m["market"] = True
+    return m
+
+
 class _ReadOnlyLane:
     """A Lane whose save() writes nothing: the market-line pass must never touch a file."""
     def __init__(self, lane):
@@ -1461,16 +1493,10 @@ def market_leans(key, lane, slate, odds, model):
     The model ran with no Onyx prices, so no ledger, trial lane or pick saw these lines; the rows built
     here are leans only, flagged src "market" (the page labels the price "Market line", never Onyx, and
     picks.py never logs one). Game lines only, from the same pricing as Onyx's (game_rows / tennis_rows)."""
-    if _priced(odds) or key not in ("nfl", "tennis", *TEAM_MODELS):
+    if key not in ("nfl", "tennis", *TEAM_MODELS):
         return
-    mkt = lane.load("market.json", None)
-    if not _priced(mkt) or not mkt.get("fallback") or mkt.get("date") != slate.get("date"):
-        return
-    try:
-        age = datetime.now(timezone.utc) - datetime.fromisoformat(mkt["fetched"])
-        if age.total_seconds() > 3 * 3600:
-            return
-    except Exception:
+    mkt = fallback_market(lane, slate, odds)
+    if not mkt:
         return
     try:
         if key == "tennis":
@@ -1571,7 +1597,10 @@ def main():
     data = {"sport": key, "cfg": page_cfg, "date": slate.get("date"), "label": slate.get("label"),
             "season": slate.get("season"), "games": slate.get("games") or [], "events": slate.get("events") or [],
             "next_date": slate.get("next_date"), "next_n": slate.get("next_n"),
-            "odds": odds or {}, "model": model,
+            # 11/5 (Jordan: "no lines on games in the gamecenter"): with Onyx down the page's odds board,
+            # game cards and gamecenter show the fallback market line, flagged market (labelled "Market
+            # line", no bet selections). Only the page gets it: the model, ledgers and cards used `odds`.
+            "odds": odds if _priced(odds) else (_page_market(lane, slate, odds) or odds or {}), "model": model,
             "depth_at": (depth or {}).get("generated") if (depth or {}).get("teams") else None,
             "sit_at": sit_at,
             "generated": datetime.now(timezone.utc).isoformat(timespec="seconds")}
