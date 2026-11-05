@@ -5499,5 +5499,63 @@
   "actual": "19",
   "profit": -1.0,
   "graded_at": "2026-11-05T19:34:35+00:00"
+ },
+ {
+  "id": "tennis-186729-total-over",
+  "sport": "tennis",
+  "gid": "186729",
+  "date": "2026-11-05",
+  "logged_at": "2026-11-05T19:35:27+00:00",
+  "matchup": "Bianca Andreescu vs Luisina Giovannini",
+  "home": "Luisina Giovannini",
+  "away": "Bianca Andreescu",
+  "label": "Over 18.5 games",
+  "kind": "total",
+  "side": "over",
+  "line": 18.5,
+  "price": -120,
+  "chance": 0.6172,
+  "implied": 0.5455,
+  "edge": 0.072,
+  "fair": -160,
+  "state": {
+   "sets": "0-0",
+   "srv": "home",
+   "need": 2
+  },
+  "model": "live-v4",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "tennis-186495-ml-away",
+  "sport": "tennis",
+  "gid": "186495",
+  "date": "2026-11-05",
+  "logged_at": "2026-11-05T20:07:50+00:00",
+  "matchup": "Casper Ruud vs Jan-Lennard Struff",
+  "home": "Jan-Lennard Struff",
+  "away": "Casper Ruud",
+  "label": "Casper Ruud to win",
+  "kind": "ml",
+  "side": "away",
+  "line": null,
+  "price": -210,
+  "chance": 0.7077,
+  "implied": 0.6774,
+  "edge": 0.03,
+  "fair": -240,
+  "state": {
+   "sets": "3-2",
+   "srv": null,
+   "need": 2
+  },
+  "model": "live-v4",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]

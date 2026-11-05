@@ -2444,9 +2444,9 @@
     },
     {
      "id": "186495",
-     "start": "2026-11-05T19:30Z",
-     "state": "pre",
-     "detail": "11/5 - 2:30 PM EST",
+     "start": "2026-11-05T19:50Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 3",
      "draw": "Men's Singles",
      "court": "Court Central",
@@ -2457,8 +2457,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/nor.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        3
+       ],
+       "serve": true
       },
       {
        "name": "Jan-Lennard Struff",
@@ -2466,7 +2468,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ger.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        2
+       ],
        "serve": false
       }
      ]
@@ -6652,9 +6656,9 @@
        "sets": [
         4,
         7,
-        1
+        4
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Carole Monnet",
@@ -6665,9 +6669,9 @@
        "sets": [
         6,
         5,
-        0
+        4
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
@@ -6724,7 +6728,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        0
+        6
        ],
        "serve": false
       },
@@ -6735,17 +6739,17 @@
        "seed": null,
        "win": false,
        "sets": [
-        0
+        1
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
     {
      "id": "186730",
-     "start": "2026-11-05T20:00Z",
+     "start": "2026-11-05T20:20Z",
      "state": "pre",
-     "detail": "11/5 - 3:00 PM EST",
+     "detail": "11/5 - 3:20 PM EST",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Campo 3",
@@ -8134,5 +8138,5 @@
    ]
   }
  ],
- "fetched": "2026-11-05T19:34:11+00:00"
+ "fetched": "2026-11-05T20:07:23+00:00"
 }
