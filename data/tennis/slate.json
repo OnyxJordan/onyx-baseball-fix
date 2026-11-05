@@ -3745,8 +3745,8 @@
     {
      "id": "186640",
      "start": "2026-11-05T06:05Z",
-     "state": "pre",
-     "detail": "11/5 - 1:05 AM EST",
+     "state": "in",
+     "detail": "2nd",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Court 1",
@@ -3757,8 +3757,11 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/rus.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        6,
+        5
+       ],
+       "serve": true
       },
       {
        "name": "Elena Pridankina",
@@ -3766,7 +3769,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/rus.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        7,
+        1
+       ],
        "serve": false
       }
      ]
@@ -3774,8 +3780,8 @@
     {
      "id": "186631",
      "start": "2026-11-05T06:05Z",
-     "state": "pre",
-     "detail": "11/5 - 1:05 AM EST",
+     "state": "in",
+     "detail": "3rd",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Centre Court",
@@ -3786,7 +3792,11 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/cro.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        6,
+        4,
+        2
+       ],
        "serve": false
       },
       {
@@ -3795,16 +3805,20 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/chn.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        3,
+        6,
+        0
+       ],
        "serve": false
       }
      ]
     },
     {
      "id": "186639",
-     "start": "2026-11-05T07:30Z",
+     "start": "2026-11-05T08:10Z",
      "state": "pre",
-     "detail": "11/5 - 2:30 AM EST",
+     "detail": "11/5 - 3:10 AM EST",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Centre Court",
@@ -7986,5 +8000,5 @@
    ]
   }
  ],
- "fetched": "2026-11-05T06:00:32+00:00"
+ "fetched": "2026-11-05T08:02:59+00:00"
 }

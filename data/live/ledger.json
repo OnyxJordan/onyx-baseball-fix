@@ -5116,10 +5116,10 @@
    "f": 0.652
   },
   "model": "live-v2",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "116-117",
+  "profit": -1.0,
+  "graded_at": "2026-11-05T08:03:25+00:00"
  },
  {
   "id": "nba-401909935-spread-home",
@@ -5146,10 +5146,10 @@
    "f": 0.652
   },
   "model": "live-v2",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "116-117",
+  "profit": -1.0,
+  "graded_at": "2026-11-05T08:03:25+00:00"
  },
  {
   "id": "nhl-401892647-spread-away",
@@ -5180,5 +5180,34 @@
   "actual": "2-1",
   "profit": 0.2439,
   "graded_at": "2026-11-05T06:00:57+00:00"
+ },
+ {
+  "id": "tennis-186640-total-under",
+  "sport": "tennis",
+  "gid": "186640",
+  "date": "2026-11-04",
+  "logged_at": "2026-11-05T08:03:24+00:00",
+  "matchup": "Alexandra Shubladze vs Elena Pridankina",
+  "home": "Elena Pridankina",
+  "away": "Alexandra Shubladze",
+  "label": "Under 30.5 games",
+  "kind": "total",
+  "side": "under",
+  "line": 30.5,
+  "price": -175,
+  "chance": 0.6778,
+  "implied": 0.6364,
+  "edge": 0.041,
+  "fair": -210,
+  "state": {
+   "sets": "6-7 5-1",
+   "srv": "away",
+   "need": 2
+  },
+  "model": "live-v2",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
