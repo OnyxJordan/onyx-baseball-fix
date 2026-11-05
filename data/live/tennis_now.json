@@ -1,1 +1,31 @@
-[]
+[
+ {
+  "id": "tennis-186729-total-over",
+  "sport": "tennis",
+  "gid": "186729",
+  "date": "2026-11-05",
+  "logged_at": "2026-11-05T19:35:27+00:00",
+  "matchup": "Bianca Andreescu vs Luisina Giovannini",
+  "home": "Luisina Giovannini",
+  "away": "Bianca Andreescu",
+  "label": "Over 18.5 games",
+  "kind": "total",
+  "side": "over",
+  "line": 18.5,
+  "price": -120,
+  "chance": 0.6172,
+  "implied": 0.5455,
+  "edge": 0.072,
+  "fair": -160,
+  "state": {
+   "sets": "0-0",
+   "srv": "home",
+   "need": 2
+  },
+  "model": "live-v4",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ }
+]
