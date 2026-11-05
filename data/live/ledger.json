@@ -5470,5 +5470,34 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186503-total-over",
+  "sport": "tennis",
+  "gid": "186503",
+  "date": "2026-11-05",
+  "logged_at": "2026-11-05T18:40:41+00:00",
+  "matchup": "Taylor Fritz vs Arthur Fils",
+  "home": "Arthur Fils",
+  "away": "Taylor Fritz",
+  "label": "Over 22.5 games",
+  "kind": "total",
+  "side": "over",
+  "line": 22.5,
+  "price": -120,
+  "chance": 0.6022,
+  "implied": 0.5455,
+  "edge": 0.057,
+  "fair": -150,
+  "state": {
+   "sets": "3-2",
+   "srv": "home",
+   "need": 2
+  },
+  "model": "live-v3",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
