@@ -1494,5 +1494,93 @@
   "model": "v2",
   "result": null,
   "actual": null
+ },
+ {
+  "date": "2026-11-04",
+  "key": "401864533|herschel turner|rush_yds",
+  "gid": "401864533",
+  "pid": "5220671",
+  "name": "Herschel Turner",
+  "team": "NEV",
+  "opp": "UNM",
+  "matchup": "NEV vs UNM",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 41.5,
+  "price": -114,
+  "sel": "6d4cee45-6e92-4309-8255-7176a4a7470c",
+  "proj": 47.9,
+  "prob": 0.6268,
+  "implied": 0.5327,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.53,
+    "avg": 0.77,
+    "pp": -5.7
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.87,
+    "avg": 0.93,
+    "pp": 1.0
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.37,
+    "avg": -0.05,
+    "pp": 0.3
+   }
+  ],
+  "opened_at": "2026-11-05T00:53:10+00:00",
+  "logged_at": "2026-11-05T00:53:10+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-04",
+  "key": "401864533|dominic kelley|rush_yds",
+  "gid": "401864533",
+  "pid": "5265178",
+  "name": "Dominic Kelley",
+  "team": "NEV",
+  "opp": "UNM",
+  "matchup": "NEV vs UNM",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 51.5,
+  "price": -114,
+  "sel": "2cdc8762-d460-4159-8843-8c0f97a7be30",
+  "proj": 53.7,
+  "prob": 0.6254,
+  "implied": 0.5327,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.53,
+    "avg": 0.77,
+    "pp": -5.7
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.87,
+    "avg": 0.93,
+    "pp": 1.0
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.52,
+    "avg": -0.05,
+    "pp": 0.4
+   }
+  ],
+  "opened_at": "2026-11-05T00:53:10+00:00",
+  "logged_at": "2026-11-05T00:53:10+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
  }
 ]
