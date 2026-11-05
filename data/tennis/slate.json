@@ -2411,7 +2411,7 @@
      "id": "186503",
      "start": "2026-11-05T18:15Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 3",
      "draw": "Men's Singles",
      "court": "Court Central",
@@ -2423,6 +2423,7 @@
        "seed": null,
        "win": false,
        "sets": [
+        6,
         3
        ],
        "serve": false
@@ -2434,7 +2435,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        3,
+        1
        ],
        "serve": true
       }
@@ -6649,7 +6651,7 @@
        "win": false,
        "sets": [
         4,
-        2
+        6
        ],
        "serve": false
       },
@@ -6661,9 +6663,9 @@
        "win": false,
        "sets": [
         6,
-        2
+        5
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -6685,9 +6687,9 @@
        "sets": [
         4,
         6,
-        0
+        2
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Julia Riera",
@@ -6698,17 +6700,17 @@
        "sets": [
         6,
         1,
-        0
+        5
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
     {
      "id": "186730",
-     "start": "2026-11-05T18:50Z",
+     "start": "2026-11-05T19:20Z",
      "state": "pre",
-     "detail": "11/5 - 1:50 PM EST",
+     "detail": "11/5 - 2:20 PM EST",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Campo 3",
@@ -6735,9 +6737,9 @@
     },
     {
      "id": "186729",
-     "start": "2026-11-05T19:00Z",
+     "start": "2026-11-05T19:20Z",
      "state": "pre",
-     "detail": "11/5 - 2:00 PM EST",
+     "detail": "11/5 - 2:20 PM EST",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Campo 1",
@@ -8126,5 +8128,5 @@
    ]
   }
  ],
- "fetched": "2026-11-05T18:40:17+00:00"
+ "fetched": "2026-11-05T19:12:20+00:00"
 }
