@@ -570,6 +570,18 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
   - Tennis: ATP and WTA moneyline, game spread, total games. Unpriced matches are
     dropped; on 10/26, 57 of 66 matches were priced.
   - Golf: Onyx prices nothing, so there is no fetch.
+  - **Fallback (11/5, Jordan):** when Onyx prices nothing for a sport (that day at ~10 AM ET the
+    sweeps book `onyx_odds` went silent on OpticOdds in every sport; `onyx_predictions` is Onyx's
+    separate prediction product and prices differently, `odds_probe.yml` job=compare, so it is
+    never used), the same pull runs against DraftKings into `market.json` (`"fallback": true`).
+    `odds.json` stays Onyx-only, so every ledger, trial lane and Onyx Pick sees no prices.
+    `sports_build.market_leans` then prices each game line against `market.json` with the pure
+    `game_rows` / `tennis_rows`, flags the rows `src: "market"` (no selection id), and adds them as
+    leans to the Plays tab, `top.json` and `board.json`. The page and the home Top 10 label those
+    prices "Market line", never Onyx or the book's name, with an "Onyx prices are down" note;
+    `picks.log` refuses `src: "market"`. Ignored when older than 3 hours or from another day.
+    When Onyx answers again, the next run writes an empty `market.json` and the leans go back
+    to Onyx prices.
 
   `tools/onyx_markets_probe.py` (the manual `odds_probe.yml` workflow, `job=probe`)
   reports what the Onyx book prices.

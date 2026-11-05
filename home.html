@@ -468,7 +468,7 @@ async function askGo(q, forced) {
       <div class="t10-w"><b>${esc(label)}</b><span>${esc(p.matchup)}${p.start ? ' · ' + esc(t10When(p.start)) : ''}${R.two ? ' · anytime TD ' + Math.round(100 * p.conf) + '%' : p.edge != null ? ' · edge ' + (p.edge >= 0 ? '+' : '') + (100 * p.edge).toFixed(1) : ''}${!R.two && p.model != null && /td$/.test(p.mkt || '') ? ' · TD model ' + Math.round(100 * p.model) + '%' : ''}</span></div>
       <div class="t10-c"><b>${Math.round(100 * conf)}%</b><small>${R.two ? '2+ TD CHANCE' : 'CONFIDENCE'}</small></div>
       <div class="t10-f"><span class="t10-tag sp">${esc(OnyxAsk.LG[p.sport] || p.sport)}</span>${p.pick ? '<span class="t10-tag pick">Onyx Pick</span>' : '<span class="t10-tag proj">Projection</span>'}
-        <a class="t10-bet" href="${url}" target="_blank" rel="noopener">${R.two ? 'Anytime TD ' : ''}${fmtOdds(p.price)} on Onyx</a>${save}</div></div>`;
+        <a class="t10-bet" href="${url}" target="_blank" rel="noopener">${R.two ? 'Anytime TD ' : ''}${fmtOdds(p.price)} ${p.src === 'market' ? 'market line' : 'on Onyx'}</a>${save}</div></div>`;
   }).join('');
   // a round robin: every combination of the picks as its own ticket, $1 each
   const rr = R.rr ? `<div class="ask-pl"><div><b>Round robin by ${R.rr.by}s · ${R.rr.combos.length} tickets</b><br>
@@ -597,7 +597,7 @@ async function top10() {
       <div class="t10-w"><b>${esc(p.label)}</b><span>${esc(p.matchup)}${p.start ? ' · ' + esc(t10When(p.start)) : ''}</span></div>
       <div class="t10-c"><b>${Math.round(100 * p.conf)}%</b><small>TO HIT</small></div>
       <div class="t10-f"><a class="t10-tag sp" href="${p.href}">${esc(p.lg)}</a>${p.pick ? '<a class="t10-tag pick" href="picks.html">Onyx Pick</a>' : '<span class="t10-tag proj">Projection</span>'}<span class="t10-tag val" title="Expected profit per $100 at this Onyx price">+$${Math.round(100 * EV(p))} value</span>
-        <span class="t10-act"><a class="t10-bet" href="${url}" target="_blank" rel="noopener" onclick="track('top10_bet',{sport:'${p.sport}',rank:${i + 1}})">${fmtOdds(p.price)} on Onyx</a>${window.OnyxSaved ? OnyxSaved.btn(Object.assign({id: p.sel}, p)) : ''}</span></div></div>`;
+        <span class="t10-act"><a class="t10-bet" href="${url}" target="_blank" rel="noopener" onclick="track('top10_bet',{sport:'${p.sport}',rank:${i + 1}})">${fmtOdds(p.price)} ${p.src === 'market' ? 'market line' : 'on Onyx'}</a>${window.OnyxSaved ? OnyxSaved.btn(Object.assign({id: p.sel}, p)) : ''}</span></div></div>`;
   }).join('');
   document.getElementById('t10Note').textContent = 'To hit is the chance the play wins by that sport\'s model, blended with the Onyx market. Value is the expected profit per $100 at that price over the long run. "Onyx Pick" plays are our picks: a market that beat Onyx\'s real prices on games its model never saw, logged once at its Onyx price before the start and graded on the Onyx Picks record. "Projection" plays are the model\'s read in a market that has not passed that test: shown, never graded, not picks.';
 }

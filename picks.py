@@ -173,6 +173,8 @@ def log(sport, plays, now=None, mark_only=False):
             continue
         if mark_only or (sport, e.get("mkt")) not in fin:
             continue
+        if e.get("src") == "market":
+            continue          # 11/5: a lean priced off the fallback market line is never an Onyx Pick
         st = _when(e.get("start"))
         if not st or st <= now or e.get("price") is None or e.get("conf") is None:
             continue          # logged only before the start, at a real price

@@ -105,6 +105,9 @@ def match_tennis(fx, events):
     return None
 
 
+MARKET_BOOK = "draftkings"   # the fallback when Onyx prices nothing (never named on the site)
+
+
 def main():
     key = (sys.argv[1:] or ["nfl"])[0]
     if key not in MARKETS:
@@ -154,128 +157,146 @@ def main():
         print(f"{key} odds: no upcoming fixtures")
         return 0
 
-    out = {"date": slate.get("date"), "fetched": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-           "book": book, "games": {}, "props": [], "matches": {}, "next_props": []}
-    targets = {}
-    for fid, (lg, f) in fixtures.items():
-        if key == "tennis":
-            m = match_tennis(f, slate.get("events") or [])
-            if m:
-                targets[fid] = (lg, ("match", m))
-        else:
-            g, a, h = match_game(f, slate.get("games") or [])
-            if g and g.get("state") != "post":
-                targets[fid] = (lg, ("game", g, a, h))
-            elif slate.get("next_games"):
-                g, a, h = match_game(f, slate["next_games"])
-                if g:
-                    targets[fid] = (lg, ("next", g, a, h))
-    mk = "".join(f"&market={urllib.parse.quote(m)}" for m in list(spec["game"]) + list(spec["props"]) + list(spec["yes"]) + list(spec.get("extra", ())))
-    by_league = {}
-    for fid, (lg, t) in targets.items():
-        by_league.setdefault(lg, []).append(fid)
-    for lg, fids in by_league.items():
-        for i in range(0, len(fids), 5):
-            q = "".join(f"&fixture_id={urllib.parse.quote(f)}" for f in fids[i:i + 5])
-            r = get(f"{OPTIC}/fixtures/odds?sport={sport}&league={lg}&sportsbook={urllib.parse.quote(book)}"
-                    f"&odds_format=AMERICAN{q}{mk}") or {}
-            for row in r.get("data") or []:
-                t = targets.get(row.get("id"))
-                if not t:
-                    continue
-                kind = t[1]
-                if kind[0] == "match":
-                    m = kind[1]
-                    if os.environ.get("ODDS_DEBUG") and not out["matches"]:
-                        print("  debug tennis row:", json.dumps((row.get("odds") or [])[:3])[:900])
-                    names = [_norm(p.get("name")).split(" ")[-1] for p in m["p"]]
-                    mo = out["matches"].setdefault(m["id"], {"p": [p["name"] for p in m["p"]]})
+    def pull(book):
+        out = {"date": slate.get("date"), "fetched": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+               "book": book, "games": {}, "props": [], "matches": {}, "next_props": []}
+        targets = {}
+        for fid, (lg, f) in fixtures.items():
+            if key == "tennis":
+                m = match_tennis(f, slate.get("events") or [])
+                if m:
+                    targets[fid] = (lg, ("match", m))
+            else:
+                g, a, h = match_game(f, slate.get("games") or [])
+                if g and g.get("state") != "post":
+                    targets[fid] = (lg, ("game", g, a, h))
+                elif slate.get("next_games"):
+                    g, a, h = match_game(f, slate["next_games"])
+                    if g:
+                        targets[fid] = (lg, ("next", g, a, h))
+        mk = "".join(f"&market={urllib.parse.quote(m)}" for m in list(spec["game"]) + list(spec["props"]) + list(spec["yes"]) + list(spec.get("extra", ())))
+        by_league = {}
+        for fid, (lg, t) in targets.items():
+            by_league.setdefault(lg, []).append(fid)
+        for lg, fids in by_league.items():
+            for i in range(0, len(fids), 5):
+                q = "".join(f"&fixture_id={urllib.parse.quote(f)}" for f in fids[i:i + 5])
+                r = get(f"{OPTIC}/fixtures/odds?sport={sport}&league={lg}&sportsbook={urllib.parse.quote(book)}"
+                        f"&odds_format=AMERICAN{q}{mk}") or {}
+                for row in r.get("data") or []:
+                    t = targets.get(row.get("id"))
+                    if not t:
+                        continue
+                    kind = t[1]
+                    if kind[0] == "match":
+                        m = kind[1]
+                        if os.environ.get("ODDS_DEBUG") and not out["matches"]:
+                            print("  debug tennis row:", json.dumps((row.get("odds") or [])[:3])[:900])
+                        names = [_norm(p.get("name")).split(" ")[-1] for p in m["p"]]
+                        mo = out["matches"].setdefault(m["id"], {"p": [p["name"] for p in m["p"]]})
+                        for od in row.get("odds") or []:
+                            price = american(od.get("price"))
+                            if price is None or not od.get("is_main"):
+                                continue
+                            mid, who = od.get("market_id"), _norm(od.get("selection") or od.get("name")).split(" ")
+                            idx = next((j for j, n in enumerate(names) if n and n in who), None)
+                            if mid == "moneyline" and idx is not None:
+                                mo[f"ml{idx}"], mo[f"ml{idx}_sel"] = price, _sel(od)
+                            elif mid in TOTAL and od.get("points") is not None:
+                                side = str(od.get("selection_line") or "").lower()
+                                if side in ("over", "under"):
+                                    mo["total"] = float(od["points"])
+                                    mo[side], mo[side + "_sel"] = price, _sel(od)
+                            elif mid in SPREAD and idx is not None and od.get("points") is not None:
+                                mo[f"sp{idx}"], mo[f"sp{idx}_price"], mo[f"sp{idx}_sel"] = float(od["points"]), price, _sel(od)
+                        continue
+                    g, a_name, h_name = kind[1], kind[2], kind[3]
+                    if kind[0] == "next":
+                        # next week's game: its two-sided player lines only, kept apart from this
+                        # week's props (they are keyed by name), for the opening-price capture
+                        nxt = {}
+                        for od in row.get("odds") or []:
+                            price, mid = american(od.get("price")), od.get("market_id")
+                            sel, side = od.get("selection") or od.get("name") or "", str(od.get("selection_line") or "").lower()
+                            if (price is None or mid not in spec["props"] or not od.get("is_main") or side not in ("over", "under")
+                                    or od.get("points") is None or not sel):
+                                continue
+                            e = nxt.setdefault((sel, mid), {"name": sel, "mkt": spec["props"][mid], "line": float(od["points"]),
+                                                            "gid": g["gid"], "over": None, "under": None})
+                            if float(od["points"]) == e["line"]:
+                                e[side], e[side + "_sel"] = price, _sel(od)
+                        out["next_props"] += [e for e in nxt.values() if e["over"] is not None and e["under"] is not None]
+                        continue
+                    gl = out["games"].setdefault(g["gid"], {})
+                    props = {}
                     for od in row.get("odds") or []:
                         price = american(od.get("price"))
-                        if price is None or not od.get("is_main"):
+                        if price is None:
                             continue
-                        mid, who = od.get("market_id"), _norm(od.get("selection") or od.get("name")).split(" ")
-                        idx = next((j for j, n in enumerate(names) if n and n in who), None)
-                        if mid == "moneyline" and idx is not None:
-                            mo[f"ml{idx}"], mo[f"ml{idx}_sel"] = price, _sel(od)
-                        elif mid in TOTAL and od.get("points") is not None:
-                            side = str(od.get("selection_line") or "").lower()
-                            if side in ("over", "under"):
-                                mo["total"] = float(od["points"])
-                                mo[side], mo[side + "_sel"] = price, _sel(od)
-                        elif mid in SPREAD and idx is not None and od.get("points") is not None:
-                            mo[f"sp{idx}"], mo[f"sp{idx}_price"], mo[f"sp{idx}_sel"] = float(od["points"]), price, _sel(od)
-                    continue
-                g, a_name, h_name = kind[1], kind[2], kind[3]
-                if kind[0] == "next":
-                    # next week's game: its two-sided player lines only, kept apart from this
-                    # week's props (they are keyed by name), for the opening-price capture
-                    nxt = {}
-                    for od in row.get("odds") or []:
-                        price, mid = american(od.get("price")), od.get("market_id")
-                        sel, side = od.get("selection") or od.get("name") or "", str(od.get("selection_line") or "").lower()
-                        if (price is None or mid not in spec["props"] or not od.get("is_main") or side not in ("over", "under")
-                                or od.get("points") is None or not sel):
+                        mid = od.get("market_id")
+                        sel = od.get("selection") or od.get("name") or ""
+                        side = str(od.get("selection_line") or "").lower()
+                        if mid == "player_touchdowns" and side == "over" and od.get("points") is not None and float(od["points"]) == 1.5 and sel:
+                            # 2+ touchdowns (11/1): Onyx's over 1.5 on a player's touchdowns, not its main (0.5) line
+                            out["props"].append({"name": sel, "mkt": "two_td", "line": 1.5, "over": price, "over_sel": _sel(od),
+                                                 "under": None, "under_sel": None, "gid": g["gid"]})
                             continue
-                        e = nxt.setdefault((sel, mid), {"name": sel, "mkt": spec["props"][mid], "line": float(od["points"]),
-                                                        "gid": g["gid"], "over": None, "under": None})
-                        if float(od["points"]) == e["line"]:
+                        if mid in spec["yes"] and od.get("is_main"):
+                            who = od.get("selection") or od.get("selection_line") or od.get("name")
+                            if who:
+                                out["props"].append({"name": who, "mkt": spec["yes"][mid], "line": 0.5, "over": price,
+                                                     "over_sel": _sel(od), "under": None, "under_sel": None, "gid": g["gid"]})
+                            continue
+                        if mid in spec["props"]:
+                            if not od.get("is_main") or side not in ("over", "under") or od.get("points") is None or not sel:
+                                continue
+                            e = props.setdefault((sel, mid), {"name": sel, "mkt": spec["props"][mid], "line": float(od["points"]),
+                                                              "gid": g["gid"], "over": None, "under": None})
+                            if float(od["points"]) != e["line"]:
+                                continue
                             e[side], e[side + "_sel"] = price, _sel(od)
-                    out["next_props"] += [e for e in nxt.values() if e["over"] is not None and e["under"] is not None]
-                    continue
-                gl = out["games"].setdefault(g["gid"], {})
-                props = {}
-                for od in row.get("odds") or []:
-                    price = american(od.get("price"))
-                    if price is None:
-                        continue
-                    mid = od.get("market_id")
-                    sel = od.get("selection") or od.get("name") or ""
-                    side = str(od.get("selection_line") or "").lower()
-                    if mid == "player_touchdowns" and side == "over" and od.get("points") is not None and float(od["points"]) == 1.5 and sel:
-                        # 2+ touchdowns (11/1): Onyx's over 1.5 on a player's touchdowns, not its main (0.5) line
-                        out["props"].append({"name": sel, "mkt": "two_td", "line": 1.5, "over": price, "over_sel": _sel(od),
-                                             "under": None, "under_sel": None, "gid": g["gid"]})
-                        continue
-                    if mid in spec["yes"] and od.get("is_main"):
-                        who = od.get("selection") or od.get("selection_line") or od.get("name")
-                        if who:
-                            out["props"].append({"name": who, "mkt": spec["yes"][mid], "line": 0.5, "over": price,
-                                                 "over_sel": _sel(od), "under": None, "under_sel": None, "gid": g["gid"]})
-                        continue
-                    if mid in spec["props"]:
-                        if not od.get("is_main") or side not in ("over", "under") or od.get("points") is None or not sel:
                             continue
-                        e = props.setdefault((sel, mid), {"name": sel, "mkt": spec["props"][mid], "line": float(od["points"]),
-                                                          "gid": g["gid"], "over": None, "under": None})
-                        if float(od["points"]) != e["line"]:
+                        if not od.get("is_main"):
                             continue
-                        e[side], e[side + "_sel"] = price, _sel(od)
-                        continue
-                    if not od.get("is_main"):
-                        continue
-                    is_home = _norm(sel) == _norm(h_name) or (team_match(sel, g, "home") and not team_match(sel, g, "away"))
-                    is_away = _norm(sel) == _norm(a_name) or (team_match(sel, g, "away") and not team_match(sel, g, "home"))
-                    if mid == "moneyline":
-                        if is_home:
-                            gl["home_ml"], gl["home_ml_sel"] = price, _sel(od)
-                        elif is_away:
-                            gl["away_ml"], gl["away_ml_sel"] = price, _sel(od)
-                    elif mid in SPREAD and od.get("points") is not None:
-                        if is_home:
-                            gl["home_spread"], gl["home_spread_price"], gl["home_spread_sel"] = float(od["points"]), price, _sel(od)
-                        elif is_away:
-                            gl["away_spread"], gl["away_spread_price"], gl["away_spread_sel"] = float(od["points"]), price, _sel(od)
-                    elif mid in TOTAL and od.get("points") is not None and side in ("over", "under"):
-                        gl["total"] = float(od["points"])
-                        gl[side + "_price"], gl[side + "_sel"] = price, _sel(od)
-                out["props"] += [e for e in props.values() if e["over"] is not None or e["under"] is not None]
-    out["games"] = {k: v for k, v in out["games"].items() if v}
-    out["matches"] = {k: v for k, v in out["matches"].items() if len(v) > 1}   # drop matches Onyx has not priced
-    lane.save("odds.json", out, indent=None)
-    print(f"{key} odds: book '{book}' · {len(fixtures)} fixtures, {len(targets)} matched to the slate · "
-          f"{len(out['games'])} games with lines, {len(out['props'])} player lines, {len(out['matches'])} matches"
-          + (f", {len(out['next_props'])} next-week player lines" if out["next_props"] else ""))
+                        is_home = _norm(sel) == _norm(h_name) or (team_match(sel, g, "home") and not team_match(sel, g, "away"))
+                        is_away = _norm(sel) == _norm(a_name) or (team_match(sel, g, "away") and not team_match(sel, g, "home"))
+                        if mid == "moneyline":
+                            if is_home:
+                                gl["home_ml"], gl["home_ml_sel"] = price, _sel(od)
+                            elif is_away:
+                                gl["away_ml"], gl["away_ml_sel"] = price, _sel(od)
+                        elif mid in SPREAD and od.get("points") is not None:
+                            if is_home:
+                                gl["home_spread"], gl["home_spread_price"], gl["home_spread_sel"] = float(od["points"]), price, _sel(od)
+                            elif is_away:
+                                gl["away_spread"], gl["away_spread_price"], gl["away_spread_sel"] = float(od["points"]), price, _sel(od)
+                        elif mid in TOTAL and od.get("points") is not None and side in ("over", "under"):
+                            gl["total"] = float(od["points"])
+                            gl[side + "_price"], gl[side + "_sel"] = price, _sel(od)
+                    out["props"] += [e for e in props.values() if e["over"] is not None or e["under"] is not None]
+        out["games"] = {k: v for k, v in out["games"].items() if v}
+        out["matches"] = {k: v for k, v in out["matches"].items() if len(v) > 1}   # drop matches Onyx has not priced
+        return out
+
+    def report(out, book, file):
+        print(f"{key} odds: book '{book}' -> {file} · {len(fixtures)} fixtures · "
+              f"{len(out['games'])} games with lines, {len(out['props'])} player lines, {len(out['matches'])} matches"
+              + (f", {len(out['next_props'])} next-week player lines" if out["next_props"] else ""))
+
+    out = pull(book)
+    lane.save("odds.json", out, indent=None)       # Onyx prices only, even when empty: the ledgers and picks read this file
+    report(out, book, "odds.json")
+    # 11/5 (Jordan): when Onyx's feed has an issue (at 10 AM ET that day it went silent in every sport),
+    # fall back to DraftKings lines so every game still gets a lean. They go to market.json, never
+    # odds.json: sports_build prices leans from them, labelled "Market line" on the page, and nothing
+    # priced from them is ever tracked, logged or graded.
+    if not (out["games"] or out["props"] or out["matches"]):
+        mk_out = pull(MARKET_BOOK)
+        mk_out["fallback"] = True
+        lane.save("market.json", mk_out, indent=None)
+        report(mk_out, MARKET_BOOK, "market.json (fallback)")
+    elif lane.load("market.json", None) is not None:
+        lane.save("market.json", {"date": out["date"], "fetched": out["fetched"], "fallback": False, "games": {}, "props": [], "matches": {}}, indent=None)
     return 0
 
 
