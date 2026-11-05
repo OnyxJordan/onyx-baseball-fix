@@ -5441,5 +5441,34 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186727-spread-away",
+  "sport": "tennis",
+  "gid": "186727",
+  "date": "2026-11-05",
+  "logged_at": "2026-11-05T18:08:23+00:00",
+  "matchup": "Renata Zarazua vs Julia Riera",
+  "home": "Julia Riera",
+  "away": "Renata Zarazua",
+  "label": "Renata Zarazua +4.5 games",
+  "kind": "spread",
+  "side": "away",
+  "line": 4.5,
+  "price": -140,
+  "chance": 0.6377,
+  "implied": 0.5833,
+  "edge": 0.054,
+  "fair": -175,
+  "state": {
+   "sets": "4-6 0-0",
+   "srv": "home",
+   "need": 2
+  },
+  "model": "live-v3",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]

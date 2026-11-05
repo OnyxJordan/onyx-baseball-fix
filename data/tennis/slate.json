@@ -2409,9 +2409,9 @@
     },
     {
      "id": "186503",
-     "start": "2026-11-05T18:00Z",
+     "start": "2026-11-05T18:10Z",
      "state": "pre",
-     "detail": "11/5 - 1:00 PM EST",
+     "detail": "11/5 - 1:10 PM EST",
      "round": "Round 3",
      "draw": "Men's Singles",
      "court": "Court Central",
@@ -6644,7 +6644,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        4
        ],
        "serve": false
       },
@@ -6655,9 +6655,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        4
+        6
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -6665,7 +6665,7 @@
      "id": "186727",
      "start": "2026-11-05T17:05Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Campo 1",
@@ -6677,7 +6677,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        4
+        4,
+        0
        ],
        "serve": false
       },
@@ -6688,9 +6689,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        1
+        6,
+        0
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
@@ -8116,5 +8118,5 @@
    ]
   }
  ],
- "fetched": "2026-11-05T17:35:41+00:00"
+ "fetched": "2026-11-05T18:07:53+00:00"
 }
