@@ -5354,5 +5354,34 @@
   "actual": "21",
   "profit": 0.8,
   "graded_at": "2026-11-05T14:11:12+00:00"
+ },
+ {
+  "id": "tennis-186499-spread-away",
+  "sport": "tennis",
+  "gid": "186499",
+  "date": "2026-11-05",
+  "logged_at": "2026-11-05T16:01:36+00:00",
+  "matchup": "Luca Van Assche vs Lorenzo Musetti",
+  "home": "Lorenzo Musetti",
+  "away": "Luca Van Assche",
+  "label": "Luca Van Assche +2.5 games",
+  "kind": "spread",
+  "side": "away",
+  "line": 2.5,
+  "price": -120,
+  "chance": 0.6087,
+  "implied": 0.5455,
+  "edge": 0.063,
+  "fair": -155,
+  "state": {
+   "sets": "7-5 2-4",
+   "srv": "away",
+   "need": 2
+  },
+  "model": "live-v2",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
