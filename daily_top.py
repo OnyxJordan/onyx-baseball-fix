@@ -76,7 +76,9 @@ def entry(sport, r, tag="lean", start=None):
             "kind": r.get("kind") or "prop", "mkt": r.get("mkt") or r.get("stat") or r.get("kind"), "side": r.get("side"),
             "line": r.get("line"), "hcap": _hcap(r), "name": r.get("name"), "team": r.get("team"),
             # the one-line reason the sport page's "Best plays today" shows (live.js spotHTML), from the model's own inputs
-            "why": why(r)}
+            "why": why(r),
+            # 11/5: priced off the fallback market line (Onyx priced nothing): a lean, labelled "Market line"
+            **({"src": "market"} if r.get("src") == "market" else {})}
 
 
 def why(r):

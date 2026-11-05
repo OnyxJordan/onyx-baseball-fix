@@ -2029,7 +2029,7 @@ function playCards(rows) {
   return `<div class="pk-grid">${rows.map(r => `<div class="pk${r.projected ? ' lean' : ''}">${r.trial ? '<span class="pk-badge" style="color:#61e970;border-color:rgba(97,233,112,.5)">On trial · graded at the open</span>' : r.projected ? '<span class="pk-badge">Lean · not tracked</span>' : ''}
     <div class="pk-top"><span>${esc(MKT_NAME[r.mkt] || r.mkt)}</span><span>${esc(r.matchup || '')}</span></div>
     <div class="pk-main">${r.hs ? `<img class="lg m" style="border-radius:50%" src="${esc(r.hs)}" alt="" loading="lazy">` : ''}<b>${esc(pickLabel(r))}</b></div>
-    <div class="pk-nums"><div><span>Onyx</span><b>${fmtOdds(r.price)}</b></div><div><span>${r.projected ? 'Confidence' : 'Win chance'}</span><b>${pct(r.prob)}</b></div>
+    <div class="pk-nums"><div><span>${r.src === 'market' ? 'Market line' : 'Onyx'}</span><b>${fmtOdds(r.price)}</b></div><div><span>${r.projected ? 'Confidence' : 'Win chance'}</span><b>${pct(r.prob)}</b></div>
       <div><span>Implied</span><b>${pct(r.implied)}</b></div><div><span>Edge</span><b class="edge-pos">${r.edge != null ? '+' + (r.edge * 100).toFixed(1) + 'pp' : '-'}</b></div>
       ${r.proj != null ? `<div><span>Projection</span><b>${num(r.proj)}</b></div>` : ''}</div>
     ${whyLine(r)}
@@ -2086,7 +2086,7 @@ function gameLeanTable(rows, inGame) {
       <div class="pl-who"><div class="pl-nm"><b class="${r.edge > 0 ? 'lean-o' : ''}">${esc(pickLabel(r))}</b><span>${esc(r.detail || '')}</span></div>
         <div class="pl-pj"><b>${pct(r.prob, 0)}</b><span>confidence</span></div></div>
       <div class="pl-ev"><span>Model <b>${pct(r.model_p, 1)}</b></span><span>Edge <b class="${r.edge > 0 ? 'edge-pos' : 'edge-neg'}">${r.edge != null ? (r.edge > 0 ? '+' : '') + (r.edge * 100).toFixed(1) + 'pp' : '-'}</b></span>
-        <span class="pl-ln" onclick="event.stopPropagation()">${r.price != null ? chip(r.price, pickLabel(r), r.sel, 'Onyx') : '<span class="dim">no line</span>'}</span></div>
+        <span class="pl-ln" onclick="event.stopPropagation()">${r.price != null ? chip(r.price, pickLabel(r), r.sel, r.src === 'market' ? 'Market line' : 'Onyx') : '<span class="dim">no line</span>'}</span></div>
     </div>`).join('')}</div>`;
 }
 function renderPlays() {
@@ -2105,12 +2105,13 @@ function renderPlays() {
   const picked = new Set(picks.map(k => k.sel));
   const leans = proj.filter(k => !picked.has(k.sel));
   const leanHdr = (t, n) => `<div class="sec-hdr"><span class="sec-title">${t}</span><span class="sec-count">${n}</span></div>`;
-  const pickHtml = M.status === 'live'
+  const mktNote = M.market ? `<div class="lab" style="margin-bottom:10px"><div class="eb">Onyx prices are down</div><p>Onyx's price feed is not answering right now, so these leans are priced against the market line until it returns. Leans only: nothing priced off the market line is tracked or graded. Check the price in the Onyx app before you bet.</p></div>` : '';
+  const pickHtml = mktNote + (M.status === 'live'
     ? leanHdr('Tracked picks · graded', picks.length) + (picks.length ? playCards(picks) : '<div class="empty">No play clears the tracked screens on this slate. The best other plays are below.</div>')
       + (leans.length ? leanHdr('More plays · model leans, not graded', leans.length) + playCards(leans) : '')
     : leanHdr("Today's plays · best first", proj.length)
       + `<p class="dim" style="font-size:12px;line-height:1.6;margin:0 0 10px">Where the model's chance beats Onyx's price, best value first, two per game at most. Confidence is the model's chance the play wins. ${M.status === 'trial' ? 'Plays marked On trial are graded in public at the opening price; the rest are leans, not graded.' : `Model leans: not graded until the ${esc(C.name)} model beats Onyx's prices in a backtest.`}</p>`
-      + (proj.length ? playCards(proj) : '<div class="empty">No line on this slate beats the Onyx price right now. Plays appear as Onyx posts lines.</div>');
+      + (proj.length ? playCards(proj) : '<div class="empty">No line on this slate beats the Onyx price right now. Plays appear as Onyx posts lines.</div>'));
   const rows = M.rows || [];
   const gameRows = rows.filter(r => r.kind), propRows = rows.filter(r => !r.kind);
   let body = (M.td || []).length ? tdTable(M.td.slice(0, 60), 'Touchdown scorers · anytime and first TD') : '';
