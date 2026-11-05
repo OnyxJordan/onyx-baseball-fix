@@ -3646,10 +3646,10 @@
    "f": 0.869
   },
   "model": "live-v2",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "7-35",
+  "profit": 0.9009,
+  "graded_at": "2026-11-05T04:22:27+00:00"
  },
  {
   "id": "nba-401909922-spread-away",
@@ -4186,10 +4186,10 @@
    "f": 0.55
   },
   "model": "live-v2",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "42",
+  "profit": -1.0,
+  "graded_at": "2026-11-05T04:22:27+00:00"
  },
  {
   "id": "nba-401909922-ml-away",
@@ -4336,10 +4336,10 @@
    "f": 0.5
   },
   "model": "live-v2",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "233",
+  "profit": -1.0,
+  "graded_at": "2026-11-05T04:22:27+00:00"
  },
  {
   "id": "nba-401909929-spread-home",
@@ -4666,10 +4666,10 @@
    "f": 0.532
   },
   "model": "live-v2",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "154",
+  "profit": 0.8333,
+  "graded_at": "2026-11-05T04:22:27+00:00"
  },
  {
   "id": "nba-401909928-spread-away",
@@ -4696,10 +4696,10 @@
    "f": 0.153
   },
   "model": "live-v2",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "120-113",
+  "profit": -1.0,
+  "graded_at": "2026-11-05T04:22:27+00:00"
  },
  {
   "id": "nba-401909930-total-under",
@@ -4726,10 +4726,10 @@
    "f": 0.328
   },
   "model": "live-v2",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "224",
+  "profit": -1.0,
+  "graded_at": "2026-11-05T04:22:28+00:00"
  },
  {
   "id": "nba-401909932-total-over",
@@ -5054,6 +5054,96 @@
    "period": 1,
    "clock": "0:00",
    "f": 0.5
+  },
+  "model": "live-v2",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "nba-401909934-total-over",
+  "sport": "nba",
+  "gid": "401909934",
+  "date": "2026-11-04",
+  "logged_at": "2026-11-05T04:22:24+00:00",
+  "matchup": "LAL @ SAC",
+  "home": "SAC",
+  "away": "LAL",
+  "label": "Over 227.5",
+  "kind": "total",
+  "side": "over",
+  "line": 227.5,
+  "price": -115,
+  "chance": 0.6052,
+  "implied": 0.5349,
+  "edge": 0.07,
+  "fair": -155,
+  "state": {
+   "score": "LAL 61 - 54 SAC",
+   "period": 2,
+   "clock": "0.0",
+   "f": 0.5
+  },
+  "model": "live-v2",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "nba-401909935-ml-home",
+  "sport": "nba",
+  "gid": "401909935",
+  "date": "2026-11-04",
+  "logged_at": "2026-11-05T04:22:24+00:00",
+  "matchup": "MIA @ LAC",
+  "home": "LAC",
+  "away": "MIA",
+  "label": "LAC to win",
+  "kind": "ml",
+  "side": "home",
+  "line": null,
+  "price": -150,
+  "chance": 0.6627,
+  "implied": 0.6,
+  "edge": 0.063,
+  "fair": -195,
+  "state": {
+   "score": "MIA 35 - 45 LAC",
+   "period": 2,
+   "clock": "7:17",
+   "f": 0.652
+  },
+  "model": "live-v2",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "nba-401909935-spread-home",
+  "sport": "nba",
+  "gid": "401909935",
+  "date": "2026-11-04",
+  "logged_at": "2026-11-05T04:22:24+00:00",
+  "matchup": "MIA @ LAC",
+  "home": "LAC",
+  "away": "MIA",
+  "label": "LAC -2.5",
+  "kind": "spread",
+  "side": "home",
+  "line": -2.5,
+  "price": -120,
+  "chance": 0.594,
+  "implied": 0.5455,
+  "edge": 0.049,
+  "fair": -145,
+  "state": {
+   "score": "MIA 35 - 45 LAC",
+   "period": 2,
+   "clock": "7:17",
+   "f": 0.652
   },
   "model": "live-v2",
   "result": null,
