@@ -11,161 +11,499 @@
    "name": "World Wide Technology Championship",
    "start": "2026-11-05T05:00Z",
    "end": "2026-11-08T05:00Z",
-   "state": "pre",
+   "state": "in",
    "detail": null,
-   "round": 0,
+   "round": 1,
    "venue": null,
    "board": [
     {
      "pos": 1,
-     "name": "Brice Garnett",
-     "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
-     "to_par": "E",
-     "rounds": [],
-     "id": "2283"
-    },
-    {
-     "pos": 2,
-     "name": "Ben Martin",
-     "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
-     "to_par": "E",
-     "rounds": [],
-     "id": "4638"
-    },
-    {
-     "pos": 3,
      "name": "Peter Malnati",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
-     "to_par": "E",
-     "rounds": [],
+     "to_par": "-2",
+     "rounds": [
+      {
+       "s": 6.0,
+       "d": "-2",
+       "h": [
+        [
+         1,
+         3,
+         "-2"
+        ],
+        [
+         2,
+         3,
+         "E"
+        ]
+       ],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 1.0
+      }
+     ],
      "id": "5692"
     },
     {
-     "pos": 4,
-     "name": "Joel Dahmen",
-     "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
-     "to_par": "E",
-     "rounds": [],
-     "id": "6196"
-    },
-    {
-     "pos": 5,
-     "name": "Justin Lower",
-     "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
-     "to_par": "E",
-     "rounds": [],
-     "id": "9144"
-    },
-    {
-     "pos": 6,
-     "name": "Chad Ramey",
-     "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
-     "to_par": "E",
-     "rounds": [],
-     "id": "10057"
-    },
-    {
-     "pos": 7,
-     "name": "Kevin Streelman",
-     "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
-     "to_par": "E",
-     "rounds": [],
-     "id": "1077"
-    },
-    {
-     "pos": 8,
-     "name": "David Skinns",
-     "flag": "https://a.espncdn.com/i/teamlogos/countries/500/eng.png",
-     "to_par": "E",
-     "rounds": [],
-     "id": "3257"
-    },
-    {
-     "pos": 9,
+     "pos": 2,
      "name": "Matthieu Pavon",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
-     "to_par": "E",
-     "rounds": [],
+     "to_par": "-2",
+     "rounds": [
+      {
+       "s": 6.0,
+       "d": "-2",
+       "h": [
+        [
+         1,
+         4,
+         "-1"
+        ],
+        [
+         2,
+         2,
+         "-1"
+        ]
+       ],
+       "b": 2.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "10596"
     },
     {
-     "pos": 10,
-     "name": "Rico Hoey",
-     "flag": "https://a.espncdn.com/i/teamlogos/countries/500/phi.png",
-     "to_par": "E",
-     "rounds": [],
-     "id": "11385"
-    },
-    {
-     "pos": 11,
-     "name": "Will Gordon",
-     "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
-     "to_par": "E",
-     "rounds": [],
-     "id": "4565482"
-    },
-    {
-     "pos": 12,
+     "pos": 3,
      "name": "Johnny Keefer",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
-     "to_par": "E",
-     "rounds": [],
+     "to_par": "-2",
+     "rounds": [
+      {
+       "s": 6.0,
+       "d": "-2",
+       "h": [
+        [
+         1,
+         3,
+         "-2"
+        ],
+        [
+         2,
+         3,
+         "E"
+        ]
+       ],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 1.0
+      }
+     ],
      "id": "5217048"
     },
     {
-     "pos": 13,
-     "name": "Mark Hubbard",
-     "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
-     "to_par": "E",
-     "rounds": [],
-     "id": "9143"
+     "pos": 4,
+     "name": "David Skinns",
+     "flag": "https://a.espncdn.com/i/teamlogos/countries/500/eng.png",
+     "to_par": "-1",
+     "rounds": [
+      {
+       "s": 6.0,
+       "d": "-1",
+       "h": [
+        [
+         10,
+         3,
+         "-1"
+        ],
+        [
+         11,
+         3,
+         "E"
+        ]
+       ],
+       "b": 1.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
+     "id": "3257"
     },
     {
-     "pos": 14,
-     "name": "Denny McCarthy",
+     "pos": 5,
+     "name": "Will Gordon",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
-     "to_par": "E",
-     "rounds": [],
-     "id": "10054"
+     "to_par": "-1",
+     "rounds": [
+      {
+       "s": 6.0,
+       "d": "-1",
+       "h": [
+        [
+         10,
+         4,
+         "E"
+        ],
+        [
+         11,
+         2,
+         "-1"
+        ]
+       ],
+       "b": 1.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
+     "id": "4565482"
     },
     {
-     "pos": 15,
-     "name": "Max Greyserman",
+     "pos": 6,
+     "name": "Ben Martin",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
-     "to_par": "E",
-     "rounds": [],
-     "id": "11101"
+     "to_par": "-1",
+     "rounds": [
+      {
+       "s": 7.0,
+       "d": "-1",
+       "h": [
+        [
+         1,
+         4,
+         "-1"
+        ],
+        [
+         2,
+         3,
+         "E"
+        ]
+       ],
+       "b": 1.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
+     "id": "4638"
     },
     {
-     "pos": 16,
-     "name": "Max McGreevy",
+     "pos": 7,
+     "name": "Joel Dahmen",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
-     "to_par": "E",
-     "rounds": [],
-     "id": "11383"
+     "to_par": "-1",
+     "rounds": [
+      {
+       "s": 7.0,
+       "d": "-1",
+       "h": [
+        [
+         1,
+         4,
+         "-1"
+        ],
+        [
+         2,
+         3,
+         "E"
+        ]
+       ],
+       "b": 1.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
+     "id": "6196"
     },
     {
-     "pos": 17,
+     "pos": 8,
+     "name": "Rico Hoey",
+     "flag": "https://a.espncdn.com/i/teamlogos/countries/500/phi.png",
+     "to_par": "-1",
+     "rounds": [
+      {
+       "s": 7.0,
+       "d": "-1",
+       "h": [
+        [
+         1,
+         4,
+         "-1"
+        ],
+        [
+         2,
+         3,
+         "E"
+        ]
+       ],
+       "b": 1.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
+     "id": "11385"
+    },
+    {
+     "pos": 9,
      "name": "Nick Dunlap",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
-     "to_par": "E",
-     "rounds": [],
+     "to_par": "-1",
+     "rounds": [
+      {
+       "s": 3.0,
+       "d": "-1",
+       "h": [
+        [
+         10,
+         3,
+         "-1"
+        ]
+       ],
+       "b": 1.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "4832046"
     },
     {
-     "pos": 18,
+     "pos": 10,
+     "name": "Mark Hubbard",
+     "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
+     "to_par": "-1",
+     "rounds": [
+      {
+       "s": 4.0,
+       "d": "-1",
+       "h": [
+        [
+         1,
+         4,
+         "-1"
+        ]
+       ],
+       "b": 1.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
+     "id": "9143"
+    },
+    {
+     "pos": 11,
+     "name": "Denny McCarthy",
+     "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
+     "to_par": "-1",
+     "rounds": [
+      {
+       "s": 4.0,
+       "d": "-1",
+       "h": [
+        [
+         1,
+         4,
+         "-1"
+        ]
+       ],
+       "b": 1.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
+     "id": "10054"
+    },
+    {
+     "pos": 12,
+     "name": "Brice Garnett",
+     "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
+     "to_par": "E",
+     "rounds": [
+      {
+       "s": 11.0,
+       "d": "E",
+       "h": [
+        [
+         10,
+         4,
+         "E"
+        ],
+        [
+         11,
+         3,
+         "E"
+        ],
+        [
+         12,
+         4,
+         "E"
+        ]
+       ],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
+     "id": "2283"
+    },
+    {
+     "pos": 13,
+     "name": "Justin Lower",
+     "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
+     "to_par": "E",
+     "rounds": [
+      {
+       "s": 7.0,
+       "d": "E",
+       "h": [
+        [
+         10,
+         4,
+         "E"
+        ],
+        [
+         11,
+         3,
+         "E"
+        ]
+       ],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
+     "id": "9144"
+    },
+    {
+     "pos": 14,
+     "name": "Chad Ramey",
+     "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
+     "to_par": "E",
+     "rounds": [
+      {
+       "s": 7.0,
+       "d": "E",
+       "h": [
+        [
+         10,
+         4,
+         "E"
+        ],
+        [
+         11,
+         3,
+         "E"
+        ]
+       ],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
+     "id": "10057"
+    },
+    {
+     "pos": 15,
      "name": "Jackson Suber",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 4.0,
+       "d": "E",
+       "h": [
+        [
+         10,
+         4,
+         "E"
+        ]
+       ],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "4982182"
+    },
+    {
+     "pos": 16,
+     "name": "Kevin Streelman",
+     "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
+     "to_par": "+1",
+     "rounds": [
+      {
+       "s": 8.0,
+       "d": "+1",
+       "h": [
+        [
+         10,
+         4,
+         "E"
+        ],
+        [
+         11,
+         4,
+         "+1"
+        ]
+       ],
+       "b": 0.0,
+       "bo": 1.0,
+       "e": 0.0
+      }
+     ],
+     "id": "1077"
+    },
+    {
+     "pos": 17,
+     "name": "Max Greyserman",
+     "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
+     "to_par": "+1",
+     "rounds": [
+      {
+       "s": 5.0,
+       "d": "+1",
+       "h": [
+        [
+         10,
+         5,
+         "+1"
+        ]
+       ],
+       "b": 0.0,
+       "bo": 1.0,
+       "e": 0.0
+      }
+     ],
+     "id": "11101"
+    },
+    {
+     "pos": 18,
+     "name": "Max McGreevy",
+     "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
+     "to_par": "E",
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
+     "id": "11383"
     },
     {
      "pos": 19,
      "name": "Nick Taylor",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/can.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "3792"
     },
     {
@@ -173,7 +511,16 @@
      "name": "Kevin Yu",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/tpe.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "4349547"
     },
     {
@@ -181,7 +528,16 @@
      "name": "Sami Välimäki",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fin.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "4585548"
     },
     {
@@ -189,7 +545,16 @@
      "name": "Ryan Gerard",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "5076021"
     },
     {
@@ -197,7 +562,16 @@
      "name": "William Mouw",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "5076025"
     },
     {
@@ -205,7 +579,16 @@
      "name": "Blades Brown",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "5211425"
     },
     {
@@ -213,7 +596,16 @@
      "name": "Matt Kuchar",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "257"
     },
     {
@@ -221,7 +613,16 @@
      "name": "Tony Finau",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "2230"
     },
     {
@@ -229,7 +630,16 @@
      "name": "Chris Kirk",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "3449"
     },
     {
@@ -237,7 +647,16 @@
      "name": "Keith Mitchell",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "8906"
     },
     {
@@ -245,7 +664,16 @@
      "name": "Harry Hall",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/eng.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "4589438"
     },
     {
@@ -253,7 +681,16 @@
      "name": "Karl Vilips",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/aus.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "5147097"
     },
     {
@@ -261,7 +698,16 @@
      "name": "Rafael Campos",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/pur.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "3683"
     },
     {
@@ -269,7 +715,16 @@
      "name": "Adam Svensson",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/can.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "9127"
     },
     {
@@ -277,7 +732,16 @@
      "name": "Christiaan Bezuidenhout",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/rsa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "9243"
     },
     {
@@ -285,7 +749,16 @@
      "name": "Taylor Pendrith",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/can.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "9658"
     },
     {
@@ -293,7 +766,16 @@
      "name": "Dylan Wu",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "4423323"
     },
     {
@@ -301,7 +783,16 @@
      "name": "Joe Highsmith",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "4868733"
     },
     {
@@ -309,7 +800,16 @@
      "name": "Andrew Putnam",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "5502"
     },
     {
@@ -317,7 +817,16 @@
      "name": "Tom Hoge",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "6086"
     },
     {
@@ -325,7 +834,16 @@
      "name": "Patrick Rodgers",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "6825"
     },
     {
@@ -333,7 +851,16 @@
      "name": "Mackenzie Hughes",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/can.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "6931"
     },
     {
@@ -341,7 +868,16 @@
      "name": "Taylor Montgomery",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "4372851"
     },
     {
@@ -349,7 +885,16 @@
      "name": "Takumi Kanaya",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/jpn.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "4410612"
     },
     {
@@ -357,7 +902,16 @@
      "name": "Willie Mack III",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "4355611"
     },
     {
@@ -365,7 +919,16 @@
      "name": "Alejandro Tosti",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "4358081"
     },
     {
@@ -373,7 +936,16 @@
      "name": "Patrick Fishburn",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "4358083"
     },
     {
@@ -381,7 +953,16 @@
      "name": "Pontus Nyholm",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/swe.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "4375977"
     },
     {
@@ -389,7 +970,16 @@
      "name": "Kensei Hirata",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/jpn.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "5075548"
     },
     {
@@ -397,7 +987,16 @@
      "name": "Alejandro Madariaga",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/mex.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "5325151"
     },
     {
@@ -405,7 +1004,16 @@
      "name": "Nicholas Lindheim",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "6999"
     },
     {
@@ -413,7 +1021,16 @@
      "name": "Paul Peterson",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "9600"
     },
     {
@@ -421,7 +1038,16 @@
      "name": "Jimmy Stanger",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "10990"
     },
     {
@@ -429,7 +1055,16 @@
      "name": "Kristoffer Ventura",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/nor.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "4351896"
     },
     {
@@ -437,7 +1072,16 @@
      "name": "Jeffrey Kang",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "4408318"
     },
     {
@@ -445,7 +1089,16 @@
      "name": "Nicholas Marchese",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/can.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "5348546"
     },
     {
@@ -453,7 +1106,16 @@
      "name": "Marcelo Rozo",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/col.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "7120"
     },
     {
@@ -461,7 +1123,16 @@
      "name": "Hayden Springer",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "10562"
     },
     {
@@ -469,7 +1140,16 @@
      "name": "Jorge Villar",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/mex.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "5075258"
     },
     {
@@ -477,7 +1157,16 @@
      "name": "Adrien Dumont de Chassart",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/bel.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "5076011"
     },
     {
@@ -485,7 +1174,16 @@
      "name": "Davis Chatfield",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "5113338"
     },
     {
@@ -493,7 +1191,16 @@
      "name": "Preston Stout",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "5210226"
     },
     {
@@ -501,7 +1208,16 @@
      "name": "Emiliano Grillo",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "5882"
     },
     {
@@ -509,7 +1225,16 @@
      "name": "Beau Hossler",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "6011"
     },
     {
@@ -517,7 +1242,16 @@
      "name": "Tyler Duncan",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "9569"
     },
     {
@@ -525,7 +1259,16 @@
      "name": "Taylor Moore",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "10664"
     },
     {
@@ -533,7 +1276,16 @@
      "name": "Lee Hodges",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "4404991"
     },
     {
@@ -541,7 +1293,16 @@
      "name": "Sudarshan Yellamaraju",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/can.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "5143175"
     },
     {
@@ -549,7 +1310,16 @@
      "name": "Harry Higgs",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "4844"
     },
     {
@@ -557,7 +1327,16 @@
      "name": "Ben Kohles",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "6922"
     },
     {
@@ -565,7 +1344,16 @@
      "name": "Rasmus Højgaard",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/den.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "11253"
     },
     {
@@ -573,7 +1361,16 @@
      "name": "Hank Lebioda",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "11387"
     },
     {
@@ -581,7 +1378,16 @@
      "name": "Kevin Roy",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "4408320"
     },
     {
@@ -589,7 +1395,16 @@
      "name": "Rasmus Neergaard-Petersen",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/den.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "4858859"
     },
     {
@@ -597,7 +1412,16 @@
      "name": "Patton Kizzire",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "3980"
     },
     {
@@ -605,7 +1429,16 @@
      "name": "John Parry",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/eng.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "4671"
     },
     {
@@ -613,7 +1446,16 @@
      "name": "Séamus Power",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/irl.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "6001"
     },
     {
@@ -621,7 +1463,16 @@
      "name": "Jordan Smith",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/eng.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "9506"
     },
     {
@@ -629,7 +1480,16 @@
      "name": "Zach Bauchou",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "10030"
     },
     {
@@ -637,7 +1497,16 @@
      "name": "Austin Eckroat",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "4425898"
     },
     {
@@ -645,7 +1514,16 @@
      "name": "Lucas Glover",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "676"
     },
     {
@@ -653,7 +1531,16 @@
      "name": "Davis Riley",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "10058"
     },
     {
@@ -661,7 +1548,16 @@
      "name": "Aaron Wise",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "10577"
     },
     {
@@ -669,7 +1565,16 @@
      "name": "Ben Griffin",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "4404992"
     },
     {
@@ -677,7 +1582,16 @@
      "name": "Pierceson Coody",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "4837368"
     },
     {
@@ -685,7 +1599,16 @@
      "name": "Jackson Koivun",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "5215013"
     },
     {
@@ -693,7 +1616,16 @@
      "name": "Billy Horschel",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "1651"
     },
     {
@@ -701,7 +1633,16 @@
      "name": "Stephan Jaeger",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ger.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "6937"
     },
     {
@@ -709,7 +1650,16 @@
      "name": "Cam Davis",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/aus.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "10863"
     },
     {
@@ -717,7 +1667,16 @@
      "name": "Garrick Higgo",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/rsa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "11393"
     },
     {
@@ -725,7 +1684,16 @@
      "name": "Steven Fisk",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "4426182"
     },
     {
@@ -733,7 +1701,16 @@
      "name": "Ben James",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "5077389"
     },
     {
@@ -741,7 +1718,16 @@
      "name": "Camilo Villegas",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/col.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "1264"
     },
     {
@@ -749,7 +1735,16 @@
      "name": "David Lipsky",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "6701"
     },
     {
@@ -757,7 +1752,16 @@
      "name": "Zac Blair",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "9040"
     },
     {
@@ -765,7 +1769,16 @@
      "name": "Erik van Rooyen",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/rsa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "9364"
     },
     {
@@ -773,7 +1786,16 @@
      "name": "Danny Walker",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "4408319"
     },
     {
@@ -781,7 +1803,16 @@
      "name": "Chandler Phillips",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "4587989"
     },
     {
@@ -789,7 +1820,16 @@
      "name": "Ben Silverman",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/can.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "8910"
     },
     {
@@ -797,7 +1837,16 @@
      "name": "Michael Kim",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "8974"
     },
     {
@@ -805,7 +1854,16 @@
      "name": "Vince Whaley",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "4408315"
     },
     {
@@ -813,7 +1871,16 @@
      "name": "David Ford",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "5150294"
     },
     {
@@ -821,7 +1888,16 @@
      "name": "Neal Shipley",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "5209442"
     },
     {
@@ -829,7 +1905,16 @@
      "name": "Lyon Lazare",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "5472448"
     },
     {
@@ -837,7 +1922,16 @@
      "name": "Christo Lamprecht",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/rsa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "11395"
     },
     {
@@ -845,7 +1939,16 @@
      "name": "Isaiah Salinda",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "4589406"
     },
     {
@@ -853,7 +1956,16 @@
      "name": "Tyler Collet",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "4723205"
     },
     {
@@ -861,7 +1973,16 @@
      "name": "Austin Hitt",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "5074950"
     },
     {
@@ -869,7 +1990,16 @@
      "name": "A.J. Ewart",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/can.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "5075652"
     },
     {
@@ -877,7 +2007,16 @@
      "name": "Luke Clanton",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "5215039"
     },
     {
@@ -885,7 +2024,16 @@
      "name": "Zecheng Dou",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/chn.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "8889"
     },
     {
@@ -893,7 +2041,16 @@
      "name": "Haotong Li",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/chn.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "9221"
     },
     {
@@ -901,7 +2058,16 @@
      "name": "Alvaro Ortiz",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/mex.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "10481"
     },
     {
@@ -909,7 +2075,16 @@
      "name": "Marco Penge",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/eng.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "4585549"
     },
     {
@@ -917,7 +2092,16 @@
      "name": "Jesper Svensson",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/swe.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "4699329"
     },
     {
@@ -925,7 +2109,16 @@
      "name": "Muzzy Donohue",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "5369915"
     },
     {
@@ -933,7 +2126,16 @@
      "name": "Trace Crowe",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "11183"
     },
     {
@@ -941,7 +2143,16 @@
      "name": "John VanDerLaan",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "4361934"
     },
     {
@@ -949,7 +2160,16 @@
      "name": "Chandler Blanchet",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "4618114"
     },
     {
@@ -957,7 +2177,16 @@
      "name": "Gordon Sargent",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "5139663"
     },
     {
@@ -965,7 +2194,16 @@
      "name": "Jay Leng",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "5461860"
     },
     {
@@ -973,7 +2211,16 @@
      "name": "Nathan Tseng",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "E",
-     "rounds": [],
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 0.0,
+       "bo": 0.0,
+       "e": 0.0
+      }
+     ],
      "id": "5472447"
     }
    ],
@@ -988,5 +2235,5 @@
    "cut_n": 65
   }
  ],
- "fetched": "2026-11-05T12:08:23+00:00"
+ "fetched": "2026-11-05T14:10:56+00:00"
 }

@@ -950,5 +950,33 @@
   "actual": 63.0,
   "profit": 0.8333,
   "graded_at": "2026-11-05T04:21:18+00:00"
+ },
+ {
+  "id": "nba-20261106DE5BCAFF-q1-q1_total",
+  "sport": "nba",
+  "date": "2026-11-05",
+  "logged_at": "2026-11-05T14:09:49+00:00",
+  "start": "2026-11-06T03:00:00Z",
+  "gid": "20261106DE5BCAFF",
+  "matchup": "MIA @ GS",
+  "label": "MIA @ GS Under 61.5 1st-quarter points",
+  "market": "q1_total",
+  "kind": "prop",
+  "name": "MIA @ GS",
+  "team": "MIA",
+  "who": "q1",
+  "side": "under",
+  "line": 61.5,
+  "hcap": null,
+  "price": -114,
+  "chance": 0.5558,
+  "edge": 0.0231,
+  "ev": 0.0433,
+  "sel": "6575045f-2a2e-43d5-8b83-a472b77139ea",
+  "model": "q1 0.254/12.0",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
