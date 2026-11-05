@@ -85,6 +85,8 @@ LEDGER_RETENTION_DAYS = {
     "picks/ledger": None,
     # live value record, on trial (live_log.py): every live value play, logged once, graded off the final
     "live/ledger": None,
+    # the minute watcher's tennis picks (live_log.py --tennis-now, live_watch.yml), copied into live/ledger
+    "live/tennis_now": None,
 }
 LEDGERS = tuple(LEDGER_RETENTION_DAYS)
 
