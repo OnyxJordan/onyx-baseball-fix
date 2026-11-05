@@ -67,7 +67,7 @@ jobs:
       # browser on its own, and the runner has no pre-installed one
       - name: Install headless browser
         run: |
-          npm install playwright playwright-core --no-save
+          npm install playwright@1.64.1 playwright-core@1.64.1 --no-save   # pinned 11/5: npm shipped playwright 1.65.0 before its playwright-core
           npx playwright install --with-deps chromium
 
       # Same gate a human is told to run before shipping a shell change: walks
