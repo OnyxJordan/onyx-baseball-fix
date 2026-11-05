@@ -5379,10 +5379,10 @@
    "need": 2
   },
   "model": "live-v2",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "15-16",
+  "profit": 0.8333,
+  "graded_at": "2026-11-05T17:36:08+00:00"
  },
  {
   "id": "tennis-186494-total-over",
@@ -5404,6 +5404,35 @@
   "fair": -155,
   "state": {
    "sets": "0-6 1-2",
+   "srv": "home",
+   "need": 2
+  },
+  "model": "live-v3",
+  "result": "L",
+  "actual": "14",
+  "profit": -1.0,
+  "graded_at": "2026-11-05T17:36:08+00:00"
+ },
+ {
+  "id": "tennis-186728-ml-home",
+  "sport": "tennis",
+  "gid": "186728",
+  "date": "2026-11-05",
+  "logged_at": "2026-11-05T17:36:07+00:00",
+  "matchup": "Leyre Romero Gormaz vs Carole Monnet",
+  "home": "Carole Monnet",
+  "away": "Leyre Romero Gormaz",
+  "label": "Carole Monnet to win",
+  "kind": "ml",
+  "side": "home",
+  "line": null,
+  "price": -142,
+  "chance": 0.6176,
+  "implied": 0.5868,
+  "edge": 0.031,
+  "fair": -160,
+  "state": {
+   "sets": "2-4",
    "srv": "home",
    "need": 2
   },
