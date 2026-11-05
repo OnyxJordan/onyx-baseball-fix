@@ -3676,10 +3676,10 @@
    "f": 0.674
   },
   "model": "live-v2",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "106-112",
+  "profit": -1.0,
+  "graded_at": "2026-11-05T03:17:44+00:00"
  },
  {
   "id": "nba-401909923-spread-away",
@@ -3766,10 +3766,10 @@
    "f": 0.867
   },
   "model": "live-v2",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "211",
+  "profit": 0.8333,
+  "graded_at": "2026-11-05T03:17:44+00:00"
  },
  {
   "id": "nba-401909926-spread-home",
@@ -3796,10 +3796,10 @@
    "f": 0.897
   },
   "model": "live-v2",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "135-105",
+  "profit": 0.8333,
+  "graded_at": "2026-11-05T03:17:44+00:00"
  },
  {
   "id": "cbb-401920410-total-under",
@@ -3916,10 +3916,10 @@
    "f": 0.607
   },
   "model": "live-v2",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "109-102",
+  "profit": -1.0,
+  "graded_at": "2026-11-05T03:17:44+00:00"
  },
  {
   "id": "nba-401909925-total-under",
@@ -4036,10 +4036,10 @@
    "f": 0.667
   },
   "model": "live-v2",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "3",
+  "profit": 1.24,
+  "graded_at": "2026-11-05T03:17:44+00:00"
  },
  {
   "id": "cbb-401902276-total-under",
@@ -4126,10 +4126,10 @@
    "f": 0.734
   },
   "model": "live-v2",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "94-102",
+  "profit": 0.8333,
+  "graded_at": "2026-11-05T03:17:44+00:00"
  },
  {
   "id": "cfb-401866457-ml-away",
@@ -4216,10 +4216,10 @@
    "f": 0.5
   },
   "model": "live-v2",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "106-112",
+  "profit": 0.2222,
+  "graded_at": "2026-11-05T03:17:44+00:00"
  },
  {
   "id": "nba-401909926-total-under",
@@ -4246,10 +4246,10 @@
    "f": 0.56
   },
   "model": "live-v2",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "240",
+  "profit": 0.9091,
+  "graded_at": "2026-11-05T03:17:44+00:00"
  },
  {
   "id": "nba-401909927-spread-away",
@@ -4486,10 +4486,10 @@
    "f": 0.393
   },
   "model": "live-v2",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "1-2",
+  "profit": -1.0,
+  "graded_at": "2026-11-05T03:17:45+00:00"
  },
  {
   "id": "cbb-401928811-total-under",
@@ -4516,10 +4516,10 @@
    "f": 0.5
   },
   "model": "live-v2",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "196",
+  "profit": -1.0,
+  "graded_at": "2026-11-05T03:17:45+00:00"
  },
  {
   "id": "cfb-401866455-total-over",
@@ -4606,10 +4606,10 @@
    "f": 0.223
   },
   "model": "live-v2",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "1-2",
+  "profit": 0.6897,
+  "graded_at": "2026-11-05T03:17:45+00:00"
  },
  {
   "id": "nhl-401892645-total-under",
@@ -4664,6 +4664,276 @@
    "period": 1,
    "clock": "1:18",
    "f": 0.532
+  },
+  "model": "live-v2",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "nba-401909928-spread-away",
+  "sport": "nba",
+  "gid": "401909928",
+  "date": "2026-11-04",
+  "logged_at": "2026-11-05T03:17:40+00:00",
+  "matchup": "UTAH @ NO",
+  "home": "NO",
+  "away": "UTAH",
+  "label": "UTAH +1.5",
+  "kind": "spread",
+  "side": "away",
+  "line": 1.5,
+  "price": -120,
+  "chance": 0.5986,
+  "implied": 0.5455,
+  "edge": 0.053,
+  "fair": -150,
+  "state": {
+   "score": "UTAH 87 - 86 NO",
+   "period": 4,
+   "clock": "7:20",
+   "f": 0.153
+  },
+  "model": "live-v2",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "nba-401909930-total-under",
+  "sport": "nba",
+  "gid": "401909930",
+  "date": "2026-11-04",
+  "logged_at": "2026-11-05T03:17:40+00:00",
+  "matchup": "MIN @ HOU",
+  "home": "HOU",
+  "away": "MIN",
+  "label": "Under 221.5",
+  "kind": "total",
+  "side": "under",
+  "line": 221.5,
+  "price": -115,
+  "chance": 0.6136,
+  "implied": 0.5349,
+  "edge": 0.079,
+  "fair": -160,
+  "state": {
+   "score": "MIN 73 - 73 HOU",
+   "period": 3,
+   "clock": "3:45",
+   "f": 0.328
+  },
+  "model": "live-v2",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "nba-401909932-total-over",
+  "sport": "nba",
+  "gid": "401909932",
+  "date": "2026-11-04",
+  "logged_at": "2026-11-05T03:17:40+00:00",
+  "matchup": "POR @ PHX",
+  "home": "PHX",
+  "away": "POR",
+  "label": "Over 241.5",
+  "kind": "total",
+  "side": "over",
+  "line": 241.5,
+  "price": -120,
+  "chance": 0.6277,
+  "implied": 0.5455,
+  "edge": 0.082,
+  "fair": -170,
+  "state": {
+   "score": "POR 72 - 59 PHX",
+   "period": 2,
+   "clock": "0.0",
+   "f": 0.5
+  },
+  "model": "live-v2",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "nba-401909933-total-over",
+  "sport": "nba",
+  "gid": "401909933",
+  "date": "2026-11-04",
+  "logged_at": "2026-11-05T03:17:40+00:00",
+  "matchup": "DAL @ SA",
+  "home": "SA",
+  "away": "DAL",
+  "label": "Over 223.5",
+  "kind": "total",
+  "side": "over",
+  "line": 223.5,
+  "price": -105,
+  "chance": 0.5941,
+  "implied": 0.5122,
+  "edge": 0.082,
+  "fair": -145,
+  "state": {
+   "score": "DAL 26 - 29 SA",
+   "period": 1,
+   "clock": "33.1",
+   "f": 0.761
+  },
+  "model": "live-v2",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "nba-401909934-ml-home",
+  "sport": "nba",
+  "gid": "401909934",
+  "date": "2026-11-04",
+  "logged_at": "2026-11-05T03:17:40+00:00",
+  "matchup": "LAL @ SAC",
+  "home": "SAC",
+  "away": "LAL",
+  "label": "SAC to win",
+  "kind": "ml",
+  "side": "home",
+  "line": null,
+  "price": 200,
+  "chance": 0.4308,
+  "implied": 0.3333,
+  "edge": 0.097,
+  "fair": 130,
+  "state": {
+   "score": "LAL 8 - 16 SAC",
+   "period": 1,
+   "clock": "7:15",
+   "f": 0.901
+  },
+  "model": "live-v2",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "nba-401909934-spread-home",
+  "sport": "nba",
+  "gid": "401909934",
+  "date": "2026-11-04",
+  "logged_at": "2026-11-05T03:17:40+00:00",
+  "matchup": "LAL @ SAC",
+  "home": "SAC",
+  "away": "LAL",
+  "label": "SAC +6.5",
+  "kind": "spread",
+  "side": "home",
+  "line": 6.5,
+  "price": -110,
+  "chance": 0.5904,
+  "implied": 0.5238,
+  "edge": 0.067,
+  "fair": -145,
+  "state": {
+   "score": "LAL 8 - 16 SAC",
+   "period": 1,
+   "clock": "7:15",
+   "f": 0.901
+  },
+  "model": "live-v2",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "cbb-401917513-total-under",
+  "sport": "cbb",
+  "gid": "401917513",
+  "date": "2026-11-04",
+  "logged_at": "2026-11-05T03:17:40+00:00",
+  "matchup": "MILW @ SCU",
+  "home": "SCU",
+  "away": "MILW",
+  "label": "Under 155.5",
+  "kind": "total",
+  "side": "under",
+  "line": 155.5,
+  "price": -115,
+  "chance": 0.6146,
+  "implied": 0.5349,
+  "edge": 0.08,
+  "fair": -160,
+  "state": {
+   "score": "MILW 3 - 16 SCU",
+   "period": 1,
+   "clock": "12:43",
+   "f": 0.818
+  },
+  "model": "live-v2",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "cbb-401917513-spread-home",
+  "sport": "cbb",
+  "gid": "401917513",
+  "date": "2026-11-04",
+  "logged_at": "2026-11-05T03:17:40+00:00",
+  "matchup": "MILW @ SCU",
+  "home": "SCU",
+  "away": "MILW",
+  "label": "SCU -23.5",
+  "kind": "spread",
+  "side": "home",
+  "line": -23.5,
+  "price": -110,
+  "chance": 0.5851,
+  "implied": 0.5238,
+  "edge": 0.061,
+  "fair": -140,
+  "state": {
+   "score": "MILW 3 - 16 SCU",
+   "period": 1,
+   "clock": "12:43",
+   "f": 0.818
+  },
+  "model": "live-v2",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "cbb-401917512-spread-home",
+  "sport": "cbb",
+  "gid": "401917512",
+  "date": "2026-11-04",
+  "logged_at": "2026-11-05T03:17:40+00:00",
+  "matchup": "NDSU @ SMC",
+  "home": "SMC",
+  "away": "NDSU",
+  "label": "SMC -13.5",
+  "kind": "spread",
+  "side": "home",
+  "line": -13.5,
+  "price": -110,
+  "chance": 0.5801,
+  "implied": 0.5238,
+  "edge": 0.056,
+  "fair": -140,
+  "state": {
+   "score": "NDSU 13 - 19 SMC",
+   "period": 1,
+   "clock": "11:35",
+   "f": 0.79
   },
   "model": "live-v2",
   "result": null,
