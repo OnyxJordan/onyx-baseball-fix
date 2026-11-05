@@ -1,7 +1,7 @@
 {
  "sport": "nba",
  "date": "2026-11-04",
- "generated": "2026-11-05T02:10:31+00:00",
+ "generated": "2026-11-05T02:43:15+00:00",
  "unit": "min",
  "stats": [
   "pts",
@@ -2145,8 +2145,8 @@
   "ATL": {
    "name": "Atlanta Hawks",
    "date": "2026-11-04",
-   "pace": 104.2,
-   "min_sum": 241.0,
+   "pace": 104.0,
+   "min_sum": 242.7,
    "players": [
     {
      "id": "DC77AD36110A",
@@ -2154,29 +2154,29 @@
      "pos": "SG",
      "role": "Starter",
      "tag": "",
-     "use": 30.1,
+     "use": 30.3,
      "proj": {
-      "pts": 20.3,
-      "reb": 3.2,
+      "pts": 21.1,
+      "reb": 3.3,
       "ast": 2.8,
-      "3pm": 3.2,
-      "pra": 26.3
+      "3pm": 3.5,
+      "pra": 27.2
      },
      "model": {
-      "use": 30.1,
-      "pts": 20.1
+      "use": 30.3,
+      "pts": 20.9
      },
      "last": {
-      "use": 30.1,
-      "pts": 21.1,
-      "reb": 3.2,
-      "ast": 2.8,
-      "3pm": 3.9,
-      "gp": 8
+      "use": 30.3,
+      "pts": 21.7,
+      "reb": 3.3,
+      "ast": 2.7,
+      "3pm": 4.1,
+      "gp": 9
      },
      "now": {
-      "gp": 8,
-      "use": 30.1
+      "gp": 9,
+      "use": 30.3
      },
      "hs": "4278039",
      "gid": "202611057D43DED6",
@@ -2189,29 +2189,29 @@
      "pos": "SG",
      "role": "Starter",
      "tag": "",
-     "use": 29.8,
+     "use": 30.2,
      "proj": {
       "pts": 10.3,
-      "reb": 5.8,
-      "ast": 4.8,
+      "reb": 7.1,
+      "ast": 5.2,
       "3pm": 0.3,
-      "pra": 21.0
+      "pra": 22.6
      },
      "model": {
-      "use": 30.0,
+      "use": 30.4,
       "pts": 10.4
      },
      "last": {
-      "use": 29.1,
-      "pts": 9.8,
-      "reb": 5.5,
-      "ast": 4.1,
+      "use": 29.7,
+      "pts": 9.6,
+      "reb": 6.7,
+      "ast": 4.6,
       "3pm": 0.1,
-      "gp": 8
+      "gp": 9
      },
      "now": {
-      "gp": 8,
-      "use": 29.1
+      "gp": 9,
+      "use": 29.7
      },
      "hs": "4869342",
      "gid": "202611057D43DED6",
@@ -2226,27 +2226,27 @@
      "tag": "",
      "use": 29.6,
      "proj": {
-      "pts": 14.7,
-      "reb": 8.8,
-      "ast": 2.7,
-      "3pm": 1.4,
-      "pra": 26.3
+      "pts": 14.6,
+      "reb": 9.5,
+      "ast": 2.9,
+      "3pm": 1.5,
+      "pra": 27.1
      },
      "model": {
-      "use": 29.8,
-      "pts": 15.2
+      "use": 29.7,
+      "pts": 15.1
      },
      "last": {
-      "use": 28.9,
-      "pts": 12.0,
-      "reb": 7.5,
-      "ast": 2.6,
-      "3pm": 1.2,
-      "gp": 8
+      "use": 29.1,
+      "pts": 12.2,
+      "reb": 8.4,
+      "ast": 2.8,
+      "3pm": 1.3,
+      "gp": 9
      },
      "now": {
-      "gp": 8,
-      "use": 28.9
+      "gp": 9,
+      "use": 29.1
      },
      "hs": "4431680",
      "gid": "202611057D43DED6",
@@ -2259,29 +2259,29 @@
      "pos": "PG",
      "role": "Starter",
      "tag": "",
-     "use": 27.5,
+     "use": 26.9,
      "proj": {
-      "pts": 16.5,
-      "reb": 3.4,
-      "ast": 4.3,
-      "3pm": 2.2,
-      "pra": 24.2
+      "pts": 15.9,
+      "reb": 3.6,
+      "ast": 4.4,
+      "3pm": 2.0,
+      "pra": 24.0
      },
      "model": {
-      "use": 27.8,
-      "pts": 16.9
+      "use": 27.0,
+      "pts": 16.2
      },
      "last": {
-      "use": 26.8,
-      "pts": 14.2,
-      "reb": 2.8,
-      "ast": 4.0,
+      "use": 26.6,
+      "pts": 14.3,
+      "reb": 3.0,
+      "ast": 4.1,
       "3pm": 2.0,
-      "gp": 8
+      "gp": 9
      },
      "now": {
-      "gp": 8,
-      "use": 26.8
+      "gp": 9,
+      "use": 26.6
      },
      "hs": "2490149",
      "gid": "202611057D43DED6",
@@ -2294,29 +2294,29 @@
      "pos": "SF",
      "role": "Starter",
      "tag": "",
-     "use": 25.4,
+     "use": 26.6,
      "proj": {
-      "pts": 9.8,
-      "reb": 3.4,
-      "ast": 1.4,
-      "3pm": 1.8,
-      "pra": 14.6
+      "pts": 9.6,
+      "reb": 3.6,
+      "ast": 1.6,
+      "3pm": 1.9,
+      "pra": 14.8
      },
      "model": {
-      "use": 25.7,
-      "pts": 9.9
+      "use": 27.0,
+      "pts": 9.7
      },
      "last": {
-      "use": 24.6,
-      "pts": 9.2,
+      "use": 25.3,
+      "pts": 8.9,
       "reb": 3.0,
-      "ast": 1.4,
-      "3pm": 1.5,
-      "gp": 8
+      "ast": 1.6,
+      "3pm": 1.6,
+      "gp": 9
      },
      "now": {
-      "gp": 8,
-      "use": 24.6
+      "gp": 9,
+      "use": 25.3
      },
      "hs": "4397020",
      "gid": "202611057D43DED6",
@@ -2329,29 +2329,29 @@
      "pos": "SG",
      "role": "Rotation",
      "tag": "",
-     "use": 25.2,
+     "use": 25.8,
      "proj": {
-      "pts": 13.4,
-      "reb": 3.9,
+      "pts": 13.7,
+      "reb": 4.0,
       "ast": 2.1,
-      "3pm": 2.1,
-      "pra": 19.3
+      "3pm": 2.2,
+      "pra": 19.8
      },
      "model": {
-      "use": 24.7,
-      "pts": 13.2
+      "use": 25.5,
+      "pts": 13.6
      },
      "last": {
-      "use": 25.6,
-      "pts": 13.8,
-      "reb": 3.6,
+      "use": 26.0,
+      "pts": 13.9,
+      "reb": 3.7,
       "ast": 1.9,
-      "3pm": 2.6,
-      "gp": 8
+      "3pm": 2.7,
+      "gp": 9
      },
      "now": {
-      "gp": 8,
-      "use": 25.6
+      "gp": 9,
+      "use": 26.0
      },
      "hs": "4397183",
      "gid": "202611057D43DED6",
@@ -2366,27 +2366,27 @@
      "tag": "",
      "use": 20.7,
      "proj": {
-      "pts": 8.5,
-      "reb": 2.8,
+      "pts": 9.2,
+      "reb": 2.9,
       "ast": 4.1,
-      "3pm": 0.9,
-      "pra": 15.4
+      "3pm": 1.1,
+      "pra": 16.1
      },
      "model": {
-      "use": 21.1,
-      "pts": 9.2
+      "use": 20.8,
+      "pts": 9.8
      },
      "last": {
-      "use": 20.3,
-      "pts": 7.1,
+      "use": 20.6,
+      "pts": 8.0,
       "reb": 2.9,
-      "ast": 4.6,
-      "3pm": 0.7,
-      "gp": 7
+      "ast": 4.5,
+      "3pm": 0.9,
+      "gp": 8
      },
      "now": {
-      "gp": 7,
-      "use": 20.3
+      "gp": 8,
+      "use": 20.6
      },
      "hs": "5149077",
      "gid": "202611057D43DED6",
@@ -2399,31 +2399,66 @@
      "pos": "PF",
      "role": "Bench",
      "tag": "Questionable: Toe (Leg, Left)",
-     "use": 10.6,
+     "use": 10.3,
      "proj": {
-      "pts": 4.3,
-      "reb": 2.1,
-      "ast": 0.5,
+      "pts": 4.0,
+      "reb": 2.2,
+      "ast": 0.6,
       "3pm": 0.5,
-      "pra": 6.9
+      "pra": 6.8
      },
      "model": {
-      "use": 9.0,
-      "pts": 4.4
+      "use": 8.8,
+      "pts": 4.2
      },
      "last": {
-      "use": 11.2,
-      "pts": 4.0,
+      "use": 11.0,
+      "pts": 3.6,
+      "reb": 2.6,
+      "ast": 1.0,
+      "3pm": 0.4,
+      "gp": 5
+     },
+     "now": {
+      "gp": 5,
+      "use": 11.0
+     },
+     "hs": "4873201",
+     "gid": "202611057D43DED6",
+     "opp": "WSH",
+     "home": false
+    },
+    {
+     "id": "325AAC638B7F9988",
+     "n": "Zuby Ejiofor",
+     "pos": "PF",
+     "role": "Bench",
+     "tag": "",
+     "use": 9.4,
+     "proj": {
+      "pts": 3.4,
+      "reb": 2.0,
+      "ast": 0.6,
+      "3pm": 0.3,
+      "pra": 6.1
+     },
+     "model": {
+      "use": 7.4,
+      "pts": 3.0
+     },
+     "last": {
+      "use": 10.2,
+      "pts": 4.2,
       "reb": 2.5,
-      "ast": 0.5,
-      "3pm": 0.5,
+      "ast": 1.0,
+      "3pm": 0.8,
       "gp": 4
      },
      "now": {
       "gp": 4,
-      "use": 11.2
+      "use": 10.2
      },
-     "hs": "4873201",
+     "hs": "5106262",
      "gid": "202611057D43DED6",
      "opp": "WSH",
      "home": false
@@ -2434,29 +2469,29 @@
      "pos": "SF",
      "role": "Bench",
      "tag": "",
-     "use": 8.6,
+     "use": 8.3,
      "proj": {
-      "pts": 5.6,
-      "reb": 0.8,
+      "pts": 5.5,
+      "reb": 0.7,
       "ast": 0.6,
-      "3pm": 0.8,
-      "pra": 7.1
+      "3pm": 0.7,
+      "pra": 6.9
      },
      "model": {
-      "use": 8.8,
-      "pts": 4.8
+      "use": 8.2,
+      "pts": 4.5
      },
      "last": {
-      "use": 8.5,
-      "pts": 7.5,
-      "reb": 0.5,
-      "ast": 0.5,
-      "3pm": 2.0,
-      "gp": 4
+      "use": 8.4,
+      "pts": 7.8,
+      "reb": 0.4,
+      "ast": 0.6,
+      "3pm": 1.8,
+      "gp": 5
      },
      "now": {
-      "gp": 4,
-      "use": 8.5
+      "gp": 5,
+      "use": 8.4
      },
      "hs": "4280151",
      "gid": "202611057D43DED6",
@@ -2469,17 +2504,17 @@
      "pos": "PG",
      "role": "Bench",
      "tag": "",
-     "use": 7.9,
+     "use": 7.7,
      "proj": {
-      "pts": 3.4,
+      "pts": 3.2,
       "reb": 1.4,
-      "ast": 1.4,
+      "ast": 1.3,
       "3pm": 0.5,
-      "pra": 6.2
+      "pra": 5.9
      },
      "model": {
-      "use": 7.6,
-      "pts": 3.1
+      "use": 7.0,
+      "pts": 2.9
      },
      "last": {
       "use": 8.0,
@@ -2499,36 +2534,36 @@
      "home": false
     },
     {
-     "id": "325AAC638B7F9988",
-     "n": "Zuby Ejiofor",
+     "id": "8C7E63063F9B",
+     "n": "Dorian Finney-Smith",
      "pos": "PF",
      "role": "Bench",
      "tag": "",
-     "use": 7.4,
+     "use": 4.3,
      "proj": {
-      "pts": 2.3,
-      "reb": 1.8,
-      "ast": 0.5,
+      "pts": 1.3,
+      "reb": 0.7,
+      "ast": 0.3,
       "3pm": 0.3,
-      "pra": 4.5
+      "pra": 2.3
      },
      "model": {
-      "use": 6.1,
-      "pts": 2.4
+      "use": 5.0,
+      "pts": 1.4
      },
      "last": {
-      "use": 8.0,
-      "pts": 2.0,
-      "reb": 2.3,
-      "ast": 0.7,
-      "3pm": 0.7,
+      "use": 4.0,
+      "pts": 1.0,
+      "reb": 0.7,
+      "ast": 0.3,
+      "3pm": 0.3,
       "gp": 3
      },
      "now": {
       "gp": 3,
-      "use": 8.0
+      "use": 4.0
      },
-     "hs": "5106262",
+     "hs": "2578185",
      "gid": "202611057D43DED6",
      "opp": "WSH",
      "home": false
@@ -2539,17 +2574,17 @@
      "pos": "G",
      "role": "Bench",
      "tag": "",
-     "use": 4.6,
+     "use": 4.2,
      "proj": {
-      "pts": 1.4,
+      "pts": 1.2,
       "reb": 0.3,
-      "ast": 0.4,
+      "ast": 0.3,
       "3pm": 0.3,
-      "pra": 2.1
+      "pra": 1.9
      },
      "model": {
-      "use": 4.6,
-      "pts": 1.4
+      "use": 4.2,
+      "pts": 1.2
      },
      "last": null,
      "now": {
@@ -2567,17 +2602,17 @@
      "pos": "SF",
      "role": "Bench",
      "tag": "",
-     "use": 4.6,
+     "use": 4.2,
      "proj": {
-      "pts": 1.9,
-      "reb": 0.7,
+      "pts": 1.8,
+      "reb": 0.6,
       "ast": 0.3,
-      "3pm": 0.3,
-      "pra": 2.9
+      "3pm": 0.2,
+      "pra": 2.7
      },
      "model": {
-      "use": 4.6,
-      "pts": 1.9
+      "use": 4.2,
+      "pts": 1.8
      },
      "last": null,
      "now": {
@@ -2595,17 +2630,17 @@
      "pos": "PG",
      "role": "Bench",
      "tag": "",
-     "use": 4.6,
+     "use": 4.2,
      "proj": {
-      "pts": 1.4,
+      "pts": 1.3,
       "reb": 0.4,
-      "ast": 0.7,
+      "ast": 0.6,
       "3pm": 0.1,
-      "pra": 2.6
+      "pra": 2.4
      },
      "model": {
-      "use": 4.6,
-      "pts": 1.4
+      "use": 4.2,
+      "pts": 1.3
      },
      "last": null,
      "now": {
@@ -2613,41 +2648,6 @@
       "use": null
      },
      "hs": "4585618",
-     "gid": "202611057D43DED6",
-     "opp": "WSH",
-     "home": false
-    },
-    {
-     "id": "8C7E63063F9B",
-     "n": "Dorian Finney-Smith",
-     "pos": "PF",
-     "role": "Bench",
-     "tag": "",
-     "use": 4.4,
-     "proj": {
-      "pts": 1.4,
-      "reb": 0.8,
-      "ast": 0.3,
-      "3pm": 0.3,
-      "pra": 2.4
-     },
-     "model": {
-      "use": 5.4,
-      "pts": 1.5
-     },
-     "last": {
-      "use": 4.0,
-      "pts": 1.0,
-      "reb": 0.7,
-      "ast": 0.3,
-      "3pm": 0.3,
-      "gp": 3
-     },
-     "now": {
-      "gp": 3,
-      "use": 4.0
-     },
-     "hs": "2578185",
      "gid": "202611057D43DED6",
      "opp": "WSH",
      "home": false
@@ -4539,7 +4539,7 @@
      "n": "Adem Bona",
      "pos": "C",
      "role": "Bench",
-     "tag": "",
+     "tag": "Questionable: Head",
      "use": 11.7,
      "proj": {
       "pts": 1.4,
@@ -6403,8 +6403,8 @@
   "WSH": {
    "name": "Washington Wizards",
    "date": "2026-11-04",
-   "pace": 104.2,
-   "min_sum": 254.9,
+   "pace": 104.0,
+   "min_sum": 257.3,
    "players": [
     {
      "id": "2A95E890DFCB",
@@ -6412,29 +6412,29 @@
      "pos": "PG",
      "role": "Starter",
      "tag": "",
-     "use": 35.5,
+     "use": 35.4,
      "proj": {
-      "pts": 20.6,
-      "reb": 3.8,
-      "ast": 10.6,
-      "3pm": 2.3,
-      "pra": 35.1
+      "pts": 20.5,
+      "reb": 3.7,
+      "ast": 10.2,
+      "3pm": 2.2,
+      "pra": 34.4
      },
      "model": {
       "use": 35.3,
-      "pts": 20.8
+      "pts": 20.6
      },
      "last": {
-      "use": 36.0,
-      "pts": 19.9,
-      "reb": 3.7,
-      "ast": 10.0,
+      "use": 35.8,
+      "pts": 19.6,
+      "reb": 3.5,
+      "ast": 9.5,
       "3pm": 1.9,
-      "gp": 7
+      "gp": 8
      },
      "now": {
-      "gp": 7,
-      "use": 36.0
+      "gp": 8,
+      "use": 35.8
      },
      "hs": "4277905",
      "gid": "202611057D43DED6",
@@ -6447,29 +6447,29 @@
      "pos": "PF",
      "role": "Starter",
      "tag": "",
-     "use": 33.5,
+     "use": 33.0,
      "proj": {
-      "pts": 22.0,
+      "pts": 22.5,
       "reb": 10.5,
       "ast": 2.5,
       "3pm": 0.8,
-      "pra": 35.1
+      "pra": 35.5
      },
      "model": {
-      "use": 33.5,
-      "pts": 21.9
+      "use": 32.9,
+      "pts": 22.4
      },
      "last": {
-      "use": 33.6,
-      "pts": 23.0,
-      "reb": 9.1,
-      "ast": 1.9,
-      "3pm": 1.0,
-      "gp": 7
+      "use": 33.1,
+      "pts": 23.4,
+      "reb": 9.2,
+      "ast": 2.0,
+      "3pm": 0.9,
+      "gp": 8
      },
      "now": {
-      "gp": 7,
-      "use": 33.6
+      "gp": 8,
+      "use": 33.1
      },
      "hs": "6583",
      "gid": "202611057D43DED6",
@@ -6482,29 +6482,29 @@
      "pos": "SF",
      "role": "Starter",
      "tag": "",
-     "use": 32.7,
+     "use": 32.8,
      "proj": {
-      "pts": 15.2,
-      "reb": 5.3,
-      "ast": 4.5,
-      "3pm": 2.1,
-      "pra": 25.0
+      "pts": 15.9,
+      "reb": 5.0,
+      "ast": 4.7,
+      "3pm": 2.2,
+      "pra": 25.6
      },
      "model": {
       "use": 32.8,
-      "pts": 15.0
+      "pts": 15.7
      },
      "last": {
-      "use": 32.4,
-      "pts": 16.1,
-      "reb": 4.3,
-      "ast": 4.6,
-      "3pm": 1.7,
-      "gp": 7
+      "use": 32.8,
+      "pts": 17.2,
+      "reb": 4.2,
+      "ast": 4.9,
+      "3pm": 1.9,
+      "gp": 8
      },
      "now": {
-      "gp": 7,
-      "use": 32.4
+      "gp": 8,
+      "use": 32.8
      },
      "hs": "5174563",
      "gid": "202611057D43DED6",
@@ -6517,29 +6517,29 @@
      "pos": "SF",
      "role": "Starter",
      "tag": "",
-     "use": 30.0,
+     "use": 30.7,
      "proj": {
-      "pts": 18.1,
-      "reb": 5.5,
-      "ast": 2.5,
-      "3pm": 1.4,
-      "pra": 26.1
+      "pts": 17.0,
+      "reb": 5.7,
+      "ast": 2.6,
+      "3pm": 1.2,
+      "pra": 25.4
      },
      "model": {
-      "use": 30.0,
-      "pts": 17.9
+      "use": 30.8,
+      "pts": 17.1
      },
      "last": {
-      "use": 30.0,
-      "pts": 19.0,
-      "reb": 5.0,
-      "ast": 1.7,
-      "3pm": 1.0,
-      "gp": 3
+      "use": 30.5,
+      "pts": 16.5,
+      "reb": 5.2,
+      "ast": 2.0,
+      "3pm": 0.8,
+      "gp": 4
      },
      "now": {
-      "gp": 3,
-      "use": 30.0
+      "gp": 4,
+      "use": 30.5
      },
      "hs": "5142718",
      "gid": "202611057D43DED6",
@@ -6552,29 +6552,29 @@
      "pos": "SG",
      "role": "Starter",
      "tag": "",
-     "use": 27.5,
+     "use": 26.9,
      "proj": {
-      "pts": 9.5,
-      "reb": 4.2,
+      "pts": 9.3,
+      "reb": 4.0,
       "ast": 1.8,
       "3pm": 0.8,
-      "pra": 15.5
+      "pra": 15.1
      },
      "model": {
-      "use": 27.6,
-      "pts": 9.7
+      "use": 26.9,
+      "pts": 9.5
      },
      "last": {
-      "use": 27.3,
-      "pts": 8.1,
-      "reb": 3.6,
-      "ast": 0.7,
+      "use": 26.8,
+      "pts": 7.9,
+      "reb": 3.4,
+      "ast": 0.9,
       "3pm": 0.4,
-      "gp": 7
+      "gp": 8
      },
      "now": {
-      "gp": 7,
-      "use": 27.3
+      "gp": 8,
+      "use": 26.8
      },
      "hs": "5104155",
      "gid": "202611057D43DED6",
@@ -6587,29 +6587,64 @@
      "pos": "C",
      "role": "Rotation",
      "tag": "",
-     "use": 25.9,
+     "use": 23.0,
      "proj": {
-      "pts": 11.6,
-      "reb": 6.3,
-      "ast": 2.5,
-      "3pm": 0.9,
-      "pra": 20.3
+      "pts": 10.2,
+      "reb": 5.6,
+      "ast": 1.9,
+      "3pm": 0.7,
+      "pra": 17.6
      },
      "model": {
-      "use": 26.2,
-      "pts": 12.8
+      "use": 20.8,
+      "pts": 10.5
      },
      "last": {
-      "use": 25.5,
-      "pts": 9.3,
-      "reb": 5.5,
-      "ast": 2.2,
-      "3pm": 0.7,
-      "gp": 6
+      "use": 25.1,
+      "pts": 9.6,
+      "reb": 6.0,
+      "ast": 2.0,
+      "3pm": 0.6,
+      "gp": 7
      },
      "now": {
-      "gp": 6,
-      "use": 25.5
+      "gp": 7,
+      "use": 25.1
+     },
+     "hs": null,
+     "gid": "202611057D43DED6",
+     "opp": "ATL",
+     "home": true
+    },
+    {
+     "id": "D1738676D8EC",
+     "n": "Carlton Carrington",
+     "pos": "PG",
+     "role": "Rotation",
+     "tag": "",
+     "use": 18.2,
+     "proj": {
+      "pts": 5.3,
+      "reb": 1.8,
+      "ast": 2.6,
+      "3pm": 1.2,
+      "pra": 9.7
+     },
+     "model": {
+      "use": 16.7,
+      "pts": 5.2
+     },
+     "last": {
+      "use": 19.6,
+      "pts": 5.4,
+      "reb": 1.8,
+      "ast": 2.4,
+      "3pm": 1.5,
+      "gp": 8
+     },
+     "now": {
+      "gp": 8,
+      "use": 19.6
      },
      "hs": null,
      "gid": "202611057D43DED6",
@@ -6622,66 +6657,31 @@
      "pos": "SG",
      "role": "Rotation",
      "tag": "",
-     "use": 17.7,
+     "use": 17.9,
      "proj": {
-      "pts": 7.5,
-      "reb": 1.8,
-      "ast": 0.9,
+      "pts": 7.4,
+      "reb": 2.0,
+      "ast": 1.0,
       "3pm": 1.1,
       "pra": 10.3
      },
      "model": {
-      "use": 14.4,
-      "pts": 6.5
+      "use": 15.9,
+      "pts": 6.8
      },
      "last": {
-      "use": 21.0,
-      "pts": 9.3,
-      "reb": 2.2,
-      "ast": 0.7,
-      "3pm": 1.2,
-      "gp": 6
-     },
-     "now": {
-      "gp": 6,
-      "use": 21.0
-     },
-     "hs": "5238230",
-     "gid": "202611057D43DED6",
-     "opp": "ATL",
-     "home": true
-    },
-    {
-     "id": "D1738676D8EC",
-     "n": "Carlton Carrington",
-     "pos": "PG",
-     "role": "Rotation",
-     "tag": "",
-     "use": 17.0,
-     "proj": {
-      "pts": 5.3,
-      "reb": 1.7,
-      "ast": 2.3,
-      "3pm": 1.2,
-      "pra": 9.2
-     },
-     "model": {
-      "use": 14.3,
-      "pts": 4.8
-     },
-     "last": {
-      "use": 19.7,
-      "pts": 6.1,
-      "reb": 1.9,
-      "ast": 2.4,
-      "3pm": 1.7,
+      "use": 20.0,
+      "pts": 8.4,
+      "reb": 2.1,
+      "ast": 0.6,
+      "3pm": 1.1,
       "gp": 7
      },
      "now": {
       "gp": 7,
-      "use": 19.7
+      "use": 20.0
      },
-     "hs": null,
+     "hs": "5238230",
      "gid": "202611057D43DED6",
      "opp": "ATL",
      "home": true
@@ -6690,31 +6690,31 @@
      "id": "54818F8E80E9",
      "n": "Deandre Ayton",
      "pos": "C",
-     "role": "Bench",
+     "role": "Rotation",
      "tag": "",
-     "use": 14.6,
+     "use": 14.4,
      "proj": {
-      "pts": 4.9,
-      "reb": 3.9,
-      "ast": 0.6,
+      "pts": 5.4,
+      "reb": 4.2,
+      "ast": 0.7,
       "3pm": 0.0,
-      "pra": 9.4
+      "pra": 10.3
      },
      "model": {
-      "use": 11.9,
-      "pts": 4.6
+      "use": 13.6,
+      "pts": 5.4
      },
      "last": {
-      "use": 15.7,
+      "use": 15.1,
       "pts": 5.4,
       "reb": 4.4,
       "ast": 0.9,
       "3pm": 0.0,
-      "gp": 7
+      "gp": 8
      },
      "now": {
-      "gp": 7,
-      "use": 15.7
+      "gp": 8,
+      "use": 15.1
      },
      "hs": "4278129",
      "gid": "202611057D43DED6",
@@ -6733,7 +6733,7 @@
       "reb": 1.2,
       "ast": 0.6,
       "3pm": 0.2,
-      "pra": 3.9
+      "pra": 4.0
      },
      "model": {
       "use": 5.9,
@@ -6762,29 +6762,29 @@
      "pos": "SF",
      "role": "Bench",
      "tag": "",
-     "use": 3.8,
+     "use": 5.5,
      "proj": {
-      "pts": 1.3,
+      "pts": 1.4,
       "reb": 0.2,
       "ast": 0.3,
       "3pm": 0.1,
-      "pra": 1.8
+      "pra": 1.9
      },
      "model": {
-      "use": 2.7,
-      "pts": 1.3
+      "use": 3.2,
+      "pts": 1.5
      },
      "last": {
-      "use": 4.3,
-      "pts": 1.3,
+      "use": 6.5,
+      "pts": 1.0,
       "reb": 0.0,
-      "ast": 0.3,
+      "ast": 0.2,
       "3pm": 0.0,
-      "gp": 3
+      "gp": 4
      },
      "now": {
-      "gp": 3,
-      "use": 4.3
+      "gp": 4,
+      "use": 6.5
      },
      "hs": "5144126",
      "gid": "202611057D43DED6",
@@ -6803,7 +6803,7 @@
       "reb": 0.6,
       "ast": 0.2,
       "3pm": 0.1,
-      "pra": 1.8
+      "pra": 1.9
      },
      "model": {
       "use": 3.3,
@@ -6825,22 +6825,29 @@
      "pos": "PG",
      "role": "Bench",
      "tag": "",
-     "use": 2.0,
+     "use": 2.5,
      "proj": {
-      "pts": 0.9,
-      "reb": 0.3,
-      "ast": 0.3,
+      "pts": 1.0,
+      "reb": 0.1,
+      "ast": 0.2,
       "3pm": 0.1,
-      "pra": 1.4
+      "pra": 1.3
      },
      "model": {
-      "use": 2.0,
-      "pts": 0.9
+      "use": 1.4,
+      "pts": 0.6
      },
-     "last": null,
+     "last": {
+      "use": 3.0,
+      "pts": 2.0,
+      "reb": 0.0,
+      "ast": 0.0,
+      "3pm": 0.0,
+      "gp": 1
+     },
      "now": {
-      "gp": 0,
-      "use": null
+      "gp": 1,
+      "use": 3.0
      },
      "hs": "4432819",
      "gid": "202611057D43DED6",
@@ -6853,22 +6860,29 @@
      "pos": "PF",
      "role": "Bench",
      "tag": "",
-     "use": 0.0,
+     "use": 2.3,
      "proj": {
-      "pts": 0.0,
-      "reb": 0.0,
+      "pts": 0.2,
+      "reb": 0.5,
       "ast": 0.0,
       "3pm": 0.0,
-      "pra": 0.0
+      "pra": 0.7
      },
      "model": {
-      "use": 0.0,
-      "pts": 0.0
+      "use": 0.6,
+      "pts": 0.2
      },
-     "last": null,
+     "last": {
+      "use": 3.0,
+      "pts": 0.0,
+      "reb": 1.0,
+      "ast": 0.0,
+      "3pm": 0.0,
+      "gp": 1
+     },
      "now": {
-      "gp": 0,
-      "use": null
+      "gp": 1,
+      "use": 3.0
      },
      "hs": "5105841",
      "gid": "202611057D43DED6",
@@ -8392,7 +8406,7 @@
      "use": 36.5,
      "proj": {
       "pts": 25.5,
-      "reb": 4.3,
+      "reb": 4.2,
       "ast": 6.7,
       "3pm": 3.0,
       "pra": 36.4
@@ -11205,9 +11219,9 @@
      "proj": {
       "pts": 21.0,
       "reb": 5.6,
-      "ast": 4.7,
+      "ast": 4.6,
       "3pm": 2.6,
-      "pra": 31.3
+      "pra": 31.2
      },
      "model": {
       "use": 30.5,
@@ -11270,7 +11284,7 @@
      "n": "Payton Pritchard",
      "pos": "PG",
      "role": "Starter",
-     "tag": "",
+     "tag": "Questionable: Eye (Head, Abrasion, Right)",
      "use": 28.4,
      "proj": {
       "pts": 17.0,
@@ -11842,7 +11856,7 @@
      "tag": "",
      "use": 32.4,
      "proj": {
-      "pts": 13.2,
+      "pts": 13.3,
       "reb": 2.2,
       "ast": 7.4,
       "3pm": 1.8,
@@ -11881,11 +11895,11 @@
       "reb": 11.7,
       "ast": 6.1,
       "3pm": 0.5,
-      "pra": 45.4
+      "pra": 45.5
      },
      "model": {
       "use": 31.8,
-      "pts": 27.4
+      "pts": 27.5
      },
      "last": {
       "use": 31.9,
@@ -11920,7 +11934,7 @@
      },
      "model": {
       "use": 31.9,
-      "pts": 17.8
+      "pts": 17.9
      },
      "last": {
       "use": 31.4,
@@ -11955,7 +11969,7 @@
      },
      "model": {
       "use": 28.3,
-      "pts": 11.8
+      "pts": 11.9
      },
      "last": {
       "use": 29.7,
@@ -11990,7 +12004,7 @@
      },
      "model": {
       "use": 27.5,
-      "pts": 12.5
+      "pts": 12.6
      },
      "last": {
       "use": 26.9,
@@ -12056,11 +12070,11 @@
       "reb": 6.4,
       "ast": 1.6,
       "3pm": 1.6,
-      "pra": 17.8
+      "pra": 17.9
      },
      "model": {
       "use": 21.4,
-      "pts": 10.3
+      "pts": 10.4
      },
      "last": {
       "use": 22.1,
@@ -13247,7 +13261,7 @@
      "proj": {
       "pts": 21.9,
       "reb": 2.6,
-      "ast": 7.7,
+      "ast": 7.6,
       "3pm": 2.5,
       "pra": 32.1
      },
@@ -13358,7 +13372,7 @@
      },
      "model": {
       "use": 27.7,
-      "pts": 12.5
+      "pts": 12.4
      },
      "last": {
       "use": 28.8,
@@ -13389,7 +13403,7 @@
       "reb": 3.3,
       "ast": 2.0,
       "3pm": 1.9,
-      "pra": 17.1
+      "pra": 17.0
      },
      "model": {
       "use": 26.1,
@@ -13428,7 +13442,7 @@
      },
      "model": {
       "use": 18.2,
-      "pts": 9.8
+      "pts": 9.7
      },
      "last": {
       "use": 25.0,
@@ -13560,7 +13574,7 @@
      "tag": "",
      "use": 14.8,
      "proj": {
-      "pts": 5.9,
+      "pts": 5.8,
       "reb": 2.3,
       "ast": 0.6,
       "3pm": 0.7,
@@ -16634,7 +16648,7 @@
    "name": "Charlotte Hornets",
    "date": "2026-11-04",
    "pace": 98.0,
-   "min_sum": 258.7,
+   "min_sum": 259.7,
    "players": [
     {
      "id": "94623DDFFBAB",
@@ -16644,15 +16658,15 @@
      "tag": "",
      "use": 33.6,
      "proj": {
-      "pts": 24.3,
-      "reb": 5.1,
-      "ast": 3.0,
+      "pts": 23.3,
+      "reb": 5.2,
+      "ast": 3.1,
       "3pm": 3.5,
-      "pra": 32.4
+      "pra": 31.5
      },
      "model": {
       "use": 33.5,
-      "pts": 24.5
+      "pts": 23.3
      },
      "last": {
       "use": 33.8,
@@ -16679,15 +16693,15 @@
      "tag": "",
      "use": 30.4,
      "proj": {
-      "pts": 11.3,
+      "pts": 11.4,
       "reb": 2.9,
       "ast": 5.3,
       "3pm": 1.1,
-      "pra": 19.5
+      "pra": 19.6
      },
      "model": {
       "use": 30.1,
-      "pts": 11.4
+      "pts": 11.5
      },
      "last": {
       "use": 31.2,
@@ -16718,11 +16732,11 @@
       "reb": 7.3,
       "ast": 2.0,
       "3pm": 2.2,
-      "pra": 24.8
+      "pra": 24.9
      },
      "model": {
       "use": 29.4,
-      "pts": 15.6
+      "pts": 15.7
      },
      "last": {
       "use": 28.9,
@@ -16749,11 +16763,11 @@
      "tag": "",
      "use": 28.0,
      "proj": {
-      "pts": 9.2,
-      "reb": 9.2,
+      "pts": 9.1,
+      "reb": 9.0,
       "ast": 2.0,
       "3pm": 0.0,
-      "pra": 20.4
+      "pra": 20.2
      },
      "model": {
       "use": 27.7,
@@ -16782,17 +16796,17 @@
      "pos": "SG",
      "role": "Starter",
      "tag": "",
-     "use": 23.8,
+     "use": 23.4,
      "proj": {
-      "pts": 12.7,
-      "reb": 2.5,
-      "ast": 2.3,
+      "pts": 12.5,
+      "reb": 2.4,
+      "ast": 2.2,
       "3pm": 2.5,
-      "pra": 17.5
+      "pra": 17.1
      },
      "model": {
-      "use": 23.0,
-      "pts": 12.3
+      "use": 22.4,
+      "pts": 12.1
      },
      "last": {
       "use": 26.4,
@@ -16817,17 +16831,17 @@
      "pos": "SG",
      "role": "Rotation",
      "tag": "",
-     "use": 23.0,
+     "use": 22.8,
      "proj": {
-      "pts": 5.1,
-      "reb": 2.9,
+      "pts": 5.0,
+      "reb": 2.8,
       "ast": 2.3,
       "3pm": 1.0,
-      "pra": 10.3
+      "pra": 10.2
      },
      "model": {
-      "use": 21.4,
-      "pts": 5.4
+      "use": 20.9,
+      "pts": 5.2
      },
      "last": {
       "use": 24.6,
@@ -16852,16 +16866,16 @@
      "pos": "SG",
      "role": "Rotation",
      "tag": "",
-     "use": 19.4,
+     "use": 19.1,
      "proj": {
       "pts": 11.7,
       "reb": 1.9,
-      "ast": 3.4,
-      "3pm": 1.9,
-      "pra": 17.0
+      "ast": 3.3,
+      "3pm": 1.8,
+      "pra": 16.8
      },
      "model": {
-      "use": 22.7,
+      "use": 22.2,
       "pts": 14.2
      },
      "last": {
@@ -16887,17 +16901,17 @@
      "pos": "SF",
      "role": "Rotation",
      "tag": "",
-     "use": 17.6,
+     "use": 17.4,
      "proj": {
-      "pts": 5.3,
-      "reb": 2.9,
+      "pts": 5.2,
+      "reb": 2.8,
       "ast": 1.0,
       "3pm": 1.3,
-      "pra": 9.1
+      "pra": 9.0
      },
      "model": {
-      "use": 17.1,
-      "pts": 5.5
+      "use": 16.7,
+      "pts": 5.4
      },
      "last": {
       "use": 18.0,
@@ -16922,17 +16936,17 @@
      "pos": "C",
      "role": "Rotation",
      "tag": "",
-     "use": 16.1,
+     "use": 15.8,
      "proj": {
-      "pts": 4.8,
-      "reb": 3.9,
-      "ast": 0.9,
+      "pts": 4.7,
+      "reb": 3.8,
+      "ast": 1.0,
       "3pm": 0.0,
       "pra": 9.5
      },
      "model": {
-      "use": 15.6,
-      "pts": 5.0
+      "use": 15.2,
+      "pts": 4.9
      },
      "last": {
       "use": 16.5,
@@ -17127,6 +17141,34 @@
      "home": false
     },
     {
+     "id": "F44DA1008FAF60EA",
+     "n": "Kon Knueppel",
+     "pos": "SF",
+     "role": "Bench",
+     "tag": "Questionable: Leg (Soreness, Left)",
+     "use": 2.4,
+     "proj": {
+      "pts": 1.5,
+      "reb": 0.4,
+      "ast": 0.3,
+      "3pm": 0.3,
+      "pra": 2.1
+     },
+     "model": {
+      "use": 2.4,
+      "pts": 1.5
+     },
+     "last": null,
+     "now": {
+      "gp": 0,
+      "use": null
+     },
+     "hs": "5061575",
+     "gid": "20261105F3B029AD",
+     "opp": "BKN",
+     "home": false
+    },
+    {
      "id": "B1E4DF384419E36A",
      "n": "Kobe Stewart",
      "pos": "FG",
@@ -17259,31 +17301,6 @@
       "use": null
      },
      "hs": "4066218",
-     "gid": "20261105F3B029AD",
-     "opp": "BKN",
-     "home": false
-    },
-    {
-     "id": "F44DA1008FAF60EA",
-     "n": "Kon Knueppel",
-     "pos": "SF",
-     "role": "Out",
-     "tag": "Out: Leg (Soreness, Left)",
-     "use": 0.0,
-     "proj": {
-      "pts": 0.0,
-      "reb": 0.0,
-      "ast": 0.0,
-      "3pm": 0.0,
-      "pra": 0.0
-     },
-     "model": null,
-     "last": null,
-     "now": {
-      "gp": 0,
-      "use": null
-     },
-     "hs": "5061575",
      "gid": "20261105F3B029AD",
      "opp": "BKN",
      "home": false
@@ -17546,7 +17563,7 @@
      "n": "Isaiah Stewart",
      "pos": "C",
      "role": "Rotation",
-     "tag": "",
+     "tag": "Questionable: Knee (Leg, Right)",
      "use": 17.4,
      "proj": {
       "pts": 9.4,
@@ -18087,7 +18104,7 @@
      "use": 33.2,
      "proj": {
       "pts": 13.2,
-      "reb": 7.3,
+      "reb": 7.2,
       "ast": 1.4,
       "3pm": 1.6,
       "pra": 21.9
@@ -18870,7 +18887,7 @@
       "reb": 5.5,
       "ast": 1.4,
       "3pm": 0.8,
-      "pra": 17.6
+      "pra": 17.5
      },
      "model": {
       "use": 23.7,

@@ -3526,10 +3526,10 @@
    "f": 0.794
   },
   "model": "live-v2",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "82-73",
+  "profit": -1.0,
+  "graded_at": "2026-11-05T02:44:52+00:00"
  },
  {
   "id": "cbb-401920191-total-under",
@@ -3556,10 +3556,10 @@
    "f": 0.794
   },
   "model": "live-v2",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "155",
+  "profit": -1.0,
+  "graded_at": "2026-11-05T02:44:53+00:00"
  },
  {
   "id": "cfb-401866455-ml-away",
@@ -3706,10 +3706,10 @@
    "f": 0.639
   },
   "model": "live-v2",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "105-120",
+  "profit": 0.8333,
+  "graded_at": "2026-11-05T02:44:53+00:00"
  },
  {
   "id": "nba-401909923-total-over",
@@ -3736,10 +3736,10 @@
    "f": 0.639
   },
   "model": "live-v2",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "225",
+  "profit": -1.0,
+  "graded_at": "2026-11-05T02:44:53+00:00"
  },
  {
   "id": "nba-401909924-total-under",
@@ -3856,10 +3856,10 @@
    "f": 0.526
   },
   "model": "live-v2",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "82-73",
+  "profit": -1.0,
+  "graded_at": "2026-11-05T02:44:54+00:00"
  },
  {
   "id": "cbb-401902276-spread-home",
@@ -4096,10 +4096,10 @@
    "f": 0.5
   },
   "model": "live-v2",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "146",
+  "profit": 0.8696,
+  "graded_at": "2026-11-05T02:44:54+00:00"
  },
  {
   "id": "cbb-401928811-spread-away",
@@ -4514,6 +4514,156 @@
    "period": 1,
    "clock": "0:00",
    "f": 0.5
+  },
+  "model": "live-v2",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "cfb-401866455-total-over",
+  "sport": "cfb",
+  "gid": "401866455",
+  "date": "2026-11-04",
+  "logged_at": "2026-11-05T02:44:48+00:00",
+  "matchup": "BALL @ MASS",
+  "home": "MASS",
+  "away": "BALL",
+  "label": "Over 45.5",
+  "kind": "total",
+  "side": "over",
+  "line": 45.5,
+  "price": -114,
+  "chance": 0.5893,
+  "implied": 0.5327,
+  "edge": 0.057,
+  "fair": -145,
+  "state": {
+   "score": "BALL 17 - 21 MASS",
+   "period": 4,
+   "clock": "11:28",
+   "f": 0.191
+  },
+  "model": "live-v2",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "nba-401909931-spread-away",
+  "sport": "nba",
+  "gid": "401909931",
+  "date": "2026-11-04",
+  "logged_at": "2026-11-05T02:44:48+00:00",
+  "matchup": "TOR @ DEN",
+  "home": "DEN",
+  "away": "TOR",
+  "label": "TOR +2.5",
+  "kind": "spread",
+  "side": "away",
+  "line": 2.5,
+  "price": -115,
+  "chance": 0.5715,
+  "implied": 0.5349,
+  "edge": 0.037,
+  "fair": -135,
+  "state": {
+   "score": "TOR 45 - 42 DEN",
+   "period": 2,
+   "clock": "8:00",
+   "f": 0.667
+  },
+  "model": "live-v2",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "nhl-401892644-spread-away",
+  "sport": "nhl",
+  "gid": "401892644",
+  "date": "2026-11-04",
+  "logged_at": "2026-11-05T02:44:48+00:00",
+  "matchup": "OTT @ BUF",
+  "home": "BUF",
+  "away": "OTT",
+  "label": "OTT +1.5",
+  "kind": "spread",
+  "side": "away",
+  "line": 1.5,
+  "price": -145,
+  "chance": 0.6686,
+  "implied": 0.5918,
+  "edge": 0.077,
+  "fair": -200,
+  "state": {
+   "score": "OTT 0 - 1 BUF",
+   "period": 3,
+   "clock": "13:24",
+   "f": 0.223
+  },
+  "model": "live-v2",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "nhl-401892645-total-under",
+  "sport": "nhl",
+  "gid": "401892645",
+  "date": "2026-11-04",
+  "logged_at": "2026-11-05T02:44:48+00:00",
+  "matchup": "CHI @ FLA",
+  "home": "FLA",
+  "away": "CHI",
+  "label": "Under 5.5",
+  "kind": "total",
+  "side": "under",
+  "line": 5.5,
+  "price": 120,
+  "chance": 0.539,
+  "implied": 0.4545,
+  "edge": 0.084,
+  "fair": -115,
+  "state": {
+   "score": "CHI 1 - 3 FLA",
+   "period": 3,
+   "clock": "15:34",
+   "f": 0.259
+  },
+  "model": "live-v2",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "cbb-401918052-total-under",
+  "sport": "cbb",
+  "gid": "401918052",
+  "date": "2026-11-04",
+  "logged_at": "2026-11-05T02:44:48+00:00",
+  "matchup": "RAD @ CAL",
+  "home": "CAL",
+  "away": "RAD",
+  "label": "Under 170.5",
+  "kind": "total",
+  "side": "under",
+  "line": 170.5,
+  "price": -120,
+  "chance": 0.6001,
+  "implied": 0.5455,
+  "edge": 0.055,
+  "fair": -150,
+  "state": {
+   "score": "RAD 37 - 45 CAL",
+   "period": 1,
+   "clock": "1:18",
+   "f": 0.532
   },
   "model": "live-v2",
   "result": null,
