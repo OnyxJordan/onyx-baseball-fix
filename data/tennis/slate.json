@@ -2410,8 +2410,8 @@
     {
      "id": "186503",
      "start": "2026-11-05T18:15Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 3",
      "draw": "Men's Singles",
      "court": "Court Central",
@@ -2421,10 +2421,10 @@
        "short": "T. Fritz",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        3
+        6
        ],
        "serve": false
       },
@@ -2436,9 +2436,9 @@
        "win": false,
        "sets": [
         3,
-        1
+        4
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -2548,9 +2548,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Taylor Fritz",
+       "short": "T. Fritz",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -6638,7 +6638,7 @@
      "id": "186728",
      "start": "2026-11-05T17:05Z",
      "state": "in",
-     "detail": "2nd",
+     "detail": "3rd",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Campo 3",
@@ -6651,9 +6651,10 @@
        "win": false,
        "sets": [
         4,
-        6
+        7,
+        1
        ],
-       "serve": false
+       "serve": true
       },
       {
        "name": "Carole Monnet",
@@ -6663,7 +6664,8 @@
        "win": false,
        "sets": [
         6,
-        5
+        5,
+        0
        ],
        "serve": false
       }
@@ -6672,8 +6674,8 @@
     {
      "id": "186727",
      "start": "2026-11-05T17:05Z",
-     "state": "in",
-     "detail": "3rd",
+     "state": "post",
+     "detail": "Final",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Campo 1",
@@ -6696,11 +6698,44 @@
        "short": "J. Riera",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
         1,
-        5
+        6
+       ],
+       "serve": false
+      }
+     ]
+    },
+    {
+     "id": "186729",
+     "start": "2026-11-05T19:25Z",
+     "state": "in",
+     "detail": "1st",
+     "round": "Quarterfinal",
+     "draw": "Women's Singles",
+     "court": "Campo 1",
+     "p": [
+      {
+       "name": "Bianca Andreescu",
+       "short": "B. Andreescu",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/can.png",
+       "seed": null,
+       "win": false,
+       "sets": [
+        0
+       ],
+       "serve": false
+      },
+      {
+       "name": "Luisina Giovannini",
+       "short": "L. Giovannini",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
+       "seed": null,
+       "win": false,
+       "sets": [
+        0
        ],
        "serve": true
       }
@@ -6708,9 +6743,9 @@
     },
     {
      "id": "186730",
-     "start": "2026-11-05T19:20Z",
+     "start": "2026-11-05T20:00Z",
      "state": "pre",
-     "detail": "11/5 - 2:20 PM EST",
+     "detail": "11/5 - 3:00 PM EST",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Campo 3",
@@ -6736,35 +6771,6 @@
      ]
     },
     {
-     "id": "186729",
-     "start": "2026-11-05T19:20Z",
-     "state": "pre",
-     "detail": "11/5 - 2:20 PM EST",
-     "round": "Quarterfinal",
-     "draw": "Women's Singles",
-     "court": "Campo 1",
-     "p": [
-      {
-       "name": "Bianca Andreescu",
-       "short": "B. Andreescu",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/can.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "Luisina Giovannini",
-       "short": "L. Giovannini",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      }
-     ]
-    },
-    {
      "id": "186734",
      "start": "2026-11-06T05:00Z",
      "state": "pre",
@@ -6774,9 +6780,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Julia Riera",
+       "short": "J. Riera",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -8128,5 +8134,5 @@
    ]
   }
  ],
- "fetched": "2026-11-05T19:12:20+00:00"
+ "fetched": "2026-11-05T19:34:11+00:00"
 }
