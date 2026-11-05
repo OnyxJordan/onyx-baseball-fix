@@ -2446,7 +2446,7 @@
      "id": "186495",
      "start": "2026-11-05T19:50Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 3",
      "draw": "Men's Singles",
      "court": "Court Central",
@@ -2458,9 +2458,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        3
+        6,
+        2
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Jan-Lennard Struff",
@@ -2469,9 +2470,10 @@
        "seed": null,
        "win": false,
        "sets": [
+        3,
         2
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
@@ -6641,8 +6643,8 @@
     {
      "id": "186728",
      "start": "2026-11-05T17:05Z",
-     "state": "in",
-     "detail": "3rd",
+     "state": "post",
+     "detail": "Final",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Campo 3",
@@ -6652,11 +6654,11 @@
        "short": "L. Romero Gormaz",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         4,
         7,
-        4
+        6
        ],
        "serve": false
       },
@@ -6671,7 +6673,7 @@
         5,
         4
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -6716,7 +6718,7 @@
      "id": "186729",
      "start": "2026-11-05T19:25Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Campo 1",
@@ -6728,7 +6730,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        6
+        6,
+        5
        ],
        "serve": false
       },
@@ -6739,7 +6742,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        1
+        1,
+        2
        ],
        "serve": false
       }
@@ -6747,9 +6751,9 @@
     },
     {
      "id": "186730",
-     "start": "2026-11-05T20:20Z",
-     "state": "pre",
-     "detail": "11/5 - 3:20 PM EST",
+     "start": "2026-11-05T20:25Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Campo 3",
@@ -6760,7 +6764,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        1
+       ],
        "serve": false
       },
       {
@@ -6769,8 +6775,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        0
+       ],
+       "serve": true
       }
      ]
     },
@@ -6793,9 +6801,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Leyre Romero Gormaz",
+       "short": "L. Romero Gormaz",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -8138,5 +8146,5 @@
    ]
   }
  ],
- "fetched": "2026-11-05T20:07:23+00:00"
+ "fetched": "2026-11-05T20:40:16+00:00"
 }
