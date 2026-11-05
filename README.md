@@ -459,6 +459,14 @@ so old links and the pipeline are unchanged.
   edge AND a 60%+ chance (`live.js` TN_CONF/isVal, `live_model.TN_CONF`, `live_log.py`, which logs as
   `live-v2`; v1 rows stay as logged). Below it the card reads "Too close to call". 60 graded plays is a
   small sample: the lane stays on trial and the bar is revisited as rows come in.
+- **One tennis pick per match (11/5, Jordan: a Musetti match showed three different picks).** Before,
+  a match could log a moneyline, a spread and a total, or both sides as the line moved (25 of 36
+  matches had more than one row). `live_log.py` (`live-v3`) now logs one pick per tennis match, the
+  most confident value play when the match first qualifies, and nothing more for that match. The
+  page ranks tennis bets by confidence and, once a match is logged, shows that pick locked ("Our pick,
+  logged") with no other side. The ledger keeps every row (append-only); the record counts one per
+  tennis match (`live.js` onePerMatch): from the match's first logging run, the most confident play,
+  never chosen by result. Tennis 37-37 (-4.96u, 75 rows) reads 20-15 (-1.32u, 36 matches).
 
 ## Onyx Sports pages: NFL, college football, NHL, tennis, golf (10/26)
 
