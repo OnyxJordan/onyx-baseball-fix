@@ -4426,10 +4426,10 @@
    "f": 0.974
   },
   "model": "live-v2",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "119-132",
+  "profit": 0.8696,
+  "graded_at": "2026-11-05T04:54:53+00:00"
  },
  {
   "id": "nba-401909932-ml-away",
@@ -4456,10 +4456,10 @@
    "f": 0.974
   },
   "model": "live-v2",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "119-132",
+  "profit": 0.625,
+  "graded_at": "2026-11-05T04:54:53+00:00"
  },
  {
   "id": "nhl-401892644-ml-home",
@@ -4576,10 +4576,10 @@
    "f": 0.667
   },
   "model": "live-v2",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "128-109",
+  "profit": -1.0,
+  "graded_at": "2026-11-05T04:54:53+00:00"
  },
  {
   "id": "nhl-401892644-spread-away",
@@ -4756,10 +4756,10 @@
    "f": 0.5
   },
   "model": "live-v2",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "251",
+  "profit": 0.8333,
+  "graded_at": "2026-11-05T04:54:54+00:00"
  },
  {
   "id": "nba-401909933-total-over",
@@ -4936,10 +4936,10 @@
    "f": 0.79
   },
   "model": "live-v2",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "105-64",
+  "profit": 0.9091,
+  "graded_at": "2026-11-05T04:54:54+00:00"
  },
  {
   "id": "nba-401909933-spread-home",
@@ -5056,10 +5056,10 @@
    "f": 0.5
   },
   "model": "live-v2",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "169",
+  "profit": -1.0,
+  "graded_at": "2026-11-05T04:54:54+00:00"
  },
  {
   "id": "nba-401909934-total-over",
@@ -5144,6 +5144,36 @@
    "period": 2,
    "clock": "7:17",
    "f": 0.652
+  },
+  "model": "live-v2",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "nhl-401892647-spread-away",
+  "sport": "nhl",
+  "gid": "401892647",
+  "date": "2026-11-04",
+  "logged_at": "2026-11-05T04:54:52+00:00",
+  "matchup": "CGY @ SEA",
+  "home": "SEA",
+  "away": "CGY",
+  "label": "CGY +1.5",
+  "kind": "spread",
+  "side": "away",
+  "line": 1.5,
+  "price": -410,
+  "chance": 0.8372,
+  "implied": 0.8039,
+  "edge": 0.033,
+  "fair": -515,
+  "state": {
+   "score": "CGY 1 - 1 SEA",
+   "period": 2,
+   "clock": "0:00",
+   "f": 0.333
   },
   "model": "live-v2",
   "result": null,
