@@ -2590,9 +2590,9 @@
     },
     {
      "id": "186493",
-     "start": "2026-11-06T22:00Z",
-     "state": "pre",
-     "detail": "11/6 - 5:00 PM EST",
+     "start": "2026-11-06T22:10Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Quarterfinal",
      "draw": "Men's Singles",
      "court": "Court Central",
@@ -2603,7 +2603,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/por.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        1
+       ],
        "serve": false
       },
       {
@@ -2612,8 +2614,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/nor.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        1
+       ],
+       "serve": true
       }
      ]
     },
@@ -8260,5 +8264,5 @@
    ]
   }
  ],
- "fetched": "2026-11-06T21:49:31+00:00"
+ "fetched": "2026-11-06T22:22:17+00:00"
 }

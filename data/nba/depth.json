@@ -1,7 +1,7 @@
 {
  "sport": "nba",
  "date": "2026-11-06",
- "generated": "2026-11-06T21:48:09+00:00",
+ "generated": "2026-11-06T22:21:18+00:00",
  "unit": "min",
  "stats": [
   "pts",
@@ -793,43 +793,8 @@
    "name": "Atlanta Hawks",
    "date": "2026-11-06",
    "pace": 104.0,
-   "min_sum": 251.3,
+   "min_sum": 234.4,
    "players": [
-    {
-     "id": "4844268304BB",
-     "n": "Jalen Johnson",
-     "pos": "PF",
-     "role": "Starter",
-     "tag": "Questionable: Ankle (Leg, Left)",
-     "use": 33.0,
-     "proj": {
-      "pts": 19.8,
-      "reb": 9.7,
-      "ast": 7.5,
-      "3pm": 1.4,
-      "pra": 36.9
-     },
-     "model": {
-      "use": 33.1,
-      "pts": 20.0
-     },
-     "last": {
-      "use": 32.7,
-      "pts": 18.3,
-      "reb": 9.0,
-      "ast": 8.0,
-      "3pm": 1.1,
-      "gp": 7
-     },
-     "now": {
-      "gp": 7,
-      "use": 32.7
-     },
-     "hs": "4701230",
-     "gid": "202611071B7DCCC7",
-     "opp": "WSH",
-     "home": true
-    },
     {
      "id": "DC77AD36110A",
      "n": "Nickeil Alexander-Walker",
@@ -838,15 +803,15 @@
      "tag": "",
      "use": 30.3,
      "proj": {
-      "pts": 20.9,
-      "reb": 3.1,
-      "ast": 2.6,
+      "pts": 21.7,
+      "reb": 3.4,
+      "ast": 2.7,
       "3pm": 3.5,
-      "pra": 26.7
+      "pra": 27.7
      },
      "model": {
       "use": 30.3,
-      "pts": 20.8
+      "pts": 21.6
      },
      "last": {
       "use": 30.3,
@@ -873,15 +838,15 @@
      "tag": "",
      "use": 30.2,
      "proj": {
-      "pts": 10.4,
-      "reb": 7.2,
-      "ast": 4.9,
+      "pts": 10.6,
+      "reb": 7.1,
+      "ast": 5.1,
       "3pm": 0.3,
-      "pra": 22.5
+      "pra": 22.9
      },
      "model": {
       "use": 30.4,
-      "pts": 10.5
+      "pts": 10.8
      },
      "last": {
       "use": 29.7,
@@ -908,15 +873,15 @@
      "tag": "",
      "use": 29.6,
      "proj": {
-      "pts": 14.5,
-      "reb": 9.0,
-      "ast": 2.8,
+      "pts": 15.0,
+      "reb": 9.3,
+      "ast": 2.9,
       "3pm": 1.5,
-      "pra": 26.3
+      "pra": 27.2
      },
      "model": {
       "use": 29.7,
-      "pts": 14.9
+      "pts": 15.4
      },
      "last": {
       "use": 29.1,
@@ -943,15 +908,15 @@
      "tag": "",
      "use": 26.9,
      "proj": {
-      "pts": 15.5,
-      "reb": 3.5,
-      "ast": 4.3,
+      "pts": 16.1,
+      "reb": 3.6,
+      "ast": 4.4,
       "3pm": 2.0,
-      "pra": 23.4
+      "pra": 24.2
      },
      "model": {
       "use": 27.0,
-      "pts": 15.8
+      "pts": 16.4
      },
      "last": {
       "use": 26.6,
@@ -974,19 +939,19 @@
      "id": "2139C185A117",
      "n": "Luguentz Dort",
      "pos": "SF",
-     "role": "Rotation",
+     "role": "Starter",
      "tag": "",
-     "use": 26.2,
+     "use": 26.6,
      "proj": {
-      "pts": 9.5,
-      "reb": 3.4,
-      "ast": 1.5,
+      "pts": 9.8,
+      "reb": 3.6,
+      "ast": 1.6,
       "3pm": 1.9,
-      "pra": 14.4
+      "pra": 15.0
      },
      "model": {
       "use": 27.0,
-      "pts": 9.8
+      "pts": 10.0
      },
      "last": {
       "use": 25.3,
@@ -1011,17 +976,17 @@
      "pos": "SG",
      "role": "Rotation",
      "tag": "",
-     "use": 24.5,
+     "use": 25.8,
      "proj": {
-      "pts": 12.7,
-      "reb": 3.6,
-      "ast": 1.9,
-      "3pm": 2.0,
-      "pra": 18.3
+      "pts": 13.9,
+      "reb": 4.0,
+      "ast": 2.1,
+      "3pm": 2.2,
+      "pra": 20.0
      },
      "model": {
-      "use": 23.0,
-      "pts": 12.0
+      "use": 25.5,
+      "pts": 14.0
      },
      "last": {
       "use": 26.0,
@@ -1046,17 +1011,17 @@
      "pos": "PG",
      "role": "Rotation",
      "tag": "",
-     "use": 19.7,
+     "use": 20.7,
      "proj": {
-      "pts": 8.5,
-      "reb": 2.7,
-      "ast": 3.7,
-      "3pm": 1.0,
-      "pra": 14.9
+      "pts": 9.3,
+      "reb": 2.9,
+      "ast": 4.0,
+      "3pm": 1.1,
+      "pra": 16.2
      },
      "model": {
-      "use": 18.8,
-      "pts": 8.8
+      "use": 20.8,
+      "pts": 10.0
      },
      "last": {
       "use": 20.6,
@@ -1081,17 +1046,17 @@
      "pos": "PF",
      "role": "Bench",
      "tag": "",
-     "use": 8.4,
+     "use": 10.2,
      "proj": {
-      "pts": 2.5,
-      "reb": 1.6,
-      "ast": 0.4,
-      "3pm": 0.2,
-      "pra": 4.5
+      "pts": 4.3,
+      "reb": 2.4,
+      "ast": 0.8,
+      "3pm": 0.5,
+      "pra": 7.5
      },
      "model": {
-      "use": 4.2,
-      "pts": 1.7
+      "use": 10.1,
+      "pts": 4.3
      },
      "last": {
       "use": 10.2,
@@ -1116,17 +1081,17 @@
      "pos": "SF",
      "role": "Bench",
      "tag": "",
-     "use": 7.3,
+     "use": 9.2,
      "proj": {
-      "pts": 4.1,
-      "reb": 0.5,
-      "ast": 0.4,
-      "3pm": 0.4,
-      "pra": 5.0
+      "pts": 6.8,
+      "reb": 1.0,
+      "ast": 0.8,
+      "3pm": 1.0,
+      "pra": 8.6
      },
      "model": {
-      "use": 4.7,
-      "pts": 2.6
+      "use": 11.2,
+      "pts": 6.3
      },
      "last": {
       "use": 8.4,
@@ -1151,17 +1116,17 @@
      "pos": "PG",
      "role": "Bench",
      "tag": "",
-     "use": 6.8,
+     "use": 8.5,
      "proj": {
-      "pts": 2.3,
-      "reb": 1.1,
-      "ast": 0.9,
-      "3pm": 0.3,
-      "pra": 4.3
+      "pts": 4.0,
+      "reb": 1.6,
+      "ast": 1.7,
+      "3pm": 0.7,
+      "pra": 7.3
      },
      "model": {
-      "use": 4.0,
-      "pts": 1.6
+      "use": 9.6,
+      "pts": 4.0
      },
      "last": {
       "use": 8.0,
@@ -1181,57 +1146,22 @@
      "home": true
     },
     {
-     "id": "8C7E63063F9B",
-     "n": "Dorian Finney-Smith",
-     "pos": "PF",
-     "role": "Bench",
-     "tag": "",
-     "use": 3.6,
-     "proj": {
-      "pts": 0.9,
-      "reb": 0.5,
-      "ast": 0.2,
-      "3pm": 0.2,
-      "pra": 1.6
-     },
-     "model": {
-      "use": 2.8,
-      "pts": 0.8
-     },
-     "last": {
-      "use": 4.0,
-      "pts": 1.0,
-      "reb": 0.7,
-      "ast": 0.3,
-      "3pm": 0.3,
-      "gp": 3
-     },
-     "now": {
-      "gp": 3,
-      "use": 4.0
-     },
-     "hs": "2578185",
-     "gid": "202611071B7DCCC7",
-     "opp": "WSH",
-     "home": true
-    },
-    {
      "id": "225E313B0E0E",
      "n": "Gabe Vincent",
      "pos": "G",
      "role": "Bench",
      "tag": "",
-     "use": 2.4,
+     "use": 5.8,
      "proj": {
-      "pts": 0.7,
-      "reb": 0.2,
-      "ast": 0.2,
-      "3pm": 0.2,
-      "pra": 1.1
+      "pts": 1.8,
+      "reb": 0.4,
+      "ast": 0.5,
+      "3pm": 0.4,
+      "pra": 2.6
      },
      "model": {
-      "use": 2.4,
-      "pts": 0.7
+      "use": 5.8,
+      "pts": 1.8
      },
      "last": null,
      "now": {
@@ -1249,17 +1179,17 @@
      "pos": "SF",
      "role": "Bench",
      "tag": "",
-     "use": 2.4,
+     "use": 5.8,
      "proj": {
-      "pts": 1.0,
-      "reb": 0.3,
-      "ast": 0.2,
-      "3pm": 0.1,
-      "pra": 1.5
+      "pts": 2.5,
+      "reb": 0.9,
+      "ast": 0.4,
+      "3pm": 0.3,
+      "pra": 3.8
      },
      "model": {
-      "use": 2.4,
-      "pts": 1.0
+      "use": 5.8,
+      "pts": 2.5
      },
      "last": null,
      "now": {
@@ -1267,6 +1197,41 @@
       "use": null
      },
      "hs": "4431714",
+     "gid": "202611071B7DCCC7",
+     "opp": "WSH",
+     "home": true
+    },
+    {
+     "id": "8C7E63063F9B",
+     "n": "Dorian Finney-Smith",
+     "pos": "PF",
+     "role": "Bench",
+     "tag": "",
+     "use": 4.8,
+     "proj": {
+      "pts": 1.7,
+      "reb": 0.9,
+      "ast": 0.4,
+      "3pm": 0.4,
+      "pra": 2.9
+     },
+     "model": {
+      "use": 6.8,
+      "pts": 2.0
+     },
+     "last": {
+      "use": 4.0,
+      "pts": 1.0,
+      "reb": 0.7,
+      "ast": 0.3,
+      "3pm": 0.3,
+      "gp": 3
+     },
+     "now": {
+      "gp": 3,
+      "use": 4.0
+     },
+     "hs": "2578185",
      "gid": "202611071B7DCCC7",
      "opp": "WSH",
      "home": true
@@ -1323,6 +1288,38 @@
       "use": null
      },
      "hs": null,
+     "gid": "202611071B7DCCC7",
+     "opp": "WSH",
+     "home": true
+    },
+    {
+     "id": "4844268304BB",
+     "n": "Jalen Johnson",
+     "pos": "PF",
+     "role": "Out",
+     "tag": "Out: Ankle (Leg, Left)",
+     "use": 0.0,
+     "proj": {
+      "pts": 0.0,
+      "reb": 0.0,
+      "ast": 0.0,
+      "3pm": 0.0,
+      "pra": 0.0
+     },
+     "model": null,
+     "last": {
+      "use": 32.7,
+      "pts": 18.3,
+      "reb": 9.0,
+      "ast": 8.0,
+      "3pm": 1.1,
+      "gp": 7
+     },
+     "now": {
+      "gp": 7,
+      "use": 32.7
+     },
+     "hs": "4701230",
      "gid": "202611071B7DCCC7",
      "opp": "WSH",
      "home": true
@@ -5103,7 +5100,7 @@
       "reb": 10.5,
       "ast": 2.5,
       "3pm": 0.8,
-      "pra": 34.9
+      "pra": 34.8
      },
      "model": {
       "use": 32.9,
@@ -5135,7 +5132,7 @@
      "use": 32.8,
      "proj": {
       "pts": 15.5,
-      "reb": 5.0,
+      "reb": 4.9,
       "ast": 4.7,
       "3pm": 2.2,
       "pra": 25.2
@@ -5348,7 +5345,7 @@
       "reb": 4.2,
       "ast": 0.7,
       "3pm": 0.0,
-      "pra": 10.2
+      "pra": 10.1
      },
      "model": {
       "use": 13.6,
