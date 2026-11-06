@@ -201,5 +201,34 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186687-ml-away",
+  "sport": "tennis",
+  "gid": "186687",
+  "date": "2026-11-06",
+  "logged_at": "2026-11-06T11:24:16+00:00",
+  "matchup": "Gina Feistel vs Ksenia Zaytseva",
+  "home": "Ksenia Zaytseva",
+  "away": "Gina Feistel",
+  "label": "Gina Feistel to win",
+  "kind": "ml",
+  "side": "away",
+  "line": null,
+  "price": -178,
+  "chance": 0.6853,
+  "implied": 0.6403,
+  "edge": 0.045,
+  "fair": -220,
+  "state": {
+   "sets": "2-0",
+   "srv": "away",
+   "need": 2
+  },
+  "model": "live-v4",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
