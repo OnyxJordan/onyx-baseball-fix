@@ -493,5 +493,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186492-ml-away",
+  "sport": "tennis",
+  "gid": "186492",
+  "date": "2026-11-06",
+  "logged_at": "2026-11-06T19:10:16+00:00",
+  "matchup": "Carlos Alcaraz vs Taylor Fritz",
+  "home": "Taylor Fritz",
+  "away": "Carlos Alcaraz",
+  "label": "Carlos Alcaraz to win",
+  "kind": "ml",
+  "side": "away",
+  "line": null,
+  "price": -249,
+  "chance": 0.745,
+  "implied": 0.7135,
+  "edge": 0.032,
+  "fair": -290,
+  "state": {
+   "sets": "1-1",
+   "srv": "home",
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v6",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
