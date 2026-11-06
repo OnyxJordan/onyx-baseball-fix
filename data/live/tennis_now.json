@@ -172,5 +172,34 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186689-spread-away",
+  "sport": "tennis",
+  "gid": "186689",
+  "date": "2026-11-06",
+  "logged_at": "2026-11-06T11:04:48+00:00",
+  "matchup": "Martyna Kubka vs Sofya Lansere",
+  "home": "Sofya Lansere",
+  "away": "Martyna Kubka",
+  "label": "Martyna Kubka -3.5 games",
+  "kind": "spread",
+  "side": "away",
+  "line": -3.5,
+  "price": -130,
+  "chance": 0.6227,
+  "implied": 0.5652,
+  "edge": 0.058,
+  "fair": -165,
+  "state": {
+   "sets": "1-0",
+   "srv": null,
+   "need": 2
+  },
+  "model": "live-v4",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
