@@ -365,6 +365,19 @@ def nfl_block(lane, slate, odds):
         inj = {}
     dropped = set()
     out = []
+    # v15: teams starting a deep backup quarterback tonight (nfl_model.deep_backups): his receivers'
+    # catches and yards come down, and the team's points in the game lines (game_rows)
+    deep = {}
+    if hasattr(M, "deep_backups"):
+        try:
+            deep = M.deep_backups(rows, lane.load("depth.json", None), inj,
+                                  {t for g in slate.get("games") or [] if g.get("state") == "pre" for t in (g["home"], g["away"])},
+                                  E.injury_of)
+        except Exception as ex:
+            print(f"  nfl qb: {ex}")
+        for t, v in sorted(deep.items()):
+            print(f"  nfl qb: {t} starts {v['qb']} ({v['prior']} prior start(s), usual {v['usual']}): "
+                  f"{M.QB_DEEP['pts']:+.1f} pts, receivers yards x{M.QB_DEEP['rec_yds']}, catches x{M.QB_DEEP['rec']}")
     # v14: tonight's players by team, so a projection is built on the games shared with teammates
     # coming back from injury (nfl_model.with_teammates)
     played_g, role_g = M.team_context(rows) if hasattr(M, "team_context") else ({}, {})
@@ -414,6 +427,10 @@ def nfl_block(lane, slate, odds):
                                 pv = M.VERSE_P["w"] * pvv + (1 - M.VERSE_P["w"]) * pv
                         if pv is not None:
                             pr, vol = pv, True
+                    qb_note = None
+                    if team in deep and s in ("rec", "rec_yds"):
+                        pr *= M.QB_DEEP[s]
+                        qb_note = f"{deep[team]['qb']} at QB ({deep[team]['prior']} prior start{'s' if deep[team]['prior'] != 1 else ''})"
                     ln = props.get((nk(cur[-1]["name"]), s))
                     out.append({"pid": pid, "name": cur[-1]["name"], "hs": cur[-1].get("hs"), "team": team, "opp": opp,
                                 "home": home, "gid": g["gid"], "mkt": s, "proj": round(pr, 1),
@@ -422,7 +439,7 @@ def nfl_block(lane, slate, odds):
                                 "line": ln.get("line") if ln else None,
                                 "over": ln.get("over") if ln else None, "under": ln.get("under") if ln else None,
                                 "over_sel": ln.get("over_sel") if ln else None, "under_sel": ln.get("under_sel") if ln else None,
-                                "vol": vol, **({"inj": "Q", "inj_d": it["d"]} if it else {})})
+                                "vol": vol, **({"inj": "Q", "inj_d": it["d"]} if it else {}), **({"qb": qb_note} if qb_note else {})})
                 # v9: passing touchdowns for a quarterback who passed in the team's last game
                 if hasattr(M, "project_pass_td") and (cur[-1].get("att") or 0) >= M.PTD_P["min_att"] and team in team_env:
                     lam = M.project_pass_td(gs, team_env[team][0])
@@ -558,6 +575,8 @@ def nfl_block(lane, slate, odds):
     games = (lane.load("results.json", {}) or {}).get("games") or []
     gw = ((bt.get("lane") or {}).get("w")) or DEFAULT_W
     R = T.fit(games, slate.get("date") or "9999", M.GAME_P)
+    R["adj"] = {t: M.QB_DEEP["pts"] for t in deep} if deep else {}
+    R["adj_why"] = {t: f"{v['qb']} at QB ({v['prior']} prior start{'s' if v['prior'] != 1 else ''}) {M.QB_DEEP['pts']:+.1f}" for t, v in deep.items()}
     grows, proj = game_rows("nfl", M, slate, odds, R, gw)
     block["tests"].append({"k": "Game win log loss", "v": f"{M.GAME_TEST['logloss']:.3f}",
                            "d": f"vs {M.GAME_TEST['base_logloss']:.3f} home base rate · {M.GAME_TEST['n']} games"})
@@ -648,9 +667,13 @@ def game_rows(key, M, slate, odds, R, w):
         if R["n"].get(g["home"], 0) < GP.get("min_games", 3) or R["n"].get(g["away"], 0) < GP.get("min_games", 3):
             continue
         eh, ea = T.expect(R, g["home"], g["away"], g.get("neutral"))
+        # v15 NFL: a deep backup quarterback's team points (nfl_model.QB_DEEP), set by nfl_block
+        adj = R.get("adj") or {}
+        eh, ea = eh + adj.get(g["home"], 0.0), ea + adj.get(g["away"], 0.0)
         pr = (T.hk_probs if kind == "hockey" else T.fb_probs)(eh, ea, GP)    # basketball: normal margin and total, like football
         unit = "goals" if kind == "hockey" else "pts"
-        detail = f"model {g['away']} {ea:.1f} {g['home']} {eh:.1f}"
+        detail = f"model {g['away']} {ea:.1f} {g['home']} {eh:.1f}" + "".join(
+            f" · {t} {R['adj_why'][t]}" for t in (g["away"], g["home"]) if t in (R.get("adj_why") or {}))
         proj[g["gid"]] = {"home": round(eh, 2), "away": round(ea, 2), "home_win": round(pr["home_win"], 4), "unit": unit}
         o = ((odds or {}).get("games") or {}).get(g["gid"]) or {}
         if o.get("home_ml") is not None and o.get("away_ml") is not None:
