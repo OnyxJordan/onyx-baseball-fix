@@ -2479,9 +2479,9 @@
     },
     {
      "id": "186500",
-     "start": "2026-11-06T13:00Z",
-     "state": "pre",
-     "detail": "11/6 - 8:00 AM EST",
+     "start": "2026-11-06T13:10Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Quarterfinal",
      "draw": "Men's Singles",
      "court": "Court Central",
@@ -2492,7 +2492,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        0
+       ],
        "serve": false
       },
       {
@@ -2501,8 +2503,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        0
+       ],
+       "serve": true
       }
      ]
     },
@@ -4077,8 +4081,8 @@
     {
      "id": "186634",
      "start": "2026-11-06T12:35Z",
-     "state": "pre",
-     "detail": "11/6 - 7:35 AM EST",
+     "state": "in",
+     "detail": "1st",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Centre Court",
@@ -4089,7 +4093,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/phi.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        3
+       ],
        "serve": false
       },
       {
@@ -4098,7 +4104,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/cro.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        4
+       ],
        "serve": false
       }
      ]
@@ -5528,7 +5536,7 @@
      "id": "186597",
      "start": "2026-11-06T12:20Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Centre Court",
@@ -5540,7 +5548,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        3,
+        1
        ],
        "serve": false
       },
@@ -5551,17 +5560,18 @@
        "seed": null,
        "win": false,
        "sets": [
+        6,
         2
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
     {
      "id": "186596",
-     "start": "2026-11-06T13:00Z",
+     "start": "2026-11-06T13:20Z",
      "state": "pre",
-     "detail": "11/6 - 8:00 AM EST",
+     "detail": "11/6 - 8:20 AM EST",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Centre Court",
@@ -5588,9 +5598,9 @@
     },
     {
      "id": "186595",
-     "start": "2026-11-06T14:00Z",
+     "start": "2026-11-06T14:20Z",
      "state": "pre",
-     "detail": "11/6 - 9:00 AM EST",
+     "detail": "11/6 - 9:20 AM EST",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Centre Court",
@@ -7989,7 +7999,7 @@
        "win": false,
        "sets": [
         6,
-        2
+        5
        ],
        "serve": false
       },
@@ -8001,7 +8011,7 @@
        "win": false,
        "sets": [
         7,
-        2
+        5
        ],
        "serve": true
       }
@@ -8010,8 +8020,8 @@
     {
      "id": "186687",
      "start": "2026-11-06T11:10Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Court 3",
@@ -8021,12 +8031,12 @@
        "short": "G. Feistel",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/pol.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        5
+        7
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Ksenia Zaytseva",
@@ -8036,7 +8046,7 @@
        "win": false,
        "sets": [
         1,
-        4
+        5
        ],
        "serve": false
       }
@@ -8044,9 +8054,9 @@
     },
     {
      "id": "186686",
-     "start": "2026-11-06T12:50Z",
+     "start": "2026-11-06T13:20Z",
      "state": "pre",
-     "detail": "11/6 - 7:50 AM EST",
+     "detail": "11/6 - 8:20 AM EST",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Lwena Court",
@@ -8139,9 +8149,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Gina Feistel",
+       "short": "G. Feistel",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/pol.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -8190,5 +8200,5 @@
    ]
   }
  ],
- "fetched": "2026-11-06T12:37:26+00:00"
+ "fetched": "2026-11-06T13:13:40+00:00"
 }
