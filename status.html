@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>Onyx Line Status</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0c0c0c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Onyx Sports">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<meta name="description" content="Where every Onyx Sports line comes from right now, which games are missing one, and why.">
+<link rel="stylesheet" href="onyx.css">
+<script src="onyx.js" defer></script>
+<script src="ui.js" defer></script>
+<style>
+body{background:#0c0c0c;color:#fff;margin:0}
+.ls{max-width:1100px;margin:0 auto;padding:28px 16px 40px}
+.ls h1{margin:0;font-size:clamp(30px,7vw,48px);line-height:1}
+.ls .sub{margin:8px 0 18px;color:#b9b2c4;font-size:14px;line-height:1.6;max-width:640px}
+.ls-back{display:inline-block;margin:0 0 14px;color:#d795ff;font:700 12px monospace;letter-spacing:.06em;text-transform:uppercase;text-decoration:none}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:10px}
+.card{padding:14px;border-radius:16px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.035);min-width:0}
+.card.ok{border-color:rgba(97,233,112,.45)}.card.mk{border-color:rgba(176,56,249,.55)}.card.bad{border-color:rgba(255,92,92,.55)}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
+.top h3{margin:0;font-size:17px}
+.tag{display:inline-block;padding:3px 8px;border-radius:999px;font:700 10px monospace;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+.tag.ok{background:rgba(97,233,112,.15);color:#61e970}.tag.mk{background:rgba(176,56,249,.2);color:#d795ff}.tag.bad{background:rgba(255,92,92,.15);color:#ff7a7a}
+.nums{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-bottom:10px}
+.nums div{padding:8px;border-radius:10px;background:rgba(255,255,255,.04);text-align:center;min-width:0}
+.nums b{display:block;font:800 16px monospace}.nums span{font:600 9px monospace;letter-spacing:.06em;text-transform:uppercase;color:#9a93a6}
+.card ul{margin:6px 0 0;padding-left:18px;color:#cfc8da;font-size:13px;line-height:1.5}
+.card .why{color:#9a93a6}
+.card .note{margin:6px 0 0;color:#b9b2c4;font-size:13px;line-height:1.5}
+h2{margin:28px 0 10px;font-size:22px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+td,th{padding:7px 6px;border-bottom:1px solid rgba(255,255,255,.08);text-align:left;vertical-align:top}
+th{font:700 10px monospace;letter-spacing:.06em;text-transform:uppercase;color:#9a93a6}
+.tw{overflow-x:auto}
+.empty{color:#9a93a6;font-size:14px;padding:12px 0}
+</style>
+</head>
+<body>
+<main class="ls">
+<a class="ls-back" href="home.html">&larr; Onyx Sports</a>
+<h1>Line status</h1>
+<p class="sub">Where every line on the site comes from right now, which games have no line, and why. Onyx is the source; when the Onyx feed is empty the site shows the market line instead, and those are never tracked as Onyx Picks.</p>
+<div id="at" class="sub"></div>
+<div id="cards" class="grid"><div class="empty">Loading...</div></div>
+<h2>Live tennis gaps</h2>
+<p class="sub">Checked every minute. A row when a live match loses its line, and one when the line comes back.</p>
+<div class="tw"><table><thead><tr><th>When (ET)</th><th>Match</th><th>State</th><th>Why</th></tr></thead><tbody id="gaps"><tr><td colspan="4" class="empty">Loading...</td></tr></tbody></table></div>
+<h2>Recent builds</h2>
+<div class="tw"><table><thead><tr><th>When (ET)</th><th>Sport</th><th>Source</th><th>Games with no line</th><th>Live with a line</th></tr></thead><tbody id="hist"></tbody></table></div>
+</main>
+<script>
+var GAPS_URL = 'https://raw.githubusercontent.com/OnyxJordan/onyx-baseball-fix/main/data/lines/live_gaps.json';
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]; }); }
+function et(iso) { try { return new Date(iso).toLocaleString('en-US', {timeZone: 'America/New_York', month: 'numeric', day: 'numeric', hour: 'numeric', minute: '2-digit'}); } catch (e) { return iso; } }
+var SRC = {onyx: ['ok', 'Onyx'], market: ['mk', 'Market line'], none: ['bad', 'No lines']};
+var WHY = {
+  'feed error': 'the live line service did not answer',
+  'not on the feed': 'the odds feed does not cover this event',
+  'no book pricing it': 'on the feed, but no price posted right now (suspended, delay or timeout)',
+  'names differ': 'the feed lists it under different names'
+};
+function card(k, v) {
+  var p = v.pregame || {}, l = v.live || {}, s = SRC[p.source] || SRC.none;
+  var miss = p.n_missing != null ? p.n_missing : (p.missing || []).length;
+  var h = '<div class="card ' + s[0] + '"><div class="top"><h3>' + esc(v.name || k) + '</h3><span class="tag ' + s[0] + '">' + s[1] + '</span></div>';
+  if (p.error) h += '<p class="note">Could not read: ' + esc(p.error) + '</p>';
+  h += '<div class="nums"><div><b>' + (p.games || 0) + '</b><span>To play</span></div><div><b>' + miss + '</b><span>No line</span></div>'
+     + '<div><b>' + (l.in_play ? (l.with_line || 0) + '/' + l.in_play : '-') + '</b><span>Live lined</span></div></div>';
+  h += '<p class="note">Onyx lines ' + (p.onyx_lines || 0) + ', market lines ' + (p.market_lines || 0) + '.'
+     + (p.awaiting_players ? ' ' + p.awaiting_players + ' more matches wait on a player still to be decided, so nobody prices them yet.' : '') + '</p>';
+  if (miss) h += '<ul>' + (p.missing || []).slice(0, 12).map(function (m) { return '<li>' + esc(m) + '</li>'; }).join('') + (miss > 12 ? '<li class="why">and ' + (miss - 12) + ' more</li>' : '') + '</ul>';
+  if ((l.gaps || []).length) h += '<p class="note">Live with no line:</p><ul>' + l.gaps.map(function (g) { return '<li>' + esc(g.match) + ' <span class="why">(' + esc(WHY[g.reason] || g.reason) + ')</span></li>'; }).join('') + '</ul>';
+  return h + '</div>';
+}
+fetch('data/lines/status.json', {cache: 'no-store'}).then(function (r) { return r.json(); }).then(function (S) {
+  document.getElementById('at').textContent = 'Checked ' + et(S.at) + ' ET, every refresh build.';
+  var sp = S.sports || {};
+  document.getElementById('cards').innerHTML = Object.keys(sp).map(function (k) { return card(k, sp[k]); }).join('') || '<div class="empty">No sports on the board.</div>';
+  var rows = [];
+  (S.history || []).slice(-12).reverse().forEach(function (h) {
+    Object.keys(h.s || {}).forEach(function (k) {
+      var x = h.s[k]; if (!x.pre && !x.lv) return;
+      rows.push('<tr><td>' + et(h.at) + '</td><td>' + esc((sp[k] || {}).name || k) + '</td><td>' + (SRC[x.src] || SRC.none)[1] + '</td><td>' + (x.miss || 0) + ' of ' + (x.pre || 0) + '</td><td>' + (x.lv ? (x.lvok || 0) + ' of ' + x.lv : '-') + '</td></tr>');
+    });
+  });
+  document.getElementById('hist').innerHTML = rows.join('') || '<tr><td colspan="5" class="empty">No builds recorded yet.</td></tr>';
+}).catch(function () { document.getElementById('cards').innerHTML = '<div class="empty">Line status posts with the next refresh build.</div>'; });
+fetch(GAPS_URL + '?t=' + Date.now()).then(function (r) { return r.json(); }).then(function (G) {
+  var rows = (G || []).slice(-60).reverse().map(function (g) {
+    return '<tr><td>' + et(g.at) + '</td><td>' + esc(g.match) + '</td><td>' + (g.state === 'open' ? 'Line lost' : 'Line back') + '</td><td>' + esc(g.state === 'open' ? (WHY[g.reason] || g.reason) : 'line back, or the match ended') + '</td></tr>';
+  });
+  document.getElementById('gaps').innerHTML = rows.join('') || '<tr><td colspan="4" class="empty">No live gaps recorded.</td></tr>';
+}).catch(function () { document.getElementById('gaps').innerHTML = '<tr><td colspan="4" class="empty">No live gaps recorded yet.</td></tr>'; });
+</script>
+</body>
+</html>
