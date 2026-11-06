@@ -74,9 +74,9 @@
     [/\breceiving\b|\brec(eiving)? yds\b|\breceivers?\b|\bwideouts?\b|\bwrs?\b|\btight ends?\b/, 'rec_yds'],
     [/\brushing\b|\brush\b|\brushers?\b|\bcarries\b|\bground game\b|\brunning backs?\b|\brbs?\b/, 'rush_yds'],
     [/\bpassing\b|\bpass yards\b|\bpassers?\b|\bqbs?\b|\bquarterbacks?\b|\bthrowing\b/, 'pass_yds'],
-    [/(?<!\bhigh )\bpoints?\b(?!\s*guards?)|\bpts\b|\bscorers?\b|\bscoring\b|\bbuckets\b/, 'pts'],
-    [/\bspreads?\b|\bcover(s|ing)?\b|\bpuck ?lines?\b|\bhandicap\b|\bats\b/, 'spread'],
-    [/\b(game )?totals?\b|\bo\/u\b|\bover ?\/? ?unders?\b|\bover[\s-]unders?\b/, 'total'],
+    [/(?<!\bhigh )\bpoints?\b(?!\s*(guards?|spr[a-z]*))|\bpts\b|\bscorers?\b|\bscoring\b|\bbuckets\b/, 'pts'],
+    [/\bspreads?\b|\bpoint spr[a-z]*\b|\bspreds?\b|\bsprads?\b|\bcover(s|ing)?\b|\bpuck ?lines?\b|\bhandicap\b|\bats\b/, 'spread'],
+    [/\b(game )?totals?\b(?!\s*(parlay\s+)?(odds|payout|price|of\s+\+))|\bo\/u\b|\bover ?\/? ?unders?\b|\bover[\s-]unders?\b/, 'total'],
     [/\bmoney ?lines?\b|\bml\b|\bto win\b(?!\s*(about|around)?\s*\+?\$?\d)|\bwinners?\b|\bstraight up\b|\boutright\b/, 'ml'],
   ];
   // college basketball and college football in every wording (11/2)
@@ -517,13 +517,13 @@
     // the common misspellings (tested: tools/ask_bigcorpus.py), and shorthand
     t = t.replace(/\bparly\b|\bparley\b|\bparlya\b/g, 'parlay').replace(/\bpasing\b/g, 'passing').replace(/\brec[ie]{2}ving\b/g, 'receiving')
          .replace(/\brusing\b|\brushin\b/g, 'rushing').replace(/\breboun?ds?\b|\brebouds\b/g, 'rebounds').replace(/\basists?\b/g, 'assists')
-         .replace(/\brecep[a-z]*ons?\b/g, 'receptions').replace(/\bpionts\b|\bponts\b/g, 'points').replace(/\bbasketbal\b/g, 'basketball')
+         .replace(/\brecep[a-z]*ons?\b/g, 'receptions').replace(/\bpionts\b|\bponts\b/g, 'points').replace(/\b(2night|2nite|tonite|tonigh|tonght|tnight)\b/g, 'tonight').replace(/\bmoney ?l[a-z]?nes?\b/g, 'moneyline').replace(/\bt[ou]{1,2}ch ?d[a-z]{0,2}wns?\b/g, 'touchdown').replace(/\bbasketbal\b/g, 'basketball')
          .replace(/\bhocky\b|\bhockee\b/g, 'hockey').replace(/\btouchdwns?\b|\btouchdowns?\b/g, function (m) { return /s$/.test(m) ? 'touchdowns' : 'touchdown'; })
          .replace(/\brec (yards|yds)\b/g, 'receiving yards').replace(/\brush (yards|yds)\b/g, 'rushing yards').replace(/\bpass (yards|yds)\b/g, 'passing yards');
     // what they do NOT want: "no kelce", "without lebron", "except the lakers". Taken out of the
     // request before anything else reads it (11/2: each of these read as the opposite)
     var EXW = [];
-    t = t.replace(/\b(no|without|except|excluding|exclude|other than|besides|not including|leave out|skip|but not|nothing (?:on|from)|none of|avoid|minus)\s+(the\s+)?([a-z][a-z.\-&]*(?:\s+[a-z0-9&][a-z0-9.\-&]*){0,3})/g, function (m, w, the, ph) {
+    t = t.replace(/(?<!(?:@|\bvs\.?|\bv|\bat)\s)\b(no|without|except|excluding|exclude|other than|besides|not including|leave out|skip|but not|nothing (?:on|from)|none of|avoid|minus)\s+(the\s+)?([a-z][a-z.\-&]*(?:\s+[a-z0-9&][a-z0-9.\-&]*){0,3})/g, function (m, w, the, ph) {
       var ws = ph.trim().split(' '), first = ws[0];
       // a team's whole name ("no duke blue devils", "except the kansas city chiefs", "no long beach state")
       teamDir();
@@ -552,7 +552,7 @@
       s.rr_size = by ? ({twos: 2, threes: 3, fours: 4})[by[1]] || parseInt(by[1], 10) : 2;
     }
     // a payout target: "parlay that pays +500", "to win around +1000", "a +300 parlay"
-    var tg = t.match(/\b(pays?|paying|payout( of)?|to (win|pay)|around|about|returns?)\s*\+?(\d{3,5})\b/) || t.match(/\+(\d{3,5})\s*(parlay|ticket|sgp|legger)\b/);
+    var tg = t.match(/\b(pays?|paying|payout( of)?|to (win|pay)|around|about|returns?)\s*\+?(\d{3,5})\b/) || t.match(/\+(\d{3,5})\s+(?:[a-z]+\s+){0,3}?(parlay|parlays|ticket|sgp|legger)\b/);   // 11/6: "+1000 cfb parlay three legs"
     var tgv = tg ? +(tg.slice(1).filter(function (x) { return x && /^\d+$/.test(x); })[0]) : null;
     // "pays 10 to 1", "a 20-1 longshot parlay": that many times the stake in profit
     var to1 = !tgv && t.match(/\b(\d{1,3})\s*(?:to|-|:)\s*1\b/);
@@ -568,10 +568,13 @@
     if (tgv && /parlay|ticket|legs?\b|legger|sgp|round/.test(t)) { if (s.intent === 'list') s.intent = 'parlay'; s.target_price = tgv; }
     // how many
     var tC = t.replace(/\b(pac|big|atlantic)[\s-]?(10|12)\b/g, ' ').replace(/\ba[\s-]?10\b(?!\s*(leg|legs|legger|picks?|plays?|bets?|team|teams|man|folds?|way))/g, ' ').replace(/\b\d{1,3}\s*(?:to|-|:)\s*1\b/g, ' ').replace(/\$?\s*\d+\s*(?:dollars|bucks)?\s*(?:into|to make|to win)\s*\$?\s*\d+/g, ' ');
-    var n = tC.match(/\b(\d{1,2})[\s-]*(leg|legs|legger|picks?|plays?|players?|bets?|team|man|teamer|folds?|way)\b/) || tC.match(/\btop\s*(\d{1,2})\b/)
-      || tC.match(/\bparlay of (\d{1,2})\b/) || tC.match(/\b(\d{1,2})\s+(nba|nfl|nhl|college|tennis)\b/);
+    var n = tC.match(/\b(\d{1,2})[\s-]*(leg|legs|legger|picks?|plays?|players?|bets?|team|man|teamer|folds?|way)\b/) || tC.match(/\b(?:top|best|safest|surest)\s*(\d{1,2})\b(?!\s*(points|rebounds|assists|yards|receptions|%|percent))/)
+      || tC.match(/\b(\d{1,2})\s+(?:best|safest|top|surest)\b/)
+      || tC.match(/\bparlay of (\d{1,2})\b/) || tC.match(/\b(\d{1,2})\s+(nba|nfl|nhl|college|tennis|hockey|basketball|football|hoops|ncaab|ncaaf|cbb|cfb|pro)\b(?!\s*(points|rebounds|assists|yards|receptions))/);
     var nw = tC.match(/\b(two|three|four|five|six|seven|eight|nine|ten|couple|few)( of)?[\s-]*(leg|legs|legger|picks?|plays?|bets?|team|man)\b/)
-      || tC.match(/\b(?:parlay|ticket|sgp) of (two|three|four|five|six|seven|eight|nine|ten)\b/);
+      || tC.match(/\b(?:parlay|ticket|sgp) of (two|three|four|five|six|seven|eight|nine|ten)\b/)
+      || tC.match(/\b(?:top|best|safest|surest|give me|gimme)\s+(two|three|four|five|six|seven|eight|nine|ten)\b/)
+      || tC.match(/\b(two|three|four|five|six|seven|eight|nine|ten)\s+(?:best|safest|top|surest|most likely)\b/);   // 11/6: "top three nba spreads" 
     if (!n && !nw) {
       var n2 = tC.match(/\b(\d{1,2})\s+(?:\w+\s+){0,2}?(overs|unders|props|plays|picks|bets|players|teams|sides|dogs|favorites|favs|scorers|rebounds|assists|points|receptions|touchdowns|tds|totals|spreads|parlay|sgp|legger)\b/);
       if (n2 && +n2[1] <= 12 && !/\b\d{1,2}\s+(points|rebounds|assists|receptions|tds|touchdowns)\s+(or|and|in|a|per)\b/.test(t)) n = [n2[0], n2[1]];
@@ -646,7 +649,7 @@
     if (un && !ov) s.side = 'under';
     // odds, in any wording. A floor: "-200 or better", "min -200", "nothing worse than -200",
     // "no -200 juice". A ceiling: "+300 or less", "max +300", "under +300".
-    var fl = t.match(/(min(imum)?( odds)?( of)?|no (odds |price |leg )?(worse|shorter|juicier) than|nothing (worse|shorter|juicier) than|at least|odds of at least|better than|above)\s*([+-]?\d{3,4})/)
+    var fl = t.match(/(min(imum)?( total| parlay| ticket| combined)?( odds| payout| price)?( of)?|no (odds |price |leg )?(worse|shorter|juicier) than|nothing (worse|shorter|juicier) than|at least|odds of at least|better than|above)\s*([+-]?\d{3,4})/)
       || t.match(/([+-]\d{3,4})\s*(or better|or longer|and up|or more|minimum|min\b|floor)/) || t.match(/\bno\s*(-\d{3,4})\s*(juice|or worse)?/);
     if (fl) { var v = +(fl[fl.length - 1] && /\d/.test(fl[fl.length - 1]) ? fl[fl.length - 1] : (fl[1] || fl[fl.length - 1])); if (!isNaN(v)) s.min_price = v; }
     var fl2 = t.match(/([+-]\d{3,4})\s*(or better|or longer|and up|or more|minimum|floor)/); if (fl2) s.min_price = +fl2[1];
@@ -665,7 +668,7 @@
     // the whole ticket's payout floor, not every leg's price. Each leg at +300 or longer only when the
     // request says so ("each leg", "every leg", "per leg") or asks for dogs / plus money / longshots.
     if (s.min_price != null && s.min_price >= 100 && !s.target_price && /\bparlay|\bsgp\b|same[\s-]?game|\blegs?\b|legger|\bticket/.test(t)
-        && /(\bmin(imum)?\b( total)?( parlay)?( odds)?( of)?|\bat least|odds of at least)\s*\+\d{3,4}/.test(t)
+        && /(\bmin(imum)?\b( total| parlay| ticket| combined)?( odds| payout| price)?( of)?|\bat least|odds of at least|pays at least)\s*\+\d{3,4}/.test(t)
         && !/\+\d{3,4}\s*(or better|or longer|and up|or more)/.test(t)
         && !/\b(each|every|per|all)\s+(leg|pick|play)s?\b|\blegs?\s+(each|at|of)\s+(at least\s+)?\+?\d/.test(t)
         && !/plus money|plus[\s-]odds|underdogs?|\bdogs\b|long ?shots?/.test(t)) {
@@ -826,6 +829,25 @@
     if (s.count == null && /\bcouple\b/.test(t)) s.count = 2;
     if (s.count == null && /\b(a )?few\b/.test(t)) s.count = 3;
     if (s.count == null) s.count = s.intent !== 'list' ? 3 : /\b(the|a|one) (player|play|pick|bet|guy|team)\b|\bwho (is|will|gets|has)\b|\bmost likely\b/.test(t) && !/players|plays|picks|guys|teams|scorers|receivers|rushers|passers|options|bets|choices/.test(t) ? 1 : 5;
+    if (!RT.teams.length && !s.player && /(^|[^A-Za-z])Wild\b(?!\s*card)|\bthe wild\b(?!\s*card)|\bmn wild\b/.test(RAWQ) && (B || []).some(function (p) { return p.sport === 'nhl' && /\bMIN\b/.test(p.matchup || ''); })) {
+      s.team = 'MIN'; s.tabbr = {nhl: ['MIN']}; s.sports = ['nhl']; s.team_name = 'Minnesota Wild';
+    }
+    // a game by its two abbreviations as the boards print them ("LV vs SF spread", "SJ MIN totals",
+    // "copp @ gmu moneyline"; 11/6, 98 misses in the 100k test): both teams of one game on the boards
+    if (RT.teams.length <= 2 && !s.player) {
+      var tok = {}; t.replace(/[^a-z0-9&\- ]/g, ' ').split(/\s+/).forEach(function (w) { if (w) tok[w] = 1; });
+      var hitG = {}, nowT = Date.now();
+      (B || []).forEach(function (p) {
+        if (Date.parse(p.start) <= nowT || !p.matchup) return;
+        var m = String(p.matchup).split(/\s+(?:@|vs)\s+/);
+        if (m.length === 2 && tok[m[0].toLowerCase()] && tok[m[1].toLowerCase()]) hitG[p.sport + '|' + [m[0], m[1]].sort().join('|')] = [p.sport, m[0], m[1]];
+      });
+      var HG = Object.keys(hitG);
+      if (HG.length === 1) {
+        var hg = hitG[HG[0]]; s.teams = [hg[1], hg[2]]; s.team = null; s.school = null; s.team_name = null; s.ambig = null; s.tabbr = {}; s.tabbr[hg[0]] = [hg[1], hg[2]]; s.sports = [hg[0]];
+        if (s.intent === 'list') s.one_per_game = false;
+      }
+    }
     // Onyx Picks (11/2): "Onyx picks", "official picks", "tracked picks": only the logged picks,
     // never a projection called a pick
     if (/\bonyx(s)? (official )?picks?\b|\bofficial (onyx )?picks?\b|\btracked picks?\b|\bgraded picks?\b|\bpicks page\b|\bonyx pick of the (day|night)\b/.test(t)) { s.onyx_picks = true; if (s.sort === 'conf') s.sort = 'rec'; }
@@ -863,9 +885,9 @@
   function run(spec, B) {
     var now = Date.now();
     // "2 legs paying +300": each leg has to carry its share of the payout
-    if ((spec.intent === 'parlay' || spec.intent === 'sgp') && spec.target_price && spec.count_set && spec.count >= 1) {
+    if ((spec.intent === 'parlay' || spec.intent === 'sgp') && spec.target_price && spec.count_set && spec.count >= 1 && !spec.no_leg_floor) {
       var per = Math.pow(1 + spec.target_price / 100, 1 / spec.count);
-      var floor = am(per * 0.97);
+      var floor = am(spec.ticket_floor ? per : per * 0.97);    // "+750 or more": every leg carries its full share (11/6: 3 legs at 0.97 each paid +690)
       if (spec.min_price == null || spec.default_floor || spec.min_price < floor) spec = Object.assign({}, spec, {min_price: floor});
     }
     var mk = (spec.markets || []).slice();
@@ -1384,15 +1406,42 @@
          function () { return 'Nothing at that confidence right now, so these are the most likely.'; }],
         [function (x) { return x.side && x.side !== 'any'; }, function (x) { return {side: 'any'}; },
          function () { return 'No ' + (spec.side === 'over' ? 'overs' : 'unders') + ' matched, so this includes the other side.'; }]];
+      // the steps add up (11/6: "Cowboys spreads tonight" needs both the day and the 50% floor let go;
+      // one at a time found nothing): each step keeps the ones before it, and the answer says every one used
+      var acc = spec, said = [], note0 = res.note || '';
       for (var si = 0; si < steps.length && res.rows.length < nf && !spec.onyx_picks && !spec.player; si++) {
-        if (!steps[si][0](spec)) continue;
-        var sp2 = Object.assign({}, spec, steps[si][1](spec)), r5 = run(sp2, a[1]);
-        if (r5.rows.length > res.rows.length) { var msg = steps[si][2](); res = r5; spec = sp2; res.widened = true; res.note = (res.note ? res.note + ' ' : '') + msg; }
+        if (!steps[si][0](acc)) continue;
+        acc = Object.assign({}, acc, steps[si][1](acc)); said.push(steps[si][2]());
+        var r5 = run(acc, a[1]);
+        if (r5.rows.length > res.rows.length) { res = r5; spec = acc; res.widened = true; res.note = (note0 ? note0 + ' ' : '') + said.join(' '); }
+      }
+      // a named team or game with nothing in the market asked for (no moneyline posted on a heavy favorite):
+      // that game's other lines, said so (11/6)
+      if (!res.rows.length && teamList(spec).length && (spec.markets || []).length && !spec.player) {
+        var mw7 = {ml: 'moneyline', spread: 'spread', total: 'total'}[(spec.markets || [])[0]] || MW[(spec.markets || [])[0]] || 'line like that';
+        var spT = Object.assign({}, spec, {markets: [], side: 'any', min_conf: null, default_conf: false, min_price: null, max_price: null, default_floor: false}), r7 = run(spT, a[1]);
+        if (r7.rows.length) { res = r7; spec = spT; res.widened = true; res.note = (res.note ? res.note + ' ' : '') + 'No ' + mw7 + ' on the board for that game, so these are its other lines.'; }
       }
       // a player with nothing that matches: his other markets, then any day
       if (spec.player && res.rows.length < 1) {
         var sp3 = Object.assign({}, spec, {markets: [], side: 'any', when: null, min_price: null, max_price: null, min_conf: null, default_conf: false, default_floor: false}), r6 = run(sp3, a[1]);
         if (r6.rows.length) { res = r6; spec = sp3; res.widened = true; res.note = (res.note ? res.note + ' ' : '') + 'Nothing matched that exactly, so these are ' + spec.player + '\'s lines on the board.'; }
+      }
+      // a payout no leg set on the board can reach at its per-leg share (2 legs at +1000 need +232 each):
+      // the closest ticket instead of nothing (11/6)
+      if (spec.target_price && (res.rows || []).length < 2 && (spec.intent === 'parlay' || spec.intent === 'sgp')) {
+        var spL = Object.assign({}, spec, {no_leg_floor: true, sort: 'price'}), r8 = run(spL, a[1]);
+        if (r8.rows.length > res.rows.length) { res = r8; spec = spL; }
+      }
+      // a payout the board could not reach: say what the closest ticket pays (11/6)
+      if (spec.target_price && res.parlay && res.parlay.price != null && res.parlay.price < spec.target_price && (res.rows || []).length > 1) {
+        res.note = (res.note ? res.note + ' ' : '') + 'Nothing on the board reaches +' + spec.target_price + ' with ' + res.rows.length + ' legs at these prices; the closest ticket pays ' + (res.parlay.price > 0 ? '+' : '') + res.parlay.price + '.';
+      }
+      // fewer than the number asked for: say so, never a silent short ticket (11/6)
+      if (spec.count_set && spec.count && res.rows.length && res.rows.length < spec.count && !spec.target_price) {
+        var nn = res.rows.length, par = spec.intent === 'parlay' || spec.intent === 'sgp';
+        res.note = (res.note ? res.note + ' ' : '') + 'Only ' + nn + (nn === 1 ? ' play' : ' plays') + ' on the board fit' + (spec.when === 'today' ? ' tonight' : '') +
+          ', so this is ' + (par ? 'a ' + nn + '-leg ' + (spec.intent === 'sgp' ? 'same-game parlay' : 'parlay') : nn + ' instead of ' + spec.count) + '.';
       }
       // touchdown scorers: say why every edge reads negative, and what "favorite" means here
       if ((res.rows || []).some(function (r) { return /td$/.test(r.mkt || ''); })) {
