@@ -3972,8 +3972,8 @@
     {
      "id": "186636",
      "start": "2026-11-06T06:05Z",
-     "state": "in",
-     "detail": "1st",
+     "state": "post",
+     "detail": "Final",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Centre Court",
@@ -3983,9 +3983,10 @@
        "short": "C. Liu",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
-        2
+        6,
+        6
        ],
        "serve": false
       },
@@ -3996,17 +3997,18 @@
        "seed": null,
        "win": false,
        "sets": [
-        1
+        1,
+        4
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
     {
      "id": "186637",
-     "start": "2026-11-06T08:30Z",
+     "start": "2026-11-06T08:35Z",
      "state": "pre",
-     "detail": "11/6 - 3:30 AM EST",
+     "detail": "11/6 - 3:35 AM EST",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Centre Court",
@@ -4099,9 +4101,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Claire Liu",
+       "short": "C. Liu",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -8152,5 +8154,5 @@
    ]
   }
  ],
- "fetched": "2026-11-06T06:29:29+00:00"
+ "fetched": "2026-11-06T08:32:03+00:00"
 }
