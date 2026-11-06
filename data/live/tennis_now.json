@@ -230,5 +230,34 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186597-total-over",
+  "sport": "tennis",
+  "gid": "186597",
+  "date": "2026-11-06",
+  "logged_at": "2026-11-06T12:25:43+00:00",
+  "matchup": "Maaya Rajeshwaran Revathi vs Robin Montgomery",
+  "home": "Robin Montgomery",
+  "away": "Maaya Rajeshwaran Revathi",
+  "label": "Over 19.5 games",
+  "kind": "total",
+  "side": "over",
+  "line": 19.5,
+  "price": -110,
+  "chance": 0.6231,
+  "implied": 0.5238,
+  "edge": 0.099,
+  "fair": -165,
+  "state": {
+   "sets": "0-1",
+   "srv": "away",
+   "need": 2
+  },
+  "model": "live-v4",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
