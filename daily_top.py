@@ -86,7 +86,7 @@ def why(r):
     model's own detail (ratings, form, rest), else the projection against the line. None when the
     row carries none of them (the page then says our chance against Onyx's)."""
     try:
-        parts = []
+        parts = [f"Backup QB: {r['qb']}"] if r.get("qb") else []      # v15 NFL: a deep backup's receivers
         if r.get("proj") is not None and r.get("line") is not None and (r.get("kind") or "prop") == "prop":
             parts.append(f"Projects {float(r['proj']):.1f} against the {r['line']:g} line")
         drv = sorted([w for w in r.get("why") or [] if isinstance(w, dict) and w.get("k")], key=lambda w: -abs(w.get("pp") or 0))[:2]

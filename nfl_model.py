@@ -1,8 +1,25 @@
 """
 nfl_model.py - Onyx NFL player projections.
 
-VERSION v14 (11/1). The lab notebook: every change bumps VERSION and adds an
+VERSION v15 (11/6). The lab notebook: every change bumps VERSION and adds an
 entry here citing its evidence (CLAUDE.md rule 2 applies to this model too).
+
+  v15 11/6   A deep backup quarterback moves the team's points and his receivers (Jordan, TNF:
+             "a 3rd string QB ... starting for Baltimore", the game model said 46.8 against a
+             39.5 total). The team ratings are fitted on final scores and never knew who was under
+             centre. tools/nfl_qb_backtest.py, 681 team-games 2025-26 with ratings fitted only on
+             earlier games: a team on its usual starter scored +0.46 points against expectation,
+             on any backup -1.71, on a DEEP backup (0-1 prior starts for the team) -3.65 (n=73).
+             Held out by season, a deep-backup adjustment fitted on one season cut the other's
+             team-points error 7.97 -> 7.33 and 8.14 -> 7.90 and game-total error 8.17 -> 6.74 and
+             10.59 -> 10.17 (fits -3.25 and -3.55; QB_DEEP pts -3.4). Receivers (20+ yards a game
+             with the usual starter) with a deep backup: yards x0.83 / x0.89 and catches x0.92 /
+             x0.97 fitted per season, cutting the other season's yards error 21.3 -> 20.0 and
+             21.9 -> 20.7, catches 1.50 -> 1.47 and 1.57 -> 1.55 (QB_DEEP rec_yds x0.86, rec x0.94).
+             Any backup with 2+ prior starts did NOT hold up held out (errors flat) and is left out;
+             so is the opponent's side (its sign flipped between seasons). Tonight's starter is
+             ESPN's depth chart QB1, or the next quarterback when QB1 is ruled out on the injury
+             report (deep_backups()).
 
   v14 11/1   Players coming back from injury take their share back (Jordan: "Mason came back
              from injury"). The touchdown model gave each player his share of the team's touches
@@ -274,7 +291,55 @@ player-game: pass_yds, rush_yds, rec_yds, rec, tgt, att, rush_att...).
 import math, re, unicodedata
 from collections import defaultdict
 
-VERSION = "v14"
+VERSION = "v15"
+# v15: a deep backup quarterback (0-1 prior starts for the team, not its usual starter)
+QB_DEEP = {"pts": -3.4, "rec_yds": 0.86, "rec": 0.94, "max_prior": 1, "usual_window": 10, "usual_min": 3}
+
+
+def deep_backups(rows, depth, inj, teams, injury_of=None):
+    """{team: {"qb", "usual", "prior"}} for each team in `teams` starting a deep backup tonight.
+    rows: player_games rows; depth: data/nfl/depth.json; inj: ESPN injury report. The starter of a
+    past game is its quarterback with the most pass attempts; the usual starter has the most starts
+    in the team's last 10 games (3+). Tonight's quarterback is the depth chart's first QB who is not
+    ruled out."""
+    st = {}
+    for r in rows:
+        if (r.get("att") or 0) <= 0:
+            continue
+        k = (r["gid"], r["team"])
+        if k not in st or r["att"] > st[k][1]:
+            st[k] = (r["date"], r["att"], r["pid"], r["name"])
+    by = defaultdict(list)
+    for (gid, t), v in st.items():
+        by[t].append(v)
+    out = {}
+    for t in teams:
+        L = sorted(by.get(t, []))
+        last = [x[2] for x in L[-QB_DEEP["usual_window"]:]]
+        if len(last) < QB_DEEP["usual_min"]:
+            continue
+        cnt = defaultdict(int)
+        for p in last:
+            cnt[p] += 1
+        usual, n = max(cnt.items(), key=lambda kv: kv[1])
+        if n < QB_DEEP["usual_min"]:
+            continue
+        qbs = [p for p in ((depth or {}).get("teams", {}).get(t, {}).get("players") or []) if p.get("pos") == "QB"]
+        qbs.sort(key=lambda p: str(p.get("role") or "QB9"))
+        tonight = None
+        for p in qbs:
+            it = injury_of(inj, p.get("id"), p.get("n")) if injury_of and inj else None
+            if (it or {}).get("s") == "OUT":
+                continue
+            tonight = p
+            break
+        if not tonight or str(tonight.get("id")) == str(usual):
+            continue
+        prior = sum(1 for x in L if str(x[2]) == str(tonight.get("id")))
+        if prior <= QB_DEEP["max_prior"]:
+            uname = next((x[3] for x in L if x[2] == usual), usual)
+            out[t] = {"qb": tonight.get("n"), "usual": uname, "prior": prior}
+    return out
 # game lines (team_model.py), tuned 10/26: see v1
 GAME_P = {"half_life": 240, "ridge": 5, "home": 2.0, "sd_margin": 13.5, "sd_total": 13.0, "min_games": 3}
 GAME_TEST = {"n": 199, "logloss": 0.648, "base_logloss": 0.698, "mae_total": 10.90, "base_mae_total": 11.71,
