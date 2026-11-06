@@ -9412,10 +9412,10 @@
    "need": 2
   },
   "model": "live-v4",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "15-17",
+  "profit": 0.6369,
+  "graded_at": "2026-11-06T16:49:48+00:00"
  },
  {
   "id": "tennis-186686-total-under",
@@ -9445,5 +9445,63 @@
   "actual": "17",
   "profit": 0.7692,
   "graded_at": "2026-11-06T15:37:20+00:00"
+ },
+ {
+  "id": "tennis-186688-total-over",
+  "sport": "tennis",
+  "gid": "186688",
+  "date": "2026-11-06",
+  "logged_at": "2026-11-06T15:38:01+00:00",
+  "matchup": "Yasmine Kabbaj vs Anna Blinkova",
+  "home": "Anna Blinkova",
+  "away": "Yasmine Kabbaj",
+  "label": "Over 17.5 games",
+  "kind": "total",
+  "side": "over",
+  "line": 17.5,
+  "price": -140,
+  "chance": 0.6187,
+  "implied": 0.5833,
+  "edge": 0.035,
+  "fair": -160,
+  "state": {
+   "sets": "0-0",
+   "srv": "away",
+   "need": 2
+  },
+  "model": "live-v4",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "tennis-186501-spread-away",
+  "sport": "tennis",
+  "gid": "186501",
+  "date": "2026-11-06",
+  "logged_at": "2026-11-06T15:39:03+00:00",
+  "matchup": "Rinky Hijikata vs Luca Van Assche",
+  "home": "Luca Van Assche",
+  "away": "Rinky Hijikata",
+  "label": "Rinky Hijikata +1.5 games",
+  "kind": "spread",
+  "side": "away",
+  "line": 1.5,
+  "price": -115,
+  "chance": 0.6042,
+  "implied": 0.5349,
+  "edge": 0.069,
+  "fair": -155,
+  "state": {
+   "sets": "3-2",
+   "srv": null,
+   "need": 2
+  },
+  "model": "live-v4",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
