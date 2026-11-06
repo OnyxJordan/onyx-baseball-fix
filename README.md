@@ -1575,6 +1575,26 @@ never a bet button, a pick, a Top 10 play or a parlay leg.
 
 ## Ask Onyx (10/31)
 
+**The 100k backtest (11/6).** Jordan: "we need to get through 100000+ search terms of back testing, I have
+no confidence in its search ability." `python3 tools/ask_mega.py 100000 7` writes 100,000 requests from
+today's boards (every sport; real teams by nickname, full name and abbreviation pair; real players;
+same-game parlays with a minimum total price; TD-scorer parlays; payout targets; slang, filler, mixed
+case, typos) into `tools/ask_mega.json` (gitignored: regenerate it), and
+`node tools/verify_ask.js --corpus=tools/ask_mega.json --out=res.json` grades them in ~35 minutes.
+verify_ask now grades the ticket, not only the reading: the leg count the words ask for, one game for a
+same-game parlay, the payout reached (or a note saying the closest), no leg twice, no both sides of one
+bet, nothing started, every play on the board file at its price, and no empty answer when the board has
+that team or player. First stricter sample: 82.6%. After the fixes: 99.85% of 100,000 (99,937 answered
+with plays), 744/744 hand cases, both holdouts 100%, and 300/300 through the live AI relay.
+Fixes it found: "minimum total odds of +300" is the ticket's payout (the word "total" is not the totals
+market); number words after top/best/safest; "point spread" is the spread; two abbreviations of one
+game ("LV vs SF") read as that game; the widening ladder keeps each step; a short ticket or a payout it
+cannot reach says so; a named game with no line in that market shows its other lines; 2night,
+moneylnes, tuchdown, spreds; New Orleans after "@" is not a negation; "Wild" with a capital W. And the
+board itself: `both_sides` now carries both sides of every game line while Onyx is down (from the
+market line) and in tennis (`tennis_both_sides`), so "Bears moneyline" is never empty because the model
+leaned the other way.
+
 Jordan: type what you want ("3-leg parlay, NBA points overs, minimum odds -200", "player most
 likely to score 2 TDs", "your favorite correlated SGP", "most value in college football") and
 it builds it. **The AI never picks plays.** It only turns the sentence into a search spec;
