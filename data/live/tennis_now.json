@@ -259,5 +259,34 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186634-spread-home",
+  "sport": "tennis",
+  "gid": "186634",
+  "date": "2026-11-06",
+  "logged_at": "2026-11-06T12:40:23+00:00",
+  "matchup": "Alexandra Eala vs Antonia Ruzic",
+  "home": "Antonia Ruzic",
+  "away": "Alexandra Eala",
+  "label": "Antonia Ruzic +6.5 games",
+  "kind": "spread",
+  "side": "home",
+  "line": 6.5,
+  "price": -140,
+  "chance": 0.661,
+  "implied": 0.5833,
+  "edge": 0.078,
+  "fair": -195,
+  "state": {
+   "sets": "0-0",
+   "srv": "away",
+   "need": 2
+  },
+  "model": "live-v4",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
