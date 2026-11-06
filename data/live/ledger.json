@@ -9589,10 +9589,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "15-19",
+  "profit": 0.4016,
+  "graded_at": "2026-11-06T21:50:08+00:00"
  },
  {
   "id": "tennis-186735-ml-away",
@@ -9616,6 +9616,37 @@
    "sets": "6-0 0-1",
    "srv": "away",
    "need": 2
+  },
+  "pre_src": "market",
+  "model": "live-v6",
+  "result": "W",
+  "actual": "4-11",
+  "profit": 0.2336,
+  "graded_at": "2026-11-06T21:50:08+00:00"
+ },
+ {
+  "id": "cbb-401909552-total-under",
+  "sport": "cbb",
+  "gid": "401909552",
+  "date": "2026-11-06",
+  "logged_at": "2026-11-06T21:50:05+00:00",
+  "matchup": "MASS @ BC",
+  "home": "BC",
+  "away": "MASS",
+  "label": "Under 147.5",
+  "kind": "total",
+  "side": "under",
+  "line": 147.5,
+  "price": -120,
+  "chance": 0.6029,
+  "implied": 0.5455,
+  "edge": 0.057,
+  "fair": -150,
+  "state": {
+   "score": "MASS 35 - 37 BC",
+   "period": 1,
+   "clock": "0:00",
+   "f": 0.5
   },
   "pre_src": "market",
   "model": "live-v6",
