@@ -2480,8 +2480,8 @@
     {
      "id": "186500",
      "start": "2026-11-06T13:10Z",
-     "state": "in",
-     "detail": "1st",
+     "state": "post",
+     "detail": "Final",
      "round": "Quarterfinal",
      "draw": "Men's Singles",
      "court": "Court Central",
@@ -2493,18 +2493,22 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        4,
+        6,
+        3
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Ben Shelton",
        "short": "B. Shelton",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
-        3
+        6,
+        4,
+        6
        ],
        "serve": false
       }
@@ -2512,9 +2516,9 @@
     },
     {
      "id": "186501",
-     "start": "2026-11-06T14:30Z",
-     "state": "pre",
-     "detail": "11/6 - 9:30 AM EST",
+     "start": "2026-11-06T15:20Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Quarterfinal",
      "draw": "Men's Singles",
      "court": "Court Central",
@@ -2525,8 +2529,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/aus.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        2
+       ],
+       "serve": true
       },
       {
        "name": "Luca Van Assche",
@@ -2534,7 +2540,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        2
+       ],
        "serve": false
       }
      ]
@@ -2607,9 +2615,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Ben Shelton",
+       "short": "B. Shelton",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -4081,8 +4089,8 @@
     {
      "id": "186634",
      "start": "2026-11-06T12:35Z",
-     "state": "in",
-     "detail": "1st",
+     "state": "post",
+     "detail": "Final",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Centre Court",
@@ -4092,9 +4100,10 @@
        "short": "A. Eala",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/phi.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
-        4
+        7,
+        7
        ],
        "serve": false
       },
@@ -4105,9 +4114,10 @@
        "seed": null,
        "win": false,
        "sets": [
+        6,
         5
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -4150,9 +4160,9 @@
      "court": "Centre Court",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Alexandra Eala",
+       "short": "A. Eala",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/phi.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -5535,8 +5545,8 @@
     {
      "id": "186597",
      "start": "2026-11-06T12:20Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Centre Court",
@@ -5558,10 +5568,10 @@
        "short": "R. Montgomery",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        5
+        6
        ],
        "serve": false
       }
@@ -5569,9 +5579,9 @@
     },
     {
      "id": "186596",
-     "start": "2026-11-06T13:45Z",
-     "state": "pre",
-     "detail": "11/6 - 8:45 AM EST",
+     "start": "2026-11-06T13:50Z",
+     "state": "in",
+     "detail": "2nd",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Centre Court",
@@ -5582,7 +5592,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/pol.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        4,
+        7
+       ],
        "serve": false
       },
       {
@@ -5591,16 +5604,19 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/jpn.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        6,
+        5
+       ],
        "serve": false
       }
      ]
     },
     {
      "id": "186595",
-     "start": "2026-11-06T14:45Z",
+     "start": "2026-11-06T15:45Z",
      "state": "pre",
-     "detail": "11/6 - 9:45 AM EST",
+     "detail": "11/6 - 10:45 AM EST",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Centre Court",
@@ -5626,47 +5642,18 @@
      ]
     },
     {
-     "id": "186593",
-     "start": "2026-11-07T05:00Z",
-     "state": "pre",
-     "detail": "TBD",
-     "round": "Semifinal",
-     "draw": "Women's Singles",
-     "court": "",
-     "p": [
-      {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      }
-     ]
-    },
-    {
      "id": "186594",
-     "start": "2026-11-07T05:00Z",
+     "start": "2026-11-07T12:30Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "11/7 - 7:30 AM EST",
      "round": "Semifinal",
      "draw": "Women's Singles",
-     "court": "",
+     "court": "Centre Court",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Robin Montgomery",
+       "short": "R. Montgomery",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -5676,6 +5663,35 @@
        "name": "Janice Tjen",
        "short": "J. Tjen",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ina.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      }
+     ]
+    },
+    {
+     "id": "186593",
+     "start": "2026-11-07T14:00Z",
+     "state": "pre",
+     "detail": "11/7 - 9:00 AM EST",
+     "round": "Semifinal",
+     "draw": "Women's Singles",
+     "court": "Centre Court",
+     "p": [
+      {
+       "name": "TBD",
+       "short": "TBD",
+       "flag": null,
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      },
+      {
+       "name": "TBD",
+       "short": "TBD",
+       "flag": null,
        "seed": null,
        "win": false,
        "sets": [],
@@ -8055,8 +8071,8 @@
     {
      "id": "186686",
      "start": "2026-11-06T13:35Z",
-     "state": "pre",
-     "detail": "11/6 - 8:35 AM EST",
+     "state": "post",
+     "detail": "Final",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Lwena Court",
@@ -8066,8 +8082,11 @@
        "short": "N. Noha Akugue",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ger.png",
        "seed": null,
-       "win": false,
-       "sets": [],
+       "win": true,
+       "sets": [
+        6,
+        6
+       ],
        "serve": false
       },
       {
@@ -8076,16 +8095,19 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ltu.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        2,
+        3
+       ],
        "serve": false
       }
      ]
     },
     {
      "id": "186688",
-     "start": "2026-11-06T15:30Z",
+     "start": "2026-11-06T15:35Z",
      "state": "pre",
-     "detail": "11/6 - 10:30 AM EST",
+     "detail": "11/6 - 10:35 AM EST",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Lwena Court",
@@ -8120,9 +8142,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Noma Noha Akugue",
+       "short": "N. Noha Akugue",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ger.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -8200,5 +8222,5 @@
    ]
   }
  ],
- "fetched": "2026-11-06T13:31:23+00:00"
+ "fetched": "2026-11-06T15:36:39+00:00"
 }
