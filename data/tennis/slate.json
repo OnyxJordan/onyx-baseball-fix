@@ -1,5 +1,5 @@
 {
- "date": "2026-11-05",
+ "date": "2026-11-06",
  "sport": "tennis",
  "name": "Tennis",
  "label": "Rolex Paris Masters · Prudential Hong Kong Tennis Open · Chennai Open",
@@ -4006,9 +4006,9 @@
     },
     {
      "id": "186637",
-     "start": "2026-11-06T08:35Z",
-     "state": "pre",
-     "detail": "11/6 - 3:35 AM EST",
+     "start": "2026-11-06T08:55Z",
+     "state": "post",
+     "detail": "Final",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Centre Court",
@@ -4018,8 +4018,11 @@
        "short": "A. Shubladze",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/rus.png",
        "seed": null,
-       "win": false,
-       "sets": [],
+       "win": true,
+       "sets": [
+        6,
+        6
+       ],
        "serve": false
       },
       {
@@ -4028,16 +4031,19 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/rom.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        2,
+        3
+       ],
        "serve": false
       }
      ]
     },
     {
      "id": "186635",
-     "start": "2026-11-06T10:30Z",
+     "start": "2026-11-06T10:35Z",
      "state": "pre",
-     "detail": "11/6 - 5:30 AM EST",
+     "detail": "11/6 - 5:35 AM EST",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Centre Court",
@@ -4110,9 +4116,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Alexandra Shubladze",
+       "short": "A. Shubladze",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/rus.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -5477,9 +5483,9 @@
     },
     {
      "id": "186592",
-     "start": "2026-11-06T09:30Z",
-     "state": "pre",
-     "detail": "11/6 - 4:30 AM EST",
+     "start": "2026-11-06T09:35Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Centre Court",
@@ -5490,8 +5496,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/uzb.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        5
+       ],
+       "serve": true
       },
       {
        "name": "Janice Tjen",
@@ -5499,7 +5507,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ina.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        5
+       ],
        "serve": false
       }
      ]
@@ -7950,9 +7960,9 @@
     },
     {
      "id": "186689",
-     "start": "2026-11-06T10:30Z",
+     "start": "2026-11-06T10:45Z",
      "state": "pre",
-     "detail": "11/6 - 5:30 AM EST",
+     "detail": "11/6 - 5:45 AM EST",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Lwena Court",
@@ -8154,5 +8164,5 @@
    ]
   }
  ],
- "fetched": "2026-11-06T08:32:03+00:00"
+ "fetched": "2026-11-06T10:34:34+00:00"
 }

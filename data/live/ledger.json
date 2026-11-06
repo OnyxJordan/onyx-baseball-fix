@@ -9155,5 +9155,63 @@
   "actual": "5-12",
   "profit": -1.0,
   "graded_at": "2026-11-06T08:32:29+00:00"
+ },
+ {
+  "id": "tennis-186637-ml-home",
+  "sport": "tennis",
+  "gid": "186637",
+  "date": "2026-11-06",
+  "logged_at": "2026-11-06T09:04:04+00:00",
+  "matchup": "Alexandra Shubladze vs Sorana Cirstea",
+  "home": "Sorana Cirstea",
+  "away": "Alexandra Shubladze",
+  "label": "Sorana Cirstea to win",
+  "kind": "ml",
+  "side": "home",
+  "line": null,
+  "price": -244,
+  "chance": 0.7442,
+  "implied": 0.7093,
+  "edge": 0.035,
+  "fair": -290,
+  "state": {
+   "sets": "0-0",
+   "srv": "home",
+   "need": 2
+  },
+  "model": "live-v4",
+  "result": "L",
+  "actual": "5-12",
+  "profit": -1.0,
+  "graded_at": "2026-11-06T10:35:09+00:00"
+ },
+ {
+  "id": "tennis-186592-spread-away",
+  "sport": "tennis",
+  "gid": "186592",
+  "date": "2026-11-06",
+  "logged_at": "2026-11-06T09:46:00+00:00",
+  "matchup": "Polina Kudermetova vs Janice Tjen",
+  "home": "Janice Tjen",
+  "away": "Polina Kudermetova",
+  "label": "Polina Kudermetova +3.5 games",
+  "kind": "spread",
+  "side": "away",
+  "line": 3.5,
+  "price": -125,
+  "chance": 0.6115,
+  "implied": 0.5556,
+  "edge": 0.056,
+  "fair": -155,
+  "state": {
+   "sets": "1-0",
+   "srv": "home",
+   "need": 2
+  },
+  "model": "live-v4",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
