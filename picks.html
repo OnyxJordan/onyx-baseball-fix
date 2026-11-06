@@ -69,7 +69,7 @@ details{margin-top:14px}summary{cursor:pointer;color:#d795ff;font:700 12px monos
   <a class="back" href="home.html">‹ Onyx Sports</a>
   <span class="ox-eyebrow" style="display:block;margin-top:14px">Onyx Picks</span>
   <h1>What we'd bet<br>today.</h1>
-  <p class="lead">These are our picks, not leans or projections. Every one is logged once, at its Onyx price, before the game starts, and graded in public when it ends. Only markets that beat real Onyx prices in testing on games the model never saw are posted here. Everything else on the site is a projection.</p>
+  <p class="lead">These are our picks, not leans or projections. Every one is locked once, on game day, at its Onyx price before the game starts, and graded in public when it ends. While Onyx posts no prices, a pick locks at the market line and is marked Market line. Only markets that beat real Onyx prices in testing on games the model never saw are posted here. Everything else on the site is a projection.</p>
   <div class="toc"><a href="#today">Today</a><a href="#record">The record</a><a href="#all">Every pick</a><a href="#how">How picks are chosen</a></div>
 </section>
 
@@ -154,7 +154,10 @@ function card(r) {
     '<div class="pc-c"><b>' + Math.round(100 * r.chance) + '%</b><small>TO HIT</small></div>' +
     '<div class="pc-f"><span class="tg sp">' + esc(LG[r.sport] || r.sport) + '</span><span class="tg">' + esc(MK[r.market] || r.market) + '</span>' +
     '<span class="tg">+$' + Math.round(100 * ev) + ' value per $100</span>' + resTag(r) +
-    (live && url ? '<a class="bet" href="' + url + '" target="_blank" rel="noopener">' + odds(r.price) + ' on Onyx</a>' : '<span class="bet" style="background:rgba(255,255,255,.08)">' + odds(r.price) + ' logged</span>') +
+    (r.src === 'market' ? '<span class="tg">Market line</span>' : '') +
+    (live && url ? '<a class="bet" href="' + url + '" target="_blank" rel="noopener">' + odds(r.price) + ' on Onyx</a>'
+      : live && r.src === 'market' ? '<a class="bet" href="https://app.onyxodds.com/?referrer=' + ONYX_REFERRER + '" target="_blank" rel="noopener">' + odds(r.price) + ' market, find it on Onyx</a>'
+      : '<span class="bet" style="background:rgba(255,255,255,.08)">' + odds(r.price) + ' logged</span>') +
     (live && r.sel && window.OnyxSaved ? OnyxSaved.btn(savePick(r)) : '') +
     '</div></div>';
 }
@@ -208,7 +211,7 @@ async function main() {
   var graded = led.filter(function (r) { return r.result; }).slice().sort(function (x, y) { return Date.parse(y.start) - Date.parse(x.start); });
   document.getElementById('log').innerHTML = graded.length ? graded.map(function (r) {
     var pr = r.result === 'W' ? '<span class="pos">+' + pay(r.price).toFixed(2) + 'u</span>' : r.result === 'L' ? '<span class="neg">-1.00u</span>' : '<span class="mut">0.00u</span>';
-    return '<div class="lg"><b>' + esc(r.label) + '</b><div class="r">' + pr + '</div><span>' + esc(LG[r.sport] || r.sport) + ' · ' + esc(r.matchup) + ' · ' + esc(r.date) + ' · ' + odds(r.price) + '</span><div class="r">' + resTag(r) + '</div></div>';
+    return '<div class="lg"><b>' + esc(r.label) + '</b><div class="r">' + pr + '</div><span>' + esc(LG[r.sport] || r.sport) + ' · ' + esc(r.matchup) + ' · ' + esc(r.date) + ' · ' + odds(r.price) + (r.src === 'market' ? ' market line' : '') + '</span><div class="r">' + resTag(r) + '</div></div>';
   }).join('') : '<div class="empty">No graded picks yet. The first ones grade the night they are posted, and every one stays here for good.</div>';
   // how
   var R = bt.rule || {};

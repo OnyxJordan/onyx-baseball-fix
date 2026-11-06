@@ -1693,6 +1693,12 @@ each sports page... there's X or Y value right now, take this pick."
   Why not the Cloudflare relay: the tennis Markov chain costs ~4 ms of CPU per match cold, and a
   free Worker gets 10 ms per run; 20 live matches would not fit. Onyx itself sends no tennis prices
   to OpticOdds (11/5 probe: 0 rows on 14 live matches and on matches about to start).
+- **Picks lock on game day, and through an Onyx outage (11/6).** Jordan: "we have a pick we lock in that
+  shouldn't change ... we need recommendations at the right time." `picks.log` locks a finalized market's
+  pick only on its own game day (baseball day), at the price shown when it first qualifies that day, never
+  days ahead. While Onyx prices nothing in a sport (every play in that build is on the market line), a
+  finalized market locks at the market line instead (`"src": "market"`, labelled "Market line" on
+  picks.html); when Onyx returns, only Onyx prices lock. A locked pick never changes.
 - **Live starting lines and paused live markets (11/6, `live-v5`).** Every live chance starts from the
   game's saved pregame line (`data/<sport>/pregame.json`, `daily_top.keep_pregame`). Since 11/5 that file
   held Onyx prices only, so with Onyx silent every new game would have started from a coin flip. Now a

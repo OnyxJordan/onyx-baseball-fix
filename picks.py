@@ -166,6 +166,13 @@ def log(sport, plays, now=None, mark_only=False):
         if r["sport"] == sport:
             per_day[r["date"]] = per_day.get(r["date"], 0) + 1
     added = 0
+    # 11/6 (Jordan: "we have a pick we lock in that shouldn't change ... we need recommendations at the
+    # right time"): a pick locks on its own game day, at the price shown when it first qualifies that day,
+    # never days early. While Onyx prices nothing in this sport (every play this build is on the market
+    # line), a finalized market locks at the market line instead, marked src "market" ("Market line" on
+    # picks.html); when Onyx is back, only Onyx prices lock again.
+    today = (now.astimezone(ET) - timedelta(hours=4)).date().isoformat()
+    outage = bool(plays) and all(e.get("src") == "market" for e in plays)
     for e in sorted(plays, key=lambda e: (-(e.get("ev") or 0), -(e.get("conf") or 0))):
         k = (sport, str(e.get("gid")), str(e.get("who")))
         if k in have:
@@ -173,12 +180,14 @@ def log(sport, plays, now=None, mark_only=False):
             continue
         if mark_only or (sport, e.get("mkt")) not in fin:
             continue
-        if e.get("src") == "market":
-            continue          # 11/5: a lean priced off the fallback market line is never an Onyx Pick
+        if e.get("src") == "market" and not outage:
+            continue          # a market-line price locks only while Onyx prices nothing in this sport
         st = _when(e.get("start"))
         if not st or st <= now or e.get("price") is None or e.get("conf") is None:
             continue          # logged only before the start, at a real price
         d = day_of(st)
+        if d != today:
+            continue          # locked on game day, not days ahead
         if per_day.get(d, 0) >= CAP:
             continue
         rows.append({"id": f"{sport}-{e.get('gid')}-{e.get('who')}-{e.get('mkt')}", "sport": sport, "date": d,
@@ -187,14 +196,15 @@ def log(sport, plays, now=None, mark_only=False):
                      "team": e.get("team"), "who": e.get("who"), "side": e.get("side"), "line": e.get("line"),
                      "hcap": e.get("hcap"), "price": e["price"], "chance": e["conf"], "edge": e.get("edge"),
                      "ev": e.get("ev"), "sel": e.get("sel"), "model": fin[(sport, e.get("mkt"))].get("version"),
-                     "result": None, "actual": None, "profit": None, "graded_at": None})
+                     "result": None, "actual": None, "profit": None, "graded_at": None,
+                     **({"src": "market"} if e.get("src") == "market" else {})})
         have.add(k)
         per_day[d] = per_day.get(d, 0) + 1
         e["pick"] = True
         added += 1
     if added:
         save(rows)
-        print(f"  picks: logged {added} {sport} Onyx Pick(s)")
+        print(f"  picks: logged {added} {sport} Onyx Pick(s){' at the market line (Onyx prices nothing)' if outage else ''}")
     return added
 
 
