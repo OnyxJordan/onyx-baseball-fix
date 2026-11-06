@@ -2517,8 +2517,8 @@
     {
      "id": "186501",
      "start": "2026-11-06T15:20Z",
-     "state": "in",
-     "detail": "3rd",
+     "state": "post",
+     "detail": "Final",
      "round": "Quarterfinal",
      "draw": "Men's Singles",
      "court": "Court Central",
@@ -2532,20 +2532,20 @@
        "sets": [
         4,
         7,
-        4
+        5
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Luca Van Assche",
        "short": "L. Van Assche",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
         6,
-        5
+        7
        ],
        "serve": false
       }
@@ -2553,9 +2553,9 @@
     },
     {
      "id": "186492",
-     "start": "2026-11-06T18:00Z",
+     "start": "2026-11-06T18:25Z",
      "state": "pre",
-     "detail": "11/6 - 1:00 PM EST",
+     "detail": "11/6 - 1:25 PM EST",
      "round": "Quarterfinal",
      "draw": "Men's Singles",
      "court": "Court Central",
@@ -2611,12 +2611,12 @@
     },
     {
      "id": "186504",
-     "start": "2026-11-07T05:00Z",
+     "start": "2026-11-07T13:30Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "11/7 - 8:30 AM EST",
      "round": "Semifinal",
      "draw": "Men's Singles",
-     "court": "",
+     "court": "Court Central",
      "p": [
       {
        "name": "Ben Shelton",
@@ -2628,9 +2628,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Luca Van Assche",
+       "short": "L. Van Assche",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -2640,12 +2640,12 @@
     },
     {
      "id": "186505",
-     "start": "2026-11-07T05:00Z",
+     "start": "2026-11-07T16:00Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "11/7 - 11:00 AM EST",
      "round": "Semifinal",
      "draw": "Men's Singles",
-     "court": "",
+     "court": "Court Central",
      "p": [
       {
        "name": "TBD",
@@ -5635,9 +5635,9 @@
        "win": false,
        "sets": [
         2,
-        1
+        2
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Anastasia Zakharova",
@@ -5647,7 +5647,7 @@
        "win": false,
        "sets": [
         6,
-        1
+        5
        ],
        "serve": false
       }
@@ -6856,7 +6856,7 @@
      "id": "186734",
      "start": "2026-11-06T17:10Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Semifinal",
      "draw": "Women's Singles",
      "court": "Campo 1",
@@ -6868,9 +6868,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        6
+        6,
+        4
        ],
-       "serve": false
+       "serve": true
       },
       {
        "name": "Leyre Romero Gormaz",
@@ -6879,7 +6880,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        3
+        3,
+        4
        ],
        "serve": false
       }
@@ -6887,9 +6889,9 @@
     },
     {
      "id": "186735",
-     "start": "2026-11-06T18:30Z",
+     "start": "2026-11-06T18:40Z",
      "state": "pre",
-     "detail": "11/6 - 1:30 PM EST",
+     "detail": "11/6 - 1:40 PM EST",
      "round": "Semifinal",
      "draw": "Women's Singles",
      "court": "Campo 1",
@@ -8242,5 +8244,5 @@
    ]
   }
  ],
- "fetched": "2026-11-06T17:55:39+00:00"
+ "fetched": "2026-11-06T18:28:47+00:00"
 }
