@@ -1693,6 +1693,23 @@ each sports page... there's X or Y value right now, take this pick."
   Why not the Cloudflare relay: the tennis Markov chain costs ~4 ms of CPU per match cold, and a
   free Worker gets 10 ms per run; 20 live matches would not fit. Onyx itself sends no tennis prices
   to OpticOdds (11/5 probe: 0 rows on 14 live matches and on matches about to start).
+- **Picks lock on game day, and through an Onyx outage (11/6).** Jordan: "we have a pick we lock in that
+  shouldn't change ... we need recommendations at the right time." `picks.log` locks a finalized market's
+  pick only on its own game day (baseball day), at the price shown when it first qualifies that day, never
+  days ahead. While Onyx prices nothing in a sport (every play in that build is on the market line), a
+  finalized market locks at the market line instead (`"src": "market"`, labelled "Market line" on
+  picks.html); when Onyx returns, only Onyx prices lock. A locked pick never changes.
+- **Live starting lines and paused live markets (11/6, `live-v5`).** Every live chance starts from the
+  game's saved pregame line (`data/<sport>/pregame.json`, `daily_top.keep_pregame`). Since 11/5 that file
+  held Onyx prices only, so with Onyx silent every new game would have started from a coin flip. Now a
+  game Onyx has not priced saves the market line (`"src": "market"`; the page says "Market pregame"); a
+  saved Onyx line is never overwritten by a market one; props stay Onyx-only. Each run's lines replace
+  the game's saved lines whole, so both sides of a spread come from the same moment (24 of 42 saved
+  college basketball spreads had mismatched sides, both teams getting points). Live rows carry
+  `pre_src`. Paused until they test positive, on the page and in the record (`live_model.PAUSED`,
+  live.js `PAUSED`): tennis totals (13-17, -21% graded 11/1-11/6), college basketball spreads (24-27,
+  -12%) and moneylines (6-12, -13%). NHL live (spreads +38%, totals +23%) and college basketball totals
+  (+7%) stay on.
 - **Line tracking (11/6, `status.html`).** Jordan: "if lines disappear we need to address why."
   `lines_status.py` runs in every refresh build and writes `data/lines/status.json`: per sport, how
   many lines came from Onyx and how many from the market fallback, every game still to play with no

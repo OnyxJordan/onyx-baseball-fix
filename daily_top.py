@@ -170,18 +170,23 @@ def keep_pregame(data_dir, rows, hours=36):
             return datetime.fromisoformat(str(s).replace("Z", "+00:00"))
         except ValueError:
             return None
+    # 11/6: each run's lines replace the game's saved lines whole (spread both sides, moneyline both
+    # sides, total), so the two sides always come from the same moment (24 of 42 saved college
+    # basketball spreads had one team's line from one run and the other's from another, e.g. both
+    # teams getting points). A market-line run fills games Onyx has not priced (src "market"; the
+    # live tab starts from it and says "market pregame"), and never overwrites a saved Onyx line.
+    run = {}
     for e in rows:
         k = e.get("kind")
         st = when(e.get("start"))
         if k not in ("spread", "total", "ml", "prop") or not st or st <= now or not e.get("matchup"):
             continue
-        if e.get("src") == "market":
-            continue      # 11/5: the "Onyx pregame line" and the props archive hold Onyx prices only
-        if k == "prop" and e.get("mkt") not in LIVE_PROPS:
-            continue
-        g = P.setdefault(str(e.get("gid")), {"m": e["matchup"], "start": e.get("start"), "sp": {}, "ml": {}})
-        g["m"], g["start"] = e["matchup"], e.get("start")
+        mk = e.get("src") == "market"
         if k == "prop":
+            if mk or e.get("mkt") not in LIVE_PROPS:
+                continue      # props: Onyx prices only (the props archive is an Onyx record)
+            g = P.setdefault(str(e.get("gid")), {"m": e["matchup"], "start": e.get("start"), "sp": {}, "ml": {}})
+            g["m"], g["start"] = e["matchup"], e.get("start")
             # the player's pregame Onyx price and our projection: where a live player bet "started"
             if e.get("name") and e.get("price") is not None and e.get("side") in ("over", "under"):
                 q = g.setdefault("pp", {}).setdefault(f"{e['name']}|{e['mkt']}", {})
@@ -189,14 +194,35 @@ def keep_pregame(data_dir, rows, hours=36):
                     q.clear()
                 q.update({"l": e.get("line"), "j": e.get("proj"), "lam": e.get("lam"), e["side"][0]: e["price"]})
             continue
+        R = run.setdefault(str(e.get("gid")), {"m": e["matchup"], "start": e.get("start"), "onyx": {"sp": {}, "ml": {}}, "market": {"sp": {}, "ml": {}}})
+        L = R["market" if mk else "onyx"]
         if k == "total" and e.get("line") is not None:
-            g["tot"] = e["line"]
+            L.setdefault("tot", e["line"])
         elif k == "spread":
             m = _NUM.search(str(e.get("label") or ""))
             if m:
-                g["sp"][e.get("name")] = float(m.group(1))
+                L["sp"].setdefault(e.get("name"), float(m.group(1)))
         elif k == "ml" and e.get("price") is not None:
-            g["ml"][e.get("name")] = e["price"]
+            L["ml"].setdefault(e.get("name"), e["price"])
+    for gid, R in run.items():
+        src = "onyx" if (R["onyx"]["sp"] or R["onyx"]["ml"] or R["onyx"].get("tot") is not None) else "market"
+        L = R[src]
+        g = P.setdefault(gid, {"m": R["m"], "start": R["start"], "sp": {}, "ml": {}})
+        sv = list((g.get("sp") or {}).values())
+        whole = not (len(sv) == 2 and abs(sv[0] + sv[1]) > 0.6)       # a saved line whose two sides do not mirror is replaced
+        if src == "market" and whole and g.get("src", "onyx") == "onyx" and (g.get("sp") or g.get("ml") or g.get("tot") is not None):
+            continue          # a saved Onyx line stays the starting line
+        g["m"], g["start"] = R["m"], R["start"]
+        if L["sp"]:
+            g["sp"] = dict(L["sp"])
+        if L["ml"]:
+            g["ml"] = dict(L["ml"])
+        if L.get("tot") is not None:
+            g["tot"] = L["tot"]
+        if src == "market":
+            g["src"] = "market"
+        else:
+            g.pop("src", None)
     # the archive the live player-prop backtest replays (tools/live_props_backtest.py): every game's
     # pregame props, kept 21 days (pregame.json itself keeps 36 hours, and the page loads it)
     a = Path(data_dir) / "prop_archive.json"

@@ -329,12 +329,13 @@
     var hit = null;
     Object.keys(pre || {}).forEach(function (k) { if (sameGame(pre[k].m, home, away)) hit = pre[k]; });
     var sp = {}, ml = {}, tot = null;
-    if (hit) { sp = hit.sp || {}; ml = hit.ml || {}; tot = hit.tot; out.pp = hit.pp || null; }
+    if (hit) { sp = hit.sp || {}; ml = hit.ml || {}; tot = hit.tot; out.pp = hit.pp || null; out.src = hit.src || 'onyx'; }
     else rows.forEach(function (p) {
       if (p.kind === 'prop' || !sameGame(p.matchup, home, away)) return;
       if (p.kind === 'spread') { var m = NUM.exec(String(p.label || '')); if (m) sp[p.name] = +m[1]; }
       else if (p.kind === 'total' && p.line != null) tot = p.line;
       else if (p.kind === 'ml' && p.price != null) ml[p.name] = p.price;
+      if (p.src === 'market') out.src = 'market';
     });
     var hn = Object.keys(sp).filter(function (n) { return n === home || nk(n) === nk(home); })[0];
     var an = Object.keys(sp).filter(function (n) { return n === away || nk(n) === nk(away); })[0];
@@ -500,6 +501,7 @@
       // (11/1 first run: every 20-50 point "edge" was a late football game the model misread)
       if (f != null && f < (o.kind === 'prop' ? 0.08 : FMIN[g.sport] || 0.15)) return;
       if (o.edge > 0.12) return;
+      if (PAUSED[g.sport + '|' + o.kind]) return;
       o.ok = !ten || o.p >= TN_CONF;
       out.push(o);
     }
@@ -584,6 +586,8 @@
   // tennis posts a live pick only when the model is confident (11/4, Jordan): 60%+ to hit. Its graded
   // live plays: under 60% went 12-25 (-8.6u, the coin-flip band 50-60% 8-18), 60%+ went 16-7 (+2.2u)
   var TN_CONF = 0.60;
+  // 11/6: live markets paused until they test positive (live_model.py PAUSED): tennis totals, college basketball spreads and moneylines
+  var PAUSED = {'tennis|total': 1, 'cbb|spread': 1, 'cbb|ml': 1};
   function isVal(b) { return b.edge >= VALUE && b.ok !== false; }
   var NAME = {nfl: 'NFL', cfb: 'NCAAF', nba: 'NBA', nhl: 'NHL', cbb: 'NCAAB', tennis: 'Tennis'};
   var PAGE = {nfl: 'nfl.html', cfb: 'cfb.html', nba: 'nba.html', nhl: 'nhl.html', cbb: 'cbb.html', tennis: 'tennis.html'};
@@ -716,7 +720,7 @@
       var top = B[0] || g.bets[0], rest = (B.length ? B : g.bets).slice(1, 4);
       lean = '<div class="lv-lean' + (isVal(top) ? '' : ' none') + '"><div class="lv-k">' + (isVal(top) ? 'Best live bet' : top.ok === false && top.edge >= VALUE ? 'Too close to call' : 'No value right now') + '</div>'
         + '<div class="lv-pick">' + (top.logo ? logoImg(top.logo, 'lv-lg sm') : '') + '<b>' + esc(top.label) + '</b>' + badge(top) + '</div>'
-        + '<div class="lv-steps"><div><small>Started</small><b>' + esc(top.start_txt || '-') + '</b><span>Onyx pregame</span></div>'
+        + '<div class="lv-steps"><div><small>Started</small><b>' + esc(top.start_txt || '-') + '</b><span>' + (pre.src === 'market' ? 'Market pregame' : 'Onyx pregame') + '</span></div>'
         + '<div><small>Live line</small><b>' + pr(top.price) + '</b><span>' + pct(implied(top.price)) + ' implied</span></div>'
         + '<div class="fair"><small>Our fair</small><b>' + pr(top.fair) + '</b><span>' + pct(top.p) + ' to hit</span></div></div>'
         + '<div class="lv-verdict">' + (top.ok === false && top.edge >= VALUE ? 'The price has value, but our chance is only ' + pct(top.p) + ': tennis picks post at 60% or better, so this one is a pass.' : isVal(top) ? 'A good live bet: the live line of <b>' + pr(top.price) + '</b> pays more than our fair price of <b>' + pr(top.fair) + '</b>.' : 'The closest one: the live line of ' + pr(top.price) + ' pays less than our fair price of ' + pr(top.fair) + '. It turns into value at ' + pr(top.fair) + ' or better.') + '</div>'
@@ -728,7 +732,7 @@
     } else if (L && L.kind === 'ml') {
       var moved = L.start == null ? 'no Onyx line saved' : L.now >= L.start ? 'up from ' + pct(L.start) : 'down from ' + pct(L.start);
       lean = '<div class="lv-lean"><div class="lv-k">Our live lean</div><div class="lv-pick">' + logoImg(L.logo, 'lv-lg sm') + '<b>' + esc(L.team) + ' to win</b></div>'
-        + '<div class="lv-steps"><div><small>Started</small><b>' + (L.start == null ? '-' : pct(L.start)) + '</b><span>' + (L.start_price != null ? 'Onyx ' + pr(L.start_price) : 'Onyx pregame') + '</span></div>'
+        + '<div class="lv-steps"><div><small>Started</small><b>' + (L.start == null ? '-' : pct(L.start)) + '</b><span>' + (L.start_price != null ? (pre.src === 'market' ? 'Market ' : 'Onyx ') + pr(L.start_price) : (pre.src === 'market' ? 'Market pregame' : 'Onyx pregame')) + '</span></div>'
         + '<div><small>Now</small><b>' + pct(L.now) + '</b><span>' + esc(moved) + '</span></div>'
         + '<div class="fair"><small>Fair price</small><b>' + pr(L.fair) + '</b><span>our number</span></div></div>'
         + '<div class="lv-verdict">' + (L.fair < 0 ? 'A good live bet at any price better than <b>' + pr(L.fair) + '</b>, like ' + pr(Math.round(L.fair * 0.85 / 5) * 5) + '.' : 'A good live bet at any price of <b>' + pr(L.fair) + ' or longer</b>.') + '</div></div>';
@@ -742,7 +746,7 @@
     } else {
       lean = '<div class="lv-lean none"><div class="lv-k">Our live lean</div><div class="lv-verdict">' + (L && L.why === 'nopre' ? 'No lean: Onyx\'s line from before the start was not saved for this game, so there is nothing to measure the move from.' : 'No lean on this one: the game is close to decided.') + '</div></div>';
     }
-    var more = '<div class="lv-more"><span>Our ' + (ten ? 'game spread' : 'spread') + ' now <b>' + esc(g.fair_spread || '-') + '</b></span><span>Our total now <b>' + (g.proj_total != null ? g.proj_total.toFixed(1) : '-') + (ten ? ' games' : '') + '</b></span>' + (pre.spread_txt ? '<span>Onyx pregame <b>' + esc(pre.spread_txt) + (pre.total_txt ? ' · ' + esc(pre.total_txt) : '') + '</b></span>' : '') + '</div>';
+    var more = '<div class="lv-more"><span>Our ' + (ten ? 'game spread' : 'spread') + ' now <b>' + esc(g.fair_spread || '-') + '</b></span><span>Our total now <b>' + (g.proj_total != null ? g.proj_total.toFixed(1) : '-') + (ten ? ' games' : '') + '</b></span>' + (pre.spread_txt ? '<span>' + (pre.src === 'market' ? 'Market pregame' : 'Onyx pregame') + ' <b>' + esc(pre.spread_txt) + (pre.total_txt ? ' · ' + esc(pre.total_txt) : '') + '</b></span>' : '') + '</div>';
     return '<div class="lv-card"><div class="lv-top"><span class="lv-tag">' + (NAME[g.sport] || '') + '</span><span class="lv-clock">' + esc(g.detail || 'Live') + '</span></div>'
       + teams + '<div class="lv-bar"><i style="width:' + (100 * aw).toFixed(1) + '%"></i></div>' + lean + more
       + '<div class="lv-f"><a class="go" href="' + ONYX + '" target="_blank" rel="noopener">Bet it live on Onyx</a><a href="' + gameHref(g) + '" data-lv-open="' + esc(g.gid || '') + '" data-lv-sport="' + esc(g.sport) + '" data-lv-a="' + esc(g.away || '') + '" data-lv-h="' + esc(g.home || '') + '">Open the game</a></div></div>';
@@ -765,7 +769,7 @@
     var h = '<div class="lvb-h"><div><span class="lvb-eb' + (G.length ? '' : ' off') + '"><i></i>' + (G.length ? 'Live now &middot; ' + G.length + ' ' + (sport === 'tennis' ? 'match' + (G.length === 1 ? '' : 'es') : 'game' + (G.length === 1 ? '' : 's')) + ' in play' : 'Live') + '</span>'
       + '<h3>' + (!G.length ? 'Nothing live right now' : val.length ? 'Value right now' : 'No live value right now') + '</h3></div></div>';
     if (!G.length) return h + '<div class="lvb-note">Live value shows here the moment a ' + (sport === 'tennis' ? 'match' : 'game') + ' starts: our live chance against the live line, every 30 seconds. ' + UNTESTED + '</div>' + (opt.rec || '');
-    h += '<div class="lvb-note"><b>' + UNTESTED + '</b> Our live chance starts from Onyx\'s pregame line and moves with the ' + (sport === 'tennis' ? 'sets, games and server' : 'score and the clock') + '. The live line is the in-game market (Onyx\'s in-game prices are not in our feed), so confirm the price in the Onyx app before you bet.</div>';
+    h += '<div class="lvb-note"><b>' + UNTESTED + '</b> Our live chance starts from Onyx\'s pregame line (the market line when Onyx has none) and moves with the ' + (sport === 'tennis' ? 'sets, games and server' : 'score and the clock') + '. The live line is the in-game market (Onyx\'s in-game prices are not in our feed), so confirm the price in the Onyx app before you bet.</div>';
     if (val.length) h += val.map(function (x) { return '<div class="lvb-v"><p>' + sentence(x.b, x.g) + '</p><a class="lvb-go" href="' + ONYX + '" target="_blank" rel="noopener">Bet it live on Onyx</a></div>'; }).join('');
     else if (near.length) h += '<div class="lvb-v none"><p><b>No live value right now.</b> Every live line pays less than our fair price. The closest lines:<small>' + near.map(function (x) { return esc(x.b.label) + ' ' + pr(x.b.price) + ' (our chance ' + pct(x.b.p) + ', line ' + pct(implied(x.b.price)) + ')'; }).join(' &middot; ') + '</small></p></div>';
     else h += '<div class="lvb-v none"><p><b>No live value right now.</b>' + (priced ? ' No live line we can price right now.' : ' The live line is not posted for these ' + (sport === 'tennis' ? 'matches' : 'games') + ' yet; our live chances are on the cards below.') + '</p></div>';
