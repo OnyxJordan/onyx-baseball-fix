@@ -1462,6 +1462,23 @@ def write_top(key, lane, slate, model):
     DT.write_board(lane.data, key, slate.get("date"), board, teams)
 
 
+NAME_POS = {"football": {"QB", "RB", "FB", "WR", "TE", "K"}}
+
+
+def write_names(lane, depth):
+    """data/<sport>/names.json: every rostered player on the depth chart ([name, team, position]),
+    so Ask Onyx knows a player who has no line today (11/6: "jeremiah smith receiving yards" read as
+    NFL with no player while college football had no player lines). Fail-soft."""
+    try:
+        keep = NAME_POS.get(lane.cfg["kind"])
+        rows = sorted({(p["n"], t, p.get("pos") or "") for t, T in ((depth or {}).get("teams") or {}).items()
+                       for p in T.get("players") or [] if p.get("n") and (not keep or (p.get("pos") or "") in keep)})
+        if rows:
+            lane.save("names.json", [list(r) for r in rows])
+    except Exception as ex:
+        print(f"  names: skipped ({str(ex)[:120]})")
+
+
 def _priced(o):
     return bool(o and ((o.get("games") or {}) or (o.get("props") or []) or (o.get("matches") or {})))
 
@@ -1601,6 +1618,7 @@ def main():
         except Exception as ex:
             print(f"  depth: {str(ex)[:160]}")
     depth = lane.load("depth.json", None) if cfg["kind"] in ("football", "hockey", "basketball") else None
+    write_names(lane, depth)
     # Similar spots (11/2): closing-line history of games in this game's spot, context only:
     # never a pick, never in the Top 10 or a ledger. Fail-soft and time-capped; the page
     # fetches data/<sport>/situations.json when a gamecenter opens.

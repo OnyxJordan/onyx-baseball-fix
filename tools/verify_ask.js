@@ -36,7 +36,7 @@ const srv = http.createServer((q, r) => { const p = path.join(root, decodeURICom
     const B = await OnyxAsk.loadBoards(), now = Date.now(), out = [];
     // today's boards and the Onyx Picks ledger, read straight from the files: every play shown must be one of these rows
     const FILE = {}, LEDGER = {};
-    for (const sp of Object.keys(OnyxAsk.LG)) { try { const j = await (await fetch('data/' + sp + '/board.json', {cache: 'no-cache'})).json(); (j.plays || []).forEach(p => { FILE[sp + '|' + p.sel + '|' + p.label] = p; }); } catch (e) {} }
+    for (const sp of Object.keys(OnyxAsk.LG)) { try { const j = await (await fetch('data/' + sp + '/board.json', {cache: 'no-cache'})).json(); (j.plays || []).forEach(p => { FILE[sp + '|' + p.sel + '|' + p.label + '|' + p.matchup] = p; }); } catch (e) {} }
     try { const L = await (await fetch('data/picks/ledger.json', {cache: 'no-cache'})).json(); (Array.isArray(L) ? L : []).forEach(r => { if (r && r.sel) LEDGER[r.sel] = 1; }); } catch (e) {}
     const teamsFor = (s, sp) => s.tabbr ? (s.tabbr[sp] || []) : ((s.teams || []).length ? s.teams : s.team ? [s.team] : []);
     const onT = (p, T) => { const hay = [p.team, p.matchup, p.name].join(' ').toUpperCase(); return T.some(x => new RegExp('(^|[^A-Z])' + String(x).toUpperCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '([^A-Z]|$)').test(hay)); };
@@ -108,7 +108,9 @@ const srv = http.createServer((q, r) => { const p = path.join(root, decodeURICom
         if (Date.parse(p.start) <= now) { why.push('started game'); break; }
         if (s.player && String(p.name || p.label).toLowerCase().indexOf(String(s.player).toLowerCase()) < 0) { why.push(`play not on ${s.player}`); break; }
         // on today's board file, at the same Onyx price, with its league's tag
-        const f = FILE[p.sport + '|' + p.sel + '|' + p.label];
+        // keyed by game too: a market-line play (Onyx down, 11/5) has no selection id, and the same label
+        // ("Under 155.5 total") sits in several games
+        const f = FILE[p.sport + '|' + p.sel + '|' + p.label + '|' + p.matchup];
         if (!f) { why.push(`play not on the ${p.sport} board file: ${p.label}`); break; }
         if (f.price !== p.price || f.sport !== p.sport || f.matchup !== p.matchup) { why.push(`price or game differs from the board file: ${p.label} ${p.price} vs ${f.price}`); break; }
         if (!OnyxAsk.LG[p.sport]) { why.push(`no league tag for ${p.sport}`); break; }
