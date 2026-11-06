@@ -22,6 +22,9 @@
   var PICKS = {today: [], final: []};   // Onyx Picks still to play today (data/picks/ledger.json) and the finalized markets
   var MKTS = ['pts', 'reb', 'ast', 'q1_total', 'h1_total', 'first_basket', 'first_td', 'rec', 'rec_yds', 'rush_yds', 'pass_yds', 'pass_td', 'pass_att', 'rush_rec_yds', 'pass_rush_yds', 'anytime_td', 'two_plus_td', 'spread', 'total', 'ml'];
   var BOARD = null, AI = null, PRIOR = [];
+  // every rostered player (data/<sport>/names.json from the depth charts, 11/6): known even with no
+  // line today, matched on the full name only, after today's boards and the NBA record
+  var ROSTER = {};
 
   function getJSON(u) { return fetch(u, {cache: 'no-cache'}).then(function (r) { if (!r.ok) throw new Error(u); return r.json(); }); }
   function loadBoards() {
@@ -31,7 +34,12 @@
     }).catch(function () {});
     // Onyx Picks (11/2): only finalized markets are picks; every other play is a projection
     var picks = Promise.all([getJSON('data/picks/ledger.json').catch(function () { return []; }), getJSON('data/picks/backtest.json').catch(function () { return {}; })]);
-    return Promise.all(SPORTS.map(function (k) { return getJSON('data/' + k + '/board.json').catch(function () { return null; }); }).concat([prior, picks]))
+    var roster = Promise.all(['nfl', 'cfb', 'nhl', 'cbb'].map(function (k) {
+      return getJSON('data/' + k + '/names.json').then(function (L) {
+        (L || []).forEach(function (r) { var c = clean(r[0]); if (c && c.split(' ').length >= 2 && !ROSTER[c]) ROSTER[c] = {name: r[0], sp: k, team: r[1]}; });
+      }).catch(function () {});
+    }));
+    return Promise.all(SPORTS.map(function (k) { return getJSON('data/' + k + '/board.json').catch(function () { return null; }); }).concat([prior, picks, roster]))
       .then(function (fs) {
         BOARD = []; fs.slice(0, SPORTS.length).forEach(function (f) { (f && f.plays || []).forEach(function (p) { BOARD.push(p); }); });
         var pk = fs[SPORTS.length + 1] || [[], {}], L = Array.isArray(pk[0]) ? pk[0] : (pk[0] && (pk[0].picks || pk[0].rows)) || [];
@@ -653,6 +661,16 @@
       var bare = t.match(/(?:^|\s|odds\s*|at\s*)(-\d{3,4})(?!\d)/);
       if (bare) s.max_price = +bare[1];
     }
+    // "3 leg same game parlay ... minimum odds +300" (11/6, Jordan): a plus-money minimum on a parlay is
+    // the whole ticket's payout floor, not every leg's price. Each leg at +300 or longer only when the
+    // request says so ("each leg", "every leg", "per leg") or asks for dogs / plus money / longshots.
+    if (s.min_price != null && s.min_price >= 100 && !s.target_price && /\bparlay|\bsgp\b|same[\s-]?game|\blegs?\b|legger|\bticket/.test(t)
+        && /(\bmin(imum)?\b( total)?( parlay)?( odds)?( of)?|\bat least|odds of at least)\s*\+\d{3,4}/.test(t)
+        && !/\+\d{3,4}\s*(or better|or longer|and up|or more)/.test(t)
+        && !/\b(each|every|per|all)\s+(leg|pick|play)s?\b|\blegs?\s+(each|at|of)\s+(at least\s+)?\+?\d/.test(t)
+        && !/plus money|plus[\s-]odds|underdogs?|\bdogs\b|long ?shots?/.test(t)) {
+      s.target_price = s.min_price; s.min_price = null; s.ticket_floor = true;
+    }
     if (/plus money|plus[\s-]odds|\+ ?odds|underdogs?|\bdogs\b|long ?shots?|\bvalue dogs?\b/.test(t)) s.min_price = Math.max(s.min_price == null ? 100 : s.min_price, 100);
     if (/even money|around even|near even|pick ?em/.test(t)) { s.min_price = -125; s.max_price = 125; }
     if (favW && /\bml\b|money ?line|to win|\bwin\b/.test(t)) s.max_price = Math.min(s.max_price == null ? -101 : s.max_price, -101);
@@ -709,6 +727,14 @@
     var mk = s.markets || [], want = mk.length && mk.every(function (m) { return FOOT.test(m); }) ? ['nfl', 'cfb'] : mk.length && mk.every(function (m) { return HOOP.test(m); }) ? ['nba', 'cbb'] : null;
     if (want) Object.keys(PC).forEach(function (k) { var sp = Object.keys(PC[k].sp || {}); if (sp.length && !sp.some(function (x) { return want.indexOf(x) >= 0; })) delete PC[k]; });
     s.player = findPlayer(tPlayer, PC, s.markets);
+    // a rostered player with no line today, typed by his full name ("jeremiah smith receiving yards")
+    var rost = null;
+    if (!s.player) {
+      Object.keys(ROSTER).forEach(function (k) {
+        if (tPlayer.indexOf(' ' + k + ' ') >= 0 && (!want || want.indexOf(ROSTER[k].sp) >= 0) && (!rost || k.length > rost.k.length)) rost = {k: k, r: ROSTER[k]};
+      });
+      if (rost) s.player = rost.r.name;
+    }
     if (s.player) {
       s.team = null; if (s.intent === 'list' && s.count == null && !/props|plays|lines|bets/.test(t)) s.count = 5;
       if (!s.sports.length) {
@@ -719,6 +745,7 @@
         else if (/alcaraz|sinner|djokovic|sabalenka|swiatek|gauff/.test(pl)) s.sports = ['tennis'];
         else if (/^(jeremiah smith|arch manning|julian sayin|ryan williams)$/.test(pl)) s.sports = ['cfb'];
         else if (NFLSTAR.test(pl)) s.sports = ['nfl'];
+        else if (rost) s.sports = [rost.r.sp];
       }
     }
     // defaults that follow from the rest
@@ -836,7 +863,7 @@
   function run(spec, B) {
     var now = Date.now();
     // "2 legs paying +300": each leg has to carry its share of the payout
-    if (spec.intent === 'parlay' && spec.target_price && spec.count_set && spec.count >= 1) {
+    if ((spec.intent === 'parlay' || spec.intent === 'sgp') && spec.target_price && spec.count_set && spec.count >= 1) {
       var per = Math.pow(1 + spec.target_price / 100, 1 / spec.count);
       var floor = am(per * 0.97);
       if (spec.min_price == null || spec.default_floor || spec.min_price < floor) spec = Object.assign({}, spec, {min_price: floor});
@@ -1017,7 +1044,7 @@
     b.push((s.sports || []).length ? s.sports.map(function (k) { return LG[k] || k; }).join(' + ') : 'every sport');
     if ((s.markets || []).length) b.push(s.markets.map(function (m) { return MW[m] || m; }).join(', '));
     if (s.side && s.side !== 'any') b.push(s.side === 'over' ? 'overs only' : 'unders only');
-    if (s.target_price) b.push('pays about +' + s.target_price);
+    if (s.target_price) b.push((s.ticket_floor ? 'ticket pays +' + s.target_price + ' or more' : 'pays about +' + s.target_price));
     if (s.min_price != null) b.push((s.default_floor ? 'standard prices, nothing shorter than ' : 'no price shorter than ') + (s.min_price > 0 ? '+' : '') + s.min_price);
     if (s.max_price != null) b.push('no price longer than ' + (s.max_price > 0 ? '+' : '') + s.max_price);
     if (s.min_conf != null) b.push(s.default_conf ? (s.intent === 'list' ? 'every pick 50%+ to hit' : 'every leg 50%+ to hit') : Math.round(100 * s.min_conf) + '%+ confidence');
@@ -1110,6 +1137,7 @@
     // a price rule the reader found wins (100% on prices across 80,000+ generated requests; the AI
     // read "even money" as exactly +100, which matches almost nothing)
     if (h.min_price != null) s.min_price = h.min_price;
+    if (h.ticket_floor) { s.min_price = null; s.ticket_floor = true; }
     if (h.max_price != null) s.max_price = h.max_price;
     if ((h.min_price != null || h.max_price != null) && h.min_price == null && s.min_price != null && s.max_price === h.max_price && s.min_price > s.max_price) s.min_price = null;
     if (s.min_conf != null && h.min_conf == null && !/%|percent/.test(t)) s.min_conf = null;

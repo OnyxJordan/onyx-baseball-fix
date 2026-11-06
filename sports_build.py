@@ -991,8 +991,11 @@ def cfb_player_rows(lane, slate, odds, w):
                     ratio = pr / r["line"] if r["line"] else 1.0
                     if r["line"] is not None and (abs(pr - r["line"]) > 1.0 * sd_ or not (0.6 <= ratio <= 1.67)):
                         r["role_flag"] = True
-                    elif r["line"] is not None and r["over"] is not None and r["under"] is not None:
-                        ps = L.price_side(C.prob_over(st, pr, r["line"]), r["over"], r["under"], w)
+                    elif r["line"] is not None and r["over"] is not None and (r["under"] is not None or (odds or {}).get("fallback")):
+                        # 11/6: the fallback book posts college player lines over-only; the under is filled
+                        # from a standard 4.5% two-way margin (leans only, labelled market line)
+                        und = r["under"] if r["under"] is not None else _american_of(max(0.02, min(0.98, 1.045 - L.implied(r["over"]))))
+                        ps = L.price_side(C.prob_over(st, pr, r["line"]), r["over"], und, w)
                         if ps:
                             r.update(side=ps["side"], price=ps["price"], sel=r["over_sel"] if ps["side"] == "over" else r["under_sel"],
                                      prob=ps["prob"], implied=ps["implied"], edge=ps["edge"], ev=ps["ev"], model_p=ps["model_p"])
@@ -1382,6 +1385,9 @@ def cfb_td_board(lane, slate, pre, start, DT):
     listed player's share of the game's prices x CFB_FIRST_LISTED. So the edge is never
     positive and nothing here is ever value; it answers "who is most likely to score"."""
     odds = lane.load("odds.json", {}) or {}
+    mkt = None if _priced(odds) else fallback_market(lane, slate, odds)   # 11/6: Onyx down, the market line
+    if mkt:
+        odds = mkt
     games = {g["gid"]: g for g in slate.get("games") or []}
     team_of = {}
     for r in (lane.load("player_games.json", {}) or {}).get("rows") or []:
@@ -1403,8 +1409,8 @@ def cfb_td_board(lane, slate, pre, start, DT):
         else:
             conf = CFB_FIRST_LISTED * imp / max(first_sum.get(p["gid"], 1.0), 1.0)
         c = {"kind": "prop", "mkt": p["mkt"], "name": p.get("name"), "team": tm, "side": "over", "line": 0.5,
-             "price": p["over"], "prob": conf, "edge": conf - imp, "sel": p.get("over_sel"), "gid": p["gid"],
-             "matchup": f"{g.get('away')} @ {g.get('home')}"}
+             "price": p["over"], "prob": conf, "edge": conf - imp, "sel": None if mkt else p.get("over_sel"), "gid": p["gid"],
+             "matchup": f"{g.get('away')} @ {g.get('home')}", **({"src": "market"} if mkt else {})}
         e = DT.entry("cfb", c, "lean", start.get(p["gid"]))
         if p["mkt"] == "anytime_td":
             e["lam"] = round(-math.log(max(1e-6, 1 - conf)), 4)
@@ -1440,7 +1446,7 @@ def write_top(key, lane, slate, model):
             continue
         c = {"kind": "prop", "mkt": "anytime_td", "name": r["name"], "pid": r.get("pid"), "team": r.get("team"), "side": "over",
              "line": 0.5, "price": r["any_price"], "prob": r["any"], "edge": r.get("any_edge") or 0.0, "sel": r.get("any_sel"),
-             "gid": r["gid"], "matchup": r.get("matchup")}
+             "gid": r["gid"], "matchup": r.get("matchup"), **({"src": "market"} if r.get("src") == "market" else {})}
         board.append(dict(DT.entry(key, c, tag(c), start.get(r["gid"])), lam=round(-math.log(max(1e-6, 1 - r["any"])), 4),
                           # the TD model's own chance (not blended into the chance shown: it lost to Onyx's price in testing),
                           # so Ask Onyx can rank "your favorite TD scorers" by how much the model likes them against their price
@@ -1460,6 +1466,27 @@ def write_top(key, lane, slate, model):
             if g.get(side) and g.get(side + "_name"):
                 teams[g[side]] = g[side + "_name"]
     DT.write_board(lane.data, key, slate.get("date"), board, teams)
+
+
+NAME_POS = {"football": {"QB", "RB", "FB", "WR", "TE", "K"}}
+
+
+def write_names(lane, depth):
+    """data/<sport>/names.json: every rostered player on the depth chart ([name, team, position]),
+    so Ask Onyx knows a player who has no line today (11/6: "jeremiah smith receiving yards" read as
+    NFL with no player while college football had no player lines). Fail-soft."""
+    try:
+        keep = NAME_POS.get(lane.cfg["kind"])
+        rows = sorted({(p["n"], t, p.get("pos") or "") for t, T in ((depth or {}).get("teams") or {}).items()
+                       for p in T.get("players") or [] if p.get("n") and (not keep or (p.get("pos") or "") in keep)})
+        if rows:
+            lane.save("names.json", [list(r) for r in rows])
+    except Exception as ex:
+        print(f"  names: skipped ({str(ex)[:120]})")
+
+
+def _american_of(p):
+    return int(round(-100 * p / (1 - p))) if p >= 0.5 else int(round(100 * (1 - p) / p))
 
 
 def _priced(o):
@@ -1543,6 +1570,16 @@ def market_leans(key, lane, slate, odds, model):
             blk = nfl_block if key == "nfl" else (lambda ln, sl, od: team_block(key, ln, sl, od))
             m2 = blk(_ReadOnlyLane(lane), slate, mkt)
             props = [r for r in (m2.get("_cands") or []) if (r.get("kind") or "prop") not in ("ml", "spread", "total")]
+            # the touchdown-scorer table (anytime / first TD) is built apart from the props list (11/6:
+            # "best value td scorer parlay" found nothing while Onyx was down)
+            if not model.get("td") and m2.get("td"):
+                td = []
+                for r in m2["td"]:
+                    r = dict(r, src="market")
+                    for k_ in [k_ for k_ in r if k_.endswith("_sel")]:
+                        r[k_] = None
+                    td.append(r)
+                model["td"] = td
             for r in props:
                 for k_ in ("trial", "pick", "tracked", "result", "actual"):
                     r.pop(k_, None)
@@ -1601,6 +1638,7 @@ def main():
         except Exception as ex:
             print(f"  depth: {str(ex)[:160]}")
     depth = lane.load("depth.json", None) if cfg["kind"] in ("football", "hockey", "basketball") else None
+    write_names(lane, depth)
     # Similar spots (11/2): closing-line history of games in this game's spot, context only:
     # never a pick, never in the Top 10 or a ledger. Fail-soft and time-capped; the page
     # fetches data/<sport>/situations.json when a gamecenter opens.

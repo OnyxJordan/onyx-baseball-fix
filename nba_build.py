@@ -73,6 +73,9 @@ PICK_MAX_LINE_AGE_MIN = 20    # never log a pick off Onyx prices older than this
 # and rebuild the page from fresh Onyx lines without touching any ledger -
 # no grading, no new picks, no ticket changes. The full refresh owns those.
 LINES_ONLY = os.environ.get("NBA_LINES_ONLY") == "1"
+# 11/6: Onyx priced nothing and nba_odds' market fallback stands in (props.json "fallback"): the board
+# keeps every market without Onyx selection ids, flagged src "market" (leans only, never logged)
+MARKET = False
 
 
 def line_age_min(props, now=None):
@@ -572,14 +575,14 @@ def write_top(rows, games, today_rows, open_led, today, jumps=None, fshots=None)
         po = 1 - OL._phi((g["q1_total"] - g["total"] * OL.P["q1"]) / OL.P["q1_sd"])
         for side, p in (("over", po), ("under", 1 - po)):
             price, sel = g.get(f"q1_{side}_price"), g.get(f"q1_{side}_sel")
-            if price is None or not sel:
+            if price is None or (not sel and not MARKET):
                 continue
             c = {"kind": "prop", "mkt": "q1_total", "name": f"{g['away']} @ {g['home']}", "pid": "q1", "team": g["away"], "side": side,
                  "line": g["q1_total"], "price": price, "prob": p, "edge": p - OL.implied(price), "sel": sel,
-                 "gid": g["gid"], "matchup": f"{g['away']} @ {g['home']}", "start": g.get("start")}
-            board.append(DT.entry("nba", c, tag(sel)))
+                 "gid": g["gid"], "matchup": f"{g['away']} @ {g['home']}", "start": g.get("start"), **({"src": "market"} if not sel else {})}
+            board.append(DT.entry("nba", c, tag(sel) if sel else "lean"))
             if DT.ok(c):
-                out.append(DT.entry("nba", c, tag(sel)))
+                out.append(DT.entry("nba", c, tag(sel) if sel else "lean"))
     # 1st-half totals (the qhCard read: 50.5% of the game total, sd 18) and first
     # basket (open_lanes.fb_probs): on the board for Ask Onyx, never in the Top 10
     from statistics import NormalDist
@@ -590,24 +593,24 @@ def write_top(rows, games, today_rows, open_led, today, jumps=None, fshots=None)
             po = 1 - NormalDist(g["total"] * 0.505, 18).cdf(g["h1_total"])
             for side, p in (("over", po), ("under", 1 - po)):
                 price, sel = g.get(f"h1_{side}_price"), g.get(f"h1_{side}_sel")
-                if price is not None and sel:
+                if price is not None and (sel or MARKET):
                     c = {"kind": "prop", "mkt": "h1_total", "name": f"{g['away']} @ {g['home']}", "pid": "h1", "team": g["away"], "side": side,
                          "line": g["h1_total"], "price": price, "prob": p, "edge": p - OL.implied(price), "sel": sel,
-                         "gid": g["gid"], "matchup": f"{g['away']} @ {g['home']}", "start": g.get("start")}
-                    board.append(DT.entry("nba", c, tag(sel)))
+                         "gid": g["gid"], "matchup": f"{g['away']} @ {g['home']}", "start": g.get("start"), **({"src": "market"} if not sel else {})}
+                    board.append(DT.entry("nba", c, tag(sel) if sel else "lean"))
         try:
             fbp = OL.fb_probs(rows, g, jumps or {}, fshots)
         except Exception:
             fbp = {}
         for r in rows:
             fb = r.get("fb") or {}
-            if r["gid"] != g["gid"] or r["pid"] not in fbp or fb.get("yes") is None or not fb.get("sel"):
+            if r["gid"] != g["gid"] or r["pid"] not in fbp or fb.get("yes") is None or (not fb.get("sel") and fb.get("src") != "market"):
                 continue
             p = fbp[r["pid"]]
             c = {"kind": "prop", "mkt": "first_basket", "name": r["name"], "pid": r["pid"], "team": r["team"], "side": "over", "line": 0.5,
-                 "price": fb["yes"], "prob": p, "edge": p - OL.implied(fb["yes"]), "sel": fb["sel"],
-                 "gid": g["gid"], "matchup": f"{g['away']} @ {g['home']}", "start": g.get("start")}
-            board.append(DT.entry("nba", c, tag(fb["sel"])))
+                 "price": fb["yes"], "prob": p, "edge": p - OL.implied(fb["yes"]), "sel": fb.get("sel"),
+                 "gid": g["gid"], "matchup": f"{g['away']} @ {g['home']}", "start": g.get("start"), **({"src": "market"} if not fb.get("sel") else {})}
+            board.append(DT.entry("nba", c, tag(fb["sel"]) if fb.get("sel") else "lean"))
     # game lines for Ask Onyx ("Celtics spread", "NBA sides", "game totals"): there is no NBA
     # game model, so the chance is Onyx's own price with the margin removed; never value, never Top 10
     for g in games.values():
@@ -627,13 +630,13 @@ def write_top(rows, games, today_rows, open_led, today, jumps=None, fshots=None)
             for side, other in (("over", "under"), ("under", "over")):
                 pairs.append(("total", "Total", side, g["total"], g[f"{side}_price"], g[f"{other}_price"], g.get(f"{side}_sel"), ""))
         for kind, name, side, ln, price, oprice, sel, ltxt in pairs:
-            if not sel or price is None or oprice is None:
+            if (not sel and not MARKET) or price is None or oprice is None:
                 continue
             ip, io = OL.implied(price), OL.implied(oprice)
             p = ip / (ip + io)
             c = {"kind": kind, "mkt": kind, "name": name, "team": name if kind != "total" else None, "side": "over" if side in ("home", "over") else "under",
                  "line": ln, "line_txt": ltxt, "price": price, "prob": p, "edge": p - ip, "sel": sel,
-                 "gid": g["gid"], "matchup": mu, "start": g.get("start")}
+                 "gid": g["gid"], "matchup": mu, "start": g.get("start"), **({"src": "market"} if not sel else {})}
             board.append(DT.entry("nba", c, "lean"))
     DT.write_board(Path("data/nba"), "nba", today, board)
     return DT.write(Path("data/nba"), "nba", today, out)
@@ -796,6 +799,8 @@ def main():
     pg = load(sub + "player_games.json", {})
     tg = load(sub + "team_games.json", {})
     props = load("props.json", {})
+    global MARKET
+    MARKET = bool(props.get("fallback"))
     if props.get("date") != today:
         props = {}
     merge_lines(slate, props)
