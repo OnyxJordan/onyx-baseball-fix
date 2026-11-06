@@ -2554,8 +2554,8 @@
     {
      "id": "186492",
      "start": "2026-11-06T19:00Z",
-     "state": "pre",
-     "detail": "11/6 - 2:00 PM EST",
+     "state": "in",
+     "detail": "1st",
      "round": "Quarterfinal",
      "draw": "Men's Singles",
      "court": "Court Central",
@@ -2566,8 +2566,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        4
+       ],
+       "serve": true
       },
       {
        "name": "Taylor Fritz",
@@ -2575,7 +2577,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        3
+       ],
        "serve": false
       }
      ]
@@ -6870,7 +6874,7 @@
        "sets": [
         6,
         5,
-        0
+        3
        ],
        "serve": true
       },
@@ -6883,7 +6887,7 @@
        "sets": [
         3,
         7,
-        0
+        3
        ],
        "serve": false
       }
@@ -6891,9 +6895,9 @@
     },
     {
      "id": "186735",
-     "start": "2026-11-06T19:10Z",
+     "start": "2026-11-06T19:40Z",
      "state": "pre",
-     "detail": "11/6 - 2:10 PM EST",
+     "detail": "11/6 - 2:40 PM EST",
      "round": "Semifinal",
      "draw": "Women's Singles",
      "court": "Campo 1",
@@ -8246,5 +8250,5 @@
    ]
   }
  ],
- "fetched": "2026-11-06T19:01:57+00:00"
+ "fetched": "2026-11-06T19:35:13+00:00"
 }
