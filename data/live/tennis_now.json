@@ -523,5 +523,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186735-ml-away",
+  "sport": "tennis",
+  "gid": "186735",
+  "date": "2026-11-06",
+  "logged_at": "2026-11-06T20:49:27+00:00",
+  "matchup": "Bianca Andreescu vs Alice Tubello",
+  "home": "Alice Tubello",
+  "away": "Bianca Andreescu",
+  "label": "Bianca Andreescu to win",
+  "kind": "ml",
+  "side": "away",
+  "line": null,
+  "price": -428,
+  "chance": 0.9118,
+  "implied": 0.8106,
+  "edge": 0.101,
+  "fair": -1035,
+  "state": {
+   "sets": "6-0 0-1",
+   "srv": "away",
+   "need": 2
+  },
+  "pre_src": "market",
+  "model": "live-v6",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
