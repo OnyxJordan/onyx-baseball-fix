@@ -9267,10 +9267,10 @@
    "need": 2
   },
   "model": "live-v4",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "14-11",
+  "profit": -1.0,
+  "graded_at": "2026-11-06T13:31:55+00:00"
  },
  {
   "id": "tennis-186687-ml-away",
@@ -9351,6 +9351,35 @@
   "state": {
    "sets": "0-0",
    "srv": "away",
+   "need": 2
+  },
+  "model": "live-v4",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "tennis-186500-spread-home",
+  "sport": "tennis",
+  "gid": "186500",
+  "date": "2026-11-06",
+  "logged_at": "2026-11-06T13:22:25+00:00",
+  "matchup": "Tommy Paul vs Ben Shelton",
+  "home": "Ben Shelton",
+  "away": "Tommy Paul",
+  "label": "Ben Shelton +1.5 games",
+  "kind": "spread",
+  "side": "home",
+  "line": 1.5,
+  "price": -130,
+  "chance": 0.6455,
+  "implied": 0.5652,
+  "edge": 0.08,
+  "fair": -180,
+  "state": {
+   "sets": "1-2",
+   "srv": null,
    "need": 2
   },
   "model": "live-v4",
