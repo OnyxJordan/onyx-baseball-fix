@@ -2568,9 +2568,9 @@
        "win": false,
        "sets": [
         6,
-        3
+        5
        ],
-       "serve": false
+       "serve": true
       },
       {
        "name": "Taylor Fritz",
@@ -2588,9 +2588,9 @@
     },
     {
      "id": "186493",
-     "start": "2026-11-06T20:50Z",
+     "start": "2026-11-06T21:10Z",
      "state": "pre",
-     "detail": "11/6 - 3:50 PM EST",
+     "detail": "11/6 - 4:10 PM EST",
      "round": "Quarterfinal",
      "draw": "Men's Singles",
      "court": "Court Central",
@@ -6899,7 +6899,7 @@
      "id": "186735",
      "start": "2026-11-06T20:10Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Semifinal",
      "draw": "Women's Singles",
      "court": "Campo 1",
@@ -6911,7 +6911,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        6
+        6,
+        1
        ],
        "serve": false
       },
@@ -6922,20 +6923,21 @@
        "seed": null,
        "win": false,
        "sets": [
-        0
+        0,
+        3
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
     {
      "id": "186741",
-     "start": "2026-11-07T05:00Z",
+     "start": "2026-11-07T16:30Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "11/7 - 11:30 AM EST",
      "round": "Final",
      "draw": "Women's Singles",
-     "court": "",
+     "court": "Campo 1",
      "p": [
       {
        "name": "Leyre Romero Gormaz",
@@ -8256,5 +8258,5 @@
    ]
   }
  ],
- "fetched": "2026-11-06T20:42:41+00:00"
+ "fetched": "2026-11-06T21:02:06+00:00"
 }
