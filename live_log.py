@@ -50,7 +50,7 @@ LEAGUES = {"nfl": ["football/nfl"], "cfb": ["football/college-football"], "nba":
 SBQ = {"cfb": "groups=80", "cbb": "groups=50&limit=400"}
 UA = {"User-Agent": "Mozilla/5.0 (onyx live log)"}
 NOW = Path("data/live/tennis_now.json")
-VERSION = "live-v4"   # v4 (11/5): tennis logged by the minute watcher at the price the page shows   # v3 (11/5): one tennis pick per match, the most confident; v2 (11/4): tennis needs 60%+; earlier rows stay as logged
+VERSION = "live-v5"   # v5 (11/6): tennis totals, college basketball spreads and moneylines paused (live_model.PAUSED); the starting line falls back to the market line when Onyx has none   # v4 (11/5): tennis logged by the minute watcher at the price the page shows   # v3 (11/5): one tennis pick per match, the most confident; v2 (11/4): tennis needs 60%+; earlier rows stay as logged
 
 
 def get(url, tries=2):
@@ -97,6 +97,7 @@ def pregame(pre, gid, home, away):
     if not hit:
         return out
     sp, ml = hit.get("sp") or {}, hit.get("ml") or {}
+    out["src"] = hit.get("src") or "onyx"
     pick = lambda d, n: next((k for k in d if k == n or LM.nk(k) == LM.nk(n)), None)
     hn, an = pick(sp, home), pick(sp, away)
     hl = sp[hn] if hn is not None else (-sp[an] if an is not None else None)
@@ -252,7 +253,7 @@ def log_live(led, url, sports=None, also=()):
                             "matchup": f"{g['away']} {'vs' if sport == 'tennis' else '@'} {g['home']}", "home": g["home"], "away": g["away"],
                             "label": b["label"], "kind": b["kind"], "side": b["side"], "line": b["pt"], "price": b["price"],
                             "chance": round(b["p"], 4), "implied": round(LM.implied(b["price"]), 4), "edge": b["edge"], "fair": b["fair"],
-                            "state": g["state"], "model": VERSION, "result": None, "actual": None, "profit": None, "graded_at": None}
+                            "state": g["state"], "pre_src": (g.get("pre") or {}).get("src"), "model": VERSION, "result": None, "actual": None, "profit": None, "graded_at": None}
                 led.append(row); seen.append(row)
                 added += 1
     return added

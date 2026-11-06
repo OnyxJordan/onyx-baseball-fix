@@ -31,6 +31,11 @@ FMIN = {"nfl": 0.15, "cfb": 0.15, "nba": 0.15, "nhl": 0.15, "cbb": 0.15}
 # tennis (tools/tennis_live_backtest.py fit): tour point-on-serve baselines and the form gap
 TN_P = {"base_atp": 0.62, "base_wta": 0.54, "form_atp": 0.02, "form_wta": 0.034}   # live.js TN_P, same fit
 VALUE = 0.03      # the page's Value threshold (home.html LV_VALUE, live.js VALUE)
+# 11/6 (Jordan, after a rough run): live markets paused until they test positive, on the page and in the
+# record (live.js PAUSED). Graded live plays 11/1-11/6: tennis totals 13-17 (-21%), college basketball
+# spreads 24-27 (-12%) and moneylines 6-12 (-13%); every other live market is level or ahead
+# (NHL spreads +38%, totals +23%; college basketball totals +7%).
+PAUSED = {("tennis", "total"), ("cbb", "spread"), ("cbb", "ml")}
 TN_CONF = 0.60    # tennis logs a live pick only at 60%+ to hit (live.js TN_CONF; 11/4, see live_log.py)
 EDGE_MAX = 0.12   # disagreements bigger than this are where the model is blind
 
@@ -411,6 +416,8 @@ def bets(sport, g, M, lines, pre):
         if f is not None and f < FMIN.get(sport, 0.15):
             return
         if o["edge"] > EDGE_MAX:
+            return
+        if (sport, o.get("kind")) in PAUSED:
             return
         out.append(o)
 
