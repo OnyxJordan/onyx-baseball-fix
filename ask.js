@@ -1349,7 +1349,7 @@
                 clarify: {question: 'Search does not cover ' + un[0] + ' yet' + (un[1] ? ' (' + un[1] + ')' : '') + '. Want one of these instead?', options: opts}};
       }
       var spec = normalize(a[0].spec);
-      var res = run(spec, a[1]);
+      var res = run(spec, a[1]), asked = spec;      // asked: the reading before any widening below
       // the standard-price floor left the ticket short (favorites, a thin board): widen it once and say so
       var want = spec.intent === 'list' ? 1 : (spec.count || 3);
       if (spec.default_floor && res.rows.length < want && spec.intent !== 'sgp') {
@@ -1371,13 +1371,36 @@
         var r4 = run(wideS, a[1]);
         if (r4.rows.length >= 2) { res = r4; res.widened = true; res.note = (res.note ? res.note + ' ' : '') + 'One game does not have enough of that market for a same-game parlay, so this adds the same game\'s other markets.'; }
       }
+      // 11/6 (Jordan: "I haven't had 1 successful search"): never a dead end. When nothing matches,
+      // widen what was asked one step at a time, each step said out loud: the day (late at night
+      // tonight's games have started), then the price, then the confidence floor, then the side.
+      var nf = spec.intent === 'list' ? 1 : spec.intent === 'sgp' ? 2 : Math.min(2, spec.count || 2);
+      var steps = [
+        [function (x) { return x.when; }, function (x) { return {when: null}; },
+         function () { return 'Nothing left ' + (spec.when === 'today' ? 'tonight' : 'on ' + spec.when) + ' for that, so these are from the next games on the board.'; }],
+        [function (x) { return x.min_price != null || x.max_price != null; }, function (x) { return {min_price: null, max_price: null, default_floor: false}; },
+         function () { return 'Nothing at that price, so these are the closest prices on the board.'; }],
+        [function (x) { return x.min_conf != null; }, function (x) { return {min_conf: null, default_conf: false}; },
+         function () { return 'Nothing at that confidence right now, so these are the most likely.'; }],
+        [function (x) { return x.side && x.side !== 'any'; }, function (x) { return {side: 'any'}; },
+         function () { return 'No ' + (spec.side === 'over' ? 'overs' : 'unders') + ' matched, so this includes the other side.'; }]];
+      for (var si = 0; si < steps.length && res.rows.length < nf && !spec.onyx_picks && !spec.player; si++) {
+        if (!steps[si][0](spec)) continue;
+        var sp2 = Object.assign({}, spec, steps[si][1](spec)), r5 = run(sp2, a[1]);
+        if (r5.rows.length > res.rows.length) { var msg = steps[si][2](); res = r5; spec = sp2; res.widened = true; res.note = (res.note ? res.note + ' ' : '') + msg; }
+      }
+      // a player with nothing that matches: his other markets, then any day
+      if (spec.player && res.rows.length < 1) {
+        var sp3 = Object.assign({}, spec, {markets: [], side: 'any', when: null, min_price: null, max_price: null, min_conf: null, default_conf: false, default_floor: false}), r6 = run(sp3, a[1]);
+        if (r6.rows.length) { res = r6; spec = sp3; res.widened = true; res.note = (res.note ? res.note + ' ' : '') + 'Nothing matched that exactly, so these are ' + spec.player + '\'s lines on the board.'; }
+      }
       // touchdown scorers: say why every edge reads negative, and what "favorite" means here
       if ((res.rows || []).some(function (r) { return /td$/.test(r.mkt || ''); })) {
         res.note = (res.note ? res.note + ' ' : '') + (spec.sort === 'rec' || spec.td_fav
           ? 'Favorites are the scorers our TD model rates highest against their price. Touchdown prices carry a big margin, so every edge reads negative, and the TD model has not beaten Onyx\'s price in testing yet.'
           : 'Touchdown prices carry a big margin (priced players score about 18% of the time against 22% implied), so every edge reads negative.');
       }
-      res.spec = spec; res.via = a[0].via; res.say = a[0].say || ''; res.understood = describe(spec);
+      res.spec = spec; res.asked = asked; res.via = a[0].via; res.say = a[0].say || ''; res.understood = describe(spec);
       var nowA = Date.now();
       // "Onyx picks": only logged picks. None today is said plainly, with what makes a pick (11/2)
       if (spec.onyx_picks && !res.rows.length && !forced) {
