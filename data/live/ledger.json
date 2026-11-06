@@ -9650,10 +9650,10 @@
   },
   "pre_src": "market",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "126",
+  "profit": 0.8333,
+  "graded_at": "2026-11-06T23:29:09+00:00"
  },
  {
   "id": "cbb-401920423-total-under",
@@ -9741,6 +9741,37 @@
    "need": 2
   },
   "pre_src": "onyx",
+  "model": "live-v6",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "cbb-401920717-total-under",
+  "sport": "cbb",
+  "gid": "401920717",
+  "date": "2026-11-06",
+  "logged_at": "2026-11-06T23:29:07+00:00",
+  "matchup": "EWU @ ORE",
+  "home": "ORE",
+  "away": "EWU",
+  "label": "Under 162.5",
+  "kind": "total",
+  "side": "under",
+  "line": 162.5,
+  "price": -115,
+  "chance": 0.5787,
+  "implied": 0.5349,
+  "edge": 0.044,
+  "fair": -135,
+  "state": {
+   "score": "EWU 22 - 22 ORE",
+   "period": 1,
+   "clock": "10:26",
+   "f": 0.761
+  },
+  "pre_src": "market",
   "model": "live-v6",
   "result": null,
   "actual": null,
