@@ -550,6 +550,7 @@
       var all = [].concat.apply([], LS);
       return Promise.all(G.map(function (g) {
         var L = all.filter(function (x) { return (sameTeam(x.home, g.hn) && sameTeam(x.away, g.an)) || (sameTeam(x.home, g.an) && sameTeam(x.away, g.hn)); })[0];
+        g.L = L || null;
         if (!L) { g.bets = null; return g; }
         var needBox = g.pre && g.pre.pp && L.lines.some(function (x) { return !/^(ml|spread|total)$/.test(x.m); });
         return (needBox ? box(g.sport, g.gid) : Promise.resolve(null)).then(function (bx) { g.bets = bets(g, L, bx); return g; });
@@ -659,6 +660,34 @@
     e.preventDefault();
     try { f(a.getAttribute('data-lv-open'), a.getAttribute('data-lv-a') || '', a.getAttribute('data-lv-h') || ''); } catch (x) { location.href = a.href; }
   });
+  // the logged tennis pick, priced by the live model now (ml / spread / total from the row's kind, side, line)
+  function pickChance(g, LP) {
+    var M = g.M, home = LP.side === 'home', x = null;
+    if (!M) return null;
+    try {
+      if (LP.kind === 'ml' && M.win) x = home ? M.win() : 1 - M.win();
+      else if (LP.kind === 'spread' && M.cover && LP.line != null) x = home ? M.cover(LP.line) : 1 - M.cover(-LP.line);
+      else if (LP.kind === 'total' && M.over && LP.line != null) x = LP.side === 'over' ? M.over(LP.line) : 1 - M.over(LP.line);
+    } catch (e) { x = null; }
+    return x == null || isNaN(x) ? null : Math.min(1, Math.max(0, x));
+  }
+  // the live line on the logged bet: the same line if quoted, else the nearest line on the same side
+  function pickLine(g, LP) {
+    var L = g.L; if (!L || !L.lines) return null;
+    var team = LP.side === 'home' ? g.hn : g.an, alt = LP.side === 'home' ? g.home : g.away;
+    var mine = function (x) { return sameTeam(x.sel, team) || sameTeam(x.sel, alt); };
+    var C = L.lines.filter(function (x) {
+      if (x.price == null || x.m !== LP.kind) return false;
+      if (LP.kind === 'total') return x.side === LP.side && x.pt != null;
+      if (LP.kind === 'spread') return x.pt != null && mine(x);
+      return mine(x);
+    });
+    if (!C.length) return null;
+    if (LP.kind === 'ml' || LP.line == null) return {price: C[0].price, at: null};
+    C.sort(function (a, b) { return Math.abs(a.pt - LP.line) - Math.abs(b.pt - LP.line); });
+    var b = C[0];
+    return {price: b.price, at: b.pt === LP.line ? null : (LP.kind === 'total' ? (LP.side === 'over' ? 'o' : 'u') + b.pt : sgn(b.pt))};
+  }
   // the card for one game: the best live bet first (started, live line, our fair), then the score and the rest of our numbers
   function card(g) {
     var hw = g.home_win, aw = 1 - hw, pre = g.pre || {}, L = g.lean, ten = g.sport === 'tennis';
@@ -672,12 +701,15 @@
     var LP = ten && LEDGER ? LEDGER.filter(function (r) { return r.sport === 'tennis' && String(r.gid) === String(g.gid); })
       .sort(function (a, b) { return String(a.logged_at).localeCompare(String(b.logged_at)); })[0] : null;
     if (LP) {
-      var nowB = (g.bets || []).filter(function (b) { return b.label === LP.label; })[0];
+      // 11/6 (Jordan: "these spots need to be filled in"): our chance now comes straight from the live
+      // model on the logged bet, whatever the live line is doing, and the live line box shows the logged
+      // line when it is quoted, else the nearest line on the same side (marked "at <line>")
+      var lc = pickChance(g, LP), ll = pickLine(g, LP);
       lean = '<div class="lv-lean"><div class="lv-k">Our pick &middot; logged</div>'
         + '<div class="lv-pick"><b>' + esc(LP.label) + '</b><span class="lv-val">' + pct(LP.chance) + ' to hit</span></div>'
         + '<div class="lv-steps"><div><small>Logged at</small><b>' + pr(LP.price) + '</b><span>' + esc(String(LP.logged_at).slice(11, 16)) + ' UTC</span></div>'
-        + '<div><small>Live line</small><b>' + (nowB ? pr(nowB.price) : '-') + '</b><span>' + (nowB ? pct(implied(nowB.price)) + ' implied' : 'not quoted now') + '</span></div>'
-        + '<div class="fair"><small>Our chance now</small><b>' + (nowB ? pct(nowB.p) : '-') + '</b><span>' + (LP.result ? (LP.result === 'W' ? 'won' : LP.result === 'L' ? 'lost' : 'push') : 'in play') + '</span></div></div>'
+        + '<div><small>Live line</small><b>' + (ll ? pr(ll.price) : '-') + '</b><span>' + (ll ? (ll.at != null ? 'at ' + esc(ll.at) + ' &middot; ' : '') + pct(implied(ll.price)) + ' implied' : LP.result ? 'settled' : 'off the board') + '</span></div>'
+        + '<div class="fair"><small>Our chance now</small><b>' + (lc != null ? pct(lc) : '-') + '</b><span>' + (LP.result ? (LP.result === 'W' ? 'won' : LP.result === 'L' ? 'lost' : 'push') : lc != null && LP.chance != null ? (lc >= LP.chance ? 'up ' : 'down ') + Math.abs(Math.round(100 * (lc - LP.chance))) + ' pts since logged' : 'in play') + '</span></div></div>'
         + '<div class="lv-verdict">This match\'s one pick, logged once when it was the most confident value on the board. We stick with it: no second pick, no other side.</div></div>';
     } else
     if (g.bets && g.bets.length && g.bets[0].edge > -0.05) {
