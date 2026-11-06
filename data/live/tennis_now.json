@@ -317,5 +317,63 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186596-ml-away",
+  "sport": "tennis",
+  "gid": "186596",
+  "date": "2026-11-06",
+  "logged_at": "2026-11-06T13:55:17+00:00",
+  "matchup": "Magda Linette vs Mai Hontama",
+  "home": "Mai Hontama",
+  "away": "Magda Linette",
+  "label": "Magda Linette to win",
+  "kind": "ml",
+  "side": "away",
+  "line": null,
+  "price": -157,
+  "chance": 0.6753,
+  "implied": 0.6109,
+  "edge": 0.064,
+  "fair": -210,
+  "state": {
+   "sets": "0-0",
+   "srv": "away",
+   "need": 2
+  },
+  "model": "live-v4",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "tennis-186686-total-under",
+  "sport": "tennis",
+  "gid": "186686",
+  "date": "2026-11-06",
+  "logged_at": "2026-11-06T13:55:17+00:00",
+  "matchup": "Noma Noha Akugue vs Justina Mikulskyte",
+  "home": "Justina Mikulskyte",
+  "away": "Noma Noha Akugue",
+  "label": "Under 18.5 games",
+  "kind": "total",
+  "side": "under",
+  "line": 18.5,
+  "price": -130,
+  "chance": 0.6473,
+  "implied": 0.5652,
+  "edge": 0.082,
+  "fair": -185,
+  "state": {
+   "sets": "3-0",
+   "srv": "home",
+   "need": 2
+  },
+  "model": "live-v4",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
