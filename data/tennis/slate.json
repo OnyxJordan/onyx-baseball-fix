@@ -2553,9 +2553,9 @@
     },
     {
      "id": "186492",
-     "start": "2026-11-06T18:25Z",
+     "start": "2026-11-06T19:00Z",
      "state": "pre",
-     "detail": "11/6 - 1:25 PM EST",
+     "detail": "11/6 - 2:00 PM EST",
      "round": "Quarterfinal",
      "draw": "Men's Singles",
      "court": "Court Central",
@@ -2582,9 +2582,9 @@
     },
     {
      "id": "186493",
-     "start": "2026-11-06T19:30Z",
+     "start": "2026-11-06T20:30Z",
      "state": "pre",
-     "detail": "11/6 - 2:30 PM EST",
+     "detail": "11/6 - 3:30 PM EST",
      "round": "Quarterfinal",
      "draw": "Men's Singles",
      "court": "Court Central",
@@ -5621,8 +5621,8 @@
     {
      "id": "186595",
      "start": "2026-11-06T16:45Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Retired",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Centre Court",
@@ -5644,7 +5644,7 @@
        "short": "A. Zakharova",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/rus.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
         5
@@ -5692,9 +5692,9 @@
      "court": "Centre Court",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Anastasia Zakharova",
+       "short": "A. Zakharova",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/rus.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -6856,7 +6856,7 @@
      "id": "186734",
      "start": "2026-11-06T17:10Z",
      "state": "in",
-     "detail": "2nd",
+     "detail": "3rd",
      "round": "Semifinal",
      "draw": "Women's Singles",
      "court": "Campo 1",
@@ -6869,7 +6869,8 @@
        "win": false,
        "sets": [
         6,
-        4
+        5,
+        0
        ],
        "serve": true
       },
@@ -6881,7 +6882,8 @@
        "win": false,
        "sets": [
         3,
-        4
+        7,
+        0
        ],
        "serve": false
       }
@@ -6889,9 +6891,9 @@
     },
     {
      "id": "186735",
-     "start": "2026-11-06T18:40Z",
+     "start": "2026-11-06T19:10Z",
      "state": "pre",
-     "detail": "11/6 - 1:40 PM EST",
+     "detail": "11/6 - 2:10 PM EST",
      "round": "Semifinal",
      "draw": "Women's Singles",
      "court": "Campo 1",
@@ -8244,5 +8246,5 @@
    ]
   }
  ],
- "fetched": "2026-11-06T18:28:47+00:00"
+ "fetched": "2026-11-06T19:01:57+00:00"
 }
