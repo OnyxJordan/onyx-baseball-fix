@@ -6632,10 +6632,10 @@
    "f": 0.916
   },
   "model": "live-v4",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "60-29",
+  "profit": 1.48,
+  "graded_at": "2026-11-06T05:01:08+00:00"
  },
  {
   "id": "cfb-401862817-spread-home",
@@ -6662,10 +6662,10 @@
    "f": 0.916
   },
   "model": "live-v4",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "60-29",
+  "profit": 0.9091,
+  "graded_at": "2026-11-06T05:01:08+00:00"
  },
  {
   "id": "nhl-401892648-total-under",
@@ -7292,10 +7292,10 @@
    "f": 0.865
   },
   "model": "live-v4",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "89",
+  "profit": -1.0,
+  "graded_at": "2026-11-06T05:01:08+00:00"
  },
  {
   "id": "cbb-401924718-total-under",
@@ -9090,6 +9090,36 @@
    "period": 1,
    "clock": "15:22",
    "f": 0.884
+  },
+  "model": "live-v4",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "cbb-401909739-spread-home",
+  "sport": "cbb",
+  "gid": "401909739",
+  "date": "2026-11-05",
+  "logged_at": "2026-11-06T05:01:06+00:00",
+  "matchup": "CP @ ARIZ",
+  "home": "ARIZ",
+  "away": "CP",
+  "label": "ARIZ -29.5",
+  "kind": "spread",
+  "side": "home",
+  "line": -29.5,
+  "price": -120,
+  "chance": 0.5756,
+  "implied": 0.5455,
+  "edge": 0.03,
+  "fair": -135,
+  "state": {
+   "score": "CP 45 - 63 ARIZ",
+   "period": 2,
+   "clock": "17:20",
+   "f": 0.433
   },
   "model": "live-v4",
   "result": null,
