@@ -490,7 +490,7 @@ var LV_NAME = {nfl: 'NFL', cfb: 'NCAAF', nba: 'NBA', nhl: 'NHL', cbb: 'NCAAB', t
 var LV_PAGE = {nfl: 'nfl.html', cfb: 'cfb.html', nba: 'nba.html', nhl: 'nhl.html', cbb: 'cbb.html', tennis: 'tennis.html'};
 function lvPct(x) { return x == null ? '-' : x < 0.01 ? 'under 1%' : x > 0.99 ? 'over 99%' : Math.round(100 * x) + '%'; }
 var LV_VALUE = 0.03;   // our chance at least 3 points over the live line's implied chance
-function lvVal(b) { return window.OnyxLive && OnyxLive.isVal ? OnyxLive.isVal(b) : b.edge >= LV_VALUE; }   // tennis: 60%+ to hit (live.js)
+function lvVal(b) { return window.OnyxLive && OnyxLive.isVal ? OnyxLive.isVal(b) : b.edge >= LV_VALUE; }   // tennis: 65%+ to hit (live.js)
 function lvBadge(b) { return lvVal(b) ? `<span class="lv-val">Value +${Math.round(b.edge * 100)}%</span>` : ''; }
 function lvPrice(x) { return x == null ? '-' : x > 0 ? '+' + x : String(x); }
 function lvLogo(u, cls) { return u ? `<img class="${cls || 'lv-lg'}" src="${esc(u)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">` : `<span class="${cls || 'lv-lg'} lv-nolg"></span>`; }

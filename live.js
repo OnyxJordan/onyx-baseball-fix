@@ -585,7 +585,8 @@
   var REF = 'KR680261', VALUE = 0.03;
   // tennis posts a live pick only when the model is confident (11/4, Jordan): 60%+ to hit. Its graded
   // live plays: under 60% went 12-25 (-8.6u, the coin-flip band 50-60% 8-18), 60%+ went 16-7 (+2.2u)
-  var TN_CONF = 0.60;
+  // 11/6 (Jordan): raised to 65%. Under the 60% rule, 60-64% went 13-14 (-13.5%), 65%+ went 20-7 (+13.9%)
+  var TN_CONF = 0.65;
   // 11/6: live markets paused until they test positive (live_model.py PAUSED): tennis totals, college basketball spreads and moneylines
   var PAUSED = {'tennis|total': 1, 'cbb|spread': 1, 'cbb|ml': 1};
   function isVal(b) { return b.edge >= VALUE && b.ok !== false; }
@@ -723,7 +724,7 @@
         + '<div class="lv-steps"><div><small>Started</small><b>' + esc(top.start_txt || '-') + '</b><span>' + (pre.src === 'market' ? 'Market pregame' : 'Onyx pregame') + '</span></div>'
         + '<div><small>Live line</small><b>' + pr(top.price) + '</b><span>' + pct(implied(top.price)) + ' implied</span></div>'
         + '<div class="fair"><small>Our fair</small><b>' + pr(top.fair) + '</b><span>' + pct(top.p) + ' to hit</span></div></div>'
-        + '<div class="lv-verdict">' + (top.ok === false && top.edge >= VALUE ? 'The price has value, but our chance is only ' + pct(top.p) + ': tennis picks post at 60% or better, so this one is a pass.' : isVal(top) ? 'A good live bet: the live line of <b>' + pr(top.price) + '</b> pays more than our fair price of <b>' + pr(top.fair) + '</b>.' : 'The closest one: the live line of ' + pr(top.price) + ' pays less than our fair price of ' + pr(top.fair) + '. It turns into value at ' + pr(top.fair) + ' or better.') + '</div>'
+        + '<div class="lv-verdict">' + (top.ok === false && top.edge >= VALUE ? 'The price has value, but our chance is only ' + pct(top.p) + ': tennis picks post at 65% or better, so this one is a pass.' : isVal(top) ? 'A good live bet: the live line of <b>' + pr(top.price) + '</b> pays more than our fair price of <b>' + pr(top.fair) + '</b>.' : 'The closest one: the live line of ' + pr(top.price) + ' pays less than our fair price of ' + pr(top.fair) + '. It turns into value at ' + pr(top.fair) + ' or better.') + '</div>'
         + (rest.length ? '<div class="lv-bets">' + rest.map(function (b) { return '<div class="lv-bet"><span class="n">' + esc(b.label) + '</span><span class="s">' + (b.start_txt ? esc(b.start_txt) + ' &rarr; ' : '') + '<b>' + pr(b.price) + '</b> &middot; fair ' + pr(b.fair) + '</span>' + badge(b) + '</div>'; }).join('') + '</div>' : '') + '</div>';
     } else if (g.bets && g.bets.length) {
       lean = '<div class="lv-lean none"><div class="lv-k">No value right now</div><div class="lv-verdict">Every live line on this game pays less than our fair price. We will flag it here the moment one moves past it.</div></div>';

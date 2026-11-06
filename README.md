@@ -1693,6 +1693,10 @@ each sports page... there's X or Y value right now, take this pick."
   Why not the Cloudflare relay: the tennis Markov chain costs ~4 ms of CPU per match cold, and a
   free Worker gets 10 ms per run; 20 live matches would not fit. Onyx itself sends no tennis prices
   to OpticOdds (11/5 probe: 0 rows on 14 live matches and on matches about to start).
+- **Tennis live bar raised to 65% (11/6, `live-v6`).** Graded tennis live picks under the 60% rule (54):
+  60-64% to hit went 13-14 (-13.5%; hit 48% against 62% predicted, totals 5-9), 65%+ went 20-7 (+13.9%;
+  hit 74% against 72%). `live_model.TN_CONF` and live.js `TN_CONF` are 0.65. A trial: re-check after the
+  next 50 graded tennis picks.
 - **Picks lock on game day, and through an Onyx outage (11/6).** Jordan: "we have a pick we lock in that
   shouldn't change ... we need recommendations at the right time." `picks.log` locks a finalized market's
   pick only on its own game day (baseball day), at the price shown when it first qualifies that day, never
