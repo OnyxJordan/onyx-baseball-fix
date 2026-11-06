@@ -202,18 +202,24 @@ async function optic(env, path) {
   if (!r.ok) throw { status: r.status };
   return r.json();
 }
-async function liveSport(env, sport) {
+async function liveSport(env, sport, seenFx) {
   const games = [];
   for (const [sp, lg] of LIVE_LG[sport] || []) {
     const now = new Date(), days = [new Date(now - 864e5), now].map((d) => d.toISOString().slice(0, 10));
     const fx = [];
     for (const d of days) {
       const j = await optic(env, `/fixtures?sport=${sp}&league=${lg}&start_date=${d}`).catch(() => ({}));
-      for (const f of j.data || []) if (String(f.status || "").toLowerCase() === "live" || f.is_live) fx.push(f);
+      for (const f of j.data || []) {
+        if (String(f.status || "").toLowerCase() === "live" || f.is_live) fx.push(f);
+        // 11/6 line tracking: every live-looking fixture the feed lists, priced or not, so a missing live
+        // line can be told apart: not on the feed / on the feed with no book pricing it
+        else if (seenFx && /live|progress|suspend|delay|interrupt|half|break/i.test(String(f.status || ""))) seenFx.push({ home: f.home_team_display || "", away: f.away_team_display || "", league: lg, status: f.status });
+      }
     }
     const mk = ["moneyline", sport === "nhl" ? "puck_line" : sport === "tennis" ? "game_spread" : "point_spread",
       sport === "nhl" ? "total_goals" : sport === "tennis" ? "total_games" : "total_points"].concat(LIVE_PROPS[sport] || []);
     const mq = mk.map((m) => "&market=" + encodeURIComponent(m)).join("") + LIVE_BOOKS.map((b) => "&sportsbook=" + b).join("");
+    if (seenFx) for (const f of fx) seenFx.push({ home: f.home_team_display || "", away: f.away_team_display || "", league: lg, status: f.status || "live" });
     for (let i = 0; i < fx.length && i < (LIVE_MAX[sport] || 20); i += 5) {
       const ids = fx.slice(i, i + 5).map((f) => "&fixture_id=" + encodeURIComponent(f.id)).join("");
       const j = await optic(env, `/fixtures/odds?sport=${sp}&league=${lg}&odds_format=AMERICAN${ids}${mq}`).catch(() => ({}));
@@ -262,8 +268,9 @@ async function live(req, env, h) {
   const hit = await cache.match(key);
   if (hit) return new Response(hit.body, { status: 200, headers: { "content-type": "application/json", ...h } });
   let games = [];
-  try { games = await liveSport(env, sport); } catch (e) { return json({ error: "feed " + ((e && e.status) || "") }, 502, h); }
-  const body = JSON.stringify({ sport, at: new Date().toISOString(), games });
+  const fixtures = [];
+  try { games = await liveSport(env, sport, fixtures); } catch (e) { return json({ error: "feed " + ((e && e.status) || "") }, 502, h); }
+  const body = JSON.stringify({ sport, at: new Date().toISOString(), games, fixtures });
   await cache.put(key, new Response(body, { headers: { "content-type": "application/json", "cache-control": "max-age=20" } }));
   return new Response(body, { status: 200, headers: { "content-type": "application/json", ...h } });
 }

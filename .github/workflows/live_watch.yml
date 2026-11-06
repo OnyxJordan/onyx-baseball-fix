@@ -53,9 +53,12 @@ jobs:
             # fresh ledger and pregame lines from the builds; this job's own commits only touch tennis_now.json
             git pull -q --rebase origin main || { git rebase --abort || true; }
             python3 live_log.py --tennis-now || true
-            if ! git diff --quiet -- data/live/tennis_now.json; then
-              git add data/live/tennis_now.json
-              git commit -q -m "Live tennis pick $(date -u +%Y-%m-%dT%H:%M)"
+            # line tracking (11/6): each live match without a live line, by name, and why; a row when a
+            # gap opens and one when it closes (data/lines/live_gaps.json, written only here)
+            python3 lines_status.py --live tennis || true
+            if ! git diff --quiet -- data/live/tennis_now.json data/lines/live_gaps.json 2>/dev/null || [ -n "$(git ls-files --others --exclude-standard data/lines/live_gaps.json)" ]; then
+              git add data/live/tennis_now.json data/lines/live_gaps.json 2>/dev/null || git add data/live/tennis_now.json
+              git commit -q -m "Live tennis $(date -u +%Y-%m-%dT%H:%M)"
               for i in 1 2 3 4; do
                 git push -q origin HEAD:main && break
                 git pull -q --rebase origin main || { git rebase --abort || true; }

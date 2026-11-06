@@ -132,6 +132,13 @@ jobs:
         run: python3 live_log.py
         continue-on-error: true
         timeout-minutes: 4
+      # Line tracking (lines_status.py, 11/6): per sport, where tonight's lines come from (Onyx or the
+      # market fallback), every game to play with no line, and every live game without a live line and
+      # why -> data/lines/status.json (status.html). Fail-soft.
+      - name: Line tracking
+        run: python3 lines_status.py
+        continue-on-error: true
+        timeout-minutes: 4
       # ROADMAP Phase 2, finally built. Blocks the commit when the page is
       # structurally broken, a batting slot is duplicated or missing, or a
       # graded ledger shrank. A non-zero exit here means yesterday's page stays

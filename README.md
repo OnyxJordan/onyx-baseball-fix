@@ -1693,6 +1693,19 @@ each sports page... there's X or Y value right now, take this pick."
   Why not the Cloudflare relay: the tennis Markov chain costs ~4 ms of CPU per match cold, and a
   free Worker gets 10 ms per run; 20 live matches would not fit. Onyx itself sends no tennis prices
   to OpticOdds (11/5 probe: 0 rows on 14 live matches and on matches about to start).
+- **Line tracking (11/6, `status.html`).** Jordan: "if lines disappear we need to address why."
+  `lines_status.py` runs in every refresh build and writes `data/lines/status.json`: per sport, how
+  many lines came from Onyx and how many from the market fallback, every game still to play with no
+  line from either, and every live game with no live line and why (`feed error`, `not on the feed`,
+  `no book pricing it`, `names differ`). The relay's `/live` now returns `fixtures` (every live fixture
+  on the feed, priced or not) so "the feed has it but nobody prices it" can be told from "the feed
+  never had it." The tennis watcher runs `lines_status.py --live tennis` each minute and appends a
+  row to `data/lines/live_gaps.json` when a match loses its line and when it gets it back (only the
+  watcher writes that file). Tennis draw slots with a player still TBD are counted apart
+  (`awaiting_players`): nobody prices them, and they are not a gap. First reading (11/6 morning):
+  Onyx 0 lines in every sport; market fallback covers NFL 14/14, NBA 9/9, NHL 3/3, tennis every
+  decided match; CFB 7 of 56 and CBB 20 of 72 games had no line from either (mostly lower-division
+  opponents the books do not post).
 
 **10/31 follow-ups.** A parlay spreads across games first and, when the board is short of
 games, fills its remaining legs from games it already uses (an SGP+, labelled on the ticket,
