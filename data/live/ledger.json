@@ -7562,10 +7562,10 @@
    "f": 0.877
   },
   "model": "live-v4",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "9",
+  "profit": -1.0,
+  "graded_at": "2026-11-06T03:56:03+00:00"
  },
  {
   "id": "cbb-401925754-total-under",
@@ -7982,10 +7982,10 @@
    "f": 0.813
   },
   "model": "live-v4",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "4-5",
+  "profit": 0.5,
+  "graded_at": "2026-11-06T03:56:03+00:00"
  },
  {
   "id": "cbb-401906770-total-under",
@@ -8042,10 +8042,10 @@
    "f": 0.777
   },
   "model": "live-v4",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "113-52",
+  "profit": 0.9091,
+  "graded_at": "2026-11-06T03:56:03+00:00"
  },
  {
   "id": "cbb-401906864-spread-home",
@@ -8252,10 +8252,10 @@
    "f": 0.665
   },
   "model": "live-v4",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "163",
+  "profit": -1.0,
+  "graded_at": "2026-11-06T03:56:03+00:00"
  },
  {
   "id": "cbb-401911229-total-under",
@@ -8402,10 +8402,10 @@
    "f": 0.723
   },
   "model": "live-v4",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "4-5",
+  "profit": 0.8696,
+  "graded_at": "2026-11-06T03:56:03+00:00"
  },
  {
   "id": "cbb-401906864-total-under",
@@ -8522,10 +8522,10 @@
    "f": 0.896
   },
   "model": "live-v4",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "162",
+  "profit": -1.0,
+  "graded_at": "2026-11-06T03:56:03+00:00"
  },
  {
   "id": "nhl-401892649-total-under",
@@ -8642,10 +8642,10 @@
    "f": 0.5
   },
   "model": "live-v4",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "165",
+  "profit": -1.0,
+  "graded_at": "2026-11-06T03:56:03+00:00"
  },
  {
   "id": "cbb-401913526-total-under",
@@ -8672,10 +8672,10 @@
    "f": 0.572
   },
   "model": "live-v4",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "182",
+  "profit": -1.0,
+  "graded_at": "2026-11-06T03:56:04+00:00"
  },
  {
   "id": "cbb-401921133-total-under",
@@ -8762,10 +8762,10 @@
    "f": 0.323
   },
   "model": "live-v4",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "83-80",
+  "profit": -1.0,
+  "graded_at": "2026-11-06T03:56:04+00:00"
  },
  {
   "id": "cbb-401909491-total-under",
@@ -8822,10 +8822,10 @@
    "f": 0.64
   },
   "model": "live-v4",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "82-80",
+  "profit": -1.0,
+  "graded_at": "2026-11-06T03:56:04+00:00"
  },
  {
   "id": "cbb-401921698-total-under",
@@ -8942,10 +8942,10 @@
    "f": 0.397
   },
   "model": "live-v4",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "112-70",
+  "profit": 0.8696,
+  "graded_at": "2026-11-06T03:56:04+00:00"
  },
  {
   "id": "cbb-401921698-spread-home",
@@ -9030,6 +9030,66 @@
    "period": 1,
    "clock": "0:00",
    "f": 0.667
+  },
+  "model": "live-v4",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "nba-401909936-total-over",
+  "sport": "nba",
+  "gid": "401909936",
+  "date": "2026-11-05",
+  "logged_at": "2026-11-06T03:56:00+00:00",
+  "matchup": "ORL @ PHX",
+  "home": "PHX",
+  "away": "ORL",
+  "label": "Over 222.5",
+  "kind": "total",
+  "side": "over",
+  "line": 222.5,
+  "price": -110,
+  "chance": 0.5675,
+  "implied": 0.5238,
+  "edge": 0.044,
+  "fair": -130,
+  "state": {
+   "score": "ORL 75 - 99 PHX",
+   "period": 4,
+   "clock": "10:47",
+   "f": 0.225
+  },
+  "model": "live-v4",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "cbb-401909739-total-under",
+  "sport": "cbb",
+  "gid": "401909739",
+  "date": "2026-11-05",
+  "logged_at": "2026-11-06T03:56:00+00:00",
+  "matchup": "CP @ ARIZ",
+  "home": "ARIZ",
+  "away": "CP",
+  "label": "Under 178.5",
+  "kind": "total",
+  "side": "under",
+  "line": 178.5,
+  "price": -120,
+  "chance": 0.5821,
+  "implied": 0.5455,
+  "edge": 0.037,
+  "fair": -140,
+  "state": {
+   "score": "CP 8 - 13 ARIZ",
+   "period": 1,
+   "clock": "15:22",
+   "f": 0.884
   },
   "model": "live-v4",
   "result": null,
