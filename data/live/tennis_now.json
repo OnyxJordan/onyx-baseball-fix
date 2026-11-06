@@ -463,5 +463,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186734-spread-home",
+  "sport": "tennis",
+  "gid": "186734",
+  "date": "2026-11-06",
+  "logged_at": "2026-11-06T17:16:43+00:00",
+  "matchup": "Julia Riera vs Leyre Romero Gormaz",
+  "home": "Leyre Romero Gormaz",
+  "away": "Julia Riera",
+  "label": "Leyre Romero Gormaz +2.5 games",
+  "kind": "spread",
+  "side": "home",
+  "line": 2.5,
+  "price": -115,
+  "chance": 0.6227,
+  "implied": 0.5349,
+  "edge": 0.088,
+  "fair": -165,
+  "state": {
+   "sets": "0-0",
+   "srv": "home",
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v5",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
