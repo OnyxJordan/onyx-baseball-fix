@@ -50,7 +50,7 @@ LEAGUES = {"nfl": ["football/nfl"], "cfb": ["football/college-football"], "nba":
 SBQ = {"cfb": "groups=80", "cbb": "groups=50&limit=400"}
 UA = {"User-Agent": "Mozilla/5.0 (onyx live log)"}
 NOW = Path("data/live/tennis_now.json")
-VERSION = "live-v5"   # v5 (11/6): tennis totals, college basketball spreads and moneylines paused (live_model.PAUSED); the starting line falls back to the market line when Onyx has none   # v4 (11/5): tennis logged by the minute watcher at the price the page shows   # v3 (11/5): one tennis pick per match, the most confident; v2 (11/4): tennis needs 60%+; earlier rows stay as logged
+VERSION = "live-v6"   # v6 (11/6): tennis needs 65%+ (live_model.TN_CONF)   # v5 (11/6): tennis totals, college basketball spreads and moneylines paused (live_model.PAUSED); the starting line falls back to the market line when Onyx has none   # v4 (11/5): tennis logged by the minute watcher at the price the page shows   # v3 (11/5): one tennis pick per match, the most confident; v2 (11/4): tennis needs 60%+; earlier rows stay as logged
 
 
 def get(url, tries=2):

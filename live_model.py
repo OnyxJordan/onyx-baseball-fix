@@ -36,7 +36,8 @@ VALUE = 0.03      # the page's Value threshold (home.html LV_VALUE, live.js VALU
 # spreads 24-27 (-12%) and moneylines 6-12 (-13%); every other live market is level or ahead
 # (NHL spreads +38%, totals +23%; college basketball totals +7%).
 PAUSED = {("tennis", "total"), ("cbb", "spread"), ("cbb", "ml")}
-TN_CONF = 0.60    # tennis logs a live pick only at 60%+ to hit (live.js TN_CONF; 11/4, see live_log.py)
+TN_CONF = 0.65    # tennis logs a live pick only at 65%+ to hit (live.js TN_CONF). 11/4: 60%; 11/6 (Jordan): 65%. Graded picks
+                  # under the 60% rule: 60-64% went 13-14 (-13.5%, hit 48% vs 62% predicted), 65%+ 20-7 (+13.9%, hit 74% vs 72%)
 EDGE_MAX = 0.12   # disagreements bigger than this are where the model is blind
 
 
