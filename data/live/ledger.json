@@ -11912,10 +11912,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "29-28",
+  "profit": -1.0,
+  "graded_at": "2026-11-07T08:02:03+00:00"
  },
  {
   "id": "nba-401909294-spread-away",
@@ -11943,10 +11943,10 @@
   },
   "pre_src": "market",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "124-118",
+  "profit": -1.0,
+  "graded_at": "2026-11-07T08:02:03+00:00"
  },
  {
   "id": "nba-401909294-ml-away",
@@ -11974,10 +11974,10 @@
   },
   "pre_src": "market",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "124-118",
+  "profit": -1.0,
+  "graded_at": "2026-11-07T08:02:03+00:00"
  },
  {
   "id": "cbb-401922219-total-under",
@@ -12067,10 +12067,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "29-28",
+  "profit": 0.2252,
+  "graded_at": "2026-11-07T08:02:03+00:00"
  },
  {
   "id": "nba-401909294-total-over",
@@ -12098,10 +12098,10 @@
   },
   "pre_src": "market",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "242",
+  "profit": 0.8696,
+  "graded_at": "2026-11-07T08:02:04+00:00"
  },
  {
   "id": "nba-401909295-spread-away",
@@ -12164,5 +12164,35 @@
   "actual": "233",
   "profit": 0.8333,
   "graded_at": "2026-11-07T05:59:40+00:00"
+ },
+ {
+  "id": "tennis-186644-ml-away",
+  "sport": "tennis",
+  "gid": "186644",
+  "date": "2026-11-06",
+  "logged_at": "2026-11-07T06:24:55+00:00",
+  "matchup": "Claire Liu vs Alexandra Shubladze",
+  "home": "Alexandra Shubladze",
+  "away": "Claire Liu",
+  "label": "Claire Liu to win",
+  "kind": "ml",
+  "side": "away",
+  "line": null,
+  "price": -192,
+  "chance": 0.6942,
+  "implied": 0.6575,
+  "edge": 0.037,
+  "fair": -225,
+  "state": {
+   "sets": "2-0",
+   "srv": "away",
+   "need": 2
+  },
+  "pre_src": "market",
+  "model": "live-v6",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
