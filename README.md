@@ -1978,6 +1978,16 @@ or Onyx Picks.
 
 ## Onyx Picks (11/2)
 
+**Opener markets (11/6, NBA points).** Jordan: picks should reach main markets and player props. NBA points
+wins at Onyx's opening price and loses by the close (held-out 30-23, +9.4% at the open on 53 bets, +24% in the
+tuning months, -6.7% at the close: the line moves to our number). `picks.OPENER` lists markets that lock only
+at the opener: `open_lanes` records each NBA points line's first Onyx price of the day in
+`data/nba/opening.json` ("pts"; a line already up at the day's first look is a baseline, never an opener),
+and `picks.log` locks a pick in that market only while its line and price still match it.
+`tools/picks_backtest.py` judges opener markets at the open alone (60+ held-out bets, +2%, no tuning loss
+worse than -5% at the open); the close is shown, not decisive. NBA points goes live on its own when it reaches
+60 held-out bets and still passes (7 short on 11/6, and no new bets while Onyx's feed is down).
+
 **Picks vs projections, one list (11/6).** Jordan: "I'll see lists of picks everywhere then I'll see different
 things tracked, lets nail this down." Two words on the whole site. **Onyx Picks** (data/picks/ledger.json) are
 the only picks: `onyxpicks.js` renders the same card everywhere (home top, each sport's Home and Plays tabs,

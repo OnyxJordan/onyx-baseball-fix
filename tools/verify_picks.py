@@ -117,6 +117,17 @@ def main():
     by_sport = {}
     for sp, en, _, _ in plan:
         by_sport.setdefault(sp, []).append(en)
+    # opener markets (picks.OPENER, 11/6) log only at Onyx's first price of the day: give each test play its
+    # opening, and check that a play whose price moved off the opener is never logged
+    for sp, en, _, _ in plan:
+        if (sp, en["mkt"]) in getattr(picks, "OPENER", ()):
+            d = picks.day_of(datetime.fromisoformat(en["start"].replace("Z", "+00:00")))
+            O = picks._OPEN.setdefault(sp, {"date": d})
+            O.setdefault(en["mkt"], {})[f"{en['gid']}|{en['who']}"] = {"line": en["line"], en["side"]: en["price"]}
+            st0 = datetime.fromisoformat(en["start"].replace("Z", "+00:00")) - timedelta(hours=1)
+            moved = dict(en, price=en["price"] - 15, gid=str(en["gid"]) + "-moved")
+            O[en["mkt"]][f"{moved['gid']}|{en['who']}"] = {"line": en["line"], en["side"]: en["price"]}
+            check(picks.log(sp, [moved], now=st0) == 0, f"{sp} {en['mkt']}: a price moved off the opener is never logged")
     for sp, es in by_sport.items():
         st = min(datetime.fromisoformat(x["start"].replace("Z", "+00:00")) for x in es)
         before = st - timedelta(hours=1)

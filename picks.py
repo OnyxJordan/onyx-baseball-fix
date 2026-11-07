@@ -57,6 +57,11 @@ BOX = {"nba": {"pts": ("", "PTS"), "reb": ("", "REB"), "ast": ("", "AST")},
                "rec": ("receiving", "REC"), "rec_yds": ("receiving", "YDS")},
        "cfb": {"rush_yds": ("rushing", "YDS"), "pass_yds": ("passing", "YDS"), "rec": ("receiving", "REC"),
                "rec_yds": ("receiving", "YDS")}}
+# 11/6 (Jordan): markets that lock only at Onyx's opening price, the first price of the day the pipeline saw
+# (open_lanes writes data/<sport>/opening.json). Their picks win at the open and lose by the close (NBA points:
+# +9.4% at the open, -6.7% at the close on 53 held-out bets), so a pick logs only while the line and price
+# still match the opener; tools/picks_backtest.py judges these markets at the open alone.
+OPENER = {("nba", "pts")}
 VOID_AFTER = timedelta(days=4)   # a game with no final 4 days after its start: void
 
 
@@ -152,6 +157,21 @@ def key(r):
 
 
 # ── log ─────────────────────────────────────────────────────────────────────
+_OPEN = {}
+
+
+def at_opener(sport, e, today):
+    """True when this play's line and price are still Onyx's opening ones today (data/<sport>/opening.json,
+    open_lanes.py): the first price the pipeline saw, never a baseline (a line already up at the first look)."""
+    if sport not in _OPEN:
+        _OPEN[sport] = _load(Path(f"data/{sport}/opening.json"), {}) or {}
+    O = _OPEN[sport]
+    if O.get("date") != today:
+        return False
+    op = (O.get(e.get("mkt")) or {}).get(f"{e.get('gid')}|{e.get('who')}")
+    if not op or op.get("baseline") or op.get("line") != e.get("line"):
+        return False
+    return op.get(e.get("side")) == e.get("price")
 def log(sport, plays, now=None, mark_only=False):
     """plays: daily_top entries from this build (already Top 10 qualified). Logs the
     finalized ones not logged before, up to CAP a sport a day, and marks every play that
@@ -188,6 +208,8 @@ def log(sport, plays, now=None, mark_only=False):
         d = day_of(st)
         if d != today:
             continue          # locked on game day, not days ahead
+        if (sport, e.get("mkt")) in OPENER and not at_opener(sport, e, today):
+            continue          # an opener market logs only at Onyx's first price of the day
         if per_day.get(d, 0) >= CAP:
             continue
         rows.append({"id": f"{sport}-{e.get('gid')}-{e.get('who')}-{e.get('mkt')}", "sport": sport, "date": d,
