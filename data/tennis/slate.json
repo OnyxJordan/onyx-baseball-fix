@@ -2724,8 +2724,8 @@
     {
      "id": "187453",
      "start": "2026-11-07T10:00Z",
-     "state": "pre",
-     "detail": "11/7 - 5:00 AM EST",
+     "state": "post",
+     "detail": "Final",
      "round": "Qualifying 1st Round",
      "draw": "Men's Singles",
      "court": "Court 1",
@@ -2735,8 +2735,12 @@
        "short": "B. Gojo",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/cro.png",
        "seed": null,
-       "win": false,
-       "sets": [],
+       "win": true,
+       "sets": [
+        7,
+        4,
+        7
+       ],
        "serve": false
       },
       {
@@ -2745,7 +2749,11 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/sui.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        5,
+        6,
+        6
+       ],
        "serve": false
       }
      ]
@@ -2753,8 +2761,8 @@
     {
      "id": "187452",
      "start": "2026-11-07T10:00Z",
-     "state": "pre",
-     "detail": "11/7 - 5:00 AM EST",
+     "state": "post",
+     "detail": "Final",
      "round": "Qualifying 1st Round",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -2765,7 +2773,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ita.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        4,
+        3
+       ],
        "serve": false
       },
       {
@@ -2773,8 +2784,11 @@
        "short": "N. Basilashvili",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/geo.png",
        "seed": null,
-       "win": false,
-       "sets": [],
+       "win": true,
+       "sets": [
+        6,
+        6
+       ],
        "serve": false
       }
      ]
@@ -3050,18 +3064,18 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Borna Gojo",
+       "short": "B. Gojo",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/cro.png",
        "seed": null,
        "win": false,
        "sets": [],
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Nikoloz Basilashvili",
+       "short": "N. Basilashvili",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/geo.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -5319,8 +5333,8 @@
     {
      "id": "186643",
      "start": "2026-11-07T08:20Z",
-     "state": "in",
-     "detail": "3rd",
+     "state": "post",
+     "detail": "Final",
      "round": "Semifinal",
      "draw": "Women's Singles",
      "court": "Centre Court",
@@ -5330,13 +5344,13 @@
        "short": "A. Eala",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/phi.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         7,
         3,
-        0
+        6
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Maria Sakkari",
@@ -5347,7 +5361,7 @@
        "sets": [
         5,
         6,
-        0
+        4
        ],
        "serve": false
       }
@@ -5355,17 +5369,17 @@
     },
     {
      "id": "186642",
-     "start": "2026-11-08T05:00Z",
+     "start": "2026-11-08T08:00Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "11/8 - 3:00 AM EST",
      "round": "Final",
      "draw": "Women's Singles",
-     "court": "",
+     "court": "Centre Court",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Alexandra Eala",
+       "short": "A. Eala",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/phi.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -6825,9 +6839,9 @@
     },
     {
      "id": "186594",
-     "start": "2026-11-07T12:30Z",
-     "state": "pre",
-     "detail": "11/7 - 7:30 AM EST",
+     "start": "2026-11-07T12:35Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Semifinal",
      "draw": "Women's Singles",
      "court": "Centre Court",
@@ -6838,7 +6852,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        1
+       ],
        "serve": false
       },
       {
@@ -6847,8 +6863,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ina.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        3
+       ],
+       "serve": true
       }
      ]
     },
@@ -9302,8 +9320,8 @@
     {
      "id": "186688",
      "start": "2026-11-07T10:05Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Lwena Court",
@@ -9316,7 +9334,8 @@
        "win": false,
        "sets": [
         2,
-        2
+        6,
+        4
        ],
        "serve": false
       },
@@ -9325,20 +9344,21 @@
        "short": "A. Blinkova",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        1
+        2,
+        6
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
     {
      "id": "186684",
-     "start": "2026-11-07T12:30Z",
-     "state": "pre",
-     "detail": "11/7 - 7:30 AM EST",
+     "start": "2026-11-07T12:35Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Semifinal",
      "draw": "Women's Singles",
      "court": "Lwena Court",
@@ -9349,8 +9369,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ger.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        1
+       ],
+       "serve": true
       },
       {
        "name": "Sofya Lansere",
@@ -9358,16 +9380,18 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/rus.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        1
+       ],
        "serve": false
       }
      ]
     },
     {
      "id": "186685",
-     "start": "2026-11-07T14:00Z",
+     "start": "2026-11-07T15:00Z",
      "state": "pre",
-     "detail": "11/7 - 9:00 AM EST",
+     "detail": "11/7 - 10:00 AM EST",
      "round": "Semifinal",
      "draw": "Women's Singles",
      "court": "Lwena Court",
@@ -9382,9 +9406,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Anna Blinkova",
+       "short": "A. Blinkova",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -9424,5 +9448,5 @@
    ]
   }
  ],
- "fetched": "2026-11-07T10:50:26+00:00"
+ "fetched": "2026-11-07T12:53:08+00:00"
 }

@@ -9470,10 +9470,10 @@
    "need": 2
   },
   "model": "live-v4",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "26",
+  "profit": 0.7143,
+  "graded_at": "2026-11-07T12:53:43+00:00"
  },
  {
   "id": "tennis-186501-spread-away",
@@ -12216,6 +12216,36 @@
   "state": {
    "sets": "3-2",
    "srv": "away",
+   "need": 2
+  },
+  "pre_src": "market",
+  "model": "live-v6",
+  "result": "W",
+  "actual": "15-16",
+  "profit": 0.6098,
+  "graded_at": "2026-11-07T12:53:43+00:00"
+ },
+ {
+  "id": "tennis-186594-ml-home",
+  "sport": "tennis",
+  "gid": "186594",
+  "date": "2026-11-07",
+  "logged_at": "2026-11-07T12:40:39+00:00",
+  "matchup": "Robin Montgomery vs Janice Tjen",
+  "home": "Janice Tjen",
+  "away": "Robin Montgomery",
+  "label": "Janice Tjen to win",
+  "kind": "ml",
+  "side": "home",
+  "line": null,
+  "price": -170,
+  "chance": 0.6788,
+  "implied": 0.6296,
+  "edge": 0.049,
+  "fair": -210,
+  "state": {
+   "sets": "0-1",
+   "srv": null,
    "need": 2
   },
   "pre_src": "market",
