@@ -11261,10 +11261,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "20-17",
+  "profit": 0.8696,
+  "graded_at": "2026-11-07T04:29:32+00:00"
  },
  {
   "id": "cfb-401858510-spread-away",
@@ -11416,10 +11416,10 @@
   },
   "pre_src": "market",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "134",
+  "profit": 0.8333,
+  "graded_at": "2026-11-07T04:29:32+00:00"
  },
  {
   "id": "cbb-401920807-total-under",
@@ -11509,10 +11509,10 @@
   },
   "pre_src": "market",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "145",
+  "profit": 0.9091,
+  "graded_at": "2026-11-07T04:29:32+00:00"
  },
  {
   "id": "cbb-401921732-total-under",
@@ -11540,10 +11540,10 @@
   },
   "pre_src": "market",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "153",
+  "profit": -1.0,
+  "graded_at": "2026-11-07T04:29:32+00:00"
  },
  {
   "id": "cbb-401919040-total-under",
@@ -11571,10 +11571,10 @@
   },
   "pre_src": "market",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "186",
+  "profit": -1.0,
+  "graded_at": "2026-11-07T04:29:32+00:00"
  },
  {
   "id": "nba-401909293-spread-home",
@@ -11695,10 +11695,10 @@
   },
   "pre_src": "market",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "175",
+  "profit": -1.0,
+  "graded_at": "2026-11-07T04:29:33+00:00"
  },
  {
   "id": "cbb-401917914-total-under",
@@ -11757,10 +11757,10 @@
   },
   "pre_src": "market",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "173",
+  "profit": -1.0,
+  "graded_at": "2026-11-07T04:29:33+00:00"
  },
  {
   "id": "cbb-401917515-total-under",
@@ -11850,10 +11850,10 @@
   },
   "pre_src": "market",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "164",
+  "profit": -1.0,
+  "graded_at": "2026-11-07T04:29:33+00:00"
  },
  {
   "id": "cbb-401921727-total-under",
@@ -12032,6 +12032,99 @@
    "score": "NDSU 31 - 45 SF",
    "period": 1,
    "clock": "0:00",
+   "f": 0.5
+  },
+  "pre_src": "market",
+  "model": "live-v6",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "cfb-401856855-ml-home",
+  "sport": "cfb",
+  "gid": "401856855",
+  "date": "2026-11-06",
+  "logged_at": "2026-11-07T04:29:29+00:00",
+  "matchup": "TCU @ ARIZ",
+  "home": "ARIZ",
+  "away": "TCU",
+  "label": "ARIZ to win",
+  "kind": "ml",
+  "side": "home",
+  "line": null,
+  "price": -444,
+  "chance": 0.8745,
+  "implied": 0.8162,
+  "edge": 0.058,
+  "fair": -695,
+  "state": {
+   "score": "TCU 0 - 10 ARIZ",
+   "period": 2,
+   "clock": "10:06",
+   "f": 0.668
+  },
+  "pre_src": "onyx",
+  "model": "live-v6",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "nba-401909294-total-over",
+  "sport": "nba",
+  "gid": "401909294",
+  "date": "2026-11-06",
+  "logged_at": "2026-11-07T04:29:29+00:00",
+  "matchup": "POR @ LAL",
+  "home": "LAL",
+  "away": "POR",
+  "label": "Over 225.5",
+  "kind": "total",
+  "side": "over",
+  "line": 225.5,
+  "price": -115,
+  "chance": 0.5772,
+  "implied": 0.5349,
+  "edge": 0.042,
+  "fair": -135,
+  "state": {
+   "score": "POR 60 - 53 LAL",
+   "period": 2,
+   "clock": "0.0",
+   "f": 0.5
+  },
+  "pre_src": "market",
+  "model": "live-v6",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "nba-401909295-spread-away",
+  "sport": "nba",
+  "gid": "401909295",
+  "date": "2026-11-06",
+  "logged_at": "2026-11-07T04:29:29+00:00",
+  "matchup": "SA @ SAC",
+  "home": "SAC",
+  "away": "SA",
+  "label": "SA -24.5",
+  "kind": "spread",
+  "side": "away",
+  "line": -24.5,
+  "price": -120,
+  "chance": 0.6066,
+  "implied": 0.5455,
+  "edge": 0.061,
+  "fair": -155,
+  "state": {
+   "score": "SA 75 - 56 SAC",
+   "period": 2,
+   "clock": "0.0",
    "f": 0.5
   },
   "pre_src": "market",
