@@ -2640,7 +2640,7 @@
        "win": false,
        "sets": [
         5,
-        1
+        5
        ],
        "serve": false
       },
@@ -2652,9 +2652,9 @@
        "win": false,
        "sets": [
         7,
-        0
+        2
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
@@ -6894,7 +6894,7 @@
      "id": "186593",
      "start": "2026-11-07T14:20Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Semifinal",
      "draw": "Women's Singles",
      "court": "Centre Court",
@@ -6906,9 +6906,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        4
+        6,
+        0
        ],
-       "serve": false
+       "serve": true
       },
       {
        "name": "Magda Linette",
@@ -6917,6 +6918,7 @@
        "seed": null,
        "win": false,
        "sets": [
+        2,
         1
        ],
        "serve": false
@@ -6925,12 +6927,12 @@
     },
     {
      "id": "186598",
-     "start": "2026-11-08T05:00Z",
+     "start": "2026-11-08T13:00Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "11/8 - 8:00 AM EST",
      "round": "Final",
      "draw": "Women's Singles",
-     "court": "",
+     "court": "Centre Court",
      "p": [
       {
        "name": "TBD",
@@ -8103,9 +8105,9 @@
     },
     {
      "id": "186735",
-     "start": "2026-11-07T15:00Z",
-     "state": "pre",
-     "detail": "11/7 - 10:00 AM EST",
+     "start": "2026-11-07T15:05Z",
+     "state": "post",
+     "detail": "Final",
      "round": "Semifinal",
      "draw": "Women's Singles",
      "court": "Campo 1",
@@ -8115,10 +8117,10 @@
        "short": "B. Andreescu",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/can.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        5
+        6
        ],
        "serve": false
       },
@@ -8155,9 +8157,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Bianca Andreescu",
+       "short": "B. Andreescu",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/can.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -9415,9 +9417,9 @@
     },
     {
      "id": "186685",
-     "start": "2026-11-07T15:00Z",
-     "state": "pre",
-     "detail": "11/7 - 10:00 AM EST",
+     "start": "2026-11-07T15:05Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Semifinal",
      "draw": "Women's Singles",
      "court": "Lwena Court",
@@ -9428,8 +9430,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/pol.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        0
+       ],
+       "serve": true
       },
       {
        "name": "Anna Blinkova",
@@ -9437,7 +9441,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        0
+       ],
        "serve": false
       }
      ]
@@ -9474,5 +9480,5 @@
    ]
   }
  ],
- "fetched": "2026-11-07T14:44:12+00:00"
+ "fetched": "2026-11-07T15:10:22+00:00"
 }
