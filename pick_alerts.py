@@ -56,6 +56,24 @@ def clean_key(raw):
     return "".join(t.split()), "Basic"
 
 
+def post(body, key, scheme):
+    """Send one notification. A key without the os_v2 prefix is tried as "Key" and then "Basic" (11/7: a
+    124-character key failed as Basic), and the scheme that worked is kept for the rest of the run."""
+    global SCHEME
+    tries = [SCHEME] if SCHEME else ([scheme] if scheme == "Key" else ["Key", "Basic"])
+    res = None
+    for sc in tries:
+        res = requests.post("https://api.onesignal.com/notifications", json=body, timeout=20,
+                            headers={"Authorization": f"{sc} {key}", "Content-Type": "application/json"})
+        if res.status_code != 401:
+            SCHEME = sc
+            break
+    return res
+
+
+SCHEME = None
+
+
 def main():
     # a pasted secret can carry a line break or spaces inside it (11/7: the key failed as an invalid header);
     # ids and keys never contain whitespace, so drop all of it
@@ -86,8 +104,7 @@ def main():
                 "filters": [{"field": "tag", "key": "picks", "relation": "=", "value": "1"},
                             {"field": "tag", "key": "min_conf", "relation": "<", "value": str(pct + 1)}]}
         try:
-            res = requests.post("https://api.onesignal.com/notifications", json=body, timeout=20,
-                                headers={"Authorization": f"{scheme} {key}", "Content-Type": "application/json"})
+            res = post(body, key, scheme)
             if res.status_code < 300:
                 sent.add(r["id"])
                 n += 1
