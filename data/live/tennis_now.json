@@ -583,5 +583,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186644-ml-away",
+  "sport": "tennis",
+  "gid": "186644",
+  "date": "2026-11-06",
+  "logged_at": "2026-11-07T06:24:55+00:00",
+  "matchup": "Claire Liu vs Alexandra Shubladze",
+  "home": "Alexandra Shubladze",
+  "away": "Claire Liu",
+  "label": "Claire Liu to win",
+  "kind": "ml",
+  "side": "away",
+  "line": null,
+  "price": -192,
+  "chance": 0.6942,
+  "implied": 0.6575,
+  "edge": 0.037,
+  "fair": -225,
+  "state": {
+   "sets": "2-0",
+   "srv": "away",
+   "need": 2
+  },
+  "pre_src": "market",
+  "model": "live-v6",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
