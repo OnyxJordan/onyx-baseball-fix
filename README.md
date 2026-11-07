@@ -1136,6 +1136,19 @@ qualified, so it is on the graded record; never a second tracked list), sent thr
 `https://onyxjordan.github.io/onyx-baseball-fix/`, then add repo secrets `ONESIGNAL_APP_ID` (the App ID) and
 `ONESIGNAL_API_KEY` (the App API key, REST). The next build writes data/push.json and the card turns on.
 
+The OneSignal app's **Web** platform must be configured too (Settings, Push & In-App, Web; done 11/7 as a Typical
+Site with origin `https://onyxjordan.github.io`). A Typical Site's worker lives at the domain root
+(`/OneSignalSDKWorker.js`), which a Pages project site cannot serve, so `alerts.js` inits with
+`serviceWorkerOverrideForTypical: true, path: '/onyx-baseball-fix/', serviceWorkerPath: 'sw.js', serviceWorkerParam:
+{scope: '/onyx-baseball-fix/'}`; without the override flag v16 ignores the code's path. Our `sw.js` imports
+OneSignal's worker, so the site keeps one worker for offline and push (OneSignal's downloadable
+`OneSignalSDKWorker.js` is the same one-line import and is not needed). Check the app's live web config with
+`curl "https://api.onesignal.com/sync/<app_id>/web?callback=x"` (the old onesignal.com/api/v1 path can serve a
+stale "not configured" answer for a while). Keep the dashboard's slide prompt **auto-prompt off**: the site asks
+only from the Pick alerts card, so subscribers get the `picks` and `min_conf` tags the sender filters on.
+The card shows the reason when it cannot turn on, never a silent no-op. Entry points: the bell in the home
+header, "Pick alerts" in the hero and the More sheet, and picks.html#alerts.
+
 The MLB HR/final watcher (`notify_watch.yml`, `push_watch.py`, `shell.html`'s own `ONESIGNAL_APP_ID`) rides the
 same secrets; shell.html's constant is still empty, so MLB in-page toggles stay off until it is pasted there.
 
