@@ -47,12 +47,15 @@ jobs:
                   "contents": {"en": os.environ.get("MSG") or "Test from Onyx Sports: Pick alerts are working."},
                   "url": "https://onyxjordan.github.io/onyx-baseball-fix/picks.html",
                   "filters": [{"field": "tag", "key": "picks", "relation": "=", "value": "1"}]}
-          req = urllib.request.Request("https://api.onesignal.com/notifications", data=json.dumps(body).encode(),
-                                       headers={"Authorization": f"{scheme} {key}", "Content-Type": "application/json"})
-          try:
-              with urllib.request.urlopen(req, timeout=20) as r:
-                  print(r.status, r.read().decode()[:400])
-          except urllib.error.HTTPError as e:
-              print(e.code, e.read().decode()[:400])
+          # the key's character mix (never the key): tells an API key from an id, a URL or a public key
+          print("key shape: " + ", ".join(f"{n} {k}" for k, n in (
+              ("lowercase", sum(c.islower() for c in key)), ("uppercase", sum(c.isupper() for c in key)),
+              ("digits", sum(c.isdigit() for c in key)), ("underscores", key.count("_")), ("dashes", key.count("-")),
+              ("dots", key.count(".")), ("colons", key.count(":")), ("slashes", key.count("/")), ("equals", key.count("=")),
+              ("plus", key.count("+"))) if n))
+          import pick_alerts
+          res = pick_alerts.post(body, key, scheme)
+          print("scheme tried last:", pick_alerts.SCHEME or "both failed", "|", res.status_code, res.text[:400])
+          if res.status_code >= 300:
               raise SystemExit(1)
           EOF
