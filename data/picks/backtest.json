@@ -21,6 +21,7 @@
  },
  "finalized": [
   "nba:q1_total",
+  "nba:h1_total",
   "cfb:rush_yds"
  ],
  "markets": [
@@ -1336,63 +1337,63 @@
    "held_out": "Feb 2026 on: Feb to Jun 2026 and 2026-27 to date (the 50.5% share and sd 18 were tuned on Oct 2025 to Jan 2026)",
    "tune": {
     "open": {
-     "n": 384,
-     "w": 208,
-     "l": 176,
+     "n": 90,
+     "w": 57,
+     "l": 33,
      "p": 0,
-     "units": 14.45,
-     "roi": 0.0376,
-     "avg_price": -106,
-     "claimed": 0.5834,
-     "hit": 0.5417,
-     "first": "2025-10-21",
+     "units": 19.93,
+     "roi": 0.2214,
+     "avg_price": -104,
+     "claimed": 0.5788,
+     "hit": 0.6333,
+     "first": "2025-10-22",
      "last": "2026-01-31"
     },
     "close": {
-     "n": 403,
-     "w": 215,
-     "l": 188,
+     "n": 33,
+     "w": 21,
+     "l": 12,
      "p": 0,
-     "units": 8.08,
-     "roi": 0.0201,
-     "avg_price": -106,
-     "claimed": 0.5805,
-     "hit": 0.5335,
-     "first": "2025-10-21",
-     "last": "2026-01-31"
+     "units": 7.52,
+     "roi": 0.228,
+     "avg_price": -102,
+     "claimed": 0.5688,
+     "hit": 0.6364,
+     "first": "2025-10-27",
+     "last": "2026-01-30"
     }
    },
    "test": {
     "open": {
-     "n": 298,
-     "w": 155,
-     "l": 143,
+     "n": 63,
+     "w": 40,
+     "l": 23,
      "p": 0,
-     "units": -1.88,
-     "roi": -0.0063,
-     "avg_price": -107,
-     "claimed": 0.5815,
-     "hit": 0.5201,
-     "first": "2026-02-01",
+     "units": 14.07,
+     "roi": 0.2233,
+     "avg_price": -102,
+     "claimed": 0.5741,
+     "hit": 0.6349,
+     "first": "2026-02-03",
      "last": "2026-11-05"
     },
     "close": {
-     "n": 304,
-     "w": 162,
-     "l": 142,
+     "n": 25,
+     "w": 14,
+     "l": 11,
      "p": 0,
-     "units": 6.33,
-     "roi": 0.0208,
-     "avg_price": -106,
-     "claimed": 0.5778,
-     "hit": 0.5329,
-     "first": "2026-02-01",
-     "last": "2026-11-05"
+     "units": 2.02,
+     "roi": 0.0809,
+     "avg_price": -107,
+     "claimed": 0.5716,
+     "hit": 0.56,
+     "first": "2026-02-06",
+     "last": "2026-10-24"
     }
    },
-   "verdict": "fails",
-   "why": "lost at the opening price (-0.6% on 298)",
-   "notes": "On the board for Ask Onyx only: nba_build never puts it in the Top 10 and picks.py cannot grade it."
+   "verdict": "finalized",
+   "why": "40-23 at the open, ROI +22.3%; ROI +8.1% at the close",
+   "notes": "Its own tuned rule (daily_top.MKT_RULE, 11/6): unders only, edge 4 to 16 points, price -150 to +200."
   },
   {
    "sport": "nfl",
