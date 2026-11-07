@@ -2591,8 +2591,8 @@
     {
      "id": "186493",
      "start": "2026-11-06T22:10Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Quarterfinal",
      "draw": "Men's Singles",
      "court": "Court Central",
@@ -2605,7 +2605,7 @@
        "win": false,
        "sets": [
         6,
-        3
+        4
        ],
        "serve": false
       },
@@ -2614,12 +2614,12 @@
        "short": "C. Ruud",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/nor.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         7,
-        2
+        6
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -2671,9 +2671,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Casper Ruud",
+       "short": "C. Ruud",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/nor.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -8266,5 +8266,5 @@
    ]
   }
  ],
- "fetched": "2026-11-06T23:28:29+00:00"
+ "fetched": "2026-11-07T00:01:57+00:00"
 }
