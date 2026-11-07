@@ -12493,10 +12493,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "55",
+  "profit": -1.0,
+  "graded_at": "2026-11-07T20:21:36+00:00"
  },
  {
   "id": "cfb-401862822-total-under",
@@ -12524,10 +12524,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "70",
+  "profit": -1.0,
+  "graded_at": "2026-11-07T20:21:36+00:00"
  },
  {
   "id": "cbb-401925707-total-under",
@@ -12710,10 +12710,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "10-60",
+  "profit": 0.885,
+  "graded_at": "2026-11-07T20:21:36+00:00"
  },
  {
   "id": "cbb-401918948-total-under",
@@ -12865,10 +12865,10 @@
   },
   "pre_src": "market",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "4-3",
+  "profit": 0.7407,
+  "graded_at": "2026-11-07T20:21:37+00:00"
  },
  {
   "id": "nhl-401892663-spread-away",
@@ -12927,10 +12927,10 @@
   },
   "pre_src": "market",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "150",
+  "profit": -1.0,
+  "graded_at": "2026-11-07T20:21:37+00:00"
  },
  {
   "id": "cbb-401920156-total-under",
@@ -13113,10 +13113,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "24-31",
+  "profit": -1.0,
+  "graded_at": "2026-11-07T20:21:38+00:00"
  },
  {
   "id": "cfb-401858515-spread-home",
@@ -13172,6 +13172,99 @@
    "period": 1,
    "clock": "2:52",
    "f": 0.572
+  },
+  "pre_src": "market",
+  "model": "live-v6",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "cfb-401856738-ml-away",
+  "sport": "cfb",
+  "gid": "401856738",
+  "date": "2026-11-07",
+  "logged_at": "2026-11-07T20:21:33+00:00",
+  "matchup": "ARK @ AUB",
+  "home": "AUB",
+  "away": "ARK",
+  "label": "ARK to win",
+  "kind": "ml",
+  "side": "away",
+  "line": null,
+  "price": 113,
+  "chance": 0.5719,
+  "implied": 0.4695,
+  "edge": 0.102,
+  "fair": -135,
+  "state": {
+   "score": "ARK 13 - 9 AUB",
+   "period": 3,
+   "clock": "0:14",
+   "f": 0.254
+  },
+  "pre_src": "onyx",
+  "model": "live-v6",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "cfb-401856738-total-under",
+  "sport": "cfb",
+  "gid": "401856738",
+  "date": "2026-11-07",
+  "logged_at": "2026-11-07T20:21:33+00:00",
+  "matchup": "ARK @ AUB",
+  "home": "AUB",
+  "away": "ARK",
+  "label": "Under 36.5",
+  "kind": "total",
+  "side": "under",
+  "line": 36.5,
+  "price": -143,
+  "chance": 0.6648,
+  "implied": 0.5885,
+  "edge": 0.076,
+  "fair": -200,
+  "state": {
+   "score": "ARK 13 - 9 AUB",
+   "period": 3,
+   "clock": "0:14",
+   "f": 0.254
+  },
+  "pre_src": "onyx",
+  "model": "live-v6",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "cbb-401922044-total-under",
+  "sport": "cbb",
+  "gid": "401922044",
+  "date": "2026-11-07",
+  "logged_at": "2026-11-07T20:21:33+00:00",
+  "matchup": "NCCU @ LONG",
+  "home": "LONG",
+  "away": "NCCU",
+  "label": "Under 145.5",
+  "kind": "total",
+  "side": "under",
+  "line": 145.5,
+  "price": -110,
+  "chance": 0.6351,
+  "implied": 0.5238,
+  "edge": 0.111,
+  "fair": -175,
+  "state": {
+   "score": "NCCU 12 - 15 LONG",
+   "period": 1,
+   "clock": "10:26",
+   "f": 0.761
   },
   "pre_src": "market",
   "model": "live-v6",
