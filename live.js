@@ -710,21 +710,21 @@
       // model on the logged bet, whatever the live line is doing, and the live line box shows the logged
       // line when it is quoted, else the nearest line on the same side (marked "at <line>")
       var lc = pickChance(g, LP), ll = pickLine(g, LP);
-      lean = '<div class="lv-lean"><div class="lv-k">Our pick &middot; logged</div>'
+      lean = '<div class="lv-lean"><div class="lv-k">Live projection &middot; first read</div>'
         + '<div class="lv-pick"><b>' + esc(LP.label) + '</b><span class="lv-val">' + pct(LP.chance) + ' to hit</span></div>'
-        + '<div class="lv-steps"><div><small>Logged at</small><b>' + pr(LP.price) + '</b><span>' + esc(String(LP.logged_at).slice(11, 16)) + ' UTC</span></div>'
+        + '<div class="lv-steps"><div><small>First read at</small><b>' + pr(LP.price) + '</b><span>' + esc(String(LP.logged_at).slice(11, 16)) + ' UTC</span></div>'
         + '<div><small>Live line</small><b>' + (ll ? pr(ll.price) : '-') + '</b><span>' + (ll ? (ll.at != null ? 'at ' + esc(ll.at) + ' &middot; ' : '') + pct(implied(ll.price)) + ' implied' : LP.result ? 'settled' : 'off the board') + '</span></div>'
-        + '<div class="fair"><small>Our chance now</small><b>' + (lc != null ? pct(lc) : '-') + '</b><span>' + (LP.result ? (LP.result === 'W' ? 'won' : LP.result === 'L' ? 'lost' : 'push') : lc != null && LP.chance != null ? (lc >= LP.chance ? 'up ' : 'down ') + Math.abs(Math.round(100 * (lc - LP.chance))) + ' pts since logged' : 'in play') + '</span></div></div>'
-        + '<div class="lv-verdict">This match\'s one pick, logged once when it was the most confident value on the board. We stick with it: no second pick, no other side.</div></div>';
+        + '<div class="fair"><small>Our chance now</small><b>' + (lc != null ? pct(lc) : '-') + '</b><span>' + (LP.result ? (LP.result === 'W' ? 'won' : LP.result === 'L' ? 'lost' : 'push') : lc != null && LP.chance != null ? (lc >= LP.chance ? 'up ' : 'down ') + Math.abs(Math.round(100 * (lc - LP.chance))) + ' pts since then' : 'in play') + '</span></div></div>'
+        + '<div class="lv-verdict">Our first read on this match, kept so you can follow how it moves. A projection, not an Onyx Pick: live markets have not passed the picks test yet.</div></div>';
     } else
     if (g.bets && g.bets.length && g.bets[0].edge > -0.05) {
       var top = B[0] || g.bets[0], rest = (B.length ? B : g.bets).slice(1, 4);
-      lean = '<div class="lv-lean' + (isVal(top) ? '' : ' none') + '"><div class="lv-k">' + (isVal(top) ? 'Best live bet' : top.ok === false && top.edge >= VALUE ? 'Too close to call' : 'No value right now') + '</div>'
+      lean = '<div class="lv-lean' + (isVal(top) ? '' : ' none') + '"><div class="lv-k">' + (isVal(top) ? 'Live value &middot; projection' : top.ok === false && top.edge >= VALUE ? 'Too close to call' : 'No value right now') + '</div>'
         + '<div class="lv-pick">' + (top.logo ? logoImg(top.logo, 'lv-lg sm') : '') + '<b>' + esc(top.label) + '</b>' + badge(top) + '</div>'
         + '<div class="lv-steps"><div><small>Started</small><b>' + esc(top.start_txt || '-') + '</b><span>' + (pre.src === 'market' ? 'Market pregame' : 'Onyx pregame') + '</span></div>'
         + '<div><small>Live line</small><b>' + pr(top.price) + '</b><span>' + pct(implied(top.price)) + ' implied</span></div>'
         + '<div class="fair"><small>Our fair</small><b>' + pr(top.fair) + '</b><span>' + pct(top.p) + ' to hit</span></div></div>'
-        + '<div class="lv-verdict">' + (top.ok === false && top.edge >= VALUE ? 'The price has value, but our chance is only ' + pct(top.p) + ': tennis picks post at 65% or better, so this one is a pass.' : isVal(top) ? 'A good live bet: the live line of <b>' + pr(top.price) + '</b> pays more than our fair price of <b>' + pr(top.fair) + '</b>.' : 'The closest one: the live line of ' + pr(top.price) + ' pays less than our fair price of ' + pr(top.fair) + '. It turns into value at ' + pr(top.fair) + ' or better.') + '</div>'
+        + '<div class="lv-verdict">' + (top.ok === false && top.edge >= VALUE ? 'The price has value, but our chance is only ' + pct(top.p) + ': our tennis bar is 65% or better, so this one is a pass.' : isVal(top) ? 'Value by our numbers: the live line of <b>' + pr(top.price) + '</b> pays more than our fair price of <b>' + pr(top.fair) + '</b>.' : 'The closest one: the live line of ' + pr(top.price) + ' pays less than our fair price of ' + pr(top.fair) + '. It turns into value at ' + pr(top.fair) + ' or better.') + '</div>'
         + (rest.length ? '<div class="lv-bets">' + rest.map(function (b) { return '<div class="lv-bet"><span class="n">' + esc(b.label) + '</span><span class="s">' + (b.start_txt ? esc(b.start_txt) + ' &rarr; ' : '') + '<b>' + pr(b.price) + '</b> &middot; fair ' + pr(b.fair) + '</span>' + badge(b) + '</div>'; }).join('') + '</div>' : '') + '</div>';
     } else if (g.bets && g.bets.length) {
       lean = '<div class="lv-lean none"><div class="lv-k">No value right now</div><div class="lv-verdict">Every live line on this game pays less than our fair price. We will flag it here the moment one moves past it.</div></div>';
@@ -736,21 +736,21 @@
         + '<div class="lv-steps"><div><small>Started</small><b>' + (L.start == null ? '-' : pct(L.start)) + '</b><span>' + (L.start_price != null ? (pre.src === 'market' ? 'Market ' : 'Onyx ') + pr(L.start_price) : (pre.src === 'market' ? 'Market pregame' : 'Onyx pregame')) + '</span></div>'
         + '<div><small>Now</small><b>' + pct(L.now) + '</b><span>' + esc(moved) + '</span></div>'
         + '<div class="fair"><small>Fair price</small><b>' + pr(L.fair) + '</b><span>our number</span></div></div>'
-        + '<div class="lv-verdict">' + (L.fair < 0 ? 'A good live bet at any price better than <b>' + pr(L.fair) + '</b>, like ' + pr(Math.round(L.fair * 0.85 / 5) * 5) + '.' : 'A good live bet at any price of <b>' + pr(L.fair) + ' or longer</b>.') + '</div></div>';
+        + '<div class="lv-verdict">' + (L.fair < 0 ? 'Value by our numbers at any price better than <b>' + pr(L.fair) + '</b>, like ' + pr(Math.round(L.fair * 0.85 / 5) * 5) + '.' : 'Value by our numbers at any price of <b>' + pr(L.fair) + ' or longer</b>.') + '</div></div>';
     } else if (L && L.kind === 'total') {
       var u = L.side === 'under';
       lean = '<div class="lv-lean"><div class="lv-k">Our live lean</div><div class="lv-pick"><b>' + (u ? 'Under' : 'Over') + ' the total' + (ten ? ' games' : '') + '</b></div>'
         + '<div class="lv-steps"><div><small>Started</small><b>' + L.start + '</b><span>Onyx total</span></div>'
         + '<div><small>Now</small><b>' + L.now + '</b><span>' + (ten ? 'sets won' : 'scored so far') + '</span></div>'
         + '<div class="fair"><small>Fair total</small><b>' + L.fair + '</b><span>our number</span></div></div>'
-        + '<div class="lv-verdict">A good live bet: the <b>' + (u ? 'under' : 'over') + '</b> at any live total ' + (u ? 'above' : 'below') + ' <b>' + L.fair + '</b>.</div></div>';
+        + '<div class="lv-verdict">Value by our numbers: the <b>' + (u ? 'under' : 'over') + '</b> at any live total ' + (u ? 'above' : 'below') + ' <b>' + L.fair + '</b>.</div></div>';
     } else {
       lean = '<div class="lv-lean none"><div class="lv-k">Our live lean</div><div class="lv-verdict">' + (L && L.why === 'nopre' ? 'No lean: Onyx\'s line from before the start was not saved for this game, so there is nothing to measure the move from.' : 'No lean on this one: the game is close to decided.') + '</div></div>';
     }
     var more = '<div class="lv-more"><span>Our ' + (ten ? 'game spread' : 'spread') + ' now <b>' + esc(g.fair_spread || '-') + '</b></span><span>Our total now <b>' + (g.proj_total != null ? g.proj_total.toFixed(1) : '-') + (ten ? ' games' : '') + '</b></span>' + (pre.spread_txt ? '<span>' + (pre.src === 'market' ? 'Market pregame' : 'Onyx pregame') + ' <b>' + esc(pre.spread_txt) + (pre.total_txt ? ' · ' + esc(pre.total_txt) : '') + '</b></span>' : '') + '</div>';
     return '<div class="lv-card"><div class="lv-top"><span class="lv-tag">' + (NAME[g.sport] || '') + '</span><span class="lv-clock">' + esc(g.detail || 'Live') + '</span></div>'
       + teams + '<div class="lv-bar"><i style="width:' + (100 * aw).toFixed(1) + '%"></i></div>' + lean + more
-      + '<div class="lv-f"><a class="go" href="' + ONYX + '" target="_blank" rel="noopener">Bet it live on Onyx</a><a href="' + gameHref(g) + '" data-lv-open="' + esc(g.gid || '') + '" data-lv-sport="' + esc(g.sport) + '" data-lv-a="' + esc(g.away || '') + '" data-lv-h="' + esc(g.home || '') + '">Open the game</a></div></div>';
+      + '<div class="lv-f"><a class="go" href="' + ONYX + '" target="_blank" rel="noopener">Open on Onyx</a><a href="' + gameHref(g) + '" data-lv-open="' + esc(g.gid || '') + '" data-lv-sport="' + esc(g.sport) + '" data-lv-a="' + esc(g.away || '') + '" data-lv-h="' + esc(g.home || '') + '">Open the game</a></div></div>';
   }
   // the sentence a play leads with: "Value right now: Sinner to win at +120 live. Our chance 52%, the live line says 45%: +7 points."
   function sentence(b, g) {
@@ -760,7 +760,7 @@
   }
   function topEdge(g) { return (g.bets || []).reduce(function (m, b) { return Math.max(m, b.edge); }, -1); }
   function sortGames(G) { return G.sort(function (a, b) { return (topEdge(b) - topEdge(a)) || Math.abs((b.pre || {}).home_win != null ? b.home_win - b.pre.home_win : 0) - Math.abs((a.pre || {}).home_win != null ? a.home_win - a.pre.home_win : 0); }); }
-  var UNTESTED = 'Live value, not a tracked pick, untested against live prices.';
+  var UNTESTED = 'Live projections, not picks: live markets have not passed the picks test yet.';
   // the per-sport Live block: value plays worded directly, then the live games as cards
   function blockHTML(sport, G, opt) {
     opt = opt || {};
@@ -771,7 +771,7 @@
       + '<h3>' + (!G.length ? 'Nothing live right now' : val.length ? 'Value right now' : 'No live value right now') + '</h3></div></div>';
     if (!G.length) return h + '<div class="lvb-note">Live value shows here the moment a ' + (sport === 'tennis' ? 'match' : 'game') + ' starts: our live chance against the live line, every 30 seconds. ' + UNTESTED + '</div>' + (opt.rec || '');
     h += '<div class="lvb-note"><b>' + UNTESTED + '</b> Our live chance starts from Onyx\'s pregame line (the market line when Onyx has none) and moves with the ' + (sport === 'tennis' ? 'sets, games and server' : 'score and the clock') + '. The live line is the in-game market (Onyx\'s in-game prices are not in our feed), so confirm the price in the Onyx app before you bet.</div>';
-    if (val.length) h += val.map(function (x) { return '<div class="lvb-v"><p>' + sentence(x.b, x.g) + '</p><a class="lvb-go" href="' + ONYX + '" target="_blank" rel="noopener">Bet it live on Onyx</a></div>'; }).join('');
+    if (val.length) h += val.map(function (x) { return '<div class="lvb-v"><p>' + sentence(x.b, x.g) + '</p><a class="lvb-go" href="' + ONYX + '" target="_blank" rel="noopener">Open on Onyx</a></div>'; }).join('');
     else if (near.length) h += '<div class="lvb-v none"><p><b>No live value right now.</b> Every live line pays less than our fair price. The closest lines:<small>' + near.map(function (x) { return esc(x.b.label) + ' ' + pr(x.b.price) + ' (our chance ' + pct(x.b.p) + ', line ' + pct(implied(x.b.price)) + ')'; }).join(' &middot; ') + '</small></p></div>';
     else h += '<div class="lvb-v none"><p><b>No live value right now.</b>' + (priced ? ' No live line we can price right now.' : ' The live line is not posted for these ' + (sport === 'tennis' ? 'matches' : 'games') + ' yet; our live chances are on the cards below.') + '</p></div>';
     var n = opt.limit || 4, shown = sortGames(G.slice()).slice(0, opt.all ? 99 : n);
@@ -829,22 +829,23 @@
   function spotHTML(sport, rows) {
     var now = Date.now(), today = siteDay(now);
     // today's games only (11/5, Jordan: NFL and college football showed Sunday's plays on a Thursday)
-    var up = (rows || []).filter(function (r) { return !r.start || Date.parse(r.start) > now - 5 * 60e3; });
+    // Onyx Picks have their own card (onyxpicks.js) above this list; this list is projections only (11/6)
+    var up = (rows || []).filter(function (r) { return !r.pick && (!r.start || Date.parse(r.start) > now - 5 * 60e3); });
     var nextT = up.reduce(function (m, r) { var t = r.start ? Date.parse(r.start) : NaN; return !isNaN(t) && siteDay(t) !== today && (m == null || t < m) ? t : m; }, null);
     var R = up.filter(function (r) { return !r.start || siteDay(Date.parse(r.start)) === today; })
-      .sort(function (a, b) { return ((b.pick || b.tag === 'tracked') ? 1 : 0) - ((a.pick || a.tag === 'tracked') ? 1 : 0) || (b.ev || 0) - (a.ev || 0); }).slice(0, 5);
-    var h = '<div class="lvb-h"><div><span class="lvb-eb off"><i></i>Before the start</span><h3>Best plays today</h3></div></div>';
+      .sort(function (a, b) { return (b.ev || 0) - (a.ev || 0); }).slice(0, 5);
+    var h = '<div class="lvb-h"><div><span class="lvb-eb off"><i></i>Before the start</span><h3>Top projections today &middot; not picks</h3></div></div>';
     if (!R.length) return h + '<div class="lvb-note">' + (nextT != null && !up.some(function (r) { return r.start && siteDay(Date.parse(r.start)) === today; })
-      ? 'No ' + (NAME[sport] || '') + ' games today. The best plays for the next slate post here on game day (' + esc(new Date(nextT).toLocaleDateString('en-US', {weekday: 'long', month: 'short', day: 'numeric', timeZone: 'America/New_York'})) + ').'
-      : 'No line on today\'s slate beats our number right now. Plays show here as lines post.') + '</div>';
-    var tag = function (r) { return r.pick || r.tag === 'tracked' ? 'Onyx Pick' : r.tag === 'trial' ? 'On trial' : 'Projection, not a pick'; };
+      ? 'No ' + (NAME[sport] || '') + ' games today. The top projections for the next slate post here on game day (' + esc(new Date(nextT).toLocaleDateString('en-US', {weekday: 'long', month: 'short', day: 'numeric', timeZone: 'America/New_York'})) + ').'
+      : 'No line on today\'s slate beats our number right now. Projections show here as lines post.') + '</div>';
+    var tag = function () { return 'Projection'; };
     var t = function (iso) { try { return new Date(iso).toLocaleString('en-US', {weekday: 'short', hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York'}) + ' ET'; } catch (e) { return ''; } };
-    return h + '<div class="lvb-note">Onyx Picks first (finalized markets, logged and graded), then the model\'s best value on today\'s Onyx lines, each with the reason it shows.</div><div class="sp-list">' + R.map(function (r) {
+    return h + '<div class="lvb-note">The model\'s best value on today\'s lines, each with the reason it shows. Our numbers, not picks: only the Onyx Picks card above is locked and graded.</div><div class="sp-list">' + R.map(function (r) {
       var why = r.why || ('Our chance ' + pct(r.conf) + ' against Onyx\'s ' + pct(implied(r.price)) + '.');
-      return '<div class="sp-row' + (r.pick || r.tag === 'tracked' ? ' pk' : '') + '"><div class="w"><div class="t"><em>' + tag(r) + '</em><span>' + esc(r.matchup || '') + '</span>' + (r.start ? '<span>' + esc(t(r.start)) + '</span>' : '') + '</div>'
+      return '<div class="sp-row"><div class="w"><div class="t"><em>' + tag(r) + '</em><span>' + esc(r.matchup || '') + '</span>' + (r.start ? '<span>' + esc(t(r.start)) + '</span>' : '') + '</div>'
         + '<b class="l">' + esc(r.label) + '</b><div class="r">' + esc(why) + '</div>'
         + '<div class="n">Onyx <b>' + pr(r.price) + '</b> &middot; our chance <b>' + pct(r.conf) + '</b> &middot; edge <b>' + (r.edge >= 0 ? '+' : '') + (100 * r.edge).toFixed(1) + ' pts</b></div></div>'
-        + '<a href="' + onyxSel(r.sel) + '" target="_blank" rel="noopener">Bet on Onyx</a></div>';
+        + '<a href="' + onyxSel(r.sel) + '" target="_blank" rel="noopener">See it on Onyx</a></div>';
     }).join('') + '</div>';
   }
   // mount on a sport page: {sport, home: element id (the Live block and today's spot plays: live first while
@@ -856,8 +857,9 @@
     if (typeof o.open === 'function') OPEN[sport] = o.open;
     var st = {G: [], all: false, timer: null, rows: null, led: [], sport: sport};
     function draw() {
-      var rec = recordHTML(st.led, sport), lb = live ? '<div class="lvb">' + blockHTML(sport, st.G, {all: st.all, rec: rec}) + '</div>' : '';
-      var sp = st.rows ? '<div class="lvb">' + spotHTML(sport, st.rows) + '</div>' : '';
+      var rec = '', lb = live ? '<div class="lvb">' + blockHTML(sport, st.G, {all: st.all, rec: rec}) + '</div>' : '';
+      var pk = st.pk && window.OnyxPicks ? '<div class="lvb">' + OnyxPicks.html(st.pk, {sport: sport, title: 'Onyx Picks &middot; ' + (NAME[sport] || '')}) + '</div>' : '';
+      var sp = st.rows ? pk + '<div class="lvb">' + spotHTML(sport, st.rows) + '</div>' : '';
       var h = o.home && document.getElementById(o.home), gm = o.games && document.getElementById(o.games);
       if (h) h.innerHTML = st.G.length ? lb + sp : sp ? sp + lb : '';   // nothing live and no spot list (NBA Home): stay out of the way
       if (gm) gm.innerHTML = lb;
@@ -865,8 +867,9 @@
     document.addEventListener('click', function (e) { var b = e.target.closest && e.target.closest('[data-lvb-more]'); if (b) { st.all = !st.all; draw(); } });
     function load() {
       return Promise.all([live ? games([sport]).catch(function () { return st.G; }) : [], live ? ledger() : [],
-        o.home && o.spot !== false ? getJSON('data/' + sport + '/top.json').then(function (j) { return (j && j.plays) || []; }).catch(function () { return st.rows || []; }) : null])
-        .then(function (r) { st.G = r[0] || []; st.led = r[1] || []; if (o.home && o.spot !== false) st.rows = r[2]; draw(); return st; });
+        o.home && o.spot !== false ? getJSON('data/' + sport + '/top.json').then(function (j) { return (j && j.plays) || []; }).catch(function () { return st.rows || []; }) : null,
+        o.home && o.spot !== false && window.OnyxPicks ? OnyxPicks.load().catch(function () { return st.pk || null; }) : null])
+        .then(function (r) { st.G = r[0] || []; st.led = r[1] || []; if (o.home && o.spot !== false) { st.rows = r[2]; st.pk = r[3]; } draw(); return st; });
     }
     function tick() { clearTimeout(st.timer); st.timer = setTimeout(function () { (document.hidden ? Promise.resolve() : load()).then(tick, tick); }, st.G.length ? 30e3 : 120e3); }
     st.ready = load().then(function (x) { tick(); return x; }, function () { tick(); });

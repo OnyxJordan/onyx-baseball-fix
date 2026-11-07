@@ -17,6 +17,7 @@
 <script src="saved.js"></script>
 <!-- live value (live.js): the Live block on Home and Games, shared with every sport page -->
 <script src="live.js"></script>
+<script src="onyxpicks.js"></script>
 <!-- team cards (cards.js, data/nba/cards/*.json): data-oxt opens one -->
 <script src="cards.js" defer></script>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -732,14 +733,14 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
     <div id="oxLiveHome"></div>
     <div id="homeYP" style="padding:0 0 4px"></div>
     <div class="home-section">
-      <div class="home-section-tag">The Model's Parlay</div>
-      <h2 class="home-section-title">Tonight's best look to win</h2>
-      <div id="homeMP"></div>
+      <div class="home-section-tag" id="picksTag">Onyx Picks</div>
+      <h2 class="home-section-title">What we'd bet tonight</h2>
+      <div id="homePicks"></div>
     </div>
     <div class="home-section">
-      <div class="home-section-tag" id="picksTag">Onyx Picks</div>
-      <h2 class="home-section-title">Where the model beats the line</h2>
-      <div class="nba-grid" id="homePicks"></div>
+      <div class="home-section-tag">The Model's Parlay · lab, not a pick</div>
+      <h2 class="home-section-title">The model's best look to win</h2>
+      <div id="homeMP"></div>
     </div>
     <div class="home-section" style="margin-bottom:0">
       <div class="home-section-tag">Projected Top Scorers</div>
@@ -751,6 +752,7 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
 
 <!-- ═══ PLAYS: recommended plays, MLB Edge Plays style ═══════════ -->
 <div class="pane" id="pane-plays"><div class="nba-wrap">
+  <div id="plPicks"></div>
   <div id="plTop"></div>
   <div id="plTrack"></div>
   <div class="pl-banner" id="plBanner"></div>
@@ -1306,11 +1308,9 @@ function pickCard(k) {
 function renderHome() {
   const yp = document.getElementById('homeYP'); if (yp) yp.innerHTML = yourPlayers();
   document.getElementById('homeMP').innerHTML = mpHtml();
-  const picks = D.picks || [];
-  document.getElementById('picksTag').textContent = 'Onyx Picks · ' + picks.length + ' today';
-  document.getElementById('homePicks').innerHTML = picks.length ? picks.map(pickCard).join('')
-      + `<button class="nba-card pk-click pk-all" onclick="gotoTab('plays')"><b>See every play</b><span>Conviction, the reasons behind each pick, and the near misses ›</span></button>`
-    : `<div class="empty">${(D.meta || {}).priced ? 'No play clears the bar tonight. An honest edge lane is a quiet one on most nights.' : 'Onyx prices are not posted yet for tonight. Picks appear once lines are up.'}</div>`;
+  // 11/6 (Jordan): the one Onyx Picks list (onyxpicks.js, data/picks/ledger.json). This section showed the
+  // props lane's plays under the Onyx Picks name; that lane is the lab's now, on the Plays tab.
+  if (window.OnyxPicks) OnyxPicks.mount(document.getElementById('homePicks'), {sport: 'nba', title: 'Onyx Picks · NBA'});
   const top = (D.players || []).filter(p => !p.out).sort((a, b) => b.proj.pts - a.proj.pts).slice(0, 6);
   document.getElementById('homeScorers').innerHTML = top.map((p, i) => {
     const pr = (p.props || {}).pts;
@@ -1438,14 +1438,14 @@ function plCard(k, i) {
 }
 // today's best plays: the build's own Top 10 for NBA (daily_top.py), ranked by confidence
 function topPlays() {
-  const T = (D.top || []).filter(p => (gameOf(p.gid) || {}).state === 'pre' || !gameOf(p.gid));
-  const tagTxt = {tracked: 'Tracked pick', trial: 'On trial', lean: 'Model lean'};
-  const head = `<div class="sec-hdr"><div><span class="sec-title">Today's best plays · ranked by confidence</span></div><span class="sec-count">${T.length}</span></div>`;
+  const T = (D.top || []).filter(p => !p.pick && ((gameOf(p.gid) || {}).state === 'pre' || !gameOf(p.gid)));
+  const tagTxt = {};      // every row here is a projection (11/6): only the Onyx Picks card above is a pick
+  const head = `<div class="sec-hdr"><div><span class="sec-title">Top projections · not picks</span></div><span class="sec-count">${T.length}</span></div>`;
   if (!T.length) return head + `<div class="empty">${(D.meta || {}).priced ? 'No standard-priced line (-150 to +150) where the model beats Onyx right now.' : 'Onyx prices are not posted yet for tonight.'}</div>`;
   return head + `<div class="tp-list">${T.map((p, i) => {
     const leg = p.sel ? {sel: p.sel, price: p.price, gid: p.gid, market: 'play', label: p.label} : null;
     return `<div class="tp-r${i < 3 ? ' top' : ''}"><div class="tp-n">${i + 1}</div>
-      <div class="tp-w"><b>${esc(p.label)}<span class="tp-tag ${p.tag}">${tagTxt[p.tag] || 'Model lean'}</span></b><span>${esc(p.matchup)} · ${tipTime(p.start)}</span></div>
+      <div class="tp-w"><b>${esc(p.label)}<span class="tp-tag lean">Projection</span></b><span>${esc(p.matchup)} · ${tipTime(p.start)}</span></div>
       <div class="tp-c"><b>${Math.round(100 * p.conf)}%</b><small>CONFIDENCE</small></div>
       ${nbOc(p.price, '', leg)}${window.OnyxSaved ? OnyxSaved.btn(Object.assign({id: p.sel}, p)) : ''}</div>`;
   }).join('')}</div>`;
@@ -1454,17 +1454,17 @@ function topPlays() {
 function trackStrip() {
   const R = D.record || {}, O = ((D.open || {}).kinds || {}).all || {}, K = D.tickets || {};
   const rec = (w, l) => `${w || 0}-${l || 0}`;
-  return `<div class="tk-strip">
-    <button onclick="gotoTab('record')"><i>Tracked picks</i><b>${rec(R.w, R.l)}</b><em>Graded nightly. Strict screens, so most nights have none.</em></button>
-    <button onclick="document.getElementById('plOpen').scrollIntoView({behavior:'smooth'})"><i>On trial</i><b>${rec(O.w, O.l)}</b><em>1st-quarter totals and assists unders, at Onyx's opening price.</em></button>
-    <button onclick="gotoTab('home')"><i>The Model's Parlay</i><b>${rec(K.w, K.l)}</b><em>Three starters on standard prices, one ticket a night.</em></button></div>`;
+  return `<div class="pl-div"><i></i><span>The lab · graded in public, not recommended</span><i></i></div><div class="tk-strip">
+    <button onclick="gotoTab('record')"><i>Lab · props lane</i><b>${rec(R.w, R.l)}</b><em>Graded nightly. Strict screens, so most nights have none.</em></button>
+    <button onclick="document.getElementById('plOpen').scrollIntoView({behavior:'smooth'})"><i>Lab · on trial</i><b>${rec(O.w, O.l)}</b><em>1st-quarter totals and assists unders, at Onyx's opening price.</em></button>
+    <button onclick="gotoTab('home')"><i>Lab · Model's Parlay</i><b>${rec(K.w, K.l)}</b><em>Three starters on standard prices, one ticket a night.</em></button></div>`;
 }
 function renderPlays() {
   const L = plLane(), picks = (D.picks || []).slice();
   const date = D.date ? new Date(D.date + 'T12:00:00').toLocaleDateString('en-US', {month: 'short', day: 'numeric'}) : '';
-  document.getElementById('plBanner').innerHTML = `<div class="pl-eb">Tracked picks · ${esc(date)}</div>
-    <h2>Graded picks: where the model beats the Onyx line</h2>
-    <p>Tracked picks clear every screen: an edge of +${(L.min_edge * 100).toFixed(0)} to +${(L.max_edge * 100).toFixed(0)} points over the Onyx price, priced ${L.price[0]} to +${L.price[1]},
+  document.getElementById('plBanner').innerHTML = `<div class="pl-eb">Lab · props lane · ${esc(date)}</div>
+    <h2>The props lane: graded in the lab, not an Onyx Pick</h2>
+    <p>Plays in this lane clear every screen: an edge of +${(L.min_edge * 100).toFixed(0)} to +${(L.max_edge * 100).toFixed(0)} points over the Onyx price, priced ${L.price[0]} to +${L.price[1]},
       ${L.min_min}+ projected minutes, at least ${L.signals} of 3 form reads on the same side, and no role mismatch. Odds are logged the moment a play qualifies, locked at tip and graded off the box score. Tap any play for every line on him.</p>`;
   // how old these Onyx prices are: the page is rebuilt from a fresh pull about
   // every 10 minutes through the evening, and picks never log off lines older
@@ -1512,6 +1512,7 @@ function renderPlays() {
   near.sort((a, b) => a.miss.length - b.miss.length || b.pr.edge - a.pr.edge);
   const W = near.slice(0, 8);
   document.getElementById('plTop').innerHTML = topPlays();
+  if (window.OnyxPicks) OnyxPicks.mount(document.getElementById('plPicks'), {sport: 'nba', title: 'Onyx Picks · NBA'});
   document.getElementById('plTrack').innerHTML = trackStrip();
   document.getElementById('plFb').innerHTML = fbLeans();
   document.getElementById('plOpen').innerHTML = openTrial();
@@ -1685,7 +1686,7 @@ function qhCard(g) {
 function openTrial() {
   const O = D.open || {}, K = O.kinds || {}, A = K.all || {};
   const rows = O.rows || [];
-  if (!rows.length && !O.started) return `<div class="pl-div"><i></i><span>On trial · Onyx opening prices</span><i></i></div>
+  if (!rows.length && !O.started) return `<div class="pl-div"><i></i><span>Lab · on trial · Onyx opening prices</span><i></i></div>
     <div class="ot-note">Two lanes on trial: the 1st-quarter total and assists unders beat Onyx's first price in the backtests. First basket is a lean on each game, not on trial: its corrected backtest did not beat Onyx. They log a play only while Onyx still shows the first price we saw for that market, and every play is graded here. None has qualified yet.</div>`;
   const rec = k => { const x = K[k] || {}; return `${x.w || 0}-${x.l || 0}${x.p ? '-' + x.p : ''}`; };
   const u = v => (v > 0 ? '+' : '') + (v || 0).toFixed(2) + 'u';
@@ -1700,7 +1701,7 @@ function openTrial() {
     return `<div class="ot-row"><div class="ot-who"><b>${label(k)}</b><span>${esc(k.date.slice(5))} · model ${Math.round(1000 * k.prob) / 10}% vs Onyx ${Math.round(1000 * k.implied) / 10}%${k.actual != null && k.kind === 'q1_total' ? ' · scored ' + k.actual : ''}${k.actual != null && k.kind === 'ast_under' ? ' · ' + k.actual + ' assists' : ''}</span>${why(k) ? `<span class="ot-why">Why: ${why(k)}</span>` : ''}</div>
       ${leg ? nbOc(k.price, '', leg) : `<span class="ot-px">${fmtOdds(k.price)}</span>`}${res}</div>`;
   };
-  return `<div class="pl-div"><i></i><span>On trial · Onyx opening prices</span><i></i></div>
+  return `<div class="pl-div"><i></i><span>Lab · on trial · Onyx opening prices</span><i></i></div>
     <div class="ot-rec"><span><b>${rec('all')}</b><i>record</i></span><span><b class="${(A.units || 0) >= 0 ? 'up' : 'dn'}">${u(A.units)}</b><i>units, 1 per play</i></span>
       <span><b>${rec('q1_total')}</b><i>1st-quarter totals</i></span>${(K.first_basket || {}).w + (K.first_basket || {}).l + (K.first_basket || {}).p + (K.first_basket || {}).pending ? `<span><b>${rec('first_basket')}</b><i>first basket (retired)</i></span>` : ''}<span><b>${rec('ast_under')}</b><i>assists unders</i></span></div>
     <div class="ot-note">Logged only while Onyx still shows the first price we saw for that market, at that price, then graded after the game. The 1st-quarter total beat Onyx's first price in the backtest (+7.5%) but not its closing price. First basket came off this list on 11/2: its corrected 2025-26 backtest lost to Onyx's closing price (-8.7%), so it stays a lean on each game and is not logged. Assists unders (since 11/1) start from Onyx's opening price and add the assists the opponent allows and how far the line sits from the player's usual range: on games the model never saw they went 47-37 (+11.1%) at 3+ points of edge. Each lists why. All stay on trial until this record says otherwise.</div>

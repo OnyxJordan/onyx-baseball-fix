@@ -87,11 +87,7 @@ details{margin-top:14px}summary{cursor:pointer;color:#d795ff;font:700 12px monos
   <div class="tbl"><table id="byMarket"></table></div>
 </section>
 
-<section class="ox-wrap pk" id="live">
-  <h2>Live value record (on trial).</h2>
-  <p class="lead">Separate from Onyx Picks. Every live value play our pages showed (our live chance at least 3 points over the live line), logged once at that live line with the score at the time, and graded off the final. Live value, not a tracked pick, untested against live prices until this record says otherwise.</p>
-  <div id="liveRec"></div>
-</section>
+
 
 <section class="ox-wrap pk" id="all">
   <h2>Every pick.</h2>
@@ -157,7 +153,8 @@ function card(r) {
     (r.src === 'market' ? '<span class="tg">Market line</span>' : '') +
     (live && url ? '<a class="bet" href="' + url + '" target="_blank" rel="noopener">' + odds(r.price) + ' on Onyx</a>'
       : live && r.src === 'market' ? '<a class="bet" href="https://app.onyxodds.com/?referrer=' + ONYX_REFERRER + '" target="_blank" rel="noopener">' + odds(r.price) + ' market, find it on Onyx</a>'
-      : '<span class="bet" style="background:rgba(255,255,255,.08)">' + odds(r.price) + ' logged</span>') +
+      : '<span class="bet" style="background:rgba(255,255,255,.08)">' + odds(r.price) + ' locked</span>') +
+    '<span class="tg">Locked ' + esc(when(r.logged_at)) + ' at ' + odds(r.price) + '</span>' +
     (live && r.sel && window.OnyxSaved ? OnyxSaved.btn(savePick(r)) : '') +
     '</div></div>';
 }
@@ -234,11 +231,7 @@ async function main() {
         '<td class="n">' + rec(o) + '</td><td class="n">' + (o.n ? pct(o.roi) : '-') + '</td><td class="n">' + (c.n ? pct(c.roi) + ' (' + c.n + ')' : '-') + '</td><td class="n">' + (tu.n ? pct(tu.roi) + ' (' + tu.n + ')' : '-') + '</td><td>' + esc(m.why || '') + '</td></tr>';
     }).join('');
 }
-if (window.OnyxLive) { OnyxLive.css(); OnyxLive.ledger().then(function (rows) {
-  var el = document.getElementById('liveRec'); if (!el) return;
-  var by = OnyxLive.SPORTS.filter(function (k) { return rows.some(function (r) { return r.sport === k; }); });
-  el.innerHTML = '<div class="lvb">' + OnyxLive.recordHTML(rows, 'all') + by.map(function (k) { return '<div style="margin-top:-4px">' + OnyxLive.recordHTML(rows, k).replace('Live value record (on trial)', OnyxLive.NAME[k] + ' live value') + '</div>'; }).join('') + '</div>';
-}); }
+// the live projections record moved to the scorecard's lab (11/6): this page is Onyx Picks only
 main().catch(function (e) { document.getElementById('todayLead').textContent = 'The picks could not load right now. Pull to refresh.'; });
 </script>
 </body>

@@ -1978,6 +1978,19 @@ or Onyx Picks.
 
 ## Onyx Picks (11/2)
 
+**Picks vs projections, one list (11/6).** Jordan: "I'll see lists of picks everywhere then I'll see different
+things tracked, lets nail this down." Two words on the whole site. **Onyx Picks** (data/picks/ledger.json) are
+the only picks: `onyxpicks.js` renders the same card everywhere (home top, each sport's Home and Plays tabs,
+the NBA Home and Plays tabs, the scorecard), each pick with "Locked <time> at <price>" (and the date when it
+locked before game day), its status and the bet button. **Projections** are everything else: the home Top
+list ("Top projections, not picks", Onyx Picks removed from it), each sport's projections, live cards (a
+live value read says "Value by our numbers", the tennis first read is "Live projection, first read", buttons
+say "Open on Onyx"), and the lab. Jordan's calls: live plays are projections until a live market passes the
+picks test; the home page shows picks first, then projections. The lab (old graded lanes, on-trial lanes,
+the NBA props lane and Model's Parlay, the live projections record) lives on the scorecard under "The lab ·
+not recommended" and on the NBA Plays tab under "The lab"; the picks page is Onyx Picks only. The NBA Home
+section titled "Onyx Picks" had been showing the props lane; it now shows the real Onyx Picks.
+
 Jordan: "we need to track plays what it recommends not leans and trials this is who I'd pick
 today with tracking and visibility there's too much obscurity right now". **Decision: markets
 that pass the test below are posted as tracked Onyx Picks; every other market shows projections
