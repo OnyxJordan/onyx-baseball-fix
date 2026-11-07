@@ -513,6 +513,7 @@
   }
   function localSpec(q, B) {
     RAWQ = q;
+    q = String(q).replace(/[.\s]+$/, '');                 // "without Cowboys." (11/6)
     var t = ' ' + q.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[’']/g, '').replace(/[?!,()]/g, ' ').replace(/\s+/g, ' ') + ' ';
     // the common misspellings (tested: tools/ask_bigcorpus.py), and shorthand
     t = t.replace(/\bparly\b|\bparley\b|\bparlya\b/g, 'parlay').replace(/\bpasing\b/g, 'passing').replace(/\brec[ie]{2}ving\b/g, 'receiving')
@@ -523,8 +524,28 @@
     // what they do NOT want: "no kelce", "without lebron", "except the lakers". Taken out of the
     // request before anything else reads it (11/2: each of these read as the opposite)
     var EXW = [];
-    t = t.replace(/(?<!(?:@|\bvs\.?|\bv|\bat)\s)\b(no|without|except|excluding|exclude|other than|besides|not including|leave out|skip|but not|nothing (?:on|from)|none of|avoid|minus)\s+(the\s+)?([a-z][a-z.\-&]*(?:\s+[a-z0-9&][a-z0-9.\-&]*){0,3})/g, function (m, w, the, ph) {
+    // 11/6 (Jordan: "if you say no that's actually the only thing it focuses on": "no first basket scorers,
+    // parlay of +2000" built a first-basket parlay): a market after no / without / except is left out
+    var XMK = [], XSIDE = null, XPROPS = false, XLINES = false;
+    var NEG = '(?<!(?:@|\\bvs\\.?|\\bv|\\bat)\\s)\\b(?:no|not|without|except|excluding|exclude|other than|besides|not including|leave out|skip|but not|none of|avoid|minus|stay away from|nothing with)\\s+(?:any\\s+)?(?:the\\s+)?(?:more\\s+)?';
+    t = t.replace(new RegExp(NEG + '((?:player\\s+)?props?|game lines?|main lines?|overs|unders|point spr[a-z]*|spr[ae]+ds?|against the spread|ats|o\\/u|over[\\s-]?unders?|to win|win outright|winners?|rebs|reb|dimes|ast|anytime touchdowns?|anytime tds?|rec yards|rush yards|pass yards|catches|(?:(?:1st|first|anytime|2\\+?|two)\\s*)?(?:basket|bucket|td|tds|touchdowns?|quarter|qtr|half)(?:\\s*(?:scorers?|totals?|bets?|props?|picks?))?|spreads?|totals?|moneylines?|money lines?|ml|rebounds?|boards|assists?|dimes|points?|pts|threes|3s|receptions?|catches|(?:receiving|rushing|passing|rec|rush|pass)\\s*(?:yards|yds)|(?:receiving|rushing|passing)|td scorers?|scorers?)\\b', 'g'), function (m, ph) {
+      if (/^(?:player\s+)?props?$/.test(ph)) XPROPS = true;
+      else if (/^(game|main) lines?$/.test(ph)) XLINES = true;
+      else if (ph === 'overs') XSIDE = 'under';
+      else if (ph === 'unders') XSIDE = 'over';
+      else {
+        var hit = false, ph2 = ' ' + ph + ' ';
+        for (var wi = 0; wi < WORDS.length; wi++) if (WORDS[wi][0].test(ph2)) { XMK.push(WORDS[wi][1]); hit = true; break; }
+        if (!hit && /^(td|tds|touchdowns?|td scorers?|scorers?)$/.test(ph)) { XMK.push('anytime_td'); hit = true; }
+        if (!hit) return m;
+      }
+      return ' ';
+    });
+    t = t.replace(/(?<!(?:@|\bvs\.?|\bv|\bat)\s)\b(no|without|except|excluding|exclude|other than|besides|not including|leave out|skip|but not|nothing (?:on|from)|none of|avoid|minus)\s+(the\s+)?([a-z0-9][a-z0-9.\-&]*(?:\s+[a-z0-9&][a-z0-9.\-&]*){0,3})/g, function (m, w, the, ph) {
       var ws = ph.trim().split(' '), first = ws[0];
+      // a player's full name before any school ("no Xavier Worthy" is the receiver, not Xavier; 11/6)
+      if (ws.length >= 2) { var NM0 = names(B, PRIOR);
+        for (var pw = Math.min(3, ws.length); pw >= 2; pw--) if (NM0[clean(ws.slice(0, pw).join(' '))]) { EXW.push(ws.slice(0, pw).join(' ')); return ' ' + ws.slice(pw).join(' ') + ' '; } }
       // a team's whole name ("no duke blue devils", "except the kansas city chiefs", "no long beach state")
       teamDir();
       for (var nw0 = Math.min(4, ws.length); nw0 >= 1; nw0--) {
@@ -540,6 +561,11 @@
     }).replace(/\s+/g, ' ');
     var s = {intent: 'list', count: null, sports: [], markets: [], side: 'any', min_price: null, max_price: null, min_conf: null,
              min_edge: null, player: null, team: null, sort: 'conf', one_per_game: true, when: null, summary: ''};
+    if (XMK.length) s.xmk = XMK.filter(function (m, i) { return XMK.indexOf(m) === i; });
+    if (XMK.indexOf('anytime_td') >= 0 && s.xmk.indexOf('first_td') < 0) s.xmk.push('first_td', 'two_plus_td');
+    if (XPROPS) s.no_props = true;
+    if (XLINES) s.props_only = true;
+    if (XSIDE) s.side = XSIDE;
     // what kind of answer
     if (/sgp ?(\+|plus)(?!\s*(odds|money|\d))/.test(t)) s.intent = 'parlay';
     else if (/\bsgp\b|same[\s-]*game|correlated|stack/.test(t)) s.intent = 'sgp';
@@ -630,6 +656,7 @@
     var dogW = /\bunderdogs?\b|\bdogs\b/.test(t);
     var propsW = /\bprops?\b|\bplayer (bets?|lines?|markets?)\b/.test(t) && !/\bgame props?\b/.test(t);
     if ((favW || dogW) && !s.markets.length && !propsW) s.markets.push('ml');
+    if (s.xmk) s.markets = s.markets.filter(function (m) { return s.xmk.indexOf(m) < 0; });   // never the market they ruled out
     if (favW && !dogW && s.markets.length === 1 && s.markets[0] === 'ml') s.max_price = s.max_price == null ? -101 : Math.min(s.max_price, -101);
     if (propsW) s.props_only = true;
     // "college" alone: football for a football market, basketball for a basketball one, else both
@@ -668,8 +695,9 @@
     // the whole ticket's payout floor, not every leg's price. Each leg at +300 or longer only when the
     // request says so ("each leg", "every leg", "per leg") or asks for dogs / plus money / longshots.
     if (s.min_price != null && s.min_price >= 100 && !s.target_price && /\bparlay|\bsgp\b|same[\s-]?game|\blegs?\b|legger|\bticket/.test(t)
-        && /(\bmin(imum)?\b( total| parlay| ticket| combined)?( odds| payout| price)?( of)?|\bat least|odds of at least|pays at least)\s*\+\d{3,4}/.test(t)
-        && !/\+\d{3,4}\s*(or better|or longer|and up|or more)/.test(t)
+        && (/(\bmin(imum)?\b( total| parlay| ticket| combined)?( odds| payout| price)?( of)?|\bat least|odds of at least|pays at least)\s*\+\d{3,4}/.test(t)
+            || s.min_price >= 400)      // "+2000 or longer" on a parlay is the ticket: no leg needs +2000 (11/6)
+        && !(/\+\d{3,4}\s*(or better|or longer|and up|or more)/.test(t) && s.min_price < 400)
         && !/\b(each|every|per|all)\s+(leg|pick|play)s?\b|\blegs?\s+(each|at|of)\s+(at least\s+)?\+?\d/.test(t)
         && !/plus money|plus[\s-]odds|underdogs?|\bdogs\b|long ?shots?/.test(t)) {
       s.target_price = s.min_price; s.min_price = null; s.ticket_floor = true;
@@ -709,12 +737,14 @@
     } else if (!cfx && CONF_NO.test(' ' + cnorm(t).replace(/-/g, ' ') + ' ') && !s.team) s.unsupported = 'that conference by name|we have the SEC, Big Ten, Big 12, ACC, Big East, Pac-12, Mountain West, WCC, A-10, American, MAC, Sun Belt, C-USA, Ivy and Missouri Valley, or name a team';
     if (!s.team && !(s.teams || []).length && !s.ambig && !s.conf) {
       // abbreviations only when typed in capitals ("MIN -200" is odds, "MIN" is Minnesota)
-      var tm = String(q).match(/\b(ATL|BOS|BKN|CHA|CHI|CLE|DAL|DEN|DET|GS|GSW|HOU|IND|LAC|LAL|MEM|MIA|MIL|MIN|NOP|NYK|OKC|ORL|PHI|PHX|POR|SAC|SAS|TOR|UTAH|UTA|WSH|WAS|ARI|BAL|BUF|CAR|CIN|GB|JAX|KC|LV|LAR|NE|NYG|NYJ|PIT|SEA|SF|TB|TEN|VGK|EDM|COL|NYR|NYI|NJ|CBJ|WPG|VAN|CGY|OTT|MTL|NSH|STL|SJ|ANA)\b/);
+      var EXTOK = {}; EXW.forEach(function (w) { String(w).toUpperCase().split(/\s+/).forEach(function (x) { EXTOK[x] = 1; }); });
+      var qX = String(q).replace(/\b[A-Z][A-Z&-]{1,4}\b/g, function (m) { return EXTOK[m] ? ' ' : m; });   // "except UNLV": not the team asked for (11/6)
+      var tm = qX.match(/\b(ATL|BOS|BKN|CHA|CHI|CLE|DAL|DEN|DET|GS|GSW|HOU|IND|LAC|LAL|MEM|MIA|MIL|MIN|NOP|NYK|OKC|ORL|PHI|PHX|POR|SAC|SAS|TOR|UTAH|UTA|WSH|WAS|ARI|BAL|BUF|CAR|CIN|GB|JAX|KC|LV|LAR|NE|NYG|NYJ|PIT|SEA|SF|TB|TEN|VGK|EDM|COL|NYR|NYI|NJ|CBJ|WPG|VAN|CGY|OTT|MTL|NSH|STL|SJ|ANA)\b/);
       if (tm) s.team = ({GSW: 'GS', NOP: 'NO', NYK: 'NY', SAS: 'SA', UTA: 'UTAH', WAS: 'WSH'})[tm[1]] || tm[1];
       // a school's abbreviation in capitals ("DUKE", "UK", "GONZ")
       if (!tm) {
         teamDir();
-        var cm = /[a-z]/.test(String(q)) ? String(q).match(/\b[A-Z][A-Z&-]{1,4}\b/g) || [] : [];   // not in an all-caps request
+        var cm = /[a-z]/.test(String(q)) ? qX.match(/\b[A-Z][A-Z&-]{1,4}\b/g) || [] : [];   // not in an all-caps request
         for (var cj = 0; cj < cm.length; cj++) {
           var cc = COLS.byAb[cm[cj]] || COLS.filter(function (x) { return x.cfb === cm[cj]; })[0];
           if (cc && (cm[cj].length >= 3 || cm[cj] === 'UK') && !/^(SGP|ATS|PRA|NBA|NFL|NHL|CFB|CBB|TDS|MVP|ROTY|OVER|PLUS)$/.test(cm[cj])) {
@@ -773,7 +803,11 @@
     // the players and teams they do not want
     if (EXW.length) {
       s.exclude = [];
+      var NMx = typeof PC !== 'undefined' ? PC : names(B, PRIOR);
       EXW.forEach(function (ph) {
+        // a player's exact full name first ("but not Marshall Pritchett" is the player, not Marshall the school)
+        var phc = clean(ph.replace(/\b(rn|pls|please|thx|today|tonight|asap)\b/g, ' ').replace(/\s+/g, ' ').trim());
+        if (phc && NMx[phc]) { s.exclude.push(typeof NMx[phc] === 'string' ? NMx[phc] : ph); return; }
         // a team by its name: the school (each sport's abbreviation) or the pro team
         teamDir(); var ce = NKEY[cnorm(ph).replace(/-/g, ' ')] || NKEY[cnorm(ph).replace(/-/g, ' ').replace(/^the /, '')];
         if (ce && ce.col.length && (colSig || !ce.pro.length) && !NICK[cnorm(ph)]) {
@@ -785,7 +819,11 @@
         if (nkHit) { s.exclude.push(NICK[nkHit]); return; }
         var ph2 = ph.split(' ').filter(function (w) { return !NOT_NAMES.test(w); }).join(' ');
         if (!ph2) return;
-        var pl = findPlayer(' ' + ph2 + ' ', typeof PC !== 'undefined' ? PC : names(B, PRIOR), s.markets);
+        var pl = findPlayer(' ' + ph2 + ' ', NMx, s.markets);
+        // a near match only when the last name agrees ("Chance Williams" is never Joseph Williams, 11/6)
+        var lastW = function (x) { var w = clean(String(x || '')).replace(/\b(jr|sr|ii|iii|iv|v)\b/g, '').trim().split(' '); return w[w.length - 1]; };
+        if (pl && lastW(pl) !== lastW(ph2)) pl = null;
+        if (pl && ph2.split(' ').length >= 2 && clean(pl).split(' ')[0].charAt(0) !== clean(ph2).split(' ')[0].charAt(0)) pl = null;
         s.exclude.push(pl || ph2);
       });
       if (!s.exclude.length) delete s.exclude;
@@ -899,6 +937,8 @@
       if (spec.sports && spec.sports.length && spec.sports.indexOf(p.sport) < 0) return false;
       if (mk.length && mk.indexOf(p.mkt) < 0 && mk.indexOf(p.kind) < 0) return false;
       if (spec.props_only && p.kind !== 'prop') return false;
+      if (spec.no_props && p.kind === 'prop') return false;                                  // "no props": game lines only
+      if (spec.xmk && (spec.xmk.indexOf(p.mkt) >= 0 || spec.xmk.indexOf(p.kind) >= 0)) return false;   // "no first basket" (11/6)
       if (spec.side && spec.side !== 'any' && (p.kind === 'prop' || p.kind === 'total') && p.side !== spec.side) return false;
       // 2+ touchdowns: priced off the TD model (lam), so the anytime price and its floors do not apply;
       // the player, team, day and exclusions still do (11/2: "two touchdowns for kelce" answered with
@@ -911,14 +951,18 @@
       if (spec.player && String(p.name || p.label).toLowerCase().indexOf(String(spec.player).toLowerCase()) < 0) return false;
       if (spec.exclude && spec.exclude.length && spec.exclude.some(function (x) {
         x = String(x || '').trim();
-        if (/^[A-Z]{2,4}$/.test(x)) return String(p.team || (p.kind === 'spread' || p.kind === 'ml' ? p.name : '')).toUpperCase() === x;   // a team: its players and its side
-        x = x.toLowerCase(); return x && (String(p.name || '') + ' ' + String(p.label || '')).toLowerCase().indexOf(x) >= 0; })) return false;
+        if (/^[A-Z0-9&-]{2,5}$/.test(x)) { var tmx = p.team || (p.kind === 'spread' || p.kind === 'ml' ? p.name : '');   // a team: its players and its side
+          return tmx ? String(tmx).toUpperCase() === x : new RegExp('(^|[^A-Z])' + x.replace(/[&-]/g, '\\$&') + '([^A-Z]|$)').test(String(p.matchup || '').toUpperCase()); }
+        x = clean(x); return x && clean(String(p.name || '') + ' ' + String(p.label || '')).indexOf(x) >= 0; })) return false;   // "Ja'Marr" = "jamarr" (11/6)
       // the teams named, per sport (a college abbreviation means nothing on a pro board: "DEN" is the
       // Denver Pioneers in college basketball and the Nuggets in the NBA)
       var TLp = teamsFor(spec, p.sport, TL);
       if (spec.tabbr && !TLp.length) return false;
       if (TLp.length && !onTeams(p, TLp)) return false;
       if (TLp.length && (p.kind === 'spread' || p.kind === 'ml') && TLp.indexOf(String(p.team || p.name).toUpperCase()) < 0) return false;   // "Georgia to cover" is Georgia's side
+      // "Celtics points overs": Celtics players, not the Hornets in the same game (11/6: Coby White came back);
+      // a same-game parlay keeps the whole game
+      if (TLp.length && p.kind === 'prop' && p.team && spec.intent !== 'sgp' && TLp.indexOf(String(p.team).toUpperCase()) < 0) return false;
       if (spec.onyx_picks && !p.pick) return false;
       if (spec.when && !whenOk(spec.when, p.start)) return false;
       return true;
@@ -1170,6 +1214,10 @@
     // the AI kept part of the name ("Cameron"): the reader's full name ("Josh Cameron")
     if (s.player && h.player && s.player !== h.player && String(h.player).toLowerCase().split(/\s+/).indexOf(String(s.player).toLowerCase()) >= 0) s.player = h.player;
     if ((h.exclude || []).length && !(s.exclude || []).length) s.exclude = h.exclude.slice();
+    // what they ruled out, from the built-in reader: the AI never turns "no first basket" back into the market (11/6)
+    if (h.xmk) { s.xmk = h.xmk.slice(); s.markets = (s.markets || []).filter(function (m) { return h.xmk.indexOf(m) < 0; }); }
+    if (h.no_props) { s.no_props = true; s.props_only = false; }
+    if (h.props_only && !s.props_only) s.props_only = true;
     if (h.unsupported) s.unsupported = h.unsupported;
     // what the reader knows that the AI's schema does not carry (11/2): every team by name per sport
     // (a college name is never a pro team), conferences, a name two teams share (ask, never guess),
@@ -1427,6 +1475,19 @@
         var sp3 = Object.assign({}, spec, {markets: [], side: 'any', when: null, min_price: null, max_price: null, min_conf: null, default_conf: false, default_floor: false}), r6 = run(sp3, a[1]);
         if (r6.rows.length) { res = r6; spec = sp3; res.widened = true; res.note = (res.note ? res.note + ' ' : '') + 'Nothing matched that exactly, so these are ' + spec.player + '\'s lines on the board.'; }
       }
+      // never an empty answer without the reason (11/6, Jordan: the Knicks ask came back blank)
+      if (!(res.rows || []).length && !res.note) {
+        var SPW = {nba: 'NBA', nfl: 'NFL', cfb: 'college football', cbb: 'college basketball', nhl: 'NHL', tennis: 'tennis'};
+        var nowE = Date.now(), sps = spec.sports || [];
+        var fut = a[1].filter(function (p) { return Date.parse(p.start) > nowE && (!sps.length || sps.indexOf(p.sport) >= 0); });
+        var tl = teamList(spec), tn = spec.school || spec.team_name || tl.join(', ');
+        // the team field and the matchup, not a player's name ("Duke Watson" is not Duke)
+        var onT = function (p) { var hay = ' ' + [p.team, p.matchup].join(' ').toUpperCase() + ' '; return tl.some(function (x) { return new RegExp('[^A-Z]' + String(x).toUpperCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '[^A-Z]').test(hay); }); };
+        if (!fut.length) res.note = 'No ' + (sps.length ? sps.map(function (x) { return SPW[x] || x; }).join(' or ') + ' ' : '') + 'games left on the board right now: today\'s have started or finished. The next slate shows here once its lines post.';
+        else if (tl.length && !fut.some(onT)) res.note = (tn || 'That team') + (tl.length > 1 ? ' are' : ' is') + ' not on the board right now: no game with lines posted yet. Ask again once their next game is priced.';
+        else if (spec.player && !fut.some(function (p) { return String(p.name || p.label).toLowerCase().indexOf(String(spec.player).toLowerCase()) >= 0; })) res.note = spec.player + ' has no line on the board right now.';
+        else res.note = 'Nothing on the board fits all of that right now. Try fewer rules, a different market, or another day.';
+      }
       // a payout no leg set on the board can reach at its per-leg share (2 legs at +1000 need +232 each):
       // the closest ticket instead of nothing (11/6)
       if (spec.target_price && (res.rows || []).length < 2 && (spec.intent === 'parlay' || spec.intent === 'sgp')) {
@@ -1471,6 +1532,8 @@
       if (res.clarify || a[0].spec._fixed) res.say = '';
       if (teamList(spec).length > 1 && !spec.school) res.understood += ' · ' + teamList(spec).join(', ');
       if (spec.exclude && spec.exclude.length) res.understood += ' · without ' + spec.exclude.join(', ');
+      if (spec.xmk && spec.xmk.length) res.understood += ' · no ' + spec.xmk.filter(function (m) { return m !== 'first_td' || spec.xmk.indexOf('anytime_td') < 0; }).filter(function (m) { return m !== 'two_plus_td'; }).map(function (m) { return (MW[m] || m).toLowerCase(); }).join(', ');
+      if (spec.no_props) res.understood += ' · no player props';
       LAST = {q: q, spec: a[0].spec, legs: (res.rows || []).map(function (p) { return {name: p.name || p.label, play: p.label, price: p.price}; })};
       return res;
     });

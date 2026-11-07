@@ -222,6 +222,86 @@ def f_slang():
 
 FAM = [(f_list, 18), (f_parlay, 18), (f_target, 8), (f_sgp, 12), (f_td, 6), (f_team, 16), (f_player, 12), (f_matchup, 4), (f_price, 4), (f_slang, 2)]
 
+# 11/6 (Jordan: "if you say no that's actually the only thing it focuses on"; "the best over points option for
+# the Knicks but not Jalen Brunson"; "top 10 value plays to score a td"): exclusions of every kind, a team's
+# best option minus a player, top-N value plays for a market, and payout floors, in every sport on the boards
+ROSTER = {}
+for sp, rows in B.items():
+    for p in rows:
+        if p.get("kind") == "prop" and p.get("team") and p.get("name") and "D/ST" not in p["name"] and p.get("mkt") in PROPW:
+            ROSTER.setdefault((sp, p["team"]), {}).setdefault(p["mkt"], set()).add(p["name"])
+TEAM_NAME = {(sp, ab): full for sp, ab, full in TEAMS}
+NEGW = ["no", "without", "but not", "except", "excluding", "not", "leave out", "skip"]
+VALUE_MK = {"anytime_td": ["score a td", "score a touchdown", "find the end zone"], "pts": ["points overs", "points"],
+            "reb": ["rebounds"], "ast": ["assists"], "rec": ["receptions", "catches"], "rec_yds": ["receiving yards"], "rush_yds": ["rushing yards"],
+            "spread": ["cover", "spreads"], "total": ["totals"], "ml": ["moneylines", "win outright"]}
+
+
+def f_exclude():
+    sp = R.choice(LIVE_SPORTS)
+    k = R.random()
+    mks = [m for m in ["spread", "total", "ml"] + PROP_SPORTS.get(sp, []) if m != "q1_total"]
+    if k < 0.35 and mks:                                    # a market ruled out, maybe with a payout floor
+        xm = R.choice(mks)
+        word = R.choice(LINEW.get(xm) or PROPW[xm])
+        if xm == "anytime_td":
+            word = R.choice(["td scorers", "anytime td", "touchdowns"])
+        n = R.choice([2, 3, 4, 5])
+        tp = R.choice([None, None, 500, 1000, 2000])
+        neg = R.choice(NEGW[:6])
+        if tp:
+            q = R.choice([f"{neg} {word} to make a parlay of +{tp} or longer in {{s}}", f"{{s}} parlay +{tp} or longer {neg} {word}",
+                          f"{{s}} parlay at least +{tp} {neg} {word}"]).format(s=R.choice(SPW[sp]))
+            return q, {"sports": [sp], "intent": "parlay", "target_price": tp, "xmk": [xm]}
+        q = R.choice([f"{nw(n)} leg {{s}} parlay {neg} {word}", f"{{s}} picks {neg} {word}", f"best {{s}} bets {neg} {word}"]).format(s=R.choice(SPW[sp]))
+        e = {"sports": [sp], "xmk": [xm]}
+        if "leg" in q.split():
+            e.update(intent="parlay", count=n)
+        return q, e
+    if k < 0.55:                                            # a side ruled out
+        sd = R.choice(["over", "under"])
+        mk = R.choice([m for m in PROP_SPORTS.get(sp, []) if m != "anytime_td"] or ["total"])
+        q = f"{R.choice(SPW[sp])} {R.choice(PROPW.get(mk) or LINEW[mk])} no {'unders' if sd == 'over' else 'overs'}"
+        return q, {"sports": [sp], "side": sd, "markets": [mk]}
+    if k < 0.85 and ROSTER:                                 # a team's best option, minus one of its players
+        (tsp, ab), mm = R.choice(sorted(ROSTER.items(), key=lambda x: (x[0][0], x[0][1])))
+        mk = R.choice(sorted(mm))
+        if len(mm[mk]) < 2:
+            return None
+        who = R.choice(sorted(mm[mk]))
+        tn = TEAM_NAME.get((tsp, ab))
+        if not tn:
+            return None
+        sd = R.choice(["over", "under"]) if mk != "anytime_td" else None
+        mw = R.choice(PROPW[mk])
+        q = R.choice(["best {sd}{m} option for the {t} but not {p}", "{t} {sd}{m} {neg} {p}", "give me the {t} {m} {sd}but not {p}",
+                      "{t} {m} picks {neg} {p}"]).format(sd=(sd + " ") if sd else "", m=mw, t=tname(tsp, ab, tn), p=who, neg=R.choice(NEGW[:4]))
+        e = {"team": ab, "markets": [mk], "exclude_player": who}
+        if sd and "{sd}" not in "":
+            e["side"] = sd if (sd + " ") in q or (sd + "s") in q else e.get("side")
+            if e.get("side") is None:
+                e.pop("side")
+        return " ".join(q.split()), e
+    T = [t for t in TEAMS if t[0] == sp]                     # a team ruled out
+    if not T:
+        return None
+    _, ab, full = R.choice(T)
+    q = f"{R.choice(SPW[sp])} {R.choice(['picks', 'parlay', 'bets'])} {R.choice(NEGW[:5])} {tname(sp, ab, full)}"
+    return q, {"sports": [sp], "exclude_team": ab}
+
+
+def f_value():
+    sp = R.choice(LIVE_SPORTS)
+    mks = [m for m in VALUE_MK if m in PROP_SPORTS.get(sp, []) or m in ("spread", "total", "ml")]
+    mk = R.choice(mks)
+    n = R.choice([3, 5, 10])
+    q = R.choice(["give me top {n} value plays to {m} in {s} {w}", "top {n} value {m} {s} {w}", "best {n} value plays {m} {s}",
+                  "{n} best value {s} {m} plays {w}"]).format(n=nw(n) if n < 7 else n, m=R.choice(VALUE_MK[mk]), s=R.choice(SPW[sp]), w=R.choice(["today", "tonight", ""]))
+    return " ".join(q.split()), {"sports": [sp], "markets": [mk], "count": n}
+
+
+FAM += [(f_exclude, 22), (f_value, 8)]
+
 
 def perturb(q):
     if R.random() < 0.12:
