@@ -432,7 +432,7 @@ def main(argv):
         except requests.HTTPError as e:
             body = e.response.text[:200] if e.response is not None else ""
             print(f"::warning::my_alerts poll: {e} {body}")
-            if e.response is not None and e.response.status_code in (401, 403, 404):
+            if e.response is not None and e.response.status_code in (400, 401, 403, 404):
                 print("my_alerts: check SUPABASE_SERVICE_KEY and that supabase/schema.sql (11/7 part) has been run")
                 break
         except Exception as e:
