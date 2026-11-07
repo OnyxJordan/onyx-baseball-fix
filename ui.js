@@ -565,6 +565,42 @@
     bar.appendChild(more);
     document.body.appendChild(bar);
   }
+  /* 11/7 (Jordan's screenshot: the bottom bar stuck two thirds of the way down the installed app, the page
+     showing beneath it). iOS in the Home Screen app can leave the page's layout height short after the
+     keyboard closes (Ask Onyx, the Account code box) or after a system sheet (the notification prompt), and
+     a bottom:0 bar then sits at that short bottom. After each of those moments: nudge the scroll so iOS
+     recomputes the layout, then measure where the bar ends against the visible screen and move it down by
+     the gap. While a text field has focus nothing is touched (the keyboard owns the bottom then). */
+  function anchorBar() {
+    var bar = document.querySelector('.obar');
+    if (!bar || getComputedStyle(bar).display === 'none') return;
+    var a = document.activeElement;
+    if (a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) && a.type !== 'button') { bar.style.transform = ''; return; }
+    var vv = window.visualViewport;
+    if (vv && vv.scale > 1.05) return;                       // pinch-zoomed: leave it
+    bar.style.transform = '';
+    var vis = vv ? vv.offsetTop + vv.height : innerHeight;
+    var gap = Math.round(vis - bar.getBoundingClientRect().bottom);
+    if (gap > 2 && gap < 700) bar.style.transform = 'translateY(' + gap + 'px)';
+  }
+  function reflowKick() {
+    var x = window.scrollX, y = window.scrollY;
+    try { window.scrollTo(x, y + 1); window.scrollTo(x, y); } catch (e) {}
+  }
+  var anchorT = [];
+  function anchorSoon() {
+    anchorT.forEach(clearTimeout);
+    anchorT = [60, 350, 900].map(function (ms, i) { return setTimeout(function () { if (i === 0) reflowKick(); anchorBar(); }, ms); });
+  }
+  function watchAnchor() {
+    document.addEventListener('focusout', anchorSoon, true);
+    document.addEventListener('focusin', anchorSoon, true);
+    ['resize', 'orientationchange', 'pageshow', 'focus'].forEach(function (e) { window.addEventListener(e, anchorSoon); });
+    document.addEventListener('visibilitychange', function () { if (!document.hidden) anchorSoon(); });
+    if (window.visualViewport) { visualViewport.addEventListener('resize', anchorSoon); visualViewport.addEventListener('scroll', anchorBar); }
+    window.addEventListener('scroll', function () { if (document.querySelector('.obar[style*="translate"]')) anchorBar(); }, {passive: true});
+    anchorSoon();
+  }
   function syncActive(tab) {
     current = tab;
     var inBar = S.bar.some(function (b) { return b[0] === tab; });
@@ -1106,7 +1142,7 @@
     fixSafeArea();
     window.addEventListener('orientationchange', function () { setTimeout(fixSafeArea, 300); });
     stdNav();
-    buildBar(); applyFold(); foldSoon();
+    buildBar(); applyFold(); foldSoon(); watchAnchor();
     buildSheet();
     siteFooter();
     hook();
