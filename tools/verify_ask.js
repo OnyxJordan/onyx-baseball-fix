@@ -61,7 +61,7 @@ const srv = http.createServer((q, r) => { const p = path.join(root, decodeURICom
       if (e.min_price != null && s.min_price !== e.min_price) why.push(`min_price ${s.min_price} want ${e.min_price}`);
       if (e.max_price != null && s.max_price !== e.max_price) why.push(`max_price ${s.max_price} want ${e.max_price}`);
       if (e.min_conf != null && s.min_conf !== e.min_conf) why.push(`min_conf ${s.min_conf} want ${e.min_conf}`);
-      if (e.team && s.team !== e.team) why.push(`team ${s.team} want ${e.team}`);
+      if (e.team && s.team !== e.team && !Object.values(s.tabbr || {}).some(v => (v || []).indexOf(e.team) >= 0)) why.push(`team ${s.team} want ${e.team}`);   // a school on two boards (football and basketball)
       if (e.player && String(s.player || '').toLowerCase() !== e.player.toLowerCase()) why.push(`player ${s.player} want ${e.player}`);
       if (e.teams) { const got = ((s.teams || []).length ? s.teams : s.team ? [s.team] : []).map(x => String(x).toUpperCase()).sort(); if (!same(got, e.teams)) why.push(`teams ${JSON.stringify(got)} want ${JSON.stringify(e.teams)}`); }
       if (e.props_only && !s.props_only) why.push('props_only not set');
@@ -127,6 +127,28 @@ const srv = http.createServer((q, r) => { const p = path.join(root, decodeURICom
           if ((p.kind === 'spread' || p.kind === 'ml') && T.map(x => String(x).toUpperCase()).indexOf(String(p.team || p.name).toUpperCase()) < 0) { why.push(`the other side of a named team's game: ${p.label}`); break; }
         }
       }
+      // 11/6 outcome checks (Jordan: "I have no confidence in its search ability"): the ticket itself must be right
+      const LAB = legs.map(p => p.label + '|' + p.matchup);
+      if (new Set(LAB).size !== LAB.length) why.push('the same leg twice');
+      const sideKey = {}; for (const p of legs) {
+        const k = p.matchup + '|' + (p.kind === 'prop' ? p.mkt + '|' + p.name + '|' + p.line : p.kind);
+        if (sideKey[k] && sideKey[k] !== p.side + '|' + (p.team || p.name)) { why.push(`both sides of one bet: ${p.label}`); break; }
+        sideKey[k] = p.side + '|' + (p.team || p.name);
+      }
+      // only a count the question asked for (a number of legs or picks), never the reader's default of 5
+      const NUMRE = /\b(top|best|safest|surest|give me|gimme|parlay of)\s+(\d{1,2}|two|three|four|five|six)\b(?!\s*%)|\b(\d{1,2}|two|three|four|five|six)[ -]?(leg|legs|legger|pick|picks|plays|bets|team|best|safest|top)\b|\b(\d{1,2})\s+(nba|nfl|nhl|hockey|basketball|football|hoops|ncaab|ncaaf|cbb|cfb|college|tennis)\b/i;
+      const askedN = NUMRE.test(c.q) ? s.count : null;   // only a number the question says, never the reader's default of 5
+      if (askedN && !s.target_price && (s.intent === 'parlay' || s.intent === 'sgp' || s.intent === 'list') && legs.length) {
+        if (legs.length > askedN) why.push(`${legs.length} legs, asked for ${askedN}`);
+        else if (legs.length < askedN && !R.note) why.push(`${legs.length} legs, asked for ${askedN}, and no note saying why`);
+      }
+      if ((s.intent === 'sgp' || R.parlay && R.parlay.same_game) && legs.length > 1 && new Set(legs.map(p => p.gid)).size > 1) why.push('same-game parlay with legs from different games');
+      if (s.target_price != null && legs.length > 1 && R.parlay && R.parlay.price != null && R.parlay.price < s.target_price && !R.note) why.push(`ticket pays ${R.parlay.price}, asked for at least +${s.target_price}`);
+      // a named team, player or same-game ask that comes back empty while the board has it
+      const fut = B.filter(p => Date.parse(p.start) > Date.now() && (!(s.sports || []).length || s.sports.indexOf(p.sport) >= 0));
+      const hasTeam = (s.tabbr || (s.teams || []).length || s.team) && !s.player && fut.some(p => { const T = teamsFor(s, p.sport); return T.length && onT(p, T); });
+      const hasPlayer = s.player && fut.some(p => String(p.name || p.label).toLowerCase().indexOf(String(s.player).toLowerCase()) >= 0);
+      if (!legs.length && !R.clarify && !R.ambig && !R.depth && (hasTeam || hasPlayer)) why.push(`empty answer while the board has ${hasPlayer ? s.player : 'that team'}`);
       // an empty answer is a failure when today's boards have something that fits
       const want = (e.sports || s.sports || []).length ? (e.sports || s.sports) : null, wm = (e.markets || s.markets || []).length ? (e.markets || s.markets) : null;
       const exists = !e.team && !e.player && !s.team && !(s.teams || []).length && !s.player && !s.conf && !s.tabbr && !s.onyx_picks && !R.depth && !R.ambig && s.intent !== 'sgp' && avail(want, wm, s);   // an SGP needs it all in one game

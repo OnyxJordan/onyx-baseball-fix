@@ -1339,12 +1339,22 @@ def both_sides(key, lane, slate, pre, start, board, DT):
     other half the model priced gets the complement of that chance; a game the model did not
     price gets Onyx's own price with the margin removed. Leans only, never value plays."""
     odds = (lane.load("odds.json", {}) or {}).get("games") or {}
+    mk = False
+    if not odds:     # 11/6: Onyx priced nothing (fallback): both sides from the market line, no selection ids
+        mj = lane.load("market.json", {}) or {}
+        if mj.get("fallback"):
+            odds, mk = mj.get("games") or {}, True
     have = {e.get("sel") for e in board if e.get("sel")}
+    # a side already on the board, by game, market and side (a market-line row has no selection id)
+    have_k = {(e.get("gid"), e.get("kind"), e.get("side") if e.get("kind") == "total" else e.get("name")) for e in board
+              if e.get("kind") in ("spread", "ml", "total")}
     model = {}
     for e in board:
         if e.get("kind") in ("spread", "ml", "total"):
             model[(e["gid"], e["kind"])] = e
     out = []
+    if key == "tennis":
+        return tennis_both_sides(lane, slate, pre, start, board, DT)
     for g in slate.get("games") or []:
         o = odds.get(g["gid"]) or {}
         if g["gid"] not in pre or not o:
@@ -1352,24 +1362,76 @@ def both_sides(key, lane, slate, pre, start, board, DT):
         mu = f"{g['away']} @ {g['home']}"
         sides = []
         for side, other in (("home", "away"), ("away", "home")):
-            if o.get(f"{side}_spread_sel") and o.get(f"{side}_spread_price") is not None and o.get(f"{other}_spread_price") is not None and o.get(f"{side}_spread") is not None:
+            if (o.get(f"{side}_spread_sel") or mk) and o.get(f"{side}_spread_price") is not None and o.get(f"{other}_spread_price") is not None and o.get(f"{side}_spread") is not None:
                 ln = o[f"{side}_spread"]
                 sides.append(("spread", g[side], "over", -ln, f"{ln:+g}", o[f"{side}_spread_price"], o[f"{other}_spread_price"], o[f"{side}_spread_sel"]))
-            if o.get(f"{side}_ml_sel") and o.get(f"{side}_ml") is not None and o.get(f"{other}_ml") is not None:
+            if (o.get(f"{side}_ml_sel") or mk) and o.get(f"{side}_ml") is not None and o.get(f"{other}_ml") is not None:
                 sides.append(("ml", g[side], "over", 0.0, "", o[f"{side}_ml"], o[f"{other}_ml"], o[f"{side}_ml_sel"]))
         for side, other in (("over", "under"), ("under", "over")):
-            if o.get(f"{side}_sel") and o.get(f"{side}_price") is not None and o.get(f"{other}_price") is not None and o.get("total") is not None:
+            if (o.get(f"{side}_sel") or mk) and o.get(f"{side}_price") is not None and o.get(f"{other}_price") is not None and o.get("total") is not None:
                 sides.append(("total", "Total", side, o["total"], "", o[f"{side}_price"], o[f"{other}_price"], o[f"{side}_sel"]))
         for kind, name, side, ln, ltxt, price, oprice, sel in sides:
-            if sel in have:
+            if (sel and sel in have) or (g["gid"], kind, side if kind == "total" else name) in have_k:
                 continue
             ip, io = L.implied(price), L.implied(oprice)
             m = model.get((g["gid"], kind))
             p = (1 - m["conf"]) if m and m.get("conf") is not None else ip / (ip + io)
             c = {"kind": kind, "mkt": kind, "name": name, "team": name if kind != "total" else None, "side": side, "line": ln,
-                 "line_txt": ltxt, "price": price, "prob": p, "edge": p - ip, "sel": sel, "gid": g["gid"], "matchup": mu}
+                 "line_txt": ltxt, "price": price, "prob": p, "edge": p - ip, "sel": sel, "gid": g["gid"], "matchup": mu,
+                 **({"src": "market"} if mk else {})}
             out.append(DT.entry(key, c, "lean", start.get(g["gid"])))
             have.add(sel)
+            have_k.add((g["gid"], kind, side if kind == "total" else name))
+    return out
+
+
+def tennis_both_sides(lane, slate, pre, start, board, DT):
+    """Tennis: both players' moneyline and games spread, and both sides of the games total, for Ask Onyx
+    (11/6: "Fritz to win" found nothing when the board held only the model's side). Same chance rule as
+    both_sides: the complement of the model's side, else the price with its margin removed."""
+    mo = (lane.load("odds.json", {}) or {}).get("matches") or {}
+    mk = False
+    if not mo:
+        mj = lane.load("market.json", {}) or {}
+        if mj.get("fallback"):
+            mo, mk = mj.get("matches") or {}, True
+    model, have = {}, set()
+    for e in board:
+        if e.get("kind") in ("spread", "ml", "total"):
+            model[(str(e["gid"]), e["kind"])] = e
+            have.add((str(e["gid"]), e["kind"], e.get("side") if e.get("kind") == "total" else e.get("name")))
+    out = []
+    for ev in slate.get("events") or []:
+        for m in ev.get("matches") or []:
+            gid = str(m.get("id"))
+            o = mo.get(gid) or {}
+            P = o.get("p") or [x.get("name") for x in m.get("p") or []]
+            if m.get("state") != "pre" or gid not in pre or not o or len(P) < 2:
+                continue
+            mu = f"{P[0]} vs {P[1]}"
+            sides = []
+            for i in (0, 1):
+                j = 1 - i
+                if o.get(f"ml{i}") is not None and o.get(f"ml{j}") is not None:
+                    sides.append(("ml", P[i], "over", 0.0, "", o[f"ml{i}"], o[f"ml{j}"], o.get(f"ml{i}_sel")))
+                if o.get(f"sp{i}") is not None and o.get(f"sp{i}_price") is not None and o.get(f"sp{j}_price") is not None:
+                    h = o[f"sp{i}"]
+                    sides.append(("spread", P[i], "over", -h, f"{h:+g}", o[f"sp{i}_price"], o[f"sp{j}_price"], o.get(f"sp{i}_sel")))
+            for sd, ot in (("over", "under"), ("under", "over")):
+                if o.get("total") is not None and o.get(sd) is not None and o.get(ot) is not None:
+                    sides.append(("total", "Total", sd, o["total"], "", o[sd], o[ot], o.get(f"{sd}_sel")))
+            for kind, name, side, ln, ltxt, price, oprice, sel in sides:
+                k = (gid, kind, side if kind == "total" else name)
+                if k in have:
+                    continue
+                ip, io = L.implied(price), L.implied(oprice)
+                md = model.get((gid, kind))
+                p = (1 - md["conf"]) if md and md.get("conf") is not None else ip / (ip + io)
+                c = {"kind": kind, "mkt": kind, "name": name, "team": None, "side": side, "line": ln, "line_txt": ltxt,
+                     "price": price, "prob": p, "edge": p - ip, "sel": sel, "gid": gid, "matchup": mu, "start": m.get("start"),
+                     **({"src": "market"} if mk else {})}
+                out.append(DT.entry("tennis", c, "lean", m.get("start")))
+                have.add(k)
     return out
 
 
