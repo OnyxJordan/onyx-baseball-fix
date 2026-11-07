@@ -1,0 +1,44 @@
+name: Pick alerts test push (manual)
+# Sends one test notification to everyone who turned on Pick alerts on the site (OneSignal tag picks=1), so
+# the push path can be checked end to end without waiting for a real Onyx Pick (11/7). Run it from the
+# Actions tab: "Run workflow". Nothing is logged to any ledger. The log prints OneSignal's answer: an id
+# means it went out; "not subscribed" means nobody has turned alerts on yet.
+on:
+  workflow_dispatch:
+    inputs:
+      message:
+        description: "Text of the test push"
+        required: false
+        default: "Test from Onyx Sports: Pick alerts are working. Real alerts arrive when an Onyx Pick locks."
+permissions:
+  contents: read
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Send the test push
+        env:
+          ONESIGNAL_APP_ID: ${{ secrets.ONESIGNAL_APP_ID }}
+          ONESIGNAL_API_KEY: ${{ secrets.ONESIGNAL_API_KEY }}
+          MSG: ${{ github.event.inputs.message }}
+        run: |
+          python3 - <<'EOF'
+          import json, os, urllib.request
+          app, key = os.environ.get("ONESIGNAL_APP_ID", "").strip(), os.environ.get("ONESIGNAL_API_KEY", "").strip()
+          if not app or not key:
+              raise SystemExit("ONESIGNAL_APP_ID / ONESIGNAL_API_KEY secrets are missing")
+          body = {"app_id": app, "target_channel": "push",
+                  "headings": {"en": "Onyx Pick alerts"},
+                  "contents": {"en": os.environ.get("MSG") or "Test from Onyx Sports: Pick alerts are working."},
+                  "url": "https://onyxjordan.github.io/onyx-baseball-fix/picks.html",
+                  "filters": [{"field": "tag", "key": "picks", "relation": "=", "value": "1"}]}
+          req = urllib.request.Request("https://api.onesignal.com/notifications", data=json.dumps(body).encode(),
+                                       headers={"Authorization": f"Key {key}", "Content-Type": "application/json"})
+          try:
+              with urllib.request.urlopen(req, timeout=20) as r:
+                  print(r.status, r.read().decode()[:400])
+          except urllib.error.HTTPError as e:
+              print(e.code, e.read().decode()[:400])
+              raise SystemExit(1)
+          EOF

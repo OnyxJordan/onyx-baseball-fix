@@ -40,6 +40,11 @@ body{background:#0c0c0c;color:#fff;margin:0}
 .sent b{color:#61e970}.sent small{display:block;color:#a7c9ab;font-size:12.5px;margin-top:4px}
 .errb{margin-top:14px;padding:14px;border-radius:12px;background:rgba(255,138,138,.08);border:1px solid rgba(255,138,138,.3);font-size:14px;line-height:1.55;color:#ffd9d9}
 .hint{margin-top:10px;font-size:12.5px;color:#8f879c}
+.code{margin-top:18px;padding-top:16px;border-top:1px solid rgba(255,255,255,.08)}
+.code p{margin:0 0 10px;font-size:13.5px;line-height:1.55;color:#b9b2c4}
+.code input{font-family:monospace;letter-spacing:.06em}
+.hand{margin-top:14px;padding:14px;border-radius:12px;background:rgba(176,56,249,.12);border:1px solid rgba(176,56,249,.45);font-size:14px;line-height:1.55;color:#eee}
+.hand code{display:block;margin:10px 0;padding:12px;border-radius:10px;background:#0d0a12;border:1px solid #3a2a55;font:700 16px monospace;color:#fff;word-break:break-all;user-select:all;-webkit-user-select:all}
 .ok{color:#61e970}.bad{color:#ff8a8a}
 .who{font-size:20px;font-weight:800;word-break:break-all}.who small{display:block;font:700 11px monospace;letter-spacing:.1em;text-transform:uppercase;color:#d795ff;margin-bottom:6px}
 .stat{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px}
@@ -106,7 +111,10 @@ function counts() {
   const follows = ['onyxNbaFollow', 'onyxFollow_nfl', 'onyxFollow_cfb', 'onyxFollow_cbb', 'onyxFollow_nhl', 'onyxFollow_tennis', 'onyxFollow_golf'].reduce((n, k) => n + count(k), 0);
   return {picks: count('onyxSaved'), players: follows, bets: count('onyxMyBets')};
 }
-let SENT = '', ERRM = '', WAIT = 0, TICK = null, TYPED = '';
+let SENT = '', ERRM = '', WAIT = 0, TICK = null, TYPED = '', CODEERR = '', HANDED = false;
+// iPhone: the emailed link opens Safari, which never shares a sign-in with the Home Screen app (11/7)
+const APP = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+const PHONE = /iPhone|iPad|iPod|Android/.test(navigator.userAgent);
 // a resend waits a minute (Supabase limits how often a link can be sent)
 function tick() {
   clearInterval(TICK);
@@ -126,9 +134,17 @@ function render() {
       <label for="acEmail">Your email</label>
       <input id="acEmail" type="email" inputmode="email" autocomplete="email" placeholder="you@email.com" value="${esc(SENT || TYPED)}">
       <div class="row"><button class="btn" id="acSend" type="button">${SENT ? 'Send it again' : 'Email me a sign-in link'}</button></div>
-      <div id="acMsg">${SENT ? `<div class="sent"><b>Link sent to ${esc(SENT)}.</b> Open the email on this device and tap the link to sign in.<small>It works once, for an hour. Nothing after a couple of minutes? Check spam or promotions.</small></div>`
+      <div id="acMsg">${SENT ? `<div class="sent"><b>Link sent to ${esc(SENT)}.</b> ${APP ? 'Type the 6-digit code from the email below. If the email only has a link, tap it: Safari opens with an app code to paste below.' : 'Open the email on this device and tap the link to sign in.'}<small>It works once, for an hour. Nothing after a couple of minutes? Check spam or promotions.</small></div>`
         : ERRM ? `<div class="errb">${esc(ERRM)}</div>` : st.error ? `<div class="errb">${esc(st.error)}</div>` : ''}</div>
       <div class="hint" id="acWait"></div>
+      <div class="code">
+        <label for="acCode">Have a code?</label>
+        <p>${APP ? 'In the app, the email link opens Safari instead of here. Type the 6-digit code from the email, or paste the app code Safari shows after you tap the link.' : 'Type the 6-digit code from the sign-in email, or paste an app code.'}</p>
+        <input id="acCode" type="text" inputmode="text" autocomplete="one-time-code" autocapitalize="off" spellcheck="false" placeholder="123456 or app code">
+        <div class="row"><button class="btn" id="acUse" type="button">Sign in with code</button></div>
+        ${CODEERR ? `<div class="errb">${esc(CODEERR)}</div>` : ''}
+      </div>
+      ${HANDED ? `<div class="sent"><b>Code copied.</b> Open Onyx Sports from your Home Screen, go to Account, paste it under Have a code? and tap Sign in with code. Safari is signed out so only the app holds your sign-in.</div>` : ''}
     </div>`;
     const go = async () => {
       const i = document.getElementById('acEmail'), b = document.getElementById('acSend');
@@ -140,6 +156,16 @@ function render() {
       render(); tick();
     };
     document.getElementById('acSend').onclick = go;
+    const use = async () => {
+      const c = document.getElementById('acCode'), b = document.getElementById('acUse'), em = document.getElementById('acEmail');
+      TYPED = em.value.trim() || TYPED;
+      b.disabled = true; b.textContent = 'Signing in...';
+      try { await A.useCode(TYPED || SENT, c.value); CODEERR = ''; SENT = ''; HANDED = false; }
+      catch (e) { CODEERR = e && e.message ? e.message : 'That code did not work.'; }
+      render();
+    };
+    document.getElementById('acUse').onclick = use;
+    document.getElementById('acCode').onkeydown = e => { if (e.key === 'Enter') use(); };
     document.getElementById('acEmail').onkeydown = e => { if (e.key === 'Enter') go(); };
     return;
   }
@@ -149,10 +175,23 @@ function render() {
     <div class="who"><small>Signed in as</small>${esc(st.email || '')}</div>
     <div class="stat"><div><b>${c.picks}</b><span>Saved picks</span></div><div><b>${c.players}</b><span>Players</span></div><div><b>${c.bets}</b><span>My bets</span></div></div>
     <div class="sync">${sync}</div>
+    ${!APP && PHONE && A.fromLink() && A.appCode() ? `<div class="hand"><b>Using the Onyx Sports app from your Home Screen?</b> The link signed you in here in the browser, which the app cannot see. Copy this code and paste it on the app's Account page:
+      <code id="acApp">${esc(A.appCode())}</code>
+      <div class="row"><button class="btn" type="button" id="acCopy">Copy code for the app</button></div>
+      <small style="display:block;color:#b9b2c4;margin-top:6px">Copying signs the browser out, so only the app is signed in. Works once. Staying in the browser? Ignore this.</small></div>` : ''}
     <div class="row"><a class="btn" href="home.html#my">Go to My Onyx</a><button class="btn ghost" type="button" id="acSync">Sync now</button><button class="btn ghost" type="button" id="acOut">Sign out</button></div>
     <div class="danger"><p>Delete your account: your email and everything synced to it are removed. This device keeps its own picks.</p><button class="btn ghost" type="button" id="acDel">Delete my account</button></div>
   </div>`;
   document.getElementById('acSync').onclick = () => A.sync();
+  const cp = document.getElementById('acCopy');
+  if (cp) cp.onclick = async () => {
+    const code = A.appCode();
+    let ok = false;
+    try { await navigator.clipboard.writeText(code); ok = true; } catch (e) {}
+    if (!ok) { try { const r = document.createRange(); r.selectNodeContents(document.getElementById('acApp')); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); ok = document.execCommand('copy'); } catch (e) {} }
+    if (!ok) { alert('Copy did not work here. Press and hold the code to copy it, then paste it in the app.'); return; }
+    HANDED = true; A.handOff();
+  };
   document.getElementById('acOut').onclick = () => { SENT = ''; ERRM = ''; A.signOut(); };
   document.getElementById('acDel').onclick = async () => {
     if (!confirm('Delete your Onyx account? Your email and everything synced to it are removed. This device keeps its own picks.')) return;

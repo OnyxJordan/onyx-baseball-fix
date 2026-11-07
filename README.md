@@ -1903,6 +1903,21 @@ anon key; never the service key); (5) run "Accounts (turn on / update)", which w
 `node tools/verify_accounts.js` (a stand-in Supabase, no keys: off, sign-in, first-sign-in merge,
 two devices, removals, privacy between users, session refresh, sign out, delete).
 
+**Signing in inside the installed app (11/7).** Jordan: "you can't sign in on the PWA because it takes you to
+Safari." On iPhone the emailed link always opens Safari, and Safari and the Home Screen app never share storage,
+so a link cannot sign the app in. The Account page now has **Have a code?**, which takes either:
+- the **6-digit code** from the email (`POST /auth/v1/verify`, type `email`). Supabase only puts a code in the
+  email when the Magic Link template includes `{{ .Token }}` (Authentication -> Emails -> Magic Link), e.g.
+  `<p>Your Onyx Sports code: <b>{{ .Token }}</b></p>` above the link; or
+- an **app code**: when the link lands in a phone browser that is not the installed app, the signed-in Account
+  page shows that session's refresh token with "Copy code for the app". Copying signs the browser out locally
+  (no server logout, which would end the session the app takes); pasting it in the app trades it for the app's
+  own session (`grant_type=refresh_token`). Works once, like the link.
+`accounts.js`: `useCode`, `appCode`, `handOff`, `fromLink`.
+
+**Test push.** `.github/workflows/push_test.yml` ("Pick alerts test push", Run workflow) sends one notification
+to everyone with Pick alerts on (tag `picks=1`) with the repo's OneSignal secrets, and logs OneSignal's answer.
+
 **One account, one tracker on every page (11/2).** Jordan: "the account page and tracking should
 live through all sports and pages ... a uniform experience across the board". `ui.js` now loads on
 every page (home, every sport, picks, account, how, scorecard, cbb-players, mlb-2026) and:
