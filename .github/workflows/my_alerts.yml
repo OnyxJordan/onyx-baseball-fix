@@ -1,0 +1,44 @@
+name: My picks alerts
+# Pushes about each signed-in person's own saved picks at the level they chose in the control center
+# (alerts.js; profiles.push_level): every update, key moments, results only, a daily recap, or off.
+# my_alerts.py polls every 75 s for up to 19 minutes and exits early when no saved pick is live or about
+# to start; the 20-minute cron chains the runs. The 14:47 UTC run (9:47 AM ET in winter) is the morning
+# recap. Every push is logged in push_sent first, so overlapping or restarted runs never repeat one.
+# Needs secrets SUPABASE_SERVICE_KEY, ONESIGNAL_APP_ID, ONESIGNAL_API_KEY (and SUPABASE_URL, or accounts.json).
+on:
+  schedule:
+    - cron: "*/20 * * * *"
+    - cron: "47 14 * * *"
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "watch or recap"
+        required: false
+        default: "watch"
+permissions:
+  contents: read
+concurrency:
+  group: my-alerts-${{ github.event.schedule == '47 14 * * *' && 'recap' || github.event.inputs.mode || 'watch' }}
+  cancel-in-progress: false
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests
+      - name: Pick alerts for signed-in people
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL || secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          ONESIGNAL_APP_ID: ${{ secrets.ONESIGNAL_APP_ID }}
+          ONESIGNAL_API_KEY: ${{ secrets.ONESIGNAL_API_KEY }}
+        run: |
+          if [ "${{ github.event.schedule }}" = "47 14 * * *" ] || [ "${{ github.event.inputs.mode }}" = "recap" ]; then
+            python my_alerts.py --recap
+          else
+            python my_alerts.py --watch 1140
+          fi

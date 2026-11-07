@@ -93,3 +93,31 @@ end;
 $$;
 revoke all on function public.delete_me() from public, anon;
 grant execute on function public.delete_me() to authenticated;
+
+-- ── 11/7 push control center (alerts.js, my_alerts.py) ──────────────────────────────────────
+-- How often a signed-in person wants pushes about their own saved picks:
+--   all      every update: game starts, lead changes, halftime, the result
+--   key      key moments: game starts and the result
+--   results  results only: won, lost or push
+--   recap    one morning push: yesterday's record and today's saved picks
+--   off      none (the default)
+-- The person sets it from the control center (their own profile row, under "own profile" above).
+alter table public.profiles add column if not exists push_level text not null default 'off';
+do $$ begin
+  alter table public.profiles add constraint profiles_push_level_ck check (push_level in ('all', 'key', 'results', 'recap', 'off'));
+exception when duplicate_object then null; end $$;
+
+-- What my_alerts.py has already sent (or graded) for each person's pick, so nothing is pushed twice
+-- and the morning recap can count yesterday's results. Written and read only by the server with the
+-- service key: row-level security is on and there is no policy, so the site can never read it.
+create table if not exists public.push_sent (
+  user_id uuid not null references auth.users (id) on delete cascade,
+  item_id text not null,
+  event text not null,
+  res text,
+  pushed boolean not null default true,
+  data jsonb,
+  sent_at timestamptz not null default now(),
+  primary key (user_id, item_id, event)
+);
+alter table public.push_sent enable row level security;

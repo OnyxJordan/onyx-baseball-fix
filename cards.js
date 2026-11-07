@@ -725,7 +725,8 @@
     if (O.implied != null) out.push({k: 'Team total', v: num(O.implied), d: 'implied by Onyx' + (O.spread != null ? ' · spread ' + sg(O.spread, 1) : '')});
     if (G.rest != null) out.push({k: 'Rest', v: G.rest + ' day' + (G.rest === 1 ? '' : 's'), d: 'since the last game · ' + opp + ' ' + (G.opp_rest != null ? G.opp_rest + ' days' : '-') + ' · context, not in the rating'});
     if (t.inj && t.inj.length) out.push({k: 'Injury report', v: String(t.inj.length), d: 'out or questionable (below) · ' + opp + ' ' + (G.opp_inj || 0) + ' · the ratings do not adjust for them'});
-    return why(out, 'Why this number') + (N ? '<div class="cx-note">The NBA model prices player props, not sides or totals: these are the team inputs it uses, and the game-line chances on the Bets side are Onyx\'s own with the margin removed.</div>'
+    // a team the ratings cannot price yet (too few games) still gets the heading, over the note that says so
+    return (out.length ? why(out, 'Why this number') : '<div class="cx-hdr"><span>Why this number</span></div>') + (N ? '<div class="cx-note">The NBA model prices player props, not sides or totals: these are the team inputs it uses, and the game-line chances on the Bets side are Onyx\'s own with the margin removed.</div>'
       : M ? '<div class="cx-note">Ratings: ' + u + ' scored = league average + home edge + the team\'s offense - the opponent\'s defense, fitted on every final with recent games weighing more. Each Onyx line is priced from them and blended with Onyx\'s price (' + Math.round(100 * (G.w || 0)) + '% model).</div>'
         : '<div class="cx-note">Not enough games for the ratings to price this one yet.</div>') + sidesTable(t, true);
   }

@@ -127,7 +127,7 @@
     bar: [['home', 'Home', 'home', 0, 'home.html'], ['picks', 'Picks', 'plays', 0, 'picks.html'], ['live', 'Live', 'games', 1, 'home.html#live'], ['@my', 'My picks', 'star']],
     tabs: [['home', 'Onyx Sports', 'home', 'Every sport, tonight at a glance', 'home.html'],
            ['picks', 'Onyx Picks', 'plays', "Today's card and the record", 'picks.html'],
-           ['alerts', 'Pick alerts', 'bell', 'A push when an Onyx Pick locks', 'picks.html#alerts'],
+           ['alerts', 'Alerts', 'bell', 'Your push control center', 'picks.html#alerts'],
            ['ask', 'Ask Onyx', 'search', 'Plays or a parlay, built for you', 'home.html#ask'],
            ['top10', "Today's top 10", 'trophy', 'Our favorite plays today', 'home.html#top10'],
            ['live', 'Live now', 'games', 'Every game in play', 'home.html#live'],
