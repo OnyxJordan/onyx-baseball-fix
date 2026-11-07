@@ -144,9 +144,32 @@ const srv = http.createServer((q, r) => { const p = path.join(root, decodeURICom
       }
       if ((s.intent === 'sgp' || R.parlay && R.parlay.same_game) && legs.length > 1 && new Set(legs.map(p => p.gid)).size > 1) why.push('same-game parlay with legs from different games');
       if (s.target_price != null && legs.length > 1 && R.parlay && R.parlay.price != null && R.parlay.price < s.target_price && !R.note) why.push(`ticket pays ${R.parlay.price}, asked for at least +${s.target_price}`);
+      // exclusions (11/6, Jordan: "if you say no that's actually the only thing it focuses on")
+      if (e.xmk) {
+        e.xmk.forEach(m => { if ((s.xmk || []).indexOf(m) < 0) why.push(`did not rule out ${m} (read ${JSON.stringify(s.xmk || [])}, markets ${JSON.stringify(s.markets || [])})`); });
+        const bad = legs.find(p => e.xmk.indexOf(p.mkt) >= 0 || e.xmk.indexOf(p.kind) >= 0);
+        if (bad) why.push(`a ruled-out market in the answer: ${bad.label}`);
+      }
+      if (e.exclude_player) {
+        const nn = x => String(x || '').toLowerCase().replace(/[’'.]/g, '').replace(/\b(jr|sr|ii|iii|iv)\b/g, '').replace(/\s+/g, ' ').trim();
+        const xp = nn(e.exclude_player);
+        if (!(s.exclude || []).some(x => xp.indexOf(nn(x)) >= 0 || nn(x).indexOf(xp) >= 0)) why.push(`did not rule out ${e.exclude_player} (read ${JSON.stringify(s.exclude || [])})`);
+        const bad = legs.find(p => nn(p.name || p.label).indexOf(xp) >= 0);
+        if (bad) why.push(`the ruled-out player is in the answer: ${bad.label}`);
+      }
+      if (e.exclude_team) {
+        const bad = legs.find(p => String(p.team || '').toUpperCase() === e.exclude_team || ((p.kind === 'spread' || p.kind === 'ml') && String(p.name || '').toUpperCase() === e.exclude_team));
+        if (bad) why.push(`the ruled-out team is in the answer: ${bad.label}`);
+      }
+      // a named team's props are its own players (a same-game parlay keeps the whole game)
+      if (s.team && !(s.teams || []).length && s.intent !== 'sgp' && !R.widened) {
+        const bad = legs.find(p => p.kind === 'prop' && p.team && String(p.team).toUpperCase() !== String(s.team).toUpperCase() && !Object.values(s.tabbr || {}).some(v => (v || []).indexOf(String(p.team).toUpperCase()) >= 0));
+        if (bad) why.push(`another team's player on a ${s.team} ask: ${bad.label} (${bad.team})`);
+      }
       // a named team, player or same-game ask that comes back empty while the board has it
       const fut = B.filter(p => Date.parse(p.start) > Date.now() && (!(s.sports || []).length || s.sports.indexOf(p.sport) >= 0));
-      const hasTeam = (s.tabbr || (s.teams || []).length || s.team) && !s.player && fut.some(p => { const T = teamsFor(s, p.sport); return T.length && onT(p, T); });
+      const onTM = (p, T) => { const hay = ' ' + [p.team, p.matchup].join(' ').toUpperCase() + ' '; return T.some(x => new RegExp('[^A-Z]' + String(x).toUpperCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '[^A-Z]').test(hay)); };   // team field and matchup, never a player named Duke
+      const hasTeam = (s.tabbr || (s.teams || []).length || s.team) && !s.player && fut.some(p => { const T = teamsFor(s, p.sport); return T.length && onTM(p, T); });
       const hasPlayer = s.player && fut.some(p => String(p.name || p.label).toLowerCase().indexOf(String(s.player).toLowerCase()) >= 0);
       if (!legs.length && !R.clarify && !R.ambig && !R.depth && (hasTeam || hasPlayer)) why.push(`empty answer while the board has ${hasPlayer ? s.player : 'that team'}`);
       // an empty answer is a failure when today's boards have something that fits
