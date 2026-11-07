@@ -10362,10 +10362,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "37",
+  "profit": 0.8403,
+  "graded_at": "2026-11-07T04:53:41+00:00"
  },
  {
   "id": "nba-401909287-total-over",
@@ -10796,10 +10796,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "24-13",
+  "profit": -1.0,
+  "graded_at": "2026-11-07T04:53:42+00:00"
  },
  {
   "id": "nba-401909289-total-over",
@@ -11292,10 +11292,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "24-13",
+  "profit": -1.0,
+  "graded_at": "2026-11-07T04:53:42+00:00"
  },
  {
   "id": "nba-401909292-spread-home",
@@ -11819,10 +11819,10 @@
   },
   "pre_src": "market",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "193",
+  "profit": -1.0,
+  "graded_at": "2026-11-07T04:53:42+00:00"
  },
  {
   "id": "cbb-401920344-total-under",
@@ -12126,6 +12126,37 @@
    "period": 2,
    "clock": "0.0",
    "f": 0.5
+  },
+  "pre_src": "market",
+  "model": "live-v6",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "nba-401909295-total-over",
+  "sport": "nba",
+  "gid": "401909295",
+  "date": "2026-11-06",
+  "logged_at": "2026-11-07T04:53:38+00:00",
+  "matchup": "SA @ SAC",
+  "home": "SAC",
+  "away": "SA",
+  "label": "Over 231.5",
+  "kind": "total",
+  "side": "over",
+  "line": 231.5,
+  "price": -120,
+  "chance": 0.5959,
+  "implied": 0.5455,
+  "edge": 0.05,
+  "fair": -145,
+  "state": {
+   "score": "SA 82 - 61 SAC",
+   "period": 3,
+   "clock": "6:59",
+   "f": 0.395
   },
   "pre_src": "market",
   "model": "live-v6",
