@@ -14,7 +14,7 @@ has not started, so switching push on never floods old picks. Without the ONESIG
 secrets it does nothing but write data/push.json with no app id (the site then shows alerts as coming soon).
 Fail-soft: any error prints a warning and exits 0. Depends on requests only.
 """
-import json, os
+import json, os, re
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -45,11 +45,22 @@ def _when(s):
         return None
 
 
+def clean_key(raw):
+    """The OneSignal key out of whatever was pasted into the secret (11/7: the secret held 184 characters with
+    whitespace and extra text). App API keys (os_v2_app_...) and org keys (os_v2_org_...) go with "Key";
+    a legacy REST key (no os_v2 prefix) goes with "Basic"."""
+    m = re.search(r"os_v2_(?:app|org)_[A-Za-z0-9_-]+", "".join((raw or "").split()))   # a wrap can split the key
+    if m:
+        return m.group(0), "Key"
+    t = re.sub(r"^\s*(authorization\s*:)?\s*(key|basic|bearer)?\s+", "", raw or "", flags=re.I)
+    return "".join(t.split()), "Basic"
+
+
 def main():
     # a pasted secret can carry a line break or spaces inside it (11/7: the key failed as an invalid header);
     # ids and keys never contain whitespace, so drop all of it
     app = "".join(os.environ.get("ONESIGNAL_APP_ID", "").split())
-    key = "".join(os.environ.get("ONESIGNAL_API_KEY", "").split())
+    key, scheme = clean_key(os.environ.get("ONESIGNAL_API_KEY", ""))
     # the site reads the app id here (public, not a secret): empty until push is set up
     want = {"app_id": app or None}
     if _load(PUSH, None) != want:
@@ -76,7 +87,7 @@ def main():
                             {"field": "tag", "key": "min_conf", "relation": "<", "value": str(pct + 1)}]}
         try:
             res = requests.post("https://api.onesignal.com/notifications", json=body, timeout=20,
-                                headers={"Authorization": f"Key {key}", "Content-Type": "application/json"})
+                                headers={"Authorization": f"{scheme} {key}", "Content-Type": "application/json"})
             if res.status_code < 300:
                 sent.add(r["id"])
                 n += 1

@@ -2,7 +2,8 @@ name: Pick alerts test push (manual)
 # Sends one test notification to everyone who turned on Pick alerts on the site (OneSignal tag picks=1), so
 # the push path can be checked end to end without waiting for a real Onyx Pick (11/7). Run it from the
 # Actions tab: "Run workflow". Nothing is logged to any ledger. The log prints OneSignal's answer: an id
-# means it went out; "not subscribed" means nobody has turned alerts on yet.
+# means it went out; "not subscribed" means nobody has turned alerts on yet. The key is read exactly as
+# pick_alerts.py reads it (clean_key), and only its shape is logged, never the key.
 on:
   workflow_dispatch:
     inputs:
@@ -17,6 +18,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 3
     steps:
+      - uses: actions/checkout@v4
+      - run: pip install -q requests
       - name: Send the test push
         env:
           ONESIGNAL_APP_ID: ${{ secrets.ONESIGNAL_APP_ID }}
@@ -24,21 +27,25 @@ jobs:
           MSG: ${{ github.event.inputs.message }}
         run: |
           python3 - <<'EOF'
-          import json, os, urllib.request
+          import json, os, re, urllib.request
+          from pick_alerts import clean_key
           raw = os.environ.get("ONESIGNAL_API_KEY", "")
-          app, key = "".join(os.environ.get("ONESIGNAL_APP_ID", "").split()), "".join(raw.split())
+          app = "".join(os.environ.get("ONESIGNAL_APP_ID", "").split())
+          key, scheme = clean_key(raw)
           if not app or not key:
               raise SystemExit("ONESIGNAL_APP_ID / ONESIGNAL_API_KEY secrets are missing")
-          # the key's shape, never the key: whitespace removed, and whether it looks like an App API key
-          print(f"key: {len(key)} chars after removing {len(raw) - len(key)} whitespace chars; "
-                f"app key format: {key.startswith('os_v2_app_')}; non-ascii chars: {sum(1 for c in key if ord(c) > 126 or ord(c) < 33)}")
+          compact = "".join(raw.split())
+          kinds = re.findall(r"os_v2_(app|org)_", compact)
+          print(f"secret: {len(raw)} chars, {len(raw) - len(compact)} whitespace; os_v2 keys found: {kinds or 'none'}; "
+                f"using a {len(key)}-char {'App' if key.startswith('os_v2_app_') else 'Organization' if key.startswith('os_v2_org_') else 'legacy'} key with '{scheme}'; "
+                f"text before the key: {len(compact.split(key)[0]) if key in compact else '?'} chars; app id {len(app)} chars")
           body = {"app_id": app, "target_channel": "push",
                   "headings": {"en": "Onyx Pick alerts"},
                   "contents": {"en": os.environ.get("MSG") or "Test from Onyx Sports: Pick alerts are working."},
                   "url": "https://onyxjordan.github.io/onyx-baseball-fix/picks.html",
                   "filters": [{"field": "tag", "key": "picks", "relation": "=", "value": "1"}]}
           req = urllib.request.Request("https://api.onesignal.com/notifications", data=json.dumps(body).encode(),
-                                       headers={"Authorization": f"Key {key}", "Content-Type": "application/json"})
+                                       headers={"Authorization": f"{scheme} {key}", "Content-Type": "application/json"})
           try:
               with urllib.request.urlopen(req, timeout=20) as r:
                   print(r.status, r.read().decode()[:400])
