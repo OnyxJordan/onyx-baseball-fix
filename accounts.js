@@ -172,6 +172,47 @@
         err.code = code; err.status = e && e.status; throw err;
       });
   }
+  // ── signing in inside the installed app (11/7): on iPhone the emailed link always opens Safari, and Safari and
+  // the Home Screen app keep separate storage, so a link can never sign the app in. Two ways in, typed in the app:
+  //   - the 6-digit code in the sign-in email (once the Supabase Magic Link template shows {{ .Token }})
+  //   - an app code: Safari, signed in by the link, shows its session's one-time refresh token; the app trades it
+  //     for its own session and Safari drops its copy, so the two never share a rotating token.
+  function _take(j) {
+    S = {access_token: j.access_token, refresh_token: j.refresh_token, expires_at: Date.now() + (+j.expires_in || 3600) * 1000};
+    if (j.user) S.user = {id: j.user.id, email: j.user.email};
+    lsSet(SESSION, S); ERR = '';
+    return (S.user ? Promise.resolve(S.user) : who()).then(function () { emit(); sync(); every(); return true; });
+  }
+  function useCode(email, code) {
+    code = String(code || '').replace(/\s+/g, '');
+    if (!code) return Promise.reject(new Error('Enter the code'));
+    return config().then(function () {
+      if (/^\d{6,10}$/.test(code)) {
+        email = String(email || '').trim();
+        if (!email) throw new Error('Enter your email above first, then the code from the email');
+        return call('/auth/v1/verify', {method: 'POST', body: JSON.stringify({type: 'email', email: email, token: code})});
+      }
+      return call('/auth/v1/token?grant_type=refresh_token', {method: 'POST', body: JSON.stringify({refresh_token: code})});
+    }).then(_take).catch(function (e) {
+      if (e instanceof Error) throw e;
+      throw new Error(e && (e.status === 400 || e.status === 401 || e.status === 403)
+        ? 'That code did not work: it may be mistyped, used already or expired. Get a new one and try again.'
+        : 'Could not sign in right now' + (e && e.status ? ' (' + e.status + ')' : '') + '. Try again in a minute.');
+    });
+  }
+  // the code Safari shows for the app; handing it over signs Safari out here (no server logout: that would end
+  // the session the app is about to take)
+  function appCode() { return S && S.refresh_token ? S.refresh_token : null; }
+  function handOff() {
+    S = null;
+    try { localStorage.removeItem(SESSION); } catch (e) {}
+    KEYS.forEach(function (k) { try { _rm.call(localStorage, SNAP + k); } catch (e) {} });
+    emit();
+  }
+  var FROM_LINK = false, IV = null;
+  function every() { if (!IV) IV = setInterval(function () { if (!document.hidden) sync(); }, 60000); }
+  function fromLink() { return FROM_LINK; }
+
   function signOut() {
     var s = S;
     S = null;
@@ -188,16 +229,18 @@
   function state() {
     return {enabled: on(), signedIn: !!(S && S.user), email: S && S.user ? S.user.email : null, syncing: BUSY, last: LAST, error: ERR};
   }
-  window.OnyxAccounts = {ready: null, signIn: signIn, signOut: signOut, deleteAccount: deleteAccount, sync: sync, state: state};
+  window.OnyxAccounts = {ready: null, signIn: signIn, signOut: signOut, deleteAccount: deleteAccount, sync: sync, state: state,
+                         useCode: useCode, appCode: appCode, handOff: handOff, fromLink: fromLink};
   window.OnyxAccounts.ready = config().then(function () {
     if (!on()) { emit(); return state(); }
     var landed = readHash();
+    FROM_LINK = landed;
     S = S || lsGet(SESSION, null);
     var go = S ? (S.user && !landed ? Promise.resolve() : fresh().then(function (s) { return s ? who() : null; }).catch(function () {})) : Promise.resolve();
     return go.then(function () {
       if (landed && S && S.user) toast('Signed in as ' + S.user.email + '. Syncing your picks and players.');
       emit();
-      if (S) { sync(); setInterval(function () { if (!document.hidden) sync(); }, 60000); }
+      if (S) { sync(); every(); }
       return state();
     });
   });

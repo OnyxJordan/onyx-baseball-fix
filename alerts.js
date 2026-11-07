@@ -34,7 +34,12 @@
       s.onerror = function () { INITERR = 'the alert service did not load (check your connection or content blocker)'; ok(false); };
       document.head.appendChild(s);
       window.OneSignalDeferred.push(function (OneSignal) {
-        return OneSignal.init({appId: app, serviceWorkerPath: BASE.slice(1) + 'sw.js', serviceWorkerParam: {scope: BASE}})
+        // the dashboard is a Typical Site whose worker is /OneSignalSDKWorker.js at the domain root, which a
+        // GitHub Pages project site cannot serve; v16 uses our path only with serviceWorkerOverrideForTypical
+        // (it registers path + '/' + serviceWorkerPath). sw.js imports OneSignal's worker, so the site keeps
+        // one worker for offline and push.
+        return OneSignal.init({appId: app, serviceWorkerOverrideForTypical: true, path: BASE,
+                               serviceWorkerPath: 'sw.js', serviceWorkerParam: {scope: BASE}})
           .then(function () { ok(true); })
           .catch(function (e) { INITERR = 'the alert service would not start (' + String((e && e.message) || e || 'setup failed').slice(0, 120) + ')'; ok(false); });
       });
