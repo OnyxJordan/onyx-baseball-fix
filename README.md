@@ -1915,6 +1915,13 @@ so a link cannot sign the app in. The Account page now has **Have a code?**, whi
   own session (`grant_type=refresh_token`). Works once, like the link.
 `accounts.js`: `useCode`, `appCode`, `handOff`, `fromLink`.
 
+**Pull to refresh and the bottom bar (11/7).** In the installed app (`display-mode: standalone`; `?ptr=1` turns it
+on in a browser for testing), `ui.js` adds pull to refresh on every page: at the top, pull down past the line and
+let go, and the page reloads fresh (sw.js is network-first). Never from an open menu or My picks, a text field,
+a sideways swipe, or a box that is itself scrolled down. A page can define `window.onyxRefresh()` returning a
+promise to refresh in place instead. `anchorBar()` puts the bottom bar back at the screen bottom when iOS leaves
+the layout short after the keyboard or a system sheet (Jordan's screenshot: the bar two thirds down the screen).
+
 **Test push.** `.github/workflows/push_test.yml` ("Pick alerts test push", Run workflow) sends one notification
 to everyone with Pick alerts on (tag `picks=1`) with the repo's OneSignal secrets, and logs OneSignal's answer.
 

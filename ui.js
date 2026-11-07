@@ -59,6 +59,7 @@
   var OX_MARK = '<svg viewBox="0 0 100 137" fill="currentColor" aria-hidden="true"><path d="m39.041 109.178 18.493 9.863-33.972 17.945L0 124.384v-84.11l39.041-20.411zm21.918-81.37-18.493-9.863L76.438 0 100 12.603v84.246L60.959 117.26z"/></svg>';
 
   var I = {   // 16px stroke icons
+    refresh: '<path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9"/><path d="M13.5 2.5v3h-3"/>',
     bell: '<path d="M4 11V7a4 4 0 0 1 8 0v4l1.2 1.5H2.8z"/><path d="M6.5 14a1.6 1.6 0 0 0 3 0"/>',
     home: '<path d="M2 6.5L8 2l6 4.5V14H2z"/><path d="M6 14V9h4v5"/>',
     board: '<rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 6h6M5 9h6M5 12h3"/>',
@@ -353,6 +354,14 @@
     ':root{--sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px)}',
     '.oi{width:18px;height:18px;flex-shrink:0}',
     '.ogrid[hidden],.ores[hidden],.oact[hidden]{display:none!important}',
+    /* pull to refresh */
+    '.optr{position:fixed;left:50%;top:calc(var(--sat) + 8px);z-index:10100;display:flex;align-items:center;gap:8px;padding:9px 14px 9px 10px;border-radius:999px;',
+    'background:rgba(22,16,32,.94);border:1px solid rgba(176,56,249,.5);color:#eee;font:700 12px monospace;letter-spacing:.04em;pointer-events:none;',
+    'transform:translate(-50%,-80px);opacity:0;transition:transform .25s,opacity .2s;box-shadow:0 8px 24px rgba(0,0,0,.45)}',
+    '.optr-c{display:flex;width:22px;height:22px;align-items:center;justify-content:center;border-radius:50%;background:rgba(176,56,249,.25);color:#d795ff}',
+    '.optr-c .oi{width:15px;height:15px}.optr.ready .optr-c{background:#a24bff;color:#fff}',
+    '.optr.busy .optr-c{animation:optrSpin .8s linear infinite;background:#a24bff;color:#fff}',
+    '@keyframes optrSpin{to{transform:rotate(360deg)}}',
     /* bottom bar */
     '.obar{display:none}',
     '@media '+APP+'{',
@@ -565,6 +574,42 @@
     bar.appendChild(more);
     document.body.appendChild(bar);
   }
+  /* 11/7 (Jordan's screenshot: the bottom bar stuck two thirds of the way down the installed app, the page
+     showing beneath it). iOS in the Home Screen app can leave the page's layout height short after the
+     keyboard closes (Ask Onyx, the Account code box) or after a system sheet (the notification prompt), and
+     a bottom:0 bar then sits at that short bottom. After each of those moments: nudge the scroll so iOS
+     recomputes the layout, then measure where the bar ends against the visible screen and move it down by
+     the gap. While a text field has focus nothing is touched (the keyboard owns the bottom then). */
+  function anchorBar() {
+    var bar = document.querySelector('.obar');
+    if (!bar || getComputedStyle(bar).display === 'none') return;
+    var a = document.activeElement;
+    if (a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) && a.type !== 'button') { bar.style.transform = ''; return; }
+    var vv = window.visualViewport;
+    if (vv && vv.scale > 1.05) return;                       // pinch-zoomed: leave it
+    bar.style.transform = '';
+    var vis = vv ? vv.offsetTop + vv.height : innerHeight;
+    var gap = Math.round(vis - bar.getBoundingClientRect().bottom);
+    if (gap > 2 && gap < 700) bar.style.transform = 'translateY(' + gap + 'px)';
+  }
+  function reflowKick() {
+    var x = window.scrollX, y = window.scrollY;
+    try { window.scrollTo(x, y + 1); window.scrollTo(x, y); } catch (e) {}
+  }
+  var anchorT = [];
+  function anchorSoon() {
+    anchorT.forEach(clearTimeout);
+    anchorT = [60, 350, 900].map(function (ms, i) { return setTimeout(function () { if (i === 0) reflowKick(); anchorBar(); }, ms); });
+  }
+  function watchAnchor() {
+    document.addEventListener('focusout', anchorSoon, true);
+    document.addEventListener('focusin', anchorSoon, true);
+    ['resize', 'orientationchange', 'pageshow', 'focus'].forEach(function (e) { window.addEventListener(e, anchorSoon); });
+    document.addEventListener('visibilitychange', function () { if (!document.hidden) anchorSoon(); });
+    if (window.visualViewport) { visualViewport.addEventListener('resize', anchorSoon); visualViewport.addEventListener('scroll', anchorBar); }
+    window.addEventListener('scroll', function () { if (document.querySelector('.obar[style*="translate"]')) anchorBar(); }, {passive: true});
+    anchorSoon();
+  }
   function syncActive(tab) {
     current = tab;
     var inBar = S.bar.some(function (b) { return b[0] === tab; });
@@ -666,6 +711,66 @@
       if (dy > 90) close();
       y0 = null;
     });
+  }
+  /* pull to refresh (11/7, Jordan: "slide down to update, it often gets stuck ... on score pages it would be good
+     to update when we like"). The installed app has no browser pull-to-refresh, so: at the top of the page,
+     pull down past the line and let go, and the page reloads fresh (sw.js is network-first, so a reload is
+     always today's data). Only in the installed app (Safari and Chrome already have their own), never from
+     inside an open menu, a text field, a sideways scroller or a box that is itself scrolled down. A page can
+     set window.onyxRefresh = function () { return promise } to refresh in place instead of reloading. */
+  function pullToRefresh() {
+    var standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+    if (!standalone && !/[?&]ptr=1/.test(location.search)) return;
+    var LIMIT = 70, ind = el('div', 'optr', '<span class="optr-c">' + svg('refresh') + '</span><b>Pull to refresh</b>');
+    document.body.appendChild(ind);
+    var y0 = null, x0 = 0, dy = 0, on = false, busy = false;
+    function blocked(t) {
+      if (document.querySelector('.osheet.open, .otrk.open, .ox-modal.open') || document.body.style.overflow === 'hidden') return true;
+      if (t.closest && t.closest('input,select,textarea,[contenteditable],.optr')) return true;
+      for (var n = t; n && n !== document.body && n.nodeType === 1; n = n.parentNode) {
+        var cs = getComputedStyle(n);
+        if (/(auto|scroll)/.test(cs.overflowY) && n.scrollHeight > n.clientHeight + 2 && n.scrollTop > 0) return true;
+      }
+      return false;
+    }
+    function show(d) {
+      var pull = Math.min(d * 0.55, 110), ready = pull >= LIMIT;
+      ind.style.transform = 'translate(-50%,' + (pull - 56) + 'px)';
+      ind.style.opacity = Math.min(1, pull / 40);
+      ind.classList.toggle('ready', ready);
+      ind.querySelector('b').textContent = ready ? 'Release to refresh' : 'Pull to refresh';
+      ind.querySelector('.optr-c').style.transform = 'rotate(' + Math.round(pull * 3) + 'deg)';
+      return ready;
+    }
+    function reset() { ind.classList.remove('ready', 'busy'); ind.style.transform = ''; ind.style.opacity = ''; }
+    document.addEventListener('touchstart', function (e) {
+      if (busy || e.touches.length !== 1 || (window.scrollY || document.documentElement.scrollTop) > 2 || blocked(e.target)) { y0 = null; return; }
+      y0 = e.touches[0].clientY; x0 = e.touches[0].clientX; dy = 0; on = false;
+    }, {passive: true});
+    document.addEventListener('touchmove', function (e) {
+      if (y0 == null) return;
+      var t = e.touches[0], d = t.clientY - y0, dx = Math.abs(t.clientX - x0);
+      if (!on) {
+        if (d < 8) { if (d < -4 || dx > 12) y0 = null; return; }
+        if (dx > d) { y0 = null; return; }                  // a sideways swipe
+        on = true; ind.style.transition = 'none';
+      }
+      dy = d; show(dy);
+    }, {passive: true});
+    function end() {
+      if (y0 == null || !on) { y0 = null; return; }
+      y0 = null; ind.style.transition = '';
+      if (!show(dy)) { reset(); return; }
+      busy = true; buzz();
+      ind.querySelector('.optr-c').style.transform = '';
+      ind.classList.add('busy'); ind.style.transform = 'translate(-50%,' + (LIMIT - 56) + 'px)';
+      ind.querySelector('b').textContent = 'Updating...';
+      var soft = typeof window.onyxRefresh === 'function' ? window.onyxRefresh() : null;
+      if (soft && soft.then) soft.then(function () { busy = false; reset(); toast('Updated'); }, function () { location.reload(); });
+      else setTimeout(function () { location.reload(); }, 150);
+    }
+    document.addEventListener('touchend', end);
+    document.addEventListener('touchcancel', function () { y0 = null; reset(); });
   }
   function openSheet(focusSearch) {
     if (!sheet) return;
@@ -1106,7 +1211,7 @@
     fixSafeArea();
     window.addEventListener('orientationchange', function () { setTimeout(fixSafeArea, 300); });
     stdNav();
-    buildBar(); applyFold(); foldSoon();
+    buildBar(); applyFold(); foldSoon(); watchAnchor(); pullToRefresh();
     buildSheet();
     siteFooter();
     hook();
