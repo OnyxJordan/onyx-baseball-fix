@@ -2133,7 +2133,7 @@ function renderPlays() {
   const labLink = (M.open || M.open2 || M.record) ? `<p class="dim" style="font-size:12px;margin:14px 0 0">Lab: the experiments we are testing (trial lanes and their records) are on the <a href="scorecard.html" style="color:#d795ff">scorecard</a>. Not recommended until they pass.</p>` : '';
   el.innerHTML = pickHtml + body + labLink + lab;
   if (window.OnyxPicks) OnyxPicks.mount(document.getElementById('oxPicksPlays'), {sport: SD.sport, title: 'Onyx Picks · ' + esc(C.name || '')});
-  if (window.OnyxSides && KIND !== 'golf') OnyxSides.mount(document.getElementById('oxSidesPlays'), {sports: [SD.sport], title: 'Side and total of the day · ' + (C.name || '')});
+  if (window.OnyxSides && KIND !== 'golf') OnyxSides.mount(document.getElementById('oxSidesPlays'), {sports: [SD.sport], title: 'Top 3 sides and totals · ' + (C.name || '')});
 }
 // receptions at Onyx's opening price, on trial (sports_build.nfl_open_lane): logged only
 // while Onyx still shows the first price we saw for that line, graded off the box score

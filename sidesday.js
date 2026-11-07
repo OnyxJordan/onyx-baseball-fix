@@ -58,7 +58,7 @@
     var rec = o.n ? o.w + '-' + o.l + ' on games the model never saw, ' + (o.roi >= 0 ? '+' : '') + (100 * o.roi).toFixed(1) + '% at the opening price' : 'no held-out bets yet';
     return ({finalized: 'passed its test (' + rec + ')', 'not enough yet': 'not enough tested games yet (' + rec + ')', fails: 'failed its test (' + rec + ')'})[m.verdict] || (m.verdict + ' (' + rec + ')');
   }
-  function pick(rows, sport, kinds, LED) {
+  function pick(rows, sport, kinds, LED, N) {
     var now = Date.now(), d = siteDay(now);
     // only lines the model priced: the other side of a model-priced game borrows that game's reading
     // (both_sides gives it the complement chance); a market price with no model behind it is not a read
@@ -67,12 +67,17 @@
       return kinds.indexOf(p.kind) >= 0 && p.price != null && p.conf != null && p.price >= -250 && p.price <= 250
         && W[p.gid + '|' + p.kind] && Date.parse(p.start) > now && siteDay(Date.parse(p.start)) === d;
     }).map(function (p) { return p.why ? p : Object.assign({}, p, {why: W[p.gid + '|' + p.kind]}); });
-    if (!C.length) return null;
+    if (!C.length) return [];
     var ev = function (p) { return p.conf * (1 + pay(p.price)) - 1; };
     C.sort(function (a, b) { return ev(b) - ev(a) || b.conf - a.conf; });
-    var p = C[0], sp = split(p.why);
+    // 11/7 (Jordan: "top 3 per sport"): the best N by value, one per game, sides and totals together
+    var seen = {}, out = [];
+    for (var i = 0; i < C.length && out.length < (N || 1); i++) { if (seen[C[i].gid]) continue; seen[C[i].gid] = 1; out.push(one(C[i])); }
+    return out;
+    function one(p) { var sp = split(p.why);
     var isPick = (LED || []).some(function (r) { return r.sport === sport && String(r.gid) === String(p.gid) && r.label === p.label; });
     return {p: p, proj: sp.proj, factors: sp.factors, pick: isPick, imp: implied(p.price), edge: p.conf - implied(p.price), ev: ev(p), none: ev(p) <= 0 && p.conf - implied(p.price) <= 0};
+    }
   }
   function plain(x, test) {
     var p = x.p, e = Math.round(1000 * x.edge) / 10;
@@ -104,8 +109,8 @@
                         getJSON('data/picks/ledger.json').catch(function () { return []; })]).then(function (r) {
       var B = r[0], BT = r[1], LED = r[2], items = [], html = '';
       sports.forEach(function (x, i) {
-        var side = pick(B[i], x[0], ['spread', 'ml'], LED), tot = pick(B[i], x[0], ['total'], LED);
-        if (!side && !tot) {
+        var top = pick(B[i], x[0], ['spread', 'ml', 'total'], LED, opt.n || 3);
+        if (!top.length) {
           if (sports.length === 1 || B[i].some(function (p) { return p.kind === 'spread' || p.kind === 'total'; }))
             html += (sports.length > 1 ? '<div class="oxs-sp">' + esc(x[1]) + '</div>' : '') + '<div class="oxs-empty">' + (x[0] === 'nba'
               ? 'No NBA game model yet: the NBA model reads players and the 1st quarter, so its sides and totals are the market price, not a read.'
@@ -113,16 +118,15 @@
           return;
         }
         html += (sports.length > 1 ? '<div class="oxs-sp">' + esc(x[1]) + '</div>' : '') + '<div class="oxs-grid">'
-          + (side ? card(side, x[0], 'Side', BT) : '') + (tot ? card(tot, x[0], 'Total', BT) : '') + '</div>';
-        [side, tot].forEach(function (y) {
-          if (!y) return;
+          + top.map(function (y) { return card(y, x[0], y.p.kind === 'total' ? 'Total' : 'Side', BT); }).join('') + '</div>';
+        top.forEach(function (y) {
           items.push({id: x[0] + '|' + y.p.gid + '|' + y.p.label, sport: x[1], play: y.p.label, game: y.p.matchup, price: y.p.price,
                       chance: Math.round(1000 * y.p.conf) / 10, implied: Math.round(1000 * y.imp) / 10, edge: Math.round(1000 * y.edge) / 10,
                       proj: y.proj, factors: y.factors, status: y.pick ? 'Onyx Pick' : 'Projection', test: testTxt(BT, x[0], y.p.kind)});
         });
       });
       el.innerHTML = '<div class="oxs"><div class="oxs-h"><h3>' + esc(opt.title || 'Sides and totals of the day') + '</h3></div>'
-        + '<p class="oxs-sub">One side and one total per sport: the best value on today\'s games by our numbers, with every number shown. Each write-up is AI, written only from the numbers on its card. Projections unless marked Onyx Pick.</p>'
+        + '<p class="oxs-sub">The top 3 sides and totals per sport: the best value on today\'s games by our numbers, one per game, with every number shown. Each write-up is AI, written only from the numbers on its card. Projections unless marked Onyx Pick.</p>'
         + (html || '<div class="oxs-empty">No side or total on today\'s games is priced right now. They show here as lines post.</div>') + '</div>';
       if (!items.length) return;
       return aiUrl().then(function (u) {
