@@ -16,6 +16,8 @@
 <link rel="stylesheet" href="onyx.css">
 <script src="onyx.js" defer></script>
 <script src="ui.js" defer></script>
+<script src="live.js"></script>
+<script src="onyxpicks.js"></script>
 <style>
 body{background:#0c0c0c;color:#fff;margin:0}
 .sc{padding-top:28px;padding-bottom:8px}
@@ -71,10 +73,13 @@ body{background:#0c0c0c;color:#fff;margin:0}
   <section class="ox-wrap sc" id="scorecard">
     <a class="sc-back" href="home.html">‹ Onyx Sports</a> <a class="sc-back" href="how.html" style="margin-left:14px">How every model works ›</a>
     <div class="sc-h"><div><span class="ox-eyebrow">The scorecard</span><h1>Every lane.<br>Graded in public.</h1>
-      <p>Every way the site picks, in one place: what is tracked, what is on trial, what is only a lean, and why. Records come straight from the public ledgers and update with every build. Dollar figures are $10 a bet at the price logged.</p></div></div>
+      <p>Onyx Picks are the only picks we recommend: they are first, below. Everything after them is the lab: every experiment graded in public so it can earn its way to a pick, and none of it recommended until it does. Records come straight from the public ledgers and update with every build. Dollar figures are $10 a bet at the price logged.</p></div></div>
+    <div id="scPicks"></div>
+    <h2 style="margin:26px 0 6px;font-size:24px">The lab · not recommended</h2>
     <div class="sc-tiles" id="scTiles"></div>
     <div class="sc-grid" id="scLanes"><div class="empty">Loading the ledgers...</div></div>
-    <p class="note">Tracked: a graded pick, live because its model beat real Onyx prices in a season it was not tuned on. On trial: logged at Onyx's opening price, graded, but not yet proven. Lean: the model's read only, never graded, because its backtest did not beat Onyx.</p>
+    <p class="note">Lab · graded: an earlier lane with its own public record (these were called tracked picks before 11/6; only Onyx Picks are picks now). Lab · on trial: logged at the price shown, graded, not yet proven. Lean: the model's read only, never graded. A market becomes an Onyx Pick only by passing the picks test on games its model never saw.</p>
+    <div class="lvb" id="scLive" style="margin-top:18px"></div>
   </section>
 
   <section class="ox-wrap sc" id="lab">
@@ -210,7 +215,7 @@ const LANES = [
   {sport: 'MLB', name: "The Model's Ticket (2026)", status: 'closed', src: 'data/archive/mlb_2026/ticket_history.json', grade: gradeTickets, href: 'mlb-2026.html',
    what: 'One $10 home run parlay a day, locked at first pitch.', ev: 'Season closed 10/29.'},
 ];
-const ST = {tracked: 'Tracked', trial: 'On trial', lean: 'Lean only', closed: 'Season closed'};
+const ST = {tracked: 'Lab · graded', trial: 'Lab · on trial', lean: 'Lean only', closed: 'Season closed'};
 
 async function scorecard() {
   const el = document.getElementById('scLanes');
@@ -244,7 +249,7 @@ async function scorecard() {
   }).join('');
   const n = tot.w + tot.l;
   document.getElementById('scTiles').innerHTML = [
-    [nLive, 'Tracked lanes', 'g'], [nTrial, 'On trial', 'p'],
+    [nLive, 'Graded lab lanes', 'g'], [nTrial, 'On trial', 'p'],
     [`${tot.w}-${tot.l}`, 'Tracked + trial record', ''], [n ? money(10 * tot.units) : '-', 'At $10 a bet', tot.units >= 0 ? 'g' : 'r']
   ].map(([v, l, c]) => `<div class="sc-tile"><b class="${c}">${esc(v)}</b><span>${esc(l)}</span></div>`).join('');
 }
@@ -462,6 +467,12 @@ async function lab() {
   preset(PRESETS.findIndex(p => p.s === 'all' || LAB.sports[p.s]));
 }
 scorecard(); lab();
+// 11/6: Onyx Picks first (the one list, onyxpicks.js); the live projections record is the lab's
+if (window.OnyxPicks) OnyxPicks.mount(document.getElementById('scPicks'), {title: 'Onyx Picks'});
+if (window.OnyxLive) { OnyxLive.css(); OnyxLive.ledger().then(function (rows) {
+  var el = document.getElementById('scLive'); if (!el) return;
+  el.innerHTML = '<h3 style="margin:0 0 6px">Lab · live projections record</h3><p class="note" style="margin:0 0 8px">Every live value read our pages showed, logged once at the live line and graded. Projections on trial, not picks.</p>' + OnyxLive.recordHTML(rows, 'all');
+}); }
 </script>
 </body>
 </html>

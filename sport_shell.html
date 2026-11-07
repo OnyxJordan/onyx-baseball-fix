@@ -17,6 +17,7 @@
 <script src="saved.js"></script>
 <!-- live value (live.js): the Live block on Home and Games, today's spot plays, the tennis chain -->
 <script src="live.js"></script>
+<script src="onyxpicks.js"></script>
 <!-- team and player cards (cards.js, data/<sport>/cards/*.json): data-oxt / data-oxp open them -->
 <script src="cards.js" defer></script>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -2109,12 +2110,13 @@ function renderPlays() {
   const leans = proj.filter(k => !picked.has(k.sel));
   const leanHdr = (t, n) => `<div class="sec-hdr"><span class="sec-title">${t}</span><span class="sec-count">${n}</span></div>`;
   const mktNote = M.market ? `<div class="lab" style="margin-bottom:10px"><div class="eb">Onyx prices are down</div><p>Onyx's price feed is not answering right now, so these leans are priced against the market line until it returns. Leans only: nothing priced off the market line is tracked or graded. Check the price in the Onyx app before you bet.</p></div>` : '';
-  const pickHtml = mktNote + (M.status === 'live'
-    ? leanHdr('Tracked picks · graded', picks.length) + (picks.length ? playCards(picks) : '<div class="empty">No play clears the tracked screens on this slate. The best other plays are below.</div>')
-      + (leans.length ? leanHdr('More plays · model leans, not graded', leans.length) + playCards(leans) : '')
-    : leanHdr("Today's plays · best first", proj.length)
-      + `<p class="dim" style="font-size:12px;line-height:1.6;margin:0 0 10px">Where the model's chance beats Onyx's price, best value first, two per game at most. Confidence is the model's chance the play wins. ${M.status === 'trial' ? 'Plays marked On trial are graded in public at the opening price; the rest are leans, not graded.' : `Model leans: not graded until the ${esc(C.name)} model beats Onyx's prices in a backtest.`}</p>`
-      + (proj.length ? playCards(proj) : '<div class="empty">No line on this slate beats the Onyx price right now. Plays appear as Onyx posts lines.</div>'));
+  // 11/6 (Jordan: "lists of picks everywhere"): the one Onyx Picks card (onyxpicks.js, data/picks/ledger.json)
+  // first, then every model read as a projection. The old lanes' tracked and on-trial plays are projections
+  // here too; their graded records are the lab's, on the scorecard.
+  const projAll = picks.concat(leans).map(r => Object.assign({}, r, {trial: false, projected: true}));
+  const pickHtml = '<div id="oxPicksPlays"></div>' + mktNote + leanHdr('Top projections · not picks', projAll.length)
+      + `<p class="dim" style="font-size:12px;line-height:1.6;margin:0 0 10px">Where the model's chance beats the price, best value first, two per game at most. Our numbers, not picks: only the Onyx Picks card above is locked and graded.</p>`
+      + (projAll.length ? playCards(projAll) : '<div class="empty">No line on this slate beats the price right now. Projections appear as lines post.</div>');
   const rows = M.rows || [];
   const gameRows = rows.filter(r => r.kind), propRows = rows.filter(r => !r.kind);
   let body = (M.td || []).length ? tdTable(M.td.slice(0, 60), 'Touchdown scorers · anytime and first TD') : '';
@@ -2127,7 +2129,9 @@ function renderPlays() {
     ${projTable(shown.slice(0, 120))}`;
   }
   // what to bet first, then what is tracked, then the detail; how the model works last
-  el.innerHTML = pickHtml + openTrialSport(M.open) + openTrialSport(M.open2) + recordBlock(M.record) + body + lab;
+  const labLink = (M.open || M.open2 || M.record) ? `<p class="dim" style="font-size:12px;margin:14px 0 0">Lab: the experiments we are testing (trial lanes and their records) are on the <a href="scorecard.html" style="color:#d795ff">scorecard</a>. Not recommended until they pass.</p>` : '';
+  el.innerHTML = pickHtml + body + labLink + lab;
+  if (window.OnyxPicks) OnyxPicks.mount(document.getElementById('oxPicksPlays'), {sport: SD.sport, title: 'Onyx Picks · ' + esc(C.name || '')});
 }
 // receptions at Onyx's opening price, on trial (sports_build.nfl_open_lane): logged only
 // while Onyx still shows the first price we saw for that line, graded off the box score

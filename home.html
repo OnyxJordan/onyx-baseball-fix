@@ -21,6 +21,7 @@
 <script src="saved.js"></script>
 <script src="ask.js"></script>
 <script src="live.js"></script>
+<script src="onyxpicks.js"></script>
 <script>
 if ('serviceWorker' in navigator && location.protocol === 'https:') {
   addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
@@ -148,7 +149,7 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
       <div class="ox-hero-cta">
         <a class="ox-btn fill" href="#ask">Ask Onyx</a>
         <a class="ox-btn" href="picks.html">Onyx Picks</a>
-        <a class="ox-btn" href="#top10">Today's top 10</a>
+        <a class="ox-btn" href="#top10">Today's picks</a>
         <a class="ox-btn" href="#my">My Onyx</a>
         <a class="ox-btn" href="#sports">Choose a sport</a>
         <a class="ox-btn" href="#parlay">Tonight's parlay</a>
@@ -180,9 +181,11 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
 
   <!-- ── Top 10 plays of the day, every sport ─────────────────────── -->
   <section class="ox-wrap t10" id="top10">
-    <div class="my-h"><div><span class="ox-eyebrow">Today's top 10</span><h2>Our favorite<br>plays today.</h2>
-      <p>The ten plays our models like most on today's games across every sport, ranked by value: the return the play is expected to make at its Onyx price. Plus money is in play (-150 to +200), every play needs a real edge (2+ points over the price, +3% expected return) and a real chance to cash. Plays marked Onyx Pick are our picks, logged at their Onyx price and graded in public. The rest are projections, not picks.</p></div></div>
-    <a class="t10-picks" id="t10Picks" href="picks.html"><div><b>Onyx Picks</b><span id="t10PicksTxt">What we'd bet today, every pick logged before the game and graded in public.</span></div><em>See the card</em></a>
+    <div class="my-h"><div><span class="ox-eyebrow">Onyx Picks</span><h2>What we'd<br>bet today.</h2>
+      <p>Two things on this site, never mixed. <b>Onyx Picks</b> are what we would bet: markets that beat Onyx's real prices in testing, each locked once on game day at the price shown and graded in public. <b>Projections</b> are our numbers on everything else: worth reading, not picks.</p></div></div>
+    <div id="oxPicksHome"></div>
+    <div class="sec-hdr" style="margin-top:22px"><span class="sec-title">Top projections · not picks</span></div>
+    <p class="my-note" style="margin:0 0 10px">The model's best reads on today's games in markets that have not passed the picks test. Our numbers, not picks, never graded.</p>
     <div class="t10-list" id="t10List"><div class="my-empty">Loading today's plays...</div></div>
     <div class="my-note" id="t10Note"></div>
   </section>
@@ -190,12 +193,11 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
   <!-- ── Live: every game being played, our live numbers ─────────────── -->
   <section class="ox-wrap live" id="live">
     <div class="my-h"><div><span class="ox-eyebrow">Live now</span><h2>Every game in play.<br>Our live leans.</h2>
-      <p>Every game being played in the NFL, college football, NBA, college basketball, NHL and tennis, and the bets worth making on it: where Onyx had it before the start, the live line now, and our fair price. When the live line pays more than our fair price, it is marked Value. Teams, sides, totals and player props. Updates every 20 seconds.</p></div></div>
+      <p>Every game being played in the NFL, college football, NBA, college basketball, NHL and tennis, and our live projection on it: where the line started, the live line now, and our fair price. When the live line pays more than our fair price, it is marked Value: a projection, not a pick. Teams, sides, totals and player props. Updates every 20 seconds.</p></div></div>
     <div class="lv-best" id="lvBest"></div>
     <div class="ask-ex" id="lvTabs"></div>
     <div class="lv-list" id="lvList"><div class="my-empty">Loading the games in play...</div></div>
-    <div class="my-note" id="lvNote">Our live numbers start from Onyx's pregame line and move with the score and the clock: football and basketball as the rest of the game played out around the pregame spread and total, NHL as goals for the time left, tennis point by point through the games and sets still to play, from the current score and server. Player props add the player's live box line to our pregame projection for the time left. The live line comes from the in-game market, because Onyx's in-game prices are not in our data feed yet, so confirm the price in the Onyx app before you bet. Live value, not a tracked pick, untested against live prices: every value play is logged and graded in the live value record below, so it becomes provable.</div>
-    <div id="lvRec"></div>
+    <div class="my-note" id="lvNote">Our live numbers start from Onyx's pregame line and move with the score and the clock: football and basketball as the rest of the game played out around the pregame spread and total, NHL as goals for the time left, tennis point by point through the games and sets still to play, from the current score and server. Player props add the player's live box line to our pregame projection for the time left. The live line comes from the in-game market, because Onyx's in-game prices are not in our data feed yet, so confirm the price in the Onyx app before you bet. Live numbers are projections, not picks: a live market becomes an Onyx Pick only once it passes the same test against real prices as the pregame picks.</div>
   </section>
 
   <!-- ── My Onyx: your players, your bets, everything live ─────────── -->
@@ -516,7 +518,6 @@ async function lvLoad() {
   if (!window.OnyxLive) return;
   try { LV.games = lvSort(await OnyxLive.games()); } catch (e) { LV.games = LV.games || []; }
   lvRender();
-  OnyxLive.ledger().then(rows => { const el = document.getElementById('lvRec'); if (el) el.innerHTML = '<div class="lvb">' + OnyxLive.recordHTML(rows, 'all') + '</div>'; }).catch(() => {});
 }
 function lvInit() {
   if (window.OnyxLive) OnyxLive.css();
@@ -553,12 +554,13 @@ async function t10PicksBanner() {
     (w + l ? ' · record ' + w + '-' + l + ', ' + (u >= 0 ? '+' : '') + u.toFixed(2) + ' units' : ' · every pick logged before the game and graded in public');
 }
 async function top10() {
-  t10PicksBanner().catch(() => {});
+  if (window.OnyxPicks) OnyxPicks.mount(document.getElementById('oxPicksHome'), {title: 'Onyx Picks'});
   const el = document.getElementById('t10List');
   const files = await Promise.all(T10_SPORTS.map(([k]) => getJSON('data/' + k + '/top.json').catch(() => null)));
   const now = Date.now(), all = [];
   const EV = p => p.ev != null ? p.ev : p.conf * (1 + (p.price > 0 ? p.price / 100 : 100 / -p.price)) - 1;
   files.forEach((f, i) => (f && f.plays || []).forEach(p => {
+    if (p.pick) return;                                      // an Onyx Pick sits in the Onyx Picks card above, never here (11/6)
     const t = p.start ? Date.parse(p.start) : NaN;
     if (!isNaN(t) && t <= now) return;                       // started: no longer bettable at this price
     if (!isNaN(t) && !isToday(p.start)) return;              // today's games only: Sunday's play waits for Sunday
@@ -575,7 +577,7 @@ async function top10() {
   const TR0 = {tracked: 0, trial: 1, lean: 2};
   const TRr = p => p.tag === 'lean' ? (PROVEN.has(p.sport + '|' + (p.mkt || p.kind)) ? 2 : 3) : (TR0[p.tag] ?? 2);
   // Onyx Picks (logged in a market that passed its test, picks.py) lead, then the rest by proven lane and value
-  const RK = p => p.pick ? -1 : TRr(p);
+  const RK = p => TRr(p);
   all.sort((a, b) => RK(a) - RK(b) || EV(b) - EV(a) || b.conf - a.conf);
   const pick = [], nSport = {}, nGame = {}, nMkt = {};
   const mk = p => p.sport + '|' + (p.mkt || p.kind);
@@ -590,16 +592,16 @@ async function top10() {
     if (pick.length >= 10) break;
   }
   pick.sort((a, b) => RK(a) - RK(b) || EV(b) - EV(a) || b.conf - a.conf);
-  if (!pick.length) { el.innerHTML = '<div class="my-empty">No play on today\'s games clears the bar right now: games may have started, or the models are waiting on fresh Onyx prices. Ask Onyx below can still build from the rest of the week.</div>'; return; }
+  if (!pick.length) { el.innerHTML = '<div class="my-empty">No projection on today\'s games clears the bar right now: games may have started, or the models are waiting on fresh Onyx prices. Ask Onyx below can still build from the rest of the week.</div>'; return; }
   el.innerHTML = pick.map((p, i) => {
     const url = p.sel ? 'https://app.onyxodds.com/share?selection=' + encodeURIComponent(p.sel) + '&referrer=' + ONYX_REFERRER : p.href;
     return `<div class="t10-r${i < 3 ? ' top' : ''}${p.pick ? ' pk' : ''}"><div class="t10-n">${i + 1}</div>
       <div class="t10-w"><b>${esc(p.label)}</b><span>${esc(p.matchup)}${p.start ? ' · ' + esc(t10When(p.start)) : ''}</span></div>
       <div class="t10-c"><b>${Math.round(100 * p.conf)}%</b><small>TO HIT</small></div>
-      <div class="t10-f"><a class="t10-tag sp" href="${p.href}">${esc(p.lg)}</a>${p.pick ? '<a class="t10-tag pick" href="picks.html">Onyx Pick</a>' : '<span class="t10-tag proj">Projection</span>'}<span class="t10-tag val" title="Expected profit per $100 at this Onyx price">+$${Math.round(100 * EV(p))} value</span>
+      <div class="t10-f"><a class="t10-tag sp" href="${p.href}">${esc(p.lg)}</a><span class="t10-tag proj">Projection</span><span class="t10-tag val" title="Expected profit per $100 at this Onyx price">+$${Math.round(100 * EV(p))} value</span>
         <span class="t10-act"><a class="t10-bet" href="${url}" target="_blank" rel="noopener" onclick="track('top10_bet',{sport:'${p.sport}',rank:${i + 1}})">${fmtOdds(p.price)} ${p.src === 'market' ? 'market line' : 'on Onyx'}</a>${window.OnyxSaved ? OnyxSaved.btn(Object.assign({id: p.sel}, p)) : ''}</span></div></div>`;
   }).join('');
-  document.getElementById('t10Note').textContent = 'To hit is the chance the play wins by that sport\'s model, blended with the Onyx market. Value is the expected profit per $100 at that price over the long run. "Onyx Pick" plays are our picks: a market that beat Onyx\'s real prices on games its model never saw, logged once at its Onyx price before the start and graded on the Onyx Picks record. "Projection" plays are the model\'s read in a market that has not passed that test: shown, never graded, not picks.';
+  document.getElementById('t10Note').textContent = 'Projections: to hit is the chance the play wins by that sport\'s model, blended with the market. Value is the expected profit per $100 at that price over the long run. A projection is not a pick: only Onyx Picks, above, are locked and graded.';
 }
 
 // the strip under the hero, for every sport: today's games, priced plays, first start, graded models
