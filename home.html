@@ -111,6 +111,9 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
 .t10-picks em{font:800 12px monospace;font-style:normal;padding:7px 11px;border-radius:999px;background:linear-gradient(135deg,#b038f9,#635bff);white-space:nowrap}
 .t10-f .ox-save{flex:none}.t10-act{margin-left:auto;display:flex;gap:6px;align-items:center;flex:none}.t10-act .t10-bet{margin-left:0}
 .t10-bet{margin-left:auto;font:800 12px monospace;padding:6px 10px;border-radius:999px;background:linear-gradient(135deg,#b038f9,#635bff);color:#fff;text-decoration:none;white-space:nowrap}
+.ox-bell{display:inline-flex;align-items:center;gap:6px;font:700 12px monospace;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;color:#fff;padding:7px 11px;border-radius:999px;border:1px solid rgba(176,56,249,.6);background:rgba(176,56,249,.18)}
+.ox-bell svg{width:16px;height:16px;flex:none}
+@media (max-width:640px){.ox-bell span{display:none}.ox-bell{padding:7px}}
 </style>
 </head>
 <body class="ox-page">
@@ -131,6 +134,7 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
       <a class="ox-link" href="#live">Live</a>
       <a class="ox-link" href="#sports">Sports</a>
       <a class="ox-link" href="#record">Record</a>
+      <a class="ox-bell" href="#alerts" aria-label="Pick alerts"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span>Alerts</span></a>
       <a class="ox-btn sm" data-onyx="header" href="#" target="_blank" rel="noopener">Bet on Onyx</a>
     </nav>
   </div>
@@ -151,6 +155,7 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
       <div class="ox-hero-cta">
         <a class="ox-btn fill" href="#ask">Ask Onyx</a>
         <a class="ox-btn" href="picks.html">Onyx Picks</a>
+        <a class="ox-btn" href="#alerts">Pick alerts</a>
         <a class="ox-btn" href="#top10">Today's picks</a>
         <a class="ox-btn" href="#my">My Onyx</a>
         <a class="ox-btn" href="#sports">Choose a sport</a>
@@ -186,7 +191,7 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
     <div class="my-h"><div><span class="ox-eyebrow">Onyx Picks</span><h2>What we'd<br>bet today.</h2>
       <p>Two things on this site, never mixed. <b>Onyx Picks</b> are what we would bet: markets that beat Onyx's real prices in testing, each locked once on game day at the price shown and graded in public. <b>Projections</b> are our numbers on everything else: worth reading, not picks.</p></div></div>
     <div id="oxPicksHome"></div>
-    <div id="oxAlertsHome"></div>
+    <div id="alerts" style="scroll-margin-top:72px"><div id="oxAlertsHome"></div></div>
     <div class="sec-hdr" style="margin-top:22px"><span class="sec-title">Top projections · not picks</span></div>
     <p class="my-note" style="margin:0 0 10px">The model's best reads on today's games in markets that have not passed the picks test. Our numbers, not picks, never graded.</p>
     <div class="t10-list" id="t10List"><div class="my-empty">Loading today's plays...</div></div>
