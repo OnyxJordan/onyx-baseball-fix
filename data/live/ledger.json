@@ -12310,10 +12310,10 @@
   },
   "pre_src": "market",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "14-17",
+  "profit": 0.5714,
+  "graded_at": "2026-11-07T16:38:44+00:00"
  },
  {
   "id": "tennis-186593-spread-home",
@@ -12339,6 +12339,36 @@
    "need": 2
   },
   "pre_src": "market",
+  "model": "live-v6",
+  "result": "W",
+  "actual": "14-11",
+  "profit": 0.7407,
+  "graded_at": "2026-11-07T16:38:44+00:00"
+ },
+ {
+  "id": "tennis-186685-spread-away",
+  "sport": "tennis",
+  "gid": "186685",
+  "date": "2026-11-07",
+  "logged_at": "2026-11-07T15:13:46+00:00",
+  "matchup": "Gina Feistel vs Anna Blinkova",
+  "home": "Anna Blinkova",
+  "away": "Gina Feistel",
+  "label": "Gina Feistel +5.5 games",
+  "kind": "spread",
+  "side": "away",
+  "line": 5.5,
+  "price": -150,
+  "chance": 0.7002,
+  "implied": 0.6,
+  "edge": 0.1,
+  "fair": -235,
+  "state": {
+   "sets": "1-0",
+   "srv": "home",
+   "need": 2
+  },
+  "pre_src": null,
   "model": "live-v6",
   "result": null,
   "actual": null,
