@@ -79,6 +79,11 @@ import picks_lines as PL    # noqa: E402  data/picks/lines: the committed Onyx l
 MIN_N = 60
 MIN_ROI = 0.02      # a pass needs a real margin, not a hair above zero (11/3)
 TUNE_FLOOR, TUNE_N = -0.05, 30   # and must not have lost badly where its weights were chosen
+# 11/6 (Jordan): markets whose picks lock only at Onyx's opening price (picks.OPENER). Judged at the open
+# alone (60+ held-out bets, +2% or better, no loss worse than -5% at the open in the tuning months): a pick
+# logged at the opener is paid at the opener, so the close does not decide it. NBA points: held-out 30-23,
+# +9.4% at the open on 53 bets, +24% in the tuning months, -6.7% at the close (the line moves to our number).
+OPENER = set(getattr(PK, "OPENER", {("nba", "pts")}))   # picks.OPENER, the one list
 OUT = "data/picks/backtest.json"
 NAME = {"ml": "Moneyline", "spread": "Spread", "total": "Game total", "pts": "Points", "reb": "Rebounds", "ast": "Assists",
         "q1_total": "1st-quarter total", "rush_yds": "Rushing yards", "pass_att": "Pass attempts", "pass_yds": "Passing yards",
@@ -132,15 +137,22 @@ def tally(bets):
             "hit": round(w / (w + l_), 4) if w + l_ else None, "first": days[0] if days else None, "last": days[-1] if days else None}
 
 
-def judge(test_o, test_c, tune_o=None, tune_c=None):
+def judge(test_o, test_c, tune_o=None, tune_c=None, opener=False):
     n, ro, rc = test_o["n"], test_o["roi"], test_c["roi"]
     if not n:
         return "no bets", "the pick rule found no bet in the held-out period"
     if n < MIN_N:        # a small sample is "not enough yet", either way: never a pass, never a verdict
         return "not enough yet", f"only {n} held-out bets (needs {MIN_N}); ROI {ro * 100:+.1f}% at the open" + \
-            (f", {rc * 100:+.1f}% at the close" if rc is not None else "") + " so far"
+            (f", {rc * 100:+.1f}% at the close" if rc is not None else "") + " so far" + (" (locks at the opener: judged at the open)" if opener else "")
     if ro <= 0:
         return "fails", f"lost at the opening price ({ro * 100:+.1f}% on {n})"
+    if opener:       # locks only at Onyx's opening price (picks.OPENER): the open decides, the close is shown
+        if ro < MIN_ROI:
+            return "fails", f"too thin to trust at the open: {ro * 100:+.1f}% (needs {MIN_ROI * 100:+.0f}%)"
+        if tune_o and (tune_o.get("n") or 0) >= TUNE_N and tune_o.get("roi") is not None and tune_o["roi"] < TUNE_FLOOR:
+            return "fails", f"held-out {ro * 100:+.1f}% at the open, but lost {tune_o['roi'] * 100:+.1f}% at the open in its tuning months"
+        return "finalized", f"{test_o['w']}-{test_o['l']}{'-' + str(test_o['p']) if test_o['p'] else ''} at the open, ROI {ro * 100:+.1f}%; " \
+                            f"locks at the opener only (ROI {rc * 100:+.1f}% at the close)" if rc is not None else "locks at the opener only"
     if rc is None or test_c["n"] == 0:
         return "not enough yet", "no closing prices to check"
     if rc <= 0:
@@ -162,7 +174,9 @@ def market(sport, mkt, version, chance, source, split, rows_o, rows_c, held="", 
     res = {"sport": sport, "market": mkt, "name": NAME.get(mkt, mkt), "version": version, "chance": chance, "source": source,
            "held_out_from": split, "held_out": held or f"games on or after {split}",
            "tune": {"open": T(co, False), "close": T(cc, False)}, "test": {"open": T(co, True), "close": T(cc, True)}}
-    res["verdict"], res["why"] = judge(res["test"]["open"], res["test"]["close"], res["tune"]["open"], res["tune"]["close"])
+    res["verdict"], res["why"] = judge(res["test"]["open"], res["test"]["close"], res["tune"]["open"], res["tune"]["close"], (sport, mkt) in OPENER)
+    if (sport, mkt) in OPENER:
+        res["opener"] = True
     if notes:
         res["notes"] = notes
     t = res["test"]["open"]
@@ -515,7 +529,7 @@ def main():
         r = dict(r)
         r["carried"] = r.get("carried") or prev.get("built")
         if r.get("test") and r["verdict"] in ("finalized", "fails", "not enough yet"):   # its numbers are kept; today's rule judges them
-            v, w = judge(r["test"]["open"], r["test"]["close"], (r.get("tune") or {}).get("open"), (r.get("tune") or {}).get("close"))
+            v, w = judge(r["test"]["open"], r["test"]["close"], (r.get("tune") or {}).get("open"), (r.get("tune") or {}).get("close"), (r["sport"], r["market"]) in OPENER)
             if v != r["verdict"]:
                 r["verdict"], r["why"] = v, w
         res.append(r)

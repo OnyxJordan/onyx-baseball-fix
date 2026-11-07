@@ -229,15 +229,17 @@ def run(rows, slate, props, today, jumps, fshots=None, games_log=None, tg=None, 
     first_run = not (DATA / OPENING).exists()
     O = load(OPENING, {})
     if O.get("date") != today:
-        O = {"date": today, "q1": {}, "fb": {}, "ast": {}}
+        O = {"date": today, "q1": {}, "fb": {}, "ast": {}, "pts": {}}
     ast_first = "ast" not in O     # the assists lane's first look today (open-v3): lines already up are baselines
     O.setdefault("ast", {})
+    pts_first = "pts" not in O     # 11/6: points openings (picks.OPENER locks NBA points only at the opener)
+    O.setdefault("pts", {})
     book = (props or {}).get("players") or {}
     by_optic = {v.get("optic_pid"): v for v in book.values() if v.get("optic_pid")}
 
-    def ast_line(r):
+    def ast_line(r, stat="ast"):
         rec = (by_optic.get(r["pid"]) if source == "optic" else None) or book.get(nk(r["name"])) or {}
-        m = rec.get("ast") or {}
+        m = rec.get(stat) or {}
         # 11/5: an opening is an Onyx price only; a market-line fallback price (src "market") is never one
         return m if None not in (m.get("line"), m.get("over"), m.get("under")) and m.get("src", "onyx") == "onyx" else None
     pg = (props or {}).get("games") or {}
@@ -256,6 +258,10 @@ def run(rows, slate, props, today, jumps, fshots=None, games_log=None, tg=None, 
         if m and key not in O["ast"]:
             O["ast"][key] = {"line": m["line"], "over": m["over"], "under": m["under"], "ts": ts,
                              **({"baseline": True} if first_run or ast_first else {})}
+        mp = ast_line(r, "pts") if not r.get("out") else None
+        if mp and key not in O["pts"]:
+            O["pts"][key] = {"line": mp["line"], "over": mp["over"], "under": mp["under"], "ts": ts,
+                             **({"baseline": True} if first_run or pts_first else {})}
     save(OPENING, O, indent=1)
     ah, allowed, lg_allowed = _ast_inputs(games_log, tg, today) if games_log and tg else ({}, {}, None)
 
