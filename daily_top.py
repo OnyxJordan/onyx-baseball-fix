@@ -112,7 +112,19 @@ def ev(price, prob):
     return prob * dec - 1
 
 
-def ok(r):
+# 11/6 (Jordan): a market can carry its own tuned rule, chosen on its tuning months by tools/picks_tune.py and
+# judged on held-out games by tools/picks_backtest.py like every other. NBA 1st-half totals, unders only, edge
+# 4 to 16 points: tuning +22.1% / +22.8% at the open / close on 90 bets, held out +22.3% / +8.1% on 63.
+MKT_RULE = {("nba", "h1_total"): {"price": (-150, 200), "min_edge": 0.04, "max_edge": 0.16, "min_ev": 0.0, "min_conf": 0.40, "side": "under"}}
+
+
+def ok(r, sport=None, mkt=None):
+    R = MKT_RULE.get((sport, mkt or r.get("mkt")))
+    if R:
+        return (r.get("price") is not None and r.get("prob") is not None and r.get("edge") is not None
+                and R["price"][0] <= r["price"] <= R["price"][1] and R["min_edge"] <= r["edge"] <= R["max_edge"]
+                and r["prob"] >= R["min_conf"] and ev(r["price"], r["prob"]) >= R["min_ev"]
+                and (R.get("side", "any") == "any" or r.get("side") == R["side"]))
     return (r.get("price") is not None and r.get("prob") is not None and r.get("edge") is not None
             and PRICE[0] <= r["price"] <= PRICE[1] and MIN_EDGE <= r["edge"] <= MAX_EDGE and r["prob"] >= MIN_CONF
             and ev(r["price"], r["prob"]) >= MIN_EV)

@@ -70,12 +70,12 @@ def nba_h1():
                 continue
             pov = 1 - NormalDist(tot * 0.505, 18).cdf(ln)
             for side, p, price in (("over", pov, po), ("under", 1 - pov, pu)):
-                dst.append(PB.cand(d, (fid, "h1"), side, p, price, (g["h1"] > ln) == (side == "over")))
+                dst.append(PB.cand(d, (fid, "h1"), side, p, price, (g["h1"] > ln) == (side == "over"), mk=("nba", "h1_total")))
     # the 50.5% share and sd 18 were tuned on Oct-Jan 2025-26 (README, qhCard): held out from Feb, as the 1Q total
     return [PB.market("nba", "h1_total", "h1 0.505/18", "50.5% of Onyx's game total, normal sd 18 (nba_build)",
                       "Onyx lines (data/picks/lines/nba.json), ESPN official 1st-half line scores", "2026-02-01", ro, rc,
                       held="Feb 2026 on: Feb to Jun 2026 and 2026-27 to date (the 50.5% share and sd 18 were tuned on Oct 2025 to Jan 2026)",
-                      notes="On the board for Ask Onyx only: nba_build never puts it in the Top 10 and picks.py cannot grade it.")]
+                      notes="Its own tuned rule (daily_top.MKT_RULE, 11/6): unders only, edge 4 to 16 points, price -150 to +200.")]
 
 
 # ── tennis games markets (tennis_model v2) ────────────────────────────────────────

@@ -598,6 +598,10 @@ def write_top(rows, games, today_rows, open_led, today, jumps=None, fshots=None)
                          "line": g["h1_total"], "price": price, "prob": p, "edge": p - OL.implied(price), "sel": sel,
                          "gid": g["gid"], "matchup": f"{g['away']} @ {g['home']}", "start": g.get("start"), **({"src": "market"} if not sel else {})}
                     board.append(DT.entry("nba", c, tag(sel) if sel else "lean"))
+                    # 11/6: 1st-half unders have their own tuned rule (daily_top.MKT_RULE); one that passes it reaches
+                    # the pick list, so picks.py logs it once the market is finalized for this read (picks.H1_SIG)
+                    if DT.ok(c, "nba", "h1_total"):
+                        out.append(DT.entry("nba", c, tag(sel) if sel else "lean"))
         try:
             fbp = OL.fb_probs(rows, g, jumps or {}, fshots)
         except Exception:

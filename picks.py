@@ -108,7 +108,7 @@ def payout(price):
 
 
 def gradable(sport, mkt):
-    return sport in PATH and (mkt in GAME or mkt == "q1_total" and sport == "nba" or mkt in BOX.get(sport, {}))
+    return sport in PATH and (mkt in GAME or mkt in ("q1_total", "h1_total") and sport == "nba" or mkt in BOX.get(sport, {}))
 
 
 # ── which markets are finalized ─────────────────────────────────────────────
@@ -121,7 +121,12 @@ def q1_signature(P):
     return f"q1 {P['q1']}/{P['q1_sd']}"
 
 
+H1_SIG = "h1 0.505/18"       # nba_build's 1st-half read (50.5% of the game total, sd 18), as tools/picks_replays records it
+
+
 def live_version(sport, mkt):
+    if (sport, mkt) == ("nba", "h1_total"):
+        return H1_SIG
     if (sport, mkt) == ("nba", "q1_total"):
         try:
             OL = sys.modules.get("open_lanes") or importlib.import_module("open_lanes")
@@ -352,6 +357,14 @@ def resolve(r, cache, now):
             act = sum(float((c.get("linescores") or [{}])[0].get("displayValue", (c.get("linescores") or [{}])[0].get("value")))
                       for c in side.values())
         except (TypeError, ValueError, IndexError):
+            return None
+    elif m == "h1_total":         # the 1st and 2nd quarters (11/6)
+        try:
+            act = sum(sum(float(q.get("displayValue", q.get("value"))) for q in (c.get("linescores") or [])[:2])
+                      for c in side.values())
+            if any(len(c.get("linescores") or []) < 2 for c in side.values()):
+                return None
+        except (TypeError, ValueError):
             return None
     elif m in ("ml", "spread"):
         me = _abbr(sport, r.get("name"))
