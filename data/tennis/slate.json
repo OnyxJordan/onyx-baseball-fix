@@ -2627,7 +2627,7 @@
      "id": "186504",
      "start": "2026-11-07T13:40Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Semifinal",
      "draw": "Men's Singles",
      "court": "Court Central",
@@ -2639,7 +2639,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        5
+        5,
+        1
        ],
        "serve": false
       },
@@ -2650,9 +2651,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        6
+        7,
+        0
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -2835,8 +2837,8 @@
     {
      "id": "187446",
      "start": "2026-11-07T11:30Z",
-     "state": "pre",
-     "detail": "11/7 - 6:30 AM EST",
+     "state": "post",
+     "detail": "Final",
      "round": "Qualifying 1st Round",
      "draw": "Men's Singles",
      "court": "Court 1",
@@ -2846,8 +2848,11 @@
        "short": "I. Montes-De La Torre",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
-       "win": false,
-       "sets": [],
+       "win": true,
+       "sets": [
+        7,
+        6
+       ],
        "serve": false
       },
       {
@@ -2856,7 +2861,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/bih.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        5,
+        3
+       ],
        "serve": false
       }
      ]
@@ -6898,9 +6906,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        3
+        4
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Magda Linette",
@@ -6909,7 +6917,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        0
+        1
        ],
        "serve": false
       }
@@ -9466,5 +9474,5 @@
    ]
   }
  ],
- "fetched": "2026-11-07T14:37:31+00:00"
+ "fetched": "2026-11-07T14:44:12+00:00"
 }
