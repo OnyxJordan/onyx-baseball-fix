@@ -22,6 +22,7 @@
 <script src="ask.js"></script>
 <script src="live.js"></script>
 <script src="onyxpicks.js"></script>
+<script src="sidesday.js"></script>
 <script>
 if ('serviceWorker' in navigator && location.protocol === 'https:') {
   addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
@@ -189,6 +190,9 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
     <div class="t10-list" id="t10List"><div class="my-empty">Loading today's plays...</div></div>
     <div class="my-note" id="t10Note"></div>
   </section>
+
+  <!-- ── Sides and totals of the day, every sport, with an AI write-up (11/6) ── -->
+  <section class="ox-wrap" id="sides"><div id="oxSides"></div></section>
 
   <!-- ── Live: every game being played, our live numbers ─────────────── -->
   <section class="ox-wrap live" id="live">
@@ -555,6 +559,7 @@ async function t10PicksBanner() {
 }
 async function top10() {
   if (window.OnyxPicks) OnyxPicks.mount(document.getElementById('oxPicksHome'), {title: 'Onyx Picks'});
+  if (window.OnyxSides) OnyxSides.mount(document.getElementById('oxSides'));
   const el = document.getElementById('t10List');
   const files = await Promise.all(T10_SPORTS.map(([k]) => getJSON('data/' + k + '/top.json').catch(() => null)));
   const now = Date.now(), all = [];

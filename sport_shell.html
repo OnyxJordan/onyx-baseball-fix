@@ -18,6 +18,7 @@
 <!-- live value (live.js): the Live block on Home and Games, today's spot plays, the tennis chain -->
 <script src="live.js"></script>
 <script src="onyxpicks.js"></script>
+<script src="sidesday.js"></script>
 <!-- team and player cards (cards.js, data/<sport>/cards/*.json): data-oxt / data-oxp open them -->
 <script src="cards.js" defer></script>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -2114,7 +2115,7 @@ function renderPlays() {
   // first, then every model read as a projection. The old lanes' tracked and on-trial plays are projections
   // here too; their graded records are the lab's, on the scorecard.
   const projAll = picks.concat(leans).map(r => Object.assign({}, r, {trial: false, projected: true}));
-  const pickHtml = '<div id="oxPicksPlays"></div>' + mktNote + leanHdr('Top projections · not picks', projAll.length)
+  const pickHtml = '<div id="oxPicksPlays"></div><div id="oxSidesPlays"></div>' + mktNote + leanHdr('Top projections · not picks', projAll.length)
       + `<p class="dim" style="font-size:12px;line-height:1.6;margin:0 0 10px">Where the model's chance beats the price, best value first, two per game at most. Our numbers, not picks: only the Onyx Picks card above is locked and graded.</p>`
       + (projAll.length ? playCards(projAll) : '<div class="empty">No line on this slate beats the price right now. Projections appear as lines post.</div>');
   const rows = M.rows || [];
@@ -2132,6 +2133,7 @@ function renderPlays() {
   const labLink = (M.open || M.open2 || M.record) ? `<p class="dim" style="font-size:12px;margin:14px 0 0">Lab: the experiments we are testing (trial lanes and their records) are on the <a href="scorecard.html" style="color:#d795ff">scorecard</a>. Not recommended until they pass.</p>` : '';
   el.innerHTML = pickHtml + body + labLink + lab;
   if (window.OnyxPicks) OnyxPicks.mount(document.getElementById('oxPicksPlays'), {sport: SD.sport, title: 'Onyx Picks · ' + esc(C.name || '')});
+  if (window.OnyxSides && KIND !== 'golf') OnyxSides.mount(document.getElementById('oxSidesPlays'), {sports: [SD.sport], title: 'Side and total of the day · ' + (C.name || '')});
 }
 // receptions at Onyx's opening price, on trial (sports_build.nfl_open_lane): logged only
 // while Onyx still shows the first price we saw for that line, graded off the box score

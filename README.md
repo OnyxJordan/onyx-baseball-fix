@@ -1978,6 +1978,16 @@ or Onyx Picks.
 
 ## Onyx Picks (11/2)
 
+**Sides and totals of the day (11/6, `sidesday.js`).** Jordan: "a section with an AI writeup for picks of the day
+on sides and totals, be transparent on the % and why we're picking it in every sport." On the home page (every
+sport) and each sport's Plays tab: the best-value side and total on today's games the model priced (the other side
+of a model-priced game borrows its reading; a bare market price is not a read, so NBA, with no game model, says so).
+Each card shows our chance, the chance the price implies, the edge, the model's projected score, what moved it, the
+market's record in testing (data/picks/backtest.json) and Onyx Pick or Projection; "No value today, the closest" when
+nothing has an edge. The write-up comes from the relay's `{writeup}` mode (ai/worker.js), told to use only the
+card's numbers, cached at the edge for 6 hours by the cards' content; without the relay, a write-up built from the
+same numbers.
+
 **Opener markets (11/6, NBA points).** Jordan: picks should reach main markets and player props. NBA points
 wins at Onyx's opening price and loses by the close (held-out 30-23, +9.4% at the open on 53 bets, +24% in the
 tuning months, -6.7% at the close: the line moves to our number). `picks.OPENER` lists markets that lock only
