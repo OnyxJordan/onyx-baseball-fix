@@ -23,6 +23,7 @@
 <script src="live.js"></script>
 <script src="onyxpicks.js"></script>
 <script src="sidesday.js"></script>
+<script src="alerts.js"></script>
 <script>
 if ('serviceWorker' in navigator && location.protocol === 'https:') {
   addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
@@ -185,6 +186,7 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
     <div class="my-h"><div><span class="ox-eyebrow">Onyx Picks</span><h2>What we'd<br>bet today.</h2>
       <p>Two things on this site, never mixed. <b>Onyx Picks</b> are what we would bet: markets that beat Onyx's real prices in testing, each locked once on game day at the price shown and graded in public. <b>Projections</b> are our numbers on everything else: worth reading, not picks.</p></div></div>
     <div id="oxPicksHome"></div>
+    <div id="oxAlertsHome"></div>
     <div class="sec-hdr" style="margin-top:22px"><span class="sec-title">Top projections · not picks</span></div>
     <p class="my-note" style="margin:0 0 10px">The model's best reads on today's games in markets that have not passed the picks test. Our numbers, not picks, never graded.</p>
     <div class="t10-list" id="t10List"><div class="my-empty">Loading today's plays...</div></div>
@@ -560,6 +562,7 @@ async function t10PicksBanner() {
 async function top10() {
   if (window.OnyxPicks) OnyxPicks.mount(document.getElementById('oxPicksHome'), {title: 'Onyx Picks'});
   if (window.OnyxSides) OnyxSides.mount(document.getElementById('oxSides'));
+  if (window.OnyxAlerts) OnyxAlerts.mount(document.getElementById('oxAlertsHome'));
   const el = document.getElementById('t10List');
   const files = await Promise.all(T10_SPORTS.map(([k]) => getJSON('data/' + k + '/top.json').catch(() => null)));
   const now = Date.now(), all = [];

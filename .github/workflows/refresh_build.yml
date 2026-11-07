@@ -139,6 +139,16 @@ jobs:
         run: python3 lines_status.py
         continue-on-error: true
         timeout-minutes: 4
+      # Pick alerts (pick_alerts.py, 11/7): a OneSignal push for each Onyx Pick just logged, to subscribers
+      # whose chosen X is at or below its chance; writes data/push.json (the public app id) for alerts.js.
+      # A no-op until the ONESIGNAL_APP_ID / ONESIGNAL_API_KEY secrets exist. Fail-soft.
+      - name: Pick alerts
+        env:
+          ONESIGNAL_APP_ID: ${{ secrets.ONESIGNAL_APP_ID }}
+          ONESIGNAL_API_KEY: ${{ secrets.ONESIGNAL_API_KEY }}
+        run: python3 pick_alerts.py
+        continue-on-error: true
+        timeout-minutes: 3
       # ROADMAP Phase 2, finally built. Blocks the commit when the page is
       # structurally broken, a batting slot is duplicated or missing, or a
       # graded ledger shrank. A non-zero exit here means yesterday's page stays

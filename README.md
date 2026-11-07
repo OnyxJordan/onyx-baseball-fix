@@ -1117,22 +1117,27 @@ single/parlay/fallback), `parlay_add`, `tab_view`. GA's "tag not detected" banne
 permanent false negative (it checks the domain root, which 404s) — ignore it; Realtime
 is the truth.
 
-## Push notifications (dormant — decide, then wire or delete)
+## Push notifications: Onyx Pick alerts (11/7)
 
-Closed-app push for HRs and finals is fully built but **switched off**:
+Jordan: "an alerts system for at the open that sends push notifications when it's over X%, and track that pick."
+His calls: **every alert is an Onyx Pick** (already logged in data/picks/ledger.json at the price shown when it
+qualified, so it is on the graded record; never a second tracked list), sent through **OneSignal**.
 
-- `notify_watch.yml` runs every 30 min during game hours (17-23 and 0-6 UTC) and calls
-  `push_watch.py`, which polls the MLB Stats API every ~45s for a ~28-minute window.
-- `push_watch.py` exits immediately unless `ONESIGNAL_APP_ID` and `ONESIGNAL_API_KEY`
-  are set, so today every scheduled run is a near-instant no-op.
-- `shell.html` has `const ONESIGNAL_APP_ID = ''` (line ~3281). While it is empty the
-  client SDK never loads, so **no browser can subscribe** even if the secrets existed.
+- `alerts.js` (home page under Onyx Picks, picks.html): "Pick alerts" with X = 55 / 60 / 65%. Turning it on asks
+  for permission and sets OneSignal tags `picks=1`, `min_conf=X`. It reads the public app id from `data/push.json`
+  and says "coming soon" while that is empty. iPhone needs the PWA on the Home Screen (Apple's rule for web push).
+- `pick_alerts.py` (refresh and daily builds, after picks are logged; requests only, fail-soft): one push per new
+  Onyx Pick ("New Onyx Pick", the pick, price, chance, league), filtered to `picks=1` and `min_conf` below the pick's
+  chance + 1; at most once per pick (`data/picks/alerted.json`), only picks logged in the last 3 hours whose game
+  has not started, so switching push on never floods old picks. It writes `data/push.json` from the secret.
+- `sw.js` already imports OneSignal's worker.
 
-To turn it on: create a free OneSignal Web Push app pointed at the live site URL, paste
-the Web App ID into `shell.html`, and add the two repo secrets. In-app bell toggles map
-to OneSignal tags (`hr`, `final`). iPhone users must install the PWA first (iOS requires
-an installed PWA for web push). To turn it off for good, delete `notify_watch.yml` and
-`push_watch.py` — leaving it half-wired is what makes it look broken.
+**To switch it on** (one time): create a free OneSignal Web Push app with site URL
+`https://onyxjordan.github.io/onyx-baseball-fix/`, then add repo secrets `ONESIGNAL_APP_ID` (the App ID) and
+`ONESIGNAL_API_KEY` (the App API key, REST). The next build writes data/push.json and the card turns on.
+
+The MLB HR/final watcher (`notify_watch.yml`, `push_watch.py`, `shell.html`'s own `ONESIGNAL_APP_ID`) rides the
+same secrets; shell.html's constant is still empty, so MLB in-page toggles stay off until it is pasted there.
 
 ## NBA sister site (`nba.html`)
 
