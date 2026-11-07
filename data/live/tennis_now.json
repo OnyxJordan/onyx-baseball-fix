@@ -613,5 +613,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186643-ml-away",
+  "sport": "tennis",
+  "gid": "186643",
+  "date": "2026-11-06",
+  "logged_at": "2026-11-07T08:49:34+00:00",
+  "matchup": "Alexandra Eala vs Maria Sakkari",
+  "home": "Maria Sakkari",
+  "away": "Alexandra Eala",
+  "label": "Alexandra Eala to win",
+  "kind": "ml",
+  "side": "away",
+  "line": null,
+  "price": -164,
+  "chance": 0.6587,
+  "implied": 0.6212,
+  "edge": 0.038,
+  "fair": -195,
+  "state": {
+   "sets": "3-2",
+   "srv": "away",
+   "need": 2
+  },
+  "pre_src": "market",
+  "model": "live-v6",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
