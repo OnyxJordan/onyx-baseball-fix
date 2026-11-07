@@ -18,6 +18,7 @@
 <!-- live value (live.js): the Live block on Home and Games, shared with every sport page -->
 <script src="live.js"></script>
 <script src="onyxpicks.js"></script>
+<script src="sidesday.js"></script>
 <!-- team cards (cards.js, data/nba/cards/*.json): data-oxt opens one -->
 <script src="cards.js" defer></script>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -753,6 +754,7 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
 <!-- ═══ PLAYS: recommended plays, MLB Edge Plays style ═══════════ -->
 <div class="pane" id="pane-plays"><div class="nba-wrap">
   <div id="plPicks"></div>
+  <div id="plSides"></div>
   <div id="plTop"></div>
   <div id="plTrack"></div>
   <div class="pl-banner" id="plBanner"></div>
@@ -1513,6 +1515,7 @@ function renderPlays() {
   const W = near.slice(0, 8);
   document.getElementById('plTop').innerHTML = topPlays();
   if (window.OnyxPicks) OnyxPicks.mount(document.getElementById('plPicks'), {sport: 'nba', title: 'Onyx Picks · NBA'});
+  if (window.OnyxSides && !window._plSides) { window._plSides = 1; OnyxSides.mount(document.getElementById('plSides'), {sports: ['nba'], title: 'Side and total of the day · NBA'}); }
   document.getElementById('plTrack').innerHTML = trackStrip();
   document.getElementById('plFb').innerHTML = fbLeans();
   document.getElementById('plOpen').innerHTML = openTrial();

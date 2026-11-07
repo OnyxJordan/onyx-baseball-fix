@@ -59,6 +59,20 @@ const EXPLAIN = {
   properties: { text: { type: "string" } },
 };
 
+// 11/6 (Jordan): "an AI writeup for picks of the day on sides and totals, be transparent on the % and why".
+// POST {writeup: {items: [{id, sport, play, game, price, chance, implied, edge, proj, factors, status, test}]}}
+// -> {items: [{id, text}]}, cached at the edge for the day by the items' content, so every visitor reads the same
+const WRITEUP = {
+  type: "object", additionalProperties: false, required: ["items"],
+  properties: { items: { type: "array", items: { type: "object", additionalProperties: false, required: ["id", "text"],
+    properties: { id: { type: "string" }, text: { type: "string" } } } } },
+};
+const WRITEUP_SYSTEM = `You write the "sides and totals of the day" notes for Onyx Sports. For each item, two or three short sentences in plain language, like a sharp friend explaining the read, using ONLY the numbers given:
+- chance: our chance the play wins (the sport's model blended with the market price); implied: the chance the price itself implies; edge: chance minus implied, in points.
+- proj: the model's projected score or margin; factors: what moved the model (a backup quarterback, ratings, Elo); test: how this market has done against real prices in testing.
+- status "Onyx Pick" means it is on the graded public record; "Projection" means it is our read, not a pick. Say which it is.
+Lead with why the model likes it, cite the chance against the implied chance, and be honest when the edge is small or negative or the market has not passed its test. Never invent stats, injuries, news or players. Never promise a win. No em dashes. Never name a sportsbook other than Onyx. Return one entry per item with its id.`;
+
 const SYSTEM = `You turn a sports bettor's request into a search spec for Onyx Sports. You do not pick plays; a program runs your spec against today's priced board.
 
 Fields:
@@ -288,6 +302,19 @@ export default {
     let body = {};
     try { body = await req.json(); } catch { /* empty body */ }
     try {
+      if (body.writeup) {
+        const items = (body.writeup.items || []).slice(0, 16);
+        if (!items.length) return json({ items: [] }, 200, h);
+        const raw = JSON.stringify(items);
+        const dig = Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(raw)))).map((b) => b.toString(16).padStart(2, "0")).join("").slice(0, 32);
+        const cache = caches.default, key = new Request("https://onyx-writeup.cache/" + dig);
+        const hit = await cache.match(key);
+        if (hit) return new Response(await hit.text(), { status: 200, headers: { ...h, "content-type": "application/json" } });
+        const out = await chat(env, WRITEUP_SYSTEM, `Items: ${cut(items, 6000)}`, "writeup", WRITEUP, 2500);
+        const res = JSON.stringify({ items: (out.items || []).map((x) => ({ id: String(x.id || ""), text: clean(x.text).slice(0, 600) })) });
+        await cache.put(key, new Response(res, { headers: { "content-type": "application/json", "cache-control": "max-age=21600" } }));
+        return new Response(res, { status: 200, headers: { ...h, "content-type": "application/json" } });
+      }
       if (body.explain) {
         const x = body.explain;
         const user = `Request: ${String(x.q || "").slice(0, 300)}\nTicket: ${cut(x.ticket, 300)}\nLegs: ${cut(x.legs, 3000)}\nNote shown: ${String(x.note || "").slice(0, 400)}`;
