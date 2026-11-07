@@ -2664,7 +2664,7 @@
      "id": "186505",
      "start": "2026-11-07T16:25Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Semifinal",
      "draw": "Men's Singles",
      "court": "Court Central",
@@ -2676,9 +2676,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        3
+        6,
+        1
        ],
-       "serve": false
+       "serve": true
       },
       {
        "name": "Casper Ruud",
@@ -2687,9 +2688,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        3
+        4,
+        2
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -3092,9 +3094,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Adrian Mannarino",
+       "short": "A. Mannarino",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -3121,9 +3123,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Jacob Fearnley",
+       "short": "J. Fearnley",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/gbr.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -8186,9 +8188,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        5
        ],
-       "serve": false
+       "serve": true
       },
       {
        "name": "Bianca Andreescu",
@@ -8197,9 +8199,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        3
+        5
        ],
-       "serve": true
+       "serve": false
       }
      ]
     }
@@ -9469,7 +9471,7 @@
        "sets": [
         7,
         4,
-        0
+        1
        ],
        "serve": true
       },
@@ -9482,7 +9484,7 @@
        "sets": [
         5,
         6,
-        0
+        5
        ],
        "serve": false
       }
@@ -9520,5 +9522,5 @@
    ]
   }
  ],
- "fetched": "2026-11-07T17:02:05+00:00"
+ "fetched": "2026-11-07T17:31:29+00:00"
 }
