@@ -1915,6 +1915,22 @@ so a link cannot sign the app in. The Account page now has **Have a code?**, whi
   own session (`grant_type=refresh_token`). Works once, like the link.
 `accounts.js`: `useCode`, `appCode`, `handOff`, `fromLink`.
 
+**Alerts control center (11/7).** Jordan: "a push notification control center where you can get updates on all
+your picks and you can select how often." `alerts.js` (home #alerts, picks.html#alerts, More -> Alerts) has two parts:
+- **Onyx Picks**: a switch and 55/60/65%; `pick_alerts.py` pushes each pick that locks (tags `picks`, `min_conf`).
+- **Your saved picks**, signed-in people only (Jordan's call): Every update / Key moments / Results only / Daily
+  recap / Off. Choosing one asks for permission, links this phone to the account (`OneSignal.login(user id)`, so
+  the OneSignal external_id is the Supabase user id) and saves `profiles.push_level` (`OnyxAccounts.setProfile`).
+`my_alerts.py` (workflow `my_alerts.yml`, every 20 minutes, polling every 75 s and exiting early when no saved pick
+is live or starting soon) reads signed-in people's saved picks with the service key, grades them live off ESPN
+with saved.js's rules, and pushes by level: `all` = game start, lead changes (at most every 15 minutes, 4 a
+pick), halftime and the result; `key` = start and result; `results` = result; `recap` = the 14:47 UTC run's one
+morning push (yesterday's record and units, today's saved picks). A pick already decided when first seen sends
+only the result. Every event goes to `push_sent` (user, pick, event) so nothing repeats. **Turn on:** run the 11/7
+block at the end of `supabase/schema.sql` in the Supabase SQL editor, and add the secret `SUPABASE_SERVICE_KEY`
+(Supabase -> Project Settings -> API -> service_role; server only, never in the site). Until then the card shows
+"almost ready" and the workflow exits saying what is missing.
+
 **Pull to refresh and the bottom bar (11/7).** In the installed app (`display-mode: standalone`; `?ptr=1` turns it
 on in a browser for testing), `ui.js` adds pull to refresh on every page: at the top, pull down past the line and
 let go, and the page reloads fresh (sw.js is network-first). Never from an open menu or My picks, a text field,

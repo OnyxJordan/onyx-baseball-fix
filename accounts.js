@@ -209,6 +209,19 @@
     KEYS.forEach(function (k) { try { _rm.call(localStorage, SNAP + k); } catch (e) {} });
     emit();
   }
+  // the push control center (alerts.js, 11/7): the person's profile row holds push_level, which
+  // my_alerts.py reads with the service key to decide what to push about their saved picks
+  function uid() { return S && S.user ? S.user.id : null; }
+  function profile() {
+    if (!on() || !S) return Promise.resolve(null);
+    return fresh().then(function (s) { if (!s) return null; return (S.user ? Promise.resolve(S.user) : who()).then(function () {
+      return call('/rest/v1/profiles?select=push_level&id=eq.' + S.user.id, {method: 'GET'}); }).then(function (r) { return (r && r[0]) || {}; }); });
+  }
+  function setProfile(patch) {
+    if (!on() || !S) return Promise.reject(new Error('Sign in first'));
+    return fresh().then(function () { return (S.user ? Promise.resolve(S.user) : who()); }).then(function () {
+      return call('/rest/v1/profiles?id=eq.' + S.user.id, {method: 'PATCH', headers: {prefer: 'return=minimal'}, body: JSON.stringify(patch)}); });
+  }
   var FROM_LINK = false, IV = null;
   function every() { if (!IV) IV = setInterval(function () { if (!document.hidden) sync(); }, 60000); }
   function fromLink() { return FROM_LINK; }
@@ -230,7 +243,8 @@
     return {enabled: on(), signedIn: !!(S && S.user), email: S && S.user ? S.user.email : null, syncing: BUSY, last: LAST, error: ERR};
   }
   window.OnyxAccounts = {ready: null, signIn: signIn, signOut: signOut, deleteAccount: deleteAccount, sync: sync, state: state,
-                         useCode: useCode, appCode: appCode, handOff: handOff, fromLink: fromLink};
+                         useCode: useCode, appCode: appCode, handOff: handOff, fromLink: fromLink,
+                         uid: uid, profile: profile, setProfile: setProfile};
   window.OnyxAccounts.ready = config().then(function () {
     if (!on()) { emit(); return state(); }
     var landed = readHash();
