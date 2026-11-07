@@ -12254,5 +12254,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186684-ml-away",
+  "sport": "tennis",
+  "gid": "186684",
+  "date": "2026-11-07",
+  "logged_at": "2026-11-07T12:57:28+00:00",
+  "matchup": "Noma Noha Akugue vs Sofya Lansere",
+  "home": "Sofya Lansere",
+  "away": "Noma Noha Akugue",
+  "label": "Noma Noha Akugue to win",
+  "kind": "ml",
+  "side": "away",
+  "line": null,
+  "price": -171,
+  "chance": 0.6639,
+  "implied": 0.631,
+  "edge": 0.033,
+  "fair": -200,
+  "state": {
+   "sets": "1-1",
+   "srv": "away",
+   "need": 2
+  },
+  "pre_src": "market",
+  "model": "live-v6",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
