@@ -107,6 +107,16 @@ jobs:
       # graded ledger shrank. A non-zero exit here means yesterday's page stays
       # live instead of a broken one replacing it. NOT continue-on-error: the
       # whole point is that it stops the commit.
+      # Pick alerts (pick_alerts.py, 11/7): a OneSignal push for each Onyx Pick just logged, to subscribers
+      # whose chosen X is at or below its chance; writes data/push.json (the public app id) for alerts.js.
+      # A no-op until the ONESIGNAL_APP_ID / ONESIGNAL_API_KEY secrets exist. Fail-soft.
+      - name: Pick alerts
+        env:
+          ONESIGNAL_APP_ID: ${{ secrets.ONESIGNAL_APP_ID }}
+          ONESIGNAL_API_KEY: ${{ secrets.ONESIGNAL_API_KEY }}
+        run: python3 pick_alerts.py
+        continue-on-error: true
+        timeout-minutes: 3
       - name: Validate build (blocks commit on failure)
         run: python3 validate_build.py
 

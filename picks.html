@@ -18,6 +18,7 @@
 <script src="ui.js" defer></script>
 <script src="saved.js"></script>
 <script src="live.js"></script>
+<script src="alerts.js"></script>
 <style>
 body{background:#0c0c0c;color:#fff;margin:0;overflow-x:hidden}
 .pk{padding-top:28px;padding-bottom:10px}
@@ -72,6 +73,9 @@ details{margin-top:14px}summary{cursor:pointer;color:#d795ff;font:700 12px monos
   <p class="lead">These are our picks, not leans or projections. Every one is locked once, on game day, at its Onyx price before the game starts, and graded in public when it ends. While Onyx posts no prices, a pick locks at the market line and is marked Market line. Only markets that beat real Onyx prices in testing on games the model never saw are posted here. Everything else on the site is a projection.</p>
   <div class="toc"><a href="#today">Today</a><a href="#record">The record</a><a href="#all">Every pick</a><a href="#how">How picks are chosen</a></div>
 </section>
+
+<section class="ox-wrap pk" id="alerts"><div id="oxAlertsPicks"></div></section>
+<script>document.addEventListener('DOMContentLoaded', function () { if (window.OnyxAlerts) OnyxAlerts.mount(document.getElementById('oxAlertsPicks')); });</script>
 
 <section class="ox-wrap pk" id="today">
   <h2>Today's picks.</h2>
