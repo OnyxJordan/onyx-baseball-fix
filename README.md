@@ -1978,6 +1978,16 @@ or Onyx Picks.
 
 ## Onyx Picks (11/2)
 
+**Markets with their own tuned rule (11/6, `daily_top.MKT_RULE`).** Jordan asked to backtest every market
+and tune it. `tools/picks_tune.py` tries ~1,500 rules per market (edge band, price band, expected return, side) on
+the tuning months only and judges the chosen one on held-out games (report: tools/picks_tune.json). Most tuned
+rules collapse on games they never saw (NHL spreads +22% to -27%, tennis moneylines +4% to -26%), so nothing goes
+live from the report itself. One rule held up in both periods: NBA 1st-half totals, unders only, edge 4 to 16
+points, price -150 to +200 (tuning +22.1% / +22.8% on 90 bets; held out 40-23, +22.3% / +8.1%, 25 closing prices).
+It is a `daily_top.MKT_RULE` entry that the live pick list (`nba_build.write_top`), the official replay
+(`picks_backtest.cand(..., mk=)`, `tools/picks_replays.nba_h1`) and the tuning tool all read; picks.py grades
+1st-half totals from ESPN's first two quarters (`picks.H1_SIG` is the read's version).
+
 **Sides and totals of the day (11/6, `sidesday.js`).** Jordan: "a section with an AI writeup for picks of the day
 on sides and totals, be transparent on the % and why we're picking it in every sport." On the home page (every
 sport) and each sport's Plays tab: the best-value side and total on today's games the model priced (the other side

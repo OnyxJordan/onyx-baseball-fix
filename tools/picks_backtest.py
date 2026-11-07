@@ -97,12 +97,13 @@ def payout(price):
     return price / 100.0 if price > 0 else 100.0 / -price
 
 
-def cand(date_, key, side, prob, price, won, extra_ok=True):
-    """One priced side as the live Top 10 sees it, or None when the pick rule turns it away."""
+def cand(date_, key, side, prob, price, won, extra_ok=True, mk=None):
+    """One priced side as the live Top 10 sees it, or None when the pick rule turns it away. mk: (sport, market)
+    for a market with its own tuned rule (daily_top.MKT_RULE)."""
     if prob is None or price is None:
         return None
-    r = {"price": price, "prob": prob, "edge": prob - L.implied(price)}
-    if not (DT.ok(r) and extra_ok):
+    r = {"price": price, "prob": prob, "edge": prob - L.implied(price), "side": side}
+    if not ((DT.ok(r, *mk) if mk else DT.ok(r)) and extra_ok):
         return None
     return {"date": date_, "key": key, "side": side, "price": price, "prob": prob, "ev": DT.ev(price, prob), "won": won}
 
