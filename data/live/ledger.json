@@ -12250,10 +12250,10 @@
   },
   "pre_src": "market",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "12-7",
+  "profit": 0.5882,
+  "graded_at": "2026-11-07T14:23:03+00:00"
  },
  {
   "id": "tennis-186684-ml-away",
@@ -12276,6 +12276,36 @@
   "state": {
    "sets": "1-1",
    "srv": "away",
+   "need": 2
+  },
+  "pre_src": "market",
+  "model": "live-v6",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "tennis-186504-spread-away",
+  "sport": "tennis",
+  "gid": "186504",
+  "date": "2026-11-07",
+  "logged_at": "2026-11-07T13:47:04+00:00",
+  "matchup": "Ben Shelton vs Luca Van Assche",
+  "home": "Luca Van Assche",
+  "away": "Ben Shelton",
+  "label": "Ben Shelton -2.5 games",
+  "kind": "spread",
+  "side": "away",
+  "line": -2.5,
+  "price": -175,
+  "chance": 0.6857,
+  "implied": 0.6364,
+  "edge": 0.049,
+  "fair": -220,
+  "state": {
+   "sets": "1-0",
+   "srv": "home",
    "need": 2
   },
   "pre_src": "market",

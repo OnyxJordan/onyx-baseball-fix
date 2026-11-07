@@ -2625,9 +2625,9 @@
     },
     {
      "id": "186504",
-     "start": "2026-11-07T13:30Z",
-     "state": "pre",
-     "detail": "11/7 - 8:30 AM EST",
+     "start": "2026-11-07T13:40Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Semifinal",
      "draw": "Men's Singles",
      "court": "Court Central",
@@ -2638,7 +2638,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        4
+       ],
        "serve": false
       },
       {
@@ -2647,7 +2649,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        4
+       ],
        "serve": false
       }
      ]
@@ -2796,8 +2800,8 @@
     {
      "id": "187447",
      "start": "2026-11-07T11:30Z",
-     "state": "pre",
-     "detail": "11/7 - 6:30 AM EST",
+     "state": "post",
+     "detail": "Final",
      "round": "Qualifying 1st Round",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -2807,8 +2811,11 @@
        "short": "L. Sonego",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ita.png",
        "seed": null,
-       "win": false,
-       "sets": [],
+       "win": true,
+       "sets": [
+        6,
+        7
+       ],
        "serve": false
       },
       {
@@ -2817,7 +2824,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/swe.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        4,
+        6
+       ],
        "serve": false
       }
      ]
@@ -6840,8 +6850,8 @@
     {
      "id": "186594",
      "start": "2026-11-07T12:35Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Semifinal",
      "draw": "Women's Singles",
      "court": "Centre Court",
@@ -6854,19 +6864,19 @@
        "win": false,
        "sets": [
         3,
-        0
+        4
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Janice Tjen",
        "short": "J. Tjen",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ina.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        0
+        6
        ],
        "serve": false
       }
@@ -6874,9 +6884,9 @@
     },
     {
      "id": "186593",
-     "start": "2026-11-07T14:00Z",
+     "start": "2026-11-07T14:20Z",
      "state": "pre",
-     "detail": "11/7 - 9:00 AM EST",
+     "detail": "11/7 - 9:20 AM EST",
      "round": "Semifinal",
      "draw": "Women's Singles",
      "court": "Centre Court",
@@ -6920,9 +6930,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Janice Tjen",
+       "short": "J. Tjen",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ina.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -9360,7 +9370,7 @@
      "id": "186684",
      "start": "2026-11-07T12:35Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Semifinal",
      "draw": "Women's Singles",
      "court": "Lwena Court",
@@ -9372,7 +9382,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        4
+        6,
+        2
        ],
        "serve": false
       },
@@ -9383,9 +9394,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        5
+        7,
+        4
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
@@ -9450,5 +9462,5 @@
    ]
   }
  ],
- "fetched": "2026-11-07T13:20:40+00:00"
+ "fetched": "2026-11-07T14:22:36+00:00"
 }
