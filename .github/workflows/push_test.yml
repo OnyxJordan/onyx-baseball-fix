@@ -25,9 +25,13 @@ jobs:
         run: |
           python3 - <<'EOF'
           import json, os, urllib.request
-          app, key = os.environ.get("ONESIGNAL_APP_ID", "").strip(), os.environ.get("ONESIGNAL_API_KEY", "").strip()
+          raw = os.environ.get("ONESIGNAL_API_KEY", "")
+          app, key = "".join(os.environ.get("ONESIGNAL_APP_ID", "").split()), "".join(raw.split())
           if not app or not key:
               raise SystemExit("ONESIGNAL_APP_ID / ONESIGNAL_API_KEY secrets are missing")
+          # the key's shape, never the key: whitespace removed, and whether it looks like an App API key
+          print(f"key: {len(key)} chars after removing {len(raw) - len(key)} whitespace chars; "
+                f"app key format: {key.startswith('os_v2_app_')}; non-ascii chars: {sum(1 for c in key if ord(c) > 126 or ord(c) < 33)}")
           body = {"app_id": app, "target_channel": "push",
                   "headings": {"en": "Onyx Pick alerts"},
                   "contents": {"en": os.environ.get("MSG") or "Test from Onyx Sports: Pick alerts are working."},

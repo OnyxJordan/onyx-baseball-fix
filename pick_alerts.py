@@ -46,7 +46,10 @@ def _when(s):
 
 
 def main():
-    app, key = os.environ.get("ONESIGNAL_APP_ID", "").strip(), os.environ.get("ONESIGNAL_API_KEY", "").strip()
+    # a pasted secret can carry a line break or spaces inside it (11/7: the key failed as an invalid header);
+    # ids and keys never contain whitespace, so drop all of it
+    app = "".join(os.environ.get("ONESIGNAL_APP_ID", "").split())
+    key = "".join(os.environ.get("ONESIGNAL_API_KEY", "").split())
     # the site reads the app id here (public, not a secret): empty until push is set up
     want = {"app_id": app or None}
     if _load(PUSH, None) != want:
