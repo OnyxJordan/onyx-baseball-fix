@@ -2676,7 +2676,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        1
+        3
        ],
        "serve": false
       },
@@ -2687,7 +2687,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        1
+        3
        ],
        "serve": true
       }
@@ -2695,12 +2695,12 @@
     },
     {
      "id": "186507",
-     "start": "2026-11-08T05:00Z",
+     "start": "2026-11-08T14:00Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "11/8 - 9:00 AM EST",
      "round": "Final",
      "draw": "Men's Singles",
-     "court": "",
+     "court": "Court Central",
      "p": [
       {
        "name": "TBD",
@@ -2948,8 +2948,8 @@
     {
      "id": "187450",
      "start": "2026-11-07T14:30Z",
-     "state": "pre",
-     "detail": "11/7 - 9:30 AM EST",
+     "state": "post",
+     "detail": "Final",
      "round": "Qualifying 1st Round",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -2960,7 +2960,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/swe.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        4,
+        1
+       ],
        "serve": false
       },
       {
@@ -2968,8 +2971,11 @@
        "short": "A. Mannarino",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
-       "win": false,
-       "sets": [],
+       "win": true,
+       "sets": [
+        6,
+        6
+       ],
        "serve": false
       }
      ]
@@ -2977,8 +2983,8 @@
     {
      "id": "187448",
      "start": "2026-11-07T14:30Z",
-     "state": "pre",
-     "detail": "11/7 - 9:30 AM EST",
+     "state": "post",
+     "detail": "Final",
      "round": "Qualifying 1st Round",
      "draw": "Men's Singles",
      "court": "Court 1",
@@ -2989,7 +2995,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        0,
+        2
+       ],
        "serve": false
       },
       {
@@ -2997,8 +3006,11 @@
        "short": "J. Fearnley",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/gbr.png",
        "seed": null,
-       "win": false,
-       "sets": [],
+       "win": true,
+       "sets": [
+        6,
+        6
+       ],
        "serve": false
       }
      ]
@@ -8161,8 +8173,8 @@
     {
      "id": "186741",
      "start": "2026-11-07T16:35Z",
-     "state": "pre",
-     "detail": "11/7 - 11:35 AM EST",
+     "state": "in",
+     "detail": "1st",
      "round": "Final",
      "draw": "Women's Singles",
      "court": "Campo 1",
@@ -8173,7 +8185,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        2
+       ],
        "serve": false
       },
       {
@@ -8182,8 +8196,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/can.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        3
+       ],
+       "serve": true
       }
      ]
     }
@@ -9439,7 +9455,7 @@
      "id": "186685",
      "start": "2026-11-07T15:05Z",
      "state": "in",
-     "detail": "2nd",
+     "detail": "3rd",
      "round": "Semifinal",
      "draw": "Women's Singles",
      "court": "Lwena Court",
@@ -9452,7 +9468,8 @@
        "win": false,
        "sets": [
         7,
-        2
+        4,
+        0
        ],
        "serve": true
       },
@@ -9464,7 +9481,8 @@
        "win": false,
        "sets": [
         5,
-        4
+        6,
+        0
        ],
        "serve": false
       }
@@ -9502,5 +9520,5 @@
    ]
   }
  ],
- "fetched": "2026-11-07T16:38:12+00:00"
+ "fetched": "2026-11-07T17:02:05+00:00"
 }
