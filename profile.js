@@ -19,7 +19,7 @@
   var MW = {pts: 'points', reb: 'rebounds', ast: 'assists', rec: 'receptions', rec_yds: 'receiving yards', rush_yds: 'rushing yards',
             pass_yds: 'passing yards', pass_td: 'passing TDs', pass_att: 'pass attempts', anytime_td: 'anytime TD', first_td: 'first TD',
             first_basket: 'first basket', q1_total: '1st-quarter totals', h1_total: '1st-half totals', rush_rec_yds: 'rush + rec yards',
-            spread: 'spreads', ml: 'moneylines', total: 'totals'};
+            spread: 'spreads', ml: 'moneylines', total: 'totals', parlay: 'parlays'};
   var ASKW = {pts: 'points', reb: 'rebounds', ast: 'assists', rec: 'receptions', rec_yds: 'receiving yards', rush_yds: 'rushing yards',
               pass_yds: 'passing yards', anytime_td: 'anytime td', q1_total: '1st quarter totals', h1_total: '1st half totals',
               spread: 'spreads', ml: 'moneylines', total: 'totals'};
@@ -44,7 +44,7 @@
   // ── the numbers ──────────────────────────────────────────────────────────
   function tally(rows) {
     var t = {n: rows.length, w: 0, l: 0, p: 0, units: 0};
-    rows.forEach(function (h) { if (h.res === 'W') { t.w++; t.units += win(h.price); } else if (h.res === 'L') { t.l++; t.units -= 1; } else if (h.res === 'P') t.p++; });
+    rows.forEach(function (h) { if (h.res === 'W') { t.w++; t.units += win(h.my_price != null ? h.my_price : h.price); } else if (h.res === 'L') { t.l++; t.units -= 1; } else if (h.res === 'P') t.p++; });
     t.g = t.w + t.l + t.p; t.roi = t.w + t.l ? t.units / (t.w + t.l) * 100 : null; t.rate = t.w + t.l ? t.w / (t.w + t.l) * 100 : null;
     return t;
   }
@@ -62,14 +62,14 @@
     var P = {all: H, graded: G, total: tally(G)};
     P.sport = by(G, function (h) { return h.sport; });
     P.type = by(G, function (h) { return h.sport + ':' + type(h); });
-    P.band = by(G, function (h) { return band(h.price); });
+    P.band = by(G.filter(function (h) { return h.kind !== 'parlay'; }), function (h) { return band(h.my_price != null ? h.my_price : h.price); });
     P.side = by(G, function (h) { return sideOf(h); });
     // habits: every pick saved, graded or not
     P.hSport = share(H, function (h) { return h.sport; });
     P.hType = share(H, function (h) { return h.sport + ':' + type(h); });
     P.hSide = share(H, function (h) { return sideOf(h); });
     P.hBand = share(H, function (h) { return band(h.price); });
-    P.medPrice = median(H.map(function (h) { return h.price; }));
+    P.medPrice = median(H.filter(function (h) { return h.kind !== 'parlay'; }).map(function (h) { return h.my_price != null ? h.my_price : h.price; }));
     P.props = H.filter(function (h) { return h.kind === 'prop'; }).length / (H.length || 1);
     var days = {}; H.forEach(function (h) { var d = String(h.saved || h.start || '').slice(0, 10); if (d) days[d] = 1; });
     P.perDay = H.length / Math.max(1, Object.keys(days).length);

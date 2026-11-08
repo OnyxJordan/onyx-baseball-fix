@@ -1915,6 +1915,16 @@ so a link cannot sign the app in. The Account page now has **Have a code?**, whi
   own session (`grant_type=refresh_token`). Works once, like the link.
 `accounts.js`: `useCode`, `appCode`, `handOff`, `fromLink`.
 
+**Saving picks and parlays, your odds, value check (11/8).** Jordan: "save picks to our account including the parlay
+builder so we know exactly how we're tracking; a tool where we enter the odds and you give us the value." With Onyx's
+feed down no play has a selection id, so the star vanished; `saved.js` `withId` keys such a pick from its game,
+market, player, side and line. A parlay from Ask Onyx saves as one ticket (`saveTicket`: `{kind: 'parlay', legs}`)
+in My picks and the history (synced to the account), tracked and graded by its legs (any leg lost is a loss; every
+leg won, pushes dropping out, a win), in the profile and in `my_alerts.py` pushes. `setMyPrice` stores the odds you
+got; the record, units and profile use them. **Value check** (`value(prob, price)`; under every answer and on its
+own under the search box): a leg, the whole parlay, or any play you type, against your odds: our chance, the chance
+your price needs, fair price, value per $100, edge and a Kelly ceiling.
+
 **Your profile (11/8).** Jordan: "a whole profile history: best picks, best sport, best type of bet, studying the
 profile habits and making a profile on them, and recommend the types of bets they're interested in." `profile.js`
 (Account page, More -> Your profile) reads the permanent pick history (`OnyxSaved.history()`, synced to the account
