@@ -93,11 +93,14 @@
   }
   function inSlip(sel) {
     if (NBA && typeof window.inSlip === 'function') return window.inSlip(sel);
+    if (window.OnyxParlay) return OnyxParlay.slip().some(function (x) { return x.sel === sel; });   // the one shared ticket (parlay.js, 11/8)
     return SLIP.some(function (x) { return x.sel === sel; });
   }
   function slipToggle(leg) {
     if (!leg || !leg.sel) return;
     if (NBA && typeof window.regLeg === 'function' && typeof window.slipToggle === 'function') { window.slipToggle(window.regLeg(leg)); return; }
+    // every other sport: the one ticket the Parlay Builder pill holds on every page (11/8, Jordan: every line connects to the ticket)
+    if (window.OnyxParlay) { OnyxParlay.add(Object.assign({sport: SPORT}, leg)); drawSlip(); return; }
     if (inSlip(leg.sel)) SLIP = SLIP.filter(function (x) { return x.sel !== leg.sel; });
     else if (SLIP.length < 10) { SLIP.push({sel: leg.sel, label: leg.label, odds: leg.price}); track('parlay_add', {selection: leg.label, legs: SLIP.length, source: 'card'}); }
     try { localStorage.setItem(SLIP_KEY, JSON.stringify(SLIP)); } catch (e) {}
@@ -109,6 +112,7 @@
   }
   function drawSlip() {
     if (NBA) return;
+    if (window.OnyxParlay) { var old = document.getElementById('cxSlip'); if (old) old.remove(); return; }   // parlay.js shows the ticket
     css();
     var el = document.getElementById('cxSlip');
     if (!SLIP.length) { if (el) el.remove(); return; }
@@ -849,12 +853,14 @@
     if (c === 'rung') { var mR = curMk(), rR = mR && rungsOf(mR)[+a.dataset.j]; if (rR) { BS.x = rR[0]; snapBack(); buzz(); } return; }
     if (c === 'side') { BS.side = a.dataset.s; update(true); return; }
     if (c === 'add') { if (CX.leg) { slipToggle(CX.leg); update(false); } return; }
+    var ARM = window.OnyxParlay && OnyxParlay.armed && OnyxParlay.armed();   // the builder is on: bet buttons add to the ticket
+    if (c === 'bet' && ARM && CX.leg) { slipToggle(CX.leg); update(false); return; }
     if (c === 'bet') { if (CX.leg) { track('onyx_click', {link_type: 'single', market: CX.leg.market, selection: CX.leg.label, odds: String(CX.leg.price), source: 'player_card'}); window.open(share([CX.leg.sel]), '_blank', 'noopener'); } return; }
     if (c === 'sidebet' || c === 'sideadd') {
       var s = ((p.game || {}).sides || [])[+a.dataset.i];
       if (!s || !s.sel) return;
       var leg = {sel: s.sel, price: s.price, gid: p.game.gid, market: s.k, label: s.lab};
-      if (c === 'sidebet') { track('onyx_click', {link_type: 'single', market: s.k, selection: s.lab, odds: String(s.price), source: 'team_card'}); window.open(share([s.sel]), '_blank', 'noopener'); }
+      if (c === 'sidebet' && !ARM) { track('onyx_click', {link_type: 'single', market: s.k, selection: s.lab, odds: String(s.price), source: 'team_card'}); window.open(share([s.sel]), '_blank', 'noopener'); }
       else { slipToggle(leg); CX.keepScroll = true; draw(); }
       return;
     }
