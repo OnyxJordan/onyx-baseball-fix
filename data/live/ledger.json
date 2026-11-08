@@ -16306,10 +16306,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "27",
+  "profit": 0.8547,
+  "graded_at": "2026-11-08T05:50:01+00:00"
  },
  {
   "id": "nba-401909942-total-over",
@@ -16523,10 +16523,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "17-10",
+  "profit": -1.0,
+  "graded_at": "2026-11-08T05:50:01+00:00"
  },
  {
   "id": "cfb-401864535-spread-home",
@@ -16616,10 +16616,10 @@
   },
   "pre_src": "market",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "103-125",
+  "profit": 0.9524,
+  "graded_at": "2026-11-08T05:50:01+00:00"
  },
  {
   "id": "nhl-401892671-spread-away",
@@ -16678,10 +16678,10 @@
   },
   "pre_src": "market",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "4-2",
+  "profit": 1.3,
+  "graded_at": "2026-11-08T05:50:01+00:00"
  },
  {
   "id": "nhl-401892673-total-under",
@@ -16709,10 +16709,10 @@
   },
   "pre_src": "market",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "6",
+  "profit": 0.8,
+  "graded_at": "2026-11-08T05:50:01+00:00"
  },
  {
   "id": "cbb-401920371-total-under",
@@ -16926,10 +16926,10 @@
   },
   "pre_src": "market",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "228",
+  "profit": -1.0,
+  "graded_at": "2026-11-08T05:50:02+00:00"
  },
  {
   "id": "cfb-401860912-total-under",
@@ -16985,6 +16985,37 @@
    "period": 2,
    "clock": "0:02",
    "f": 0.501
+  },
+  "pre_src": "onyx",
+  "model": "live-v6",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "cfb-401864535-total-over",
+  "sport": "cfb",
+  "gid": "401864535",
+  "date": "2026-11-07",
+  "logged_at": "2026-11-08T05:50:00+00:00",
+  "matchup": "WYO @ UNLV",
+  "home": "UNLV",
+  "away": "WYO",
+  "label": "Over 79.5",
+  "kind": "total",
+  "side": "over",
+  "line": 79.5,
+  "price": -116,
+  "chance": 0.5911,
+  "implied": 0.537,
+  "edge": 0.054,
+  "fair": -145,
+  "state": {
+   "score": "WYO 34 - 21 UNLV",
+   "period": 3,
+   "clock": "10:07",
+   "f": 0.419
   },
   "pre_src": "onyx",
   "model": "live-v6",
