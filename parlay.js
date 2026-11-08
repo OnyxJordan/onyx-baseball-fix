@@ -10,7 +10,8 @@
 // OnyxParlay.add(pick) adds a leg directly (the "+ Add" buttons on picks.html).
 (function () {
   'use strict';
-  if (window.OnyxParlay || document.getElementById('parlayFab')) return;      // Onyx Baseball keeps its own
+  // Onyx Baseball (index.html) and the NBA page keep their own builders (every odds cell there adds a leg)
+  if (window.OnyxParlay || document.getElementById('parlayFab') || typeof window.renderParlaySlip === 'function' || /(^|\/)(index|nba)\.html$|\/$/.test(location.pathname)) return;
   var KEY = 'onyxSlipAll', ARMED = false, OPEN = false, REFERRER = 'KR680261';
   var slip = []; try { slip = JSON.parse(localStorage.getItem(KEY) || '[]') || []; } catch (e) { slip = []; }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(slip)); } catch (e) {} }
@@ -81,7 +82,7 @@
     '.pbx-b{display:flex;gap:6px;flex-wrap:wrap}.pbx-b button{flex:1;font:800 11.5px monospace;border:0;border-radius:9px;padding:9px 10px;cursor:pointer;color:#fff;background:linear-gradient(135deg,#7a2ce0,#b038f9)}',
     '.pbx-b button.alt{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18)}.pbx-b button[disabled]{opacity:.45;cursor:default}',
     '.pbx-n{font:600 10.5px monospace;color:#d795ff;margin-top:6px;line-height:1.45}',
-    'body.pb-armed .t10-bet,body.pb-armed .bet,body.pb-armed .btn-primary,body.pb-armed a[href*="onyxodds.com/share"]{box-shadow:0 0 0 1.5px rgba(97,233,112,.8),0 0 10px rgba(97,233,112,.35)!important}'
+    'body.pb-armed .t10-bet,body.pb-armed .bet,body.pb-armed .btn-primary,body.pb-armed .oc:not(.dead),body.pb-armed .chipx:not(.dead),body.pb-armed [onclick*="bet(\\\'"],body.pb-armed a[href*="onyxodds.com/share"]{box-shadow:0 0 0 1.5px rgba(97,233,112,.8),0 0 10px rgba(97,233,112,.35)!important}'
   ].join('\n');
   function draw() {
     var el = document.getElementById('oxPB');
@@ -106,6 +107,33 @@
       + '</div>' : '';
     el.innerHTML = panel + '<button type="button" class="pbx-fab' + (ARMED ? ' on' : '') + '" data-pb="fab">' + (ARMED ? 'Building · tap odds to add' : 'Parlay Builder') + (n ? ' <b>' + n + '</b>' : '') + '</button>';
   }
+  // the Onyx selection a line carries: a share link's selection=, or bet('<selection>', ...) in its onclick
+  function selOf(b) {
+    var h = b.getAttribute('href') || '', m = /[?&]selection=([^&]+)/.exec(h);
+    if (m) return decodeURIComponent(m[1]);
+    var oc = b.getAttribute('onclick') || '', m2 = /bet\(\s*'([^']+)'/.exec(oc);
+    return m2 ? m2[1].replace(/&#39;/g, "'").replace(/&amp;/g, '&') : null;
+  }
+  // a selection -> the full play: today's boards (every sport, loaded once), else the page's own OX_SELINFO
+  var IDX = null;
+  function index() {
+    if (IDX) return IDX;
+    IDX = Promise.all(['nfl', 'cfb', 'nba', 'cbb', 'nhl', 'tennis'].map(function (k) {
+      return fetch('data/' + k + '/board.json', {cache: 'no-cache'}).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; });
+    })).then(function (fs) { var o = {}; fs.forEach(function (f) { (f && f.plays || []).forEach(function (p) { if (p.sel) o[p.sel] = p; }); }); return o; });
+    return IDX;
+  }
+  function bySel(sel, el) {
+    return index().then(function (o) {
+      if (o[sel]) return o[sel];
+      var i = null; try { i = window.OX_SELINFO ? window.OX_SELINFO(sel) : null; } catch (x) {}
+      if (!i || !i.label) return null;
+      var g = null; try { g = i.gid && typeof window.game === 'function' ? window.game(i.gid) : null; } catch (x) {}
+      var sp = window.OX_SITE || (typeof SD !== 'undefined' && SD.sport) || null;
+      return Object.assign({sel: sel, sport: sp, kind: i.mkt ? 'prop' : /to win$/.test(i.label) ? 'ml' : /(Over|Under) \d/.test(i.label) ? 'total' : 'spread'}, i,
+        g ? {start: g.start, matchup: g.away + ' @ ' + g.home} : {});
+    });
+  }
   document.addEventListener('click', function (e) {
     var t = e.target;
     var pb = t.closest && t.closest('[data-pb], [data-pb-x]');
@@ -120,9 +148,12 @@
       return;
     }
     if (!ARMED || !t.closest) return;
-    // armed: an odds button adds its row's play (the row's save star holds the pick, saved.js)
-    var b = t.closest('a[href*="onyxodds.com"], .t10-bet, .bet, .btn-primary, [data-pick]');
+    // armed: every line adds to the ticket (11/8, Jordan: "wherever there's a line there needs to be a connection to
+    // add to the ticket"): an Onyx link or bet('<selection>') button anywhere, or a row with a save star
+    var b = t.closest('a[href*="onyxodds.com"], .t10-bet, .bet, .btn-primary, .oc, .chipx, [onclick*="bet("], [data-pick]');
     if (!b || b.closest('#oxPB')) return;
+    var sel = selOf(b);
+    if (sel) { e.preventDefault(); e.stopPropagation(); bySel(sel, b).then(function (p) { if (p) add(p); else toast('That line is not on today\'s Onyx board'); }); return; }
     var star = null;
     for (var n = b.parentElement, i = 0; n && i < 7 && !star; n = n.parentElement, i++) { var ss = n.querySelectorAll('.ox-save'); if (ss.length === 1) star = ss[0]; else if (ss.length > 1) break; }
     var m = star && /OnyxSaved\.tap\(this,(\d+)\)/.exec(star.getAttribute('onclick') || '');
@@ -136,5 +167,5 @@
   function prune() { var n = slip.length; slip = slip.filter(function (x) { return !(Date.parse(x.start) <= Date.now()); }); if (slip.length !== n) { save(); draw(); } }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { prune(); draw(); }); else { prune(); draw(); }
   setInterval(prune, 60000);
-  window.OnyxParlay = {add: add, remove: remove, clear: clear, slip: function () { return slip.slice(); }, arm: function (on) { ARMED = on !== false; draw(); }};
+  window.OnyxParlay = {add: add, remove: remove, clear: clear, slip: function () { return slip.slice(); }, arm: function (on) { ARMED = on !== false; draw(); }, armed: function () { return ARMED; }};
 })();
