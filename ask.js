@@ -674,6 +674,12 @@
     }
     if (ov && !un) s.side = 'over';
     if (un && !ov) s.side = 'under';
+    // the whole ticket's price, said with total / ticket / parlay / combined (11/8, Jordan: "total odds of at least
+    // +700"; "each leg minimum odds of -150 ... total odds of at least +700" lost the +700): read first and taken out,
+    // so the per-leg prices around it read on their own
+    var tot = t.match(/\b(?:total|ticket|parlay|combined|overall)\s+(?:odds|payout|price)?\s*(?:of\s+)?(?:at least|minimum|min|no less than|or more of)\s*(?:of\s*)?\+(\d{3,5})/)
+      || t.match(/\b(?:total|ticket|combined|overall)\s+(?:odds|payout|price)\s+(?:of\s+)?\+(\d{3,5})/);
+    if (tot) { s.target_price = +tot[1]; s.ticket_floor = true; if (s.intent === 'list') s.intent = 'parlay'; t = t.replace(tot[0], ' '); }
     // odds, in any wording. A floor: "-200 or better", "min -200", "nothing worse than -200",
     // "no -200 juice". A ceiling: "+300 or less", "max +300", "under +300".
     var fl = t.match(/(min(imum)?( total| parlay| ticket| combined)?( odds| payout| price)?( of)?|no (odds |price |leg )?(worse|shorter|juicier) than|nothing (worse|shorter|juicier) than|at least|odds of at least|better than|above)\s*([+-]?\d{3,4})/)
@@ -683,7 +689,7 @@
     var nojuice = t.match(/\bno\s*(-\d{3,4})/); if (nojuice) s.min_price = +nojuice[1] + 1;
     var btw = t.match(/between\s*([+-]?\d{3,4})\s*(and|to|-)\s*([+-]?\d{3,4})/);
     if (btw) { s.min_price = Math.min(+btw[1], +btw[3]); s.max_price = Math.max(+btw[1], +btw[3]); }
-    var mx = btw ? null : t.match(/(max(imum)?( odds)?|no (odds |price |leg |legs )?(longer|bigger|higher|better) than|nothing (longer|bigger|higher) than|(?:^|\s)shorter than|below|at most|or less than)\s*([+-]\d{3,4})/) || t.match(/([+-]\d{3,4})\s*(or less|or shorter|and shorter|or lower|max|cap)/);
+    var mx = btw ? null : t.match(/(max(imum)?( leg)?( odds| price)?( of)?|no more than|no (odds |price |leg |legs )?(longer|bigger|higher|better) than|nothing (longer|bigger|higher) than|(?:^|\s)shorter than|below|at most|or less than)\s*([+-]\d{3,4})/) || t.match(/([+-]\d{3,4})\s*(or less|or shorter|and shorter|or lower|max|cap)/);
     if (mx) { var w = +(mx[mx.length - 1] && /\d/.test(mx[mx.length - 1]) ? mx[mx.length - 1] : mx[1]); if (!isNaN(w)) s.max_price = w; }
     // a bare price on a parlay or a list ("4 leg NFL parlay -150", "odds -150"): each leg at that
     // price or shorter. It used to read as a floor, so +575 dogs filled a "-150" parlay.
@@ -718,6 +724,23 @@
     else if (/tomorrow/.test(t)) s.when = 'tomorrow';
     else if (/this weekend|weekend/.test(t)) s.when = 'weekend';
     else for (var d = 0; d < 7; d++) if (new RegExp('\\b' + DAYS[d] + '\\b').test(t)) { s.when = DAYS[d]; break; }
+    // the slate (11/8, Jordan: "1 PM slate only"): kickoff windows in ET hours, and a night of the week
+    var SL = null;
+    if (/\b(sunday night|snf)\b/.test(t)) SL = {h0: 19, h1: 28, dow: 0, label: 'Sunday night'};
+    else if (/\b(monday night|mnf)\b/.test(t)) SL = {h0: 19, h1: 28, dow: 1, label: 'Monday night'};
+    else if (/\b(thursday night|tnf)\b/.test(t)) SL = {h0: 19, h1: 28, dow: 4, label: 'Thursday night'};
+    else if (/\b(prime ?time|night games?|late night)\b/.test(t)) SL = {h0: 19, h1: 28, label: 'night games'};
+    else if (/\bearly (games?|slate|window|kickoffs?|ones)\b|\b1 ?(pm|p m|oclock)\b|\b1:00\b/.test(t)) SL = {h0: 12, h1: 15, label: '1 PM slate'};
+    else if (/\blate (games?|slate|window|afternoon|kickoffs?|ones)\b|\b4 ?(pm|p m|oclock)\b|\b4:(05|25)\b/.test(t)) SL = {h0: 15, h1: 18.5, label: '4 PM slate'};
+    else {
+      var hm = t.match(/\b(\d{1,2})(?::(\d{2}))? ?(pm|am)\b/);
+      if (hm && /slate|games?|kick|tip|start|only|window|game/.test(t)) {
+        var hh = (+hm[1] % 12) + (hm[3] === 'pm' ? 12 : 0) + (hm[2] ? +hm[2] / 60 : 0);
+        SL = {h0: hh - 0.25, h1: hh + 0.5, label: hm[1] + (hm[2] ? ':' + hm[2] : '') + ' ' + hm[3].toUpperCase() + ' games'};
+      }
+    }
+    if (SL) s.slot = SL;
+    if (SL && /\b(snf|mnf|tnf|(sunday|monday|thursday) night football)\b/.test(t)) s.sports = ['nfl'];   // SNF is the NFL, never college
     // the teams it names: every college and pro team (readTeams), then a conference ("SEC spreads")
     var RT = readTeams(cfx ? ' ' + cnorm(t).replace(/-/g, ' ').replace(new RegExp(cfx.re.source, 'g'), ' ') + ' ' : t, s, B, colSig), tPlayer = RT.tPlayer;
     if (RT.ambig) s.ambig = RT.ambig;
@@ -920,6 +943,13 @@
     if (when === 'weekend') return g.getDay() === 0 || g.getDay() === 6;
     var wd = DAYS.indexOf(when); return wd < 0 || (g.getDay() === wd && days < 7);
   }
+  // a kickoff window in ET hours (a 1 AM start counts as 25, the night before), and a night of the week
+  function slotOk(sl, start) {
+    var t = Date.parse(start); if (isNaN(t) || !sl) return true;
+    var g = etDay(t), h = g.getHours() + g.getMinutes() / 60, dow = g.getDay();
+    if (h < 4) { h += 24; dow = (dow + 6) % 7; }
+    return h >= sl.h0 && h < sl.h1 && (sl.dow == null || dow === sl.dow);
+  }
   function run(spec, B) {
     var now = Date.now();
     // "2 legs paying +300": each leg has to carry its share of the payout
@@ -965,6 +995,7 @@
       if (TLp.length && p.kind === 'prop' && p.team && spec.intent !== 'sgp' && TLp.indexOf(String(p.team).toUpperCase()) < 0) return false;
       if (spec.onyx_picks && !p.pick) return false;
       if (spec.when && !whenOk(spec.when, p.start)) return false;
+      if (spec.slot && !slotOk(spec.slot, p.start)) return false;
       return true;
     }).map(function (p) { return two ? Object.assign({}, p, {two: p2(p.lam)}) : p; });
     // "cbb unders", "overs tonight": the totals and player lines, when there are any (not sides)
@@ -1116,6 +1147,7 @@
     if (s.min_conf != null) b.push(s.default_conf ? (s.intent === 'list' ? 'every pick 50%+ to hit' : 'every leg 50%+ to hit') : Math.round(100 * s.min_conf) + '%+ confidence');
     if (s.player) b.push(s.player);
     if (s.when) b.push(s.when === 'today' ? 'tonight' : s.when);
+    if (s.slot) b.push(s.slot.label);
     if (s.school) b.push(s.school);
     else if (s.team_name) b.push(s.team_name);
     else if (s.team && !(s.teams || []).length) b.push(s.team);
@@ -1222,7 +1254,7 @@
     // what the reader knows that the AI's schema does not carry (11/2): every team by name per sport
     // (a college name is never a pro team), conferences, a name two teams share (ask, never guess),
     // depth questions and Onyx Picks. Its teams and sports win: the AI once put "Duke" in the NBA.
-    ['tabbr', 'school', 'conf', 'ambig', 'depth', 'onyx_picks', 'col_alt'].forEach(function (k) { if (h[k] != null) s[k] = h[k]; });
+    ['tabbr', 'school', 'conf', 'ambig', 'depth', 'onyx_picks', 'col_alt', 'slot'].forEach(function (k) { if (h[k] != null) s[k] = h[k]; });
     if (h.tabbr || h.ambig) { s.team = h.team || null; s.teams = (h.teams || []).slice(); if ((h.sports || []).length) s.sports = h.sports.slice(); }
     if ((h.sports || []).length && (CBBW.test(t) || CFBW.test(t) || /\bcollege\b|\bncaa\b/.test(t))) s.sports = h.sports.slice();
     if ((h.exclude || []).length && s.player && h.exclude.indexOf(s.player) >= 0) s.player = null;
@@ -1383,8 +1415,53 @@
           : 'That team or player is not in our depth charts (NBA, college basketball, NFL, college football and NHL). Try the full team name, or open a sport\'s Depth tab.'});
     });
   }
+  // + and - (11/8, Jordan: "add and remove all of these, maybe pluses and minuses"): "-Brunson" and "-first basket"
+  // read as "no Brunson", "no first basket"; "+points" and "+Knicks" as the words themselves. Only a sign that
+  // starts a word and is followed by a letter: "-150", "+2000", "o/u", "same-game" are untouched.
+  function plusMinus(q) {
+    q = String(q);
+    // clause mode (11/8, Jordan: "top 4 nfl td scorers + 1 PM slate only - Jonathan Taylor + total odds of at least
+    // +700"): once " + " separates the rules, " - " in front of a word takes it out too
+    // ("passing + rushing yards", "points + rebounds" are one market: a + between stat words stays)
+    var STATW = '(?:points?|pts|rebounds?|rebs?|reb|assists?|asts?|ast|passing|pass|rushing|rush|receiving|rec|yards|yds|threes|3s|blocks?|steals?|pra|p|r|a)';
+    var SEP = new RegExp('(?<!\\b' + STATW + ')\\s\\+\\s+(?!' + STATW + '\\b)(?=[a-z0-9])', 'gi');
+    if (SEP.test(q)) { SEP.lastIndex = 0; q = q.replace(SEP, ', ').replace(/(^|[\s,])-\s+(?=[a-z])/gi, '$1 no '); }
+    return q.replace(/(^|[\s,;(])-(?=[a-z])/gi, '$1 no ').replace(/(^|[\s,;(])\+(?=[a-z])/gi, '$1 ').replace(/\s+/g, ' ').trim();
+  }
+  // the reading as chips the reader can take off one at a time (the − on each), each with the spec patch that
+  // removes it; the leg count is stepped with + and − (askStep in home.html)
+  function chipBase(s) {
+    var b = Object.assign({}, s);
+    if (b.default_conf) { b.min_conf = null; b.default_conf = false; }
+    if (b.default_floor) { b.min_price = null; b.default_floor = false; }
+    delete b._fixed; delete b.ambig;
+    return b;
+  }
+  function chips(s) {
+    var out = [], T = function (label, patch, neg) { out.push({label: label, patch: patch, neg: !!neg}); };
+    var od = function (x) { return (x > 0 ? '+' : '') + x; };
+    (s.sports || []).forEach(function (k) { T(LG[k] || k, {sports: s.sports.filter(function (x) { return x !== k; })}); });
+    (s.markets || []).forEach(function (m) { T(MW[m] || m, {markets: s.markets.filter(function (x) { return x !== m; })}); });
+    if (s.side && s.side !== 'any') T(s.side === 'over' ? 'Overs' : 'Unders', {side: 'any'});
+    if (s.player) T(s.player, {player: null});
+    var tn = s.school || s.team_name || teamList(s).join(', ');
+    if (tn && !s.conf) T(tn, {team: null, teams: [], tabbr: null, school: null, team_name: null, col_alt: null});
+    if (s.conf) T(s.conf + ' teams', {conf: null, tabbr: null});
+    (s.exclude || []).forEach(function (x) { T('No ' + x, {exclude: s.exclude.filter(function (y) { return y !== x; })}, true); });
+    (s.xmk || []).forEach(function (m) { if (m === 'two_plus_td' || (m === 'first_td' && s.xmk.indexOf('anytime_td') >= 0)) return;
+      T('No ' + (MW[m] || m).toLowerCase(), {xmk: s.xmk.filter(function (y) { return y !== m; })}, true); });
+    if (s.no_props) T('No player props', {no_props: false}, true);
+    if (s.target_price) T((s.ticket_floor ? 'Pays +' : 'About +') + s.target_price, {target_price: null, ticket_floor: false});
+    if (s.min_price != null && !s.default_floor) T('Shortest ' + od(s.min_price), {min_price: null});
+    if (s.max_price != null) T('Longest ' + od(s.max_price), {max_price: null});
+    if (s.min_conf != null && !s.default_conf) T(Math.round(100 * s.min_conf) + '%+ to hit', {min_conf: null});
+    if (s.when) T(s.when === 'today' ? 'Tonight' : s.when, {when: null});
+    if (s.slot) T(s.slot.label.charAt(0).toUpperCase() + s.slot.label.slice(1), {slot: null});
+    if (s.onyx_picks) T('Onyx Picks only', {onyx_picks: false});
+    return out;
+  }
   function ask(q, forced) {
-    q = String(q || '').trim().slice(0, 300);
+    q = plusMinus(String(q || '').trim().slice(0, 300));
     if (!q) return Promise.resolve(null);
     return loadBoards().then(function (B) { return Promise.all([forced ? {spec: forced, via: 'tap'} : toSpec(q, B), B]); }).then(function (a) {
       // a name more than one team goes by ("Wildcats", "Miami" in college, "Kings" when both play):
@@ -1499,7 +1576,7 @@
         res.note = (res.note ? res.note + ' ' : '') + 'Nothing on the board reaches +' + spec.target_price + ' with ' + res.rows.length + ' legs at these prices; the closest ticket pays ' + (res.parlay.price > 0 ? '+' : '') + res.parlay.price + '.';
       }
       // fewer than the number asked for: say so, never a silent short ticket (11/6)
-      if (spec.count_set && spec.count && res.rows.length && res.rows.length < spec.count && !spec.target_price) {
+      if ((spec.count_set || spec.conf || teamList(spec).length || spec.school) && spec.count && res.rows.length && res.rows.length < spec.count && !spec.target_price && !spec.onyx_picks) {
         var nn = res.rows.length, par = spec.intent === 'parlay' || spec.intent === 'sgp';
         res.note = (res.note ? res.note + ' ' : '') + 'Only ' + nn + (nn === 1 ? ' play' : ' plays') + ' on the board fit' + (spec.when === 'today' ? ' tonight' : '') +
           ', so this is ' + (par ? 'a ' + nn + '-leg ' + (spec.intent === 'sgp' ? 'same-game parlay' : 'parlay') : nn + ' instead of ' + spec.count) + '.';
@@ -1534,9 +1611,10 @@
       if (spec.exclude && spec.exclude.length) res.understood += ' · without ' + spec.exclude.join(', ');
       if (spec.xmk && spec.xmk.length) res.understood += ' · no ' + spec.xmk.filter(function (m) { return m !== 'first_td' || spec.xmk.indexOf('anytime_td') < 0; }).filter(function (m) { return m !== 'two_plus_td'; }).map(function (m) { return (MW[m] || m).toLowerCase(); }).join(', ');
       if (spec.no_props) res.understood += ' · no player props';
+      res.base = chipBase(asked); res.chips = chips(asked);
       LAST = {q: q, spec: a[0].spec, legs: (res.rows || []).map(function (p) { return {name: p.name || p.label, play: p.label, price: p.price}; })};
       return res;
     });
   }
-  window.OnyxAsk = {whenOk: whenOk, ask: ask, explain: explain, reset: reset, normalize: normalize, localSpec: localSpec, run: run, describe: describe, loadBoards: loadBoards, LG: LG, PAGE: PAGE, MKTS: MKTS};
+  window.OnyxAsk = {whenOk: whenOk, slotOk: slotOk, ask: ask, plusMinus: plusMinus, chips: chips, chipBase: chipBase, explain: explain, reset: reset, normalize: normalize, localSpec: localSpec, run: run, describe: describe, loadBoards: loadBoards, LG: LG, PAGE: PAGE, MKTS: MKTS};
 })();

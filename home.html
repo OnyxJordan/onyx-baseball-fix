@@ -81,6 +81,17 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
 .ask-ex{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:10px 0 4px}.ask-ex::-webkit-scrollbar{display:none}
 .ask-ex button{flex-shrink:0;padding:7px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:#cfc8da;font:600 12px var(--ox-body,system-ui);cursor:pointer}
 .ask-u{font:600 11px monospace;color:#9a93a6;margin:12px 0 10px;line-height:1.5}.ask-u b{color:#d795ff}.ask-u a{color:#d795ff}
+.ask-ed{margin:0 0 12px;padding:10px 12px;border-radius:14px;border:1px solid rgba(176,56,249,.3);background:rgba(176,56,249,.06)}
+.ask-ed small{display:block;font:700 10px monospace;letter-spacing:.08em;text-transform:uppercase;color:#9a93a6;margin-bottom:7px}
+.ask-chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.ask-chip{display:inline-flex;align-items:center;gap:6px;font:700 12px monospace;color:#eee;background:rgba(176,56,249,.2);border:1px solid rgba(176,56,249,.55);border-radius:999px;padding:5px 6px 5px 11px;cursor:pointer}
+.ask-chip.neg{background:rgba(255,138,138,.1);border-color:rgba(255,138,138,.45)}
+.ask-chip i{display:inline-flex;width:18px;height:18px;align-items:center;justify-content:center;border-radius:50%;background:rgba(255,255,255,.14);font-style:normal;font-weight:900}
+.ask-step{display:inline-flex;align-items:center;gap:6px;font:700 12px monospace;color:#ddd;margin-left:2px}
+.ask-step button{width:26px;height:26px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#fff;font:900 15px monospace;cursor:pointer;line-height:1}
+.ask-rf{display:flex;gap:6px;margin-top:9px}.ask-rf input{flex:1;min-width:0;background:#0d0a12;border:1px solid #3a2a55;border-radius:10px;padding:9px 10px;color:#fff;font:600 13px monospace}
+.ask-rf button{font:800 12px monospace;color:#fff;background:#a24bff;border:0;border-radius:10px;padding:0 14px;cursor:pointer}
+.ask-add{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.ask-add button{font:700 11.5px monospace;color:#cfc8da;background:rgba(255,255,255,.05);border:1px dashed rgba(255,255,255,.22);border-radius:999px;padding:5px 10px;cursor:pointer}
 .ask-say{font-size:15px;line-height:1.5;color:#efeaf7;margin:14px 0 4px}.ask-why{font-size:14px;line-height:1.55;color:#cfc7dc;border-left:2px solid #a24bff;padding:2px 0 2px 12px;margin:14px 0}
 .ask-cl{border:1px solid #3a2a55;border-radius:14px;padding:14px 16px;margin:12px 0;background:rgba(162,75,255,.06)}.ask-cl b{display:block;font-size:15px;line-height:1.45;color:#efeaf7;margin-bottom:10px}.ask-cl .ask-ex{flex-wrap:wrap}
 .ask-ex button.on{background:rgba(162,75,255,.22);border-color:#a24bff;color:#fff}
@@ -437,6 +448,46 @@ function askPick(i) {
   document.getElementById('askQ').value = o.label;
   askGo(o.label, o.q ? null : o.spec);
 }
+// ── the search editor (11/8, Jordan: "add and remove all of these, pluses and minuses"): every rule the
+// search read is a chip, tap it to take that rule off; + and - step the leg count; the box adds or removes
+// more ("+overs -Brunson"), and the quick adds are one tap
+function askEditor(R) {
+  if (!R || !R.base || R.depth) return '';
+  const s = R.base, par = s.intent === 'parlay' || s.intent === 'sgp' || s.intent === 'rr';
+  const n = s.count || (par ? 3 : 5);
+  const chips = (R.chips || []).map((c, i) => `<button type="button" class="ask-chip${c.neg ? ' neg' : ''}" onclick="askChip(${i})" aria-label="Remove ${esc(c.label)}">${esc(c.label)}<i>&minus;</i></button>`).join('');
+  const step = `<span class="ask-step">${par ? 'Legs' : 'Plays'} <button type="button" onclick="askStep(-1)" aria-label="One fewer">&minus;</button><b>${n}</b><button type="button" onclick="askStep(1)" aria-label="One more">+</button></span>`;
+  const has = m => (s.markets || []).includes(m);
+  const adds = [
+    s.side !== 'over' ? ['+ Overs', {side: 'over'}] : null, s.side !== 'under' ? ['+ Unders', {side: 'under'}] : null,
+    s.min_price == null || s.min_price < 100 ? ['+ Plus money', {min_price: 100, default_floor: false}] : null,
+    !(s.min_conf >= 0.6) ? ['+ 60%+ to hit', {min_conf: 0.6, default_conf: false}] : null,
+    !s.no_props && !(s.markets || []).length ? ['- Player props', {no_props: true}] : null,
+    s.intent === 'list' ? ['+ Make it a parlay', {intent: 'parlay', count: 3, count_set: true}] : null].filter(Boolean);
+  window.ASK_ADDS = adds;
+  return `<div class="ask-ed"><small>Your search · tap a rule to remove it</small><div class="ask-chips">${chips}${step}</div>
+    <div class="ask-add">${adds.map((a, i) => `<button type="button" onclick="askAdd(${i})">${esc(a[0])}</button>`).join('')}</div>
+    <form class="ask-rf" onsubmit="askRefine(this.r.value);return false"><input name="r" autocomplete="off" placeholder="Add or remove: +points -Brunson" aria-label="Add or remove from this search"><button type="submit">Go</button></form></div>`;
+}
+function askForced(patch) {
+  const R = window.ASK_R; if (!R || !R.base) return;
+  const spec = Object.assign({}, R.base, patch);
+  askGo(window.ASK_Q || '', spec);
+}
+function askChip(i) { const c = ((window.ASK_R || {}).chips || [])[i]; if (c) askForced(c.patch); }
+function askStep(d) {
+  const s = (window.ASK_R || {}).base; if (!s) return;
+  const par = s.intent === 'parlay' || s.intent === 'sgp' || s.intent === 'rr', n = (s.count || (par ? 3 : 5)) + d;
+  if (n < (par ? 2 : 1) || n > 12) return;
+  askForced({count: n, count_set: true});
+}
+function askAdd(i) { const a = (window.ASK_ADDS || [])[i]; if (a) askForced(a[1]); }
+function askRefine(t) {
+  t = String(t || '').trim(); if (!t) return;
+  // "+overs -Brunson" on top of what was asked: the words go to the reader with the last search
+  const q = (window.ASK_Q || '') + ' ' + t;
+  document.getElementById('askQ').value = q; askGo(q);
+}
 async function askGo(q, forced) {
   const out = document.getElementById('askOut');
   if (!window.OnyxAsk || !String(q || '').trim()) return;
@@ -446,7 +497,8 @@ async function askGo(q, forced) {
   try { R = await OnyxAsk.ask(q, forced); } catch (e) { out.innerHTML = '<div class="my-empty">Could not load today\'s boards. Try again in a minute.</div>'; return; }
   lvAsk(R, q);   // live games for a "live" question or teams playing now (fills in after the answer renders)
   const say = R.say ? `<div class="ask-say">${esc(R.say)}</div>` : '';
-  const understood = say + `<div class="ask-u">Read as: <b>${esc(R.understood)}</b>${R.via === 'ai' ? ' · AI' : ''}</div>${R.note ? `<div class="ask-u">${esc(R.note)}</div>` : ''}`;
+  window.ASK_R = R; window.ASK_Q = q;
+  const understood = say + `<div class="ask-u">Read as: <b>${esc(R.understood)}</b>${R.via === 'ai' ? ' · AI' : ''}</div>${R.note ? `<div class="ask-u">${esc(R.note)}</div>` : ''}` + askEditor(R);
   // a question back instead of a guess (the AI's, or "those games have started"): tap an answer
   if (R.clarify) {
     window.ASK_CL = R.clarify;
