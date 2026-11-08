@@ -1033,5 +1033,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-187374-ml-home",
+  "sport": "tennis",
+  "gid": "187374",
+  "date": "2026-11-08",
+  "logged_at": "2026-11-08T22:12:07+00:00",
+  "matchup": "Jessica Pegula vs Coco Gauff",
+  "home": "Coco Gauff",
+  "away": "Jessica Pegula",
+  "label": "Coco Gauff to win",
+  "kind": "ml",
+  "side": "home",
+  "line": null,
+  "price": -155,
+  "chance": 0.6632,
+  "implied": 0.6078,
+  "edge": 0.055,
+  "fair": -195,
+  "state": {
+   "sets": "0-1",
+   "srv": null,
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v6",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
