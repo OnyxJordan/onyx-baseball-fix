@@ -3182,7 +3182,7 @@
        "win": false,
        "sets": [
         6,
-        5
+        6
        ],
        "serve": false
       },
@@ -3194,17 +3194,17 @@
        "win": false,
        "sets": [
         1,
-        4
+        6
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
     {
      "id": "186528",
-     "start": "2026-11-08T17:10Z",
+     "start": "2026-11-08T17:20Z",
      "state": "pre",
-     "detail": "11/8 - 12:10 PM EST",
+     "detail": "11/8 - 12:20 PM EST",
      "round": "Round 1",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -8884,8 +8884,8 @@
     {
      "id": "187460",
      "start": "2026-11-08T16:10Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Qualifying Final",
      "draw": "Women's Singles",
      "court": "Court 1",
@@ -8898,19 +8898,19 @@
        "win": false,
        "sets": [
         1,
-        0
+        1
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Dalila Jakupovic",
        "short": "D. Jakupovic",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/slo.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        5
+        6
        ],
        "serve": false
       }
@@ -8919,8 +8919,8 @@
     {
      "id": "187461",
      "start": "2026-11-08T17:00Z",
-     "state": "pre",
-     "detail": "11/8 - 12:00 PM EST",
+     "state": "in",
+     "detail": "1st",
      "round": "Qualifying Final",
      "draw": "Women's Singles",
      "court": "Main Court",
@@ -8931,7 +8931,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/col.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        1
+       ],
        "serve": false
       },
       {
@@ -8940,8 +8942,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/col.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        1
+       ],
+       "serve": true
       }
      ]
     },
@@ -9847,5 +9851,5 @@
    ]
   }
  ],
- "fetched": "2026-11-08T16:56:04+00:00"
+ "fetched": "2026-11-08T17:15:09+00:00"
 }
