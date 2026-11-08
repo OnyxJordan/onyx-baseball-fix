@@ -17602,10 +17602,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "163",
+  "profit": -1.0,
+  "graded_at": "2026-11-08T20:23:39+00:00"
  },
  {
   "id": "cbb-401924734-total-under",
@@ -17633,10 +17633,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "150",
+  "profit": -1.0,
+  "graded_at": "2026-11-08T20:23:39+00:00"
  },
  {
   "id": "cbb-401921820-total-under",
@@ -17664,10 +17664,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "146",
+  "profit": -1.0,
+  "graded_at": "2026-11-08T20:23:39+00:00"
  },
  {
   "id": "cbb-401921687-total-under",
@@ -17695,10 +17695,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "124",
+  "profit": 0.8696,
+  "graded_at": "2026-11-08T20:23:39+00:00"
  },
  {
   "id": "cbb-401921685-total-under",
@@ -17726,10 +17726,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "157",
+  "profit": -1.0,
+  "graded_at": "2026-11-08T20:23:39+00:00"
  },
  {
   "id": "cbb-401921684-total-under",
@@ -17757,10 +17757,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "130",
+  "profit": 0.8696,
+  "graded_at": "2026-11-08T20:23:39+00:00"
  },
  {
   "id": "cbb-401921683-total-under",
@@ -17788,10 +17788,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "127",
+  "profit": 0.9091,
+  "graded_at": "2026-11-08T20:23:39+00:00"
  },
  {
   "id": "nfl-401873045-spread-away",
@@ -18343,6 +18343,68 @@
    "period": 1,
    "clock": "0:00",
    "f": 0.5
+  },
+  "pre_src": "onyx",
+  "model": "live-v6",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "cbb-401926215-total-under",
+  "sport": "cbb",
+  "gid": "401926215",
+  "date": "2026-11-08",
+  "logged_at": "2026-11-08T20:23:35+00:00",
+  "matchup": "WKU @ TNTC",
+  "home": "TNTC",
+  "away": "WKU",
+  "label": "Under 169.5",
+  "kind": "total",
+  "side": "under",
+  "line": 169.5,
+  "price": -110,
+  "chance": 0.5574,
+  "implied": 0.5238,
+  "edge": 0.034,
+  "fair": -125,
+  "state": {
+   "score": "WKU 15 - 21 TNTC",
+   "period": 1,
+   "clock": "11:45",
+   "f": 0.794
+  },
+  "pre_src": "onyx",
+  "model": "live-v6",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "cbb-401911335-total-under",
+  "sport": "cbb",
+  "gid": "401911335",
+  "date": "2026-11-08",
+  "logged_at": "2026-11-08T20:23:35+00:00",
+  "matchup": "IDST @ AF",
+  "home": "AF",
+  "away": "IDST",
+  "label": "Under 165.5",
+  "kind": "total",
+  "side": "under",
+  "line": 165.5,
+  "price": -110,
+  "chance": 0.558,
+  "implied": 0.5238,
+  "edge": 0.034,
+  "fair": -125,
+  "state": {
+   "score": "IDST 14 - 19 AF",
+   "period": 1,
+   "clock": "12:07",
+   "f": 0.803
   },
   "pre_src": "onyx",
   "model": "live-v6",

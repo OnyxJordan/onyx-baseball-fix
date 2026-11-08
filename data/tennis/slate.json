@@ -8373,9 +8373,9 @@
    "matches": [
     {
      "id": "187373",
-     "start": "2026-11-08T20:00Z",
-     "state": "pre",
-     "detail": "11/8 - 3:00 PM EST",
+     "start": "2026-11-08T20:15Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Group Stage",
      "draw": "Women's Singles",
      "court": "Indian Wells Tennis Garden",
@@ -8386,8 +8386,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/cze.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        1
+       ],
+       "serve": true
       },
       {
        "name": "Marta Kostyuk",
@@ -8395,7 +8397,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ukr.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        0
+       ],
        "serve": false
       }
      ]
@@ -9859,5 +9863,5 @@
    ]
   }
  ],
- "fetched": "2026-11-08T19:55:13+00:00"
+ "fetched": "2026-11-08T20:23:13+00:00"
 }
