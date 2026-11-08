@@ -39,6 +39,15 @@
     if (keep.length !== a.length) write(keep);
     return keep;
   }
+  // a play with no Onyx selection id (11/8: Onyx's feed is down, every play is on the market line and none has one,
+  // so no star showed anywhere): a stable key from the game, market, player, side and line. Tracking reads the game
+  // and the stats, never the id, so these follow live and grade like any other pick.
+  function withId(p) {
+    if (!p || p.id) return p;
+    var k = [p.sport, p.gid || p.matchup, p.kind, p.mkt, p.name || p.team, p.side, p.line, p.hcap].map(function (x) { return x == null ? '' : String(x); }).join('|');
+    if (!p.label || k.replace(/\|/g, '') === '') return p;
+    return Object.assign({}, p, {id: 'k:' + k.toLowerCase().replace(/\s+/g, '_')});
+  }
   function has(id) { return !!id && read().some(function (p) { return p.id === id; }); }
   function remove(id) { write(read().filter(function (p) { return p.id !== id; })); unrecord(id); }
 
@@ -53,7 +62,7 @@
     if (!p || !p.id) return;
     var a = history();
     if (a.some(function (h) { return h.id === p.id; })) return;
-    var keep = ['id', 'sport', 'label', 'matchup', 'start', 'gid', 'team', 'price', 'conf', 'kind', 'mkt', 'side', 'line', 'hcap', 'name', 'saved'];
+    var keep = ['id', 'sport', 'label', 'matchup', 'start', 'gid', 'team', 'price', 'conf', 'kind', 'mkt', 'side', 'line', 'hcap', 'name', 'saved', 'legs', 'my_price'];
     var h = {}; keep.forEach(function (k) { if (p[k] != null) h[k] = p[k]; });
     h.saved = h.saved || new Date().toISOString(); h.res = null;
     a.push(h); hWrite(a);
@@ -84,12 +93,53 @@
     }).then(function () { grading = false; }, function () { grading = false; });
   }
   // a pick graded "W" early (an over that cleared) is final; everything else waits for the final whistle
+  // ── parlays as one ticket (11/8, Jordan: "save picks to our account including the parlay builder so we know exactly
+  // how we're tracking"): {kind: 'parlay', legs: [...]}, kept in My picks and the history like any pick (so it syncs to
+  // the account), graded by its legs: any leg lost is a loss, every leg won (pushes drop out) is a win.
+  var LEGKEEP = ['id', 'sport', 'label', 'matchup', 'start', 'gid', 'team', 'price', 'conf', 'kind', 'mkt', 'side', 'line', 'hcap', 'name'];
+  function ticket(legs, o) {
+    o = o || {};
+    legs = (legs || []).map(withId).filter(function (x) { return x && x.id; }).map(function (x) { var l = {}; LEGKEEP.forEach(function (k) { if (x[k] != null) l[k] = x[k]; }); return l; });
+    if (legs.length < 2) return null;
+    var ids = legs.map(function (l) { return l.id; }).sort().join(','), h = 0;
+    for (var i = 0; i < ids.length; i++) h = (h * 31 + ids.charCodeAt(i)) >>> 0;
+    var sps = legs.map(function (l) { return l.sport; }).filter(function (x, i, a) { return a.indexOf(x) === i; });
+    var starts = legs.map(function (l) { return Date.parse(l.start); }).filter(function (x) { return !isNaN(x); });
+    var prob = legs.reduce(function (m, l) { return l.conf != null && m != null ? m * l.conf : null; }, 1);
+    return {id: 't:' + h.toString(36) + ':' + legs.length, kind: 'parlay', legs: legs, label: o.label || legs.length + '-leg parlay',
+            sport: sps.length === 1 ? sps[0] : 'multi', matchup: o.matchup || legs.map(function (l) { return l.label; }).join(' + '),
+            start: starts.length ? new Date(Math.min.apply(null, starts)).toISOString() : null, price: o.price != null ? o.price : null, conf: prob};
+  }
+  function saveTicket(legs, o) {
+    var t = ticket(legs, o); if (!t) return null;
+    if (has(t.id)) { toast('This parlay is already in My picks'); return t; }
+    toggle(t);
+    if (o && o.my_price != null) setMyPrice(t.id, o.my_price);
+    return t;
+  }
+  // the odds you actually got: your record and units use them (11/8)
+  function setMyPrice(id, price) {
+    price = price == null || price === '' ? null : Math.round(+price);
+    if (price != null && (isNaN(price) || (price > -100 && price < 100))) return false;
+    var a = read().map(function (p) { return p.id === id ? Object.assign({}, p, {my_price: price}) : p; }); write(a);
+    hWrite(history().map(function (h) { return h.id === id ? Object.assign({}, h, {my_price: price}) : h; }));
+    return true;
+  }
+  // value of a price against our chance (11/8: "a tool where we enter the odds and you give us the value")
+  function value(prob, price) {
+    price = +price; if (!prob || isNaN(price) || (price > -100 && price < 100)) return null;
+    var dec = price > 0 ? 1 + price / 100 : 1 + 100 / -price, imp = 1 / dec, ev = prob * (dec - 1) - (1 - prob);
+    var fair = prob >= 0.5 ? -Math.round(100 * prob / (1 - prob)) : Math.round(100 * (1 - prob) / prob);
+    return {prob: prob, implied: imp, edge: prob - imp, ev100: Math.round(ev * 1000) / 10, fair: fair,
+            kelly: ev > 0 ? Math.round(ev / (dec - 1) * 1000) / 10 : 0, good: ev > 0};
+  }
   function stats(a) {
     a = a || history();
     var g = a.filter(function (h) { return h.res; }), w = 0, l = 0, p = 0, units = 0, risked = 0, by = {};
     g.forEach(function (h) {
       var s = by[h.sport] = by[h.sport] || {w: 0, l: 0, p: 0, units: 0};
-      if (h.res === 'W') { w++; s.w++; var u = h.price == null ? 1 : h.price > 0 ? h.price / 100 : 100 / -h.price; units += u; s.units += u; }
+      var pr = h.my_price != null ? h.my_price : h.price;      // the odds you got, when you entered them (11/8)
+      if (h.res === 'W') { w++; s.w++; var u = pr == null ? 1 : pr > 0 ? pr / 100 : 100 / -pr; units += u; s.units += u; }
       else if (h.res === 'L') { l++; s.l++; units -= 1; s.units -= 1; }
       else { p++; s.p++; }
       if (h.res !== 'P') risked += 1;
@@ -101,6 +151,7 @@
   function alertsOn() { return lsGet(ALERTS, 0) === 1 && typeof Notification !== 'undefined' && Notification.permission === 'granted'; }
   function canAsk() { return typeof Notification !== 'undefined' && Notification.permission !== 'denied'; }
   function toggle(p) {
+    p = withId(p);
     if (!p || !p.id) return false;
     if (has(p.id)) { remove(p.id); toast('Removed from My picks'); return false; }
     var a = read(), sp = Object.assign({}, p, {saved: new Date().toISOString()}); a.push(sp); write(a); record(sp);
@@ -116,6 +167,7 @@
     el.setAttribute('aria-label', on ? 'Saved' : 'Save pick');
   }
   function btn(p) {
+    p = withId(p);
     if (!p || !p.id) return '';
     var i = REG.push(p) - 1, on = has(p.id);
     return '<button class="ox-save' + (on ? ' on' : '') + '" aria-label="' + (on ? 'Saved' : 'Save pick') + '" title="Save this pick and follow it live" ' +
@@ -183,6 +235,15 @@
   }
   // {state: pre|in|post, res: W|L|P|up|down|null, cur: the stat or score now}
   function track(p) {
+    if (p.kind === 'parlay' && (p.legs || []).length) {
+      return Promise.all(p.legs.map(function (l) { return track(l).catch(function () { return {p: l, state: 'pre', res: null}; }); })).then(function (T) {
+        var won = T.filter(function (t) { return t.res === 'W'; }).length, lost = T.some(function (t) { return t.res === 'L'; });
+        var pushed = T.filter(function (t) { return t.res === 'P'; }).length, done = T.every(function (t) { return t.res === 'W' || t.res === 'L' || t.res === 'P'; });
+        var state = T.some(function (t) { return t.state === 'in'; }) ? 'in' : T.every(function (t) { return t.state === 'post' || t.res === 'W' || t.res === 'L' || t.res === 'P'; }) ? 'post' : T.some(function (t) { return t.state !== 'pre'; }) ? 'in' : 'pre';
+        var res = lost ? 'L' : done ? (pushed === T.length ? 'P' : 'W') : T.some(function (t) { return t.res === 'down'; }) ? 'down' : won || T.some(function (t) { return t.res === 'up'; }) ? 'up' : null;
+        return {p: p, state: state, res: res, cur: won + ' of ' + T.length + ' won' + (pushed ? ', ' + pushed + ' push' : ''), legs: T};
+      });
+    }
     var out = {p: p, state: 'pre', res: null, cur: null};
     if (p.sport === 'tennis') {
       return tennis().then(function (C) {
@@ -233,6 +294,7 @@
   function finalLine(t) {
     var p = t.p;
     if (t.cur == null) return '';
+    if (p.kind === 'parlay') return String(t.cur);
     if (p.kind === 'ml' || p.kind === 'spread') return 'Score ' + t.cur;
     if (p.kind === 'total') return t.cur + ' total, line ' + p.line;
     return t.cur + ' ' + (MW[p.mkt] || '') + (p.mkt === 'anytime_td' ? '' : ', line ' + p.line);
@@ -358,7 +420,7 @@
     '@media (prefers-reduced-motion: reduce){.oxw,.oxw-big,.oxw-fx i{animation:none!important;transition:none!important}.oxw-fx{display:none}}';
   var st = document.createElement('style'); st.textContent = css; (document.head || document.documentElement).appendChild(st);
   window.OnyxSaved = {all: all, has: has, remove: remove, toggle: toggle, tap: tap, btn: btn,
-    track: track, celebrate: celebrate, watch: watch, alertsOn: alertsOn, setAlerts: setAlerts,
+    withId: withId, ticket: ticket, saveTicket: saveTicket, setMyPrice: setMyPrice, value: value, track: track, celebrate: celebrate, watch: watch, alertsOn: alertsOn, setAlerts: setAlerts,
     history: history, grade: grade, stats: stats, record: record};
   if (document.readyState === 'loading') addEventListener('DOMContentLoaded', start); else start();
 })();

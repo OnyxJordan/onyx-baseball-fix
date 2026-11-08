@@ -13,7 +13,7 @@ levels below are still read:
     recap    one morning push (--recap): yesterday's record and today's saved picks
     off      nothing
 
-    python3 my_alerts.py --watch 1140    poll every 75 s for 1140 s (my_alerts.yml runs this back to back)
+    python3 my_alerts.py --watch 20400   poll every 75 s for 5h40m (my_alerts.yml hands off to the next run)
     python3 my_alerts.py --once          one poll
     python3 my_alerts.py --recap         the morning recap
 
@@ -211,6 +211,20 @@ def q1_of(j):
 def track(p):
     """{state: pre|in|post, res: W|L|P|up|down|None, cur, detail, period} - saved.js track(), in Python."""
     out = {"state": "pre", "res": None, "cur": None, "detail": "", "period": None}
+    # a saved parlay (11/8, saved.js tickets): graded by its legs, any leg lost is a loss, every leg won is a win
+    if p.get("kind") == "parlay" and p.get("legs"):
+        T = [track(l) for l in p["legs"]]
+        won = sum(1 for t in T if t["res"] == "W")
+        pushed = sum(1 for t in T if t["res"] == "P")
+        lost = any(t["res"] == "L" for t in T)
+        done = all(t["res"] in ("W", "L", "P") for t in T)
+        state = "in" if any(t["state"] == "in" for t in T) else ("post" if all(t["state"] == "post" or t["res"] in ("W", "L", "P") for t in T)
+                                                                  else ("in" if any(t["state"] != "pre" for t in T) else "pre"))
+        res = "L" if lost else ("P" if pushed == len(T) else "W") if done else \
+            ("down" if any(t["res"] == "down" for t in T) else "up" if won or any(t["res"] == "up" for t in T) else None)
+        out.update(state=state, res=res, cur=f"{won} of {len(T)} won" + (f", {pushed} push" if pushed else ""),
+                   detail=next((t["detail"] for t in T if t["state"] == "in"), ""))
+        return out
     sp = p.get("sport")
     if sp == "tennis":
         hits = [c for c in tennis() if any(nk((x.get("athlete") or {}).get("displayName")) == nk(p.get("name"))
@@ -280,6 +294,8 @@ def status_line(p, t):
     if t["cur"] is None:
         return ""
     k = p.get("kind")
+    if k == "parlay":
+        return str(t["cur"])
     if k in ("ml", "spread"):
         return f"Score {t['cur']}"
     if k == "total":
@@ -298,7 +314,8 @@ def message(ev, p, t):
     if ev == "swing":
         return ("Your pick is ahead" if t["res"] == "up" else "Your pick fell behind"), " · ".join(x for x in (lab, st) if x)
     head = {"W": "Cashed: ", "L": "Missed: ", "P": "Push: "}[t["res"]]
-    price = f"Onyx {odds(p.get('price'))}" if p.get("price") is not None else ""
+    pr = p.get("my_price") if p.get("my_price") is not None else p.get("price")
+    price = (f"at {odds(pr)}" if p.get("my_price") is not None else f"Onyx {odds(pr)}") if pr is not None else ""
     return head + lab, " · ".join(x for x in (st, price) if x)
 
 
@@ -448,9 +465,8 @@ def main(argv):
             print(f"::warning::my_alerts poll: {str(e)[:200]}")
         if time.time() + 75 > end:
             break
-        if ACTIVE == 0:
-            print("my_alerts: no saved pick is live or starting within 25 minutes; done for this run")
-            break
+        # (11/8: GitHub ran the 20-minute schedule twice in 13 hours, so the watcher no longer stops when nothing is
+        # live: one long run covers the day, a pick saved minutes before kickoff included, and hands off to the next)
         time.sleep(75)
     print(f"my_alerts: {total} pushes sent")
 

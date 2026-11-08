@@ -163,7 +163,16 @@
           var q = pref(); q.my = want; save(q);
           return withOS(function (OS) { return OS.User.addTags({my: want}); }).catch(function () {});
         });
-      }).catch(function (e) { LEVEL = lv; ERR = ERR || (e && e.message ? String(e.message).slice(0, 120) : 'try again in a minute'); })
+      }).catch(function (e) {
+        // Supabase's own reason (accounts.js throws {status, body}), in plain words where we know it (11/8: "could not
+        // save, try again in a minute" hid an old check on push_level that only allowed one choice)
+        var b = (e && e.body) || {}, code = String(b.code || ''), msg = String(b.message || b.msg || (e && e.message) || '');
+        LEVEL = lv;
+        ERR = ERR || (code === '23514' || /check constraint/i.test(msg) ? 'the database still allows one choice only: run the 11/8 push_level check from supabase/schema.sql'
+          : code === '42703' || /push_level/.test(msg) ? 'the push settings column is missing: run the 11/7 block of supabase/schema.sql'
+          : e && (e.status === 401 || e.status === 403) ? 'your sign-in expired: sign in again on the Account page'
+          : (msg ? msg.slice(0, 120) : 'try again in a minute') + (e && e.status ? ' (' + e.status + ')' : ''));
+      })
         .then(function () { BUSY = false; draw(el); });
     }
     [].forEach.call(el.querySelectorAll('[data-ev]'), function (b) {

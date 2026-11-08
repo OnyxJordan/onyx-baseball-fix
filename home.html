@@ -91,6 +91,17 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
 .ask-step button{width:26px;height:26px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#fff;font:900 15px monospace;cursor:pointer;line-height:1}
 .ask-rf{display:flex;gap:6px;margin-top:9px}.ask-rf input{flex:1;min-width:0;background:#0d0a12;border:1px solid #3a2a55;border-radius:10px;padding:9px 10px;color:#fff;font:600 13px monospace}
 .ask-rf button{font:800 12px monospace;color:#fff;background:#a24bff;border:0;border-radius:10px;padding:0 14px;cursor:pointer}
+.ask-sv{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:-4px 0 12px}
+.ask-sv button{font:800 12px monospace;color:#fff;background:linear-gradient(135deg,#b038f9,#635bff);border:0;border-radius:999px;padding:9px 14px;cursor:pointer}
+.ask-sv button.done{background:rgba(97,233,112,.18);color:#61e970;border:1px solid rgba(97,233,112,.5)}
+.ask-sv span{font:600 11.5px monospace;color:#9a93a6}
+.vx{margin:14px 0 4px;padding:12px 14px;border-radius:14px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.03)}
+.vx small{display:block;font:700 10px monospace;letter-spacing:.08em;text-transform:uppercase;color:#d795ff;margin-bottom:8px}
+.vx-r{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.vx select,.vx input{background:#0d0a12;border:1px solid #3a2a55;border-radius:10px;padding:9px 10px;color:#fff;font:600 13px monospace;min-width:0}
+.vx select{flex:1 1 220px;max-width:100%}.vx input.o{width:96px}.vx input.q{flex:1 1 220px}
+.vx button{font:800 12px monospace;color:#fff;background:#a24bff;border:0;border-radius:10px;padding:9px 14px;cursor:pointer}
+.vx-out{margin-top:9px;font:600 12.5px monospace;line-height:1.6;color:#ddd}.vx-out b.up{color:#61e970}.vx-out b.dn{color:#ff8a8a}
 .ask-add{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.ask-add button{font:700 11.5px monospace;color:#cfc8da;background:rgba(255,255,255,.05);border:1px dashed rgba(255,255,255,.22);border-radius:999px;padding:5px 10px;cursor:pointer}
 .ask-say{font-size:15px;line-height:1.5;color:#efeaf7;margin:14px 0 4px}.ask-why{font-size:14px;line-height:1.55;color:#cfc7dc;border-left:2px solid #a24bff;padding:2px 0 2px 12px;margin:14px 0}
 .ask-cl{border:1px solid #3a2a55;border-radius:14px;padding:14px 16px;margin:12px 0;background:rgba(162,75,255,.06)}.ask-cl b{display:block;font-size:15px;line-height:1.45;color:#efeaf7;margin-bottom:10px}.ask-cl .ask-ex{flex-wrap:wrap}
@@ -195,6 +206,7 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
       <button type="submit">Build</button></form>
     <div class="ask-ex" id="askEx"></div>
     <div id="askOut"></div>
+    <div id="vxSolo"></div>
   </section>
 
   <!-- ── Top 10 plays of the day, every sport ─────────────────────── -->
@@ -469,6 +481,48 @@ function askEditor(R) {
     <div class="ask-add">${adds.map((a, i) => `<button type="button" onclick="askAdd(${i})">${esc(a[0])}</button>`).join('')}</div>
     <form class="ask-rf" onsubmit="askRefine(this.r.value);return false"><input name="r" autocomplete="off" placeholder="Add or remove: +points -Brunson" aria-label="Add or remove from this search"><button type="submit">Go</button></form></div>`;
 }
+// ── save a whole parlay (11/8, Jordan: "save picks to our account including the parlay builder"): one ticket in My
+// picks and the history, synced to the account, graded by its legs; the odds you got are optional
+function askSaveParlay() {
+  const R = window.ASK_ROWS || [], P = window.ASK_PL; if (!R.length || !window.OnyxSaved) return;
+  const legs = R.map(p => Object.assign({id: p.sel}, p));
+  const t = OnyxSaved.saveTicket(legs, {price: P ? P.price : null, label: R.length + '-leg ' + (P && P.same_game ? 'same-game parlay' : 'parlay')});
+  const b = document.getElementById('askSave'); if (!t || !b) return;
+  b.classList.add('done'); b.textContent = 'Saved to my picks';
+  const odds = prompt('Saved. What odds did you get? (optional, e.g. +650)', P && P.price != null ? (P.price > 0 ? '+' : '') + P.price : '');
+  if (odds && OnyxSaved.setMyPrice(t.id, String(odds).replace('+', ''))) b.textContent = 'Saved at ' + odds;
+}
+// ── value check (11/8: "a tool where we enter the odds and you give us the value"): pick a leg, the whole parlay or
+// any play you type, enter the odds you see, and get our chance against the price
+function valueBox(rows, parlay) {
+  window.VX_ITEMS = (rows || []).map((p, i) => ({label: (parlay ? 'Leg ' + (i + 1) + ': ' : '') + p.label, prob: p.conf, price: p.price}));
+  if (parlay && parlay.prob) window.VX_ITEMS.unshift({label: 'The whole ' + rows.length + '-leg parlay', prob: parlay.prob, price: parlay.price});
+  const opts = window.VX_ITEMS.map((x, i) => `<option value="${i}">${esc(x.label)} (our ${Math.round(100 * x.prob)}%)</option>`).join('') + '<option value="q">Another play: type it</option>';
+  return `<div class="vx" id="vx"><small>Value check · your odds against our chance</small><div class="vx-r">
+    <select onchange="vxPick(this.value)" aria-label="Which play">${opts}</select>
+    <input class="q" id="vxQ" placeholder="e.g. Jalen Brunson over 26.5 points" ${window.VX_ITEMS.length ? 'hidden' : ''} aria-label="The play">
+    <input class="o" id="vxO" inputmode="text" placeholder="+120" aria-label="Your odds"><button type="button" onclick="vxGo()">Check</button></div>
+    <div class="vx-out" id="vxOut"></div></div>`;
+}
+function vxPick(v) { const q = document.getElementById('vxQ'); if (q) q.hidden = v !== 'q'; window.VX_SEL = v; }
+async function vxGo() {
+  const out = document.getElementById('vxOut'), odds = String((document.getElementById('vxO') || {}).value || '').trim().replace(/^\+/, '');
+  if (!out || !window.OnyxSaved) return;
+  let sel = window.VX_SEL != null ? window.VX_SEL : ((window.VX_ITEMS || []).length ? '0' : 'q'), it = null;
+  if (sel === 'q') {
+    const q = String((document.getElementById('vxQ') || {}).value || '').trim(); if (!q) { out.textContent = 'Type the play first.'; return; }
+    out.textContent = 'Finding that play...';
+    try { const R = await OnyxAsk.ask(q); const p = (R.rows || [])[0]; if (p) it = {label: p.label + ' · ' + p.matchup, prob: p.conf, price: p.price}; } catch (e) {}
+    if (!it) { out.textContent = 'Could not find that play on today\'s boards. Try the player and the line, like "Brunson over 26.5 points".'; return; }
+  } else it = (window.VX_ITEMS || [])[+sel];
+  if (!it) return;
+  const v = OnyxSaved.value(it.prob, odds || it.price);
+  if (!v) { out.textContent = 'Enter American odds like +120 or -150.'; return; }
+  const sg = x => (x > 0 ? '+' : '') + x, pc = x => Math.round(100 * x) + '%';
+  out.innerHTML = `${esc(it.label)}<br>Our chance <b>${pc(v.prob)}</b> · your odds ${esc(sg(+odds || it.price))} need <b>${pc(v.implied)}</b> · fair price ${sg(v.fair)}<br>`
+    + `<b class="${v.good ? 'up' : 'dn'}">${v.good ? 'Value' : 'No value'}: ${v.ev100 > 0 ? '+' : ''}${v.ev100} per $100</b>, edge ${v.edge > 0 ? '+' : ''}${(100 * v.edge).toFixed(1)} points${v.good ? ' · Kelly says ' + v.kelly + '% of bankroll at most' : ''}`
+    + `<br><span style="color:#8f879c">Our chance is the model blended with the market price. Projections, not Onyx Picks.</span>`;
+}
 function askForced(patch) {
   const R = window.ASK_R; if (!R || !R.base) return;
   const spec = Object.assign({}, R.base, patch);
@@ -489,6 +543,7 @@ function askRefine(t) {
   document.getElementById('askQ').value = q; askGo(q);
 }
 // home.html?ask=...#ask (the profile's "Search my kind of bets"): run that search once the page is up
+addEventListener('load', () => { const vs = document.getElementById('vxSolo'); if (vs) { vs.innerHTML = valueBox([], null).replace('id="vx"', 'id="vxS"'); } });
 addEventListener('load', () => { try { const q = new URLSearchParams(location.search).get('ask'); if (!q) return;
   const go = () => { if (!window.OnyxAsk) return setTimeout(go, 200); const i = document.getElementById('askQ'); if (i) i.value = q; askGo(q); };
   go(); } catch (e) {} });
@@ -544,7 +599,10 @@ async function askGo(q, forced) {
       <span>$1 on each = $${R.rr.combos.length} total · average ticket hits ${(100 * R.rr.hit).toFixed(1)}% by the models</span><br>
       <span>${R.rr.combos.map(c => 'Legs ' + c.legs.join('+') + ' ' + fmtOdds(c.price)).join(' · ')}</span></div>
       <a class="t10-bet" href="https://app.onyxodds.com/share?${R.rows.map(p => p.sel).filter(Boolean).map(s => 'selection=' + encodeURIComponent(s)).join('&')}&referrer=${ONYX_REFERRER}" target="_blank" rel="noopener">Open the picks on Onyx</a></div>` : '';
-  out.innerHTML = understood + pl + rr + `<div class="ask-why wait" id="askWhy" hidden>Reading the legs...</div><div class="t10-list">${rows}</div><div class="my-note">${R.two ? 'Onyx prices anytime TD; the 2+ chance is from the model\'s expected touchdowns. ' : ''}Confidence is each sport model's chance blended with Onyx's price. Projections are not picks and are not graded; Onyx Picks are on the Onyx Picks page. ${SG || (R.parlay && R.parlay.sgp_plus) ? '*Onyx prices same-game legs itself and usually pays less than the legs multiplied, because the legs are tied together; the same tie is why the true chance sits above the floor shown. ' : ''}${R.pool > R.rows.length ? R.pool + ' plays matched; the best ' + R.rows.length + ' shown.' : ''}</div>`;
+  window.ASK_ROWS = R.rows; window.ASK_PL = R.parlay || null;
+  { const vs = document.getElementById('vxSolo'); if (vs) vs.innerHTML = ''; window.VX_SEL = null; }   // the answer has its own value check
+  const svb = R.parlay && window.OnyxSaved && OnyxSaved.saveTicket ? `<div class="ask-sv"><button type="button" id="askSave" onclick="askSaveParlay()">Save parlay to my account</button><span>Tracked and graded with your picks</span></div>` : '';
+  out.innerHTML = understood + pl + svb + rr + `<div class="ask-why wait" id="askWhy" hidden>Reading the legs...</div><div class="t10-list">${rows}</div>` + valueBox(R.rows, R.parlay) + `<div class="my-note">${R.two ? 'Onyx prices anytime TD; the 2+ chance is from the model\'s expected touchdowns. ' : ''}Confidence is each sport model's chance blended with Onyx's price. Projections are not picks and are not graded; Onyx Picks are on the Onyx Picks page. ${SG || (R.parlay && R.parlay.sgp_plus) ? '*Onyx prices same-game legs itself and usually pays less than the legs multiplied, because the legs are tied together; the same tie is why the true chance sits above the floor shown. ' : ''}${R.pool > R.rows.length ? R.pool + ' plays matched; the best ' + R.rows.length + ' shown.' : ''}</div>`;
   // the AI's read on these legs, from their own numbers (only with the relay on); a follow-up hint either way
   out.insertAdjacentHTML('beforeend', `<div class="ask-fu">Follow up: "swap leg 2"${R.via === 'ai' ? ', "make it +500", "same but unders"' : ''}</div>`);
   if (R.via === 'ai') {
