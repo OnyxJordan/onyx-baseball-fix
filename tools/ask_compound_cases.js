@@ -52,5 +52,12 @@ module.exports = [
   C('give me your favorite 10 value TD scorers', {markets: ['anytime_td'], intent: 'list', count: 10, sort: 'edge'}),
   C('tell me the top 5 QB passing yards projections by value', {sports: ['nfl'], markets: ['pass_yds'], count: 5, sort: 'edge'}),
   C('give me just the top 5 QB passing yard projections', {sports: ['nfl'], markets: ['pass_yds'], count: 5, sort: 'proj'}),
-  C('top 10 nfl receiving yards projections', {sports: ['nfl'], markets: ['rec_yds'], count: 10, sort: 'proj'})
+  C('top 10 nfl receiving yards projections', {sports: ['nfl'], markets: ['rec_yds'], count: 10, sort: 'proj'}),
+  // ── positive value only, as a rule (11/8, Jordan: "top 5 value plays for TDs in the 1 PM NFL games") ──
+  C('top 5 value plays for TDs in the 1 PM NFL games', {sports: ['nfl'], markets: ['anytime_td'], count: 5, slot: '1 PM slate', sort: 'edge'}),
+  C('top 5 positive value plays for TDs in the 1 PM NFL games', {sports: ['nfl'], markets: ['anytime_td'], count: 5, slot: '1 PM slate', pos_value: true}),
+  C('positive value nfl props only', {sports: ['nfl'], pos_value: true}),
+  C('only +ev plays', {pos_value: true}),
+  C('nba overs with an edge', {sports: ['nba'], side: 'over', pos_value: true}),
+  C('3 leg parlay positive ev legs only', {intent: 'parlay', count: 3, pos_value: true})
 ];
