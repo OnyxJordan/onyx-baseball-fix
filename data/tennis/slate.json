@@ -3182,7 +3182,7 @@
        "win": false,
        "sets": [
         6,
-        3
+        5
        ],
        "serve": false
       },
@@ -3194,17 +3194,17 @@
        "win": false,
        "sets": [
         1,
-        2
+        4
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
     {
      "id": "186528",
-     "start": "2026-11-08T17:00Z",
+     "start": "2026-11-08T17:10Z",
      "state": "pre",
-     "detail": "11/8 - 12:00 PM EST",
+     "detail": "11/8 - 12:10 PM EST",
      "round": "Round 1",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -8849,8 +8849,8 @@
     {
      "id": "187459",
      "start": "2026-11-08T15:10Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Qualifying Final",
      "draw": "Women's Singles",
      "court": "Main Court",
@@ -8872,12 +8872,12 @@
        "short": "K. Scott",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        3
+        6
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -8885,7 +8885,7 @@
      "id": "187460",
      "start": "2026-11-08T16:10Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Qualifying Final",
      "draw": "Women's Singles",
      "court": "Court 1",
@@ -8897,7 +8897,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        1
+        1,
+        0
        ],
        "serve": true
       },
@@ -8908,6 +8909,7 @@
        "seed": null,
        "win": false,
        "sets": [
+        6,
         5
        ],
        "serve": false
@@ -8916,9 +8918,9 @@
     },
     {
      "id": "187461",
-     "start": "2026-11-08T16:40Z",
+     "start": "2026-11-08T17:00Z",
      "state": "pre",
-     "detail": "11/8 - 11:40 AM EST",
+     "detail": "11/8 - 12:00 PM EST",
      "round": "Qualifying Final",
      "draw": "Women's Singles",
      "court": "Main Court",
@@ -9845,5 +9847,5 @@
    ]
   }
  ],
- "fetched": "2026-11-08T16:34:40+00:00"
+ "fetched": "2026-11-08T16:56:04+00:00"
 }
