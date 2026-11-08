@@ -108,7 +108,7 @@ const srv = http.createServer((q, r) => { const p = path.join(root, decodeURICom
       const legs = (R.rows || []);
       for (const p of legs) {
         if ((s.sports || []).length && s.sports.indexOf(p.sport) < 0) { why.push(`play from ${p.sport}`); break; }
-        const mk = (s.markets || []).slice(); if (mk.indexOf('two_plus_td') >= 0) mk.push('anytime_td');
+        const mk = (s.markets || []).slice(); if (mk.indexOf('two_plus_td') >= 0) mk.push('anytime_td', 'two_td');
         if (mk.length && !R.widened && mk.indexOf(p.mkt) < 0 && mk.indexOf(p.kind) < 0) { why.push(`play market ${p.mkt}`); break; }   // a widened SGP says so
         if (s.props_only && p.kind !== 'prop') { why.push('game line in a props answer'); break; }
         if (!R.widened && s.side && s.side !== 'any' && (p.kind === 'prop' || p.kind === 'total') && p.side !== s.side) { why.push(`play side ${p.side}`); break; }

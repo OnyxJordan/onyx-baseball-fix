@@ -556,6 +556,12 @@ def nfl_block(lane, slate, odds):
             if ln2 and ln2.get("over") is not None:
                 row["two_price"], row["two_sel"] = ln2["over"], ln2.get("over_sel")
                 row["two_edge"] = round(row["two"] - L.implied(ln2["over"]), 4)
+            # 3+ touchdowns (11/8), the same Poisson against Onyx's over 2.5; information, never value
+            row["three"] = round(1 - math.exp(-lam2) * (1 + lam2 + lam2 * lam2 / 2), 4)
+            ln3 = props.get((nk(last["name"]), "three_td"))
+            if ln3 and ln3.get("over") is not None:
+                row["three_price"], row["three_sel"] = ln3["over"], ln3.get("over_sel")
+                row["three_edge"] = round(row["three"] - L.implied(ln3["over"]), 4)
             td_rows.append(row)
         td_rows.sort(key=lambda r: -r["any"])
         block["td"] = td_rows[:400]
@@ -734,7 +740,7 @@ def tennis_rows(lane, slate, odds, w):
 
 MKT_WORD = {"ml": "moneyline", "spread": "spread", "total": "total", "pass_yds": "passing yards", "rush_yds": "rushing yards",
             "rec_yds": "receiving yards", "rec": "receptions", "pass_td": "passing TDs",
-            "pass_att": "pass attempts", "pass_rush_yds": "passing + rushing yards", "rush_rec_yds": "rushing + receiving yards", "two_td": "2+ touchdowns"}
+            "pass_att": "pass attempts", "pass_rush_yds": "passing + rushing yards", "rush_rec_yds": "rushing + receiving yards", "two_td": "2+ touchdowns", "three_td": "3+ touchdowns"}
 
 
 # what people bet first: spreads, totals and player props lead the plays; a
@@ -1519,6 +1525,9 @@ def write_top(key, lane, slate, model):
         if r.get("two_price") is not None:                # 2+ touchdowns at Onyx's over 1.5 (v10, information)
             c2 = dict(c, mkt="two_td", line=1.5, price=r["two_price"], prob=r["two"], edge=r.get("two_edge") or 0.0, sel=r.get("two_sel"))
             board.append(DT.entry(key, c2, "lean", start.get(r["gid"])))
+        if r.get("three_price") is not None:              # 3+ touchdowns at Onyx's over 2.5 (11/8, information)
+            c3 = dict(c, mkt="three_td", line=2.5, price=r["three_price"], prob=r["three"], edge=r.get("three_edge") or 0.0, sel=r.get("three_sel"))
+            board.append(DT.entry(key, c3, "lean", start.get(r["gid"])))
     if key == "cfb":
         board += cfb_td_board(lane, slate, pre, start, DT)
     board += both_sides(key, lane, slate, pre, start, board, DT)

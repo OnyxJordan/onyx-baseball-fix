@@ -941,7 +941,7 @@ function shortNm(n) { const w = String(n || '').trim().split(/\s+/); while (w.le
 var FB_MAP = {passing: {YDS: 'pass_yds', TD: 'pass_td'}, rushing: {YDS: 'rush_yds', TD: 'rush_td'}, receiving: {REC: 'rec', YDS: 'rec_yds', TD: 'rec_td'}};
 var HK_MAP = {G: 'goals', A: 'assists', SOG: 'shots', SV: 'saves'};
 var BK_MAP = {PTS: 'points', REB: 'rebounds', AST: 'assists', '3PT': 'threes', STL: 'steals', BLK: 'blocks', MIN: 'minutes'};
-var STAT_AB = {rebounds: 'REB', threes: '3PM', steals: 'STL', blocks: 'BLK', minutes: 'MIN', pass_yds: 'PASS YDS', rush_yds: 'RUSH YDS', rec_yds: 'REC YDS', rec: 'REC', pass_td: 'PASS TD', pass_att: 'PASS ATT', pass_rush_yds: 'PASS+RUSH', rush_rec_yds: 'RUSH+REC', two_td: '2+ TD', anytime_td: 'TD', points: 'PTS', assists: 'AST', goals: 'G', shots: 'SOG', saves: 'SV'};
+var STAT_AB = {rebounds: 'REB', threes: '3PM', steals: 'STL', blocks: 'BLK', minutes: 'MIN', pass_yds: 'PASS YDS', rush_yds: 'RUSH YDS', rec_yds: 'REC YDS', rec: 'REC', pass_td: 'PASS TD', pass_att: 'PASS ATT', pass_rush_yds: 'PASS+RUSH', rush_rec_yds: 'RUSH+REC', two_td: '2+ TD', three_td: '3+ TD', anytime_td: 'TD', points: 'PTS', assists: 'AST', goals: 'G', shots: 'SOG', saves: 'SV'};
 function boxOf(s, g) {
   const teams = [], byId = {};
   const ids = {};
@@ -1998,7 +1998,7 @@ function renderBoard() {
   el.innerHTML = out.join('');
 }
 var MKT_NAME = {ml: 'Moneyline', spread: 'Spread', total: 'Total', pass_yds: 'Passing yards', rush_yds: 'Rushing yards', rec_yds: 'Receiving yards', rec: 'Receptions',
-                pass_td: 'Passing TDs', pass_att: 'Pass attempts', pass_rush_yds: 'Passing + rushing yards', rush_rec_yds: 'Rushing + receiving yards', two_td: '2+ touchdowns', anytime_td: 'Anytime TD', first_td: 'First TD', goals: 'Goals', shots: 'Shots on goal', points: 'Points', assists: 'Assists', saves: 'Saves',
+                pass_td: 'Passing TDs', pass_att: 'Pass attempts', pass_rush_yds: 'Passing + rushing yards', rush_rec_yds: 'Rushing + receiving yards', two_td: '2+ touchdowns', three_td: '3+ touchdowns', anytime_td: 'Anytime TD', first_td: 'First TD', goals: 'Goals', shots: 'Shots on goal', points: 'Points', assists: 'Assists', saves: 'Saves',
                 rebounds: 'Rebounds', threes: '3-pointers made', pts_reb_ast: 'Pts + reb + ast'};
 
 // ── plays (model) ───────────────────────────────────────────────────

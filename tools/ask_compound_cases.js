@@ -39,5 +39,18 @@ module.exports = [
   C('points + rebounds + assists overs nba', {unsupported: true}),        // combined props: the NBA bet card, not search
   C('3 leg parlay -150 or longer', {intent: 'parlay', count: 3, no_slot: true}),
   C('nba parlay +400', {sports: ['nba'], intent: 'parlay', no_slot: true}),
-  C('same-game parlay nfl', {sports: ['nfl'], intent: 'sgp', no_slot: true})
+  C('same-game parlay nfl', {sports: ['nfl'], intent: 'sgp', no_slot: true}),
+  // ── 2+ and 3+ touchdowns at Onyx's own prices (11/8, Jordan: "I don't want a +120 3 leg parlay": the
+  //    2+ TD legs were priced at their anytime prices, -433/-338/-254, so the ticket fell short of +1000) ──
+  C('3 leg nfl parlay value on 2+ TD scorers minimum odds +1000', {sports: ['nfl'], markets: ['two_plus_td'], intent: 'parlay', count: 3, target_price: 1000, ticket_floor: true}),
+  C('2+ td parlay paying at least +800', {sports: ['nfl'], markets: ['two_plus_td'], intent: 'parlay', target_price: 800}),
+  C('3+ td scorers nfl', {sports: ['nfl'], markets: ['three_td']}),
+  C('three or more touchdowns', {sports: ['nfl'], markets: ['three_td']}),
+  C('2 or more tds sunday', {sports: ['nfl'], markets: ['two_plus_td']}),
+  // ── granular lists (11/8, Jordan) ──
+  C('give me your top 10 favorite nfl overs', {sports: ['nfl'], intent: 'list', count: 10, side: 'over', sort: 'rec'}),
+  C('give me your favorite 10 value TD scorers', {markets: ['anytime_td'], intent: 'list', count: 10, sort: 'edge'}),
+  C('tell me the top 5 QB passing yards projections by value', {sports: ['nfl'], markets: ['pass_yds'], count: 5, sort: 'edge'}),
+  C('give me just the top 5 QB passing yard projections', {sports: ['nfl'], markets: ['pass_yds'], count: 5, sort: 'proj'}),
+  C('top 10 nfl receiving yards projections', {sports: ['nfl'], markets: ['rec_yds'], count: 10, sort: 'proj'})
 ];

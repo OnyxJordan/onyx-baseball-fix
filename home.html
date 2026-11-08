@@ -101,6 +101,8 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
 .vx select,.vx input{background:#0d0a12;border:1px solid #3a2a55;border-radius:10px;padding:9px 10px;color:#fff;font:600 13px monospace;min-width:0}
 .vx select{flex:1 1 220px;max-width:100%}.vx input.o{width:96px}.vx input.q{flex:1 1 220px}
 .vx button{font:800 12px monospace;color:#fff;background:#a24bff;border:0;border-radius:10px;padding:9px 14px;cursor:pointer}
+.vx-legs{margin-top:10px}.vx-legs small{text-transform:none;letter-spacing:0;color:#9a93a6;font-weight:600}
+.vx-l{display:flex;gap:8px;align-items:center;padding:4px 0;font:600 12px monospace;color:#cfc8da}.vx-l span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.vx .vx-l input{width:80px;flex:none;padding:6px 8px;font-size:12px}
 .vx-out{margin-top:9px;font:600 12.5px monospace;line-height:1.6;color:#ddd}.vx-out b.up{color:#61e970}.vx-out b.dn{color:#ff8a8a}
 .ask-add{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.ask-add button{font:700 11.5px monospace;color:#cfc8da;background:rgba(255,255,255,.05);border:1px dashed rgba(255,255,255,.22);border-radius:999px;padding:5px 10px;cursor:pointer}
 .ask-say{font-size:15px;line-height:1.5;color:#efeaf7;margin:14px 0 4px}.ask-why{font-size:14px;line-height:1.55;color:#cfc7dc;border-left:2px solid #a24bff;padding:2px 0 2px 12px;margin:14px 0}
@@ -496,15 +498,27 @@ function askSaveParlay() {
 // any play you type, enter the odds you see, and get our chance against the price
 function valueBox(rows, parlay) {
   window.VX_ITEMS = (rows || []).map((p, i) => ({label: (parlay ? 'Leg ' + (i + 1) + ': ' : '') + p.label, prob: p.conf, price: p.price}));
-  if (parlay && parlay.prob) window.VX_ITEMS.unshift({label: 'The whole ' + rows.length + '-leg parlay', prob: parlay.prob, price: parlay.price});
+  if (parlay && parlay.prob) window.VX_ITEMS.unshift({label: 'The whole ' + rows.length + '-leg parlay', prob: parlay.prob, price: parlay.price, legs: (rows || []).map(p => ({label: p.label, prob: p.conf, price: p.price}))});
   const opts = window.VX_ITEMS.map((x, i) => `<option value="${i}">${esc(x.label)} (our ${Math.round(100 * x.prob)}%)</option>`).join('') + '<option value="q">Another play: type it</option>';
   return `<div class="vx" id="vx"><small>Value check · your odds against our chance</small><div class="vx-r">
     <select onchange="vxPick(this.value)" aria-label="Which play">${opts}</select>
     <input class="q" id="vxQ" placeholder="e.g. Jalen Brunson over 26.5 points" ${window.VX_ITEMS.length ? 'hidden' : ''} aria-label="The play">
-    <input class="o" id="vxO" inputmode="text" placeholder="+120" aria-label="Your odds"><button type="button" onclick="vxGo()">Check</button></div>
+    <input class="o" id="vxO" inputmode="text" placeholder="${window.VX_ITEMS.length && window.VX_ITEMS[0].price != null ? (window.VX_ITEMS[0].price > 0 ? '+' : '') + window.VX_ITEMS[0].price : '+120'}" aria-label="Your odds"><button type="button" onclick="vxGo()">Check</button></div>
+    <div class="vx-legs" id="vxLegs"${window.VX_ITEMS.length && window.VX_ITEMS[0].legs ? '' : ' hidden'}>${window.VX_ITEMS.length && window.VX_ITEMS[0].legs ? vxLegRows(window.VX_ITEMS[0].legs) : ''}</div>
     <div class="vx-out" id="vxOut"></div></div>`;
 }
-function vxPick(v) { const q = document.getElementById('vxQ'); if (q) q.hidden = v !== 'q'; window.VX_SEL = v; }
+// a parlay is valued from the odds, leg by leg (11/8, Jordan: "you can't just add up all the percentages"): each
+// leg is our chance x its odds, the ticket is those multiplied; type the odds you got on any leg
+function vxLegRows(legs) {
+  return '<small>Odds on each leg (blank = Onyx\'s); the box above is the ticket price if Onyx quotes a different one</small>'
+    + legs.map((l, i) => `<div class="vx-l"><span>${esc(l.label)}</span><input data-vxl="${i}" inputmode="text" placeholder="${l.price != null ? (l.price > 0 ? '+' : '') + l.price : ''}" aria-label="Odds on leg ${i + 1}"></div>`).join('');
+}
+function vxPick(v) { const q = document.getElementById('vxQ'); if (q) q.hidden = v !== 'q'; window.VX_SEL = v;
+  const lg = document.getElementById('vxLegs'), itl = v === 'q' ? null : (window.VX_ITEMS || [])[+v];
+  if (lg) { lg.hidden = !(itl && itl.legs); lg.innerHTML = itl && itl.legs ? vxLegRows(itl.legs) : ''; }
+  // the box shows the Onyx price of what is picked (11/8: a +1786 ticket read "+120"); blank means that price
+  const o = document.getElementById('vxO'), it = v === 'q' ? null : (window.VX_ITEMS || [])[+v];
+  if (o) o.placeholder = it && it.price != null ? (it.price > 0 ? '+' : '') + it.price : '+120'; }
 async function vxGo() {
   const out = document.getElementById('vxOut'), odds = String((document.getElementById('vxO') || {}).value || '').trim().replace(/^\+/, '');
   if (!out || !window.OnyxSaved) return;
@@ -516,9 +530,20 @@ async function vxGo() {
     if (!it) { out.textContent = 'Could not find that play on today\'s boards. Try the player and the line, like "Brunson over 26.5 points".'; return; }
   } else it = (window.VX_ITEMS || [])[+sel];
   if (!it) return;
+  const sg = x => (x > 0 ? '+' : '') + x, pc = x => Math.round(100 * x) + '%';
+  if (it.legs && OnyxSaved.parlayValue) {
+    const typed = [...document.querySelectorAll('#vxLegs [data-vxl]')].map(i => String(i.value || '').trim().replace(/^\+/, ''));
+    const P = OnyxSaved.parlayValue(it.legs.map((l, i) => ({prob: l.prob, price: typed[i] || l.price})), odds || null);
+    if (!P) { out.textContent = 'Enter American odds like +120 or -150 on each leg.'; return; }
+    const mx = m => 'x' + m.toFixed(2);
+    out.innerHTML = P.legs.map((L, i) => `${esc(it.legs[i].label)}: ${sg(L.price)} · our ${(100 * L.prob).toFixed(1)}% · fair ${sg(L.fair)} · <b class="${L.good ? 'up' : 'dn'}">${mx(L.mult)}</b>`).join('<br>')
+      + `<br><br>Ticket ${sg(P.price)}${P.quoted ? ' (the price you typed)' : ' (the legs multiplied)'} · our chance all hit <b>${(100 * P.prob).toFixed(1)}%</b> · fair ticket ${sg(P.fair)} · needs ${(100 * P.implied).toFixed(1)}%`
+      + `<br><b class="${P.good ? 'up' : 'dn'}">${P.good ? 'Value' : 'No value'}: ${P.ev100 > 0 ? '+' : ''}${P.ev100} per $100</b> · ${P.quoted ? 'our chance x the payout' : 'legs ' + P.legs.map(L => mx(L.mult)).join(' · ')} = ${mx(P.mult)} (over x1.00 is value)${P.good ? ' · Kelly says ' + P.kelly + '% of bankroll at most' : ''}`
+      + `<br><span style="color:#8f879c">Each leg's value is our chance times its payout; a parlay multiplies them, so one weak leg drags the whole ticket. Same-game legs are not independent: Onyx prices those together.</span>`;
+    return;
+  }
   const v = OnyxSaved.value(it.prob, odds || it.price);
   if (!v) { out.textContent = 'Enter American odds like +120 or -150.'; return; }
-  const sg = x => (x > 0 ? '+' : '') + x, pc = x => Math.round(100 * x) + '%';
   out.innerHTML = `${esc(it.label)}<br>Our chance <b>${pc(v.prob)}</b> · your odds ${esc(sg(+odds || it.price))} need <b>${pc(v.implied)}</b> · fair price ${sg(v.fair)}<br>`
     + `<b class="${v.good ? 'up' : 'dn'}">${v.good ? 'Value' : 'No value'}: ${v.ev100 > 0 ? '+' : ''}${v.ev100} per $100</b>, edge ${v.edge > 0 ? '+' : ''}${(100 * v.edge).toFixed(1)} points${v.good ? ' · Kelly says ' + v.kelly + '% of bankroll at most' : ''}`
     + `<br><span style="color:#8f879c">Our chance is the model blended with the market price. Projections, not Onyx Picks.</span>`;

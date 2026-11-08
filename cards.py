@@ -38,7 +38,7 @@ HEADSHOT = {"nfl": "https://a.espncdn.com/i/headshots/nfl/players/full/{id}.png"
             "cbb": "https://a.espncdn.com/i/headshots/mens-college-basketball/players/full/{id}.png"}
 MKT = {"pass_yds": "Passing yards", "rush_yds": "Rushing yards", "rec_yds": "Receiving yards", "rec": "Receptions",
        "pass_td": "Passing TDs", "pass_att": "Pass attempts", "pass_rush_yds": "Pass + rush yards",
-       "rush_rec_yds": "Rush + rec yards", "anytime_td": "Anytime TD", "first_td": "First TD", "two_td": "2+ TDs",
+       "rush_rec_yds": "Rush + rec yards", "anytime_td": "Anytime TD", "first_td": "First TD", "two_td": "2+ TDs", "three_td": "3+ TDs",
        "points": "Points", "assists": "Assists", "goals": "Goals", "shots": "Shots on goal", "rebounds": "Rebounds",
        "threes": "Threes made", "saves": "Saves"}
 
@@ -433,7 +433,7 @@ def _mk_onyx(p):
     """An Onyx market the model does not price: Onyx's price only."""
     m = {"m": p["mkt"], "name": MKT.get(p["mkt"], p["mkt"]), "line": p.get("line"), "over": p.get("over"), "under": p.get("under"),
          "over_sel": p.get("over_sel"), "under_sel": p.get("under_sel"), "nc": "onyx"}
-    if p["mkt"] in ("anytime_td", "first_td", "two_td") and p.get("under") is None:
+    if p["mkt"] in ("anytime_td", "first_td", "two_td", "three_td") and p.get("under") is None:
         m["yes"] = True
     return m
 
@@ -461,7 +461,7 @@ def _order(mk, main):
     """His main market first, then the markets the model prices, then Onyx-only lines,
     touchdown scorer markets last."""
     def rank(m):
-        return (m["m"] != main, m["m"] in ("anytime_td", "first_td", "two_td"), m.get("pm") is None, m.get("line") is None)
+        return (m["m"] != main, m["m"] in ("anytime_td", "first_td", "two_td", "three_td"), m.get("pm") is None, m.get("line") is None)
     return sorted(mk, key=rank)
 
 
@@ -602,9 +602,9 @@ def football_players(key, lane, slate, odds, model, depth, R, GP):
                     r = (mby.get(pid) or {}).get(pp["mkt"])
                     if r is not None and r.get("line") == pp.get("line"):
                         mk.append(_mk_from_row(r, dist_of(r)))
-                    elif pp["mkt"] in ("anytime_td", "first_td", "two_td") and td.get(pid):
+                    elif pp["mkt"] in ("anytime_td", "first_td", "two_td", "three_td") and td.get(pid):
                         t = td[pid]
-                        kk = {"anytime_td": "any", "first_td": "first", "two_td": "two"}[pp["mkt"]]
+                        kk = {"anytime_td": "any", "first_td": "first", "two_td": "two", "three_td": "three"}[pp["mkt"]]
                         m = _mk_onyx(pp)
                         if t.get(kk) is not None:
                             m.update(pb=t[kk], pm=t.get(kk + "_model"), yes=True, nc="td_any" if kk == "any" else "td_info")

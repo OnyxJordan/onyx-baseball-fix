@@ -133,6 +133,27 @@
     return {prob: prob, implied: imp, edge: prob - imp, ev100: Math.round(ev * 1000) / 10, fair: fair,
             kelly: ev > 0 ? Math.round(ev / (dec - 1) * 1000) / 10 : 0, good: ev > 0};
   }
+  // a parlay's value from the odds (11/8, Jordan: "you can't just add up the percentages, we need actual value
+  // based on the odds"): each leg's value is our chance times its decimal odds (x1.00 is break-even), and the
+  // ticket's value is those multiplied: our chance all hit times the combined payout. legs: [{prob, price}],
+  // price = the odds taken on that leg; total (optional) = the ticket's own price when the book quotes one
+  // (a same-game ticket is not the legs multiplied)
+  function amOf(d) { return d >= 2 ? Math.round((d - 1) * 100) : -Math.round(100 / (d - 1)); }
+  function decOf(p) { p = +p; return p > 0 ? 1 + p / 100 : 1 + 100 / -p; }
+  function parlayValue(legs, total) {
+    if (!legs || !legs.length || legs.some(function (l) { return !l.prob || l.price == null || isNaN(+l.price) || (+l.price > -100 && +l.price < 100); })) return null;
+    var L = legs.map(function (l) {
+      var d = decOf(l.price), m = l.prob * d;
+      return {prob: l.prob, price: +l.price, dec: d, implied: 1 / d, fair: amOf(1 / l.prob), mult: m, ev100: Math.round((m - 1) * 1000) / 10, good: m > 1};
+    });
+    var dec = L.reduce(function (a, l) { return a * l.dec; }, 1), prob = L.reduce(function (a, l) { return a * l.prob; }, 1);
+    var t = total != null && total !== '' && !isNaN(+total) && (+total >= 100 || +total <= -100) ? +total : null;
+    if (t != null) dec = decOf(t);
+    var m = prob * dec;
+    return {legs: L, prob: prob, dec: dec, price: amOf(dec), implied: 1 / dec, fairDec: 1 / prob, fair: amOf(1 / prob),
+            mult: m, ev100: Math.round((m - 1) * 1000) / 10, good: m > 1, quoted: t != null,
+            kelly: m > 1 ? Math.round((m - 1) / (dec - 1) * 1000) / 10 : 0};
+  }
   function stats(a) {
     a = a || history();
     var g = a.filter(function (h) { return h.res; }), w = 0, l = 0, p = 0, units = 0, risked = 0, by = {};
@@ -420,7 +441,7 @@
     '@media (prefers-reduced-motion: reduce){.oxw,.oxw-big,.oxw-fx i{animation:none!important;transition:none!important}.oxw-fx{display:none}}';
   var st = document.createElement('style'); st.textContent = css; (document.head || document.documentElement).appendChild(st);
   window.OnyxSaved = {all: all, has: has, remove: remove, toggle: toggle, tap: tap, btn: btn,
-    withId: withId, pickAt: function (i) { return REG[i] ? withId(REG[i]) : null; }, ticket: ticket, saveTicket: saveTicket, setMyPrice: setMyPrice, value: value, track: track, celebrate: celebrate, watch: watch, alertsOn: alertsOn, setAlerts: setAlerts,
+    withId: withId, pickAt: function (i) { return REG[i] ? withId(REG[i]) : null; }, ticket: ticket, saveTicket: saveTicket, setMyPrice: setMyPrice, value: value, parlayValue: parlayValue, track: track, celebrate: celebrate, watch: watch, alertsOn: alertsOn, setAlerts: setAlerts,
     history: history, grade: grade, stats: stats, record: record};
   if (document.readyState === 'loading') addEventListener('DOMContentLoaded', start); else start();
 })();
