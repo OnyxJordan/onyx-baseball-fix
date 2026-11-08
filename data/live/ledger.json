@@ -18377,10 +18377,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "191",
+  "profit": -1.0,
+  "graded_at": "2026-11-08T23:00:27+00:00"
  },
  {
   "id": "cbb-401911335-total-under",
@@ -18469,10 +18469,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "121-127",
+  "profit": -1.0,
+  "graded_at": "2026-11-08T23:00:27+00:00"
  },
  {
   "id": "cbb-401927362-total-under",
@@ -18686,10 +18686,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "248",
+  "profit": 0.9524,
+  "graded_at": "2026-11-08T23:00:27+00:00"
  },
  {
   "id": "cbb-401920865-total-under",
@@ -18748,10 +18748,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "138",
+  "profit": 0.8696,
+  "graded_at": "2026-11-08T23:00:27+00:00"
  },
  {
   "id": "nfl-401873046-spread-away",
@@ -18992,6 +18992,37 @@
    "period": 1,
    "clock": "8:52",
    "f": 0.722
+  },
+  "pre_src": "onyx",
+  "model": "live-v6",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "nfl-401873046-total-over",
+  "sport": "nfl",
+  "gid": "401873046",
+  "date": "2026-11-08",
+  "logged_at": "2026-11-08T23:00:25+00:00",
+  "matchup": "HOU @ LAC",
+  "home": "LAC",
+  "away": "HOU",
+  "label": "Over 51.5",
+  "kind": "total",
+  "side": "over",
+  "line": 51.5,
+  "price": -121,
+  "chance": 0.6467,
+  "implied": 0.5475,
+  "edge": 0.099,
+  "fair": -185,
+  "state": {
+   "score": "HOU 24 - 9 LAC",
+   "period": 3,
+   "clock": "14:53",
+   "f": 0.498
   },
   "pre_src": "onyx",
   "model": "live-v6",
