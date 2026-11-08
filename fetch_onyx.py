@@ -31,6 +31,11 @@ OUT = "data/onyx_games.json"
 UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/126.0 Safari/537.36")
 OPTIC = "https://api.opticodds.com/api/v3"
+# Onyx's books on OpticOdds, in the order tried (11/8): every Onyx price moved from onyx_odds (the sweeps book)
+# to onyx_predictions at 10 AM ET on 11/5 (odds_probe job=books: onyx_odds 0 prices, onyx_predictions 664 on one
+# NFL game, every one with its app.onyxodds.com/share?selection= deep link). The first book that prices anything
+# wins, so a move back to onyx_odds is picked up on its own. ONYX_SPORTSBOOK overrides.
+ONYX_BOOKS = ("onyx_predictions", "onyx_odds")
 
 # OpticOdds full team names -> our abbreviations (matches shell ONYX_TEAM_NAMES)
 NAME_ABBR = {

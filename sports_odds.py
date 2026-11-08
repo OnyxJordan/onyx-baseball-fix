@@ -30,7 +30,7 @@ from datetime import datetime, timedelta, timezone
 from sports_common import Lane, american, game_day, nk
 
 sys.path.insert(0, ".")
-from fetch_onyx import http_json, OPTIC   # noqa: E402
+from fetch_onyx import http_json, OPTIC, ONYX_BOOKS   # noqa: E402
 
 SEL_RE = re.compile(r"selection=([0-9a-fA-F-]{36})")
 FOOTBALL_PROPS = {"player_passing_yards": "pass_yds", "player_rushing_yards": "rush_yds",
@@ -140,11 +140,7 @@ def main():
             finally:
                 time.sleep(0.3)
 
-    try:
-        book = json.load(open("data/onyx_games.json", encoding="utf-8")).get("book") or "onyx_odds"
-    except Exception:
-        book = "onyx_odds"
-    book = os.environ.get("ONYX_SPORTSBOOK", "").strip() or book
+    books = [os.environ.get("ONYX_SPORTSBOOK", "").strip()] if os.environ.get("ONYX_SPORTSBOOK", "").strip() else list(ONYX_BOOKS)
 
     days = 9 if lane.cfg["slate"] == "week" else 2   # 9: reaches next Sunday from Sunday and Monday (next-week capture)
     start = datetime.strptime(slate.get("date") or str(game_day()), "%Y-%m-%d")
@@ -304,7 +300,11 @@ def main():
               f"{len(out['games'])} games with lines, {len(out['props'])} player lines, {len(out['matches'])} matches"
               + (f", {len(out['next_props'])} next-week player lines" if out["next_props"] else ""))
 
-    out = pull(book)
+    # Onyx's books in order: the first that prices anything is Onyx's live book (11/8)
+    for book in books:
+        out = pull(book)
+        if out["games"] or out["props"] or out["matches"]:
+            break
     lane.save("odds.json", out, indent=None)       # Onyx prices only, even when empty: the ledgers and picks read this file
     report(out, book, "odds.json")
     # 11/5 (Jordan): when Onyx's feed has an issue (at 10 AM ET that day it went silent in every sport),
