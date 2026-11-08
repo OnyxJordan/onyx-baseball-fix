@@ -146,7 +146,7 @@ def nfl_open_lane(lane, out, slate, season, rows, M):
     v11 = getattr(M, "V11", {})
     WD = getattr(M, "WIND", None)
     wx = (lane.load("weather.json", {}) or {}) if WD else {}
-    mkts = tuple(dict.fromkeys(("rec",) + tuple(v11) + (WD["mkts"] if WD else ())))
+    mkts = tuple(dict.fromkeys(("rec",) + tuple(v11) + (WD["mkts"] if WD else ()) + ("pass_yds",)))
     starts = O.setdefault("_lane_start", {})
     new_lanes = [m for m in mkts if m != "rec" and m not in starts]
     for m in new_lanes:
@@ -162,11 +162,35 @@ def nfl_open_lane(lane, out, slate, season, rows, M):
     for gid in [g for g, t in seen.items() if t < (datetime.now(timezone.utc) - timedelta(days=30)).isoformat()]:
         seen.pop(gid)
     cands = []
+    # 11/8 (Jordan: "set up the CB out lane to log prices now"): QB passing yards OVER when the
+    # opponent has a regular cornerback (60%+ of defensive snaps this season, 2+ games) listed
+    # Out or Doubtful. Backtest (README, NFL factor backtests 11/8): QBs +8 yds (+6.5 2019-23, +12.3
+    # 2024-26); overs 17-6 / 49-32 / 10-11 at the open, +14.8% / +20.1% open / close overall, but
+    # 2026 (the only unseen season) 10-11 -9.6% at the open: a capture lane to build that sample,
+    # logged at the price when the report lands, never an Onyx Pick. IR is left out (the tested
+    # report version had no IR rows).
+    cbo = {}
+    for tm_, t_ in ((lane.load("depth.json", {}) or {}).get("teams") or {}).items():
+        for p_ in t_.get("players") or []:
+            nu = p_.get("now") or {}
+            if p_.get("pos") == "CB" and p_.get("tag") in ("Out", "Doubtful") and (nu.get("use") or 0) >= 60 and (nu.get("gp") or 0) >= 2:
+                cbo.setdefault(tm_, []).append(f"{p_['n']} ({p_['tag'].lower()}, {nu['use']:.0f}% of snaps)")
     for r in out:
         if r["mkt"] not in mkts or r["line"] is None or r["over"] is None or r["under"] is None:
             continue
         g = games.get(r["gid"]) or {}
         key = f"{r['gid']}|{nk(r['name'])}|{r['mkt']}"
+        if r["mkt"] == "pass_yds" and r.get("opp") in cbo and g.get("state") == "pre" and key + "|cb" not in have \
+                and -130 <= r["over"] <= 120:
+            cands.append((9.5, {"date": slate.get("date"), "season": season, "week": g.get("week"), "key": key + "|cb", "gid": r["gid"],
+                                "pid": r["pid"], "name": r["name"], "team": r["team"], "opp": r["opp"],
+                                "matchup": f"{r['team']} {'vs' if r['home'] else '@'} {r['opp']}", "kind": "pass_yds",
+                                "lane": "cb_pass_over", "side": "over", "line": r["line"], "price": r["over"], "sel": r.get("over_sel"),
+                                "proj": r["proj"], "prob": None, "implied": round(L.implied(r["over"]), 4),
+                                "detail": f"{r['opp']} without " + ", ".join(cbo[r["opp"]]),
+                                "opened_at": (O.get(key) or {}).get("ts") or ts, "logged_at": ts, "model": M.VERSION,
+                                "result": None, "actual": None}))
+            have.add(key + "|cb")
         if key not in O and g.get("state") == "pre":
             O[key] = {"line": r["line"], "over": r["over"], "under": r["under"], "ts": ts,
                       **({"baseline": True} if first_run or r["gid"] in fresh or r["mkt"] in new_lanes else {})}
@@ -263,9 +287,10 @@ def nfl_open_lane(lane, out, slate, season, rows, M):
     pay = lambda a: a / 100.0 if a > 0 else 100.0 / -a
     units = sum((pay(k["price"]) if k["result"] == "W" else -1.0 if k["result"] == "L" else 0.0) for k in ledger)
     LN = {"rec_under": "Receptions unders", "rush_yds_under": "Rushing yards unders", "pass_yds_over": "Passing yards overs",
-          "pass_att_under": "Pass attempts unders", "wind_under": "Unders in the wind"}
+          "pass_att_under": "Pass attempts unders", "wind_under": "Unders in the wind",
+          "cb_pass_over": "Passing yards overs vs a missing corner"}
     lanes = []
-    for ln_ in ["rec_under"] + [f"{m}_{v11[m]['side']}" for m in v11] + (["wind_under"] if WD else []):
+    for ln_ in ["rec_under"] + [f"{m}_{v11[m]['side']}" for m in v11] + (["wind_under"] if WD else []) + ["cb_pass_over"]:
         ks = [k for k in ledger if (k.get("lane") or "rec_under") == ln_]
         ww = sum(1 for k in ks if k["result"] == "W"); ll_ = sum(1 for k in ks if k["result"] == "L")
         lanes.append({"lane": ln_, "name": LN.get(ln_, ln_), "w": ww, "l": ll_, "p": sum(1 for k in ks if k["result"] == "P"),
@@ -278,6 +303,8 @@ def nfl_open_lane(lane, out, slate, season, rows, M):
             "Unders in the wind (since 11/1): passing yards, pass attempts, receiving yards and receptions when the kickoff forecast is 15+ mph at an open stadium. "
             "In 15+ mph games, passing yards unders went 15-4 in 2024 and 28-10 in 2025, but Onyx moves these lines as forecasts firm up, "
             "so a play counts only while the opening price is still up. Passing yards overs were dropped on 11/1 after losing on 2024. "
+            "Passing yards overs vs a missing corner (since 11/8): the quarterback facing a defense with a regular cornerback ruled out or doubtful, "
+            "logged at the price when the report lands; 76-49 in the backtest but 10-11 at the open on 2026, so it is here to build that record. "
             "Every play lists why. They stay on trial until this record says otherwise.") if v11 else None
     return {"w": w, "l": l_, "p": sum(1 for k in ledger if k["result"] == "P"), "pending": sum(1 for k in ledger if not k["result"]),
             "units": round(units, 2), "roi": round(units / (w + l_), 4) if w + l_ else None, "lanes": lanes,
