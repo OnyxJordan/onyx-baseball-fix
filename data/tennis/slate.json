@@ -3204,7 +3204,7 @@
      "id": "186528",
      "start": "2026-11-08T17:35Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 1",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -3216,9 +3216,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        5
+        6,
+        1
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Thiago Agustin Tirante",
@@ -3227,9 +3228,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        5
+        7,
+        1
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
@@ -8923,8 +8925,8 @@
     {
      "id": "187461",
      "start": "2026-11-08T17:00Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Qualifying Final",
      "draw": "Women's Singles",
      "court": "Main Court",
@@ -8946,12 +8948,12 @@
        "short": "M. Herazo Gonzalez",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/col.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        5
+        6
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -9857,5 +9859,5 @@
    ]
   }
  ],
- "fetched": "2026-11-08T18:23:02+00:00"
+ "fetched": "2026-11-08T18:54:58+00:00"
 }
