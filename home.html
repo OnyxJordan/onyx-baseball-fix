@@ -488,6 +488,10 @@ function askRefine(t) {
   const q = (window.ASK_Q || '') + ' ' + t;
   document.getElementById('askQ').value = q; askGo(q);
 }
+// home.html?ask=...#ask (the profile's "Search my kind of bets"): run that search once the page is up
+addEventListener('load', () => { try { const q = new URLSearchParams(location.search).get('ask'); if (!q) return;
+  const go = () => { if (!window.OnyxAsk) return setTimeout(go, 200); const i = document.getElementById('askQ'); if (i) i.value = q; askGo(q); };
+  go(); } catch (e) {} });
 async function askGo(q, forced) {
   const out = document.getElementById('askOut');
   if (!window.OnyxAsk || !String(q || '').trim()) return;

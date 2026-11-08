@@ -18,6 +18,7 @@
 <script src="ui.js" defer></script>
 <script src="accounts.js"></script>
 <script src="saved.js"></script>
+<script src="profile.js"></script>
 <style>
 body{background:#0c0c0c;color:#fff;margin:0}
 .ac{padding-top:26px;padding-bottom:40px}
@@ -92,6 +93,7 @@ body{background:#0c0c0c;color:#fff;margin:0}
   </div>
   </aside>
   </div>
+  <div id="oxProfile" style="max-width:900px"></div>
   <section class="rec" id="record" hidden style="max-width:900px">
     <span class="ox-eyebrow">Your record</span>
     <h2>Every pick you saved.</h2>
@@ -233,6 +235,7 @@ function recRender() {
   more.onclick = () => { SHOW += 50; recRender(); };
 }
 addEventListener('onyx-history', recRender);
+if (window.OnyxProfile) OnyxProfile.mount(document.getElementById('oxProfile'));
 addEventListener('onyx-account', recRender);
 addEventListener('onyx-saved', recRender);
 setTimeout(() => { recRender(); if (window.OnyxSaved && OnyxSaved.grade) OnyxSaved.grade().then(recRender); }, 300);

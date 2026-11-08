@@ -1915,6 +1915,27 @@ so a link cannot sign the app in. The Account page now has **Have a code?**, whi
   own session (`grant_type=refresh_token`). Works once, like the link.
 `accounts.js`: `useCode`, `appCode`, `handOff`, `fromLink`.
 
+**Your profile (11/8).** Jordan: "a whole profile history: best picks, best sport, best type of bet, studying the
+profile habits and making a profile on them, and recommend the types of bets they're interested in." `profile.js`
+(Account page, More -> Your profile) reads the permanent pick history (`OnyxSaved.history()`, synced to the account
+when signed in): a one-line read of how you bet (sports, bet types, side lean, price habit, props vs lines), record /
+units / ROI, best sport, best type of bet, best price band, best side, streak, pace and median price, the coldest spot,
+your best picks (biggest prices cashed), players you come back to, and tables by sport, type, price and side. **Picks
+for you today** scores every play on today's boards by fit to your habits (sport 40%, type 35%, side 15%, price 10%),
+weighted up or down by what each spot has paid you, then blended with the model's chance; one per game, top 5, each
+with its reason. **Search my kind of bets** opens Ask Onyx (`home.html?ask=...`) with your profile filled in.
+Projections chosen for you, never labeled Onyx Picks.
+
+**Search editing, + and -, slots, ticket totals (11/8).** `ask.js`: `-word` / `+word` add and take out anything
+(`plusMinus`); with " + " between rules, " - " takes a word out too (a + between stat words stays one market).
+Every answer shows its rules as chips (`chips`, `chipBase`): tap to remove one, + / - for the leg count, quick adds,
+and a box for more. Kickoff windows (`slot`, `slotOk`): 1 PM / early, 4 PM / late, Sunday / Monday / Thursday night,
+primetime, any "N PM games". "Total / ticket / parlay / combined odds of at least +N" is the ticket minimum, read before
+per-leg prices; "maximum odds of +N" per leg. Cases: `tools/ask_compound_cases.js`.
+
+**Push checklist (11/8).** The saved-picks part of the control center is a checklist (Game starts, Lead changes,
+Halftime check, Results, Daily recap; Everything / None), stored as a comma list in `profiles.push_level`.
+
 **Alerts control center (11/7).** Jordan: "a push notification control center where you can get updates on all
 your picks and you can select how often." `alerts.js` (home #alerts, picks.html#alerts, More -> Alerts) has two parts:
 - **Onyx Picks**: a switch and 55/60/65%; `pick_alerts.py` pushes each pick that locks (tags `picks`, `min_conf`).
