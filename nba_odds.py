@@ -28,7 +28,7 @@ import json, os, re, sys, time, urllib.parse, urllib.request
 from datetime import datetime, timedelta, timezone
 
 from nba_common import ET, game_day, load, save, team_abbr, nk, american_from_any
-from fetch_onyx import http_json, OPTIC
+from fetch_onyx import http_json, OPTIC, ONYX_BOOKS
 
 STATS = {"player_points": "pts", "player_rebounds": "reb", "player_assists": "ast"}
 GAME_MKTS = ("moneyline", "point_spread", "total_points")
@@ -72,8 +72,9 @@ def current_slate():
 MARKET_BOOK = "draftkings"   # the fallback when Onyx prices nothing (never named on the site)
 
 
-def onyx_pull(key, slate, book=None):
-    """book: None for Onyx; MARKET_BOOK for the fallback (rows tagged src "market", no selection ids)."""
+def onyx_pull(key, slate, book=None, onyx_book=None):
+    """book: None for Onyx; MARKET_BOOK for the fallback (rows tagged src "market", no selection ids).
+    onyx_book: which of Onyx's books to read (fetch_onyx.ONYX_BOOKS; 11/8)."""
     src = "market" if book else "onyx"
     sel = (lambda od: None) if book else _sel    # never an Onyx bet link on a market price
     hdr = {"X-Api-Key": key}
@@ -91,11 +92,7 @@ def onyx_pull(key, slate, book=None):
             finally:
                 time.sleep(0.4)
 
-    try:
-        book = json.load(open("data/onyx_games.json", encoding="utf-8")).get("book") or "onyx_odds"
-    except Exception:
-        book = "onyx_odds"
-    book = os.environ.get("ONYX_SPORTSBOOK", "").strip() or book
+    book = onyx_book or os.environ.get("ONYX_SPORTSBOOK", "").strip() or ONYX_BOOKS[0]
     if src == "market":
         book = MARKET_BOOK
 
@@ -287,7 +284,13 @@ def main():
     n_onyx = 0
     if okey:
         try:
-            o_players, o_games = onyx_pull(okey, slate)
+            # Onyx's books in order (11/8: its prices moved to onyx_predictions); the first that prices anything
+            o_players, o_games = {}, {}
+            for bk in ([os.environ["ONYX_SPORTSBOOK"]] if os.environ.get("ONYX_SPORTSBOOK", "").strip() else ONYX_BOOKS):
+                o_players, o_games = onyx_pull(okey, slate, onyx_book=bk)
+                if o_players or o_games:
+                    print(f"nba onyx: book {bk}")
+                    break
             ALL = list(STATS.values()) + list(EXTRA.values())
             had = sum(1 for cur in players.values() for s in ALL if (cur.get(s) or {}).get("src") == "onyx")
             got = sum(1 for rec in o_players.values() for s in ALL if s in rec)
