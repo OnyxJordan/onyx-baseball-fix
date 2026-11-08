@@ -17140,10 +17140,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "17-34",
+  "profit": -1.0,
+  "graded_at": "2026-11-08T17:41:39+00:00"
  },
  {
   "id": "nfl-401873038-spread-home",
@@ -17171,10 +17171,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "17-34",
+  "profit": -1.0,
+  "graded_at": "2026-11-08T17:41:39+00:00"
  },
  {
   "id": "tennis-186534-spread-home",
@@ -17228,6 +17228,37 @@
    "sets": "1-1",
    "srv": "home",
    "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v6",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "cbb-401924646-total-under",
+  "sport": "cbb",
+  "gid": "401924646",
+  "date": "2026-11-08",
+  "logged_at": "2026-11-08T17:41:37+00:00",
+  "matchup": "IONA @ SJU",
+  "home": "SJU",
+  "away": "IONA",
+  "label": "Under 157.5",
+  "kind": "total",
+  "side": "under",
+  "line": 157.5,
+  "price": -120,
+  "chance": 0.5893,
+  "implied": 0.5455,
+  "edge": 0.044,
+  "fair": -145,
+  "state": {
+   "score": "IONA 19 - 37 SJU",
+   "period": 1,
+   "clock": "5:54",
+   "f": 0.647
   },
   "pre_src": "onyx",
   "model": "live-v6",
