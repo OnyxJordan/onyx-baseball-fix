@@ -1294,6 +1294,10 @@
     if (!h) return ai;
     var s = Object.assign({}, ai), t = String(q || '').toLowerCase(), before = JSON.stringify(ai);
     if (h.props_only) s.props_only = true;
+    // a quarter / half of a player stat and "positive value only" the reader found win (11/8: the AI may send the
+    // game's 1st-quarter total plus receiving yards, which would list full-game lines)
+    if (h.period) { s.period = h.period; s.markets = (h.markets || []).slice(); if ((h.sports || []).length) s.sports = h.sports.slice(); }
+    if (h.pos_value) { s.pos_value = true; s.sort = 'edge'; }
     // a price rule the reader found wins (100% on prices across 80,000+ generated requests; the AI
     // read "even money" as exactly +100, which matches almost nothing)
     if (h.min_price != null) s.min_price = h.min_price;
