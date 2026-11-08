@@ -70,5 +70,12 @@ module.exports = [
   C('top 3 props in the 1 PM games', {sports: ['nfl'], count: 3, slot: '1 PM slate'}),
   C('10 first td you like most', {markets: ['first_td'], count: 10, sort: 'rec'}),
   C('show me 3 2+ td projections sunday night', {sports: ['nfl'], markets: ['two_plus_td'], count: 3, slot: 'Sunday night', min_rows: 3}),
-  C('5 mnf receiving yards projections', {sports: ['nfl'], markets: ['rec_yds'], count: 5, slot: 'Monday night', min_rows: 5})
+  C('5 mnf receiving yards projections', {sports: ['nfl'], markets: ['rec_yds'], count: 5, slot: 'Monday night', min_rows: 5}),
+  // ── a quarter of a player stat is its own line, never the full game (11/8, Jordan: Kyren Williams' 1Q receiving is 5.5,
+  //    search showed his full-game 20.5) ──
+  C('1 pm nfl slate only best 1st quarter over receiving totals -judkins -teSlaa', {sports: ['nfl'], markets: ['rec_yds'], side: 'over', slot: '1 PM slate', period: 'q1', exclude: ['quinshon judkins', 'isaac teslaa'], no_player: true}),
+  C('first quarter rushing yards for kyren williams', {markets: ['rush_yds'], period: 'q1'}),
+  C('first half points jokic', {markets: ['pts'], period: 'h1'}),
+  C('nba 1st quarter totals', {sports: ['nba'], markets: ['q1_total']}),
+  C('no judkins no teslaa receiving yards', {markets: ['rec_yds'], exclude: ['quinshon judkins', 'isaac teslaa'], no_player: true})
 ];

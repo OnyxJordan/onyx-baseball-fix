@@ -542,7 +542,7 @@
       }
       return ' ';
     });
-    t = t.replace(/(?<!(?:@|\bvs\.?|\bv|\bat)\s)\b(no|without|except|excluding|exclude|other than|besides|not including|leave out|skip|but not|nothing (?:on|from)|none of|avoid|minus)\s+(the\s+)?([a-z0-9][a-z0-9.\-&]*(?:\s+[a-z0-9&][a-z0-9.\-&]*){0,3})/g, function (m, w, the, ph) {
+    t = t.replace(/(?<!(?:@|\bvs\.?|\bv|\bat)\s)\b(no|without|except|excluding|exclude|other than|besides|not including|leave out|skip|but not|nothing (?:on|from)|none of|avoid|minus)\s+(the\s+)?((?!(?:no|without|except)\b)[a-z0-9][a-z0-9.\-&]*(?:\s+(?!(?:no|without|except|and no)\b)[a-z0-9&][a-z0-9.\-&]*){0,3})/g, function (m, w, the, ph) {
       var ws = ph.trim().split(' '), first = ws[0];
       // a player's full name before any school ("no Xavier Worthy" is the receiver, not Xavier; 11/6)
       if (ws.length >= 2) { var NM0 = names(B, PRIOR);
@@ -557,6 +557,8 @@
       // a player's full name ("no Max Christie": "max" alone is a price word)
       if (ws.length >= 2) { var NM = names(B, PRIOR); if (NM[clean(ws.slice(0, 2).join(' '))]) { EXW.push(ws.slice(0, 2).join(' ')); return ' ' + ws.slice(2).join(' ') + ' '; } }
       if (NOT_NAMES.test(first) || /^(juice|odds|worse|longer|shorter|more|less|higher|lower|bigger|than|over|under|plus|minus|favou?rites?|dogs?|underdogs?|chalk|props?|parlays?|legs?|price|prices|vig|negative|longshots?|ties?|overtime|ot|live|alt|alts|one|two|three|four|five|six|risk|loss|losers?|repeats?|duplicates?|same|bad|sweat|sweats|limit|limits|more)$/.test(first)) return m;
+      // a last name and then the market ("no teslaa receiving yards", 11/8): the name alone
+      if (ws.length >= 2 && /^(receiving|rushing|passing|receptions?|catches|yards|yds|points|pts|rebounds|assists|tds?|touchdowns?|props?|overs?|unders?|attempts|first|anytime|2\+|3\+|1st)$/.test(ws[1])) { EXW.push(first); return ' ' + ws.slice(1).join(' ') + ' '; }
       // else a player (two words)
       EXW.push(ws.slice(0, 2).join(' ')); return ' ' + ws.slice(2).join(' ') + ' ';
     }).replace(/\s+/g, ' ');
@@ -821,6 +823,15 @@
         else if (rost) s.sports = [rost.r.sp];
       }
     }
+    // a quarter or half of a player stat ("best 1st quarter over receiving totals", 11/8: Jordan got full-game
+    // receiving yards, Kyren Williams over 20.5, where Onyx's 1st-quarter line is 5.5): a period rule on the stat,
+    // never the game's 1st-quarter total and never the full-game line in its place
+    var PSTAT = /^(rec|rec_yds|rush_yds|pass_yds|pass_td|pass_att|rush_rec_yds|pass_rush_yds|anytime_td|pts|reb|ast|threes)$/;
+    if (s.markets.some(function (m) { return PSTAT.test(m) && !(m === 'pts' && /\b(total|game) points\b|\bpoints total\b/.test(t)); }) && (s.markets.indexOf('q1_total') >= 0 || s.markets.indexOf('h1_total') >= 0)) {
+      s.period = s.markets.indexOf('q1_total') >= 0 ? 'q1' : 'h1';
+      s.markets = s.markets.filter(function (m) { return m !== 'q1_total' && m !== 'h1_total'; });
+      if (!s.sports.length && s.markets.some(function (m) { return FOOTM.test(m); })) s.sports = ['nfl'];
+    }
     // defaults that follow from the rest
     if (s.markets.indexOf('two_plus_td') >= 0) { s.sort = 'two_td'; if (!s.sports.length) s.sports = ['nfl']; }
     if (s.markets.indexOf('three_td') >= 0 && !s.sports.length) s.sports = ['nfl'];
@@ -988,6 +999,7 @@
       if (spec.min_price == null || spec.default_floor || spec.min_price < floor) spec = Object.assign({}, spec, {min_price: floor});
     }
     var mk = (spec.markets || []).slice();
+    if (spec.period) mk = mk.map(function (m) { return spec.period + '_' + m; });   // 1st-quarter lines only (q1_rec_yds ...)
     var two = mk.indexOf('two_plus_td') >= 0 || spec.sort === 'two_td';
     // 2+ touchdowns at Onyx's own price (11/8: "3 leg 2+ TD parlay, +1000 or more" came back +122, built
     // from anytime prices): Onyx prices 2+ TDs (over 1.5 touchdowns), so the board's two_td rows are the
@@ -1192,6 +1204,7 @@
     if (s.target_price) b.push((s.ticket_floor ? 'ticket pays +' + s.target_price + ' or more' : 'pays about +' + s.target_price));
     if (s.min_price != null) b.push((s.default_floor ? 'standard prices, nothing shorter than ' : 'no price shorter than ') + (s.min_price > 0 ? '+' : '') + s.min_price);
     if (s.max_price != null) b.push('no price longer than ' + (s.max_price > 0 ? '+' : '') + s.max_price);
+    if (s.period) b.push(s.period === 'q1' ? '1st-quarter lines only' : '1st-half lines only');
     if (s.pos_value) b.push('positive value only');
     if (s.min_conf != null) b.push(s.default_conf ? (s.intent === 'list' ? 'every pick 50%+ to hit' : 'every leg 50%+ to hit') : Math.round(100 * s.min_conf) + '%+ confidence');
     if (s.player) b.push(s.player);
@@ -1506,6 +1519,7 @@
       T('No ' + (MW[m] || m).toLowerCase(), {xmk: s.xmk.filter(function (y) { return y !== m; })}, true); });
     if (s.no_props) T('No player props', {no_props: false}, true);
     if (s.pos_value) T('Positive value only', {pos_value: false});
+    if (s.period) T(s.period === 'q1' ? '1st quarter only' : '1st half only', {period: null});
     if (s.target_price) T((s.ticket_floor ? 'Pays +' : 'About +') + s.target_price, {target_price: null, ticket_floor: false});
     if (s.min_price != null && !s.default_floor) T('Shortest ' + od(s.min_price), {min_price: null});
     if (s.max_price != null) T('Longest ' + od(s.max_price), {max_price: null});
@@ -1597,13 +1611,13 @@
       }
       // a named team or game with nothing in the market asked for (no moneyline posted on a heavy favorite):
       // that game's other lines, said so (11/6)
-      if (!res.rows.length && teamList(spec).length && (spec.markets || []).length && !spec.player) {
+      if (!res.rows.length && teamList(spec).length && (spec.markets || []).length && !spec.player && !spec.period) {
         var mw7 = {ml: 'moneyline', spread: 'spread', total: 'total'}[(spec.markets || [])[0]] || MW[(spec.markets || [])[0]] || 'line like that';
         var spT = Object.assign({}, spec, {markets: [], side: 'any', min_conf: null, default_conf: false, min_price: null, max_price: null, default_floor: false}), r7 = run(spT, a[1]);
         if (r7.rows.length) { res = r7; spec = spT; res.widened = true; res.note = (res.note ? res.note + ' ' : '') + 'No ' + mw7 + ' on the board for that game, so these are its other lines.'; }
       }
       // a player with nothing that matches: his other markets, then any day
-      if (spec.player && res.rows.length < 1) {
+      if (spec.player && res.rows.length < 1 && !spec.period) {
         var sp3 = Object.assign({}, spec, {markets: [], side: 'any', when: null, min_price: null, max_price: null, min_conf: null, default_conf: false, default_floor: false}), r6 = run(sp3, a[1]);
         if (r6.rows.length) { res = r6; spec = sp3; res.widened = true; res.note = (res.note ? res.note + ' ' : '') + 'Nothing matched that exactly, so these are ' + spec.player + '\'s lines on the board.'; }
       }
@@ -1613,6 +1627,11 @@
                 res.note = 'Nothing that fits beats Onyx\'s price right now.'
           + (rV.rows.length ? ' These are the closest to value, none of them positive: tap "Positive value only" to drop the rule.' : '');
         if (rV.rows.length) { var nV = res.note; res = rV; res.widened = true; res.note = nV; }
+      }
+      // a quarter / half player line that is not on the board: say so, never the full game in its place
+      if (spec.period && !(res.rows || []).length) {
+        res.note = 'Onyx\'s ' + (spec.period === 'q1' ? '1st-quarter' : '1st-half') + ' player lines are not in our feed right now, so there is nothing to rank. '
+          + 'Full-game lines are a different bet: tap "' + (spec.period === 'q1' ? '1st quarter only' : '1st half only') + '" to see those instead.';
       }
       // never an empty answer without the reason (11/6, Jordan: the Knicks ask came back blank)
       if (!(res.rows || []).length && !res.note) {
