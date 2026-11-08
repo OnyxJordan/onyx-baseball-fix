@@ -2721,7 +2721,15 @@ function shareUrl(sels) {
   return 'https://app.onyxodds.com/share?' + sels.map(s => 'selection=' + encodeURIComponent(s)).join('&')
     + (ONYX_REFERRER ? '&referrer=' + encodeURIComponent(ONYX_REFERRER) : '');
 }
-function inSlip(sel) { return !!sel && parlaySlip.some(x => x.sel === sel); }
+// 11/8 (Jordan: "connect the NBA page to the same ticket"): with the shared Parlay Builder (parlay.js) on the page,
+// every NBA add goes to the one ticket every page shares; this page's own slip and pill step aside
+function shared() { return window.OnyxParlay || null; }
+function sharedLeg(leg) {
+  const g = gameOf(leg.gid) || {}, mk = {moneyline: 'ml', spread: 'spread', total: 'total'}[leg.market], P = leg.pid ? playerOf(leg.pid) : null;
+  return {sel: leg.sel, label: leg.label, price: leg.price, gid: leg.gid, sport: 'nba', start: g.start, matchup: g.away && g.home ? g.away + ' @ ' + g.home : '',
+          kind: mk || 'prop', mkt: mk || leg.stat || leg.market, side: leg.side, line: leg.line, name: P ? P.name : leg.name, team: P ? P.team : leg.team, conf: leg.conf};
+}
+function inSlip(sel) { if (shared()) return !!sel && shared().slip().some(x => x.sel === sel); return !!sel && parlaySlip.some(x => x.sel === sel); }
 // legs registry: buttons reference a leg by index so no JSON lands in markup
 var LEGS = [];
 function regLeg(leg) { return LEGS.push(leg) - 1; }
@@ -2765,7 +2773,7 @@ function betLeg(i) {
   if (!leg) return;
   // a player prop opens that player's bet card: every Onyx line, the slider, the best-value play
   if (leg.pid && leg.stat && playerOf(leg.pid)) { openBetCard(leg.pid, leg.stat, leg.side, leg.line); return; }
-  if (parlayMode) { slipToggle(i); return; }
+  if (parlayMode || (shared() && shared().armed())) { slipToggle(i); return; }
   if (leg.sel) {
     track('onyx_click', {link_type: 'single', market: leg.market || '', selection: leg.label, odds: String(leg.price)});
     window.open(shareUrl([leg.sel]), '_blank', 'noopener');
@@ -2783,12 +2791,14 @@ window.OX_SELINFO = function (sel) {
     if (o.sel === sel) return {label: `${p.name} ${sd === 'over' ? 'Over' : 'Under'} ${pr.line} ${STAT_ABBR[st] || st}`, price: o.price, pid: p.pid, stat: st, side: sd, line: pr.line, gid: p.gid};
   return null;
 };
+addEventListener('onyx-slip', () => { try { rerender(); } catch (e) {} });
 window.OX_ONBET = function (rec) {
   let n = 0;
   rec.legs.forEach(l => { if (l.pid && !isFollowed(l.pid)) { FOLLOW.push(l.pid); n++; } });
   if (n) { followSave(); ['ypBox', 'homeYP'].forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = yourPlayers(); }); }
 };
 function slipAdd(leg) {
+  if (shared()) { if (!leg || !leg.sel || inSlip(leg.sel)) return false; shared().add(sharedLeg(leg)); return true; }
   if (!leg || !leg.sel || inSlip(leg.sel) || parlaySlip.length >= 10) return false;
   parlaySlip.push({sel: leg.sel, label: leg.label, odds: leg.price});
   track('parlay_add', {selection: leg.label, legs: parlaySlip.length});
@@ -2797,13 +2807,14 @@ function slipAdd(leg) {
 function slipToggle(i) {
   const leg = LEGS[i];
   if (!leg || !leg.sel) return;
+  if (shared()) { shared().add(sharedLeg(leg)); rerender(); return; }   // add, or take it off when it is on
   if (inSlip(leg.sel)) parlaySlip = parlaySlip.filter(x => x.sel !== leg.sel);
   else slipAdd(leg);
   parlayMode = true;
   document.body.classList.add('parlay-armed');
   slipSave(); renderParlaySlip(); rerender();
 }
-function parlayToggle() { parlayMode = !parlayMode; document.body.classList.toggle('parlay-armed', parlayMode); renderParlaySlip(); }
+function parlayToggle() { if (shared()) { shared().arm(!shared().armed()); return; } parlayMode = !parlayMode; document.body.classList.toggle('parlay-armed', parlayMode); renderParlaySlip(); }
 function parlayRemove(sel) { parlaySlip = parlaySlip.filter(x => x.sel !== sel); slipSave(); renderParlaySlip(); rerender(); }
 function parlayClear() { parlaySlip = []; slipSave(); renderParlaySlip(); rerender(); }
 function parlayBuild() {
@@ -2814,6 +2825,7 @@ function parlayBuild() {
 function decOf(o) { o = +o; return o > 0 ? 1 + o / 100 : 1 + 100 / -o; }
 function amerOf(dec) { return dec >= 2 ? '+' + Math.round((dec - 1) * 100) : '-' + Math.round(100 / (dec - 1)); }
 function renderParlaySlip() {
+  if (shared()) { const o = document.getElementById('parlayFab'); if (o) o.remove(); document.body.classList.remove('parlay-armed'); return; }
   let el = document.getElementById('parlayFab');
   if (!el) { el = document.createElement('div'); el.id = 'parlayFab'; document.body.appendChild(el); }
   const n = parlaySlip.length;
@@ -2929,7 +2941,7 @@ function tspHtml() {
 }
 function tspAdd(ids) {
   ids.forEach(i => slipAdd(LEGS[i]));
-  parlayMode = true; document.body.classList.add('parlay-armed');
+  if (!shared()) { parlayMode = true; document.body.classList.add('parlay-armed'); }
   slipSave(); renderParlaySlip(); rerender();
 }
 function tspBet(ids) {
@@ -3203,7 +3215,7 @@ function renderPlays() {
   const t3 = document.getElementById('plTop3');
   t3.style.display = top3.length >= 2 ? '' : 'none';
   t3.textContent = `+ Add top ${top3.length} to parlay`;
-  t3.onclick = () => { top3.forEach(k => slipAdd(plLeg(k))); parlayMode = true; document.body.classList.add('parlay-armed'); slipSave(); renderParlaySlip(); renderPlays(); };
+  t3.onclick = () => { top3.forEach(k => slipAdd(plLeg(k))); if (!shared()) { parlayMode = true; document.body.classList.add('parlay-armed'); } slipSave(); renderParlaySlip(); renderPlays(); };
   document.getElementById('plCards').innerHTML = shown.length ? shown.map(plCard).join('')
     : `<div class="empty">${picks.length ? 'No picks in this market tonight.' : (D.meta || {}).priced
         ? 'No play clears every screen tonight. An honest edge lane is a quiet one on most nights: the near misses are below.'
