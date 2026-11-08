@@ -883,5 +883,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186507-ml-away",
+  "sport": "tennis",
+  "gid": "186507",
+  "date": "2026-11-08",
+  "logged_at": "2026-11-08T14:34:42+00:00",
+  "matchup": "Carlos Alcaraz vs Ben Shelton",
+  "home": "Ben Shelton",
+  "away": "Carlos Alcaraz",
+  "label": "Carlos Alcaraz to win",
+  "kind": "ml",
+  "side": "away",
+  "line": null,
+  "price": -206,
+  "chance": 0.7189,
+  "implied": 0.6732,
+  "edge": 0.046,
+  "fair": -255,
+  "state": {
+   "sets": "1-2",
+   "srv": "away",
+   "need": 2
+  },
+  "pre_src": "market",
+  "model": "live-v6",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
