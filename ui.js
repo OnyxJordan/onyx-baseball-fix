@@ -1219,6 +1219,8 @@
     mountControls();
     // the save star, My picks and sign-in need saved.js (which loads accounts.js): every page gets them
     if (!window.OnyxSaved) needScript('saved.js');
+    // the Parlay Builder pill on every page (11/8); Onyx Baseball (index.html) keeps its own builder
+    if (SITE !== 'mlb' && !window.OnyxParlay) needScript('parlay.js');
     else if (!window.OnyxAccounts) needScript('accounts.js');
     var t0 = (location.hash || '').slice(1);
     syncActive(PAGE ? PAGE[0] : typeof currentTab !== 'undefined' ? currentTab : (typeof curTab !== 'undefined' ? curTab : (t0 || 'home')));

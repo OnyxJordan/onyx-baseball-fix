@@ -420,7 +420,7 @@
     '@media (prefers-reduced-motion: reduce){.oxw,.oxw-big,.oxw-fx i{animation:none!important;transition:none!important}.oxw-fx{display:none}}';
   var st = document.createElement('style'); st.textContent = css; (document.head || document.documentElement).appendChild(st);
   window.OnyxSaved = {all: all, has: has, remove: remove, toggle: toggle, tap: tap, btn: btn,
-    withId: withId, ticket: ticket, saveTicket: saveTicket, setMyPrice: setMyPrice, value: value, track: track, celebrate: celebrate, watch: watch, alertsOn: alertsOn, setAlerts: setAlerts,
+    withId: withId, pickAt: function (i) { return REG[i] ? withId(REG[i]) : null; }, ticket: ticket, saveTicket: saveTicket, setMyPrice: setMyPrice, value: value, track: track, celebrate: celebrate, watch: watch, alertsOn: alertsOn, setAlerts: setAlerts,
     history: history, grade: grade, stats: stats, record: record};
   if (document.readyState === 'loading') addEventListener('DOMContentLoaded', start); else start();
 })();
