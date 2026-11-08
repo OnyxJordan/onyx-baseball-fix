@@ -3168,8 +3168,8 @@
     {
      "id": "186534",
      "start": "2026-11-08T15:40Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 1",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -3179,10 +3179,10 @@
        "short": "J. Cerundolo",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        6
+        7
        ],
        "serve": false
       },
@@ -3202,9 +3202,9 @@
     },
     {
      "id": "186528",
-     "start": "2026-11-08T17:20Z",
+     "start": "2026-11-08T17:30Z",
      "state": "pre",
-     "detail": "11/8 - 12:20 PM EST",
+     "detail": "11/8 - 12:30 PM EST",
      "round": "Round 1",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -3732,9 +3732,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Juan Manuel Cerundolo",
+       "short": "J. Cerundolo",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -8943,9 +8943,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        1
+        4
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -9851,5 +9851,5 @@
    ]
   }
  ],
- "fetched": "2026-11-08T17:15:09+00:00"
+ "fetched": "2026-11-08T17:25:49+00:00"
 }
