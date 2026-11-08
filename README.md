@@ -1915,6 +1915,16 @@ so a link cannot sign the app in. The Account page now has **Have a code?**, whi
   own session (`grant_type=refresh_token`). Works once, like the link.
 `accounts.js`: `useCode`, `appCode`, `handOff`, `fromLink`.
 
+**Parlay Builder on every page (11/8).** Jordan: "we had parlay builder fully working on onyx baseball original."
+`parlay.js` brings the Onyx Baseball builder (shell.html `parlayToggle` / `renderParlaySlip`) to every page but
+index.html (which keeps its own), loaded by ui.js: the floating Parlay Builder pill arms the page and every odds
+button adds its row's play (found through the row's save star, `OnyxSaved.pickAt`); tap again to remove; both sides
+of one bet swap instead of riding together; started games leave the slip. The slip: legs and prices, combined
+odds, what $10 pays, our chance every leg hits, value against the odds you got, Save parlay to my account (a
+tracked ticket) and Build on Onyx (one share link; disabled with a note while legs have no Onyx id). picks.html
+`#builder`: today's boards, every sport, filters by sport, sort (most likely, best value, biggest price, soonest)
+and a find box, with + Add on each play. `OnyxParlay.add(pick)`.
+
 **Saving picks and parlays, your odds, value check (11/8).** Jordan: "save picks to our account including the parlay
 builder so we know exactly how we're tracking; a tool where we enter the odds and you give us the value." With Onyx's
 feed down no play has a selection id, so the star vanished; `saved.js` `withId` keys such a pick from its game,

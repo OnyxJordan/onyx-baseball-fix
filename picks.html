@@ -19,6 +19,7 @@
 <script src="saved.js"></script>
 <script src="live.js"></script>
 <script src="alerts.js"></script>
+<script src="parlay.js"></script>
 <style>
 body{background:#0c0c0c;color:#fff;margin:0;overflow-x:hidden}
 .pk{padding-top:28px;padding-bottom:10px}
@@ -62,6 +63,16 @@ tr:last-child td{border-bottom:0}
 .lg .r{text-align:right;font:800 13px monospace}
 details{margin-top:14px}summary{cursor:pointer;color:#d795ff;font:700 12px monospace;letter-spacing:.06em;text-transform:uppercase}
 .note{color:#9a93a6;font-size:12px;line-height:1.6;margin:10px 0 0}
+.pbf{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 8px}.pbf button{font:700 11px monospace;letter-spacing:.05em;text-transform:uppercase;color:#ddd;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);border-radius:999px;padding:7px 11px;cursor:pointer}
+.pbf button.on{background:rgba(176,56,249,.3);border-color:rgba(176,56,249,.7);color:#fff}
+.pbq{width:100%;box-sizing:border-box;background:#0d0a12;border:1px solid #3a2a55;border-radius:12px;padding:11px 12px;color:#fff;font:600 14px monospace;margin-bottom:8px}
+.pbr{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;align-items:center;padding:11px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);margin-bottom:7px}
+.pbr b{font-size:14.5px}.pbr span{display:block;font:600 11px monospace;color:#9a93a6;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pbr .c{text-align:right}.pbr .c b{font:800 17px monospace;color:#61e970}.pbr .c small{display:block;font:700 9px monospace;color:#9a93a6}
+.pbr .f{grid-column:1/-1;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.pbr .add{font:800 12px monospace;color:#fff;background:rgba(176,56,249,.3);border:1px solid rgba(176,56,249,.7);border-radius:999px;padding:6px 12px;cursor:pointer}
+.pbr .add.in{background:rgba(97,233,112,.18);border-color:rgba(97,233,112,.6);color:#61e970}
+.pbr .bet{margin-left:0}
 </style>
 </head>
 <body class="ox-page">
@@ -71,11 +82,68 @@ details{margin-top:14px}summary{cursor:pointer;color:#d795ff;font:700 12px monos
   <span class="ox-eyebrow" style="display:block;margin-top:14px">Onyx Picks</span>
   <h1>What we'd bet<br>today.</h1>
   <p class="lead">These are our picks, not leans or projections. Every one is locked once, on game day, at its Onyx price before the game starts, and graded in public when it ends. While Onyx posts no prices, a pick locks at the market line and is marked Market line. Only markets that beat real Onyx prices in testing on games the model never saw are posted here. Everything else on the site is a projection.</p>
-  <div class="toc"><a href="#alerts">Pick alerts</a><a href="#today">Today</a><a href="#record">The record</a><a href="#all">Every pick</a><a href="#how">How picks are chosen</a></div>
+  <div class="toc"><a href="#builder">Parlay builder</a><a href="#alerts">Pick alerts</a><a href="#today">Today</a><a href="#record">The record</a><a href="#all">Every pick</a><a href="#how">How picks are chosen</a></div>
 </section>
 
 <section class="ox-wrap pk" id="alerts"><div id="oxAlertsPicks"></div></section>
 <script>document.addEventListener('DOMContentLoaded', function () { if (window.OnyxAlerts) OnyxAlerts.mount(document.getElementById('oxAlertsPicks')); });</script>
+
+<section class="ox-wrap pk" id="builder">
+  <span class="ox-eyebrow" style="display:block">Parlay builder</span>
+  <h2>Build your own.</h2>
+  <p class="lead">Every play on today's boards, every sport. Tap + Add to put a leg on your slip (or turn on the Parlay Builder pill and tap any odds, on any page). The slip shows the combined odds, what $10 pays, our chance every leg hits and the value against the odds you got, then saves to your account or opens on Onyx. These are projections; Onyx Picks are below.</p>
+  <div class="pbf" id="pbSp"></div>
+  <div class="pbf" id="pbSort"></div>
+  <input class="pbq" id="pbQ" type="search" placeholder="Find a player, team or market" autocomplete="off" aria-label="Find a play">
+  <div id="pbList"><div class="empty">Loading today's boards...</div></div>
+  <button type="button" class="pbf" id="pbMore" hidden style="border:0;background:none;color:#d795ff;font:700 12px monospace;cursor:pointer">Show more</button>
+</section>
+<script>
+(function () {
+  var SPN = {nfl: 'NFL', nba: 'NBA', nhl: 'NHL', cbb: 'College basketball', cfb: 'College football', tennis: 'Tennis'};
+  var B = [], SP = 'all', SORT = 'conf', Q = '', SHOWN = 40, REF = 'KR680261';
+  function esc2(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]; }); }
+  function od(a) { return a == null ? '' : (a > 0 ? '+' : '') + a; }
+  function when(t) { try { return new Date(t).toLocaleString('en-US', {weekday: 'short', hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York'}) + ' ET'; } catch (e) { return ''; } }
+  function inSlip(p) { var S = window.OnyxParlay ? OnyxParlay.slip() : [], id = window.OnyxSaved && OnyxSaved.withId ? OnyxSaved.withId(Object.assign({id: p.sel}, p)).id : p.sel; return S.some(function (x) { return x.id === id; }); }
+  function chips() {
+    var have = {}; B.forEach(function (p) { have[p.sport] = 1; });
+    document.getElementById('pbSp').innerHTML = ['all'].concat(Object.keys(SPN).filter(function (k) { return have[k]; })).map(function (k) {
+      return '<button type="button" data-sp="' + k + '" class="' + (k === SP ? 'on' : '') + '">' + (k === 'all' ? 'All sports' : SPN[k]) + '</button>'; }).join('');
+    document.getElementById('pbSort').innerHTML = [['conf', 'Most likely'], ['edge', 'Best value'], ['price', 'Biggest price'], ['start', 'Soonest']].map(function (x) {
+      return '<button type="button" data-so="' + x[0] + '" class="' + (x[0] === SORT ? 'on' : '') + '">' + x[1] + '</button>'; }).join('');
+  }
+  function list() {
+    var now = Date.now(), q = Q.toLowerCase();
+    var L = B.filter(function (p) { return Date.parse(p.start) > now && (SP === 'all' || p.sport === SP) && p.price != null && p.conf != null
+      && (!q || (p.label + ' ' + p.matchup + ' ' + (p.name || '') + ' ' + (p.team || '')).toLowerCase().indexOf(q) >= 0); });
+    L.sort(function (a, b) { return SORT === 'edge' ? (b.edge || -9) - (a.edge || -9) : SORT === 'price' ? b.price - a.price : SORT === 'start' ? Date.parse(a.start) - Date.parse(b.start) : b.conf - a.conf; });
+    window.PB_ROWS = L.slice(0, SHOWN);
+    document.getElementById('pbList').innerHTML = L.length ? window.PB_ROWS.map(function (p, i) {
+      var url = p.sel ? 'https://app.onyxodds.com/share?selection=' + encodeURIComponent(p.sel) + '&referrer=' + REF : 'https://app.onyxodds.com/?referrer=' + REF;
+      var star = window.OnyxSaved ? OnyxSaved.btn(Object.assign({id: p.sel}, p)) : '';
+      return '<div class="pbr"><div style="min-width:0"><b>' + esc2(p.label) + '</b><span>' + esc2([SPN[p.sport] || p.sport, p.matchup, when(p.start)].join(' · ')) + '</span></div>'
+        + '<div class="c"><b>' + Math.round(100 * p.conf) + '%</b><small>TO HIT</small></div>'
+        + '<div class="f"><button type="button" class="add' + (inSlip(p) ? ' in' : '') + '" data-add="' + i + '">' + (inSlip(p) ? 'On slip ✓' : '+ Add') + '</button>'
+        + '<a class="bet" href="' + url + '" target="_blank" rel="noopener">' + od(p.price) + (p.src === 'market' ? ' market' : ' on Onyx') + '</a>'
+        + (p.edge != null ? '<span style="display:inline;margin:0">edge ' + (p.edge >= 0 ? '+' : '') + (100 * p.edge).toFixed(1) + '</span>' : '') + star + '</div></div>';
+    }).join('') : '<div class="empty">Nothing on the boards fits that right now.</div>';
+    document.getElementById('pbMore').hidden = L.length <= SHOWN;
+  }
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest && e.target.closest('[data-sp],[data-so],[data-add],#pbMore'); if (!t) return;
+    if (t.id === 'pbMore') { SHOWN += 40; list(); return; }
+    if (t.hasAttribute('data-sp')) { SP = t.getAttribute('data-sp'); SHOWN = 40; chips(); list(); return; }
+    if (t.hasAttribute('data-so')) { SORT = t.getAttribute('data-so'); chips(); list(); return; }
+    var p = (window.PB_ROWS || [])[+t.getAttribute('data-add')];
+    if (p && window.OnyxParlay) { OnyxParlay.add(p); list(); }
+  });
+  document.getElementById('pbQ').addEventListener('input', function (e) { Q = e.target.value.trim(); SHOWN = 40; list(); });
+  Promise.all(Object.keys(SPN).map(function (k) { return fetch('data/' + k + '/board.json', {cache: 'no-cache'}).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }); }))
+    .then(function (fs) { fs.forEach(function (f) { (f && f.plays || []).forEach(function (p) { B.push(p); }); }); chips(); list(); });
+  setInterval(function () { if (!document.hidden && B.length) list(); }, 60000);
+})();
+</script>
 
 <section class="ox-wrap pk" id="today">
   <h2>Today's picks.</h2>
