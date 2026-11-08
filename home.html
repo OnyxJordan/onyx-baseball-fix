@@ -501,10 +501,13 @@ function valueBox(rows, parlay) {
   return `<div class="vx" id="vx"><small>Value check · your odds against our chance</small><div class="vx-r">
     <select onchange="vxPick(this.value)" aria-label="Which play">${opts}</select>
     <input class="q" id="vxQ" placeholder="e.g. Jalen Brunson over 26.5 points" ${window.VX_ITEMS.length ? 'hidden' : ''} aria-label="The play">
-    <input class="o" id="vxO" inputmode="text" placeholder="+120" aria-label="Your odds"><button type="button" onclick="vxGo()">Check</button></div>
+    <input class="o" id="vxO" inputmode="text" placeholder="${window.VX_ITEMS.length && window.VX_ITEMS[0].price != null ? (window.VX_ITEMS[0].price > 0 ? '+' : '') + window.VX_ITEMS[0].price : '+120'}" aria-label="Your odds"><button type="button" onclick="vxGo()">Check</button></div>
     <div class="vx-out" id="vxOut"></div></div>`;
 }
-function vxPick(v) { const q = document.getElementById('vxQ'); if (q) q.hidden = v !== 'q'; window.VX_SEL = v; }
+function vxPick(v) { const q = document.getElementById('vxQ'); if (q) q.hidden = v !== 'q'; window.VX_SEL = v;
+  // the box shows the Onyx price of what is picked (11/8: a +1786 ticket read "+120"); blank means that price
+  const o = document.getElementById('vxO'), it = v === 'q' ? null : (window.VX_ITEMS || [])[+v];
+  if (o) o.placeholder = it && it.price != null ? (it.price > 0 ? '+' : '') + it.price : '+120'; }
 async function vxGo() {
   const out = document.getElementById('vxOut'), odds = String((document.getElementById('vxO') || {}).value || '').trim().replace(/^\+/, '');
   if (!out || !window.OnyxSaved) return;

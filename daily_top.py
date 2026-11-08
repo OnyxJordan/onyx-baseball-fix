@@ -40,7 +40,7 @@ MIN_EDGE, MAX_EDGE, MIN_EV = 0.02, 0.12, 0.03
 KEEP = 30
 WORD = {"pts": "points", "reb": "rebounds", "ast": "assists", "pass_yds": "passing yards", "rush_yds": "rushing yards",
         "rec_yds": "receiving yards", "rec": "receptions", "pass_td": "passing TDs", "pass_att": "pass attempts", "pass_rush_yds": "passing + rushing yards",
-        "rush_rec_yds": "rushing + receiving yards", "two_td": "2+ touchdowns", "q1_total": "1st-quarter points",
+        "rush_rec_yds": "rushing + receiving yards", "two_td": "2+ touchdowns", "three_td": "3+ touchdowns", "q1_total": "1st-quarter points",
         "h1_total": "1st-half points"}
 
 

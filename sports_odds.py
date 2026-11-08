@@ -236,10 +236,12 @@ def main():
                         mid = od.get("market_id")
                         sel = od.get("selection") or od.get("name") or ""
                         side = str(od.get("selection_line") or "").lower()
-                        if mid == "player_touchdowns" and side == "over" and od.get("points") is not None and float(od["points"]) == 1.5 and sel:
-                            # 2+ touchdowns (11/1): Onyx's over 1.5 on a player's touchdowns, not its main (0.5) line
-                            out["props"].append({"name": sel, "mkt": "two_td", "line": 1.5, "over": price, "over_sel": _sel(od),
-                                                 "under": None, "under_sel": None, "gid": g["gid"]})
+                        if mid == "player_touchdowns" and side == "over" and od.get("points") is not None and float(od["points"]) in (1.5, 2.5) and sel:
+                            # 2+ touchdowns (11/1): Onyx's over 1.5 on a player's touchdowns, not its main (0.5) line;
+                            # 3+ touchdowns (11/8): its over 2.5
+                            ln_ = float(od["points"])
+                            out["props"].append({"name": sel, "mkt": "two_td" if ln_ == 1.5 else "three_td", "line": ln_, "over": price,
+                                                 "over_sel": _sel(od), "under": None, "under_sel": None, "gid": g["gid"]})
                             continue
                         if mid in spec["yes"] and od.get("is_main"):
                             who = od.get("selection") or od.get("selection_line") or od.get("name")
