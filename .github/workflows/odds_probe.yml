@@ -94,6 +94,24 @@ jobs:
                   rows = r.get("data") or []
                   n = sum(len(x.get("odds") or []) for x in rows)
                   print(f"   {bk}: {n} moneyline rows", json.dumps((rows[0].get("odds") or [])[:2])[:300] if rows else "")
+          # 11/8: what onyx_predictions carries per market (counts, a full row with its deep_link) per league
+          MK = {"nfl": ["moneyline", "point_spread", "total_points", "player_receiving_yards", "player_rushing_yards", "player_receptions", "anytime_touchdown_scorer"],
+                "nba": ["moneyline", "point_spread", "total_points", "player_points", "player_rebounds", "player_assists"],
+                "nhl": ["moneyline", "puck_line", "total_goals", "player_points"], "ncaab": ["moneyline", "point_spread", "total_points"]}
+          SPT = {"nfl": "football", "nba": "basketball", "nhl": "hockey", "ncaab": "basketball"}
+          for lg, mks in MK.items():
+              fx2 = [f for f in (get(f"{OPTIC}/fixtures?sport={SPT[lg]}&league={lg}").get("data") or []) if str(f.get("status")).lower() == "unplayed"][:2]
+              for f in fx2:
+                  for bk in ("onyx_predictions", "onyx_odds"):
+                      q = "".join("&market=" + urllib.parse.quote(m) for m in mks)
+                      rows = get(f"{OPTIC}/fixtures/odds?sport={SPT[lg]}&league={lg}&sportsbook={bk}&fixture_id={urllib.parse.quote(f['id'])}&odds_format=AMERICAN{q}").get("data") or []
+                      odds = [o for r in rows for o in (r.get("odds") or [])]
+                      by = {}
+                      for o in odds: by[o.get("market_id")] = by.get(o.get("market_id"), 0) + 1
+                      dl = sum(1 for o in odds if (o.get("deep_link") or {}).get("desktop"))
+                      print(f"{lg} {f.get('away_team_display')} @ {f.get('home_team_display')} | {bk}: {len(odds)} prices, {dl} with deep_link | {by}")
+                      if bk == "onyx_predictions" and odds:
+                          print("   sample:", json.dumps(odds[0])[:700])
           json.dump({"sportsbooks": sb, "active_nfl": act}, open("probe/books.json", "w"), indent=1)
           PY
         env:
