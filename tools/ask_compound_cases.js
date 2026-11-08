@@ -68,5 +68,7 @@ module.exports = [
   C('show me 3 2+ td projections sunday night', {sports: ['nfl'], markets: ['two_plus_td'], count: 3, slot: 'Sunday night'}),
   C('5 safest 3+ td in the 1 PM games', {sports: ['nfl'], markets: ['three_td'], count: 5, slot: '1 PM slate'}),
   C('top 3 props in the 1 PM games', {sports: ['nfl'], count: 3, slot: '1 PM slate'}),
-  C('10 first td you like most', {markets: ['first_td'], count: 10, sort: 'rec'})
+  C('10 first td you like most', {markets: ['first_td'], count: 10, sort: 'rec'}),
+  C('show me 3 2+ td projections sunday night', {sports: ['nfl'], markets: ['two_plus_td'], count: 3, slot: 'Sunday night', min_rows: 3}),
+  C('5 mnf receiving yards projections', {sports: ['nfl'], markets: ['rec_yds'], count: 5, slot: 'Monday night', min_rows: 5})
 ];

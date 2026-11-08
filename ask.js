@@ -1101,6 +1101,16 @@
         who[WHO(q)] = 1; picked.push(q);
       }
     }
+    // a list short of its count because the window holds few games ("3 2+ td projections sunday night" gave 1,
+    // 11/8): fill from the same games, best first, one line per player and market
+    if (spec.intent === 'list' && picked.length < n) {
+      for (var j2 = 0; j2 < pool.length && picked.length < n; j2++) {
+        var q2 = pool[j2];
+        if (picked.indexOf(q2) >= 0 || picked.some(function (x) { return WHO(x) === WHO(q2) && (x.mkt || x.kind) === (q2.mkt || q2.kind); })) continue;
+        picked.push(q2);
+      }
+      picked.sort(function (a, b) { return key(a) - key(b); });
+    }
     if (spec.intent === 'parlay' && spec.target_price && !spec.count_set) {          // the filler pass can overshoot: stop at the target
       for (var z = 2; z <= picked.length; z++) if (ticket(picked.slice(0, z)).price >= spec.target_price) { picked = picked.slice(0, z); break; }
     }
