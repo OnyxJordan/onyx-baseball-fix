@@ -68,6 +68,7 @@ const srv = http.createServer((q, r) => { const p = path.join(root, decodeURICom
       if (e.teams) { const got = ((s.teams || []).length ? s.teams : s.team ? [s.team] : []).map(x => String(x).toUpperCase()).sort(); if (!same(got, e.teams)) why.push(`teams ${JSON.stringify(got)} want ${JSON.stringify(e.teams)}`); }
       if (e.props_only && !s.props_only) why.push('props_only not set');
       if (e.sort && s.sort !== e.sort) why.push(`sort ${s.sort} want ${e.sort}`);
+      if (e.min_rows && (R.rows || []).length < e.min_rows && B.some(p => p.sport === 'nfl' && Date.parse(p.start) > Date.now() && OnyxAsk.slotOk(s.slot, p.start))) why.push(`only ${(R.rows || []).length} rows, asked ${e.min_rows}`);
       if (e.pos_value != null && !!s.pos_value !== e.pos_value) why.push(`pos_value ${!!s.pos_value} want ${e.pos_value}`);
       if (e.when && s.when !== e.when) why.push(`when ${s.when} want ${e.when}`);
       if (e.exclude && !e.exclude.every(x => (s.exclude || []).some(y => String(y).toLowerCase() === String(x).toLowerCase()))) why.push(`exclude ${JSON.stringify(s.exclude || [])} want ${JSON.stringify(e.exclude)}`);
