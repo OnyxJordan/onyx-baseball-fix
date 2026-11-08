@@ -23,7 +23,7 @@ from fetch_onyx import http_json, OPTIC   # noqa: E402
 
 SPORTS = ["football", "hockey", "tennis", "golf", "basketball", "baseball"]
 LEAGUE_HINT = {"football": ["nfl", "ncaaf"], "hockey": ["nhl"], "basketball": ["nba"], "baseball": ["mlb"]}
-BOOK = os.environ.get("ONYX_SPORTSBOOK", "").strip() or "onyx_odds"
+BOOK = os.environ.get("ONYX_SPORTSBOOK", "").strip() or "onyx_predictions"   # 11/8: Onyx's live book
 
 
 def main():
