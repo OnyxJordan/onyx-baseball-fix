@@ -68,6 +68,8 @@ const srv = http.createServer((q, r) => { const p = path.join(root, decodeURICom
       if (e.teams) { const got = ((s.teams || []).length ? s.teams : s.team ? [s.team] : []).map(x => String(x).toUpperCase()).sort(); if (!same(got, e.teams)) why.push(`teams ${JSON.stringify(got)} want ${JSON.stringify(e.teams)}`); }
       if (e.props_only && !s.props_only) why.push('props_only not set');
       if (e.sort && s.sort !== e.sort) why.push(`sort ${s.sort} want ${e.sort}`);
+      if (e.period !== undefined && (s.period || null) !== e.period) why.push(`period ${s.period} want ${e.period}`);
+      if (s.period && (R.rows || []).some(p => !String(p.mkt || '').startsWith(s.period + '_'))) why.push('a full-game line in a quarter / half answer');
       if (e.min_rows && (R.rows || []).length < e.min_rows && B.some(p => p.sport === 'nfl' && Date.parse(p.start) > Date.now() && OnyxAsk.slotOk(s.slot, p.start))) why.push(`only ${(R.rows || []).length} rows, asked ${e.min_rows}`);
       if (e.pos_value != null && !!s.pos_value !== e.pos_value) why.push(`pos_value ${!!s.pos_value} want ${e.pos_value}`);
       if (e.when && s.when !== e.when) why.push(`when ${s.when} want ${e.when}`);
@@ -185,11 +187,12 @@ const srv = http.createServer((q, r) => { const p = path.join(root, decodeURICom
       const onTM = (p, T) => { const hay = ' ' + [p.team, p.matchup].join(' ').toUpperCase() + ' '; return T.some(x => new RegExp('[^A-Z]' + String(x).toUpperCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '[^A-Z]').test(hay)); };   // team field and matchup, never a player named Duke
       const hasTeam = (s.tabbr || (s.teams || []).length || s.team) && !s.player && fut.some(p => { const T = teamsFor(s, p.sport); return T.length && onTM(p, T); });
       const hasPlayer = s.player && fut.some(p => String(p.name || p.label).toLowerCase().indexOf(String(s.player).toLowerCase()) >= 0);
-      if (!legs.length && !R.clarify && !R.ambig && !R.depth && (hasTeam || hasPlayer)) why.push(`empty answer while the board has ${hasPlayer ? s.player : 'that team'}`);
+      const periodOk = !s.period || B.some(p => String(p.mkt || '').startsWith(s.period + '_') && !/_total$/.test(p.mkt));   // a quarter / half answer needs quarter lines
+      if (!legs.length && periodOk && !R.clarify && !R.ambig && !R.depth && (hasTeam || hasPlayer)) why.push(`empty answer while the board has ${hasPlayer ? s.player : 'that team'}`);
       // an empty answer is a failure when today's boards have something that fits
       const want = (e.sports || s.sports || []).length ? (e.sports || s.sports) : null, wm = (e.markets || s.markets || []).length ? (e.markets || s.markets) : null;
       const exists = !e.team && !e.player && !s.team && !(s.teams || []).length && !s.player && !s.conf && !s.tabbr && !s.onyx_picks && !R.depth && !R.ambig && s.intent !== 'sgp' && avail(want, wm, s);   // an SGP needs it all in one game
-      if (!legs.length && exists && !R.clarify) why.push('empty answer while the board has plays that fit');   // a question back (R.clarify) is an answer
+      if (!legs.length && exists && periodOk && !R.clarify) why.push('empty answer while the board has plays that fit');   // a question back (R.clarify) is an answer
       if (s.intent === 'parlay' && legs.length > 1 && R.parlay && R.parlay.price == null) why.push('parlay without a price');
       out.push({q: c.q, ok: !why.length, why, ms: Math.round(ms), n: legs.length, read: R.understood, via: R.via, spec: JSON.stringify(Object.assign({}, s, {summary: undefined}))});
     }
