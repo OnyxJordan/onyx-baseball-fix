@@ -16554,10 +16554,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "35-41",
+  "profit": -1.0,
+  "graded_at": "2026-11-08T08:24:13+00:00"
  },
  {
   "id": "nba-401909943-spread-home",
@@ -16833,10 +16833,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "21-42",
+  "profit": -1.0,
+  "graded_at": "2026-11-08T08:24:13+00:00"
  },
  {
   "id": "nhl-401892671-total-under",
@@ -16895,10 +16895,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "21-42",
+  "profit": 0.8772,
+  "graded_at": "2026-11-08T08:24:13+00:00"
  },
  {
   "id": "nba-401909944-total-over",
@@ -16957,10 +16957,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "63",
+  "profit": 0.9009,
+  "graded_at": "2026-11-08T08:24:13+00:00"
  },
  {
   "id": "cfb-401864535-ml-home",
@@ -16988,10 +16988,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "35-41",
+  "profit": -1.0,
+  "graded_at": "2026-11-08T08:24:13+00:00"
  },
  {
   "id": "cfb-401864535-total-over",
@@ -17018,6 +17018,36 @@
    "f": 0.419
   },
   "pre_src": "onyx",
+  "model": "live-v6",
+  "result": "L",
+  "actual": "76",
+  "profit": -1.0,
+  "graded_at": "2026-11-08T08:24:14+00:00"
+ },
+ {
+  "id": "tennis-186642-spread-home",
+  "sport": "tennis",
+  "gid": "186642",
+  "date": "2026-11-07",
+  "logged_at": "2026-11-08T08:17:41+00:00",
+  "matchup": "Alexandra Eala vs Claire Liu",
+  "home": "Claire Liu",
+  "away": "Alexandra Eala",
+  "label": "Claire Liu +5.5 games",
+  "kind": "spread",
+  "side": "home",
+  "line": 5.5,
+  "price": -140,
+  "chance": 0.6949,
+  "implied": 0.5833,
+  "edge": 0.112,
+  "fair": -230,
+  "state": {
+   "sets": "1-1",
+   "srv": "home",
+   "need": 2
+  },
+  "pre_src": "market",
   "model": "live-v6",
   "result": null,
   "actual": null,
