@@ -709,6 +709,14 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
     lines as forecasts firm up, so the `wind_under` lane logs only while the kickoff forecast
     (`nfl_weather.py`, Open-Meteo, one batched request per build, `data/nfl/weather.json`) is
     15+ mph at an open stadium and Onyx still shows its opening price.
+  - **`cb_pass_over` capture lane (11/8, Jordan: "set up the CB out lane to log prices now").** In
+    `sports_build.nfl_open_lane`, same ledger (`data/nfl/open_trial.json`, append-only, on trial, never an Onyx
+    Pick): a QB's passing yards OVER when the opponent has a cornerback with 60%+ of defensive snaps this season
+    (depth.json `now.use`, 2+ games) tagged Out or Doubtful on ESPN's injury report (IR left out, as tested), priced
+    -130 to +120, logged once at the Onyx price when it first qualifies (not only the opening price: the report
+    usually lands after the open, and the backtest's close earned as much as its open). Key `gid|name|pass_yds|cb`,
+    graded off the box like the other lanes. Promotion bar: 30+ 2026 bets with a profit at the logged price, then
+    the picks test. First day: 4 logged for the 1 PM slate (Nix, Young, Willis, Geno Smith).
   - **NFL projections from usage, depth charts and injuries (11/1, tested, not adopted).**
     `tools/nfl_proj_test.py`: volume x efficiency (team attempts / carries from Onyx's spread
     and implied points, the player's target / carry / attempt share, regressed efficiency,
@@ -771,6 +779,14 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
       Watch only: passing-yards overs vs a defense with a regular CB Out/Doubtful on the final injury report, 15-3 /
       28-16 / 6-4 at the open (log loss -16.8 / -1.1 / +2.1); needs a capture lane at the price when the report lands.
       Coaching changes: nflverse's coach field is wrong from 2024, untestable.
+    - Follow-ups (same day): backup RB by depth role: the replacement runs ~+22 yards over his trailing mean, but Onyx's
+      opening line already sits +21.9 above it (role projection within 1.8), 18-18 at the open; name him by trailing
+      carries (70% right) not the depth chart (63%). Not shipped. Passing yards vs defense-by-position at Onyx's price:
+      rules chosen on 2024-25 lost on 2026 (unders vs top-10 32-40, -16.3%); QBs vs a top-5 pass defense finish ~10
+      yds under the line, vs bottom-5 ~5 over, mostly priced. Watch: explosive pass rate allowed (same sign 3 folds).
+    - CB out, the full test: QBs +8 yds with a regular CB Out/Doubtful (+6.5 2019-23, +12.3 2024-26); overs 17-6 /
+      49-32 / 10-11 at the open (+14.8% open, +20.1% close overall), 2026 alone -9.6% at the open on 21: short of the
+      trial bar. Jordan, 11/8: log it anyway to build the 2026 record -> the `cb_pass_over` capture lane below.
   - **Rules lab history and splits (10/31).** `data/rules_lab/<sport>/<market>.json` (columnar, loaded per
     market) holds 825,148 priced lines: NBA 2024-25 (Onyx from Feb 2025 and market prices), 2025-26 with the
     model replay, 2026-27 to date, game lines, threes; MLB 2025-26 Onyx (home run yes, hits, total bases,
