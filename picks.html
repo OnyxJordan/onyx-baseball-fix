@@ -159,7 +159,7 @@ function card(r) {
       : live && r.src === 'market' ? '<a class="bet" href="https://app.onyxodds.com/?referrer=' + ONYX_REFERRER + '" target="_blank" rel="noopener">' + odds(r.price) + ' market, find it on Onyx</a>'
       : '<span class="bet" style="background:rgba(255,255,255,.08)">' + odds(r.price) + ' locked</span>') +
     '<span class="tg">Locked ' + esc(when(r.logged_at)) + ' at ' + odds(r.price) + '</span>' +
-    (live && r.sel && window.OnyxSaved ? OnyxSaved.btn(savePick(r)) : '') +
+    (live && window.OnyxSaved ? OnyxSaved.btn(savePick(r)) : '') +
     '</div></div>';
 }
 function row(cells, head) {

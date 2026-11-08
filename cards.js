@@ -76,7 +76,7 @@
   try { SLIP = JSON.parse(localStorage.getItem(SLIP_KEY) || '[]') || []; } catch (e) { SLIP = []; }
   // the save star (saved.js), the same one as every play card: the pick follows you in My picks
   var MKEY = {points: 'pts', rebounds: 'reb', assists: 'ast'};
-  function star(pick) { return window.OnyxSaved && pick && pick.id ? OnyxSaved.btn(pick) : ''; }
+  function star(pick) { return window.OnyxSaved && pick && (pick.id || pick.label) ? OnyxSaved.btn(pick) : ''; }   // no Onyx id during an outage: saved.js keys it (11/8)
   function sidePick(s, gid) {
     var g = gameOf(gid) || {}, num = parseFloat(String(s.lab || '').split(' ').pop());
     return {id: s.sel, sport: SPORT, label: s.lab, matchup: g.away && g.home ? g.away + ' @ ' + g.home : '', start: g.start, gid: gid,

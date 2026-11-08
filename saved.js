@@ -39,6 +39,15 @@
     if (keep.length !== a.length) write(keep);
     return keep;
   }
+  // a play with no Onyx selection id (11/8: Onyx's feed is down, every play is on the market line and none has one,
+  // so no star showed anywhere): a stable key from the game, market, player, side and line. Tracking reads the game
+  // and the stats, never the id, so these follow live and grade like any other pick.
+  function withId(p) {
+    if (!p || p.id) return p;
+    var k = [p.sport, p.gid || p.matchup, p.kind, p.mkt, p.name || p.team, p.side, p.line, p.hcap].map(function (x) { return x == null ? '' : String(x); }).join('|');
+    if (!p.label || k.replace(/\|/g, '') === '') return p;
+    return Object.assign({}, p, {id: 'k:' + k.toLowerCase().replace(/\s+/g, '_')});
+  }
   function has(id) { return !!id && read().some(function (p) { return p.id === id; }); }
   function remove(id) { write(read().filter(function (p) { return p.id !== id; })); unrecord(id); }
 
@@ -101,6 +110,7 @@
   function alertsOn() { return lsGet(ALERTS, 0) === 1 && typeof Notification !== 'undefined' && Notification.permission === 'granted'; }
   function canAsk() { return typeof Notification !== 'undefined' && Notification.permission !== 'denied'; }
   function toggle(p) {
+    p = withId(p);
     if (!p || !p.id) return false;
     if (has(p.id)) { remove(p.id); toast('Removed from My picks'); return false; }
     var a = read(), sp = Object.assign({}, p, {saved: new Date().toISOString()}); a.push(sp); write(a); record(sp);
@@ -116,6 +126,7 @@
     el.setAttribute('aria-label', on ? 'Saved' : 'Save pick');
   }
   function btn(p) {
+    p = withId(p);
     if (!p || !p.id) return '';
     var i = REG.push(p) - 1, on = has(p.id);
     return '<button class="ox-save' + (on ? ' on' : '') + '" aria-label="' + (on ? 'Saved' : 'Save pick') + '" title="Save this pick and follow it live" ' +
@@ -358,7 +369,7 @@
     '@media (prefers-reduced-motion: reduce){.oxw,.oxw-big,.oxw-fx i{animation:none!important;transition:none!important}.oxw-fx{display:none}}';
   var st = document.createElement('style'); st.textContent = css; (document.head || document.documentElement).appendChild(st);
   window.OnyxSaved = {all: all, has: has, remove: remove, toggle: toggle, tap: tap, btn: btn,
-    track: track, celebrate: celebrate, watch: watch, alertsOn: alertsOn, setAlerts: setAlerts,
+    withId: withId, track: track, celebrate: celebrate, watch: watch, alertsOn: alertsOn, setAlerts: setAlerts,
     history: history, grade: grade, stats: stats, record: record};
   if (document.readyState === 'loading') addEventListener('DOMContentLoaded', start); else start();
 })();
