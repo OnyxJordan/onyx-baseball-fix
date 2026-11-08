@@ -17053,5 +17053,35 @@
   "actual": "12-3",
   "profit": 0.7143,
   "graded_at": "2026-11-08T10:27:07+00:00"
+ },
+ {
+  "id": "tennis-186690-ml-away",
+  "sport": "tennis",
+  "gid": "186690",
+  "date": "2026-11-08",
+  "logged_at": "2026-11-08T11:48:07+00:00",
+  "matchup": "Sofya Lansere vs Anna Blinkova",
+  "home": "Anna Blinkova",
+  "away": "Sofya Lansere",
+  "label": "Sofya Lansere to win",
+  "kind": "ml",
+  "side": "away",
+  "line": null,
+  "price": -132,
+  "chance": 0.6547,
+  "implied": 0.569,
+  "edge": 0.086,
+  "fair": -190,
+  "state": {
+   "sets": "5-2",
+   "srv": "away",
+   "need": 2
+  },
+  "pre_src": "market",
+  "model": "live-v6",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
