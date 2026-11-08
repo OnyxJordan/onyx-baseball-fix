@@ -17175,5 +17175,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186534-spread-home",
+  "sport": "tennis",
+  "gid": "186534",
+  "date": "2026-11-08",
+  "logged_at": "2026-11-08T15:44:19+00:00",
+  "matchup": "Juan Manuel Cerundolo vs Elias Ymer",
+  "home": "Elias Ymer",
+  "away": "Juan Manuel Cerundolo",
+  "label": "Elias Ymer +4.5 games",
+  "kind": "spread",
+  "side": "home",
+  "line": 4.5,
+  "price": -165,
+  "chance": 0.6857,
+  "implied": 0.6226,
+  "edge": 0.063,
+  "fair": -220,
+  "state": {
+   "sets": "0-0",
+   "srv": "home",
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v6",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
