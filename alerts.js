@@ -26,9 +26,10 @@
     '.oxa-x button.on{background:rgba(176,56,249,.3);border-color:rgba(176,56,249,.7);color:#fff}',
     '.oxa-lv{display:grid;gap:6px;margin:6px 0 8px}',
     '.oxa-lv button{display:grid;grid-template-columns:18px 1fr;gap:2px 10px;align-items:start;text-align:left;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:#eee;cursor:pointer;font:inherit}',
-    '.oxa-lv button i{grid-row:span 2;width:16px;height:16px;margin-top:2px;border-radius:50%;border:2px solid rgba(255,255,255,.35)}',
+    '.oxa-lv button i{grid-row:span 2;width:16px;height:16px;margin-top:2px;border-radius:5px;border:2px solid rgba(255,255,255,.35);display:flex;align-items:center;justify-content:center;font:900 11px sans-serif;font-style:normal;color:#fff}',
+    '.oxa-qk{display:flex;gap:8px;margin:2px 0 6px}.oxa-qk button{font:700 11.5px monospace;color:#ddd;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:999px;padding:6px 11px;cursor:pointer}.oxa-qk button[disabled]{opacity:.5}',
     '.oxa-lv button b{font-size:14px}.oxa-lv button span{font-size:12px;color:#a9a2b6;line-height:1.4}',
-    '.oxa-lv button.on{border-color:rgba(176,56,249,.75);background:rgba(176,56,249,.16)}.oxa-lv button.on i{border-color:#a24bff;background:radial-gradient(#fff 0 3px,#a24bff 4px)}',
+    '.oxa-lv button.on{border-color:rgba(176,56,249,.75);background:rgba(176,56,249,.16)}.oxa-lv button.on i{border-color:#a24bff;background:#a24bff}',
     '.oxa-lv button[disabled]{opacity:.5;cursor:default}',
     '.oxa-in{display:inline-block;margin:2px 0 8px;font:800 12px monospace;color:#fff;background:#a24bff;border-radius:999px;padding:9px 14px;text-decoration:none}',
     '.oxa-s{margin-top:8px;font:600 11.5px monospace;color:#9a93a6;line-height:1.5}'
@@ -90,11 +91,19 @@
     if (!id && p.linked) return withOS(function (OS) { return OS.logout(); }).then(function () { delete p.linked; save(p); }).catch(function () {});
     return Promise.resolve();
   }
-  var LEVELS = [['all', 'Every update', 'Game starts, lead changes, halftime and the result'],
-                ['key', 'Key moments', 'When the game starts and the result'],
-                ['results', 'Results only', 'Cashed, missed or push, as soon as it is decided'],
-                ['recap', 'Daily recap', 'One push each morning: yesterday\'s record and today\'s picks'],
-                ['off', 'Off', 'Nothing about your saved picks']];
+  // what to push about your saved picks: a checklist (11/8, Jordan: "a checklist, not one selection only").
+  // Saved on the profile as a comma list ("start,result,recap") or "off"; my_alerts.py reads the same list.
+  var EVENTS = [['start', 'Game starts', 'The moment the game your pick is in starts'],
+                ['swing', 'Lead changes', 'When your pick goes ahead or falls behind (at most every 15 minutes)'],
+                ['half', 'Halftime check', 'Where your pick stands at the break'],
+                ['result', 'Results', 'Cashed, missed or push, as soon as it is decided'],
+                ['recap', 'Daily recap', 'One push each morning: yesterday\'s record and today\'s picks']];
+  var LEGACY = {all: 'start,swing,half,result', key: 'start,result', results: 'result', recap: 'recap', off: ''};
+  function evSet(level) {
+    var v = String(level || 'off'); if (v in LEGACY) v = LEGACY[v];
+    var o = {}; v.split(',').forEach(function (k) { if (k) o[k] = 1; }); return o;
+  }
+  function evLevel(o) { var k = EVENTS.map(function (e) { return e[0]; }).filter(function (k) { return o[k]; }); return k.length ? k.join(',') : 'off'; }
   var LEVEL = null, LVERR = '', BUSY = false;
   function loadLevel(el) {
     var A = window.OnyxAccounts;
@@ -116,9 +125,11 @@
       + '<div class="oxa-sec"><div class="oxa-hd"><b>Your saved picks</b></div>'
       + (!st.enabled ? '<p>Updates on the picks you save, from the first whistle to the result. Coming with accounts.</p>'
         : !st.signedIn ? '<p>Updates on every pick you save: when the game starts, how it is going and the result. Sign in so we know which picks are yours.</p><a class="oxa-in" href="account.html">Sign in</a>'
-        : '<p>Updates on every pick you save' + (st.email ? ' as ' + String(st.email).replace(/[<>&"]/g, '') : '') + '. How often?</p>'
-          + '<div class="oxa-lv">' + LEVELS.map(function (L) {
-            return '<button type="button" data-lv="' + L[0] + '" class="' + (L[0] === lv ? 'on' : '') + '"' + (lvDisabled ? ' disabled' : '') + '><i></i><b>' + L[1] + '</b><span>' + L[2] + '</span></button>';
+        : '<p>Updates on every pick you save' + (st.email ? ' as ' + String(st.email).replace(/[<>&"]/g, '') : '') + '. Check everything you want:</p>'
+          + '<div class="oxa-qk"><button type="button" data-qk="all"' + (lvDisabled ? ' disabled' : '') + '>Everything</button><button type="button" data-qk="off"' + (lvDisabled ? ' disabled' : '') + '>None</button></div>'
+          + '<div class="oxa-lv">' + EVENTS.map(function (E) {
+            var onE = !!evSet(lv)[E[0]];
+            return '<button type="button" role="checkbox" aria-checked="' + onE + '" data-ev="' + E[0] + '" class="' + (onE ? 'on' : '') + '"' + (lvDisabled ? ' disabled' : '') + '><i>' + (onE ? '&#10003;' : '') + '</i><b>' + E[1] + '</b><span>' + E[2] + '</span></button>';
           }).join('') + '</div>' + (LVERR ? '<p>' + LVERR + '</p>' : ''))
       + '</div>'
       + '<div class="oxa-s">' + (!ready ? 'Push alerts are coming soon. On iPhone, add Onyx Sports to your Home Screen first: Apple only allows web push from an installed app.'
@@ -126,7 +137,7 @@
         : ERR ? 'Could not save: ' + ERR.replace(/[<>&]/g, '') + '.'
         : iosBrowser() ? 'On iPhone, tap Share, then Add to Home Screen, and open Onyx Sports from there: Apple only allows push from the installed app.'
         : perm === 'denied' && OSPERM !== true ? 'Notifications are blocked for Onyx Sports. Allow them in Settings, Notifications.'
-        : (on || (lv !== 'off' && st.signedIn)) ? 'This phone: ' + [on ? 'Onyx Picks at ' + x + '%+' : '', lv !== 'off' && st.signedIn ? LEVELS.filter(function (L) { return L[0] === lv; })[0][1].toLowerCase() + ' on your picks' : ''].filter(Boolean).join(', ') + '.'
+        : (on || (evLevel(evSet(lv)) !== 'off' && st.signedIn)) ? 'This phone: ' + [on ? 'Onyx Picks at ' + x + '%+' : '', lv !== 'off' && st.signedIn ? EVENTS.filter(function (E) { return evSet(lv)[E[0]]; }).map(function (E) { return E[1].toLowerCase(); }).join(', ') + ' on your picks' : ''].filter(Boolean).join(', ') + '.'
         : 'Nothing is on yet.') + '</div></div>';
     [].forEach.call(el.querySelectorAll('[data-x]'), function (b) {
       b.onclick = function () { var q = pref(); q.x = +b.getAttribute('data-x'); save(q); if (q.on) withOS(function (OS) { return OS.User.addTags({min_conf: String(q.x)}); }).catch(function () {}); draw(el); };
@@ -143,19 +154,23 @@
       }).then(function (ok) { if (ok) { q.on = want; q.x = q.x || 60; save(q); } }, function () {})
         .then(function () { BUSY = false; draw(el); });
     };
-    [].forEach.call(el.querySelectorAll('[data-lv]'), function (b) {
-      b.onclick = function () {
-        if (iosBrowser()) { ERR = 'on iPhone, add Onyx Sports to your Home Screen (Share, Add to Home Screen) and turn alerts on from there'; draw(el); return; }
-        var want = b.getAttribute('data-lv'), A = window.OnyxAccounts; ERR = ''; BUSY = true; draw(el);
-        (want === 'off' ? Promise.resolve(true) : withOS(permit)).then(function (ok) {
-          if (!ok) return;
-          return link().then(function () { return A.setProfile({push_level: want}); }).then(function () {
-            LEVEL = want; var q = pref(); q.my = want; save(q);
-            return withOS(function (OS) { return OS.User.addTags({my: want}); }).catch(function () {});
-          });
-        }).catch(function (e) { ERR = ERR || (e && e.message ? String(e.message).slice(0, 120) : 'try again in a minute'); })
-          .then(function () { BUSY = false; draw(el); });
-      };
+    function saveLevel(want) {
+      if (iosBrowser()) { ERR = 'on iPhone, add Onyx Sports to your Home Screen (Share, Add to Home Screen) and turn alerts on from there'; draw(el); return; }
+      var A = window.OnyxAccounts; ERR = ''; BUSY = true; LEVEL = want; draw(el);
+      (want === 'off' ? Promise.resolve(true) : withOS(permit)).then(function (ok) {
+        if (!ok) { LEVEL = lv; return; }
+        return link().then(function () { return A.setProfile({push_level: want}); }).then(function () {
+          var q = pref(); q.my = want; save(q);
+          return withOS(function (OS) { return OS.User.addTags({my: want}); }).catch(function () {});
+        });
+      }).catch(function (e) { LEVEL = lv; ERR = ERR || (e && e.message ? String(e.message).slice(0, 120) : 'try again in a minute'); })
+        .then(function () { BUSY = false; draw(el); });
+    }
+    [].forEach.call(el.querySelectorAll('[data-ev]'), function (b) {
+      b.onclick = function () { var o = evSet(lv), k = b.getAttribute('data-ev'); if (o[k]) delete o[k]; else o[k] = 1; saveLevel(evLevel(o)); };
+    });
+    [].forEach.call(el.querySelectorAll('[data-qk]'), function (b) {
+      b.onclick = function () { saveLevel(b.getAttribute('data-qk') === 'all' ? evLevel({start: 1, swing: 1, half: 1, result: 1, recap: 1}) : 'off'); };
     });
   }
   function mount(el) {
