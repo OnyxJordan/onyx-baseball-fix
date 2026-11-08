@@ -18,6 +18,7 @@ const arg = k => (process.argv.find(a => a.startsWith('--' + k + '=')) || '').sp
 const CORPUS = arg('corpus') ? path.resolve(arg('corpus')) : path.join(__dirname, process.argv.includes('--holdout2') ? 'ask_holdout2.json' : process.argv.includes('--holdout') ? 'ask_holdout.json' : 'ask_corpus.json');
 let C = process.argv.includes('--college') ? [] : JSON.parse(fs.readFileSync(CORPUS, 'utf8'));
 if (process.argv.includes('--college') || (!arg('corpus') && !process.argv.includes('--holdout') && !process.argv.includes('--holdout2'))) C = C.concat(require('./ask_college_cases.js'));
+if (!arg('corpus') && !process.argv.includes('--holdout') && !process.argv.includes('--holdout2') && !process.argv.includes('--college')) C = C.concat(require('./ask_compound_cases.js'));
 if (arg('sample')) { const n = +arg('sample'), step = C.length / n; C = Array.from({length: Math.min(n, C.length)}, (_, i) => C[Math.floor(i * step)]); }
 const AI = arg('ai'), PACE = +(arg('pace') || (AI ? 3400 : 0));
 const srv = http.createServer((q, r) => { const p = path.join(root, decodeURIComponent(q.url.split('?')[0])); fs.readFile(p, (e, b) => { if (e) { r.statusCode = 404; return r.end(); } r.end(b); }); }).listen(0);
@@ -72,6 +73,13 @@ const srv = http.createServer((q, r) => { const p = path.join(root, decodeURICom
       if (!e.unsupported && s.unsupported && Object.keys(e).length) why.push(`wrongly says not priced: ${s.unsupported}`);
       if (e.unsupported && !R.clarify) why.push('no follow-up offered for a bet we do not price');
       if (e.target_price != null && s.target_price !== e.target_price) why.push(`target_price ${s.target_price} want ${e.target_price}`);
+      // compound searches (11/8, tools/ask_compound_cases.js): a kickoff window, a ticket minimum, exclusions, xmk
+      if (e.slot && (!s.slot || s.slot.label !== e.slot)) why.push(`slot ${s.slot ? s.slot.label : '-'} want ${e.slot}`);
+      if (e.no_slot && s.slot) why.push(`read a slot nobody asked for: ${s.slot.label}`);
+      if (e.ticket_floor && !s.ticket_floor) why.push('total odds not read as the ticket minimum');
+      if (e.xmk && !e.xmk.every(m => (s.xmk || []).indexOf(m) >= 0)) why.push(`xmk ${JSON.stringify(s.xmk || [])} want ${JSON.stringify(e.xmk)}`);
+      if (e.no_player && s.player) why.push(`read a player ${s.player}: should be excluded`);
+      if (e.max_legs && (R.rows || []).length > e.max_legs) why.push(`${R.rows.length} legs, no more than ${e.max_legs} asked`);
       // college and team-name expectations (tools/ask_college_cases.js, tools/ask_taxonomy.py)
       if (e.school && s.school !== e.school) why.push(`school ${s.school} want ${e.school}`);
       if (e.ambig && !R.ambig) why.push(`should ask which team (read: ${R.understood})`);
@@ -109,6 +117,8 @@ const srv = http.createServer((q, r) => { const p = path.join(root, decodeURICom
         if (!R.widened && !R.two && F.max_price != null && p.price > F.max_price) { why.push(`price ${p.price} over ${F.max_price}`); break; }
         if (R.widened && !R.note) { why.push('widened without saying so'); break; }
         if (Date.parse(p.start) <= now) { why.push('started game'); break; }
+        if (s.slot && !R.widened && !OnyxAsk.slotOk(s.slot, p.start)) { why.push(`play outside the ${s.slot.label}: ${p.label} ${p.start}`); break; }
+        if ((s.exclude || []).some(x => String(p.name || p.label).toLowerCase().indexOf(String(x).toLowerCase()) >= 0)) { why.push(`excluded ${p.name || p.label} is in the answer`); break; }
         if (s.player && String(p.name || p.label).toLowerCase().indexOf(String(s.player).toLowerCase()) < 0) { why.push(`play not on ${s.player}`); break; }
         // on today's board file, at the same Onyx price, with its league's tag
         // keyed by game too: a market-line play (Onyx down, 11/5) has no selection id, and the same label

@@ -95,7 +95,7 @@ revoke all on function public.delete_me() from public, anon;
 grant execute on function public.delete_me() to authenticated;
 
 -- ── 11/7 push control center (alerts.js, my_alerts.py) ──────────────────────────────────────
--- How often a signed-in person wants pushes about their own saved picks:
+-- What a signed-in person wants pushed about their own saved picks (11/7 single levels; 11/8 a checklist below):
 --   all      every update: game starts, lead changes, halftime, the result
 --   key      key moments: game starts and the result
 --   results  results only: won, lost or push
@@ -103,9 +103,12 @@ grant execute on function public.delete_me() to authenticated;
 --   off      none (the default)
 -- The person sets it from the control center (their own profile row, under "own profile" above).
 alter table public.profiles add column if not exists push_level text not null default 'off';
-do $$ begin
-  alter table public.profiles add constraint profiles_push_level_ck check (push_level in ('all', 'key', 'results', 'recap', 'off'));
-exception when duplicate_object then null; end $$;
+-- 11/8: a checklist, saved as a comma list of start, swing, half, result, recap (or off); the single
+-- levels above are still accepted. Dropping and re-adding makes this safe to run again over the 11/7 version.
+alter table public.profiles drop constraint if exists profiles_push_level_ck;
+alter table public.profiles add constraint profiles_push_level_ck check (
+  push_level in ('all', 'key', 'results', 'recap', 'off')
+  or push_level ~ '^(start|swing|half|result|recap)(,(start|swing|half|result|recap))*$');
 
 -- What my_alerts.py has already sent (or graded) for each person's pick, so nothing is pushed twice
 -- and the morning recap can count yesterday's results. Written and read only by the server with the

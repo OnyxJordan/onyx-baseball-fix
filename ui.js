@@ -132,6 +132,7 @@
            ['top10', "Today's top 10", 'trophy', 'Our favorite plays today', 'home.html#top10'],
            ['live', 'Live now', 'games', 'Every game in play', 'home.html#live'],
            ['account', 'Account', 'user', 'Sign in, your record', 'account.html'],
+           ['profile', 'Your profile', 'record', 'Best sport, best bets, picks for you', 'account.html#oxProfile'],
            ['scorecard', 'Scorecard', 'record', 'Every lane, graded', 'scorecard.html'],
            ['lab', 'Rules lab', 'ranks', 'Test any rule', 'scorecard.html#lab'],
            ['how', 'How it works', 'model', 'Every model, explained', 'how.html']]};

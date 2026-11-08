@@ -4,7 +4,8 @@ my_alerts.py - pushes about each signed-in person's own saved picks, at the freq
 
 Who gets what: signed-in people only (Jordan's call). The control center (alerts.js) links the phone's OneSignal
 subscription to the account (OneSignal external_id = the Supabase user id) and saves the level on the person's
-profile (profiles.push_level):
+profile (profiles.push_level), a checklist since 11/8 saved as a comma list of these (or "off"); the single
+levels below are still read:
 
     all      every update: game starts, lead changes (game lines and totals), halftime check, the result
     key      key moments: game starts and the result
@@ -39,8 +40,15 @@ STAT = {"pts": ("basketball", "PTS"), "reb": ("basketball", "REB"), "ast": ("bas
         "pass_yds": ("passing", "YDS")}
 MW = {"pts": "points", "reb": "rebounds", "ast": "assists", "rec": "catches", "rec_yds": "receiving yards",
       "rush_yds": "rushing yards", "pass_yds": "passing yards", "anytime_td": "touchdowns", "q1_total": "in the 1st quarter"}
-LEVELS = {"all": {"start", "swing", "half", "result"}, "key": {"start", "result"}, "results": {"result"},
-          "recap": set(), "off": set()}
+LEGACY = {"all": "start,swing,half,result", "key": "start,result", "results": "result", "recap": "recap", "off": ""}
+EVENTS = ("start", "swing", "half", "result", "recap")
+
+
+def wants(level):
+    """push_level -> the set of events: a checklist ("start,result,recap", 11/8) or a legacy single level."""
+    v = str(level or "off")
+    v = LEGACY.get(v, v)
+    return {k for k in v.split(",") if k in EVENTS}
 ET = timezone(timedelta(hours=-5))          # ESPN's scoreboard day; DST is a one-hour edge the 4 AM roll covers
 SWING_GAP = 15 * 60                          # a lead change pushes at most every 15 minutes per pick
 SWING_MAX = 4                                # and at most 4 times per pick
@@ -317,7 +325,8 @@ def poll(db, app, key, scheme, dry=False):
     global ACTIVE
     ACTIVE = 0
     now = datetime.now(timezone.utc)
-    users = {u["id"]: u["push_level"] for u in db.get("profiles?select=id,push_level&push_level=in.(all,key,results,recap)")}
+    users = {u["id"]: u["push_level"] for u in db.get("profiles?select=id,push_level&push_level=neq.off")
+             if wants(u["push_level"])}
     if not users:
         return 0
     rows = db.get("saved_picks?select=user_id,item_id,data&user_id=" + inlist(users))
@@ -347,7 +356,7 @@ def poll(db, app, key, scheme, dry=False):
             continue
         if t["state"] == "pre":
             continue
-        want, done = LEVELS.get(users[uid], set()), {x["event"]: x for x in seen.get((uid, iid), [])}
+        want, done = wants(users[uid]), {x["event"]: x for x in seen.get((uid, iid), [])}
         evs = []
         if t["state"] == "in" and "start" not in done and now - s < timedelta(hours=3):
             evs.append("start")
@@ -369,7 +378,7 @@ def poll(db, app, key, scheme, dry=False):
             ok = False
             if push:
                 title, body = message(base, p, t)
-                print(f"  {users[uid]:7s} {uid[:8]} {ev:7s} {title} | {body}")
+                print(f"  {users[uid][:12]:12s} {uid[:8]} {ev:7s} {title} | {body}")
                 ok = dry or send(app, key, scheme, uid, title, body)
                 n += ok
             out.append({"user_id": uid, "item_id": iid, "event": ev, "res": t["res"], "pushed": bool(push and ok),
@@ -383,7 +392,7 @@ def recap(db, app, key, scheme, dry=False):
     """One push per 'recap' person: yesterday's graded picks and today's saved ones (baseball day, ET - 4h)."""
     now = datetime.now(timezone.utc)
     bday = (now.astimezone(ET) - timedelta(hours=4)).date()
-    users = [u["id"] for u in db.get("profiles?select=id&push_level=eq.recap")]
+    users = [u["id"] for u in db.get("profiles?select=id,push_level&push_level=neq.off") if "recap" in wants(u["push_level"])]
     n = 0
     for uid in users:
         res = db.get(f"push_sent?select=item_id,res,data&user_id=eq.{uid}&event=eq.result&sent_at=gte."
