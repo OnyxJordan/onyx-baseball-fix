@@ -62,6 +62,10 @@
     if (!window.OnyxSaved || !OnyxSaved.saveTicket || slip.length < 2) return;
     var T = totals(), my = (document.getElementById('pbMy') || {}).value;
     my = String(my || '').trim().replace(/^\+/, '');
+    if (!my && slip.some(function (x) { return x.my != null && x.my !== ''; }) && OnyxSaved.parlayValue) {
+      var pv = OnyxSaved.parlayValue(slip.map(function (x) { return {prob: x.conf || 0.5, price: x.my != null && x.my !== '' ? x.my : x.price}; }));
+      if (pv) my = String(pv.price);
+    }
     var t = OnyxSaved.saveTicket(slip, {price: T.price, label: slip.length + '-leg parlay', my_price: my ? +my : null});
     if (t) toast('Saved to My picks: ' + t.label + (my ? ' at ' + odds(+my) : '') + '. Tracked and graded with your picks.');
   }
@@ -81,6 +85,7 @@
     '.pbx-l em{font:700 11px monospace;font-style:normal;color:#cfc8da;flex:none}.pbx-l i{color:#ff7a90;font-style:normal;font-weight:900;cursor:pointer;padding:0 4px;flex:none}',
     '.pbx-t{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px;margin:9px 0 6px;font:600 11.5px monospace;color:#b9b2c4}.pbx-t b{display:block;color:#fff;font-size:14px}.pbx-t b.up{color:#61e970}.pbx-t b.dn{color:#ff8a8a}',
     '.pbx-my{display:flex;gap:6px;align-items:center;margin:6px 0;font:600 11px monospace;color:#9a93a6}.pbx-my input{width:84px;background:#0d0a12;border:1px solid #3a2a55;border-radius:8px;padding:6px 8px;color:#fff;font:600 12px monospace}',
+    '.pbx-l input.pbo{width:62px;flex:none;background:#0d0a12;border:1px solid #3a2a55;border-radius:7px;padding:4px 6px;color:#fff;font:700 11px monospace}.pbx-l small .up{color:#61e970}.pbx-l small .dn{color:#ff8a8a}',
     '.pbx-v{font:600 11px monospace;line-height:1.5;color:#cfc8da;margin-bottom:6px}.pbx-v b.up{color:#61e970}.pbx-v b.dn{color:#ff8a8a}',
     '.pbx-b{display:flex;gap:6px;flex-wrap:wrap}.pbx-b button{flex:1;font:800 11.5px monospace;border:0;border-radius:9px;padding:9px 10px;cursor:pointer;color:#fff;background:linear-gradient(135deg,#7a2ce0,#b038f9)}',
     '.pbx-b button.alt{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18)}.pbx-b button[disabled]{opacity:.45;cursor:default}',
@@ -97,12 +102,19 @@
     document.body.classList.toggle('pb-armed', ARMED);
     var n = slip.length, T = totals();
     var myv = (document.getElementById('pbMy') || {}).value || '';
-    var V = T.prob && window.OnyxSaved && OnyxSaved.value ? OnyxSaved.value(T.prob, myv ? String(myv).replace(/^\+/, '') : T.price) : null;
+    // value from the odds, leg by leg (11/8): each leg is our chance x the odds taken on it (typed, or Onyx's);
+    // the ticket is those multiplied, or our chance all hit x the ticket price Onyx quotes when it is typed
+    var PV = n >= 2 && T.prob && window.OnyxSaved && OnyxSaved.parlayValue
+      ? OnyxSaved.parlayValue(slip.map(function (x) { return {prob: x.conf, price: x.my != null && x.my !== '' ? x.my : x.price}; }), myv ? String(myv).replace(/^\+/, '') : null) : null;
+    var V = PV ? {good: PV.good, ev100: PV.ev100, implied: PV.implied, fair: PV.fair} : null;
+    var mx = function (m) { return 'x' + m.toFixed(2); };
     var panel = (OPEN || ARMED) && n ? '<div class="pbx"><div class="pbx-h">PARLAY SLIP · ' + n + ' LEG' + (n === 1 ? '' : 'S') + '<span><span data-pb="clear">clear</span> · <span data-pb="hide">hide</span></span></div>'
-      + slip.map(function (x) { return '<div class="pbx-l"><b>' + esc(x.label) + '<small>' + esc([x.sport ? x.sport.toUpperCase() : '', x.matchup].filter(Boolean).join(' · ')) + '</small></b><em>' + esc(odds(x.price)) + '</em><i data-pb-x="' + esc(x.id) + '" aria-label="Remove">×</i></div>'; }).join('')
+      + slip.map(function (x) { return '<div class="pbx-l"><b>' + esc(x.label) + '<small>' + esc([x.sport ? x.sport.toUpperCase() : '', x.matchup].filter(Boolean).join(' · ')) + '</small>' + (PV && n >= 2 ? (function (L) { return '<small>our ' + (100 * L.prob).toFixed(1) + '% · fair ' + esc(odds(L.fair)) + ' · <span class="' + (L.good ? 'up' : 'dn') + '">' + mx(L.mult) + '</span></small>'; })(PV.legs[slip.indexOf(x)]) : '') + '</b><input class="pbo" data-pb-o="' + esc(x.id) + '" inputmode="text" aria-label="Your odds on this leg" placeholder="' + esc(odds(x.price)) + '" value="' + esc(x.my == null ? '' : x.my) + '"><i data-pb-x="' + esc(x.id) + '" aria-label="Remove">×</i></div>'; }).join('')
       + (n >= 2 ? '<div class="pbx-t"><div>Combined<b>' + (T.price != null ? esc(odds(T.price)) : '-') + '</b></div><div>$10 pays<b class="up">' + (T.dec ? '$' + (10 * T.dec).toFixed(0) : '-') + '</b></div>'
-        + '<div>Our chance all hit<b>' + (T.prob != null ? (100 * T.prob).toFixed(1) + '%' : '-') + '</b></div><div>Value<b class="' + (V ? (V.good ? 'up' : 'dn') : '') + '">' + (V ? (V.ev100 > 0 ? '+' : '') + V.ev100 + ' / $100' : '-') + '</b></div></div>'
-        + '<div class="pbx-my">Odds you got<input id="pbMy" inputmode="text" placeholder="' + esc(odds(T.price)) + '" value="' + esc(myv) + '"><span>' + (V ? 'needs ' + Math.round(100 * V.implied) + '% · fair ' + esc(odds(V.fair)) : '') + '</span></div>'
+        + '<div>Our chance all hit<b>' + (T.prob != null ? (100 * T.prob).toFixed(1) + '%' : '-') + '</b></div><div>Our fair odds<b>' + (PV ? esc(odds(PV.fair)) : '-') + '</b></div>'
+        + '<div>Your odds<b>' + (PV ? esc(odds(PV.price)) : '-') + '</b></div><div>Value<b class="' + (V ? (V.good ? 'up' : 'dn') : '') + '">' + (V ? (V.ev100 > 0 ? '+' : '') + V.ev100 + ' / $100' : '-') + '</b></div></div>'
+        + (PV ? '<div class="pbx-v">Value = our chance x the payout. ' + (PV.quoted ? 'Our ' + (100 * PV.prob).toFixed(1) + '% x ' + PV.dec.toFixed(2) + ' (the ticket price you typed)' : 'Legs ' + PV.legs.map(function (L) { return mx(L.mult); }).join(' · ')) + ' = <b class="' + (PV.good ? 'up' : 'dn') + '">' + mx(PV.mult) + '</b>: ' + (PV.good ? 'the odds pay more than our chance says they should.' : 'the odds pay less than our chance says they should.') + ' Over x1.00 is value. Type your odds on any leg.</div>' : '')
+        + '<div class="pbx-my">Ticket price quoted<input id="pbMy" inputmode="text" placeholder="' + esc(odds(T.price)) + '" value="' + esc(myv) + '"><span>' + (V ? 'needs ' + (100 * V.implied).toFixed(1) + '% · fair ' + esc(odds(V.fair)) : '') + '</span></div>'
         + '<div class="pbx-b"><button type="button" data-pb="save">Save parlay to my account</button><button type="button" class="alt" data-pb="onyx"' + (T.onyx ? '' : ' disabled') + '>Build on Onyx</button></div>'
         + (!T.onyx ? '<div class="pbx-n">Onyx\'s lines are down, so these are market prices and cannot open on Onyx yet. Save it to track it.</div>' : '')
         + (T.sameGame ? '<div class="pbx-n">Same-game legs: Onyx prices them together and usually pays less than the legs multiplied.</div>' : '')
@@ -167,7 +179,13 @@
     e.preventDefault(); e.stopPropagation();
     add(p);
   }, true);
-  document.addEventListener('input', function (e) { if (e.target && e.target.id === 'pbMy') { var pos = e.target.selectionStart; draw(); var i = document.getElementById('pbMy'); if (i) { i.focus(); try { i.setSelectionRange(pos, pos); } catch (x) {} } } });
+  document.addEventListener('input', function (e) {
+    var o = e.target && e.target.getAttribute && e.target.getAttribute('data-pb-o');
+    if (o) { var v = String(e.target.value || '').trim().replace(/^\+/, ''), pos = e.target.selectionStart;
+      slip.forEach(function (x) { if (x.id === o) x.my = v === '' ? null : v; }); save(); draw();
+      var j = null; document.querySelectorAll('[data-pb-o]').forEach(function (k) { if (k.getAttribute('data-pb-o') === o) j = k; });
+      if (j) { j.focus(); try { j.setSelectionRange(pos, pos); } catch (x2) {} } return; }
+    if (e.target && e.target.id === 'pbMy') { var pos = e.target.selectionStart; draw(); var i = document.getElementById('pbMy'); if (i) { i.focus(); try { i.setSelectionRange(pos, pos); } catch (x) {} } } });
   // legs whose game has started leave the slip on their own
   function prune() { var n = slip.length; slip = slip.filter(function (x) { return !(Date.parse(x.start) <= Date.now()); }); if (slip.length !== n) { save(); draw(); } }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { prune(); draw(); }); else { prune(); draw(); }

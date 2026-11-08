@@ -1934,6 +1934,13 @@ leg won, pushes dropping out, a win), in the profile and in `my_alerts.py` pushe
 got; the record, units and profile use them. **Value check** (`value(prob, price)`; under every answer and on its
 own under the search box): a leg, the whole parlay, or any play you type, against your odds: our chance, the chance
 your price needs, fair price, value per $100, edge and a Kelly ceiling.
+**Parlay value from the odds (11/8).** Jordan: "you can't just add up all the percentages to gauge value, we need
+actual value based on the odds." `OnyxSaved.parlayValue(legs, total)`: each leg's value is our chance x its decimal
+odds (x1.00 is break-even), the ticket's is those multiplied (= our chance all hit x the combined payout), or our
+chance all hit x the ticket price when one is typed (Onyx prices same-game legs together). The slip and the value
+check show every leg's odds (editable: the odds you got), our chance, fair price and multiplier, then the combined
+odds, our fair ticket odds, the chance the ticket needs and value per $100. A saved ticket keeps the typed legs'
+combined odds as the odds you got.
 
 **Your profile (11/8).** Jordan: "a whole profile history: best picks, best sport, best type of bet, studying the
 profile habits and making a profile on them, and recommend the types of bets they're interested in." `profile.js`
