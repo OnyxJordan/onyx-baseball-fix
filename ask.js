@@ -595,13 +595,21 @@
     if (tgv && /parlay|ticket|legs?\b|legger|sgp|round/.test(t)) { if (s.intent === 'list') s.intent = 'parlay'; s.target_price = tgv; }
     // how many
     var tC = t.replace(/\b(pac|big|atlantic)[\s-]?(10|12)\b/g, ' ').replace(/\ba[\s-]?10\b(?!\s*(leg|legs|legger|picks?|plays?|bets?|team|teams|man|folds?|way))/g, ' ').replace(/\b\d{1,3}\s*(?:to|-|:)\s*1\b/g, ' ').replace(/\$?\s*\d+\s*(?:dollars|bucks)?\s*(?:into|to make|to win)\s*\$?\s*\d+/g, ' ');
-    var n = tC.match(/\b(\d{1,2})[\s-]*(leg|legs|legger|picks?|plays?|players?|bets?|team|man|teamer|folds?|way)\b/) || tC.match(/\b(?:top|best|safest|surest)\s*(\d{1,2})\b(?!\s*(points|rebounds|assists|yards|receptions|%|percent))/)
+    var n = tC.match(/\b(\d{1,2})[\s-]*(leg|legs|legger|picks?|plays?|players?|bets?|team|man|teamer|folds?|way)\b/) || tC.match(/\b(?:top|best|safest|surest)\s*(\d{1,2})\b(?!\s*(\+|points|rebounds|assists|yards|receptions|%|percent|or more))/)
       || tC.match(/\b(\d{1,2})\s+(?:best|safest|top|surest)\b/)
+      // "7 highest projected ...", "3 positive value ..." (11/8 list test: read as 5)
+      || tC.match(/^\s*(?:give me |gimme |show me |list |find |get me |what are |whats )?(?:the |your |my |our )?(\d{1,2})\s+(?:highest|positive|most|biggest|largest|lowest|value|projected|favou?rite|leading|strongest|likeliest|plus|\+ ?ev)\b/)
       || tC.match(/\bparlay of (\d{1,2})\b/) || tC.match(/\b(\d{1,2})\s+(nba|nfl|nhl|college|tennis|hockey|basketball|football|hoops|ncaab|ncaaf|cbb|cfb|pro)\b(?!\s*(points|rebounds|assists|yards|receptions))/);
     var nw = tC.match(/\b(two|three|four|five|six|seven|eight|nine|ten|couple|few)( of)?[\s-]*(leg|legs|legger|picks?|plays?|bets?|team|man)\b/)
       || tC.match(/\b(?:parlay|ticket|sgp) of (two|three|four|five|six|seven|eight|nine|ten)\b/)
       || tC.match(/\b(?:top|best|safest|surest|give me|gimme)\s+(two|three|four|five|six|seven|eight|nine|ten)\b/)
       || tC.match(/\b(two|three|four|five|six|seven|eight|nine|ten)\s+(?:best|safest|top|surest|most likely)\b/);   // 11/6: "top three nba spreads" 
+    if (!n && !nw) {
+      // a count that opens the request: "show me 7 rushing yards projections", "10 first td you like most" (11/8 list
+      // test), never a line ("30 points for Jokic") or a time ("1 pm")
+      var n0 = tC.match(/^\s*(?:give me |gimme |show me |list |find |get me |what are |whats )?(?:the |your |my |our )?(\d{1,2})\s+(?=[a-z]|\d\+)(?!(?:pm|am|oclock|p m)\b)(?!(?:points?|pts|rebounds|assists|yards|receptions|catches|tds?|touchdowns|threes)\s+(?:for|by|or|and|in|a|per|from)\b)/);
+      if (n0 && +n0[1] >= 2 && +n0[1] <= 12) n = [n0[0], n0[1]];
+    }
     if (!n && !nw) {
       var n2 = tC.match(/\b(\d{1,2})\s+(?:\w+\s+){0,2}?(overs|unders|props|plays|picks|bets|players|teams|sides|dogs|favorites|favs|scorers|rebounds|assists|points|receptions|touchdowns|tds|totals|spreads|parlay|sgp|legger)\b/);
       if (n2 && +n2[1] <= 12 && !/\b\d{1,2}\s+(points|rebounds|assists|receptions|tds|touchdowns)\s+(or|and|in|a|per)\b/.test(t)) n = [n2[0], n2[1]];
@@ -720,7 +728,8 @@
     if (/\bvalue\b|most value|best value|biggest edge|\bedge\b|beats? (the )?(line|price|onyx|book)|mispriced|soft line|(^|\s)\+ ?ev\b|positive ev|\bev\b/.test(t)) s.sort = 'edge';
     // positive value only (11/8, Jordan): plays our chance says the price underpays, edge above zero; a filter, not
     // just an order ("value plays" still ranks by value and keeps the rest)
-    if (/\bpositive (value|ev|edge|expected value)\b|(^|\s)\+ ?ev\b|\bplus ev\b|\b(only|just) (\w+ ){0,2}(value|\+ ?ev|ev|positive)( plays?| bets?| picks?| props?)?\b|\bvalue (plays? |bets? |picks? |props? )?only\b|\b(with|has|have|that have) (an? )?(real )?(edge|value)\b|\bbeats? (the )?(price|line|onyx)\b|\bpositive\b(?= (plays?|bets?|picks?|props?))/.test(t)) { s.pos_value = true; s.sort = 'edge'; }
+    if (/\bpositive (value|ev|edge|expected value)\b|(^|\s)\+ ?ev\b|\bplus ev\b|\b(only|just) (\w+ ){0,2}(value|\+ ?ev|ev|positive)( plays?| bets?| picks?| props?)?\b|\bvalue (plays? |bets? |picks? |props? )?only\b|\b(with|has|have|that have) (an? )?(real )?(edge|value)\b|\bbeats? (the )?(price|line|onyx)\b|\bpositive\b(?= (plays?|bets?|picks?|props?))/.test(t)
+        || /(^|\s)\+ ?ev\b/i.test(RAWQ || '')) { s.pos_value = true; s.sort = 'edge'; }
     if (/biggest payout|longshots?|long shots?|lottery|moonshot|highest odds|big payout/.test(t)) s.sort = 'price';
     if (/lock of the|pick of the|play of the|bet of the|prop of the|best bet\b|the lock\b|(highest|best|top|most likely|safest) (\w+ ){0,3}(prop|play|pick|bet|scorer)\b(?!s)/.test(t) && s.count == null && s.intent === 'list') s.count = 1;
     // confidence floor: "60%", "60 percent", "over 60%"
@@ -747,6 +756,8 @@
     }
     if (SL) s.slot = SL;
     if (SL && /\b(snf|mnf|tnf|(sunday|monday|thursday) night football)\b/.test(t)) s.sports = ['nfl'];   // SNF is the NFL, never college
+    // the NFL's Sunday windows with no sport named: "props in the 1 PM games" is the NFL (11/8 list test)
+    if (SL && /^(1 PM slate|4 PM slate|Sunday night|Monday night|Thursday night)$/.test(SL.label) && !s.sports.length && !/\b(college|ncaa|cfb|cbb|nba|nhl|hockey|basketball|tennis)\b/.test(t)) s.sports = ['nfl'];
     // the teams it names: every college and pro team (readTeams), then a conference ("SEC spreads")
     var RT = readTeams(cfx ? ' ' + cnorm(t).replace(/-/g, ' ').replace(new RegExp(cfx.re.source, 'g'), ' ') + ' ' : t, s, B, colSig), tPlayer = RT.tPlayer;
     if (RT.ambig) s.ambig = RT.ambig;
@@ -1452,7 +1463,7 @@
   // read as "no Brunson", "no first basket"; "+points" and "+Knicks" as the words themselves. Only a sign that
   // starts a word and is followed by a letter: "-150", "+2000", "o/u", "same-game" are untouched.
   function plusMinus(q) {
-    q = String(q);
+    q = String(q).replace(/(^|[\s,;(])\+ ?ev\b/gi, '$1 positive ev');   // "+ev" is positive value, not an added rule (11/8)
     // clause mode (11/8, Jordan: "top 4 nfl td scorers + 1 PM slate only - Jonathan Taylor + total odds of at least
     // +700"): once " + " separates the rules, " - " in front of a word takes it out too
     // ("passing + rushing yards", "points + rebounds" are one market: a + between stat words stays)

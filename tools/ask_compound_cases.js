@@ -59,5 +59,14 @@ module.exports = [
   C('positive value nfl props only', {sports: ['nfl'], pos_value: true}),
   C('only +ev plays', {pos_value: true}),
   C('nba overs with an edge', {sports: ['nba'], side: 'over', pos_value: true}),
-  C('3 leg parlay positive ev legs only', {intent: 'parlay', count: 3, pos_value: true})
+  C('3 leg parlay positive ev legs only', {intent: 'parlay', count: 3, pos_value: true}),
+  // ── list sweep (11/8: 2,926 generated list searches, 76% -> 100%; a fresh 3,000 at 99.97%) ──
+  C('7 highest projected nfl receiving yards', {sports: ['nfl'], markets: ['rec_yds'], intent: 'list', count: 7, sort: 'proj'}),
+  C('3 positive value nfl passing yards in the 1 PM games', {sports: ['nfl'], markets: ['pass_yds'], count: 3, slot: '1 PM slate', pos_value: true}),
+  C('top 7 nfl pass attempts +ev', {sports: ['nfl'], markets: ['pass_att'], count: 7, pos_value: true}),
+  C('show me 7 rushing yards projections', {markets: ['rush_yds'], count: 7, sort: 'proj'}),
+  C('show me 3 2+ td projections sunday night', {sports: ['nfl'], markets: ['two_plus_td'], count: 3, slot: 'Sunday night'}),
+  C('5 safest 3+ td in the 1 PM games', {sports: ['nfl'], markets: ['three_td'], count: 5, slot: '1 PM slate'}),
+  C('top 3 props in the 1 PM games', {sports: ['nfl'], count: 3, slot: '1 PM slate'}),
+  C('10 first td you like most', {markets: ['first_td'], count: 10, sort: 'rec'})
 ];
