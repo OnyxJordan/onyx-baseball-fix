@@ -1623,6 +1623,19 @@ model's number on it.
   Onyx side (any price) with its blended confidence, edge, tag (tracked / trial / lean),
   selection id, and for NFL anytime-TD props `lam`, the expected touchdowns, so 2+ TD chance is
   1 - e^-lam (1 + lam). NBA rows skip held (closed) lines.
+- 2+ and 3+ touchdowns at Onyx's price (11/8): Onyx prices `player_touchdowns` over 1.5 (2+) and over 2.5
+  (3+); `sports_odds.py` keeps both (`two_td`, `three_td`) and the NFL board carries them with the Poisson
+  chance from the anytime chance. Search builds a 2+ TD ticket from the `two_td` rows (their prices, their
+  floors), so "3 leg 2+ TD parlay, +1000 or more" pays +1000 or more; the anytime-priced 2+ mode is only the
+  fallback for a board with no 2+ prices (college football). First TD is `first_td`; the feed carries no
+  last-TD market for Onyx (probe, 11/8).
+- Granular lists (11/8): "your favorite" / "our top" is what we recommend (sort rec), never the betting
+  favorites; "by value" ranks by edge; "projections" ranks by projection, and a projection list drops the
+  pick floors (50%+, -200) so it is the biggest projections, every one.
+- Positive value only (11/8): "positive value", "+ev", "only value plays", "with an edge", "beats the price" (or the
+  "+ Positive value only" chip) set `pos_value`: a filter, every play's edge above zero, ranked by value, the 50% floor
+  off. First TD and first basket stay out unless named (Onyx's price beat the model there). Nothing qualifies: the
+  answer says so and shows the closest to value, never calling them value. "value plays" alone still only ranks.
 - `ask.js`: the spec (`intent` list / parlay / sgp, count, sports, markets, side, price bounds,
   confidence and edge floors, player, team, sort conf / rec / edge / price / two_td). Defaults
   are mainstream: no parlay or SGP leg shorter than -150 and no single shorter than -200 unless
