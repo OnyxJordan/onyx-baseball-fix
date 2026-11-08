@@ -63,7 +63,8 @@ const srv = http.createServer((q, r) => { const p = path.join(root, decodeURICom
       if (e.max_price != null && s.max_price !== e.max_price) why.push(`max_price ${s.max_price} want ${e.max_price}`);
       if (e.min_conf != null && s.min_conf !== e.min_conf) why.push(`min_conf ${s.min_conf} want ${e.min_conf}`);
       if (e.team && s.team !== e.team && !Object.values(s.tabbr || {}).some(v => (v || []).indexOf(e.team) >= 0)) why.push(`team ${s.team} want ${e.team}`);   // a school on two boards (football and basketball)
-      if (e.player && String(s.player || '').toLowerCase() !== e.player.toLowerCase()) why.push(`player ${s.player} want ${e.player}`);
+      const nmS = x => String(x || '').toLowerCase().replace(/[.']/g, '').replace(/\b(jr|sr|ii|iii|iv|v)\b/g, '').replace(/\s+/g, ' ').trim();   // "Terrance Carter Jr." is Terrance Carter (11/8)
+      if (e.player && nmS(s.player) !== nmS(e.player)) why.push(`player ${s.player} want ${e.player}`);
       if (e.teams) { const got = ((s.teams || []).length ? s.teams : s.team ? [s.team] : []).map(x => String(x).toUpperCase()).sort(); if (!same(got, e.teams)) why.push(`teams ${JSON.stringify(got)} want ${JSON.stringify(e.teams)}`); }
       if (e.props_only && !s.props_only) why.push('props_only not set');
       if (e.sort && s.sort !== e.sort) why.push(`sort ${s.sort} want ${e.sort}`);

@@ -278,7 +278,7 @@ def f_exclude():
                       "{t} {m} picks {neg} {p}"]).format(sd=(sd + " ") if sd else "", m=mw, t=tname(tsp, ab, tn), p=who, neg=R.choice(NEGW[:4]))
         e = {"team": ab, "markets": [mk], "exclude_player": who}
         if sd and "{sd}" not in "":
-            e["side"] = sd if (sd + " ") in q or (sd + "s") in q else e.get("side")
+            e["side"] = sd if re.search(r"\b" + sd + r"s?\b", q) else e.get("side")      # whole words: "thunder" is not "under" (11/8)
             if e.get("side") is None:
                 e.pop("side")
         return " ".join(q.split()), e
