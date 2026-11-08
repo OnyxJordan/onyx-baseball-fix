@@ -13,7 +13,7 @@ levels below are still read:
     recap    one morning push (--recap): yesterday's record and today's saved picks
     off      nothing
 
-    python3 my_alerts.py --watch 1140    poll every 75 s for 1140 s (my_alerts.yml runs this back to back)
+    python3 my_alerts.py --watch 20400   poll every 75 s for 5h40m (my_alerts.yml hands off to the next run)
     python3 my_alerts.py --once          one poll
     python3 my_alerts.py --recap         the morning recap
 
@@ -448,9 +448,8 @@ def main(argv):
             print(f"::warning::my_alerts poll: {str(e)[:200]}")
         if time.time() + 75 > end:
             break
-        if ACTIVE == 0:
-            print("my_alerts: no saved pick is live or starting within 25 minutes; done for this run")
-            break
+        # (11/8: GitHub ran the 20-minute schedule twice in 13 hours, so the watcher no longer stops when nothing is
+        # live: one long run covers the day, a pick saved minutes before kickoff included, and hands off to the next)
         time.sleep(75)
     print(f"my_alerts: {total} pushes sent")
 

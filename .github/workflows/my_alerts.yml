@@ -1,13 +1,15 @@
 name: My picks alerts
-# Pushes about each signed-in person's own saved picks at the level they chose in the control center
-# (alerts.js; profiles.push_level): every update, key moments, results only, a daily recap, or off.
-# my_alerts.py polls every 75 s for up to 19 minutes and exits early when no saved pick is live or about
-# to start; the 20-minute cron chains the runs. The 14:47 UTC run (9:47 AM ET in winter) is the morning
-# recap. Every push is logged in push_sent first, so overlapping or restarted runs never repeat one.
+# Pushes about each signed-in person's own saved picks, by the checklist they set in the alerts control center
+# (alerts.js; profiles.push_level): game starts, lead changes, halftime check, results, a daily recap.
+#
+# One watcher at a time (11/8, the live_watch.yml pattern: GitHub ran a 20-minute schedule twice in 13 hours):
+# my_alerts.py polls every 75 s for 5h40m, then this job dispatches its successor. The hourly cron restarts the
+# chain if a hand-off is lost and exits in seconds while a watcher is running. The 14:47 UTC run (9:47 AM ET in
+# winter) is the morning recap. Every push is logged in push_sent first, so nothing is ever sent twice.
 # Needs secrets SUPABASE_SERVICE_KEY, ONESIGNAL_APP_ID, ONESIGNAL_API_KEY (and SUPABASE_URL, or accounts.json).
 on:
   schedule:
-    - cron: "*/20 * * * *"
+    - cron: "23 * * * *"
     - cron: "47 14 * * *"
   workflow_dispatch:
     inputs:
@@ -17,28 +19,70 @@ on:
         default: "watch"
 permissions:
   contents: read
-concurrency:
-  group: my-alerts-${{ github.event.schedule == '47 14 * * *' && 'recap' || github.event.inputs.mode || 'watch' }}
-  cancel-in-progress: false
+  actions: write
 jobs:
-  run:
+  recap:
+    if: github.event.schedule == '47 14 * * *' || github.event.inputs.mode == 'recap'
     runs-on: ubuntu-latest
-    timeout-minutes: 22
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
       - run: pip install requests
-      - name: Pick alerts for signed-in people
+      - name: Morning recap
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL || secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          ONESIGNAL_APP_ID: ${{ secrets.ONESIGNAL_APP_ID }}
+          ONESIGNAL_API_KEY: ${{ secrets.ONESIGNAL_API_KEY }}
+        run: python my_alerts.py --recap
+  watch:
+    if: github.event.schedule != '47 14 * * *' && github.event.inputs.mode != 'recap'
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: One watcher at a time
+        id: one
+        run: |
+          # a fresh hand-off waits up to 3 minutes for its predecessor to finish; the cron backup never waits
+          tries=1; [ "${{ github.event_name }}" = "workflow_dispatch" ] && tries=10
+          for i in $(seq 1 $tries); do
+            n=$(gh run list --repo ${{ github.repository }} --workflow my_alerts.yml --status in_progress --json databaseId,name \
+                --jq '[.[] | select(.databaseId != ${{ github.run_id }})] | length' || echo 0)
+            if [ "${n:-0}" = "0" ]; then echo "go=yes" >> "$GITHUB_OUTPUT"; exit 0; fi
+            [ $i -lt $tries ] && sleep 20
+          done
+          echo "a watcher is already running; exiting"
+          echo "go=no" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v4
+        if: steps.one.outputs.go == 'yes'
+      - uses: actions/setup-python@v5
+        if: steps.one.outputs.go == 'yes'
+        with:
+          python-version: "3.11"
+      - if: steps.one.outputs.go == 'yes'
+        run: pip install requests
+      - name: Watch saved picks
+        if: steps.one.outputs.go == 'yes'
         env:
           SUPABASE_URL: ${{ vars.SUPABASE_URL || secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
           ONESIGNAL_APP_ID: ${{ secrets.ONESIGNAL_APP_ID }}
           ONESIGNAL_API_KEY: ${{ secrets.ONESIGNAL_API_KEY }}
         run: |
-          if [ "${{ github.event.schedule }}" = "47 14 * * *" ] || [ "${{ github.event.inputs.mode }}" = "recap" ]; then
-            python my_alerts.py --recap
-          else
-            python my_alerts.py --watch 1140
-          fi
+          echo "WATCH_T0=$(date +%s)" >> "$GITHUB_ENV"
+          python my_alerts.py --watch 20400
+      - name: Hand off to the next watcher
+        if: ${{ !cancelled() && steps.one.outputs.go == 'yes' }}
+        run: |
+          # only after a full run: one that stopped early (a key or schema problem) leaves the restart to the hourly cron
+          if [ $(( $(date +%s) - ${WATCH_T0:-0} )) -lt 18000 ]; then echo "stopped early; the hourly cron restarts the watcher"; exit 0; fi
+          for i in 1 2 3; do
+            gh workflow run my_alerts.yml --repo ${{ github.repository }} --ref main -f mode=watch && exit 0
+            sleep $((i * 10))
+          done
+          echo "::warning::could not dispatch the next watcher; the hourly cron restarts it"

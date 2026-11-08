@@ -1942,7 +1942,7 @@ your picks and you can select how often." `alerts.js` (home #alerts, picks.html#
 - **Your saved picks**, signed-in people only (Jordan's call): Every update / Key moments / Results only / Daily
   recap / Off. Choosing one asks for permission, links this phone to the account (`OneSignal.login(user id)`, so
   the OneSignal external_id is the Supabase user id) and saves `profiles.push_level` (`OnyxAccounts.setProfile`).
-`my_alerts.py` (workflow `my_alerts.yml`, every 20 minutes, polling every 75 s and exiting early when no saved pick
+`my_alerts.py` (workflow `my_alerts.yml`: one watcher at a time polling every 75 s for 5h40m, then handing off, an hourly cron as backup; before 11/8 every 20 minutes, exiting early when no saved pick
 is live or starting soon) reads signed-in people's saved picks with the service key, grades them live off ESPN
 with saved.js's rules, and pushes by level: `all` = game start, lead changes (at most every 15 minutes, 4 a
 pick), halftime and the result; `key` = start and result; `results` = result; `recap` = the 14:47 UTC run's one
