@@ -68,6 +68,7 @@ const srv = http.createServer((q, r) => { const p = path.join(root, decodeURICom
       if (e.teams) { const got = ((s.teams || []).length ? s.teams : s.team ? [s.team] : []).map(x => String(x).toUpperCase()).sort(); if (!same(got, e.teams)) why.push(`teams ${JSON.stringify(got)} want ${JSON.stringify(e.teams)}`); }
       if (e.props_only && !s.props_only) why.push('props_only not set');
       if (e.sort && s.sort !== e.sort) why.push(`sort ${s.sort} want ${e.sort}`);
+      if (e.pos_value != null && !!s.pos_value !== e.pos_value) why.push(`pos_value ${!!s.pos_value} want ${e.pos_value}`);
       if (e.when && s.when !== e.when) why.push(`when ${s.when} want ${e.when}`);
       if (e.exclude && !e.exclude.every(x => (s.exclude || []).some(y => String(y).toLowerCase() === String(x).toLowerCase()))) why.push(`exclude ${JSON.stringify(s.exclude || [])} want ${JSON.stringify(e.exclude)}`);
       if (e.unsupported && !s.unsupported) why.push('should say we do not price this');
@@ -117,6 +118,7 @@ const srv = http.createServer((q, r) => { const p = path.join(root, decodeURICom
         if (!R.widened && !R.two && F.min_price != null && p.price < F.min_price && !(F.target_price && F.default_floor)) { why.push(`price ${p.price} under ${F.min_price}`); break; }   // a payout target moves the default floor
         if (!R.widened && !R.two && F.max_price != null && p.price > F.max_price) { why.push(`price ${p.price} over ${F.max_price}`); break; }
         if (R.widened && !R.note) { why.push('widened without saying so'); break; }
+        if (s.pos_value && !R.widened && !(p.edge > 0)) { why.push(`positive value only, but ${p.label} has edge ${p.edge}`); break; }
         if (Date.parse(p.start) <= now) { why.push('started game'); break; }
         if (s.slot && !R.widened && !OnyxAsk.slotOk(s.slot, p.start)) { why.push(`play outside the ${s.slot.label}: ${p.label} ${p.start}`); break; }
         if ((s.exclude || []).some(x => String(p.name || p.label).toLowerCase().indexOf(String(x).toLowerCase()) >= 0)) { why.push(`excluded ${p.name || p.label} is in the answer`); break; }

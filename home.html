@@ -476,6 +476,7 @@ function askEditor(R) {
     s.side !== 'over' ? ['+ Overs', {side: 'over'}] : null, s.side !== 'under' ? ['+ Unders', {side: 'under'}] : null,
     s.min_price == null || s.min_price < 100 ? ['+ Plus money', {min_price: 100, default_floor: false}] : null,
     !(s.min_conf >= 0.6) ? ['+ 60%+ to hit', {min_conf: 0.6, default_conf: false}] : null,
+    !s.pos_value ? ['+ Positive value only', {pos_value: true, sort: 'edge'}] : null,
     !s.no_props && !(s.markets || []).length ? ['- Player props', {no_props: true}] : null,
     s.intent === 'list' ? ['+ Make it a parlay', {intent: 'parlay', count: 3, count_set: true}] : null].filter(Boolean);
   window.ASK_ADDS = adds;

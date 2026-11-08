@@ -718,6 +718,9 @@
     if (/most likely|safest|safe\b|locks?\b|highest (chance|confidence|probability|hit rate)|sure ?thing|surest|can.?t lose|banker/.test(t)) s.sort = 'conf';
     if (/recommend|favou?rite (play|pick|bet|sgp|parlay|td|touchdown|scorer|prop|leg)|your (\d+ |top |four |three |five )?favou?rites?|my favou?rites?|best (picks?|plays?|bets?)|top picks?|your picks?|should i (bet|play)|what do you like|you like|pick of the (day|night)|play of the (day|night)|best bet/.test(t)) s.sort = 'rec';
     if (/\bvalue\b|most value|best value|biggest edge|\bedge\b|beats? (the )?(line|price|onyx|book)|mispriced|soft line|(^|\s)\+ ?ev\b|positive ev|\bev\b/.test(t)) s.sort = 'edge';
+    // positive value only (11/8, Jordan): plays our chance says the price underpays, edge above zero; a filter, not
+    // just an order ("value plays" still ranks by value and keeps the rest)
+    if (/\bpositive (value|ev|edge|expected value)\b|(^|\s)\+ ?ev\b|\bplus ev\b|\b(only|just) (\w+ ){0,2}(value|\+ ?ev|ev|positive)( plays?| bets?| picks?| props?)?\b|\bvalue (plays? |bets? |picks? |props? )?only\b|\b(with|has|have|that have) (an? )?(real )?(edge|value)\b|\bbeats? (the )?(price|line|onyx)\b|\bpositive\b(?= (plays?|bets?|picks?|props?))/.test(t)) { s.pos_value = true; s.sort = 'edge'; }
     if (/biggest payout|longshots?|long shots?|lottery|moonshot|highest odds|big payout/.test(t)) s.sort = 'price';
     if (/lock of the|pick of the|play of the|bet of the|prop of the|best bet\b|the lock\b|(highest|best|top|most likely|safest) (\w+ ){0,3}(prop|play|pick|bet|scorer)\b(?!s)/.test(t) && s.count == null && s.intent === 'list') s.count = 1;
     // confidence floor: "60%", "60 percent", "over 60%"
@@ -999,6 +1002,9 @@
       if (!two && spec.max_price != null && p.price > spec.max_price) return false;
       if (!two && spec.min_conf != null && p.conf < spec.min_conf) return false;
       if (!two && spec.min_edge != null && p.edge < spec.min_edge) return false;
+      if (spec.pos_value && !(p.edge > 0)) return false;                                  // positive value only (11/8)
+      // first TD / first basket: Onyx's price beat the model in testing, so their edges are not value unless asked for
+      if (spec.pos_value && (p.mkt === 'first_td' || p.mkt === 'first_basket') && (spec.markets || []).indexOf(p.mkt) < 0) return false;
       if (spec.player && String(p.name || p.label).toLowerCase().indexOf(String(spec.player).toLowerCase()) < 0) return false;
       if (spec.exclude && spec.exclude.length && spec.exclude.some(function (x) {
         x = String(x || '').trim();
@@ -1165,6 +1171,7 @@
     if (s.target_price) b.push((s.ticket_floor ? 'ticket pays +' + s.target_price + ' or more' : 'pays about +' + s.target_price));
     if (s.min_price != null) b.push((s.default_floor ? 'standard prices, nothing shorter than ' : 'no price shorter than ') + (s.min_price > 0 ? '+' : '') + s.min_price);
     if (s.max_price != null) b.push('no price longer than ' + (s.max_price > 0 ? '+' : '') + s.max_price);
+    if (s.pos_value) b.push('positive value only');
     if (s.min_conf != null) b.push(s.default_conf ? (s.intent === 'list' ? 'every pick 50%+ to hit' : 'every leg 50%+ to hit') : Math.round(100 * s.min_conf) + '%+ confidence');
     if (s.player) b.push(s.player);
     if (s.when) b.push(s.when === 'today' ? 'tonight' : s.when);
@@ -1349,6 +1356,8 @@
     if (s.min_price == null && !two && !longMkt && !teamList(s).length && !s.player && !s.conf) { s.min_price = s.intent === 'list' ? -200 : -150; s.default_floor = true; }
     // a list ranked by projection is the projections, every one (11/8: "just the top 5 QB passing yard projections"
     // came back trimmed to 50%+ overs at standard prices); the pick floors are for picks
+    // positive value: the price decides, so the 50%+ floor goes (a +250 that should be +180 is value at 32%)
+    if (s.pos_value && s.default_conf) { s.min_conf = null; s.default_conf = false; }
     if (s.intent === 'list' && s.sort === 'proj') { if (s.default_conf) { s.min_conf = null; s.default_conf = false; } if (s.default_floor) { s.min_price = null; s.default_floor = false; } }
     if (teamList(s).length === 1 && s.intent === 'list') s.one_per_game = false;      // "Ohio State player props": several from the one game
     // Onyx Picks: every logged pick, at the price it was logged under the picks rule (40%+ chance,
@@ -1475,6 +1484,7 @@
     (s.xmk || []).forEach(function (m) { if (m === 'two_plus_td' || m === 'two_td' || ((m === 'first_td' || m === 'three_td') && s.xmk.indexOf('anytime_td') >= 0)) return;
       T('No ' + (MW[m] || m).toLowerCase(), {xmk: s.xmk.filter(function (y) { return y !== m; })}, true); });
     if (s.no_props) T('No player props', {no_props: false}, true);
+    if (s.pos_value) T('Positive value only', {pos_value: false});
     if (s.target_price) T((s.ticket_floor ? 'Pays +' : 'About +') + s.target_price, {target_price: null, ticket_floor: false});
     if (s.min_price != null && !s.default_floor) T('Shortest ' + od(s.min_price), {min_price: null});
     if (s.max_price != null) T('Longest ' + od(s.max_price), {max_price: null});
@@ -1575,6 +1585,13 @@
       if (spec.player && res.rows.length < 1) {
         var sp3 = Object.assign({}, spec, {markets: [], side: 'any', when: null, min_price: null, max_price: null, min_conf: null, default_conf: false, default_floor: false}), r6 = run(sp3, a[1]);
         if (r6.rows.length) { res = r6; spec = sp3; res.widened = true; res.note = (res.note ? res.note + ' ' : '') + 'Nothing matched that exactly, so these are ' + spec.player + '\'s lines on the board.'; }
+      }
+      // positive value only and nothing qualifies: say so, and show the closest to value, never call them value
+      if (spec.pos_value && !(res.rows || []).length) {
+        var spV = Object.assign({}, spec, {pos_value: false, sort: 'edge'}), rV = run(spV, a[1]);
+                res.note = 'Nothing that fits beats Onyx\'s price right now.'
+          + (rV.rows.length ? ' These are the closest to value, none of them positive: tap "Positive value only" to drop the rule.' : '');
+        if (rV.rows.length) { var nV = res.note; res = rV; res.widened = true; res.note = nV; }
       }
       // never an empty answer without the reason (11/6, Jordan: the Knicks ask came back blank)
       if (!(res.rows || []).length && !res.note) {
