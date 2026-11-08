@@ -748,6 +748,29 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
     1Q -5.6%), so no rule carries forward; 2026 1H looked good (+15.8%, 64 bets) but
     the rule fails its tuning season. Line ratios match reality (1H line 0.505 of the
     total, actual 0.506). Always-under 1H: 2025 +1.8% (285), 2026 +12.9% (106): too thin.
+  - **NFL factor backtests, 11/8 (none shipped; the record so nobody re-runs them blind).** Jordan: the Colts' trades,
+    splits, who covers whom, snap counts, a pass-catching back vs a run-stout / pass-weak defense. nflverse 2019-2026,
+    fit on earlier seasons, judged on unseen ones; the splits also against Onyx's opening prices (2024 market, 2025-26
+    Onyx, nfl_feature_screen lines). Scripts and outputs were scratch work, not committed.
+    - Line personnel (missing OL / DL starters by trailing snap share; the Colts traded LG Nelson 10/27, DT Buckner
+      10/28): a missing OL starter cuts the RB1's rushing about 5% (-4.4% fit / -6.4% held out, ~3 yards) and team
+      rushing ~3.5%, but held-out error is flat (28.20 -> 28.16 yards, within one standard error) and over/under log
+      loss slightly worse; the player's own recent stats absorb it within 1-3 games. Missing DL: no effect on
+      opponents. 18 mid-season OL/DL trades since 2019 showed no extra effect.
+    - Matchups: defense vs position (catches / yards allowed to RBs, WRs, TEs), run- and pass-funnel defenses, man/zone
+      (participation data; 2026 not published, so only last season's rates could run live). Best: receptions DvP,
+      better in 3 of 4 held-out seasons by ~0.1% of error (1.65 catches). Funnels flip sign; live man/zone worse in
+      2+ of 4 seasons. The team-wide opp_rec / opp_rush_yds already carry most of it. Who covers whom, slot vs
+      outside and CB shadowing are not in public data. Untested yet: passing-yards DvP against the price.
+    - Vacated volume (a 6+ target or 10+ carry teammate ruled out): spreading his share proportionally is worse held
+      out (rec yds MAE +2.15); pass catchers lose volume when the RB1 is out. Real but unproven: the next RB gains
+      ~+23 rushing yards on a 32 base (fit +23.4, held out +24.9, n=50), not significant held out yet.
+    - Player splits vs Onyx's price (log loss x1000, 2024 / 2025 / 2026): the player's own home/away, dome/turf and
+      primetime splits are noise (better in 0 of 3); domes (+4-7% receiving), rain (-12-17%) and primetime pass
+      attempts (+3%) are real but already in Onyx's price; short week and bye too thin; safeties/LBs out flip.
+      Watch only: passing-yards overs vs a defense with a regular CB Out/Doubtful on the final injury report, 15-3 /
+      28-16 / 6-4 at the open (log loss -16.8 / -1.1 / +2.1); needs a capture lane at the price when the report lands.
+      Coaching changes: nflverse's coach field is wrong from 2024, untestable.
   - **Rules lab history and splits (10/31).** `data/rules_lab/<sport>/<market>.json` (columnar, loaded per
     market) holds 825,148 priced lines: NBA 2024-25 (Onyx from Feb 2025 and market prices), 2025-26 with the
     model replay, 2026-27 to date, game lines, threes; MLB 2025-26 Onyx (home run yes, hits, total bases,
