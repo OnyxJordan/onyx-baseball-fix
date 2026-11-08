@@ -16740,10 +16740,10 @@
   },
   "pre_src": "market",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "146",
+  "profit": 0.9091,
+  "graded_at": "2026-11-08T05:17:57+00:00"
  },
  {
   "id": "cbb-401917519-total-under",
@@ -16771,10 +16771,10 @@
   },
   "pre_src": "market",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "160",
+  "profit": 0.8696,
+  "graded_at": "2026-11-08T05:17:57+00:00"
  },
  {
   "id": "cbb-401911470-total-under",
@@ -16802,10 +16802,10 @@
   },
   "pre_src": "market",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "170",
+  "profit": -1.0,
+  "graded_at": "2026-11-08T05:17:58+00:00"
  },
  {
   "id": "cfb-401860912-ml-home",
@@ -16925,6 +16925,68 @@
    "f": 0.402
   },
   "pre_src": "market",
+  "model": "live-v6",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "cfb-401860912-total-under",
+  "sport": "cfb",
+  "gid": "401860912",
+  "date": "2026-11-07",
+  "logged_at": "2026-11-08T05:17:55+00:00",
+  "matchup": "TXST @ ORST",
+  "home": "ORST",
+  "away": "TXST",
+  "label": "Under 65.5",
+  "kind": "total",
+  "side": "under",
+  "line": 65.5,
+  "price": -111,
+  "chance": 0.6019,
+  "implied": 0.5261,
+  "edge": 0.076,
+  "fair": -150,
+  "state": {
+   "score": "TXST 21 - 7 ORST",
+   "period": 2,
+   "clock": "0:38",
+   "f": 0.511
+  },
+  "pre_src": "onyx",
+  "model": "live-v6",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "cfb-401864535-ml-home",
+  "sport": "cfb",
+  "gid": "401864535",
+  "date": "2026-11-07",
+  "logged_at": "2026-11-08T05:17:55+00:00",
+  "matchup": "WYO @ UNLV",
+  "home": "UNLV",
+  "away": "WYO",
+  "label": "UNLV to win",
+  "kind": "ml",
+  "side": "home",
+  "line": null,
+  "price": 382,
+  "chance": 0.2683,
+  "implied": 0.2075,
+  "edge": 0.061,
+  "fair": 275,
+  "state": {
+   "score": "WYO 31 - 21 UNLV",
+   "period": 2,
+   "clock": "0:02",
+   "f": 0.501
+  },
+  "pre_src": "onyx",
   "model": "live-v6",
   "result": null,
   "actual": null,
