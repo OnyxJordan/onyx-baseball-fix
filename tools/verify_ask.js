@@ -125,7 +125,7 @@ const srv = http.createServer((q, r) => { const p = path.join(root, decodeURICom
         if (Date.parse(p.start) <= now) { why.push('started game'); break; }
         if (s.slot && !R.widened && !OnyxAsk.slotOk(s.slot, p.start)) { why.push(`play outside the ${s.slot.label}: ${p.label} ${p.start}`); break; }
         if ((s.exclude || []).some(x => String(p.name || p.label).toLowerCase().indexOf(String(x).toLowerCase()) >= 0)) { why.push(`excluded ${p.name || p.label} is in the answer`); break; }
-        if (s.player && String(p.name || p.label).toLowerCase().indexOf(String(s.player).toLowerCase()) < 0) { why.push(`play not on ${s.player}`); break; }
+        if (s.player && !(s.player2 && String(p.name || p.label).toLowerCase().indexOf(String(s.player2).toLowerCase()) >= 0) && String(p.name || p.label).toLowerCase().indexOf(String(s.player).toLowerCase()) < 0) { why.push(`play not on ${s.player}`); break; }
         // on today's board file, at the same Onyx price, with its league's tag
         // keyed by game too: a market-line play (Onyx down, 11/5) has no selection id, and the same label
         // ("Under 155.5 total") sits in several games

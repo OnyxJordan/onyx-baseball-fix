@@ -41,7 +41,8 @@ KEEP = 30
 WORD = {"pts": "points", "reb": "rebounds", "ast": "assists", "pass_yds": "passing yards", "rush_yds": "rushing yards",
         "rec_yds": "receiving yards", "rec": "receptions", "pass_td": "passing TDs", "pass_att": "pass attempts", "pass_rush_yds": "passing + rushing yards",
         "rush_rec_yds": "rushing + receiving yards", "two_td": "2+ touchdowns", "three_td": "3+ touchdowns", "q1_total": "1st-quarter points",
-        "h1_total": "1st-half points"}
+        "h1_total": "1st-half points", "threes": "3-pointers made", "pra": "points + rebounds + assists",
+        "pr": "points + rebounds", "pa": "points + assists"}
 
 
 def _num(x):
@@ -65,6 +66,8 @@ def label(r):
         return f"{r['name']} first TD"
     if mkt == "first_basket":
         return f"{r['name']} first basket"
+    if mkt in ("dbl_dbl", "trp_dbl"):           # 11/9: double-double / triple-double, a yes bet
+        return f"{r['name']} {'double-double' if mkt == 'dbl_dbl' else 'triple-double'}"
     return f"{r['name']} {side} {_num(r['line'])} {WORD.get(mkt, mkt or '')}".strip()
 
 
@@ -155,7 +158,7 @@ def write(data_dir, sport, date, rows):
     return out
 
 
-BOARD_KEEP = 1500
+BOARD_KEEP = 3000   # 11/9: NBA threes, combos, double- and triple-doubles joined the board
 
 
 _NUM = re.compile(r"([+-]?\d+(?:\.\d+)?)\s*$")

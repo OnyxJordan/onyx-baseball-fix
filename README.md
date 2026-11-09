@@ -1636,6 +1636,22 @@ never a bet button, a pick, a Top 10 play or a parlay leg.
 
 ## Ask Onyx (10/31)
 
+**Lists, NBA specials and matchups (11/9).** Jordan: "top 5 point scorers, top 7 most likely to score a TD, the
+best value to have a triple double tonight ... you should be able to ask it about specific matchups as well."
+The NBA board (`nba_build.write_top`) now carries 3-pointers made (`threes`), P+R+A / P+R / P+A (`pra`, `pr`,
+`pa`) off the bet ladders' main line, and double-double / triple-double (`dbl_dbl`, `trp_dbl`): the model's
+chance is built from P(10+) in points, rebounds and assists (independent stats; DD = any two, TD = all three),
+blended at `M.MODEL_WEIGHT` with the de-vigged Onyx price. These are named `dbl_dbl`/`trp_dbl`, never `dd`/`td`,
+because `td` collides with touchdown markets and the parlay words in ask.js. `BOARD_KEEP` is 3000 so the
+new rows fit. Search: "top N point scorers" sorts points by projection; "threes"/"three point shooters" is
+the threes market; "best value triple double" with no positive edge ranks by model chance x payout and
+says so; "A or B points" / "A vs B" returns both players; two teams of one game with no market is a game
+card (best moneyline, spread, total, then that game's props), "who wins X Y" is the moneyline and "who covers
+X Y" the spread. "top 10 receptions in the 1 PM games" now reads 10 (the stat word after "top N" only means a
+line when followed by +, "or more", "for" or "per"). Gates: verify_ask full corpus 797/813 (the 16 misses are
+the Sunday NFL-slot cases that need a Sunday board, plus a CFB player not on today's board, all failing
+identically on main), holdouts 59/59 and 49/49, list sweeps 2,926/2,926 tuned and 3,000/3,000 fresh.
+
 **The 100k backtest (11/6).** Jordan: "we need to get through 100000+ search terms of back testing, I have
 no confidence in its search ability." `python3 tools/ask_mega.py 100000 7` writes 100,000 requests from
 today's boards (every sport; real teams by nickname, full name and abbreviation pair; real players;
