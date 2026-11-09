@@ -20,7 +20,7 @@
   // where each sport's depth chart lives (data/<sport>/depth.json)
   var DEPTHPG = {nba: 'nba.html#depth', cbb: 'cbb-players.html#', cfb: 'cfb.html#depth:', nfl: 'nfl.html#depth:', nhl: 'nhl.html#depth:'};
   var PICKS = {today: [], final: []};   // Onyx Picks still to play today (data/picks/ledger.json) and the finalized markets
-  var MKTS = ['pts', 'reb', 'ast', 'q1_total', 'h1_total', 'first_basket', 'first_td', 'rec', 'rec_yds', 'rush_yds', 'pass_yds', 'pass_td', 'pass_att', 'rush_rec_yds', 'pass_rush_yds', 'anytime_td', 'two_plus_td', 'three_td', 'spread', 'total', 'ml'];
+  var MKTS = ['pts', 'reb', 'ast', 'q1_total', 'h1_total', 'first_basket', 'first_td', 'rec', 'rec_yds', 'rush_yds', 'pass_yds', 'pass_td', 'pass_att', 'rush_rec_yds', 'pass_rush_yds', 'anytime_td', 'two_plus_td', 'three_td', 'threes', 'pra', 'pr', 'pa', 'dbl_dbl', 'trp_dbl', 'spread', 'total', 'ml'];
   var BOARD = null, AI = null, PRIOR = [];
   // every rostered player (data/<sport>/names.json from the depth charts, 11/6): known even with no
   // line today, matched on the full name only, after today's boards and the NBA record
@@ -211,7 +211,7 @@
     if (!abbr) return false;
     return (B || []).some(function (p) { return p.sport === sport && Date.parse(p.start) > now && onTeams(p, [abbr]); });
   }
-  var COLLEGE_SP = ['cfb', 'cbb'], FOOTM = /^(rec|rec_yds|rush_yds|pass_yds|pass_td|pass_att|anytime_td|first_td|two_plus_td|three_td|rush_rec_yds|pass_rush_yds)$/, HOOPM = /^(pts|reb|ast|threes|first_basket|q1_total|h1_total)$/;
+  var COLLEGE_SP = ['cfb', 'cbb'], FOOTM = /^(rec|rec_yds|rush_yds|pass_yds|pass_td|pass_att|anytime_td|first_td|two_plus_td|three_td|rush_rec_yds|pass_rush_yds)$/, HOOPM = /^(pts|reb|ast|threes|pra|pr|pa|dbl_dbl|trp_dbl|first_basket|q1_total|h1_total)$/;
   // the college sports a request can mean: the ones it named, else what its markets say, else both
   function colSports(s) {
     var named = (s.sports || []).filter(function (x) { return COLLEGE_SP.indexOf(x) >= 0; });
@@ -570,9 +570,10 @@
     if (XLINES) s.props_only = true;
     if (XSIDE) s.side = XSIDE;
     // what kind of answer
+    var tDD = t.replace(/\b(double|triple|trip|dub)[\s-]?(doubles?|dubs?)\b/g, ' ');   // "triple double" is a market, not a 3-leg parlay (11/9)
     if (/sgp ?(\+|plus)(?!\s*(odds|money|\d))/.test(t)) s.intent = 'parlay';
     else if (/\bsgp\b|same[\s-]*game|correlated|stack/.test(t)) s.intent = 'sgp';
-    else if (/parlay|\blegs?\b|legger|(?<!lottery )ticket|\bslip\b|\bcombo\b|\bdouble\b|\btriple\b|\bteaser\b|\baccas?\b|\baccumulators?\b|\bmultis?\b(?![\s-]?tds?\b|[\s-]?touchdown)|\b\d{1,2}[\s-]*folds?\b|\btrebles?\b/.test(t)) s.intent = 'parlay';
+    else if (/parlay|\blegs?\b|legger|(?<!lottery )ticket|\bslip\b|\bcombo\b|\bdouble\b|\btriple\b|\bteaser\b|\baccas?\b|\baccumulators?\b|\bmultis?\b(?![\s-]?tds?\b|[\s-]?touchdown)|\b\d{1,2}[\s-]*folds?\b|\btrebles?\b/.test(tDD)) s.intent = 'parlay';
     // a round robin: "round robin 4 picks by 2s", "rr of 5 by 3s"
     var rr = t.match(/\b(round[\s-]*robin|\brr\b)/);
     if (rr) {
@@ -597,7 +598,7 @@
     if (tgv && /parlay|ticket|legs?\b|legger|sgp|round/.test(t)) { if (s.intent === 'list') s.intent = 'parlay'; s.target_price = tgv; }
     // how many
     var tC = t.replace(/\b(pac|big|atlantic)[\s-]?(10|12)\b/g, ' ').replace(/\ba[\s-]?10\b(?!\s*(leg|legs|legger|picks?|plays?|bets?|team|teams|man|folds?|way))/g, ' ').replace(/\b\d{1,3}\s*(?:to|-|:)\s*1\b/g, ' ').replace(/\$?\s*\d+\s*(?:dollars|bucks)?\s*(?:into|to make|to win)\s*\$?\s*\d+/g, ' ');
-    var n = tC.match(/\b(\d{1,2})[\s-]*(leg|legs|legger|picks?|plays?|players?|bets?|team|man|teamer|folds?|way)\b/) || tC.match(/\b(?:top|best|safest|surest)\s*(\d{1,2})\b(?!\s*(\+|points|rebounds|assists|yards|receptions|%|percent|or more))/)
+    var n = tC.match(/\b(\d{1,2})[\s-]*(leg|legs|legger|picks?|plays?|players?|bets?|team|man|teamer|folds?|way)\b/) || tC.match(/\b(?:top|best|safest|surest)\s*(\d{1,2})\b(?!\s*(\+|%|percent|or more|(points|rebounds|assists|yards|receptions)\s*(\+|or more|for|per|a game|plus\b)))/)
       || tC.match(/\b(\d{1,2})\s+(?:best|safest|top|surest)\b/)
       // "7 highest projected ...", "3 positive value ..." (11/8 list test: read as 5)
       || tC.match(/^\s*(?:give me |gimme |show me |list |find |get me |what are |whats )?(?:the |your |my |our )?(\d{1,2})\s+(?:highest|positive|most|biggest|largest|lowest|value|projected|favou?rite|leading|strongest|likeliest|plus|\+ ?ev)\b/)
@@ -619,7 +620,7 @@
       else if (/\b(one|a single|1)\s+(\w+\s+){0,2}?(bet|play|pick|prop|leg)\b(?!s)/.test(t)) nw = [null, 'one'];
     }
     s.count_set = !!(n || nw);
-    s.count = n ? +n[1] : nw ? NUMW[nw[1]] : /\bdouble\b/.test(t) && s.intent === 'parlay' ? 2 : /\b(triple|treble)\b/.test(t) && s.intent === 'parlay' ? 3 : null;
+    s.count = n ? +n[1] : nw ? NUMW[nw[1]] : /\bdouble\b/.test(tDD) && s.intent === 'parlay' ? 2 : /\b(triple|treble)\b/.test(tDD) && s.intent === 'parlay' ? 3 : null;
     // which sport
     // college basketball and college football by name (11/2: "college basketball" was read as
     // unsupported and "college" alone as football); "college" alone is both, unless a market says which
@@ -660,8 +661,25 @@
     if (s.markets.indexOf('rec') >= 0 && s.markets.indexOf('rec_yds') >= 0 && !/receiving|\byards\b|\byds\b/.test(t)) s.markets.splice(s.markets.indexOf('rec_yds'), 1);
     if (s.markets.indexOf('first_td') >= 0 && /\bnba\b|basketball|bucket|basket|hoops/.test(t) && !/\btds?\b|touchdown/.test(t)) s.markets[s.markets.indexOf('first_td')] = 'first_basket';
     if (/\byards\b|\byds\b/.test(t) && !s.markets.some(function (m) { return /yds/.test(m); })) s.markets.push('rec_yds', 'rush_yds', 'pass_yds');
-    if (/\bscore (the )?most\b|\bmost points\b|\btop (point )?scorers?\b|\bleading scorer\b|\bdrop (the )?most\b|\bhighest scor/.test(t)) { if (s.markets.indexOf('pts') < 0) s.markets.push('pts'); s.sort = 'proj'; s.side = 'over'; }
-    if (/\bpra\b|pts ?\+ ?reb ?\+ ?ast/.test(t)) ['pts', 'reb', 'ast'].forEach(function (m) { if (s.markets.indexOf(m) < 0) s.markets.push(m); });
+    if ((/\bscore (the )?most\b|\bmost points\b|\btop (point )?scorers?\b|\bleading scorer\b|\bdrop (the )?most\b|\bhighest scor/.test(t)
+        || /\b(top|best|biggest|leading|highest)( \d{1,2}| two| three| four| five| ten)? (point |points |pts )?scorers?\b/.test(t) && /\bpoints?\b|\bpts\b|\bnba\b|basketball|hoops|\bcbb\b/.test(t))
+        && !/\btds?\b|touchdown|\bgoals?\b|first (td|basket)|\banytime\b/.test(t) && !s.markets.some(function (m) { return m !== 'pts' && /^(pra|pr|pa)$/.test(m); })) { if (s.markets.indexOf('pts') < 0) s.markets.push('pts'); s.sort = 'proj'; s.side = 'over'; }
+    // 11/9 (Jordan: "the best value to have a triple double tonight"): the NBA's other Onyx markets. Each replaces the
+    // single stats its words also match ("points + rebounds" is one combo bet, "three point shooters" is not points)
+    var NBX = [[/\btriple[\s-]?doubles?\b|\btrip(le)?[\s-]?dub(s)?\b/, 'trp_dbl', ['pts', 'reb', 'ast']],
+      [/\bdouble[\s-]?doubles?\b|\bdub[\s-]?dub\b/, 'dbl_dbl', ['pts', 'reb', 'ast']],
+      [/\bpra\b|\bp ?\+ ?r ?\+ ?a\b|\b(points|pts) ?(,|\+|plus|&)? ?(rebounds|reb|rebs|boards) ?(,|\+|plus|&|and) ?(assists|ast|dimes)\b/, 'pra', ['pts', 'reb', 'ast']],
+      [/\bp ?\+ ?r\b|\b(points|pts) ?(\+|plus|&) ?(rebounds|reb|rebs|boards)\b/, 'pr', ['pts', 'reb']],
+      [/\bp ?\+ ?a\b|\b(points|pts) ?(\+|plus|&) ?(assists|ast|dimes)\b/, 'pa', ['pts', 'ast']],
+      [/\bthrees\b|\btreys?\b|\b3s\b|\b3[\s-]?(pointers?|pt|pts)\b|\bthree[\s-]?pointers?\b|\b3pm\b|\bthree[\s-]?point(s|er)? (shooters?|shots?|makers?|makes|made)\b|\b(3|three)[\s-]?point shooting\b/, 'threes', ['pts']]];
+    for (var nx = 0; nx < NBX.length; nx++) if (NBX[nx][0].test(t) && s.markets.indexOf(NBX[nx][1]) < 0) {
+      if (NBX[nx][1] === 'pr' && s.markets.indexOf('pra') >= 0) continue;
+      if (NBX[nx][1] === 'pa' && s.markets.indexOf('pra') >= 0) continue;
+      if (NBX[nx][1] === 'dbl_dbl' && s.markets.indexOf('trp_dbl') >= 0 && !/\bdouble[\s-]?doubles?\b/.test(t.replace(/triple[\s-]?doubles?/g, ''))) continue;
+      s.markets = s.markets.filter(function (m) { return NBX[nx][2].indexOf(m) < 0; }).concat([NBX[nx][1]]);
+    }
+    // "three point shooters", "best shooters": the most 3-pointers projected
+    if (s.markets.indexOf('threes') >= 0 && /\bshooters?\b|\bmost\b|\bmakers?\b/.test(t) && s.sort === 'conf') { s.sort = 'proj'; if (s.side === 'any') s.side = 'over'; }
     // "favorites" / "dogs" with no market named: to win (moneyline); "favorite play / pick / prop" is a recommendation, not this
     var favW = /\bfavou?rites\b|\bfavs\b|\bchalk\b|\bfavou?rite\b(?!\s+(\w+\s+){0,2}(plays?|picks?|props?|bets?|sgps?|parlays?|tickets?|leans?|sides?|legs?))/.test(t) && !/\b(your|our|onyx'?s?|the model'?s?|my)( \w+){0,3} favou?rites?\b/.test(t);
     // "your top 10 favorite nfl overs" (11/8): what we recommend most, not the betting favorites
@@ -798,10 +816,16 @@
     }
     // a player: a nickname, a full name, a last or first name (the most prominent one), or one letter off
     // only players of the sport the named market belongs to ("receiving yards" is never an NBA player)
-    var PC = names(B, PRIOR), FOOT = /^(rec|rec_yds|rush_yds|pass_yds|pass_td|pass_att|anytime_td|first_td|two_plus_td|three_td|rush_rec_yds|pass_rush_yds)$/, HOOP = /^(pts|reb|ast|threes|first_basket)$/;
+    var PC = names(B, PRIOR), FOOT = /^(rec|rec_yds|rush_yds|pass_yds|pass_td|pass_att|anytime_td|first_td|two_plus_td|three_td|rush_rec_yds|pass_rush_yds)$/, HOOP = /^(pts|reb|ast|threes|pra|pr|pa|dbl_dbl|trp_dbl|first_basket)$/;
     var mk = s.markets || [], want = mk.length && mk.every(function (m) { return FOOT.test(m); }) ? ['nfl', 'cfb'] : mk.length && mk.every(function (m) { return HOOP.test(m); }) ? ['nba', 'cbb'] : null;
     if (want) Object.keys(PC).forEach(function (k) { var sp = Object.keys(PC[k].sp || {}); if (sp.length && !sp.some(function (x) { return want.indexOf(x) >= 0; })) delete PC[k]; });
     s.player = findPlayer(tPlayer, PC, s.markets);
+    // two players head to head ("jokic vs sengun", "Jokic or Sengun points", 11/9): both players' lines
+    var vsP = tPlayer.split(/\s(?:vs\.?|versus|v\.?|or|compared to|against|and)\s/);
+    if (s.player && vsP.length === 2) {
+      var p1 = findPlayer(' ' + vsP[0] + ' ', PC, s.markets), p2 = findPlayer(' ' + vsP[1] + ' ', PC, s.markets);
+      if (p1 && p2 && p1 !== p2) { s.player = p1; s.player2 = p2; }
+    }
     // a rostered player with no line today, typed by his full name ("jeremiah smith receiving yards")
     var rost = null;
     if (!s.player) {
@@ -811,7 +835,7 @@
       if (rost) s.player = rost.r.name;
     }
     if (s.player) {
-      s.team = null; if (s.intent === 'list' && s.count == null && !/props|plays|lines|bets/.test(t)) s.count = 5;
+      s.team = null; if (s.intent === 'list' && s.count == null && !/props|plays|lines|bets/.test(t)) s.count = s.player2 ? 10 : 5;
       if (!s.sports.length) {
         var pl = String(s.player).toLowerCase(), on2 = sportsOn(B, function (p) { return p.kind === 'prop' && String(p.name || '').toLowerCase() === pl; });
         if (on2.length) s.sports = on2;
@@ -836,7 +860,7 @@
     if (s.markets.indexOf('two_plus_td') >= 0) { s.sort = 'two_td'; if (!s.sports.length) s.sports = ['nfl']; }
     if (s.markets.indexOf('three_td') >= 0 && !s.sports.length) s.sports = ['nfl'];
     if (s.markets.indexOf('anytime_td') >= 0 && !s.sports.length) s.sports = ['nfl', 'cfb'];
-    if (s.markets.some(function (m) { return /^(pts|reb|ast|q1_total)$/.test(m); }) && !s.sports.length) s.sports = ['nba'];
+    if (s.markets.some(function (m) { return /^(pts|reb|ast|q1_total|threes|pra|pr|pa|dbl_dbl|trp_dbl)$/.test(m); }) && !s.sports.length) s.sports = ['nba'];
     if (s.markets.some(function (m) { return /^(rec|rec_yds|rush_yds|pass_yds|pass_td|pass_att|rush_rec_yds|pass_rush_yds)$/.test(m); }) && !s.sports.length) s.sports = ['nfl'];
     if (s.intent === 'rr' && s.count == null) s.count = 4;
     // a matchup in abbreviations: "KC @ DEN", "lal vs bos"
@@ -895,9 +919,7 @@
       [/\bgolf\b|\bpga\b|\blpga\b|\bmasters\b|\btop (5|10|20) finish\b|\bmake the cut\b|\bbirdies\b/, 'golf|our golf leans are on the Golf page'],
       [/\bmlb\b|\bbaseball\b|\bhome ?runs?\b|\bhomers?\b|\bstrike ?outs?\b|\bpitchers?\b|\bworld series\b/, 'MLB|the 2026 season is over, and its record is on the MLB page'],
       [/\bshots? on goal\b|\bsog\b|\bgoal ?scorers?\b|\banytime goal\b|\bto score a goal\b|\bsaves\b|\bgoalies?\b/, 'NHL goal scorers, shots and saves|we have NHL player points and assists when Onyx prices them'],
-      [/\bthrees\b|\b3[\s-]?pointers?\b|\bthree[\s-]?pointers?\b|\b3pm\b|\bmade threes\b|\b3s made\b/, 'threes|each player\'s bet card on the NBA page has them'],
-      [/\bdouble[\s-]?doubles?\b|\btriple[\s-]?doubles?\b/, 'double-doubles and triple-doubles|the NBA bet cards have them'],
-      [/\bpra\b|\bp ?\+ ?r ?\+ ?a\b|\bpts ?\+ ?reb|\bpts ?\+ ?ast|\breb ?\+ ?ast|\bp ?\+ ?r\b|\bp ?\+ ?a\b|\br ?\+ ?a\b|\b(points|pts|rebounds|reb|boards|assists|ast|dimes) (\+|plus|&) (points|pts|rebounds|reb|boards|assists|ast|dimes)\b|\b(points|rebounds|assists|boards|dimes) (and|\+) (points|rebounds|assists|boards|dimes) combos?\b/, 'combined-stat props|each player\'s bet card on the NBA page has PRA, P+R and P+A'],
+      [/(?<!\b(points|pts|p) ?(,|\+|plus|&)? ?)(\breb(ounds)? ?(\+|plus|&) ?ast(s|ists)?\b|\br ?\+ ?a\b|\b(rebounds|boards) (\+|plus|&) (assists|dimes)\b)/, 'rebounds + assists|Onyx prices points + rebounds + assists, points + rebounds and points + assists, all in search'],
       [/\bteam totals?\b/, 'team totals'],
       [/\b(1st|first|2nd|second|3rd|third|4th|fourth)[\s-]*(quarter|half|period|q)\b(?:\s+\w+){0,2}\s+(spreads?|money ?lines?|ml|to win|winners?)\b|\b(q[1-4]|[1-4]q|1h|2h|h1|h2)\s*(spreads?|ml|money ?lines?)\b|\b(spreads?|money ?lines?|ml)\s+(for|in) the (1st|first|2nd|second) (half|quarter)\b/, 'quarter and half spreads or moneylines|we have NBA 1st-quarter and 1st-half totals'],
       [/\b(2nd|second|3rd|third|4th|fourth)[\s-]*(quarter|half|period)\b|\b(q[2-4]|[2-4]q|2h|h2)\b/, 'later quarters and the 2nd half|we have NBA 1st-quarter and 1st-half totals'],
@@ -952,6 +974,15 @@
         var hg = hitG[HG[0]]; s.player = null; s.teams = [hg[1], hg[2]]; s.team = null; s.school = null; s.team_name = null; s.ambig = null; s.tabbr = {}; s.tabbr[hg[0]] = [hg[1], hg[2]]; s.sports = [hg[0]];
         if (s.intent === 'list') s.one_per_game = false;
       }
+    }
+    // a game asked about as a game (11/9, Jordan: "you should be able to ask it about specific matchups"): two teams
+    // of one game named. "who wins" is the moneyline, "who covers" the spread; no market at all is a game card:
+    // the best read on the moneyline, spread and total, then that game's best props
+    var twoT = Object.keys(s.tabbr || {}).some(function (k) { return (s.tabbr[k] || []).length === 2; }) || (s.teams || []).length === 2;
+    if (twoT && !s.player && s.intent === 'list') {
+      if (/\bwho (wins|will win|is winning|s winning|takes (it|this|the game))\b|\bwho('s| is)? (gonna|going to) win\b|\bwinner\b|\bwho has the edge\b/.test(t) && (!s.markets.length || s.markets.join() === 'ml')) { s.markets = ['ml']; if (!s.count_set) s.count = 1; }
+      else if (/\bwho (covers|will cover|s covering)\b/.test(t) && (!s.markets.length || s.markets.join() === 'spread')) { s.markets = ['spread']; if (!s.count_set) s.count = 1; }
+      else if (!s.markets.length && !s.props_only && !s.no_props && !s.side_set && (s.side || 'any') === 'any') { s.matchup = true; if (!s.count_set) s.count = 8; s.one_per_game = false; }
     }
     // Onyx Picks (11/2): "Onyx picks", "official picks", "tracked picks": only the logged picks,
     // never a projection called a pick
@@ -1032,7 +1063,8 @@
       if (spec.pos_value && !(p.edge > 0)) return false;                                  // positive value only (11/8)
       // first TD / first basket: Onyx's price beat the model in testing, so their edges are not value unless asked for
       if (spec.pos_value && (p.mkt === 'first_td' || p.mkt === 'first_basket') && (spec.markets || []).indexOf(p.mkt) < 0) return false;
-      if (spec.player && String(p.name || p.label).toLowerCase().indexOf(String(spec.player).toLowerCase()) < 0) return false;
+      if (spec.player && String(p.name || p.label).toLowerCase().indexOf(String(spec.player).toLowerCase()) < 0
+          && !(spec.player2 && String(p.name || p.label).toLowerCase().indexOf(String(spec.player2).toLowerCase()) >= 0)) return false;
       if (spec.exclude && spec.exclude.length && spec.exclude.some(function (x) {
         x = String(x || '').trim();
         if (/^[A-Z0-9&-]{2,5}$/.test(x)) { var tmx = /_total$/.test(p.mkt || '') ? '' : p.team || (p.kind === 'spread' || p.kind === 'ml' ? p.name : '');   // a game's quarter / half total is both teams' (11/9, 1M test)   // a team: its players and its side
@@ -1079,11 +1111,25 @@
       key = function (p) { return -(0.25 * p.conf + Math.max(-0.05, Math.min(0.12, (p.model != null ? p.model : p.conf) - p.conf))); };
       pool.sort(function (a, b) { return key(a) - key(b); });
       spec.td_fav = true;
+    } else if (spec.sort === 'edge' && !two && pool.length && pool[0].edge <= 0 && mk.length && mk.every(function (m) { return m === 'trp_dbl' || m === 'dbl_dbl'; })
+               && pool.some(function (p) { return p.model != null; })) {
+      // double- and triple-doubles (11/9): nothing beats Onyx's price, so "best value" ranks by how far our model's own
+      // chance sits above the price, and says so
+      key = function (p) { return -((p.model != null ? p.model : p.conf) * dec(p.price)); };   // our chance / the price's: a ratio, so long shots are not favored by default
+      pool.sort(function (a, b) { return key(a) - key(b); });
+      note = 'None of these beats Onyx\'s price once its margin is counted, so they are ranked by our model\'s own chance against the price\'s (closest to fair first).';
     } else if (spec.sort === 'edge' && !two && pool.length && pool[0].edge <= 0) {
       key = function (p) { return -p.conf - p.edge / 10; };
       pool.sort(function (a, b) { return key(a) - key(b); });
       note = (mk.length && mk.every(function (m) { return /td$/.test(m); }) ? 'No touchdown scorer beats Onyx\'s price in our testing' : 'Nothing that matches beats Onyx\'s price right now')
         + ', so these are the most likely instead.';
+    }
+    if (spec.matchup && spec.intent === 'list' && pool.length) {
+      var GL = {}, PR = [];
+      pool.forEach(function (p) { if (/^(ml|spread|total)$/.test(p.kind)) { if (!GL[p.kind]) GL[p.kind] = p; } else PR.push(p); });
+      var card = ['ml', 'spread', 'total'].map(function (k) { return GL[k]; }).filter(Boolean), seenW = {};
+      PR.forEach(function (p) { if (card.length < Math.max(3, spec.count || 8) && !seenW[WHO(p)]) { seenW[WHO(p)] = 1; card.push(p); } });
+      return {rows: card, pool: pool.length, two: false, note: note, matchup: true};
     }
     if (spec.intent === 'sgp') return sgp(spec, pool, key);
     var n = Math.max(1, Math.min(spec.intent === 'list' ? 25 : 8, spec.count || 5));
@@ -1198,7 +1244,7 @@
 
   // ── what the spec understood, in plain words ────────────────────────────
   var MW = {pts: 'points', reb: 'rebounds', ast: 'assists', q1_total: '1st-quarter totals', rec: 'receptions', rec_yds: 'receiving yards',
-            rush_yds: 'rushing yards', pass_yds: 'passing yards', pass_td: 'passing TDs', pass_att: 'pass attempts', rush_rec_yds: 'rushing + receiving yards', pass_rush_yds: 'passing + rushing yards', anytime_td: 'anytime TD', first_td: 'first TD', first_basket: 'first basket', h1_total: '1st-half totals', two_plus_td: '2+ touchdowns', three_td: '3+ touchdowns', spread: 'spreads', total: 'totals', ml: 'moneylines'};
+            rush_yds: 'rushing yards', pass_yds: 'passing yards', pass_td: 'passing TDs', pass_att: 'pass attempts', rush_rec_yds: 'rushing + receiving yards', pass_rush_yds: 'passing + rushing yards', anytime_td: 'anytime TD', first_td: 'first TD', first_basket: 'first basket', h1_total: '1st-half totals', two_plus_td: '2+ touchdowns', three_td: '3+ touchdowns', threes: '3-pointers made', pra: 'points + rebounds + assists', pr: 'points + rebounds', pa: 'points + assists', dbl_dbl: 'double-doubles', trp_dbl: 'triple-doubles', spread: 'spreads', total: 'totals', ml: 'moneylines'};
   function describe(s) {
     var b = [];
     b.push(s.intent === 'parlay' && s.target_price && !s.count_set ? 'parlay' : s.intent === 'rr' ? 'round robin of ' + (s.count || 4) + ' by ' + (s.rr_size || 2) + 's' : s.intent === 'sgp' ? (s.count || 3) + '-leg same-game parlay, correlated' : s.intent === 'parlay' ? (s.count || 3) + '-leg parlay' : (s.count || 5) === 1 ? 'top play' : 'top ' + (s.count || 5));
@@ -1211,7 +1257,7 @@
     if (s.period) b.push(s.period === 'q1' ? '1st-quarter lines only' : '1st-half lines only');
     if (s.pos_value) b.push('positive value only');
     if (s.min_conf != null) b.push(s.default_conf ? (s.intent === 'list' ? 'every pick 50%+ to hit' : 'every leg 50%+ to hit') : Math.round(100 * s.min_conf) + '%+ confidence');
-    if (s.player) b.push(s.player);
+    if (s.player) b.push(s.player2 ? s.player + ' vs ' + s.player2 : s.player);
     if (s.when) b.push(s.when === 'today' ? 'tonight' : s.when);
     if (s.slot) b.push(s.slot.label);
     if (s.school) b.push(s.school);
@@ -1388,7 +1434,7 @@
     var s = Object.assign({intent: 'list', count: 5, sports: [], markets: [], side: 'any', sort: 'conf', one_per_game: true}, spec || {});
     s.sports = (s.sports || []).filter(function (x, i, a) { return a.indexOf(x) === i; });   // the AI once sent ["cfb", "cfb", "cfb"]
     var two = (s.markets || []).indexOf('two_plus_td') >= 0 || s.sort === 'two_td';
-    var longMkt = (s.markets || []).some(function (m) { return m === 'first_td' || m === 'first_basket' || m === 'anytime_td' || m === 'three_td'; });
+    var longMkt = (s.markets || []).some(function (m) { return m === 'first_td' || m === 'first_basket' || m === 'anytime_td' || m === 'three_td' || m === 'trp_dbl' || m === 'dbl_dbl'; });
     // a named team or player: every line on them, at any price ("Buckeyes moneyline" at -400 is still the answer)
     // a parlay is only as good as its weakest leg: every leg more likely than not, unless the
     // request asks for dogs, longshots or a payout (then the price filters decide)

@@ -569,6 +569,44 @@ def write_top(rows, games, today_rows, open_led, today, jumps=None, fshots=None)
                 board.append(dict(DT.entry("nba", c, tg), proj=(r.get("proj") or {}).get(s_), min=r["min"]))
                 if r["min"] >= TICKET_MIN_MIN and DT.ok(c):
                     out.append(DT.entry("nba", c, tg))
+        # 11/9 (Jordan: "the best value to have a triple double tonight ... make it as expansive as we can"): the bet
+        # card's other Onyx markets on the search board too. Threes and the combos at their main (two-sided) line,
+        # the chance the card shows (20% model / 80% Onyx fair, the main lane's blend); double-double and
+        # triple-double as a yes bet, the model's chance that 2 / 3 of points, rebounds, assists reach 10 (each from
+        # prob_over at 9.5, taken as independent: the real stats move together, so this reads low on the stars)
+        # blended the same way. Search only: never the Top 10, never a pick.
+        bets = r.get("bets") or {}
+        for s_ in ("fg3", "pra", "pr", "pa"):
+            lad = [x for x in bets.get(s_) or [] if x[1] is not None and x[3] is not None and x[6] is not None]
+            if not lad:
+                continue
+            main = min(lad, key=lambda x: abs(OL.implied(x[1]) - OL.implied(x[3])))
+            line, op, osel, up, usel, pm, pb = main
+            for side, price, sel, p in (("over", op, osel, pb), ("under", up, usel, 1 - pb)):
+                if not sel:
+                    continue
+                c = {"kind": "prop", "mkt": "threes" if s_ == "fg3" else s_, "name": r["name"], "pid": r["pid"], "team": r["team"],
+                     "side": side, "line": line, "price": price, "prob": p, "edge": p - OL.implied(price), "sel": sel,
+                     "gid": r["gid"], "matchup": f"{g.get('away')} @ {g.get('home')}", "start": g.get("start")}
+                pj = r.get("proj") or {}
+                board.append(dict(DT.entry("nba", c, "lean"), proj=round(pj.get("fg3", 0.0) if s_ == "fg3" else sum(pj.get(x, 0.0) for x in M.COMBOS[s_]), 2), min=r["min"]))
+        pj = r.get("proj") or {}
+        if all(pj.get(x) is not None for x in ("pts", "reb", "ast")):
+            p10 = [M.prob_over(pj[x], 9.5, x)[0] for x in ("pts", "reb", "ast")]
+            a_, b_, c_ = p10
+            p_dd = a_ * b_ + a_ * c_ + b_ * c_ - 2 * a_ * b_ * c_
+            p_td = a_ * b_ * c_
+            for s_, pm in (("dd", p_dd), ("td", p_td)):
+                row = (bets.get(s_) or [None])[0]
+                if not row or row[1] is None or not row[2]:
+                    continue
+                _, op, osel, up, usel, _, _ = row
+                fair = OL.implied(op) / (OL.implied(op) + OL.implied(up)) if up is not None else min(0.985, OL.implied(op) / 1.05)
+                p = M.MODEL_WEIGHT * pm + (1 - M.MODEL_WEIGHT) * fair
+                c = {"kind": "prop", "mkt": "dbl_dbl" if s_ == "dd" else "trp_dbl", "name": r["name"], "pid": r["pid"], "team": r["team"], "side": "over", "line": 0.5,
+                     "price": op, "prob": p, "edge": p - OL.implied(op), "sel": osel,
+                     "gid": r["gid"], "matchup": f"{g.get('away')} @ {g.get('home')}", "start": g.get("start")}
+                board.append(dict(DT.entry("nba", c, "lean"), model=round(pm, 4), min=r["min"]))
     for g in games.values():
         if g.get("state") != "pre" or g.get("q1_total") is None or not g.get("total"):
             continue

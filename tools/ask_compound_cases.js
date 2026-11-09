@@ -36,7 +36,7 @@ module.exports = [
   C('nfl player props + late games - Christian McCaffrey', {sports: ['nfl'], slot: '4 PM slate', exclude: ['christian mccaffrey']}),
   // ── things that must stay as they were ──
   C('passing + rushing yards overs', {sports: ['nfl'], markets: ['pass_rush_yds'], side: 'over', no_slot: true}),
-  C('points + rebounds + assists overs nba', {unsupported: true}),        // combined props: the NBA bet card, not search
+  C('points + rebounds + assists overs nba', {sports: ['nba'], markets: ['pra'], side: 'over'}),   // 11/9: combos are in search
   C('3 leg parlay -150 or longer', {intent: 'parlay', count: 3, no_slot: true}),
   C('nba parlay +400', {sports: ['nba'], intent: 'parlay', no_slot: true}),
   C('same-game parlay nfl', {sports: ['nfl'], intent: 'sgp', no_slot: true}),
@@ -77,5 +77,18 @@ module.exports = [
   C('first quarter rushing yards for kyren williams', {markets: ['rush_yds'], period: 'q1'}),
   C('first half points jokic', {markets: ['pts'], period: 'h1'}),
   C('nba 1st quarter totals', {sports: ['nba'], markets: ['q1_total']}),
-  C('no judkins no teslaa receiving yards', {markets: ['rec_yds'], exclude: ['quinshon judkins', 'isaac teslaa'], no_player: true})
+  C('no judkins no teslaa receiving yards', {markets: ['rec_yds'], exclude: ['quinshon judkins', 'isaac teslaa'], no_player: true}),
+  // ── NBA's other markets, lists and matchups (11/9, Jordan: "top 5 point scorers, top 7 most likely to score a td, the best
+  //    value to have a triple double tonight ... you should be able to ask it about specific matchups") ──
+  C('top 5 point scorers', {sports: ['nba'], markets: ['pts'], count: 5, sort: 'proj', side: 'over'}),
+  C('top 7 most likely to score a td', {markets: ['anytime_td'], count: 7, sort: 'conf'}),
+  C('the best value to have a triple double tonight', {sports: ['nba'], markets: ['trp_dbl'], intent: 'list', sort: 'edge'}),
+  C('triple double parlay', {sports: ['nba'], markets: ['trp_dbl'], intent: 'parlay'}),
+  C('3 leg parlay of double doubles', {sports: ['nba'], markets: ['dbl_dbl'], intent: 'parlay', count: 3}),
+  C('top 3 three point shooters tonight', {sports: ['nba'], markets: ['threes'], count: 3, sort: 'proj', side: 'over'}),
+  C('points + rebounds overs', {sports: ['nba'], markets: ['pr'], side: 'over'}),
+  C('best pra unders', {sports: ['nba'], markets: ['pra'], side: 'under'}),
+  C('who wins lakers hawks', {sports: ['nba'], markets: ['ml'], count: 1}),
+  C('who covers nuggets rockets', {sports: ['nba'], markets: ['spread'], count: 1}),
+  C('doncic or curry points', {sports: ['nba'], markets: ['pts']})
 ];
