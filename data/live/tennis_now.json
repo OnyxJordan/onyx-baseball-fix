@@ -1483,5 +1483,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-187381-spread-home",
+  "sport": "tennis",
+  "gid": "187381",
+  "date": "2026-11-09",
+  "logged_at": "2026-11-09T20:33:58+00:00",
+  "matchup": "Karolina Muchova vs Aryna Sabalenka",
+  "home": "Aryna Sabalenka",
+  "away": "Karolina Muchova",
+  "label": "Aryna Sabalenka +1.5 games",
+  "kind": "spread",
+  "side": "home",
+  "line": 1.5,
+  "price": -150,
+  "chance": 0.6591,
+  "implied": 0.6,
+  "edge": 0.059,
+  "fair": -195,
+  "state": {
+   "sets": "2-2",
+   "srv": "home",
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
