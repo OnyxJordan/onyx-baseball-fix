@@ -1660,6 +1660,8 @@
           if (!rW.rows.length && spW.props_only) { spW = Object.assign({}, spW, {props_only: false, min_conf: null, default_conf: false}); rW = run(spW, a[1]); noPW = rW.rows.length > 0; }
           var noMW = false;
           if (!rW.rows.length && (spW.markets || []).length) { spW = Object.assign({}, spW, {markets: [], side: 'any'}); rW = run(spW, a[1]); noMW = rW.rows.length > 0; }
+          // a same-game parlay for that later game, which has no player props yet: its game lines (11/9, 1M re-run)
+          if (!rW.rows.length && spW.intent === 'sgp') { spW = Object.assign({}, spW, {intent: 'list', count: 5, markets: [], props_only: false, min_conf: null, default_conf: false, min_price: null, default_floor: false}); rW = run(spW, a[1]); noPW = rW.rows.length > 0; }
           var dW = new Date(nx.start).toLocaleString('en-US', {timeZone: 'America/New_York', weekday: 'long', hour: 'numeric', minute: '2-digit'});
           var dayW = spec.when === 'today' ? 'tonight' : spec.when;
           var nW = (tl.length > 1 && !spec.school ? nx.matchup + ' is not ' + dayW + ': it is ' + dW + ' ET'
