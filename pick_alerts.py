@@ -106,8 +106,17 @@ def main():
         try:
             res = post(body, key, scheme)
             if res.status_code < 300:
+                # a 200 with no id means no subscriber matched (11/9 sweep: logged, so a quiet night can be told apart
+                # from a broken one); the pick is still marked, so it is never re-sent
+                try:
+                    j = res.json()
+                except Exception:
+                    j = {}
                 sent.add(r["id"])
-                n += 1
+                if j.get("id"):
+                    n += 1
+                else:
+                    print(f"pick alert for {r['id']}: no subscriber matched ({str(j.get('errors') or j)[:120]})")
             else:
                 print(f"::warning::pick alert for {r['id']} not sent: {res.status_code} {res.text[:160]}")
         except Exception as e:
