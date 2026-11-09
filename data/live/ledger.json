@@ -20440,5 +20440,36 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "cbb-401909718-total-under",
+  "sport": "cbb",
+  "gid": "401909718",
+  "date": "2026-11-09",
+  "logged_at": "2026-11-09T23:42:14+00:00",
+  "matchup": "SYR @ IU",
+  "home": "IU",
+  "away": "SYR",
+  "label": "Under 148.5",
+  "kind": "total",
+  "side": "under",
+  "line": 148.5,
+  "price": -115,
+  "chance": 0.5869,
+  "implied": 0.5349,
+  "edge": 0.052,
+  "fair": -140,
+  "state": {
+   "score": "SYR 8 - 7 IU",
+   "period": 1,
+   "clock": "15:24",
+   "f": 0.885
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
