@@ -935,6 +935,10 @@
     // (11/8: a game that started still names its teams, so the answer can say it started; and two board
     // abbreviations beat a player found from one of them as a first name: "VAN @ EDM" is not Van Jefferson)
     var fullP = s.player && clean(t).indexOf(clean(s.player)) >= 0;
+    // (11/9, 1M test: "BUFF @ BALL moneylines" read a player "Buff Ball", 67 misses) a "player" whose every word is
+    // a team abbreviation of one game on the boards is that game
+    if (fullP && (B || []).some(function (p) { var m = String(p.matchup || '').toLowerCase().split(/\s+(?:@|vs)\s+/), w = clean(s.player).split(' ');
+      return m.length === 2 && w.length === 2 && ((w[0] === m[0] && w[1] === m[1]) || (w[0] === m[1] && w[1] === m[0])); })) fullP = false;
     if (RT.teams.length <= 2 && !fullP) {
       var tok = {}; t.replace(/[^a-z0-9&\- ]/g, ' ').split(/\s+/).forEach(function (w) { if (w) tok[w] = 1; });
       var hitG = {}, nowT = Date.now();
@@ -1031,7 +1035,7 @@
       if (spec.player && String(p.name || p.label).toLowerCase().indexOf(String(spec.player).toLowerCase()) < 0) return false;
       if (spec.exclude && spec.exclude.length && spec.exclude.some(function (x) {
         x = String(x || '').trim();
-        if (/^[A-Z0-9&-]{2,5}$/.test(x)) { var tmx = p.team || (p.kind === 'spread' || p.kind === 'ml' ? p.name : '');   // a team: its players and its side
+        if (/^[A-Z0-9&-]{2,5}$/.test(x)) { var tmx = /_total$/.test(p.mkt || '') ? '' : p.team || (p.kind === 'spread' || p.kind === 'ml' ? p.name : '');   // a game's quarter / half total is both teams' (11/9, 1M test)   // a team: its players and its side
           return tmx ? String(tmx).toUpperCase() === x : new RegExp('(^|[^A-Z])' + x.replace(/[&-]/g, '\\$&') + '([^A-Z]|$)').test(String(p.matchup || '').toUpperCase()); }
         x = clean(x); return x && clean(String(p.name || '') + ' ' + String(p.label || '')).indexOf(x) >= 0; })) return false;   // "Ja'Marr" = "jamarr" (11/6)
       // the teams named, per sport (a college abbreviation means nothing on a pro board: "DEN" is the
@@ -1615,9 +1619,9 @@
       }
       // a named team or game with nothing in the market asked for (no moneyline posted on a heavy favorite):
       // that game's other lines, said so (11/6)
-      if (!res.rows.length && teamList(spec).length && (spec.markets || []).length && !spec.player && !spec.period) {
-        var mw7 = {ml: 'moneyline', spread: 'spread', total: 'total'}[(spec.markets || [])[0]] || MW[(spec.markets || [])[0]] || 'line like that';
-        var spT = Object.assign({}, spec, {markets: [], side: 'any', min_conf: null, default_conf: false, min_price: null, max_price: null, default_floor: false}), r7 = run(spT, a[1]);
+      if (!res.rows.length && teamList(spec).length && ((spec.markets || []).length || spec.props_only) && !spec.player && !spec.period) {
+        var mw7 = spec.props_only && !(spec.markets || []).length ? 'player props' : {ml: 'moneyline', spread: 'spread', total: 'total'}[(spec.markets || [])[0]] || MW[(spec.markets || [])[0]] || 'line like that';
+        var spT = Object.assign({}, spec, {markets: [], props_only: false, side: 'any', min_conf: null, default_conf: false, min_price: null, max_price: null, default_floor: false}), r7 = run(spT, a[1]);
         if (r7.rows.length) { res = r7; spec = spT; res.widened = true; res.note = (res.note ? res.note + ' ' : '') + 'No ' + mw7 + ' on the board for that game, so these are its other lines.'; }
       }
       // a player with nothing that matches: his other markets, then any day
@@ -1648,6 +1652,25 @@
         if (!fut.length) res.note = 'No ' + (sps.length ? sps.map(function (x) { return SPW[x] || x; }).join(' or ') + ' ' : '') + 'games left on the board right now: today\'s have started or finished. The next slate shows here once its lines post.';
         else if (tl.length && !fut.some(onT)) res.note = (tn || 'That team') + (tl.length > 1 ? ' are' : ' is') + ' not on the board right now: no game with lines posted yet. Ask again once their next game is priced.';
         else if (spec.player && !fut.some(function (p) { return String(p.name || p.label).toLowerCase().indexOf(String(spec.player).toLowerCase()) >= 0; })) res.note = spec.player + ' has no line on the board right now.';
+        // the team plays, just not on the day asked (11/9, 1M test: "UTEP props tonight" when UTEP plays Saturday): say
+        // when, and show that game's lines
+        else if (tl.length && spec.when && fut.some(onT) && !fut.some(function (p) { return onT(p) && whenOk(spec.when, p.start); })) {
+          var nx = fut.filter(onT).sort(function (x, y) { return Date.parse(x.start) - Date.parse(y.start); })[0];
+          var spW = Object.assign({}, spec, {when: null}), rW = run(spW, a[1]), noPW = false;
+          if (!rW.rows.length && spW.props_only) { spW = Object.assign({}, spW, {props_only: false, min_conf: null, default_conf: false}); rW = run(spW, a[1]); noPW = rW.rows.length > 0; }
+          var dW = new Date(nx.start).toLocaleString('en-US', {timeZone: 'America/New_York', weekday: 'long', hour: 'numeric', minute: '2-digit'});
+          var nW = (tn || 'That team') + ' does not play ' + (spec.when === 'today' ? 'tonight' : spec.when) + ': the next game is ' + nx.matchup + ', ' + dW + ' ET'
+            + (noPW ? '. Onyx has not posted its player props yet, so these are its game lines.' : rW.rows.length ? ', so these are its lines.' : '.');
+          if (rW.rows.length) { res = rW; spec = spW; res.widened = true; }
+          res.note = nW;
+        }
+        // a same-game parlay for a game with no player props posted yet (college props post close to kickoff)
+        else if (tl.length && spec.intent === 'sgp' && fut.some(onT) && !fut.some(function (p) { return onT(p) && p.kind === 'prop'; })) {
+          var spS = Object.assign({}, spec, {intent: 'list', count: 5, markets: [], props_only: false, min_conf: null, default_conf: false, min_price: null, default_floor: false}), rS = run(spS, a[1]);
+          var gS = (fut.filter(onT)[0] || {}).matchup || 'that game';
+          res.note = 'Onyx has not posted player props for ' + gS + ' yet, and a same-game parlay needs them' + (rS.rows.length ? ', so these are its game lines.' : '.');
+          if (rS.rows.length) { var nS = res.note; res = rS; spec = spS; res.widened = true; res.note = nS; }
+        }
         else res.note = 'Nothing on the board fits all of that right now. Try fewer rules, a different market, or another day.';
       }
       // a payout no leg set on the board can reach at its per-leg share (2 legs at +1000 need +232 each):
