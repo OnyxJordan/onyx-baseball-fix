@@ -597,7 +597,7 @@
     if (mx3 && +mx3[1] >= 2) tgv = (+mx3[1] - 1) * 100;
     if (tgv && /parlay|ticket|legs?\b|legger|sgp|round/.test(t)) { if (s.intent === 'list') s.intent = 'parlay'; s.target_price = tgv; }
     // how many
-    var tC = t.replace(/\b(pac|big|atlantic)[\s-]?(10|12)\b/g, ' ').replace(/\ba[\s-]?10\b(?!\s*(leg|legs|legger|picks?|plays?|bets?|team|teams|man|folds?|way))/g, ' ').replace(/\b\d{1,3}\s*(?:to|-|:)\s*1\b/g, ' ').replace(/\$?\s*\d+\s*(?:dollars|bucks)?\s*(?:into|to make|to win)\s*\$?\s*\d+/g, ' ');
+    var tC = t.replace(/\bthree[\s-]?(point|pt|pointer)(s|ers?)?\b|\b3[\s-]?(point|pt|pointer)(ers?)?\b(?!s)/g, ' threept ').replace(/\b(pac|big|atlantic)[\s-]?(10|12)\b/g, ' ').replace(/\ba[\s-]?10\b(?!\s*(leg|legs|legger|picks?|plays?|bets?|team|teams|man|folds?|way))/g, ' ').replace(/\b\d{1,3}\s*(?:to|-|:)\s*1\b/g, ' ').replace(/\$?\s*\d+\s*(?:dollars|bucks)?\s*(?:into|to make|to win)\s*\$?\s*\d+/g, ' ');
     var n = tC.match(/\b(\d{1,2})[\s-]*(leg|legs|legger|picks?|plays?|players?|bets?|team|man|teamer|folds?|way)\b/) || tC.match(/\b(?:top|best|safest|surest)\s*(\d{1,2})\b(?!\s*(\+|%|percent|or more|(points|rebounds|assists|yards|receptions)\s*(\+|or more|for|per|a game|plus\b)))/)
       || tC.match(/\b(\d{1,2})\s+(?:best|safest|top|surest)\b/)
       // "7 highest projected ...", "3 positive value ..." (11/8 list test: read as 5)
@@ -671,7 +671,7 @@
       [/\bpra\b|\bp ?\+ ?r ?\+ ?a\b|\b(points|pts) ?(,|\+|plus|&)? ?(rebounds|reb|rebs|boards) ?(,|\+|plus|&|and) ?(assists|ast|dimes)\b/, 'pra', ['pts', 'reb', 'ast']],
       [/\bp ?\+ ?r\b|\b(points|pts) ?(\+|plus|&) ?(rebounds|reb|rebs|boards)\b/, 'pr', ['pts', 'reb']],
       [/\bp ?\+ ?a\b|\b(points|pts) ?(\+|plus|&) ?(assists|ast|dimes)\b/, 'pa', ['pts', 'ast']],
-      [/\bthrees\b|\btreys?\b|\b3s\b|\b3[\s-]?(pointers?|pt|pts)\b|\bthree[\s-]?pointers?\b|\b3pm\b|\bthree[\s-]?point(s|er)? (shooters?|shots?|makers?|makes|made)\b|\b(3|three)[\s-]?point shooting\b/, 'threes', ['pts']]];
+      [/\bthrees\b|\btreys?\b|\b3s\b|\b3[\s-]?(pointers?|pt|pts)\b|\bthree[\s-]?pointers?\b|\b3pm\b|\bthree[\s-]?point(s|er)? (shooters?|shots?|makers?|makes|made)\b|\b(3|three)[\s-]?point shooting\b|\b(3|three)[\s-]?point (props?|overs?|unders?|lines?|bets?|plays?|picks?|leaders?|guys|parlay)\b/, 'threes', ['pts']]];
     for (var nx = 0; nx < NBX.length; nx++) if (NBX[nx][0].test(t) && s.markets.indexOf(NBX[nx][1]) < 0) {
       if (NBX[nx][1] === 'pr' && s.markets.indexOf('pra') >= 0) continue;
       if (NBX[nx][1] === 'pa' && s.markets.indexOf('pra') >= 0) continue;

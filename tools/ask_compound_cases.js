@@ -90,5 +90,8 @@ module.exports = [
   C('best pra unders', {sports: ['nba'], markets: ['pra'], side: 'under'}),
   C('who wins lakers hawks', {sports: ['nba'], markets: ['ml'], count: 1}),
   C('who covers nuggets rockets', {sports: ['nba'], markets: ['spread'], count: 1}),
-  C('doncic or curry points', {sports: ['nba'], markets: ['pts']})
+  C('doncic or curry points', {sports: ['nba'], markets: ['pts']}),
+  C('best three point shooters tonight', {sports: ['nba'], markets: ['threes'], side: 'over', count: 5}),
+  C('top 3 three point shooters', {sports: ['nba'], markets: ['threes'], count: 3}),
+  C('3 point props', {sports: ['nba'], markets: ['threes']})
 ];
