@@ -1453,5 +1453,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186755-spread-away",
+  "sport": "tennis",
+  "gid": "186755",
+  "date": "2026-11-09",
+  "logged_at": "2026-11-09T20:25:25+00:00",
+  "matchup": "Yuliana Lizarazo vs Irene Burillo",
+  "home": "Irene Burillo",
+  "away": "Yuliana Lizarazo",
+  "label": "Yuliana Lizarazo +6.5 games",
+  "kind": "spread",
+  "side": "away",
+  "line": 6.5,
+  "price": -165,
+  "chance": 0.686,
+  "implied": 0.6226,
+  "edge": 0.063,
+  "fair": -220,
+  "state": {
+   "sets": "2-4",
+   "srv": null,
+   "need": 2
+  },
+  "pre_src": null,
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
