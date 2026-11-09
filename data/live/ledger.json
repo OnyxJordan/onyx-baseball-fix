@@ -19305,10 +19305,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "223",
+  "profit": -1.0,
+  "graded_at": "2026-11-09T03:36:56+00:00"
  },
  {
   "id": "nba-401909948-spread-home",
@@ -19336,10 +19336,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "130-93",
+  "profit": 0.9524,
+  "graded_at": "2026-11-09T03:36:56+00:00"
  },
  {
   "id": "nhl-401892676-spread-home",
@@ -19584,10 +19584,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "158",
+  "profit": 0.8333,
+  "graded_at": "2026-11-09T03:36:56+00:00"
  },
  {
   "id": "nba-401909949-spread-away",
@@ -19615,10 +19615,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "97-117",
+  "profit": -1.0,
+  "graded_at": "2026-11-09T03:36:57+00:00"
  },
  {
   "id": "nba-401909951-total-over",
@@ -19769,6 +19769,68 @@
    "f": 0.274
   },
   "pre_src": null,
+  "model": "live-v6",
+  "result": "W",
+  "actual": "154",
+  "profit": 0.8,
+  "graded_at": "2026-11-09T03:36:57+00:00"
+ },
+ {
+  "id": "nfl-401873050-ml-away",
+  "sport": "nfl",
+  "gid": "401873050",
+  "date": "2026-11-08",
+  "logged_at": "2026-11-09T03:36:54+00:00",
+  "matchup": "TB @ CHI",
+  "home": "CHI",
+  "away": "TB",
+  "label": "TB to win",
+  "kind": "ml",
+  "side": "away",
+  "line": null,
+  "price": 380,
+  "chance": 0.2595,
+  "implied": 0.2083,
+  "edge": 0.051,
+  "fair": 285,
+  "state": {
+   "score": "TB 13 - 17 CHI",
+   "period": 3,
+   "clock": "5:33",
+   "f": 0.343
+  },
+  "pre_src": "onyx",
+  "model": "live-v6",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "nba-401909950-total-over",
+  "sport": "nba",
+  "gid": "401909950",
+  "date": "2026-11-08",
+  "logged_at": "2026-11-09T03:36:54+00:00",
+  "matchup": "NO @ LAC",
+  "home": "LAC",
+  "away": "NO",
+  "label": "Over 240.5",
+  "kind": "total",
+  "side": "over",
+  "line": 240.5,
+  "price": -110,
+  "chance": 0.5759,
+  "implied": 0.5238,
+  "edge": 0.052,
+  "fair": -135,
+  "state": {
+   "score": "NO 67 - 72 LAC",
+   "period": 3,
+   "clock": "9:53",
+   "f": 0.456
+  },
+  "pre_src": "onyx",
   "model": "live-v6",
   "result": null,
   "actual": null,
