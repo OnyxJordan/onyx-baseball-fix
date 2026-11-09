@@ -2921,7 +2921,7 @@
        "win": false,
        "sets": [
         6,
-        1
+        4
        ],
        "serve": false
       },
@@ -2933,7 +2933,7 @@
        "win": false,
        "sets": [
         7,
-        0
+        5
        ],
        "serve": true
       }
@@ -2941,9 +2941,9 @@
     },
     {
      "id": "187382",
-     "start": "2026-11-09T21:30Z",
+     "start": "2026-11-09T22:00Z",
      "state": "pre",
-     "detail": "11/9 - 4:30 PM EST",
+     "detail": "11/9 - 5:00 PM EST",
      "round": "Group Stage",
      "draw": "Women's Singles",
      "court": "Indian Wells Tennis Garden",
@@ -3690,8 +3690,8 @@
     {
      "id": "186755",
      "start": "2026-11-09T19:55Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Main Court",
@@ -3713,12 +3713,12 @@
        "short": "I. Burillo",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        5
+        6
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -4060,9 +4060,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Irene Burillo",
+       "short": "I. Burillo",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -4392,5 +4392,5 @@
    ]
   }
  ],
- "fetched": "2026-11-09T21:23:33+00:00"
+ "fetched": "2026-11-09T21:56:12+00:00"
 }
