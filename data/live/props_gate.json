@@ -1,0 +1,32 @@
+{
+ "passed": false,
+ "n": 0,
+ "w": 0,
+ "l": 0,
+ "units": 0,
+ "roi": null,
+ "by_half": [
+  {
+   "n": 0,
+   "w": 0,
+   "l": 0,
+   "units": 0,
+   "roi": null,
+   "from": null,
+   "to": null
+  },
+  {
+   "n": 0,
+   "w": 0,
+   "l": 0,
+   "units": 0,
+   "roi": null,
+   "from": null,
+   "to": null
+  }
+ ],
+ "version": "props-v1",
+ "at": "2026-11-09T16:24:35Z",
+ "pending": 0,
+ "rule": "60+ graded live prop value plays (data/live/ledger.json, kind prop) logged under prop params props-v1, ROI +2% or better at the logged price, profitable in both halves split by date. Until it passes, the pages show live props as projections, \"Value untested\"."
+}

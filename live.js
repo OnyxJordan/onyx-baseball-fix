@@ -488,9 +488,39 @@
   // .6668, college .5761 -> .5748 (SD -> .35 x proj + 18, PK .9). Every changed market better on both
   // held-out halves. Catches and passing yards: no fit held up on held-out games, left as they were.
   // Thin: 16 NFL games. Not tested against live prices (none archived).
+  // These are the built-in defaults. data/live/prop_params.json (the same numbers today, version
+  // props-v1) replaces them when it loads: the weekly re-fit (live_props_retest.yml,
+  // tools/live_props_backtest.js --fit --write-params) writes a new version there only when it beats
+  // the current one on both held-out halves, and live_model.py (the live logger) reads the same file.
   var PVAR = {pts: 4, reb: 1.6, ast: 1.3, threes: 1.3, rec: 1.3};
   var PK = {pts: 0.95, reb: 0.9, ast: 0.85, rec_yds: 0.85, rush_yds: 0.9};
   var YSD = {rec_yds: [0.3, 12], rush_yds: [0.35, 18], pass_yds: [0.45, 12]};
+  var PROP_V = 'props-v1';
+  // the file's numbers, key by key, into the same objects (OnyxLive.PVAR etc. stay the live ones)
+  function setPropParams(j) {
+    if (!j || typeof j !== 'object') return false;
+    var put = function (dst, src, ok) { if (!src || typeof src !== 'object') return; for (var k in src) if (ok(src[k])) dst[k] = src[k]; };
+    var num = function (v) { return typeof v === 'number' && isFinite(v) && v > 0; };
+    put(PVAR, j.PVAR, num); put(PK, j.PK, num);
+    put(YSD, j.YSD, function (v) { return v && v.length === 2 && num(v[0]) && typeof v[1] === 'number' && isFinite(v[1]) && v[1] >= 0; });
+    if (j.version) PROP_V = String(j.version);
+    return true;
+  }
+  // Value on a live player prop is earned, not assumed: the page calls a prop "Value" only when
+  // data/live/props_gate.json (tools/live_props_backtest.js --gate) says the logged prop value plays
+  // passed for the prop parameters in use (60+ graded, ROI +2% or better at the logged price,
+  // profitable in both halves). Until then a prop shows as a projection, "Value untested".
+  var PROPS_GATE = {passed: false};
+  function setPropsGate(j) { PROPS_GATE = j && typeof j === 'object' ? j : {passed: false}; }
+  function propsLive() { return PROPS_GATE.passed === true && String(PROPS_GATE.version || '') === PROP_V; }
+  // both files load once, fail-soft, and never hold up the first card for more than 1.5 s
+  var PARAMS_P = null;
+  function propFiles() {
+    if (!PARAMS_P) PARAMS_P = Promise.all([
+      getJSON('data/live/prop_params.json').then(setPropParams).catch(function () { return false; }),
+      getJSON('data/live/props_gate.json').then(setPropsGate).catch(function () { return false; })]).catch(function () { return null; });
+    return Promise.race([PARAMS_P, new Promise(function (r) { setTimeout(r, 1500); })]);
+  }
   function propP(mkt, cur, proj, f, line) {
     var rem = Math.max(0, proj * (PK[mkt] || 1) * f), mean = cur + rem, sd, y = YSD[mkt] || [0.45, 12];
     if (/yds$/.test(mkt)) sd = (y[0] * proj + y[1]) * Math.sqrt(f);
@@ -539,7 +569,8 @@
         var q = pre.pp[key], me = bx[pn(x.sel)] || {}, nm = key.split('|')[0];
         if (x.m === 'anytime_td') {
           if ((me.td || 0) >= 1 || q.lam == null) return;     // already scored: the bet is settled
-          add({kind: 'prop', mkt: x.m, player: nm, label: nm + ' anytime TD', p: 1 - Math.exp(-q.lam * f), price: x.price,
+          if (x.side === 'no' || x.side === 'under') return;    // a "no TD" side is not the anytime bet we price
+          add({kind: 'prop', mkt: x.m, player: nm, side: 'yes', line: null, label: nm + ' anytime TD', p: 1 - Math.exp(-q.lam * f), price: x.price,
                start: q.o, start_txt: q.o != null ? fmt(q.o) : null});
           return;
         }
@@ -547,7 +578,7 @@
         var cur = me[x.m]; if (cur == null) cur = 0;
         if (me.fouls != null && me.fouls >= 6) return;          // fouled out
         var pov = propP(x.m, cur, q.j, f, x.pt), sd0 = x.side === 'over' ? q.o : q.u;
-        add({kind: 'prop', mkt: x.m, player: nm, label: nm + ' ' + (x.side === 'over' ? 'over ' : 'under ') + x.pt + ' ' + MKN[x.m], p: x.side === 'over' ? pov : 1 - pov,
+        add({kind: 'prop', mkt: x.m, player: nm, side: x.side, line: x.pt, label: nm + ' ' + (x.side === 'over' ? 'over ' : 'under ') + x.pt + ' ' + MKN[x.m], p: x.side === 'over' ? pov : 1 - pov,
              price: x.price, cur: cur, start: sd0, start_txt: q.l != null && sd0 != null ? (x.side === 'over' ? 'o' : 'u') + q.l + ' ' + fmt(sd0) : null});
       }
     });
@@ -560,7 +591,7 @@
   // attach .bets (best value first) to every live game; games without a live line keep bets = null
   function withBets(G) {
     var sports = G.map(function (g) { return g.sport; }).filter(function (s, i, a) { return a.indexOf(s) === i; });
-    var led = sports.indexOf('tennis') >= 0 ? ledger() : Promise.resolve(null);
+    var led = Promise.all([sports.indexOf('tennis') >= 0 ? ledger() : null, propFiles()]);
     return led.then(function () { return Promise.all(sports.map(lines)); }).then(function (LS) {
       var all = [].concat.apply([], LS);
       return Promise.all(G.map(function (g) {
@@ -602,7 +633,9 @@
   var TN_CONF = 0.65;
   // 11/6: live markets paused until they test positive (live_model.py PAUSED): tennis totals, college basketball spreads and moneylines
   var PAUSED = {'tennis|total': 1, 'cbb|spread': 1, 'cbb|ml': 1};
-  function isVal(b) { return b.edge >= VALUE && b.ok !== false; }
+  function isVal(b) { return b.edge >= VALUE && b.ok !== false && (b.kind !== 'prop' || propsLive()); }
+  // a player prop the price would call value, while prop value is still untested (props_gate.json)
+  function untested(b) { return b.kind === 'prop' && !propsLive(); }
   var NAME = {nfl: 'NFL', cfb: 'NCAAF', nba: 'NBA', nhl: 'NHL', cbb: 'NCAAB', tennis: 'Tennis'};
   var PAGE = {nfl: 'nfl.html', cfb: 'cfb.html', nba: 'nba.html', nhl: 'nhl.html', cbb: 'cbb.html', tennis: 'tennis.html'};
   var LIVE_SPORTS = ['nfl', 'cfb', 'nba', 'nhl', 'cbb', 'tennis'];
@@ -631,7 +664,8 @@
     '.lv-val{margin-left:auto;font:800 10px monospace;letter-spacing:.05em;color:#0b0710;background:#61e970;border-radius:999px;padding:3px 8px;white-space:nowrap}',
     '.lv-bets{display:flex;flex-direction:column;gap:6px;border-top:1px solid rgba(255,255,255,.08);padding-top:9px}',
     '.lv-bet{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 8px;align-items:center;font-size:13px;color:#e8e2f1}.lv-bet .s{grid-column:1;font:600 11px monospace;color:#a79fb5}.lv-bet .s b{color:#fff}',
-    '.lv-bet .lv-val{grid-column:2;grid-row:1/3}',
+    '.lv-bet .lv-val,.lv-bet .lv-unt{grid-column:2;grid-row:1/3}',
+    '.lv-unt{margin-left:auto;font:700 10px monospace;letter-spacing:.04em;color:#cfc8da;border:1px dashed #4a2d7a;border-radius:999px;padding:3px 8px;white-space:nowrap}',
     '.lv-best{display:flex;flex-direction:column;gap:8px;margin-top:12px}.lv-best .lv-bet{background:#141019;border:1px solid #4a2d7a;border-radius:12px;padding:10px 12px}',
     '.lv-f{display:flex;gap:8px;flex-wrap:wrap}.lv-f a{font:700 11px monospace;color:#d795ff;text-decoration:none;border:1px solid #3a2a55;border-radius:999px;padding:6px 11px}',
     '.lv-f a.go{background:#a24bff;border-color:#a24bff;color:#fff}',
@@ -663,7 +697,7 @@
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]; }); }
   function pct(x) { return x == null ? '-' : x < 0.01 ? 'under 1%' : x > 0.99 ? 'over 99%' : Math.round(100 * x) + '%'; }
   function pr(x) { return x == null ? '-' : x > 0 ? '+' + x : String(x); }
-  function badge(b) { return isVal(b) ? '<span class="lv-val">Value +' + Math.round(b.edge * 100) + '%</span>' : ''; }
+  function badge(b) { return isVal(b) ? '<span class="lv-val">Value +' + Math.round(b.edge * 100) + '%</span>' : untested(b) ? '<span class="lv-unt">Value untested</span>' : ''; }
   function logoImg(u, cls) { return u ? '<img class="' + (cls || 'lv-lg') + '" src="' + esc(u) + '" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">' : '<span class="' + (cls || 'lv-lg') + ' lv-nolg"></span>'; }
   var ONYX = 'https://app.onyxodds.com/?referrer=' + REF;
   function onyxSel(sel) { return sel ? 'https://app.onyxodds.com/share?selection=' + encodeURIComponent(sel) + '&referrer=' + REF : ONYX; }
@@ -732,12 +766,13 @@
     } else
     if (g.bets && g.bets.length && g.bets[0].edge > -0.05) {
       var top = B[0] || g.bets[0], rest = (B.length ? B : g.bets).slice(1, 4);
-      lean = '<div class="lv-lean' + (isVal(top) ? '' : ' none') + '"><div class="lv-k">' + (isVal(top) ? 'Live value &middot; projection' : top.ok === false && top.edge >= VALUE ? 'Too close to call' : 'No value right now') + '</div>'
+      var ut = untested(top);
+      lean = '<div class="lv-lean' + (isVal(top) ? '' : ' none') + '"><div class="lv-k">' + (isVal(top) ? 'Live value &middot; projection' : ut ? 'Live projection &middot; player prop' : top.ok === false && top.edge >= VALUE ? 'Too close to call' : 'No value right now') + '</div>'
         + '<div class="lv-pick">' + (top.logo ? logoImg(top.logo, 'lv-lg sm') : '') + '<b>' + esc(top.label) + '</b>' + badge(top) + '</div>'
         + '<div class="lv-steps"><div><small>Started</small><b>' + esc(top.start_txt || '-') + '</b><span>' + (pre.src === 'market' ? 'Market pregame' : 'Onyx pregame') + '</span></div>'
         + '<div><small>Live line</small><b>' + pr(top.price) + '</b><span>' + pct(implied(top.price)) + ' implied</span></div>'
         + '<div class="fair"><small>Our fair</small><b>' + pr(top.fair) + '</b><span>' + pct(top.p) + ' to hit</span></div></div>'
-        + '<div class="lv-verdict">' + (top.ok === false && top.edge >= VALUE ? 'The price has value, but our chance is only ' + pct(top.p) + ': our tennis bar is 65% or better, so this one is a pass.' : isVal(top) ? 'Value by our numbers: the live line of <b>' + pr(top.price) + '</b> pays more than our fair price of <b>' + pr(top.fair) + '</b>.' : 'The closest one: the live line of ' + pr(top.price) + ' pays less than our fair price of ' + pr(top.fair) + '. It turns into value at ' + pr(top.fair) + ' or better.') + '</div>'
+        + '<div class="lv-verdict">' + (ut ? 'A projection, not a value call: our chance is ' + pct(top.p) + ', a fair price of <b>' + pr(top.fair) + '</b>. Value untested: live player-prop prices have not passed our test yet, so we do not call one value.' : top.ok === false && top.edge >= VALUE ? 'The price has value, but our chance is only ' + pct(top.p) + ': our tennis bar is 65% or better, so this one is a pass.' : isVal(top) ? 'Value by our numbers: the live line of <b>' + pr(top.price) + '</b> pays more than our fair price of <b>' + pr(top.fair) + '</b>.' : 'The closest one: the live line of ' + pr(top.price) + ' pays less than our fair price of ' + pr(top.fair) + '. It turns into value at ' + pr(top.fair) + ' or better.') + '</div>'
         + (rest.length ? '<div class="lv-bets">' + rest.map(function (b) { return '<div class="lv-bet"><span class="n">' + esc(b.label) + '</span><span class="s">' + (b.start_txt ? esc(b.start_txt) + ' &rarr; ' : '') + '<b>' + pr(b.price) + '</b> &middot; fair ' + pr(b.fair) + '</span>' + badge(b) + '</div>'; }).join('') + '</div>' : '') + '</div>';
     } else if (g.bets && g.bets.length) {
       lean = '<div class="lv-lean none"><div class="lv-k">No value right now</div><div class="lv-verdict">Every live line on this game pays less than our fair price. We will flag it here the moment one moves past it.</div></div>';
@@ -778,15 +813,16 @@
   function blockHTML(sport, G, opt) {
     opt = opt || {};
     var all = [].concat.apply([], G.map(function (g) { return (g.bets || []).map(function (b) { return {b: b, g: g}; }); })).sort(function (x, y) { return y.b.edge - x.b.edge; });
-    var val = all.filter(function (x) { return isVal(x.b); }).slice(0, 4), near = all.filter(function (x) { return !isVal(x.b); }).slice(0, 3);
+    var val = all.filter(function (x) { return isVal(x.b); }).slice(0, 4), near = all.filter(function (x) { return !isVal(x.b) && !untested(x.b); }).slice(0, 3);
+    var pu = all.some(function (x) { return untested(x.b); });
     var priced = G.some(function (g) { return g.bets; });
     var h = '<div class="lvb-h"><div><span class="lvb-eb' + (G.length ? '' : ' off') + '"><i></i>' + (G.length ? 'Live now &middot; ' + G.length + ' ' + (sport === 'tennis' ? 'match' + (G.length === 1 ? '' : 'es') : 'game' + (G.length === 1 ? '' : 's')) + ' in play' : 'Live') + '</span>'
       + '<h3>' + (!G.length ? 'Nothing live right now' : val.length ? 'Value right now' : 'No live value right now') + '</h3></div></div>';
     if (!G.length) return h + '<div class="lvb-note">Live value shows here the moment a ' + (sport === 'tennis' ? 'match' : 'game') + ' starts: our live chance against the live line, every 30 seconds. ' + UNTESTED + '</div>' + (opt.rec || '');
-    h += '<div class="lvb-note"><b>' + UNTESTED + '</b> Our live chance starts from Onyx\'s pregame line (the market line when Onyx has none) and moves with the ' + (sport === 'tennis' ? 'sets, games and server' : 'score and the clock') + '. The live line is the in-game market (Onyx\'s in-game prices are not in our feed), so confirm the price in the Onyx app before you bet.</div>';
+    h += '<div class="lvb-note"><b>' + UNTESTED + '</b> Our live chance starts from Onyx\'s pregame line (the market line when Onyx has none) and moves with the ' + (sport === 'tennis' ? 'sets, games and server' : 'score and the clock') + '. The live line is the in-game market (Onyx\'s in-game prices are not in our feed), so confirm the price in the Onyx app before you bet.' + (pu ? ' Player props are projections only, <b>Value untested</b>, until the logged live prop plays pass our test.' : '') + '</div>';
     if (val.length) h += val.map(function (x) { return '<div class="lvb-v"><p>' + sentence(x.b, x.g) + '</p><a class="lvb-go" href="' + ONYX + '" target="_blank" rel="noopener">Open on Onyx</a></div>'; }).join('');
-    else if (near.length) h += '<div class="lvb-v none"><p><b>No live value right now.</b> Every live line pays less than our fair price. The closest lines:<small>' + near.map(function (x) { return esc(x.b.label) + ' ' + pr(x.b.price) + ' (our chance ' + pct(x.b.p) + ', line ' + pct(implied(x.b.price)) + ')'; }).join(' &middot; ') + '</small></p></div>';
-    else h += '<div class="lvb-v none"><p><b>No live value right now.</b>' + (priced ? ' No live line we can price right now.' : ' The live line is not posted for these ' + (sport === 'tennis' ? 'matches' : 'games') + ' yet; our live chances are on the cards below.') + '</p></div>';
+    else if (near.length) h += '<div class="lvb-v none"><p><b>No live value right now.</b> Every live ' + (pu ? 'game ' : '') + 'line pays less than our fair price. The closest lines:<small>' + near.map(function (x) { return esc(x.b.label) + ' ' + pr(x.b.price) + ' (our chance ' + pct(x.b.p) + ', line ' + pct(implied(x.b.price)) + ')'; }).join(' &middot; ') + '</small></p></div>';
+    else h += '<div class="lvb-v none"><p><b>No live value right now.</b>' + (priced ? (pu ? ' Only player props are priced right now, and their value is untested: our chances are on the cards below.' : ' No live line we can price right now.') : ' The live line is not posted for these ' + (sport === 'tennis' ? 'matches' : 'games') + ' yet; our live chances are on the cards below.') + '</p></div>';
     var n = opt.limit || 4, shown = sortGames(G.slice()).slice(0, opt.all ? 99 : n);
     h += '<div class="lv-list">' + shown.map(card).join('') + '</div>';
     if (G.length > n) h += '<button type="button" class="lvb-more" data-lvb-more>' + (opt.all ? 'Show fewer' : 'Show all ' + G.length + ' live') + '</button>';
@@ -804,7 +840,7 @@
       : getJSON('data/live/ledger.json').then(function (j) { LED0 = Array.isArray(j) ? j : (j && j.plays) || []; LED0_AT = Date.now(); return LED0; }).catch(function () { return LED0 || []; });
     var now = Date.now() - NOW_AT < 60e3 ? Promise.resolve(NOWROWS)
       : fetch(NOW_URL).then(function (r) { if (!r.ok) throw r; return r.json(); }).then(function (j) { NOWROWS = Array.isArray(j) ? j : []; NOW_AT = Date.now(); return NOWROWS; }).catch(function () { return NOWROWS; });
-    return Promise.all([base, now]).then(function (r) {
+    return Promise.all([base, now, propFiles()]).then(function (r) {
       var have = {};
       r[0].forEach(function (x) { if (x.sport === 'tennis') have[String(x.gid)] = 1; });
       LEDGER = r[0].concat(r[1].filter(function (x) { return x.sport === 'tennis' && !have[String(x.gid)]; }));
@@ -826,7 +862,9 @@
     return rows.filter(function (r) { return r.sport !== 'tennis' || first[String(r.gid)] === r; });
   }
   function record(rows, sport) {
-    rows = onePerMatch(rows || []);
+    // live player props count only once their value has passed the test (props_gate.json): until then
+    // the page never called one value, so they are logged (that is the test's sample) but not in this record
+    rows = onePerMatch(rows || []).filter(function (r) { return r.kind !== 'prop' || propsLive(); });
     var R = rows.filter(function (r) { return !sport || sport === 'all' || r.sport === sport; }), a = {w: 0, l: 0, p: 0, pend: 0, units: 0, n: R.length};
     R.forEach(function (r) { if (r.result === 'W') { a.w++; a.units += r.price > 0 ? r.price / 100 : 100 / -r.price; } else if (r.result === 'L') { a.l++; a.units -= 1; } else if (r.result === 'P' || r.result === 'V') a.p++; else a.pend++; });
     a.units = Math.round(a.units * 100) / 100; a.roi = a.w + a.l ? a.units / (a.w + a.l) : null; return a;
@@ -891,6 +929,7 @@
   }
 
   window.OnyxLive = {left: left, model: model, plays: plays, noVig: noVig, implied: implied, phi: phi, games: games, pregame: pregame, american: american, lean: lean, bets: bets, propP: propP, PVAR: PVAR, PK: PK, YSD: YSD,
+    setPropParams: setPropParams, setPropsGate: setPropsGate, propFiles: propFiles, propsLive: propsLive, untested: untested, propVersion: function () { return PROP_V; }, propsGate: function () { return PROPS_GATE; },
     SD: SD, PACE: PACE, TOTK: TOTK, LEN: LEN, ML_PTS: ML_PTS, DEF_TOTAL: DEF_TOTAL, FMIN: FMIN, tn: tn, VALUE: VALUE, TN_CONF: TN_CONF, isVal: isVal, card: card, block: blockHTML, spot: spotHTML, sentence: sentence, sortGames: sortGames,
     css: css, mount: mount, ledger: ledger, onePerMatch: onePerMatch, record: record, recordHTML: recordHTML, NAME: NAME, PAGE: PAGE, SPORTS: LIVE_SPORTS};
 })();

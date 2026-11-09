@@ -13,19 +13,42 @@
 // Value calls: live.js bets() run on the PREGAME Onyx prices at the opening moment only (there is no
 // archive of in-game prices), graded at those prices.
 //   node tools/live_props_backtest.js [--sports=nba,nfl,cfb] [--cache=dir] [--out=report.json]
-//                                     [--dump=moments.json] [--fit]
+//                                     [--dump=moments.json] [--fit] [--write-params] [--gate]
+// Pricing uses data/live/prop_params.json (the numbers the page and live_model.py use), else live.js's
+// built-in defaults.
+//   --fit           also refits PVAR / PK / YSD per market (one half of the games, scored on the other,
+//                   both ways). The moments are the archive's rebuilt ones plus, when it has them, every
+//                   snapshot in data/live/prop_snaps.json (live_log.py: real live lines and prices, graded
+//                   on ESPN's final box score), which also get a calibration report against the live price.
+//   --write-params  with --fit: writes data/live/prop_params.json with a bumped version ONLY when, for
+//                   at least one market, the refit beats the current numbers on BOTH held-out halves
+//                   (by MIN_GAIN log loss each), and only those markets change. A new version resets the
+//                   gate's sample (the gate counts plays logged under the version in use).
+//   --gate          grades the prop value plays in data/live/ledger.json (live_log.py, kind "prop") for
+//                   the current prop_params version and writes data/live/props_gate.json. Rule: 60+
+//                   graded plays, ROI +2% or better at the logged price, profitable in both halves
+//                   (by date). live.js calls a live prop "Value" only when it says passed. Alone, --gate
+//                   reads no network.
 // NBA archive keys are date+hash; the ESPN event is found on that day's scoreboard by matchup.
 const fs = require('fs'), path = require('path'), { execFile } = require('child_process');
 const arg = (k, d) => { const a = process.argv.find(x => x.startsWith('--' + k + '=')); return a ? a.split('=').slice(1).join('=') : d; };
 global.window = {}; global.fetch = () => Promise.reject(new Error('offline'));
 // live.js wires a click handler on load (the page's "Bet" taps); node has no document
 global.document = global.document || { addEventListener() {}, querySelector() { return null; }, getElementById() { return null; } };
-require(path.join(__dirname, '..', 'live.js'));
-const L = window.OnyxLive;
 const ROOT = path.join(__dirname, '..');
+require(path.join(ROOT, 'live.js'));
+const L = window.OnyxLive;
 const ESPN = 'https://site.api.espn.com/apis/site/v2/sports/';
 const PATHS = { nba: 'basketball/nba', nfl: 'football/nfl', cfb: 'football/college-football' };
-const CACHE = arg('cache', '/tmp/claude-0/-home-user/14eaa11d-8a0b-551a-a7a2-bd87e2dc2550/scratchpad/liveprops/cache');
+const CACHE = arg('cache', path.join(require('os').tmpdir(), 'liveprops-cache'));
+// the shared parameters (data/live/prop_params.json), so the fit starts from what is live
+const PARAMS_F = path.join(ROOT, 'data', 'live', 'prop_params.json'), GATE_F = path.join(ROOT, 'data', 'live', 'props_gate.json');
+const LEDGER_F = path.join(ROOT, 'data', 'live', 'ledger.json'), SNAPS_F = path.join(ROOT, 'data', 'live', 'prop_snaps.json');
+const readJ = (f, d) => { try { return JSON.parse(fs.readFileSync(f, 'utf8')); } catch (_) { return d; } };
+const PARAMS0 = readJ(PARAMS_F, null);
+if (PARAMS0) L.setPropParams(PARAMS0);
+const MIN_GAIN = 0.0005;      // held-out log loss a refit must win by, on each half, to replace a market's numbers
+const GATE = { n: 60, roi: 0.02 };
 const SPORTS = arg('sports', 'nba,nfl,cfb').split(',');
 const ELAPSED = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9];
 fs.mkdirSync(CACHE, { recursive: true });
@@ -273,6 +296,82 @@ function valueCall(sport, gid, nm, mkt, q, cur, fin) {
   });
 }
 
+// prop_snaps.json (live_log.py) -> moments with a real live line and its prices, graded on ESPN's final
+async function snapRows() {
+  const S = readJ(SNAPS_F, null), out = [];
+  if (!S || !S.days) return out;
+  const fin = {};
+  for (const day of Object.values(S.days)) {
+    for (const r of day.r || []) {
+      const k = (day.k || [])[r[1]]; if (!k) continue;
+      const [sport, gid, player, mkt, proj] = k, [t, , line, over, under, p, cur, f] = r;
+      if (!PATHS[sport]) continue;
+      if (!(gid in fin)) {
+        const d = await cached(sport + '_' + gid, ESPN + PATHS[sport] + '/summary?event=' + gid, isPost);
+        fin[gid] = d && isPost(d) ? boxOf(sport, d) : null;
+      }
+      const B = fin[gid]; if (!B) continue;
+      const o = Object.values(B).find(x => pn(x.name) === pn(player));
+      if (!o || o.dnp || (sport !== 'nba' && !o.cat)) continue;
+      const sk = mkt === 'anytime_td' ? 'td' : mkt, v = o.s[sk];
+      if (v == null || isNaN(v)) continue;
+      if (mkt === 'anytime_td') { out.push({ sport, gid, player, mkt, f, cur: 0, j: proj, line: 0.5, kind: 'td', p, y: v >= 1 ? 1 : 0, over, under, t }); continue; }
+      if (line == null || v === line) continue;
+      out.push({ sport, gid, player, mkt, f, cur, j: proj, line, kind: 'snap', p, y: v > line ? 1 : 0, over, under, nv: over != null && under != null ? L.noVig(over, under) : null, t });
+    }
+  }
+  return out;
+}
+
+// --gate: the prop value plays live_log.py logged, for the prop parameters in use
+function gate() {
+  const led = readJ(LEDGER_F, []), ver = L.propVersion();
+  const R = (Array.isArray(led) ? led : []).filter(r => r.kind === 'prop' && r.prop_model === ver && (r.result === 'W' || r.result === 'L'))
+    .sort((a, b) => String(a.logged_at).localeCompare(String(b.logged_at)));
+  const units = r => r.result === 'W' ? (r.price > 0 ? r.price / 100 : 100 / -r.price) : -1;
+  const sum = X => { const w = X.filter(r => r.result === 'W').length, u = X.reduce((s, r) => s + units(r), 0);
+    return { n: X.length, w, l: X.length - w, units: +u.toFixed(2), roi: X.length ? +(u / X.length).toFixed(4) : null,
+             from: X.length ? String(X[0].date || X[0].logged_at).slice(0, 10) : null, to: X.length ? String(X[X.length - 1].date || X[X.length - 1].logged_at).slice(0, 10) : null }; };
+  // halves by date: the earlier days and the later days, a day never split (the split day goes to the half that keeps them closest in size)
+  const days = [...new Set(R.map(r => String(r.date || r.logged_at).slice(0, 10)))].sort();
+  let cut = 0, best = Infinity;
+  for (let i = 1; i < days.length; i++) { const a = R.filter(r => String(r.date || r.logged_at).slice(0, 10) < days[i]).length, d = Math.abs(2 * a - R.length); if (d < best) { best = d; cut = i; } }
+  const H = days.length > 1 ? [R.filter(r => String(r.date || r.logged_at).slice(0, 10) < days[cut]), R.filter(r => String(r.date || r.logged_at).slice(0, 10) >= days[cut])] : [R, []];
+  const all = sum(R), by_half = H.map(sum);
+  const passed = all.n >= GATE.n && all.roi >= GATE.roi && by_half.every(h => h.n > 0 && h.units > 0);
+  const out = { passed, n: all.n, w: all.w, l: all.l, units: all.units, roi: all.roi, by_half, version: ver, at: new Date().toISOString().slice(0, 19) + 'Z',
+    pending: (Array.isArray(led) ? led : []).filter(r => r.kind === 'prop' && r.prop_model === ver && !r.result).length,
+    rule: `${GATE.n}+ graded live prop value plays (data/live/ledger.json, kind prop) logged under prop params ${ver}, ROI +${GATE.roi * 100}% or better at the logged price, profitable in both halves split by date. Until it passes, the pages show live props as projections, "Value untested".` };
+  fs.writeFileSync(GATE_F, JSON.stringify(out, null, 1) + '\n');
+  console.log(`\nGATE ${ver}: ${out.passed ? 'PASSED' : 'not passed'}: ${all.n} graded (${all.w}-${all.l}, ${all.units}u, ROI ${all.roi == null ? '-' : (100 * all.roi).toFixed(1) + '%'}), halves ` +
+    by_half.map(h => `${h.n} ${h.units}u`).join(' / ') + `, ${out.pending} open -> ${path.relative(ROOT, GATE_F)}`);
+  return out;
+}
+
+// --write-params: adopt a market's refit only when it beats the current numbers on both held-out halves
+function writeParams(F, nGames) {
+  const P = PARAMS0 || { version: L.propVersion(), PVAR: Object.assign({}, L.PVAR), PK: Object.assign({}, L.PK), YSD: JSON.parse(JSON.stringify(L.YSD)) };
+  const nx = { PVAR: Object.assign({}, L.PVAR), PK: Object.assign({}, L.PK), YSD: JSON.parse(JSON.stringify(L.YSD)) }, changed = [];
+  for (const [mkt, x] of Object.entries(F)) {
+    if (!x.folds.every(f => f.n_test > 0 && f.test_fit <= f.test_now - MIN_GAIN)) continue;
+    const b = x.all_best.P, yds = /yds$/.test(mkt);
+    const before = yds ? { k: x.now.k, a: x.now.a, b: x.now.b } : { k: x.now.k, v: x.now.v }, after = yds ? { k: b.k, a: b.a, b: b.b } : { k: b.k, v: b.v };
+    if (JSON.stringify(before) === JSON.stringify(after)) continue;
+    nx.PK[mkt] = b.k;
+    if (yds) nx.YSD[mkt] = [b.a, b.b]; else nx.PVAR[mkt] = b.v;
+    changed.push(`${mkt} ${JSON.stringify(before)} -> ${JSON.stringify(after)} (held-out LL ${x.folds.map(f => f.test_now + ' -> ' + f.test_fit).join(', ')})`);
+  }
+  if (!changed.length) { console.log('\nwrite-params: no market beat the current numbers on both held-out halves; ' + path.relative(ROOT, PARAMS_F) + ' unchanged'); return false; }
+  const m = /^(.*?)(\d+)$/.exec(String(P.version || 'props-v1')), ver = m ? m[1] + (+m[2] + 1) : 'props-v2';
+  const out = { version: ver, at: new Date().toISOString().slice(0, 10), replaces: P.version || null,
+    evidence: `Weekly refit (tools/live_props_backtest.js --fit --write-params) on ${nGames}; each change won on both held-out halves by ${MIN_GAIN}+ log loss: ` + changed.join('; ') + '. A new version starts the prop value gate over.',
+    PVAR: nx.PVAR, PK: nx.PK, YSD: nx.YSD };
+  fs.writeFileSync(PARAMS_F, JSON.stringify(out, null, 1) + '\n');
+  L.setPropParams(out);
+  console.log(`\nwrite-params: ${P.version} -> ${ver}\n  ` + changed.join('\n  '));
+  return true;
+}
+
 // ── grading ──
 const ll = (p, y) => { p = Math.min(0.999, Math.max(0.001, p)); return -(y ? Math.log(p) : Math.log(1 - p)); };
 function grade(R, key = 'p') {
@@ -317,13 +416,17 @@ function fit(rows) {
       return { fit_on: h, n_train: tr.length, n_test: te.length, games_test: new Set(te.map(r => r.gid)).size, fitted: best.P,
                test_now: +score(te, now).toFixed(4), test_fit: +score(te, best.P).toFixed(4) };
     });
-    out[mkt] = { now, all_now: +score(R, now).toFixed(4), folds };
+    let all_best = null; for (const P of grid) { const s = score(R, P); if (!all_best || s < all_best.s) all_best = { s: +s.toFixed(4), P }; }
+    out[mkt] = { now, all_now: +score(R, now).toFixed(4), all_best, n: R.length, games: new Set(R.map(r => r.gid)).size, folds };
   }
   return out;
 }
 
 (async () => {
-  const report = { at: new Date().toISOString(), moments: ELAPSED, sports: {} }, ALL = [];
+  const FIT = process.argv.includes('--fit'), GATE_ONLY = process.argv.includes('--gate') && !FIT;
+  console.log(`prop params ${L.propVersion()}${PARAMS0 ? ' (data/live/prop_params.json)' : ' (live.js defaults)'}`);
+  if (GATE_ONLY) { gate(); return; }
+  const report = { at: new Date().toISOString(), params: L.propVersion(), moments: ELAPSED, sports: {} }, ALL = [];
   for (const sport of SPORTS) {
     const R = await sportRows(sport);
     ALL.push(...R.rows);
@@ -363,12 +466,26 @@ function fit(rows) {
     }
     for (const [m, x] of Object.entries(S.value)) console.log(`  value ${m.padEnd(10)} ${x.calls} calls ${x.won}-${x.lost}-${x.pushes} ${x.units}u ROI ${x.roi} (said ${x.mean_p}, edge ${x.mean_edge}; ${x.overs} overs ${x.unders} unders)`);
   }
-  if (process.argv.includes('--fit')) {
+  if (FIT) {
+    const SN = await snapRows();
+    if (SN.length) {
+      ALL.push(...SN);
+      const P = SN.filter(r => r.kind === 'snap' && r.nv != null && live(r));
+      report.snaps = { moments: SN.length, games: new Set(SN.map(r => r.gid)).size, ours: grade(SN.filter(live)), priced_both_sides: P.length,
+        vs_live_price: P.length ? { ours: grade(P), live_novig: grade(P, 'nv') } : null };
+      console.log(`\nSNAPSHOTS (data/live/prop_snaps.json): ${SN.length} graded moments from ${report.snaps.games} games` +
+        (P.length ? `; against the live line's no-vig price on ${P.length}: ours LL ${report.snaps.vs_live_price.ours.logloss} vs live ${report.snaps.vs_live_price.live_novig.logloss}` : ''));
+    }
     report.fit = fit(ALL);
     console.log('\nFIT (live moments 8%+ left, both lines; fit on one half of the games, scored on the other, both ways):');
     for (const [m, x] of Object.entries(report.fit))
       console.log(`  ${m.padEnd(9)} live.js now ${JSON.stringify(x.now)} LL ${x.all_now}  ` + x.folds.map(f => `| fit ${JSON.stringify(f.fitted)} held-out ${f.test_now} -> ${f.test_fit} (${f.games_test} games)`).join('  '));
   }
+  if (FIT && process.argv.includes('--write-params')) {
+    const ng = Object.entries(report.sports).map(([s, x]) => `${x.finished_games} ${s.toUpperCase()}`).join(', ') + ' archived games' + (report.snaps ? ` + ${report.snaps.games} games of live snapshots` : '');
+    report.params_written = writeParams(report.fit, ng);
+  }
+  if (process.argv.includes('--gate')) report.gate = gate();
   if (arg('dump', null)) fs.writeFileSync(arg('dump'), JSON.stringify(ALL));
   if (arg('out', null)) fs.writeFileSync(arg('out'), JSON.stringify(report, null, 1));
 })();

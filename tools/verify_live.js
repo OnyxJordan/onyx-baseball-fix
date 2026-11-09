@@ -17,7 +17,12 @@
 //             the next game never lowers the chance, the games distribution sums to 1, totals and
 //             spreads move the right way, best of 3 and 5
 //   parity    live_model.py (the live logger) gives the same chances as live.js (to 5e-5, the serve-rate fit's resolution) on a sample
-//             of every sport's states
+//             of every sport's states; player props too (11/9): propP and the anytime-TD chance on random states,
+//             and live_model.prop_bets against live.js bets() on generated games (same bets, same chances), both
+//             reading the same data/live/prop_params.json
+//   prop gate (11/9) a live prop is called Value only when data/live/props_gate.json passed for the prop params in
+//             use: gate off (or passed for another version) -> no Value badge, "Value untested", not in the
+//             value sentence or the live record; gate on -> Value badge, the value sentence, in the record
 //   pages     (11/3) the Live block on tennis.html and nba.html (the built pages) with a stubbed relay
 //             and a live-game fixture (tools/fixtures/live_tennis.json, a real ESPN + relay snapshot;
 //             live_nba.json, a game set in play): cards, the value sentence, the untested label, the
@@ -41,6 +46,7 @@ const srv = http.createServer((q, r) => { const p = path.join(root, decodeURICom
     return u.startsWith(base) ? rt.continue() : rt.abort(); });
   await pg.goto(base + '/home.html', { waitUntil: 'domcontentloaded' });
   await pg.waitForFunction(() => window.OnyxLive && typeof lvCard === 'function');
+  await pg.evaluate(() => OnyxLive.propFiles());      // data/live/prop_params.json and props_gate.json, as the page loads them
   const res = await pg.evaluate(([N, SEED]) => {
     let x = SEED >>> 0; const R = () => ((x = (x * 1664525 + 1013904223) >>> 0) / 4294967296);
     const pick = a => a[Math.floor(R() * a.length)], O = OnyxLive;
@@ -53,7 +59,7 @@ const srv = http.createServer((q, r) => { const p = path.join(root, decodeURICom
       tennis: [['Iga Swiatek', 'Iga Swiatek'], ['Coco Gauff', 'Coco Gauff'], ['Jannik Sinner', 'Jannik Sinner'], ['Carlos Alcaraz', 'Carlos Alcaraz']] };
     const TOT = { nba: [205, 245], nfl: [36, 54], cfb: [40, 70], nhl: [5.5, 6.5], cbb: [130, 165] }, LEN = { nba: [4, 12], nfl: [4, 15], cfb: [4, 15], nhl: [3, 20], cbb: [2, 20] };
     const PROPS = { nba: ['pts', 'reb', 'ast', 'threes'], nfl: ['anytime_td', 'rec', 'rec_yds', 'rush_yds', 'pass_yds'], cfb: ['anytime_td', 'rush_yds', 'rec_yds'], nhl: [], cbb: [], tennis: [] };
-    const SETS = [[6, 0], [6, 1], [6, 2], [6, 3], [6, 4], [7, 5], [7, 6]], PAR = [];
+    const SETS = [[6, 0], [6, 1], [6, 2], [6, 3], [6, 4], [7, 5], [7, 6]], PAR = [], PROPG = [];
     const PROJ = { pts: [8, 32], reb: [3, 13], ast: [2, 10], threes: [0.8, 4], rec: [2, 8], rec_yds: [20, 95], rush_yds: [15, 110], pass_yds: [180, 300] };
     const FMIN = { nfl: 0.15, cfb: 0.15, nba: 0.15, nhl: 0.15, cbb: 0.15 };
     const BOOKS = /DraftKings|FanDuel|BetMGM|Caesars|Pinnacle|ESPN ?Bet|bet365/i;
@@ -157,6 +163,9 @@ const srv = http.createServer((q, r) => { const p = path.join(root, decodeURICom
       let B;
       try { B = O.bets(g, { lines }, bx); } catch (e) { fail(g, 'bets threw ' + e.message); continue; }
       g.bets = B; counts.games++;
+      if (sport !== 'tennis' && g.f != null && PROPG.length < 600)
+        PROPG.push({ sport, f: g.f, pp, bx, lines: lines.filter(l => !/^(ml|spread|total)$/.test(l.m)).map(l => ({ m: l.m, sel: l.sel, side: l.side == null ? null : l.side, pt: l.pt == null ? null : l.pt, price: l.price })),
+          out: B.filter(b => b.kind === 'prop').map(b => ({ player: b.player, mkt: b.mkt, side: b.side, line: b.line == null ? null : b.line, price: b.price, p: b.p, edge: b.edge })) });
       // numbers and rules
       B.forEach((bt, k) => {
         counts.bets++; counts[bt.kind === 'prop' ? 'props' : bt.kind]++;
@@ -188,10 +197,52 @@ const srv = http.createServer((q, r) => { const p = path.join(root, decodeURICom
       if (B.length && B[0].edge > -0.05 && !(/Started/.test(text) && /Live line/.test(text) && /Our fair/.test(text))) fail(g, 'bet shown without Started / Live line / Our fair');
       if (i < 400) { if (!window.__keep) window.__keep = []; window.__keep.push(g); }
     }
+    // propP and the anytime-TD chance on random states, for the Python parity check
+    const PROPP = [];
+    for (let k = 0; k < 600; k++) {
+      const mkt = pick(['pts', 'reb', 'ast', 'threes', 'rec', 'rec_yds', 'rush_yds', 'pass_yds', 'blk']), [a, z] = PROJ[mkt] || [1, 4], proj = rnd(a, z), f = rnd(0.004, 1);
+      const cur = Math.round(proj * (1 - f) * rnd(0, 2)), line = Math.floor(cur + proj * f * rnd(0.5, 1.5)) + 0.5, lam = rnd(0.05, 1.2);
+      PROPP.push({ mkt, cur, proj, f, line, p: O.propP(mkt, cur, proj, f, line), lam, td: 1 - Math.exp(-lam * f) });
+    }
+    // the prop gate, both ways: a live prop whose price would be value (edge about 6 points)
+    const GATE = [], gate0 = O.propsGate(), V = O.propVersion();
+    {
+      const nm = 'Kalo Renmi', mkt = 'pts', proj = 24, f = 0.5, cur = 12, line = 20.5, pv = O.propP(mkt, cur, proj, f, line);
+      const M = O.model('nba', { hs: 60, as: 58, f, pre_margin: 2, pre_total: 228, pre_home_win: 0.55 });
+      const g = { sport: 'nba', gid: 'gate1', home: 'BOS', away: 'NY', hn: 'Boston Celtics', an: 'New York Knicks', hl: null, al: null, detail: 'Q3 0:00', f, hs: 60, as: 58,
+        pre: { pp: { [nm + '|' + mkt]: { l: 22.5, j: proj, o: -110, u: -110 } } }, M, home_win: M.win(), proj_total: M.proj_total, fair_spread: 'BOS -2' };
+      const lines = { lines: [{ m: mkt, sel: nm, side: 'over', pt: line, price: O.american(pv - 0.06) }] }, bx = { 'kalo renmi': { pts: cur, fouls: 2 } };
+      const rec = [{ id: 'x', sport: 'nba', gid: 'gate1', kind: 'prop', result: 'W', price: 100, logged_at: '2026-11-09T00:00:00+00:00' }];
+      for (const [name, G, want] of [['gate not passed', { passed: false, version: V }, false], ['gate passed', { passed: true, version: V }, true], ['gate passed for another version', { passed: true, version: V + '-old' }, false]]) {
+        O.setPropsGate(G);
+        const B = O.bets(g, lines, bx); g.bets = B;
+        const b = B[0], card = O.card(g), blk = O.block('nba', [g]), r = O.record(rec, 'all');
+        const bad = why => GATE.push(name + ': ' + why);
+        if (!b || b.kind !== 'prop' || !(b.edge >= O.VALUE)) { bad('test prop not priced at value (' + JSON.stringify(b) + ')'); continue; }
+        if (O.isVal(b) !== want) bad('isVal ' + O.isVal(b));
+        if (want) {
+          if (!/Value \+\d+%/.test(card)) bad('no Value badge on the card');
+          if (/Value untested/.test(card)) bad('"Value untested" on a passed prop');
+          if (!/Value right now: /.test(blk)) bad('no value sentence in the block');
+          if (r.n !== 1) bad('prop row not in the live record');
+        } else {
+          if (/Value \+\d+%/.test(card)) bad('Value badge on an untested prop');
+          if (!/Value untested/.test(card)) bad('card does not say "Value untested"');
+          if (/Live value &middot;/.test(card)) bad('card calls the untested prop live value');
+          if (!/Our fair/.test(card) || !/to hit/.test(card)) bad('untested prop card lacks our chance and fair price');
+          if (/Value right now: /.test(blk)) bad('value sentence for an untested prop');
+          if (!/Value untested/.test(blk)) bad('block does not say "Value untested"');
+          if (r.n !== 0) bad('untested prop row counted in the live record');
+        }
+        if (/—/.test(card + blk)) bad('em dash');
+      }
+      O.setPropsGate(gate0);
+    }
     // a real page of cards at phone width
     LV.games = lvSort(window.__keep); LV.sport = 'all'; lvRender();
     const over = document.documentElement.scrollWidth > innerWidth;
-    return { counts, fails, over, rendered: document.querySelectorAll('#lvList .lv-card').length, par: PAR };
+    return { counts, fails, over, rendered: document.querySelectorAll('#lvList .lv-card').length, par: PAR, propg: PROPG, propp: PROPP, gate: GATE,
+             params: { version: O.propVersion(), PVAR: O.PVAR, PK: O.PK, YSD: O.YSD, gate: O.propsGate() } };
   }, [N, SEED]);
   // parity: live_model.py (the live logger) against live.js on the same states
   const py = require('child_process').spawnSync('python3', ['-c', `
@@ -218,6 +269,47 @@ print(json.dumps({'n': n, 'bad': bad[:5], 'nbad': len(bad)}))
   try { par = JSON.parse(py.stdout); } catch (e) {}
   console.log(`parity live_model.py vs live.js: ${par.n} states, ${par.nbad} differ by more than 5e-5`);
   par.bad.forEach(x => console.log('FAIL parity', JSON.stringify(x)));
+  // prop parity: live_model.py's prop pricing (live_log.py's prop logging) against live.js
+  const py2 = require('child_process').spawnSync('python3', ['-c', `
+import json, sys
+sys.path.insert(0, ${JSON.stringify(root)})
+import live_model as LM
+D = json.load(sys.stdin)
+bad, n = [], 0
+P = D['params']
+for k in ('PVAR', 'PK'):
+    if {a: float(b) for a, b in P[k].items()} != {a: float(b) for a, b in getattr(LM, k).items()}:
+        bad.append({'params': k, 'js': P[k], 'py': getattr(LM, k)})
+if {a: [float(x) for x in b] for a, b in P['YSD'].items()} != {a: [float(x) for x in b] for a, b in LM.YSD.items()} or P['version'] != LM.PROP_VERSION:
+    bad.append({'params': 'YSD/version', 'js': [P['YSD'], P['version']], 'py': [LM.YSD, LM.PROP_VERSION]})
+for s in D['propp']:
+    n += 1
+    a, b = LM.prop_p(s['mkt'], s['cur'], s['proj'], s['f'], s['line']), LM.td_p(s['lam'], s['f'])
+    if abs(a - s['p']) > 5e-5 or abs(b - s['td']) > 1e-9:
+        bad.append({'propP': s, 'py': [a, b]})
+edge = lambda o: abs(o['p'] - 0.03) < 1e-4 or abs(o['p'] - 0.97) < 1e-4 or abs(o['edge'] - 0.12) < 0.0015
+ng = nb = 0
+for g in D['propg']:
+    ng += 1
+    py = LM.prop_bets(g['sport'], g['f'], g['lines'], g['pp'], g['bx'])
+    key = lambda o: (o['player'], o['mkt'], o['side'], o.get('line', o.get('pt')), o['price'])
+    J, Y = {key(o): o for o in g['out']}, {key(o): o for o in py}
+    for k in set(J) | set(Y):
+        nb += 1
+        j, y = J.get(k), Y.get(k)
+        if j and y:
+            if abs(j['p'] - y['p']) > 5e-5 or abs(j['edge'] - y['edge']) > 0.0011:
+                bad.append({'bet': k, 'js': j, 'py': y})
+        elif not edge(j or y):
+            bad.append({'bet': k, 'only_in': 'js' if j else 'py', 'row': j or y})
+print(json.dumps({'n': n, 'games': ng, 'bets': nb, 'bad': bad[:5], 'nbad': len(bad)}))
+`], { input: JSON.stringify({ params: res.params, propp: res.propp, propg: res.propg }), encoding: 'utf8' });
+  let par2 = { n: 0, nbad: 1, bad: [py2.stderr] };
+  try { par2 = JSON.parse(py2.stdout); } catch (e) {}
+  console.log(`prop parity live_model.py vs live.js (params ${res.params.version}): ${par2.n} propP / TD states, ${par2.bets} prop bets on ${par2.games} games, ${par2.nbad} differ`);
+  par2.bad.forEach(x => console.log('FAIL prop parity', JSON.stringify(x)));
+  console.log(`prop gate (props_gate.json: ${res.params.gate.passed ? 'passed' : 'not passed'}, version ${res.params.gate.version || '-'}): checked both ways, ${res.gate.length} failures`);
+  res.gate.forEach(x => console.log('FAIL prop gate', x));
   // the Live block on the built pages, a stubbed relay and a live-game fixture
   const pageFails = [];
   if (arg('pages', '1') !== '0') {
@@ -326,7 +418,7 @@ print(json.dumps({'n': n, 'bad': bad[:5], 'nbad': len(bad)}))
   console.log(`${c.models} model shape checks, ${c.cards} cards rendered as text, ${res.rendered} rendered on a 390px page (sideways scroll: ${res.over})`);
   if (errs.length) console.log('page errors:', errs.slice(0, 5));
   res.fails.forEach(f => console.log('FAIL', JSON.stringify(f)));
-  const bad = res.fails.length + errs.length + (res.over ? 1 : 0) + par.nbad + pageFails.length;
+  const bad = res.fails.length + errs.length + (res.over ? 1 : 0) + par.nbad + par2.nbad + res.gate.length + pageFails.length;
   console.log(bad ? `\n${bad} failures` : '\nALL CHECKS PASSED');
   await b.close(); srv.close();
   process.exit(bad ? 1 : 0);

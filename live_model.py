@@ -8,6 +8,9 @@ generated game states (football, NBA, college basketball, NHL, tennis).
     Onyx's pregame spread and total, scaled by the share of the game left (SD, PACE, TOTK).
   NHL: Poisson goals for the time left, the rates split so the pregame moneyline holds; a game
     level after regulation adds one goal for the winner (overtime or the shootout).
+  player props (prop_p, td_p, prop_bets): live.js propP and the anytime-TD chance, with the
+    PVAR / PK / YSD numbers from data/live/prop_params.json when it is there (live.js reads the
+    same file), else the built-in defaults below (the same numbers, props-v1).
   tennis: point -> game -> set -> match Markov chain. Each player's chance of winning a point on
     serve is fitted so the chain's pre-match chance equals the pregame chance (Onyx's no-vig
     moneyline, which is the blended chance at the tennis blend weight of 0, else Elo), as two form
@@ -19,7 +22,10 @@ generated game states (football, NBA, college basketball, NHL, tennis).
 Pure math, standard library only: the pipeline depends on `requests` alone.
 """
 
+import json
 import math
+import re
+from pathlib import Path
 
 SD = {"nfl": (16.5, 17.5), "cfb": (16, 17), "nba": (17, 21.6), "cbb": (15.4, 20.2)}
 LEN = {"nfl": (4, 15), "cfb": (4, 15), "nba": (4, 12), "nhl": (3, 20), "cbb": (2, 20)}
@@ -468,3 +474,170 @@ def same_team(a, b):
         return True
     x, y = a.split(" "), b.split(" ")
     return len(x) > 1 and len(y) > 1 and x[-1] == y[-1] and len(x[-1]) > 3
+
+
+
+# ── live player props (live.js propP / bets(), the prop branch) ─────────────────────────
+# Built-in defaults: the 11/9 refit (tools/live_props_backtest.js --fit, see live.js for the numbers).
+# data/live/prop_params.json replaces them key by key when present (load_prop_params), the same way
+# live.js does, so the page and the logger always price a prop with the same numbers.
+PVAR = {"pts": 4, "reb": 1.6, "ast": 1.3, "threes": 1.3, "rec": 1.3}
+PK = {"pts": 0.95, "reb": 0.9, "ast": 0.85, "rec_yds": 0.85, "rush_yds": 0.9}
+YSD = {"rec_yds": (0.3, 12), "rush_yds": (0.35, 18), "pass_yds": (0.45, 12)}
+PROP_VERSION = "props-v1"
+PROP_PARAMS = Path(__file__).resolve().parent / "data" / "live" / "prop_params.json"
+PROP_FMIN = 0.08     # no prop bet in the last 8% of a game (live.js bets())
+MKN = {"pts": "points", "reb": "rebounds", "ast": "assists", "threes": "threes", "rec": "catches", "rec_yds": "receiving yds",
+       "rush_yds": "rushing yds", "pass_yds": "passing yds"}
+
+
+def _num(v):
+    return isinstance(v, (int, float)) and not isinstance(v, bool) and math.isfinite(v) and v > 0
+
+
+def load_prop_params(path=None):
+    """Read data/live/prop_params.json into PVAR / PK / YSD / PROP_VERSION. Fail-soft: a missing
+    or broken file leaves the defaults. -> True when the file was read."""
+    global PROP_VERSION
+    try:
+        j = json.loads(Path(path or PROP_PARAMS).read_text(encoding="utf-8"))
+    except Exception:
+        return False
+    if not isinstance(j, dict):
+        return False
+    for k, v in (j.get("PVAR") or {}).items():
+        if _num(v):
+            PVAR[k] = v
+    for k, v in (j.get("PK") or {}).items():
+        if _num(v):
+            PK[k] = v
+    for k, v in (j.get("YSD") or {}).items():
+        if isinstance(v, (list, tuple)) and len(v) == 2 and _num(v[0]) and isinstance(v[1], (int, float)) and v[1] >= 0:
+            YSD[k] = (v[0], v[1])
+    if j.get("version"):
+        PROP_VERSION = str(j["version"])
+    return True
+
+
+load_prop_params()
+
+
+def prop_p(mkt, cur, proj, f, line):
+    """P(stat > line) for an over / under prop: live.js propP, line for line."""
+    rem = max(0.0, proj * PK.get(mkt, 1) * f)
+    mean = cur + rem
+    y = YSD.get(mkt, (0.45, 12))
+    if mkt.endswith("yds"):
+        sd = (y[0] * proj + y[1]) * math.sqrt(f)
+    else:
+        sd = math.sqrt(max(0.15, rem * PVAR.get(mkt, 1.5)))
+    sd = max(sd, 0.35)
+    return 1 - phi((line - mean) / sd)
+
+
+def td_p(lam, f):
+    """Anytime TD while he has not scored: 1 - exp(-lam x share of the game left) (live.js bets())."""
+    return 1 - math.exp(-lam * f)
+
+
+def pn(n):
+    """live.js pn(): player names compared by their letters, suffixes dropped."""
+    return re.sub(r"\s+", " ", re.sub(r"\b(jr|sr|ii|iii|iv)\b", "", nk(n))).strip()
+
+
+def _num_txt(v):
+    try:
+        x = float(str("" if v is None else v).split("-")[0])
+    except ValueError:
+        return None
+    return None if x != x else x
+
+
+def box_stats(sport, summary):
+    """ESPN summary -> {pn(name): {pts, reb, ast, threes, fouls} or {pass_yds, rush_yds, rec, rec_yds, td}}:
+    live.js box(), line for line (a player who did not play has an empty dict)."""
+    out = {}
+    for t in ((summary or {}).get("boxscore") or {}).get("players") or []:
+        for cat in t.get("statistics") or []:
+            keys = cat.get("keys") or []
+            lab = [str(x).upper() for x in cat.get("labels") or []]
+            nm = str(cat.get("name") or "").lower()
+            for a in cat.get("athletes") or []:
+                n = pn((a.get("athlete") or {}).get("displayName"))
+                st = a.get("stats") or []
+                o = out.setdefault(n, {})
+
+                def at(k, l=None):
+                    i = keys.index(k) if k in keys else -1
+                    if i < 0 and l:
+                        i = lab.index(l) if l in lab else -1
+                    return st[i] if 0 <= i < len(st) else None
+                if sport == "nba":
+                    if a.get("didNotPlay"):
+                        continue
+                    o["pts"] = _num_txt(at("points", "PTS"))
+                    o["reb"] = _num_txt(at("rebounds", "REB"))
+                    o["ast"] = _num_txt(at("assists", "AST"))
+                    o["threes"] = _num_txt(at("threePointFieldGoalsMade-threePointFieldGoalsAttempted", "3PT"))
+                    o["fouls"] = _num_txt(at("fouls", "PF"))
+                elif nm == "passing":
+                    o["pass_yds"] = _num_txt(at("passingYards", "YDS"))
+                    o["td"] = o.get("td") or 0
+                elif nm == "rushing":
+                    o["rush_yds"] = _num_txt(at("rushingYards", "YDS"))
+                    o["td"] = (o.get("td") or 0) + (_num_txt(at("rushingTouchdowns", "TD")) or 0)
+                elif nm == "receiving":
+                    o["rec"] = _num_txt(at("receptions", "REC"))
+                    o["rec_yds"] = _num_txt(at("receivingYards", "YDS"))
+                    o["td"] = (o.get("td") or 0) + (_num_txt(at("receivingTouchdowns", "TD")) or 0)
+    return out
+
+
+def prop_price(x, pp, bx, f):
+    """One relay prop line priced, before the page's gates: -> {player, mkt, side, pt, price, p, cur, proj}
+    or None (no pregame projection for him, already scored, fouled out, a line we do not price)."""
+    m, sel = x.get("m"), x.get("sel")
+    key = next((k for k in pp if k.split("|")[1:2] == [m] and pn(k.split("|")[0]) == pn(sel)), None)
+    if key is None:
+        return None
+    q, me, nm = pp[key] or {}, bx.get(pn(sel)) or {}, key.split("|")[0]
+    if m == "anytime_td":
+        if (me.get("td") or 0) >= 1 or q.get("lam") is None or x.get("side") in ("no", "under"):
+            return None
+        return {"player": nm, "mkt": m, "side": "yes", "pt": None, "price": x.get("price"), "p": td_p(q["lam"], f),
+                "cur": me.get("td") or 0, "proj": q["lam"], "label": nm + " anytime TD"}
+    if q.get("j") is None or x.get("pt") is None or x.get("side") not in ("over", "under"):
+        return None
+    cur = me.get(m)
+    if cur is None:
+        cur = 0
+    if me.get("fouls") is not None and me["fouls"] >= 6:
+        return None
+    pov = prop_p(m, cur, q["j"], f, x["pt"])
+    return {"player": nm, "mkt": m, "side": x["side"], "pt": x["pt"], "price": x.get("price"), "p": pov if x["side"] == "over" else 1 - pov,
+            "cur": cur, "proj": q["j"], "label": nm + " " + x["side"] + " " + fmt_pt(x["pt"]) + " " + MKN.get(m, m)}
+
+
+def prop_bets(sport, f, lines, pp, bx):
+    """Every player-prop bet on one game against the live line, with live.js bets()'s gates: chance
+    clamped to .005-.995, nothing decided (under 3% / over 97%), prices -500..+500, nothing in the last
+    8% of the game, nothing we disagree with by more than 12 points. -> [{kind: 'prop', ...}], best first."""
+    out = []
+    if not pp or f is None or bx is None:
+        return out
+    for x in lines or []:
+        if x.get("m") in ("ml", "spread", "total"):
+            continue
+        o = prop_price(x, pp, bx, f)
+        if not o or o["price"] is None or o["p"] != o["p"]:
+            continue
+        o["kind"] = "prop"
+        o["p"] = min(0.995, max(0.005, o["p"]))
+        o["fair"] = american(o["p"])
+        o["edge"] = round((o["p"] - implied(o["price"])) * 1000) / 1000
+        if o["p"] < 0.03 or o["p"] > 0.97 or o["price"] < -500 or o["price"] > 500:
+            continue
+        if f < PROP_FMIN or o["edge"] > EDGE_MAX or (sport, "prop") in PAUSED:
+            continue
+        out.append(o)
+    return sorted(out, key=lambda o: -o["edge"])
