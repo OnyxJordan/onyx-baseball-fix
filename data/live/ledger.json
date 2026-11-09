@@ -19739,10 +19739,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "5-2",
+  "profit": 0.7692,
+  "graded_at": "2026-11-09T04:09:00+00:00"
  },
  {
   "id": "cbb-401918053-total-under",
@@ -19829,6 +19829,37 @@
    "period": 3,
    "clock": "9:53",
    "f": 0.456
+  },
+  "pre_src": "onyx",
+  "model": "live-v6",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "nba-401909951-spread-home",
+  "sport": "nba",
+  "gid": "401909951",
+  "date": "2026-11-08",
+  "logged_at": "2026-11-09T04:08:59+00:00",
+  "matchup": "MIA @ SAC",
+  "home": "SAC",
+  "away": "MIA",
+  "label": "SAC +4.5",
+  "kind": "spread",
+  "side": "home",
+  "line": 4.5,
+  "price": -106,
+  "chance": 0.5667,
+  "implied": 0.5146,
+  "edge": 0.052,
+  "fair": -130,
+  "state": {
+   "score": "MIA 91 - 90 SAC",
+   "period": 4,
+   "clock": "9:21",
+   "f": 0.195
   },
   "pre_src": "onyx",
   "model": "live-v6",
