@@ -1750,5 +1750,49 @@
   "model": "v2",
   "result": null,
   "actual": null
+ },
+ {
+  "date": "2026-11-09",
+  "key": "401856885|raleek brown|rush_yds",
+  "gid": "401856885",
+  "pid": "4685268",
+  "name": "Raleek Brown",
+  "team": "TEX",
+  "opp": "LSU",
+  "matchup": "TEX @ LSU",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 60.5,
+  "price": -126,
+  "sel": "f8d84f51-1f74-4a3b-89e9-5b8864b75b36",
+  "proj": 46.8,
+  "prob": 0.6274,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.55,
+    "avg": 0.77,
+    "pp": -5.2
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.88,
+    "avg": 0.93,
+    "pp": 0.8
+   },
+   {
+    "k": "line vs his usual range",
+    "v": 0.02,
+    "avg": -0.05,
+    "pp": -0.1
+   }
+  ],
+  "opened_at": "2026-11-09T20:18:23+00:00",
+  "logged_at": "2026-11-09T20:18:23+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
  }
 ]
