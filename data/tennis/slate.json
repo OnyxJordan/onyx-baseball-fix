@@ -616,8 +616,8 @@
     {
      "id": "186536",
      "start": "2026-11-09T13:30Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 1",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -627,10 +627,10 @@
        "short": "U. Humbert",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        1
+        6
        ],
        "serve": false
       },
@@ -644,7 +644,7 @@
         4,
         3
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -1006,9 +1006,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Ugo Humbert",
+       "short": "U. Humbert",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -3420,9 +3420,9 @@
     },
     {
      "id": "186744",
-     "start": "2026-11-09T15:30Z",
-     "state": "pre",
-     "detail": "11/9 - 10:30 AM EST",
+     "start": "2026-11-09T15:35Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Court 1",
@@ -3433,7 +3433,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/slo.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        2
+       ],
        "serve": false
       },
       {
@@ -3442,16 +3444,18 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/bra.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        5
+       ],
        "serve": false
       }
      ]
     },
     {
      "id": "186749",
-     "start": "2026-11-09T15:30Z",
-     "state": "pre",
-     "detail": "11/9 - 10:30 AM EST",
+     "start": "2026-11-09T15:35Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Court 2",
@@ -3462,8 +3466,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        2
+       ],
+       "serve": true
       },
       {
        "name": "Polona Hercog",
@@ -3471,16 +3477,18 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/slo.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        3
+       ],
        "serve": false
       }
      ]
     },
     {
      "id": "186753",
-     "start": "2026-11-09T15:30Z",
-     "state": "pre",
-     "detail": "11/9 - 10:30 AM EST",
+     "start": "2026-11-09T15:35Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Main Court",
@@ -3491,7 +3499,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        3
+       ],
        "serve": false
       },
       {
@@ -3500,7 +3510,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ger.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        2
+       ],
        "serve": false
       }
      ]
@@ -4320,5 +4332,5 @@
    ]
   }
  ],
- "fetched": "2026-11-09T14:40:58+00:00"
+ "fetched": "2026-11-09T16:07:36+00:00"
 }
