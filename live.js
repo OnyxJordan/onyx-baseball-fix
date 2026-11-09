@@ -477,10 +477,23 @@
   // variance of what a player adds per unit of their pregame projection (a count-like stat), and a
   // floor; football yards use a wider, proportional spread
   var FMIN = {nfl: 0.15, cfb: 0.15, nba: 0.15, nhl: 0.15, cbb: 0.15};
-  var PVAR = {pts: 2.4, reb: 1.6, ast: 1.6, threes: 1.3, rec: 1.3};
+  // refit 11/9 on a week of archived games (tools/live_props_backtest.js --fit; data/<sport>/prop_archive.json:
+  // 40 NBA, 16 NFL, 35 college games, each player rebuilt at 10 moments from ESPN play-by-play, graded on
+  // the box-score final, fit on half the games and checked on the other half both ways). The remaining
+  // stat ran short of projection x time left (a 50-50 line at that mean went over 37-42% of the time, 28%
+  // late for receiving yards: blowout minutes, skewed yards), so PK scales the projection still to come.
+  // Live log loss, all moments 8%+ left: NBA pts .6040 -> .5982 (PVAR 2.4 -> 4, PK .95), reb .5823 ->
+  // .5776 (PK .9), ast .5675 -> .5558 (PVAR 1.6 -> 1.3, PK .85); receiving yds NFL .5922 -> .5773 and
+  // college .5894 -> .5706 (SD .45 x proj + 12 -> .3 x proj + 12, PK .85); rushing yds NFL .6747 ->
+  // .6668, college .5761 -> .5748 (SD -> .35 x proj + 18, PK .9). Every changed market better on both
+  // held-out halves. Catches and passing yards: no fit held up on held-out games, left as they were.
+  // Thin: 16 NFL games. Not tested against live prices (none archived).
+  var PVAR = {pts: 4, reb: 1.6, ast: 1.3, threes: 1.3, rec: 1.3};
+  var PK = {pts: 0.95, reb: 0.9, ast: 0.85, rec_yds: 0.85, rush_yds: 0.9};
+  var YSD = {rec_yds: [0.3, 12], rush_yds: [0.35, 18], pass_yds: [0.45, 12]};
   function propP(mkt, cur, proj, f, line) {
-    var rem = Math.max(0, proj * f), mean = cur + rem, sd;
-    if (/yds$/.test(mkt)) sd = (0.45 * proj + 12) * Math.sqrt(f);
+    var rem = Math.max(0, proj * (PK[mkt] || 1) * f), mean = cur + rem, sd, y = YSD[mkt] || [0.45, 12];
+    if (/yds$/.test(mkt)) sd = (y[0] * proj + y[1]) * Math.sqrt(f);
     else sd = Math.sqrt(Math.max(0.15, rem * (PVAR[mkt] || 1.5)));
     sd = Math.max(sd, 0.35);
     return 1 - phi((line - mean) / sd);       // lines are x.5, so this is P(stat >= line + 0.5)
@@ -877,7 +890,7 @@
     return st;
   }
 
-  window.OnyxLive = {left: left, model: model, plays: plays, noVig: noVig, implied: implied, phi: phi, games: games, pregame: pregame, american: american, lean: lean, bets: bets, propP: propP,
+  window.OnyxLive = {left: left, model: model, plays: plays, noVig: noVig, implied: implied, phi: phi, games: games, pregame: pregame, american: american, lean: lean, bets: bets, propP: propP, PVAR: PVAR, PK: PK, YSD: YSD,
     SD: SD, PACE: PACE, TOTK: TOTK, LEN: LEN, ML_PTS: ML_PTS, DEF_TOTAL: DEF_TOTAL, FMIN: FMIN, tn: tn, VALUE: VALUE, TN_CONF: TN_CONF, isVal: isVal, card: card, block: blockHTML, spot: spotHTML, sentence: sentence, sortGames: sortGames,
     css: css, mount: mount, ledger: ledger, onePerMatch: onePerMatch, record: record, recordHTML: recordHTML, NAME: NAME, PAGE: PAGE, SPORTS: LIVE_SPORTS};
 })();

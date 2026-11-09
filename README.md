@@ -1735,8 +1735,23 @@ model at every stage where bets show (NBA first half Brier 0.1875 / 0.1674 vs ES
 lines (over/under log loss 0.5973 -> 0.5877). `tools/verify_live.js` stress-tests the cards on
 generated games (5,000 per seed; run on 5 seeds, 277,425 bets): chances in range, fair price =
 our chance, edge math, every gate, model shape (a bigger lead never lowers the chance), no
-NaN / em dash / book names on a card, no sideways scroll at 390px. Player-prop live pricing is
-the one part not yet backtested: ESPN keeps no pregame projections to replay it against.
+NaN / em dash / book names on a card, no sideways scroll at 390px.
+
+**Live player-prop pricing, backtested (11/9).** `tools/live_props_backtest.js` (dev only) replays
+`data/<sport>/prop_archive.json` (pregame line, projection, lam, Onyx prices; 21 days kept): each archived
+player's stat rebuilt at 10 moments from ESPN play-by-play (NBA points/rebounds/assists 99.8-100% exact vs
+the box; NFL catches 100%, yards 93-99% within tolerance; college lower, mismatches dropped), priced with
+`live.js` `propP` and graded on the final. Week of 11/2-11/8: 40 NBA / 16 NFL / 35 college games, 3,133 props,
+53,324 priced moments. Finding: the stat still to come ran short of projection x time left (a 50-50 line at
+that mean went over 37-42%, worse late: blowout minutes, skewed yards). Refit on half the games, checked on
+the other half both ways: `PK` scales the projection still to come (pts .95, reb .9, ast .85, rec yds .85,
+rush yds .9), PVAR pts 2.4 -> 4 and ast 1.6 -> 1.3, yards SD rec .3 x proj + 12 and rush .35 x proj + 18.
+Live log loss NBA pts .6040 -> .5982, ast .5675 -> .5558, NFL rec yds .5922 -> .5773, college rec yds
+.5894 -> .5706. Catches, passing yards and anytime TD (already calibrated: NFL said 10.6%, hit 12.0%) unchanged.
+Value calls on props: not trustworthy yet. No in-game prices are archived, so only the opening moment
+could be tested: Onyx's no-vig price beat our chance on every NBA prop market (points .691 vs .709 log loss),
+and Value calls at those prices went NBA 255-260 (-7.1%), NFL 55-44 (+3.6%, 16 games), college 68-61 (-1.4%).
+`node tools/live_props_backtest.js [--fit]`.
 
 **Live on every sport page, tennis live model, live value record (11/3).** Jordan: "live picks on
 each sports page... there's X or Y value right now, take this pick."

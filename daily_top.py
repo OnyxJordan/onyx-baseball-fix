@@ -235,7 +235,7 @@ def keep_pregame(data_dir, rows, hours=36):
             g["src"] = "market"
         else:
             g.pop("src", None)
-    # the archive the live player-prop backtest replays (tools/live_props_backtest.py): every game's
+    # the archive the live player-prop backtest replays (tools/live_props_backtest.js): every game's
     # pregame props, kept 21 days (pregame.json itself keeps 36 hours, and the page loads it)
     a = Path(data_dir) / "prop_archive.json"
     try:
