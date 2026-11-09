@@ -8409,8 +8409,8 @@
     {
      "id": "187374",
      "start": "2026-11-08T22:05Z",
-     "state": "in",
-     "detail": "3rd",
+     "state": "post",
+     "detail": "Final",
      "round": "Group Stage",
      "draw": "Women's Singles",
      "court": "Indian Wells Tennis Garden",
@@ -8426,18 +8426,18 @@
         7,
         2
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Coco Gauff",
        "short": "C. Gauff",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
         6,
-        4
+        6
        ],
        "serve": false
       }
@@ -9873,5 +9873,5 @@
    ]
   }
  ],
- "fetched": "2026-11-09T00:37:26+00:00"
+ "fetched": "2026-11-09T01:10:05+00:00"
 }

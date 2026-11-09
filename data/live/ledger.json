@@ -18531,10 +18531,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "27-45",
+  "profit": -1.0,
+  "graded_at": "2026-11-09T01:10:29+00:00"
  },
  {
   "id": "nfl-401873049-ml-home",
@@ -18562,10 +18562,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "27-45",
+  "profit": -1.0,
+  "graded_at": "2026-11-09T01:10:29+00:00"
  },
  {
   "id": "nfl-401873049-total-under",
@@ -18593,10 +18593,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "72",
+  "profit": -1.0,
+  "graded_at": "2026-11-09T01:10:29+00:00"
  },
  {
   "id": "nfl-401873047-ml-away",
@@ -18964,10 +18964,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "18-13",
+  "profit": 0.6452,
+  "graded_at": "2026-11-09T01:10:30+00:00"
  },
  {
   "id": "cbb-401911238-total-under",
@@ -19150,10 +19150,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "171",
+  "profit": -1.0,
+  "graded_at": "2026-11-09T01:10:30+00:00"
  },
  {
   "id": "nba-401909946-ml-away",
@@ -19240,6 +19240,68 @@
    "period": 1,
    "clock": "7:14",
    "f": 0.787
+  },
+  "pre_src": "onyx",
+  "model": "live-v6",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "nba-401909947-total-under",
+  "sport": "nba",
+  "gid": "401909947",
+  "date": "2026-11-08",
+  "logged_at": "2026-11-09T01:10:27+00:00",
+  "matchup": "UTAH @ MIN",
+  "home": "MIN",
+  "away": "UTAH",
+  "label": "Under 221.5",
+  "kind": "total",
+  "side": "under",
+  "line": 221.5,
+  "price": -115,
+  "chance": 0.5669,
+  "implied": 0.5349,
+  "edge": 0.032,
+  "fair": -130,
+  "state": {
+   "score": "UTAH 51 - 57 MIN",
+   "period": 2,
+   "clock": "0.0",
+   "f": 0.5
+  },
+  "pre_src": "onyx",
+  "model": "live-v6",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "nba-401909948-total-over",
+  "sport": "nba",
+  "gid": "401909948",
+  "date": "2026-11-08",
+  "logged_at": "2026-11-09T01:10:27+00:00",
+  "matchup": "BKN @ DAL",
+  "home": "DAL",
+  "away": "BKN",
+  "label": "Over 224.5",
+  "kind": "total",
+  "side": "over",
+  "line": 224.5,
+  "price": -110,
+  "chance": 0.5551,
+  "implied": 0.5238,
+  "edge": 0.031,
+  "fair": -125,
+  "state": {
+   "score": "BKN 26 - 33 DAL",
+   "period": 1,
+   "clock": "0.0",
+   "f": 0.75
   },
   "pre_src": "onyx",
   "model": "live-v6",
