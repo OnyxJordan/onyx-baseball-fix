@@ -1333,5 +1333,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186530-spread-away",
+  "sport": "tennis",
+  "gid": "186530",
+  "date": "2026-11-09",
+  "logged_at": "2026-11-09T17:34:10+00:00",
+  "matchup": "Max Dahlin vs Tomas Martin Etcheverry",
+  "home": "Tomas Martin Etcheverry",
+  "away": "Max Dahlin",
+  "label": "Max Dahlin +5.5 games",
+  "kind": "spread",
+  "side": "away",
+  "line": 5.5,
+  "price": -150,
+  "chance": 0.6534,
+  "implied": 0.6,
+  "edge": 0.053,
+  "fair": -190,
+  "state": {
+   "sets": "2-3",
+   "srv": "home",
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
