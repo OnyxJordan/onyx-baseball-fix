@@ -1188,6 +1188,19 @@ only from the Pick alerts card, so subscribers get the `picks` and `min_conf` ta
 The card shows the reason when it cannot turn on, never a silent no-op. Entry points: the bell in the home
 header, "Pick alerts" in the hero and the More sheet, and picks.html#alerts.
 
+**Notification sweep (11/9).** `python3 -B tools/verify_alerts.py` (also a CI step) runs every push path with
+nothing sent: my_alerts.py against an in-memory Supabase that reads query strings the way PostgREST does, and a
+scripted ESPN (NBA moneyline and points, NFL anytime TD and spread, NHL total, NBA 1Q total, CFB and CBB by game id,
+tennis, a parlay; every push level; dedupe, the 15-minute lead-change gap, the recap once a day), and pick_alerts.py
+against a scratch ledger and a fake OneSignal. What it found: my_alerts.py wrote its `sent_at=gte.` filters with
+`isoformat()`, whose `+00:00` reaches PostgREST as ` 00:00` (a 400). The watcher stops on a 400, so from 11/7 to
+11/9 every poll that had a live saved pick died on its first query and no My picks push was ever sent; the recap
+failed on the same query. Timestamps now go through `ts()` (`...Z`). The 14:47 UTC recap schedule never fired on
+time (11/8 it ran at 19:11), so the watcher also sends the recap between 9:45 AM and 1 PM ET, once a day per person
+through a `push_sent` row (`item_id` `recap-<day>`, event `recap`). pick_alerts.py now logs a 200 with no
+notification id ("no subscriber matched") instead of counting it as sent. To check against the real database
+without sending anything: Actions, "My picks alerts", Run workflow, mode `dry`.
+
 The MLB HR/final watcher (`notify_watch.yml`, `push_watch.py`, `shell.html`'s own `ONESIGNAL_APP_ID`) rides the
 same secrets; shell.html's constant is still empty, so MLB in-page toggles stay off until it is pasted there.
 

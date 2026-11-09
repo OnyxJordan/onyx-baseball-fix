@@ -58,6 +58,11 @@ jobs:
       - name: Validate build
         run: python3 validate_build.py
 
+      # every push path (saved-pick updates, the recap, Onyx Pick alerts) against a fake Supabase that reads filters
+      # like PostgREST and a scripted ESPN; nothing is sent (11/9 sweep: a bad timestamp had stopped every My picks push)
+      - name: Notification sweep
+        run: python3 -B tools/verify_alerts.py
+
       - name: Set up Node
         uses: actions/setup-node@v4
         with:

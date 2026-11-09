@@ -85,6 +85,13 @@ class Supa:
         r.raise_for_status()
 
 
+def ts(d):
+    """A timestamp for a PostgREST filter. Never isoformat(): its "+00:00" reaches Supabase as " 00:00" (a "+" in a
+    query string is a space), which is a 400 (11/9 sweep: every poll with a live pick failed this way and stopped
+    the watcher, and the recap failed on the same query, so no My picks push had ever been sent)."""
+    return d.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
 def inlist(xs):
     return "in.(" + ",".join('"' + str(x).replace('"', "") + '"' for x in xs) + ")"
 
@@ -362,7 +369,7 @@ def poll(db, app, key, scheme, dry=False):
         return 0
     seen = {}
     for x in db.get("push_sent?select=user_id,item_id,event,res,sent_at&user_id=" + inlist({u for u, *_ in live})
-                    + "&sent_at=gte." + (now - timedelta(days=2)).isoformat()):
+                    + "&sent_at=gte." + ts(now - timedelta(days=2))):
         seen.setdefault((x["user_id"], x["item_id"]), []).append(x)
     out, n = [], 0
     for uid, iid, p, s in live:
@@ -410,10 +417,14 @@ def recap(db, app, key, scheme, dry=False):
     now = datetime.now(timezone.utc)
     bday = (now.astimezone(ET) - timedelta(hours=4)).date()
     users = [u["id"] for u in db.get("profiles?select=id,push_level&push_level=neq.off") if "recap" in wants(u["push_level"])]
-    n = 0
+    n, rid = 0, f"recap-{bday.isoformat()}"
+    # once a day per person, whoever sends it (the 14:47 cron or the watcher, 11/9): logged in push_sent
+    done = {x["user_id"] for x in db.get("push_sent?select=user_id&event=eq.recap&item_id=eq." + rid)} if users else set()
     for uid in users:
+        if uid in done:
+            continue
         res = db.get(f"push_sent?select=item_id,res,data&user_id=eq.{uid}&event=eq.result&sent_at=gte."
-                     + (now - timedelta(hours=36)).isoformat())
+                     + ts(now - timedelta(hours=36)))
         y = [r for r in res if r.get("data") and r["data"].get("start") and
              (datetime.fromisoformat(r["data"]["start"].replace("Z", "+00:00")).astimezone(ET) - timedelta(hours=4)).date()
              == bday - timedelta(days=1)]
@@ -435,7 +446,18 @@ def recap(db, app, key, scheme, dry=False):
         print(f"  recap {uid[:8]} | {body}")
         if dry or send(app, key, scheme, uid, "Your Onyx recap", body):
             n += 1
+            if not dry:
+                db.put("push_sent", [{"user_id": uid, "item_id": rid, "event": "recap", "res": None, "pushed": True,
+                                      "data": {"body": body}}])
     return n
+
+
+RECAP_FROM, RECAP_TO = (9, 45), (13, 0)     # ET: the morning recap window the watcher covers
+
+
+def recap_due(now):
+    t = now.astimezone(ET)
+    return RECAP_FROM <= (t.hour, t.minute) < RECAP_TO
 
 
 def main(argv):
@@ -451,9 +473,15 @@ def main(argv):
         print(f"my_alerts recap: {recap(db, app, key, scheme, dry)} sent")
         return
     secs = int(argv[argv.index("--watch") + 1]) if "--watch" in argv else 0
-    end, total = time.time() + secs, 0
+    end, total, recapped = time.time() + secs, 0, None
     while True:
         try:
+            # the morning recap rides the watcher (11/9 sweep: GitHub never fired the 14:47 schedule on time; on
+            # 11/8 it ran at 19:11 UTC). push_sent keeps it to one a day whoever sends it
+            now = datetime.now(timezone.utc)
+            if secs and recap_due(now) and recapped != now.astimezone(ET).date():
+                recapped = now.astimezone(ET).date()
+                print(f"my_alerts recap: {recap(db, app, key, scheme, dry)} sent")
             total += poll(db, app, key, scheme, dry)
         except requests.HTTPError as e:
             body = e.response.text[:200] if e.response is not None else ""
