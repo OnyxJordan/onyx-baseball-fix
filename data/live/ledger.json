@@ -18624,10 +18624,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "38-17",
+  "profit": -1.0,
+  "graded_at": "2026-11-09T00:37:59+00:00"
  },
  {
   "id": "nfl-401873048-ml-away",
@@ -18655,10 +18655,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "17-3",
+  "profit": -1.0,
+  "graded_at": "2026-11-09T00:37:59+00:00"
  },
  {
   "id": "nba-401909945-total-over",
@@ -18779,10 +18779,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "22-44",
+  "profit": 0.8,
+  "graded_at": "2026-11-09T00:37:59+00:00"
  },
  {
   "id": "nfl-401873046-ml-away",
@@ -18810,10 +18810,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "22-44",
+  "profit": 0.4587,
+  "graded_at": "2026-11-09T00:37:59+00:00"
  },
  {
   "id": "nfl-401873047-spread-home",
@@ -18841,10 +18841,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "38-17",
+  "profit": 0.8403,
+  "graded_at": "2026-11-09T00:37:59+00:00"
  },
  {
   "id": "nfl-401873048-spread-away",
@@ -18872,10 +18872,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "17-3",
+  "profit": -1.0,
+  "graded_at": "2026-11-09T00:37:59+00:00"
  },
  {
   "id": "nhl-401892675-spread-home",
@@ -18995,10 +18995,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "132",
+  "profit": 0.8333,
+  "graded_at": "2026-11-09T00:38:00+00:00"
  },
  {
   "id": "nfl-401873046-total-over",
@@ -19026,10 +19026,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "66",
+  "profit": 0.8264,
+  "graded_at": "2026-11-09T00:38:00+00:00"
  },
  {
   "id": "nfl-401873047-total-over",
@@ -19057,10 +19057,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "55",
+  "profit": -1.0,
+  "graded_at": "2026-11-09T00:38:00+00:00"
  },
  {
   "id": "nba-401909946-spread-away",
@@ -19209,6 +19209,37 @@
    "period": 1,
    "clock": "0:00",
    "f": 0.5
+  },
+  "pre_src": "onyx",
+  "model": "live-v6",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "nhl-401892678-total-under",
+  "sport": "nhl",
+  "gid": "401892678",
+  "date": "2026-11-08",
+  "logged_at": "2026-11-09T00:37:55+00:00",
+  "matchup": "PHI @ CGY",
+  "home": "CGY",
+  "away": "PHI",
+  "label": "Under 5.5",
+  "kind": "total",
+  "side": "under",
+  "line": 5.5,
+  "price": -115,
+  "chance": 0.5647,
+  "implied": 0.5349,
+  "edge": 0.03,
+  "fair": -130,
+  "state": {
+   "score": "PHI 1 - 0 CGY",
+   "period": 1,
+   "clock": "7:14",
+   "f": 0.787
   },
   "pre_src": "onyx",
   "model": "live-v6",

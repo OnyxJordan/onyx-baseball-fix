@@ -254,8 +254,9 @@
   "opened_at": "2026-11-04T08:10:26+00:00",
   "logged_at": "2026-11-04T08:10:26+00:00",
   "model": "v14",
-  "result": null,
-  "actual": null
+  "result": "W",
+  "actual": 7.0,
+  "graded_at": "2026-11-09T00:37:12+00:00"
  },
  {
   "date": "2026-11-04",
@@ -616,8 +617,9 @@
   "opened_at": "2026-11-03T18:24:19+00:00",
   "logged_at": "2026-11-04T17:13:44+00:00",
   "model": "v14",
-  "result": null,
-  "actual": null
+  "result": "W",
+  "actual": 2.0,
+  "graded_at": "2026-11-09T00:37:12+00:00"
  },
  {
   "date": "2026-11-04",
@@ -861,8 +863,9 @@
   "opened_at": "2026-11-04T23:46:24+00:00",
   "logged_at": "2026-11-04T23:46:24+00:00",
   "model": "v14",
-  "result": null,
-  "actual": null
+  "result": "W",
+  "actual": 28.0,
+  "graded_at": "2026-11-09T00:37:12+00:00"
  },
  {
   "date": "2026-11-05",
@@ -964,8 +967,9 @@
   "opened_at": "2026-11-08T14:44:03+00:00",
   "logged_at": "2026-11-08T14:44:03+00:00",
   "model": "v15",
-  "result": null,
-  "actual": null
+  "result": "W",
+  "actual": 3.0,
+  "graded_at": "2026-11-09T00:37:12+00:00"
  },
  {
   "date": "2026-11-08",
@@ -1015,8 +1019,9 @@
   "opened_at": "2026-11-08T14:44:03+00:00",
   "logged_at": "2026-11-08T14:44:03+00:00",
   "model": "v15",
-  "result": null,
-  "actual": null
+  "result": "W",
+  "actual": 2.0,
+  "graded_at": "2026-11-09T00:37:12+00:00"
  },
  {
   "date": "2026-11-08",
@@ -1040,8 +1045,9 @@
   "opened_at": "2026-11-08T14:44:03+00:00",
   "logged_at": "2026-11-08T14:44:03+00:00",
   "model": "v15",
-  "result": null,
-  "actual": null
+  "result": "W",
+  "actual": 2.0,
+  "graded_at": "2026-11-09T00:37:12+00:00"
  },
  {
   "date": "2026-11-08",
@@ -1233,5 +1239,32 @@
   "result": "W",
   "actual": 274.0,
   "graded_at": "2026-11-08T21:27:48+00:00"
+ },
+ {
+  "date": "2026-11-08",
+  "season": 2026,
+  "week": 9,
+  "key": "401873050|baker mayfield|pass_yds|cb",
+  "gid": "401873050",
+  "pid": "3052587",
+  "name": "Baker Mayfield",
+  "team": "TB",
+  "opp": "CHI",
+  "matchup": "TB @ CHI",
+  "kind": "pass_yds",
+  "lane": "cb_pass_over",
+  "side": "over",
+  "line": 208.5,
+  "price": -125,
+  "sel": "456130c4-8db6-4c51-bdf0-b79f858f5a3a",
+  "proj": 151.9,
+  "prob": null,
+  "implied": 0.5556,
+  "detail": "CHI without Malik Muhammad II (out, 75% of snaps)",
+  "opened_at": "2026-11-03T19:32:03+00:00",
+  "logged_at": "2026-11-09T00:37:12+00:00",
+  "model": "v15",
+  "result": null,
+  "actual": null
  }
 ]

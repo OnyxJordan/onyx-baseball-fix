@@ -11,7 +11,7 @@
    "name": "World Wide Technology Championship",
    "start": "2026-11-05T05:00Z",
    "end": "2026-11-08T05:00Z",
-   "state": "in",
+   "state": "post",
    "detail": null,
    "round": 5,
    "venue": null,
@@ -20,7 +20,7 @@
      "pos": 1,
      "name": "Blades Brown",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
-     "to_par": "-24",
+     "to_par": "-25",
      "rounds": [
       {
        "s": 66.0,
@@ -419,9 +419,14 @@
        "e": 0.0
       },
       {
-       "s": 4.0,
-       "d": "-1",
+       "s": 8.0,
+       "d": "-2",
        "h": [
+        [
+         18,
+         4,
+         "-1"
+        ],
         [
          18,
          4,
@@ -39746,5 +39751,5 @@
    "cut_n": 65
   }
  ],
- "fetched": "2026-11-09T00:05:01+00:00"
+ "fetched": "2026-11-09T00:37:37+00:00"
 }
