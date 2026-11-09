@@ -1063,5 +1063,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186598-spread-away",
+  "sport": "tennis",
+  "gid": "186598",
+  "date": "2026-11-08",
+  "logged_at": "2026-11-09T05:58:24+00:00",
+  "matchup": "Magda Linette vs Janice Tjen",
+  "home": "Janice Tjen",
+  "away": "Magda Linette",
+  "label": "Magda Linette +4.5 games",
+  "kind": "spread",
+  "side": "away",
+  "line": 4.5,
+  "price": -140,
+  "chance": 0.6689,
+  "implied": 0.5833,
+  "edge": 0.086,
+  "fair": -200,
+  "state": {
+   "sets": "2-2",
+   "srv": "away",
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v6",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
