@@ -651,8 +651,8 @@
     {
      "id": "186530",
      "start": "2026-11-09T17:05Z",
-     "state": "in",
-     "detail": "3rd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 1",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -668,18 +668,18 @@
         7,
         3
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Tomas Martin Etcheverry",
        "short": "T. Etcheverry",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
         6,
-        4
+        6
        ],
        "serve": false
       }
@@ -687,9 +687,9 @@
     },
     {
      "id": "186522",
-     "start": "2026-11-09T19:45Z",
+     "start": "2026-11-09T19:55Z",
      "state": "pre",
-     "detail": "11/9 - 2:45 PM EST",
+     "detail": "11/9 - 2:55 PM EST",
      "round": "Round 1",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -820,9 +820,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Tomas Martin Etcheverry",
+       "short": "T. Etcheverry",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -3608,8 +3608,8 @@
     {
      "id": "186756",
      "start": "2026-11-09T18:55Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Main Court",
@@ -3624,17 +3624,17 @@
         0,
         1
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Sofia Costoulas",
        "short": "S. Costoulas",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/bel.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        4
+        6
        ],
        "serve": false
       }
@@ -3644,7 +3644,7 @@
      "id": "186754",
      "start": "2026-11-09T19:00Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Court 1",
@@ -3656,9 +3656,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        6
+        6,
+        1
        ],
-       "serve": false
+       "serve": true
       },
       {
        "name": "Tamara Zidansek",
@@ -3667,7 +3668,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        2,
+        0
        ],
        "serve": false
       }
@@ -3675,9 +3677,9 @@
     },
     {
      "id": "186755",
-     "start": "2026-11-09T19:40Z",
+     "start": "2026-11-09T19:50Z",
      "state": "pre",
-     "detail": "11/9 - 2:40 PM EST",
+     "detail": "11/9 - 2:50 PM EST",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Main Court",
@@ -4118,9 +4120,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Sofia Costoulas",
+       "short": "S. Costoulas",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/bel.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -4372,5 +4374,5 @@
    ]
   }
  ],
- "fetched": "2026-11-09T19:37:59+00:00"
+ "fetched": "2026-11-09T19:45:34+00:00"
 }
