@@ -19429,10 +19429,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "27-24",
+  "profit": -1.0,
+  "graded_at": "2026-11-09T04:40:59+00:00"
  },
  {
   "id": "nba-401909947-spread-home",
@@ -19491,10 +19491,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "108-114",
+  "profit": -1.0,
+  "graded_at": "2026-11-09T04:40:59+00:00"
  },
  {
   "id": "nhl-401892676-total-under",
@@ -19646,10 +19646,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "222",
+  "profit": -1.0,
+  "graded_at": "2026-11-09T04:40:59+00:00"
  },
  {
   "id": "nba-401909950-spread-home",
@@ -19677,10 +19677,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "139-123",
+  "profit": 0.8333,
+  "graded_at": "2026-11-09T04:40:59+00:00"
  },
  {
   "id": "nba-401909950-ml-home",
@@ -19708,10 +19708,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "139-123",
+  "profit": 0.2941,
+  "graded_at": "2026-11-09T04:40:59+00:00"
  },
  {
   "id": "nhl-401892679-spread-away",
@@ -19801,10 +19801,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "27-24",
+  "profit": -1.0,
+  "graded_at": "2026-11-09T04:40:59+00:00"
  },
  {
   "id": "nba-401909950-total-over",
@@ -19832,10 +19832,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v6",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "262",
+  "profit": 0.9091,
+  "graded_at": "2026-11-09T04:40:59+00:00"
  },
  {
   "id": "nba-401909951-spread-home",
@@ -19860,6 +19860,37 @@
    "period": 4,
    "clock": "9:21",
    "f": 0.195
+  },
+  "pre_src": "onyx",
+  "model": "live-v6",
+  "result": "L",
+  "actual": "108-114",
+  "profit": -1.0,
+  "graded_at": "2026-11-09T04:40:59+00:00"
+ },
+ {
+  "id": "cbb-401919029-total-under",
+  "sport": "cbb",
+  "gid": "401919029",
+  "date": "2026-11-08",
+  "logged_at": "2026-11-09T04:40:59+00:00",
+  "matchup": "WICH @ USC",
+  "home": "USC",
+  "away": "WICH",
+  "label": "Under 173.5",
+  "kind": "total",
+  "side": "under",
+  "line": 173.5,
+  "price": -110,
+  "chance": 0.5712,
+  "implied": 0.5238,
+  "edge": 0.047,
+  "fair": -135,
+  "state": {
+   "score": "WICH 30 - 28 USC",
+   "period": 1,
+   "clock": "8:18",
+   "f": 0.708
   },
   "pre_src": "onyx",
   "model": "live-v6",
