@@ -1303,5 +1303,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186758-spread-home",
+  "sport": "tennis",
+  "gid": "186758",
+  "date": "2026-11-09",
+  "logged_at": "2026-11-09T17:27:45+00:00",
+  "matchup": "Marina Bassols Ribera vs Maria Herazo Gonzalez",
+  "home": "Maria Herazo Gonzalez",
+  "away": "Marina Bassols Ribera",
+  "label": "Maria Herazo Gonzalez +9.5 games",
+  "kind": "spread",
+  "side": "home",
+  "line": 9.5,
+  "price": -140,
+  "chance": 0.6802,
+  "implied": 0.5833,
+  "edge": 0.097,
+  "fair": -215,
+  "state": {
+   "sets": "3-0",
+   "srv": "away",
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
