@@ -1618,5 +1618,137 @@
   "result": "W",
   "actual": -4.0,
   "graded_at": "2026-11-07T05:25:36+00:00"
+ },
+ {
+  "date": "2026-11-09",
+  "key": "401856885|arch manning|rush_yds",
+  "gid": "401856885",
+  "pid": "4870906",
+  "name": "Arch Manning",
+  "team": "TEX",
+  "opp": "LSU",
+  "matchup": "TEX @ LSU",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 14.5,
+  "price": -126,
+  "sel": "d907034e-3e9d-4703-9cd2-b93ddc139071",
+  "proj": 6.4,
+  "prob": 0.629,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.55,
+    "avg": 0.77,
+    "pp": -5.2
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.88,
+    "avg": 0.93,
+    "pp": 0.8
+   },
+   {
+    "k": "line vs his usual range",
+    "v": 0.2,
+    "avg": -0.05,
+    "pp": -0.2
+   }
+  ],
+  "opened_at": "2026-11-09T19:20:28+00:00",
+  "logged_at": "2026-11-09T19:20:28+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-09",
+  "key": "401856885|dilin jones|rush_yds",
+  "gid": "401856885",
+  "pid": "5079482",
+  "name": "Dilin Jones",
+  "team": "LSU",
+  "opp": "TEX",
+  "matchup": "LSU vs TEX",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 75.5,
+  "price": -126,
+  "sel": "24f6a493-f786-4b80-84fb-4feb9aaa9a5b",
+  "proj": 63.4,
+  "prob": 0.6159,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.65,
+    "avg": 0.77,
+    "pp": -2.8
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.97,
+    "avg": 0.93,
+    "pp": -0.7
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.18,
+    "avg": -0.05,
+    "pp": 0.1
+   }
+  ],
+  "opened_at": "2026-11-09T19:20:28+00:00",
+  "logged_at": "2026-11-09T19:20:28+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-09",
+  "key": "401856885|sam leavitt|rush_yds",
+  "gid": "401856885",
+  "pid": "5078810",
+  "name": "Sam Leavitt",
+  "team": "LSU",
+  "opp": "TEX",
+  "matchup": "LSU vs TEX",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 29.5,
+  "price": -126,
+  "sel": "24d7c729-cff3-4978-8aa3-32afd6f6fafd",
+  "proj": 29.0,
+  "prob": 0.6153,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.65,
+    "avg": 0.77,
+    "pp": -2.8
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.97,
+    "avg": 0.93,
+    "pp": -0.7
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.24,
+    "avg": -0.05,
+    "pp": 0.2
+   }
+  ],
+  "opened_at": "2026-11-09T19:20:28+00:00",
+  "logged_at": "2026-11-09T19:20:28+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
  }
 ]
