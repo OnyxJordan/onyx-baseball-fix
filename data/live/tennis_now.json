@@ -1153,5 +1153,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186536-ml-away",
+  "sport": "tennis",
+  "gid": "186536",
+  "date": "2026-11-09",
+  "logged_at": "2026-11-09T13:36:06+00:00",
+  "matchup": "Ugo Humbert vs Adolfo Daniel Vallejo",
+  "home": "Adolfo Daniel Vallejo",
+  "away": "Ugo Humbert",
+  "label": "Ugo Humbert to win",
+  "kind": "ml",
+  "side": "away",
+  "line": null,
+  "price": -141,
+  "chance": 0.6728,
+  "implied": 0.5851,
+  "edge": 0.088,
+  "fair": -205,
+  "state": {
+   "sets": "0-0",
+   "srv": "home",
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v6",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
