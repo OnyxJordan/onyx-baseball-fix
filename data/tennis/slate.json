@@ -2749,8 +2749,8 @@
     {
      "id": "186598",
      "start": "2026-11-09T05:35Z",
-     "state": "in",
-     "detail": "1st",
+     "state": "post",
+     "detail": "Final",
      "round": "Final",
      "draw": "Women's Singles",
      "court": "Centre Court",
@@ -2760,9 +2760,11 @@
        "short": "M. Linette",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/pol.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
-        5
+        5,
+        6,
+        6
        ],
        "serve": false
       },
@@ -2773,9 +2775,11 @@
        "seed": null,
        "win": false,
        "sets": [
+        7,
+        1,
         4
        ],
-       "serve": true
+       "serve": false
       }
      ]
     }
@@ -4292,5 +4296,5 @@
    ]
   }
  ],
- "fetched": "2026-11-09T06:31:13+00:00"
+ "fetched": "2026-11-09T08:33:21+00:00"
 }
