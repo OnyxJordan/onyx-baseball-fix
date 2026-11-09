@@ -1,0 +1,79 @@
+name: Live props re-fit and gate (weekly)
+# Keeps live player-prop pricing adjusting to results (Jordan, 11/9: "keep adjusting to the
+# results and focus on shoring up the process"). Once a week, after the Onyx Picks re-test:
+#   1. tools/live_props_backtest.js --fit replays the archived games (data/<sport>/prop_archive.json,
+#      21 days) and every live prop snapshot live_log.py took (data/live/prop_snaps.json: real live
+#      lines and prices), graded on ESPN's final box scores, and refits PVAR / PK / YSD per market
+#      on one half of the games, scored on the other, both ways.
+#   2. --write-params writes data/live/prop_params.json with a bumped version ONLY for markets whose
+#      refit beats the numbers in use on BOTH held-out halves. A new version resets the gate's sample.
+#   3. --gate grades the live prop value plays live_log.py logged (data/live/ledger.json, kind
+#      "prop") for the version in use and writes data/live/props_gate.json: 60+ graded, ROI +2% or
+#      better at the logged price, profitable in both halves by date. live.js calls a live prop
+#      "Value" only when it passed; until then props show as projections, "Value untested".
+# It commits only data/live/prop_params.json and data/live/props_gate.json (files no other workflow
+# writes), after tools/verify_live.js (parity of live.js and live_model.py on the new numbers, the
+# prop gate both ways) and validate_build.py pass. live.js and live_log.py read them on the next
+# page load and the next refresh build.
+on:
+  schedule:
+    - cron: "47 12 * * 2"       # Tuesdays 12:47 UTC: after picks_retest.yml (10:17 UTC)
+  workflow_dispatch:
+permissions:
+  contents: write
+# its own group: the full refresh (onyx-build) cancels in progress, which would kill a re-fit
+# mid-pull. No ledger or page is in this commit, so it never races the refresh on one; the push
+# rebases and retries.
+concurrency:
+  group: onyx-live-props-retest
+  cancel-in-progress: false
+jobs:
+  refit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          # full history: validate_build diffs ledger row counts against HEAD
+          fetch-depth: 0
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install requests
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      # same as ci.yml: full playwright, it brings the browser verify_live.js drives
+      - name: Install headless browser
+        run: |
+          npm install playwright@1.64.1 playwright-core@1.64.1 --no-save
+          npx playwright install --with-deps chromium
+      - name: Re-fit live prop pricing, then the prop value gate
+        run: node tools/live_props_backtest.js --fit --write-params --gate --out=/tmp/live_props_report.json
+      # --pages=0: the built-page checks need fixtures of the live slate; the model, parity and
+      # prop-gate checks are what this commit can change
+      - name: Live model check (blocks commit on failure)
+        run: node tools/verify_live.js --pages=0
+      - name: Validate build (blocks commit on failure)
+        run: python3 -B validate_build.py
+      - name: Commit the re-fit (only if something changed)
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/live/prop_params.json data/live/props_gate.json
+          if git diff --cached --quiet; then
+            echo "nothing to commit"
+            exit 0
+          fi
+          MSG=$(python3 -c "import json; p = json.load(open('data/live/prop_params.json')); g = json.load(open('data/live/props_gate.json')); print('Live props re-fit ' + p['at'] + ': params ' + p['version'] + ', gate ' + ('passed' if g.get('passed') else 'not passed') + ' (' + str(g.get('n')) + ' graded)')")
+          git commit -m "$MSG"
+          for i in 1 2 3 4; do
+            if git push; then exit 0; fi
+            git pull --rebase -X theirs origin main || { git rebase --abort || true; git pull --rebase -s ours origin main || true; }
+            sleep $((i * 5))
+          done
+          git push || { echo "::error::push lost the race 4x; re-run this workflow"; exit 1; }

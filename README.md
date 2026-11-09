@@ -1456,6 +1456,10 @@ why a local `auto_build.py` still produces a full board.
 | `bullpen_db.json` | team bullpen HR/9, consumed by `auto_build.py` |
 | `data/*_history.json`, `data/picks_input.json` | the four graded ledgers — sacred |
 | `data/line_history.json` | market snapshots for the line-movement UI |
+| `data/live/ledger.json`, `data/live/tennis_now.json` | live value record (`live_log.py`; game lines and, since 11/9, live player props `kind: "prop"`) and the tennis minute watcher's picks — append-only, sacred |
+| `data/live/prop_params.json` | live prop pricing constants (PVAR / PK / YSD, versioned) read by `live.js` and `live_model.py`; only the weekly re-fit changes it |
+| `data/live/props_gate.json` | live prop value gate (`tools/live_props_backtest.js --gate`): live.js calls a prop Value only when it passed |
+| `data/live/prop_snaps.json` | every priced live prop at each build, 21 days rolling (calibration against live prices; not a ledger) |
 | `data/salaries.json` | read by `auto_build.py` only; a leftover of the retired DFS lane |
 | `data/splits.json`, `data/pitcher_l14.json` | **empty** — see Known gaps |
 | `rebuild_dbs.py`, `build_pitcher_hand.py` | DB rebuild, manual workflow only |
@@ -1753,6 +1757,47 @@ could be tested: Onyx's no-vig price beat our chance on every NBA prop market (p
 and Value calls at those prices went NBA 255-260 (-7.1%), NFL 55-44 (+3.6%, 16 games), college 68-61 (-1.4%).
 `node tools/live_props_backtest.js [--fit]`.
 
+**Live player props: logged, re-fit weekly, Value earned (11/9, `live-v7`, `props-v1`).** Jordan: "keep
+adjusting to the results and focus on shoring up the process." A live prop is never called Value on
+the page until its logged value plays have earned it at real live prices.
+- **One set of numbers.** `data/live/prop_params.json` `{version, at, evidence, PVAR, PK, YSD}` holds the
+  prop pricing constants. `live.js` loads it (with `props_gate.json`, once, fail-soft, never holding the
+  first card more than 1.5 s; `OnyxLive.propFiles`) and `live_model.py` reads it at import; both fall back
+  to identical built-in defaults. `live_model.prop_p` / `td_p` / `prop_bets` / `box_stats` are live.js
+  `propP`, the anytime-TD chance (1 - exp(-lam x share left), nothing once he has scored, no "no TD"
+  side), `bets()`'s prop branch and `box()`, line for line. `tools/verify_live.js` checks parity (propP
+  and TD on 600 random states, `prop_bets` vs `bets()` on 600 generated games, and that both loaded the
+  same params version).
+- **Logging** (`live_log.py`, in every refresh build, fail-soft; a prop error never costs the game
+  lines). For each live NBA / NFL / college game with a pregame projection (`data/<sport>/pregame.json`
+  "pp", the source the page uses) and relay prop lines, it reads ESPN's live box score and prices every
+  prop at the page's gates (8%+ of the game left, -500..+500, no 12+ point disagreement, Value at 3
+  points). (a) Each prop VALUE play is appended once to `data/live/ledger.json` (one side per player
+  market; id `<sport>-<gid>-prop-<player>-<mkt>-<side>`, `kind: "prop"`, price, chance, implied, edge,
+  line, cur, proj, f, `prop_model` = params version), graded off the final box score (a player not in
+  the box is void). These rows are logged whether or not the gate has passed: they are its sample. (b)
+  `data/live/prop_snaps.json` keeps every priced live prop (both sides' prices when quoted, our over
+  chance, cur, proj, f, time): columnar (`k` = sport, gid, player, market, proj; `r` = t, k, line, over,
+  under, p, cur, f), one row per line, at most one snapshot per prop per 10 minutes of game time, 21
+  baseball days kept, capped at 8,000 rows a day. About 45 bytes a row: an NBA night (10 games x ~40
+  props x ~5 builds) is ~2,000 rows / 90 KB, an NFL Sunday ~4,000 / 180 KB, so 2-4 MB at most.
+  `--dry-run` writes nothing; `--ledger=` / `--snaps=` write elsewhere.
+- **The gate.** `node tools/live_props_backtest.js --gate` (no network) writes `data/live/props_gate.json`
+  `{passed, n, w, l, units, roi, by_half, version, at, rule}`: **60+ graded prop value plays logged under
+  the prop params version in use, ROI +2% or better at the logged price, profitable in both halves split
+  by date** (the Onyx Picks bar's spirit). live.js: only when it says passed for the version in use does a
+  prop get the Value badge, "Live value", the value sentence and a place in the live value record;
+  otherwise it shows as "Live projection, player prop" with our chance, our fair price and a "Value
+  untested" note. Game lines are unchanged.
+- **Weekly re-fit** (`.github/workflows/live_props_retest.yml`, Tuesdays 12:47 UTC, after
+  `picks_retest.yml`; own concurrency group): `--fit --write-params --gate` refits on the archive plus
+  the snapshots (graded on ESPN finals; also reports our chance against the live line's no-vig price) and
+  writes new numbers ONLY for markets whose refit beats the current ones on BOTH held-out halves (by
+  .0005 log loss each), bumping the version and recording the evidence. **A new params version resets
+  the gate's sample**, like a model `VERSION` bump: the gate counts only plays logged under it. Then
+  `verify_live.js --pages=0` and `validate_build.py` must pass before it commits the two files
+  (rebase-and-retry push). First run here, 11/9: no market beat props-v1 on both halves; params unchanged.
+
 **Live on every sport page, tennis live model, live value record (11/3).** Jordan: "live picks on
 each sports page... there's X or Y value right now, take this pick."
 - `live.js` is the one implementation: models, pricing (`bets`) and rendering (`card`, `block`,
@@ -1783,7 +1828,7 @@ each sports page... there's X or Y value right now, take this pick."
 - `live_model.py` is the same math in Python (verify_live checks parity to 5e-5). `live_log.py` runs
   in `refresh_build.yml` (fail-soft) and appends each live value play once (game, market, side) to
   `data/live/ledger.json` with the price, our chance, the edge and the score, then grades it off
-  ESPN's final. Game lines only (props are shown, not logged). In validate_build's ledger list. Shown
+  ESPN's final. Since 11/9 live player props too (see "Live player props: logged, re-fit weekly" above). In validate_build's ledger list. Shown
   as "Live value record (on trial)" on each sport's Live block, the home Live tab and `picks.html`.
   Not Onyx Picks.
 - **Tennis logs the minute it qualifies (11/5, `live-v4`).** `live_watch.yml` is one long GitHub job
