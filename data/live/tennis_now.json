@@ -1363,5 +1363,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186750-ml-home",
+  "sport": "tennis",
+  "gid": "186750",
+  "date": "2026-11-09",
+  "logged_at": "2026-11-09T18:07:20+00:00",
+  "matchup": "Veronika Erjavec vs Elizabeth Mandlik",
+  "home": "Elizabeth Mandlik",
+  "away": "Veronika Erjavec",
+  "label": "Elizabeth Mandlik to win",
+  "kind": "ml",
+  "side": "home",
+  "line": null,
+  "price": -375,
+  "chance": 0.8207,
+  "implied": 0.7895,
+  "edge": 0.031,
+  "fair": -460,
+  "state": {
+   "sets": "2-5",
+   "srv": "home",
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
