@@ -2907,8 +2907,8 @@
     {
      "id": "187381",
      "start": "2026-11-09T20:15Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Group Stage",
      "draw": "Women's Singles",
      "court": "Indian Wells Tennis Garden",
@@ -2921,7 +2921,7 @@
        "win": false,
        "sets": [
         6,
-        4
+        5
        ],
        "serve": false
       },
@@ -2930,20 +2930,20 @@
        "short": "A. Sabalenka",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/blr.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         7,
-        5
+        7
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
     {
      "id": "187382",
-     "start": "2026-11-09T22:00Z",
+     "start": "2026-11-09T22:30Z",
      "state": "pre",
-     "detail": "11/9 - 5:00 PM EST",
+     "detail": "11/9 - 5:30 PM EST",
      "round": "Group Stage",
      "draw": "Women's Singles",
      "court": "Indian Wells Tennis Garden",
@@ -4392,5 +4392,5 @@
    ]
   }
  ],
- "fetched": "2026-11-09T21:56:12+00:00"
+ "fetched": "2026-11-09T22:28:52+00:00"
 }
