@@ -1093,5 +1093,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186535-spread-home",
+  "sport": "tennis",
+  "gid": "186535",
+  "date": "2026-11-09",
+  "logged_at": "2026-11-09T12:06:34+00:00",
+  "matchup": "Yannick Hanfmann vs Alex Michelsen",
+  "home": "Alex Michelsen",
+  "away": "Yannick Hanfmann",
+  "label": "Alex Michelsen -2.5 games",
+  "kind": "spread",
+  "side": "home",
+  "line": -2.5,
+  "price": -165,
+  "chance": 0.6531,
+  "implied": 0.6226,
+  "edge": 0.03,
+  "fair": -190,
+  "state": {
+   "sets": "1-2",
+   "srv": "away",
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v6",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
