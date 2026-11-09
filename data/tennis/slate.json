@@ -650,9 +650,9 @@
     },
     {
      "id": "186530",
-     "start": "2026-11-09T17:00Z",
-     "state": "pre",
-     "detail": "11/9 - 12:00 PM EST",
+     "start": "2026-11-09T17:05Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 1",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -663,7 +663,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/swe.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        0
+       ],
        "serve": false
       },
       {
@@ -672,7 +674,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        1
+       ],
        "serve": false
       }
      ]
@@ -3421,8 +3425,8 @@
     {
      "id": "186744",
      "start": "2026-11-09T15:35Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Court 1",
@@ -3435,7 +3439,7 @@
        "win": false,
        "sets": [
         3,
-        2
+        3
        ],
        "serve": false
       },
@@ -3444,12 +3448,12 @@
        "short": "L. Pigossi",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/bra.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        3
+        6
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -3470,7 +3474,7 @@
        "win": false,
        "sets": [
         2,
-        2
+        6
        ],
        "serve": false
       },
@@ -3482,7 +3486,7 @@
        "win": false,
        "sets": [
         6,
-        4
+        7
        ],
        "serve": false
       }
@@ -3505,9 +3509,9 @@
        "win": false,
        "sets": [
         6,
-        0
+        4
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Tatjana Maria",
@@ -3517,17 +3521,50 @@
        "win": false,
        "sets": [
         4,
-        1
+        5
        ],
        "serve": false
       }
      ]
     },
     {
+     "id": "186758",
+     "start": "2026-11-09T17:10Z",
+     "state": "in",
+     "detail": "1st",
+     "round": "Round 1",
+     "draw": "Women's Singles",
+     "court": "Court 1",
+     "p": [
+      {
+       "name": "Marina Bassols Ribera",
+       "short": "M. Bassols Ribera",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
+       "seed": null,
+       "win": false,
+       "sets": [
+        0
+       ],
+       "serve": false
+      },
+      {
+       "name": "Maria Herazo Gonzalez",
+       "short": "M. Herazo Gonzalez",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/col.png",
+       "seed": null,
+       "win": false,
+       "sets": [
+        0
+       ],
+       "serve": true
+      }
+     ]
+    },
+    {
      "id": "186750",
-     "start": "2026-11-09T17:00Z",
+     "start": "2026-11-09T17:20Z",
      "state": "pre",
-     "detail": "11/9 - 12:00 PM EST",
+     "detail": "11/9 - 12:20 PM EST",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Court 2",
@@ -3554,9 +3591,9 @@
     },
     {
      "id": "186756",
-     "start": "2026-11-09T17:00Z",
+     "start": "2026-11-09T17:20Z",
      "state": "pre",
-     "detail": "11/9 - 12:00 PM EST",
+     "detail": "11/9 - 12:20 PM EST",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Main Court",
@@ -3574,35 +3611,6 @@
        "name": "Sofia Costoulas",
        "short": "S. Costoulas",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/bel.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      }
-     ]
-    },
-    {
-     "id": "186758",
-     "start": "2026-11-09T17:00Z",
-     "state": "pre",
-     "detail": "11/9 - 12:00 PM EST",
-     "round": "Round 1",
-     "draw": "Women's Singles",
-     "court": "Court 1",
-     "p": [
-      {
-       "name": "Marina Bassols Ribera",
-       "short": "M. Bassols Ribera",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "Maria Herazo Gonzalez",
-       "short": "M. Herazo Gonzalez",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/col.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -4026,9 +4034,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Laura Pigossi",
+       "short": "L. Pigossi",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/bra.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -4338,5 +4346,5 @@
    ]
   }
  ],
- "fetched": "2026-11-09T16:43:40+00:00"
+ "fetched": "2026-11-09T17:16:17+00:00"
 }
