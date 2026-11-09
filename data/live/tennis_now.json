@@ -1393,5 +1393,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186754-spread-home",
+  "sport": "tennis",
+  "gid": "186754",
+  "date": "2026-11-09",
+  "logged_at": "2026-11-09T19:11:21+00:00",
+  "matchup": "Julia Grabher vs Tamara Zidansek",
+  "home": "Tamara Zidansek",
+  "away": "Julia Grabher",
+  "label": "Tamara Zidansek +5.5 games",
+  "kind": "spread",
+  "side": "home",
+  "line": 5.5,
+  "price": -130,
+  "chance": 0.6641,
+  "implied": 0.5652,
+  "edge": 0.099,
+  "fair": -200,
+  "state": {
+   "sets": "1-0",
+   "srv": "away",
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
