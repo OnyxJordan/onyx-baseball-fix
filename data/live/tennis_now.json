@@ -1843,5 +1843,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186543-spread-away",
+  "sport": "tennis",
+  "gid": "186543",
+  "date": "2026-11-10",
+  "logged_at": "2026-11-10T19:15:18+00:00",
+  "matchup": "Toby Samuel vs Lorenzo Musetti",
+  "home": "Lorenzo Musetti",
+  "away": "Toby Samuel",
+  "label": "Toby Samuel +6.5 games",
+  "kind": "spread",
+  "side": "away",
+  "line": 6.5,
+  "price": -135,
+  "chance": 0.6874,
+  "implied": 0.5745,
+  "edge": 0.113,
+  "fair": -220,
+  "state": {
+   "sets": "0-2",
+   "srv": null,
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
