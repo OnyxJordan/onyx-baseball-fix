@@ -90,9 +90,13 @@ def team_open_lane(lane, rule, rows, slate, M):
                                   "mkt": r["mkt"], "name": r.get("name"), "side": r["side"], "line": r["line"], "price": r["price"],
                                   "sel": r.get("sel"), "prob": r["prob"], "implied": r["implied"], "detail": r.get("detail"),
                                   "opened_at": op["ts"], "logged_at": ts, "model": M.VERSION, "result": None, "actual": None}))
-    today_n = sum(1 for k in ledger if k.get("date") == slate.get("date"))
-    for e, row in sorted(cands, key=lambda c: -c[0])[:max(0, rule.get("max_per_slate", 6) - today_n)]:
-        ledger.append(row)
+    # the cap is per side (11/10, Jordan: "test the unders only lane on the trial log"): overs never crowd the
+    # unders out of a slate, so the unders record on the scorecard is every under that qualifies, up to the cap
+    for side in ("over", "under"):
+        today_n = sum(1 for k in ledger if k.get("date") == slate.get("date") and k.get("side") == side)
+        mine = [c for c in cands if c[1]["side"] == side]
+        for e, row in sorted(mine, key=lambda c: -c[0])[:max(0, rule.get("max_per_slate", 6) - today_n)]:
+            ledger.append(row)
     resolve = grade_team(lane)
     for k in ledger:
         if k.get("result"):
