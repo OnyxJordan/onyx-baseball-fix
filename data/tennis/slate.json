@@ -894,8 +894,8 @@
     {
      "id": "186525",
      "start": "2026-11-10T17:15Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 1",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -908,7 +908,7 @@
        "win": false,
        "sets": [
         3,
-        2
+        4
        ],
        "serve": false
       },
@@ -917,20 +917,20 @@
        "short": "H. Rune",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/den.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        1
+        6
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
     {
      "id": "186543",
-     "start": "2026-11-10T18:30Z",
+     "start": "2026-11-10T19:00Z",
      "state": "pre",
-     "detail": "11/10 - 1:30 PM EST",
+     "detail": "11/10 - 2:00 PM EST",
      "round": "Round 2",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -1023,9 +1023,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Holger Rune",
+       "short": "H. Rune",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/den.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -2321,7 +2321,7 @@
      "id": "186748",
      "start": "2026-11-10T17:30Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Court 1",
@@ -2333,7 +2333,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        6
+        6,
+        3
        ],
        "serve": false
       },
@@ -2344,7 +2345,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        6
+        7,
+        2
        ],
        "serve": false
       }
@@ -2354,7 +2356,7 @@
      "id": "186745",
      "start": "2026-11-10T17:55Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Main Court",
@@ -2366,7 +2368,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        6,
+        1
        ],
        "serve": false
       },
@@ -2377,6 +2380,7 @@
        "seed": null,
        "win": false,
        "sets": [
+        3,
         2
        ],
        "serve": false
@@ -2386,8 +2390,8 @@
     {
      "id": "186746",
      "start": "2026-11-10T18:20Z",
-     "state": "pre",
-     "detail": "11/10 - 1:20 PM EST",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Court 2",
@@ -2398,7 +2402,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/col.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        2
+       ],
        "serve": false
       },
       {
@@ -2407,8 +2413,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        5
+       ],
+       "serve": true
       }
      ]
     },
@@ -2908,5 +2916,5 @@
    ]
   }
  ],
- "fetched": "2026-11-10T18:17:57+00:00"
+ "fetched": "2026-11-10T18:51:28+00:00"
 }

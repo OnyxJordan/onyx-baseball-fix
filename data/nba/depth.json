@@ -1,7 +1,7 @@
 {
  "sport": "nba",
  "date": "2026-11-10",
- "generated": "2026-11-10T18:17:15+00:00",
+ "generated": "2026-11-10T18:50:38+00:00",
  "unit": "min",
  "stats": [
   "pts",
@@ -793,60 +793,25 @@
    "name": "Utah Jazz",
    "date": "2026-11-10",
    "pace": 107.4,
-   "min_sum": 247.1,
+   "min_sum": 234.8,
    "players": [
-    {
-     "id": "CC05C7A93A71",
-     "n": "Lauri Markkanen",
-     "pos": "PF",
-     "role": "Starter",
-     "tag": "Questionable: Wrist (Arm, Sprain, Right)",
-     "use": 31.9,
-     "proj": {
-      "pts": 21.8,
-      "reb": 7.0,
-      "ast": 2.0,
-      "3pm": 3.4,
-      "pra": 30.8
-     },
-     "model": {
-      "use": 32.3,
-      "pts": 22.5
-     },
-     "last": {
-      "use": 30.9,
-      "pts": 18.0,
-      "reb": 6.6,
-      "ast": 2.0,
-      "3pm": 3.6,
-      "gp": 8
-     },
-     "now": {
-      "gp": 8,
-      "use": 30.9
-     },
-     "hs": "4066336",
-     "gid": "20261111BBA4D06B",
-     "opp": "MIA",
-     "home": true
-    },
     {
      "id": "65BD50DAD15C3619",
      "n": "Darryn Peterson",
      "pos": "SG",
      "role": "Starter",
      "tag": "",
-     "use": 30.9,
+     "use": 31.5,
      "proj": {
-      "pts": 17.2,
-      "reb": 4.0,
-      "ast": 4.7,
-      "3pm": 2.0,
-      "pra": 25.9
+      "pts": 18.4,
+      "reb": 4.1,
+      "ast": 4.8,
+      "3pm": 2.1,
+      "pra": 27.3
      },
      "model": {
-      "use": 31.0,
-      "pts": 17.6
+      "use": 31.8,
+      "pts": 19.1
      },
      "last": {
       "use": 30.7,
@@ -871,17 +836,17 @@
      "pos": "SF",
      "role": "Starter",
      "tag": "",
-     "use": 30.8,
+     "use": 31.5,
      "proj": {
-      "pts": 14.1,
-      "reb": 5.5,
+      "pts": 16.0,
+      "reb": 5.7,
       "ast": 2.1,
       "3pm": 1.6,
-      "pra": 21.7
+      "pra": 23.7
      },
      "model": {
-      "use": 30.8,
-      "pts": 14.5
+      "use": 31.8,
+      "pts": 16.7
      },
      "last": {
       "use": 30.6,
@@ -906,17 +871,17 @@
      "pos": "C",
      "role": "Starter",
      "tag": "",
-     "use": 25.1,
+     "use": 25.6,
      "proj": {
-      "pts": 10.1,
-      "reb": 6.2,
+      "pts": 10.8,
+      "reb": 6.4,
       "ast": 1.6,
       "3pm": 0.0,
-      "pra": 17.9
+      "pra": 18.8
      },
      "model": {
-      "use": 25.0,
-      "pts": 10.3
+      "use": 25.7,
+      "pts": 11.2
      },
      "last": {
       "use": 25.3,
@@ -941,17 +906,17 @@
      "pos": "G",
      "role": "Starter",
      "tag": "",
-     "use": 19.7,
+     "use": 20.4,
      "proj": {
-      "pts": 5.5,
-      "reb": 1.8,
-      "ast": 1.0,
-      "3pm": 1.0,
-      "pra": 8.3
+      "pts": 5.9,
+      "reb": 1.9,
+      "ast": 1.1,
+      "3pm": 1.1,
+      "pra": 8.9
      },
      "model": {
-      "use": 20.3,
-      "pts": 5.7
+      "use": 21.2,
+      "pts": 6.2
      },
      "last": {
       "use": 18.0,
@@ -974,19 +939,19 @@
      "id": "4D256A901B62",
      "n": "Josh Okogie",
      "pos": "SG",
-     "role": "Rotation",
+     "role": "Starter",
      "tag": "",
-     "use": 19.1,
+     "use": 19.9,
      "proj": {
-      "pts": 4.8,
-      "reb": 3.2,
+      "pts": 5.6,
+      "reb": 3.3,
       "ast": 1.0,
       "3pm": 0.8,
-      "pra": 8.9
+      "pra": 9.9
      },
      "model": {
-      "use": 19.6,
-      "pts": 5.5
+      "use": 20.4,
+      "pts": 6.0
      },
      "last": {
       "use": 18.6,
@@ -1011,17 +976,17 @@
      "pos": "C",
      "role": "Rotation",
      "tag": "",
-     "use": 17.3,
+     "use": 17.6,
      "proj": {
-      "pts": 7.0,
-      "reb": 6.2,
+      "pts": 7.3,
+      "reb": 6.3,
       "ast": 0.8,
       "3pm": 0.3,
-      "pra": 13.9
+      "pra": 14.5
      },
      "model": {
-      "use": 16.9,
-      "pts": 6.6
+      "use": 17.5,
+      "pts": 7.2
      },
      "last": {
       "use": 17.7,
@@ -1046,17 +1011,17 @@
      "pos": "PG",
      "role": "Rotation",
      "tag": "",
-     "use": 15.5,
+     "use": 15.9,
      "proj": {
-      "pts": 7.0,
-      "reb": 2.5,
-      "ast": 4.2,
+      "pts": 7.5,
+      "reb": 2.6,
+      "ast": 4.4,
       "3pm": 0.2,
-      "pra": 13.8
+      "pra": 14.5
      },
      "model": {
-      "use": 15.4,
-      "pts": 7.4
+      "use": 16.3,
+      "pts": 8.2
      },
      "last": {
       "use": 15.6,
@@ -1079,19 +1044,19 @@
      "id": "D44ED022E7C7",
      "n": "Svi Mykhailiuk",
      "pos": "SF",
-     "role": "Bench",
+     "role": "Rotation",
      "tag": "",
-     "use": 13.8,
+     "use": 15.5,
      "proj": {
-      "pts": 3.6,
-      "reb": 1.3,
-      "ast": 0.9,
-      "3pm": 0.7,
-      "pra": 5.8
+      "pts": 4.9,
+      "reb": 1.6,
+      "ast": 1.2,
+      "3pm": 1.0,
+      "pra": 7.8
      },
      "model": {
-      "use": 10.8,
-      "pts": 3.8
+      "use": 15.9,
+      "pts": 5.8
      },
      "last": {
       "use": 15.1,
@@ -1114,19 +1079,19 @@
      "id": "48F89FF00975",
      "n": "Brice Sensabaugh",
      "pos": "SF",
-     "role": "Bench",
+     "role": "Rotation",
      "tag": "",
-     "use": 13.1,
+     "use": 14.8,
      "proj": {
-      "pts": 6.7,
-      "reb": 2.2,
-      "ast": 0.9,
-      "3pm": 0.9,
-      "pra": 9.8
+      "pts": 9.4,
+      "reb": 2.6,
+      "ast": 1.3,
+      "3pm": 1.4,
+      "pra": 13.3
      },
      "model": {
-      "use": 10.5,
-      "pts": 6.5
+      "use": 15.5,
+      "pts": 10.5
      },
      "last": {
       "use": 14.2,
@@ -1151,17 +1116,17 @@
      "pos": "PF",
      "role": "Bench",
      "tag": "",
-     "use": 8.5,
+     "use": 9.7,
      "proj": {
-      "pts": 3.7,
-      "reb": 2.0,
-      "ast": 0.8,
-      "3pm": 0.3,
-      "pra": 6.5
+      "pts": 5.3,
+      "reb": 2.7,
+      "ast": 1.1,
+      "3pm": 0.5,
+      "pra": 9.2
      },
      "model": {
-      "use": 7.4,
-      "pts": 4.0
+      "use": 11.2,
+      "pts": 6.3
      },
      "last": {
       "use": 9.0,
@@ -1181,22 +1146,134 @@
      "home": true
     },
     {
+     "id": "2829D9A3BD677C44",
+     "n": "Andersson Garcia",
+     "pos": "F",
+     "role": "Bench",
+     "tag": "",
+     "use": 7.0,
+     "proj": {
+      "pts": 1.9,
+      "reb": 1.6,
+      "ast": 0.8,
+      "3pm": 0.1,
+      "pra": 4.3
+     },
+     "model": {
+      "use": 7.0,
+      "pts": 1.9
+     },
+     "last": null,
+     "now": {
+      "gp": 0,
+      "use": null
+     },
+     "hs": null,
+     "gid": "20261111BBA4D06B",
+     "opp": "MIA",
+     "home": true
+    },
+    {
+     "id": "E2C9AF20F26E",
+     "n": "Kobe Bufkin",
+     "pos": "PG",
+     "role": "Bench",
+     "tag": "",
+     "use": 6.8,
+     "proj": {
+      "pts": 3.1,
+      "reb": 0.9,
+      "ast": 0.8,
+      "3pm": 0.3,
+      "pra": 4.9
+     },
+     "model": {
+      "use": 6.8,
+      "pts": 3.1
+     },
+     "last": null,
+     "now": {
+      "gp": 0,
+      "use": null
+     },
+     "hs": "4683736",
+     "gid": "20261111BBA4D06B",
+     "opp": "MIA",
+     "home": true
+    },
+    {
+     "id": "E2528BADFC8C",
+     "n": "Trey Alexander",
+     "pos": "SG",
+     "role": "Bench",
+     "tag": "",
+     "use": 6.8,
+     "proj": {
+      "pts": 2.9,
+      "reb": 0.7,
+      "ast": 0.7,
+      "3pm": 0.3,
+      "pra": 4.3
+     },
+     "model": {
+      "use": 6.8,
+      "pts": 2.9
+     },
+     "last": null,
+     "now": {
+      "gp": 0,
+      "use": null
+     },
+     "hs": "4433268",
+     "gid": "20261111BBA4D06B",
+     "opp": "MIA",
+     "home": true
+    },
+    {
+     "id": "C4B0F78AAFC1",
+     "n": "Harrison Ingram",
+     "pos": "SF",
+     "role": "Bench",
+     "tag": "",
+     "use": 6.1,
+     "proj": {
+      "pts": 2.3,
+      "reb": 1.2,
+      "ast": 0.4,
+      "3pm": 0.2,
+      "pra": 4.0
+     },
+     "model": {
+      "use": 6.1,
+      "pts": 2.3
+     },
+     "last": null,
+     "now": {
+      "gp": 0,
+      "use": null
+     },
+     "hs": "4433618",
+     "gid": "20261111BBA4D06B",
+     "opp": "MIA",
+     "home": true
+    },
+    {
      "id": "149C5739E6A11D5F",
      "n": "Tony Bradley",
      "pos": "C",
      "role": "Bench",
      "tag": "",
-     "use": 4.5,
+     "use": 5.0,
      "proj": {
-      "pts": 1.3,
-      "reb": 1.2,
-      "ast": 0.1,
+      "pts": 1.9,
+      "reb": 1.5,
+      "ast": 0.2,
       "3pm": 0.0,
-      "pra": 2.7
+      "pra": 3.7
      },
      "model": {
-      "use": 3.2,
-      "pts": 1.3
+      "use": 5.1,
+      "pts": 2.1
      },
      "last": {
       "use": 5.0,
@@ -1216,134 +1293,22 @@
      "home": true
     },
     {
-     "id": "2829D9A3BD677C44",
-     "n": "Andersson Garcia",
-     "pos": "F",
-     "role": "Bench",
-     "tag": "",
-     "use": 4.4,
-     "proj": {
-      "pts": 1.2,
-      "reb": 1.0,
-      "ast": 0.5,
-      "3pm": 0.1,
-      "pra": 2.7
-     },
-     "model": {
-      "use": 4.4,
-      "pts": 1.2
-     },
-     "last": null,
-     "now": {
-      "gp": 0,
-      "use": null
-     },
-     "hs": null,
-     "gid": "20261111BBA4D06B",
-     "opp": "MIA",
-     "home": true
-    },
-    {
-     "id": "E2C9AF20F26E",
-     "n": "Kobe Bufkin",
-     "pos": "PG",
-     "role": "Bench",
-     "tag": "",
-     "use": 4.4,
-     "proj": {
-      "pts": 1.9,
-      "reb": 0.6,
-      "ast": 0.5,
-      "3pm": 0.2,
-      "pra": 3.1
-     },
-     "model": {
-      "use": 4.4,
-      "pts": 1.9
-     },
-     "last": null,
-     "now": {
-      "gp": 0,
-      "use": null
-     },
-     "hs": "4683736",
-     "gid": "20261111BBA4D06B",
-     "opp": "MIA",
-     "home": true
-    },
-    {
-     "id": "E2528BADFC8C",
-     "n": "Trey Alexander",
-     "pos": "SG",
-     "role": "Bench",
-     "tag": "",
-     "use": 4.4,
-     "proj": {
-      "pts": 1.8,
-      "reb": 0.5,
-      "ast": 0.4,
-      "3pm": 0.2,
-      "pra": 2.7
-     },
-     "model": {
-      "use": 4.4,
-      "pts": 1.8
-     },
-     "last": null,
-     "now": {
-      "gp": 0,
-      "use": null
-     },
-     "hs": "4433268",
-     "gid": "20261111BBA4D06B",
-     "opp": "MIA",
-     "home": true
-    },
-    {
-     "id": "C4B0F78AAFC1",
-     "n": "Harrison Ingram",
-     "pos": "SF",
-     "role": "Bench",
-     "tag": "",
-     "use": 3.7,
-     "proj": {
-      "pts": 1.3,
-      "reb": 0.7,
-      "ast": 0.3,
-      "3pm": 0.1,
-      "pra": 2.3
-     },
-     "model": {
-      "use": 3.7,
-      "pts": 1.3
-     },
-     "last": null,
-     "now": {
-      "gp": 0,
-      "use": null
-     },
-     "hs": "4433618",
-     "gid": "20261111BBA4D06B",
-     "opp": "MIA",
-     "home": true
-    },
-    {
      "id": "23593868FAB841DF",
      "n": "Jonas Aidoo",
      "pos": "C",
      "role": "Bench",
      "tag": "",
-     "use": 0.0,
+     "use": 0.7,
      "proj": {
-      "pts": 0.0,
-      "reb": 0.0,
+      "pts": 0.3,
+      "reb": 0.2,
       "ast": 0.0,
       "3pm": 0.0,
-      "pra": 0.0
+      "pra": 0.6
      },
      "model": {
-      "use": 0.0,
-      "pts": 0.0
+      "use": 0.7,
+      "pts": 0.3
      },
      "last": null,
      "now": {
@@ -1383,6 +1348,38 @@
       "use": 32.1
      },
      "hs": "4433627",
+     "gid": "20261111BBA4D06B",
+     "opp": "MIA",
+     "home": true
+    },
+    {
+     "id": "CC05C7A93A71",
+     "n": "Lauri Markkanen",
+     "pos": "PF",
+     "role": "Out",
+     "tag": "Out: Wrist (Arm, Sprain, Right)",
+     "use": 0.0,
+     "proj": {
+      "pts": 0.0,
+      "reb": 0.0,
+      "ast": 0.0,
+      "3pm": 0.0,
+      "pra": 0.0
+     },
+     "model": null,
+     "last": {
+      "use": 30.9,
+      "pts": 18.0,
+      "reb": 6.6,
+      "ast": 2.0,
+      "3pm": 3.6,
+      "gp": 8
+     },
+     "now": {
+      "gp": 8,
+      "use": 30.9
+     },
+     "hs": "4066336",
      "gid": "20261111BBA4D06B",
      "opp": "MIA",
      "home": true
@@ -1460,15 +1457,15 @@
      "tag": "",
      "use": 32.7,
      "proj": {
-      "pts": 32.5,
+      "pts": 32.7,
       "reb": 3.8,
       "ast": 5.8,
       "3pm": 2.4,
-      "pra": 42.1
+      "pra": 42.3
      },
      "model": {
       "use": 32.6,
-      "pts": 33.0
+      "pts": 33.2
      },
      "last": {
       "use": 32.9,
@@ -1495,15 +1492,15 @@
      "tag": "",
      "use": 27.1,
      "proj": {
-      "pts": 16.6,
-      "reb": 3.3,
+      "pts": 16.7,
+      "reb": 3.4,
       "ast": 3.4,
       "3pm": 1.0,
-      "pra": 23.3
+      "pra": 23.4
      },
      "model": {
       "use": 27.1,
-      "pts": 16.2
+      "pts": 16.3
      },
      "last": {
       "use": 27.2,
@@ -1530,15 +1527,15 @@
      "tag": "",
      "use": 24.8,
      "proj": {
-      "pts": 12.3,
+      "pts": 12.4,
       "reb": 3.4,
       "ast": 1.7,
       "3pm": 1.8,
-      "pra": 17.4
+      "pra": 17.5
      },
      "model": {
       "use": 24.7,
-      "pts": 12.3
+      "pts": 12.4
      },
      "last": {
       "use": 25.2,
@@ -1565,15 +1562,15 @@
      "tag": "",
      "use": 24.2,
      "proj": {
-      "pts": 6.9,
+      "pts": 7.0,
       "reb": 9.3,
       "ast": 3.4,
       "3pm": 0.0,
-      "pra": 19.6
+      "pra": 19.7
      },
      "model": {
       "use": 24.2,
-      "pts": 6.9
+      "pts": 7.0
      },
      "last": {
       "use": 24.2,
@@ -1604,11 +1601,11 @@
       "reb": 6.1,
       "ast": 1.4,
       "3pm": 0.3,
-      "pra": 15.9
+      "pra": 16.0
      },
      "model": {
       "use": 20.9,
-      "pts": 8.5
+      "pts": 8.6
      },
      "last": {
       "use": 19.8,
@@ -1635,15 +1632,15 @@
      "tag": "",
      "use": 20.0,
      "proj": {
-      "pts": 8.6,
+      "pts": 8.7,
       "reb": 1.7,
       "ast": 1.6,
       "3pm": 1.8,
-      "pra": 11.9
+      "pra": 12.0
      },
      "model": {
       "use": 20.1,
-      "pts": 8.7
+      "pts": 8.8
      },
      "last": {
       "use": 19.9,
@@ -1674,11 +1671,11 @@
       "reb": 3.9,
       "ast": 1.6,
       "3pm": 1.3,
-      "pra": 13.1
+      "pra": 13.2
      },
      "model": {
       "use": 19.6,
-      "pts": 8.0
+      "pts": 8.1
      },
      "last": {
       "use": 18.4,
@@ -1707,7 +1704,7 @@
      "proj": {
       "pts": 6.9,
       "reb": 3.7,
-      "ast": 2.9,
+      "ast": 3.0,
       "3pm": 1.2,
       "pra": 13.6
      },
@@ -1783,7 +1780,7 @@
      },
      "model": {
       "use": 14.0,
-      "pts": 3.7
+      "pts": 3.8
      },
      "last": {
       "use": 17.2,
@@ -2241,11 +2238,11 @@
       "reb": 3.4,
       "ast": 6.1,
       "3pm": 2.8,
-      "pra": 33.0
+      "pra": 33.1
      },
      "model": {
       "use": 36.0,
-      "pts": 23.0
+      "pts": 23.1
      },
      "last": {
       "use": 36.2,
@@ -2272,7 +2269,7 @@
      "tag": "",
      "use": 35.7,
      "proj": {
-      "pts": 21.9,
+      "pts": 22.0,
       "reb": 6.5,
       "ast": 4.2,
       "3pm": 2.0,
@@ -2308,10 +2305,10 @@
      "use": 33.8,
      "proj": {
       "pts": 12.8,
-      "reb": 5.4,
+      "reb": 5.5,
       "ast": 3.2,
       "3pm": 2.0,
-      "pra": 21.4
+      "pra": 21.5
      },
      "model": {
       "use": 33.9,
@@ -2342,11 +2339,11 @@
      "tag": "",
      "use": 32.8,
      "proj": {
-      "pts": 16.3,
+      "pts": 16.4,
       "reb": 6.6,
       "ast": 6.8,
       "3pm": 1.2,
-      "pra": 29.7
+      "pra": 29.8
      },
      "model": {
       "use": 32.8,
@@ -2377,11 +2374,11 @@
      "tag": "",
      "use": 31.1,
      "proj": {
-      "pts": 18.7,
+      "pts": 18.8,
       "reb": 8.4,
       "ast": 3.8,
       "3pm": 0.8,
-      "pra": 30.9
+      "pra": 31.0
      },
      "model": {
       "use": 30.8,
@@ -2420,7 +2417,7 @@
      },
      "model": {
       "use": 17.0,
-      "pts": 3.0
+      "pts": 3.1
      },
      "last": {
       "use": 24.8,
@@ -2451,7 +2448,7 @@
       "reb": 1.9,
       "ast": 1.1,
       "3pm": 0.9,
-      "pra": 7.5
+      "pra": 7.6
      },
      "model": {
       "use": 15.7,
@@ -2525,7 +2522,7 @@
      },
      "model": {
       "use": 5.0,
-      "pts": 1.3
+      "pts": 1.4
      },
      "last": {
       "use": 11.3,
@@ -2619,7 +2616,7 @@
       "reb": 0.6,
       "ast": 0.2,
       "3pm": 0.1,
-      "pra": 1.8
+      "pra": 1.9
      },
      "model": {
       "use": 3.5,
@@ -3073,11 +3070,11 @@
       "reb": 4.8,
       "ast": 3.3,
       "3pm": 1.3,
-      "pra": 21.9
+      "pra": 22.0
      },
      "model": {
       "use": 27.6,
-      "pts": 13.6
+      "pts": 13.7
      },
      "last": {
       "use": 27.8,
@@ -3143,7 +3140,7 @@
       "reb": 5.6,
       "ast": 2.3,
       "3pm": 1.7,
-      "pra": 17.2
+      "pra": 17.3
      },
      "model": {
       "use": 27.4,
@@ -3178,7 +3175,7 @@
       "reb": 4.2,
       "ast": 2.2,
       "3pm": 0.9,
-      "pra": 15.6
+      "pra": 15.7
      },
      "model": {
       "use": 20.3,
@@ -3314,7 +3311,7 @@
      "tag": "Questionable: Ankle (Leg, Sprain, Left)",
      "use": 15.7,
      "proj": {
-      "pts": 7.0,
+      "pts": 7.1,
       "reb": 5.5,
       "ast": 0.6,
       "3pm": 0.6,
@@ -3458,7 +3455,7 @@
       "reb": 0.4,
       "ast": 0.3,
       "3pm": 0.6,
-      "pra": 3.1
+      "pra": 3.2
      },
      "model": {
       "use": 6.0,
@@ -4980,11 +4977,11 @@
       "reb": 3.1,
       "ast": 6.2,
       "3pm": 2.8,
-      "pra": 36.1
+      "pra": 36.2
      },
      "model": {
       "use": 32.4,
-      "pts": 26.9
+      "pts": 27.0
      },
      "last": {
       "use": 33.9,
@@ -5015,7 +5012,7 @@
       "reb": 5.1,
       "ast": 2.3,
       "3pm": 2.0,
-      "pra": 24.1
+      "pra": 24.2
      },
      "model": {
       "use": 31.9,
@@ -5050,11 +5047,11 @@
       "reb": 7.3,
       "ast": 4.4,
       "3pm": 1.5,
-      "pra": 21.5
+      "pra": 21.6
      },
      "model": {
       "use": 30.7,
-      "pts": 10.1
+      "pts": 10.2
      },
      "last": {
       "use": 31.7,
@@ -5081,7 +5078,7 @@
      "tag": "",
      "use": 30.8,
      "proj": {
-      "pts": 21.0,
+      "pts": 21.1,
       "reb": 12.4,
       "ast": 3.2,
       "3pm": 1.8,
@@ -5116,11 +5113,11 @@
      "tag": "",
      "use": 26.1,
      "proj": {
-      "pts": 9.8,
+      "pts": 9.9,
       "reb": 3.3,
       "ast": 2.6,
       "3pm": 1.3,
-      "pra": 15.7
+      "pra": 15.8
      },
      "model": {
       "use": 26.1,
@@ -5153,7 +5150,7 @@
      "proj": {
       "pts": 10.1,
       "reb": 1.6,
-      "ast": 1.7,
+      "ast": 1.8,
       "3pm": 2.2,
       "pra": 13.5
      },
@@ -5684,7 +5681,7 @@
      "tag": "",
      "use": 33.0,
      "proj": {
-      "pts": 25.6,
+      "pts": 25.7,
       "reb": 7.1,
       "ast": 6.6,
       "3pm": 2.8,
@@ -5727,7 +5724,7 @@
      },
      "model": {
       "use": 30.0,
-      "pts": 13.8
+      "pts": 13.9
      },
      "last": {
       "use": 29.8,
@@ -5754,11 +5751,11 @@
      "tag": "",
      "use": 29.7,
      "proj": {
-      "pts": 18.4,
+      "pts": 18.5,
       "reb": 5.0,
       "ast": 3.9,
       "3pm": 2.9,
-      "pra": 27.3
+      "pra": 27.4
      },
      "model": {
       "use": 29.6,
@@ -5832,7 +5829,7 @@
      },
      "model": {
       "use": 21.9,
-      "pts": 7.8
+      "pts": 7.9
      },
      "last": {
       "use": 21.0,
@@ -5863,7 +5860,7 @@
       "reb": 6.7,
       "ast": 1.5,
       "3pm": 0.1,
-      "pra": 17.4
+      "pra": 17.5
      },
      "model": {
       "use": 21.7,
@@ -5894,7 +5891,7 @@
      "tag": "",
      "use": 20.1,
      "proj": {
-      "pts": 6.2,
+      "pts": 6.3,
       "reb": 3.9,
       "ast": 1.4,
       "3pm": 1.4,
@@ -5902,7 +5899,7 @@
      },
      "model": {
       "use": 20.0,
-      "pts": 6.4
+      "pts": 6.5
      },
      "last": {
       "use": 20.1,
@@ -5972,7 +5969,7 @@
      },
      "model": {
       "use": 15.4,
-      "pts": 4.1
+      "pts": 4.2
      },
      "last": {
       "use": 15.6,
@@ -6337,7 +6334,7 @@
      },
      "model": {
       "use": 35.9,
-      "pts": 13.8
+      "pts": 13.9
      },
      "last": {
       "use": 35.5,
@@ -6364,15 +6361,15 @@
      "tag": "",
      "use": 33.5,
      "proj": {
-      "pts": 19.6,
+      "pts": 19.7,
       "reb": 9.7,
       "ast": 3.4,
       "3pm": 0.9,
-      "pra": 32.7
+      "pra": 32.8
      },
      "model": {
       "use": 33.7,
-      "pts": 19.8
+      "pts": 19.9
      },
      "last": {
       "use": 32.8,
@@ -6399,15 +6396,15 @@
      "tag": "Questionable: Wrist (Arm, Sprain, Right)",
      "use": 33.4,
      "proj": {
-      "pts": 28.1,
+      "pts": 28.3,
       "reb": 13.0,
       "ast": 5.9,
       "3pm": 0.4,
-      "pra": 46.9
+      "pra": 47.1
      },
      "model": {
       "use": 33.5,
-      "pts": 28.2
+      "pts": 28.4
      },
      "last": {
       "use": 32.9,
@@ -6434,7 +6431,7 @@
      "tag": "",
      "use": 28.7,
      "proj": {
-      "pts": 11.4,
+      "pts": 11.5,
       "reb": 3.4,
       "ast": 3.5,
       "3pm": 1.2,
@@ -6442,7 +6439,7 @@
      },
      "model": {
       "use": 28.5,
-      "pts": 11.4
+      "pts": 11.5
      },
      "last": {
       "use": 29.4,
@@ -6473,11 +6470,11 @@
       "reb": 3.7,
       "ast": 1.9,
       "3pm": 1.5,
-      "pra": 15.6
+      "pra": 15.7
      },
      "model": {
       "use": 26.4,
-      "pts": 10.2
+      "pts": 10.3
      },
      "last": {
       "use": 26.4,
@@ -6504,7 +6501,7 @@
      "tag": "",
      "use": 25.0,
      "proj": {
-      "pts": 15.1,
+      "pts": 15.2,
       "reb": 2.1,
       "ast": 2.0,
       "3pm": 3.9,
@@ -6512,7 +6509,7 @@
      },
      "model": {
       "use": 25.8,
-      "pts": 15.3
+      "pts": 15.4
      },
      "last": {
       "use": 24.2,
@@ -6543,7 +6540,7 @@
       "reb": 5.9,
       "ast": 1.7,
       "3pm": 1.2,
-      "pra": 15.3
+      "pra": 15.4
      },
      "model": {
       "use": 19.9,
@@ -6840,7 +6837,7 @@
      "tag": "",
      "use": 1.8,
      "proj": {
-      "pts": 0.6,
+      "pts": 0.7,
       "reb": 0.5,
       "ast": 0.2,
       "3pm": 0.1,
@@ -8533,7 +8530,7 @@
       "reb": 3.4,
       "ast": 5.0,
       "3pm": 2.6,
-      "pra": 28.0
+      "pra": 28.1
      },
      "model": {
       "use": 29.9,
@@ -8600,7 +8597,7 @@
      "use": 26.3,
      "proj": {
       "pts": 12.6,
-      "reb": 3.6,
+      "reb": 3.7,
       "ast": 4.1,
       "3pm": 2.2,
       "pra": 20.3
@@ -8740,7 +8737,7 @@
      "use": 16.3,
      "proj": {
       "pts": 6.9,
-      "reb": 6.6,
+      "reb": 6.7,
       "ast": 1.1,
       "3pm": 0.1,
       "pra": 14.6
