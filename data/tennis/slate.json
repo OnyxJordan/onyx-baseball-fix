@@ -723,8 +723,8 @@
     {
      "id": "186526",
      "start": "2026-11-10T12:00Z",
-     "state": "in",
-     "detail": "1st",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 1",
      "draw": "Men's Singles",
      "court": "Court 1",
@@ -734,9 +734,10 @@
        "short": "A. Shevchenko",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/kaz.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
-        2
+        6,
+        6
        ],
        "serve": false
       },
@@ -747,7 +748,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        1
+        1,
+        3
        ],
        "serve": false
       }
@@ -756,8 +758,8 @@
     {
      "id": "186541",
      "start": "2026-11-10T12:05Z",
-     "state": "in",
-     "detail": "1st",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 2",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -769,18 +771,20 @@
        "seed": null,
        "win": false,
        "sets": [
-        0
+        3,
+        2
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Alex Michelsen",
        "short": "A. Michelsen",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
-        1
+        6,
+        6
        ],
        "serve": false
       }
@@ -788,9 +792,9 @@
     },
     {
      "id": "186533",
-     "start": "2026-11-10T13:30Z",
-     "state": "pre",
-     "detail": "11/10 - 8:30 AM EST",
+     "start": "2026-11-10T13:25Z",
+     "state": "in",
+     "detail": "2nd",
      "round": "Round 1",
      "draw": "Men's Singles",
      "court": "Court 1",
@@ -801,7 +805,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        4,
+        2
+       ],
        "serve": false
       },
       {
@@ -810,7 +817,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ita.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        6,
+        2
+       ],
        "serve": false
       }
      ]
@@ -818,18 +828,18 @@
     {
      "id": "186539",
      "start": "2026-11-10T13:30Z",
-     "state": "pre",
-     "detail": "11/10 - 8:30 AM EST",
+     "state": "post",
+     "detail": "Walkover",
      "round": "Round 2",
      "draw": "Men's Singles",
-     "court": "Center Court",
+     "court": "",
      "p": [
       {
        "name": "Thiago Agustin Tirante",
        "short": "T. Tirante",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [],
        "serve": false
       },
@@ -846,12 +856,12 @@
     },
     {
      "id": "186527",
-     "start": "2026-11-10T15:00Z",
+     "start": "2026-11-10T14:30Z",
      "state": "pre",
-     "detail": "11/10 - 10:00 AM EST",
+     "detail": "11/10 - 9:30 AM EST",
      "round": "Round 1",
      "draw": "Men's Singles",
-     "court": "Court 1",
+     "court": "Center Court",
      "p": [
       {
        "name": "Miomir Kecmanovic",
@@ -979,9 +989,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Aleksandr Shevchenko",
+       "short": "A. Shevchenko",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/kaz.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -1153,9 +1163,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Alex Michelsen",
+       "short": "A. Michelsen",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -1182,9 +1192,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Thiago Agustin Tirante",
+       "short": "T. Tirante",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -2856,5 +2866,5 @@
    ]
   }
  ],
- "fetched": "2026-11-10T12:19:06+00:00"
+ "fetched": "2026-11-10T14:22:12+00:00"
 }

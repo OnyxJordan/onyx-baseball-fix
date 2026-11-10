@@ -1468,5 +1468,33 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "nba-20261111DECF1459-q1-q1_total",
+  "sport": "nba",
+  "date": "2026-11-10",
+  "logged_at": "2026-11-10T14:21:32+00:00",
+  "start": "2026-11-11T00:30:00Z",
+  "gid": "20261111DECF1459",
+  "matchup": "MIL @ NY",
+  "label": "MIL @ NY Over 53.5 1st-quarter points",
+  "market": "q1_total",
+  "kind": "prop",
+  "name": "MIL @ NY",
+  "team": "MIL",
+  "who": "q1",
+  "side": "over",
+  "line": 53.5,
+  "hcap": null,
+  "price": -128,
+  "chance": 0.5827,
+  "edge": 0.0213,
+  "ev": 0.038,
+  "sel": "f304ff6b-fac8-478f-b226-90295409b5d0",
+  "model": "q1 0.254/12.0",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
