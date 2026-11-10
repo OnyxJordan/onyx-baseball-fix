@@ -217,9 +217,15 @@ def live_games(sport):
     return out
 
 
+STALE = 90      # seconds: a live price older than this is behind the play and never logged (11/10)
+
+
 def relay_lines(url, sport):
     j = get(f"{url}/live?sport={sport}") if url else None
-    return (j or {}).get("games") or []
+    G = (j or {}).get("games") or []
+    for g in G:
+        g["lines"] = [x for x in g.get("lines") or [] if x.get("age") is None or x["age"] <= STALE]
+    return G
 
 
 def match(L, g):

@@ -1907,6 +1907,17 @@ each sports page... there's X or Y value right now, take this pick."
   decided match; CFB 7 of 56 and CBB 20 of 72 games had no line from either (mostly lower-division
   opponents the books do not post).
 
+- **Tennis live lines catch up (11/10, Jordan: "tennis live lines were too far behind again").** The live
+  line could be most of a minute behind the score: the page polled every 30 s, the relay cached 20 s, and it took
+  DraftKings first even when DraftKings had not moved its price in minutes. Now the relay (`ai/worker.js`) takes,
+  for each market, the book whose price moved most recently (books within 15 s of the freshest keep the old order),
+  caches tennis 8 s, and puts `age` (seconds since that price was set, from the feed's timestamp) on every line;
+  live.js polls every 10 s while tennis is live and shows the age on the card; `live_log.relay_lines` drops any line
+  older than 90 s, so the minute watcher never logs a pick at a stale price. The gap log was also broken:
+  `lines_status.py --live` treated every match that ever had a gap as still open, so each minute wrote a "closed"
+  row for all of them (29,522 rows on 11/10, 15 MB re-committed every minute). It now reads each match's latest
+  row and squashes the repeats on its next run (75,808 rows to 73: 37 real gaps, 36 closed).
+
 **10/31 follow-ups.** A parlay spreads across games first and, when the board is short of
 games, fills its remaining legs from games it already uses (an SGP+, labelled on the ticket,
 never one player twice, one game line of each kind per game). My bets (`onyxMyBets`, ui.js and
