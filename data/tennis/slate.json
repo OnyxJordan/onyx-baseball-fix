@@ -1513,9 +1513,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        1
+        6
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Coco Gauff",
@@ -1524,7 +1524,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        0
+        3
        ],
        "serve": false
       }
@@ -2446,7 +2446,7 @@
      "id": "186757",
      "start": "2026-11-10T19:55Z",
      "state": "in",
-     "detail": "2nd",
+     "detail": "3rd",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Court 2",
@@ -2459,9 +2459,10 @@
        "win": false,
        "sets": [
         7,
-        6
+        6,
+        1
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Laura Samson",
@@ -2471,7 +2472,8 @@
        "win": false,
        "sets": [
         6,
-        5
+        7,
+        4
        ],
        "serve": false
       }
@@ -2481,7 +2483,7 @@
      "id": "186759",
      "start": "2026-11-10T20:30Z",
      "state": "in",
-     "detail": "2nd",
+     "detail": "3rd",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Main Court",
@@ -2494,7 +2496,8 @@
        "win": false,
        "sets": [
         3,
-        6
+        6,
+        1
        ],
        "serve": false
       },
@@ -2506,6 +2509,7 @@
        "win": false,
        "sets": [
         6,
+        4,
         4
        ],
        "serve": false
@@ -2950,5 +2954,5 @@
    ]
   }
  ],
- "fetched": "2026-11-10T22:17:55+00:00"
+ "fetched": "2026-11-10T22:51:30+00:00"
 }
