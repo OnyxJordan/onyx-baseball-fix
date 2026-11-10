@@ -154,7 +154,20 @@ def main():
         if not isinstance(rows, list):
             print("::warning::live_gaps.json does not parse; not touching it")
             return
-        open_ = {r["match"]: r for r in rows if r.get("sport") == sport and r.get("state") == "open"}
+        # a match's state is its LATEST row (11/10: this kept every match that ever opened as open, so each
+        # minute wrote another "closed" row for all of them; 29,522 rows on 11/10 alone, 15 MB). Repeats are
+        # squashed once here: a row that only restates the match's previous state is dropped.
+        last, keep = {}, []
+        for r in rows:
+            k = (r.get("sport"), r.get("match"))
+            p = last.get(k)
+            if p is not None and p.get("state") == r.get("state") and (r.get("state") == "closed" or p.get("reason") == r.get("reason")):
+                continue
+            last[k] = r
+            keep.append(r)
+        squashed = len(rows) - len(keep)
+        rows = keep
+        open_ = {m: r for (sp, m), r in last.items() if sp == sport and r.get("state") == "open"}
         cur = {x["match"]: x for x in L["gaps"]}
         t, added = now_iso(), 0
         for m, x in cur.items():
@@ -166,7 +179,7 @@ def main():
                 rows.append({"at": t, "sport": sport, "match": m, "state": "closed", "reason": r.get("reason"),
                              "detail": "line back, or the match ended"})
                 added += 1
-        if added:
+        if added or squashed:
             save(GAPS, rows, indent=1)
         print(f"lines {sport} live: {L['with_line']} of {L['in_play']} in play with a line"
               + "".join(f"\n  no line: {x['match']} ({x['reason']}: {x.get('detail') or ''})" for x in L["gaps"]))

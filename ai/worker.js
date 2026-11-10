@@ -190,13 +190,15 @@ async function chat(env, system, user, name, schema, maxTokens) {
 // Onyx does not send in-game prices to the odds feed (11/1 probe: 0 rows on every live game, while
 // other books had hundreds), so the live tab compares our numbers with the live line from the
 // feed: DraftKings first, the next book only where it has no line. The book is never named on the
-// site ("Live line"). Cached 20 seconds per sport, so every visitor shares one pull.
+// site ("Live line"). Cached 20 seconds per sport (tennis 8), so every visitor shares one pull.
 const OPTIC = "https://api.opticodds.com/api/v3";
 const LIVE_LG = { nfl: [["football", "nfl"]], cfb: [["football", "ncaaf"]], nba: [["basketball", "nba"]], nhl: [["hockey", "nhl"]],
   cbb: [["basketball", "ncaab"]], tennis: [["tennis", "atp"], ["tennis", "wta"]] };
 // fixtures priced per call: college basketball and tennis run many games at once (11/3)
 const LIVE_MAX = { cbb: 40, tennis: 40 };
 const LIVE_BOOKS = ["draftkings", "fanduel", "betmgm", "caesars", "pinnacle"];
+const FRESH_TIE = 15;                    // seconds: books this close to the freshest price count as current
+const LIVE_TTL = { tennis: 8 };          // edge cache per sport, seconds (tennis moves every point; others 20)
 const LIVE_MK = {
   moneyline: "ml", point_spread: "spread", puck_line: "spread", game_spread: "spread", total_points: "total", total_goals: "total", total_games: "total",
   anytime_touchdown_scorer: "anytime_td", player_points: "pts", player_rebounds: "reb", player_assists: "ast", player_made_threes: "threes",
@@ -241,21 +243,31 @@ async function liveSport(env, sport, seenFx) {
         const f = fx.find((x) => x.id === row.id) || row;
         // each market (and each player's market) from ONE book, the first in LIVE_BOOKS order that has
         // its main line, so an over and its under share a number and a spread's two sides match
-        const groups = new Map();
+        // 11/10 (Jordan: "tennis live lines were too far behind"): the book is the one whose price moved most
+        // recently, not DraftKings by default; a book that last moved more than FRESH_TIE seconds before the
+        // freshest one is behind the play. Books within FRESH_TIE of each other keep LIVE_BOOKS order. Every
+        // line carries age (seconds since that price was set, when the feed says).
+        const groups = new Map(), nowS = Date.now() / 1000;
         for (const od of row.odds || []) {
           const m = LIVE_MK[od.market_id], price = american(od.price);
           if (!m || price == null) continue;
           const player = !["ml", "spread", "total"].includes(m);
           const gk = m + "|" + (player ? String(od.selection || od.name || "") : "");
           const bk = LIVE_BOOKS.indexOf(String(od.sportsbook || "").toLowerCase());
+          let ts = Number(od.timestamp);
+          if (!isFinite(ts) || ts <= 0) ts = null; else if (ts > 1e12) ts = ts / 1000;
           if (!groups.has(gk)) groups.set(gk, []);
-          groups.get(gk).push({ od, m, price, bk: bk < 0 ? 99 : bk });
+          groups.get(gk).push({ od, m, price, bk: bk < 0 ? 99 : bk, ts });
         }
         const lines = [];
         for (const arr of groups.values()) {
           const main = arr.filter((x) => x.od.is_main !== false || x.m === "anytime_td");
           if (!main.length) continue;
-          const bk = Math.min(...main.map((x) => x.bk));
+          const moved = {};
+          for (const x of main) if (x.ts != null) moved[x.bk] = Math.max(moved[x.bk] || 0, x.ts);
+          const best = Math.max(0, ...Object.values(moved));
+          const ok = main.filter((x) => !best || (moved[x.bk] != null && best - moved[x.bk] <= FRESH_TIE));
+          const bk = Math.min(...(ok.length ? ok : main).map((x) => x.bk));
           let pick = main.filter((x) => x.bk === bk);
           if (pick.some((x) => x.od.is_main === true)) pick = pick.filter((x) => x.od.is_main === true);
           const seen = new Set();
@@ -264,7 +276,8 @@ async function liveSport(env, sport, seenFx) {
             const k = (x.m === "total" ? side : sel + "|" + side);
             if (seen.has(k)) continue;
             seen.add(k);
-            lines.push({ m: x.m, sel, side, pt: x.od.points == null ? null : Number(x.od.points), price: x.price });
+            lines.push({ m: x.m, sel, side, pt: x.od.points == null ? null : Number(x.od.points), price: x.price,
+              age: x.ts != null ? Math.max(0, Math.round(nowS - x.ts)) : null });
           }
         }
         games.push({ home: f.home_team_display || "", away: f.away_team_display || "", start: f.start_date || null,
@@ -285,7 +298,7 @@ async function live(req, env, h) {
   const fixtures = [];
   try { games = await liveSport(env, sport, fixtures); } catch (e) { return json({ error: "feed " + ((e && e.status) || "") }, 502, h); }
   const body = JSON.stringify({ sport, at: new Date().toISOString(), games, fixtures });
-  await cache.put(key, new Response(body, { headers: { "content-type": "application/json", "cache-control": "max-age=20" } }));
+  await cache.put(key, new Response(body, { headers: { "content-type": "application/json", "cache-control": "max-age=" + (LIVE_TTL[sport] || 20) } }));
   return new Response(body, { status: 200, headers: { "content-type": "application/json", ...h } });
 }
 

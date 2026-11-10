@@ -434,6 +434,8 @@
     RELAY = getJSON('ai.json').then(function (j) { return (j && j.url) || null; }).catch(function () { return null; });
     return RELAY;
   }
+  // how old a live price is (relay "age", seconds since that book last moved it; 11/10)
+  function ageTxt(a) { return a < 60 ? a + 's old' : Math.round(a / 60) + 'm old'; }
   function lines(sport) {
     return relay().then(function (u) { return u ? getJSON(u.replace(/\/$/, '') + '/live?sport=' + sport) : {games: []}; })
       .then(function (j) { return (j && j.games) || []; }).catch(function () { return []; });
@@ -735,10 +737,10 @@
       return mine(x);
     });
     if (!C.length) return null;
-    if (LP.kind === 'ml' || LP.line == null) return {price: C[0].price, at: null};
+    if (LP.kind === 'ml' || LP.line == null) return {price: C[0].price, at: null, age: C[0].age};
     C.sort(function (a, b) { return Math.abs(a.pt - LP.line) - Math.abs(b.pt - LP.line); });
     var b = C[0];
-    return {price: b.price, at: b.pt === LP.line ? null : (LP.kind === 'total' ? (LP.side === 'over' ? 'o' : 'u') + b.pt : sgn(b.pt))};
+    return {price: b.price, age: b.age, at: b.pt === LP.line ? null : (LP.kind === 'total' ? (LP.side === 'over' ? 'o' : 'u') + b.pt : sgn(b.pt))};
   }
   // the card for one game: the best live bet first (started, live line, our fair), then the score and the rest of our numbers
   function card(g) {
@@ -760,7 +762,7 @@
       lean = '<div class="lv-lean"><div class="lv-k">Live projection &middot; first read</div>'
         + '<div class="lv-pick"><b>' + esc(LP.label) + '</b><span class="lv-val">' + pct(LP.chance) + ' to hit</span></div>'
         + '<div class="lv-steps"><div><small>First read at</small><b>' + pr(LP.price) + '</b><span>' + esc(String(LP.logged_at).slice(11, 16)) + ' UTC</span></div>'
-        + '<div><small>Live line</small><b>' + (ll ? pr(ll.price) : '-') + '</b><span>' + (ll ? (ll.at != null ? 'at ' + esc(ll.at) + ' &middot; ' : '') + pct(implied(ll.price)) + ' implied' : LP.result ? 'settled' : 'off the board') + '</span></div>'
+        + '<div><small>Live line</small><b>' + (ll ? pr(ll.price) : '-') + '</b><span>' + (ll ? (ll.at != null ? 'at ' + esc(ll.at) + ' &middot; ' : '') + pct(implied(ll.price)) + ' implied' + (ll.age != null ? ' &middot; ' + ageTxt(ll.age) : '') : LP.result ? 'settled' : 'off the board') + '</span></div>'
         + '<div class="fair"><small>Our chance now</small><b>' + (lc != null ? pct(lc) : '-') + '</b><span>' + (LP.result ? (LP.result === 'W' ? 'won' : LP.result === 'L' ? 'lost' : 'push') : lc != null && LP.chance != null ? (lc >= LP.chance ? 'up ' : 'down ') + Math.abs(Math.round(100 * (lc - LP.chance))) + ' pts since then' : 'in play') + '</span></div></div>'
         + '<div class="lv-verdict">Our first read on this match, kept so you can follow how it moves. A projection, not an Onyx Pick: live markets have not passed the picks test yet.</div></div>';
     } else
@@ -922,7 +924,7 @@
         o.home && o.spot !== false && window.OnyxPicks ? OnyxPicks.load().catch(function () { return st.pk || null; }) : null])
         .then(function (r) { st.G = r[0] || []; st.led = r[1] || []; if (o.home && o.spot !== false) { st.rows = r[2]; st.pk = r[3]; } draw(); return st; });
     }
-    function tick() { clearTimeout(st.timer); st.timer = setTimeout(function () { (document.hidden ? Promise.resolve() : load()).then(tick, tick); }, st.G.length ? 30e3 : 120e3); }
+    function tick() { clearTimeout(st.timer); st.timer = setTimeout(function () { (document.hidden ? Promise.resolve() : load()).then(tick, tick); }, st.G.length ? (sport === 'tennis' ? 10e3 : 30e3) : 120e3); }   // tennis moves every point (11/10)
     st.ready = load().then(function (x) { tick(); return x; }, function () { tick(); });
     st.load = load; st.draw = draw;
     return st;
