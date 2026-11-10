@@ -28695,10 +28695,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v7",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "4",
+  "profit": 0.8696,
+  "graded_at": "2026-11-10T05:13:36+00:00"
  },
  {
   "id": "cbb-401920887-total-over",
@@ -28757,10 +28757,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v7",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "178",
+  "profit": -1.0,
+  "graded_at": "2026-11-10T05:13:37+00:00"
  },
  {
   "id": "nba-401909957-prop-nikola_jokic-ast-under",
@@ -29596,10 +29596,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v7",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "141",
+  "profit": 0.8333,
+  "graded_at": "2026-11-10T05:13:37+00:00"
  },
  {
   "id": "cbb-401921095-total-under",
@@ -29627,10 +29627,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v7",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "164",
+  "profit": -1.0,
+  "graded_at": "2026-11-10T05:13:37+00:00"
  },
  {
   "id": "nfl-401873051-prop-aaron_jones-rec-under",
@@ -30207,10 +30207,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v7",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "1-3",
+  "profit": 0.8696,
+  "graded_at": "2026-11-10T05:13:37+00:00"
  },
  {
   "id": "nba-401909959-prop-karlo_matkovic-pts-over",
@@ -30244,6 +30244,37 @@
   "pre_src": "onyx",
   "model": "live-v7",
   "prop_model": "props-v1",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "nhl-401892682-total-under",
+  "sport": "nhl",
+  "gid": "401892682",
+  "date": "2026-11-09",
+  "logged_at": "2026-11-10T05:13:30+00:00",
+  "matchup": "NYI @ SJ",
+  "home": "SJ",
+  "away": "NYI",
+  "label": "Under 5.5",
+  "kind": "total",
+  "side": "under",
+  "line": 5.5,
+  "price": -160,
+  "chance": 0.6604,
+  "implied": 0.6154,
+  "edge": 0.045,
+  "fair": -195,
+  "state": {
+   "score": "NYI 2 - 2 SJ",
+   "period": 3,
+   "clock": "11:08",
+   "f": 0.186
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
   "result": null,
   "actual": null,
   "profit": null,
