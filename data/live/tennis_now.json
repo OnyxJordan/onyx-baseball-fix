@@ -1573,5 +1573,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186526-spread-home",
+  "sport": "tennis",
+  "gid": "186526",
+  "date": "2026-11-10",
+  "logged_at": "2026-11-10T12:23:57+00:00",
+  "matchup": "Aleksandr Shevchenko vs Adrian Mannarino",
+  "home": "Adrian Mannarino",
+  "away": "Aleksandr Shevchenko",
+  "label": "Adrian Mannarino +4.5 games",
+  "kind": "spread",
+  "side": "home",
+  "line": 4.5,
+  "price": -145,
+  "chance": 0.6951,
+  "implied": 0.5918,
+  "edge": 0.103,
+  "fair": -230,
+  "state": {
+   "sets": "3-1",
+   "srv": "home",
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
