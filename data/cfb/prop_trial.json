@@ -1882,5 +1882,137 @@
   "model": "v2",
   "result": null,
   "actual": null
+ },
+ {
+  "date": "2026-11-10",
+  "key": "401856883|dwight phillips|rush_yds",
+  "gid": "401856883",
+  "pid": "5079561",
+  "name": "Dwight Phillips Jr.",
+  "team": "UGA",
+  "opp": "MIZ",
+  "matchup": "UGA vs MIZ",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 38.5,
+  "price": -126,
+  "sel": "b1d3ef37-8d15-47c3-accb-f5937d4c70bb",
+  "proj": 44.7,
+  "prob": 0.6138,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.62,
+    "avg": 0.77,
+    "pp": -3.5
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.4,
+    "avg": -0.05,
+    "pp": 0.3
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.93,
+    "avg": 0.93,
+    "pp": 0.1
+   }
+  ],
+  "opened_at": "2026-11-10T19:20:05+00:00",
+  "logged_at": "2026-11-10T19:20:05+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-10",
+  "key": "401856883|gunner stockton|rush_yds",
+  "gid": "401856883",
+  "pid": "4685578",
+  "name": "Gunner Stockton",
+  "team": "UGA",
+  "opp": "MIZ",
+  "matchup": "UGA vs MIZ",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 24.5,
+  "price": -126,
+  "sel": "bd8e395a-3ea5-4f57-b0fd-891657a15208",
+  "proj": 21.1,
+  "prob": 0.6172,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.62,
+    "avg": 0.77,
+    "pp": -3.5
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.93,
+    "avg": 0.93,
+    "pp": 0.1
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.05,
+    "avg": -0.05,
+    "pp": -0.0
+   }
+  ],
+  "opened_at": "2026-11-10T19:20:05+00:00",
+  "logged_at": "2026-11-10T19:20:05+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-10",
+  "key": "401856883|nate frazier|rush_yds",
+  "gid": "401856883",
+  "pid": "5084047",
+  "name": "Nate Frazier",
+  "team": "UGA",
+  "opp": "MIZ",
+  "matchup": "UGA vs MIZ",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 47.5,
+  "price": -126,
+  "sel": "6e6ab4e3-2a0b-4644-a217-b5240125d0e1",
+  "proj": 46.5,
+  "prob": 0.6148,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.62,
+    "avg": 0.77,
+    "pp": -3.5
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.3,
+    "avg": -0.05,
+    "pp": 0.2
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.93,
+    "avg": 0.93,
+    "pp": 0.1
+   }
+  ],
+  "opened_at": "2026-11-10T19:20:05+00:00",
+  "logged_at": "2026-11-10T19:20:05+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
  }
 ]
