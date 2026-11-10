@@ -1903,5 +1903,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186757-spread-away",
+  "sport": "tennis",
+  "gid": "186757",
+  "date": "2026-11-10",
+  "logged_at": "2026-11-10T20:40:35+00:00",
+  "matchup": "Carolina Alves vs Laura Samson",
+  "home": "Laura Samson",
+  "away": "Carolina Alves",
+  "label": "Carolina Alves +4.5 games",
+  "kind": "spread",
+  "side": "away",
+  "line": 4.5,
+  "price": -125,
+  "chance": 0.6599,
+  "implied": 0.5556,
+  "edge": 0.104,
+  "fair": -195,
+  "state": {
+   "sets": "4-4",
+   "srv": null,
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
