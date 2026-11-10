@@ -1838,5 +1838,49 @@
   "model": "v2",
   "result": null,
   "actual": null
+ },
+ {
+  "date": "2026-11-10",
+  "key": "401858519|fame ijeboi|rush_yds",
+  "gid": "401858519",
+  "pid": "5218961",
+  "name": "Fame Ijeboi",
+  "team": "PUR",
+  "opp": "IOWA",
+  "matchup": "PUR @ IOWA",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 39.5,
+  "price": -126,
+  "sel": "f9a6d20a-3469-40cc-ba90-df37ee16a4ec",
+  "proj": 49.9,
+  "prob": 0.634,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.53,
+    "avg": 0.77,
+    "pp": -5.6
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.52,
+    "avg": -0.05,
+    "pp": 0.4
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.93,
+    "avg": 0.93,
+    "pp": 0.1
+   }
+  ],
+  "opened_at": "2026-11-10T16:37:39+00:00",
+  "logged_at": "2026-11-10T16:37:39+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
  }
 ]
