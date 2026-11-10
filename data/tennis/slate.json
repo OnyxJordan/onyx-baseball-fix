@@ -858,7 +858,7 @@
      "id": "186527",
      "start": "2026-11-10T14:35Z",
      "state": "in",
-     "detail": "2nd",
+     "detail": "3rd",
      "round": "Round 1",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -871,7 +871,8 @@
        "win": false,
        "sets": [
         7,
-        3
+        4,
+        2
        ],
        "serve": true
       },
@@ -883,7 +884,8 @@
        "win": false,
        "sets": [
         6,
-        2
+        6,
+        1
        ],
        "serve": false
       }
@@ -2206,7 +2208,7 @@
      "id": "186747",
      "start": "2026-11-10T15:35Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Main Court",
@@ -2218,7 +2220,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        4,
+        0
        ],
        "serve": false
       },
@@ -2229,7 +2232,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        3
+        6,
+        1
        ],
        "serve": false
       }
@@ -2239,7 +2243,7 @@
      "id": "186751",
      "start": "2026-11-10T15:35Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Court 1",
@@ -2251,9 +2255,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        6,
+        0
        ],
-       "serve": false
+       "serve": true
       },
       {
        "name": "Alice Tubello",
@@ -2262,9 +2267,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        4
+        7,
+        0
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -2272,7 +2278,7 @@
      "id": "186752",
      "start": "2026-11-10T15:35Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Court 2",
@@ -2284,6 +2290,7 @@
        "seed": null,
        "win": false,
        "sets": [
+        3,
         1
        ],
        "serve": true
@@ -2295,7 +2302,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        4
+        6,
+        1
        ],
        "serve": false
       }
@@ -2884,5 +2892,5 @@
    ]
   }
  ],
- "fetched": "2026-11-10T16:01:43+00:00"
+ "fetched": "2026-11-10T16:37:45+00:00"
 }
