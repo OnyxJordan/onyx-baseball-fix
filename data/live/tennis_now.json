@@ -1723,5 +1723,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186752-ml-home",
+  "sport": "tennis",
+  "gid": "186752",
+  "date": "2026-11-10",
+  "logged_at": "2026-11-10T16:11:53+00:00",
+  "matchup": "Julieta Pareja vs Lucia Bronzetti",
+  "home": "Lucia Bronzetti",
+  "away": "Julieta Pareja",
+  "label": "Lucia Bronzetti to win",
+  "kind": "ml",
+  "side": "home",
+  "line": null,
+  "price": -205,
+  "chance": 0.7048,
+  "implied": 0.6721,
+  "edge": 0.033,
+  "fair": -240,
+  "state": {
+   "sets": "2-5",
+   "srv": null,
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
