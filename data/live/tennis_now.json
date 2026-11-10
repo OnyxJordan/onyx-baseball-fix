@@ -1693,5 +1693,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186747-spread-away",
+  "sport": "tennis",
+  "gid": "186747",
+  "date": "2026-11-10",
+  "logged_at": "2026-11-10T16:06:21+00:00",
+  "matchup": "Leyre Romero Gormaz vs Carole Monnet",
+  "home": "Carole Monnet",
+  "away": "Leyre Romero Gormaz",
+  "label": "Leyre Romero Gormaz +4.5 games",
+  "kind": "spread",
+  "side": "away",
+  "line": 4.5,
+  "price": -140,
+  "chance": 0.6629,
+  "implied": 0.5833,
+  "edge": 0.08,
+  "fair": -195,
+  "state": {
+   "sets": "2-4",
+   "srv": "away",
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
