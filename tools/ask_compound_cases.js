@@ -93,5 +93,10 @@ module.exports = [
   C('doncic or curry points', {sports: ['nba'], markets: ['pts']}),
   C('best three point shooters tonight', {sports: ['nba'], markets: ['threes'], side: 'over', count: 5}),
   C('top 3 three point shooters', {sports: ['nba'], markets: ['threes'], count: 3}),
-  C('3 point props', {sports: ['nba'], markets: ['threes']})
+  C('3 point props', {sports: ['nba'], markets: ['threes']}),
+  C('kings pts over but not Zach LaVine', {sports: ['nba'], team: 'SAC', markets: ['pts'], side: 'over'}),
+  C('nhl picks without Wild', {sports: ['nhl'], no_team: 'MIN'}),
+  C('wild sprad', {sports: ['nhl'], team: 'MIN', markets: ['spread']}),
+  C('give me a wild parlay', {intent: 'parlay', no_team: 'MIN'}),
+  C('is Trey Johnson going over his td scorer?', {markets: ['anytime_td']})
 ];

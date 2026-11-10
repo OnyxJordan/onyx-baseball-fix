@@ -495,6 +495,18 @@
       mask(at2, nk.length);
       var lg = SPORT_OF_NICK[nk], ab = NICK[nk], named = (s.sports || []).filter(function (x) { return /^(nba|nfl|nhl)$/.test(x); });
       if (DUPN[nk]) {
+        // (11/10, 1M test: "kings pts over but not Zach LaVine", 1,294 misses asked "which Kings?") the words can
+        // say which: basketball-only markets, or a player named (to include or rule out) who plays for one of them
+        if (!named.length) {
+          if ((s.markets || []).length && s.markets.every(function (m) { return HOOPM.test(m); })) named = ['nba'];
+          else {
+            var D0 = DUPN[nk], byP = Object.keys(D0).filter(function (x) { return (B || []).some(function (p) {
+              if (p.sport !== x || p.team !== D0[x] || !p.name) return false;
+              var ln = clean(String(p.name)).split(' ').pop();
+              return ln.length > 3 && new RegExp('\\b' + ln + '\\b').test(t); }); });
+            if (byP.length === 1) named = byP;
+          }
+        }
         var D = DUPN[nk], opts = Object.keys(D).filter(function (x) { return !named.length || named.indexOf(x) >= 0; });
         if (nk === 'jets' && /hockey|winnipeg/.test(t)) opts = ['nhl'];
         var liveD = opts.filter(function (x) { return plays(B, x, D[x], now); });
@@ -671,7 +683,7 @@
       [/\bpra\b|\bp ?\+ ?r ?\+ ?a\b|\b(points|pts) ?(,|\+|plus|&)? ?(rebounds|reb|rebs|boards) ?(,|\+|plus|&|and) ?(assists|ast|dimes)\b/, 'pra', ['pts', 'reb', 'ast']],
       [/\bp ?\+ ?r\b|\b(points|pts) ?(\+|plus|&) ?(rebounds|reb|rebs|boards)\b/, 'pr', ['pts', 'reb']],
       [/\bp ?\+ ?a\b|\b(points|pts) ?(\+|plus|&) ?(assists|ast|dimes)\b/, 'pa', ['pts', 'ast']],
-      [/\bthrees\b|\btreys?\b|\b3s\b|\b3[\s-]?(pointers?|pt|pts)\b|\bthree[\s-]?pointers?\b|\b3pm\b|\bthree[\s-]?point(s|er)? (shooters?|shots?|makers?|makes|made)\b|\b(3|three)[\s-]?point shooting\b|\b(3|three)[\s-]?point (props?|overs?|unders?|lines?|bets?|plays?|picks?|leaders?|guys|parlay)\b/, 'threes', ['pts']]];
+      [/\bthrees\b|\btreys\b|\btrey (props?|overs?|unders?|made|makes|lines?)\b|\b3s\b|\b3[\s-]?(pointers?|pt|pts)\b|\bthree[\s-]?pointers?\b|\b3pm\b|\bthree[\s-]?point(s|er)? (shooters?|shots?|makers?|makes|made)\b|\b(3|three)[\s-]?point shooting\b|\b(3|three)[\s-]?point (props?|overs?|unders?|lines?|bets?|plays?|picks?|leaders?|guys|parlay)\b/, 'threes', ['pts']]];
     for (var nx = 0; nx < NBX.length; nx++) if (NBX[nx][0].test(t) && s.markets.indexOf(NBX[nx][1]) < 0) {
       if (NBX[nx][1] === 'pr' && s.markets.indexOf('pra') >= 0) continue;
       if (NBX[nx][1] === 'pa' && s.markets.indexOf('pra') >= 0) continue;
@@ -949,7 +961,23 @@
     if (s.count == null && /\bcouple\b/.test(t)) s.count = 2;
     if (s.count == null && /\b(a )?few\b/.test(t)) s.count = 3;
     if (s.count == null) s.count = s.intent !== 'list' ? 3 : /\b(the|a|one) (player|play|pick|bet|guy|team)\b|\bwho (is|will|gets|has)\b|\bmost likely\b/.test(t) && !/players|plays|picks|guys|teams|scorers|receivers|rushers|passers|options|bets|choices/.test(t) ? 1 : 5;
-    if (!RT.teams.length && !s.player && /(^|[^A-Za-z])Wild\b(?!\s*card)|\bthe wild\b(?!\s*card)|\bmn wild\b/.test(RAWQ) && (B || []).some(function (p) { return p.sport === 'nhl' && /\bMIN\b/.test(p.matchup || ''); })) {
+    // "Wild" (Minnesota): capitalised, "the wild", "mn wild", or (11/10, 1M test) lowercase right before a bet word
+    // ("wild sprad", "wild over under"; "a wild parlay" stays a wild parlay). After a ruling-out word it is the
+    // team to leave out ("nhl picks without Wild", 405 misses kept MIN in the answer)
+    var WILDX = /\b(not|no|without|excluding|exclude|except|minus|fade|but not|other than|besides|skip|avoid)\s+(the\s+)?(mn\s+|minnesota\s+)?wild\b/;
+    var wildHit = /(^|[^A-Za-z])(Wild|WILD)\b(?!\s*(card|CARD))|\bthe wild\b(?!\s*card)|\bmn wild\b/.test(RAWQ) ||
+      /\bwild\s+(spread|sprad|spreads|ml|moneyline|money line|total|totals|over|under|o\/u|puck line|puckline|game|picks|bets|plays|props|sgp|same[\s-]game|against|point|ats|to win|win)\b|\b(same[\s-]game parlay|same[\s-]game parlya|same[\s-]game parley|sgp|parlay|parly|parley)\s+(on\s+|for\s+)?(the\s+)?wild\b|\b(bet|like|take|on|fade|back|ride)\s+(the\s+)?wild\b/.test(t) ||
+      /^\s*(yo|hey|pls|please|give me|gimme|show me|build me|whats|what about|how about|i want|can i get|hit me with|looking for)?\s*(the\s+)?wild\s*(tonight|today|rn|asap|please|pls|thx|!+|\?+|\.)*\s*$/.test(t);
+    var wildOn = (B || []).some(function (p) { return p.sport === 'nhl' && /\bMIN\b/.test(p.matchup || ''); });
+    // "a wild parlay", "some wild longshots": the adjective, unless the request is about hockey
+    if (wildHit && /\b(a|an|some|super|crazy|really|so|too|pretty|real)\s+wild\b/.test(t) && !/\b(nhl|hockey|minnesota|mn)\b/.test(t) && !/\bwild\s+(sgp|same[\s-]game)/.test(t)) wildHit = false;   // a same-game parlay needs a game: "a Wild SGP" is the team
+    if (wildHit && wildOn && WILDX.test(String(RAWQ).toLowerCase())) {
+      s.exclude = (s.exclude || []).filter(function (x) { return !/^(the |mn |minnesota )?wild\b/i.test(String(x).trim()); });
+      if (s.team === 'MIN') { s.team = null; s.team_name = null; s.tabbr = {}; }
+      s.teams = (s.teams || []).filter(function (x) { return x !== 'MIN'; });
+      if (s.exclude.indexOf('MIN') < 0) s.exclude.push('MIN');
+      if (!(s.sports || []).length) s.sports = ['nhl'];
+    } else if (!RT.teams.length && !s.player && wildHit && wildOn) {
       s.team = 'MIN'; s.tabbr = {nhl: ['MIN']}; s.sports = ['nhl']; s.team_name = 'Minnesota Wild';
     }
     // a game by its two abbreviations as the boards print them ("LV vs SF spread", "SJ MIN totals",

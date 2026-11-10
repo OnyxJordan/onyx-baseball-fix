@@ -1649,6 +1649,21 @@ never a bet button, a pick, a Top 10 play or a parlay leg.
 
 ## Ask Onyx (10/31)
 
+**1,000,000 more (11/10).** Jordan: "run the 1000000 search sweep again across all sports." `tools/ask_mega.py`
+seeds 21-24, 250,000 each on the 11/10 boards, graded in 50,000-search chunks (a 250,000 run in one page crashed
+the headless tab): 994,294 passed, 99.43%, up from 98.1% on 11/9. The 5,706 failures (5,359 distinct) were five
+things:
+- "Kings" (4,592): the request named basketball markets or a Sacramento player ("kings pts over but not Zach
+  LaVine") and still asked which Kings. The words now decide; with no such word and both Kings on the boards,
+  asking is right, and verify_ask passes the question when the wanted team is one of its buttons.
+- "Wild" (about 870): "nhl picks without Wild" kept Minnesota in, and "wild sprad", "WILD ATS", "yo wild" found
+  no team. A ruling-out word excludes MIN; the lowercase or all-caps word before or after a bet word is the team;
+  "a wild parlay" stays a parlay unless it is a same-game parlay or about hockey.
+- "Trey" (195): the 11/9 threes rule read "Trey Johnson" as 3-pointers. Now only "treys" or "trey props/overs".
+- College team exclusions (about 50): a test bug. verify_ask matched an excluded code inside a name ("MIZ" in
+  Isaiah Mizell); codes now match the play's team and names match whole words.
+Re-running all 5,359: 5,359 pass. Corpus 818/821, holdouts 59/59 and 49/49, list sweeps 2,926 and 3,000.
+
 **Lists, NBA specials and matchups (11/9).** Jordan: "top 5 point scorers, top 7 most likely to score a TD, the
 best value to have a triple double tonight ... you should be able to ask it about specific matchups as well."
 The NBA board (`nba_build.write_top`) now carries 3-pointers made (`threes`), P+R+A / P+R / P+A (`pra`, `pr`,
