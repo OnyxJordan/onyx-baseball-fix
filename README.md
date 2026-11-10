@@ -1983,6 +1983,13 @@ picked on games before 2026-03-01 only, then judged on the held-out 2026 games a
   11/1 finding that our totals run hot. Watch it in the trial log rather than mining it here.
 - **NFL:** pace is worse than the ratings (held-out MAE 12.13 against 11.13), and nothing holds at the close
   (pace -24.0%). Nothing adopted, so no model version changed. The live lanes are unchanged.
+- **Unders only, on trial (11/10, Jordan: "test the unders only lane on the trial log").** The live totals rule
+  (blend 0.3, edge 2-10pp, -200..+150, sd 17), replayed unders only: 2026 41-26 +16.7% at the open and 22-15 +13.7%
+  at the close; 2025 17-13 +8.2% open but 9-12 -17.8% close. Overs lost at both prices over 2025-26 (-0.7% open
+  on 127, -9.8% close on 107). The live trial had gone unders 1-4 and overs 4-3 by 11/9. The scorecard grades the
+  unders as their own lane ("Totals, unders only", the same `data/cfb/open_trial.json` filtered to `side ==
+  under`). `team_open_lane`'s 6-a-slate cap is now per side, so overs never crowd an under out. Both sides keep
+  logging, and no model or version changed.
 
 **College football player projections (11/1).** `sports_espn.ingest_box` (the NFL box-score
 reader, generalized) reads every FBS box score this season into `data/cfb/player_games.json`
