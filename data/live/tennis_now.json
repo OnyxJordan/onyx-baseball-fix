@@ -1873,5 +1873,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-187372-spread-home",
+  "sport": "tennis",
+  "gid": "187372",
+  "date": "2026-11-10",
+  "logged_at": "2026-11-10T20:34:21+00:00",
+  "matchup": "Jessica Pegula vs Marta Kostyuk",
+  "home": "Marta Kostyuk",
+  "away": "Jessica Pegula",
+  "label": "Marta Kostyuk +6.5 games",
+  "kind": "spread",
+  "side": "home",
+  "line": 6.5,
+  "price": -165,
+  "chance": 0.6866,
+  "implied": 0.6226,
+  "edge": 0.064,
+  "fair": -220,
+  "state": {
+   "sets": "3-1",
+   "srv": "home",
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
