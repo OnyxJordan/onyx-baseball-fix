@@ -723,8 +723,8 @@
     {
      "id": "186526",
      "start": "2026-11-10T12:00Z",
-     "state": "pre",
-     "detail": "11/10 - 7:00 AM EST",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 1",
      "draw": "Men's Singles",
      "court": "Court 1",
@@ -735,7 +735,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/kaz.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        2
+       ],
        "serve": false
       },
       {
@@ -744,16 +746,18 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        1
+       ],
        "serve": false
       }
      ]
     },
     {
      "id": "186541",
-     "start": "2026-11-10T12:00Z",
-     "state": "pre",
-     "detail": "11/10 - 7:00 AM EST",
+     "start": "2026-11-10T12:05Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 2",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -764,8 +768,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        0
+       ],
+       "serve": true
       },
       {
        "name": "Alex Michelsen",
@@ -773,7 +779,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        1
+       ],
        "serve": false
       }
      ]
@@ -2848,5 +2856,5 @@
    ]
   }
  ],
- "fetched": "2026-11-10T10:15:46+00:00"
+ "fetched": "2026-11-10T12:19:06+00:00"
 }
