@@ -1,5 +1,5 @@
 {
- "built": "2026-11-07",
+ "built": "2026-11-10",
  "rule": {
   "price": [
    -150,
@@ -203,17 +203,17 @@
    },
    "test": {
     "open": {
-     "n": 33,
-     "w": 12,
+     "n": 34,
+     "w": 13,
      "l": 21,
      "p": 0,
-     "units": -7.97,
-     "roi": -0.2416,
-     "avg_price": 64,
-     "claimed": 0.5038,
-     "hit": 0.3636,
+     "units": -6.73,
+     "roi": -0.198,
+     "avg_price": 66,
+     "claimed": 0.5029,
+     "hit": 0.3824,
      "first": "2026-02-01",
-     "last": "2026-10-26"
+     "last": "2026-11-09"
     },
     "close": {
      "n": 33,
@@ -230,7 +230,7 @@
     }
    },
    "verdict": "not enough yet",
-   "why": "only 33 held-out bets (needs 60); ROI -24.2% at the open, -23.9% at the close so far",
+   "why": "only 34 held-out bets (needs 60); ROI -19.8% at the open, -23.9% at the close so far",
    "notes": "Model tuned on Oct 2025 to Jan 2026; held out Feb to Apr 2026 and every 2026-27 game."
   },
   {
@@ -272,34 +272,34 @@
    },
    "test": {
     "open": {
-     "n": 266,
-     "w": 154,
-     "l": 112,
+     "n": 271,
+     "w": 158,
+     "l": 113,
      "p": 0,
-     "units": 29.08,
-     "roi": 0.1093,
+     "units": 31.81,
+     "roi": 0.1174,
      "avg_price": -100,
-     "claimed": 0.5692,
-     "hit": 0.5789,
+     "claimed": 0.5689,
+     "hit": 0.583,
      "first": "2026-02-01",
-     "last": "2026-11-05"
+     "last": "2026-11-09"
     },
     "close": {
-     "n": 275,
-     "w": 149,
-     "l": 126,
+     "n": 280,
+     "w": 153,
+     "l": 127,
      "p": 0,
-     "units": 11.33,
-     "roi": 0.0412,
+     "units": 14.04,
+     "roi": 0.0501,
      "avg_price": -102,
-     "claimed": 0.5629,
-     "hit": 0.5418,
+     "claimed": 0.5628,
+     "hit": 0.5464,
      "first": "2026-02-01",
-     "last": "2026-11-05"
+     "last": "2026-11-09"
     }
    },
    "verdict": "finalized",
-   "why": "154-112 at the open, ROI +10.9%; ROI +4.1% at the close"
+   "why": "158-113 at the open, ROI +11.7%; ROI +5.0% at the close"
   },
   {
    "sport": "nfl",
@@ -340,34 +340,34 @@
    },
    "test": {
     "open": {
-     "n": 10,
+     "n": 11,
      "w": 4,
-     "l": 6,
+     "l": 7,
      "p": 0,
-     "units": -1.3,
-     "roi": -0.13,
-     "avg_price": 81,
-     "claimed": 0.4943,
-     "hit": 0.4,
+     "units": -2.3,
+     "roi": -0.2091,
+     "avg_price": 88,
+     "claimed": 0.4886,
+     "hit": 0.3636,
      "first": "2026-09-13",
-     "last": "2026-11-06"
+     "last": "2026-11-08"
     },
     "close": {
-     "n": 7,
+     "n": 8,
      "w": 3,
-     "l": 4,
+     "l": 5,
      "p": 0,
-     "units": -0.12,
-     "roi": -0.0171,
-     "avg_price": 138,
-     "claimed": 0.4608,
-     "hit": 0.4286,
+     "units": -1.12,
+     "roi": -0.14,
+     "avg_price": 139,
+     "claimed": 0.4584,
+     "hit": 0.375,
      "first": "2026-09-27",
-     "last": "2026-10-27"
+     "last": "2026-11-08"
     }
    },
    "verdict": "not enough yet",
-   "why": "only 10 held-out bets (needs 60); ROI -13.0% at the open, -1.7% at the close so far"
+   "why": "only 11 held-out bets (needs 60); ROI -20.9% at the open, -14.0% at the close so far"
   },
   {
    "sport": "nfl",
@@ -421,21 +421,21 @@
      "last": "2026-11-06"
     },
     "close": {
-     "n": 10,
-     "w": 5,
+     "n": 11,
+     "w": 6,
      "l": 5,
      "p": 0,
-     "units": -0.31,
-     "roi": -0.0309,
-     "avg_price": -90,
-     "claimed": 0.554,
-     "hit": 0.5,
+     "units": 0.62,
+     "roi": 0.0561,
+     "avg_price": -91,
+     "claimed": 0.5542,
+     "hit": 0.5455,
      "first": "2026-09-27",
-     "last": "2026-11-02"
+     "last": "2026-11-08"
     }
    },
    "verdict": "not enough yet",
-   "why": "only 15 held-out bets (needs 60); ROI +28.1% at the open, -3.1% at the close so far"
+   "why": "only 15 held-out bets (needs 60); ROI +28.1% at the open, +5.6% at the close so far"
   },
   {
    "sport": "nfl",
@@ -476,34 +476,34 @@
    },
    "test": {
     "open": {
-     "n": 9,
+     "n": 10,
      "w": 4,
-     "l": 5,
+     "l": 6,
      "p": 0,
-     "units": -1.36,
-     "roi": -0.1515,
+     "units": -2.36,
+     "roi": -0.2364,
      "avg_price": -110,
-     "claimed": 0.5538,
-     "hit": 0.4444,
+     "claimed": 0.5545,
+     "hit": 0.4,
      "first": "2026-09-13",
-     "last": "2026-10-18"
+     "last": "2026-11-08"
     },
     "close": {
-     "n": 12,
+     "n": 13,
      "w": 5,
-     "l": 7,
+     "l": 8,
      "p": 0,
-     "units": -2.47,
-     "roi": -0.2058,
-     "avg_price": -93,
-     "claimed": 0.5552,
-     "hit": 0.4167,
+     "units": -3.47,
+     "roi": -0.2669,
+     "avg_price": -94,
+     "claimed": 0.5547,
+     "hit": 0.3846,
      "first": "2026-09-27",
-     "last": "2026-11-06"
+     "last": "2026-11-08"
     }
    },
    "verdict": "not enough yet",
-   "why": "only 9 held-out bets (needs 60); ROI -15.2% at the open, -20.6% at the close so far"
+   "why": "only 10 held-out bets (needs 60); ROI -23.6% at the open, -26.7% at the close so far"
   },
   {
    "sport": "cfb",
@@ -680,17 +680,17 @@
    },
    "test": {
     "open": {
-     "n": 41,
-     "w": 24,
+     "n": 42,
+     "w": 25,
      "l": 17,
      "p": 0,
-     "units": 4.89,
-     "roi": 0.1192,
+     "units": 5.8,
+     "roi": 0.138,
      "avg_price": -110,
-     "claimed": 0.5579,
-     "hit": 0.5854,
+     "claimed": 0.5578,
+     "hit": 0.5952,
      "first": "2026-09-05",
-     "last": "2026-10-31"
+     "last": "2026-11-07"
     },
     "close": {
      "n": 25,
@@ -707,7 +707,7 @@
     }
    },
    "verdict": "not enough yet",
-   "why": "only 41 held-out bets (needs 60); ROI +11.9% at the open, +14.6% at the close so far"
+   "why": "only 42 held-out bets (needs 60); ROI +13.8% at the open, +14.6% at the close so far"
   },
   {
    "sport": "nhl",
@@ -761,17 +761,17 @@
      "last": "2026-11-06"
     },
     "close": {
-     "n": 124,
-     "w": 41,
+     "n": 125,
+     "w": 42,
      "l": 83,
      "p": 0,
-     "units": -25.42,
-     "roi": -0.205,
+     "units": -24.22,
+     "roi": -0.1938,
      "avg_price": 144,
-     "claimed": 0.4464,
-     "hit": 0.3306,
+     "claimed": 0.4466,
+     "hit": 0.336,
      "first": "2026-01-15",
-     "last": "2026-11-06"
+     "last": "2026-11-10"
     }
    },
    "verdict": "fails",
@@ -952,17 +952,17 @@
    },
    "test": {
     "open": {
-     "n": 92,
-     "w": 42,
+     "n": 93,
+     "w": 43,
      "l": 50,
      "p": 0,
-     "units": -2.64,
-     "roi": -0.0287,
-     "avg_price": 38,
-     "claimed": 0.5108,
-     "hit": 0.4565,
+     "units": -0.74,
+     "roi": -0.0079,
+     "avg_price": 39,
+     "claimed": 0.5097,
+     "hit": 0.4624,
      "first": "2026-01-01",
-     "last": "2026-11-07"
+     "last": "2026-11-10"
     },
     "close": {
      "n": 84,
@@ -979,7 +979,7 @@
     }
    },
    "verdict": "fails",
-   "why": "lost at the opening price (-2.9% on 92)"
+   "why": "lost at the opening price (-0.8% on 93)"
   },
   {
    "sport": "cbb",
@@ -1020,34 +1020,34 @@
    },
    "test": {
     "open": {
-     "n": 178,
-     "w": 85,
-     "l": 93,
+     "n": 184,
+     "w": 87,
+     "l": 97,
      "p": 0,
-     "units": -14.67,
-     "roi": -0.0824,
+     "units": -16.81,
+     "roi": -0.0914,
      "avg_price": -99,
-     "claimed": 0.559,
-     "hit": 0.4775,
+     "claimed": 0.5608,
+     "hit": 0.4728,
      "first": "2026-01-01",
-     "last": "2026-11-07"
+     "last": "2026-11-10"
     },
     "close": {
-     "n": 200,
-     "w": 99,
-     "l": 101,
+     "n": 206,
+     "w": 102,
+     "l": 104,
      "p": 0,
-     "units": -10.71,
-     "roi": -0.0535,
+     "units": -10.99,
+     "roi": -0.0534,
      "avg_price": -101,
-     "claimed": 0.5615,
-     "hit": 0.495,
+     "claimed": 0.5632,
+     "hit": 0.4951,
      "first": "2026-01-01",
-     "last": "2026-11-07"
+     "last": "2026-11-10"
     }
    },
    "verdict": "fails",
-   "why": "lost at the opening price (-8.2% on 178)"
+   "why": "lost at the opening price (-9.1% on 184)"
   },
   {
    "sport": "cbb",
@@ -1088,34 +1088,34 @@
    },
    "test": {
     "open": {
-     "n": 115,
-     "w": 64,
-     "l": 51,
+     "n": 120,
+     "w": 67,
+     "l": 53,
      "p": 0,
-     "units": 7.44,
-     "roi": 0.0647,
+     "units": 8.26,
+     "roi": 0.0688,
      "avg_price": -110,
-     "claimed": 0.5549,
-     "hit": 0.5565,
+     "claimed": 0.5556,
+     "hit": 0.5583,
      "first": "2026-01-01",
-     "last": "2026-11-06"
+     "last": "2026-11-10"
     },
     "close": {
-     "n": 179,
-     "w": 104,
-     "l": 75,
+     "n": 184,
+     "w": 106,
+     "l": 78,
      "p": 0,
-     "units": 19.32,
-     "roi": 0.108,
+     "units": 18.1,
+     "roi": 0.0984,
      "avg_price": -110,
-     "claimed": 0.5562,
-     "hit": 0.581,
+     "claimed": 0.5569,
+     "hit": 0.5761,
      "first": "2026-01-01",
-     "last": "2026-11-06"
+     "last": "2026-11-10"
     }
    },
    "verdict": "fails",
-   "why": "held-out +6.5% / +10.8%, but lost -11.6% at the open in its tuning months (175 bets), so the held-out profit looks like luck"
+   "why": "held-out +6.9% / +9.8%, but lost -11.6% at the open in its tuning months (175 bets), so the held-out profit looks like luck"
   },
   {
    "sport": "tennis",
@@ -1378,21 +1378,21 @@
      "last": "2026-11-05"
     },
     "close": {
-     "n": 25,
+     "n": 26,
      "w": 14,
-     "l": 11,
+     "l": 12,
      "p": 0,
-     "units": 2.02,
-     "roi": 0.0809,
+     "units": 1.02,
+     "roi": 0.0393,
      "avg_price": -107,
-     "claimed": 0.5716,
-     "hit": 0.56,
+     "claimed": 0.5715,
+     "hit": 0.5385,
      "first": "2026-02-06",
-     "last": "2026-10-24"
+     "last": "2026-11-09"
     }
    },
    "verdict": "finalized",
-   "why": "40-23 at the open, ROI +22.3%; ROI +8.1% at the close",
+   "why": "40-23 at the open, ROI +22.3%; ROI +3.9% at the close",
    "notes": "Its own tuned rule (daily_top.MKT_RULE, 11/6): unders only, edge 4 to 16 points, price -150 to +200."
   },
   {
@@ -1434,34 +1434,34 @@
    },
    "test": {
     "open": {
-     "n": 49,
-     "w": 31,
+     "n": 52,
+     "w": 34,
      "l": 18,
      "p": 0,
-     "units": 19.75,
-     "roi": 0.403,
-     "avg_price": 96,
-     "claimed": 0.5178,
-     "hit": 0.6327,
+     "units": 23.44,
+     "roi": 0.4507,
+     "avg_price": 98,
+     "claimed": 0.5171,
+     "hit": 0.6538,
      "first": "2026-09-13",
-     "last": "2026-11-01"
+     "last": "2026-11-09"
     },
     "close": {
-     "n": 32,
-     "w": 14,
+     "n": 34,
+     "w": 16,
      "l": 18,
      "p": 0,
-     "units": -3.52,
-     "roi": -0.11,
-     "avg_price": 45,
-     "claimed": 0.5207,
-     "hit": 0.4375,
+     "units": -1.05,
+     "roi": -0.0309,
+     "avg_price": 50,
+     "claimed": 0.5182,
+     "hit": 0.4706,
      "first": "2026-09-18",
-     "last": "2026-11-02"
+     "last": "2026-11-09"
     }
    },
    "verdict": "not enough yet",
-   "why": "only 49 held-out bets (needs 60); ROI +40.3% at the open, -11.0% at the close so far",
+   "why": "only 52 held-out bets (needs 60); ROI +45.1% at the open, -3.1% at the close so far",
    "notes": "Close only where the closing line equals the opening line. Players with snaps and no catch count as 0."
   },
   {
@@ -1503,34 +1503,34 @@
    },
    "test": {
     "open": {
-     "n": 38,
-     "w": 18,
-     "l": 20,
+     "n": 42,
+     "w": 19,
+     "l": 23,
      "p": 0,
-     "units": -1.49,
-     "roi": -0.0393,
-     "avg_price": -14,
-     "claimed": 0.5491,
-     "hit": 0.4737,
+     "units": -3.55,
+     "roi": -0.0846,
+     "avg_price": -12,
+     "claimed": 0.546,
+     "hit": 0.4524,
      "first": "2026-10-10",
-     "last": "2026-11-07"
+     "last": "2026-11-08"
     },
     "close": {
-     "n": 36,
+     "n": 38,
      "w": 11,
-     "l": 25,
+     "l": 27,
      "p": 0,
-     "units": -11.53,
-     "roi": -0.3203,
-     "avg_price": 58,
-     "claimed": 0.5103,
-     "hit": 0.3056,
+     "units": -13.53,
+     "roi": -0.356,
+     "avg_price": 61,
+     "claimed": 0.51,
+     "hit": 0.2895,
      "first": "2026-10-07",
-     "last": "2026-11-04"
+     "last": "2026-11-07"
     }
    },
    "verdict": "not enough yet",
-   "why": "only 38 held-out bets (needs 60); ROI -3.9% at the open, -32.0% at the close so far",
+   "why": "only 42 held-out bets (needs 60); ROI -8.5% at the open, -35.6% at the close so far",
    "notes": "Players with no box line are voids here (Onyx settles them at 0)."
   },
   {
@@ -1572,34 +1572,34 @@
    },
    "test": {
     "open": {
-     "n": 59,
-     "w": 34,
-     "l": 25,
+     "n": 64,
+     "w": 35,
+     "l": 29,
      "p": 0,
-     "units": 7.55,
-     "roi": 0.128,
-     "avg_price": -34,
+     "units": 4.43,
+     "roi": 0.0692,
+     "avg_price": -36,
      "claimed": 0.5522,
-     "hit": 0.5763,
+     "hit": 0.5469,
      "first": "2026-10-07",
-     "last": "2026-11-07"
+     "last": "2026-11-08"
     },
     "close": {
-     "n": 54,
-     "w": 29,
-     "l": 25,
+     "n": 57,
+     "w": 31,
+     "l": 26,
      "p": 0,
-     "units": 2.59,
-     "roi": 0.048,
-     "avg_price": -58,
-     "claimed": 0.5514,
-     "hit": 0.537,
+     "units": 3.32,
+     "roi": 0.0582,
+     "avg_price": -61,
+     "claimed": 0.5523,
+     "hit": 0.5439,
      "first": "2026-10-08",
      "last": "2026-11-07"
     }
    },
-   "verdict": "not enough yet",
-   "why": "only 59 held-out bets (needs 60); ROI +12.8% at the open, +4.8% at the close so far",
+   "verdict": "fails",
+   "why": "held-out +6.9% / +5.8%, but lost -25.8% at the open in its tuning months (39 bets), so the held-out profit looks like luck",
    "notes": "Players with no box line are voids here (Onyx settles them at 0)."
   },
   {
@@ -1641,34 +1641,34 @@
    },
    "test": {
     "open": {
-     "n": 103,
-     "w": 77,
-     "l": 26,
+     "n": 108,
+     "w": 80,
+     "l": 28,
      "p": 0,
-     "units": 41.64,
-     "roi": 0.4043,
+     "units": 42.27,
+     "roi": 0.3914,
      "avg_price": -114,
-     "claimed": 0.6074,
-     "hit": 0.7476,
+     "claimed": 0.6089,
+     "hit": 0.7407,
      "first": "2026-10-02",
-     "last": "2026-11-07"
+     "last": "2026-11-08"
     },
     "close": {
-     "n": 98,
-     "w": 68,
-     "l": 30,
+     "n": 103,
+     "w": 69,
+     "l": 34,
      "p": 0,
-     "units": 30.61,
-     "roi": 0.3124,
+     "units": 27.46,
+     "roi": 0.2666,
      "avg_price": -110,
-     "claimed": 0.6042,
-     "hit": 0.6939,
+     "claimed": 0.6056,
+     "hit": 0.6699,
      "first": "2026-10-02",
-     "last": "2026-11-07"
+     "last": "2026-11-08"
     }
    },
    "verdict": "finalized",
-   "why": "77-26 at the open, ROI +40.4%; ROI +31.2% at the close",
+   "why": "80-28 at the open, ROI +39.1%; ROI +26.7% at the close",
    "notes": "Players with no box line are voids here (Onyx settles them at 0)."
   },
   {
@@ -1710,34 +1710,34 @@
    },
    "test": {
     "open": {
-     "n": 44,
-     "w": 29,
-     "l": 15,
-     "p": 0,
-     "units": 11.87,
-     "roi": 0.2697,
-     "avg_price": -63,
-     "claimed": 0.5642,
-     "hit": 0.6591,
-     "first": "2026-10-07",
-     "last": "2026-11-07"
-    },
-    "close": {
-     "n": 35,
-     "w": 18,
+     "n": 50,
+     "w": 33,
      "l": 17,
      "p": 0,
-     "units": -0.82,
-     "roi": -0.0235,
-     "avg_price": -81,
-     "claimed": 0.5608,
-     "hit": 0.5143,
+     "units": 13.38,
+     "roi": 0.2675,
+     "avg_price": -70,
+     "claimed": 0.5654,
+     "hit": 0.66,
+     "first": "2026-10-07",
+     "last": "2026-11-08"
+    },
+    "close": {
+     "n": 37,
+     "w": 20,
+     "l": 17,
+     "p": 0,
+     "units": 0.93,
+     "roi": 0.0252,
+     "avg_price": -83,
+     "claimed": 0.5612,
+     "hit": 0.5405,
      "first": "2026-10-08",
-     "last": "2026-11-06"
+     "last": "2026-11-07"
     }
    },
    "verdict": "not enough yet",
-   "why": "only 44 held-out bets (needs 60); ROI +27.0% at the open, -2.4% at the close so far",
+   "why": "only 50 held-out bets (needs 60); ROI +26.8% at the open, +2.5% at the close so far",
    "notes": "Players with no box line are voids here (Onyx settles them at 0)."
   },
   {
