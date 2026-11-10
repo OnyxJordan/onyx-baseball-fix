@@ -1466,7 +1466,7 @@
      "id": "187372",
      "start": "2026-11-10T20:15Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Group Stage",
      "draw": "Women's Singles",
      "court": "Indian Wells Tennis Garden",
@@ -1478,7 +1478,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        6,
+        1
        ],
        "serve": false
       },
@@ -1489,6 +1490,7 @@
        "seed": null,
        "win": false,
        "sets": [
+        2,
         1
        ],
        "serve": false
@@ -2452,9 +2454,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        3
+        6
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Laura Samson",
@@ -2463,7 +2465,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        1
+        5
        ],
        "serve": false
       }
@@ -2472,8 +2474,8 @@
     {
      "id": "186759",
      "start": "2026-11-10T20:30Z",
-     "state": "pre",
-     "detail": "11/10 - 3:30 PM EST",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Main Court",
@@ -2484,8 +2486,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/col.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        2
+       ],
+       "serve": true
       },
       {
        "name": "Maria Lourdes Carle",
@@ -2493,7 +2497,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        3
+       ],
        "serve": false
       }
      ]
@@ -2936,5 +2942,5 @@
    ]
   }
  ],
- "fetched": "2026-11-10T20:26:46+00:00"
+ "fetched": "2026-11-10T21:00:04+00:00"
 }
