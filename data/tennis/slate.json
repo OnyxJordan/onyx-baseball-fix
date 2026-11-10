@@ -793,8 +793,8 @@
     {
      "id": "186533",
      "start": "2026-11-10T13:25Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 1",
      "draw": "Men's Singles",
      "court": "Court 1",
@@ -807,7 +807,7 @@
        "win": false,
        "sets": [
         4,
-        2
+        6
        ],
        "serve": false
       },
@@ -816,10 +816,10 @@
        "short": "L. Sonego",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ita.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        2
+        7
        ],
        "serve": false
       }
@@ -856,9 +856,9 @@
     },
     {
      "id": "186527",
-     "start": "2026-11-10T14:30Z",
-     "state": "pre",
-     "detail": "11/10 - 9:30 AM EST",
+     "start": "2026-11-10T14:35Z",
+     "state": "in",
+     "detail": "2nd",
      "round": "Round 1",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -869,8 +869,11 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ser.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        7,
+        3
+       ],
+       "serve": true
       },
       {
        "name": "Arthur Rinderknech",
@@ -878,7 +881,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        6,
+        2
+       ],
        "serve": false
       }
      ]
@@ -960,9 +966,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Lorenzo Sonego",
+       "short": "L. Sonego",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ita.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -2198,9 +2204,9 @@
     },
     {
      "id": "186747",
-     "start": "2026-11-10T15:00Z",
-     "state": "pre",
-     "detail": "11/10 - 10:00 AM EST",
+     "start": "2026-11-10T15:35Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Main Court",
@@ -2211,7 +2217,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        2
+       ],
        "serve": false
       },
       {
@@ -2220,16 +2228,18 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        3
+       ],
        "serve": false
       }
      ]
     },
     {
      "id": "186751",
-     "start": "2026-11-10T15:00Z",
-     "state": "pre",
-     "detail": "11/10 - 10:00 AM EST",
+     "start": "2026-11-10T15:35Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Court 1",
@@ -2240,7 +2250,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        2
+       ],
        "serve": false
       },
       {
@@ -2249,16 +2261,18 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        4
+       ],
+       "serve": true
       }
      ]
     },
     {
      "id": "186752",
-     "start": "2026-11-10T15:00Z",
-     "state": "pre",
-     "detail": "11/10 - 10:00 AM EST",
+     "start": "2026-11-10T15:35Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Court 2",
@@ -2269,8 +2283,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        1
+       ],
+       "serve": true
       },
       {
        "name": "Lucia Bronzetti",
@@ -2278,16 +2294,18 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ita.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        4
+       ],
        "serve": false
       }
      ]
     },
     {
      "id": "186745",
-     "start": "2026-11-10T16:30Z",
+     "start": "2026-11-10T17:00Z",
      "state": "pre",
-     "detail": "11/10 - 11:30 AM EST",
+     "detail": "11/10 - 12:00 PM EST",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Main Court",
@@ -2314,17 +2332,17 @@
     },
     {
      "id": "186746",
-     "start": "2026-11-10T16:30Z",
+     "start": "2026-11-10T17:00Z",
      "state": "pre",
-     "detail": "11/10 - 11:30 AM EST",
+     "detail": "11/10 - 12:00 PM EST",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Court 2",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Maria Camila Torres Murcia",
+       "short": "M. Torres Murcia",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/col.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -2343,9 +2361,9 @@
     },
     {
      "id": "186748",
-     "start": "2026-11-10T16:30Z",
+     "start": "2026-11-10T17:00Z",
      "state": "pre",
-     "detail": "11/10 - 11:30 AM EST",
+     "detail": "11/10 - 12:00 PM EST",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Court 1",
@@ -2372,9 +2390,9 @@
     },
     {
      "id": "186757",
-     "start": "2026-11-10T18:00Z",
+     "start": "2026-11-10T18:30Z",
      "state": "pre",
-     "detail": "11/10 - 1:00 PM EST",
+     "detail": "11/10 - 1:30 PM EST",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Court 1",
@@ -2401,9 +2419,9 @@
     },
     {
      "id": "186759",
-     "start": "2026-11-10T18:00Z",
+     "start": "2026-11-10T18:30Z",
      "state": "pre",
-     "detail": "11/10 - 1:00 PM EST",
+     "detail": "11/10 - 1:30 PM EST",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Main Court",
@@ -2866,5 +2884,5 @@
    ]
   }
  ],
- "fetched": "2026-11-10T14:22:12+00:00"
+ "fetched": "2026-11-10T16:01:43+00:00"
 }

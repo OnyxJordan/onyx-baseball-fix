@@ -1794,5 +1794,49 @@
   "model": "v2",
   "result": null,
   "actual": null
+ },
+ {
+  "date": "2026-11-10",
+  "key": "401858526|aidan laughery|rush_yds",
+  "gid": "401858526",
+  "pid": "4827047",
+  "name": "Aidan Laughery",
+  "team": "ILL",
+  "opp": "UCLA",
+  "matchup": "ILL @ UCLA",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 45.5,
+  "price": -126,
+  "sel": "1d9c7db3-3a19-4d67-8430-3c31c09e3b6a",
+  "proj": 53.1,
+  "prob": 0.6194,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.57,
+    "avg": 0.77,
+    "pp": -4.7
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.67,
+    "avg": -0.05,
+    "pp": 0.6
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.9,
+    "avg": 0.93,
+    "pp": 0.5
+   }
+  ],
+  "opened_at": "2026-11-10T16:01:37+00:00",
+  "logged_at": "2026-11-10T16:01:37+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
  }
 ]
