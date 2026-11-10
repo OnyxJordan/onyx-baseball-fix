@@ -1663,5 +1663,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186751-ml-home",
+  "sport": "tennis",
+  "gid": "186751",
+  "date": "2026-11-10",
+  "logged_at": "2026-11-10T15:59:43+00:00",
+  "matchup": "Julia Riera vs Alice Tubello",
+  "home": "Alice Tubello",
+  "away": "Julia Riera",
+  "label": "Alice Tubello to win",
+  "kind": "ml",
+  "side": "home",
+  "line": null,
+  "price": -301,
+  "chance": 0.7811,
+  "implied": 0.7506,
+  "edge": 0.03,
+  "fair": -355,
+  "state": {
+   "sets": "1-4",
+   "srv": "away",
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
