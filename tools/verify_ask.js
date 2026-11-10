@@ -62,7 +62,11 @@ const srv = http.createServer((q, r) => { const p = path.join(root, decodeURICom
       if (e.min_price != null && s.min_price !== e.min_price) why.push(`min_price ${s.min_price} want ${e.min_price}`);
       if (e.max_price != null && s.max_price !== e.max_price) why.push(`max_price ${s.max_price} want ${e.max_price}`);
       if (e.min_conf != null && s.min_conf !== e.min_conf) why.push(`min_conf ${s.min_conf} want ${e.min_conf}`);
-      if (e.team && s.team !== e.team && !Object.values(s.tabbr || {}).some(v => (v || []).indexOf(e.team) >= 0)) why.push(`team ${s.team} want ${e.team}`);   // a school on two boards (football and basketball)
+      // (11/10, 1M test) a nickname two teams on today's boards share ("Kings": Sacramento and Los Angeles), with no
+      // sport or basketball/hockey word in the request, SHOULD be asked: the button for the wanted team is a pass
+      const CUE = /\b(nba|nhl|basketball|hoops|hockey|pts|points|rebounds|rebs|boards|assists|dimes|threes|treys|pra|goals|puck|sog|saves|sacramento|los angeles|la kings)\b/i;
+      const askOK = !!(R.ambig && e.team && !CUE.test(c.q) && (R.clarify && R.clarify.options || []).some(o => JSON.stringify(o).indexOf('"' + e.team + '"') >= 0));
+      if (e.team && !askOK && s.team !== e.team && !Object.values(s.tabbr || {}).some(v => (v || []).indexOf(e.team) >= 0)) why.push(`team ${s.team} want ${e.team}`);   // a school on two boards (football and basketball)
       const nmS = x => String(x || '').toLowerCase().replace(/[.']/g, '').replace(/\b(jr|sr|ii|iii|iv|v)\b/g, '').replace(/\s+/g, ' ').trim();   // "Terrance Carter Jr." is Terrance Carter (11/8)
       if (e.player && nmS(s.player) !== nmS(e.player)) why.push(`player ${s.player} want ${e.player}`);
       if (e.teams) { const got = ((s.teams || []).length ? s.teams : s.team ? [s.team] : []).map(x => String(x).toUpperCase()).sort(); if (!same(got, e.teams)) why.push(`teams ${JSON.stringify(got)} want ${JSON.stringify(e.teams)}`); }
@@ -84,11 +88,12 @@ const srv = http.createServer((q, r) => { const p = path.join(root, decodeURICom
       if (e.ticket_floor && !s.ticket_floor) why.push('total odds not read as the ticket minimum');
       if (e.xmk && !e.xmk.every(m => (s.xmk || []).indexOf(m) >= 0)) why.push(`xmk ${JSON.stringify(s.xmk || [])} want ${JSON.stringify(e.xmk)}`);
       if (e.no_player && s.player) why.push(`read a player ${s.player}: should be excluded`);
+      if (e.no_team && (s.team === e.no_team || Object.values(s.tabbr || {}).some(v => (v || []).indexOf(e.no_team) >= 0))) why.push(`read the team ${e.no_team}: it was ruled out or is not a team here`);
       if (e.max_legs && (R.rows || []).length > e.max_legs) why.push(`${R.rows.length} legs, no more than ${e.max_legs} asked`);
       // college and team-name expectations (tools/ask_college_cases.js, tools/ask_taxonomy.py)
       if (e.school && s.school !== e.school) why.push(`school ${s.school} want ${e.school}`);
       if (e.ambig && !R.ambig) why.push(`should ask which team (read: ${R.understood})`);
-      if (!e.ambig && R.ambig && Object.keys(e).length && !e.ambig_ok) why.push(`asked which team: ${(R.clarify && R.clarify.options || []).map(o => o.label).join(' | ')}`);
+      if (!e.ambig && R.ambig && Object.keys(e).length && !e.ambig_ok && !askOK) why.push(`asked which team: ${(R.clarify && R.clarify.options || []).map(o => o.label).join(' | ')}`);
       if (e.ambig_has) { const labs = (R.clarify && R.clarify.options || []).map(o => o.label).join(' | '); e.ambig_has.forEach(n => { if (labs.indexOf(n) < 0) why.push(`no button for ${n}`); }); }
       if (e.conf && s.conf !== e.conf) why.push(`conf ${s.conf} want ${e.conf}`);
       if (e.depth && !R.depth) why.push('not answered from the depth charts');
@@ -124,7 +129,11 @@ const srv = http.createServer((q, r) => { const p = path.join(root, decodeURICom
         if (s.pos_value && !R.widened && !(p.edge > 0)) { why.push(`positive value only, but ${p.label} has edge ${p.edge}`); break; }
         if (Date.parse(p.start) <= now) { why.push('started game'); break; }
         if (s.slot && !R.widened && !OnyxAsk.slotOk(s.slot, p.start)) { why.push(`play outside the ${s.slot.label}: ${p.label} ${p.start}`); break; }
-        if ((s.exclude || []).some(x => String(p.name || p.label).toLowerCase().indexOf(String(x).toLowerCase()) >= 0)) { why.push(`excluded ${p.name || p.label} is in the answer`); break; }
+        // (11/10) a team code is the play's team (or a side of its game line), a name is whole words: "MIZ" is not
+        // inside "Isaiah Mizell", "STAN" not inside "Jay Kastantin"
+        const exHit = x => { const xs = String(x); if (/^[A-Z0-9&]{2,6}$/.test(xs)) return p.team === xs || (!p.name && String(p.matchup || '').split(/[^A-Za-z0-9&]+/).indexOf(xs) >= 0);
+          return new RegExp('(^|[^a-z])' + xs.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '($|[^a-z])').test(String(p.name || p.label).toLowerCase()); };
+        if ((s.exclude || []).some(exHit)) { why.push(`excluded ${p.name || p.label} is in the answer`); break; }
         if (s.player && !(s.player2 && String(p.name || p.label).toLowerCase().indexOf(String(s.player2).toLowerCase()) >= 0) && String(p.name || p.label).toLowerCase().indexOf(String(s.player).toLowerCase()) < 0) { why.push(`play not on ${s.player}`); break; }
         // on today's board file, at the same Onyx price, with its league's tag
         // keyed by game too: a market-line play (Onyx down, 11/5) has no selection id, and the same label
