@@ -1465,8 +1465,8 @@
     {
      "id": "187372",
      "start": "2026-11-10T20:15Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Group Stage",
      "draw": "Women's Singles",
      "court": "Indian Wells Tennis Garden",
@@ -1476,12 +1476,12 @@
        "short": "J. Pegula",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        6
+        7
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Marta Kostyuk",
@@ -1499,9 +1499,9 @@
     },
     {
      "id": "187375",
-     "start": "2026-11-10T21:45Z",
-     "state": "pre",
-     "detail": "11/10 - 4:45 PM EST",
+     "start": "2026-11-10T22:10Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Group Stage",
      "draw": "Women's Singles",
      "court": "Indian Wells Tennis Garden",
@@ -1512,8 +1512,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/cze.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        1
+       ],
+       "serve": true
       },
       {
        "name": "Coco Gauff",
@@ -1521,7 +1523,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        0
+       ],
        "serve": false
       }
      ]
@@ -2455,7 +2459,7 @@
        "win": false,
        "sets": [
         7,
-        3
+        6
        ],
        "serve": true
       },
@@ -2467,7 +2471,7 @@
        "win": false,
        "sets": [
         6,
-        2
+        5
        ],
        "serve": false
       }
@@ -2490,7 +2494,7 @@
        "win": false,
        "sets": [
         3,
-        3
+        6
        ],
        "serve": false
       },
@@ -2502,9 +2506,9 @@
        "win": false,
        "sets": [
         6,
-        2
+        4
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -2946,5 +2950,5 @@
    ]
   }
  ],
- "fetched": "2026-11-10T21:45:01+00:00"
+ "fetched": "2026-11-10T22:17:55+00:00"
 }

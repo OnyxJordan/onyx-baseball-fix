@@ -2102,5 +2102,137 @@
   "model": "v2",
   "result": null,
   "actual": null
+ },
+ {
+  "date": "2026-11-10",
+  "key": "401858293|amari thomas|rush_yds",
+  "gid": "401858293",
+  "pid": "5372196",
+  "name": "Amari Thomas",
+  "team": "FSU",
+  "opp": "PITT",
+  "matchup": "FSU @ PITT",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 35.5,
+  "price": -126,
+  "sel": "8dba8bbc-7c65-437b-b6d9-15f46cf93667",
+  "proj": 18.3,
+  "prob": 0.6498,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.44,
+    "avg": 0.77,
+    "pp": -7.6
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.85,
+    "avg": 0.93,
+    "pp": 1.3
+   },
+   {
+    "k": "line vs his usual range",
+    "v": 0.27,
+    "avg": -0.05,
+    "pp": -0.3
+   }
+  ],
+  "opened_at": "2026-11-10T22:17:50+00:00",
+  "logged_at": "2026-11-10T22:17:50+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-10",
+  "key": "401858293|quintrevion wisner|rush_yds",
+  "gid": "401858293",
+  "pid": "4871076",
+  "name": "Quintrevion Wisner",
+  "team": "FSU",
+  "opp": "PITT",
+  "matchup": "FSU @ PITT",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 44.5,
+  "price": -126,
+  "sel": "7a2c2f92-8d97-4070-ba5b-632e3f3b4987",
+  "proj": 27.8,
+  "prob": 0.6503,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.44,
+    "avg": 0.77,
+    "pp": -7.6
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.85,
+    "avg": 0.93,
+    "pp": 1.3
+   },
+   {
+    "k": "line vs his usual range",
+    "v": 0.31,
+    "avg": -0.05,
+    "pp": -0.3
+   }
+  ],
+  "opened_at": "2026-11-10T22:17:50+00:00",
+  "logged_at": "2026-11-10T22:17:50+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-10",
+  "key": "401858293|ashton daniels|rush_yds",
+  "gid": "401858293",
+  "pid": "4838679",
+  "name": "Ashton Daniels",
+  "team": "FSU",
+  "opp": "PITT",
+  "matchup": "FSU @ PITT",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 49.5,
+  "price": -126,
+  "sel": "b0914835-8e42-4178-8080-80bb71cb9707",
+  "proj": 32.0,
+  "prob": 0.6483,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.44,
+    "avg": 0.77,
+    "pp": -7.6
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.85,
+    "avg": 0.93,
+    "pp": 1.3
+   },
+   {
+    "k": "line vs his usual range",
+    "v": 0.09,
+    "avg": -0.05,
+    "pp": -0.1
+   }
+  ],
+  "opened_at": "2026-11-10T22:17:50+00:00",
+  "logged_at": "2026-11-10T22:17:50+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
  }
 ]
