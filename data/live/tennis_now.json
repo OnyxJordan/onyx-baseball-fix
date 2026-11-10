@@ -1933,5 +1933,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186759-spread-away",
+  "sport": "tennis",
+  "gid": "186759",
+  "date": "2026-11-10",
+  "logged_at": "2026-11-10T20:54:04+00:00",
+  "matchup": "Valentina Mediorreal Arias vs Maria Lourdes Carle",
+  "home": "Maria Lourdes Carle",
+  "away": "Valentina Mediorreal Arias",
+  "label": "Valentina Mediorreal Arias +8.5 games",
+  "kind": "spread",
+  "side": "away",
+  "line": 8.5,
+  "price": -165,
+  "chance": 0.7081,
+  "implied": 0.6226,
+  "edge": 0.086,
+  "fair": -245,
+  "state": {
+   "sets": "1-3",
+   "srv": "home",
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
