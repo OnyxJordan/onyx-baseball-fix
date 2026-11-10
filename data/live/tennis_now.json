@@ -1543,5 +1543,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186541-spread-away",
+  "sport": "tennis",
+  "gid": "186541",
+  "date": "2026-11-10",
+  "logged_at": "2026-11-10T12:16:24+00:00",
+  "matchup": "Juan Manuel Cerundolo vs Alex Michelsen",
+  "home": "Alex Michelsen",
+  "away": "Juan Manuel Cerundolo",
+  "label": "Juan Manuel Cerundolo +5.5 games",
+  "kind": "spread",
+  "side": "away",
+  "line": 5.5,
+  "price": -140,
+  "chance": 0.694,
+  "implied": 0.5833,
+  "edge": 0.111,
+  "fair": -225,
+  "state": {
+   "sets": "0-1",
+   "srv": "away",
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
