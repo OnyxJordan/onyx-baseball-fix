@@ -2014,5 +2014,93 @@
   "model": "v2",
   "result": null,
   "actual": null
+ },
+ {
+  "date": "2026-11-10",
+  "key": "401856883|jamal roberts|rush_yds",
+  "gid": "401856883",
+  "pid": "4921116",
+  "name": "Jamal Roberts",
+  "team": "MIZ",
+  "opp": "UGA",
+  "matchup": "MIZ @ UGA",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 62.5,
+  "price": -124,
+  "sel": "a4e139e5-5c90-4d7d-848c-0f3cd7728f36",
+  "proj": 90.0,
+  "prob": 0.6206,
+  "implied": 0.5536,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.54,
+    "avg": 0.77,
+    "pp": -5.3
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.88,
+    "avg": 0.93,
+    "pp": 0.8
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.86,
+    "avg": -0.05,
+    "pp": 0.8
+   }
+  ],
+  "opened_at": "2026-11-10T20:26:40+00:00",
+  "logged_at": "2026-11-10T20:26:40+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-10",
+  "key": "401858518|waymond jordan|rush_yds",
+  "gid": "401858518",
+  "pid": "5295318",
+  "name": "Waymond Jordan",
+  "team": "USC",
+  "opp": "IU",
+  "matchup": "USC @ IU",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 28.5,
+  "price": -126,
+  "sel": "a7f4199f-40c2-4295-a931-4d5c04bf33a5",
+  "proj": 29.9,
+  "prob": 0.6393,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.49,
+    "avg": 0.77,
+    "pp": -6.5
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.94,
+    "avg": -0.05,
+    "pp": 0.9
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.92,
+    "avg": 0.93,
+    "pp": 0.1
+   }
+  ],
+  "opened_at": "2026-11-10T20:26:40+00:00",
+  "logged_at": "2026-11-10T20:26:40+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
  }
 ]
