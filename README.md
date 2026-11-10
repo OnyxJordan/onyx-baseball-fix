@@ -1966,6 +1966,24 @@ validate_build's ledger list), shown under "On trial" on the CFB Plays tab. The 
 on 10/31 stay on the graded record. A guard skipping totals far from the market was tested and
 did not help.
 
+**Football totals, pace x efficiency, priced (11/10, task #77).** `python3 tools/fb_totals_bt.py cfb nfl [--debias]`
+walks every game in `data/picks/lines/<sport>.json` forward and prices the over/under at Onyx's opening and closing
+prices. It compares five models: the live points ratings; pace (plays from tempo against plays allowed, times
+points per 100 plays from offense against defense, `totals_audit.pace_fit`); ypp (plays times yards per play times
+the league's points per yard); and the means of ratings with pace and with ypp. Each fit and each betting rule is
+picked on games before 2026-03-01 only, then judged on the held-out 2026 games against the finalization bar.
+- **Accuracy (CFB, held-out MAE):** pace 13.08 and ratings 13.24 points, against Onyx's open at 13.19 and close
+  at 12.68. Pace beats the ratings and roughly matches the open, but nothing beats the close. Every model projects
+  1.2 to 1.8 points high on the tuning season.
+- **Betting (CFB):** every model profits at the open and loses it by the close (pace 51-33 +16.0% open, -0.3%
+  close). Only the ratings model at blend 0.3, edge 3pp+ cleared the bar (63 bets, +15.3% at the close). That rule
+  is an island: at 2pp it is -1.4%, at blend 0.5 it is -3% to +0%, and its tuning season at the close is -4.4%.
+  Removing the bias barely changes it (+10.9% without). Not adopted; the totals lane stays on trial. Unders beat
+  overs in every cut (the passing rule: unders 21-11 +25.5%, overs 17-14 +4.7%), which is the same story as the
+  11/1 finding that our totals run hot. Watch it in the trial log rather than mining it here.
+- **NFL:** pace is worse than the ratings (held-out MAE 12.13 against 11.13), and nothing holds at the close
+  (pace -24.0%). Nothing adopted, so no model version changed. The live lanes are unchanged.
+
 **College football player projections (11/1).** `sports_espn.ingest_box` (the NFL box-score
 reader, generalized) reads every FBS box score this season into `data/cfb/player_games.json`
 (575 games, weeks 1-9 seeded; the daily run adds new finals). `cfb_players.py` runs nfl_model's
