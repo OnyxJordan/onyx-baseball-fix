@@ -1440,5 +1440,33 @@
   "actual": 57.0,
   "profit": 0.8403,
   "graded_at": "2026-11-10T04:06:55+00:00"
+ },
+ {
+  "id": "nba-20261111C4046DD5-q1-q1_total",
+  "sport": "nba",
+  "date": "2026-11-10",
+  "logged_at": "2026-11-10T10:15:03+00:00",
+  "start": "2026-11-11T04:00:00Z",
+  "gid": "20261111C4046DD5",
+  "matchup": "OKC @ POR",
+  "label": "OKC @ POR Over 55.5 1st-quarter points",
+  "market": "q1_total",
+  "kind": "prop",
+  "name": "OKC @ POR",
+  "team": "OKC",
+  "who": "q1",
+  "side": "over",
+  "line": 55.5,
+  "hcap": null,
+  "price": -122,
+  "chance": 0.5714,
+  "edge": 0.0218,
+  "ev": 0.0397,
+  "sel": "c884bef8-d2bd-4596-9bae-066ece9f6bcc",
+  "model": "q1 0.254/12.0",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
