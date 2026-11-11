@@ -2113,5 +2113,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186766-spread-away",
+  "sport": "tennis",
+  "gid": "186766",
+  "date": "2026-11-11",
+  "logged_at": "2026-11-11T15:49:04+00:00",
+  "matchup": "Carole Monnet vs Polona Hercog",
+  "home": "Polona Hercog",
+  "away": "Carole Monnet",
+  "label": "Carole Monnet +5.5 games",
+  "kind": "spread",
+  "side": "away",
+  "line": 5.5,
+  "price": -175,
+  "chance": 0.7023,
+  "implied": 0.6364,
+  "edge": 0.066,
+  "fair": -235,
+  "state": {
+   "sets": "3-6 0-0",
+   "srv": "away",
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
