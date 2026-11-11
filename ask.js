@@ -394,7 +394,10 @@
     // a full name nobody on today's boards has: keep it, so the answer can say they have no game today
     if (typed && !fk.some(function (k) { return fit[k] >= 2; })) return typed.replace(/\b\w/g, function (c) { return c.toUpperCase(); });
     // 4. one name part one letter off and nothing else ("jokick"): the most prominent such player
-    var loose = keys.filter(function (k) { return k.split(' ').some(function (n) { return n.length >= 5 && W.some(function (w) { return w.length >= 5 && lev1(w, n); }); }); });
+    // (11/11, Jordan's screenshot: "all games start 3 PM or earlier" was Marcus Smart) everyday words are never a
+    // misspelled name
+    var NOTYPO = /^(start|starts|started|starting|stats|early|earlier|later|latest|games|today|tonight|total|totals|spread|spreads|parlay|parlays|under|unders|overs|points|their|there|where|other|those|these|after|before|night|first|third|score|scores|picks|plays|value|money|lines|bets|legs|leave|least|most|rather|maybe|shots|saves|goals|teams|sides|smart|safe|safer|safest|fades|locks|hammer|slate|games)$/;
+    var loose = keys.filter(function (k) { return k.split(' ').some(function (n) { return n.length >= 5 && W.some(function (w) { return w.length >= 5 && !NOTYPO.test(w) && lev1(w, n); }); }); });
     if (loose.length) return C[best(loose)].name;
     return null;
   }
@@ -772,14 +775,37 @@
     else if (/this weekend|weekend/.test(t)) s.when = 'weekend';
     else for (var d = 0; d < 7; d++) if (new RegExp('\\b' + DAYS[d] + '\\b').test(t)) { s.when = DAYS[d]; break; }
     // the slate (11/8, Jordan: "1 PM slate only"): kickoff windows in ET hours, and a night of the week
+    function rangeSlot() {
+      var SL = null;
+      // a window of start times (11/11, Jordan: "all games start 3 PM or earlier"): before / by / or earlier, after /
+      // or later, between two times. ET hours; a time with no am/pm reads as afternoon or evening (1-11 -> pm)
+      var TM = '(\\d{1,2}|noon)(?::(\\d{2}))? ?(pm|am|p m|a m|oclock)?(?![a-z0-9])(?!\\s*(?:legs?|picks?|teams?|man|way|plays?|bets?|points?|pts|rebounds|assists|yards|catches|tds?|goals|units?|dollars|bucks|games? parlay|team parlay)\\b)(?!\\s*%)';
+      var TCTX = /\b(start|starts|starting|started|tip|tips|tipoff|kick|kicks|kickoff|games?|slate|window|matches|et|est|oclock|o clock|time)\b/.test(t), hr = function (h, m, ap) {
+        if (h === 'noon') return 12;
+        var x = +h % 12; if (ap ? /^p/.test(ap) : x >= 1 && x <= 11) x += 12; return x + (m ? +m / 60 : 0); };
+      var lab = function (x) { var h = Math.floor(x), m = Math.round((x - h) * 60); return ((h + 11) % 12 + 1) + (m ? ':' + (m < 10 ? '0' : '') + m : '') + (h >= 12 && h < 24 ? ' PM' : ' AM'); };
+      var rB = new RegExp('\\bbetween ' + TM + ' (and|to|-) ' + TM + '\\b').exec(t)
+        || new RegExp('\\b(?:from )?' + TM + ' ?(-|to) ?' + TM + ' (?:et )?(?:games?|slate|window|starts?|tips?|kicks?)\\b').exec(t);
+      var rE = new RegExp('\\b(?:before|by|until|till|no later than|not after|earlier than|ending by)\\s+' + TM + '|\\b' + TM + '\\s+(?:or|and)\\s+(?:earlier|before|sooner)\\b|\\b' + TM + '\\s+at the latest\\b').exec(t);
+      var rL = new RegExp('\\b(?:after|from|starting at|no earlier than|later than|not before)\\s+' + TM + '|\\b' + TM + '\\s+(?:or|and)\\s+(?:later|after)\\b|\\b' + TM + '\\s+on\\b').exec(t);
+      var pickT = function (m, i) { return m[i] != null && (m[i + 2] || m[i] === 'noon' || TCTX || /^(before|after|until|till|no later|not after|earlier than|later than|not before|no earlier|between)/.test(m[0])) ? hr(m[i], m[i + 1], m[i + 2]) : null; };
+      if (rB) { var a0 = pickT(rB, 1), a1 = pickT(rB, rB[5] != null ? 5 : 5); a1 = a1 != null ? a1 : pickT(rB, 5);
+        if (a0 != null && a1 != null && a1 > a0) SL = {h0: a0 - 0.01, h1: a1 + 0.01, label: 'starting ' + lab(a0) + ' to ' + lab(a1)}; }
+      if (!SL && rE) { var e0 = pickT(rE, 1) != null ? pickT(rE, 1) : pickT(rE, 4) != null ? pickT(rE, 4) : pickT(rE, 7);
+        if (e0 != null) SL = {h0: 4, h1: e0 + 0.01, label: 'starting by ' + lab(e0)}; }
+      if (!SL && rL) { var l0 = pickT(rL, 1) != null ? pickT(rL, 1) : pickT(rL, 4) != null ? pickT(rL, 4) : pickT(rL, 7);
+        if (l0 != null) SL = {h0: l0 - 0.01, h1: 28, label: 'starting ' + lab(l0) + ' or later'}; }
+          return SL;
+    }
     var SL = null;
     if (/\b(sunday night|snf)\b/.test(t)) SL = {h0: 19, h1: 28, dow: 0, label: 'Sunday night'};
     else if (/\b(monday night|mnf)\b/.test(t)) SL = {h0: 19, h1: 28, dow: 1, label: 'Monday night'};
     else if (/\b(thursday night|tnf)\b/.test(t)) SL = {h0: 19, h1: 28, dow: 4, label: 'Thursday night'};
     else if (/\b(prime ?time|night games?|late night)\b/.test(t)) SL = {h0: 19, h1: 28, label: 'night games'};
+    else if ((SL = rangeSlot())) {}
     else if (/\bearly (games?|slate|window|kickoffs?|ones)\b|\b1 ?(pm|p m|oclock)\b|\b1:00\b/.test(t)) SL = {h0: 12, h1: 15, label: '1 PM slate'};
     else if (/\blate (games?|slate|window|afternoon|kickoffs?|ones)\b|\b4 ?(pm|p m|oclock)\b|\b4:(05|25)\b/.test(t)) SL = {h0: 15, h1: 18.5, label: '4 PM slate'};
-    else {
+    if (!SL) {
       var hm = t.match(/\b(\d{1,2})(?::(\d{2}))? ?(pm|am)\b/);
       if (hm && /slate|games?|kick|tip|start|only|window|game/.test(t)) {
         var hh = (+hm[1] % 12) + (hm[3] === 'pm' ? 12 : 0) + (hm[2] ? +hm[2] / 60 : 0);

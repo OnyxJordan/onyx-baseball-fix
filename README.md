@@ -1649,6 +1649,14 @@ never a bet button, a pick, a Top 10 play or a parlay leg.
 
 ## Ask Onyx (10/31)
 
+**Start-time windows (11/11, Jordan's screenshot).** "give me a 3 leg parlay college basketball game all games start
+3 PM or earlier" answered "Not in search: college basketball player props": "start" is one letter from "Smart", so
+it read Marcus Smart. Everyday words (start, games, earlier, totals, ...) are never a misspelled name now, and
+`rangeSlot` reads a window of ET start times: before / by / until / "3 PM or earlier" (by 3 PM), after / "7 PM or
+later" (7 PM on), and "between 1 and 4 pm". A bare hour counts as afternoon or evening, and only after before /
+after / until or with a game-time word, so "4 picks by 2s" and "after 2 legs" stay counts. Sides, totals and
+parlays already covered every sport.
+
 **1,000,000 more (11/10).** Jordan: "run the 1000000 search sweep again across all sports." `tools/ask_mega.py`
 seeds 21-24, 250,000 each on the 11/10 boards, graded in 50,000-search chunks (a 250,000 run in one page crashed
 the headless tab): 994,294 passed, 99.43%, up from 98.1% on 11/9. The 5,706 failures (5,359 distinct) were five
