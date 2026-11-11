@@ -2023,5 +2023,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186760-spread-home",
+  "sport": "tennis",
+  "gid": "186760",
+  "date": "2026-11-11",
+  "logged_at": "2026-11-11T15:30:18+00:00",
+  "matchup": "Jazmin Ortenzi vs Andrea Lazaro Garcia",
+  "home": "Andrea Lazaro Garcia",
+  "away": "Jazmin Ortenzi",
+  "label": "Andrea Lazaro Garcia +5.5 games",
+  "kind": "spread",
+  "side": "home",
+  "line": 5.5,
+  "price": -125,
+  "chance": 0.6654,
+  "implied": 0.5556,
+  "edge": 0.11,
+  "fair": -200,
+  "state": {
+   "sets": "3-1",
+   "srv": "home",
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
