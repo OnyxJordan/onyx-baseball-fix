@@ -2383,5 +2383,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-187385-ml-away",
+  "sport": "tennis",
+  "gid": "187385",
+  "date": "2026-11-11",
+  "logged_at": "2026-11-11T20:32:24+00:00",
+  "matchup": "Karolina Muchova vs Elina Svitolina",
+  "home": "Elina Svitolina",
+  "away": "Karolina Muchova",
+  "label": "Karolina Muchova to win",
+  "kind": "ml",
+  "side": "away",
+  "line": null,
+  "price": -247,
+  "chance": 0.7497,
+  "implied": 0.7118,
+  "edge": 0.038,
+  "fair": -300,
+  "state": {
+   "sets": "3-1",
+   "srv": "home",
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
