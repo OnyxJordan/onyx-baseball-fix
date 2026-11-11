@@ -974,5 +974,37 @@
   "state": "closed",
   "reason": "not on the feed",
   "detail": "line back, or the match ended"
+ },
+ {
+  "at": "2026-11-11T18:34:57+00:00",
+  "sport": "tennis",
+  "match": "Casper Ruud vs Aleksandr Shevchenko",
+  "state": "open",
+  "reason": "feed error",
+  "detail": "feed error (HTTPSConnectionPool(host='onyx-ask.jordan-8ad.workers.dev', port=443): Read time)"
+ },
+ {
+  "at": "2026-11-11T18:34:57+00:00",
+  "sport": "tennis",
+  "match": "Elizabeth Mandlik vs Lucia Bronzetti",
+  "state": "open",
+  "reason": "feed error",
+  "detail": "feed error (HTTPSConnectionPool(host='onyx-ask.jordan-8ad.workers.dev', port=443): Read time)"
+ },
+ {
+  "at": "2026-11-11T18:34:57+00:00",
+  "sport": "tennis",
+  "match": "Julia Grabher vs Irene Burillo",
+  "state": "open",
+  "reason": "feed error",
+  "detail": "feed error (HTTPSConnectionPool(host='onyx-ask.jordan-8ad.workers.dev', port=443): Read time)"
+ },
+ {
+  "at": "2026-11-11T18:34:57+00:00",
+  "sport": "tennis",
+  "match": "Laura Pigossi vs Bianca Andreescu",
+  "state": "open",
+  "reason": "feed error",
+  "detail": "feed error (HTTPSConnectionPool(host='onyx-ask.jordan-8ad.workers.dev', port=443): Read time)"
  }
 ]
