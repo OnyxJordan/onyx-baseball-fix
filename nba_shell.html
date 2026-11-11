@@ -106,6 +106,18 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
   background:radial-gradient(120% 70% at 0% 0%,rgba(176,56,249,.09),transparent 55%),linear-gradient(180deg,rgba(255,255,255,.025),transparent 45%),var(--bg2);
   cursor:pointer;color:var(--text);text-align:left;font:inherit;transition:border-color .2s,transform .2s,box-shadow .2s}
 .gm:hover,.gm.sel{border-color:rgba(176,56,249,.6);box-shadow:0 14px 34px -18px rgba(176,56,249,.65)}.gm:hover{transform:translateY(-2px)}
+/* NBA scoreboard, livened (11/11, Jordan: "do the same for the nba scoreboard"): team colours, Onyx's win chance as a
+   bar, Onyx's implied score, what happened against the favourite, live heat (as cbb.html) */
+.gm.gx{background:radial-gradient(110% 80% at 0% 0%,var(--ca),transparent 58%),radial-gradient(110% 80% at 100% 100%,var(--ch),transparent 58%),linear-gradient(180deg,rgba(255,255,255,.025),transparent 45%),var(--bg2);overflow:hidden}
+.gm.gx::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:linear-gradient(90deg,var(--ca1) 0 50%,var(--ch1) 50% 100%)}
+.gm.gx.on{border-color:rgba(97,233,112,.45);box-shadow:0 0 0 1px rgba(97,233,112,.12),0 16px 36px -20px rgba(97,233,112,.55);animation:gxGlow 2.6s ease-in-out infinite}
+@keyframes gxGlow{50%{box-shadow:0 0 0 1px rgba(97,233,112,.25),0 18px 40px -18px rgba(97,233,112,.75)}}
+.gx-wp{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:8px;margin-top:2px;font:700 10.5px monospace;color:var(--text2)}
+.gx-wp b{color:#fff}.gx-bar{height:6px;border-radius:4px;overflow:hidden;display:flex;background:rgba(255,255,255,.06)}
+.gx-bar i{display:block;height:100%;background:var(--ca1)}.gx-bar i+i{background:var(--ch1)}
+.gx-pj{font:600 10px monospace;color:var(--text3);letter-spacing:.02em}.gx-pj b{color:#d795ff;font-weight:700}
+.gx-tag{display:inline-flex;align-items:center;gap:4px;margin-left:8px;padding:2px 7px;border-radius:999px;font:800 9px monospace;letter-spacing:.08em;text-transform:uppercase;vertical-align:1px}
+.gx-tag.hit{background:rgba(97,233,112,.14);color:#61e970}.gx-tag.ups{background:rgba(255,77,125,.16);color:#ff6b9a}.gx-tag.hot{background:rgba(176,56,249,.2);color:#e3b8ff}
 .gm-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:6px}
 .gm.odds .gm-row,.gm-board .gm-row{grid-template-columns:minmax(0,1fr) auto repeat(3,var(--ocw));column-gap:5px}
 .gm-row.lose{opacity:.55}
@@ -1837,6 +1849,34 @@ function nbCells(g, side) {
     g.total != null ? nbOc(ov ? g.over_price : g.under_price, (ov ? 'O ' : 'U ') + g.total, L(ov ? g.over_sel : g.under_sel, ov ? g.over_price : g.under_price, 'total', `${g.away} @ ${g.home} ${ov ? 'Over' : 'Under'} ${g.total}`)) : nbOc(null, ''),
     nbOc(g[side + '_ml'], '', L(g[side + '_ml_sel'], g[side + '_ml'], 'moneyline', `${nick} ML`))];
 }
+// team colours that read on a dark card and never show yellow or gold (site rule): navy and black teams take
+// their brightest non-yellow colour
+const NB_COL = {ATL: 'e03a3e', BOS: '007a33', BKN: '8a8a8a', CHA: '1d8cab', CHI: 'ce1141', CLE: '860038', DAL: '0064b1', DEN: '1d428a',
+  DET: 'c8102e', GSW: '1d428a', HOU: 'ce1141', IND: '2a5aa8', LAC: 'c8102e', LAL: '6a3fb0', MEM: '5d76a9', MIA: '98002e', MIL: '00471b',
+  MIN: '236192', NO: 'c8102e', NYK: 'f58426', NY: 'f58426', GS: '1d428a', UTAH: '6c4ab6', WAS: 'e31837', PHO: 'e56020', SAS: 'a9b4bd', NOP: 'c8102e', OKC: '007ac1', ORL: '0077c0', PHI: '006bb6', PHX: 'e56020', POR: 'e03a3e', SAC: '6b3fa0',
+  SA: 'a9b4bd', TOR: 'ce1141', UTA: '6c4ab6', WSH: 'e31837'};
+function gxRgba(hex, a) { const m = /^#([0-9a-f]{6})$/i.exec(hex); return m ? 'rgba(' + [0, 2, 4].map(i => parseInt(m[1].slice(i, i + 2), 16)).join(',') + ',' + a + ')' : 'transparent'; }
+function nbImp(a) { return a == null ? null : a > 0 ? 100 / (a + 100) : -a / (-a + 100); }
+function nbExtra(g) {
+  const ia = nbImp(g.away_ml), ih = nbImp(g.home_ml);
+  let tag = '', body = '';
+  if (ia != null && ih != null) {
+    const aw = ia / (ia + ih), hw = 1 - aw, fav = hw >= 0.5 ? 'home' : 'away', favP = Math.max(aw, hw);
+    body += `<div class="gx-wp"><span><b>${esc(g.away)}</b> ${pct(aw, 0)}</span><div class="gx-bar"><i style="width:${(aw * 100).toFixed(1)}%"></i><i style="width:${(hw * 100).toFixed(1)}%"></i></div><span>${pct(hw, 0)} <b>${esc(g.home)}</b></span></div>`;
+    const as = +g.away_score, hs = +g.home_score, lead = as > hs ? 'away' : hs > as ? 'home' : null;
+    if (g.state === 'post' && lead) tag = lead === fav ? `<span class="gx-tag hit">Favorite held</span>` : `<span class="gx-tag ups">${favP >= 0.75 ? 'Big upset' : 'Upset'}</span>`;
+    else if (g.state === 'live') {
+      if (lead && lead !== fav && favP >= 0.62) tag = `<span class="gx-tag ups">Upset alert</span>`;
+      else if (/4th|q4|ot/i.test(g.detail || '') && Math.abs(as - hs) <= 5) tag = `<span class="gx-tag hot">Close game</span>`;
+    }
+  }
+  // Onyx's own implied score (its spread and total), before tip
+  if (g.state === 'pre' && g.away_implied != null && g.home_implied != null) {
+    const by = g.home_implied - g.away_implied;
+    body += `<div class="gx-pj">Onyx: <b>${esc(by >= 0 ? g.home : g.away)} by ${num(Math.abs(by))}</b> · ${num(g.away_implied)}-${num(g.home_implied)}${g.total != null ? ' · total ' + esc(g.total) : ''}</div>`;
+  }
+  return {tag, body};
+}
 function sbCard(g, sel) {
   const live = g.state === 'live', fin = g.state === 'post', a = +g.away_score, h = +g.home_score;
   const rows = ['away', 'home'].map(sd => ({sd, cells: nbCells(g, sd)}));
@@ -1847,10 +1887,11 @@ function sbCard(g, sel) {
   const head = odds ? `<div class="gm-row gm-oh"><span class="gm-onyx">Onyx</span><span></span><span>Spread</span><span>Total</span><span>Money</span></div>` : '';
   const body = rows.map(r => `<div class="gm-row${lose(r.sd) ? ' lose' : ''}"><div class="gm-id">${id(r.sd)}</div><span class="sc">${live || fin ? esc(g[r.sd + '_score'] ?? '') : ''}</span>${odds ? (r.cells || [nbOc(null, ''), nbOc(null, ''), nbOc(null, '')]).join('') : ''}</div>`).join('');
   const st = live ? `<span class="live">${esc(g.detail || 'Live')}</span>` : fin ? 'Final' : esc(tipTime(g.start));
+  const X = nbExtra(g), ca = '#' + (NB_COL[g.away] || '7d5bd6'), ch = '#' + (NB_COL[g.home] || 'b038f9');
   const foot = odds ? 'Tap a price to bet on Onyx' : g.state === 'pre' ? 'Lines post on Onyx soon' : live ? 'Follow it live in the gamecenter' : '';
-  return `<div class="gm${odds ? ' odds' : ''}${sel ? ' sel' : ''}" onclick="gcSel='${esc(g.gid)}';rerender();gcScroll()" tabindex="0" onkeydown="if(event.key==='Enter'){gcSel='${esc(g.gid)}';rerender();gcScroll()}">
-    <div class="gm-top"><span>${st}</span><span>${g.total != null && !odds && g.state === 'pre' ? 'O/U ' + esc(g.total) : ''}</span></div>
-    ${head}${body}
+  return `<div class="gm gx${live ? ' on' : ''}${odds ? ' odds' : ''}${sel ? ' sel' : ''}" style="--ca:${gxRgba(ca, .2)};--ch:${gxRgba(ch, .18)};--ca1:${ca};--ch1:${ch}" onclick="gcSel='${esc(g.gid)}';rerender();gcScroll()" tabindex="0" onkeydown="if(event.key==='Enter'){gcSel='${esc(g.gid)}';rerender();gcScroll()}">
+    <div class="gm-top"><span>${st}${X.tag}</span><span>${g.total != null && !odds && g.state === 'pre' ? 'O/U ' + esc(g.total) : ''}</span></div>
+    ${head}${body}${X.body}
     <div class="gm-ft"><span>${foot}</span><b>Gamecenter ›</b></div></div>`;
 }
 function gcScroll() { const b = document.getElementById('gcBody'); if (b) b.scrollIntoView({behavior: 'smooth', block: 'start'}); }
