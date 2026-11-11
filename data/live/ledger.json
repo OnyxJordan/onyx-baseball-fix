@@ -38060,5 +38060,36 @@
   "actual": "15-10",
   "profit": -1.0,
   "graded_at": "2026-11-11T22:18:16+00:00"
+ },
+ {
+  "id": "cbb-401925717-total-under",
+  "sport": "cbb",
+  "gid": "401925717",
+  "date": "2026-11-11",
+  "logged_at": "2026-11-11T22:51:45+00:00",
+  "matchup": "BCU @ SDSU",
+  "home": "SDSU",
+  "away": "BCU",
+  "label": "Under 148.5",
+  "kind": "total",
+  "side": "under",
+  "line": 148.5,
+  "price": 105,
+  "chance": 0.5244,
+  "implied": 0.4878,
+  "edge": 0.037,
+  "fair": -110,
+  "state": {
+   "score": "BCU 35 - 36 SDSU",
+   "period": 1,
+   "clock": "0:00",
+   "f": 0.5
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
