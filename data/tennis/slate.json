@@ -1571,8 +1571,8 @@
     {
      "id": "187385",
      "start": "2026-11-11T20:10Z",
-     "state": "in",
-     "detail": "3rd",
+     "state": "post",
+     "detail": "Final",
      "round": "Group Stage",
      "draw": "Women's Singles",
      "court": "Indian Wells Tennis Garden",
@@ -1595,13 +1595,13 @@
        "short": "E. Svitolina",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ukr.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         3,
         6,
-        5
+        6
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -3050,5 +3050,5 @@
    ]
   }
  ],
- "fetched": "2026-11-11T22:13:48+00:00"
+ "fetched": "2026-11-11T22:17:48+00:00"
 }
