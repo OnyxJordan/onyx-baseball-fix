@@ -1649,6 +1649,16 @@ never a bet button, a pick, a Top 10 play or a parlay leg.
 
 ## Ask Onyx (10/31)
 
+**College basketball scoreboard, livened (11/11, Jordan: "cbb scoreboard is a little boring").** On cbb.html only
+(`sport_shell.html`, `GX = SD.sport === 'cbb'`), each game card wears its two teams' colours (a split bar along the top
+and a faint wash from each corner; `gxColor` never shows yellow or gold, the site rule, and lifts black and navy so
+they read). Under the prices: the model's win chance as a two-colour bar and, before tip, "Model: USF by 6.6 ·
+71.7-78.3 · total 150.0" (`SD.model.proj`, leans, not picks). Tags in the card's top line: "Model called it" or
+"Upset" / "Big upset" (favourite 75%+) on finals, "Upset alert" when the model's 62%+ favourite trails live, "Close
+game" within 5 in the second half. Live cards glow. A "Top 25" filter joins All / Live / Upcoming / Final when a
+ranked team plays. Every sport: the live-value block above the scoreboard no longer carries the page's 120px bottom
+padding, which left a gap under "Nothing live right now".
+
 **Start-time windows (11/11, Jordan's screenshot).** "give me a 3 leg parlay college basketball game all games start
 3 PM or earlier" answered "Not in search: college basketball player props": "start" is one letter from "Smart", so
 it read Marcus Smart. Everyday words (start, games, earlier, totals, ...) are never a misspelled name now, and
