@@ -2203,5 +2203,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186761-ml-home",
+  "sport": "tennis",
+  "gid": "186761",
+  "date": "2026-11-11",
+  "logged_at": "2026-11-11T17:04:55+00:00",
+  "matchup": "Elizabeth Mandlik vs Lucia Bronzetti",
+  "home": "Lucia Bronzetti",
+  "away": "Elizabeth Mandlik",
+  "label": "Lucia Bronzetti to win",
+  "kind": "ml",
+  "side": "home",
+  "line": null,
+  "price": -210,
+  "chance": 0.7125,
+  "implied": 0.6774,
+  "edge": 0.035,
+  "fair": -250,
+  "state": {
+   "sets": "0-1",
+   "srv": "home",
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
