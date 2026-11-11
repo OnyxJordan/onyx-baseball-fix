@@ -2263,5 +2263,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186762-ml-away",
+  "sport": "tennis",
+  "gid": "186762",
+  "date": "2026-11-11",
+  "logged_at": "2026-11-11T17:37:35+00:00",
+  "matchup": "Julia Grabher vs Irene Burillo",
+  "home": "Irene Burillo",
+  "away": "Julia Grabher",
+  "label": "Julia Grabher to win",
+  "kind": "ml",
+  "side": "away",
+  "line": null,
+  "price": -178,
+  "chance": 0.7025,
+  "implied": 0.6403,
+  "edge": 0.062,
+  "fair": -235,
+  "state": {
+   "sets": "0-0",
+   "srv": "away",
+   "need": 2
+  },
+  "pre_src": null,
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
