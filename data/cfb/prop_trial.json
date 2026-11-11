@@ -2278,5 +2278,93 @@
   "model": "v2",
   "result": null,
   "actual": null
+ },
+ {
+  "date": "2026-11-11",
+  "key": "401858301|kevin jennings|rush_yds",
+  "gid": "401858301",
+  "pid": "5084084",
+  "name": "Kevin Jennings",
+  "team": "SMU",
+  "opp": "WAKE",
+  "matchup": "SMU vs WAKE",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 9.5,
+  "price": -126,
+  "sel": "76e03f81-b1c4-4621-8164-57f3248930d3",
+  "proj": 10.9,
+  "prob": 0.6242,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.55,
+    "avg": 0.77,
+    "pp": -5.1
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.88,
+    "avg": 0.93,
+    "pp": 0.8
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.33,
+    "avg": -0.05,
+    "pp": 0.3
+   }
+  ],
+  "opened_at": "2026-11-11T14:16:11+00:00",
+  "logged_at": "2026-11-11T14:16:11+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-11",
+  "key": "401858301|kendrick raphael|rush_yds",
+  "gid": "401858301",
+  "pid": "4899368",
+  "name": "Kendrick Raphael",
+  "team": "SMU",
+  "opp": "WAKE",
+  "matchup": "SMU vs WAKE",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 65.5,
+  "price": -126,
+  "sel": "f3e2d94b-9d57-4c43-9f7a-9e286bcef5d7",
+  "proj": 63.4,
+  "prob": 0.6241,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.55,
+    "avg": 0.77,
+    "pp": -5.1
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.88,
+    "avg": 0.93,
+    "pp": 0.8
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.33,
+    "avg": -0.05,
+    "pp": 0.3
+   }
+  ],
+  "opened_at": "2026-11-11T14:16:11+00:00",
+  "logged_at": "2026-11-11T14:16:11+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
  }
 ]
