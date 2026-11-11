@@ -2143,5 +2143,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186542-ml-away",
+  "sport": "tennis",
+  "gid": "186542",
+  "date": "2026-11-11",
+  "logged_at": "2026-11-11T15:55:19+00:00",
+  "matchup": "Ugo Humbert vs Borna Gojo",
+  "home": "Borna Gojo",
+  "away": "Ugo Humbert",
+  "label": "Ugo Humbert to win",
+  "kind": "ml",
+  "side": "away",
+  "line": null,
+  "price": -368,
+  "chance": 0.8192,
+  "implied": 0.7863,
+  "edge": 0.033,
+  "fair": -455,
+  "state": {
+   "sets": "6-2 1-2",
+   "srv": "away",
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
