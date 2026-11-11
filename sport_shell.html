@@ -44,6 +44,7 @@
 .tbl tr.tap{cursor:pointer}.tbl tr.tap:hover td{background:rgba(176,56,249,.06)}
 .lg{width:22px;height:22px;object-fit:contain;vertical-align:middle;flex-shrink:0}
 .lg.l{width:46px;height:46px}.lg.m{width:30px;height:30px}
+.lg-ph{display:inline-flex;align-items:center;justify-content:center;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid var(--border2);font:800 10px monospace;color:var(--text2);letter-spacing:.02em}
 .sp-tabs-seg{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-bottom:12px}.sp-tabs-seg::-webkit-scrollbar{display:none}
 .sp-tabs-seg button{flex-shrink:0;padding:8px 13px;border-radius:999px;border:1px solid var(--border2);background:rgba(255,255,255,.04);color:var(--text2);font:700 12px 'Space Grotesk',system-ui,sans-serif;cursor:pointer;white-space:nowrap}
 .sp-tabs-seg button.on{background:linear-gradient(135deg,#b038f9,#635bff);color:#fff;border-color:transparent}
@@ -525,9 +526,12 @@ function oddsRows(rows) {
   const head = odds ? `<div class="gm-row gm-oh"><span class="gm-onyx">${OXN}</span><span></span><span>Spread</span><span>Total</span><span>Money</span></div>` : '';
   return {odds, html: head + rows.map(r => `<div class="gm-row${r.lose ? ' lose' : ''}"><div class="gm-id">${r.id}</div><span class="sc">${r.sc || ''}</span>${odds ? (r.cells || [oc(null, ''), oc(null, ''), oc(null, '')]).join('') : ''}</div>`).join('')};
 }
+// a team with no logo (small schools ESPN has no art for) gets a round badge with its initials, so every card lines up
+function lgPh(nm) { const w = String(nm || '').replace(/[^A-Za-z ]/g, ' ').split(/\s+/).filter(Boolean);
+  return `<span class="lg m lg-ph">${esc((w.length > 1 ? w[0][0] + w[1][0] : (w[0] || '?').slice(0, 2)).toUpperCase())}</span>`; }
 function teamId(g, side, full) {
   const rk = g[side + '_rank'] ? `<span class="rk">#${esc(g[side + '_rank'])}</span> ` : '';
-  return `${lg(g[side + '_logo'], 'm')}<div class="gm-nm" data-oxt="${esc(g[side])}"><b>${rk}${esc(full ? (g[side + '_name'] || g[side]) : (g[side + '_short'] || g[side]))}</b><span>${esc(g[side + '_rec'] || '')}</span></div>`;
+  return `${g[side + '_logo'] ? lg(g[side + '_logo'], 'm') : lgPh(g[side + '_short'] || g[side + '_name'] || g[side])}<div class="gm-nm" data-oxt="${esc(g[side])}"><b>${rk}${esc(full ? (g[side + '_name'] || g[side]) : (g[side + '_short'] || g[side]))}</b><span>${esc(g[side + '_rec'] || '')}</span></div>`;
 }
 function gameBoard(g) {
   const b = oddsRows(['away', 'home'].map(sd => ({id: teamId(g, sd, true), cells: gameCells(g, sd)})));
@@ -667,15 +671,19 @@ function gxExtra(g) {
 function gameCard(g0) {
   const g = live(g0);
   const fin = g.state === 'post', aw = +g.away_score > +g.home_score;
+  // (11/11, Jordan: "games that don't have lines should be uniform") an upcoming game keeps the price grid, dashes
+  // until Onyx posts, so every card has the same shape
+  const dead = g.state === 'pre' ? [oc(null, ''), oc(null, ''), oc(null, '')] : null;
   const b = oddsRows(['away', 'home'].map(sd => ({id: teamId(g, sd), sc: g.state !== 'pre' ? esc(g[sd + '_score']) : '',
-    cells: gameCells(g, sd), lose: fin && (sd === 'away' ? !aw : aw)})));
+    cells: gameCells(g, sd) || dead, lose: fin && (sd === 'away' ? !aw : aw)})));
+  const priced = ['away', 'home'].some(sd => gameCells(g, sd));
   const X = GX ? gxExtra(g) : {tag: '', body: ''};
   const ca = GX ? gxColor(g.away_color, '#7d5bd6') : '', ch = GX ? gxColor(g.home_color, '#b038f9') : '';
   const sty = GX ? ` style="--ca:${gxRgba(ca, .2)};--ch:${gxRgba(ch, .18)};--ca1:${ca};--ch1:${ch}"` : '';
   return `<div class="gm${GX ? ' gx' + (g.state === 'in' ? ' on' : '') : ''}${b.odds ? ' odds' : ''}${OPEN_GAME === g.gid ? ' sel' : ''}"${sty} onclick="openGame('${g.gid}')" tabindex="0" onkeydown="if(event.key==='Enter')openGame('${g.gid}')">
     <div class="gm-top"><span>${stateTxt(g)}${X.tag}</span><span>${esc(g.tv || '')}</span></div>
     ${b.html}${X.body}
-    <div class="gm-ft"><span>${b.odds ? ((SD.odds || {}).market ? 'Market line while Onyx prices are down: check Onyx before you bet' : 'Tap a price to bet on Onyx') : g.state === 'pre' ? 'Lines post on Onyx soon' : g.state === 'in' ? 'Follow it live in the gamecenter' : ''}</span><b>Gamecenter ›</b></div>
+    <div class="gm-ft"><span>${priced ? ((SD.odds || {}).market ? 'Market line while Onyx prices are down: check Onyx before you bet' : 'Tap a price to bet on Onyx') : g.state === 'pre' ? 'Lines post on Onyx soon' : g.state === 'in' ? 'Follow it live in the gamecenter' : ''}</span><b>Gamecenter ›</b></div>
   </div>`;
 }
 var GFILTER = 'all';
