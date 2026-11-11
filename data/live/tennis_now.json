@@ -1993,5 +1993,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186540-spread-away",
+  "sport": "tennis",
+  "gid": "186540",
+  "date": "2026-11-11",
+  "logged_at": "2026-11-11T13:02:33+00:00",
+  "matchup": "Alejandro Tabilo vs Lorenzo Sonego",
+  "home": "Lorenzo Sonego",
+  "away": "Alejandro Tabilo",
+  "label": "Alejandro Tabilo +2.5 games",
+  "kind": "spread",
+  "side": "away",
+  "line": 2.5,
+  "price": -140,
+  "chance": 0.6584,
+  "implied": 0.5833,
+  "edge": 0.075,
+  "fair": -195,
+  "state": {
+   "sets": "6-5",
+   "srv": "home",
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
