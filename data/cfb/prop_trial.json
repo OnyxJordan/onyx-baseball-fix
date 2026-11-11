@@ -1882,5 +1882,489 @@
   "model": "v2",
   "result": null,
   "actual": null
+ },
+ {
+  "date": "2026-11-10",
+  "key": "401856883|dwight phillips|rush_yds",
+  "gid": "401856883",
+  "pid": "5079561",
+  "name": "Dwight Phillips Jr.",
+  "team": "UGA",
+  "opp": "MIZ",
+  "matchup": "UGA vs MIZ",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 38.5,
+  "price": -126,
+  "sel": "b1d3ef37-8d15-47c3-accb-f5937d4c70bb",
+  "proj": 44.7,
+  "prob": 0.6138,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.62,
+    "avg": 0.77,
+    "pp": -3.5
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.4,
+    "avg": -0.05,
+    "pp": 0.3
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.93,
+    "avg": 0.93,
+    "pp": 0.1
+   }
+  ],
+  "opened_at": "2026-11-10T19:20:05+00:00",
+  "logged_at": "2026-11-10T19:20:05+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-10",
+  "key": "401856883|gunner stockton|rush_yds",
+  "gid": "401856883",
+  "pid": "4685578",
+  "name": "Gunner Stockton",
+  "team": "UGA",
+  "opp": "MIZ",
+  "matchup": "UGA vs MIZ",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 24.5,
+  "price": -126,
+  "sel": "bd8e395a-3ea5-4f57-b0fd-891657a15208",
+  "proj": 21.1,
+  "prob": 0.6172,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.62,
+    "avg": 0.77,
+    "pp": -3.5
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.93,
+    "avg": 0.93,
+    "pp": 0.1
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.05,
+    "avg": -0.05,
+    "pp": -0.0
+   }
+  ],
+  "opened_at": "2026-11-10T19:20:05+00:00",
+  "logged_at": "2026-11-10T19:20:05+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-10",
+  "key": "401856883|nate frazier|rush_yds",
+  "gid": "401856883",
+  "pid": "5084047",
+  "name": "Nate Frazier",
+  "team": "UGA",
+  "opp": "MIZ",
+  "matchup": "UGA vs MIZ",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 47.5,
+  "price": -126,
+  "sel": "6e6ab4e3-2a0b-4644-a217-b5240125d0e1",
+  "proj": 46.5,
+  "prob": 0.6148,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.62,
+    "avg": 0.77,
+    "pp": -3.5
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.3,
+    "avg": -0.05,
+    "pp": 0.2
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.93,
+    "avg": 0.93,
+    "pp": 0.1
+   }
+  ],
+  "opened_at": "2026-11-10T19:20:05+00:00",
+  "logged_at": "2026-11-10T19:20:05+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-10",
+  "key": "401856883|jamal roberts|rush_yds",
+  "gid": "401856883",
+  "pid": "4921116",
+  "name": "Jamal Roberts",
+  "team": "MIZ",
+  "opp": "UGA",
+  "matchup": "MIZ @ UGA",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 62.5,
+  "price": -124,
+  "sel": "a4e139e5-5c90-4d7d-848c-0f3cd7728f36",
+  "proj": 90.0,
+  "prob": 0.6206,
+  "implied": 0.5536,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.54,
+    "avg": 0.77,
+    "pp": -5.3
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.88,
+    "avg": 0.93,
+    "pp": 0.8
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.86,
+    "avg": -0.05,
+    "pp": 0.8
+   }
+  ],
+  "opened_at": "2026-11-10T20:26:40+00:00",
+  "logged_at": "2026-11-10T20:26:40+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-10",
+  "key": "401858518|waymond jordan|rush_yds",
+  "gid": "401858518",
+  "pid": "5295318",
+  "name": "Waymond Jordan",
+  "team": "USC",
+  "opp": "IU",
+  "matchup": "USC @ IU",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 28.5,
+  "price": -126,
+  "sel": "a7f4199f-40c2-4295-a931-4d5c04bf33a5",
+  "proj": 29.9,
+  "prob": 0.6393,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.49,
+    "avg": 0.77,
+    "pp": -6.5
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.94,
+    "avg": -0.05,
+    "pp": 0.9
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.92,
+    "avg": 0.93,
+    "pp": 0.1
+   }
+  ],
+  "opened_at": "2026-11-10T20:26:40+00:00",
+  "logged_at": "2026-11-10T20:26:40+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-10",
+  "key": "401858293|amari thomas|rush_yds",
+  "gid": "401858293",
+  "pid": "5372196",
+  "name": "Amari Thomas",
+  "team": "FSU",
+  "opp": "PITT",
+  "matchup": "FSU @ PITT",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 35.5,
+  "price": -126,
+  "sel": "8dba8bbc-7c65-437b-b6d9-15f46cf93667",
+  "proj": 18.3,
+  "prob": 0.6498,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.44,
+    "avg": 0.77,
+    "pp": -7.6
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.85,
+    "avg": 0.93,
+    "pp": 1.3
+   },
+   {
+    "k": "line vs his usual range",
+    "v": 0.27,
+    "avg": -0.05,
+    "pp": -0.3
+   }
+  ],
+  "opened_at": "2026-11-10T22:17:50+00:00",
+  "logged_at": "2026-11-10T22:17:50+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-10",
+  "key": "401858293|quintrevion wisner|rush_yds",
+  "gid": "401858293",
+  "pid": "4871076",
+  "name": "Quintrevion Wisner",
+  "team": "FSU",
+  "opp": "PITT",
+  "matchup": "FSU @ PITT",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 44.5,
+  "price": -126,
+  "sel": "7a2c2f92-8d97-4070-ba5b-632e3f3b4987",
+  "proj": 27.8,
+  "prob": 0.6503,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.44,
+    "avg": 0.77,
+    "pp": -7.6
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.85,
+    "avg": 0.93,
+    "pp": 1.3
+   },
+   {
+    "k": "line vs his usual range",
+    "v": 0.31,
+    "avg": -0.05,
+    "pp": -0.3
+   }
+  ],
+  "opened_at": "2026-11-10T22:17:50+00:00",
+  "logged_at": "2026-11-10T22:17:50+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-10",
+  "key": "401858293|ashton daniels|rush_yds",
+  "gid": "401858293",
+  "pid": "4838679",
+  "name": "Ashton Daniels",
+  "team": "FSU",
+  "opp": "PITT",
+  "matchup": "FSU @ PITT",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 49.5,
+  "price": -126,
+  "sel": "b0914835-8e42-4178-8080-80bb71cb9707",
+  "proj": 32.0,
+  "prob": 0.6483,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.44,
+    "avg": 0.77,
+    "pp": -7.6
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.85,
+    "avg": 0.93,
+    "pp": 1.3
+   },
+   {
+    "k": "line vs his usual range",
+    "v": 0.09,
+    "avg": -0.05,
+    "pp": -0.1
+   }
+  ],
+  "opened_at": "2026-11-10T22:17:50+00:00",
+  "logged_at": "2026-11-10T22:17:50+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-10",
+  "key": "401858518|king miller|rush_yds",
+  "gid": "401858518",
+  "pid": "5233016",
+  "name": "King Miller",
+  "team": "USC",
+  "opp": "IU",
+  "matchup": "USC @ IU",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 47.5,
+  "price": -126,
+  "sel": "ce1106b8-f60a-41d8-a312-4a9580b254c7",
+  "proj": 54.4,
+  "prob": 0.6406,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.49,
+    "avg": 0.77,
+    "pp": -6.5
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.79,
+    "avg": -0.05,
+    "pp": 0.7
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.92,
+    "avg": 0.93,
+    "pp": 0.1
+   }
+  ],
+  "opened_at": "2026-11-11T05:30:21+00:00",
+  "logged_at": "2026-11-11T05:30:21+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-11",
+  "key": "401858301|kevin jennings|rush_yds",
+  "gid": "401858301",
+  "pid": "5084084",
+  "name": "Kevin Jennings",
+  "team": "SMU",
+  "opp": "WAKE",
+  "matchup": "SMU vs WAKE",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 9.5,
+  "price": -126,
+  "sel": "76e03f81-b1c4-4621-8164-57f3248930d3",
+  "proj": 10.9,
+  "prob": 0.6242,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.55,
+    "avg": 0.77,
+    "pp": -5.1
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.88,
+    "avg": 0.93,
+    "pp": 0.8
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.33,
+    "avg": -0.05,
+    "pp": 0.3
+   }
+  ],
+  "opened_at": "2026-11-11T14:16:11+00:00",
+  "logged_at": "2026-11-11T14:16:11+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-11",
+  "key": "401858301|kendrick raphael|rush_yds",
+  "gid": "401858301",
+  "pid": "4899368",
+  "name": "Kendrick Raphael",
+  "team": "SMU",
+  "opp": "WAKE",
+  "matchup": "SMU vs WAKE",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 65.5,
+  "price": -126,
+  "sel": "f3e2d94b-9d57-4c43-9f7a-9e286bcef5d7",
+  "proj": 63.4,
+  "prob": 0.6241,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.55,
+    "avg": 0.77,
+    "pp": -5.1
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.88,
+    "avg": 0.93,
+    "pp": 0.8
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.33,
+    "avg": -0.05,
+    "pp": 0.3
+   }
+  ],
+  "opened_at": "2026-11-11T14:16:11+00:00",
+  "logged_at": "2026-11-11T14:16:11+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
  }
 ]

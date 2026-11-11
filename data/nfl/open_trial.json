@@ -1279,5 +1279,57 @@
   "result": "W",
   "actual": 243.0,
   "graded_at": "2026-11-09T04:40:27+00:00"
+ },
+ {
+  "date": "2026-11-10",
+  "season": 2026,
+  "week": 10,
+  "key": "401873056|c j stroud|pass_att",
+  "gid": "401873056",
+  "pid": "4432577",
+  "name": "C.J. Stroud",
+  "team": "HOU",
+  "opp": "CLE",
+  "matchup": "HOU @ CLE",
+  "kind": "pass_att",
+  "lane": "pass_att_under",
+  "side": "under",
+  "line": 34.5,
+  "price": -140,
+  "sel": "eeef74b8-6978-46cb-96d1-f8275a811a14",
+  "proj": 34.0,
+  "prob": 0.6324,
+  "implied": 0.5833,
+  "why": [
+   {
+    "k": "opponent catches allowed",
+    "v": 0.88,
+    "avg": 0.99,
+    "pp": -4.9
+   },
+   {
+    "k": "recent trend",
+    "v": -2.92,
+    "avg": 0.62,
+    "pp": -1.7
+   },
+   {
+    "k": "yards per carry",
+    "v": 5.0,
+    "avg": 4.11,
+    "pp": -1.5
+   },
+   {
+    "k": "game-to-game swings",
+    "v": 8.78,
+    "avg": 8.59,
+    "pp": -0.3
+   }
+  ],
+  "opened_at": "2026-11-11T06:02:52+00:00",
+  "logged_at": "2026-11-11T06:02:52+00:00",
+  "model": "v15",
+  "result": null,
+  "actual": null
  }
 ]
