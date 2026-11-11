@@ -37844,10 +37844,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v7",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "18-14",
+  "profit": -1.0,
+  "graded_at": "2026-11-11T19:28:26+00:00"
  },
  {
   "id": "tennis-186762-ml-away",
@@ -37931,6 +37931,36 @@
   "state": {
    "sets": "0-0",
    "srv": "home",
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": "W",
+  "actual": "13-6",
+  "profit": 0.6667,
+  "graded_at": "2026-11-11T19:28:26+00:00"
+ },
+ {
+  "id": "tennis-186764-ml-away",
+  "sport": "tennis",
+  "gid": "186764",
+  "date": "2026-11-11",
+  "logged_at": "2026-11-11T19:15:07+00:00",
+  "matchup": "Marina Bassols Ribera vs Maria Lourdes Carle",
+  "home": "Maria Lourdes Carle",
+  "away": "Marina Bassols Ribera",
+  "label": "Marina Bassols Ribera to win",
+  "kind": "ml",
+  "side": "away",
+  "line": null,
+  "price": -160,
+  "chance": 0.6585,
+  "implied": 0.6154,
+  "edge": 0.043,
+  "fair": -195,
+  "state": {
+   "sets": "1-1",
+   "srv": "away",
    "need": 2
   },
   "pre_src": "onyx",
