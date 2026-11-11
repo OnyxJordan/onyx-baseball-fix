@@ -1084,9 +1084,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        1
+        5
        ],
-       "serve": false
+       "serve": true
       },
       {
        "name": "Aleksandr Shevchenko",
@@ -1095,9 +1095,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        0
+        5
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -2652,8 +2652,8 @@
     {
      "id": "186763",
      "start": "2026-11-11T16:25Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Court 1",
@@ -2666,7 +2666,7 @@
        "win": false,
        "sets": [
         2,
-        0
+        2
        ],
        "serve": false
       },
@@ -2675,12 +2675,12 @@
        "short": "L. Samson",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/cze.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        3
+        6
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -2700,7 +2700,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        3
+        5
        ],
        "serve": false
       },
@@ -2711,7 +2711,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        1
+        5
        ],
        "serve": false
       }
@@ -2719,9 +2719,9 @@
     },
     {
      "id": "186762",
-     "start": "2026-11-11T17:25Z",
-     "state": "pre",
-     "detail": "11/11 - 12:25 PM EST",
+     "start": "2026-11-11T17:35Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Court 2",
@@ -2732,8 +2732,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/aut.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        0
+       ],
+       "serve": true
       },
       {
        "name": "Irene Burillo",
@@ -2741,16 +2743,18 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        2
+       ],
        "serve": false
       }
      ]
     },
     {
      "id": "186765",
-     "start": "2026-11-11T18:00Z",
+     "start": "2026-11-11T17:50Z",
      "state": "pre",
-     "detail": "11/11 - 1:00 PM EST",
+     "detail": "11/11 - 12:50 PM EST",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Court 1",
@@ -2852,9 +2856,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Laura Samson",
+       "short": "L. Samson",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/cze.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -3010,5 +3014,5 @@
    ]
   }
  ],
- "fetched": "2026-11-11T17:15:26+00:00"
+ "fetched": "2026-11-11T17:48:28+00:00"
 }
