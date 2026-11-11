@@ -2413,5 +2413,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-187378-ml-home",
+  "sport": "tennis",
+  "gid": "187378",
+  "date": "2026-11-11",
+  "logged_at": "2026-11-11T23:00:31+00:00",
+  "matchup": "Mirra Andreeva vs Aryna Sabalenka",
+  "home": "Aryna Sabalenka",
+  "away": "Mirra Andreeva",
+  "label": "Aryna Sabalenka to win",
+  "kind": "ml",
+  "side": "home",
+  "line": null,
+  "price": -280,
+  "chance": 0.7816,
+  "implied": 0.7368,
+  "edge": 0.045,
+  "fair": -360,
+  "state": {
+   "sets": "1-4",
+   "srv": null,
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
