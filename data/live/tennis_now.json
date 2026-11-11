@@ -2173,5 +2173,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186763-spread-away",
+  "sport": "tennis",
+  "gid": "186763",
+  "date": "2026-11-11",
+  "logged_at": "2026-11-11T16:35:48+00:00",
+  "matchup": "Sofia Costoulas vs Laura Samson",
+  "home": "Laura Samson",
+  "away": "Sofia Costoulas",
+  "label": "Sofia Costoulas +4.5 games",
+  "kind": "spread",
+  "side": "away",
+  "line": 4.5,
+  "price": -140,
+  "chance": 0.6552,
+  "implied": 0.5833,
+  "edge": 0.072,
+  "fair": -190,
+  "state": {
+   "sets": "1-0",
+   "srv": "home",
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
