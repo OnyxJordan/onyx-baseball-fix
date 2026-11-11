@@ -1649,6 +1649,15 @@ never a bet button, a pick, a Top 10 play or a parlay leg.
 
 ## Ask Onyx (10/31)
 
+**NBA scoreboard, livened (11/11, Jordan: "do the same for the nba scoreboard").** `nba_shell.html` `sbCard`: each
+card in its teams' colours (`NB_COL`, every team's brightest non-yellow colour, keyed by both the page's and the
+league's abbreviations), Onyx's win chance as a two-colour bar (the moneylines with the margin removed), and before
+tip Onyx's implied score ("Onyx: IND by 3.0 · 112.8-115.8 · total 228.5", `away_implied` / `home_implied`). The NBA
+model prices players, not games, so the bar and tags judge against Onyx's favourite: "Favorite held" or "Upset" /
+"Big upset" (75%+) on finals, "Upset alert" when a 62%+ favourite trails live, "Close game" within 5 in the 4th or
+OT. Live cards glow. A team-ratings score (pace x ORtg/DRtg) was tried and dropped: it ignores injuries and read SA
+by 7.9 against Onyx's -15.5.
+
 **College basketball scoreboard, livened (11/11, Jordan: "cbb scoreboard is a little boring").** On cbb.html only
 (`sport_shell.html`, `GX = SD.sport === 'cbb'`), each game card wears its two teams' colours (a split bar along the top
 and a faint wash from each corner; `gxColor` never shows yellow or gold, the site rule, and lifts black and navy so
