@@ -1496,5 +1496,33 @@
   "actual": 47.0,
   "profit": -1.0,
   "graded_at": "2026-11-11T03:02:03+00:00"
+ },
+ {
+  "id": "nba-20261112FF3B2E0D-q1-q1_total",
+  "sport": "nba",
+  "date": "2026-11-11",
+  "logged_at": "2026-11-11T10:08:45+00:00",
+  "start": "2026-11-12T01:00:00Z",
+  "gid": "20261112FF3B2E0D",
+  "matchup": "DEN @ MEM",
+  "label": "DEN @ MEM Over 55.5 1st-quarter points",
+  "market": "q1_total",
+  "kind": "prop",
+  "name": "DEN @ MEM",
+  "team": "DEN",
+  "who": "q1",
+  "side": "over",
+  "line": 55.5,
+  "hcap": null,
+  "price": -126,
+  "chance": 0.5838,
+  "edge": 0.0263,
+  "ev": 0.0471,
+  "sel": "77a6ab57-f3f0-4587-b865-3cba8c9332ed",
+  "model": "q1 0.254/12.0",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
