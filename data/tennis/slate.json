@@ -1072,7 +1072,7 @@
      "id": "186538",
      "start": "2026-11-11T17:05Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 2",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -1084,9 +1084,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        5
+        7,
+        1
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Aleksandr Shevchenko",
@@ -1095,7 +1096,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        5
+        6,
+        2
        ],
        "serve": false
       }
@@ -2688,7 +2690,7 @@
      "id": "186761",
      "start": "2026-11-11T16:55Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Main Court",
@@ -2700,9 +2702,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        5
+        7,
+        1
        ],
-       "serve": false
+       "serve": true
       },
       {
        "name": "Lucia Bronzetti",
@@ -2711,7 +2714,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        5
+        6,
+        0
        ],
        "serve": false
       }
@@ -2733,9 +2737,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        0
+        4
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Irene Burillo",
@@ -2744,17 +2748,17 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        5
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
     {
      "id": "186765",
      "start": "2026-11-11T17:50Z",
-     "state": "pre",
-     "detail": "11/11 - 12:50 PM EST",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Court 1",
@@ -2765,7 +2769,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/bra.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        1
+       ],
        "serve": false
       },
       {
@@ -2774,16 +2780,18 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/can.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        5
+       ],
        "serve": false
       }
      ]
     },
     {
      "id": "186764",
-     "start": "2026-11-11T18:25Z",
+     "start": "2026-11-11T18:45Z",
      "state": "pre",
-     "detail": "11/11 - 1:25 PM EST",
+     "detail": "11/11 - 1:45 PM EST",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Main Court",
@@ -3014,5 +3022,5 @@
    ]
   }
  ],
- "fetched": "2026-11-11T17:48:28+00:00"
+ "fetched": "2026-11-11T18:21:58+00:00"
 }
