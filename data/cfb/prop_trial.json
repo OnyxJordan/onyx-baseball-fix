@@ -2234,5 +2234,49 @@
   "model": "v2",
   "result": null,
   "actual": null
+ },
+ {
+  "date": "2026-11-10",
+  "key": "401858518|king miller|rush_yds",
+  "gid": "401858518",
+  "pid": "5233016",
+  "name": "King Miller",
+  "team": "USC",
+  "opp": "IU",
+  "matchup": "USC @ IU",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 47.5,
+  "price": -126,
+  "sel": "ce1106b8-f60a-41d8-a312-4a9580b254c7",
+  "proj": 54.4,
+  "prob": 0.6406,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.49,
+    "avg": 0.77,
+    "pp": -6.5
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.79,
+    "avg": -0.05,
+    "pp": 0.7
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.92,
+    "avg": 0.93,
+    "pp": 0.1
+   }
+  ],
+  "opened_at": "2026-11-11T05:30:21+00:00",
+  "logged_at": "2026-11-11T05:30:21+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
  }
 ]
