@@ -1107,9 +1107,9 @@
     },
     {
      "id": "186544",
-     "start": "2026-11-11T19:40Z",
-     "state": "pre",
-     "detail": "11/11 - 2:40 PM EST",
+     "start": "2026-11-11T19:45Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 2",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -1120,7 +1120,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/den.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        2
+       ],
        "serve": false
       },
       {
@@ -1129,7 +1131,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ser.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        6
+       ],
        "serve": false
       }
      ]
@@ -1562,9 +1566,9 @@
     },
     {
      "id": "187385",
-     "start": "2026-11-11T20:00Z",
+     "start": "2026-11-11T20:10Z",
      "state": "pre",
-     "detail": "11/11 - 3:00 PM EST",
+     "detail": "11/11 - 3:10 PM EST",
      "round": "Group Stage",
      "draw": "Women's Singles",
      "court": "Indian Wells Tennis Garden",
@@ -2726,8 +2730,8 @@
     {
      "id": "186762",
      "start": "2026-11-11T17:35Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Court 2",
@@ -2749,10 +2753,10 @@
        "short": "I. Burillo",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         7,
-        6
+        7
        ],
        "serve": false
       }
@@ -2809,9 +2813,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        3
+        5
        ],
-       "serve": false
+       "serve": true
       },
       {
        "name": "Maria Lourdes Carle",
@@ -2820,20 +2824,20 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        5
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
     {
      "id": "186770",
-     "start": "2026-11-12T05:00Z",
+     "start": "2026-11-12T15:00Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "11/12 - 10:00 AM EST",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
-     "court": "",
+     "court": "Court 1",
      "p": [
       {
        "name": "Andrea Lazaro Garcia",
@@ -2857,17 +2861,17 @@
     },
     {
      "id": "186771",
-     "start": "2026-11-12T05:00Z",
+     "start": "2026-11-12T15:00Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "11/12 - 10:00 AM EST",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
-     "court": "",
+     "court": "Main Court",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Irene Burillo",
+       "short": "I. Burillo",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -2886,12 +2890,12 @@
     },
     {
      "id": "186769",
-     "start": "2026-11-12T05:00Z",
+     "start": "2026-11-12T16:30Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "11/12 - 11:30 AM EST",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
-     "court": "",
+     "court": "Court 1",
      "p": [
       {
        "name": "Polona Hercog",
@@ -2915,12 +2919,12 @@
     },
     {
      "id": "186768",
-     "start": "2026-11-12T05:00Z",
+     "start": "2026-11-12T16:30Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "11/12 - 11:30 AM EST",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
-     "court": "",
+     "court": "Main Court",
      "p": [
       {
        "name": "TBD",
@@ -3032,5 +3036,5 @@
    ]
   }
  ],
- "fetched": "2026-11-11T19:37:13+00:00"
+ "fetched": "2026-11-11T20:10:53+00:00"
 }
