@@ -647,5 +647,60 @@
   "pnl": -10.0,
   "locked_at": "2026-11-10T00:14:12+00:00",
   "graded_at": "2026-11-10T05:45:41+00:00"
+ },
+ {
+  "date": "2026-11-10",
+  "stake": 10.0,
+  "data_src": "optic",
+  "legs": [
+   {
+    "pid": "580C5919659E",
+    "player": "Darius Garland",
+    "team": "LAC",
+    "opp": "PHX",
+    "gid": "2026111199F1D9DC",
+    "stat": "reb",
+    "side": "under",
+    "line": 2.5,
+    "odds": -150,
+    "prob": 0.5593,
+    "proj": 2.22,
+    "sel": "7840e216-8727-4544-98ac-95f6e0cbc55b",
+    "hit": null
+   },
+   {
+    "pid": "DD05A1E94051",
+    "player": "Toumani Camara",
+    "team": "POR",
+    "opp": "OKC",
+    "gid": "20261111C4046DD5",
+    "stat": "reb",
+    "side": "under",
+    "line": 4.5,
+    "odds": -150,
+    "prob": 0.5502,
+    "proj": 4.14,
+    "sel": "a42af3cc-0e9e-4c68-87a2-92e277f8f3aa",
+    "hit": null
+   },
+   {
+    "pid": "6EE974116BF2",
+    "player": "Karl-Anthony Towns",
+    "team": "NY",
+    "opp": "MIL",
+    "gid": "20261111DECF1459",
+    "stat": "reb",
+    "side": "under",
+    "line": 13.5,
+    "odds": -143,
+    "prob": 0.537,
+    "proj": 12.93,
+    "sel": "97f6fe42-25d9-4917-b9cf-c203c1ec71b2",
+    "hit": null
+   }
+  ],
+  "result": null,
+  "pnl": null,
+  "locked_at": "2026-11-11T00:30:15+00:00"
  }
 ]
