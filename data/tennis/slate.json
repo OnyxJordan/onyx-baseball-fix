@@ -964,8 +964,8 @@
     {
      "id": "186540",
      "start": "2026-11-11T12:05Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 2",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -975,10 +975,11 @@
        "short": "A. Tabilo",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/chi.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         7,
-        6
+        6,
+        7
        ],
        "serve": false
       },
@@ -990,46 +991,18 @@
        "win": false,
        "sets": [
         6,
-        7
+        7,
+        5
        ],
        "serve": false
       }
      ]
     },
     {
-     "id": "186545",
-     "start": "2026-11-11T14:45Z",
-     "state": "pre",
-     "detail": "11/11 - 9:45 AM EST",
-     "round": "Round 2",
-     "draw": "Men's Singles",
-     "court": "Center Court",
-     "p": [
-      {
-       "name": "Cameron Norrie",
-       "short": "C. Norrie",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/gbr.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "Taylor Fritz",
-       "short": "T. Fritz",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      }
-     ]
-    },
-    {
      "id": "186542",
-     "start": "2026-11-11T15:00Z",
-     "state": "pre",
-     "detail": "11/11 - 10:00 AM EST",
+     "start": "2026-11-11T15:05Z",
+     "state": "in",
+     "detail": "2nd",
      "round": "Round 2",
      "draw": "Men's Singles",
      "court": "Court 1",
@@ -1040,7 +1013,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        6,
+        1
+       ],
        "serve": false
       },
       {
@@ -1049,8 +1025,44 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/cro.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        2,
+        1
+       ],
        "serve": false
+      }
+     ]
+    },
+    {
+     "id": "186545",
+     "start": "2026-11-11T15:20Z",
+     "state": "in",
+     "detail": "1st",
+     "round": "Round 2",
+     "draw": "Men's Singles",
+     "court": "Center Court",
+     "p": [
+      {
+       "name": "Cameron Norrie",
+       "short": "C. Norrie",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/gbr.png",
+       "seed": null,
+       "win": false,
+       "sets": [
+        4
+       ],
+       "serve": false
+      },
+      {
+       "name": "Taylor Fritz",
+       "short": "T. Fritz",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
+       "seed": null,
+       "win": false,
+       "sets": [
+        2
+       ],
+       "serve": true
       }
      ]
     },
@@ -1122,9 +1134,9 @@
      "court": "Center Court",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Alejandro Tabilo",
+       "short": "A. Tabilo",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/chi.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -2525,39 +2537,10 @@
      ]
     },
     {
-     "id": "186760",
-     "start": "2026-11-11T15:00Z",
-     "state": "pre",
-     "detail": "11/11 - 10:00 AM EST",
-     "round": "Round 2",
-     "draw": "Women's Singles",
-     "court": "Court 2",
-     "p": [
-      {
-       "name": "Jazmin Ortenzi",
-       "short": "J. Ortenzi",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "Andrea Lazaro Garcia",
-       "short": "A. Lazaro Garcia",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      }
-     ]
-    },
-    {
      "id": "186766",
-     "start": "2026-11-11T15:00Z",
-     "state": "pre",
-     "detail": "11/11 - 10:00 AM EST",
+     "start": "2026-11-11T15:05Z",
+     "state": "in",
+     "detail": "2nd",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Court 1",
@@ -2568,8 +2551,11 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        3,
+        0
+       ],
+       "serve": true
       },
       {
        "name": "Polona Hercog",
@@ -2577,16 +2563,19 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/slo.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        6,
+        0
+       ],
        "serve": false
       }
      ]
     },
     {
      "id": "186767",
-     "start": "2026-11-11T15:00Z",
-     "state": "pre",
-     "detail": "11/11 - 10:00 AM EST",
+     "start": "2026-11-11T15:05Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Main Court",
@@ -2597,8 +2586,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        5
+       ],
+       "serve": true
       },
       {
        "name": "Tatjana Maria",
@@ -2606,7 +2597,44 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ger.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        4
+       ],
+       "serve": false
+      }
+     ]
+    },
+    {
+     "id": "186760",
+     "start": "2026-11-11T15:10Z",
+     "state": "in",
+     "detail": "2nd",
+     "round": "Round 2",
+     "draw": "Women's Singles",
+     "court": "Court 2",
+     "p": [
+      {
+       "name": "Jazmin Ortenzi",
+       "short": "J. Ortenzi",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
+       "seed": null,
+       "win": false,
+       "sets": [
+        6,
+        0
+       ],
+       "serve": false
+      },
+      {
+       "name": "Andrea Lazaro Garcia",
+       "short": "A. Lazaro Garcia",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
+       "seed": null,
+       "win": false,
+       "sets": [
+        2,
+        1
+       ],
        "serve": false
       }
      ]
@@ -2962,5 +2990,5 @@
    ]
   }
  ],
- "fetched": "2026-11-11T14:16:16+00:00"
+ "fetched": "2026-11-11T15:48:55+00:00"
 }
