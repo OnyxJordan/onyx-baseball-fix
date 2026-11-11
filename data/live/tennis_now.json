@@ -2083,5 +2083,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186767-ml-home",
+  "sport": "tennis",
+  "gid": "186767",
+  "date": "2026-11-11",
+  "logged_at": "2026-11-11T15:36:36+00:00",
+  "matchup": "Alice Tubello vs Tatjana Maria",
+  "home": "Tatjana Maria",
+  "away": "Alice Tubello",
+  "label": "Tatjana Maria to win",
+  "kind": "ml",
+  "side": "home",
+  "line": null,
+  "price": -185,
+  "chance": 0.6879,
+  "implied": 0.6491,
+  "edge": 0.039,
+  "fair": -220,
+  "state": {
+   "sets": "2-4",
+   "srv": "home",
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
