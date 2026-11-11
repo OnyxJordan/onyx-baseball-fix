@@ -98,5 +98,8 @@ module.exports = [
   C('nhl picks without Wild', {sports: ['nhl'], no_team: 'MIN'}),
   C('wild sprad', {sports: ['nhl'], team: 'MIN', markets: ['spread']}),
   C('give me a wild parlay', {intent: 'parlay', no_team: 'MIN'}),
-  C('is Trey Johnson going over his td scorer?', {markets: ['anytime_td']})
+  C('is Trey Johnson going over his td scorer?', {markets: ['anytime_td']}),
+  C('give me a 3 leg parlay college basketball game all games start 3 PM or earlier', {sports: ['cbb'], intent: 'parlay', count: 3, no_player: true}),
+  C('nba parlay games after 8pm', {sports: ['nba'], intent: 'parlay'}),
+  C('round robin 4 picks by 2s', {intent: 'rr'})
 ];
