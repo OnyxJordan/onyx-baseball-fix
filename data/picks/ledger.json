@@ -1692,5 +1692,33 @@
   "actual": 33.0,
   "profit": 0.7937,
   "graded_at": "2026-11-12T04:21:07+00:00"
+ },
+ {
+  "id": "nba-2026111302743AE0-q1-q1_total",
+  "sport": "nba",
+  "date": "2026-11-12",
+  "logged_at": "2026-11-12T10:06:56+00:00",
+  "start": "2026-11-13T00:00:00Z",
+  "gid": "2026111302743AE0",
+  "matchup": "TOR @ PHI",
+  "label": "TOR @ PHI Over 53.5 1st-quarter points",
+  "market": "q1_total",
+  "kind": "prop",
+  "name": "TOR @ PHI",
+  "team": "TOR",
+  "who": "q1",
+  "side": "over",
+  "line": 53.5,
+  "hcap": null,
+  "price": -133,
+  "chance": 0.591,
+  "edge": 0.0202,
+  "ev": 0.0353,
+  "sel": "9321597d-de34-4fb4-9544-c299a37d4a29",
+  "model": "q1 0.254/12.0",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
