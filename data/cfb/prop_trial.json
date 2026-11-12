@@ -2454,5 +2454,49 @@
   "model": "v2",
   "result": null,
   "actual": null
+ },
+ {
+  "date": "2026-11-12",
+  "key": "401858523|dierre hill|rush_yds",
+  "gid": "401858523",
+  "pid": "5141499",
+  "name": "Dierre Hill Jr.",
+  "team": "ORE",
+  "opp": "MICH",
+  "matchup": "ORE vs MICH",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 66.5,
+  "price": -124,
+  "sel": "57095bd4-fbe1-41ae-bb14-30ea944fc95a",
+  "proj": 43.5,
+  "prob": 0.6183,
+  "implied": 0.5536,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.65,
+    "avg": 0.77,
+    "pp": -2.8
+   },
+   {
+    "k": "line vs his usual range",
+    "v": 0.54,
+    "avg": -0.05,
+    "pp": -0.6
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.95,
+    "avg": 0.93,
+    "pp": -0.3
+   }
+  ],
+  "opened_at": "2026-11-12T17:45:29+00:00",
+  "logged_at": "2026-11-12T17:45:29+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
  }
 ]
