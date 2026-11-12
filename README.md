@@ -754,6 +754,12 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
     if a weekly re-test passes. The re-test of every sport finalized the same three markets
     (NBA 1Q total, NBA 1H total, CFB rushing yards). Closest: CFB spread 46 bets (+12.0% / +8.7%)
     and CFB total 42 bets (+13.8% / +14.6%), short of 60.
+    Later the same day (Jordan: "get the cfb spread and total to 60 bets"): the college football replays
+    were dropping every game of 13 FBS/FCS teams whose Onyx names do not fold to ESPN's ("Miami Florida",
+    "North Carolina State", "Hawaii", "Connecticut", ...); `tools/sports_backtest.ALIAS` maps them (Division
+    II/III names stay unmatched: the live model does not rate them). Re-test: spread 48 bets (+11.3% / +3.6%),
+    total 44 (+12.9% / +20.5%). Waiting is unlikely to reach 60 this season: the lane finds its edges in
+    September and early October, before team ratings settle (spread: no bet since 10/17; totals 1-2 a week).
   - **NHL points and assists vs Onyx (11/1, tested, not adopted).** `tools/nhl_box_pull.py`
     pulls NHL API boxscores (ice time, shots, power-play goals, shifts, hits, blocks,
     position) and `tools/nhl_feature_screen.py` runs the NFL v11 method on 16,484 points and

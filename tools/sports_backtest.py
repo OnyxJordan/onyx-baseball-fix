@@ -59,7 +59,20 @@ def team_map(key):
                 out.setdefault(nk(t[k]), t.get("abbreviation"))
         if t.get("location") and t.get("name"):
             out[nk(t["location"] + " " + t["name"])] = t.get("abbreviation")
+    for onyx, espn in ALIAS.get(key, {}).items():
+        if espn in out:
+            out.setdefault(nk(onyx), out[espn])
     return out
+
+
+# Onyx (OpticOdds) team names that fold to no ESPN name (value: ESPN's folded name). 11/12: before this, these
+# 13 FBS/FCS teams' games (about 9 a season each) were dropped from every college football replay, though the
+# live site prices them. Division II and III names stay unmatched on purpose: the live model does not rate them.
+ALIAS = {"cfb": {"Hawaii": "hawai i", "Miami Florida": "miami", "Miami Ohio": "miami oh", "North Carolina State": "nc state",
+                 "Connecticut": "uconn", "Appalachian State": "app state", "Southern Mississippi": "southern miss",
+                 "Sam Houston State": "sam houston", "St Thomas Minnesota": "st thomas", "New Haven College": "new haven",
+                 "Texas A&M Commerce": "east texas a&m", "Southeastern Louisiana": "se louisiana",
+                 "St. Francis Pennsylvania": "saint francis"}}
 
 
 def team_samples(key, lines, M, GP):
