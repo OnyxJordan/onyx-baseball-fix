@@ -1246,8 +1246,8 @@
     {
      "id": "186550",
      "start": "2026-11-12T19:25Z",
-     "state": "in",
-     "detail": "3rd",
+     "state": "post",
+     "detail": "Final",
      "round": "Quarterfinal",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -1261,20 +1261,20 @@
        "sets": [
         6,
         6,
-        3
+        4
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Lorenzo Musetti",
        "short": "L. Musetti",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ita.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         7,
         3,
-        4
+        6
        ],
        "serve": false
       }
@@ -1319,9 +1319,9 @@
      "court": "Center Court",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Lorenzo Musetti",
+       "short": "L. Musetti",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ita.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -1699,9 +1699,9 @@
     },
     {
      "id": "187376",
-     "start": "2026-11-12T21:55Z",
-     "state": "pre",
-     "detail": "11/12 - 4:55 PM EST",
+     "start": "2026-11-12T22:20Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Group Stage",
      "draw": "Women's Singles",
      "court": "Indian Wells Tennis Garden",
@@ -1712,7 +1712,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/cze.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        0
+       ],
        "serve": false
       },
       {
@@ -1721,8 +1723,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        0
+       ],
+       "serve": true
       }
      ]
     },
@@ -3108,5 +3112,5 @@
    ]
   }
  ],
- "fetched": "2026-11-12T21:56:03+00:00"
+ "fetched": "2026-11-12T22:25:19+00:00"
 }
