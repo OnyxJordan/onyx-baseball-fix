@@ -725,7 +725,8 @@
     "prob": 0.5591,
     "proj": 15.57,
     "sel": "53efada9-dac9-413d-b65a-6377ebd7f1f1",
-    "hit": null
+    "hit": true,
+    "actual": 14.0
    },
    {
     "pid": "AFDA3EB48D8F",
@@ -740,7 +741,8 @@
     "prob": 0.5535,
     "proj": 4.99,
     "sel": "b2993c64-c2eb-423d-bc88-b2c733e08fe6",
-    "hit": null
+    "hit": true,
+    "actual": 2.0
    },
    {
     "pid": "84B7EF493CAFADBB",
@@ -755,11 +757,13 @@
     "prob": 0.5511,
     "proj": 6.82,
     "sel": "ad5fecb5-4093-4155-8e2b-292d05f419d9",
-    "hit": null
+    "hit": false,
+    "actual": 4.0
    }
   ],
-  "result": null,
-  "pnl": null,
-  "locked_at": "2026-11-12T00:32:15+00:00"
+  "result": "loss",
+  "pnl": -10.0,
+  "locked_at": "2026-11-12T00:32:15+00:00",
+  "graded_at": "2026-11-12T03:47:01+00:00"
  }
 ]
