@@ -2473,5 +2473,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186548-spread-away",
+  "sport": "tennis",
+  "gid": "186548",
+  "date": "2026-11-12",
+  "logged_at": "2026-11-12T14:42:03+00:00",
+  "matchup": "Aleksandr Shevchenko vs Thiago Agustin Tirante",
+  "home": "Thiago Agustin Tirante",
+  "away": "Aleksandr Shevchenko",
+  "label": "Aleksandr Shevchenko +3.5 games",
+  "kind": "spread",
+  "side": "away",
+  "line": 3.5,
+  "price": -155,
+  "chance": 0.7075,
+  "implied": 0.6078,
+  "edge": 0.1,
+  "fair": -240,
+  "state": {
+   "sets": "2-3",
+   "srv": "away",
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
