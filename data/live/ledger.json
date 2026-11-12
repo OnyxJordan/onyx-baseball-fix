@@ -50880,10 +50880,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v7",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "19-16",
+  "profit": 0.6452,
+  "graded_at": "2026-11-12T17:12:32+00:00"
  },
  {
   "id": "tennis-186771-spread-away",
@@ -50910,10 +50910,10 @@
   },
   "pre_src": null,
   "model": "live-v7",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "13-8",
+  "profit": 0.7407,
+  "graded_at": "2026-11-12T17:12:32+00:00"
  },
  {
   "id": "tennis-186770-spread-away",
@@ -50944,5 +50944,35 @@
   "actual": "13-6",
   "profit": -1.0,
   "graded_at": "2026-11-12T16:38:54+00:00"
+ },
+ {
+  "id": "tennis-186769-spread-home",
+  "sport": "tennis",
+  "gid": "186769",
+  "date": "2026-11-12",
+  "logged_at": "2026-11-12T16:58:51+00:00",
+  "matchup": "Polona Hercog vs Alice Tubello",
+  "home": "Alice Tubello",
+  "away": "Polona Hercog",
+  "label": "Alice Tubello +1.5 games",
+  "kind": "spread",
+  "side": "home",
+  "line": 1.5,
+  "price": -135,
+  "chance": 0.6917,
+  "implied": 0.5745,
+  "edge": 0.117,
+  "fair": -225,
+  "state": {
+   "sets": "1-1",
+   "srv": "home",
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
