@@ -542,6 +542,12 @@
     var EXW = [];
     // 11/6 (Jordan: "if you say no that's actually the only thing it focuses on": "no first basket scorers,
     // parlay of +2000" built a first-basket parlay): a market after no / without / except is left out
+    // (11/12, 1M test: "CAR NO spread" read "Carolina, no spreads", 50 misses) NO next to the abbreviation of the
+    // team it plays today is New Orleans: written as the game ("car @ no") so no exclusion takes it
+    var NOG = {};
+    (B || []).forEach(function (p) { var m = String(p.matchup || '').split(/\s+(?:@|vs)\s+/);
+      if (m.length === 2 && Date.parse(p.start) > Date.now() - 8 * 3600e3) { if (m[0] === 'NO') NOG[m[1].toLowerCase()] = 1; if (m[1] === 'NO') NOG[m[0].toLowerCase()] = 1; } });
+    t = t.replace(/\b([a-z]{2,4})\s+no\b/g, function (m, a) { return NOG[a] ? a + ' @ no' : m; });   // "no car" stays "without Carolina"
     var XMK = [], XSIDE = null, XPROPS = false, XLINES = false;
     var NEG = '(?<!(?:@|\\bvs\\.?|\\bv|\\bat)\\s)\\b(?:no|not|without|except|excluding|exclude|other than|besides|not including|leave out|skip|but not|none of|avoid|minus|stay away from|nothing with)\\s+(?:any\\s+)?(?:the\\s+)?(?:more\\s+)?';
     t = t.replace(new RegExp(NEG + '((?:player\\s+)?props?|game lines?|main lines?|overs|unders|point spr[a-z]*|spr[ae]+ds?|against the spread|ats|o\\/u|over[\\s-]?unders?|to win|win outright|winners?|rebs|reb|dimes|ast|anytime touchdowns?|anytime tds?|rec yards|rush yards|pass yards|catches|(?:(?:1st|first|anytime|2\\+?|two)\\s*)?(?:basket|bucket|td|tds|touchdowns?|quarter|qtr|half)(?:\\s*(?:scorers?|totals?|bets?|props?|picks?))?|spreads?|totals?|moneylines?|money lines?|ml|rebounds?|boards|assists?|dimes|points?|pts|threes|3s|receptions?|catches|(?:receiving|rushing|passing|rec|rush|pass)\\s*(?:yards|yds)|(?:receiving|rushing|passing)|td scorers?|scorers?)\\b', 'g'), function (m, ph) {
@@ -970,7 +976,9 @@
     var mon = new Date().getMonth();
     if (mon !== 2 && !(mon === 3 && new Date().getDate() <= 8)) UNS.splice(2, 0, [/\bmarch madness\b|\bncaa tournament\b|\bbig dance\b|\bfinal four\b|\bsweet (16|sixteen)\b|\belite (8|eight)\b|\bbrackets?\b|\bbracketology\b|\bselection sunday\b|\bconference tournaments?\b/,
       'NCAA tournament bets|the tournament starts in March; today\'s college basketball games are on the board']);
-    for (var ui = 0; ui < UNS.length && !s.unsupported; ui++) if (UNS[ui][0].test(t)) { s.unsupported = UNS[ui][1]; break; }
+    // (11/12, 1M test: "Travis Homer anytime td" said MLB) a word inside the player's own name is not a market
+    var tUN = s.player && clean(t).indexOf(clean(s.player)) >= 0 ? t.replace(new RegExp('\\b' + clean(s.player).split(' ').map(function (w) { return w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }).join('|\\b') + '\\b', 'g'), ' ') : t;
+    for (var ui = 0; ui < UNS.length && !s.unsupported; ui++) if (UNS[ui][0].test(tUN)) { s.unsupported = UNS[ui][1]; break; }
     // college basketball markets Onyx does not price on our board (props, halves): say so, never empty
     var cbbOnly = s.sports.length === 1 && s.sports[0] === 'cbb';
     if (cbbOnly && !s.unsupported && (s.props_only || s.player || s.markets.some(function (m) { return !/^(spread|total|ml)$/.test(m); }))
@@ -993,7 +1001,7 @@
     var WILDX = /\b(not|no|without|excluding|exclude|except|minus|fade|but not|other than|besides|skip|avoid)\s+(the\s+)?(mn\s+|minnesota\s+)?wild\b/;
     var wildHit = /(^|[^A-Za-z])(Wild|WILD)\b(?!\s*(card|CARD))|\bthe wild\b(?!\s*card)|\bmn wild\b/.test(RAWQ) ||
       /\bwild\s+(spread|sprad|spreads|ml|moneyline|money line|total|totals|over|under|o\/u|puck line|puckline|game|picks|bets|plays|props|sgp|same[\s-]game|against|point|ats|to win|win)\b|\b(same[\s-]game parlay|same[\s-]game parlya|same[\s-]game parley|sgp|parlay|parly|parley)\s+(on\s+|for\s+)?(the\s+)?wild\b|\b(bet|like|take|on|fade|back|ride)\s+(the\s+)?wild\b/.test(t) ||
-      /^\s*(yo|hey|pls|please|give me|gimme|show me|build me|whats|what about|how about|i want|can i get|hit me with|looking for)?\s*(the\s+)?wild\s*(tonight|today|rn|asap|please|pls|thx|!+|\?+|\.)*\s*$/.test(t);
+      /^\s*(yo|hey|pls|please|give me|gimme|show me|build me|whats|what about|how about|i want|can i get|hit me with|looking for|what are|what is|any)?\s*(the\s+)?wild\s*(tonight|today|rn|asap|please|pls|thx|!+|\?+|\.)*\s*$/.test(t);
     var wildOn = (B || []).some(function (p) { return p.sport === 'nhl' && /\bMIN\b/.test(p.matchup || ''); });
     // "a wild parlay", "some wild longshots": the adjective, unless the request is about hockey
     if (wildHit && /\b(a|an|some|super|crazy|really|so|too|pretty|real)\s+wild\b/.test(t) && !/\b(nhl|hockey|minnesota|mn)\b/.test(t) && !/\bwild\s+(sgp|same[\s-]game)/.test(t)) wildHit = false;   // a same-game parlay needs a game: "a Wild SGP" is the team

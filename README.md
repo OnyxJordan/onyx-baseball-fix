@@ -1694,6 +1694,18 @@ later" (7 PM on), and "between 1 and 4 pm". A bare hour counts as afternoon or e
 after / until or with a game-time word, so "4 picks by 2s" and "after 2 legs" stay counts. Sides, totals and
 parlays already covered every sport.
 
+**1,000,000 more (11/12).** Jordan: "run the 1000000 search sweep again across all sports." Seeds 25-28,
+250,000 each on the 11/12 boards, in 50,000-search chunks: 999,767 passed, 99.977%, up from 99.43% on 11/10.
+The 233 failures (228 distinct) were three things:
+- "CAR NO" (175): Carolina at New Orleans written as two codes read "NO" as a ruling-out word, so the game lost
+  New Orleans and its sport. A code followed by "no" is now that game when the two teams play each other on the
+  board; "no CAR picks" still rules Carolina out.
+- "Travis Homer" (57): the running back's last name tripped the MLB season-over message. The unsupported-market
+  checks now run with the matched player's name taken out, so "homer picks" still gets the MLB message.
+- "what are wild today" (1): "what are", "what is" and "any" now count as lead-ins before the team word.
+Re-running all 228: 228 pass. Corpus 823/824 (the miss, a "start 3 PM or earlier" parlay, fails the same on main
+late in the day), holdouts 59/59 and 49/49.
+
 **1,000,000 more (11/10).** Jordan: "run the 1000000 search sweep again across all sports." `tools/ask_mega.py`
 seeds 21-24, 250,000 each on the 11/10 boards, graded in 50,000-search chunks (a 250,000 run in one page crashed
 the headless tab): 994,294 passed, 99.43%, up from 98.1% on 11/9. The 5,706 failures (5,359 distinct) were five
