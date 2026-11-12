@@ -2443,5 +2443,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186549-spread-away",
+  "sport": "tennis",
+  "gid": "186549",
+  "date": "2026-11-12",
+  "logged_at": "2026-11-12T12:30:33+00:00",
+  "matchup": "Alejandro Tabilo vs Alex Michelsen",
+  "home": "Alex Michelsen",
+  "away": "Alejandro Tabilo",
+  "label": "Alejandro Tabilo +4.5 games",
+  "kind": "spread",
+  "side": "away",
+  "line": 4.5,
+  "price": -175,
+  "chance": 0.712,
+  "implied": 0.6364,
+  "edge": 0.076,
+  "fair": -245,
+  "state": {
+   "sets": "2-2",
+   "srv": "away",
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
