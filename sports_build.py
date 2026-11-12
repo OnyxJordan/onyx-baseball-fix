@@ -753,6 +753,10 @@ def tennis_rows(lane, slate, odds, w):
                          f"Onyx {fa * 100:.0f}% adjusted to {pv * 100:.0f}% · Elo {E.r.get(nk(a), 1500):.0f} vs {E.r.get(nk(b), 1500):.0f} · {e.get('name')}"
                          if fa is not None else f"Elo {E.r.get(nk(a), 1500):.0f} vs {E.r.get(nk(b), 1500):.0f} · {e.get('name')}")
                 if r:
+                    if fa is not None and r.get("name") == b:
+                        # 11/12: the detail reads from the picked player's side (it showed player a's chance on a b pick)
+                        r["detail"] = (f"Onyx {(1 - fa) * 100:.0f}% adjusted to {(1 - pv) * 100:.0f}% · Elo {E.r.get(nk(b), 1500):.0f}"
+                                       f" vs {E.r.get(nk(a), 1500):.0f} · {e.get('name')}")
                     r["matchup"] = f"{a} vs {b}"
                     out.append(r)
             # games markets (v2): the Elo view of the total and the game spread
