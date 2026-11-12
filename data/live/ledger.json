@@ -51126,5 +51126,35 @@
   "actual": "144",
   "profit": -1.0,
   "graded_at": "2026-11-12T22:25:45+00:00"
+ },
+ {
+  "id": "tennis-187376-spread-home",
+  "sport": "tennis",
+  "gid": "187376",
+  "date": "2026-11-12",
+  "logged_at": "2026-11-12T22:36:16+00:00",
+  "matchup": "Linda Noskova vs Jessica Pegula",
+  "home": "Jessica Pegula",
+  "away": "Linda Noskova",
+  "label": "Jessica Pegula +2.5 games",
+  "kind": "spread",
+  "side": "home",
+  "line": 2.5,
+  "price": -130,
+  "chance": 0.6605,
+  "implied": 0.5652,
+  "edge": 0.095,
+  "fair": -195,
+  "state": {
+   "sets": "1-2",
+   "srv": null,
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
