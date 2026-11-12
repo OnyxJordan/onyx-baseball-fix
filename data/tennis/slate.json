@@ -1144,9 +1144,9 @@
     },
     {
      "id": "186549",
-     "start": "2026-11-12T12:00Z",
-     "state": "pre",
-     "detail": "11/12 - 7:00 AM EST",
+     "start": "2026-11-12T12:05Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Quarterfinal",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -1157,8 +1157,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/chi.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        0
+       ],
+       "serve": true
       },
       {
        "name": "Alex Michelsen",
@@ -1166,7 +1168,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        0
+       ],
        "serve": false
       }
      ]
@@ -3056,5 +3060,5 @@
    ]
   }
  ],
- "fetched": "2026-11-12T10:07:42+00:00"
+ "fetched": "2026-11-12T12:11:04+00:00"
 }
