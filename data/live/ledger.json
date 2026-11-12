@@ -51218,5 +51218,36 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "cbb-401916288-total-under",
+  "sport": "cbb",
+  "gid": "401916288",
+  "date": "2026-11-12",
+  "logged_at": "2026-11-12T23:42:39+00:00",
+  "matchup": "TNTC @ IU",
+  "home": "IU",
+  "away": "TNTC",
+  "label": "Under 163.5",
+  "kind": "total",
+  "side": "under",
+  "line": 163.5,
+  "price": -112,
+  "chance": 0.5914,
+  "implied": 0.5283,
+  "edge": 0.063,
+  "fair": -145,
+  "state": {
+   "score": "TNTC 3 - 6 IU",
+   "period": 1,
+   "clock": "15:58",
+   "f": 0.899
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
