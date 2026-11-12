@@ -2653,5 +2653,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-187371-ml-away",
+  "sport": "tennis",
+  "gid": "187371",
+  "date": "2026-11-12",
+  "logged_at": "2026-11-12T20:15:59+00:00",
+  "matchup": "Coco Gauff vs Marta Kostyuk",
+  "home": "Marta Kostyuk",
+  "away": "Coco Gauff",
+  "label": "Coco Gauff to win",
+  "kind": "ml",
+  "side": "away",
+  "line": null,
+  "price": -233,
+  "chance": 0.7338,
+  "implied": 0.6997,
+  "edge": 0.034,
+  "fair": -275,
+  "state": {
+   "sets": "0-0",
+   "srv": "away",
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
