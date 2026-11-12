@@ -1181,7 +1181,7 @@
      "id": "186548",
      "start": "2026-11-12T14:20Z",
      "state": "in",
-     "detail": "2nd",
+     "detail": "3rd",
      "round": "Quarterfinal",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -1194,7 +1194,8 @@
        "win": false,
        "sets": [
         6,
-        7
+        7,
+        1
        ],
        "serve": false
       },
@@ -1206,7 +1207,8 @@
        "win": false,
        "sets": [
         7,
-        6
+        6,
+        1
        ],
        "serve": false
       }
@@ -2865,8 +2867,8 @@
     {
      "id": "186770",
      "start": "2026-11-12T15:05Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Court 1",
@@ -2888,10 +2890,10 @@
        "short": "E. Mandlik",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        6
+        7
        ],
        "serve": false
       }
@@ -2914,9 +2916,9 @@
        "win": false,
        "sets": [
         5,
-        1
+        2
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Laura Samson",
@@ -2928,7 +2930,7 @@
         7,
         4
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
@@ -3000,9 +3002,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Elizabeth Mandlik",
+       "short": "E. Mandlik",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -3080,5 +3082,5 @@
    ]
   }
  ],
- "fetched": "2026-11-12T16:32:01+00:00"
+ "fetched": "2026-11-12T16:38:32+00:00"
 }
