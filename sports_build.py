@@ -744,8 +744,14 @@ def tennis_rows(lane, slate, odds, w):
             p0 = E.p(nk(a), nk(b))
             g = {"gid": m["id"], "start": m.get("start"), "away": b, "home": a}
             if o.get("ml0") is not None and o.get("ml1") is not None:
-                r = _row(g, "ml", a, 0.0, "", None, p0, o["ml0"], o["ml1"], o.get("ml0_sel"), o.get("ml1_sel"), w,
-                         f"Elo {E.r.get(nk(a), 1500):.0f} vs {E.r.get(nk(b), 1500):.0f} · {e.get('name')}")
+                # v3 (11/12): the match price is Onyx's own no-vig moneyline adjusted by each player's last 45 days
+                # (tennis_model.p_v3), weight 1: it already starts from Onyx's price
+                fa, _ = L.fair_pair(o["ml0"], o["ml1"])
+                pv = TM.p_v3(fa, TM.v3_features(E, nk(a), nk(b), (m.get("start") or slate.get("date") or "")[:10], fa, m.get("round"))) \
+                    if fa is not None else p0
+                r = _row(g, "ml", a, 0.0, "", None, pv, o["ml0"], o["ml1"], o.get("ml0_sel"), o.get("ml1_sel"), 1.0,
+                         f"Onyx {fa * 100:.0f}% adjusted to {pv * 100:.0f}% · Elo {E.r.get(nk(a), 1500):.0f} vs {E.r.get(nk(b), 1500):.0f} · {e.get('name')}"
+                         if fa is not None else f"Elo {E.r.get(nk(a), 1500):.0f} vs {E.r.get(nk(b), 1500):.0f} · {e.get('name')}")
                 if r:
                     r["matchup"] = f"{a} vs {b}"
                     out.append(r)

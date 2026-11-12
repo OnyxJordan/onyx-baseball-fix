@@ -48,7 +48,7 @@ Sources (data/picks/lines/ committed; bt/ local, see tools/rules_lab_build.py fo
                    bt/cfb_lines.json, bt/nhl_lines.json); college basketball from tools/cbb_price_backtest.samples
                    on data/picks/lines/cbb.json (+ bt/cbb_lines.json); chance = the live blend at the backtest lane
                    weight (data/<sport>/backtest.json lane w, sports_build.DEFAULT_W 0.3 without one)
-  tennis moneyline tools/sports_backtest.tennis_samples (Elo), same blend
+  tennis moneyline tools/tennis_v3.samples (v3: Onyx's price adjusted by each player's schedule), weight 1
   NBA props        tools/nba_backtest.walk (v8, confirmed lineups, simulated roster): 2025-26 on bt/nba,
                    2026-27 on the live box scores (data/nba/player_games.json, data/nba/prior.json); the live
                    20/80 model / Onyx blend, 28+ projected minutes like the Top 10
@@ -237,19 +237,20 @@ def team_markets():
                               "Onyx lines (data/picks/lines/cbb.json, 2025-26 on), ESPN finals", CPB.SPLIT, ro, rc,
                               held="Jan 1 to Apr 9 2026 (Nov-Dec 2025 tuned the blend weight)"))
     if os.path.exists("bt/tennis_atp_lines.json"):
+        # v3 (11/12): Onyx's no-vig price adjusted by the player's schedule (tennis_model.p_v3), weight 1 (it already
+        # starts from Onyx's price); coefficients fitted on 2025 closing prices only (tools/tennis_v3.py)
         import tennis_model as TM
-        bt = json.load(open("data/tennis/backtest.json"))
-        w = (bt.get("lane") or {}).get("w") or 0.3
-        S = SB.tennis_samples([f for f in ("bt/tennis_atp_lines.json", "bt/tennis_wta_lines.json") if os.path.exists(f)])
+        import tennis_v3 as T3
         ro, rc = [], []
-        for r in S:
-            ps = L.price_side(r["p"], r["over"], r["under"], w)
+        for r in T3.samples():
+            ps = L.price_side(TM.p_v3(r["fair"], r["f"]), r["over"], r["under"], 1.0)
             if not ps:
                 continue
             c = cand(r["date"], (r["gid"], "ml"), ps["side"], ps["prob"], ps["price"], (r["y"] == 1) == (ps["side"] == "over"))
             (ro if r["when"] == "o" else rc).append(c)
-        out.append(market("tennis", "ml", TM.VERSION, f"Elo blended {round(w * 100)}% with Onyx's no-vig price",
-                          "bt/tennis_*_lines.json, ATP/WTA results", SB.SPLIT["tennis"], ro, rc))
+        out.append(market("tennis", "ml", TM.VERSION, "Onyx's no-vig price adjusted by each player's last 45 days (v3)",
+                          "bt/tennis_*_lines.json, ATP/WTA results", T3.SPLIT, ro, rc,
+                          held="2026 matches (v3 coefficients fitted on 2025 closing prices)"))
     return out
 
 

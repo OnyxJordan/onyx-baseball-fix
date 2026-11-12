@@ -742,6 +742,18 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
     1/1/2026, judged after). Nothing beat Onyx on the unseen year: match winner .6009 vs .6000,
     total games .6927 vs .6909 (unders 3pp+ -15.5%), spread .6935 vs .6890. Onyx's tennis prices
     are efficient; tennis stays leans.
+  - **Tennis v3 and the all-sports picks re-test (11/12, Jordan: "go on tennis", then "backtest all
+    sports and finalize where we can").** `tennis_model.py` v3 prices a match from Onyx's own no-vig
+    moneyline, adjusted by each player's last 45 days (matches in 7 days, three-setters, form vs
+    Elo, qualifying, layoff, rest, Elo gap), the same 45-day window the live site keeps; weights
+    from `tools/tennis_v3.py --fit` on 2025 closing prices. Held-out 2026 log loss .60213 vs Onyx
+    .60270, so it is now the tennis projection. Under the Onyx Picks rule it fails: 283 bets,
+    +2.4% at the open, -4.0% at the close. (With full match history the same idea read +7.0% /
+    +2.6%; the live site cannot see that history, so that number was not used.) `picks.py` now
+    grades tennis moneylines off ESPN (retired/walkover = void), so tennis finalizes on its own
+    if a weekly re-test passes. The re-test of every sport finalized the same three markets
+    (NBA 1Q total, NBA 1H total, CFB rushing yards). Closest: CFB spread 46 bets (+12.0% / +8.7%)
+    and CFB total 42 bets (+13.8% / +14.6%), short of 60.
   - **NHL points and assists vs Onyx (11/1, tested, not adopted).** `tools/nhl_box_pull.py`
     pulls NHL API boxscores (ice time, shots, power-play goals, shifts, hits, blocks,
     position) and `tools/nhl_feature_screen.py` runs the NFL v11 method on 16,484 points and
