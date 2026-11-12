@@ -1,7 +1,7 @@
 {
  "sport": "nba",
  "date": "2026-11-12",
- "generated": "2026-11-12T17:44:31+00:00",
+ "generated": "2026-11-12T18:17:54+00:00",
  "unit": "min",
  "stats": [
   "pts",
@@ -793,7 +793,7 @@
    "name": "Philadelphia 76ers",
    "date": "2026-11-12",
    "pace": 102.2,
-   "min_sum": 259.7,
+   "min_sum": 242.9,
    "players": [
     {
      "id": "7879697610D8",
@@ -803,15 +803,15 @@
      "tag": "",
      "use": 35.7,
      "proj": {
-      "pts": 24.3,
+      "pts": 24.8,
       "reb": 3.2,
       "ast": 6.1,
       "3pm": 2.7,
-      "pra": 33.6
+      "pra": 34.2
      },
      "model": {
       "use": 35.8,
-      "pts": 24.0
+      "pts": 24.6
      },
      "last": {
       "use": 35.4,
@@ -838,15 +838,15 @@
      "tag": "",
      "use": 34.2,
      "proj": {
-      "pts": 22.3,
-      "reb": 6.4,
-      "ast": 3.9,
+      "pts": 23.2,
+      "reb": 6.5,
+      "ast": 4.1,
       "3pm": 2.0,
-      "pra": 32.7
+      "pra": 33.7
      },
      "model": {
       "use": 33.9,
-      "pts": 22.4
+      "pts": 23.4
      },
      "last": {
       "use": 35.0,
@@ -873,15 +873,15 @@
      "tag": "",
      "use": 33.4,
      "proj": {
-      "pts": 13.3,
-      "reb": 5.2,
-      "ast": 3.4,
+      "pts": 13.7,
+      "reb": 5.3,
+      "ast": 3.5,
       "3pm": 1.9,
-      "pra": 21.9
+      "pra": 22.5
      },
      "model": {
       "use": 33.5,
-      "pts": 13.3
+      "pts": 13.8
      },
      "last": {
       "use": 33.2,
@@ -901,41 +901,6 @@
      "home": true
     },
     {
-     "id": "3C093E0F82BD",
-     "n": "LeBron James",
-     "pos": "SF",
-     "role": "Starter",
-     "tag": "Questionable: Back (Torso)",
-     "use": 32.3,
-     "proj": {
-      "pts": 16.6,
-      "reb": 6.6,
-      "ast": 6.6,
-      "3pm": 1.2,
-      "pra": 29.8
-     },
-     "model": {
-      "use": 32.2,
-      "pts": 16.8
-     },
-     "last": {
-      "use": 32.5,
-      "pts": 15.1,
-      "reb": 7.2,
-      "ast": 6.5,
-      "3pm": 0.9,
-      "gp": 10
-     },
-     "now": {
-      "gp": 10,
-      "use": 32.5
-     },
-     "hs": "1966",
-     "gid": "2026111302743AE0",
-     "opp": "TOR",
-     "home": true
-    },
-    {
      "id": "0926C6680D09",
      "n": "Joel Embiid",
      "pos": "C",
@@ -943,15 +908,15 @@
      "tag": "Questionable: Foot (Leg, Right)",
      "use": 30.9,
      "proj": {
-      "pts": 19.9,
-      "reb": 8.3,
+      "pts": 20.6,
+      "reb": 8.4,
       "ast": 3.5,
       "3pm": 0.8,
-      "pra": 31.7
+      "pra": 32.5
      },
      "model": {
       "use": 30.6,
-      "pts": 20.3
+      "pts": 21.2
      },
      "last": {
       "use": 31.8,
@@ -974,19 +939,19 @@
      "id": "94FB16CEEFBA",
      "n": "Dean Wade",
      "pos": "PF",
-     "role": "Rotation",
+     "role": "Starter",
      "tag": "",
-     "use": 21.4,
+     "use": 23.5,
      "proj": {
-      "pts": 3.7,
-      "reb": 3.3,
-      "ast": 1.2,
-      "3pm": 0.8,
-      "pra": 8.2
+      "pts": 4.8,
+      "reb": 4.1,
+      "ast": 1.4,
+      "3pm": 1.1,
+      "pra": 10.3
      },
      "model": {
-      "use": 18.2,
-      "pts": 3.8
+      "use": 23.2,
+      "pts": 5.0
      },
      "last": {
       "use": 24.6,
@@ -1011,17 +976,17 @@
      "pos": "SG",
      "role": "Rotation",
      "tag": "",
-     "use": 19.0,
+     "use": 21.2,
      "proj": {
-      "pts": 8.5,
-      "reb": 1.8,
-      "ast": 1.5,
-      "3pm": 1.6,
-      "pra": 11.8
+      "pts": 10.2,
+      "reb": 2.1,
+      "ast": 1.8,
+      "3pm": 2.0,
+      "pra": 14.1
      },
      "model": {
-      "use": 16.3,
-      "pts": 7.7
+      "use": 20.8,
+      "pts": 10.3
      },
      "last": {
       "use": 21.7,
@@ -1046,17 +1011,17 @@
      "pos": "SG",
      "role": "Rotation",
      "tag": "",
-     "use": 18.4,
+     "use": 20.6,
      "proj": {
-      "pts": 4.6,
-      "reb": 1.8,
-      "ast": 1.2,
-      "3pm": 0.9,
-      "pra": 7.6
+      "pts": 5.5,
+      "reb": 2.1,
+      "ast": 1.5,
+      "3pm": 1.1,
+      "pra": 9.1
      },
      "model": {
-      "use": 16.1,
-      "pts": 4.4
+      "use": 20.6,
+      "pts": 5.8
      },
      "last": {
       "use": 20.7,
@@ -1081,17 +1046,17 @@
      "pos": "F",
      "role": "Bench",
      "tag": "",
-     "use": 9.6,
+     "use": 10.8,
      "proj": {
-      "pts": 2.9,
-      "reb": 2.4,
-      "ast": 0.3,
-      "3pm": 0.2,
-      "pra": 5.6
+      "pts": 4.2,
+      "reb": 3.2,
+      "ast": 0.4,
+      "3pm": 0.3,
+      "pra": 7.7
      },
      "model": {
-      "use": 5.4,
-      "pts": 2.1
+      "use": 9.5,
+      "pts": 3.9
      },
      "last": {
       "use": 11.4,
@@ -1116,17 +1081,17 @@
      "pos": "G",
      "role": "Bench",
      "tag": "",
-     "use": 8.8,
+     "use": 9.9,
      "proj": {
-      "pts": 1.7,
-      "reb": 0.7,
-      "ast": 0.5,
-      "3pm": 0.2,
-      "pra": 2.9
+      "pts": 2.6,
+      "reb": 0.9,
+      "ast": 0.7,
+      "3pm": 0.4,
+      "pra": 4.3
      },
      "model": {
-      "use": 4.6,
-      "pts": 1.4
+      "use": 8.2,
+      "pts": 2.6
      },
      "last": {
       "use": 10.6,
@@ -1151,17 +1116,17 @@
      "pos": "G",
      "role": "Bench",
      "tag": "",
-     "use": 4.2,
+     "use": 7.4,
      "proj": {
-      "pts": 2.0,
-      "reb": 0.5,
-      "ast": 0.5,
-      "3pm": 0.4,
-      "pra": 3.0
+      "pts": 3.7,
+      "reb": 0.8,
+      "ast": 0.9,
+      "3pm": 0.7,
+      "pra": 5.4
      },
      "model": {
-      "use": 4.2,
-      "pts": 2.0
+      "use": 7.4,
+      "pts": 3.7
      },
      "last": null,
      "now": {
@@ -1179,17 +1144,17 @@
      "pos": "SG",
      "role": "Bench",
      "tag": "",
-     "use": 3.7,
+     "use": 4.5,
      "proj": {
-      "pts": 1.0,
-      "reb": 0.9,
-      "ast": 0.3,
-      "3pm": 0.1,
-      "pra": 2.1
+      "pts": 1.6,
+      "reb": 1.2,
+      "ast": 0.4,
+      "3pm": 0.2,
+      "pra": 3.1
      },
      "model": {
-      "use": 3.1,
-      "pts": 1.0
+      "use": 5.6,
+      "pts": 1.8
      },
      "last": {
       "use": 4.0,
@@ -1209,22 +1174,50 @@
      "home": true
     },
     {
+     "id": "04D3E410C15C",
+     "n": "Jeff Dowtin",
+     "pos": "G",
+     "role": "Bench",
+     "tag": "",
+     "use": 4.3,
+     "proj": {
+      "pts": 1.9,
+      "reb": 0.4,
+      "ast": 0.5,
+      "3pm": 0.2,
+      "pra": 2.8
+     },
+     "model": {
+      "use": 4.3,
+      "pts": 1.9
+     },
+     "last": null,
+     "now": {
+      "gp": 0,
+      "use": null
+     },
+     "hs": null,
+     "gid": "2026111302743AE0",
+     "opp": "TOR",
+     "home": true
+    },
+    {
      "id": "AF84A76C7608",
      "n": "Justin Edwards",
      "pos": "SF",
      "role": "Bench",
      "tag": "",
-     "use": 3.2,
+     "use": 3.8,
      "proj": {
-      "pts": 1.1,
-      "reb": 0.5,
-      "ast": 0.2,
-      "3pm": 0.2,
-      "pra": 1.7
+      "pts": 1.6,
+      "reb": 0.6,
+      "ast": 0.3,
+      "3pm": 0.3,
+      "pra": 2.5
      },
      "model": {
-      "use": 2.6,
-      "pts": 1.0
+      "use": 4.5,
+      "pts": 1.8
      },
      "last": {
       "use": 3.5,
@@ -1249,17 +1242,17 @@
      "pos": "C",
      "role": "Bench",
      "tag": "",
-     "use": 2.5,
+     "use": 2.7,
      "proj": {
-      "pts": 0.3,
-      "reb": 0.6,
+      "pts": 0.6,
+      "reb": 0.8,
       "ast": 0.1,
       "3pm": 0.0,
-      "pra": 1.0
+      "pra": 1.4
      },
      "model": {
-      "use": 1.2,
-      "pts": 0.4
+      "use": 2.1,
+      "pts": 0.8
      },
      "last": {
       "use": 3.0,
@@ -1274,34 +1267,6 @@
       "use": 3.0
      },
      "hs": "3904625",
-     "gid": "2026111302743AE0",
-     "opp": "TOR",
-     "home": true
-    },
-    {
-     "id": "04D3E410C15C",
-     "n": "Jeff Dowtin",
-     "pos": "G",
-     "role": "Bench",
-     "tag": "",
-     "use": 2.4,
-     "proj": {
-      "pts": 1.0,
-      "reb": 0.2,
-      "ast": 0.3,
-      "3pm": 0.1,
-      "pra": 1.6
-     },
-     "model": {
-      "use": 2.4,
-      "pts": 1.0
-     },
-     "last": null,
-     "now": {
-      "gp": 0,
-      "use": null
-     },
-     "hs": null,
      "gid": "2026111302743AE0",
      "opp": "TOR",
      "home": true
@@ -1498,6 +1463,38 @@
       "use": null
      },
      "hs": null,
+     "gid": "2026111302743AE0",
+     "opp": "TOR",
+     "home": true
+    },
+    {
+     "id": "3C093E0F82BD",
+     "n": "LeBron James",
+     "pos": "SF",
+     "role": "Out",
+     "tag": "Out: Back (Torso)",
+     "use": 0.0,
+     "proj": {
+      "pts": 0.0,
+      "reb": 0.0,
+      "ast": 0.0,
+      "3pm": 0.0,
+      "pra": 0.0
+     },
+     "model": null,
+     "last": {
+      "use": 32.5,
+      "pts": 15.1,
+      "reb": 7.2,
+      "ast": 6.5,
+      "3pm": 0.9,
+      "gp": 10
+     },
+     "now": {
+      "gp": 10,
+      "use": 32.5
+     },
+     "hs": "1966",
      "gid": "2026111302743AE0",
      "opp": "TOR",
      "home": true
@@ -2918,43 +2915,8 @@
    "name": "Toronto Raptors",
    "date": "2026-11-12",
    "pace": 102.2,
-   "min_sum": 259.3,
+   "min_sum": 239.3,
    "players": [
-    {
-     "id": "0497CAEAD35C",
-     "n": "Scottie Barnes",
-     "pos": "F",
-     "role": "Starter",
-     "tag": "Questionable: Groin (Soreness, Left)",
-     "use": 32.3,
-     "proj": {
-      "pts": 20.9,
-      "reb": 7.5,
-      "ast": 5.5,
-      "3pm": 0.7,
-      "pra": 33.9
-     },
-     "model": {
-      "use": 32.3,
-      "pts": 20.9
-     },
-     "last": {
-      "use": 33.4,
-      "pts": 23.5,
-      "reb": 7.6,
-      "ast": 5.1,
-      "3pm": 0.5,
-      "gp": 8
-     },
-     "now": {
-      "gp": 8,
-      "use": 33.4
-     },
-     "hs": "4433134",
-     "gid": "2026111302743AE0",
-     "opp": "PHI",
-     "home": false
-    },
     {
      "id": "B05F49FE7024",
      "n": "RJ Barrett",
@@ -2963,15 +2925,15 @@
      "tag": "",
      "use": 32.2,
      "proj": {
-      "pts": 19.9,
+      "pts": 21.5,
       "reb": 5.8,
-      "ast": 4.0,
+      "ast": 4.1,
       "3pm": 1.4,
-      "pra": 29.6
+      "pra": 31.3
      },
      "model": {
       "use": 31.7,
-      "pts": 19.8
+      "pts": 21.6
      },
      "last": {
       "use": 33.8,
@@ -2998,15 +2960,15 @@
      "tag": "",
      "use": 30.4,
      "proj": {
-      "pts": 15.7,
-      "reb": 3.8,
+      "pts": 16.9,
+      "reb": 4.0,
       "ast": 5.4,
       "3pm": 2.3,
-      "pra": 25.0
+      "pra": 26.4
      },
      "model": {
       "use": 30.1,
-      "pts": 15.5
+      "pts": 16.9
      },
      "last": {
       "use": 31.3,
@@ -3033,15 +2995,15 @@
      "tag": "",
      "use": 30.1,
      "proj": {
-      "pts": 11.2,
+      "pts": 11.9,
       "reb": 4.2,
-      "ast": 2.0,
+      "ast": 1.9,
       "3pm": 2.1,
-      "pra": 17.4
+      "pra": 18.0
      },
      "model": {
       "use": 29.9,
-      "pts": 11.2
+      "pts": 11.9
      },
      "last": {
       "use": 30.8,
@@ -3068,15 +3030,15 @@
      "tag": "",
      "use": 25.7,
      "proj": {
-      "pts": 10.7,
-      "reb": 8.3,
-      "ast": 1.8,
+      "pts": 11.1,
+      "reb": 8.4,
+      "ast": 1.7,
       "3pm": 0.0,
-      "pra": 20.7
+      "pra": 21.1
      },
      "model": {
       "use": 26.3,
-      "pts": 11.1
+      "pts": 11.6
      },
      "last": {
       "use": 23.8,
@@ -3099,19 +3061,19 @@
      "id": "3563CFD62F22",
      "n": "Jamal Shead",
      "pos": "PG",
-     "role": "Rotation",
+     "role": "Starter",
      "tag": "",
-     "use": 23.1,
+     "use": 25.6,
      "proj": {
-      "pts": 6.9,
-      "reb": 2.0,
-      "ast": 6.1,
-      "3pm": 0.9,
-      "pra": 15.0
+      "pts": 8.5,
+      "reb": 2.4,
+      "ast": 7.4,
+      "3pm": 1.1,
+      "pra": 18.3
      },
      "model": {
-      "use": 21.3,
-      "pts": 6.6
+      "use": 25.8,
+      "pts": 8.7
      },
      "last": {
       "use": 24.8,
@@ -3136,17 +3098,17 @@
      "pos": "PF",
      "role": "Rotation",
      "tag": "",
-     "use": 20.6,
+     "use": 22.6,
      "proj": {
-      "pts": 8.9,
-      "reb": 4.5,
-      "ast": 1.5,
-      "3pm": 0.4,
-      "pra": 14.8
+      "pts": 10.4,
+      "reb": 5.1,
+      "ast": 1.7,
+      "3pm": 0.5,
+      "pra": 17.1
      },
      "model": {
-      "use": 19.1,
-      "pts": 8.2
+      "use": 23.2,
+      "pts": 10.5
      },
      "last": {
       "use": 22.0,
@@ -3171,17 +3133,17 @@
      "pos": "F",
      "role": "Rotation",
      "tag": "",
-     "use": 18.0,
+     "use": 19.8,
      "proj": {
-      "pts": 8.0,
-      "reb": 1.8,
-      "ast": 0.6,
-      "3pm": 1.7,
-      "pra": 10.4
+      "pts": 9.4,
+      "reb": 2.2,
+      "ast": 0.7,
+      "3pm": 2.0,
+      "pra": 12.2
      },
      "model": {
-      "use": 16.4,
-      "pts": 7.2
+      "use": 19.9,
+      "pts": 9.3
      },
      "last": {
       "use": 19.6,
@@ -3206,17 +3168,17 @@
      "pos": "PF",
      "role": "Bench",
      "tag": "",
-     "use": 10.9,
+     "use": 12.6,
      "proj": {
-      "pts": 2.9,
-      "reb": 1.6,
-      "ast": 0.4,
-      "3pm": 0.3,
-      "pra": 5.0
+      "pts": 4.6,
+      "reb": 2.3,
+      "ast": 0.7,
+      "3pm": 0.6,
+      "pra": 7.6
      },
      "model": {
-      "use": 5.7,
-      "pts": 2.0
+      "use": 11.5,
+      "pts": 4.4
      },
      "last": {
       "use": 13.1,
@@ -3241,17 +3203,17 @@
      "pos": "G",
      "role": "Bench",
      "tag": "",
-     "use": 10.7,
+     "use": 12.5,
      "proj": {
-      "pts": 3.9,
-      "reb": 1.2,
-      "ast": 0.5,
-      "3pm": 0.3,
-      "pra": 5.6
+      "pts": 5.9,
+      "reb": 1.7,
+      "ast": 0.9,
+      "3pm": 0.6,
+      "pra": 8.6
      },
      "model": {
-      "use": 5.7,
-      "pts": 2.5
+      "use": 11.6,
+      "pts": 5.4
      },
      "last": {
       "use": 12.9,
@@ -3271,36 +3233,29 @@
      "home": false
     },
     {
-     "id": "1F188BF54EC4",
-     "n": "Trayce Jackson-Davis",
-     "pos": "PF",
+     "id": "63F31D06E12C69DD",
+     "n": "Malachi Smith",
+     "pos": "SG",
      "role": "Bench",
-     "tag": "Questionable: Illness (Other)",
-     "use": 6.7,
+     "tag": "",
+     "use": 9.8,
      "proj": {
-      "pts": 1.9,
-      "reb": 1.8,
-      "ast": 0.3,
-      "3pm": 0.0,
-      "pra": 4.0
+      "pts": 3.7,
+      "reb": 1.4,
+      "ast": 1.4,
+      "3pm": 0.6,
+      "pra": 6.5
      },
      "model": {
-      "use": 3.1,
-      "pts": 1.2
+      "use": 9.8,
+      "pts": 3.7
      },
-     "last": {
-      "use": 8.2,
-      "pts": 3.5,
-      "reb": 3.0,
-      "ast": 0.5,
-      "3pm": 0.0,
-      "gp": 8
-     },
+     "last": null,
      "now": {
-      "gp": 8,
-      "use": 8.2
+      "gp": 0,
+      "use": null
      },
-     "hs": "4431684",
+     "hs": "4397784",
      "gid": "2026111302743AE0",
      "opp": "PHI",
      "home": false
@@ -3311,17 +3266,17 @@
      "pos": "SF",
      "role": "Bench",
      "tag": "",
-     "use": 6.7,
+     "use": 7.9,
      "proj": {
-      "pts": 1.3,
-      "reb": 1.0,
-      "ast": 0.7,
-      "3pm": 0.0,
-      "pra": 3.0
+      "pts": 2.2,
+      "reb": 1.4,
+      "ast": 1.3,
+      "3pm": 0.1,
+      "pra": 4.9
      },
      "model": {
-      "use": 3.8,
-      "pts": 1.1
+      "use": 7.6,
+      "pts": 2.4
      },
      "last": {
       "use": 8.0,
@@ -3341,50 +3296,22 @@
      "home": false
     },
     {
-     "id": "63F31D06E12C69DD",
-     "n": "Malachi Smith",
-     "pos": "SG",
-     "role": "Bench",
-     "tag": "",
-     "use": 4.8,
-     "proj": {
-      "pts": 1.7,
-      "reb": 0.7,
-      "ast": 0.7,
-      "3pm": 0.3,
-      "pra": 3.1
-     },
-     "model": {
-      "use": 4.8,
-      "pts": 1.7
-     },
-     "last": null,
-     "now": {
-      "gp": 0,
-      "use": null
-     },
-     "hs": "4397784",
-     "gid": "2026111302743AE0",
-     "opp": "PHI",
-     "home": false
-    },
-    {
      "id": "3855F480C7787654",
      "n": "Jaden Bradley",
      "pos": "PG",
      "role": "Bench",
      "tag": "",
-     "use": 4.7,
+     "use": 5.3,
      "proj": {
-      "pts": 1.2,
-      "reb": 0.5,
-      "ast": 0.4,
-      "3pm": 0.1,
-      "pra": 2.0
+      "pts": 1.8,
+      "reb": 0.6,
+      "ast": 0.6,
+      "3pm": 0.2,
+      "pra": 3.1
      },
      "model": {
-      "use": 2.2,
-      "pts": 0.8
+      "use": 4.5,
+      "pts": 1.7
      },
      "last": {
       "use": 5.7,
@@ -3409,17 +3336,17 @@
      "pos": "G",
      "role": "Bench",
      "tag": "",
-     "use": 2.4,
+     "use": 4.8,
      "proj": {
-      "pts": 0.8,
-      "reb": 0.4,
-      "ast": 0.3,
-      "3pm": 0.1,
-      "pra": 1.5
+      "pts": 1.6,
+      "reb": 0.9,
+      "ast": 0.6,
+      "3pm": 0.2,
+      "pra": 3.1
      },
      "model": {
-      "use": 2.4,
-      "pts": 0.8
+      "use": 4.8,
+      "pts": 1.6
      },
      "last": null,
      "now": {
@@ -3572,6 +3499,38 @@
      "home": false
     },
     {
+     "id": "0497CAEAD35C",
+     "n": "Scottie Barnes",
+     "pos": "F",
+     "role": "Out",
+     "tag": "Out: Groin (Soreness, Left)",
+     "use": 0.0,
+     "proj": {
+      "pts": 0.0,
+      "reb": 0.0,
+      "ast": 0.0,
+      "3pm": 0.0,
+      "pra": 0.0
+     },
+     "model": null,
+     "last": {
+      "use": 33.4,
+      "pts": 23.5,
+      "reb": 7.6,
+      "ast": 5.1,
+      "3pm": 0.5,
+      "gp": 8
+     },
+     "now": {
+      "gp": 8,
+      "use": 33.4
+     },
+     "hs": "4433134",
+     "gid": "2026111302743AE0",
+     "opp": "PHI",
+     "home": false
+    },
+    {
      "id": "B97A9B7266A2",
      "n": "Kawhi Leonard",
      "pos": "SF",
@@ -3599,6 +3558,38 @@
       "use": 26.0
      },
      "hs": "6450",
+     "gid": "2026111302743AE0",
+     "opp": "PHI",
+     "home": false
+    },
+    {
+     "id": "1F188BF54EC4",
+     "n": "Trayce Jackson-Davis",
+     "pos": "PF",
+     "role": "Out",
+     "tag": "Out: Illness (Other)",
+     "use": 0.0,
+     "proj": {
+      "pts": 0.0,
+      "reb": 0.0,
+      "ast": 0.0,
+      "3pm": 0.0,
+      "pra": 0.0
+     },
+     "model": null,
+     "last": {
+      "use": 8.2,
+      "pts": 3.5,
+      "reb": 3.0,
+      "ast": 0.5,
+      "3pm": 0.0,
+      "gp": 8
+     },
+     "now": {
+      "gp": 8,
+      "use": 8.2
+     },
+     "hs": "4431684",
      "gid": "2026111302743AE0",
      "opp": "PHI",
      "home": false

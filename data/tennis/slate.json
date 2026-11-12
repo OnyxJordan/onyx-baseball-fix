@@ -2937,8 +2937,8 @@
     {
      "id": "186769",
      "start": "2026-11-12T16:45Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Court 1",
@@ -2948,10 +2948,10 @@
        "short": "P. Hercog",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/slo.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        2
+        6
        ],
        "serve": false
       },
@@ -2963,9 +2963,9 @@
        "win": false,
        "sets": [
         2,
-        0
+        3
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -2985,7 +2985,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        1
+        4
        ],
        "serve": true
       },
@@ -2996,7 +2996,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        0
+        1
        ],
        "serve": false
       }
@@ -3050,9 +3050,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Polona Hercog",
+       "short": "P. Hercog",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/slo.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -3092,5 +3092,5 @@
    ]
   }
  ],
- "fetched": "2026-11-12T17:45:35+00:00"
+ "fetched": "2026-11-12T18:18:57+00:00"
 }
