@@ -1533,5 +1533,82 @@
   "model": "v15",
   "result": null,
   "actual": null
+ },
+ {
+  "date": "2026-11-11",
+  "season": 2026,
+  "week": 10,
+  "key": "401873059|greg dulcich|rec_yds",
+  "gid": "401873059",
+  "pid": "4367209",
+  "name": "Greg Dulcich",
+  "team": "MIA",
+  "opp": "IND",
+  "matchup": "MIA @ IND",
+  "kind": "rec",
+  "side": "under",
+  "line": 33.5,
+  "price": -123,
+  "sel": "bf5580ca-338a-4b76-9401-aa6ba097b986",
+  "proj": 24.1,
+  "prob": 0.7383,
+  "implied": 0.5516,
+  "opened_at": "2026-11-12T00:32:26+00:00",
+  "logged_at": "2026-11-12T00:32:26+00:00",
+  "model": "v15",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-11",
+  "season": 2026,
+  "week": 10,
+  "key": "401873061|matthew stafford|pass_att",
+  "gid": "401873061",
+  "pid": "12483",
+  "name": "Matthew Stafford",
+  "team": "LAR",
+  "opp": "ARI",
+  "matchup": "LAR @ ARI",
+  "kind": "pass_att",
+  "lane": "pass_att_under",
+  "side": "under",
+  "line": 30.5,
+  "price": -112,
+  "sel": "e44a5e6a-5054-4a63-96e9-6df72e2da8e4",
+  "proj": 36.1,
+  "prob": 0.63,
+  "implied": 0.5283,
+  "why": [
+   {
+    "k": "game-to-game swings",
+    "v": 12.11,
+    "avg": 8.59,
+    "pp": -5.5
+   },
+   {
+    "k": "yards per carry",
+    "v": 1.54,
+    "avg": 4.11,
+    "pp": 4.3
+   },
+   {
+    "k": "recent trend",
+    "v": -7.79,
+    "avg": 0.62,
+    "pp": -4.0
+   },
+   {
+    "k": "opponent catches allowed",
+    "v": 0.91,
+    "avg": 0.99,
+    "pp": -3.8
+   }
+  ],
+  "opened_at": "2026-11-12T00:32:26+00:00",
+  "logged_at": "2026-11-12T00:32:26+00:00",
+  "model": "v15",
+  "result": null,
+  "actual": null
  }
 ]
