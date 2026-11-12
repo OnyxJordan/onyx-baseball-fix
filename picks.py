@@ -108,6 +108,8 @@ def payout(price):
 
 
 def gradable(sport, mkt):
+    if sport == "tennis":                 # 11/12: the match winner, off ESPN's ATP / WTA scoreboard (_tennis)
+        return mkt == "ml"
     return sport in PATH and (mkt in GAME or mkt in ("q1_total", "h1_total") and sport == "nba" or mkt in BOX.get(sport, {}))
 
 
@@ -326,12 +328,50 @@ def _nk(s):
     return " ".join(s.split())
 
 
+def _tennis(r, cache, now, st):
+    """A tennis moneyline (11/12, v3): the match on ESPN's ATP or WTA scoreboard for its day (or the next, a late
+    start), found by both players' names; W / L from ESPN's winner. A match not played out (retirement, walkover,
+    default) is void: neither result says who was the better bet."""
+    if r.get("market") != "ml":
+        return None
+    me = _nk(r.get("name"))
+    pl = [_nk(x) for x in str(r.get("matchup") or "").split(" vs ")]
+    if len(pl) != 2 or me not in pl:
+        return None
+    for d in (st, st + timedelta(days=1)):
+        day = d.astimezone(ET).strftime("%Y%m%d")
+        for tour in ("atp", "wta"):
+            k = ("tn", tour, day)
+            if k not in cache:
+                cache[k] = _get(ESPN + "tennis/" + tour + "/scoreboard", {"dates": day}) or {}
+            for e in cache[k].get("events") or []:
+                for g in e.get("groupings") or []:
+                    for c in g.get("competitions") or []:
+                        cs = c.get("competitors") or []
+                        names = [_nk((x.get("athlete") or {}).get("displayName")) for x in cs]
+                        if sorted(names) != sorted(pl):
+                            continue
+                        stt = (c.get("status") or {}).get("type") or {}
+                        if stt.get("state") != "post":
+                            return ("V", None) if now > st + VOID_AFTER else None
+                        det = " ".join(str(stt.get(x) or "") for x in ("description", "detail", "name")).lower()
+                        if any(w in det for w in ("retire", "walkover", "default", "abandon", "cancel", "postpone")):
+                            return "V", None
+                        mine = next((x for x in cs if _nk((x.get("athlete") or {}).get("displayName")) == me), None)
+                        if mine is None or mine.get("winner") is None:
+                            return None
+                        return ("W" if mine.get("winner") else "L"), None
+    return ("V", None) if now > st + VOID_AFTER else None
+
+
 def resolve(r, cache, now):
     """(result, actual) for a finished pick, or None while it is not final."""
     sport = r["sport"]
     st = _when(r.get("start"))
     if not st or now < st + timedelta(hours=2):
         return None
+    if sport == "tennis":
+        return _tennis(r, cache, now, st)
     eid = _event_id(sport, r, cache)
     summ = None
     if eid:
@@ -444,7 +484,7 @@ def hook(sport, plays):
             pass
         return
     try:
-        if sport in PATH and any(not r.get("result") and r["sport"] == sport for r in load()):
+        if (sport in PATH or sport == "tennis") and any(not r.get("result") and r["sport"] == sport for r in load()):
             grade([sport])
     except Exception as x:
         print(f"  picks: grading skipped ({str(x)[:120]})")

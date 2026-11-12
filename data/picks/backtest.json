@@ -1,5 +1,5 @@
 {
- "built": "2026-11-10",
+ "built": "2026-11-12",
  "rule": {
   "price": [
    -150,
@@ -1121,76 +1121,75 @@
    "sport": "tennis",
    "market": "ml",
    "name": "Moneyline",
-   "version": "v2",
-   "chance": "Elo blended 30% with Onyx's no-vig price",
+   "version": "v3",
+   "chance": "Onyx's no-vig price adjusted by each player's last 45 days (v3)",
    "source": "bt/tennis_*_lines.json, ATP/WTA results",
    "held_out_from": "2026-01-01",
-   "held_out": "games on or after 2026-01-01",
+   "held_out": "2026 matches (v3 coefficients fitted on 2025 closing prices)",
    "tune": {
     "open": {
-     "n": 270,
-     "w": 102,
-     "l": 168,
+     "n": 180,
+     "w": 105,
+     "l": 75,
      "p": 0,
-     "units": -36.8,
-     "roi": -0.1363,
-     "avg_price": 95,
-     "claimed": 0.4763,
-     "hit": 0.3778,
-     "first": "2025-01-25",
-     "last": "2025-12-12"
+     "units": 33.18,
+     "roi": 0.1843,
+     "avg_price": 5,
+     "claimed": 0.5285,
+     "hit": 0.5833,
+     "first": "2025-01-28",
+     "last": "2025-12-11"
     },
     "close": {
-     "n": 267,
-     "w": 102,
-     "l": 165,
+     "n": 169,
+     "w": 94,
+     "l": 75,
      "p": 0,
-     "units": -35.21,
-     "roi": -0.1319,
-     "avg_price": 103,
-     "claimed": 0.4772,
-     "hit": 0.382,
-     "first": "2025-01-25",
-     "last": "2025-12-14"
+     "units": 23.49,
+     "roi": 0.139,
+     "avg_price": 22,
+     "claimed": 0.5259,
+     "hit": 0.5562,
+     "first": "2025-02-02",
+     "last": "2025-12-10"
     }
    },
    "test": {
     "open": {
-     "n": 379,
-     "w": 154,
-     "l": 225,
+     "n": 283,
+     "w": 143,
+     "l": 140,
      "p": 0,
-     "units": -27.8,
-     "roi": -0.0734,
-     "avg_price": 94,
-     "claimed": 0.4802,
-     "hit": 0.4063,
-     "first": "2026-01-03",
-     "last": "2026-10-25"
+     "units": 6.71,
+     "roi": 0.0237,
+     "avg_price": 14,
+     "claimed": 0.528,
+     "hit": 0.5053,
+     "first": "2026-01-02",
+     "last": "2026-10-26"
     },
     "close": {
-     "n": 412,
-     "w": 169,
-     "l": 243,
+     "n": 270,
+     "w": 127,
+     "l": 143,
      "p": 0,
-     "units": -20.92,
-     "roi": -0.0508,
-     "avg_price": 105,
-     "claimed": 0.4725,
-     "hit": 0.4102,
-     "first": "2026-01-03",
-     "last": "2026-10-26"
+     "units": -10.78,
+     "roi": -0.0399,
+     "avg_price": 14,
+     "claimed": 0.5268,
+     "hit": 0.4704,
+     "first": "2026-01-02",
+     "last": "2026-10-24"
     }
    },
    "verdict": "fails",
-   "why": "lost at the opening price (-7.3% on 379)",
-   "carried": "2026-11-03"
+   "why": "won at the open (+2.4%) but lost at the close (-4.0% on 270)"
   },
   {
    "sport": "nfl",
    "market": "rush_yds",
    "name": "Rushing yards",
-   "version": "v14",
+   "version": "v15",
    "chance": "Onyx's price moved by rec_epa_t, tgt_trend (unders only, 100% shown)",
    "source": "tools/nfl_feature_screen.py rows (nflverse, Onyx open and close)",
    "held_out_from": "2026-03-01",
@@ -1253,14 +1252,13 @@
    },
    "verdict": "not enough yet",
    "why": "only 44 held-out bets (needs 60); ROI +8.1% at the open, -45.0% at the close so far",
-   "notes": "Close only where the closing line equals the opening line.",
-   "carried": "2026-11-03"
+   "notes": "Close only where the closing line equals the opening line."
   },
   {
    "sport": "nfl",
    "market": "pass_att",
    "name": "Pass attempts",
-   "version": "v14",
+   "version": "v15",
    "chance": "Onyx's price moved by opp_rec, sd8, trend, ypc (unders only, 50% shown)",
    "source": "tools/nfl_feature_screen.py rows (nflverse, Onyx open and close)",
    "held_out_from": "2026-03-01",
@@ -1323,8 +1321,7 @@
    },
    "verdict": "not enough yet",
    "why": "only 47 held-out bets (needs 60); ROI +13.9% at the open, -5.0% at the close so far",
-   "notes": "Close only where the closing line equals the opening line.",
-   "carried": "2026-11-03"
+   "notes": "Close only where the closing line equals the opening line."
   },
   {
    "sport": "nba",
@@ -1744,7 +1741,7 @@
    "sport": "tennis",
    "market": "total_games",
    "name": "Total games",
-   "version": "v2",
+   "version": "v3",
    "chance": "Elo games model (v2) blended 30% with Onyx's no-vig price",
    "source": "bt/tennis_*_games.json (Onyx), ATP/WTA final games",
    "held_out_from": "2026-01-01",
@@ -1807,14 +1804,13 @@
    },
    "verdict": "fails",
    "why": "lost at the opening price (-15.4% on 341)",
-   "notes": "picks.py has no tennis grader yet, so a pass here would still need one before tennis is logged.",
-   "carried": "2026-11-03"
+   "notes": "picks.py has no tennis grader yet, so a pass here would still need one before tennis is logged."
   },
   {
    "sport": "tennis",
    "market": "game_spread",
    "name": "Game spread",
-   "version": "v2",
+   "version": "v3",
    "chance": "Elo games model (v2) blended 30% with Onyx's no-vig price",
    "source": "bt/tennis_*_games.json (Onyx), ATP/WTA final games",
    "held_out_from": "2026-01-01",
@@ -1877,8 +1873,7 @@
    },
    "verdict": "fails",
    "why": "lost at the opening price (-6.3% on 386)",
-   "notes": "picks.py has no tennis grader yet, so a pass here would still need one before tennis is logged.",
-   "carried": "2026-11-03"
+   "notes": "picks.py has no tennis grader yet, so a pass here would still need one before tennis is logged."
   },
   {
    "sport": "cbb",

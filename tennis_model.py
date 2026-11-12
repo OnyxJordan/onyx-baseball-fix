@@ -4,6 +4,18 @@ ATP and WTA singles match ESPN reports (data/tennis/results.json).
 
 Changelog (newest first; each entry cites its evidence)
 
+  v3  11/12  Match price from Onyx's own no-vig moneyline, adjusted (Jordan: "go on tennis", then "backtest all
+      sports and finalize where we can"). Elo alone adds nothing to Onyx's price: blended 30% (v2) it made 2026
+      log loss worse (.5990 against Onyx's .5946) and the pick rule lost -7.3% at the open on 379 bets. v3 =
+      logistic(a x logit(Onyx no-vig) + schedule terms), fitted on 2025 closing prices only (tools/tennis_v3.py
+      --fit): a 1.03 (Onyx is a touch cautious, favourites win a little more than it says), matches in the last
+      7 days +.051 (a player on a run), days of rest -.149 per 30 (rust) with a 28-day layoff flag +.054,
+      form against Elo over the last 10 -.153 (a hot streak regresses), Elo against Onyx -.166 (where Elo
+      disagrees, Onyx is usually right), sets in the last 3 days and qualifying rounds near zero. Features use
+      only the last 45 days (what the live results.json keeps), so the backtest and the site compute the same
+      number. Held out on 2026 closing prices: log loss .60213 against Onyx's .60270 on 6,429. Moneyline only;
+      the games markets keep the v2 Elo chain. The Onyx Picks verdict is tools/picks_backtest.py's.
+
   v2  10/29  Games markets (spread and total games), so tennis plays can be
       spreads and totals, not only match winners. The match is played out
       game by game from each player's chance of winning a point on serve
@@ -31,7 +43,7 @@ import math
 
 from sports_common import nk
 
-VERSION = "v2"
+VERSION = "v3"
 P = {"k0": 150.0, "shape": 0.4, "k_slam": 1.0, "min_matches": 10}
 SLAMS = ("australian open", "roland garros", "french open", "wimbledon", "us open")
 
@@ -45,6 +57,7 @@ class Elo:
     def __init__(self, P=P):
         self.P = P
         self.r, self.n = {}, {}
+        self.h = {}                 # v3: each player's recent matches, [(date, sets, won, chance before)], HIST_DAYS
 
     def p(self, a, b):
         ra, rb = self.r.get(a, 1500.0), self.r.get(b, 1500.0)
@@ -53,9 +66,15 @@ class Elo:
     def known(self, a):
         return self.n.get(a, 0) >= self.P["min_matches"]
 
-    def update(self, w, l, event=None):
+    def update(self, w, l, event=None, match=None):
         pw = self.p(w, l)
         m = self.P["k_slam"] if _is_slam(event) else 1.0
+        if match and match.get("date"):         # v3 schedule features: the recent matches, with the chance before each
+            for who, won, pexp in ((w, 1, pw), (l, 0, 1 - pw)):
+                H = self.h.setdefault(who, [])
+                H.append((match["date"], match.get("sets") or 0, won, pexp))
+                if len(H) > 40:
+                    del H[:-40]
         for who, s, pexp in ((w, 1.0, pw), (l, 0.0, 1 - pw)):
             k = self.P["k0"] / (self.n.get(who, 0) + 5) ** self.P["shape"] * m
             self.r[who] = self.r.get(who, 1500.0) + k * (s - pexp)
@@ -74,7 +93,10 @@ def load(lane):
     E.n = {k: v[1] for k, v in (st.get("r") or {}).items()}
     for m in (lane.load("results.json", {}) or {}).get("matches") or []:
         if m["date"] >= st.get("through", ""):
-            E.update(nk(m["w"]), nk(m["l"]), m.get("event"))
+            E.update(nk(m["w"]), nk(m["l"]), m.get("event"), m)
+        else:                                   # folded into the ratings already: only its place in the schedule
+            for who, won in ((nk(m["w"]), 1), (nk(m["l"]), 0)):
+                E.h.setdefault(who, []).append((m["date"], m.get("sets") or 0, won, None))
     return E
 
 
@@ -236,3 +258,47 @@ def games_markets(p_win, tour, event, total=None, spread0=None, P=GAME_P):
     if spread0 is not None:
         out["p_cover0"] = sum(p for (_, d), p in dist.items() if d + spread0 > 0)
     return out
+
+
+# ── v3 (11/12): the match price from Onyx's own price, adjusted ────────────────────
+# Elo alone adds nothing to Onyx's moneyline (blended at 30% it made 2026 log loss worse, .5990 vs Onyx's .5946,
+# and the v2 pick rule lost -7.3% at the open). v3 starts from Onyx's no-vig price and moves it by what the
+# price underweights: Onyx is a touch cautious (slope a > 1: favourites win more than it says) and by each
+# player's schedule over the last HIST_DAYS (the window the live results.json keeps, so the backtest and the
+# site compute the same thing). Coefficients fitted on 2025 Onyx closing prices only (tools/tennis_v3.py).
+HIST_DAYS = 45
+V3 = {"a": 1.0301, "B": {"m7": 0.0508, "s3": -0.0043, "form": -0.1533, "qual": -0.0069, "layoff": 0.0542, "rest": -0.1491,
+                       "elo": -0.166}}       # tools/tennis_v3.py --fit, 2025 Onyx closing prices only
+V3_SC = {"m7": 1.0, "s3": 1.0, "form": 1.0, "qual": 1.0, "layoff": 1.0, "rest": 1 / 30, "elo": 1.0}
+
+
+def schedule(E, who, day):
+    """A player's schedule features on day (ISO date), from matches strictly before it in the last HIST_DAYS."""
+    from datetime import date as _d
+    d = _d.fromisoformat(day[:10])
+    H = [x for x in E.h.get(who, []) if x[0] < day[:10] and (d - _d.fromisoformat(x[0])).days <= HIST_DAYS]
+    last = (d - _d.fromisoformat(H[-1][0])).days if H else 60
+    form = [x[2] - x[3] for x in H[-10:] if x[3] is not None]
+    return {"rest": min(last, 60), "layoff": 1 if last > 28 else 0,
+            "m7": sum(1 for x in H if (d - _d.fromisoformat(x[0])).days <= 7),
+            "s3": sum(x[1] or 0 for x in H if (d - _d.fromisoformat(x[0])).days <= 3),
+            "form": sum(form) / len(form) if form else 0.0}
+
+
+def v3_features(E, a, b, day, fair_a, rnd=None):
+    """Player a's side of the v3 features: a's schedule minus b's, Elo against the price, a qualifying round."""
+    fa, fb = schedule(E, a, day), schedule(E, b, day)
+    f = {k: fa[k] - fb[k] for k in fa}
+    pe = min(max(E.p(a, b), 1e-4), 1 - 1e-4)
+    fair_a = min(max(fair_a, 1e-4), 1 - 1e-4)
+    f["elo"] = math.log(pe / (1 - pe)) - math.log(fair_a / (1 - fair_a))
+    f["qual"] = 1 if "qualif" in str(rnd or "").lower() else 0
+    return f
+
+
+def p_v3(fair_a, f, C=None):
+    """v3 chance player a wins, from Onyx's no-vig chance for a and a's v3 features."""
+    C = C or V3
+    fair_a = min(max(fair_a, 1e-4), 1 - 1e-4)
+    z = C["a"] * math.log(fair_a / (1 - fair_a)) + sum(C["B"].get(k, 0.0) * f[k] * V3_SC[k] for k in C["B"])
+    return 1 / (1 + math.exp(-z))
