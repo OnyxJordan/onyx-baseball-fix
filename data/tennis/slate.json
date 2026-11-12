@@ -1245,9 +1245,9 @@
     },
     {
      "id": "186550",
-     "start": "2026-11-12T19:00Z",
+     "start": "2026-11-12T19:15Z",
      "state": "pre",
-     "detail": "11/12 - 2:00 PM EST",
+     "detail": "11/12 - 2:15 PM EST",
      "round": "Quarterfinal",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -2973,7 +2973,7 @@
      "id": "186768",
      "start": "2026-11-12T17:25Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Main Court",
@@ -2985,9 +2985,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        4
+        4,
+        1
        ],
-       "serve": false
+       "serve": true
       },
       {
        "name": "Bianca Andreescu",
@@ -2996,7 +2997,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        3
+        6,
+        2
        ],
        "serve": false
       }
@@ -3092,5 +3094,5 @@
    ]
   }
  ],
- "fetched": "2026-11-12T18:26:55+00:00"
+ "fetched": "2026-11-12T19:00:15+00:00"
 }

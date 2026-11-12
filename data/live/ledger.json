@@ -51004,5 +51004,36 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "nhl-401891808-spread-home",
+  "sport": "nhl",
+  "gid": "401891808",
+  "date": "2026-11-12",
+  "logged_at": "2026-11-12T19:00:34+00:00",
+  "matchup": "CAR @ SEA",
+  "home": "SEA",
+  "away": "CAR",
+  "label": "SEA +3.5",
+  "kind": "spread",
+  "side": "home",
+  "line": 3.5,
+  "price": 108,
+  "chance": 0.5204,
+  "implied": 0.4808,
+  "edge": 0.04,
+  "fair": -110,
+  "state": {
+   "score": "CAR 3 - 0 SEA",
+   "period": 2,
+   "clock": "0:00",
+   "f": 0.333
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
