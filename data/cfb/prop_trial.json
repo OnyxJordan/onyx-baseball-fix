@@ -2366,5 +2366,93 @@
   "model": "v2",
   "result": null,
   "actual": null
+ },
+ {
+  "date": "2026-11-12",
+  "key": "401858294|mason mckenzie|rush_yds",
+  "gid": "401858294",
+  "pid": "5307005",
+  "name": "Mason McKenzie",
+  "team": "BC",
+  "opp": "ND",
+  "matchup": "BC @ ND",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 45.5,
+  "price": -126,
+  "sel": "25873653-7bc2-4809-8177-f7f7166362aa",
+  "proj": 56.4,
+  "prob": 0.6135,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.56,
+    "avg": 0.77,
+    "pp": -4.8
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.85,
+    "avg": 0.93,
+    "pp": 1.4
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.56,
+    "avg": -0.05,
+    "pp": 0.5
+   }
+  ],
+  "opened_at": "2026-11-12T16:17:24+00:00",
+  "logged_at": "2026-11-12T16:17:24+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-12",
+  "key": "401856889|jared curtis|rush_yds",
+  "gid": "401856889",
+  "pid": "5158948",
+  "name": "Jared Curtis",
+  "team": "VAN",
+  "opp": "ALA",
+  "matchup": "VAN vs ALA",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 16.5,
+  "price": -126,
+  "sel": "9af9170e-7354-4016-8228-a86ba74a1ebd",
+  "proj": 17.3,
+  "prob": 0.6092,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.68,
+    "avg": 0.77,
+    "pp": -2.1
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.97,
+    "avg": 0.93,
+    "pp": -0.6
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.22,
+    "avg": -0.05,
+    "pp": 0.2
+   }
+  ],
+  "opened_at": "2026-11-12T16:17:24+00:00",
+  "logged_at": "2026-11-12T16:17:24+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
  }
 ]
