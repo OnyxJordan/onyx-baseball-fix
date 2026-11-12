@@ -1247,7 +1247,7 @@
      "id": "186550",
      "start": "2026-11-12T19:25Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Quarterfinal",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -1259,7 +1259,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        4
+        6,
+        1
        ],
        "serve": false
       },
@@ -1270,7 +1271,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        4
+        7,
+        0
        ],
        "serve": true
       }
@@ -1660,9 +1662,9 @@
     },
     {
      "id": "187371",
-     "start": "2026-11-12T20:00Z",
-     "state": "pre",
-     "detail": "11/12 - 3:00 PM EST",
+     "start": "2026-11-12T20:15Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Group Stage",
      "draw": "Women's Singles",
      "court": "Indian Wells Tennis Garden",
@@ -1673,8 +1675,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        4
+       ],
+       "serve": true
       },
       {
        "name": "Marta Kostyuk",
@@ -1682,7 +1686,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ukr.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        2
+       ],
        "serve": false
       }
      ]
@@ -3098,5 +3104,5 @@
    ]
   }
  ],
- "fetched": "2026-11-12T20:06:39+00:00"
+ "fetched": "2026-11-12T20:39:35+00:00"
 }
