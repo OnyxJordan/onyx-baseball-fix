@@ -2623,5 +2623,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186550-ml-home",
+  "sport": "tennis",
+  "gid": "186550",
+  "date": "2026-11-12",
+  "logged_at": "2026-11-12T19:46:08+00:00",
+  "matchup": "Ugo Humbert vs Lorenzo Musetti",
+  "home": "Lorenzo Musetti",
+  "away": "Ugo Humbert",
+  "label": "Lorenzo Musetti to win",
+  "kind": "ml",
+  "side": "home",
+  "line": null,
+  "price": -207,
+  "chance": 0.7069,
+  "implied": 0.6743,
+  "edge": 0.033,
+  "fair": -240,
+  "state": {
+   "sets": "1-2",
+   "srv": null,
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
