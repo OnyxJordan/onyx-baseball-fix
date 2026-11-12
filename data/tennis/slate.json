@@ -1261,7 +1261,7 @@
        "sets": [
         6,
         6,
-        2
+        3
        ],
        "serve": true
       },
@@ -1274,7 +1274,7 @@
        "sets": [
         7,
         3,
-        3
+        4
        ],
        "serve": false
       }
@@ -1665,8 +1665,8 @@
     {
      "id": "187371",
      "start": "2026-11-12T20:15Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Group Stage",
      "draw": "Women's Singles",
      "court": "Indian Wells Tennis Garden",
@@ -1676,10 +1676,10 @@
        "short": "C. Gauff",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        4
+        7
        ],
        "serve": false
       },
@@ -1699,9 +1699,9 @@
     },
     {
      "id": "187376",
-     "start": "2026-11-12T21:45Z",
+     "start": "2026-11-12T21:55Z",
      "state": "pre",
-     "detail": "11/12 - 4:45 PM EST",
+     "detail": "11/12 - 4:55 PM EST",
      "round": "Group Stage",
      "draw": "Women's Singles",
      "court": "Indian Wells Tennis Garden",
@@ -3108,5 +3108,5 @@
    ]
   }
  ],
- "fetched": "2026-11-12T21:45:54+00:00"
+ "fetched": "2026-11-12T21:56:03+00:00"
 }
