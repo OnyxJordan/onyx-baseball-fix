@@ -2833,5 +2833,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-187379-ml-home",
+  "sport": "tennis",
+  "gid": "187379",
+  "date": "2026-11-13",
+  "logged_at": "2026-11-13T21:50:04+00:00",
+  "matchup": "Elina Svitolina vs Aryna Sabalenka",
+  "home": "Aryna Sabalenka",
+  "away": "Elina Svitolina",
+  "label": "Aryna Sabalenka to win",
+  "kind": "ml",
+  "side": "home",
+  "line": null,
+  "price": -246,
+  "chance": 0.7496,
+  "implied": 0.711,
+  "edge": 0.039,
+  "fair": -300,
+  "state": {
+   "sets": "1-2",
+   "srv": "home",
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
