@@ -1,7 +1,7 @@
 {
  "sport": "nba",
  "date": "2026-11-12",
- "generated": "2026-11-13T04:34:59+00:00",
+ "generated": "2026-11-13T05:07:31+00:00",
  "unit": "min",
  "stats": [
   "pts",
@@ -5023,7 +5023,7 @@
    "name": "Charlotte Hornets",
    "date": "2026-11-12",
    "pace": 96.9,
-   "min_sum": 242.6,
+   "min_sum": 256.6,
    "players": [
     {
      "id": "2998DCA7D4A7",
@@ -5033,15 +5033,15 @@
      "tag": "",
      "use": 30.0,
      "proj": {
-      "pts": 17.3,
+      "pts": 16.6,
       "reb": 7.4,
       "ast": 2.1,
       "3pm": 2.3,
-      "pra": 26.9
+      "pra": 26.2
      },
      "model": {
       "use": 30.0,
-      "pts": 17.4
+      "pts": 16.6
      },
      "last": {
       "use": 30.1,
@@ -5068,15 +5068,15 @@
      "tag": "",
      "use": 28.4,
      "proj": {
-      "pts": 8.7,
+      "pts": 8.5,
       "reb": 9.2,
-      "ast": 1.8,
+      "ast": 1.9,
       "3pm": 0.0,
-      "pra": 19.7
+      "pra": 19.6
      },
      "model": {
       "use": 28.2,
-      "pts": 8.7
+      "pts": 8.5
      },
      "last": {
       "use": 29.1,
@@ -5103,15 +5103,15 @@
      "tag": "",
      "use": 28.1,
      "proj": {
-      "pts": 15.1,
+      "pts": 14.4,
       "reb": 2.9,
       "ast": 3.3,
       "3pm": 3.2,
-      "pra": 21.3
+      "pra": 20.6
      },
      "model": {
       "use": 28.1,
-      "pts": 15.1
+      "pts": 14.3
      },
      "last": {
       "use": 27.9,
@@ -5138,15 +5138,15 @@
      "tag": "",
      "use": 26.5,
      "proj": {
-      "pts": 7.7,
+      "pts": 7.3,
       "reb": 3.8,
-      "ast": 2.6,
+      "ast": 2.5,
       "3pm": 1.3,
-      "pra": 14.2
+      "pra": 13.5
      },
      "model": {
       "use": 26.6,
-      "pts": 7.9
+      "pts": 7.4
      },
      "last": {
       "use": 26.3,
@@ -5166,22 +5166,57 @@
      "home": false
     },
     {
+     "id": "94623DDFFBAB",
+     "n": "Brandon Miller",
+     "pos": "SF",
+     "role": "Starter",
+     "tag": "Questionable: Groin (Soreness, Right)",
+     "use": 23.9,
+     "proj": {
+      "pts": 15.1,
+      "reb": 3.1,
+      "ast": 1.9,
+      "3pm": 2.0,
+      "pra": 20.1
+     },
+     "model": {
+      "use": 21.5,
+      "pts": 14.2
+     },
+     "last": {
+      "use": 31.0,
+      "pts": 20.6,
+      "reb": 4.9,
+      "ast": 2.2,
+      "3pm": 2.7,
+      "gp": 10
+     },
+     "now": {
+      "gp": 10,
+      "use": 31.0
+     },
+     "hs": "4433287",
+     "gid": "20261113E915CB86",
+     "opp": "PHX",
+     "home": false
+    },
+    {
      "id": "CAF8DE2F60DC",
      "n": "Royce O'Neale",
      "pos": "F",
-     "role": "Starter",
+     "role": "Rotation",
      "tag": "",
-     "use": 20.7,
+     "use": 19.3,
      "proj": {
-      "pts": 6.5,
-      "reb": 3.5,
-      "ast": 1.3,
-      "3pm": 1.6,
-      "pra": 11.2
+      "pts": 5.4,
+      "reb": 3.1,
+      "ast": 1.1,
+      "3pm": 1.4,
+      "pra": 9.7
      },
      "model": {
-      "use": 21.0,
-      "pts": 6.8
+      "use": 18.7,
+      "pts": 5.7
      },
      "last": {
       "use": 19.9,
@@ -5206,17 +5241,17 @@
      "pos": "C",
      "role": "Rotation",
      "tag": "",
-     "use": 19.8,
+     "use": 18.6,
      "proj": {
-      "pts": 5.8,
-      "reb": 5.5,
-      "ast": 1.0,
+      "pts": 5.1,
+      "reb": 5.0,
+      "ast": 0.9,
       "3pm": 0.0,
-      "pra": 12.4
+      "pra": 11.0
      },
      "model": {
-      "use": 20.5,
-      "pts": 6.6
+      "use": 18.3,
+      "pts": 5.4
      },
      "last": {
       "use": 19.0,
@@ -5241,17 +5276,17 @@
      "pos": "G",
      "role": "Rotation",
      "tag": "",
-     "use": 19.3,
+     "use": 18.1,
      "proj": {
-      "pts": 11.8,
-      "reb": 2.4,
-      "ast": 3.2,
-      "3pm": 1.4,
-      "pra": 17.4
+      "pts": 10.4,
+      "reb": 2.2,
+      "ast": 3.0,
+      "3pm": 1.3,
+      "pra": 15.5
      },
      "model": {
-      "use": 20.6,
-      "pts": 12.9
+      "use": 18.3,
+      "pts": 10.7
      },
      "last": {
       "use": 18.0,
@@ -5276,17 +5311,17 @@
      "pos": "F",
      "role": "Rotation",
      "tag": "",
-     "use": 18.4,
+     "use": 17.2,
      "proj": {
-      "pts": 8.8,
-      "reb": 3.2,
-      "ast": 1.4,
-      "3pm": 1.5,
-      "pra": 13.4
+      "pts": 8.1,
+      "reb": 2.9,
+      "ast": 1.3,
+      "3pm": 1.3,
+      "pra": 12.3
      },
      "model": {
-      "use": 20.8,
-      "pts": 7.6
+      "use": 18.5,
+      "pts": 6.5
      },
      "last": {
       "use": 16.0,
@@ -5311,17 +5346,17 @@
      "pos": "PF",
      "role": "Rotation",
      "tag": "",
-     "use": 15.7,
+     "use": 14.8,
      "proj": {
-      "pts": 6.4,
-      "reb": 3.6,
-      "ast": 0.5,
-      "3pm": 1.2,
-      "pra": 10.6
+      "pts": 5.7,
+      "reb": 3.4,
+      "ast": 0.4,
+      "3pm": 1.1,
+      "pra": 9.5
      },
      "model": {
-      "use": 16.8,
-      "pts": 6.7
+      "use": 15.0,
+      "pts": 5.6
      },
      "last": {
       "use": 14.5,
@@ -5346,17 +5381,17 @@
      "pos": "PG",
      "role": "Bench",
      "tag": "",
-     "use": 12.0,
+     "use": 10.8,
      "proj": {
-      "pts": 4.1,
-      "reb": 1.2,
-      "ast": 1.2,
-      "3pm": 0.7,
-      "pra": 6.4
+      "pts": 3.0,
+      "reb": 0.9,
+      "ast": 0.8,
+      "3pm": 0.4,
+      "pra": 4.8
      },
      "model": {
-      "use": 9.8,
-      "pts": 3.8
+      "use": 6.0,
+      "pts": 2.2
      },
      "last": {
       "use": 12.9,
@@ -5381,17 +5416,17 @@
      "pos": "PF",
      "role": "Bench",
      "tag": "",
-     "use": 11.0,
+     "use": 10.2,
      "proj": {
-      "pts": 2.4,
-      "reb": 2.7,
-      "ast": 0.4,
-      "3pm": 0.2,
-      "pra": 5.6
+      "pts": 1.8,
+      "reb": 2.3,
+      "ast": 0.3,
+      "3pm": 0.1,
+      "pra": 4.4
      },
      "model": {
-      "use": 7.4,
-      "pts": 2.3
+      "use": 4.5,
+      "pts": 1.3
      },
      "last": {
       "use": 12.6,
@@ -5416,17 +5451,17 @@
      "pos": "SF",
      "role": "Bench",
      "tag": "",
-     "use": 9.2,
+     "use": 8.5,
      "proj": {
-      "pts": 3.0,
-      "reb": 1.5,
-      "ast": 0.5,
-      "3pm": 0.4,
-      "pra": 5.0
+      "pts": 2.2,
+      "reb": 1.2,
+      "ast": 0.4,
+      "3pm": 0.3,
+      "pra": 3.8
      },
      "model": {
-      "use": 6.7,
-      "pts": 2.6
+      "use": 4.1,
+      "pts": 1.5
      },
      "last": {
       "use": 10.3,
@@ -5451,17 +5486,17 @@
      "pos": "C",
      "role": "Bench",
      "tag": "Returning",
-     "use": 3.5,
+     "use": 2.2,
      "proj": {
-      "pts": 1.5,
-      "reb": 1.2,
-      "ast": 0.2,
-      "3pm": 0.1,
-      "pra": 2.8
+      "pts": 0.9,
+      "reb": 0.7,
+      "ast": 0.1,
+      "3pm": 0.0,
+      "pra": 1.7
      },
      "model": {
-      "use": 3.5,
-      "pts": 1.5
+      "use": 2.2,
+      "pts": 0.9
      },
      "last": {
       "use": 6.0,
@@ -5588,38 +5623,6 @@
       "use": null
      },
      "hs": null,
-     "gid": "20261113E915CB86",
-     "opp": "PHX",
-     "home": false
-    },
-    {
-     "id": "94623DDFFBAB",
-     "n": "Brandon Miller",
-     "pos": "SF",
-     "role": "Out",
-     "tag": "Out: Groin (Soreness, Right)",
-     "use": 0.0,
-     "proj": {
-      "pts": 0.0,
-      "reb": 0.0,
-      "ast": 0.0,
-      "3pm": 0.0,
-      "pra": 0.0
-     },
-     "model": null,
-     "last": {
-      "use": 31.0,
-      "pts": 20.6,
-      "reb": 4.9,
-      "ast": 2.2,
-      "3pm": 2.7,
-      "gp": 10
-     },
-     "now": {
-      "gp": 10,
-      "use": 31.0
-     },
-     "hs": "4433287",
      "gid": "20261113E915CB86",
      "opp": "PHX",
      "home": false
