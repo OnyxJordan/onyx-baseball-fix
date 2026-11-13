@@ -2542,5 +2542,49 @@
   "model": "v2",
   "result": null,
   "actual": null
+ },
+ {
+  "date": "2026-11-12",
+  "key": "401858294|bo maccormack|rush_yds",
+  "gid": "401858294",
+  "pid": "5208592",
+  "name": "Bo MacCormack III",
+  "team": "BC",
+  "opp": "ND",
+  "matchup": "BC @ ND",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 33.5,
+  "price": -126,
+  "sel": "f625c9e3-f7db-457d-a3bf-17692153f0d6",
+  "proj": 43.0,
+  "prob": 0.6154,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.56,
+    "avg": 0.77,
+    "pp": -4.8
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.85,
+    "avg": 0.93,
+    "pp": 1.4
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.35,
+    "avg": -0.05,
+    "pp": 0.3
+   }
+  ],
+  "opened_at": "2026-11-13T03:29:36+00:00",
+  "logged_at": "2026-11-13T03:29:36+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
  }
 ]
