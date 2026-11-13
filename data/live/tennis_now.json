@@ -2773,5 +2773,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186774-spread-away",
+  "sport": "tennis",
+  "gid": "186774",
+  "date": "2026-11-13",
+  "logged_at": "2026-11-13T17:11:11+00:00",
+  "matchup": "Bianca Andreescu vs Polona Hercog",
+  "home": "Polona Hercog",
+  "away": "Bianca Andreescu",
+  "label": "Bianca Andreescu -6.5 games",
+  "kind": "spread",
+  "side": "away",
+  "line": -6.5,
+  "price": -165,
+  "chance": 0.7197,
+  "implied": 0.6226,
+  "edge": 0.097,
+  "fair": -255,
+  "state": {
+   "sets": "4-0",
+   "srv": "away",
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
