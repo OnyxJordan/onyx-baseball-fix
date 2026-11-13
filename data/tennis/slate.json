@@ -1283,8 +1283,8 @@
     {
      "id": "186546",
      "start": "2026-11-13T13:10Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Semifinal",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -1294,12 +1294,12 @@
        "short": "T. Tirante",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         7,
-        5
+        7
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Alejandro Tabilo",
@@ -1309,7 +1309,7 @@
        "win": false,
        "sets": [
         5,
-        4
+        6
        ],
        "serve": false
       }
@@ -1354,9 +1354,9 @@
      "court": "Center Court",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Thiago Agustin Tirante",
+       "short": "T. Tirante",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -3035,8 +3035,8 @@
     {
      "id": "186773",
      "start": "2026-11-13T15:00Z",
-     "state": "pre",
-     "detail": "11/13 - 10:00 AM EST",
+     "state": "in",
+     "detail": "2nd",
      "round": "Semifinal",
      "draw": "Women's Singles",
      "court": "Main Court",
@@ -3047,7 +3047,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        6,
+        0
+       ],
        "serve": false
       },
       {
@@ -3056,8 +3059,11 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/cze.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        3,
+        1
+       ],
+       "serve": true
       }
      ]
     },
@@ -3122,5 +3128,5 @@
    ]
   }
  ],
- "fetched": "2026-11-13T14:41:36+00:00"
+ "fetched": "2026-11-13T15:54:02+00:00"
 }
