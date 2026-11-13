@@ -58447,10 +58447,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v7",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "136",
+  "profit": 0.9091,
+  "graded_at": "2026-11-13T22:18:50+00:00"
  },
  {
   "id": "tennis-187384-spread-away",
@@ -58481,5 +58481,66 @@
   "actual": "12-3",
   "profit": -1.0,
   "graded_at": "2026-11-13T21:11:03+00:00"
+ },
+ {
+  "id": "tennis-187379-ml-home",
+  "sport": "tennis",
+  "gid": "187379",
+  "date": "2026-11-13",
+  "logged_at": "2026-11-13T21:50:04+00:00",
+  "matchup": "Elina Svitolina vs Aryna Sabalenka",
+  "home": "Aryna Sabalenka",
+  "away": "Elina Svitolina",
+  "label": "Aryna Sabalenka to win",
+  "kind": "ml",
+  "side": "home",
+  "line": null,
+  "price": -246,
+  "chance": 0.7496,
+  "implied": 0.711,
+  "edge": 0.039,
+  "fair": -300,
+  "state": {
+   "sets": "1-2",
+   "srv": "home",
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "cbb-401909696-total-under",
+  "sport": "cbb",
+  "gid": "401909696",
+  "date": "2026-11-13",
+  "logged_at": "2026-11-13T22:18:48+00:00",
+  "matchup": "AMCC @ FSU",
+  "home": "FSU",
+  "away": "AMCC",
+  "label": "Under 146.5",
+  "kind": "total",
+  "side": "under",
+  "line": 146.5,
+  "price": -115,
+  "chance": 0.5839,
+  "implied": 0.5349,
+  "edge": 0.049,
+  "fair": -140,
+  "state": {
+   "score": "AMCC 5 - 14 FSU",
+   "period": 1,
+   "clock": "13:31",
+   "f": 0.838
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
