@@ -2586,5 +2586,49 @@
   "model": "v2",
   "result": null,
   "actual": null
+ },
+ {
+  "date": "2026-11-13",
+  "key": "401858520|dejuan williams|rush_yds",
+  "gid": "401858520",
+  "pid": "5295550",
+  "name": "DeJuan Williams",
+  "team": "MD",
+  "opp": "WIS",
+  "matchup": "MD vs WIS",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 49.5,
+  "price": -126,
+  "sel": "719f3409-4160-4ea6-b9b6-afe77a750bcf",
+  "proj": 58.9,
+  "prob": 0.6162,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.65,
+    "avg": 0.77,
+    "pp": -2.7
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 1.0,
+    "avg": 0.93,
+    "pp": -1.1
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.77,
+    "avg": -0.05,
+    "pp": 0.7
+   }
+  ],
+  "opened_at": "2026-11-13T20:12:11+00:00",
+  "logged_at": "2026-11-13T20:12:11+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
  }
 ]
