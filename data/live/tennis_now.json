@@ -2743,5 +2743,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186773-ml-away",
+  "sport": "tennis",
+  "gid": "186773",
+  "date": "2026-11-13",
+  "logged_at": "2026-11-13T15:23:56+00:00",
+  "matchup": "Elizabeth Mandlik vs Laura Samson",
+  "home": "Laura Samson",
+  "away": "Elizabeth Mandlik",
+  "label": "Elizabeth Mandlik to win",
+  "kind": "ml",
+  "side": "away",
+  "line": null,
+  "price": -158,
+  "chance": 0.6676,
+  "implied": 0.6124,
+  "edge": 0.055,
+  "fair": -200,
+  "state": {
+   "sets": "4-1",
+   "srv": null,
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
