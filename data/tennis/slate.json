@@ -1784,8 +1784,8 @@
     {
      "id": "187379",
      "start": "2026-11-13T21:30Z",
-     "state": "in",
-     "detail": "3rd",
+     "state": "post",
+     "detail": "Final",
      "round": "Group Stage",
      "draw": "Women's Singles",
      "court": "Indian Wells Tennis Garden",
@@ -1795,13 +1795,13 @@
        "short": "E. Svitolina",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ukr.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
         3,
-        5
+        6
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Aryna Sabalenka",
@@ -1828,9 +1828,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Elina Svitolina",
+       "short": "E. Svitolina",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ukr.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -3154,5 +3154,5 @@
    ]
   }
  ],
- "fetched": "2026-11-13T23:25:04+00:00"
+ "fetched": "2026-11-13T23:58:20+00:00"
 }
