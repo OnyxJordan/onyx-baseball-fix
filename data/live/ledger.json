@@ -58420,5 +58420,36 @@
   "actual": "5-12",
   "profit": 0.6061,
   "graded_at": "2026-11-13T18:32:37+00:00"
+ },
+ {
+  "id": "cbb-401921167-total-under",
+  "sport": "cbb",
+  "gid": "401921167",
+  "date": "2026-11-13",
+  "logged_at": "2026-11-13T20:46:18+00:00",
+  "matchup": "UWF @ CLE",
+  "home": "CLE",
+  "away": "UWF",
+  "label": "Under 145.5",
+  "kind": "total",
+  "side": "under",
+  "line": 145.5,
+  "price": -110,
+  "chance": 0.6123,
+  "implied": 0.5238,
+  "edge": 0.088,
+  "fair": -160,
+  "state": {
+   "score": "UWF 36 - 31 CLE",
+   "period": 1,
+   "clock": "0:00",
+   "f": 0.5
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
