@@ -1749,8 +1749,8 @@
     {
      "id": "187384",
      "start": "2026-11-13T20:10Z",
-     "state": "in",
-     "detail": "1st",
+     "state": "post",
+     "detail": "Final",
      "round": "Group Stage",
      "draw": "Women's Singles",
      "court": "Indian Wells Tennis Garden",
@@ -1762,7 +1762,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        2,
+        1
        ],
        "serve": false
       },
@@ -1771,8 +1772,9 @@
        "short": "M. Andreeva",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/rus.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
+        6,
         6
        ],
        "serve": false
@@ -3144,5 +3146,5 @@
    ]
   }
  ],
- "fetched": "2026-11-13T20:45:55+00:00"
+ "fetched": "2026-11-13T21:10:37+00:00"
 }

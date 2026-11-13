@@ -58451,5 +58451,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-187384-spread-away",
+  "sport": "tennis",
+  "gid": "187384",
+  "date": "2026-11-13",
+  "logged_at": "2026-11-13T20:51:38+00:00",
+  "matchup": "Diana Shnaider vs Mirra Andreeva",
+  "home": "Mirra Andreeva",
+  "away": "Diana Shnaider",
+  "label": "Diana Shnaider +6.5 games",
+  "kind": "spread",
+  "side": "away",
+  "line": 6.5,
+  "price": -175,
+  "chance": 0.6847,
+  "implied": 0.6364,
+  "edge": 0.048,
+  "fair": -215,
+  "state": {
+   "sets": "2-6 1-0",
+   "srv": "home",
+   "need": 2
+  },
+  "pre_src": null,
+  "model": "live-v7",
+  "result": "L",
+  "actual": "12-3",
+  "profit": -1.0,
+  "graded_at": "2026-11-13T21:11:03+00:00"
  }
 ]
