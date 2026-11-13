@@ -2498,5 +2498,49 @@
   "model": "v2",
   "result": null,
   "actual": null
+ },
+ {
+  "date": "2026-11-12",
+  "key": "401856889|sedrick alexander|rush_yds",
+  "gid": "401856889",
+  "pid": "5030333",
+  "name": "Sedrick Alexander",
+  "team": "VAN",
+  "opp": "ALA",
+  "matchup": "VAN vs ALA",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 32.5,
+  "price": -126,
+  "sel": "c93b7df5-0026-4cac-8372-07a1917c881e",
+  "proj": 30.2,
+  "prob": 0.6093,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.68,
+    "avg": 0.77,
+    "pp": -2.1
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.97,
+    "avg": 0.93,
+    "pp": -0.6
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.2,
+    "avg": -0.05,
+    "pp": 0.1
+   }
+  ],
+  "opened_at": "2026-11-13T02:56:24+00:00",
+  "logged_at": "2026-11-13T02:56:24+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
  }
 ]
