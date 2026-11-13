@@ -1784,8 +1784,8 @@
     {
      "id": "187379",
      "start": "2026-11-13T21:30Z",
-     "state": "pre",
-     "detail": "11/13 - 4:30 PM EST",
+     "state": "in",
+     "detail": "1st",
      "round": "Group Stage",
      "draw": "Women's Singles",
      "court": "Indian Wells Tennis Garden",
@@ -1796,8 +1796,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ukr.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        0
+       ],
+       "serve": true
       },
       {
        "name": "Aryna Sabalenka",
@@ -1805,7 +1807,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/blr.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        2
+       ],
        "serve": false
       }
      ]
@@ -3146,5 +3150,5 @@
    ]
   }
  ],
- "fetched": "2026-11-13T21:33:38+00:00"
+ "fetched": "2026-11-13T21:45:10+00:00"
 }
