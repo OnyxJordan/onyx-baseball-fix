@@ -1282,9 +1282,9 @@
     },
     {
      "id": "186546",
-     "start": "2026-11-13T13:00Z",
-     "state": "pre",
-     "detail": "11/13 - 8:00 AM EST",
+     "start": "2026-11-13T13:10Z",
+     "state": "in",
+     "detail": "2nd",
      "round": "Semifinal",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -1295,8 +1295,11 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        7,
+        5
+       ],
+       "serve": true
       },
       {
        "name": "Alejandro Tabilo",
@@ -1304,7 +1307,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/chi.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        5,
+        4
+       ],
        "serve": false
       }
      ]
@@ -1340,12 +1346,12 @@
     },
     {
      "id": "186552",
-     "start": "2026-11-14T05:00Z",
+     "start": "2026-11-14T12:00Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "11/14 - 7:00 AM EST",
      "round": "Final",
      "draw": "Men's Singles",
-     "court": "",
+     "court": "Center Court",
      "p": [
       {
        "name": "TBD",
@@ -3116,5 +3122,5 @@
    ]
   }
  ],
- "fetched": "2026-11-13T12:38:43+00:00"
+ "fetched": "2026-11-13T14:41:36+00:00"
 }
