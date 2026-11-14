@@ -635,7 +635,7 @@
       if (n0 && +n0[1] >= 2 && +n0[1] <= 12) n = [n0[0], n0[1]];
     }
     if (!n && !nw) {
-      var n2 = tC.match(/\b(\d{1,2})\s+(?:\w+\s+){0,2}?(overs|unders|props|plays|picks|bets|players|teams|sides|dogs|favorites|favs|scorers|rebounds|assists|points|receptions|touchdowns|tds|totals|spreads|parlay|sgp|legger)\b/);
+      var n2 = tC.match(/\b(\d{1,2})(?!:)\s+(?!(?:pm|am|p m|a m|oclock|o clock|et|est)\b)(?:\w+\s+){0,2}?(overs|unders|props|plays|picks|bets|players|teams|sides|dogs|favorites|favs|scorers|rebounds|assists|points|receptions|touchdowns|tds|totals|spreads|parlay|sgp|legger)\b/);
       if (n2 && +n2[1] <= 12 && !/\b\d{1,2}\s+(points|rebounds|assists|receptions|tds|touchdowns)\s+(or|and|in|a|per)\b/.test(t)) n = [n2[0], n2[1]];
       else if (/\b(a )?pair of\b/.test(t)) nw = [null, 'two'];
       else if (/\b(one|a single|1)\s+(\w+\s+){0,2}?(bet|play|pick|prop|leg)\b(?!s)/.test(t)) nw = [null, 'one'];
@@ -1381,6 +1381,14 @@
     }
     return null;
   }
+  var PLAINW = /^(top|best|the|my|me|give|show|get|gimme|whats|what|are|is|todays|today|tonight|sunday|monday|thursday|this|week|weeks|nfl|nba|nhl|football|pro|picks?|plays?|bets?|ats|against|spreads?|totals?|player|props?|anytime|tds?|touchdowns?|scorers?|to|score|a|2\+?|two|or|more|\d{1,2})$/;
+  function plainList(q, h) {
+    var w = String(q).toLowerCase().replace(/[^a-z0-9+ ]/g, ' ').split(/\s+/).filter(Boolean);
+    if (!w.length || w.length > 9 || !w.every(function (x) { return PLAINW.test(x); })) return false;
+    var ks = Object.keys(h).filter(function (k) { var v = h[k]; return v != null && v !== false && v !== '' && !(Array.isArray(v) && !v.length) && !(k === 'side' && v === 'any'); });
+    var OK = {intent: 1, count: 1, count_set: 1, sports: 1, markets: 1, sort: 1, when: 1, one_per_game: 1, props_only: 1, default_conf: 1, default_floor: 1, min_conf: 1, min_price: 1};
+    return h.intent === 'list' && (h.sports || []).length === 1 && ((h.markets || []).length >= 1 || h.props_only) && ks.every(function (k) { return OK[k]; });
+  }
   function toSpec(q, B) {
     return aiUrl().then(function (u) {
       var lf = localFollow(q);
@@ -1390,6 +1398,11 @@
       // the built-in reader's take goes along (tested on 500 phrasings): the AI starts from it and
       // corrects only what it misread, so nothing the parser has learned is lost
       var hint = null; try { hint = lf || localSpec(q, B); } catch (e) { hint = null; }
+      // a plain category list ("top 5 nfl spreads", "top 10 nfl td scorers", 11/14, Jordan: "quicker to pull when it's
+      // already there"): every word is one the reader knows and its reading is just a sport, a market and a count, so
+      // the answer is the same with or without the AI. Skip the ~2 second round trip; the same lists show on the
+      // sport page's model picks (data/<sport>/tops.json)
+      if (hint && !lf && !ctx && plainList(q, hint)) return {spec: hint, via: 'local'};
       return fetch(u, {method: 'POST', headers: {'content-type': 'application/json'}, body: JSON.stringify({q: q, ctx: ctx, hint: hint}), signal: ctl.signal})
         .then(function (r) { clearTimeout(tm); if (!r.ok) throw new Error('relay ' + r.status); return r.json(); })
         .then(function (j) { if (!j || !j.spec) throw new Error('no spec'); return {spec: blend(j.spec, hint, q, !ctx || !FOLLOWW.test(String(q).toLowerCase().replace(/same[- ]game/g, ''))), say: j.say || '', clarify: hint && (hint.tabbr || hint.ambig || hint.depth || hint.conf || hint.onyx_picks) ? null : j.clarify || null, via: 'ai'}; })   // the reader's team, conference, depth or picks reading is not a question

@@ -96,6 +96,10 @@ jobs:
       - name: Headless sport page check
         run: node tools/verify_sports.js
 
+      # the NFL page's model picks (data/nfl/tops.json) must be the plays Ask Onyx returns for the same request
+      - name: Model picks match Ask Onyx
+        run: node tools/verify_tops.js
+
       # Installed-iPhone gate for both pages: a 0 safe-area inset (what iOS
       # sometimes reports) must not put the header or menu under the status
       # bar, and the bottom menu must open, navigate and close.
