@@ -37,9 +37,9 @@
   {
    "gid": "401919004",
    "start": "2026-11-14T17:00Z",
-   "state": "pre",
-   "status": "STATUS_SCHEDULED",
-   "detail": "11/14 - 12:00 PM EST",
+   "state": "in",
+   "status": "STATUS_IN_PROGRESS",
+   "detail": "10:00 - 1st",
    "name": "TULN @ AKR",
    "away": "TULN",
    "home": "AKR",
@@ -57,8 +57,8 @@
    "home_rec": "2-0",
    "away_rank": null,
    "home_rank": null,
-   "away_score": "0",
-   "home_score": "0",
+   "away_score": "8",
+   "home_score": "16",
    "venue": "James A. Rhodes Arena",
    "neutral": false,
    "tv": "ESPN+",
@@ -2136,7 +2136,7 @@
   }
  ],
  "events": [],
- "fetched": "2026-11-14T16:49:07+00:00",
+ "fetched": "2026-11-14T17:22:25+00:00",
  "season": 2027,
  "season_type": 2,
  "bye": []
