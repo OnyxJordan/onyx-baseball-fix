@@ -1694,6 +1694,21 @@ later" (7 PM on), and "between 1 and 4 pm". A bare hour counts as afternoon or e
 after / until or with a game-time word, so "4 picks by 2s" and "after 2 legs" stay counts. Sides, totals and
 parlays already covered every sport.
 
+**Sides, not moneylines alone (11/14).** Jordan: "the search needs to learn to include spreads, I don't want just
+moneylines." "winners", "who wins tonight", "team picks", "teams to bet", "a parlay of teams", "favorites", "underdogs"
+and "the chalk" used to answer with moneylines only (the built-in reader mapped "winners" and favorites/dogs to `ml`,
+and the AI reader sends `ml` for "who wins"). They now mean sides: the spread and the moneyline. Favorites and
+underdogs carry `fav` ("fav" / "dog"): a moneyline by its price, a spread by its points (-6.5 is the favorite,
++6.5 the dog), so a -110 spread dog is no longer dropped by a +100 floor. An AI answer of moneylines only, with no
+moneyline word in the request, is widened the same way in `blend`. Still moneylines: "moneyline", "ml", "to win",
+"straight up", "outright" ("dogs to win" stays plus-money moneylines), "plus money", and "who wins A vs B" about one
+game. "4 team parlay" is a leg count and is unchanged. Tests: the old `ml`-only expectations for favorites and dogs
+moved to sides with `fav` (corpus, holdout, college, `ask_mega.py`); verify_ask checks every returned side is the
+favorite or dog asked for; 14 new corpus cases. Corpus 838/838, holdouts 59/59 and 49/49, college 239/239; a fresh
+50,000 from `ask_mega.py 50000 29` on the 11/14 boards: 49,996. Two older misses it found are fixed here: a player
+named Sides ("Landon Sides anytime td") is no longer read as sides, and a game named by codes ("JKST vs WIN total")
+is no longer "win total", a future. Open: "PENN JOES" reads JOES as a player shown as "____ Joe" (4 of 50,000).
+
 **1,000,000 more (11/12).** Jordan: "run the 1000000 search sweep again across all sports." Seeds 25-28,
 250,000 each on the 11/12 boards, in 50,000-search chunks: 999,767 passed, 99.977%, up from 99.43% on 11/10.
 The 233 failures (228 distinct) were three things:
