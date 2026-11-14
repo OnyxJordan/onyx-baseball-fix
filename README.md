@@ -1694,6 +1694,15 @@ later" (7 PM on), and "between 1 and 4 pm". A bare hour counts as afternoon or e
 after / until or with a game-time word, so "4 picks by 2s" and "after 2 legs" stay counts. Sides, totals and
 parlays already covered every sport.
 
+**Times with am/pm on both ends (11/14).** Jordan's screenshot, "still not picking up times": "college football
+sides from 4:30 PM to 6:30 PM against the spread" read as "starting 4:30 PM or later" (7 to 9:30 PM games came
+back). The range patterns needed the first time bare ("4-6 pm") or a word like "games" after the range; with "PM" on
+both times it fell through to "from 4:30 PM" (or later). The range now takes am/pm on either or both times and
+-, to, until, till or through ("4:30-6:30 pm", "from 4:30pm to 6:30pm", "4:30 pm - 6:30 pm", "11am to 3pm"). Also
+"3pm" next to a time word is 3 PM, not 3-pointers made ("cfb games 11am to 3pm" asked for threes); "curry 3pm" and
+"nba 3pm overs" are still threes. Corpus 847/849 (the same two board / time-of-day misses), holdouts 59/59 and
+49/49, college 239/239.
+
 **Sides, take two (11/14).** Jordan's screenshot, "it didn't work": "favorite 4-6 pm est college football sides with
 the spread" answered with five moneylines, two of them after 9 PM. Three causes, all fixed in `ask.js`:
 - Ranking: a favorite's moneyline reads 60%+ and its spread about 52%, so by confidence alone every slot went to

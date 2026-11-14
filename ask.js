@@ -696,7 +696,7 @@
       [/\bpra\b|\bp ?\+ ?r ?\+ ?a\b|\b(points|pts) ?(,|\+|plus|&)? ?(rebounds|reb|rebs|boards) ?(,|\+|plus|&|and) ?(assists|ast|dimes)\b/, 'pra', ['pts', 'reb', 'ast']],
       [/\bp ?\+ ?r\b|\b(points|pts) ?(\+|plus|&) ?(rebounds|reb|rebs|boards)\b/, 'pr', ['pts', 'reb']],
       [/\bp ?\+ ?a\b|\b(points|pts) ?(\+|plus|&) ?(assists|ast|dimes)\b/, 'pa', ['pts', 'ast']],
-      [/\bthrees\b|\btreys\b|\btrey (props?|overs?|unders?|made|makes|lines?)\b|\b3s\b|\b3[\s-]?(pointers?|pt|pts)\b|\bthree[\s-]?pointers?\b|\b3pm\b|\bthree[\s-]?point(s|er)? (shooters?|shots?|makers?|makes|made)\b|\b(3|three)[\s-]?point shooting\b|\b(3|three)[\s-]?point (props?|overs?|unders?|lines?|bets?|plays?|picks?|leaders?|guys|parlay)\b/, 'threes', ['pts']]];
+      [/\bthrees\b|\btreys\b|\btrey (props?|overs?|unders?|made|makes|lines?)\b|\b3s\b|\b3[\s-]?(pointers?|pt|pts)\b|\bthree[\s-]?pointers?\b|\b3pm\b(?!\s*(et|est|games?|tip|start|kick|slate|or (earlier|later)|to\b|-))(?<!\b(at|by|before|after|from|to|until|till|and|-)\s?3pm)|\bthree[\s-]?point(s|er)? (shooters?|shots?|makers?|makes|made)\b|\b(3|three)[\s-]?point shooting\b|\b(3|three)[\s-]?point (props?|overs?|unders?|lines?|bets?|plays?|picks?|leaders?|guys|parlay)\b/, 'threes', ['pts']]];
     for (var nx = 0; nx < NBX.length; nx++) if (NBX[nx][0].test(t) && s.markets.indexOf(NBX[nx][1]) < 0) {
       if (NBX[nx][1] === 'pr' && s.markets.indexOf('pra') >= 0) continue;
       if (NBX[nx][1] === 'pa' && s.markets.indexOf('pra') >= 0) continue;
@@ -797,11 +797,11 @@
       var lab = function (x) { var h = Math.floor(x), m = Math.round((x - h) * 60); return ((h + 11) % 12 + 1) + (m ? ':' + (m < 10 ? '0' : '') + m : '') + (h >= 12 && h < 24 ? ' PM' : ' AM'); };
       var rB = new RegExp('\\bbetween ' + TM + ' (and|to|-) ' + TM + '\\b').exec(t)
         || new RegExp('\\b(?:from )?' + TM + ' ?(-|to) ?' + TM + ' (?:et )?(?:games?|slate|window|starts?|tips?|kicks?)\\b').exec(t)
-        || new RegExp('\\b(?:from )?(\\d{1,2})(?::(\\d{2}))?( ?)(-|to) ?(\\d{1,2})(?::(\\d{2}))? ?(pm|am)(?![a-z0-9])').exec(t);   // "4-6 pm est" (11/14)
+        || new RegExp('\\b(?:from )?(\\d{1,2})(?::(\\d{2}))? ?(pm|am)? ?(-|to|until|till|through|thru) ?(\\d{1,2})(?::(\\d{2}))? ?(pm|am)(?![a-z0-9])').exec(t);   // "4-6 pm est", "from 4:30 pm to 6:30 pm" (11/14)
       var rE = new RegExp('\\b(?:before|by|until|till|no later than|not after|earlier than|ending by)\\s+' + TM + '|\\b' + TM + '\\s+(?:or|and)\\s+(?:earlier|before|sooner)\\b|\\b' + TM + '\\s+at the latest\\b').exec(t);
       var rL = new RegExp('\\b(?:after|from|starting at|no earlier than|later than|not before)\\s+' + TM + '|\\b' + TM + '\\s+(?:or|and)\\s+(?:later|after)\\b|\\b' + TM + '\\s+on\\b').exec(t);
       var pickT = function (m, i) { return m[i] != null && (m[i + 2] || m[i] === 'noon' || TCTX || /^(before|after|until|till|no later|not after|earlier than|later than|not before|no earlier|between)/.test(m[0])) ? hr(m[i], m[i + 1], m[i + 2]) : null; };
-      if (rB && rB[3] === ' ' || rB && rB[3] === '') rB[3] = rB[7];   // "4-6 pm": the 4 is pm too
+      if (rB && !rB[3] && rB[7] && /^\d/.test(rB[1] || '')) rB[3] = rB[7];   // "4-6 pm": the 4 is pm too
       if (rB) { var a0 = pickT(rB, 1), a1 = pickT(rB, rB[5] != null ? 5 : 5); a1 = a1 != null ? a1 : pickT(rB, 5);
         if (a0 != null && a1 != null && a1 > a0) SL = {h0: a0 - 0.01, h1: a1 + 0.01, label: 'starting ' + lab(a0) + ' to ' + lab(a1)}; }
       if (!SL && rE) { var e0 = pickT(rE, 1) != null ? pickT(rE, 1) : pickT(rE, 4) != null ? pickT(rE, 4) : pickT(rE, 7);
