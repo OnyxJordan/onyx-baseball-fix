@@ -1694,6 +1694,23 @@ later" (7 PM on), and "between 1 and 4 pm". A bare hour counts as afternoon or e
 after / until or with a game-time word, so "4 picks by 2s" and "after 2 legs" stay counts. Sides, totals and
 parlays already covered every sport.
 
+**Sides, take two (11/14).** Jordan's screenshot, "it didn't work": "favorite 4-6 pm est college football sides with
+the spread" answered with five moneylines, two of them after 9 PM. Three causes, all fixed in `ask.js`:
+- Ranking: a favorite's moneyline reads 60%+ and its spread about 52%, so by confidence alone every slot went to
+  moneylines. When a request wants spreads and moneylines (and is not sorted by value or payout), the two take
+  turns, each in its own order, in `run` before the picker.
+- "with the spread": a spread named with no moneyline word is the spread alone ("sides with the spread", "nfl sides
+  ats"); "spreads and moneylines" keeps both.
+- "4-6 pm", "4 to 6pm": a range that ends in am/pm is a start window (the first time takes its am/pm); before, the
+  range needed a word like "games" after it.
+A short favorites / underdogs or start-window answer now says so: "Only 1 play on the board fit ... In the other
+games the model leans to the underdog, or neither side is 50%+." (the board carries the side the model likes in each
+game; in Jordan's 4-6 PM window 12 games, one favorite, UCF -3.5 at 51.4%, is 50%+). verify_ask: `slot_label`
+expectations, and a sides list of 4+ with no spread fails when a spread that passes the request's rules is on the
+board. Corpus 842/844 (Jeremiah Smith is not on today's board; the 3 PM parlay is time of day; both fail the same on
+main), holdouts 59/59 and 49/49, college 239/239; a fresh 50,000 (`ask_mega.py 50000 30`): 49,989, all 11 misses the
+open "PENN JOES" one.
+
 **Sides, not moneylines alone (11/14).** Jordan: "the search needs to learn to include spreads, I don't want just
 moneylines." "winners", "who wins tonight", "team picks", "teams to bet", "a parlay of teams", "favorites", "underdogs"
 and "the chalk" used to answer with moneylines only (the built-in reader mapped "winners" and favorites/dogs to `ml`,

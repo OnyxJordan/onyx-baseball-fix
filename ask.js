@@ -796,10 +796,12 @@
         var x = +h % 12; if (ap ? /^p/.test(ap) : x >= 1 && x <= 11) x += 12; return x + (m ? +m / 60 : 0); };
       var lab = function (x) { var h = Math.floor(x), m = Math.round((x - h) * 60); return ((h + 11) % 12 + 1) + (m ? ':' + (m < 10 ? '0' : '') + m : '') + (h >= 12 && h < 24 ? ' PM' : ' AM'); };
       var rB = new RegExp('\\bbetween ' + TM + ' (and|to|-) ' + TM + '\\b').exec(t)
-        || new RegExp('\\b(?:from )?' + TM + ' ?(-|to) ?' + TM + ' (?:et )?(?:games?|slate|window|starts?|tips?|kicks?)\\b').exec(t);
+        || new RegExp('\\b(?:from )?' + TM + ' ?(-|to) ?' + TM + ' (?:et )?(?:games?|slate|window|starts?|tips?|kicks?)\\b').exec(t)
+        || new RegExp('\\b(?:from )?(\\d{1,2})(?::(\\d{2}))?( ?)(-|to) ?(\\d{1,2})(?::(\\d{2}))? ?(pm|am)(?![a-z0-9])').exec(t);   // "4-6 pm est" (11/14)
       var rE = new RegExp('\\b(?:before|by|until|till|no later than|not after|earlier than|ending by)\\s+' + TM + '|\\b' + TM + '\\s+(?:or|and)\\s+(?:earlier|before|sooner)\\b|\\b' + TM + '\\s+at the latest\\b').exec(t);
       var rL = new RegExp('\\b(?:after|from|starting at|no earlier than|later than|not before)\\s+' + TM + '|\\b' + TM + '\\s+(?:or|and)\\s+(?:later|after)\\b|\\b' + TM + '\\s+on\\b').exec(t);
       var pickT = function (m, i) { return m[i] != null && (m[i + 2] || m[i] === 'noon' || TCTX || /^(before|after|until|till|no later|not after|earlier than|later than|not before|no earlier|between)/.test(m[0])) ? hr(m[i], m[i + 1], m[i + 2]) : null; };
+      if (rB && rB[3] === ' ' || rB && rB[3] === '') rB[3] = rB[7];   // "4-6 pm": the 4 is pm too
       if (rB) { var a0 = pickT(rB, 1), a1 = pickT(rB, rB[5] != null ? 5 : 5); a1 = a1 != null ? a1 : pickT(rB, 5);
         if (a0 != null && a1 != null && a1 > a0) SL = {h0: a0 - 0.01, h1: a1 + 0.01, label: 'starting ' + lab(a0) + ' to ' + lab(a1)}; }
       if (!SL && rE) { var e0 = pickT(rE, 1) != null ? pickT(rE, 1) : pickT(rE, 4) != null ? pickT(rE, 4) : pickT(rE, 7);
@@ -883,6 +885,11 @@
       });
       if (rost) s.player = rost.r.name;
     }
+    // "sides with the spread" (11/14, Jordan's screenshot: five moneylines came back): a spread named with no
+    // moneyline word is the spread alone
+    if (sidesW && mk0.indexOf('ml') < 0 && s.markets.indexOf('spread') >= 0 && s.markets.indexOf('ml') >= 0
+        && /\bspr[ae]+ds?\b|\bats\b|against the spread|point spread|puck ?lines?|run ?lines?/.test(t) && !/money ?lines?|\bml\b|\bto win\b|straight up|outright/.test(t))
+      s.markets = s.markets.filter(function (m) { return m !== 'ml'; });
     // "Landon Sides" (11/14 test): a name is not the word "sides"
     if (sidesW && s.player && /\bsides?\b/i.test(s.player) && !/\bsides?\b|\bteams?\b|\bwinners?\b|\bwho (wins|will win)\b/.test(t.replace(new RegExp('\\b' + clean(s.player).split(' ').join('\\b|\\b') + '\\b', 'g'), ' ')))
       s.markets = s.markets.filter(function (m) { return mk0.indexOf(m) >= 0 || (m !== 'spread' && m !== 'ml'); });
@@ -1212,6 +1219,16 @@
       return {rows: card, pool: pool.length, two: false, note: note, matchup: true};
     }
     if (spec.intent === 'sgp') return sgp(spec, pool, key);
+    // sides (11/14, Jordan: "it didn't work"): a favorite's moneyline reads 60%+ and its spread about 52%, so by
+    // confidence alone every slot went to moneylines. Spreads and moneylines take turns, each in its own order
+    if (mk.indexOf('spread') >= 0 && mk.indexOf('ml') >= 0 && spec.sort !== 'price' && spec.sort !== 'edge') {
+      var SPq = pool.filter(function (p) { return p.kind === 'spread'; }), MLq = pool.filter(function (p) { return p.kind === 'ml'; }), OTq = pool.filter(function (p) { return p.kind !== 'spread' && p.kind !== 'ml'; });
+      if (SPq.length && MLq.length) {
+        var IL = [], fS = pool.indexOf(SPq[0]) < pool.indexOf(MLq[0]);
+        for (var ii = 0; ii < Math.max(SPq.length, MLq.length); ii++) { var A1 = fS ? SPq[ii] : MLq[ii], A2 = fS ? MLq[ii] : SPq[ii]; if (A1) IL.push(A1); if (A2) IL.push(A2); }
+        pool = IL.concat(OTq);
+      }
+    }
     var n = Math.max(1, Math.min(spec.intent === 'list' ? 25 : 8, spec.count || 5));
     if (spec.intent === 'parlay' && spec.target_price && !spec.count_set) n = 10;   // no leg count asked: add legs until the payout is reached
     var picked = [], games = {}, who = {}, mkts = {};
@@ -1824,10 +1841,13 @@
         res.note = (res.note ? res.note + ' ' : '') + 'Nothing on the board reaches +' + spec.target_price + ' with ' + res.rows.length + ' legs at these prices; the closest ticket pays ' + (res.parlay.price > 0 ? '+' : '') + res.parlay.price + '.';
       }
       // fewer than the number asked for: say so, never a silent short ticket (11/6)
-      if ((spec.count_set || spec.conf || teamList(spec).length || spec.school) && spec.count && res.rows.length && res.rows.length < spec.count && !spec.target_price && !spec.onyx_picks) {
+      if ((spec.count_set || spec.conf || teamList(spec).length || spec.school || spec.fav || spec.slot) && spec.count && res.rows.length && res.rows.length < spec.count && !spec.target_price && !spec.onyx_picks) {
         var nn = res.rows.length, par = spec.intent === 'parlay' || spec.intent === 'sgp';
         res.note = (res.note ? res.note + ' ' : '') + 'Only ' + nn + (nn === 1 ? ' play' : ' plays') + ' on the board fit' + (spec.when === 'today' ? ' tonight' : '') +
           ', so this is ' + (par ? 'a ' + nn + '-leg ' + (spec.intent === 'sgp' ? 'same-game parlay' : 'parlay') : nn + ' instead of ' + spec.count) + '.';
+        // favorites / underdogs (11/14): the board carries the side the model likes in each game, so a short list
+        // means the model leans the other way in the rest
+        if (spec.fav && spec.default_conf) res.note += ' In the other games the model leans to the ' + (spec.fav === 'fav' ? 'underdog' : 'favorite') + ', or neither side is 50%+.';
       }
       // touchdown scorers: say why every edge reads negative, and what "favorite" means here
       if ((res.rows || []).some(function (r) { return /td$/.test(r.mkt || ''); })) {

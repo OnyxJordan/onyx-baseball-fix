@@ -62,6 +62,7 @@ const srv = http.createServer((q, r) => { const p = path.join(root, decodeURICom
       if (e.min_price != null && s.min_price !== e.min_price) why.push(`min_price ${s.min_price} want ${e.min_price}`);
       if (e.max_price != null && s.max_price !== e.max_price) why.push(`max_price ${s.max_price} want ${e.max_price}`);
       if (e.fav && s.fav !== e.fav) why.push(`fav ${s.fav} want ${e.fav}`);
+      if (e.slot_label && !(s.slot && s.slot.label === e.slot_label)) why.push(`slot ${s.slot && s.slot.label} want ${e.slot_label}`);
       if (e.min_conf != null && s.min_conf !== e.min_conf) why.push(`min_conf ${s.min_conf} want ${e.min_conf}`);
       // (11/10, 1M test) a nickname two teams on today's boards share ("Kings": Sacramento and Los Angeles), with no
       // sport or basketball/hockey word in the request, SHOULD be asked: the button for the wanted team is a pass
@@ -116,6 +117,12 @@ const srv = http.createServer((q, r) => { const p = path.join(root, decodeURICom
       if (/draftkings|fanduel|betmgm|caesars|bet365|espn ?bet|fanatics/i.test(said)) why.push('another sportsbook named');
       // every play returned must honor the reading
       const legs = (R.rows || []);
+      // sides (11/14): a list of 4+ that asked for spreads and moneylines shows both, when the board has both
+      if (!R.widened && legs.length >= 4 && (s.markets || []).indexOf('spread') >= 0 && (s.markets || []).indexOf('ml') >= 0 && !s.matchup
+          && !legs.some(p => p.kind === 'spread') && Object.values(FILE).some(f => f.kind === 'spread' && (!(s.sports || []).length || s.sports.indexOf(f.sport) >= 0) && Date.parse(f.start) > Date.now()
+            && (s.min_price == null || f.price >= s.min_price) && (s.max_price == null || f.price <= s.max_price) && (s.min_conf == null || f.conf >= s.min_conf)
+            && (!s.fav || (s.fav === 'fav') === (parseFloat((String(f.label).match(/([+-]\d+(?:\.\d+)?)\s*$/) || [])[1]) < 0))))
+        why.push('sides answer with no spreads');
       for (const p of legs) {
         if ((s.sports || []).length && s.sports.indexOf(p.sport) < 0) { why.push(`play from ${p.sport}`); break; }
         const mk = (s.markets || []).slice(); if (mk.indexOf('two_plus_td') >= 0) mk.push('anytime_td', 'two_td');
