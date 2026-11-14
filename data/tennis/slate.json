@@ -1353,8 +1353,8 @@
     {
      "id": "186552",
      "start": "2026-11-14T12:10Z",
-     "state": "in",
-     "detail": "1st",
+     "state": "post",
+     "detail": "Final",
      "round": "Final",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -1366,7 +1366,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        1
+        2,
+        6,
+        6
        ],
        "serve": false
       },
@@ -1375,11 +1377,13 @@
        "short": "T. Fritz",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
-        3
+        6,
+        4,
+        7
        ],
-       "serve": true
+       "serve": false
       }
      ]
     }
@@ -3158,5 +3162,5 @@
    ]
   }
  ],
- "fetched": "2026-11-14T12:30:06+00:00"
+ "fetched": "2026-11-14T14:33:25+00:00"
 }
