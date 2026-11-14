@@ -2893,5 +2893,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186772-spread-home",
+  "sport": "tennis",
+  "gid": "186772",
+  "date": "2026-11-14",
+  "logged_at": "2026-11-14T18:07:01+00:00",
+  "matchup": "Elizabeth Mandlik vs Bianca Andreescu",
+  "home": "Bianca Andreescu",
+  "away": "Elizabeth Mandlik",
+  "label": "Bianca Andreescu -4.5 games",
+  "kind": "spread",
+  "side": "home",
+  "line": -4.5,
+  "price": -135,
+  "chance": 0.6642,
+  "implied": 0.5745,
+  "edge": 0.09,
+  "fair": -200,
+  "state": {
+   "sets": "3-6 1-0",
+   "srv": "home",
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
