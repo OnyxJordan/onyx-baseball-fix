@@ -1829,8 +1829,8 @@
     {
      "id": "187441",
      "start": "2026-11-14T20:10Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Semifinal",
      "draw": "Women's Singles",
      "court": "Indian Wells Tennis Garden",
@@ -1840,10 +1840,10 @@
        "short": "M. Andreeva",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/rus.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        5
+        6
        ],
        "serve": false
       },
@@ -1863,9 +1863,9 @@
     },
     {
      "id": "187440",
-     "start": "2026-11-14T21:40Z",
-     "state": "pre",
-     "detail": "11/14 - 4:40 PM EST",
+     "start": "2026-11-14T22:00Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Semifinal",
      "draw": "Women's Singles",
      "court": "Indian Wells Tennis Garden",
@@ -1876,8 +1876,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ukr.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        0
+       ],
+       "serve": true
       },
       {
        "name": "Linda Noskova",
@@ -1885,7 +1887,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/cze.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        0
+       ],
        "serve": false
       }
      ]
@@ -1900,9 +1904,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Mirra Andreeva",
+       "short": "M. Andreeva",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/rus.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -3174,5 +3178,5 @@
    ]
   }
  ],
- "fetched": "2026-11-14T21:35:54+00:00"
+ "fetched": "2026-11-14T22:04:58+00:00"
 }
