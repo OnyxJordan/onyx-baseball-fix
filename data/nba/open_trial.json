@@ -1350,5 +1350,45 @@
   "result": "W",
   "actual": 56.0,
   "graded_at": "2026-11-10T04:06:54+00:00"
+ },
+ {
+  "date": "2026-11-13",
+  "kind": "ast_under",
+  "key": "20261114A4284A58|410453BCABBB07EC",
+  "gid": "20261114A4284A58",
+  "matchup": "CLE @ MIA",
+  "away": "CLE",
+  "home": "MIA",
+  "pid": "410453BCABBB07EC",
+  "hs": "4431772",
+  "name": "Myron Gardner",
+  "team": "MIA",
+  "data_src": "optic",
+  "side": "under",
+  "line": 1.5,
+  "price": -128,
+  "sel": "0b4b5e5f-aa7d-4cfc-bda1-a3a8c31a1b35",
+  "prob": 0.5962,
+  "implied": 0.5614,
+  "proj": 0.3,
+  "why": [
+   {
+    "k": "line vs his usual range",
+    "v": 2.26,
+    "avg": -0.04,
+    "pp": -8.7
+   },
+   {
+    "k": "assists the opponent allows",
+    "v": 1.02,
+    "avg": 1.0,
+    "pp": 0.6
+   }
+  ],
+  "opened_at": "2026-11-14T01:04:34+00:00",
+  "logged_at": "2026-11-14T01:04:34+00:00",
+  "model": "open-v5",
+  "result": null,
+  "actual": null
  }
 ]
