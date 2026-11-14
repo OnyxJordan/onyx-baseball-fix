@@ -245,6 +245,15 @@
 .pl-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,420px),1fr));gap:8px}
 .pl-row{display:flex;flex-direction:column;gap:8px;padding:11px 12px;border-radius:14px;border:1px solid var(--border2);background:linear-gradient(180deg,rgba(255,255,255,.025),transparent 50%),var(--bg2);min-width:0}
 .pl-row.tap{cursor:pointer}.pl-row.tap:hover{border-color:rgba(176,56,249,.55)}
+/* the model's picks by category (11/14, data/<sport>/tops.json) */
+.tp-wrap{margin:0 0 18px}.tp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:12px}
+.tp-cat{border:1px solid var(--border2);border-radius:16px;padding:12px;background:var(--bg2);min-width:0}
+.tp-cat h4{margin:0 0 8px;font:800 12px monospace;letter-spacing:.08em;text-transform:uppercase;color:#d795ff}
+.tp-row{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:8px;align-items:center;padding:8px 0;border-top:1px solid rgba(255,255,255,.06)}
+.tp-row:first-of-type{border-top:0}.tp-n{font:800 13px monospace;color:#9a93a6;text-align:center}
+.tp-w{min-width:0}.tp-w b{display:block;font-size:14px;color:#fff;overflow-wrap:anywhere}.tp-w span{display:block;font-size:11.5px;color:#9a93a6;overflow-wrap:anywhere}
+.tp-r{display:flex;align-items:center;gap:8px}.tp-c{font:800 14px monospace;color:#61e970;text-align:right;min-width:38px}.tp-c small{display:block;font:600 9px monospace;color:#9a93a6;letter-spacing:.05em}
+.tp-empty{font-size:12.5px;color:#9a93a6;padding:6px 0}
 .pl-who{display:flex;align-items:center;gap:10px;min-width:0}
 .pl-hs{width:36px;height:36px;border-radius:50%;object-fit:cover;background:var(--bg3);flex-shrink:0}
 .pl-nm{flex:1;min-width:0}.pl-nm b{display:block;font-size:15px;line-height:1.2}
@@ -2176,7 +2185,7 @@ function renderPlays() {
   // first, then every model read as a projection. The old lanes' tracked and on-trial plays are projections
   // here too; their graded records are the lab's, on the scorecard.
   const projAll = picks.concat(leans).map(r => Object.assign({}, r, {trial: false, projected: true}));
-  const pickHtml = '<div id="oxPicksPlays"></div><div id="oxSidesPlays"></div>' + mktNote + leanHdr('Top projections · not picks', projAll.length)
+  const pickHtml = '<div id="oxPicksPlays"></div><div id="oxTops"></div><div id="oxSidesPlays"></div>' + mktNote + leanHdr('Top projections · not picks', projAll.length)
       + `<p class="dim" style="font-size:12px;line-height:1.6;margin:0 0 10px">Where the model's chance beats the price, best value first, two per game at most. Our numbers, not picks: only the Onyx Picks card above is locked and graded.</p>`
       + (projAll.length ? playCards(projAll) : '<div class="empty">No line on this slate beats the price right now. Projections appear as lines post.</div>');
   const rows = M.rows || [];
@@ -2195,6 +2204,47 @@ function renderPlays() {
   el.innerHTML = pickHtml + body + labLink + lab;
   if (window.OnyxPicks) OnyxPicks.mount(document.getElementById('oxPicksPlays'), {sport: SD.sport, title: 'Onyx Picks · ' + esc(C.name || '')});
   if (window.OnyxSides && KIND !== 'golf') OnyxSides.mount(document.getElementById('oxSidesPlays'), {sports: [SD.sport], title: 'Top 3 sides and totals · ' + (C.name || '')});
+  mountTops(document.getElementById('oxTops'));
+}
+// The model's picks by category (11/14, Jordan: "top 5 picks ATS, top 5 totals, top 10 player props, top 10 players
+// to score TDs, top 5 players to score 2 TDs ... readily available pick information that doesn't need the search").
+// data/<sport>/tops.json (daily_top.write_tops) ranks each list by the same rules Ask Onyx uses for "top N <sport>
+// <category>", so the page and the search agree. Here: games that have started drop out, one play per game and per
+// player, then the top N. Model picks, never Onyx Picks: not logged, not graded (Jordan's choice, 11/14).
+var TOPS = null;
+function mountTops(el) {
+  if (!el) return;
+  const draw = T => { if (el.isConnected) el.innerHTML = topsHtml(T); };
+  if (TOPS) return draw(TOPS);
+  fetch('data/' + SD.sport + '/tops.json', {cache: 'no-cache'}).then(r => r.ok ? r.json() : null).then(T => { if (T && (T.lists || []).length) { TOPS = T; draw(T); } }).catch(() => {});
+}
+function topLabel(r) {
+  if (r.mkt === 'two_td') return `${r.name} 2+ touchdowns`;
+  if (r.mkt === 'anytime_td') return `${r.name} to score a TD`;
+  if (r.kind === 'total') return `${r.label.replace(/ total$/, '')} · ${r.matchup}`;
+  return r.label;
+}
+function topsHtml(T) {
+  const now = Date.now(), impl = p => p > 0 ? 100 / (p + 100) : -p / (-p + 100);
+  const kick = s => { const d = new Date(s); return isNaN(d) ? '' : d.toLocaleString('en-US', {weekday: 'short', hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York'}) + ' ET'; };
+  const cats = T.lists.map(L => {
+    const games = {}, who = {}, rows = [];
+    for (const r of L.rows) {
+      if (rows.length >= L.n) break;
+      const w = r.kind === 'prop' ? r.who : r.gid + ':' + r.kind;    // Ask Onyx's WHO: a player, or a game's side / total
+      if (!(Date.parse(r.start) > now) || games[r.gid] || who[w]) continue;
+      games[r.gid] = 1; who[w] = 1; rows.push(r);
+    }
+    const body = rows.length ? rows.map((r, i) => {
+      const lab = topLabel(r), sub = [r.kind !== 'total' ? r.matchup : '', kick(r.start), 'Onyx implies ' + pct(impl(r.price)), typeof r.why === 'string' ? r.why : ''].filter(Boolean).join(' · ');
+      return `<div class="tp-row"><span class="tp-n">${i + 1}</span><div class="tp-w"><b>${esc(lab)}</b><span>${esc(sub)}</span></div>
+        <div class="tp-r"><div class="tp-c">${pct(r.conf)}<small>CHANCE</small></div>${chip(r.price, lab, r.sel, 'on Onyx')}</div></div>`;
+    }).join('') : '<div class="tp-empty">Nothing in this category clears the bar on the games still to play.</div>';
+    return `<div class="tp-cat"><h4>${esc(L.title)}</h4>${body}</div>`;
+  }).join('');
+  return `<div class="tp-wrap"><div class="sec-hdr"><span class="sec-title">Model's ${esc(C.name || '')} picks</span><span class="sec-count">not tracked</span></div>
+    <p class="dim" style="font-size:12px;line-height:1.6;margin:0 0 10px">The model's most likely plays in each category at today's Onyx prices: nothing shorter than -200 and 50%+ to hit, one per game (the touchdown lists have no floor; Onyx's touchdown prices carry a big margin, so their chances sit below the price). Model picks, not Onyx Picks: no ${esc(C.name || '')} market has passed our backtest against Onyx's prices yet, so these are not logged or graded. Ask Onyx gives the same lists for "top 5 ${esc((C.name || '').toLowerCase())} spreads" and the rest.</p>
+    <div class="tp-grid">${cats}</div></div>`;
 }
 // receptions at Onyx's opening price, on trial (sports_build.nfl_open_lane): logged only
 // while Onyx still shows the first price we saw for that line, graded off the box score

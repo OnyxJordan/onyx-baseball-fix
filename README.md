@@ -1694,6 +1694,29 @@ later" (7 PM on), and "between 1 and 4 pm". A bare hour counts as afternoon or e
 after / until or with a game-time word, so "4 picks by 2s" and "after 2 legs" stay counts. Sides, totals and
 parlays already covered every sport.
 
+**Model's NFL picks by category (11/14).** Jordan: "for NFL we have legitimately the most information I want the
+picks page to have top 5 picks ATS, top 5 totals, top 10 player props, top 10 players to score TDs, top 5 players to
+score [2] TDs ... readily available pick information that doesn't need the search but also gets quicker to pull when
+it's already there." His call on the record (11/14): **model picks, not graded**. No NFL market has passed
+`tools/picks_backtest.py` (spreads, totals, moneylines and the prop lanes are "not enough yet"; anytime TD can never
+pass, Onyx's TD prices carry the margin), so the section says "not tracked", is never logged to
+`data/picks/ledger.json` and never graded. Onyx Picks stay backtest-only.
+- `daily_top.write_tops` (called by `write_board`, fail-soft) writes `data/<sport>/tops.json` for sports in `TOPS`
+  (NFL only): each category ranked by Ask Onyx's own "most likely first" key (chance + edge/10), with Ask's list
+  floors (nothing shorter than -200, 50%+; the TD lists have none), kept 4x deep.
+- The Plays tab (`sport_shell.html` `mountTops` / `topsHtml`) drops started games, keeps one play per game and per
+  player (Ask's WHO), and shows the top N with chance, Onyx's implied chance, the model's reason and a bet chip.
+- `tools/verify_tops.js` (in CI) fails if any list differs from Ask Onyx's answer to "top 5 nfl spreads", "top 5 nfl
+  totals", "top 10 nfl player props no touchdowns", "top 10 nfl anytime td scorers", "top 5 nfl 2+ td scorers".
+- Quicker in search: a plain category request (every word a list word, reading only sport + market + count) skips
+  the AI round trip (`plainList` in `toSpec`): about 15 ms instead of 1.5 to 2 seconds. "nfl picks", "best nfl bets"
+  and anything with a team, player, time or price still go through the AI.
+- Fixed with it: "nfl 1 pm slate spreads" read "1" as the count (one play); a number before pm/am is a time.
+  verify_ask's "empty while the board has plays that fit" now honors a start window (the 3 PM and 4-6 PM cases
+  failed late in the day only because those games had started).
+Corpus 853/854 (Jeremiah Smith is not on today's board), holdouts 59/59 and 49/49, college 239/239; a fresh 50,000
+(`ask_mega.py 50000 32`): 49,990, all 10 misses the open "PENN JOES" one.
+
 **Times with am/pm on both ends (11/14).** Jordan's screenshot, "still not picking up times": "college football
 sides from 4:30 PM to 6:30 PM against the spread" read as "starting 4:30 PM or later" (7 to 9:30 PM games came
 back). The range patterns needed the first time bare ("4-6 pm") or a word like "games" after the range; with "PM" on

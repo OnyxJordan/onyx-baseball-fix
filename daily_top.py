@@ -255,6 +255,47 @@ def keep_pregame(data_dir, rows, hours=36):
     p.write_text(json.dumps(P, separators=(",", ":")), encoding="utf-8")
 
 
+# The model's picks by category (11/14, Jordan: "top 5 picks ATS, top 5 totals, top 10 player props, top 10
+# players to score TDs, top 5 players to score 2 TDs ... readily available pick information that doesn't need
+# the search"). Model picks, not Onyx Picks: no NFL market has passed tools/picks_backtest.py, so they are
+# never logged or graded (Jordan's choice, 11/14). Each list is ranked by the same rules Ask Onyx applies to
+# "top N nfl <category>" (standard prices: nothing shorter than -200, 50%+ to hit, most likely first; touchdown
+# lists have no floors), so the page and the search agree. Candidates are kept 4x deep so the page can drop
+# games that have started and still fill each list, one play per game.
+TOPS = {"nfl": [
+    ("ats", "Top 5 against the spread", 5, lambda e: e.get("kind") == "spread", True),
+    ("totals", "Top 5 totals", 5, lambda e: e.get("kind") == "total", True),
+    ("props", "Top 10 player props", 10, lambda e: e.get("kind") == "prop" and e.get("mkt") not in TD_MKTS, True),
+    ("td", "Top 10 to score a touchdown", 10, lambda e: e.get("mkt") == "anytime_td", False),
+    ("td2", "Top 5 to score 2+ touchdowns", 5, lambda e: e.get("mkt") == "two_td", False),
+]}
+TD_MKTS = {"anytime_td", "first_td", "two_td", "three_td"}
+
+
+def write_tops(data_dir, sport, date, rows):
+    """data/<sport>/tops.json: the model's picks in each TOPS category, ranked, 4x deep. Fail-soft."""
+    if sport not in TOPS:
+        return None
+    now = datetime.now(timezone.utc)
+
+    def pre(e):
+        try:
+            return datetime.fromisoformat(str(e.get("start")).replace("Z", "+00:00")) > now
+        except ValueError:
+            return False
+    lists = []
+    for key, title, n, want, std in TOPS[sport]:
+        c = [e for e in rows if want(e) and pre(e) and e.get("price") is not None and e.get("conf") is not None
+             and e.get("src") != "market" and (not std or (e["price"] >= -200 and e["conf"] >= 0.5))]
+        c.sort(key=lambda e: -(e["conf"] + (e.get("edge") or 0) / 10))   # Ask Onyx's "most likely first" key
+        lists.append({"key": key, "title": title, "n": n, "rows": c[:4 * n]})
+    out = {"sport": sport, "date": date, "generated": now.isoformat(timespec="seconds"), "lists": lists}
+    p = Path(data_dir) / "tops.json"
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text(json.dumps(out, separators=(",", ":")), encoding="utf-8")
+    return out
+
+
 def write_board(data_dir, sport, date, rows, teams=None):
     """data/<sport>/board.json: every priced Onyx side the model reads today,
     any price, for the home page's "Ask Onyx" search (it filters and builds
@@ -277,5 +318,9 @@ def write_board(data_dir, sport, date, rows, teams=None):
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(json.dumps({"sport": sport, "date": date, "generated": datetime.now(timezone.utc).isoformat(timespec="seconds"),
                              "plays": out[:BOARD_KEEP]}, separators=(",", ":")), encoding="utf-8")
+    try:
+        write_tops(data_dir, sport, date, out[:BOARD_KEEP])
+    except Exception as ex:   # fail-soft: the board is what matters
+        print(f"  tops: skipped ({str(ex)[:120]})")
     return out
 
