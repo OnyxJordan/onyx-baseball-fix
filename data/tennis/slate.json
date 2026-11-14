@@ -1352,9 +1352,9 @@
     },
     {
      "id": "186552",
-     "start": "2026-11-14T12:00Z",
-     "state": "pre",
-     "detail": "11/14 - 7:00 AM EST",
+     "start": "2026-11-14T12:10Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Final",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -1365,7 +1365,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        1
+       ],
        "serve": false
       },
       {
@@ -1374,8 +1376,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        3
+       ],
+       "serve": true
       }
      ]
     }
@@ -3154,5 +3158,5 @@
    ]
   }
  ],
- "fetched": "2026-11-14T10:26:16+00:00"
+ "fetched": "2026-11-14T12:30:06+00:00"
 }
