@@ -824,5 +824,60 @@
   "pnl": -10.0,
   "locked_at": "2026-11-13T00:14:45+00:00",
   "graded_at": "2026-11-13T04:34:59+00:00"
+ },
+ {
+  "date": "2026-11-13",
+  "stake": 10.0,
+  "data_src": "optic",
+  "legs": [
+   {
+    "pid": "BF1720499157",
+    "player": "Jalen Suggs",
+    "team": "ORL",
+    "opp": "MIL",
+    "gid": "202611145F82AA90",
+    "stat": "reb",
+    "side": "over",
+    "line": 2.5,
+    "odds": -136,
+    "prob": 0.5746,
+    "proj": 4.71,
+    "sel": "6f4ffd60-4ec2-4d45-a4a0-643f4c830fea",
+    "hit": null
+   },
+   {
+    "pid": "69245BA7CCBE",
+    "player": "Stephon Castle",
+    "team": "SA",
+    "opp": "GS",
+    "gid": "20261114938E5358",
+    "stat": "pts",
+    "side": "under",
+    "line": 16.5,
+    "odds": -133,
+    "prob": 0.5499,
+    "proj": 14.21,
+    "sel": "aab18085-e9f2-4b6e-8621-b17dd750ef66",
+    "hit": null
+   },
+   {
+    "pid": "DD7487275A321904",
+    "player": "Ace Bailey",
+    "team": "UTAH",
+    "opp": "HOU",
+    "gid": "20261114620E0079",
+    "stat": "reb",
+    "side": "under",
+    "line": 5.5,
+    "odds": -146,
+    "prob": 0.5484,
+    "proj": 4.97,
+    "sel": "58bfed62-119d-4b3e-89d5-668111c909ca",
+    "hit": null
+   }
+  ],
+  "result": null,
+  "pnl": null,
+  "locked_at": "2026-11-14T00:30:38+00:00"
  }
 ]
