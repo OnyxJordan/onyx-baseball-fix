@@ -2923,5 +2923,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-187441-ml-away",
+  "sport": "tennis",
+  "gid": "187441",
+  "date": "2026-11-14",
+  "logged_at": "2026-11-14T20:22:36+00:00",
+  "matchup": "Mirra Andreeva vs Jessica Pegula",
+  "home": "Jessica Pegula",
+  "away": "Mirra Andreeva",
+  "label": "Mirra Andreeva to win",
+  "kind": "ml",
+  "side": "away",
+  "line": null,
+  "price": -177,
+  "chance": 0.6723,
+  "implied": 0.639,
+  "edge": 0.033,
+  "fair": -205,
+  "state": {
+   "sets": "1-1",
+   "srv": "away",
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
