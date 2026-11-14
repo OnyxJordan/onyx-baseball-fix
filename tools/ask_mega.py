@@ -202,7 +202,7 @@ def f_matchup():
 
 def f_price():
     sp = R.choice(LIVE_SPORTS)
-    k = R.choice([("plus money", {"min_price": 100}), ("underdogs", {"min_price": 100}), ("+150 or longer", {"min_price": 150}),
+    k = R.choice([("plus money", {"min_price": 100}), ("underdogs", {"markets": ["spread", "ml"], "fav": "dog"}), ("+150 or longer", {"min_price": 150}),
                   ("-110 or better", {"min_price": -110}), ("no worse than -150", {"min_price": -150}), ("70% or better", {"min_conf": 0.7}),
                   ("60%+", {"min_conf": 0.6}), ("65% or better", {"min_conf": 0.65})])
     q = R.choice(["{s} {k}", "{k} {s} picks", "best {k} {s}", "{s} plays {k}"]).format(s=R.choice(SPW[sp]), k=k[0])

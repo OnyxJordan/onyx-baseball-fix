@@ -78,7 +78,7 @@
     [/(?<!\bhigh )\bpoints?\b(?!\s*(guards?|spr[a-z]*))|\bpts\b|\bscorers?\b|\bscoring\b|\bbuckets\b/, 'pts'],
     [/\bspreads?\b|\bpoint spr[a-z]*\b|\bspreds?\b|\bsprads?\b|\bcover(s|ing)?\b|\bpuck ?lines?\b|\bhandicap\b|\bats\b/, 'spread'],
     [/\b(game )?totals?\b(?!\s*(parlay\s+)?(odds|payout|price|of\s+\+))|\bo\/u\b|\bover ?\/? ?unders?\b|\bover[\s-]unders?\b/, 'total'],
-    [/\bmoney ?lines?\b|\bml\b|\bto win\b(?!\s*(about|around)?\s*\+?\$?\d)|\bwinners?\b|\bstraight up\b|\boutright\b/, 'ml'],
+    [/\bmoney ?lines?\b|\bml\b|\bto win\b(?!\s*(about|around)?\s*\+?\$?\d)|\bstraight up\b|\boutright\b/, 'ml'],
   ];
   // college basketball and college football in every wording (11/2)
   var CBBW = /\b(college|ncaa|ncaam|ncaa mens|mens college|men s college|d1|division (1|i)|collegiate) ?(mens |men s )?(basketball|hoops|bball|b-ball|hoop)\b|\bncaa ?b\b|\bncaab\b|\bncaam\b|\bncaambb\b|\bcbb\b|\bcbk\b|\bmarch madness\b|\bncaa tournament\b|\bbig dance\b|\bfinal four\b|\bsweet (16|sixteen)\b|\belite (8|eight)\b/;
@@ -674,7 +674,11 @@
       s.markets.push(WORDS[i][1]);
     }
     // "sides", "game lines", "ATS": the game, not a player (spreads and moneylines; totals too for "game lines")
-    if (/\bsides?\b|\bteams? to (win|cover)\b|\bteam bets?\b/.test(t) && !/\bboth sides\b/.test(t)) ['spread', 'ml'].forEach(function (m) { if (s.markets.indexOf(m) < 0) s.markets.push(m); });
+    // 11/14 (Jordan: "the search needs to learn to include spreads, I don't want just moneylines"): winners,
+    // team picks, teams to bet and a parlay of teams are sides too, the spread with the moneyline
+    var sidesW = false, mk0 = s.markets.slice();
+    if ((/\bsides?\b|\bteams? to (win|cover|bet|back|play|take)\b|\bteam (bets?|picks?|plays?|parlays?)\b|\bbest teams\b|\b(parlay|ticket) of teams\b|\bwinners?\b|\bwho (wins|will win|s gonna win|is gonna win)\b/.test(t) && !/\bboth sides\b/.test(t))
+        && !/\b\d+\s*[- ]?\s*team (parlay|teaser|ticket)s?\b/.test(t) && !/\bteam totals?\b/.test(t)) { sidesW = true; ['spread', 'ml'].forEach(function (m) { if (s.markets.indexOf(m) < 0) s.markets.push(m); }); }
     if (/\bgame lines?\b|\bmain lines?\b|\bgame bets?\b|\bstraight bets? on games\b/.test(t)) ['spread', 'ml', 'total'].forEach(function (m) { if (s.markets.indexOf(m) < 0) s.markets.push(m); });
     // "rushing yards over under" is the player's line, not the game total
     if (s.markets.indexOf('total') >= 0 && !/\b(game )?totals?\b/.test(t) && s.markets.some(function (m) { return /^(pts|reb|ast|rec|rec_yds|rush_yds|pass_yds|pass_td|pass_att|rush_rec_yds|pass_rush_yds)$/.test(m); })) s.markets.splice(s.markets.indexOf('total'), 1);
@@ -707,7 +711,8 @@
     if (/\b(your|our|onyx'?s?|the model'?s?)( \w+){0,3} favou?rites?\b|\b(your|our) (top|best)\b/.test(t) && s.sort === 'conf') s.sort = 'rec';
     var dogW = /\bunderdogs?\b|\bdogs\b/.test(t);
     var propsW = /\bprops?\b|\bplayer (bets?|lines?|markets?)\b/.test(t) && !/\bgame props?\b/.test(t);
-    if ((favW || dogW) && !s.markets.length && !propsW) s.markets.push('ml');
+    if ((favW || dogW) && !s.markets.length && !propsW) s.markets.push('spread', 'ml');   // 11/14: not moneylines alone
+    if ((favW || dogW) && !(favW && dogW) && s.markets.indexOf('spread') >= 0 && !propsW) s.fav = favW ? 'fav' : 'dog';
     if (s.xmk) s.markets = s.markets.filter(function (m) { return s.xmk.indexOf(m) < 0; });   // never the market they ruled out
     if (favW && !dogW && s.markets.length === 1 && s.markets[0] === 'ml') s.max_price = s.max_price == null ? -101 : Math.min(s.max_price, -101);
     if (propsW) s.props_only = true;
@@ -760,7 +765,7 @@
         && !/plus money|plus[\s-]odds|underdogs?|\bdogs\b|long ?shots?/.test(t)) {
       s.target_price = s.min_price; s.min_price = null; s.ticket_floor = true;
     }
-    if (/plus money|plus[\s-]odds|\+ ?odds|underdogs?|\bdogs\b|long ?shots?|\bvalue dogs?\b/.test(t)) s.min_price = Math.max(s.min_price == null ? 100 : s.min_price, 100);
+    if (/plus money|plus[\s-]odds|\+ ?odds|long ?shots?/.test(t) || (/underdogs?|\bdogs\b|\bvalue dogs?\b/.test(t) && s.fav !== 'dog')) s.min_price = Math.max(s.min_price == null ? 100 : s.min_price, 100);
     if (/even money|around even|near even|pick ?em/.test(t)) { s.min_price = -125; s.max_price = 125; }
     if (favW && /\bml\b|money ?line|to win|\bwin\b/.test(t)) s.max_price = Math.min(s.max_price == null ? -101 : s.max_price, -101);
     // ordering
@@ -772,7 +777,7 @@
     if (/\bpositive (value|ev|edge|expected value)\b|(^|\s)\+ ?ev\b|\bplus ev\b|\b(only|just) (\w+ ){0,2}(value|\+ ?ev|ev|positive)( plays?| bets?| picks?| props?)?\b|\bvalue (plays? |bets? |picks? |props? )?only\b|\b(with|has|have|that have) (an? )?(real )?(edge|value)\b|\bbeats? (the )?(price|line|onyx)\b|\bpositive\b(?= (plays?|bets?|picks?|props?))/.test(t)
         || /(^|\s)\+ ?ev\b/i.test(RAWQ || '')) { s.pos_value = true; s.sort = 'edge'; }
     if (/biggest payout|longshots?|long shots?|lottery|moonshot|highest odds|big payout/.test(t)) s.sort = 'price';
-    if (/lock of the|pick of the|play of the|bet of the|prop of the|best bet\b|the lock\b|(highest|best|top|most likely|safest) (\w+ ){0,3}(prop|play|pick|bet|scorer)\b(?!s)/.test(t) && s.count == null && s.intent === 'list') s.count = 1;
+    if (/lock of the|pick of the|play of the|bet of the|prop of the|best bet\b|the lock\b|(highest|best|top|most likely|safest) (\w+ ){0,3}(prop|play|pick|bet|scorer)\b(?!s)/.test(t) && !/\b(teams|sides|games|players) to (bet|back|play|take)\b/.test(t) && s.count == null && s.intent === 'list') s.count = 1;
     // confidence floor: "60%", "60 percent", "over 60%"
     var c = t.match(/(\d{2})\s*(%|percent)/); if (c) s.min_conf = +c[1] / 100;
     // time: tonight / today / tomorrow / a weekday / this weekend
@@ -878,6 +883,9 @@
       });
       if (rost) s.player = rost.r.name;
     }
+    // "Landon Sides" (11/14 test): a name is not the word "sides"
+    if (sidesW && s.player && /\bsides?\b/i.test(s.player) && !/\bsides?\b|\bteams?\b|\bwinners?\b|\bwho (wins|will win)\b/.test(t.replace(new RegExp('\\b' + clean(s.player).split(' ').join('\\b|\\b') + '\\b', 'g'), ' ')))
+      s.markets = s.markets.filter(function (m) { return mk0.indexOf(m) >= 0 || (m !== 'spread' && m !== 'ml'); });
     if (s.player) {
       s.team = null; if (s.intent === 'list' && s.count == null && !/props|plays|lines|bets/.test(t)) s.count = s.player2 ? 10 : 5;
       if (!s.sports.length) {
@@ -1036,13 +1044,18 @@
         var hg = hitG[HG[0]]; s.player = null; s.teams = [hg[1], hg[2]]; s.team = null; s.school = null; s.team_name = null; s.ambig = null; s.tabbr = {}; s.tabbr[hg[0]] = [hg[1], hg[2]]; s.sports = [hg[0]];
         if (s.intent === 'list') s.one_per_game = false;
       }
+      // a game named by two codes ("JKST vs WIN total", 11/14 test): Winthrop's code is not "win total", a future
+      if (HG.length === 1 && s.unsupported === 'futures and season-long bets') {
+        var tG = t; [hitG[HG[0]][1], hitG[HG[0]][2]].forEach(function (ab) { tG = tG.replace(new RegExp('\\b' + String(ab).toLowerCase().replace(/[.*+?^${}()|[\]\\&-]/g, '\\$&') + '\\b', 'g'), ' '); });
+        if (!UNS.some(function (u) { return u[1] === s.unsupported && u[0].test(tG); })) s.unsupported = null;
+      }
     }
     // a game asked about as a game (11/9, Jordan: "you should be able to ask it about specific matchups"): two teams
     // of one game named. "who wins" is the moneyline, "who covers" the spread; no market at all is a game card:
     // the best read on the moneyline, spread and total, then that game's best props
     var twoT = Object.keys(s.tabbr || {}).some(function (k) { return (s.tabbr[k] || []).length === 2; }) || (s.teams || []).length === 2;
     if (twoT && !s.player && s.intent === 'list') {
-      if (/\bwho (wins|will win|is winning|s winning|takes (it|this|the game))\b|\bwho('s| is)? (gonna|going to) win\b|\bwinner\b|\bwho has the edge\b/.test(t) && (!s.markets.length || s.markets.join() === 'ml')) { s.markets = ['ml']; if (!s.count_set) s.count = 1; }
+      if (/\bwho (wins|will win|is winning|s winning|takes (it|this|the game))\b|\bwho('s| is)? (gonna|going to) win\b|\bwinner\b|\bwho has the edge\b/.test(t) && (!s.markets.length || s.markets.join() === 'ml' || s.markets.slice().sort().join() === 'ml,spread')) { s.markets = ['ml']; if (!s.count_set) s.count = 1; }
       else if (/\bwho (covers|will cover|s covering)\b/.test(t) && (!s.markets.length || s.markets.join() === 'spread')) { s.markets = ['spread']; if (!s.count_set) s.count = 1; }
       else if (!s.markets.length && !s.props_only && !s.no_props && !s.side_set && (s.side || 'any') === 'any') { s.matchup = true; if (!s.count_set) s.count = 8; s.one_per_game = false; }
     }
@@ -1122,7 +1135,12 @@
       if (!two && spec.max_price != null && p.price > spec.max_price) return false;
       if (!two && spec.min_conf != null && p.conf < spec.min_conf) return false;
       if (!two && spec.min_edge != null && p.edge < spec.min_edge) return false;
-      if (spec.pos_value && !(p.edge > 0)) return false;                                  // positive value only (11/8)
+      if (spec.pos_value && !(p.edge > 0)) return false;
+      // favorites / underdogs on sides (11/14): the moneyline by its price, the spread by its points (-6.5 gives, +6.5 gets)
+      if (spec.fav && (p.kind === 'ml' || p.kind === 'spread')) {
+        var fvP = p.kind === 'ml' ? -p.price : (function (m) { return m ? -parseFloat(m[1]) : NaN; })(String(p.label || '').match(/([+-]\d+(?:\.\d+)?)\s*$/));
+        if (isNaN(fvP) || (spec.fav === 'fav' ? !(fvP > 0) : !(fvP < 0))) return false;
+      }                                  // positive value only (11/8)
       // first TD / first basket: Onyx's price beat the model in testing, so their edges are not value unless asked for
       if (spec.pos_value && (p.mkt === 'first_td' || p.mkt === 'first_basket') && (spec.markets || []).indexOf(p.mkt) < 0) return false;
       if (spec.player && String(p.name || p.label).toLowerCase().indexOf(String(spec.player).toLowerCase()) < 0
@@ -1313,6 +1331,7 @@
     b.push((s.sports || []).length ? s.sports.map(function (k) { return LG[k] || k; }).join(' + ') : 'every sport');
     if ((s.markets || []).length) b.push(s.markets.map(function (m) { return MW[m] || m; }).join(', '));
     if (s.side && s.side !== 'any') b.push(s.side === 'over' ? 'overs only' : 'unders only');
+    if (s.fav) b.push(s.fav === 'fav' ? 'favorites only' : 'underdogs only');
     if (s.target_price) b.push((s.ticket_floor ? 'ticket pays +' + s.target_price + ' or more' : 'pays about +' + s.target_price));
     if (s.min_price != null) b.push((s.default_floor ? 'standard prices, nothing shorter than ' : 'no price shorter than ') + (s.min_price > 0 ? '+' : '') + s.min_price);
     if (s.max_price != null) b.push('no price longer than ' + (s.max_price > 0 ? '+' : '') + s.max_price);
@@ -1445,6 +1464,13 @@
     // (1,000 live-AI requests: all 8 misses were this)
     if ((h.markets || []).length && JSON.stringify((s.markets || []).slice().sort()) !== JSON.stringify(h.markets.slice().sort())) s.markets = h.markets.slice();
     if ((!s.side || s.side === 'any') && (h.side === 'over' || h.side === 'under')) s.side = h.side;
+    // 11/14: the AI reads "who wins", "winners", "underdogs" as moneylines only; with no moneyline word said,
+    // a side is the spread and the moneyline
+    if ((s.markets || []).join() === 'ml' && !/money ?lines?|\bml\b|\bto win\b|straight up|outright/.test(t)) {
+      var twoG = (s.teams || []).length === 2 || Object.keys(s.tabbr || {}).some(function (k) { return (s.tabbr[k] || []).length === 2; });
+      if (!twoG) s.markets = ['spread', 'ml'];
+    }
+    if (h.fav) { s.fav = h.fav; if (h.min_price == null && h.fav === 'dog') s.min_price = null; if (h.max_price == null && h.fav === 'fav') s.max_price = null; }
     // a fresh question (not a follow-up): ticket type, leg count and teams nobody named follow the
     // reader, so the same words get the same answer every time (60 questions asked 3 times each:
     // the AI wobbled between 1 and 5 picks on single-player asks and once made a parlay of 3 unnamed teams)

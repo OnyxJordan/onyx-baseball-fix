@@ -39,10 +39,10 @@ for sp in ("nfl", "nba", "nhl", "cfb"):
     w = SPORT[sp][0]
     add(f"{w} sides", sports=[sp], markets=["spread", "ml"])
     add(f"{w} game lines", sports=[sp], markets=["spread", "ml", "total"])
-    add(f"{w} favorites", sports=[sp], markets=["ml"], max_price=-101)
-    add(f"{w} underdogs", sports=[sp], markets=["ml"], min_price=100)
-    add(f"3 leg {w} favorites parlay", sports=[sp], markets=["ml"], intent="parlay", count=3)
-    add(f"parlay of {w} dogs", sports=[sp], markets=["ml"], intent="parlay", min_price=100)
+    add(f"{w} favorites", sports=[sp], markets=["spread", "ml"], fav="fav")   # 11/14: sides, not moneylines alone
+    add(f"{w} underdogs", sports=[sp], markets=["spread", "ml"], fav="dog")
+    add(f"3 leg {w} favorites parlay", sports=[sp], markets=["spread", "ml"], fav="fav", intent="parlay", count=3)
+    add(f"parlay of {w} dogs", sports=[sp], markets=["spread", "ml"], fav="dog", intent="parlay")
     add(f"Parlay that pays +500 only {w} sides", sports=[sp], markets=["spread", "ml"], intent="parlay")
     add(f"Parlay that pays +500 only {w} only totals", sports=[sp], markets=["total"], intent="parlay")
     add(f"{w} player props", sports=[sp], props_only=True)
@@ -81,7 +81,7 @@ VAR = [
  ("overs only", dict(side="over")), ("hit the over", dict(side="over")), ("three team nfl parlay", dict(sports=["nfl"], intent="parlay", count=3)),
  ("a couple nba plays", dict(sports=["nba"], count=2)), ("few nhl picks", dict(sports=["nhl"], count=3)), ("double nba", dict(sports=["nba"], intent="parlay", count=2)),
  ("college football best bets", dict(sports=["cfb"])), ("ncaaf picks", dict(sports=["cfb"])), ("hockey best bets", dict(sports=["nhl"])),
- ("tennis favorites parlay", dict(sports=["tennis"], intent="parlay", markets=["ml"])), ("nfl rushing yards over under", dict(sports=["nfl"], markets=["rush_yds"])),
+ ("tennis favorites parlay", dict(sports=["tennis"], intent="parlay", markets=["spread", "ml"], fav="fav")), ("nfl rushing yards over under", dict(sports=["nfl"], markets=["rush_yds"])),
  ("total receptions nfl", dict(sports=["nfl"], markets=["rec"])), ("total points for jokic", dict(markets=["pts"])),
  ("best value picks to score a touchdown for college football", dict(sports=["cfb"], markets=["anytime_td"])),
  ("Parlay that pays +500 only college football sides", dict(sports=["cfb"], markets=["spread", "ml"], intent="parlay")),
@@ -103,8 +103,8 @@ HARD = [
  ("pts overs", dict(markets=["pts"], side="over")), ("points unders for tonight", dict(markets=["pts"], side="under")),
  ("best player prop tonight", dict(props_only=True)), ("top 10 props", dict(props_only=True, count=10)),
  ("top 3 nfl props", dict(sports=["nfl"], props_only=True, count=3)), ("give me 2 nhl sides", dict(sports=["nhl"], markets=["spread", "ml"], count=2)),
- ("nfl dogs", dict(sports=["nfl"], markets=["ml"], min_price=100)), ("college dogs to win outright", dict(sports=["cfb"], markets=["ml"], min_price=100)),
- ("biggest favorite tonight", dict(markets=["ml"])), ("heavy favorites parlay", dict(markets=["ml"], intent="parlay")),
+ ("nfl dogs", dict(sports=["nfl"], markets=["spread", "ml"], fav="dog")), ("college dogs to win outright", dict(sports=["cfb"], markets=["ml"], min_price=100)),
+ ("biggest favorite tonight", dict(markets=["spread", "ml"], fav="fav")), ("heavy favorites parlay", dict(markets=["spread", "ml"], fav="fav", intent="parlay")),
  ("who is most likely to score a td sunday", dict(markets=["anytime_td"])), ("anytime td parlay", dict(markets=["anytime_td"], intent="parlay")),
  ("td scorers plus money", dict(markets=["anytime_td"], min_price=100)), ("anytime touchdown longshots", dict(markets=["anytime_td"])),
  ("first td bets", dict(markets=["first_td"])), ("2+ td scorers", dict(markets=["two_plus_td"])), ("multi td parlay", dict(markets=["two_plus_td"])),
@@ -123,7 +123,7 @@ HARD = [
  ("no juice nba", dict(sports=["nba"])), ("nothing worse than -130", dict(min_price=-130)), ("-110 or better", dict(min_price=-110)),
  ("+150 or longer", dict(min_price=150)), ("odds between -150 and +150", dict(min_price=-150, max_price=150)),
  ("what do you like in hockey tonight", dict(sports=["nhl"])), ("any good tennis bets", dict(sports=["tennis"])),
- ("atp matches today", dict(sports=["tennis"])), ("wta favorites", dict(sports=["tennis"], markets=["ml"])),
+ ("atp matches today", dict(sports=["tennis"])), ("wta favorites", dict(sports=["tennis"], markets=["spread", "ml"], fav="fav")),
  ("college football totals", dict(sports=["cfb"], markets=["total"])), ("cfb overs", dict(sports=["cfb"], side="over")),
  ("ncaa football spreads", dict(sports=["cfb"], markets=["spread"])), ("college ats", dict(sports=["cfb"], markets=["spread"])),
  ("nfl ats picks", dict(sports=["nfl"], markets=["spread"])), ("against the spread nfl", dict(sports=["nfl"], markets=["spread"])),

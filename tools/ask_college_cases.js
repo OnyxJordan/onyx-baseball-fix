@@ -30,7 +30,7 @@ module.exports = [
   C('CBB unders', {sports: ['cbb'], side: 'under'}),
   C('cbb overs tonight', {sports: ['cbb'], side: 'over', when: 'today'}),
   C("men's college basketball 3 leg parlay", {sports: ['cbb'], intent: 'parlay', count: 3}),
-  C('mens college hoops dogs', {sports: ['cbb'], markets: ['ml'], min_price: 100}),
+  C('mens college hoops dogs', {sports: ['cbb'], markets: ['spread', 'ml'], fav: 'dog'}),   // 11/14: sides, not moneylines alone
   C('ncaam spreads tonight', {sports: ['cbb'], markets: ['spread'], when: 'today'}),
   C('d1 basketball overs', {sports: ['cbb'], side: 'over'}),
   C('college bball totals', {sports: ['cbb'], markets: ['total']}),
@@ -49,7 +49,7 @@ module.exports = [
   C('college rushing overs', {sports: ['cfb'], markets: ['rush_yds'], side: 'over'}),
   C('college ats', {sports: COL, markets: ['spread']}),
   C('college totals', {sports: COL, markets: ['total']}),
-  C('college dogs', {sports: COL, markets: ['ml'], min_price: 100}),
+  C('college dogs', {sports: COL, markets: ['spread', 'ml'], fav: 'dog'}),
   C('college basketball and college football spreads', {sports: COL, markets: ['spread']}),
   C('basketball spreads', {sports: ['nba'], markets: ['spread']}),
   C('football spreads', {sports: ['nfl'], markets: ['spread']}),

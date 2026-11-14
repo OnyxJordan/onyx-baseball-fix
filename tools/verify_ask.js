@@ -61,6 +61,7 @@ const srv = http.createServer((q, r) => { const p = path.join(root, decodeURICom
       if (e.side && s.side !== e.side) why.push(`side ${s.side} want ${e.side}`);
       if (e.min_price != null && s.min_price !== e.min_price) why.push(`min_price ${s.min_price} want ${e.min_price}`);
       if (e.max_price != null && s.max_price !== e.max_price) why.push(`max_price ${s.max_price} want ${e.max_price}`);
+      if (e.fav && s.fav !== e.fav) why.push(`fav ${s.fav} want ${e.fav}`);
       if (e.min_conf != null && s.min_conf !== e.min_conf) why.push(`min_conf ${s.min_conf} want ${e.min_conf}`);
       // (11/10, 1M test) a nickname two teams on today's boards share ("Kings": Sacramento and Los Angeles), with no
       // sport or basketball/hockey word in the request, SHOULD be asked: the button for the wanted team is a pass
@@ -126,6 +127,10 @@ const srv = http.createServer((q, r) => { const p = path.join(root, decodeURICom
         if (!R.widened && !R.two && F.min_price != null && p.price < F.min_price && !(F.target_price && F.default_floor)) { why.push(`price ${p.price} under ${F.min_price}`); break; }   // a payout target moves the default floor
         if (!R.widened && !R.two && F.max_price != null && p.price > F.max_price) { why.push(`price ${p.price} over ${F.max_price}`); break; }
         if (R.widened && !R.note) { why.push('widened without saying so'); break; }
+        if (!R.widened && F.fav && (p.kind === 'ml' || p.kind === 'spread')) {   // favorites / underdogs on sides (11/14)
+          const pts = p.kind === 'ml' ? -p.price : -parseFloat((String(p.label).match(/([+-]\d+(?:\.\d+)?)\s*$/) || [])[1]);
+          if (!(F.fav === 'fav' ? pts > 0 : pts < 0)) { why.push(`${p.label} is not a ${F.fav === 'fav' ? 'favorite' : 'underdog'}`); break; }
+        }
         if (s.pos_value && !R.widened && !(p.edge > 0)) { why.push(`positive value only, but ${p.label} has edge ${p.edge}`); break; }
         if (Date.parse(p.start) <= now) { why.push('started game'); break; }
         if (s.slot && !R.widened && !OnyxAsk.slotOk(s.slot, p.start)) { why.push(`play outside the ${s.slot.label}: ${p.label} ${p.start}`); break; }
