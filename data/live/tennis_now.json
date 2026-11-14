@@ -2953,5 +2953,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-187440-ml-home",
+  "sport": "tennis",
+  "gid": "187440",
+  "date": "2026-11-14",
+  "logged_at": "2026-11-14T22:11:03+00:00",
+  "matchup": "Elina Svitolina vs Linda Noskova",
+  "home": "Linda Noskova",
+  "away": "Elina Svitolina",
+  "label": "Linda Noskova to win",
+  "kind": "ml",
+  "side": "home",
+  "line": null,
+  "price": -194,
+  "chance": 0.7045,
+  "implied": 0.6599,
+  "edge": 0.045,
+  "fair": -240,
+  "state": {
+   "sets": "0-1",
+   "srv": "home",
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
