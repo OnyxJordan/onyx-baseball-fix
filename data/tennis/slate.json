@@ -1,5 +1,5 @@
 {
- "date": "2026-11-12",
+ "date": "2026-11-14",
  "sport": "tennis",
  "name": "Tennis",
  "label": "Bybit Stockholm Open · FAGE WTA Finals Indian Wells · DIRECTV Open Presentado por Compesar",
@@ -1282,9 +1282,9 @@
     },
     {
      "id": "186546",
-     "start": "2026-11-13T13:00Z",
-     "state": "pre",
-     "detail": "11/13 - 8:00 AM EST",
+     "start": "2026-11-13T13:10Z",
+     "state": "post",
+     "detail": "Final",
      "round": "Semifinal",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -1294,8 +1294,11 @@
        "short": "T. Tirante",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
        "seed": null,
-       "win": false,
-       "sets": [],
+       "win": true,
+       "sets": [
+        7,
+        7
+       ],
        "serve": false
       },
       {
@@ -1304,16 +1307,19 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/chi.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        5,
+        6
+       ],
        "serve": false
       }
      ]
     },
     {
      "id": "186547",
-     "start": "2026-11-13T16:00Z",
-     "state": "pre",
-     "detail": "11/13 - 11:00 AM EST",
+     "start": "2026-11-13T16:05Z",
+     "state": "post",
+     "detail": "Final",
      "round": "Semifinal",
      "draw": "Men's Singles",
      "court": "Center Court",
@@ -1324,7 +1330,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ita.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        4,
+        2
+       ],
        "serve": false
       },
       {
@@ -1332,37 +1341,48 @@
        "short": "T. Fritz",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
-       "win": false,
-       "sets": [],
+       "win": true,
+       "sets": [
+        6,
+        6
+       ],
        "serve": false
       }
      ]
     },
     {
      "id": "186552",
-     "start": "2026-11-14T05:00Z",
-     "state": "pre",
-     "detail": "TBD",
+     "start": "2026-11-14T12:10Z",
+     "state": "post",
+     "detail": "Final",
      "round": "Final",
      "draw": "Men's Singles",
-     "court": "",
+     "court": "Center Court",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Thiago Agustin Tirante",
+       "short": "T. Tirante",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        2,
+        6,
+        6
+       ],
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Taylor Fritz",
+       "short": "T. Fritz",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
-       "win": false,
-       "sets": [],
+       "win": true,
+       "sets": [
+        6,
+        4,
+        7
+       ],
        "serve": false
       }
      ]
@@ -1700,8 +1720,8 @@
     {
      "id": "187376",
      "start": "2026-11-12T22:20Z",
-     "state": "in",
-     "detail": "1st",
+     "state": "post",
+     "detail": "Final",
      "round": "Group Stage",
      "draw": "Women's Singles",
      "court": "Indian Wells Tennis Garden",
@@ -1713,18 +1733,22 @@
        "seed": null,
        "win": false,
        "sets": [
-        3
+        6,
+        6,
+        5
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Jessica Pegula",
        "short": "J. Pegula",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
-        4
+        7,
+        4,
+        7
        ],
        "serve": false
       }
@@ -1732,22 +1756,85 @@
     },
     {
      "id": "187384",
-     "start": "2026-11-13T20:00Z",
-     "state": "pre",
-     "detail": "11/13 - 3:00 PM EST",
+     "start": "2026-11-13T20:10Z",
+     "state": "post",
+     "detail": "Final",
      "round": "Group Stage",
      "draw": "Women's Singles",
      "court": "Indian Wells Tennis Garden",
      "p": [
       {
-       "name": "Karolina Muchova",
-       "short": "K. Muchova",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/cze.png",
+       "name": "Diana Shnaider",
+       "short": "D. Shnaider",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/rus.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        2,
+        1
+       ],
        "serve": false
       },
+      {
+       "name": "Mirra Andreeva",
+       "short": "M. Andreeva",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/rus.png",
+       "seed": null,
+       "win": true,
+       "sets": [
+        6,
+        6
+       ],
+       "serve": false
+      }
+     ]
+    },
+    {
+     "id": "187379",
+     "start": "2026-11-13T21:30Z",
+     "state": "post",
+     "detail": "Final",
+     "round": "Group Stage",
+     "draw": "Women's Singles",
+     "court": "Indian Wells Tennis Garden",
+     "p": [
+      {
+       "name": "Elina Svitolina",
+       "short": "E. Svitolina",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ukr.png",
+       "seed": null,
+       "win": true,
+       "sets": [
+        6,
+        3,
+        6
+       ],
+       "serve": false
+      },
+      {
+       "name": "Aryna Sabalenka",
+       "short": "A. Sabalenka",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/blr.png",
+       "seed": null,
+       "win": false,
+       "sets": [
+        3,
+        6,
+        1
+       ],
+       "serve": false
+      }
+     ]
+    },
+    {
+     "id": "187441",
+     "start": "2026-11-14T20:00Z",
+     "state": "pre",
+     "detail": "11/14 - 3:00 PM EST",
+     "round": "Semifinal",
+     "draw": "Women's Singles",
+     "court": "Indian Wells Tennis Garden",
+     "p": [
       {
        "name": "Mirra Andreeva",
        "short": "M. Andreeva",
@@ -1756,15 +1843,24 @@
        "win": false,
        "sets": [],
        "serve": false
+      },
+      {
+       "name": "Jessica Pegula",
+       "short": "J. Pegula",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
       }
      ]
     },
     {
-     "id": "187379",
-     "start": "2026-11-13T21:30Z",
+     "id": "187440",
+     "start": "2026-11-14T21:30Z",
      "state": "pre",
-     "detail": "11/13 - 4:30 PM EST",
-     "round": "Group Stage",
+     "detail": "11/14 - 4:30 PM EST",
+     "round": "Semifinal",
      "draw": "Women's Singles",
      "court": "Indian Wells Tennis Garden",
      "p": [
@@ -1778,67 +1874,9 @@
        "serve": false
       },
       {
-       "name": "Aryna Sabalenka",
-       "short": "A. Sabalenka",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/blr.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      }
-     ]
-    },
-    {
-     "id": "187440",
-     "start": "2026-11-14T05:00Z",
-     "state": "pre",
-     "detail": "TBD",
-     "round": "Semifinal",
-     "draw": "Women's Singles",
-     "court": "",
-     "p": [
-      {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      }
-     ]
-    },
-    {
-     "id": "187441",
-     "start": "2026-11-14T05:00Z",
-     "state": "pre",
-     "detail": "TBD",
-     "round": "Semifinal",
-     "draw": "Women's Singles",
-     "court": "",
-     "p": [
-      {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Linda Noskova",
+       "short": "L. Noskova",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/cze.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -3025,9 +3063,79 @@
     {
      "id": "186773",
      "start": "2026-11-13T15:00Z",
-     "state": "pre",
-     "detail": "11/13 - 10:00 AM EST",
+     "state": "post",
+     "detail": "Final",
      "round": "Semifinal",
+     "draw": "Women's Singles",
+     "court": "Main Court",
+     "p": [
+      {
+       "name": "Elizabeth Mandlik",
+       "short": "E. Mandlik",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
+       "seed": null,
+       "win": true,
+       "sets": [
+        6,
+        6
+       ],
+       "serve": false
+      },
+      {
+       "name": "Laura Samson",
+       "short": "L. Samson",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/cze.png",
+       "seed": null,
+       "win": false,
+       "sets": [
+        3,
+        3
+       ],
+       "serve": false
+      }
+     ]
+    },
+    {
+     "id": "186774",
+     "start": "2026-11-13T16:50Z",
+     "state": "post",
+     "detail": "Final",
+     "round": "Semifinal",
+     "draw": "Women's Singles",
+     "court": "Main Court",
+     "p": [
+      {
+       "name": "Bianca Andreescu",
+       "short": "B. Andreescu",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/can.png",
+       "seed": null,
+       "win": true,
+       "sets": [
+        6,
+        6
+       ],
+       "serve": false
+      },
+      {
+       "name": "Polona Hercog",
+       "short": "P. Hercog",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/slo.png",
+       "seed": null,
+       "win": false,
+       "sets": [
+        1,
+        4
+       ],
+       "serve": false
+      }
+     ]
+    },
+    {
+     "id": "186772",
+     "start": "2026-11-14T17:00Z",
+     "state": "pre",
+     "detail": "11/14 - 12:00 PM EST",
+     "round": "Final",
      "draw": "Women's Singles",
      "court": "Main Court",
      "p": [
@@ -3041,67 +3149,9 @@
        "serve": false
       },
       {
-       "name": "Laura Samson",
-       "short": "L. Samson",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/cze.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      }
-     ]
-    },
-    {
-     "id": "186774",
-     "start": "2026-11-13T16:30Z",
-     "state": "pre",
-     "detail": "11/13 - 11:30 AM EST",
-     "round": "Semifinal",
-     "draw": "Women's Singles",
-     "court": "Main Court",
-     "p": [
-      {
        "name": "Bianca Andreescu",
        "short": "B. Andreescu",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/can.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "Polona Hercog",
-       "short": "P. Hercog",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/slo.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      }
-     ]
-    },
-    {
-     "id": "186772",
-     "start": "2026-11-14T05:00Z",
-     "state": "pre",
-     "detail": "TBD",
-     "round": "Final",
-     "draw": "Women's Singles",
-     "court": "",
-     "p": [
-      {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
        "seed": null,
        "win": false,
        "sets": [],
@@ -3112,5 +3162,5 @@
    ]
   }
  ],
- "fetched": "2026-11-12T22:58:20+00:00"
+ "fetched": "2026-11-14T16:48:55+00:00"
 }

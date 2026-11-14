@@ -1836,8 +1836,9 @@
   "opened_at": "2026-11-10T16:01:37+00:00",
   "logged_at": "2026-11-10T16:01:37+00:00",
   "model": "v2",
-  "result": null,
-  "actual": null
+  "result": "L",
+  "actual": 49.0,
+  "graded_at": "2026-11-14T05:46:52+00:00"
  },
  {
   "date": "2026-11-10",
@@ -2144,8 +2145,9 @@
   "opened_at": "2026-11-10T22:17:50+00:00",
   "logged_at": "2026-11-10T22:17:50+00:00",
   "model": "v2",
-  "result": null,
-  "actual": null
+  "result": "W",
+  "actual": 30.0,
+  "graded_at": "2026-11-14T03:49:32+00:00"
  },
  {
   "date": "2026-11-10",
@@ -2188,8 +2190,9 @@
   "opened_at": "2026-11-10T22:17:50+00:00",
   "logged_at": "2026-11-10T22:17:50+00:00",
   "model": "v2",
-  "result": null,
-  "actual": null
+  "result": "V",
+  "actual": null,
+  "graded_at": "2026-11-14T03:49:32+00:00"
  },
  {
   "date": "2026-11-10",
@@ -2232,8 +2235,9 @@
   "opened_at": "2026-11-10T22:17:50+00:00",
   "logged_at": "2026-11-10T22:17:50+00:00",
   "model": "v2",
-  "result": null,
-  "actual": null
+  "result": "W",
+  "actual": 27.0,
+  "graded_at": "2026-11-14T03:49:32+00:00"
  },
  {
   "date": "2026-11-10",
@@ -2495,6 +2499,138 @@
   ],
   "opened_at": "2026-11-12T17:45:29+00:00",
   "logged_at": "2026-11-12T17:45:29+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-12",
+  "key": "401856889|sedrick alexander|rush_yds",
+  "gid": "401856889",
+  "pid": "5030333",
+  "name": "Sedrick Alexander",
+  "team": "VAN",
+  "opp": "ALA",
+  "matchup": "VAN vs ALA",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 32.5,
+  "price": -126,
+  "sel": "c93b7df5-0026-4cac-8372-07a1917c881e",
+  "proj": 30.2,
+  "prob": 0.6093,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.68,
+    "avg": 0.77,
+    "pp": -2.1
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.97,
+    "avg": 0.93,
+    "pp": -0.6
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.2,
+    "avg": -0.05,
+    "pp": 0.1
+   }
+  ],
+  "opened_at": "2026-11-13T02:56:24+00:00",
+  "logged_at": "2026-11-13T02:56:24+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-12",
+  "key": "401858294|bo maccormack|rush_yds",
+  "gid": "401858294",
+  "pid": "5208592",
+  "name": "Bo MacCormack III",
+  "team": "BC",
+  "opp": "ND",
+  "matchup": "BC @ ND",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 33.5,
+  "price": -126,
+  "sel": "f625c9e3-f7db-457d-a3bf-17692153f0d6",
+  "proj": 43.0,
+  "prob": 0.6154,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.56,
+    "avg": 0.77,
+    "pp": -4.8
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.85,
+    "avg": 0.93,
+    "pp": 1.4
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.35,
+    "avg": -0.05,
+    "pp": 0.3
+   }
+  ],
+  "opened_at": "2026-11-13T03:29:36+00:00",
+  "logged_at": "2026-11-13T03:29:36+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-13",
+  "key": "401858520|dejuan williams|rush_yds",
+  "gid": "401858520",
+  "pid": "5295550",
+  "name": "DeJuan Williams",
+  "team": "MD",
+  "opp": "WIS",
+  "matchup": "MD vs WIS",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 49.5,
+  "price": -126,
+  "sel": "719f3409-4160-4ea6-b9b6-afe77a750bcf",
+  "proj": 58.9,
+  "prob": 0.6162,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.65,
+    "avg": 0.77,
+    "pp": -2.7
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 1.0,
+    "avg": 0.93,
+    "pp": -1.1
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.77,
+    "avg": -0.05,
+    "pp": 0.7
+   }
+  ],
+  "opened_at": "2026-11-13T20:12:11+00:00",
+  "logged_at": "2026-11-13T20:12:11+00:00",
   "model": "v2",
   "result": null,
   "actual": null
