@@ -2639,5 +2639,49 @@
   "result": "L",
   "actual": 72.0,
   "graded_at": "2026-11-14T20:48:54+00:00"
+ },
+ {
+  "date": "2026-11-14",
+  "key": "401856858|lj martin|rush_yds",
+  "gid": "401856858",
+  "pid": "4918126",
+  "name": "LJ Martin",
+  "team": "BYU",
+  "opp": "BAY",
+  "matchup": "BYU vs BAY",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 60.5,
+  "price": -124,
+  "sel": "6905b2ce-3af3-4d00-87b3-6b384cba1886",
+  "proj": 60.5,
+  "prob": 0.6053,
+  "implied": 0.5536,
+  "why": [
+   {
+    "k": "carries the defense allows",
+    "v": 1.02,
+    "avg": 0.93,
+    "pp": -1.4
+   },
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.73,
+    "avg": 0.77,
+    "pp": -1.0
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.18,
+    "avg": -0.05,
+    "pp": 0.1
+   }
+  ],
+  "opened_at": "2026-11-14T23:10:48+00:00",
+  "logged_at": "2026-11-14T23:10:48+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
  }
 ]
