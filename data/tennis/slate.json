@@ -1042,8 +1042,8 @@
     {
      "id": "187534",
      "start": "2026-11-15T17:25Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Qualifying Final",
      "draw": "Women's Singles",
      "court": "Grandstand",
@@ -1058,17 +1058,17 @@
         1,
         0
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Martina Trevisan",
        "short": "M. Trevisan",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ita.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        5
+        6
        ],
        "serve": false
       }
@@ -1078,7 +1078,7 @@
      "id": "187533",
      "start": "2026-11-15T17:35Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Qualifying Final",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -1090,7 +1090,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        3
+        3,
+        1
        ],
        "serve": false
       },
@@ -1101,6 +1102,7 @@
        "seed": null,
        "win": false,
        "sets": [
+        6,
         5
        ],
        "serve": false
@@ -1109,9 +1111,9 @@
     },
     {
      "id": "187536",
-     "start": "2026-11-15T18:30Z",
-     "state": "pre",
-     "detail": "11/15 - 1:30 PM EST",
+     "start": "2026-11-15T18:35Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Qualifying Final",
      "draw": "Women's Singles",
      "court": "Grandstand",
@@ -1122,8 +1124,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ukr.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        2
+       ],
+       "serve": true
       },
       {
        "name": "Zhibek Kulambayeva",
@@ -1131,7 +1135,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/kaz.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        0
+       ],
        "serve": false
       }
      ]
@@ -2038,5 +2044,5 @@
    ]
   }
  ],
- "fetched": "2026-11-15T18:18:51+00:00"
+ "fetched": "2026-11-15T18:51:56+00:00"
 }
