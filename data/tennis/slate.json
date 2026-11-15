@@ -1007,8 +1007,8 @@
     {
      "id": "187535",
      "start": "2026-11-15T16:00Z",
-     "state": "pre",
-     "detail": "11/15 - 11:00 AM EST",
+     "state": "in",
+     "detail": "2nd",
      "round": "Qualifying Final",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -1019,8 +1019,11 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/aus.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        2,
+        2
+       ],
+       "serve": true
       },
       {
        "name": "Diletta Cherubini",
@@ -1028,16 +1031,19 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ita.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        6,
+        4
+       ],
        "serve": false
       }
      ]
     },
     {
      "id": "187534",
-     "start": "2026-11-15T16:00Z",
+     "start": "2026-11-15T17:20Z",
      "state": "pre",
-     "detail": "11/15 - 11:00 AM EST",
+     "detail": "11/15 - 12:20 PM EST",
      "round": "Qualifying Final",
      "draw": "Women's Singles",
      "court": "Grandstand",
@@ -1055,35 +1061,6 @@
        "name": "Martina Trevisan",
        "short": "M. Trevisan",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ita.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      }
-     ]
-    },
-    {
-     "id": "187536",
-     "start": "2026-11-15T17:30Z",
-     "state": "pre",
-     "detail": "11/15 - 12:30 PM EST",
-     "round": "Qualifying Final",
-     "draw": "Women's Singles",
-     "court": "Grandstand",
-     "p": [
-      {
-       "name": "Valeriya Strakhova",
-       "short": "V. Strakhova",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ukr.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "Zhibek Kulambayeva",
-       "short": "Z. Kulambayeva",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/kaz.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -1113,6 +1090,35 @@
        "name": "Ariana Geerlings",
        "short": "A. Geerlings",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      }
+     ]
+    },
+    {
+     "id": "187536",
+     "start": "2026-11-15T18:00Z",
+     "state": "pre",
+     "detail": "11/15 - 1:00 PM EST",
+     "round": "Qualifying Final",
+     "draw": "Women's Singles",
+     "court": "Grandstand",
+     "p": [
+      {
+       "name": "Valeriya Strakhova",
+       "short": "V. Strakhova",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ukr.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      },
+      {
+       "name": "Zhibek Kulambayeva",
+       "short": "Z. Kulambayeva",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/kaz.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -2022,5 +2028,5 @@
    ]
   }
  ],
- "fetched": "2026-11-15T15:13:56+00:00"
+ "fetched": "2026-11-15T17:17:16+00:00"
 }
