@@ -883,5 +883,60 @@
   "pnl": -10.0,
   "locked_at": "2026-11-14T00:30:38+00:00",
   "graded_at": "2026-11-14T05:11:31+00:00"
+ },
+ {
+  "date": "2026-11-14",
+  "stake": 10.0,
+  "data_src": "optic",
+  "legs": [
+   {
+    "pid": "708EEEB44C85",
+    "player": "Jaylon Tyson",
+    "team": "CLE",
+    "opp": "DAL",
+    "gid": "202611150C8E2086",
+    "stat": "reb",
+    "side": "under",
+    "line": 6.5,
+    "odds": -144,
+    "prob": 0.578,
+    "proj": 4.68,
+    "sel": "03460483-14ff-4683-b699-46a4493cd9ea",
+    "hit": null
+   },
+   {
+    "pid": "93FA1A458E478733",
+    "player": "Cameron Boozer",
+    "team": "MEM",
+    "opp": "BKN",
+    "gid": "20261115FE7E9B09",
+    "stat": "reb",
+    "side": "under",
+    "line": 9.5,
+    "odds": -145,
+    "prob": 0.5608,
+    "proj": 8.11,
+    "sel": "faa01716-3906-42c1-bd01-f74c9fb33083",
+    "hit": null
+   },
+   {
+    "pid": "72F133EEC33F",
+    "player": "Cade Cunningham",
+    "team": "DET",
+    "opp": "MIA",
+    "gid": "20261115CDD102F4",
+    "stat": "ast",
+    "side": "over",
+    "line": 8.5,
+    "odds": -147,
+    "prob": 0.5414,
+    "proj": 9.54,
+    "sel": "4f13d382-e437-468b-bb2f-decbdd0ddfd9",
+    "hit": null
+   }
+  ],
+  "result": null,
+  "pnl": null,
+  "locked_at": "2026-11-15T00:26:45+00:00"
  }
 ]
