@@ -2196,5 +2196,33 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "nba-202611165A5D8300-q1-q1_total",
+  "sport": "nba",
+  "date": "2026-11-15",
+  "logged_at": "2026-11-15T14:33:19+00:00",
+  "start": "2026-11-16T00:00:00Z",
+  "gid": "202611165A5D8300",
+  "matchup": "HOU @ WSH",
+  "label": "HOU @ WSH Over 54.5 1st-quarter points",
+  "market": "q1_total",
+  "kind": "prop",
+  "name": "HOU @ WSH",
+  "team": "HOU",
+  "who": "q1",
+  "side": "over",
+  "line": 54.5,
+  "hcap": null,
+  "price": -119,
+  "chance": 0.5667,
+  "edge": 0.0233,
+  "ev": 0.0429,
+  "sel": "8fc7471d-bd0f-49af-8bb9-56a78d1520dd",
+  "model": "q1 0.254/12.0",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
