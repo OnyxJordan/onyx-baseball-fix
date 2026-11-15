@@ -1547,7 +1547,12 @@ def write_top(key, lane, slate, model):
     # the full board for "Ask Onyx": every priced side, any price, plus every
     # anytime-TD price with its expected touchdowns (lam) for "2+ TD" questions
     tag = lambda r: "tracked" if r.get("sel") in tracked else "trial" if r.get("sel") in trial else "lean"
-    board = [dict(DT.entry(key, r, tag(r), start.get(r.get("gid"))), proj=r.get("proj"))
+    # v16 NFL (11/15): a market whose chance shown is Onyx's own (nfl_model.ONYX_ONLY) is marked no_read: it is
+    # not the model's pick, so it stays out of the model picks lists and a generic "props" search
+    import importlib
+    nr = set(getattr(importlib.import_module("nfl_model"), "ONYX_ONLY", ())) if key == "nfl" else set()
+    board = [dict(DT.entry(key, r, tag(r), start.get(r.get("gid"))), proj=r.get("proj"),
+                  **({"no_read": True} if r.get("kind", "prop") == "prop" and r.get("mkt") in nr else {}))
              for r in cands if r.get("price") is not None and r.get("prob") is not None and r.get("edge") is not None
              and r.get("gid") in pre]
     for r in model.get("td") or []:

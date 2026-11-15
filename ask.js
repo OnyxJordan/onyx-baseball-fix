@@ -1131,6 +1131,9 @@
       if (spec.sports && spec.sports.length && spec.sports.indexOf(p.sport) < 0) return false;
       if (mk.length && mk.indexOf(p.mkt) < 0 && mk.indexOf(p.kind) < 0) return false;
       if (spec.props_only && p.kind !== 'prop') return false;
+      // NFL v16 (11/15): a line whose chance is Onyx's own (no_read) is not the model's pick: a request that names
+      // neither the market nor the player leaves it out, as the sport page's model picks do
+      if (p.no_read && !(spec.markets || []).length && !spec.player && !spec.player2) return false;
       if (spec.no_props && p.kind === 'prop') return false;                                  // "no props": game lines only
       if (spec.xmk && (spec.xmk.indexOf(p.mkt) >= 0 || spec.xmk.indexOf(p.kind) >= 0)) return false;   // "no first basket" (11/6)
       if (spec.side && spec.side !== 'any' && (p.kind === 'prop' || p.kind === 'total') && p.side !== spec.side) return false;

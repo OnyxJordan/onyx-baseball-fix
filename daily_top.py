@@ -270,7 +270,7 @@ NBA_PROPS = {"pts", "reb", "ast", "threes", "pr", "pa", "pra"}
 _ATS = ("ats", "Top 5 against the spread", 5, lambda e: e.get("kind") == "spread", True)
 _TOT = ("totals", "Top 5 totals", 5, lambda e: e.get("kind") == "total", True)
 _ML = ("ml", "Top 5 moneylines", 5, lambda e: e.get("kind") == "ml", True)
-_FBP = ("props", "Top 10 player props", 10, lambda e: e.get("kind") == "prop" and e.get("mkt") not in TD_MKTS, True)
+_FBP = ("props", "Top 10 player props", 10, lambda e: e.get("kind") == "prop" and e.get("mkt") not in TD_MKTS and not e.get("no_read"), True)   # no_read: nfl_model v16
 _TD = ("td", "Top 10 to score a touchdown", 10, lambda e: e.get("mkt") == "anytime_td", False)
 TOPS = {
     "nfl": [_ATS, _TOT, _FBP, _TD, ("td2", "Top 5 to score 2+ touchdowns", 5, lambda e: e.get("mkt") == "two_td", False)],

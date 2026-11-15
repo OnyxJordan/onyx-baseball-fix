@@ -1,8 +1,31 @@
 """
 nfl_model.py - Onyx NFL player projections.
 
-VERSION v15 (11/6). The lab notebook: every change bumps VERSION and adds an
+VERSION v16 (11/15). The lab notebook: every change bumps VERSION and adds an
 entry here citing its evidence (CLAUDE.md rule 2 applies to this model too).
+
+  v16 11/15  The yardage markets show Onyx's own chance (Jordan: "backtest ... with 50,000 backtests ...
+             see what the results would have been based on our projections situationally and start to make
+             those adjustments to the projections starting with NFL"). tools/nfl_situational.py replays every
+             Onyx prop line (2024 at market prices, 2025 and 2026 at Onyx's opening price; 15,916 lines with a
+             projection) through the live chance and side, and tests 262,626 situational rules chosen on
+             2024-25 and judged on 2026: of the 3,571 that made 5%+ on 100+ bets in 2024-25, 1,606 (45%) were
+             positive on 2026, a coin flip, and none survived a Benjamini-Hochberg check at 10%. The one finding
+             that held in every market and both periods: Onyx's line knows what the projection misses. A
+             player whose line sits above his last 5 beat the projection by 5-17%, below it fell 3-15% short,
+             and a projection 15%+ away from the line landed near the line. Fitting a pull toward the line on
+             2024-25 put 100% on the line for receiving, passing and pass + rush yards and 80% for rush + rec
+             yards (2026 error 22.5 -> 20.4, 67.4 -> 59.6, 66.2 -> 57.2, 30.4 -> 27.1). The chance shown, by log
+             loss on the over: Onyx's no-vig price alone matched or beat the blend in both periods (receiving
+             .6958 -> .6932 / .6939 -> .6938, rush + rec .6927 -> .6924 / .7005 -> .6933, passing .6965 ->
+             .6929 / .6974 -> .6929, pass + rush .6965 -> .6932 / .6933 -> .6931). So those four markets give
+             the model no share of the chance (VOL_P rec_yds w 0, BLEND_W 0) and are marked no_read: the chance
+             is Onyx's, so they are not the model's picks (out of the Top 10 props list and a generic "props"
+             search). The projection still shows as information. Receptions keep the blend (Onyx alone was
+             better on 2024-25 .6833 vs .6865, the blend on 2026 .6836 vs .6873; its trial lane stands);
+             rushing yards and pass attempts keep their v11 market models. Not changed: a level correction
+             (receiving yards land at 0.94 x the line) would lean every line under, and blanket unders lost at
+             Onyx's prices (-0.3% 2024-25, -4.5% 2026).
 
   v15 11/6   A deep backup quarterback moves the team's points and his receivers (Jordan, TNF:
              "a 3rd string QB ... starting for Baltimore", the game model said 46.8 against a
@@ -291,7 +314,10 @@ player-game: pass_yds, rush_yds, rec_yds, rec, tgt, att, rush_att...).
 import math, re, unicodedata
 from collections import defaultdict
 
-VERSION = "v15"
+VERSION = "v16"
+# v16: markets where Onyx's price alone beat the model's blend in 2024-25 and 2026 (tools/nfl_situational.py):
+# the chance shown is Onyx's, so a play there is not the model's read
+ONYX_ONLY = ("rec_yds", "rush_rec_yds", "pass_yds", "pass_rush_yds")
 # v15: a deep backup quarterback (0-1 prior starts for the team, not its usual starter)
 QB_DEEP = {"pts": -3.4, "rec_yds": 0.86, "rec": 0.94, "max_prior": 1, "usual_window": 10, "usual_min": 3}
 
@@ -377,7 +403,7 @@ PROP_SD = {"pass_yds": (160.0, 0.0), "rush_yds": (40.0, 0.54), "rec_yds": (30.0,
            # v10 starting spreads, refit against Onyx lines in the v10 test (changelog)
            "pass_att": (16.0, 0.0), "pass_rush_yds": (120.0, 0.0), "rush_rec_yds": (60.0, 0.0)}
 # v10: the model's share of the chance shown, where it differs from the 30% default
-BLEND_W = {"pass_rush_yds": 0.1}
+BLEND_W = {"pass_rush_yds": 0.0, "pass_yds": 0.0, "rush_rec_yds": 0.0, "rec_yds": 0.0}   # v16 (was pass_rush_yds 0.1, the rest 0.3)
 REC_VAR = 3.2
 
 
@@ -580,7 +606,7 @@ def td_probs(lams_by_game, p=TD_P):
 
 # ── receptions and receiving yards from volume (v4) ──────────────────
 VOL_P = {"rec": {"dec": 0.85, "e_imp": 1.0, "e_sp": 0.15, "k": 30.0, "c": 3.0, "w": 0.5, "edge": 0.03},
-         "rec_yds": {"dec": 0.85, "e_imp": 1.0, "e_sp": 0.08, "k": 30.0, "c": 3.0, "w": 0.35, "edge": 1.0}}   # v6: never a play
+         "rec_yds": {"dec": 0.85, "e_imp": 1.0, "e_sp": 0.08, "k": 30.0, "c": 3.0, "w": 0.0, "edge": 1.0}}   # v6: never a play; v16: no share of the chance (was 0.35)
 
 
 def volume_history(rows):

@@ -1694,6 +1694,30 @@ later" (7 PM on), and "between 1 and 4 pm". A bare hour counts as afternoon or e
 after / until or with a game-time word, so "4 picks by 2s" and "after 2 legs" stay counts. Sides, totals and
 parlays already covered every sport.
 
+**NFL v16: 262,626 situational backtests, and the yardage markets show Onyx's chance (11/15).** Jordan: "backtest all of
+these sports with 50,000 backtests each and see what the results would have been based on our projections
+situationally and start to make those adjustments to the projections starting with NFL"; "what if we do this at X%,
+55, 60, 65". `tools/nfl_situational.py`: every Onyx prop line (2024 market prices, 2025 and 2026 Onyx opening prices;
+15,916 with a projection) through the live chance and side; rules chosen on 2024-25, judged on 2026.
+- Situational rules: 262,626 tested (market x side x up to three of chance, edge, price, home, favorite, implied
+  points, wind, dome, cold, depth chart, teammates out, snaps, line vs last 5, projection vs line, week, opponent,
+  pace, form). 3,571 made 5%+ on 100+ bets in 2024-25; 1,606 (45%) were positive on 2026; none survived
+  Benjamini-Hochberg at 10%. No situational rule beats Onyx's opening price reliably.
+- Ranking a daily top 10 (props): most likely -2.0% 2025 / +7.3% 2026; best value +0.1% / +11.7%; 55%+ best value
+  +13.3% / +11.0% but carried by the rushing yards and pass attempts models fitted on those seasons (without them
+  -1.1% / -12.7%). The one cut positive in both Onyx seasons on markets never fitted to them: 60%+, most likely,
+  +10.5% on 83 (2025) and +23.6% on 43 (2026); 2024 at market prices -17.4% on 32. Promising, not proven: not adopted.
+- Who beats projections: in every market and both periods, the Onyx line knows what the projection misses (line
+  above his last 5: 5-17% over the projection; below: 3-15% under; a projection 15%+ off the line lands near the
+  line). Best fit on 2024-25: 100% line for receiving, passing, pass + rush yards, 80% for rush + rec.
+- v16 (nfl_model changelog): those four markets give the model no share of the chance shown (Onyx alone matched or
+  beat the blend by log loss in both periods), are marked `no_read` on the board (daily_top / write_top), and leave
+  the model picks props list and a generic "props" search (ask.js run: no market and no player named). Receptions,
+  rushing yards and pass attempts keep their models.
+- The live board history (`tools/model_audit.py`, 27,690 plays since 10/30, 21,021 graded): NBA chances are well
+  calibrated (55% band hit 56.9%, 60% hit 61.5% on 11,470 plays) and best value beat most likely (top 10 +24.6% on
+  63 vs +4.6%); tennis is overconfident (55-60% band hit 45%); college basketball's 60% band hit 51%.
+
 **Model record: every sport graded (11/14).** Jordan: "where's tennis record where's nhl record we're missing all of
 that from the site there's no oversight into how it's actually performing." Nothing in NHL or tennis was graded:
 no market passed `tools/picks_backtest.py` and their page leans were never graded. His calls (11/14): grade the
