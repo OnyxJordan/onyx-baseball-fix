@@ -1694,6 +1694,30 @@ later" (7 PM on), and "between 1 and 4 pm". A bare hour counts as afternoon or e
 after / until or with a game-time word, so "4 picks by 2s" and "after 2 legs" stay counts. Sides, totals and
 parlays already covered every sport.
 
+**Model record: every sport graded (11/14).** Jordan: "where's tennis record where's nhl record we're missing all of
+that from the site there's no oversight into how it's actually performing." Nothing in NHL or tennis was graded:
+no market passed `tools/picks_backtest.py` and their page leans were never graded. His calls (11/14): grade the
+model's plays in **every sport**, in a record **apart from Onyx Picks**, and **rebuild the past weeks** too.
+- Lists for every sport (`daily_top.TOPS`): NFL (5 ATS, 5 totals, 10 props, 10 TD, 5 2+ TD), college football (5 ATS,
+  5 totals, 10 props, 10 TD), NBA (5 ATS, 5 totals, 10 props), college basketball (5 ATS, 5 totals, 5 moneylines),
+  NHL (5 puck lines, 5 moneylines, 5 totals), tennis (5 match winners, 5 game spreads, 5 total games). Only
+  markets the grader can settle. They show on each sport page's Plays tab (not yet on nba.html, its own shell).
+- `model_record.py`: `write_tops` -> `hook` grades the sport's finished plays and logs the plays the page shows now
+  whose game is today, once each, at the Onyx price showing, at most N a list a day, into
+  `data/picks/model_log.json` (append-only, in validate_build's ledger list), graded with `picks.resolve`.
+  `data/picks/model_record.json` is the summary the pages load (records by sport and list, 25 latest per sport).
+- `picks.py` grader: combined stats and touchdowns (rush+rec yards, pass+rush yards, passing TDs, anytime and 2+ TD
+  from rushing + receiving TDs; NBA threes, P+R, P+A, P+R+A), tennis game spreads and total games from set
+  scores, a tennis match within 30 hours of its start (Grabher and Riera met twice that week), and a player matched
+  by first initial and last name ("Alexandre" / "Alex" Sarr). `tools/verify_picks.py` still passes.
+- Rebuild: `tools/model_record_rebuild.py` replays every committed board (10/30 to 11/14: 537 NFL, NHL, CFB and
+  tennis boards, 1,194 NBA, 438 CBB) as of its generated time through the same rule; rows carry `"src": "rebuilt"`.
+  891 plays, spot-checked against ESPN by hand (tennis winners, NFL TDs and yards, NBA combos).
+- Where it stands (11/14): 408-407-23, -111.7u, -13.7% ROI. NFL -16.6%, NBA -10.3%, NHL -14.7%, tennis -25.1%,
+  college football -1.5%, college basketball -8.7%. The lists rank by likelihood (Ask's "most likely first"), which
+  favors short prices: about half win at -130 to -200, which loses. Shown on every sport page and on
+  scorecard.html ("Model record · every sport").
+
 **Model's NFL picks by category (11/14).** Jordan: "for NFL we have legitimately the most information I want the
 picks page to have top 5 picks ATS, top 5 totals, top 10 player props, top 10 players to score TDs, top 5 players to
 score [2] TDs ... readily available pick information that doesn't need the search but also gets quicker to pull when

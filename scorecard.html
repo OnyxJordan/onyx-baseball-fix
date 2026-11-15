@@ -28,6 +28,11 @@ body{background:#0c0c0c;color:#fff;margin:0}
 .sc-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));gap:8px;margin:0 0 18px}
 .sc-tile{padding:12px 14px;border-radius:14px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.035)}
 .sc-tile b{display:block;font:800 22px monospace}.sc-tile span{font:600 10px monospace;letter-spacing:.08em;text-transform:uppercase;color:#9a93a6}
+.mr{margin:22px 0 4px}.mr h2{margin:0 0 6px;font-size:24px}.mr p{margin:0 0 10px;color:#b9b2c4;font-size:13px;line-height:1.6}
+.mr-t{width:100%;border-collapse:collapse;font-size:13px}.mr-t th,.mr-t td{padding:7px 8px;border-top:1px solid rgba(255,255,255,.08);text-align:right;white-space:nowrap}
+.mr-t th:first-child,.mr-t td:first-child{text-align:left;white-space:normal}.mr-t th{font:700 10.5px monospace;letter-spacing:.06em;text-transform:uppercase;color:#9a93a6}
+.mr-t tr.sp td{font-weight:800;color:#fff;background:rgba(176,56,249,.08)}.mr-t td.pos{color:#61e970}.mr-t td.neg{color:#ff8a8a}.mr-t tr.c td:first-child{padding-left:20px;color:#cfc8da}
+.mr-w{overflow-x:auto;border:1px solid rgba(255,255,255,.1);border-radius:14px}
 .sc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:10px}
 .lane{padding:14px;border-radius:16px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.035);min-width:0}
 .lane.tracked{border-color:rgba(97,233,112,.45)}.lane.trial{border-color:rgba(176,56,249,.55)}.lane.closed{border-color:rgba(255,255,255,.18)}
@@ -75,6 +80,7 @@ body{background:#0c0c0c;color:#fff;margin:0}
     <div class="sc-h"><div><span class="ox-eyebrow">The scorecard</span><h1>Every lane.<br>Graded in public.</h1>
       <p>Onyx Picks are the only picks we recommend: they are first, below. Everything after them is the lab: every experiment graded in public so it can earn its way to a pick, and none of it recommended until it does. Records come straight from the public ledgers and update with every build. Dollar figures are $10 a bet at the price logged.</p></div></div>
     <div id="scPicks"></div>
+    <div id="scModel"></div>
     <h2 style="margin:26px 0 6px;font-size:24px">The lab · not recommended</h2>
     <div class="sc-tiles" id="scTiles"></div>
     <div class="sc-grid" id="scLanes"><div class="empty">Loading the ledgers...</div></div>
@@ -473,6 +479,20 @@ async function lab() {
 scorecard(); lab();
 // 11/6: Onyx Picks first (the one list, onyxpicks.js); the live projections record is the lab's
 if (window.OnyxPicks) OnyxPicks.mount(document.getElementById('scPicks'), {title: 'Onyx Picks'});
+// the Model record (11/14, Jordan: "where's tennis record where's nhl record ... no oversight into how it's actually
+// performing"): every sport's model picks lists, graded at the Onyx price shown before the game (model_record.py)
+fetch('data/picks/model_record.json', {cache: 'no-cache'}).then(r => r.ok ? r.json() : null).then(R => {
+  const el = document.getElementById('scModel');
+  if (!R || !el || !R.sport) return;
+  const E = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'})[c]);
+  const NAME = {nfl: 'NFL', nba: 'NBA', nhl: 'NHL', tennis: 'Tennis', cfb: 'College football', cbb: 'College basketball'}, PAGE = {nfl: 'nfl.html', nba: 'nba.html', nhl: 'nhl.html', tennis: 'tennis.html', cfb: 'cfb.html', cbb: 'cbb.html'};
+  const row = (lab, a, cls) => `<tr class="${cls}"><td>${lab}</td><td>${a.w}-${a.l}${a.p ? '-' + a.p : ''}</td><td class="${a.units >= 0 ? 'pos' : 'neg'}">${a.units >= 0 ? '+' : ''}${a.units.toFixed(1)}u</td><td class="${(a.roi || 0) >= 0 ? 'pos' : 'neg'}">${a.roi == null ? '-' : (a.roi >= 0 ? '+' : '') + (a.roi * 100).toFixed(1) + '%'}</td></tr>`;
+  const order = ['nfl', 'nba', 'nhl', 'tennis', 'cfb', 'cbb'].filter(k => R.sport[k]);
+  const body = order.map(k => row(`<a href="${PAGE[k]}#plays" style="color:inherit">${NAME[k]}</a>`, R.sport[k], 'sp') + Object.keys(R.cat).filter(c => c.startsWith(k + ':')).map(c => row(E(R.cat[c].title || c), R.cat[c], 'c')).join('')).join('');
+  el.innerHTML = `<div class="mr"><h2>Model record · every sport</h2>
+    <p>Every play the sport pages' model picks lists showed (Top 5 against the spread, Top 5 totals, Top 10 player props and the rest), graded at the Onyx price showing before the game, one unit each. Not Onyx Picks: a market becomes one only by passing our backtest. Since ${E(String(R.since || '').slice(5).replace('-', '/').replace(/^0/, ''))}; ${R.rebuilt} plays through 11/14 were rebuilt from the site's own history of what it showed, the rest logged as they happen.</p>
+    <div class="mr-w"><table class="mr-t"><thead><tr><th>Sport · list</th><th>W-L-P</th><th>Units</th><th>ROI</th></tr></thead><tbody>${row('All sports', R.all, 'sp')}${body}</tbody></table></div></div>`;
+}).catch(() => {});
 if (window.OnyxLive) { OnyxLive.css(); OnyxLive.ledger().then(function (rows) {
   var el = document.getElementById('scLive'); if (!el) return;
   el.innerHTML = '<h3 style="margin:0 0 6px">Lab · live projections record</h3><p class="note" style="margin:0 0 8px">Every live value read our pages showed, logged once at the live line and graded. Projections on trial, not picks.</p>' + OnyxLive.recordHTML(rows, 'all');

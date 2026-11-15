@@ -89,6 +89,13 @@ Onyx lines to `data/picks/lines/<sport>.json` (`tools/picks_lines.py`; a price o
 re-runs `tools/picks_backtest.py` and commits the verdicts. Finalization follows the tool, never a hand edit;
 a market whose inputs live only in `bt/` keeps its last verdict, marked `"carried"`.
 
+## Model record (Jordan, 11/14)
+
+Every sport's model picks lists (`daily_top.TOPS`, the Plays tab) are graded in the **Model record**
+(`model_record.py` -> `data/picks/model_log.json`, append-only, sacred like the other ledgers), kept apart from the
+Onyx Picks record. It is oversight, not picks: never call its plays Onyx Picks. Rows rebuilt from history carry
+`"src": "rebuilt"`; never re-run the rebuild over existing rows.
+
 ## Dates
 
 Everything runs on the **baseball day = ET − 4h** (rolls at 4 AM ET). Never date anything
