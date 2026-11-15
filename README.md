@@ -1717,6 +1717,8 @@ situationally and start to make those adjustments to the projections starting wi
 - The live board history (`tools/model_audit.py`, 27,690 plays since 10/30, 21,021 graded): NBA chances are well
   calibrated (55% band hit 56.9%, 60% hit 61.5% on 11,470 plays) and best value beat most likely (top 10 +24.6% on
   63 vs +4.6%); tennis is overconfident (55-60% band hit 45%); college basketball's 60% band hit 51%.
+- NBA spreads and totals had lists (11/14) with no model behind them: their chance is Onyx's no-vig price (every
+  -127 / -127 line 51.02%). Removed from `TOPS`; their logged rows stay in the Model record.
 
 **Model record: every sport graded (11/14).** Jordan: "where's tennis record where's nhl record we're missing all of
 that from the site there's no oversight into how it's actually performing." Nothing in NHL or tennis was graded:
