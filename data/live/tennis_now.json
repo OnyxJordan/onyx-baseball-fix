@@ -3073,5 +3073,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-187506-spread-away",
+  "sport": "tennis",
+  "gid": "187506",
+  "date": "2026-11-15",
+  "logged_at": "2026-11-15T20:59:02+00:00",
+  "matchup": "Arthur Fils vs Ben Shelton",
+  "home": "Ben Shelton",
+  "away": "Arthur Fils",
+  "label": "Arthur Fils +4.5 games",
+  "kind": "spread",
+  "side": "away",
+  "line": 4.5,
+  "price": -165,
+  "chance": 0.7261,
+  "implied": 0.6226,
+  "edge": 0.103,
+  "fair": -265,
+  "state": {
+   "sets": "2-6 5-3",
+   "srv": "away",
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
