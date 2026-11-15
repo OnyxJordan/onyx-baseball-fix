@@ -53,7 +53,7 @@
      "id": "187506",
      "start": "2026-11-15T19:40Z",
      "state": "in",
-     "detail": "2nd",
+     "detail": "3rd",
      "round": "Group Stage",
      "draw": "Men's Singles",
      "court": "Inalpi Arena",
@@ -66,7 +66,8 @@
        "win": false,
        "sets": [
         2,
-        2
+        6,
+        0
        ],
        "serve": true
       },
@@ -78,7 +79,8 @@
        "win": false,
        "sets": [
         6,
-        2
+        3,
+        1
        ],
        "serve": false
       }
@@ -974,7 +976,7 @@
      "id": "187442",
      "start": "2026-11-15T20:10Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Final",
      "draw": "Women's Singles",
      "court": "Indian Wells Tennis Garden",
@@ -986,7 +988,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        3
+        7,
+        0
        ],
        "serve": false
       },
@@ -997,7 +1000,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        3
+        5,
+        0
        ],
        "serve": true
       }
@@ -1122,8 +1126,8 @@
     {
      "id": "187536",
      "start": "2026-11-15T18:35Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Qualifying Final",
      "draw": "Women's Singles",
      "court": "Grandstand",
@@ -1133,12 +1137,12 @@
        "short": "V. Strakhova",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ukr.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         7,
-        4
+        6
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Zhibek Kulambayeva",
@@ -1173,9 +1177,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Valeriya Strakhova",
+       "short": "V. Strakhova",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ukr.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -1193,9 +1197,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Martina Trevisan",
+       "short": "M. Trevisan",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ita.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -1483,9 +1487,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Diletta Cherubini",
+       "short": "D. Cherubini",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ita.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -1570,9 +1574,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Ariana Geerlings",
+       "short": "A. Geerlings",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -2056,5 +2060,5 @@
    ]
   }
  ],
- "fetched": "2026-11-15T20:40:17+00:00"
+ "fetched": "2026-11-15T21:12:54+00:00"
 }
