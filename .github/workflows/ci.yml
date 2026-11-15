@@ -100,6 +100,10 @@ jobs:
       - name: Model picks match Ask Onyx
         run: node tools/verify_tops.js
 
+      # NFL Studio (studio.html, 11/15): every tool tab at 390 and 1280, no errors, no sideways scroll, self-checks
+      - name: NFL Studio check
+        run: node tools/verify_studio.js
+
       # Installed-iPhone gate for both pages: a 0 safe-area inset (what iOS
       # sometimes reports) must not put the header or menu under the status
       # bar, and the bottom menu must open, navigate and close.

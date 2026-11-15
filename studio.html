@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>Onyx NFL Studio</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0c0c0c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Onyx Sports">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<meta name="description" content="Onyx NFL Studio: compare players and Onyx odds, play any game out 10,000 times, build parlays with the model's true chance, sweat your bets live, and read Onyx Insights.">
+<link rel="stylesheet" href="onyx.css">
+<script src="onyx.js" defer></script>
+<script src="ui.js" defer></script>
+<script src="saved.js"></script>
+<script src="live.js"></script>
+<script src="parlay.js" defer></script>
+<script src="ask.js" defer></script>
+<style>
+:root{--bg:#0c0c0c;--card:rgba(255,255,255,.035);--line:rgba(255,255,255,.1);--txt:#fff;--dim:#b9b2c4;--mute:#9a93a6;--pur:#b038f9;--pur2:#d795ff;--grn:#61e970;--red:#ff8a8a}
+body{background:var(--bg);color:var(--txt);margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+.st{max-width:1100px;margin:0 auto;padding:calc(18px + env(safe-area-inset-top)) 16px 90px}
+.st-h{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.st-h h1{margin:0;font-size:clamp(28px,7vw,48px);line-height:1;letter-spacing:-.01em}
+.st-h h1 span{color:var(--pur2)}
+.st-h p{margin:8px 0 0;color:var(--dim);font-size:14px;max-width:640px;line-height:1.55}
+.st-back{color:var(--pur2);font:700 12px monospace;letter-spacing:.06em;text-transform:uppercase;text-decoration:none}
+.st-tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 -16px 16px;padding:0 16px;position:sticky;top:0;z-index:20;background:linear-gradient(var(--bg) 80%,transparent);padding-top:8px;padding-bottom:10px}
+.st-tabs::-webkit-scrollbar{display:none}
+.st-tab{flex:0 0 auto;border:1px solid var(--line);background:var(--card);color:var(--dim);border-radius:999px;padding:9px 14px;font:700 12px monospace;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;white-space:nowrap}
+.st-tab.on{background:var(--pur);border-color:var(--pur);color:#fff}
+.st-pane{display:none;min-height:50vh}.st-pane.on{display:block}
+.st-load{padding:40px 0;text-align:center;color:var(--mute);font:600 12px monospace;letter-spacing:.08em;text-transform:uppercase}
+.st-err{padding:16px;border:1px solid rgba(255,138,138,.4);border-radius:14px;color:var(--red);font-size:13px}
+.st-foot{margin-top:28px;color:var(--mute);font-size:11.5px;line-height:1.6}
+/* shared building blocks the tools use */
+.sx-card{padding:14px;border-radius:16px;border:1px solid var(--line);background:var(--card);min-width:0}
+.sx-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:10px}
+.sx-h{margin:0 0 6px;font-size:18px}.sx-sub{margin:0 0 12px;color:var(--dim);font-size:13px;line-height:1.55}
+.sx-k{font:700 10.5px monospace;letter-spacing:.07em;text-transform:uppercase;color:var(--mute)}
+.sx-big{font:800 26px monospace}.sx-pos{color:var(--grn)}.sx-neg{color:var(--red)}.sx-pur{color:var(--pur2)}
+.sx-btn{border:1px solid var(--pur);background:var(--pur);color:#fff;border-radius:12px;padding:10px 14px;font:700 13px system-ui;cursor:pointer}
+.sx-btn.ghost{background:transparent;color:var(--pur2)}.sx-btn:disabled{opacity:.45;cursor:default}
+.sx-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.05);font:700 12px monospace;color:#fff;cursor:pointer;text-decoration:none}
+.sx-chip.onyx{border-color:var(--pur);color:var(--pur2)}
+.sx-bar{height:8px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}.sx-bar>i{display:block;height:100%;background:var(--pur);border-radius:999px;transition:width .35s ease}
+.sx-sel{width:100%;background:#151018;color:#fff;border:1px solid var(--line);border-radius:12px;padding:10px;font:600 14px system-ui}
+.sx-in{width:100%;box-sizing:border-box;background:#151018;color:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font:600 14px system-ui}
+.sx-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-top:1px solid rgba(255,255,255,.07)}
+.sx-row:first-child{border-top:0}
+.sx-t{width:100%;border-collapse:collapse;font-size:13px}.sx-t th,.sx-t td{padding:7px 8px;border-top:1px solid rgba(255,255,255,.08);text-align:right;white-space:nowrap}
+.sx-t th:first-child,.sx-t td:first-child{text-align:left;white-space:normal}.sx-t th{font:700 10.5px monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--mute)}
+.sx-scroll{overflow-x:auto}
+</style>
+</head>
+<body>
+<main class="st">
+  <a class="st-back" href="nfl.html">&larr; Onyx NFL</a>
+  <div class="st-h">
+    <div><h1>NFL <span>Studio</span></h1>
+      <p id="stLead">Compare players and Onyx odds, play any game out 10,000 times, build a parlay with the model's true chance, sweat your bets live, and read what everyone is asking.</p></div>
+  </div>
+  <div class="st-tabs" id="stTabs" role="tablist"></div>
+  <div id="stPanes"></div>
+  <p class="st-foot">Model numbers are the Onyx NFL model's projections and chances, the same ones on the NFL page. They are projections, not Onyx Picks: a market becomes an Onyx Pick only by passing our backtest against Onyx's prices. Every price shown is Onyx's. Bet responsibly.</p>
+</main>
+<script src="studio.js"></script>
+<script src="studio-compare.js" defer></script>
+<script src="studio-sim.js" defer></script>
+<script src="studio-lab.js" defer></script>
+<script src="studio-sweat.js" defer></script>
+<script src="studio-insights.js" defer></script>
+<script>document.addEventListener('DOMContentLoaded', function () { Studio.start(); });</script>
+</body>
+</html>

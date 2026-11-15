@@ -35,7 +35,8 @@
   // The hub keeps its own onyxodds.com header and gets the shared controls in it.
   var FILE = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
   var PAGE_KEYS = {'home.html': ['home', 'Sports'], 'picks.html': ['picks', 'Picks'], 'account.html': ['account', 'Account'],
-                   'how.html': ['how', 'How it works'], 'scorecard.html': ['scorecard', 'Scorecard'], 'cbb-players.html': ['cbbp', 'College Basketball']};
+                   'how.html': ['how', 'How it works'], 'scorecard.html': ['scorecard', 'Scorecard'], 'cbb-players.html': ['cbbp', 'College Basketball'],
+                   'studio.html': ['studio', 'NFL Studio']};
   var IS_PAGE = !window.OX_SITE && !IS_NBA && !document.querySelector('nav.nav');
   var PAGE = IS_PAGE ? (PAGE_KEYS[FILE] || ['page', 'Sports']) : null;
   var IS_HUB = IS_PAGE && !!document.querySelector('.ox-head .ox-acts');
@@ -130,6 +131,7 @@
            ['alerts', 'Alerts', 'bell', 'Your push control center', 'picks.html#alerts'],
            ['ask', 'Ask Onyx', 'search', 'Plays or a parlay, built for you', 'home.html#ask'],
            ['top10', "Today's top 10", 'trophy', 'Our favorite plays today', 'home.html#top10'],
+           ['studio', 'NFL Studio', 'ranks', 'Compare, simulate, parlay, sweat', 'studio.html'],
            ['live', 'Live now', 'games', 'Every game in play', 'home.html#live'],
            ['account', 'Account', 'user', 'Sign in, your record', 'account.html'],
            ['profile', 'Your profile', 'record', 'Best sport, best bets, picks for you', 'account.html#oxProfile'],

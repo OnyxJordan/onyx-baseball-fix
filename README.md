@@ -1701,6 +1701,25 @@ later" (7 PM on), and "between 1 and 4 pm". A bare hour counts as afternoon or e
 after / until or with a game-time word, so "4 picks by 2s" and "after 2 legs" stay counts. Sides, totals and
 parlays already covered every sport.
 
+**Onyx NFL Studio (11/15).** Jordan: "player & odds comparison tool, play it out, parlay lab, Sunday Sweat, and onyx
+insights ... lets go wild". `studio.html` (linked from the home hub, the NFL home and the Onyx Sports menu) with five
+tools, each one file registered with the frame in `studio.js` (shared board load, helpers, `#tab?param` deep links):
+- `studio-compare.js`: two or three players (or two games) side by side at Onyx prices: projection, model chance,
+  fair odds, edge, EV verdict per market (no_read markets say so), last-8 form sparklines against the line.
+- `studio-sim.js` (Play It Out): 10,000 simulated games in the browser (touchdown / field goal scoring around the
+  model's team scores; props drawn to match the model's chance at the line, correlated with team scoring), knobs
+  (QB out per the v15 rule, wind, pace, sit a player), and a same-game parlay from the legs that hit together most.
+- `studio-lab.js` (Parlay Lab): on the shared slip (parlay.js): the model's chance every leg hits with a same-game
+  Gaussian copula (hand-set correlation table in the file), value against Onyx's payout, swaps, a 2-5 leg ladder,
+  presets (model ideas, never Onyx Picks).
+- `studio-sweat.js` (Sunday Sweat): saved picks, saved parlays and the slip, live off ESPN every 35 s (progress
+  bars, live hit chance from live.js); a demo replay of WSH @ NYG (11/13) built from local files when nothing is live.
+- `studio-insights.js` (Insights): the question types Ask Onyx is asked most (ranked from its 3,643-question test
+  corpora, `tools/insights_freq.py`; there is no log of real searches), answered live with OnyxAsk's local reader
+  only, each with a highlight page (`#insights?q=`).
+Gate: `node tools/verify_studio.js` (in CI): every tab at 390 and 1280, no errors, no sideways scroll, and each
+tool's self-check (`Studio.checks`). Onyx clicks count on the tap (one listener in studio.js).
+
 **Tune-ups and the tennis paper test (11/15).** Jordan: "start tuning up their models especially tennis", then "commit
 everything and build the tennis paper test". Each sport was replayed on Onyx's opening and closing prices, chosen on one
 season and judged on another:

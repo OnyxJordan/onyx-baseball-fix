@@ -467,7 +467,9 @@
         <button class="btn-primary" onclick="gotoTab('games')">Live games</button>
         <button class="btn-secondary" onclick="gotoTab('board')">Onyx board</button>
         <button class="btn-secondary" onclick="gotoTab('plays')">Plays</button>
+        <a class="btn-secondary" id="studioCta" href="studio.html" style="display:none;text-decoration:none">NFL Studio</a>
       </div>
+      <script>if (window.OX_SITE === 'nfl') document.getElementById('studioCta').style.display = '';</script>
     </div>
   </div>
   <div class="home-stats-grid" id="homeStats"></div>
@@ -2252,6 +2254,17 @@ function topsHtml(T, REC) {
       const w = r.kind === 'prop' ? r.who : r.gid + ':' + r.kind;    // Ask Onyx's WHO: a player, or a game's side / total
       if (!(Date.parse(r.start) > now) || (games[r.gid] && L.mode !== 'ev') || who[w]) continue;   // ev: several a game, one per player
       games[r.gid] = 1; who[w] = 1; rows.push(r);
+    }
+    // information lists short of their count (few games left: the late window) fill from the games already used,
+    // best first, one line per player, then back in list order: Ask Onyx's list rule (11/15)
+    if (L.info && rows.length < L.n) {
+      for (const r of L.rows) {
+        if (rows.length >= L.n) break;
+        const w = r.kind === 'prop' ? r.who : r.gid + ':' + r.kind;
+        if (!(Date.parse(r.start) > now) || who[w]) continue;
+        who[w] = 1; rows.push(r);
+      }
+      rows.sort((a, b) => L.rows.indexOf(a) - L.rows.indexOf(b));
     }
     const body = rows.length ? rows.map((r, i) => {
       const lab = topLabel(r), sub = [r.kind !== 'total' ? r.matchup : '', kick(r.start), 'Onyx implies ' + pct(impl(r.price)), L.mode === 'ev' && r.ev != null ? 'expected value +' + (100 * r.ev).toFixed(1) + '%' : '', L.key === 'tdlook' && r.tpg ? r.tpg + ' touches a game, team implied ' + r.tt : '', typeof r.why === 'string' ? r.why : ''].filter(Boolean).join(' · ');
