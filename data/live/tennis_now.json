@@ -2983,5 +2983,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-187535-spread-away",
+  "sport": "tennis",
+  "gid": "187535",
+  "date": "2026-11-15",
+  "logged_at": "2026-11-15T16:22:59+00:00",
+  "matchup": "Alexandra Osborne vs Diletta Cherubini",
+  "home": "Diletta Cherubini",
+  "away": "Alexandra Osborne",
+  "label": "Alexandra Osborne +7.5 games",
+  "kind": "spread",
+  "side": "away",
+  "line": 7.5,
+  "price": -129,
+  "chance": 0.6599,
+  "implied": 0.5633,
+  "edge": 0.097,
+  "fair": -195,
+  "state": {
+   "sets": "1-2",
+   "srv": "home",
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
