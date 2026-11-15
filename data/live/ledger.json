@@ -84037,10 +84037,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v7",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "43",
+  "profit": 0.8333,
+  "graded_at": "2026-11-15T06:11:47+00:00"
  },
  {
   "id": "cfb-401860915-ml-home",
@@ -84068,10 +84068,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v7",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "30-13",
+  "profit": 1.55,
+  "graded_at": "2026-11-15T06:11:47+00:00"
  },
  {
   "id": "nba-401909982-prop-davion_mitchell-ast-under",
@@ -84896,10 +84896,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v7",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "30-13",
+  "profit": -1.0,
+  "graded_at": "2026-11-15T06:11:47+00:00"
  },
  {
   "id": "cfb-401856864-total-under",
@@ -85483,10 +85483,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v7",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "5",
+  "profit": -1.0,
+  "graded_at": "2026-11-15T06:11:48+00:00"
  },
  {
   "id": "cfb-401856863-prop-caleb_hawkins-rush_yds-over",
@@ -85693,6 +85693,43 @@
   },
   "pre_src": "onyx",
   "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "cfb-401860917-prop-durell_robinson-anytime_td-yes",
+  "sport": "cfb",
+  "gid": "401860917",
+  "date": "2026-11-14",
+  "logged_at": "2026-11-15T06:11:46+00:00",
+  "matchup": "CSU @ WSU",
+  "home": "WSU",
+  "away": "CSU",
+  "label": "Durell Robinson anytime TD",
+  "kind": "prop",
+  "mkt": "anytime_td",
+  "player": "Durell Robinson",
+  "side": "yes",
+  "line": null,
+  "price": 475,
+  "chance": 0.2081,
+  "implied": 0.1739,
+  "edge": 0.034,
+  "fair": 380,
+  "cur": 0,
+  "proj": 0.745,
+  "f": 0.313,
+  "state": {
+   "score": "CSU 7 - 59 WSU",
+   "period": 3,
+   "clock": "3:48",
+   "f": 0.313
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "prop_model": "props-v1",
   "result": null,
   "actual": null,
   "profit": null,
