@@ -3013,5 +3013,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-187536-ml-away",
+  "sport": "tennis",
+  "gid": "187536",
+  "date": "2026-11-15",
+  "logged_at": "2026-11-15T18:55:02+00:00",
+  "matchup": "Valeriya Strakhova vs Zhibek Kulambayeva",
+  "home": "Zhibek Kulambayeva",
+  "away": "Valeriya Strakhova",
+  "label": "Valeriya Strakhova to win",
+  "kind": "ml",
+  "side": "away",
+  "line": null,
+  "price": -158,
+  "chance": 0.7022,
+  "implied": 0.6124,
+  "edge": 0.09,
+  "fair": -235,
+  "state": {
+   "sets": "3-0",
+   "srv": "home",
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
