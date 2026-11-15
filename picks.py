@@ -57,6 +57,15 @@ BOX = {"nba": {"pts": ("", "PTS"), "reb": ("", "REB"), "ast": ("", "AST")},
                "rec": ("receiving", "REC"), "rec_yds": ("receiving", "YDS")},
        "cfb": {"rush_yds": ("rushing", "YDS"), "pass_yds": ("passing", "YDS"), "rec": ("receiving", "REC"),
                "rec_yds": ("receiving", "YDS")}}
+# 11/14 (the Model record, model_record.py): combined stats and touchdowns, a list of (group, label) summed.
+# Touchdowns are rushing + receiving scores off the box score (a return or fumble-recovery score is not in it).
+_TD = [("rushing", "TD"), ("receiving", "TD")]
+BOX["nfl"].update({"pass_td": ("passing", "TD"), "rush_rec_yds": [("rushing", "YDS"), ("receiving", "YDS")],
+                   "pass_rush_yds": [("passing", "YDS"), ("rushing", "YDS")], "anytime_td": _TD, "two_td": _TD})
+BOX["cfb"].update({"anytime_td": _TD, "two_td": _TD})
+for _sp in ("nba", "cbb"):
+    BOX[_sp].update({"threes": ("", "3PT"), "pr": [("", "PTS"), ("", "REB")], "pa": [("", "PTS"), ("", "AST")],
+                     "pra": [("", "PTS"), ("", "REB"), ("", "AST")]})
 # 11/6 (Jordan): markets that lock only at Onyx's opening price, the first price of the day the pipeline saw
 # (open_lanes writes data/<sport>/opening.json). Their picks win at the open and lose by the close (NBA points:
 # +9.4% at the open, -6.7% at the close on 53 held-out bets), so a pick logs only while the line and price
@@ -290,29 +299,47 @@ def _num(v):
 
 
 def _box_stat(sport, summ, r):
-    """The player's number off ESPN's box score; 'void' when he did not play."""
-    grp, lab = BOX[sport][r["market"]]
+    """The player's number off ESPN's box score; 'void' when he did not play. A market that sums
+    several stats (rushing + receiving yards, P+R+A, touchdowns) adds each part it finds; a part he
+    has no line for (no carries, no catches) counts 0 once he played."""
+    spec = BOX[sport][r["market"]]
+    parts = spec if isinstance(spec, list) else [spec]
     name = _nk(r.get("name"))
     who = str(r.get("who") or "")
     played = False
-    val = None
+    got = {}
     for t in (summ.get("boxscore") or {}).get("players") or []:
         for st in t.get("statistics") or []:
             labels = st.get("labels") or []
             for a in st.get("athletes") or []:
                 at = a.get("athlete") or {}
-                if str(at.get("id")) != who and _nk(at.get("displayName")) != name:
+                dn = _nk(at.get("displayName"))
+                # the same player under a shorter first name ("Alexandre Sarr" on the board, "Alex Sarr" at ESPN, 11/14):
+                # first initial and last name
+                ini = lambda x: (x.split()[0][:1] + " " + " ".join(x.split()[1:])) if len(x.split()) > 1 else x
+                if str(at.get("id")) != who and dn != name and ini(dn) != ini(name):
                     continue
                 if a.get("didNotPlay") or not a.get("stats"):
                     continue
                 played = True
-                if (not grp or st.get("name") == grp) and lab in labels:
-                    raw = a["stats"][labels.index(lab)]
-                    val = _num(raw.split("/")[1]) if lab == "C/ATT" and "/" in str(raw) else _num(raw)
+                for i, (grp, lab) in enumerate(parts):
+                    if (not grp or st.get("name") == grp) and lab in labels:
+                        raw = a["stats"][labels.index(lab)]
+                        if lab == "C/ATT" and "/" in str(raw):
+                            v = _num(raw.split("/")[1])
+                        elif lab in ("3PT", "FG", "FT") and "-" in str(raw):
+                            v = _num(str(raw).split("-")[0])        # "3-7": 3 made
+                        else:
+                            v = _num(raw)
+                        if v is not None:
+                            got[i] = v
     if not played:
         return "void"
+    if len(parts) > 1 or r["market"] in ("anytime_td", "two_td"):
+        return float(sum(got.values()))
+    val = got.get(0)
     if val is None:
-        if sport in ("nfl", "cfb") and r["market"] in ("rush_yds", "rec", "rec_yds"):
+        if sport in ("nfl", "cfb") and r["market"] in ("rush_yds", "rec", "rec_yds", "pass_td"):
             return 0.0       # played, no carry or catch: 0 (a sure under, as Onyx settles it)
         return "void"
     return val
@@ -332,11 +359,12 @@ def _tennis(r, cache, now, st):
     """A tennis moneyline (11/12, v3): the match on ESPN's ATP or WTA scoreboard for its day (or the next, a late
     start), found by both players' names; W / L from ESPN's winner. A match not played out (retirement, walkover,
     default) is void: neither result says who was the better bet."""
-    if r.get("market") != "ml":
+    mkt = r.get("market")
+    if mkt not in ("ml", "spread", "total"):
         return None
     me = _nk(r.get("name"))
     pl = [_nk(x) for x in str(r.get("matchup") or "").split(" vs ")]
-    if len(pl) != 2 or me not in pl:
+    if len(pl) != 2 or (mkt != "total" and me not in pl):
         return None
     for d in (st, st + timedelta(days=1)):
         day = d.astimezone(ET).strftime("%Y%m%d")
@@ -351,13 +379,29 @@ def _tennis(r, cache, now, st):
                         names = [_nk((x.get("athlete") or {}).get("displayName")) for x in cs]
                         if sorted(names) != sorted(pl):
                             continue
+                        cd = _when(c.get("date") or c.get("startDate"))
+                        if cd and abs((cd - st).total_seconds()) > 30 * 3600:
+                            continue      # the same two players' other meeting that week (11/14: Grabher and Riera met twice)
                         stt = (c.get("status") or {}).get("type") or {}
                         if stt.get("state") != "post":
                             return ("V", None) if now > st + VOID_AFTER else None
                         det = " ".join(str(stt.get(x) or "") for x in ("description", "detail", "name")).lower()
                         if any(w in det for w in ("retire", "walkover", "default", "abandon", "cancel", "postpone")):
                             return "V", None
+                        # games won, set by set (11/14, the Model record): the game spread and total games
+                        gm = {_nk((x.get("athlete") or {}).get("displayName")): sum(float(l.get("value") or 0) for l in x.get("linescores") or []) for x in cs}
+                        if mkt == "total":
+                            act, line = sum(gm.values()), r.get("line")
+                            if line is None or not all(x.get("linescores") for x in cs):
+                                return None
+                            return ("P" if act == line else "W" if (act > line) == (r.get("side") == "over") else "L"), act
                         mine = next((x for x in cs if _nk((x.get("athlete") or {}).get("displayName")) == me), None)
+                        if mkt == "spread":
+                            if mine is None or not all(x.get("linescores") for x in cs):
+                                return None
+                            margin = gm[me] - sum(v for k, v in gm.items() if k != me)
+                            adj = margin + float(r.get("hcap") or 0.0)
+                            return ("W" if adj > 0 else "L" if adj < 0 else "P"), margin
                         if mine is None or mine.get("winner") is None:
                             return None
                         return ("W" if mine.get("winner") else "L"), None

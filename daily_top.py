@@ -262,21 +262,47 @@ def keep_pregame(data_dir, rows, hours=36):
 # "top N nfl <category>" (standard prices: nothing shorter than -200, 50%+ to hit, most likely first; touchdown
 # lists have no floors), so the page and the search agree. Candidates are kept 4x deep so the page can drop
 # games that have started and still fill each list, one play per game.
-TOPS = {"nfl": [
-    ("ats", "Top 5 against the spread", 5, lambda e: e.get("kind") == "spread", True),
-    ("totals", "Top 5 totals", 5, lambda e: e.get("kind") == "total", True),
-    ("props", "Top 10 player props", 10, lambda e: e.get("kind") == "prop" and e.get("mkt") not in TD_MKTS, True),
-    ("td", "Top 10 to score a touchdown", 10, lambda e: e.get("mkt") == "anytime_td", False),
-    ("td2", "Top 5 to score 2+ touchdowns", 5, lambda e: e.get("mkt") == "two_td", False),
-]}
+# 11/14 (Jordan: "where's tennis record where's nhl record ... no oversight into how it's actually performing"):
+# every sport gets the same lists, and every play in them is graded in the Model record (model_record.py,
+# data/picks/model_log.json), apart from the Onyx Picks record. Only markets the grader can settle are listed.
 TD_MKTS = {"anytime_td", "first_td", "two_td", "three_td"}
+NBA_PROPS = {"pts", "reb", "ast", "threes", "pr", "pa", "pra"}
+_ATS = ("ats", "Top 5 against the spread", 5, lambda e: e.get("kind") == "spread", True)
+_TOT = ("totals", "Top 5 totals", 5, lambda e: e.get("kind") == "total", True)
+_ML = ("ml", "Top 5 moneylines", 5, lambda e: e.get("kind") == "ml", True)
+_FBP = ("props", "Top 10 player props", 10, lambda e: e.get("kind") == "prop" and e.get("mkt") not in TD_MKTS, True)
+_TD = ("td", "Top 10 to score a touchdown", 10, lambda e: e.get("mkt") == "anytime_td", False)
+TOPS = {
+    "nfl": [_ATS, _TOT, _FBP, _TD, ("td2", "Top 5 to score 2+ touchdowns", 5, lambda e: e.get("mkt") == "two_td", False)],
+    "cfb": [_ATS, _TOT, _FBP, _TD],
+    "nba": [_ATS, _TOT, ("props", "Top 10 player props", 10, lambda e: e.get("kind") == "prop" and e.get("mkt") in NBA_PROPS, True)],
+    "cbb": [_ATS, _TOT, _ML],
+    "nhl": [("ats", "Top 5 puck lines", 5, lambda e: e.get("kind") == "spread", True), _ML, _TOT],
+    "tennis": [("ml", "Top 5 match winners", 5, lambda e: e.get("kind") == "ml", True),
+               ("ats", "Top 5 game spreads", 5, lambda e: e.get("kind") == "spread", True),
+               ("totals", "Top 5 total games", 5, lambda e: e.get("kind") == "total", True)],
+}
 
 
 def write_tops(data_dir, sport, date, rows):
     """data/<sport>/tops.json: the model's picks in each TOPS category, ranked, 4x deep. Fail-soft."""
     if sport not in TOPS:
         return None
-    now = datetime.now(timezone.utc)
+    out = tops(sport, date, rows)
+    p = Path(data_dir) / "tops.json"
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text(json.dumps(out, separators=(",", ":")), encoding="utf-8")
+    try:                      # grade this sport's finished model plays, then log today's (fail-soft)
+        import model_record
+        model_record.hook(sport, out)
+    except Exception as ex:
+        print(f"  model record: skipped ({str(ex)[:120]})")
+    return out
+
+
+def tops(sport, date, rows, now=None):
+    """The TOPS lists from board rows, as of `now` (tools/model_record_rebuild.py replays past boards)."""
+    now = now or datetime.now(timezone.utc)
 
     def pre(e):
         try:
@@ -289,11 +315,7 @@ def write_tops(data_dir, sport, date, rows):
              and e.get("src") != "market" and (not std or (e["price"] >= -200 and e["conf"] >= 0.5))]
         c.sort(key=lambda e: -(e["conf"] + (e.get("edge") or 0) / 10))   # Ask Onyx's "most likely first" key
         lists.append({"key": key, "title": title, "n": n, "rows": c[:4 * n]})
-    out = {"sport": sport, "date": date, "generated": now.isoformat(timespec="seconds"), "lists": lists}
-    p = Path(data_dir) / "tops.json"
-    p.parent.mkdir(parents=True, exist_ok=True)
-    p.write_text(json.dumps(out, separators=(",", ":")), encoding="utf-8")
-    return out
+    return {"sport": sport, "date": date, "generated": now.isoformat(timespec="seconds"), "lists": lists}
 
 
 def write_board(data_dir, sport, date, rows, teams=None):

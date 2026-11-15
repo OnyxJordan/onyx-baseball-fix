@@ -254,6 +254,11 @@
 .tp-w{min-width:0}.tp-w b{display:block;font-size:14px;color:#fff;overflow-wrap:anywhere}.tp-w span{display:block;font-size:11.5px;color:#9a93a6;overflow-wrap:anywhere}
 .tp-r{display:flex;align-items:center;gap:8px}.tp-c{font:800 14px monospace;color:#61e970;text-align:right;min-width:38px}.tp-c small{display:block;font:600 9px monospace;color:#9a93a6;letter-spacing:.05em}
 .tp-empty{font-size:12.5px;color:#9a93a6;padding:6px 0}
+.tp-rec{font:600 11px monospace;color:#b9b2c4;margin:-4px 0 8px;letter-spacing:.02em}.tp-neg{color:#ff8a8a}
+.tp-sum{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:baseline;padding:12px 14px;border-radius:14px;border:1px solid rgba(176,56,249,.4);background:rgba(176,56,249,.08);margin:0 0 12px}
+.tp-sum b.big{font:800 20px monospace;color:#fff}.tp-sum span{font-size:12.5px;color:#b9b2c4}
+.tp-hist{margin-top:12px}.tp-hist summary{cursor:pointer;font:700 12px monospace;color:#d795ff;letter-spacing:.04em}
+.tp-res{font:800 11px monospace;padding:2px 7px;border-radius:999px;background:rgba(255,255,255,.08)}.tp-res.w{color:#61e970}.tp-res.l{color:#ff8a8a}
 .pl-who{display:flex;align-items:center;gap:10px;min-width:0}
 .pl-hs{width:36px;height:36px;border-radius:50%;object-fit:cover;background:var(--bg3);flex-shrink:0}
 .pl-nm{flex:1;min-width:0}.pl-nm b{display:block;font-size:15px;line-height:1.2}
@@ -2211,12 +2216,25 @@ function renderPlays() {
 // data/<sport>/tops.json (daily_top.write_tops) ranks each list by the same rules Ask Onyx uses for "top N <sport>
 // <category>", so the page and the search agree. Here: games that have started drop out, one play per game and per
 // player, then the top N. Model picks, never Onyx Picks: not logged, not graded (Jordan's choice, 11/14).
-var TOPS = null;
+var TOPS = null, MREC = null;
+// 11/14 (Jordan: "where's tennis record where's nhl record ... no oversight into how it's actually performing"):
+// every play these lists show is graded in the Model record (model_record.py, data/picks/model_record.json),
+// apart from the Onyx Picks record
 function mountTops(el) {
   if (!el) return;
-  const draw = T => { if (el.isConnected) el.innerHTML = topsHtml(T); };
-  if (TOPS) return draw(TOPS);
-  fetch('data/' + SD.sport + '/tops.json', {cache: 'no-cache'}).then(r => r.ok ? r.json() : null).then(T => { if (T && (T.lists || []).length) { TOPS = T; draw(T); } }).catch(() => {});
+  const draw = () => { if (el.isConnected && (TOPS || MREC)) el.innerHTML = topsHtml(TOPS || {lists: []}, MREC); };
+  if (TOPS || MREC) return draw();
+  const get = u => fetch(u, {cache: 'no-cache'}).then(r => r.ok ? r.json() : null).catch(() => null);
+  Promise.all([get('data/' + SD.sport + '/tops.json'), get('data/picks/model_record.json')]).then(([T, R]) => {
+    if (T && (T.lists || []).length) TOPS = T;
+    if (R && (R.sport || {})[SD.sport]) MREC = R;
+    draw();
+  });
+}
+function recLine(a) {
+  if (!a || !(a.w + a.l)) return a && a.pending ? `${a.pending} pending` : 'no graded plays yet';
+  const u = a.units, roi = a.roi;
+  return `${a.w}-${a.l}${a.p ? '-' + a.p : ''} · <b class="${u >= 0 ? 'edge-pos' : 'tp-neg'}">${u >= 0 ? '+' : ''}${u.toFixed(1)}u</b> · ${roi >= 0 ? '+' : ''}${(roi * 100).toFixed(1)}% ROI${a.pending ? ' · ' + a.pending + ' pending' : ''}`;
 }
 function topLabel(r) {
   if (r.mkt === 'two_td') return `${r.name} 2+ touchdowns`;
@@ -2224,7 +2242,7 @@ function topLabel(r) {
   if (r.kind === 'total') return `${r.label.replace(/ total$/, '')} · ${r.matchup}`;
   return r.label;
 }
-function topsHtml(T) {
+function topsHtml(T, REC) {
   const now = Date.now(), impl = p => p > 0 ? 100 / (p + 100) : -p / (-p + 100);
   const kick = s => { const d = new Date(s); return isNaN(d) ? '' : d.toLocaleString('en-US', {weekday: 'short', hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York'}) + ' ET'; };
   const cats = T.lists.map(L => {
@@ -2240,11 +2258,24 @@ function topsHtml(T) {
       return `<div class="tp-row"><span class="tp-n">${i + 1}</span><div class="tp-w"><b>${esc(lab)}</b><span>${esc(sub)}</span></div>
         <div class="tp-r"><div class="tp-c">${pct(r.conf)}<small>CHANCE</small></div>${chip(r.price, lab, r.sel, 'on Onyx')}</div></div>`;
     }).join('') : '<div class="tp-empty">Nothing in this category clears the bar on the games still to play.</div>';
-    return `<div class="tp-cat"><h4>${esc(L.title)}</h4>${body}</div>`;
+    const CV = REC && ((REC.ver || {})[SD.sport] || [])[0];
+    const cr = CV ? (CV.cat || {})[L.key] : REC && (REC.cat || {})[SD.sport + ':' + L.key];
+    return `<div class="tp-cat"><h4>${esc(L.title)}</h4>${REC ? `<div class="tp-rec">Record ${recLine(cr)}</div>` : ''}${body}</div>`;
   }).join('');
-  return `<div class="tp-wrap"><div class="sec-hdr"><span class="sec-title">Model's ${esc(C.name || '')} picks</span><span class="sec-count">not tracked</span></div>
-    <p class="dim" style="font-size:12px;line-height:1.6;margin:0 0 10px">The model's most likely plays in each category at today's Onyx prices: nothing shorter than -200 and 50%+ to hit, one per game (the touchdown lists have no floor; Onyx's touchdown prices carry a big margin, so their chances sit below the price). Model picks, not Onyx Picks: no ${esc(C.name || '')} market has passed our backtest against Onyx's prices yet, so these are not logged or graded. Ask Onyx gives the same lists for "top 5 ${esc((C.name || '').toLowerCase())} spreads" and the rest.</p>
-    <div class="tp-grid">${cats}</div></div>`;
+  // the current model version's record first, earlier versions below (11/14, Jordan): a new model starts fresh
+  const VS = REC && (REC.ver || {})[SD.sport] || [], CV0 = VS[0];
+  const SR = CV0 || (REC && (REC.sport || {})[SD.sport]);
+  const md = d => String(d || '').slice(5).replace('-', '/').replace(/^0/, '');
+  const older = VS.slice(1).map(v => `${esc(v.v)} (${md(v.start)} to ${md(v.end)}) ${v.w}-${v.l}${v.p ? '-' + v.p : ''}, ${v.units >= 0 ? '+' : ''}${v.units.toFixed(1)}u`).join(' · ');
+  const recent = REC && (REC.recent || {})[SD.sport] || [];
+  const sum = SR ? `<div class="tp-sum"><b class="big">${SR.w}-${SR.l}${SR.p ? '-' + SR.p : ''}</b><span>${recLine(SR).replace(/^[^·]*· /, '')}</span>
+      <span>${CV0 ? `Current model (${esc(CV0.v)}) since ${md(CV0.start)}` : `Model record since ${md(REC.since)}`}: every play these lists showed, graded at the Onyx price showing before the game, one unit each. Through 11/14 rebuilt from the site's own history; from then on logged as it happens.${older ? ` Earlier model versions: ${older}.` : ''}</span></div>` : '';
+  const hist = recent.length ? `<details class="tp-hist"><summary>Latest graded model picks (${recent.length})</summary><div class="tp-cat" style="margin-top:8px">${recent.map(r =>
+      `<div class="tp-row"><span class="tp-n"><span class="tp-res ${r.result === 'W' ? 'w' : r.result === 'L' ? 'l' : ''}">${esc(r.result)}</span></span><div class="tp-w"><b>${esc(r.label)}</b><span>${esc([r.matchup, r.date, r.actual != null ? 'final ' + r.actual : ''].filter(Boolean).join(' · '))}</span></div><div class="tp-r"><span class="ot-px">${fmtOdds(r.price)}</span></div></div>`).join('')}</div></details>` : '';
+  return `<div class="tp-wrap"><div class="sec-hdr"><span class="sec-title">Model's ${esc(C.name || '')} picks</span><span class="sec-count">model record, not Onyx Picks</span></div>
+    ${sum}
+    <p class="dim" style="font-size:12px;line-height:1.6;margin:0 0 10px">The model's most likely plays in each category at today's Onyx prices: nothing shorter than -200 and 50%+ to hit, one per game${KIND === 'football' ? ' (the touchdown lists have no floor; Onyx\'s touchdown prices carry a big margin, so their chances sit below the price)' : ''}. Every one is graded in the Model record above, kept apart from the Onyx Picks record: a market becomes an Onyx Pick only by passing our backtest against Onyx's prices. Ask Onyx gives the same lists for "top 5 ${esc((C.name || '').toLowerCase())} totals" and the rest.</p>
+    ${T.lists.length ? `<div class="tp-grid">${cats}</div>` : '<div class="tp-empty">No games on the board right now.</div>'}${hist}</div>`;
 }
 // receptions at Onyx's opening price, on trial (sports_build.nfl_open_lane): logged only
 // while Onyx still shows the first price we saw for that line, graded off the box score

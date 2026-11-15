@@ -83,6 +83,8 @@ LEDGER_RETENTION_DAYS = {
     "tennis/picks_history": None,
     # Onyx Picks (picks.py): every sport's tracked picks, logged once at the price shown
     "picks/ledger": None,
+    # the Model record (model_record.py, 11/14): every sport's model picks lists, graded apart from Onyx Picks
+    "picks/model_log": None,
     # live value record, on trial (live_log.py): every live value play, logged once, graded off the final
     "live/ledger": None,
     # the minute watcher's tennis picks (live_log.py --tennis-now, live_watch.yml), copied into live/ledger
