@@ -1248,6 +1248,8 @@ def team_block(key, lane, slate, odds):
     TEST = M.GAME_TEST if key == "nfl" else M.TEST
     bt = lane.load("backtest.json", None) or {}
     w = ((bt.get("lane") or {}).get("w")) or DEFAULT_W
+    if getattr(M, "W_BLEND", None) is not None:     # nhl_model v3: the model sets its own blend weight
+        w = M.W_BLEND
     games = (lane.load("results.json", {}) or {}).get("games") or []
     if hasattr(M, "ratings"):    # college basketball: this season only, pulled toward a preseason prior
         R = M.ratings(str(lane.data), games, slate.get("date") or str(game_day()), lane.load("teams_espn.json", {}) or {})

@@ -199,6 +199,8 @@ def team_markets():
         GP = M.GAME_P if key == "nfl" else M.P
         bt = json.load(open(f"data/{key}/backtest.json"))
         w = (bt.get("lane") or {}).get("w") or 0.3          # sports_build.team_block / nfl_block: the live blend weight
+        if key != "nfl" and getattr(M, "W_BLEND", None) is not None:    # nhl_model v3 sets its own (team_block)
+            w = M.W_BLEND
         S = SB.team_samples(key, X, M, GP)
         for mk in ("ml", "spread", "total"):
             if mk == "total" and getattr(M, "NO_TOTALS", False):
