@@ -270,12 +270,14 @@ NBA_PROPS = {"pts", "reb", "ast", "threes", "pr", "pa", "pra"}
 _ATS = ("ats", "Top 5 against the spread", 5, lambda e: e.get("kind") == "spread", True)
 _TOT = ("totals", "Top 5 totals", 5, lambda e: e.get("kind") == "total", True)
 _ML = ("ml", "Top 5 moneylines", 5, lambda e: e.get("kind") == "ml", True)
-_FBP = ("props", "Top 10 player props", 10, lambda e: e.get("kind") == "prop" and e.get("mkt") not in TD_MKTS, True)
+_FBP = ("props", "Top 10 player props", 10, lambda e: e.get("kind") == "prop" and e.get("mkt") not in TD_MKTS and not e.get("no_read"), True)   # no_read: nfl_model v16
 _TD = ("td", "Top 10 to score a touchdown", 10, lambda e: e.get("mkt") == "anytime_td", False)
 TOPS = {
     "nfl": [_ATS, _TOT, _FBP, _TD, ("td2", "Top 5 to score 2+ touchdowns", 5, lambda e: e.get("mkt") == "two_td", False)],
     "cfb": [_ATS, _TOT, _FBP, _TD],
-    "nba": [_ATS, _TOT, ("props", "Top 10 player props", 10, lambda e: e.get("kind") == "prop" and e.get("mkt") in NBA_PROPS, True)],
+    # 11/15: no NBA game model prices spreads or totals (their chance is Onyx's own no-vig price), so those are not
+    # the model's picks and have no list (11/14-11/15 rows stay in the Model record, append-only)
+    "nba": [("props", "Top 10 player props", 10, lambda e: e.get("kind") == "prop" and e.get("mkt") in NBA_PROPS, True)],
     "cbb": [_ATS, _TOT, _ML],
     "nhl": [("ats", "Top 5 puck lines", 5, lambda e: e.get("kind") == "spread", True), _ML, _TOT],
     "tennis": [("ml", "Top 5 match winners", 5, lambda e: e.get("kind") == "ml", True),

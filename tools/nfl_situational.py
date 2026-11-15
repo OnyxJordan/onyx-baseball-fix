@@ -50,6 +50,12 @@ def load(pk):
     return DATA, IX
 
 
+def _w(mkt):
+    """The model's share of the chance shown (a 0 is a 0, not the default)."""
+    v = (M.VOL_P.get(mkt) or {}).get("w")
+    return v if v is not None else M.BLEND_W.get(mkt, 0.3)
+
+
 def payout(price):
     return price / 100.0 if price > 0 else 100.0 / -price
 
@@ -79,7 +85,7 @@ def build_rows(DATA, IX):
                 best = (m, P)
         P = best[1]
         params[mkt] = {k: P[k] for k in grid}
-        w = (M.VOL_P.get(mkt) or {}).get("w") or M.BLEND_W.get(mkt) or 0.3
+        w = _w(mkt)
         for r in rows:
             pr = PJ.project(r, stat, P)
             if pr is None or r.get("po") is None or r.get("pu") is None:
@@ -297,7 +303,7 @@ def adjust(rows):
         if len(t) < 300 or len(e) < 100:
             continue
         X = np.array([[1.0] + [float(fn(r)) for (_, _, fn) in C] for r in t])
-        yv = np.array([math.log((r["act"] + 1) / (r["proj"] + 1)) for r in t])
+        yv = np.array([math.log((max(r["act"], 0) + 1) / (r["proj"] + 1)) for r in t])
         lam = 25.0
         A = X.T @ X + lam * np.eye(X.shape[1]); A[0, 0] -= lam
         beta = np.linalg.solve(A, X.T @ yv)
@@ -306,7 +312,7 @@ def adjust(rows):
         adj = [(r["proj"] + 1) * m - 1 for r, m in zip(e, mult)]
         mae0 = sum(abs(r["proj"] - r["act"]) for r in e) / len(e)
         mae1 = sum(abs(a - r["act"]) for a, r in zip(adj, e)) / len(e)
-        w = (M.VOL_P.get(mkt) or {}).get("w") or M.BLEND_W.get(mkt) or 0.3
+        w = _w(mkt)
         f = M.prob_over_volume if mkt in M.VOL_P else M.prob_over
         p0 = [L.blend(f(mkt, r["proj"], r["line"]), r["p_onyx"], w) for r in e]
         p1 = [L.blend(f(mkt, a, r["line"]), r["p_onyx"], w) for a, r in zip(adj, e)]
@@ -362,7 +368,7 @@ def main():
            "top_tune_then_test": sorted(good, key=lambda g: -g["tune"][3])[:60],
            "base": [g for g in G if g["rule"] == "every line"],
            "ranking_2026": ranking(rows), "calibration": calibration(rows), "bias": bias(rows), "adjust": adjust(rows)}
-    json.dump(rep, open(outp, "w"), indent=1)
+    json.dump(rep, open(outp, "w"), indent=1, default=lambda o: o.item() if hasattr(o, "item") else str(o))
     print(json.dumps({k: rep[k] for k in ("rows", "rules_tested", "rules_60_tune", "good_in_tune", "positive_on_2026", "significant_on_2026_bh10")}))
     print(f"done ({time.time() - t0:.0f}s) -> {outp}")
 
