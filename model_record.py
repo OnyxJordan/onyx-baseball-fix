@@ -76,7 +76,7 @@ def select(T, now):
                 break
             st = PK._when(r.get("start"))
             w = who_key(r)
-            if not st or st <= now or r.get("gid") in games or w in who:
+            if not st or st <= now or (r.get("gid") in games and L.get("mode") != "ev") or w in who:
                 continue
             games.add(r.get("gid"))
             who.add(w)
@@ -112,6 +112,8 @@ def log(sport, T, now=None, rows=None, src="live", model_v=None):
     today = (now.astimezone(PK.ET) - timedelta(hours=4)).date().isoformat()
     added = 0
     for cat, (L, shown) in select(T, now).items():
+        if L.get("info"):
+            continue          # "most likely to score" lists are information, not picks (11/15): never graded
         for e in shown:
             k = key(sport, cat, e)
             if k in have or e.get("price") is None or e.get("conf") is None or e.get("src") == "market":

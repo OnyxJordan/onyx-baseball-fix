@@ -1384,12 +1384,12 @@
     }
     return null;
   }
-  var PLAINW = /^(top|best|the|my|me|give|show|get|gimme|whats|what|are|is|todays|today|tonight|sunday|monday|thursday|this|week|weeks|nfl|nba|nhl|football|pro|picks?|plays?|bets?|ats|against|spreads?|totals?|player|props?|anytime|tds?|touchdowns?|scorers?|to|score|a|2\+?|two|or|more|\d{1,2})$/;
+  var PLAINW = /^(top|best|the|my|me|give|show|get|gimme|whats|what|are|is|todays|today|tonight|sunday|monday|thursday|this|week|weeks|nfl|nba|nhl|football|pro|picks?|plays?|bets?|ats|against|spreads?|totals?|player|props?|anytime|tds?|touchdowns?|scorers?|to|score|a|2\+?|two|or|more|positive|value|only|best|\d{1,2})$/;
   function plainList(q, h) {
     var w = String(q).toLowerCase().replace(/[^a-z0-9+ ]/g, ' ').split(/\s+/).filter(Boolean);
     if (!w.length || w.length > 9 || !w.every(function (x) { return PLAINW.test(x); })) return false;
     var ks = Object.keys(h).filter(function (k) { var v = h[k]; return v != null && v !== false && v !== '' && !(Array.isArray(v) && !v.length) && !(k === 'side' && v === 'any'); });
-    var OK = {intent: 1, count: 1, count_set: 1, sports: 1, markets: 1, sort: 1, when: 1, one_per_game: 1, props_only: 1, default_conf: 1, default_floor: 1, min_conf: 1, min_price: 1};
+    var OK = {intent: 1, count: 1, count_set: 1, sports: 1, markets: 1, sort: 1, when: 1, one_per_game: 1, props_only: 1, pos_value: 1, default_conf: 1, default_floor: 1, min_conf: 1, min_price: 1};
     return h.intent === 'list' && (h.sports || []).length === 1 && ((h.markets || []).length >= 1 || h.props_only) && ks.every(function (k) { return OK[k]; });
   }
   function toSpec(q, B) {

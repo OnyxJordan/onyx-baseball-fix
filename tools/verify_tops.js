@@ -11,8 +11,24 @@ const srv = http.createServer((q, r) => { const p = path.join(root, decodeURICom
   await pg.goto(base0 + '/home.html', {waitUntil: 'domcontentloaded'});
   const res = await pg.evaluate(async () => {
     const B = await OnyxAsk.loadBoards(), T = await (await fetch('data/nfl/tops.json')).json(), now = Date.now(), out = [];
-    const Q = {ats: 'top 5 nfl spreads', totals: 'top 5 nfl totals', props: 'top 10 nfl player props no touchdowns', td: 'top 10 nfl anytime td scorers', td2: 'top 5 nfl 2+ td scorers'};
+    const Q = {ats: 'top 5 nfl spreads positive value only', totals: 'top 5 nfl totals positive value only', props: 'top 10 nfl player props no touchdowns positive value only', td: 'top 10 nfl anytime td scorers', td2: 'top 5 nfl 2+ td scorers'};   // 11/15: value lists; the TD lists stay most likely (information)
     for (const L of T.lists) {
+      // lists Ask cannot phrase are checked against their own rule (11/15): every row the page shows must qualify,
+      // in the list's order, and every qualifying play still to start must be in the 4x-deep candidates
+      const RULE = {
+        rec: {ok: r => r.kind === 'prop' && ['rec', 'pass_att', 'rush_yds'].includes(r.mkt) && r.side === 'under' && r.price >= -150 && r.price <= 150 && r.ev >= 0.10, key: r => -r.ev},
+        tdlook: {ok: r => r.mkt === 'anytime_td' && r.role === 'RB' && r.tpg >= 15 && r.tt >= 24 && r.price >= -200, key: r => -(r.conf + (r.edge || 0) / 10)},
+      };
+      if (!Q[L.key]) {
+        const R = RULE[L.key];
+        if (!R) { out.push(L.key + ': no rule to check it against DIFF'); continue; }
+        const bad = L.rows.filter(r => !R.ok(r));
+        const sorted = L.rows.every((r, i) => i === 0 || R.key(L.rows[i - 1]) <= R.key(r) + 1e-9);
+        const want = (await (await fetch('data/nfl/board.json')).json()).plays.filter(r => R.ok(r) && Date.parse(r.start) > now).length;
+        const ok = !bad.length && sorted && L.rows.length === Math.min(want, 4 * L.n);
+        out.push(L.key + ': rule check, ' + L.rows.length + ' candidates of ' + want + ' qualifying' + (bad.length ? ', ' + bad.length + ' break the rule' : '') + (sorted ? '' : ', out of order') + (ok ? ' SAME' : ' DIFF'));
+        continue;
+      }
       const games = {}, who = {}, page = [];
       for (const r of L.rows) { if (page.length >= L.n) break; const w = r.kind === 'prop' ? r.who : r.gid + ':' + r.kind;
         if (!(Date.parse(r.start) > now) || games[r.gid] || who[w]) continue; games[r.gid] = 1; who[w] = 1; page.push(r.sel); }

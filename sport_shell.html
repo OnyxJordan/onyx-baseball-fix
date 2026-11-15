@@ -2250,17 +2250,17 @@ function topsHtml(T, REC) {
     for (const r of L.rows) {
       if (rows.length >= L.n) break;
       const w = r.kind === 'prop' ? r.who : r.gid + ':' + r.kind;    // Ask Onyx's WHO: a player, or a game's side / total
-      if (!(Date.parse(r.start) > now) || games[r.gid] || who[w]) continue;
+      if (!(Date.parse(r.start) > now) || (games[r.gid] && L.mode !== 'ev') || who[w]) continue;   // ev: several a game, one per player
       games[r.gid] = 1; who[w] = 1; rows.push(r);
     }
     const body = rows.length ? rows.map((r, i) => {
-      const lab = topLabel(r), sub = [r.kind !== 'total' ? r.matchup : '', kick(r.start), 'Onyx implies ' + pct(impl(r.price)), typeof r.why === 'string' ? r.why : ''].filter(Boolean).join(' · ');
+      const lab = topLabel(r), sub = [r.kind !== 'total' ? r.matchup : '', kick(r.start), 'Onyx implies ' + pct(impl(r.price)), L.mode === 'ev' && r.ev != null ? 'expected value +' + (100 * r.ev).toFixed(1) + '%' : '', L.key === 'tdlook' && r.tpg ? r.tpg + ' touches a game, team implied ' + r.tt : '', typeof r.why === 'string' ? r.why : ''].filter(Boolean).join(' · ');
       return `<div class="tp-row"><span class="tp-n">${i + 1}</span><div class="tp-w"><b>${esc(lab)}</b><span>${esc(sub)}</span></div>
         <div class="tp-r"><div class="tp-c">${pct(r.conf)}<small>CHANCE</small></div>${chip(r.price, lab, r.sel, 'on Onyx')}</div></div>`;
-    }).join('') : '<div class="tp-empty">Nothing in this category clears the bar on the games still to play.</div>';
+    }).join('') : `<div class="tp-empty">${L.info ? 'Nothing priced on the games still to play.' : L.mode === 'ev' ? 'No under clears 10% expected value at the current prices. These show up mostly when lines first open, before the market moves toward them: check back early in the week.' : 'No play here beats its Onyx price right now. This list fills only when the model\'s chance beats the price.'}</div>`;
     const CV = REC && ((REC.ver || {})[SD.sport] || [])[0];
     const cr = CV ? (CV.cat || {})[L.key] : REC && (REC.cat || {})[SD.sport + ':' + L.key];
-    return `<div class="tp-cat"><h4>${esc(L.title)}</h4>${REC ? `<div class="tp-rec">Record ${recLine(cr)}</div>` : ''}${body}</div>`;
+    return `<div class="tp-cat"><h4>${esc(L.title)}</h4>${L.info ? '<div class="tp-rec">Information, not a value pick: never graded</div>' : REC ? `<div class="tp-rec">Record ${recLine(cr)}</div>` : ''}${body}</div>`;
   }).join('');
   // the current model version's record first, earlier versions below (11/14, Jordan): a new model starts fresh
   const VS = REC && (REC.ver || {})[SD.sport] || [], CV0 = VS[0];
@@ -2274,7 +2274,7 @@ function topsHtml(T, REC) {
       `<div class="tp-row"><span class="tp-n"><span class="tp-res ${r.result === 'W' ? 'w' : r.result === 'L' ? 'l' : ''}">${esc(r.result)}</span></span><div class="tp-w"><b>${esc(r.label)}</b><span>${esc([r.matchup, r.date, r.actual != null ? 'final ' + r.actual : ''].filter(Boolean).join(' · '))}</span></div><div class="tp-r"><span class="ot-px">${fmtOdds(r.price)}</span></div></div>`).join('')}</div></details>` : '';
   return `<div class="tp-wrap"><div class="sec-hdr"><span class="sec-title">Model's ${esc(C.name || '')} picks</span><span class="sec-count">model record, not Onyx Picks</span></div>
     ${sum}
-    <p class="dim" style="font-size:12px;line-height:1.6;margin:0 0 10px">The model's most likely plays in each category at today's Onyx prices: nothing shorter than -200 and 50%+ to hit, one per game${KIND === 'football' ? ' (the touchdown lists have no floor; Onyx\'s touchdown prices carry a big margin, so their chances sit below the price)' : ''}. Every one is graded in the Model record above, kept apart from the Onyx Picks record: a market becomes an Onyx Pick only by passing our backtest against Onyx's prices. Ask Onyx gives the same lists for "top 5 ${esc((C.name || '').toLowerCase())} totals" and the rest.</p>
+    <p class="dim" style="font-size:12px;line-height:1.6;margin:0 0 10px">${SD.sport === 'nfl' ? 'Recommended plays: unders in receptions, pass attempts and rushing yards, priced -150 to +150, where the model\'s expected value is 10% or more, highest first. Backtested on every Onyx line from 2024 to 2026: 121-62, +58.2 units, +31.8% at the opening price, positive in all three seasons (overs lost every season). ' : ''}The other lists are best value first: only plays where the model's chance beats the Onyx price, biggest edge first, nothing shorter than -200 and 50%+ to hit, one per game. A list is empty when nothing beats the price. ${KIND === 'football' ? 'The touchdown lists are for fun, information only: Onyx\'s touchdown prices carry the biggest margin on the board (every yes price lost 18-24% in 2025 and 2026), so no scorer beats the price. Best TD looks are lead backs (15+ touches a game) on teams implied 24+, the slice that lost least. ' : ''}Every value play is graded in the Model record above, kept apart from the Onyx Picks record: a market becomes an Onyx Pick only by passing our backtest against Onyx's prices. Ask Onyx gives the same lists for "top 5 ${esc((C.name || '').toLowerCase())} totals positive value only" and the rest.</p>
     ${T.lists.length ? `<div class="tp-grid">${cats}</div>` : '<div class="tp-empty">No games on the board right now.</div>'}${hist}</div>`;
 }
 // receptions at Onyx's opening price, on trial (sports_build.nfl_open_lane): logged only

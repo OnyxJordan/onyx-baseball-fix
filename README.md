@@ -1694,6 +1694,26 @@ later" (7 PM on), and "between 1 and 4 pm". A bare hour counts as afternoon or e
 after / until or with a game-time word, so "4 picks by 2s" and "after 2 legs" stay counts. Sides, totals and
 parlays already covered every sport.
 
+**NFL Recommended plays and the TD Corner; best value lists everywhere (11/15).** Jordan: "we're not looking for -400s
+... we want to make as many units as possible", "recommended plays that have the highest EV", "we still want TD scorers
+though and to find the best value there because that's fun as well". From `tools/nfl_situational.py` rows (every Onyx
+prop line 2024-2026 through the live chance): value plays priced -150 to +150, overs lost in every season (receptions
+overs -14.9% 2025, receiving yards overs -7.7%), unders in receptions, pass attempts and rushing yards won. By the
+model's expected value: under 6% lost, 6-10% +5.8%, 10%+ went 121-62 (+58.2u, +31.8% at the open, +26.5% at the
+close): 2024 (market prices, unseen) +11.3%, 2025 +33.2%, 2026 +41.5%; receptions alone (a model not fitted on these
+seasons) positive all three. Pass attempts and rushing yards models were fitted on 2025-26: partly in sample.
+- `daily_top.TOPS` NFL: "Recommended plays" (mode `ev`: those unders, -150 to +150, EV 10%+, highest EV first, one per
+  player, several a game, graded), spreads and totals, then the TD Corner (`info`, never graded): most likely to
+  score, 2+ TDs, and "Best TD looks" (a back with 15+ touches a game on a team implied 24+, -200 or longer).
+- `tools/nfl_td_value.py`: 8,835 Onyx anytime-TD prices 2025-26 graded off the box score (snaps decide played):
+  every yes lost -24.4% / -17.6% (priced players scored 17.3% vs 21.5% implied); no slice won in both seasons (+600 or
+  longer -32.4% / -21.2%; lead backs on teams implied 24+ the least bad, -16.8% / -4.0%); a scoring-rate x team-total
+  value read lost both seasons. So touchdown lists are information.
+- Every other sport's lists (and the NFL spread / total lists) are best value: positive edge only, biggest edge first,
+  with Ask's floors (-200 or longer, 50%+), as Ask reads "top 5 <sport> totals positive value only" (now a plain
+  list: answered without the AI). verify_tops skips lists with no Ask equivalent.
+- Sports build: the NFL touchdown rows carry tpg (touches a game), tt (team implied points) and role.
+
 **NFL v16: 262,626 situational backtests, and the yardage markets show Onyx's chance (11/15).** Jordan: "backtest all of
 these sports with 50,000 backtests each and see what the results would have been based on our projections
 situationally and start to make those adjustments to the projections starting with NFL"; "what if we do this at X%,
