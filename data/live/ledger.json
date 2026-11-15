@@ -82531,10 +82531,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v7",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "35-16",
+  "profit": 1.65,
+  "graded_at": "2026-11-15T05:39:51+00:00"
  },
  {
   "id": "nba-401909981-spread-home",
@@ -83827,10 +83827,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v7",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "35-16",
+  "profit": 0.9259,
+  "graded_at": "2026-11-15T05:39:51+00:00"
  },
  {
   "id": "cfb-401856863-spread-away",
@@ -84525,10 +84525,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v7",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "51",
+  "profit": 0.8772,
+  "graded_at": "2026-11-15T05:39:52+00:00"
  },
  {
   "id": "cfb-401856863-total-under",
@@ -84735,10 +84735,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v7",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "5-6",
+  "profit": 0.431,
+  "graded_at": "2026-11-15T05:39:52+00:00"
  },
  {
   "id": "cbb-401917530-total-under",
@@ -84766,10 +84766,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v7",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "175",
+  "profit": -1.0,
+  "graded_at": "2026-11-15T05:39:52+00:00"
  },
  {
   "id": "cbb-401911455-total-under",
@@ -84797,10 +84797,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v7",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "144",
+  "profit": 0.8696,
+  "graded_at": "2026-11-15T05:39:52+00:00"
  },
  {
   "id": "cfb-401856863-ml-away",
@@ -85452,10 +85452,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v7",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "11",
+  "profit": -1.0,
+  "graded_at": "2026-11-15T05:39:53+00:00"
  },
  {
   "id": "nhl-401892720-total-under",
@@ -85662,6 +85662,37 @@
   "pre_src": "onyx",
   "model": "live-v7",
   "prop_model": "props-v1",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "cfb-401864540-total-over",
+  "sport": "cfb",
+  "gid": "401864540",
+  "date": "2026-11-14",
+  "logged_at": "2026-11-15T05:39:49+00:00",
+  "matchup": "WYO @ UTEP",
+  "home": "UTEP",
+  "away": "WYO",
+  "label": "Over 42.5",
+  "kind": "total",
+  "side": "over",
+  "line": 42.5,
+  "price": -116,
+  "chance": 0.5768,
+  "implied": 0.537,
+  "edge": 0.04,
+  "fair": -135,
+  "state": {
+   "score": "WYO 24 - 9 UTEP",
+   "period": 3,
+   "clock": "0:50",
+   "f": 0.264
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
   "result": null,
   "actual": null,
   "profit": null,
