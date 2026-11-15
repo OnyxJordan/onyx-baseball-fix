@@ -89,6 +89,8 @@ LEDGER_RETENTION_DAYS = {
     "live/ledger": None,
     # the minute watcher's tennis picks (live_log.py --tennis-now, live_watch.yml), copied into live/ledger
     "live/tennis_now": None,
+    # the tennis paper test (tennis_paper.py, 11/15): Onyx's moneyline against the sharp book's, logged once
+    "tennis/paper": None,
 }
 LEDGERS = tuple(LEDGER_RETENTION_DAYS)
 

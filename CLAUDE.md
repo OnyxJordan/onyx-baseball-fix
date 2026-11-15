@@ -99,6 +99,11 @@ record reasonably what it would of recommended"): "v1" (no field) = the old most
 plays (unders in rec / pass att / rush yds, -150 to +150, EV 10%+) and best value elsewhere, logged the moment a play
 qualifies. The pages lead with the current rule; a rule's rows never block or mix with another's. NFL v2 rows before
 10/30 are the 2026 season replay (`"src": "replay"`, tools/model_record_nfl_replay.py). A new list rule gets a new tag.
+"v3" (11/15 tune-ups, `model_record.RULES`): NBA props unders only, no points, edge 2+ pts; college football spreads
+with a 2-point edge and rushing yards unders (its totals are leans, never graded). A sport on a newer rule keeps its
+earlier value rows as `prev`. The tennis paper test (`tennis_paper.py` -> `data/tennis/paper.json`, append-only, in
+validate_build's list) logs Onyx moneylines 2%+ softer than the sharp book's, both prices from the same odds run;
+it is never shown as picks and the other book is never named on the site.
 
 ## Dates
 

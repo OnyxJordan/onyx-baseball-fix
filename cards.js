@@ -408,7 +408,7 @@
       if (k === 'total' && sdOk) { m.dist = {t: 'n', m: M.total, s: M.sd_total}; m.proj = M.total; }
       m.note = a.pm == null ? (NBA ? 'The NBA model prices player props and the 1st-quarter total, not sides: this is Onyx\'s own line, ' + esc(a.lab) + ' ' + pct(a.fair, 1) + ' with its margin removed'
         : 'Not enough games for the ratings to price this one yet: Onyx\'s price only')
-        : 'Model: the team ratings\' chance. Blended: ' + w + '% model, the rest Onyx\'s price with its margin removed. EV per $10 at Onyx\'s price on the blended chance' +
+        : 'Model: the team ratings\' chance. Blended: ' + (G.wk && G.wk[k] != null ? Math.round(100 * G.wk[k]) : w) + '% model, the rest Onyx\'s price with its margin removed. EV per $10 at Onyx\'s price on the blended chance' +
           (m.dist ? '. Drag the chart or the slider: off Onyx\'s line you see the model\'s chance only, release to snap back' : '');
       out.push(m);
     });
@@ -731,7 +731,7 @@
     if (t.inj && t.inj.length) out.push({k: 'Injury report', v: String(t.inj.length), d: 'out or questionable (below) · ' + opp + ' ' + (G.opp_inj || 0) + ' · the ratings do not adjust for them'});
     // a team the ratings cannot price yet (too few games) still gets the heading, over the note that says so
     return (out.length ? why(out, 'Why this number') : '<div class="cx-hdr"><span>Why this number</span></div>') + (N ? '<div class="cx-note">The NBA model prices player props, not sides or totals: these are the team inputs it uses, and the game-line chances on the Bets side are Onyx\'s own with the margin removed.</div>'
-      : M ? '<div class="cx-note">Ratings: ' + u + ' scored = league average + home edge + the team\'s offense - the opponent\'s defense, fitted on every final with recent games weighing more. Each Onyx line is priced from them and blended with Onyx\'s price (' + Math.round(100 * (G.w || 0)) + '% model).</div>'
+      : M ? '<div class="cx-note">Ratings: ' + u + ' scored = league average + home edge + the team\'s offense - the opponent\'s defense, fitted on every final with recent games weighing more. Each Onyx line is priced from them and blended with Onyx\'s price (' + (G.wk ? ['ml', 'spread', 'total'].map(function (k) { return Math.round(100 * (G.wk[k] || 0)) + '% ' + (k === 'ml' ? 'moneyline' : k); }).join(', ') + ' model: held out, no larger model share beat Onyx' : Math.round(100 * (G.w || 0)) + '% model') + ').</div>'
         : '<div class="cx-note">Not enough games for the ratings to price this one yet.</div>') + sidesTable(t, true);
   }
   function sideRow(s, i, compact) {

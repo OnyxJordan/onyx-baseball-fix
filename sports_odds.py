@@ -193,7 +193,7 @@ def main():
                         if os.environ.get("ODDS_DEBUG") and not out["matches"]:
                             print("  debug tennis row:", json.dumps((row.get("odds") or [])[:3])[:900])
                         names = [_norm(p.get("name")).split(" ")[-1] for p in m["p"]]
-                        mo = out["matches"].setdefault(m["id"], {"p": [p["name"] for p in m["p"]]})
+                        mo = out["matches"].setdefault(m["id"], {"p": [p["name"] for p in m["p"]], "start": m.get("start")})
                         for od in row.get("odds") or []:
                             price = american(od.get("price"))
                             if price is None or not od.get("is_main"):
@@ -309,6 +309,16 @@ def main():
             break
     lane.save("odds.json", out, indent=None)       # Onyx prices only, even when empty: the ledgers and picks read this file
     report(out, book, "odds.json")
+    # 11/15 tennis paper test (tennis_paper.py): the sharp book's moneyline in the same run, so both prices are taken
+    # at the same moment; logged to data/tennis/paper.json only (never shown, never a pick, the book never named)
+    if key == "tennis" and out["matches"]:
+        try:
+            import tennis_paper
+            sharp = pull(tennis_paper.SHARP_BOOK)
+            added, graded = tennis_paper.log(out["matches"], sharp["matches"])
+            print(f"tennis paper test: {len(sharp['matches'])} matches priced by the sharp book, {added} logged, {graded} graded")
+        except Exception as x:
+            print(f"tennis paper test skipped ({str(x)[:120]})")
     # 11/5 (Jordan): when Onyx's feed has an issue (at 10 AM ET that day it went silent in every sport),
     # fall back to DraftKings lines so every game still gets a lean. They go to market.json, never
     # odds.json: sports_build prices leans from them, labelled "Market line" on the page, and nothing

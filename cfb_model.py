@@ -4,6 +4,30 @@ defense ratings in points (team_model.py), normal margin and total.
 
 Changelog (newest first; each entry cites its evidence)
 
+  v2  11/15  MODEL PICKS LISTS ONLY (daily_top.TOPS["cfb"]); the ratings, the
+      20% blend and every chance shown are unchanged, so the version stays v2
+      and the live spread lane and the finalized rushing yards market (its own
+      version, cfb_players) keep their gates. The best-value lists had lost
+      39-41 (-7.0u): totals 3-12, spreads 5-8, props +11% (all rushing unders).
+      Replayed on every Onyx line on file, chosen on one season and judged on
+      the other, at opening and closing prices; 220 configs tried.
+        spreads   edge 2+ points only (equal to a 10% model share, the weight
+                  2025 log loss chose). 2026: open 29-22 +8.4%, close 28-23
+                  +4.9% (was 51-53 -6.3%, 44-46 -6.7%). 2025: +11.2% / +23.0%
+                  (was +3.4% / +2.0%).
+        totals    no rule won 2025 at both prices; the list lost -24.3% at the
+                  2025 close and -5.2% over 2019-2024 ESPN closes. Shown as
+                  leans, never graded.
+        props     rushing yards unders only. The other prop markets as a list
+                  lost before 10/5 (-13.8% open) and after (-2.2%); rushing
+                  unders after 10/5: open 63-32 +24.6%, close 57-33 +19.7%
+                  (whole list +10.2%, +14.3%).
+      Next model change (v3, owner's call): a 10% model share for spreads and
+      0 for totals and moneylines. Log loss gain over Onyx's no-vig price
+      (thousandths per line):
+      spreads w .10 +0.37 / +0.85 (2025 open / close) vs w .20 -0.25 / +0.75;
+      moneylines lose at every weight above 0 in both seasons.
+
   v2  10/31  TOTALS LANE ADDED (NO_TOTALS off). Same ratings and parameters as
       v1; what changes is that Onyx totals are priced and can be picked.
       tools/sports_backtest.py --markets=total on 2,913 Onyx games (through

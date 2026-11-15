@@ -50,11 +50,11 @@ def write_summary(rows):
     for k, v in R["cat"].items():
         v["title"] = titles.get(k)
     recent = {}
-    for r in sorted((r for r in rows if r.get("result") and rule_of(r) == RULE), key=lambda r: (r.get("start") or "", r.get("id")), reverse=True):
+    for r in sorted((r for r in rows if r.get("result") and is_current(r)), key=lambda r: (r.get("start") or "", r.get("id")), reverse=True):
         L = recent.setdefault(r["sport"], [])
         if len(L) < 25:
             L.append({k: r.get(k) for k in ("date", "cat", "label", "matchup", "price", "chance", "result", "actual", "profit", "src")})
-    dates = sorted(r["date"] for r in rows if rule_of(r) == RULE)
+    dates = sorted(r["date"] for r in rows if is_current(r))
     out = {"generated": PK._iso(PK._now()), "since": dates[0] if dates else None,
            "rebuilt": sum(1 for r in rows if r.get("src") == "rebuilt"), "live": sum(1 for r in rows if r.get("src") == "live"),
            **R, "recent": recent}
@@ -66,10 +66,23 @@ def write_summary(rows):
 # -150 to +150, expected value 10%+) and best value, positive edge only, everywhere else; logged the moment a play
 # qualifies, any day before its start, at the price showing. Rows of one rule never block or mix with the other's.
 RULE = "v2"
+# "v3" (11/15, the tune-ups Jordan approved: "commit everything"): NBA props unders only, no single-stat points, edge
+# over 2 points; college football spreads with a 2-point edge and rushing yards unders (its totals turned leans, never
+# graded). A sport on a newer rule leads with it; its v2 rows are kept as the previous rule's record ("prev").
+RULES = {"nba": "v3", "cfb": "v3"}
 
 
 def rule_of(r):
     return r.get("rule") or "v1"
+
+
+def current(sport):
+    """The list rule a sport logs and leads with now."""
+    return RULES.get(sport, RULE)
+
+
+def is_current(r):
+    return rule_of(r) == current(r["sport"])
 
 
 def who_key(r):
@@ -115,10 +128,11 @@ def log(sport, T, now=None, rows=None, src="live", model_v=None):
     now = now or PK._now()
     own = rows is None
     rows = load() if own else rows
-    have = {(r["sport"], r["cat"], str(r.get("gid")), str(r.get("who")), str(r.get("market"))) for r in rows if rule_of(r) == RULE}
+    rule = current(sport)
+    have = {(r["sport"], r["cat"], str(r.get("gid")), str(r.get("who")), str(r.get("market"))) for r in rows if rule_of(r) == rule}
     per = {}
     for r in rows:
-        if rule_of(r) == RULE:
+        if rule_of(r) == rule:
             k = (r["sport"], r["cat"], r["date"])
             per[k] = per.get(k, 0) + 1
     added = 0
@@ -134,7 +148,7 @@ def log(sport, T, now=None, rows=None, src="live", model_v=None):
             if per.get((sport, cat, d), 0) >= L["n"]:     # v2: early is fine (the price is the one showing)
                 continue
             m = e.get("mkt") or e.get("kind")
-            rows.append({"id": f"{sport}-{cat}-{e.get('gid')}-{e.get('who')}-{m}-{RULE}", "rule": RULE, "sport": sport, "cat": cat,
+            rows.append({"id": f"{sport}-{cat}-{e.get('gid')}-{e.get('who')}-{m}-{rule}", "rule": rule, "sport": sport, "cat": cat,
                          "cat_title": L.get("title"), "date": d, "logged_at": PK._iso(now), "src": src,
                          "start": e.get("start"), "gid": e.get("gid"), "matchup": e.get("matchup"),
                          "label": e.get("label"), "market": m, "kind": e.get("kind"), "name": e.get("name"),
@@ -189,12 +203,14 @@ def record(rows=None):
                 "pending": sum(1 for r in rs if not r.get("result")), "units": round(u, 2),
                 "roi": round(u / (w + l_), 4) if w + l_ else None}
     # the current list rule's record leads (sport, cat, ver, src); the earlier rule's is kept under "old"
-    old = [r for r in rows if rule_of(r) != RULE]
-    rows = [r for r in rows if rule_of(r) == RULE]
-    out = {"rule": RULE, "all": agg(rows), "sport": {}, "cat": {}, "ver": {}, "src": {}, "old": {}}
-    for sp in sorted({r["sport"] for r in old}):
-        o = [r for r in old if r["sport"] == sp]
-        out["old"][sp] = dict(agg(o), start=min(r["date"] for r in o), end=max(r["date"] for r in o))
+    old = [r for r in rows if rule_of(r) == "v1"]
+    prev = [r for r in rows if rule_of(r) != "v1" and not is_current(r)]
+    rows = [r for r in rows if is_current(r)]
+    out = {"rule": RULE, "rules": {**RULES}, "all": agg(rows), "sport": {}, "cat": {}, "ver": {}, "src": {}, "old": {}, "prev": {}}
+    for key_, src_ in (("old", old), ("prev", prev)):
+        for sp in sorted({r["sport"] for r in src_}):
+            o = [r for r in src_ if r["sport"] == sp]
+            out[key_][sp] = dict(agg(o), start=min(r["date"] for r in o), end=max(r["date"] for r in o))
     for sp in sorted({r["sport"] for r in rows}):
         out["src"][sp] = {k: sum(1 for r in rows if r["sport"] == sp and (r.get("src") or "live") == k) for k in ("replay", "rebuilt", "live")}
     by_s, by_c = {}, {}

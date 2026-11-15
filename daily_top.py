@@ -273,6 +273,21 @@ _TOT = ("totals", "Top 5 totals", 5, lambda e: e.get("kind") == "total", True)
 _ML = ("ml", "Top 5 moneylines", 5, lambda e: e.get("kind") == "ml", True)
 _FBP = ("props", "Top 10 player props", 10, lambda e: e.get("kind") == "prop" and e.get("mkt") not in TD_MKTS and not e.get("no_read"), True)   # no_read: nfl_model v16
 _TD = ("td", "Top 10 most likely to score a touchdown", 10, lambda e: e.get("mkt") == "anytime_td", False)
+# College football lists (11/15, Jordan: "start tuning up their models"). The best-value lists lost (39-41, -7.0u):
+# totals 3-12, spreads 5-8, props +11% (all of it rushing yards unders). Replayed on every Onyx line on file
+# (2025 and 2026, opening and closing prices; rule chosen on one season, judged on the other) and on ESPN closes
+# 2019-2024. 220 configs tried (123 blend / total-shift / spread settings, 90 list rules, 7 props mixes).
+#  - Spreads: only an edge of 2+ points at the live blend. Same as edge > 0 at a 10% model share, the weight log loss
+#    chose on 2025. 2026 held out: open 29-22 +8.4%, close 28-23 +4.9% (was 51-53 -6.3%, 44-46 -6.7%); 2025:
+#    +11.2% / +23.0% (was +3.4% / +2.0%); ESPN closes 2019-24 -4.6% on 351 (was -5.1% on 647).
+#  - Totals: no setting won in 2025 at both prices (every model share above 0 lost log loss to Onyx at the 2025
+#    close, and the list lost -24.3% at the 2025 close and -5.2% over six seasons of ESPN closes), so the model has
+#    no totals edge to grade: the list stays as leans ("lean": best value first, information, never graded).
+#  - Props: rushing yards unders only (cfb_players v2, the finalized Onyx Picks market). Every other prop market,
+#    as its own list, lost in the tuning weeks (before 10/5: -13.8% open, -13.7% close) and held out (-2.2%, -0.6%).
+#    Rushing unders held out (10/5 on): open 63-32 +24.6%, close 57-33 +19.7% (whole list: +10.2%, +14.3%).
+# New list keys, so the new rules start their own Model record (the old rows stay, append-only).
+CFB_ATS_EDGE = 0.02
 TOPS = {
     # NFL (11/15, Jordan: "we want recommended plays that have the highest EV ... we're not looking for -400s"):
     # tools/nfl_situational.py: unders in receptions, pass attempts and rushing yards, priced -150 to +150, with the
@@ -287,10 +302,21 @@ TOPS = {
             ("td2", "Top 5 most likely to score 2+ touchdowns", 5, lambda e: e.get("mkt") == "two_td", False),
             ("tdlook", "Best TD looks: lead backs on high-scoring teams", 5, lambda e: e.get("mkt") == "anytime_td" and e.get("role") == "RB"
              and (e.get("tpg") or 0) >= 15 and (e.get("tt") or 0) >= 24 and (e.get("price") or -999) >= -200, False)],   # no -300s (Jordan 11/15)
-    "cfb": [_ATS, _TOT, _FBP, _TD],
+    "cfb": [("ats_e2", "Top 5 against the spread", 5, lambda e: e.get("kind") == "spread" and (e.get("edge") or 0) > CFB_ATS_EDGE, True),
+            ("totals", "Top 5 totals (leans, not graded)", 5, lambda e: e.get("kind") == "total", "lean"),
+            ("rush_u", "Top 10 player props: rushing yards unders", 10, lambda e: e.get("kind") == "prop" and e.get("mkt") == "rush_yds"
+             and e.get("side") == "under", True),
+            _TD],
     # 11/15: no NBA game model prices spreads or totals (their chance is Onyx's own no-vig price), so those are not
     # the model's picks and have no list (11/14-11/15 rows stay in the Model record, append-only)
-    "nba": [("props", "Top 10 player props", 10, lambda e: e.get("kind") == "prop" and e.get("mkt") in NBA_PROPS, True)],
+    # NBA props, list rule v3 (11/15, the NBA tune-up): unders only, no single-stat points, edge over 2 points, on top of
+    # the best-value floors (-200 or longer, 50%+, edge > 0, biggest edge first). Chosen on the tuning months (2024-25
+    # and Oct-Jan 2025-26; every one of the 50 best of 6,048 list rules by tuning ROI dropped points and needed 2+ points
+    # of edge, 36 of 50 were unders), judged on Feb 2026 on (held out, fives unknown): open 216-156 +12.6% (v2 +6.5%),
+    # close 202-154 +9.5% (v2 +3.3%). Points: the model's chance loses to Onyx's own close (log loss .6937 vs .6922
+    # held out). 2026-27 alone at the close: -2.7% on 73 (v2 -1.5%). New list key, so it starts its own record.
+    "nba": [("props_u", "Top 10 player props: unders", 10, lambda e: e.get("kind") == "prop" and e.get("mkt") in NBA_PROPS - {"pts"}
+             and e.get("side") == "under" and (e.get("edge") or 0) > 0.02, True)],
     "cbb": [_ATS, _TOT, _ML],
     "nhl": [("ats", "Top 5 puck lines", 5, lambda e: e.get("kind") == "spread", True), _ML, _TOT],
     "tennis": [("ml", "Top 5 match winners", 5, lambda e: e.get("kind") == "ml", True),
@@ -346,7 +372,8 @@ def tops(sport, date, rows, now=None):
             # Ask Onyx's "most likely first" key; Onyx's own 2+ TD prices rank by chance alone, as Ask does (11/15: a
             # near tie in one game, Allen .1806 / Cook .1761, flipped between the page and Ask on the edge term)
             c.sort(key=lambda e: -e["conf"] if e.get("mkt") == "two_td" else -(e["conf"] + (e.get("edge") or 0) / 10))
-        lists.append({"key": key, "title": title, "n": n, "rows": c[:4 * n], **({} if std else {"info": True}),
+        # "lean" (11/15, college football totals): ranked best value like a value list, but information, never graded
+        lists.append({"key": key, "title": title, "n": n, "rows": c[:4 * n], **({"info": True} if not std or std == "lean" else {}),
                       **({"mode": "ev"} if std == "ev" else {})})   # ev: one play per player, several a game (as tested)
     return {"sport": sport, "date": date, "generated": now.isoformat(timespec="seconds"), "lists": lists}
 

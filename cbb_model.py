@@ -5,6 +5,44 @@ started each season from last season's ratings pulled toward average.
 
 Changelog (newest first; each entry cites its evidence)
 
+  v3  11/15  Honest chances: the shown chance is essentially Onyx's no-vig price, because
+      nothing we tried beats Onyx held out. The model's share of the blend (BLEND_W) is
+      moneyline 0, spread 0.05, total 0.05 (was 30% on all three, sports_build.DEFAULT_W),
+      and the projected margin is stretched x1.2 while either team has played fewer than 12
+      games this season, shrunk x0.9 after (STRETCH; the November margin squeeze: a 20-point
+      model favourite won by 23 to 25). Ratings, home edge, prior keep, pace and totals are
+      unchanged.
+      Evidence: tools/cbb_v3_backtest.py (every number below). Choose: ESPN closing spreads and
+      totals 2018-19 to 2024-25 (about 37,000 games), each game priced from ratings fitted on
+      games before its date. Tried 61,425 configurations: 28,350 margin (early stretch 0.9 to
+      1.3 below 6 or 12 games played, late stretch 0.9 to 1.1, home edge -1 / 0 / +1 point,
+      margin spread 9 / 11 / 13, blend weight 0 to 0.45 with or without a ramp by games
+      played) and 33,075 total (level shift -1 to +3, a rolling 7 / 14 / 28-day scoring-level
+      correction, a tempo term of -0.4 / 0 / +0.4 a possession off 68 (a scratch run: the
+      tool's grid has the other 11,025), total spread 13 / 15 / 17, the same weights), each at
+      prior keep 0.85 / 1.0 / 1.14; ranked by log loss and,
+      separately, by best-value list ROI on three choose windows (2024-25 alone, 2018-25, Onyx
+      2025-26 open). Log loss picked the same margin shape in every window (stretch 1.2 early,
+      0.9 late, keep 0.85, weight 0.05 to 0.2); home edge, tempo, the level correction and the
+      prior keep gained nothing that held up, and every total config sat within 0.0001 of the
+      closing price. ROI-ranked winners made +4% to +10% where chosen and -45% to +6% later.
+      The log-loss winner (margin spread 13, weight 0.1) and v3 (spread 11 as tuned in v1,
+      weight 0.05) are within 0.00005 everywhere; the lower weight is taken because the 0.1
+      list did not clear the bar held out (below).
+      Judged on Onyx 2025-26 (5,000+ games a market, never used to choose) and Nov 2026 (220):
+      log loss minus Onyx's no-vig price's, x1e-4 (negative beats Onyx), open / close:
+        spread    v2 +15.8 / +15.8, Nov 2026 +148.7 / +96.0   v3 -2.6 / -2.2, Nov 2026 -0.8 / -0.9
+        total     v2  -5.2 / +10.6, Nov 2026  -22.9 / -51.9   v3 -2.6 / -0.4, Nov 2026 -8.3 / -14.3
+        moneyline v2 +17.2 / +23.2, Nov 2026  +66.0 / +71.5   v3 exactly Onyx (weight 0)
+      Every moneyline weight above 0 was worse than Onyx in every held-out window. Against the
+      ESPN close of Nov 2026 (545 games) v3's spread is still +9.8 worse (v2 +123.9).
+      Best-value lists (edge > 0, -200 or longer, 50%+, top 5 a market a day), all markets,
+      2025-26: v2 829-755 -2.1% (1,584 bets) at the open, 818-777 -3.6% (1,595) at the close;
+      v3 1-0 and 1-3: the chance almost never clears Onyx's margin, so the lists go quiet.
+      Nov 2026: v2 40-41 -4.2% / 47-32 +13.7%; v3 no bets. Spread weight 0.1 instead: 2025-26
+      117-104 +1.1% / 118-108 +0.1% (221 / 226), Nov 2026 12-13 -8.2% / 14-13 -1.0%; under the
+      +2% finalize bar and losing this season, so not taken.
+
   Tested 11/2, NOT adopted (still v2): the transfer-aware preseason blend
     (data/cbb/team_prior.json's method; ratings(blend=...)) as the prior in place of last
     season's Torvik kept 85%. Walk-forward on 5,489 games with real Onyx 2025-26 prices
@@ -69,7 +107,7 @@ import json, math, re, unicodedata
 from datetime import date
 from pathlib import Path
 
-VERSION = "v2"
+VERSION = "v3"
 KIND = "basketball"
 TEMPO = 68.0          # possessions per 40 minutes, D1 average, turns per-100 efficiency into points
 PRIOR_KEEP = 0.85     # share of last season's distance from average a team starts with
@@ -81,6 +119,11 @@ P = {"half_life": 120, "ridge": 6, "home": 3.5, "sd_margin": 11.0, "sd_total": 1
 # pace rating carries (final scores alone barely separate pace from offense and defense)
 PACE_KEEP = 0.5
 BLEND_KEEP = 1.0      # share of the transfer-aware blend's distance from average a team starts with (tested 11/2, not live)
+# v3: the model's share of each market's blend with Onyx's no-vig price (sports_build.game_rows, cards._sides,
+# tools/picks_backtest.py read it); held out, no larger share beat Onyx, and any moneyline share lost to it
+BLEND_W = {"ml": 0.0, "spread": 0.05, "total": 0.05}
+# v3: projected margin x early while either team has played fewer than `games` this season, x late after
+STRETCH = {"early": 1.2, "late": 0.9, "games": 12}
 P2 = {"half_life": 120, "ridge": 6, "ridge_pace": 30, "home": 3.5, "mu0": 72.0, "mu_k": 40, "iters": 15}
 TEST = {"n": 3528, "logloss": 0.585, "base_logloss": 0.697, "mae_total": 13.62, "base_mae_total": 15.42,
         "mae_total_v1": 13.76, "mae_total_close": 13.38, "window": "1/1/2026 on"}
@@ -329,4 +372,23 @@ def ratings(lane_dir, games, as_of, names=None, P_=None, pace=True, blend=None):
             m, tot = eh - ea, ph + pa
             return max((tot + m) / 2, 0.05), max((tot - m) / 2, 0.05)
         R = dict(R, expect=expect, pace=Rp["pace"], poss=Rp["poss"], tempo=Rp["tempo"])
-    return R
+    return stretch(R, cur, as_of, T)
+
+
+def stretch(R, cur, as_of, T, S=None):
+    """v3: the projected margin x STRETCH early while either team has played fewer than STRETCH
+    games this season (the fit squeezes November margins), x late after; the total is unchanged."""
+    S = S or STRETCH
+    gp = {}
+    for g in cur:
+        if g["date"] < as_of:
+            for t in (g["home"], g["away"]):
+                gp[t] = gp.get(t, 0) + 1
+    base = dict(R)
+
+    def expect(home, away, neutral=False):
+        eh, ea = T.expect(base, home, away, neutral)
+        k = S["early"] if min(gp.get(home, 0), gp.get(away, 0)) < S["games"] else S["late"]
+        m, tot = k * (eh - ea), eh + ea
+        return max((tot + m) / 2, 0.05), max((tot - m) / 2, 0.05)
+    return dict(R, expect=expect, gp=gp, stretch=dict(S))
