@@ -4,6 +4,18 @@ ATP and WTA singles match ESPN reports (data/tennis/results.json).
 
 Changelog (newest first; each entry cites its evidence)
 
+  v4  11/15  Games markets fixed and made honest (Jordan, after the tennis audit: "tennis & nfl need an overhaul", then
+      "Tennis: bug + games markets"). The tennis scope (12,926 Onyx-priced matches Jan 2025 to Oct 2026, every
+      chance rebuilt from earlier matches only; tools/scope_tennis_*.py, report in the 11/15 README note):
+      (1) Bug: any ATP match at a Slam was played out best of five, qualifying included (qualifying is best of
+      three), so the site showed ~65% overs on Slam qualifying totals that won 45% (811 past lines); it is also
+      what made the Onyx Picks re-test's total-games lane claim 63% and hit 45%. Best of five now only for ATP
+      main-draw rounds (games_markets rnd). (2) The games chain ran on Elo alone and ignored the price: where it
+      said 60-80% the side won about 50%. Fed the match price instead (the v3 chance: Onyx's no-vig moneyline
+      adjusted), held-out log loss 0.722 -> 0.691 on spreads and 0.804 -> 0.698 on totals; still not better than
+      Onyx's own spread and total prices, so the model's share of the chance shown on games markets is 0
+      (GAMES_W): they show the projected games as information and never claim an edge. Moneyline unchanged (v3).
+
   v3  11/12  Match price from Onyx's own no-vig moneyline, adjusted (Jordan: "go on tennis", then "backtest all
       sports and finalize where we can"). Elo alone adds nothing to Onyx's price: blended 30% (v2) it made 2026
       log loss worse (.5990 against Onyx's .5946) and the pick rule lost -7.3% at the open on 379 bets. v3 =
@@ -43,7 +55,9 @@ import math
 
 from sports_common import nk
 
-VERSION = "v3"
+VERSION = "v4"
+# v4: the games markets' share of the chance shown (they did not beat Onyx's own spread and total prices held out)
+GAMES_W = 0.0
 P = {"k0": 150.0, "shape": 0.4, "k_slam": 1.0, "min_matches": 10}
 SLAMS = ("australian open", "roland garros", "french open", "wimbledon", "us open")
 
@@ -234,10 +248,11 @@ def _match(pt, need):
     return win, end
 
 
-def games_markets(p_win, tour, event, total=None, spread0=None, P=GAME_P):
-    """The Elo view of a match's games markets: P(over total), P(player 0
-    covers spread0) and the expected games. p_win: Elo chance player 0 wins."""
-    need = 3 if tour == "ATP" and any(s in (event or "").lower() for s in SLAM_BO5) else 2
+def games_markets(p_win, tour, event, total=None, spread0=None, P=GAME_P, rnd=None):
+    """A match's games markets: P(over total), P(player 0 covers spread0) and the expected games, played out game by
+    game from p_win (v4: the match price, Onyx's no-vig moneyline adjusted, p_v3; it was Elo). Best of five only
+    in an ATP Slam main draw (v4: qualifying is best of three)."""
+    need = 3 if tour == "ATP" and any(s in (event or "").lower() for s in SLAM_BO5) and "qualif" not in str(rnd or "").lower() else 2
     base = P["base_wta"] if tour == "WTA" else P["base_atp"]
     sg = P["form"]
 

@@ -749,6 +749,7 @@ def tennis_rows(lane, slate, odds, w):
             if not (E.known(nk(a)) and E.known(nk(b))):
                 continue
             p0 = E.p(nk(a), nk(b))
+            pv = None          # the v3 match price, when Onyx prices the moneyline
             g = {"gid": m["id"], "start": m.get("start"), "away": b, "home": a}
             if o.get("ml0") is not None and o.get("ml1") is not None:
                 # v3 (11/12): the match price is Onyx's own no-vig moneyline adjusted by each player's last 45 days
@@ -766,19 +767,23 @@ def tennis_rows(lane, slate, odds, w):
                                        f" vs {E.r.get(nk(a), 1500):.0f} · {e.get('name')}")
                     r["matchup"] = f"{a} vs {b}"
                     out.append(r)
-            # games markets (v2): the Elo view of the total and the game spread
+            # games markets (v4): played out from the match price (v3: Onyx's no-vig moneyline adjusted; was Elo), best
+            # of five only in an ATP Slam main draw, and no model share in the chance shown (TM.GAMES_W 0: they did not
+            # beat Onyx's own spread and total prices held out), so they are information, never an edge
             if o.get("total") is not None or o.get("sp0") is not None:
-                gm = TM.games_markets(p0, e.get("tour"), e.get("name"), o.get("total"), o.get("sp0"))
-                det = f"Elo {E.r.get(nk(a), 1500):.0f} vs {E.r.get(nk(b), 1500):.0f} · {gm['exp_games']:.1f} games projected"
+                pm = pv if pv is not None else p0
+                gm = TM.games_markets(pm, e.get("tour"), e.get("name"), o.get("total"), o.get("sp0"), rnd=m.get("round"))
+                gw = getattr(TM, "GAMES_W", w)
+                det = f"Match price {pm * 100:.0f}% · {gm['exp_games']:.1f} games projected · Elo {E.r.get(nk(a), 1500):.0f} vs {E.r.get(nk(b), 1500):.0f}"
                 if o.get("total") is not None and o.get("over") is not None and o.get("under") is not None:
                     r = _row(g, "total", "Total games", o["total"], "", None, gm["p_over"], o["over"], o["under"],
-                             o.get("over_sel"), o.get("under_sel"), w, det)
+                             o.get("over_sel"), o.get("under_sel"), gw, det)
                     if r:
                         r["matchup"] = f"{a} vs {b}"
                         out.append(r)
                 if o.get("sp0") is not None and o.get("sp0_price") is not None and o.get("sp1_price") is not None:
                     r = _row(g, "spread", a, o["sp0"], f"{o['sp0']:+g}", None, gm["p_cover0"], o["sp0_price"], o["sp1_price"],
-                             o.get("sp0_sel"), o.get("sp1_sel"), w, det)
+                             o.get("sp0_sel"), o.get("sp1_sel"), gw, det)
                     if r:
                         r["matchup"] = f"{a} vs {b}"
                         out.append(r)

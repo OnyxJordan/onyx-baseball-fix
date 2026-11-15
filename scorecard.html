@@ -488,18 +488,13 @@ fetch('data/picks/model_record.json', {cache: 'no-cache'}).then(r => r.ok ? r.js
   const NAME = {nfl: 'NFL', nba: 'NBA', nhl: 'NHL', tennis: 'Tennis', cfb: 'College football', cbb: 'College basketball'}, PAGE = {nfl: 'nfl.html', nba: 'nba.html', nhl: 'nhl.html', tennis: 'tennis.html', cfb: 'cfb.html', cbb: 'cbb.html'};
   const row = (lab, a, cls) => `<tr class="${cls}"><td>${lab}</td><td>${a.w}-${a.l}${a.p ? '-' + a.p : ''}</td><td class="${a.units >= 0 ? 'pos' : 'neg'}">${a.units >= 0 ? '+' : ''}${a.units.toFixed(1)}u</td><td class="${(a.roi || 0) >= 0 ? 'pos' : 'neg'}">${a.roi == null ? '-' : (a.roi >= 0 ? '+' : '') + (a.roi * 100).toFixed(1) + '%'}</td></tr>`;
   const order = ['nfl', 'nba', 'nhl', 'tennis', 'cfb', 'cbb'].filter(k => R.sport[k]);
-  // the current model version first; earlier versions in one row below it (11/14, Jordan)
-  const md = d => String(d || '').slice(5).replace('-', '/').replace(/^0/, '');
-  const sum = L => L.reduce((a, v) => ({w: a.w + v.w, l: a.l + v.l, p: a.p + v.p, units: a.units + v.units, roi: null, pending: a.pending + v.pending}), {w: 0, l: 0, p: 0, units: 0, pending: 0});
-  const body = order.map(k => { const VS = (R.ver || {})[k] || [], C = VS[0];
-    if (!C) return row(`<a href="${PAGE[k]}#plays" style="color:inherit">${NAME[k]}</a>`, R.sport[k], 'sp');
-    const old = VS.slice(1), O = sum(old); if (O.w + O.l) O.roi = O.units / (O.w + O.l);
-    return row(`<a href="${PAGE[k]}#plays" style="color:inherit">${NAME[k]}</a> · current model ${E(C.v)} since ${md(C.start)}`, C, 'sp')
-      + Object.keys(C.cat || {}).map(c => row(E((R.cat[k + ':' + c] || {}).title || c), C.cat[c], 'c')).join('')
-      + (old.length ? row('Earlier versions (' + old.map(v => E(v.v)).join(', ') + ')', O, 'c') : ''); }).join('');
+  // 11/15: the current list rules' record per sport and list, then the old lists' record (most likely first)
+  const body = order.map(k => row(`<a href="${PAGE[k]}#plays" style="color:inherit">${NAME[k]}</a>`, R.sport[k], 'sp')
+      + Object.keys(R.cat).filter(c => c.startsWith(k + ':')).map(c => row(E(R.cat[c].title || c), R.cat[c], 'c')).join('')
+      + ((R.old || {})[k] ? row('Old lists, most likely first (to 11/15)', R.old[k], 'c') : '')).join('');
   el.innerHTML = `<div class="mr"><h2>Model record · every sport</h2>
-    <p>Every play the sport pages' model picks lists showed (Top 5 against the spread, Top 5 totals, Top 10 player props and the rest), graded at the Onyx price showing before the game, one unit each. Not Onyx Picks: a market becomes one only by passing our backtest. Since ${E(String(R.since || '').slice(5).replace('-', '/').replace(/^0/, ''))}; ${R.rebuilt} plays through 11/14 were rebuilt from the site's own history of what it showed, the rest logged as they happen.</p>
-    <div class="mr-w"><table class="mr-t"><thead><tr><th>Sport · list (current model)</th><th>W-L-P</th><th>Units</th><th>ROI</th></tr></thead><tbody>${row('All sports', R.all, 'sp')}${body}</tbody></table></div></div>`;
+    <p>Today's list rules (NFL Recommended plays: unders in receptions, pass attempts and rushing yards at 10%+ expected value; every other list: best value, positive edge only), every play they would have listed, one unit each at the Onyx price showing when it qualified. NFL before 10/30 is the 2026 season replay at Onyx's opening price; 10/30 to 11/15 is rebuilt from the site's own board history; after that, logged live. Not Onyx Picks: a market becomes one only by passing our backtest. The old lists (most likely first) keep their own record below each sport.</p>
+    <div class="mr-w"><table class="mr-t"><thead><tr><th>Sport · list</th><th>W-L-P</th><th>Units</th><th>ROI</th></tr></thead><tbody>${row('All sports', R.all, 'sp')}${body}</tbody></table></div></div>`;
 }).catch(() => {});
 if (window.OnyxLive) { OnyxLive.css(); OnyxLive.ledger().then(function (rows) {
   var el = document.getElementById('scLive'); if (!el) return;
