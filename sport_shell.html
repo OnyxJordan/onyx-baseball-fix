@@ -467,7 +467,9 @@
         <button class="btn-primary" onclick="gotoTab('games')">Live games</button>
         <button class="btn-secondary" onclick="gotoTab('board')">Onyx board</button>
         <button class="btn-secondary" onclick="gotoTab('plays')">Plays</button>
+        <a class="btn-secondary" id="studioCta" href="studio.html" style="display:none;text-decoration:none">NFL Studio</a>
       </div>
+      <script>if (window.OX_SITE === 'nfl') document.getElementById('studioCta').style.display = '';</script>
     </div>
   </div>
   <div class="home-stats-grid" id="homeStats"></div>
