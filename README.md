@@ -1701,6 +1701,25 @@ later" (7 PM on), and "between 1 and 4 pm". A bare hour counts as afternoon or e
 after / until or with a game-time word, so "4 picks by 2s" and "after 2 legs" stay counts. Sides, totals and
 parlays already covered every sport.
 
+**Tune-ups and the tennis paper test (11/15).** Jordan: "start tuning up their models especially tennis", then "commit
+everything and build the tennis paper test". Each sport was replayed on Onyx's opening and closing prices, chosen on one
+season and judged on another:
+- NBA (list rule v3, `daily_top` key `props_u`): unders only, no single-stat points, edge over 2 points. Held out (Feb
+  2026 on): +12.6% open / +9.5% close on 372 / 356 bets (v2 +6.5% / +3.3%). 2026-27 alone at the close -2.7% on 73.
+  No model change: 27 projection fixes, none held. The 1Q / 1H Onyx Picks lanes are untouched.
+- College football (rule v3): spreads need a 2-point edge (2026 held out +8.4% / +4.9% on 51, was -6.3% / -6.7%),
+  props are rushing yards unders (+24.6% / +19.7% from 10/5), totals are leans, never graded (3-12; no setting won
+  2025 at both prices). cfb_model stays v2; the finalized rushing yards market is keyed to cfb_players, untouched.
+- NHL v3 and college basketball v3: nothing beat Onyx held out (588 and 61,425 configs), so the chance shown is
+  essentially Onyx's (NHL 10% model share and a 180-day ratings half-life; CBB moneyline 0, spread and total 5%, plus
+  an early-season margin stretch). Their value lists go quiet, which is the honest answer.
+- Tennis: set-score serve proxies (tiebreak rate, games per set, decider rate, games won in lost sets) improved log
+  loss by only .0005-.001 held out. Onyx against the sharp book (Pinnacle's 2025-26 prices on the same feed, about
+  17,000 matches): Onyx moneylines 2%+ softer than the sharp no-vig chance made +9.3% (2025, 1,544) and +9.2% (2026,
+  2,091) at the two opens, +9.5% / +7.6% where 4%+ softer at the closes (in-play closes screened out); spreads and
+  totals showed nothing. The history has no timestamps, so `tennis_paper.py` now logs the rule live with both prices
+  from one odds run (`data/tennis/paper.json`), graded off ESPN, never shown as picks.
+
 **The record under today's rules, every sport; tennis v4 (11/15).** Jordan: "run the record on what it would be based on
 the recommended best bets retroactively is it 17-26?", "fix the record reasonably what it would of recommended and what
 it would be on the 2026 season", "do this across all sports with new models". The 17-26 was NFL's old lists (most likely
