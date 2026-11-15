@@ -1694,6 +1694,26 @@ later" (7 PM on), and "between 1 and 4 pm". A bare hour counts as afternoon or e
 after / until or with a game-time word, so "4 picks by 2s" and "after 2 legs" stay counts. Sides, totals and
 parlays already covered every sport.
 
+**The record under today's rules, every sport; tennis v4 (11/15).** Jordan: "run the record on what it would be based on
+the recommended best bets retroactively is it 17-26?", "fix the record reasonably what it would of recommended and what
+it would be on the 2026 season", "do this across all sports with new models". The 17-26 was NFL's old lists (most likely
+first, v15). `model_record.py` now tags every row with its list `rule`: "v1" = the old lists (10/30-11/15, kept as
+they were), "v2" = today's (NFL Recommended plays; best value, positive edge only, elsewhere), logged the moment a
+play qualifies (any day before its start, at the price showing: the NFL value is at the open). The pages and the
+scorecard lead with v2 and show the v1 record below each sport.
+- v2 rows: `tools/model_record_rebuild.py` replayed the site's board history (10/30-11/15) under the v2 rules for
+  every sport (480 plays), and `tools/model_record_nfl_replay.py` the 2026 NFL season before 10/30 (the
+  nfl_situational replay at Onyx's opening price, 45 plays, `"src": "replay"`).
+- v2 vs v1 (to 11/15): NFL 44-30, +12.0u, +16.2% (Recommended plays 35-17, +16.8u, +32.4%: replay 34-11, board
+  history 1-6) vs 38-50, -14.7u; NBA 62-47, +6.8u, +6.3% vs 118-107, -26.4u; tennis 28-31, -7.6u vs 76-98, -43.6u;
+  college basketball 73-68, -6.3u vs 76-75, -14.6u; college football 39-41, -7.0u (props +11.1%, totals 3-12) vs
+  53-34, -2.9u; NHL 16-25, -12.8u (puck lines 9-17) vs 68-68, -21.1u. Best value helps NFL, NBA, tennis and college
+  basketball; NHL and college football value lists lose (the NHL audit: where the model disagrees with Onyx, Onyx is
+  right).
+- tennis_model v4 (changelog): Slam qualifying is best of three (it was priced best of five: ~65% overs that won 45%);
+  the games markets play out from the match price (v3) instead of Elo, and give the model no share of the chance
+  shown (GAMES_W 0), so spreads and total games are information, never an edge.
+
 **NFL Recommended plays and the TD Corner; best value lists everywhere (11/15).** Jordan: "we're not looking for -400s
 ... we want to make as many units as possible", "recommended plays that have the highest EV", "we still want TD scorers
 though and to find the best value there because that's fun as well". From `tools/nfl_situational.py` rows (every Onyx
