@@ -560,6 +560,13 @@ def nfl_block(lane, slate, odds):
             g, team, opp, home, last = meta[pid]
             row = {"pid": pid, "name": last["name"], "hs": last.get("hs"), "team": team, "opp": opp, "home": home, "gid": g["gid"],
                    "matchup": f"{team} {'vs' if home else '@'} {opp}", "any": round(p_any, 4), "first": round(p_first, 4)}
+            # 11/15 TD Corner (tools/nfl_td_value.py): his touches a game this season, his team's Onyx-implied points and
+            # his role, for "best TD looks" (a back with 15+ touches on a team implied 24+, the least-bad slice)
+            cur_ = [x for x in by.get(pid, []) if x["season"] == season]
+            car_ = sum(x.get("rush_att") or 0 for x in cur_); tgt_ = sum(x.get("tgt") or 0 for x in cur_)
+            row["tpg"] = round(sum((x.get("rush_att") or 0) + (x.get("rec") or 0) for x in cur_) / len(cur_), 1) if cur_ else None
+            row["tt"] = round(implied.get(team), 1) if implied.get(team) is not None else None
+            row["role"] = "RB" if car_ >= tgt_ and car_ > 0 else "WR/TE" if tgt_ > 0 else None
             it = E.injury_of(inj, pid, last["name"])
             if it:
                 row["inj"], row["inj_d"] = "Q", it["d"]
@@ -1564,7 +1571,9 @@ def write_top(key, lane, slate, model):
         board.append(dict(DT.entry(key, c, tag(c), start.get(r["gid"])), lam=round(-math.log(max(1e-6, 1 - r["any"])), 4),
                           # the TD model's own chance (not blended into the chance shown: it lost to Onyx's price in testing),
                           # so Ask Onyx can rank "your favorite TD scorers" by how much the model likes them against their price
-                          **({"model": round(r["any_model"], 4)} if r.get("any_model") is not None else {})))
+                          **({"model": round(r["any_model"], 4)} if r.get("any_model") is not None else {}),
+                          # TD Corner (11/15): touches a game, team implied points, role
+                          **{k: r[k] for k in ("tpg", "tt", "role") if r.get(k) is not None}))
         if r.get("first_price") is not None:              # first touchdown scorer (shown, never recommended: Onyx won its backtest)
             c1 = dict(c, mkt="first_td", price=r["first_price"], prob=r["first"], edge=r.get("first_edge") or 0.0, sel=r.get("first_sel"))
             board.append(DT.entry(key, c1, "lean", start.get(r["gid"])))

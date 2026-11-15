@@ -266,14 +266,27 @@ def keep_pregame(data_dir, rows, hours=36):
 # every sport gets the same lists, and every play in them is graded in the Model record (model_record.py,
 # data/picks/model_log.json), apart from the Onyx Picks record. Only markets the grader can settle are listed.
 TD_MKTS = {"anytime_td", "first_td", "two_td", "three_td"}
+NFL_REC = {"rec", "pass_att", "rush_yds"}
 NBA_PROPS = {"pts", "reb", "ast", "threes", "pr", "pa", "pra"}
 _ATS = ("ats", "Top 5 against the spread", 5, lambda e: e.get("kind") == "spread", True)
 _TOT = ("totals", "Top 5 totals", 5, lambda e: e.get("kind") == "total", True)
 _ML = ("ml", "Top 5 moneylines", 5, lambda e: e.get("kind") == "ml", True)
 _FBP = ("props", "Top 10 player props", 10, lambda e: e.get("kind") == "prop" and e.get("mkt") not in TD_MKTS and not e.get("no_read"), True)   # no_read: nfl_model v16
-_TD = ("td", "Top 10 to score a touchdown", 10, lambda e: e.get("mkt") == "anytime_td", False)
+_TD = ("td", "Top 10 most likely to score a touchdown", 10, lambda e: e.get("mkt") == "anytime_td", False)
 TOPS = {
-    "nfl": [_ATS, _TOT, _FBP, _TD, ("td2", "Top 5 to score 2+ touchdowns", 5, lambda e: e.get("mkt") == "two_td", False)],
+    # NFL (11/15, Jordan: "we want recommended plays that have the highest EV ... we're not looking for -400s"):
+    # tools/nfl_situational.py: unders in receptions, pass attempts and rushing yards, priced -150 to +150, with the
+    # model's expected value 10%+, went 121-62 (+58.2u, +31.8% at the open, +26.5% at the close) over 2024-2026,
+    # positive in all three seasons; overs lost every season; under 6% EV lost. Ranked by expected value ("ev").
+    # Then the TD Corner (tools/nfl_td_value.py): no touchdown slice beat Onyx's margin in both seasons, so these are
+    # information ("info"): the most likely scorers and the least-bad slice, a back with 15+ touches a game on a team
+    # implied 24+ (-16.8% 2025, -4.0% 2026 at the open), never graded.
+    "nfl": [("rec", "Recommended plays", 20, lambda e: e.get("kind") == "prop" and e.get("mkt") in NFL_REC and e.get("side") == "under"
+             and -150 <= (e.get("price") or 0) <= 150 and (e.get("ev") or 0) >= 0.10, "ev"),
+            _ATS, _TOT, _TD,
+            ("td2", "Top 5 most likely to score 2+ touchdowns", 5, lambda e: e.get("mkt") == "two_td", False),
+            ("tdlook", "Best TD looks: lead backs on high-scoring teams", 5, lambda e: e.get("mkt") == "anytime_td" and e.get("role") == "RB"
+             and (e.get("tpg") or 0) >= 15 and (e.get("tt") or 0) >= 24 and (e.get("price") or -999) >= -200, False)],   # no -300s (Jordan 11/15)
     "cfb": [_ATS, _TOT, _FBP, _TD],
     # 11/15: no NBA game model prices spreads or totals (their chance is Onyx's own no-vig price), so those are not
     # the model's picks and have no list (11/14-11/15 rows stay in the Model record, append-only)
@@ -313,10 +326,26 @@ def tops(sport, date, rows, now=None):
             return False
     lists = []
     for key, title, n, want, std in TOPS[sport]:
-        c = [e for e in rows if want(e) and pre(e) and e.get("price") is not None and e.get("conf") is not None
-             and e.get("src") != "market" and (not std or (e["price"] >= -200 and e["conf"] >= 0.5))]
-        c.sort(key=lambda e: -(e["conf"] + (e.get("edge") or 0) / 10))   # Ask Onyx's "most likely first" key
-        lists.append({"key": key, "title": title, "n": n, "rows": c[:4 * n]})
+        # 11/15 (Jordan, after the six-sport audit): best value, positive edge only. "Most likely first" bought
+        # expensive favorites our own numbers said were overpriced (NBA held out: most likely -5.5%, best value
+        # +5.6%; NFL, tennis, college basketball the same direction). A list is the plays whose chance beats the
+        # price, biggest edge first, with Ask Onyx's list floors (-200 or longer, 50%+), as Ask reads
+        # "top 5 nfl spreads positive value only". Touchdown scorers can never beat Onyx's price (its touchdown
+        # prices carry about a 21% margin), so their lists stay "most likely to score": information, not picks,
+        # never logged in the Model record (info).
+        if std == "ev":       # the NFL recommended plays: the rule is in want(); highest expected value first
+            c = [e for e in rows if want(e) and pre(e) and e.get("price") is not None and e.get("conf") is not None and e.get("src") != "market"]
+            c.sort(key=lambda e: -(e.get("ev") or 0))
+        elif std:
+            c = [e for e in rows if want(e) and pre(e) and e.get("price") is not None and e.get("conf") is not None
+                 and e.get("src") != "market" and e["price"] >= -200 and e["conf"] >= 0.5 and (e.get("edge") or 0) > 0]
+            c.sort(key=lambda e: -(e.get("edge") or 0))      # Ask Onyx's "best value" key
+        else:
+            c = [e for e in rows if want(e) and pre(e) and e.get("price") is not None and e.get("conf") is not None
+                 and e.get("src") != "market"]
+            c.sort(key=lambda e: -(e["conf"] + (e.get("edge") or 0) / 10))   # Ask Onyx's "most likely first" key
+        lists.append({"key": key, "title": title, "n": n, "rows": c[:4 * n], **({} if std else {"info": True}),
+                      **({"mode": "ev"} if std == "ev" else {})})   # ev: one play per player, several a game (as tested)
     return {"sport": sport, "date": date, "generated": now.isoformat(timespec="seconds"), "lists": lists}
 
 
