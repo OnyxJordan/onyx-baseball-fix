@@ -1043,7 +1043,7 @@
      "id": "187534",
      "start": "2026-11-15T17:25Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Qualifying Final",
      "draw": "Women's Singles",
      "court": "Grandstand",
@@ -1055,9 +1055,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        1
+        1,
+        0
        ],
-       "serve": false
+       "serve": true
       },
       {
        "name": "Martina Trevisan",
@@ -1066,9 +1067,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        4
+        6,
+        5
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -1088,9 +1090,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        0
+        3
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Ariana Geerlings",
@@ -1099,7 +1101,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        5
        ],
        "serve": false
       }
@@ -2036,5 +2038,5 @@
    ]
   }
  ],
- "fetched": "2026-11-15T17:50:24+00:00"
+ "fetched": "2026-11-15T18:18:51+00:00"
 }
