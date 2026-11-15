@@ -36,7 +36,6 @@
     },
     onyx: function (sels, tag) {
       sels = (sels || []).filter(Boolean); if (!sels.length) return null;
-      try { if (window.gtag) gtag('event', 'onyx_click', {link_type: 'studio_' + (tag || 'bet'), legs: sels.length}); } catch (e) {}
       return 'https://app.onyxodds.com/share?' + sels.map(function (s) { return 'selection=' + encodeURIComponent(s); }).join('&') + '&referrer=' + REFERRER;
     },
     onyxBtn: function (row, text) {
@@ -89,6 +88,12 @@
       catch (e) { console.error(e); el.innerHTML = '<div class="st-err">' + u.esc(NAMES[key] || key) + ' could not load: ' + u.esc(e.message) + '</div>'; MOUNTED[key] = {}; }
     }).catch(function (e) { el.innerHTML = '<div class="st-err">The NFL board could not load (' + u.esc(e.message) + '). Pull to refresh.</div>'; });
   }
+
+  // one Onyx click event per tap on any Onyx link in the Studio (counted on the tap, never when a link is drawn)
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a[href^="https://app.onyxodds.com/share"]'); if (!a) return;
+    try { if (window.gtag) gtag('event', 'onyx_click', {link_type: 'studio_' + (location.hash.slice(1).split('?')[0] || 'tab'), legs: (a.href.match(/selection=/g) || []).length}); } catch (x) {}
+  }, true);
 
   function start() {
     var tabs = document.getElementById('stTabs'), panes = document.getElementById('stPanes');
