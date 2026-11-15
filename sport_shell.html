@@ -2263,13 +2263,16 @@ function topsHtml(T, REC) {
   }).join('');
   // 11/15 (Jordan: "fix the record reasonably what it would of recommended"): the current list rules' record leads;
   // where it came from (season replay, the site's board history, live) is said; the old lists' record sits below
-  const SR = REC && (REC.sport || {})[SD.sport], OLD = REC && (REC.old || {})[SD.sport], SRC = REC && (REC.src || {})[SD.sport] || {};
+  const SR = REC && (REC.sport || {})[SD.sport], OLD = REC && (REC.old || {})[SD.sport], PREV = REC && (REC.prev || {})[SD.sport], SRC = REC && (REC.src || {})[SD.sport] || {};
   const md = d => String(d || '').slice(5).replace('-', '/').replace(/^0/, '');
   const how = [SRC.replay ? `${SRC.replay} from the 2026 season replay at Onyx's opening price (before 10/30)` : '', SRC.rebuilt ? `${SRC.rebuilt} rebuilt from the site's own board history since 10/30` : '', SRC.live ? `${SRC.live} logged live` : ''].filter(Boolean).join(', ');
   const older = OLD && (OLD.w + OLD.l) ? `The old lists (most likely first, ${md(OLD.start)} to ${md(OLD.end)}): ${OLD.w}-${OLD.l}${OLD.p ? '-' + OLD.p : ''}, ${OLD.units >= 0 ? '+' : ''}${OLD.units.toFixed(1)}u.` : '';
+  // 11/15 tune-ups: a sport on a newer list rule keeps the previous rule's record (best value, any side) below
+  const before = PREV && (PREV.w + PREV.l) ? `Before the 11/15 tune-up (best value, ${md(PREV.start)} to ${md(PREV.end)}): ${PREV.w}-${PREV.l}${PREV.p ? '-' + PREV.p : ''}, ${PREV.units >= 0 ? '+' : ''}${PREV.units.toFixed(1)}u.` : '';
   const recent = REC && (REC.recent || {})[SD.sport] || [];
   const sum = SR ? `<div class="tp-sum"><b class="big">${SR.w}-${SR.l}${SR.p ? '-' + SR.p : ''}</b><span>${recLine(SR).replace(/^[^·]*· /, '')}</span>
-      <span>The record of today's list rules, every play they would have listed, one unit each at the Onyx price showing when it qualified: ${esc(how)}. ${esc(older)}</span></div>` : '';
+      <span>The record of today's list rules, every play they would have listed, one unit each at the Onyx price showing when it qualified: ${esc(how)}. ${esc(before)} ${esc(older)}</span></div>`
+    : PREV ? `<div class="tp-sum"><span>New list rules from 11/15 (the tune-up): no graded plays under them yet. ${esc(before)} ${esc(older)}</span></div>` : '';
   const hist = recent.length ? `<details class="tp-hist"><summary>Latest graded model picks (${recent.length})</summary><div class="tp-cat" style="margin-top:8px">${recent.map(r =>
       `<div class="tp-row"><span class="tp-n"><span class="tp-res ${r.result === 'W' ? 'w' : r.result === 'L' ? 'l' : ''}">${esc(r.result)}</span></span><div class="tp-w"><b>${esc(r.label)}</b><span>${esc([r.matchup, r.date, r.actual != null ? 'final ' + r.actual : ''].filter(Boolean).join(' · '))}</span></div><div class="tp-r"><span class="ot-px">${fmtOdds(r.price)}</span></div></div>`).join('')}</div></details>` : '';
   return `<div class="tp-wrap"><div class="sec-hdr"><span class="sec-title">Model's ${esc(C.name || '')} picks</span><span class="sec-count">model record, not Onyx Picks</span></div>

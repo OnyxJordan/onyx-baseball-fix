@@ -309,7 +309,14 @@ TOPS = {
             _TD],
     # 11/15: no NBA game model prices spreads or totals (their chance is Onyx's own no-vig price), so those are not
     # the model's picks and have no list (11/14-11/15 rows stay in the Model record, append-only)
-    "nba": [("props", "Top 10 player props", 10, lambda e: e.get("kind") == "prop" and e.get("mkt") in NBA_PROPS, True)],
+    # NBA props, list rule v3 (11/15, the NBA tune-up): unders only, no single-stat points, edge over 2 points, on top of
+    # the best-value floors (-200 or longer, 50%+, edge > 0, biggest edge first). Chosen on the tuning months (2024-25
+    # and Oct-Jan 2025-26; every one of the 50 best of 6,048 list rules by tuning ROI dropped points and needed 2+ points
+    # of edge, 36 of 50 were unders), judged on Feb 2026 on (held out, fives unknown): open 216-156 +12.6% (v2 +6.5%),
+    # close 202-154 +9.5% (v2 +3.3%). Points: the model's chance loses to Onyx's own close (log loss .6937 vs .6922
+    # held out). 2026-27 alone at the close: -2.7% on 73 (v2 -1.5%). New list key, so it starts its own record.
+    "nba": [("props_u", "Top 10 player props: unders", 10, lambda e: e.get("kind") == "prop" and e.get("mkt") in NBA_PROPS - {"pts"}
+             and e.get("side") == "under" and (e.get("edge") or 0) > 0.02, True)],
     "cbb": [_ATS, _TOT, _ML],
     "nhl": [("ats", "Top 5 puck lines", 5, lambda e: e.get("kind") == "spread", True), _ML, _TOT],
     "tennis": [("ml", "Top 5 match winners", 5, lambda e: e.get("kind") == "ml", True),
