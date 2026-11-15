@@ -223,7 +223,9 @@ def team_markets():
         bt = (json.load(open("data/cbb/backtest.json")) if os.path.exists("data/cbb/backtest.json") else {})
         w = (bt.get("lane") or {}).get("w") or 0.3          # sports_build.team_block: the live blend weight (DEFAULT_W without a backtest)
         S, _ = CPB.samples(X)
+        w0 = w
         for mk in ("ml", "spread", "total"):
+            w = (getattr(CM, "BLEND_W", None) or {}).get(mk, w0)     # cbb_model v3: the live weight per market
             ro, rc = [], []
             for r in S:
                 if r["mkt"] != mk:

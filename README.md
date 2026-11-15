@@ -493,7 +493,7 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
   attempts, rebounds, assists, steals, blocks, turnovers, fouls), newest first, at most
   260 games or 120 seconds a run, so cbb runs LAST in the sports loop (the step has a
   12-minute cap). An empty slate stores `next_date` and the page says when play resumes.
-  `cbb_model.py` (v2) fits this season only, every rating
+  `cbb_model.py` (v3) fits this season only, every rating
   pulled toward a preseason prior: last season's Torvik adjusted efficiency from
   `data/cbb/history/teams.json` (Torvik names mapped to ESPN abbreviations in
   `cbb_model.ALIAS`) kept at 85%, or, without that file, last season's own fitted
@@ -539,6 +539,13 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
   --prior 2026 bt/cbb_prior_2026.json`) was slightly better on log loss and margin error but
   better only at the opening price and worse at the close, so `cbb_model` stays v2 (numbers in
   its docstring).
+  v3 (11/15, honest chances): nothing tested beat Onyx held out (`tools/cbb_v3_backtest.py`,
+  61,425 configurations chosen on 2018-25 closing lines, judged on Onyx 2025-26 and Nov 2026),
+  so `cbb_model.BLEND_W` gives the model 0% of the moneyline, 5% of the spread and total
+  (`sports_build.game_rows`, `cards._sides` and `tools/picks_backtest.py` read it in place of
+  the 30% `DEFAULT_W`), and `cbb_model.STRETCH` widens the projected margin x1.2 until both teams
+  have 12 games (x0.9 after). The chance shown is essentially Onyx's, so the best-value lists
+  rarely post a CBB play; that is the honest result, not a bug.
   Onyx league `ncaab`: moneyline,
   spread, total, player points / rebounds / assists / made threes / PRA (NBA market ids;
   confirmed by the 11/3 history pull, over-only lines; tested in Onyx Picks, see below). Gate: `tools/verify_sports.js` renders a real

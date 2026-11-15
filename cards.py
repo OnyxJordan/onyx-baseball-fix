@@ -231,16 +231,17 @@ def team_history(key, team, games, season_now, ratings_by_season=None):
 def _sides(o, pr, w, home, away):
     """Each side of each Onyx game line: Onyx price and selection, the model's chance,
     the blended chance (the sport's blend weight on the model, the rest on Onyx's price
-    with the margin removed)."""
+    with the margin removed). w: one weight, or {market: weight} (cbb_model v3 BLEND_W)."""
     out = []
 
     def add(kind, lab, team, price, oprice, sel, pm):
         fo, _ = L.fair_pair(price, oprice)
         if fo is None or price is None:
             return
+        wk = w.get(kind, DEFAULT_W) if isinstance(w, dict) else w
         out.append({"k": kind, "lab": lab, "team": team, "price": price, "sel": sel,
                     "pm": _r(pm, 4) if pm is not None else None,
-                    "pb": _r(L.blend(pm, fo, w), 4) if pm is not None else _r(fo, 4), "fair": _r(fo, 4)})
+                    "pb": _r(L.blend(pm, fo, wk), 4) if pm is not None else _r(fo, 4), "fair": _r(fo, 4)})
     if o.get("home_ml") is not None and o.get("away_ml") is not None:
         add("ml", f"{away} moneyline", away, o["away_ml"], o["home_ml"], o.get("away_ml_sel"), None if pr is None else 1 - pr["home_win"])
         add("ml", f"{home} moneyline", home, o["home_ml"], o["away_ml"], o.get("home_ml_sel"), None if pr is None else pr["home_win"])
@@ -265,7 +266,9 @@ def game_why(key, team, g, R, GP, w, odds, kind):
     opp = g["away"] if home else g["home"]
     o = ((odds or {}).get("games") or {}).get(g["gid"]) or {}
     out = {"gid": g["gid"], "opp": opp, "home": home, "neutral": bool(g.get("neutral")), "start": g.get("start"),
-           "state": g.get("state"), "w": w}
+           "state": g.get("state"), "w": w.get("spread", DEFAULT_W) if isinstance(w, dict) else w}
+    if isinstance(w, dict):
+        out["wk"] = dict(w)          # cbb_model v3: the blend weight per market (cards.js reads it)
     if R is not None and R["n"].get(g["home"], 0) >= GP.get("min_games", 3) and R["n"].get(g["away"], 0) >= GP.get("min_games", 3):
         eh, ea = T.expect(R, g["home"], g["away"], g.get("neutral"))
         pr = (T.hk_probs if kind == "hockey" else T.fb_probs)(eh, ea, GP)
@@ -1062,7 +1065,7 @@ def build(key, lane, slate, odds, model):
                 tc["rating"] = {"off": _r(R["off"].get(t), 2), "def": _r(R["def"].get(t), 2), "n": R["n"].get(t)}
             g = slate_t.get(t)
             if g:
-                tc["game"] = game_why(key, t, g, R, GP, w, odds, kind)
+                tc["game"] = game_why(key, t, g, R, GP, getattr(M, "BLEND_W", None) or w, odds, kind)
                 day = (g.get("start") or slate.get("date") or "")[:10]
                 opp = tc["game"]["opp"]
                 r1, d1 = _rest(by_team, t, day)

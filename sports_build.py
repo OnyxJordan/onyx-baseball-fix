@@ -696,6 +696,20 @@ def _row(g, kind, name, line, line_txt, _side, model_p_over, over, under, over_s
     return r
 
 
+def blend_txt(M, w):
+    """The blend sentence for the Model tab: one weight, or cbb_model v3's weight per market."""
+    BW = getattr(M, "BLEND_W", None)
+    if not BW:
+        return f"The blend gives the model {round(w * 100)}% and the Onyx market the rest"
+    nm = {"ml": "moneylines", "spread": "spreads", "total": "totals"}
+    by = {}
+    for k in ("ml", "spread", "total"):
+        by.setdefault(round(BW.get(k, w) * 100), []).append(nm[k])
+    part = ", ".join(f"{v}% on {' and '.join(ks)}" for v, ks in sorted(by.items()))
+    return (f"The blend gives the model {part} and the Onyx market the rest (held out, no larger model share beat "
+            f"Onyx's own price, so the chance shown is essentially Onyx's)")
+
+
 def name_other(g, team):
     return g["away"] if team == g["home"] else g["home"]
 
@@ -704,6 +718,9 @@ def game_rows(key, M, slate, odds, R, w):
     import team_model as T
     GP = M.GAME_P if key == "nfl" else M.P
     kind = M.KIND if hasattr(M, "KIND") else "football"
+    # cbb_model v3: a blend weight per market (BLEND_W); every other model takes the one weight
+    BW = getattr(M, "BLEND_W", None) or {}
+    wm, ws, wt = BW.get("ml", w), BW.get("spread", w), BW.get("total", w)
     out, proj = [], {}
     for g in slate.get("games") or []:
         if g.get("state") != "pre":
@@ -722,14 +739,14 @@ def game_rows(key, M, slate, odds, R, w):
         o = ((odds or {}).get("games") or {}).get(g["gid"]) or {}
         if o.get("home_ml") is not None and o.get("away_ml") is not None:
             out.append(_row(g, "ml", g["home"], 0.0, "", None, pr["home_win"], o["home_ml"], o["away_ml"],
-                            o.get("home_ml_sel"), o.get("away_ml_sel"), w, detail))
+                            o.get("home_ml_sel"), o.get("away_ml_sel"), wm, detail))
         if o.get("home_spread") is not None and o.get("home_spread_price") is not None and o.get("away_spread_price") is not None:
             sp = o["home_spread"]
             out.append(_row(g, "spread", g["home"], sp, f"{sp:+g}", None, pr["home_cover"](sp), o["home_spread_price"],
-                            o["away_spread_price"], o.get("home_spread_sel"), o.get("away_spread_sel"), w, detail))
+                            o["away_spread_price"], o.get("home_spread_sel"), o.get("away_spread_sel"), ws, detail))
         if o.get("total") is not None and o.get("over_price") is not None and o.get("under_price") is not None and not getattr(M, "NO_TOTALS", False):
             out.append(_row(g, "total", "Total", o["total"], "", None, pr["over"](o["total"]), o["over_price"], o["under_price"],
-                            o.get("over_sel"), o.get("under_sel"), w, detail + f" · total {eh + ea:.1f}"))
+                            o.get("over_sel"), o.get("under_sel"), wt, detail + f" · total {eh + ea:.1f}"))
     out = [r for r in out if r]
     out.sort(key=lambda r: -r["edge"])
     return out, proj
@@ -854,6 +871,7 @@ def engine_team(key, M, GP, w, bt, live):
     """The Model tab's breakdown for a team-ratings sport, from the live
     parameters: each step of a price, the factors, the lane."""
     hockey = getattr(M, "KIND", "football") == "hockey"
+    w = (getattr(M, "BLEND_W", None) or {}).get("spread", w)     # cbb_model v3: per-market weights, the spread's in the bars
     prior = hasattr(M, "PRIOR_KEEP")     # college basketball: ratings pulled toward last season's, not toward average
     unit = "goals" if hockey else "points"
     T = M.GAME_TEST if key == "nfl" else M.TEST
@@ -876,6 +894,7 @@ def engine_team(key, M, GP, w, bt, live):
              ["Moneyline, spread", "the chance the margin clears zero, or the line"]])},
         {"t": "3 · Against the Onyx price", "bars": [["Onyx market", round((1 - w) * 100)], ["Onyx model", round(w * 100)]],
          "note": "The model's chance is blended with the Onyx market; edge is the blended chance minus the chance the listed price implies. " +
+                 (blend_txt(M, w) + ". " if getattr(M, "BLEND_W", None) else "") +
                  ("The market carries most of the weight because, line for line, it is the sharper read." if w < 0.5 else
                   "The backtest gave the model and the market an even say." if w == 0.5 else
                   "The backtest gave the model the larger say.")}]
@@ -1250,7 +1269,7 @@ def team_block(key, lane, slate, odds):
                  "Basketball prices: the margin and the total are normal around the ratings' projection; the season starts from last "
                  "season's ratings pulled toward average. " if cfg["kind"] == "basketball" else
                  "Football prices: the margin and the total are normal around the ratings' projection. ") +
-                f"The blend gives the model {round(w * 100)}% and the Onyx market the rest; edge is the blended chance minus the price's implied chance."],
+                blend_txt(M, w) + "; edge is the blended chance minus the price's implied chance."],
         tests=[{"k": "Win log loss", "v": f"{TEST['logloss']:.3f}", "d": f"vs {TEST['base_logloss']:.3f} home base rate · {TEST['n']} games from {TEST['window']}"},
                {"k": f"Total error ({unit})", "v": f"{TEST['mae_total']:.2f}", "d": f"vs {TEST['base_mae_total']:.2f} league average"}],
         roadmap=ROADMAP.get(key, []))
