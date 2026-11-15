@@ -343,7 +343,9 @@ def tops(sport, date, rows, now=None):
         else:
             c = [e for e in rows if want(e) and pre(e) and e.get("price") is not None and e.get("conf") is not None
                  and e.get("src") != "market"]
-            c.sort(key=lambda e: -(e["conf"] + (e.get("edge") or 0) / 10))   # Ask Onyx's "most likely first" key
+            # Ask Onyx's "most likely first" key; Onyx's own 2+ TD prices rank by chance alone, as Ask does (11/15: a
+            # near tie in one game, Allen .1806 / Cook .1761, flipped between the page and Ask on the edge term)
+            c.sort(key=lambda e: -e["conf"] if e.get("mkt") == "two_td" else -(e["conf"] + (e.get("edge") or 0) / 10))
         lists.append({"key": key, "title": title, "n": n, "rows": c[:4 * n], **({} if std else {"info": True}),
                       **({"mode": "ev"} if std == "ev" else {})})   # ev: one play per player, several a game (as tested)
     return {"sport": sport, "date": date, "generated": now.isoformat(timespec="seconds"), "lists": lists}
