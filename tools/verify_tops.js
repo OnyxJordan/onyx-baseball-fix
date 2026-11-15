@@ -33,7 +33,10 @@ const srv = http.createServer((q, r) => { const p = path.join(root, decodeURICom
       for (const r of L.rows) { if (page.length >= L.n) break; const w = r.kind === 'prop' ? r.who : r.gid + ':' + r.kind;
         if (!(Date.parse(r.start) > now) || games[r.gid] || who[w]) continue; games[r.gid] = 1; who[w] = 1; page.push(r.sel); }
       const R = await OnyxAsk.ask(Q[L.key], OnyxAsk.localSpec(Q[L.key], B));
-      const ask = (R.rows || []).map(r => r.sel);
+      // "positive value only" with nothing positive: Ask says so and shows the closest plays, flagged as none of them
+      // positive (res.widened, every edge <= 0). Its value list is empty, the same as the page's (11/15).
+      const noneV = R.widened && (R.rows || []).length && R.rows.every(r => !(r.edge > 0));
+      const ask = noneV ? [] : (R.rows || []).map(r => r.sel);
       out.push(L.key + ': page ' + page.length + ' ask ' + ask.length + ' ' + (JSON.stringify(page) === JSON.stringify(ask) ? 'SAME' : 'DIFF\n   page ' + L.rows.filter(r => page.includes(r.sel)).map(r => r.label).join(' | ') + '\n   ask  ' + R.rows.map(r => r.label).join(' | ') + '\n   read ' + R.understood));
     }
     return out; });
