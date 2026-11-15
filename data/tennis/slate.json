@@ -17,8 +17,8 @@
     {
      "id": "187505",
      "start": "2026-11-15T13:25Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Group Stage",
      "draw": "Men's Singles",
      "court": "Inalpi Arena",
@@ -31,19 +31,19 @@
        "win": false,
        "sets": [
         4,
-        1
+        4
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Alexander Zverev",
        "short": "A. Zverev",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ger.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        3
+        6
        ],
        "serve": false
       }
@@ -2022,5 +2022,5 @@
    ]
   }
  ],
- "fetched": "2026-11-15T14:33:41+00:00"
+ "fetched": "2026-11-15T15:13:56+00:00"
 }
