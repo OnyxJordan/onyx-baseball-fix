@@ -89,7 +89,16 @@ def key(sport, cat, r):
     return (sport, cat, str(r.get("gid")), str(r.get("who")), str(r.get("mkt") or r.get("market")))
 
 
-def log(sport, T, now=None, rows=None, src="live"):
+def version_now(sport):
+    """The sport model's VERSION right now (picks.MODULE), so the record splits by model version (11/14, Jordan:
+    show each sport's current-model record first, earlier versions below)."""
+    try:
+        return PK.live_version(sport, None)
+    except Exception:
+        return None
+
+
+def log(sport, T, now=None, rows=None, src="live", model_v=None):
     """Log the plays the page shows now whose game is today. Returns how many were added (writes only when
     `rows` is not passed in: the rebuild passes its own list and saves once)."""
     now = now or PK._now()
@@ -118,7 +127,8 @@ def log(sport, T, now=None, rows=None, src="live"):
                          "label": e.get("label"), "market": m, "kind": e.get("kind"), "name": e.get("name"),
                          "team": e.get("team"), "who": e.get("who"), "side": e.get("side"), "line": e.get("line"),
                          "hcap": e.get("hcap"), "price": e["price"], "chance": e["conf"], "edge": e.get("edge"),
-                         "sel": e.get("sel"), "result": None, "actual": None, "profit": None, "graded_at": None})
+                         "sel": e.get("sel"), "model": model_v if model_v is not None else version_now(sport),
+                         "result": None, "actual": None, "profit": None, "graded_at": None})
             have.add(k)
             per[(sport, cat, d)] = per.get((sport, cat, d), 0) + 1
             added += 1
@@ -165,12 +175,20 @@ def record(rows=None):
         return {"w": w, "l": l_, "p": sum(1 for r in rs if r.get("result") in ("P", "V")),
                 "pending": sum(1 for r in rs if not r.get("result")), "units": round(u, 2),
                 "roi": round(u / (w + l_), 4) if w + l_ else None}
-    out = {"all": agg(rows), "sport": {}, "cat": {}}
+    out = {"all": agg(rows), "sport": {}, "cat": {}, "ver": {}}
     by_s, by_c = {}, {}
     for r in rows:
         by_s.setdefault(r["sport"], []).append(r)
         by_c.setdefault(f"{r['sport']}:{r['cat']}", []).append(r)
     out["sport"] = {k: agg(v) for k, v in by_s.items()}
+    # by model version, newest first: {sport: [{"v", "from", "to", ...record}]}
+    for sp, rs in by_s.items():
+        vs = {}
+        for r in rs:
+            vs.setdefault(str(r.get("model") or "?"), []).append(r)
+        L = [dict(agg(v), v=k, start=min(x["date"] for x in v), end=max(x["date"] for x in v),
+                  cat={c: agg([x for x in v if x["cat"] == c]) for c in sorted({x["cat"] for x in v})}) for k, v in vs.items()]
+        out["ver"][sp] = sorted(L, key=lambda x: (x["end"], x["start"]), reverse=True)
     out["cat"] = {k: agg(v) for k, v in by_c.items()}
     return out
 

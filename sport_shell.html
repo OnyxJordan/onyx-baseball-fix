@@ -2258,13 +2258,18 @@ function topsHtml(T, REC) {
       return `<div class="tp-row"><span class="tp-n">${i + 1}</span><div class="tp-w"><b>${esc(lab)}</b><span>${esc(sub)}</span></div>
         <div class="tp-r"><div class="tp-c">${pct(r.conf)}<small>CHANCE</small></div>${chip(r.price, lab, r.sel, 'on Onyx')}</div></div>`;
     }).join('') : '<div class="tp-empty">Nothing in this category clears the bar on the games still to play.</div>';
-    const cr = REC && (REC.cat || {})[SD.sport + ':' + L.key];
+    const CV = REC && ((REC.ver || {})[SD.sport] || [])[0];
+    const cr = CV ? (CV.cat || {})[L.key] : REC && (REC.cat || {})[SD.sport + ':' + L.key];
     return `<div class="tp-cat"><h4>${esc(L.title)}</h4>${REC ? `<div class="tp-rec">Record ${recLine(cr)}</div>` : ''}${body}</div>`;
   }).join('');
-  const SR = REC && (REC.sport || {})[SD.sport];
+  // the current model version's record first, earlier versions below (11/14, Jordan): a new model starts fresh
+  const VS = REC && (REC.ver || {})[SD.sport] || [], CV0 = VS[0];
+  const SR = CV0 || (REC && (REC.sport || {})[SD.sport]);
+  const md = d => String(d || '').slice(5).replace('-', '/').replace(/^0/, '');
+  const older = VS.slice(1).map(v => `${esc(v.v)} (${md(v.start)} to ${md(v.end)}) ${v.w}-${v.l}${v.p ? '-' + v.p : ''}, ${v.units >= 0 ? '+' : ''}${v.units.toFixed(1)}u`).join(' · ');
   const recent = REC && (REC.recent || {})[SD.sport] || [];
   const sum = SR ? `<div class="tp-sum"><b class="big">${SR.w}-${SR.l}${SR.p ? '-' + SR.p : ''}</b><span>${recLine(SR).replace(/^[^·]*· /, '')}</span>
-      <span>Model record since ${esc(String(REC.since || '').slice(5).replace('-', '/').replace(/^0/, ''))}: every play these lists showed, graded at the Onyx price showing before the game, one unit each. Through 11/14 rebuilt from the site's own history; from then on logged as it happens.</span></div>` : '';
+      <span>${CV0 ? `Current model (${esc(CV0.v)}) since ${md(CV0.start)}` : `Model record since ${md(REC.since)}`}: every play these lists showed, graded at the Onyx price showing before the game, one unit each. Through 11/14 rebuilt from the site's own history; from then on logged as it happens.${older ? ` Earlier model versions: ${older}.` : ''}</span></div>` : '';
   const hist = recent.length ? `<details class="tp-hist"><summary>Latest graded model picks (${recent.length})</summary><div class="tp-cat" style="margin-top:8px">${recent.map(r =>
       `<div class="tp-row"><span class="tp-n"><span class="tp-res ${r.result === 'W' ? 'w' : r.result === 'L' ? 'l' : ''}">${esc(r.result)}</span></span><div class="tp-w"><b>${esc(r.label)}</b><span>${esc([r.matchup, r.date, r.actual != null ? 'final ' + r.actual : ''].filter(Boolean).join(' · '))}</span></div><div class="tp-r"><span class="ot-px">${fmtOdds(r.price)}</span></div></div>`).join('')}</div></details>` : '';
   return `<div class="tp-wrap"><div class="sec-hdr"><span class="sec-title">Model's ${esc(C.name || '')} picks</span><span class="sec-count">model record, not Onyx Picks</span></div>

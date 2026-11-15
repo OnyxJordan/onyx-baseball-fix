@@ -32,6 +32,32 @@ def versions(ref, sport):
     return [(h, int(t)) for h, t in (x.split() for x in out if x.strip())]
 
 
+def timeline(ref, sport):
+    """[(unix time, VERSION)] of the sport's model module (picks.MODULE), oldest first, from git."""
+    f = MR.PK.MODULE[sport] + ".py"
+    out = subprocess.run(["git", "log", "--reverse", "--format=%H %ct", "-G", "^VERSION *=", ref, "--", f],
+                         cwd=ROOT, capture_output=True, text=True, check=True).stdout.split("\n")
+    T = []
+    for x in out:
+        if not x.strip():
+            continue
+        h, ct = x.split()
+        src = subprocess.run(["git", "show", f"{h}:{f}"], cwd=ROOT, capture_output=True, text=True).stdout
+        import re
+        m = re.search(r'^VERSION *= *["\']([^"\']+)', src, re.M)
+        if m:
+            T.append((int(ct), m.group(1)))
+    return T
+
+
+def version_at(T, ts):
+    v = None
+    for t, x in T:
+        if t <= ts:
+            v = x
+    return v
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--ref", default="origin/main")
@@ -43,6 +69,7 @@ def main():
     cat = subprocess.Popen(["git", "cat-file", "--batch"], cwd=ROOT, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
     for sport in a.sports.split(","):
         V = versions(a.ref, sport)
+        TL = timeline(a.ref, sport)
         added = 0
         for h, ct in V:
             cat.stdin.write(f"{h}:data/{sport}/board.json\n".encode())
@@ -58,10 +85,16 @@ def main():
                 continue
             now = MR.PK._when(B.get("generated")) or datetime.fromtimestamp(ct, timezone.utc)
             T = DT.tops(sport, B.get("date"), B.get("plays") or [], now=now)
-            added += MR.log(sport, T, now=now, rows=rows, src="rebuilt")
+            added += MR.log(sport, T, now=now, rows=rows, src="rebuilt", model_v=version_at(TL, now.timestamp()))
         print(f"{sport}: {len(V)} boards replayed, {added} plays logged")
     cat.stdin.close()
     cat.wait()
+    # rows rebuilt before rows carried the model version (11/14): stamped from the same timeline, nothing else touched
+    for sport in a.sports.split(","):
+        TL = timeline(a.ref, sport)
+        for r in rows:
+            if r["sport"] == sport and r.get("src") == "rebuilt" and not r.get("model"):
+                r["model"] = version_at(TL, MR.PK._when(r["logged_at"]).timestamp())
     if not a.no_grade:
         n = MR.grade(rows=rows)
         print(f"graded {n}")
