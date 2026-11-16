@@ -706,7 +706,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        0
+        2
        ],
        "serve": false
       },
@@ -717,17 +717,17 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        6
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
     {
      "id": "186797",
      "start": "2026-11-16T16:10Z",
-     "state": "pre",
-     "detail": "11/16 - 11:10 AM EST",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -738,8 +738,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ita.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        1
+       ],
+       "serve": true
       },
       {
        "name": "Guiomar Maristany Zuleta De Reales",
@@ -747,7 +749,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        4
+       ],
        "serve": false
       }
      ]
@@ -869,7 +873,7 @@
      ]
     },
     {
-     "id": "186794",
+     "id": "186795",
      "start": "2026-11-17T05:00Z",
      "state": "pre",
      "detail": "TBD",
@@ -878,17 +882,17 @@
      "court": "",
      "p": [
       {
-       "name": "Andrea Lazaro Garcia",
-       "short": "A. Lazaro Garcia",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
+       "name": "Antonia Vergara Rivera",
+       "short": "A. Vergara Rivera",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/chi.png",
        "seed": null,
        "win": false,
        "sets": [],
        "serve": false
       },
       {
-       "name": "Barbara Gatica",
-       "short": "B. Gatica",
+       "name": "Fernanda Labrana",
+       "short": "F. Labrana",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/chi.png",
        "seed": null,
        "win": false,
@@ -927,7 +931,7 @@
      ]
     },
     {
-     "id": "186785",
+     "id": "186794",
      "start": "2026-11-17T05:00Z",
      "state": "pre",
      "detail": "TBD",
@@ -936,8 +940,8 @@
      "court": "",
      "p": [
       {
-       "name": "Alicia Herrero Linana",
-       "short": "A. Herrero Linana",
+       "name": "Andrea Lazaro Garcia",
+       "short": "A. Lazaro Garcia",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
        "win": false,
@@ -945,67 +949,9 @@
        "serve": false
       },
       {
-       "name": "Lucia Bronzetti",
-       "short": "L. Bronzetti",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ita.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      }
-     ]
-    },
-    {
-     "id": "186786",
-     "start": "2026-11-17T05:00Z",
-     "state": "pre",
-     "detail": "TBD",
-     "round": "Round 1",
-     "draw": "Women's Singles",
-     "court": "",
-     "p": [
-      {
-       "name": "Laura Samson",
-       "short": "L. Samson",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/cze.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "Despina Papamichail",
-       "short": "D. Papamichail",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/gre.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      }
-     ]
-    },
-    {
-     "id": "186787",
-     "start": "2026-11-17T05:00Z",
-     "state": "pre",
-     "detail": "TBD",
-     "round": "Round 1",
-     "draw": "Women's Singles",
-     "court": "",
-     "p": [
-      {
-       "name": "Darja Semenistaja",
-       "short": "D. Semenistaja",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/lat.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "Irene Burillo",
-       "short": "I. Burillo",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
+       "name": "Barbara Gatica",
+       "short": "B. Gatica",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/chi.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -1043,35 +989,6 @@
      ]
     },
     {
-     "id": "186795",
-     "start": "2026-11-17T05:00Z",
-     "state": "pre",
-     "detail": "TBD",
-     "round": "Round 1",
-     "draw": "Women's Singles",
-     "court": "",
-     "p": [
-      {
-       "name": "Antonia Vergara Rivera",
-       "short": "A. Vergara Rivera",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/chi.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "Fernanda Labrana",
-       "short": "F. Labrana",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/chi.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      }
-     ]
-    },
-    {
      "id": "186790",
      "start": "2026-11-17T05:00Z",
      "state": "pre",
@@ -1093,6 +1010,122 @@
        "name": "Polona Hercog",
        "short": "P. Hercog",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/slo.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      }
+     ]
+    },
+    {
+     "id": "186787",
+     "start": "2026-11-17T05:00Z",
+     "state": "pre",
+     "detail": "TBD",
+     "round": "Round 1",
+     "draw": "Women's Singles",
+     "court": "",
+     "p": [
+      {
+       "name": "Darja Semenistaja",
+       "short": "D. Semenistaja",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/lat.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      },
+      {
+       "name": "Irene Burillo",
+       "short": "I. Burillo",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      }
+     ]
+    },
+    {
+     "id": "186786",
+     "start": "2026-11-17T05:00Z",
+     "state": "pre",
+     "detail": "TBD",
+     "round": "Round 1",
+     "draw": "Women's Singles",
+     "court": "",
+     "p": [
+      {
+       "name": "Laura Samson",
+       "short": "L. Samson",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/cze.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      },
+      {
+       "name": "Despina Papamichail",
+       "short": "D. Papamichail",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/gre.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      }
+     ]
+    },
+    {
+     "id": "186785",
+     "start": "2026-11-17T05:00Z",
+     "state": "pre",
+     "detail": "TBD",
+     "round": "Round 1",
+     "draw": "Women's Singles",
+     "court": "",
+     "p": [
+      {
+       "name": "Alicia Herrero Linana",
+       "short": "A. Herrero Linana",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      },
+      {
+       "name": "Lucia Bronzetti",
+       "short": "L. Bronzetti",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ita.png",
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      }
+     ]
+    },
+    {
+     "id": "186803",
+     "start": "2026-11-18T05:00Z",
+     "state": "pre",
+     "detail": "TBD",
+     "round": "Round 2",
+     "draw": "Women's Singles",
+     "court": "",
+     "p": [
+      {
+       "name": "TBD",
+       "short": "TBD",
+       "flag": null,
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      },
+      {
+       "name": "Rebeka Masarova",
+       "short": "R. Masarova",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/sui.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -1275,98 +1308,11 @@
      ]
     },
     {
-     "id": "186803",
-     "start": "2026-11-18T05:00Z",
-     "state": "pre",
-     "detail": "TBD",
-     "round": "Round 2",
-     "draw": "Women's Singles",
-     "court": "",
-     "p": [
-      {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "Rebeka Masarova",
-       "short": "R. Masarova",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/sui.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      }
-     ]
-    },
-    {
      "id": "186802",
      "start": "2026-11-18T05:00Z",
      "state": "pre",
      "detail": "TBD",
      "round": "Round 2",
-     "draw": "Women's Singles",
-     "court": "",
-     "p": [
-      {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      }
-     ]
-    },
-    {
-     "id": "186799",
-     "start": "2026-11-20T05:00Z",
-     "state": "pre",
-     "detail": "TBD",
-     "round": "Quarterfinal",
-     "draw": "Women's Singles",
-     "court": "",
-     "p": [
-      {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      }
-     ]
-    },
-    {
-     "id": "186798",
-     "start": "2026-11-20T05:00Z",
-     "state": "pre",
-     "detail": "TBD",
-     "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "",
      "p": [
@@ -1421,6 +1367,64 @@
     },
     {
      "id": "186800",
+     "start": "2026-11-20T05:00Z",
+     "state": "pre",
+     "detail": "TBD",
+     "round": "Quarterfinal",
+     "draw": "Women's Singles",
+     "court": "",
+     "p": [
+      {
+       "name": "TBD",
+       "short": "TBD",
+       "flag": null,
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      },
+      {
+       "name": "TBD",
+       "short": "TBD",
+       "flag": null,
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      }
+     ]
+    },
+    {
+     "id": "186799",
+     "start": "2026-11-20T05:00Z",
+     "state": "pre",
+     "detail": "TBD",
+     "round": "Quarterfinal",
+     "draw": "Women's Singles",
+     "court": "",
+     "p": [
+      {
+       "name": "TBD",
+       "short": "TBD",
+       "flag": null,
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      },
+      {
+       "name": "TBD",
+       "short": "TBD",
+       "flag": null,
+       "seed": null,
+       "win": false,
+       "sets": [],
+       "serve": false
+      }
+     ]
+    },
+    {
+     "id": "186798",
      "start": "2026-11-20T05:00Z",
      "state": "pre",
      "detail": "TBD",
@@ -1538,5 +1542,5 @@
    ]
   }
  ],
- "fetched": "2026-11-16T16:05:08+00:00"
+ "fetched": "2026-11-16T16:39:04+00:00"
 }
