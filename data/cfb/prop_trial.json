@@ -2786,5 +2786,49 @@
   "model": "v2",
   "result": null,
   "actual": null
+ },
+ {
+  "date": "2026-11-16",
+  "key": "401856753|jabree coleman|rush_yds",
+  "gid": "401856753",
+  "pid": "5141742",
+  "name": "Jabree Coleman",
+  "team": "SC",
+  "opp": "UGA",
+  "matchup": "SC vs UGA",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 43.5,
+  "price": -126,
+  "sel": "382bf898-09da-438f-be9c-5946b4ce86bf",
+  "proj": 29.4,
+  "prob": 0.6284,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.55,
+    "avg": 0.77,
+    "pp": -5.1
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.88,
+    "avg": 0.93,
+    "pp": 0.8
+   },
+   {
+    "k": "line vs his usual range",
+    "v": 0.2,
+    "avg": -0.05,
+    "pp": -0.2
+   }
+  ],
+  "opened_at": "2026-11-16T19:16:25+00:00",
+  "logged_at": "2026-11-16T19:16:25+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
  }
 ]
