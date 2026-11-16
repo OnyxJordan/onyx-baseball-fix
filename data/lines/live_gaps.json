@@ -1422,5 +1422,13 @@
   "state": "closed",
   "reason": "not on the feed",
   "detail": "line back, or the match ended"
+ },
+ {
+  "at": "2026-11-16T17:31:16+00:00",
+  "sport": "tennis",
+  "match": "Nuria Brancaccio vs Sofia Costoulas",
+  "state": "open",
+  "reason": "feed error",
+  "detail": "feed error (HTTPSConnectionPool(host='onyx-ask.jordan-8ad.workers.dev', port=443): Max retri)"
  }
 ]
