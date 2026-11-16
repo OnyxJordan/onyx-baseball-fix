@@ -860,7 +860,7 @@
         6,
         4
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Valeriya Strakhova",
@@ -873,15 +873,15 @@
         4,
         5
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
     {
      "id": "186788",
      "start": "2026-11-16T22:25Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -891,12 +891,12 @@
        "short": "A. Geerlings",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        5
+        6
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Luisina Giovannini",
@@ -1366,9 +1366,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Ariana Geerlings",
+       "short": "A. Geerlings",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -1582,5 +1582,5 @@
    ]
   }
  ],
- "fetched": "2026-11-16T23:33:14+00:00"
+ "fetched": "2026-11-16T23:39:31+00:00"
 }
