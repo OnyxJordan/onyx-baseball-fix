@@ -105311,5 +105311,36 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "cbb-401921087-total-under",
+  "sport": "cbb",
+  "gid": "401921087",
+  "date": "2026-11-16",
+  "logged_at": "2026-11-16T23:33:37+00:00",
+  "matchup": "IONA @ UMBC",
+  "home": "UMBC",
+  "away": "IONA",
+  "label": "Under 138.5",
+  "kind": "total",
+  "side": "under",
+  "line": 138.5,
+  "price": -112,
+  "chance": 0.6462,
+  "implied": 0.5283,
+  "edge": 0.118,
+  "fair": -185,
+  "state": {
+   "score": "IONA 22 - 26 UMBC",
+   "period": 1,
+   "clock": "3:55",
+   "f": 0.598
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
