@@ -104,6 +104,9 @@ with a 2-point edge and rushing yards unders (its totals are leans, never graded
 earlier value rows as `prev`. The tennis paper test (`tennis_paper.py` -> `data/tennis/paper.json`, append-only, in
 validate_build's list) logs Onyx moneylines 2%+ softer than the sharp book's, both prices from the same odds run;
 it is never shown as picks and the other book is never named on the site.
+Search log (11/16): `OnyxAsk.logSearch` writes each typed search (question text and how Ask read it, never who asked) to
+Supabase `search_log` (insert-only; `supabase/search_log.sql`); `search_trends.py` (refresh_build, service key) counts
+the last 7 days into `data/insights/trending.json`, which the NFL Studio's Insights uses once it has 30+ NFL searches.
 
 ## Dates
 

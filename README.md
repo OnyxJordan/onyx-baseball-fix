@@ -1701,6 +1701,18 @@ later" (7 PM on), and "between 1 and 4 pm". A bare hour counts as afternoon or e
 after / until or with a game-time word, so "4 picks by 2s" and "after 2 legs" stay counts. Sides, totals and
 parlays already covered every sport.
 
+**Search logging, so Insights' trending is real (11/16).** Jordan: "add the search logging so trending is real".
+`OnyxAsk.logSearch(q, R, page)` (ask.js), called from home.html's askGo (typed searches only, not refinements built
+by buttons) and the Studio's "Ask your own", posts one row per question per page view to Supabase `search_log`: the
+question (2-200 characters; anything with an email, link or long number is skipped), its sport, how Ask read it
+(intent, markets, side, floors, whether a player or team was named, local or AI) and the page. Never who asked: no
+user id, no device id. The table is insert-only from the public key (row-level security, no read policy), so the
+site can never read it back. `search_trends.py` runs in refresh_build with the service key: the last 7 days, tagged
+by question type with the same tagger as tools/insights_freq.py, NFL questions asked 3+ times listed, written to
+`data/insights/trending.json`; rows older than 90 days are deleted. Insights switches from the test-corpus counts to
+the real ones once 30+ NFL searches are logged, and says which it is showing. One-time setup: run
+`supabase/search_log.sql` in the Supabase SQL editor (until then the inserts 404 harmlessly and the counts stay corpus).
+
 **Onyx NFL Studio (11/15).** Jordan: "player & odds comparison tool, play it out, parlay lab, Sunday Sweat, and onyx
 insights ... lets go wild". `studio.html` (linked from the home hub, the NFL home and the Onyx Sports menu) with five
 tools, each one file registered with the frame in `studio.js` (shared board load, helpers, `#tab?param` deep links):

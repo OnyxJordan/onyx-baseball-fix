@@ -581,6 +581,7 @@ async function askGo(q, forced) {
   track('ask', {q: String(q).slice(0, 100)});
   let R;
   try { R = await OnyxAsk.ask(q, forced); } catch (e) { out.innerHTML = '<div class="my-empty">Could not load today\'s boards. Try again in a minute.</div>'; return; }
+  if (!forced && OnyxAsk.logSearch) OnyxAsk.logSearch(q, R, 'home');   // what people ask, for Insights' trending (11/16)
   lvAsk(R, q);   // live games for a "live" question or teams playing now (fills in after the answer renders)
   const say = R.say ? `<div class="ask-say">${esc(R.say)}</div>` : '';
   window.ASK_R = R; window.ASK_Q = q;
