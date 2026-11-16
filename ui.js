@@ -36,7 +36,7 @@
   var FILE = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
   var PAGE_KEYS = {'home.html': ['home', 'Sports'], 'picks.html': ['picks', 'Picks'], 'account.html': ['account', 'Account'],
                    'how.html': ['how', 'How it works'], 'scorecard.html': ['scorecard', 'Scorecard'], 'cbb-players.html': ['cbbp', 'College Basketball'],
-                   'studio.html': ['studio', 'Studio']};
+                   'studio.html': ['studio', 'Studio'], 'season.html': ['season', 'My Season']};
   var IS_PAGE = !window.OX_SITE && !IS_NBA && !document.querySelector('nav.nav');
   var PAGE = IS_PAGE ? (PAGE_KEYS[FILE] || ['page', 'Sports']) : null;
   var IS_HUB = IS_PAGE && !!document.querySelector('.ox-head .ox-acts');
@@ -677,6 +677,7 @@
       '<button class="oact ox-all" data-act="mypicks">' + OX_MARK + '<span class="oact-my">My picks: saved picks and your record</span></button>' +
       '<a class="oact ox-all" href="account.html" data-act="acct">' + OX_MARK + '<span class="oact-ac">Account: sign in, sync every device</span></a>' +
       '<a class="oact ox-all" href="picks.html">' + OX_MARK + 'Onyx Picks: today\'s card and the record</a>' +
+      '<a class="oact ox-all" href="season.html">' + OX_MARK + 'My Season: your record, units and recap</a>' +
       '<a class="oact ox-all" href="home.html#my">' + OX_MARK + 'My Onyx: players and bets</a>' +
       '<a class="oact ox-all" href="home.html">' + OX_MARK + 'All Onyx sports</a>' +
       (SITE === 'page' ? '' : '<button class="oact pri" data-act="slip">' + svg('slip') + 'Parlay builder</button>') +
