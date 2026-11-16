@@ -125,3 +125,5 @@ jobs:
         run: node tools/verify_share.js
       - name: Pick saving and My Season
         run: node tools/verify_season.js
+      - name: Live chance to cash
+        run: node tools/verify_cash.js
