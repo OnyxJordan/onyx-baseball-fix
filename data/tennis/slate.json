@@ -707,9 +707,9 @@
        "win": false,
        "sets": [
         2,
-        0
+        2
        ],
-       "serve": false
+       "serve": true
       },
       {
        "name": "Sofia Costoulas",
@@ -719,9 +719,9 @@
        "win": false,
        "sets": [
         6,
-        0
+        5
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -729,7 +729,7 @@
      "id": "186797",
      "start": "2026-11-16T16:10Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -741,7 +741,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        2,
+        1
        ],
        "serve": false
       },
@@ -752,17 +753,18 @@
        "seed": null,
        "win": false,
        "sets": [
+        6,
         5
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
     {
      "id": "186784",
-     "start": "2026-11-16T17:00Z",
+     "start": "2026-11-16T17:25Z",
      "state": "pre",
-     "detail": "11/16 - 12:00 PM EST",
+     "detail": "11/16 - 12:25 PM EST",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Grandstand",
@@ -1544,5 +1546,5 @@
    ]
   }
  ],
- "fetched": "2026-11-16T16:45:08+00:00"
+ "fetched": "2026-11-16T17:18:08+00:00"
 }

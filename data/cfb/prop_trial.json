@@ -2742,5 +2742,49 @@
   "model": "v2",
   "result": null,
   "actual": null
+ },
+ {
+  "date": "2026-11-16",
+  "key": "401856754|desean bishop|rush_yds",
+  "gid": "401856754",
+  "pid": "4921108",
+  "name": "DeSean Bishop",
+  "team": "TENN",
+  "opp": "LSU",
+  "matchup": "TENN vs LSU",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 115.5,
+  "price": -126,
+  "sel": "b5ee1290-d29b-4f32-81ee-c583f044d9df",
+  "proj": 88.1,
+  "prob": 0.6252,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.56,
+    "avg": 0.77,
+    "pp": -5.0
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.88,
+    "avg": 0.93,
+    "pp": 0.8
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.01,
+    "avg": -0.05,
+    "pp": -0.0
+   }
+  ],
+  "opened_at": "2026-11-16T17:18:04+00:00",
+  "logged_at": "2026-11-16T17:18:04+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
  }
 ]
