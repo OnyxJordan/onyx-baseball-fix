@@ -20,6 +20,11 @@
 (function () {
   'use strict';
   var REG = {}, D = null, LOADING = null, MOUNTED = {}, REFERRER = 'KR680261';
+  // every sport (11/16, Jordan: "make this as interactive as possible the entire site"): studio.html?sport=nba ...
+  var SPORTS = {nfl: ['NFL', 'nfl.html'], nba: ['NBA', 'nba.html'], cfb: ['College Football', 'cfb.html'], cbb: ['College Basketball', 'cbb.html'],
+                nhl: ['NHL', 'nhl.html'], tennis: ['Tennis', 'tennis.html']};
+  var SPORT = (function () { var m = location.search.match(/[?&]sport=([a-z]+)/); return m && SPORTS[m[1]] ? m[1] : 'nfl'; })();
+  var DIR = 'data/' + SPORT + '/';
   var NAMES = {compare: 'Compare', sim: 'Play It Out', lab: 'Parlay Lab', sweat: 'Sunday Sweat', insights: 'Insights'};
   var ORDER = ['compare', 'sim', 'lab', 'sweat', 'insights'];
 
@@ -49,14 +54,20 @@
 
   function load() {
     if (LOADING) return LOADING;
-    LOADING = Promise.all([getJSON('data/nfl/board.json'), getJSON('data/nfl/slate.json').catch(function () { return {}; })]).then(function (a) {
+    LOADING = Promise.all([getJSON(DIR + 'board.json'), getJSON(DIR + 'slate.json').catch(function () { return {}; })]).then(function (a) {
       var b = a[0] || {}, s = a[1] || {}, plays = b.plays || [];
+      // tennis: the slate's matches are its games (gid = the match id, away / home = the two players)
+      if (!(s.games || []).length && (s.events || []).length) s.games = [].concat.apply([], s.events.map(function (e) {
+        return (e.matches || []).map(function (m) { var p = m.p || [];
+          return {gid: m.id, start: m.start, state: m.state, away: (p[0] || {}).name, home: (p[1] || {}).name, away_name: (p[0] || {}).name, home_name: (p[1] || {}).name,
+                  name: ((p[0] || {}).short || (p[0] || {}).name) + ' vs ' + ((p[1] || {}).short || (p[1] || {}).name), event: e.name, round: m.round, tennis: true}; }); }));
       // next week's games too (11/16): the board carries their openers from the moment Onyx prices them
       var games = (s.games || []).concat((s.next_games || []).filter(function (g) { return plays.some(function (p) { return p.gid === g.gid; }); }));
       var gi = {}; games.forEach(function (g) { gi[g.gid] = g; });
       var bp = {}; plays.forEach(function (p) { if (p.kind === 'prop' && p.name) (bp[u.nk(p.name)] = bp[u.nk(p.name)] || []).push(p); });
       var cards = {}, hist = null, tops = null;
       D = {
+        sport: SPORT, sportName: SPORTS[SPORT][0], sportPage: SPORTS[SPORT][1], dir: DIR,
         date: b.date, generated: b.generated, plays: plays, games: games,
         pre: games.filter(function (g) { return g.state === 'pre'; }),
         game: function (gid) { return gi[gid] || null; },
@@ -66,9 +77,9 @@
           return Object.keys(bp).map(function (k) { var r = bp[k]; return {name: r[0].name, team: r[0].team, gid: r[0].gid, matchup: r[0].matchup, role: (r.filter(function (x) { return x.role; })[0] || {}).role || null, rows: r}; })
             .sort(function (x, y) { return x.name.localeCompare(y.name); });
         },
-        card: function (team) { if (!cards[team]) cards[team] = getJSON('data/nfl/cards/' + encodeURIComponent(team) + '.json').catch(function () { return null; }); return cards[team]; },
-        history: function () { if (!hist) hist = getJSON('data/nfl/player_games.json').then(function (j) { return j.rows || []; }).catch(function () { return []; }); return hist; },
-        tops: function () { if (!tops) tops = getJSON('data/nfl/tops.json').catch(function () { return {lists: []}; }); return tops; }
+        card: function (team) { if (!cards[team]) cards[team] = getJSON(DIR + 'cards/' + encodeURIComponent(team) + '.json').catch(function () { return null; }); return cards[team]; },
+        history: function () { if (!hist) hist = getJSON(DIR + 'player_games.json').then(function (j) { return j.rows || []; }).catch(function () { return []; }); return hist; },
+        tops: function () { if (!tops) tops = getJSON(DIR + 'tops.json').catch(function () { return {lists: []}; }); return tops; }
       };
       return D;
     });
@@ -97,7 +108,21 @@
     try { if (window.gtag) gtag('event', 'onyx_click', {link_type: 'studio_' + (location.hash.slice(1).split('?')[0] || 'tab'), legs: (a.href.match(/selection=/g) || []).length}); } catch (x) {}
   }, true);
 
+  // the page header follows the sport: title, back link, lead, and a sport switcher (same tab, other sport)
+  function header() {
+    var nm = SPORTS[SPORT][0];
+    document.title = 'Onyx ' + nm + ' Studio';
+    var h = document.querySelector('.st-h h1'); if (h) h.innerHTML = u.esc(nm) + ' <span>Studio</span>';
+    var bk = document.querySelector('.st-back'); if (bk) { bk.href = SPORTS[SPORT][1]; bk.innerHTML = '&larr; Onyx ' + u.esc(nm); }
+    var ft = document.querySelector('.st-foot'); if (ft) ft.textContent = ft.textContent.replace(/Onyx NFL model|NFL page/g, function (m) { return m.replace('NFL', nm); });
+    var sw = document.getElementById('stSports');
+    if (sw) sw.innerHTML = Object.keys(SPORTS).map(function (k) {
+      return '<a class="st-sp' + (k === SPORT ? ' on' : '') + '" href="studio.html?sport=' + k + location.hash.split('?')[0] + '">' + u.esc(SPORTS[k][0]) + '</a>'; }).join('');
+    window.addEventListener('hashchange', function () { Array.prototype.forEach.call(document.querySelectorAll('.st-sp'), function (a) { a.href = a.href.split('#')[0] + location.hash.split('?')[0]; }); });
+  }
+
   function start() {
+    header();
     var tabs = document.getElementById('stTabs'), panes = document.getElementById('stPanes');
     var keys = ORDER.filter(function (k) { return REG[k]; }).concat(Object.keys(REG).filter(function (k) { return ORDER.indexOf(k) < 0; }));
     tabs.innerHTML = keys.map(function (k) { return '<button class="st-tab" role="tab" data-k="' + k + '">' + u.esc(REG[k].title || NAMES[k] || k) + '</button>'; }).join('');
@@ -110,5 +135,5 @@
   // query params on the hash (#sim?gid=401873063): tools read them for deep links
   function param(k) { var q = (location.hash.split('?')[1] || ''); var m = q.match(new RegExp('(^|&)' + k + '=([^&]*)')); return m ? decodeURIComponent(m[2]) : null; }
 
-  window.Studio = {register: function (k, def) { REG[k] = def; }, start: start, show: show, load: load, u: u, param: param, checks: {}};
+  window.Studio = {sport: SPORT, sports: SPORTS, register: function (k, def) { REG[k] = def; }, start: start, show: show, load: load, u: u, param: param, checks: {}};
 })();

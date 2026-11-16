@@ -8,16 +8,19 @@ const root = path.join(__dirname, '..');
 const srv = http.createServer((q, r) => { const p = path.join(root, decodeURIComponent(q.url.split('?')[0])); fs.readFile(p, (e, b) => { if (e) { r.statusCode = 404; return r.end(); } if (p.endsWith('.js')) r.setHeader('content-type', 'text/javascript'); r.end(b); }); }).listen(0);
 (async () => {
   const base = 'http://127.0.0.1:' + srv.address().port, b = await chromium.launch(), out = [];
-  const only = process.argv.slice(2);
-  for (const w of [390, 1280]) {
+  const args = process.argv.slice(2), sp = args.find(a => a.startsWith('--sport='));
+  const only = args.filter(a => !a.startsWith('--'));
+  // every sport's Studio (11/16): studio.html?sport=<k>; --sport=nba,cfb to narrow
+  const SPORTS = sp ? sp.slice(8).split(',') : ['nfl', 'nba', 'cfb', 'cbb', 'nhl', 'tennis'];
+  for (const sport of SPORTS) for (const w of [390, 1280]) {
     const pg = await b.newPage({viewport: {width: w, height: 900}}), errs = [];
     pg.on('pageerror', e => errs.push(e.message));
     pg.on('console', m => { if (m.type() === 'error' && !/Failed to load resource|net::ERR/.test(m.text())) errs.push('console: ' + m.text()); });
     await pg.route('**/*', rt => { const u = rt.request().url(); if (u.startsWith(base + '/ai.json')) return rt.fulfill({contentType: 'application/json', body: '{"url":""}'}); return u.startsWith(base) ? rt.continue() : rt.abort(); });
-    await pg.goto(base + '/studio.html', {waitUntil: 'domcontentloaded'});
+    await pg.goto(base + '/studio.html?sport=' + sport, {waitUntil: 'domcontentloaded'});
     await pg.waitForFunction(() => document.querySelectorAll('.st-tab').length > 0, null, {timeout: 15000}).catch(() => {});
     const keys = await pg.evaluate(() => Array.from(document.querySelectorAll('.st-tab')).map(b => b.dataset.k));
-    if (!keys.length) out.push(`FAIL ${w}: no tabs registered`);
+    if (!keys.length) out.push(`FAIL ${sport} ${w}: no tabs registered`);
     for (const k of keys) {
       if (only.length && !only.includes(k)) continue;
       const n0 = errs.length;
@@ -36,7 +39,7 @@ const srv = http.createServer((q, r) => { const p = path.join(root, decodeURICom
       if (r.err) bad.push('error box: ' + r.errTxt.slice(0, 160));
       if (r.side) bad.push('sideways scroll');
       if (r.chk) bad.push('self-check: ' + r.chk);
-      out.push((bad.length ? 'FAIL' : 'ok  ') + ` ${String(w).padEnd(5)} ${k.padEnd(9)} ${bad.length ? bad.join('; ') : r.head}`);
+      out.push((bad.length ? 'FAIL' : 'ok  ') + ` ${sport.padEnd(7)} ${String(w).padEnd(5)} ${k.padEnd(9)} ${bad.length ? bad.join('; ') : r.head}`);
     }
     await pg.close();
   }

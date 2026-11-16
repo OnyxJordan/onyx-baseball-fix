@@ -1,4 +1,5 @@
-// studio-lab.js - Parlay Lab, the NFL Studio's parlay workbench (11/15, Jordan: "parlay lab ... lets go wild").
+// studio-lab.js - Parlay Lab, the Studio's parlay workbench (11/15, Jordan: "parlay lab ... lets go wild"; every
+// sport 11/16: each sport's own market names, presets and same-game correlation table, below).
 // Parlays are the product, so this tab works on the ONE shared slip (parlay.js, window.OnyxParlay, localStorage
 // onyxSlipAll), never a second one. Every add, remove, swap or preset goes through OnyxParlay, and every view
 // redraws on its 'onyx-slip' event, so the floating slip and this page always show the same legs.
@@ -19,6 +20,12 @@
 // multiply exactly). Legs in one game share a correlation from the table below, the latents are drawn 5,000 times
 // (seeded, so the numbers never flicker) through a Cholesky factor, and the joint chance is the share of runs
 // where every leg hits. A table that is not positive definite is shrunk toward zero until it is.
+//
+// Tables by sport (TABLES): NFL fitted (tools/nfl_sgp_corr.py); college football reuses the NFL table; NBA player
+// props fitted (tools/nba_sgp_corr.py) and its game lines fitted (tools/sgp_lines_corr.py); college basketball, NHL
+// and tennis game lines fitted the same way (the favorite's side with the over, a team's moneyline with its own
+// spread, and with the other team's). The few cells no history covers are marked as estimates in the table and
+// the "how" panel says so.
 (function () {
   'use strict';
   if (!window.Studio) return;
@@ -26,10 +33,24 @@
   var D = null, u = null, ROOT = null, ROWS = [], BYID = {}, BYSEL = {}, ROLE = {}, LAST = null, PREVIEW = null, TIMER = null, SWAPJOB = 0;
   var F = {gid: '', mkt: '', side: '', price: '', mode: 'likes', q: '', lim: 40};
 
-  var MK = {spread: 'Spread', ml: 'Moneyline', total: 'Game total', pass_yds: 'Passing yds', pass_att: 'Pass attempts', pass_td: 'Passing TDs',
+  var SPORT = Studio.sport;
+  var MK_FB = {spread: 'Spread', ml: 'Moneyline', total: 'Game total', pass_yds: 'Passing yds', pass_att: 'Pass attempts', pass_td: 'Passing TDs',
     pass_rush_yds: 'Pass + rush yds', rush_yds: 'Rushing yds', rec: 'Receptions', rec_yds: 'Receiving yds', rush_rec_yds: 'Rush + rec yds',
     anytime_td: 'Anytime TD', first_td: 'First TD', two_td: '2+ TDs', three_td: '3+ TDs'};
-  var MK_ORDER = ['spread', 'ml', 'total', 'anytime_td', 'first_td', 'two_td', 'three_td', 'pass_yds', 'pass_att', 'pass_td', 'pass_rush_yds', 'rush_yds', 'rec', 'rec_yds', 'rush_rec_yds'];
+  var MKS = {
+    nfl: MK_FB, cfb: MK_FB,
+    nba: {spread: 'Spread', ml: 'Moneyline', total: 'Game total', pts: 'Points', reb: 'Rebounds', ast: 'Assists', threes: '3-pointers',
+      pr: 'Pts + reb', pa: 'Pts + ast', pra: 'Pts + reb + ast', dbl_dbl: 'Double-double', trp_dbl: 'Triple-double', first_basket: 'First basket',
+      h1_total: '1st-half total', q1_total: '1st-quarter total'},
+    cbb: {spread: 'Spread', ml: 'Moneyline', total: 'Game total'},
+    nhl: {spread: 'Puck line', ml: 'Moneyline', total: 'Total goals'},
+    tennis: {spread: 'Game spread', ml: 'Match winner', total: 'Total games'}
+  };
+  var MK = MKS[SPORT] || MK_FB;
+  var MK_ORDER = SPORT === 'nba' ? ['spread', 'ml', 'total', 'h1_total', 'q1_total', 'pts', 'reb', 'ast', 'threes', 'pr', 'pa', 'pra', 'dbl_dbl', 'trp_dbl', 'first_basket']
+    : MKS[SPORT] && MKS[SPORT] !== MK_FB ? ['ml', 'spread', 'total']
+    : ['spread', 'ml', 'total', 'anytime_td', 'first_td', 'two_td', 'three_td', 'pass_yds', 'pass_att', 'pass_td', 'pass_rush_yds', 'rush_yds', 'rec', 'rec_yds', 'rush_rec_yds'];
+  var PROPS = SPORT === 'nfl' || SPORT === 'cfb' || SPORT === 'nba';
 
   // ── the same-game correlation table ─────────────────────────────────────────────────────────────────────────
   // Every leg gets a category and a direction (+1 wants more of its stat or its team doing well, -1 an under).
@@ -55,20 +76,62 @@
   var SIDE_OWN = {recv: -0.05, td: 0.198, rush: 0.193, pass: 0.136, att: -0.175, ftd: 0.15};   // a team's side and its own players
   var SIDE_OPP = {recv: 0.05, td: -0.198, rush: -0.193, pass: -0.136, att: 0.175, ftd: -0.1};  // a team's side and the other team's players
   var TOTAL = {recv: 0.149, td: 0.247, rush: 0.097, pass: 0.319, att: 0.175, ftd: 0.1, side: 0}; // the game total and anything in it
-  var SIDES = {same: 0.8, opp: -0.8};                                                     // moneyline / spread pairs
+  var SIDES = {same: 0.8, opp: -0.8, excl: -0.99};   // moneyline / spread pairs (hand-set; excl: both sides of one market, which cannot both win)
   var CAT = {pass_yds: 'pass', pass_td: 'pass', pass_rush_yds: 'pass', pass_att: 'att', rec: 'recv', rec_yds: 'recv', rush_yds: 'rush',
-    anytime_td: 'td', two_td: 'td', three_td: 'td', first_td: 'ftd'};
+    anytime_td: 'td', two_td: 'td', three_td: 'td', first_td: 'ftd',
+    pts: 'pts', reb: 'reb', ast: 'ast', threes: 'thr', pr: 'pr', pa: 'pa', pra: 'pra', dbl_dbl: 'dd', trp_dbl: 'dd', first_basket: 'fb', h1_total: 'gtot', q1_total: 'gtot'};
+
+  // NBA (11/16, tools/nba_sgp_corr.py): the NFL method on every Onyx opening line with a result in 2024-25 and 2025-26
+  // (129,475 graded lines in 2,041 games: points, rebounds, assists, 3s, the three combos, spread and total; 4,697,047
+  // same-game pairs), each cell the correlation that best predicts how often its real pairs both hit, shrunk toward 0
+  // by n / (n + 80). Held out it beat independence both ways (log loss .54055 -> .54034 judging 2024-25 on a 2025-26
+  // fit; .54624 -> .54620 the other way, where 2024-25 had no combo or 3s lines to learn from). Strong part: one
+  // player's markets (points with a combo +.89, points with 3s +.74). Teammates fight a little (-.05), opponents ~0.
+  // Double / triple-doubles, first basket and the half / quarter totals have no graded history: estimates (sp, gtot).
+  var NBA = {
+    same: {'pts|reb': 0.299, 'ast|pts': 0.149, 'ast|reb': 0.199, 'pr|pts': 0.895, 'pr|reb': 0.497, 'pts|thr': 0.745, 'pra|pts': 0.894, 'pr|pra': 0.894, 'pra|reb': 0.546, 'reb|thr': 0.099, 'pr|thr': 0.645, 'pa|pts': 0.893, 'pa|pra': 0.893, 'ast|pa': 0.447, 'pa|pr': 0.893, 'pa|reb': 0.298, 'ast|pr': 0.149, 'ast|pra': 0.447, 'pra|thr': 0.595, 'pa|thr': 0.595, 'ast|thr': 0.05},
+    team: {'pts|reb': -0.05, 'ast|pts': 0.1, 'ast|reb': 0.05, 'pts|pts': -0.05, 'pr|pts': -0.1, 'pr|reb': 0.05, 'reb|reb': 0.0, 'pts|thr': -0.05, 'pra|pts': -0.05, 'pa|pts': -0.05, 'reb|thr': -0.05, 'pra|reb': 0.0, 'pr|thr': -0.05, 'pr|pra': -0.05, 'pa|reb': 0.05, 'pa|pr': -0.05, 'ast|pr': 0.1, 'pra|thr': 0.0, 'pa|thr': -0.05, 'ast|thr': 0.1, 'pa|pra': 0.05, 'ast|pra': 0.05, 'ast|pa': 0.05, 'ast|ast': -0.05, 'pr|pr': -0.05, 'thr|thr': 0.0, 'pra|pra': 0.0, 'pa|pa': 0.0},
+    opp: {'pts|reb': 0.05, 'ast|pts': -0.05, 'ast|reb': 0.0, 'pr|pts': 0.0, 'pts|pts': 0.0, 'pr|reb': 0.0, 'reb|reb': -0.05, 'pts|thr': 0.0, 'pra|pts': 0.0, 'pa|pts': 0.0, 'reb|thr': 0.0, 'pra|reb': 0.0, 'pr|thr': 0.0, 'pr|pra': -0.05, 'pa|reb': -0.05, 'pa|pr': 0.0, 'ast|pr': 0.05, 'pra|thr': 0.05, 'pa|thr': 0.0, 'ast|thr': 0.05, 'pa|pra': 0.0, 'ast|pra': 0.05, 'ast|pa': 0.0, 'ast|ast': 0.05, 'pr|pr': 0.0, 'thr|thr': 0.0, 'pra|pra': 0.05, 'pa|pa': 0.05},
+    sideOwn: {'pts': 0.15, 'reb': 0.15, 'ast': 0.1, 'pr': 0.199, 'thr': 0.099, 'pra': 0.199, 'pa': 0.149},
+    sideOpp: {'pts': -0.1, 'reb': -0.15, 'ast': -0.149, 'pr': -0.149, 'thr': -0.099, 'pra': -0.199, 'pa': -0.099},
+    total: {'pts': 0.15, 'reb': -0.1, 'ast': 0.149, 'pr': 0.099, 'thr': 0.099, 'pra': 0.099, 'pa': 0.099}
+  };
+  // game lines (11/16): tools/sgp_lines_corr.py, from Onyx's opening lines and the finals (NBA 2,323 games, college
+  // basketball 5,420, NHL 1,500, tennis 13,928 matches; each beat independence on the later half of its games held out).
+  // favMl / favSp = the favorite's moneyline / spread with the over (the underdog's takes the opposite sign); same = a
+  // team's moneyline with its own spread; cross = with the other team's spread; excl = two sides of one market.
+  var LINES = {
+    nba: {same: 0.934, cross: -0.934, excl: -0.99, favMl: 0.147, favSp: 0.098},
+    cbb: {same: 0.942, cross: -0.942, excl: -0.99, favMl: 0.0, favSp: -0.099},
+    nhl: {same: 0.875, cross: -0.924, excl: -0.99, favMl: -0.049, favSp: -0.097},
+    tennis: {same: 0.942, cross: -0.942, excl: -0.99, favMl: -0.149, favSp: -0.595}
+  };
+  NBA.team['fb|fb'] = NBA.opp['fb|fb'] = -0.35;      // two first baskets: only one player scores it (estimate, as the NFL's first TD)
+  var FB_TABLE = {same: SAME_PLAYER, team: TEAMMATES, opp: OPPONENTS, sideOwn: SIDE_OWN, sideOpp: SIDE_OPP, total: TOTAL, sides: SIDES, favOver: TOTAL.side, sp: 0.3};
+  var NBA_TABLE = {same: NBA.same, team: NBA.team, opp: NBA.opp, sideOwn: NBA.sideOwn, sideOpp: NBA.sideOpp, total: NBA.total, sides: LINES.nba, gtot: 0.75, sp: 0.3};
+  var TABLES = {nfl: FB_TABLE, cfb: FB_TABLE, nba: NBA_TABLE,
+    cbb: {sides: LINES.cbb}, nhl: {sides: LINES.nhl}, tennis: {sides: LINES.tennis}};
+  var TB = TABLES[SPORT] || FB_TABLE;
 
   function pk(a, b) { return a < b ? a + '|' + b : b + '|' + a; }
   function rho(a, b) {
     if (!a.gid || a.gid !== b.gid) return 0;
-    var A = a.cat, B = b.cat, base;
-    if (a.kind === 'prop' && b.kind === 'prop' && a.name && a.name === b.name) base = SAME_PLAYER[pk(A, B)] != null ? SAME_PLAYER[pk(A, B)] : 0.3;
-    else if (A === 'total' || B === 'total') base = TOTAL[A === 'total' ? B : A] || 0;
-    else if (A === 'side' && B === 'side') base = a.team === b.team ? SIDES.same : SIDES.opp;
-    else if (A === 'side' || B === 'side') { var s = A === 'side' ? a : b, o = A === 'side' ? b : a; base = ((s.team === o.team ? SIDE_OWN : SIDE_OPP)[o.cat]) || 0; }
-    else if (a.team && a.team === b.team) base = TEAMMATES[pk(A, B)] || 0;
-    else base = OPPONENTS[pk(A, B)] || 0;
+    var A = a.cat, B = b.cat, base, t = TB, cl = function (o, k) { return o && o[k] != null ? o[k] : null; };
+    if (a.kind === 'prop' && b.kind === 'prop' && a.name && a.name === b.name && A !== 'gtot') { var v = cl(t.same, pk(A, B)); base = v != null ? v : (t.sp != null ? t.sp : 0.3); }
+    else if (A === 'total' && B === 'total') base = 0.99;                                  // one total: the same bet, or its other side
+    else if ((A === 'total' || A === 'gtot') && (B === 'total' || B === 'gtot')) base = t.gtot != null ? t.gtot : 0;
+    else if (A === 'total' || B === 'total' || A === 'gtot' || B === 'gtot') {
+      var tl = A === 'total' || A === 'gtot' ? a : b, o = tl === a ? b : a;
+      if (o.cat === 'side') { var fo = (t.sides || {})[o.kind === 'ml' ? 'favMl' : 'favSp']; base = (fo != null ? fo : t.favOver || 0) * (o.fav ? 1 : -1) * (tl.cat === 'gtot' ? 0.8 : 1); }
+      else base = (cl(t.total, o.cat) || 0) * (tl.cat === 'gtot' ? 0.8 : 1);
+    }
+    else if (A === 'side' && B === 'side') {
+      var sd = t.sides || SIDES;
+      base = a.team === b.team ? sd.same : a.kind === b.kind && sd.excl != null ? sd.excl : sd.cross != null ? sd.cross : sd.opp;
+    }
+    else if (A === 'side' || B === 'side') { var s = A === 'side' ? a : b, o2 = A === 'side' ? b : a; base = cl(s.team === o2.team ? t.sideOwn : t.sideOpp, o2.cat) || 0; }
+    else if (a.team && a.team === b.team) base = cl(t.team, pk(A, B)) || 0;
+    else base = cl(t.opp, pk(A, B)) || 0;
     return base * a.dir * b.dir;
   }
 
@@ -134,7 +197,7 @@
     return CAT[r.mkt] || 'recv';
   }
   function teamOf(r) { return r.kind === 'spread' || r.kind === 'ml' ? (r.team || r.name || r.who) : r.kind === 'total' ? null : r.team; }
-  function idOf(r) { if (r.sel) return r.sel; var w = window.OnyxSaved && OnyxSaved.withId ? OnyxSaved.withId(Object.assign({sport: 'nfl'}, r)) : null; return (w && w.id) || ('k:' + r.label); }
+  function idOf(r) { if (r.sel) return r.sel; var w = window.OnyxSaved && OnyxSaved.withId ? OnyxSaved.withId(Object.assign({sport: SPORT}, r)) : null; return (w && w.id) || ('k:' + r.label); }
   function betKey(l) { return (l.gid || l.matchup) + '|' + (l.kind === 'prop' ? l.mkt + ':' + (l.name || '') : l.kind); }
   function live(r) { return !(Date.parse(r.start) <= Date.now()); }
   function clampP(p) { return Math.min(0.995, Math.max(0.005, p)); }
@@ -144,6 +207,8 @@
     if (extra) Object.keys(extra).forEach(function (k) { L[k] = extra[k]; });
     L.dec = u.dec(L.price); L.p = clampP(L.conf != null ? L.conf : u.imp(L.price)); L.cat = catOf(L);
     L.dir = L.cat === 'side' ? 1 : (L.side === 'under' ? -1 : 1);
+    // a side's favorite or underdog (its link with the total turns on it): the spread's sign, the cheaper moneyline
+    if (L.cat === 'side') L.fav = src._fav != null ? src._fav : src.kind === 'spread' ? src.hcap < 0 : src.price < 0;
     return L;
   }
   function fromRow(r) { return mkLeg(r); }
@@ -153,8 +218,8 @@
     return s.filter(function (l) { return l && l.price != null; }).map(function (l) {
       var r = (l.sel && BYSEL[l.sel]) || BYID[l.id] || null;
       if (r) return mkLeg(r, {id: l.id});
-      var nfl = !l.sport || l.sport === 'nfl', own = l.conf == null;
-      return mkLeg(l, {id: l.id, gid: nfl ? l.gid : null, own: own, off: true, edge: null});
+      var mine = !l.sport || l.sport === SPORT, own = l.conf == null;
+      return mkLeg(l, {id: l.id, gid: mine ? l.gid : null, own: own, off: true, edge: null});
     });
   }
 
@@ -234,23 +299,45 @@
   function pool(f) { return ROWS.filter(function (r) { return live(r) && !r.no_read && r.conf != null && r.price != null && f(r); }); }
   function distinctGames(rows, n) { var g = {}, out = []; rows.forEach(function (r) { if (out.length < n && !g[r.gid]) { g[r.gid] = 1; out.push(r); } }); return out; }
   var byEv = function (a, b) { return (b.ev || 0) - (a.ev || 0); };
+  var GAME = SPORT === 'tennis' ? 'match' : 'game';
+  // the plays the model rates best against Onyx's price: its edges first, then the best of the rest
+  function bestValue(f) { var a = pool(f).sort(byEv); return a.filter(function (r) { return r.edge > 0; }).concat(a.filter(function (r) { return !(r.edge > 0); })); }
   var PRESETS = {
-    value3: {t: "Model's value 3-legger", d: 'The three plays the model rates highest against Onyx\'s price, one per game.', build: function () {
-      var a = pool(function (r) { return r.edge > 0 && r.price >= -250 && r.price <= 250; }).sort(byEv);
-      return distinctGames(a, 3);
+    value3: {t: "Model's value 3-legger", d: 'The three plays the model rates best against Onyx\'s price, one per ' + GAME + ' (its edges first).', build: function () {
+      return distinctGames(bestValue(function (r) { return r.price >= -250 && r.price <= 250; }), 3);
     }},
     td: {t: 'TD long shot', d: 'Three anytime TD scorers at +150 to +500 that the model rates best against Onyx\'s price, three games.', build: function () {
       return distinctGames(pool(function (r) { return r.mkt === 'anytime_td' && r.price >= 150 && r.price <= 500; }).sort(byEv), 3);
     }},
-    safe: {t: 'Safe-ish 2-legger', d: 'The two likeliest plays at -200 or longer where the model agrees with the side, two games.', build: function () {
+    unders: {t: "Model's unders", d: 'Three player unders (rebounds, assists, 3s or combos, no points) where the model\'s projection sits 2+ under Onyx\'s line, three games: the NBA model\'s own list rule.', build: function () {
+      return distinctGames(pool(function (r) { return r.kind === 'prop' && r.side === 'under' && r.proj != null && r.line - r.proj >= 2 && ['reb', 'ast', 'threes', 'pr', 'pa', 'pra'].indexOf(r.mkt) >= 0 && r.price >= -250; })
+        .sort(function (x, y) { return (y.line - y.proj) / y.line - (x.line - x.proj) / x.line; }), 3);
+    }},
+    dogs: {t: 'Underdog double', d: 'Two underdogs to win at +100 to +300, the two the model rates best against Onyx\'s price, two ' + (GAME === 'match' ? 'matches' : 'games') + '.', build: function () {
+      return distinctGames(bestValue(function (r) { return r.kind === 'ml' && r.price >= 100 && r.price <= 300; }), 2);
+    }},
+    safe: {t: 'Safe-ish 2-legger', d: 'The two likeliest plays at -200 or longer where the model agrees with the side, two ' + (GAME === 'match' ? 'matches' : 'games') + '.', build: function () {
       var a = pool(function (r) { return r.price >= -200 && r.price <= 150; }), byC = function (x, y) { return y.conf - x.conf; };
       var good = a.filter(function (r) { return r.edge >= 0; }).sort(byC), rest = a.filter(function (r) { return r.edge < 0; }).sort(byC);
       return distinctGames(good.concat(rest), 2);
     }},
+    pair: {t: 'Side + total', d: 'Pick a ' + GAME + ': the model\'s best side there with the total that moves with it.', build: function (gid) { return pair(gid); }},
     sgp: {t: 'Same-game stack', d: 'Pick a game: the model\'s favorite play there plus two legs that move with it.', build: function (gid) { return stack(gid); }}
   };
+  var PRESET_KEYS = {nfl: ['value3', 'td', 'safe', 'sgp'], cfb: ['value3', 'td', 'safe', 'sgp'], nba: ['value3', 'unders', 'safe', 'sgp'],
+    cbb: ['value3', 'dogs', 'safe', 'pair'], nhl: ['value3', 'dogs', 'safe', 'pair'], tennis: ['value3', 'dogs', 'safe', 'pair']}[SPORT] || ['value3', 'safe', 'sgp'];
+  // a side and the total side its link favors (the favorite with the over when favOver > 0)
+  function pair(gid) {
+    var a = pool(function (r) { return r.gid === gid && r.price >= -400 && r.price <= 400; });
+    var sides = a.filter(function (r) { return r.kind === 'spread' || r.kind === 'ml'; }).sort(function (x, y) { return ((y.edge > 0) - (x.edge > 0)) || (y.ev || 0) - (x.ev || 0); });
+    if (!sides.length) return [];
+    var s0 = sides[0], L = fromRow(s0), tots = a.filter(function (r) { return r.kind === 'total'; });
+    var best = null;
+    tots.forEach(function (r) { var c = fromRow(r), sc = rho(L, c) + 0.5 * (r.ev || 0); if (!best || sc > best.s) best = {r: r, s: sc}; });
+    return best ? [s0, best.r] : [s0];
+  }
   function stack(gid) {
-    var a = pool(function (r) { return r.gid === gid && r.price >= -300 && r.price <= 350 && ['first_td', 'two_td', 'three_td'].indexOf(r.mkt) < 0; });
+    var a = pool(function (r) { return r.gid === gid && r.price >= -300 && r.price <= 350 && ['first_td', 'two_td', 'three_td', 'first_basket', 'trp_dbl'].indexOf(r.mkt) < 0; });
     if (a.length < 2) return [];
     var lead = a.slice().sort(function (x, y) { return ((y.edge > 0) - (x.edge > 0)) || (y.ev || 0) - (x.ev || 0); })[0], picked = [lead];
     while (picked.length < 3) {
@@ -258,6 +345,8 @@
       picked.forEach(function (r) { keys[betKey(r)] = 1; });
       a.forEach(function (r) {
         if (keys[betKey(r)] || picked.indexOf(r) >= 0) return;
+        var tot = function (x) { return x.kind === 'total' || CAT[x.mkt] === 'gtot'; };      // one total-type leg a stack
+        if (tot(r) && picked.some(tot)) return;
         var c = fromRow(r), link = Math.max.apply(null, legs.map(function (l) { return rho(l, c); }));
         if (link < 0.1) return;
         var A = analyze(legs.concat([c]), QUICK), score = A.value + 0.5 * link;
@@ -269,7 +358,7 @@
   }
 
   // ── view helpers ────────────────────────────────────────────────────────────────────────────────────────────
-  function gameName(gid, fb) { var g = D.game(gid); return g ? g.away + ' @ ' + g.home : (fb || ''); }
+  function gameName(gid, fb) { var g = D.game(gid); return g ? (g.tennis ? g.name || g.away + ' vs ' + g.home : g.away + ' @ ' + g.home) : (fb || ''); }
   function sgn(x, d) { return (x > 0 ? '+' : '') + (100 * x).toFixed(d == null ? 0 : d) + '%'; }
   function cls(x) { return x > 0.0005 ? 'sx-pos' : x < -0.0005 ? 'sx-neg' : ''; }
   function chance(p) { return p < 0.01 ? (100 * p).toFixed(2) + '%' : p < 0.1 ? (100 * p).toFixed(1) + '%' : (100 * p).toFixed(0) + '%'; }
@@ -326,7 +415,7 @@
     var mk = {}; ROWS.forEach(function (r) { if (live(r)) mk[r.mkt] = (mk[r.mkt] || 0) + 1; });
     return '<div class="sx-card lab-pick"><div class="lab-ph"><h3 class="sx-h">Leg picker</h3><span class="sx-k" id="labCount"></span></div>'
       + '<div class="lab-modes"><button type="button" class="sx-chip" data-mode="likes">Model likes</button><button type="button" class="sx-chip" data-mode="likely">Most likely</button><button type="button" class="sx-chip" data-mode="all">All</button></div>'
-      + '<input class="sx-in lab-q" id="labQ" type="search" placeholder="Search a player or team" autocomplete="off">'
+      + '<input class="sx-in lab-q" id="labQ" type="search" placeholder="' + (SPORT === 'tennis' ? 'Search a player' : PROPS ? 'Search a player or team' : 'Search a team') + '" autocomplete="off">'
       + '<div class="lab-f">'
       + '<select class="sx-sel" data-f="gid" aria-label="Game"><option value="">Every game</option>' + gl.map(function (g) { return '<option value="' + u.esc(g.gid) + '">' + u.esc(gameName(g.gid, g.m)) + '</option>'; }).join('') + '</select>'
       + '<select class="sx-sel" data-f="mkt" aria-label="Market"><option value="">Every market</option>' + MK_ORDER.filter(function (k) { return mk[k]; }).map(function (k) { return '<option value="' + k + '">' + MK[k] + ' (' + mk[k] + ')</option>'; }).join('') + '</select>'
@@ -339,10 +428,10 @@
   function presetsHTML() {
     var games = {}; ROWS.forEach(function (r) { if (live(r) && !r.no_read) games[r.gid] = games[r.gid] || {gid: r.gid, t: Date.parse(r.start), m: r.matchup}; });
     var gl = Object.keys(games).map(function (k) { return games[k]; }).sort(function (a, b) { return a.t - b.t; });
-    var cards = ['value3', 'td', 'safe', 'sgp'].map(function (k) {
+    var cards = PRESET_KEYS.map(function (k) {
       var P = PRESETS[k];
       return '<div class="lab-pre"><b>' + u.esc(P.t) + '</b><small>' + u.esc(P.d) + '</small>'
-        + (k === 'sgp' ? '<select class="sx-sel lab-sgp" id="labSgp" aria-label="Game for the stack">' + gl.map(function (g) { return '<option value="' + u.esc(g.gid) + '">' + u.esc(gameName(g.gid, g.m)) + '</option>'; }).join('') + '</select>' : '')
+        + (k === 'sgp' || k === 'pair' ? '<select class="sx-sel lab-sgp" id="labSgp" aria-label="Game for the stack">' + gl.map(function (g) { return '<option value="' + u.esc(g.gid) + '">' + u.esc(gameName(g.gid, g.m)) + '</option>'; }).join('') + '</select>' : '')
         + '<button type="button" class="sx-btn" data-preset="' + k + '"' + (gl.length ? '' : ' disabled') + '>Build it</button></div>';
     }).join('');
     return '<div class="sx-card lab-pres"><h3 class="sx-h">One-tap ideas</h3><p class="sx-sub">Built from today\'s board by the model. Each one is a model idea, not an Onyx Pick.</p>'
@@ -379,7 +468,7 @@
     var legsHTML = legs.map(function (l, i) {
       var e = A.effects[i], f = [];
       if (l.own) f.push('<span class="lab-fl own">this leg\'s chance is Onyx\'s own (no model read)</span>');
-      if (l.off) f.push('<span class="lab-fl own">not on today\'s NFL board: read on its own</span>');
+      if (l.off) f.push('<span class="lab-fl own">not on today\'s ' + u.esc(D.sportName) + ' board: read on its own</span>');
       if (n >= 2 && i === worst && e.mult < 1) f.push('<span class="lab-fl bad">drags the value down most</span>');
       return '<div class="lab-leg' + (i === worst && n >= 2 && e.mult < 1 ? ' worst' : '') + '"><div class="lab-lm"><b>' + u.esc(l.label) + '</b><small>' + u.esc(sub(l)) + '</small>' + (f.length ? '<div>' + f.join('') + '</div>' : '') + '</div>'
         + '<div class="lab-ln"><span><i>Model</i>' + chance(l.p) + '</span><span><i>Onyx</i>' + u.odds(l.price) + '</span>'
@@ -423,6 +512,7 @@
   function short(l) {
     var s = l.label || '';
     if (l.kind === 'prop') s = s.replace(/ (receiving|rushing|passing) (yards|yds)$/, ' $1').replace(/ receptions$/, ' rec').replace(/ pass attempts$/, ' att');
+    if (l.kind === 'prop') s = s.replace(/ points \+ rebounds \+ assists$/, ' PRA').replace(/ points \+ rebounds$/, ' P+R').replace(/ points \+ assists$/, ' P+A').replace(/ 3-pointers made$/, ' 3s');
     if (l.kind === 'total') s += ' (' + gameName(l.gid, l.matchup) + ')';
     return s;
   }
@@ -454,7 +544,7 @@
     else if (b.hasAttribute('data-rm')) { if (P) P.remove(b.getAttribute('data-rm')); }
     else if (b.hasAttribute('data-clear')) { if (P) P.clear(); }
     else if (b.hasAttribute('data-preset')) {
-      var k = b.getAttribute('data-preset'), gid = k === 'sgp' ? (ROOT.querySelector('#labSgp') || {}).value : null;
+      var k = b.getAttribute('data-preset'), gid = k === 'sgp' || k === 'pair' ? (ROOT.querySelector('#labSgp') || {}).value : null;
       PREVIEW = {k: k, rows: PRESETS[k].build(gid)}; renderPreview();
       var pv = ROOT.querySelector('#labPreview'); if (pv && pv.scrollIntoView) try { pv.scrollIntoView({block: 'nearest', behavior: 'smooth'}); } catch (x) {}
     }
@@ -529,18 +619,47 @@
     document.head.appendChild(s);
   }
   function howHTML() {
-    return '<details class="lab-howto sx-card"><summary>How the lab reads same-game legs</summary><p>Legs in different games multiply. Legs in the same game get a correlation, and the lab plays the slip out 5,000 times with every leg keeping the model\'s own chance. Every link is measured from real games: how often Onyx\'s own lines hit together across 524,593 same-game pairs in 2025 and 2026. The main ones:</p><ul>'
+    var f = function (x) { return (x > 0 ? '+' : '') + (+x).toFixed(2); }, li = function (t) { return '<li>' + t + '</li>'; };
+    var open = '<details class="lab-howto sx-card"><summary>How the lab reads same-game legs</summary><p>Legs in different ' + (SPORT === 'tennis' ? 'matches' : 'games') + ' multiply. Legs in the same ' + GAME + ' get a correlation, and the lab plays the slip out 5,000 times with every leg keeping the model\'s own chance. ';
+    var close = '</ul><p>Model chances are projections, not Onyx Picks.</p></details>';
+    var sd = TB.sides || {};
+    var lines = function (nm) {
+      return li('A ' + nm + '\'s moneyline and its own ' + (MK.spread || 'spread').toLowerCase() + ': ' + f(sd.same) + '; with the other side\'s ' + (MK.spread || 'spread').toLowerCase() + ': ' + f(sd.cross))
+        + li('The favorite\'s moneyline and the over: ' + f(sd.favMl) + ', its ' + (MK.spread || 'spread').toLowerCase() + ' and the over: ' + f(sd.favSp) + ' (the underdog takes the other sign)')
+        + li('Both sides of one market cannot both win: the lab treats them as near opposite (-0.99).');
+    };
+    if (SPORT === 'nba') {
+      var S = TB.same || {}, T = TB.team || {}, O = TB.opp || {}, To = TB.total || {}, So = TB.sideOwn || {};
+      return open + 'Every player link is measured from real games: how often Onyx\'s own lines hit together across 4.7 million same-game pairs in 2,041 games of 2024-25 and 2025-26 (tools/nba_sgp_corr.py). The game lines are measured from 2,323 games\' finals (tools/sgp_lines_corr.py). The main ones:</p><ul>'
+        + li('One player\'s points and his points + rebounds + assists: ' + f(S['pra|pts']) + '; his points and rebounds: ' + f(S['pts|reb']) + ', points and assists: ' + f(S['ast|pts']) + ', points and 3s: ' + f(S['pts|thr']))
+        + li('Two teammates\' points: ' + f(T['pts|pts']) + ' (they share the shots); a player\'s assists and a teammate\'s points: ' + f(T['ast|pts']))
+        + li('Players on opposite teams, points with points: ' + f(O['pts|pts']))
+        + li('The game total over and a player\'s points over: ' + f(To.pts) + '; a team covering and its own player\'s points: ' + f(So.pts))
+        + lines('team')
+        + li('Estimates, not measured (no graded history): double and triple-doubles with that player\'s other markets (+0.30), first basket, and the first-half and first-quarter totals with the game total (+0.75).')
+        + li('Unders flip the sign: a points under with a teammate\'s points over fight less than two overs move together.') + close;
+    }
+    if (SPORT === 'cbb' || SPORT === 'nhl' || SPORT === 'tennis') {
+      var nm = SPORT === 'tennis' ? 'player' : 'team', src = {cbb: '5,420 games', nhl: '1,500 games, overtime and shootouts included', tennis: '13,928 matches, the spread and total graded on games'}[SPORT];
+      return open + 'This board is game lines only, so three links matter, each measured from Onyx\'s own opening lines and the finals (' + src + ', tools/sgp_lines_corr.py):</p><ul>'
+        + lines(nm) + close;
+    }
+    return '<details class="lab-howto sx-card"><summary>How the lab reads same-game legs</summary><p>Legs in different games multiply. Legs in the same game get a correlation, and the lab plays the slip out 5,000 times with every leg keeping the model\'s own chance. ' + (SPORT === 'cfb' ? 'College football uses the NFL table: every link below was measured on NFL games (no college history has been graded for it), so treat the college numbers as estimates.' : 'Every link is measured from real games: how often Onyx\'s own lines hit together across 524,593 same-game pairs in 2025 and 2026.') + ' The main ones:</p><ul>'
       + '<li>A player\'s receptions over and his receiving yards over: +0.79</li><li>A QB\'s passing over and his own receiver\'s receiving over: +0.35 (his pass attempts and that receiver: +0.25)</li>'
       + '<li>The game total over and a QB\'s passing over: +0.32, an anytime TD +0.25, a receiver over +0.15</li><li>A team covering and its own running back\'s rushing over: +0.19, its anytime TD scorers +0.20</li>'
       + '<li>A team covering and its QB\'s pass attempts over: -0.18 (trailing teams throw more)</li><li>Two teammates both scoring a TD: -0.10 (they share the end zone)</li>'
       + '<li>Players on opposite teams: about 0. A "shootout" lifts both sides less than it feels like.</li>'
-      + '<li>Unders flip the sign: a passing under with a receiving over fight each other.</li></ul><p>First TD links are estimates (there is no graded history to measure them on). Model chances are projections, not Onyx Picks.</p></details>';
+      + '<li>Unders flip the sign: a passing under with a receiving over fight each other.</li></ul><p>First TD links and a moneyline with its own spread (+0.80) are estimates (no graded history measures them). Model chances are projections, not Onyx Picks.</p></details>';
   }
   function mount(el, d, uu) {
     D = d; u = uu; ROOT = el; css();
     ROLE = {}; D.plays.forEach(function (r) { if (r.role && r.name) ROLE[u.nk(r.name)] = r.role; });
     ROWS = D.plays.filter(function (r) { return r && r.label && r.price != null; }).map(function (r) { r._id = idOf(r); r._team = teamOf(r); return r; });
     BYID = {}; BYSEL = {}; ROWS.forEach(function (r) { BYID[r._id] = r; if (r.sel) BYSEL[r.sel] = r; });
+    ROWS.forEach(function (r) {
+      if (r.kind === 'spread') r._fav = r.hcap < 0;
+      else if (r.kind === 'ml') { var o = ROWS.filter(function (x) { return x.kind === 'ml' && x.gid === r.gid && x !== r; })[0]; r._fav = o ? r.price < o.price : r.price < 0; }
+    });
     var g = Studio.param('gid'); if (g && ROWS.some(function (r) { return r.gid === g; })) F.gid = g;
     el.innerHTML = '<div class="lab"><div class="lab-hero"><h2>Parlay Lab</h2><p>Build on your one Onyx slip. The lab reads every leg with the model: the true chance it all hits, same-game links included, what it should pay against what Onyx pays, and which legs to swap.</p></div>'
       + '<div class="lab-cols"><div class="lab-main"><div id="labSlip"></div><div id="labSwap"></div><div id="labLadder"></div></div>'
@@ -569,14 +688,34 @@
     if (Math.abs(mc - A.naive) > 4 * se + 0.005) return 'Monte Carlo of different-game legs ' + mc.toFixed(4) + ' far from the product ' + A.naive.toFixed(4);
     if (Math.abs(A.fairDec * A.trueP - 1) > 1e-9) return 'fair odds do not match the true chance';
     if (Math.abs(A.value - (A.trueP * A.dec - 1)) > 1e-12) return 'value math off';
-    // a same-game stack must sit above the naive product, a fighting pair below, both inside [0, min chance]
-    var qb = good.filter(function (r) { return r.mkt === 'pass_yds' && r.side === 'over'; })[0] || ROWS.filter(function (r) { return r.mkt === 'pass_yds' && r.side === 'over'; })[0];
+    // same-game pairs from this sport's board: each joint chance inside the Frechet bounds [pa + pb - 1, min(pa, pb)],
+    // and above the legs multiplied when the table says they move together, below when they fight
+    var pairs = [], pick = function (f) { return good.filter(f)[0] || ROWS.filter(f)[0]; };
+    var qb = pick(function (r) { return r.mkt === 'pass_yds' && r.side === 'over'; });
     var wr = qb && ROWS.filter(function (r) { return r.gid === qb.gid && r.team === qb.team && r.mkt === 'rec_yds' && r.side === 'over'; })[0];
-    if (qb && wr) {
-      var S = analyze([fromRow(qb), fromRow(wr)]), mn = Math.min(S.legs[0].p, S.legs[1].p);
-      if (!(S.trueP > S.naive && S.trueP <= mn + 0.01)) return 'QB + WR stack chance ' + S.trueP.toFixed(4) + ' should sit between ' + S.naive.toFixed(4) + ' and ' + mn.toFixed(4);
-      var neg = mkLeg(wr, {side: 'under'}); var S2 = analyze([fromRow(qb), neg]);
-      if (!(S2.trueP < S2.naive)) return 'opposite-script pair should fall under the product';
+    if (qb && wr) pairs.push(['QB + WR stack', fromRow(qb), fromRow(wr)], ['QB over + WR under', fromRow(qb), mkLeg(wr, {side: 'under'})]);
+    var pts = pick(function (r) { return r.mkt === 'pts' && r.side === 'over'; }) || pick(function (r) { return r.mkt === 'pts'; });
+    var pra = pts && ROWS.filter(function (r) { return r.gid === pts.gid && r.name === pts.name && r.mkt === 'pra'; })[0];
+    if (pts && pra) pairs.push(['points + PRA, one player', mkLeg(pts, {side: 'over'}), mkLeg(pra, {side: 'over'})], ['points over + PRA under', mkLeg(pts, {side: 'over'}), mkLeg(pra, {side: 'under'})]);
+    var sp = pick(function (r) { return r.kind === 'spread' && r.conf > 0.05 && r.conf < 0.95; });
+    var ml = sp && ROWS.filter(function (r) { return r.kind === 'ml' && r.gid === sp.gid && r.name === sp.name; })[0];
+    var ml2 = sp && ROWS.filter(function (r) { return r.kind === 'ml' && r.gid === sp.gid && r.name !== sp.name; })[0];
+    var ov = sp && ROWS.filter(function (r) { return r.kind === 'total' && r.gid === sp.gid && r.side !== 'under'; })[0];
+    if (sp && ml) pairs.push(['moneyline + own spread', fromRow(ml), fromRow(sp)]);
+    if (ml && ml2) pairs.push(['both moneylines', fromRow(ml), fromRow(ml2)]);
+    if (sp && ov) pairs.push(['spread + over', fromRow(sp), fromRow(ov)]);
+    for (var pi = 0; pi < pairs.length; pi++) {
+      var pr = pairs[pi], S = analyze([pr[1], pr[2]]), pa = S.legs[0].p, pb = S.legs[1].p, r0 = rho(S.legs[0], S.legs[1]), se2 = 0.012;
+      if (!(S.trueP <= Math.min(pa, pb) + se2 && S.trueP >= Math.max(0, pa + pb - 1) - se2)) return pr[0] + ': joint ' + S.trueP.toFixed(4) + ' outside [' + Math.max(0, pa + pb - 1).toFixed(4) + ', ' + Math.min(pa, pb).toFixed(4) + ']';
+      if (r0 > 0.05 && !(S.trueP > S.naive)) return pr[0] + ' (correlation ' + r0.toFixed(2) + ') should sit above the legs multiplied: ' + S.trueP.toFixed(4) + ' vs ' + S.naive.toFixed(4);
+      if (r0 < -0.05 && !(S.trueP < S.naive)) return pr[0] + ' (correlation ' + r0.toFixed(2) + ') should fall under the legs multiplied: ' + S.trueP.toFixed(4) + ' vs ' + S.naive.toFixed(4);
+    }
+    // every preset builds distinct bets from this board, and a one-game preset stays in its game
+    var gid0 = (ROWS.filter(function (r) { return live(r) && !r.no_read; })[0] || {}).gid;
+    for (var ki = 0; ki < PRESET_KEYS.length; ki++) {
+      var rows = PRESETS[PRESET_KEYS[ki]].build(gid0) || [], seen = {};
+      for (var ri = 0; ri < rows.length; ri++) { var bk = betKey(rows[ri]); if (seen[bk]) return 'preset ' + PRESET_KEYS[ki] + ' repeats a bet'; seen[bk] = 1; }
+      if ((PRESET_KEYS[ki] === 'sgp' || PRESET_KEYS[ki] === 'pair') && rows.some(function (r) { return r.gid !== gid0; })) return 'preset ' + PRESET_KEYS[ki] + ' left its game';
     }
     if (LAST) {
       var L = LAST.A, p2 = L.legs.reduce(function (m, l) { return m * u.dec(l.price); }, 1);

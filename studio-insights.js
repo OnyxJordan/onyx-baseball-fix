@@ -1,81 +1,248 @@
-// studio-insights.js - Onyx Insights, the NFL Studio's FAQ feed (11/15, Jordan: "onyx insights where we type the most
+// studio-insights.js - Onyx Insights, the Studio's FAQ feed (11/15 NFL, Jordan: "onyx insights where we type the most
 // frequently asked questions that come up in the search (can generate them randomly) and put out the responses,
-// highlight pages").
+// highlight pages"; every sport 11/16).
 //
-// Every visit deals 8 to 12 NFL questions from the bank below, weighted by how often that kind of question is asked,
-// and answers each one live from today's board with Ask Onyx (ask.js) on its built-in reader only: the spec comes
-// from OnyxAsk.localSpec and is handed to OnyxAsk.ask as a forced spec, so no question ever takes the AI round trip.
-// Each answer is a highlight card (headline, a one-line takeaway written from the numbers, the top plays with Onyx
-// chips and "+ Slip", chance bars); tapping one opens its page at #insights?q=<question> (every play, the board's
-// "why" lines, Share, "Bet this on Onyx", "Parlay the top 3"). "Ask your own" runs any question the same way.
+// Every visit deals 8 to 12 questions in the Studio's sport from that sport's bank below, weighted by how often that
+// kind of question is asked, and answers each one live from today's board with Ask Onyx (ask.js) on its built-in
+// reader only: the spec comes from OnyxAsk.localSpec and is handed to OnyxAsk.ask as a forced spec, so no question ever
+// takes the AI round trip. Each answer is a highlight card (headline, a one-line takeaway written from the numbers, the
+// top plays with Onyx chips and "+ Slip", chance bars); tapping one opens its page at #insights?q=<question> (every
+// play, the board's "why" lines, Share, "Bet this on Onyx", "Parlay the top 3"). "Ask your own" runs any question the
+// same way. Templates fill with today's names in the sport (players, teams, matches still to play).
 //
-// Where the frequencies come from (FREQ): the site keeps no log of what people type into search (ask.js stores
-// nothing, accounts.js syncs only bet lists, supabase/schema.sql has no search table), so the counts are the NFL
-// questions in the four sets Ask Onyx is tested on: tools/ask_corpus.json (535), tools/ask_big.json (3,000 requests
-// written the way people type), tools/ask_holdout.json (59) and tools/ask_holdout2.json (49, both hand-written).
-// tools/insights_freq.py tags each NFL question with every type it carries and prints this table (802 NFL questions
-// of 3,643). Re-run it when the sets grow and paste the counts here.
+// Where the frequencies come from (CFG[sport].freq): the questions in the four sets Ask Onyx is tested on,
+// tools/ask_corpus.json (535), tools/ask_big.json (3,000 requests written the way people type), tools/ask_holdout.json
+// (59) and tools/ask_holdout2.json (49, both hand-written), 3,643 in all. `python3 tools/insights_freq.py --sport all`
+// tags each sport's questions with every type they carry and prints these tables (a question counts for a sport when
+// it names it, names only its own markets or players, or names nothing at all). Re-run it when the sets grow and
+// paste the counts here. Real searches: search_trends.py counts what people typed (data/insights/trending.json); with
+// REAL_MIN+ searches in the sport, its real counts replace the corpus ones (per-sport types when the file carries
+// them as by_sport[sport], else the NFL's own; for other sports without per-sport types it says how many real
+// searches there were and that the ranking is still the test set's).
 (function () {
   'use strict';
-  var FREQ_N = 802, FREQ_ALL = 3643;
-  var FREQ = {parlay: 392, game: 191, passing: 160, receiving: 132, td: 126, safe: 98, best: 94, spread: 65, over: 63,
-              rushing: 63, under: 56, ml: 54, plus: 37, total: 36, player: 31, sgp: 12, value: 6};
-  var TYPE = {parlay: 'Parlays', game: 'Team and game questions', passing: 'Passing yards', receiving: 'Receptions and receiving',
-              td: 'Touchdown scorers', safe: 'Safest plays', best: 'Best bets', spread: 'Spreads', over: 'Overs', rushing: 'Rushing yards',
-              under: 'Unders', ml: 'Moneylines', plus: 'Plus money', total: 'Game totals', player: 'Player lookups', sgp: 'Same-game parlays',
-              value: 'Value plays', own: 'Your question'};
+  var SPORT = (window.Studio && Studio.sport) || 'nfl', FREQ_ALL = 3643;
+  var pick = function (a) { return a.length ? a[Math.floor(Math.random() * a.length)] : null; };
+  var NBA_NICK = {ATL: 'Hawks', BOS: 'Celtics', BKN: 'Nets', CHA: 'Hornets', CHI: 'Bulls', CLE: 'Cavaliers', DAL: 'Mavericks', DEN: 'Nuggets', DET: 'Pistons',
+    GS: 'Warriors', HOU: 'Rockets', IND: 'Pacers', LAC: 'Clippers', LAL: 'Lakers', MEM: 'Grizzlies', MIA: 'Heat', MIL: 'Bucks', MIN: 'Timberwolves', NO: 'Pelicans',
+    NY: 'Knicks', OKC: 'Thunder', ORL: 'Magic', PHI: '76ers', PHX: 'Suns', POR: 'Trail Blazers', SAC: 'Kings', SA: 'Spurs', TOR: 'Raptors', UTAH: 'Jazz', WSH: 'Wizards'};
+  // a team's name the way people type it (and Ask reads it): NFL abbreviations, NBA nicknames, schools, NHL nicknames, tennis names
+  function tn(g, side) {
+    var ab = g[side];
+    if (SPORT === 'nba') return NBA_NICK[ab] || ab;
+    if (SPORT === 'cfb' || SPORT === 'cbb') return g[side + '_loc'] || g[side + '_short'] || ab;
+    if (SPORT === 'nhl') return g[side + '_short'] || ab;
+    return ab;
+  }
+  function gm(g) { return g ? tn(g, 'away') + ' vs ' + tn(g, 'home') : null; }
+  var COMMON_T = {parlay: 'Parlays', game: 'Team and game questions', safe: 'Safest plays', best: 'Best bets', spread: 'Spreads', over: 'Overs', under: 'Unders',
+    ml: 'Moneylines', plus: 'Plus money', total: 'Game totals', player: 'Player lookups', sgp: 'Same-game parlays', value: 'Value plays', own: 'Your question'};
+  var FOOT_T = {passing: 'Passing yards', receiving: 'Receptions and receiving', td: 'Touchdown scorers', rushing: 'Rushing yards'};
+  var HOOP_T = {points: 'Points', rebounds: 'Rebounds', assists: 'Assists', threes: 'Threes', combos: 'Points + rebounds + assists', specials: 'Double-doubles and first baskets', halves: 'Halves and quarters'};
+
+  // ── per sport: the search word, the corpus counts (tools/insights_freq.py --sport <k>), the type names and the
+  // question bank [type, template]. A template is a string or fn(names) -> string|null (null: nothing on today's
+  // board to fill it, so it sits this deal out). Each type's weight is split across its templates. ─────
+  var CFG = {
+    nfl: {n: 802, word: 'NFL', ph: 'Josh Allen passing yards', fallback: 'best nfl bets today',
+      freq: {parlay: 392, game: 191, passing: 160, receiving: 132, td: 126, safe: 98, best: 94, spread: 65, over: 63, rushing: 63, under: 56, ml: 54, plus: 37, total: 36, player: 31, sgp: 12, value: 6},
+      types: FOOT_T,
+      bank: [
+        ['parlay', 'safest 3 leg nfl parlay'],
+        ['parlay', function () { return pick([2, 3, 4]) + ' leg nfl parlay'; }],
+        ['parlay', 'nfl parlay that pays +500'],
+        ['parlay', function (N) { var g = pick(N.games); return g ? {q: '3 leg parlay ' + g.away + ' vs ' + g.home, gid: g.gid} : null; }],
+        ['game', function (N) { var g = pick(N.games); return g ? {q: 'who scores a td in ' + g.away + ' vs ' + g.home, gid: g.gid} : null; }],
+        ['game', function (N) { var g = pick(N.games); return g ? {q: g.away + ' vs ' + g.home + ' best bets', gid: g.gid} : null; }],
+        ['game', function (N) { var g = pick(N.games); return g ? {q: g.away + ' vs ' + g.home + ' total', gid: g.gid} : null; }],
+        ['passing', function (N) { var p = pick(N.qb); return p ? {q: p + ' passing yards', name: p} : null; }],
+        ['passing', 'nfl passing yards unders'],
+        ['passing', 'nfl passing yards overs'],
+        ['receiving', 'best nfl receptions unders today'],
+        ['receiving', function (N) { var p = pick(N.wr); return p ? {q: p + ' receptions', name: p} : null; }],
+        ['receiving', 'nfl receiving yards overs'],
+        ['receiving', 'top 5 nfl receptions overs'],
+        ['td', 'top 10 nfl anytime td scorers'],
+        ['td', 'most likely nfl anytime td scorer'],
+        ['td', 'top 5 nfl 2+ td scorers'],
+        ['td', function (N) { var p = pick(N.td); return p ? {q: p + ' anytime td', name: p} : null; }],
+        ['safe', 'safest nfl props today'],
+        ['safe', 'safest nfl rushing yards'],
+        ['best', 'best nfl bets today'],
+        ['best', 'top 10 nfl player props no touchdowns positive value only'],
+        ['spread', 'top 5 nfl spreads positive value only'],
+        ['spread', function (N) { var t = pick(N.teams); return t ? {q: t + ' spread', team: N.tab[t]} : null; }],
+        ['over', 'nfl player props over'],
+        ['rushing', 'nfl rushing yards unders'],
+        ['rushing', function (N) { var p = pick(N.rb); return p ? {q: p + ' rushing yards', name: p} : null; }],
+        ['under', 'nfl unders today'],
+        ['ml', 'nfl underdogs to win outright'],
+        ['ml', function (N) { var t = pick(N.teams); return t ? {q: t + ' moneyline', team: N.tab[t]} : null; }],
+        ['plus', '3 leg nfl parlay plus money'],
+        ['plus', 'nfl plus money props'],
+        ['total', 'top 5 nfl totals positive value only'],
+        ['player', function (N) { var p = pick(N.all); return p ? {q: p + ' props', name: p} : null; }],
+        ['sgp', function (N) { var g = pick(N.games); return g ? {q: g.away + ' vs ' + g.home + ' same game parlay', gid: g.gid} : null; }],
+        ['value', 'best nfl value plays']
+      ]},
+    cfb: {n: 636, word: 'college football', ph: 'Ohio State spread', fallback: 'best college football bets today',
+      freq: {parlay: 254, safe: 110, passing: 102, receiving: 94, td: 88, game: 84, ml: 77, rushing: 75, spread: 71, best: 70, total: 59, under: 56, over: 46, plus: 35, player: 13, sgp: 11, value: 6},
+      types: FOOT_T,
+      bank: [
+        ['parlay', 'safest 3 leg college football parlay'],
+        ['parlay', function () { return pick([2, 3, 4]) + ' leg college football parlay'; }],
+        ['parlay', 'college football parlay that pays +500'],
+        ['safe', 'safest college football bets today'],
+        ['safe', 'safest college football props'],
+        ['passing', 'college football passing yards overs'],
+        ['passing', function (N) { var p = pick(N.qb); return p ? {q: p + ' passing yards', name: p} : null; }],
+        ['receiving', 'college football receiving yards overs'],
+        ['receiving', function (N) { var p = pick(N.wr); return p ? {q: p + ' receiving yards', name: p} : null; }],
+        ['td', 'most likely college football anytime td scorer'],
+        ['td', 'top 5 college football anytime td scorers'],
+        ['game', function (N) { var g = pick(N.games); return g ? {q: gm(g) + ' best bets', gid: g.gid} : null; }],
+        ['game', function (N) { var g = pick(N.games); return g ? {q: gm(g) + ' total', gid: g.gid} : null; }],
+        ['ml', 'college football underdogs to win outright'],
+        ['ml', function (N) { var t = pick(N.teams); return t ? {q: t + ' moneyline', team: N.tab[t]} : null; }],
+        ['rushing', 'college football rushing yards unders'],
+        ['rushing', function (N) { var p = pick(N.rb); return p ? {q: p + ' rushing yards', name: p} : null; }],
+        ['spread', 'top 5 college football spreads positive value only'],
+        ['spread', function (N) { var t = pick(N.teams); return t ? {q: t + ' spread', team: N.tab[t]} : null; }],
+        ['best', 'best college football bets today'],
+        ['total', 'college football totals overs'],
+        ['under', 'college football unders today'],
+        ['over', 'college football player props over'],
+        ['plus', 'college football plus money bets'],
+        ['player', function (N) { var p = pick(N.all); return p ? {q: p + ' props', name: p} : null; }],
+        ['sgp', function (N) { var g = pick(N.games); return g ? {q: gm(g) + ' same game parlay', gid: g.gid} : null; }],
+        ['value', 'best college football value plays']
+      ]},
+    nba: {n: 1048, word: 'NBA', ph: 'Nikola Jokic rebounds', fallback: 'best nba bets today',
+      freq: {parlay: 370, player: 357, rebounds: 213, points: 210, assists: 180, game: 162, over: 148, under: 122, safe: 102, best: 75, spread: 67, ml: 65, total: 53, halves: 52, plus: 45, threes: 18, sgp: 11, value: 7, specials: 5, combos: 2},
+      types: HOOP_T,
+      bank: [
+        ['parlay', 'safest 3 leg nba parlay'],
+        ['parlay', function () { return pick([2, 3, 4]) + ' leg nba parlay'; }],
+        ['parlay', 'nba parlay that pays +500'],
+        ['parlay', function (N) { var g = pick(N.games); return g ? {q: '3 leg parlay ' + gm(g), gid: g.gid} : null; }],
+        ['player', function (N) { var p = pick(N.all); return p ? {q: p + ' props', name: p} : null; }],
+        ['player', function (N) { var p = pick(N.pts); return p ? {q: p + ' points', name: p} : null; }],
+        ['rebounds', 'nba rebounds overs'],
+        ['rebounds', 'top 5 nba rebounds unders'],
+        ['rebounds', function (N) { var p = pick(N.reb); return p ? {q: p + ' rebounds', name: p} : null; }],
+        ['points', 'best nba points props today'],
+        ['points', 'nba points unders'],
+        ['points', function (N) { var p = pick(N.pts); return p ? {q: p + ' points over', name: p} : null; }],
+        ['assists', 'nba assists overs'],
+        ['assists', function (N) { var p = pick(N.ast); return p ? {q: p + ' assists', name: p} : null; }],
+        ['game', function (N) { var g = pick(N.games); return g ? {q: gm(g) + ' best bets', gid: g.gid} : null; }],
+        ['game', function (N) { var g = pick(N.games); return g ? {q: gm(g) + ' total', gid: g.gid} : null; }],
+        ['over', 'nba player props over'],
+        ['under', 'nba unders today'],
+        ['safe', 'safest nba props today'],
+        ['safe', 'safest nba rebounds'],
+        ['best', 'best nba bets today'],
+        ['spread', 'top 5 nba spreads positive value only'],
+        ['spread', function (N) { var t = pick(N.teams); return t ? {q: t + ' spread', team: N.tab[t]} : null; }],
+        ['ml', 'nba underdogs to win outright'],
+        ['ml', function (N) { var t = pick(N.teams); return t ? {q: t + ' moneyline', team: N.tab[t]} : null; }],
+        ['total', 'top 5 nba totals positive value only'],
+        ['halves', 'nba first quarter totals'],
+        ['halves', 'nba first half totals'],
+        ['plus', 'nba plus money props'],
+        ['threes', 'nba threes overs'],
+        ['threes', function (N) { var p = pick(N.threes); return p ? {q: p + ' threes', name: p} : null; }],
+        ['sgp', function (N) { var g = pick(N.games); return g ? {q: gm(g) + ' same game parlay', gid: g.gid} : null; }],
+        ['value', 'best nba value plays'],
+        ['specials', 'nba double double props'],
+        ['combos', 'nba points rebounds assists props']
+      ]},
+    cbb: {n: 97, word: 'college basketball', ph: 'Kentucky college basketball spread', fallback: 'best college basketball bets today',
+      freq: {parlay: 27, best: 16, sgp: 11, spread: 8, plus: 8, player: 7, game: 6, ml: 6, safe: 6, points: 5, over: 4, value: 3, under: 3, rebounds: 2, threes: 1},
+      types: HOOP_T,
+      bank: [
+        ['parlay', 'safest 3 leg college basketball parlay'],
+        ['parlay', function () { return pick([2, 3]) + ' leg college basketball parlay'; }],
+        ['parlay', 'college basketball parlay that pays +400'],
+        ['best', 'best college basketball bets today'],
+        ['best', 'top 5 college basketball bets'],
+        ['sgp', function (N) { var g = pick(N.games); return g ? {q: gm(g) + ' same game parlay', gid: g.gid} : null; }],
+        ['spread', 'top 5 college basketball spreads positive value only'],
+        ['spread', function (N) { var t = pick(N.teams); return t ? {q: t + ' spread', team: N.tab[t]} : null; }],
+        ['plus', 'college basketball underdogs plus money'],
+        ['player', 'college basketball player props'],
+        ['game', function (N) { var g = pick(N.games); return g ? {q: gm(g) + ' best bets', gid: g.gid} : null; }],
+        ['game', function (N) { var g = pick(N.games); return g ? {q: gm(g) + ' total', gid: g.gid} : null; }],
+        ['ml', 'college basketball moneylines'],
+        ['ml', function (N) { var t = pick(N.teams); return t ? {q: t + ' moneyline', team: N.tab[t]} : null; }],
+        ['safe', 'safest college basketball bets'],
+        ['points', 'college basketball points props'],
+        ['over', 'college basketball overs'],
+        ['under', 'college basketball unders'],
+        ['value', 'best college basketball value plays']
+      ]},
+    nhl: {n: 585, word: 'NHL', ph: 'Rangers puck line', fallback: 'best nhl bets today',
+      freq: {parlay: 354, total: 143, ml: 140, spread: 126, game: 104, safe: 98, best: 71, plus: 40, over: 33, under: 26, sgp: 11, value: 4, player: 3, goals: 2},
+      types: {spread: 'Puck lines', total: 'Total goals', goals: 'Goal scorers'},
+      bank: [
+        ['parlay', 'safest 3 leg nhl parlay'],
+        ['parlay', function () { return pick([2, 3]) + ' leg nhl parlay'; }],
+        ['parlay', 'nhl parlay that pays +400'],
+        ['total', 'nhl totals overs'],
+        ['total', 'nhl unders today'],
+        ['ml', 'nhl moneylines today'],
+        ['ml', function (N) { var t = pick(N.teams); return t ? {q: t + ' moneyline', team: N.tab[t]} : null; }],
+        ['spread', 'nhl puck lines'],
+        ['spread', function (N) { var t = pick(N.teams); return t ? {q: t + ' puck line', team: N.tab[t]} : null; }],
+        ['game', function (N) { var g = pick(N.games); return g ? {q: gm(g) + ' best bets', gid: g.gid} : null; }],
+        ['game', function (N) { var g = pick(N.games); return g ? {q: gm(g) + ' total', gid: g.gid} : null; }],
+        ['safe', 'safest nhl bets today'],
+        ['best', 'best nhl bets today'],
+        ['plus', 'nhl underdogs plus money'],
+        ['over', 'nhl overs'],
+        ['under', 'nhl under 6.5'],
+        ['sgp', function (N) { var g = pick(N.games); return g ? {q: gm(g) + ' same game parlay', gid: g.gid} : null; }],
+        ['value', 'best nhl value plays'],
+        ['goals', 'nhl anytime goal scorers']
+      ]},
+    tennis: {n: 436, word: 'tennis', ph: 'Zverev to win', fallback: 'best tennis bets today',
+      freq: {parlay: 232, ml: 191, total: 168, safe: 99, best: 67, over: 44, plus: 33, under: 32, sgp: 11, value: 3, spread: 3, player: 1},
+      types: {game: 'Match questions', ml: 'Match winners', total: 'Total games', spread: 'Game spreads'},
+      bank: [
+        ['parlay', 'safest 3 leg tennis parlay'],
+        ['parlay', function () { return pick([2, 3]) + ' leg tennis parlay'; }],
+        ['parlay', 'tennis parlay that pays +300'],
+        ['ml', 'tennis match winners today'],
+        ['ml', 'atp to win'],
+        ['ml', function (N) { var p = pick(N.all); return p ? {q: p + ' to win', name: p} : null; }],
+        ['total', 'tennis total games overs'],
+        ['total', function (N) { var g = pick(N.games); return g ? {q: gm(g) + ' total games', gid: g.gid} : null; }],
+        ['safe', 'safest tennis bets today'],
+        ['best', 'best tennis bets today'],
+        ['over', 'tennis overs'],
+        ['under', 'tennis total games unders'],
+        ['plus', 'tennis underdogs plus money'],
+        ['sgp', function (N) { var g = pick(N.games); return g ? {q: gm(g) + ' same game parlay', gid: g.gid} : null; }],
+        ['value', 'best tennis value plays'],
+        ['spread', 'tennis game spreads'],
+        ['player', function (N) { var p = pick(N.all); return p ? {q: p + ' odds', name: p} : null; }]
+      ]}
+  };
+  var C = CFG[SPORT] || CFG.nfl, BANK = C.bank;
+  var FREQ_N = C.n, FREQ = Object.assign({}, C.freq);
+  var TYPE = Object.assign({}, COMMON_T, FOOT_T, HOOP_T, {goals: 'Goal scorers', sets: 'Sets'}, C.types);
+  var SNAME = {nfl: 'NFL', cfb: 'college football', nba: 'NBA', cbb: 'college basketball', nhl: 'NHL', tennis: 'tennis'}[SPORT] || 'NFL';
 
   // how a question reads as a headline: league and bet words in capitals ("nfl" -> "NFL", "td" -> "TD")
   function headline(q) {
-    var t = String(q || '').replace(/\bnfl\b/gi, 'NFL').replace(/\btds?\b/gi, function (m) { return m.toUpperCase(); }).replace(/\bsgp\b/gi, 'SGP').replace(/\bml\b/g, 'ML');
+    var t = String(q || '').replace(/\b(nfl|nba|nhl|atp|wta|sgp|pra)\b/gi, function (m) { return m.toUpperCase(); }).replace(/\btds?\b/gi, function (m) { return m.toUpperCase(); }).replace(/\bml\b/g, 'ML');
     return t.charAt(0).toUpperCase() + t.slice(1);
   }
-  function rnd(a) { return a.length ? a[Math.floor(Math.random() * a.length)] : null; }
-
-  // ── the question bank: [type, template]. A template is a string or fn(names) -> string|null (null: nothing on
-  // today's board to fill it, so it sits this deal out). Each type's weight is split across its templates. ─────
-  var BANK = [
-    ['parlay', 'safest 3 leg nfl parlay'],
-    ['parlay', function () { return rnd([2, 3, 4]) + ' leg nfl parlay'; }],
-    ['parlay', 'nfl parlay that pays +500'],
-    ['parlay', function (N) { var g = rnd(N.games); return g ? '3 leg parlay ' + g.away + ' vs ' + g.home : null; }],
-    ['game', function (N) { var g = rnd(N.games); return g ? 'who scores a td in ' + g.away + ' vs ' + g.home : null; }],
-    ['game', function (N) { var g = rnd(N.games); return g ? g.away + ' vs ' + g.home + ' best bets' : null; }],
-    ['game', function (N) { var g = rnd(N.games); return g ? g.away + ' vs ' + g.home + ' total' : null; }],
-    ['passing', function (N) { var p = rnd(N.qb); return p ? p + ' passing yards' : null; }],
-    ['passing', 'nfl passing yards unders'],
-    ['passing', 'nfl passing yards overs'],
-    ['receiving', 'best nfl receptions unders today'],
-    ['receiving', function (N) { var p = rnd(N.wr); return p ? p + ' receptions' : null; }],
-    ['receiving', 'nfl receiving yards overs'],
-    ['receiving', 'top 5 nfl receptions overs'],
-    ['td', 'top 10 nfl anytime td scorers'],
-    ['td', 'most likely nfl anytime td scorer'],
-    ['td', 'top 5 nfl 2+ td scorers'],
-    ['td', function (N) { var p = rnd(N.td); return p ? p + ' anytime td' : null; }],
-    ['safe', 'safest nfl props today'],
-    ['safe', 'safest nfl rushing yards'],
-    ['best', 'best nfl bets today'],
-    ['best', 'top 10 nfl player props no touchdowns positive value only'],
-    ['spread', 'top 5 nfl spreads positive value only'],
-    ['spread', function (N) { var t = rnd(N.teams); return t ? t + ' spread' : null; }],
-    ['over', 'nfl player props over'],
-    ['rushing', 'nfl rushing yards unders'],
-    ['rushing', function (N) { var p = rnd(N.rb); return p ? p + ' rushing yards' : null; }],
-    ['under', 'nfl unders today'],
-    ['ml', 'nfl underdogs to win outright'],
-    ['ml', function (N) { var t = rnd(N.teams); return t ? t + ' moneyline' : null; }],
-    ['plus', '3 leg nfl parlay plus money'],
-    ['plus', 'nfl plus money props'],
-    ['total', 'top 5 nfl totals positive value only'],
-    ['player', function (N) { var p = rnd(N.all); return p ? p + ' props' : null; }],
-    ['sgp', function (N) { var g = rnd(N.games); return g ? g.away + ' vs ' + g.home + ' same game parlay' : null; }],
-    ['value', 'best nfl value plays']
-  ];
+  var rnd = pick;
   function weigh() { var per = {}; BANK.forEach(function (b) { per[b[0]] = (per[b[0]] || 0) + 1; }); BANK.forEach(function (b) { b[2] = Math.max(1, FREQ[b[0]] || 0) / per[b[0]]; }); }
   weigh();
   // real searches (11/16): search_trends.py counts what people typed into Ask Onyx over the last 7 days
-  // (data/insights/trending.json). With REAL_MIN+ NFL searches those counts replace the test-corpus ones above.
+  // (data/insights/trending.json). With REAL_MIN+ searches in the sport those counts replace the test-corpus ones above.
   var REAL_MIN = 30, REAL = null;
 
   // the kind of question a typed one is (the kicker on its card), the same tags tools/insights_freq.py counts
@@ -88,13 +255,21 @@
     if (/passing|pass yds|pass att/.test(t)) return 'passing';
     if (/reception|receiving|catches/.test(t)) return 'receiving';
     if (/rushing|rush yds/.test(t)) return 'rushing';
-    if (/spread/.test(t)) return 'spread';
-    if (/moneyline|to win|underdog/.test(t)) return 'ml';
-    if (/totals?\b/.test(t)) return 'total';
+    if (/double double|triple double|first basket/.test(t)) return 'specials';
+    if (/points rebounds assists|\bpra\b/.test(t)) return 'combos';
+    if (/rebound/.test(t)) return 'rebounds';
+    if (/assist/.test(t) && SPORT !== 'nhl') return 'assists';
+    if (/three|3s\b|3pt/.test(t)) return 'threes';
+    if (/first (half|quarter)/.test(t)) return 'halves';
+    if (/goal scorer|anytime goal/.test(t)) return 'goals';
+    if (/\bpoints\b/.test(t) && (SPORT === 'nba' || SPORT === 'cbb')) return 'points';
+    if (/spread|puck line/.test(t)) return 'spread';
+    if (/moneyline|to win|underdog|winners?\b/.test(t)) return 'ml';
+    if (/totals?\b|total games/.test(t)) return 'total';
     if (/safe|most likely/.test(t)) return 'safe';
     if (/value|edge/.test(t)) return 'value';
     if (/plus money/.test(t)) return 'plus';
-    if (/\bprops?\b/.test(t)) return 'player';
+    if (/\bprops?\b|\bodds\b/.test(t)) return 'player';
     return 'best';
   }
 
@@ -143,13 +318,13 @@
 
       el.innerHTML = '<div id="insFeed">' +
         '<p class="sx-sub" style="margin-top:0">The questions people ask search most, answered live from today\'s Onyx board by the model. Tap any card for its full page.</p>' +
-        '<form class="ins-ask" id="insAsk" autocomplete="off"><input class="sx-in" id="insQ" type="search" enterkeyhint="go" placeholder="Ask your own: Josh Allen passing yards" aria-label="Ask your own NFL question"><button class="sx-btn" type="submit">Ask</button></form>' +
+        '<form class="ins-ask" id="insAsk" autocomplete="off"><input class="sx-in" id="insQ" type="search" enterkeyhint="go" placeholder="Ask your own: ' + u.esc(C.ph) + '" aria-label="Ask your own ' + u.esc(SNAME) + ' question"><button class="sx-btn" type="submit">Ask</button></form>' +
         '<div id="insOwn"></div>' +
-        '<div class="ins-top" style="margin-top:6px"><div><h2>Trending in search</h2><p id="insTrendLead">The most asked kinds of NFL question, out of ' + FREQ_N.toLocaleString() + ' NFL searches in Ask Onyx\'s test set</p></div></div>' +
+        '<div class="ins-top" style="margin-top:6px"><div><h2>Trending in search</h2><p id="insTrendLead">The most asked kinds of ' + u.esc(SNAME) + ' question, out of ' + FREQ_N.toLocaleString() + ' ' + u.esc(SNAME) + ' questions in Ask Onyx\'s test set</p></div></div>' +
         '<div class="ins-trend" id="insTrend"></div><div id="insAsked"></div>' +
         '<div class="ins-top"><div><h2>Today\'s answers</h2><p id="insLead">Dealing questions</p></div><button class="sx-btn ghost" id="insShuffle" type="button">Shuffle</button></div>' +
         '<div class="sx-grid" id="insGrid"></div>' +
-        '<p class="ins-note" id="insNote">Every answer is the model\'s projection on Onyx\'s current prices, built by Ask Onyx\'s own reader: the same plays a search returns. Projections are not Onyx Picks. Trending counts come from the ' + FREQ_ALL.toLocaleString() + ' questions Ask Onyx is tested against, ' + FREQ_N.toLocaleString() + ' of them NFL, until enough real searches are logged.</p>' +
+        '<p class="ins-note" id="insNote">Every answer is the model\'s projection on Onyx\'s current prices, built by Ask Onyx\'s own reader: the same plays a search returns. Projections are not Onyx Picks. Trending counts come from the ' + FREQ_ALL.toLocaleString() + ' questions Ask Onyx is tested against, ' + FREQ_N.toLocaleString() + ' of them ' + u.esc(SNAME) + ' (or naming no sport), until enough real searches are logged.' + (FREQ_N < 200 ? ' That is a small sample, so read the ranking loosely.' : '') + '</p>' +
         '</div><div id="insPage" class="ins-page" hidden></div>';
       var feed = el.querySelector('#insFeed'), page = el.querySelector('#insPage'), grid = el.querySelector('#insGrid');
 
@@ -167,27 +342,48 @@
       }
       drawTrend();
       fetch('data/insights/trending.json?v=' + Math.floor(Date.now() / 600000)).then(function (r) { return r.ok ? r.json() : null; }).then(function (T) {
-        if (!T || !(T.nfl >= REAL_MIN) || !T.types) return;
-        REAL = T; FREQ = {}; Object.keys(T.types).forEach(function (k) { if (TYPE[k]) FREQ[k] = T.types[k]; }); FREQ_N = T.nfl; weigh();
-        el.querySelector('#insTrendLead').textContent = 'What people asked Ask Onyx in the last ' + (T.days || 7) + ' days: ' + T.nfl.toLocaleString() + ' NFL searches';
-        el.querySelector('#insNote').innerHTML = 'Every answer is the model\'s projection on Onyx\'s current prices, built by Ask Onyx\'s own reader: the same plays a search returns. Projections are not Onyx Picks. Trending counts are real searches from the last ' + (T.days || 7) + ' days (only the question is kept, never who asked).';
+        if (!T) return;
+        // the sport's own real counts: by_sport[sport] when search_trends.py writes it, the NFL's top-level counts, else only how many
+        var bs = T.by_sport && T.by_sport[SPORT], R = bs && bs.types ? {n: bs.n, types: bs.types, top: bs.top} : SPORT === 'nfl' && T.types ? {n: T.nfl, types: T.types, top: T.top} : null;
+        var n = R ? R.n : (T.sports || {})[SPORT], days = T.days || 7;
+        if (!(n >= REAL_MIN)) return;
+        var noteHead = 'Every answer is the model\'s projection on Onyx\'s current prices, built by Ask Onyx\'s own reader: the same plays a search returns. Projections are not Onyx Picks. ';
+        if (!R) {      // real searches in the sport, but no per-sport kinds yet: say so, keep the test set's ranking
+          el.querySelector('#insTrendLead').textContent = n.toLocaleString() + ' real ' + SNAME + ' searches in the last ' + days + ' days. The kinds below are still ranked from Ask Onyx\'s test set (' + FREQ_N.toLocaleString() + ' ' + SNAME + ' questions) until search counts kinds per sport.';
+          el.querySelector('#insNote').innerHTML = noteHead + 'Trending kinds come from the ' + FREQ_ALL.toLocaleString() + ' questions Ask Onyx is tested against; the search count is real (only the question is kept, never who asked).';
+          return;
+        }
+        REAL = R; FREQ = {}; Object.keys(R.types).forEach(function (k) { if (TYPE[k]) FREQ[k] = R.types[k]; }); FREQ_N = n; weigh();
+        el.querySelector('#insTrendLead').textContent = 'What people asked Ask Onyx in the last ' + days + ' days: ' + n.toLocaleString() + ' ' + SNAME + ' searches';
+        el.querySelector('#insNote').innerHTML = noteHead + 'Trending counts are real searches from the last ' + days + ' days (only the question is kept, never who asked).';
         drawTrend();
       }).catch(function () {});
 
       // today's names for the templates: games, teams and players still to play
       function names() {
-        var now = Date.now(), fut = D.plays.filter(function (p) { return Date.parse(p.start) > now; }), N = {games: [], teams: [], qb: [], wr: [], rb: [], td: [], all: []};
+        var now = Date.now(), fut = D.plays.filter(function (p) { return Date.parse(p.start) > now; });
+        var N = {tab: {}, games: [], teams: [], qb: [], wr: [], rb: [], td: [], pts: [], reb: [], ast: [], threes: [], all: []};
         var gids = {}; fut.forEach(function (p) { gids[p.gid] = 1; });
-        D.games.forEach(function (g) { if (gids[g.gid] && Date.parse(g.start) > now) { N.games.push(g); [g.away_short, g.home_short].forEach(function (t) { if (t) N.teams.push(t); }); } });
+        D.games.forEach(function (g) {
+          if (!gids[g.gid] || !(Date.parse(g.start) > now)) return;
+          N.games.push(g);
+          if (SPORT === 'nfl') [['away_short', 'away'], ['home_short', 'home']].forEach(function (k) { var t = g[k[0]]; if (t) { N.teams.push(t); N.tab[t] = g[k[1]]; } });
+          else if (SPORT === 'tennis') [g.away, g.home].forEach(function (t) { if (t && N.all.indexOf(t) < 0) N.all.push(t); });
+          else ['away', 'home'].forEach(function (k) { var t = tn(g, k); if (t && N.teams.indexOf(t) < 0) { N.teams.push(t); N.tab[t] = g[k]; } });
+        });
         var seen = {};
         fut.forEach(function (p) {
-          if (p.kind !== 'prop' || !p.name) return;
+          if (p.kind !== 'prop' || !p.name || p.name === p.matchup) return;
           var add = function (L) { if (L.indexOf(p.name) < 0) L.push(p.name); };
           if (p.mkt === 'pass_yds') add(N.qb);
-          if (p.mkt === 'rec' && p.line >= 3.5) add(N.wr);
+          if (p.mkt === 'rec' && p.line >= 3.5 || SPORT === 'cfb' && p.mkt === 'rec_yds' && p.line >= 40) add(N.wr);
           if (p.mkt === 'rush_yds' && p.line >= 40) add(N.rb);
           if (p.mkt === 'anytime_td' && p.conf >= 0.4) add(N.td);
-          if (!seen[p.name] && (p.mkt === 'pass_yds' || p.mkt === 'rec_yds' || p.mkt === 'rush_yds')) { seen[p.name] = 1; N.all.push(p.name); }
+          if (p.mkt === 'pts' && p.line >= 15) add(N.pts);
+          if (p.mkt === 'reb' && p.line >= 6) add(N.reb);
+          if (p.mkt === 'ast' && p.line >= 4) add(N.ast);
+          if (p.mkt === 'threes' && p.line >= 1.5) add(N.threes);
+          if (!seen[p.name] && /^(pass_yds|rec_yds|rush_yds|pts|reb)$/.test(p.mkt)) { seen[p.name] = 1; N.all.push(p.name); }
         });
         return N;
       }
@@ -197,7 +393,12 @@
         var N = names();
         return BANK.map(function (b) { return {t: b[0], w: b[2], f: b[1], k: Math.pow(Math.random(), 1 / b[2])}; })
           .sort(function (a, b) { return b.k - a.k; })
-          .map(function (b) { var q = typeof b.f === 'function' ? b.f(N) : b.f; return q ? {type: b.t, q: q} : null; }).filter(Boolean);
+          .map(function (b) {
+            var q = typeof b.f === 'function' ? b.f(N) : b.f; if (!q) return null;
+            var it = typeof q === 'object' ? Object.assign({type: b.t}, q) : {type: b.t, q: q};
+            if ((SPORT === 'cfb' || SPORT === 'cbb') && (it.gid || it.team) && it.q.indexOf('college') < 0) it.q = C.word + ' ' + it.q;   // "Kentucky" alone is read as football
+            return it;
+          }).filter(Boolean);
       }
 
       // ── Ask Onyx, local reader only ─────────────────────────────────
@@ -230,6 +431,17 @@
         return String(p.label || '').replace(/ Over 1\.5 2\+ touchdowns$/, ' 2+ touchdowns').replace(/ Over 2\.5 3\+ touchdowns$/, ' 3+ touchdowns');
       }
       function ok(R) { return !!(R && (R.rows || []).length && !R.clarify && !R.depth); }
+      // a dealt question must be answered in this sport, and a question that names a player, team or game must be answered
+      // about it (Ask reads some names as someone else: those questions sit the deal out instead of showing a wrong answer)
+      function fits(it, R) {
+        if (!ok(R)) return !(it.name || it.gid || it.team);   // a named question with no answer: Ask may have read another name
+        var rows = R.rows.slice(0, 4), has = function (fn) { return rows.some(fn); };
+        if (has(function (r) { return r.sport && r.sport !== SPORT; })) return false;
+        if (it.name && !has(function (r) { return u.nk(r.name) === u.nk(it.name) || String(r.label || '').indexOf(it.name) >= 0 || String(r.matchup || '').indexOf(it.name) >= 0; })) return false;
+        if (it.gid && !has(function (r) { return r.gid === it.gid; })) return false;
+        if (it.team && !has(function (r) { return r.who === it.team || r.team === it.team || String(r.matchup || '').split(/ @ | vs /).indexOf(it.team) >= 0; })) return false;
+        return true;
+      }
       function valueNone(R) { return R.widened && R.spec && R.asked && R.asked.pos_value && R.rows.every(function (r) { return !(r.edge > 0); }); }
       function takeaway(R) {
         if (!ok(R)) return '';
@@ -250,7 +462,7 @@
       function honest(R) {
         if (!R) return 'Search could not read that question.';
         if (R.clarify && R.clarify.question) return (R.note ? R.note + ' ' : '') + R.clarify.question.replace(/ What should I build instead\?.*$/, '').replace(/ Want one of these instead\?.*$/, '');
-        if (R.depth) return 'That is a depth chart question: the full chart is on the NFL page.';
+        if (R.depth) return 'That is a depth chart question: the full chart is on the ' + D.sportName + ' page.';
         return R.note || 'Nothing on today\'s Onyx board fits that right now.';
       }
       function shortNote(R) {
@@ -305,7 +517,7 @@
             if (seq !== SEQ) return;
             // the same plays as a card already up (two phrasings, one answer): draw another question instead
             var sig = ok(R) ? R.rows.slice(0, 3).map(function (r) { return r.sel; }).join('|') : 'none:' + honest(R).slice(0, 40);
-            if (sigs[sig]) { box.remove(); return next(); }
+            if (sigs[sig] || !fits(it, R)) { box.remove(); return next(); }
             sigs[sig] = 1; shown++; per[it.type] = (per[it.type] || 0) + 1;
             fill(box, it, R); CARDS.push({q: it.q, state: cardState(R), via: R.via}); next();
           }, function (e) {
@@ -368,7 +580,7 @@
       function open(q) { FROM_FEED = true; location.hash = '#insights?q=' + encodeURIComponent(q); }
       function share() {
         var url = page.dataset.url || location.href, t = page.dataset.title || 'Onyx Insights', done = function (m) { var c = el.querySelector('#insCopied'); if (c) c.textContent = m; };
-        if (navigator.share) { navigator.share({title: 'Onyx Insights: ' + t, text: t + ' (the Onyx NFL model on today\'s board)', url: url}).catch(function () {}); return; }
+        if (navigator.share) { navigator.share({title: 'Onyx Insights: ' + t, text: t + ' (the Onyx ' + D.sportName + ' model on today\'s board)', url: url}).catch(function () {}); return; }
         var fb = function () { try { var i = document.createElement('input'); i.value = url; document.body.appendChild(i); i.select(); document.execCommand('copy'); i.remove(); done('Link copied'); } catch (e) { done(url); } };
         if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(function () { done('Link copied'); }, fb); else fb();
       }
@@ -382,7 +594,7 @@
         if (e.target.closest('[data-share]')) { share(); return; }
         var aq = e.target.closest('.ins-q'); if (aq && aq.dataset.q) { open(aq.dataset.q); return; }
         var tr = e.target.closest('.ins-tr');
-        if (tr) { var cand = order().filter(function (x) { return x.type === tr.dataset.t; }); open(cand.length ? cand[0].q : 'best nfl bets today'); return; }
+        if (tr) { var cand = order().filter(function (x) { return x.type === tr.dataset.t; }); open(cand.length ? cand[0].q : C.fallback); return; }
         var c = e.target.closest('.ins-card');
         if (c && c.dataset.q && !e.target.closest('button')) open(c.dataset.q);
       });
