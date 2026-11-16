@@ -658,8 +658,8 @@
     {
      "id": "186792",
      "start": "2026-11-16T14:05Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -672,19 +672,19 @@
        "win": false,
        "sets": [
         5,
-        2
+        3
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Rebeka Masarova",
        "short": "R. Masarova",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/sui.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         7,
-        3
+        6
        ],
        "serve": false
       }
@@ -693,8 +693,8 @@
     {
      "id": "186796",
      "start": "2026-11-16T15:50Z",
-     "state": "pre",
-     "detail": "11/16 - 10:50 AM EST",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Grandstand",
@@ -705,7 +705,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ita.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        0
+       ],
        "serve": false
       },
       {
@@ -714,16 +716,18 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/bel.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        2
+       ],
+       "serve": true
       }
      ]
     },
     {
      "id": "186797",
-     "start": "2026-11-16T15:55Z",
+     "start": "2026-11-16T16:10Z",
      "state": "pre",
-     "detail": "11/16 - 10:55 AM EST",
+     "detail": "11/16 - 11:10 AM EST",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -779,9 +783,9 @@
     },
     {
      "id": "186793",
-     "start": "2026-11-16T17:00Z",
+     "start": "2026-11-16T17:30Z",
      "state": "pre",
-     "detail": "11/16 - 12:00 PM EST",
+     "detail": "11/16 - 12:30 PM EST",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -1289,9 +1293,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Rebeka Masarova",
+       "short": "R. Masarova",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/sui.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -1534,5 +1538,5 @@
    ]
   }
  ],
- "fetched": "2026-11-16T15:39:13+00:00"
+ "fetched": "2026-11-16T16:05:08+00:00"
 }
