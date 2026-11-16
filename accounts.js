@@ -89,6 +89,17 @@
     var q = '/rest/v1/' + L.table + '?select=item_id,data' + (L.sport ? '&sport=eq.' + encodeURIComponent(L.sport) : '');
     return call(q, {method: 'GET'}).then(function (r) { return r || []; });
   }
+  var USER = ['my_price', 'stake', 'note', 'tags', 'edited'], GRADE = ['res', 'final', 'graded'];
+  // x (this device) with the account's copy r folded in; returns x itself when nothing changes
+  function combine(x, r, merge) {
+    var o = null;
+    if ((+r.edited || 0) > (+x.edited || 0)) {
+      o = Object.assign({}, x);
+      USER.forEach(function (k) { if (r[k] != null) o[k] = r[k]; else delete o[k]; });
+    }
+    if (merge && r.res && !x.res) { o = o || Object.assign({}, x); GRADE.forEach(function (k) { if (r[k] != null) o[k] = r[k]; }); }
+    return o || x;
+  }
   function inList(ids) { return 'in.(' + ids.map(function (x) { return '"' + String(x).replace(/["\\]/g, '') + '"'; }).join(',') + ')'; }
   function one(L) {
     var local = lsGet(L.key, []); if (!Array.isArray(local)) local = [];
@@ -106,12 +117,22 @@
       if (L.merge) lost = lost.filter(function (i) { return !(ids[i] && ids[i].res); });
       var merged = local.filter(function (x) { return lost.indexOf(L.id(x)) < 0; });
       var added = 0;
-      if (L.merge) merged = merged.map(function (x) { var r = remote[L.id(x)]; if (r && r.res && !x.res) { added++; return r; } return x; });   // graded elsewhere
+      // on both sides: a grade from elsewhere joins, and the newer edit of what the person added (the odds they got,
+      // stake, note; saved.js stamps 'edited') wins (11/16: before, an edit after the first sync never left the device)
+      merged = merged.map(function (x) {
+        var r = remote[L.id(x)];
+        if (!r || !x || typeof x !== 'object' || typeof r !== 'object') return x;
+        var o = combine(x, r, L.merge);
+        if (o !== x) added++;
+        return o;
+      });
       Object.keys(remote).forEach(function (i) { if (!ids[i] && gone.indexOf(i) < 0) { merged.push(remote[i]); added++; } });
       var up = merged.filter(function (x) {
         var i = L.id(x); if (!i) return false;
         if (!(i in remote)) return true;
-        return L.merge && x.res && !(remote[i] && remote[i].res);                       // graded here: send the grade
+        var r = remote[i] || {};
+        if (typeof x === 'object' && (+x.edited || 0) > (+r.edited || 0)) return true;     // edited here: send the edit
+        return L.merge && x.res && !r.res;                                               // graded here: send the grade
       }).map(function (x) {
         var r = {user_id: S.user.id, item_id: String(L.id(x)), data: x, updated_at: new Date().toISOString()};
         if (L.sport) r.sport = L.sport;
@@ -140,7 +161,7 @@
         LAST = Date.now(); ERR = '';
         var ch = res.reduce(function (n, r) { return n + r.changed; }, 0);
         call('/rest/v1/profiles?id=eq.' + S.user.id, {method: 'PATCH', headers: {prefer: 'return=minimal'}, body: JSON.stringify({last_seen: new Date().toISOString()})}).catch(function () {});
-        if (ch) { try { dispatchEvent(new Event('onyx-saved')); } catch (e) {} }
+        if (ch) { try { dispatchEvent(new Event('onyx-saved')); dispatchEvent(new Event('onyx-history')); } catch (e) {} }
         return true;
       });
     }).catch(function (e) { ERR = 'Could not sync right now' + (e && e.status ? ' (' + e.status + ')' : ''); return false; })

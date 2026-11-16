@@ -72,6 +72,28 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
 .pk-bar em{position:absolute;top:-3px;width:2px;height:12px;background:#fff;opacity:.7}
 .pk-x{position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:999px;border:1px solid rgba(255,255,255,.15);background:transparent;color:#9a93a6;font-size:16px;cursor:pointer}
 .my-note{font:600 10px monospace;color:#7d768a;margin-top:10px;line-height:1.5}
+.pk-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:6px 12px;margin-bottom:10px;font:600 11px monospace}
+.pk-sy{color:#9a93a6}.pk-sy.ok{color:#61e970}.pk-sy.bad{color:#ff8a8a}.pk-sy a{color:#d795ff}
+.pk-season{color:#fff;text-decoration:none;padding:7px 12px;border-radius:999px;border:1px solid rgba(176,56,249,.55);background:rgba(176,56,249,.12);white-space:nowrap}
+.pk-season b{margin-left:4px}.pk-season b.w{color:#61e970}.pk-season b.l{color:#ff8a8a}
+.pk-slip{display:flex;flex-direction:column;align-items:flex-start;width:100%;margin:0 0 10px;padding:12px 14px;border-radius:14px;border:1px dashed rgba(176,56,249,.6);background:rgba(176,56,249,.08);color:#fff;font:800 14px "Space Grotesk",system-ui,sans-serif;cursor:pointer;text-align:left}
+.pk-slip span{font:600 11px monospace;color:#b9b2c4;margin-top:2px}
+.pk-c .pk-mine{color:#d795ff}.pk-c .pk-mine em{color:#b9b2c4}
+.pk-legs{display:flex;flex-wrap:wrap;gap:4px}.pk-legs span{font:600 11px monospace;padding:2px 7px;border-radius:999px;background:rgba(255,255,255,.06);color:#cfc8da;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pk-legs span.w{background:rgba(97,233,112,.14);color:#61e970}.pk-legs span.l{background:rgba(255,138,138,.12);color:#ff8a8a}
+.pk-cash{grid-column:1/-1;min-width:0}.pk-cash:empty{display:none}
+.pk-acts{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:2px}
+.pk-ed{background:none;border:0;padding:6px 0;color:#d795ff;font:700 11px monospace;cursor:pointer}
+.pk-bet{color:#fff;text-decoration:none;font:800 11px monospace;padding:7px 11px;border-radius:999px;background:linear-gradient(135deg,#7a2ce0,#b038f9)}
+.my-sub{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;margin:18px 0 8px}.my-sub b{font-size:15px}.my-sub span{font:600 11px monospace;color:#8f879c}
+.pk-set{display:flex;flex-direction:column;gap:4px}
+.pk-set div{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:9px 12px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);font-size:13px}
+.pk-set span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pk-set i{font:800 10px monospace;font-style:normal;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:999px;background:rgba(255,255,255,.08)}
+.pk-set i.W{background:rgba(97,233,112,.16);color:#61e970}.pk-set i.L{background:rgba(255,138,138,.12);color:#ff8a8a}
+.pk-set b{font:800 12px monospace;min-width:56px;text-align:right}.pk-set b.w{color:#61e970}.pk-set b.l{color:#ff8a8a}
+.pk-lean .pk-res{text-align:right}.pk-lean .pk-res i{font:800 10px monospace;font-style:normal;letter-spacing:.06em;padding:3px 8px;border-radius:999px;background:rgba(97,233,112,.16);color:#61e970}
+.pk-more{display:inline-block;margin-top:8px;color:#d795ff;font:700 12px monospace;text-decoration:none}
 /* Ask Onyx: type what you want, plays and parlays built from today's boards (ask.js) */
 .ask{padding-top:28px;padding-bottom:8px}
 .ask-box{display:flex;gap:8px;align-items:stretch}
@@ -490,11 +512,10 @@ function askEditor(R) {
 function askSaveParlay() {
   const R = window.ASK_ROWS || [], P = window.ASK_PL; if (!R.length || !window.OnyxSaved) return;
   const legs = R.map(p => Object.assign({id: p.sel}, p));
+  // the save sheet (saved.js) asks for the odds you got and your units, no pop-up prompt (11/16)
   const t = OnyxSaved.saveTicket(legs, {price: P ? P.price : null, label: R.length + '-leg ' + (P && P.same_game ? 'same-game parlay' : 'parlay')});
   const b = document.getElementById('askSave'); if (!t || !b) return;
   b.classList.add('done'); b.textContent = 'Saved to my picks';
-  const odds = prompt('Saved. What odds did you get? (optional, e.g. +650)', P && P.price != null ? (P.price > 0 ? '+' : '') + P.price : '');
-  if (odds && OnyxSaved.setMyPrice(t.id, String(odds).replace('+', ''))) b.textContent = 'Saved at ' + odds;
 }
 // ── value check (11/8: "a tool where we enter the odds and you give us the value"): pick a leg, the whole parlay or
 // any play you type, enter the odds you see, and get our chance against the price
@@ -1020,24 +1041,126 @@ async function pkTrack(p) {
   if (win != null) out.res = (done || out.q1done) ? (push ? 'P' : win ? 'W' : 'L') : (win ? 'up' : 'down');
   return out;
 }
+// a saved parlay ticket follows its legs (saved.js track: any leg lost is a loss, every leg won is a win)
+async function pkTicket(p) {
+  const t = await OnyxSaved.track(p);
+  const st = t.state === 'in' ? 'in' : t.state === 'post' ? 'post' : 'pre';
+  const legs = (t.legs || []).map(x => ({label: (x.p || {}).label, res: x.res}));
+  return {p, state: st, res: t.res, cur: null, lead: null, legs, href: 'home.html#my',
+    txt: st === 'pre' ? (p.start ? 'First leg ' + etShort(p.start) : '') : String(t.cur || '')};
+}
 async function myPicks() {
   const P = window.OnyxSaved ? OnyxSaved.all() : [];
-  const T = await Promise.all(P.map(p => pkTrack(p).catch(() => ({p, state: '', txt: ''}))));
+  const T = await Promise.all(P.map(p => (p.kind === 'parlay' && OnyxSaved.track ? pkTicket(p) : pkTrack(p)).catch(() => ({p, state: '', txt: ''}))));
   const rank = t => t.state === 'in' ? 0 : t.state === 'pre' ? 1 : 2;
   return T.sort((a, b) => rank(a) - rank(b) || String(a.p.start).localeCompare(String(b.p.start)));
+}
+// ── the share card for a pick or ticket (OnyxShare, onyx-share.js; guarded) ──
+var MY_CARDS = {};
+function selOk(id) { return id && !/^(k|t):/.test(id); }
+function shareCard(t) {
+  const p = t.p, legs = p.kind === 'parlay' ? (p.legs || []) : [p];
+  const c = {kind: p.kind === 'parlay' ? 'parlay' : 'single', title: p.label || '', price: p.my_price != null ? p.my_price : p.price, chance: p.conf != null ? p.conf : null,
+    legs: legs.map((l, i) => ({label: l.label || '', matchup: l.matchup || '', price: l.price, conf: l.conf, sport: l.sport, res: p.kind === 'parlay' ? ((t.legs || [])[i] || {}).res || null : t.res})),
+    sels: legs.map(l => l.id).filter(selOk)};
+  const cash = (window.MY_CASHP || {})[p.id];
+  if (t.state === 'in') c.live = {p: cash != null ? cash : null, now: t.txt || ''};
+  MY_CARDS[p.id] = c;
+  return c;
+}
+function shareBtn(t) {
+  if (!window.OnyxShare || !OnyxShare.button) return '';
+  try { return `<span class="pk-sh" data-share="${esc(t.p.id)}">${OnyxShare.button(shareCard(t), 'Share')}</span>`; } catch (e) { return ''; }
 }
 function pickCard(t) {
   const p = t.p, R = {W: ['Won', 'w'], L: ['Lost', 'l'], P: ['Push', ''], up: ['Winning', 'w'], down: ['Losing', 'l']}[t.res] || null;
   // progress toward the line: the bar is the stat so far, the tick is the line
   const mx = t.lead ? Math.max(t.lead[1] * 1.25, t.lead[0], 1) : 0, bar = t.lead ? Math.max(3, 100 * t.lead[0] / mx) : null, tick = t.lead ? 100 * t.lead[1] / mx : 0;
-  return `<a class="my-b pk-c${t.state === 'in' ? ' live' : ''}${R ? ' r-' + R[1] : ''}" href="${esc(t.href)}">
+  const mine = [p.my_price != null ? 'your odds ' + fmtOdds(p.my_price) : '', +p.stake > 0 && +p.stake !== 1 ? p.stake + 'u' : ''].filter(Boolean).join(' · ');
+  const legs = p.kind === 'parlay' ? `<div class="legs pk-legs">${(t.legs || (p.legs || []).map(l => ({label: l.label}))).map(l => `<span class="${l.res === 'W' || l.res === 'up' ? 'w' : l.res === 'L' || l.res === 'down' ? 'l' : ''}">${esc(l.label || '')}</span>`).join('')}</div>` : '';
+  return `<a class="my-b pk-c${t.state === 'in' ? ' live' : ''}${R ? ' r-' + R[1] : ''}" href="${esc(t.href)}" data-pk="${esc(p.id)}">
     <b>${esc(p.label)}</b><span class="p">${fmtOdds(p.price)}</span>
     <span class="st">${esc(String(p.sport).toUpperCase())}${p.conf ? ' · ' + Math.round(100 * p.conf) + '% model' : ''} · ${t.state === 'in' ? '● ' : ''}${esc(t.txt || '')}</span>
     <span class="pk-res">${R ? `<i class="${R[1]}">${R[0]}</i>` : ''}</span>
+    ${mine || p.note ? `<div class="legs pk-mine">${esc(mine)}${mine && p.note ? ' · ' : ''}${p.note ? `<em>${esc(p.note)}</em>` : ''}</div>` : ''}
+    ${legs}
     ${t.cur != null ? `<div class="legs">Now <b>${esc(t.cur)}</b>${t.lead ? ` · line ${esc(p.mkt === 'anytime_td' ? 'a TD' : p.line)} (${p.side === 'under' ? 'under' : 'over'})` : ''}</div>` : ''}
     ${bar != null ? `<div class="pk-bar"><i style="width:${bar.toFixed(0)}%"></i><em style="left:${tick.toFixed(0)}%"></em></div>` : ''}
-    <button class="pk-x" aria-label="Remove" onclick="event.preventDefault();event.stopPropagation();OnyxSaved.remove('${esc(p.id)}')">×</button></a>`;
+    ${window.OnyxCash && OnyxCash.mount ? `<div class="pk-cash" data-cash="${esc(p.id)}"></div>` : ''}
+    <div class="pk-acts">${shareBtn(t)}<button type="button" class="pk-ed" data-edit="${esc(p.id)}">${p.my_price != null || p.stake || p.note ? 'Edit odds, units' : 'Add your odds, units'}</button></div>
+    <button type="button" class="pk-x" aria-label="Remove" data-rm="${esc(p.id)}">×</button></a>`;
 }
+// ── live chance to cash on each pick (OnyxCash, onyx-cash.js; guarded): one meter per pick, kept across redraws ──
+var MY_CASH = {}; window.MY_CASHP = {};
+function mountCash() {
+  if (!window.OnyxCash || !OnyxCash.mount) return;
+  const seen = {};
+  document.querySelectorAll('#myBody .pk-cash[data-cash]').forEach(ph => {
+    const id = ph.getAttribute('data-cash'), p = MY_PK.map(t => t.p).find(x => x.id === id); if (!p) return;
+    seen[id] = 1;
+    if (MY_CASH[id]) { ph.replaceWith(MY_CASH[id].el); return; }
+    const el = document.createElement('div'); el.className = 'pk-cash'; el.setAttribute('data-cash', id);
+    ph.replaceWith(el);
+    try { MY_CASH[id] = {el, h: OnyxCash.mount(el, p)}; } catch (e) {}
+  });
+  Object.keys(MY_CASH).forEach(id => { if (!seen[id] && MY.tab === 'picks') { try { MY_CASH[id].h && MY_CASH[id].h.stop && MY_CASH[id].h.stop(); } catch (e) {} delete MY_CASH[id]; } });
+}
+addEventListener('onyx-cash', e => { const d = e.detail || {}; if (d.id) window.MY_CASHP[d.id] = d.p; });
+// ── live leans (OnyxCash.leans, guarded): the live model's projections against live lines, never picks ──
+var MY_LEANS = null, MY_LEANS_T = 0;
+async function loadLeans() {
+  if (!window.OnyxCash || !OnyxCash.leans || Date.now() - MY_LEANS_T < 30e3) return;
+  MY_LEANS_T = Date.now();
+  try { const L = await Promise.resolve(OnyxCash.leans()); MY_LEANS = Array.isArray(L) ? L : (L && L.leans) || []; } catch (e) { MY_LEANS = []; }
+  if (MY.tab === 'picks') renderMy();
+}
+function leansBox() {
+  if (!window.OnyxCash || !OnyxCash.leans) return '';
+  const L = (MY_LEANS || []).filter(x => x && x.label).slice(0, 5);
+  const pc = x => { const v = x.p != null ? x.p : x.chance != null ? x.chance : x.prob; return v == null ? '' : Math.round(100 * v) + '%'; };
+  return `<div class="my-sub"><b>Live leans</b><span>The live model against the live line, right now. Projections, not picks.</span></div>` +
+    (MY_LEANS == null ? `<div class="my-note">Loading live leans...</div>` : !L.length ? `<div class="my-note">No live leans right now. They show up here when a game in play moves off its number.</div>`
+    : `<div class="my-grid">${L.map(x => {
+        const sel = x.sel || x.id, url = sel && selOk(sel) ? `https://app.onyxodds.com/share?selection=${encodeURIComponent(sel)}&referrer=KR680261` : '';
+        const ed = x.edge != null ? `edge ${x.edge > 0 ? '+' : ''}${Math.round((Math.abs(x.edge) < 1 ? 100 : 1) * x.edge)}%` : '';
+        return `<div class="my-b pk-lean live"><b>${esc(x.label)}</b><span class="p">${x.price != null ? fmtOdds(x.price) : ''}</span>
+          <span class="st">${esc(String(x.sport || '').toUpperCase())}${x.matchup ? ' · ' + esc(x.matchup) : ''}${x.now || x.txt ? ' · ● ' + esc(x.now || x.txt) : ''}</span>
+          <span class="pk-res">${pc(x) ? `<i class="w">${pc(x)} live</i>` : ''}</span>
+          <div class="legs pk-acts">${ed ? `<span>${esc(ed)}</span>` : ''}${url ? `<a class="pk-bet" href="${url}" target="_blank" rel="noopener">Bet live on Onyx</a>` : ''}${window.OnyxSaved && sel ? OnyxSaved.btn(Object.assign({id: sel}, x)) : ''}</div></div>`; }).join('')}</div>`);
+}
+// ── the top of My picks: where they are kept, the slip in one tap, My Season ──
+function slipLegs() { try { return window.OnyxParlay && OnyxParlay.slip ? OnyxParlay.slip() : (JSON.parse(localStorage.getItem('onyxSlipAll') || '[]') || []); } catch (e) { return []; } }
+function picksHead() {
+  const sy = window.OnyxSaved && OnyxSaved.syncState ? OnyxSaved.syncState() : {text: 'Saved on this device'};
+  const sl = slipLegs(), H = window.OnyxSaved && OnyxSaved.history ? OnyxSaved.history() : [], g = H.filter(h => h.res);
+  const st = g.length && OnyxSaved.stats ? OnyxSaved.stats(H) : null;
+  return `<div class="pk-head"><span class="pk-sy${sy.ok ? ' ok' : sy.bad ? ' bad' : ''}">${esc(sy.text)}${sy.on && !sy.signedIn ? ' · <a href="account.html">Sign in to sync</a>' : ''}</span>
+    <a class="pk-season" href="season.html">${st ? `My Season <b>${st.w}-${st.l}${st.p ? '-' + st.p : ''}</b> <b class="${st.units > 0 ? 'w' : st.units < 0 ? 'l' : ''}">${st.units > 0 ? '+' : ''}${st.units.toFixed(2)}u</b>` : 'My Season'} ›</a></div>` +
+    (sl.length >= 2 ? `<button type="button" class="pk-slip" data-slip="1">Save your ${sl.length}-leg slip as one ticket<span>Tracked live and graded like a pick</span></button>` : '');
+}
+function settledBox() {
+  if (!window.OnyxSaved || !OnyxSaved.settled) return '';
+  const live = {}; MY_PK.forEach(t => { live[t.p.id] = 1; });
+  const S = OnyxSaved.settled(3).filter(h => !live[h.id]).slice(0, 4);
+  if (!S.length) return '';
+  return `<div class="my-sub"><b>Settled</b><span>Graded in the last 3 days, at your odds and units</span></div><div class="pk-set">${S.map(h => {
+    const u = OnyxSaved.unitsOf ? OnyxSaved.unitsOf(h) : 0;
+    return `<div><span>${esc(h.label || h.name || '')}</span><i class="${h.res}">${{W: 'Won', L: 'Lost', P: 'Push'}[h.res]}</i><b class="${u > 0 ? 'w' : u < 0 ? 'l' : ''}">${u > 0 ? '+' : ''}${u.toFixed(2)}u</b></div>`; }).join('')}</div>
+    <a class="pk-more" href="season.html#settled">Every settled pick in My Season ›</a>`;
+}
+document.addEventListener('click', e => {
+  const body = document.getElementById('myBody'); if (!body || !body.contains(e.target)) return;
+  const sh = e.target.closest('.pk-sh');
+  if (sh) { e.preventDefault(); e.stopPropagation(); const c = MY_CARDS[sh.getAttribute('data-share')]; if (c && window.OnyxShare && OnyxShare.open) OnyxShare.open(c); return; }
+  const rm = e.target.closest('[data-rm]');
+  if (rm) { e.preventDefault(); e.stopPropagation(); if (OnyxSaved.drop) OnyxSaved.drop(rm.getAttribute('data-rm')); else OnyxSaved.remove(rm.getAttribute('data-rm')); return; }
+  const ed = e.target.closest('[data-edit]');
+  if (ed) { e.preventDefault(); e.stopPropagation(); const p = OnyxSaved.find && OnyxSaved.find(ed.getAttribute('data-edit')); if (p && OnyxSaved.openSheet) OnyxSaved.openSheet(p); return; }
+  if (e.target.closest('[data-slip]')) { e.preventDefault(); if (OnyxSaved.saveSlip) OnyxSaved.saveSlip(); return; }
+  if (e.target.closest('.pk-cash, .ox-save, .pk-bet')) { if (!e.target.closest('a.pk-bet')) e.preventDefault(); }
+}, true);
+addEventListener('onyx-slip', () => { if (MY.tab === 'picks') renderMy(); });
+addEventListener('onyx-history', () => { if (MY.tab === 'picks') renderMy(); });
 // ── Accounts (accounts.js): optional sign-in that syncs picks, players and bets across devices ──
 function acctRender() {
   const el = document.getElementById('acct'), nav = document.getElementById('acctNav'), A = window.OnyxAccounts;
@@ -1082,8 +1205,9 @@ function renderMy() {
   document.getElementById('myTabs').innerHTML = tabs.map(([k, t, n]) => `<button class="${MY.tab === k ? 'on' : ''}" onclick="MY.tab='${k}';renderMy()">${t}<b>${n}</b></button>`).join('');
   let h = '';
   if (MY.tab === 'picks') {
-    h = MY_PK.length ? `<div class="my-grid">${MY_PK.map(pickCard).join('')}</div><div class="my-note">Picks you saved with the star, on this device. Each one follows its game live (the player's line for props, the score for game lines) and settles when it ends. Tap one to open its game. Saved picks clear 24 hours after their game starts.</div>`
-      : `<div class="my-empty">No saved picks yet. Tap the star on any play (the Top 10 above or a sport's Plays tab) and follow it here all night.</div>`;
+    h = picksHead() + (MY_PK.length ? `<div class="my-grid">${MY_PK.map(pickCard).join('')}</div><div class="my-note">Picks you saved with the star. Each one follows its game live (the player's line for props, the score for game lines) and settles when it ends. Tap one to open its game. 24 hours after its game starts a pick moves to Settled and your record in My Season.</div>`
+      : `<div class="my-empty">No saved picks yet. Tap the star on any play (the Top 10 above, Ask Onyx or a sport's Plays tab), or save your whole parlay slip, and follow it here all night. Every graded pick counts in <a href="season.html">My Season</a>.</div>`) +
+      leansBox() + settledBox();
   } else if (MY.tab === 'live') {
     const tl = MY.tn.filter(c => ((c.status || {}).type || {}).state === 'in').slice(0, 6);
     h = live.length || tl.length ? `<div class="my-grid">${live.map(([L, e]) => gameCard(L, e)).join('')}${tl.map(c => `<a class="my-g live" href="tennis.html#games"><div class="lgt"><span>Tennis</span><span>● live</span></div>
@@ -1095,9 +1219,19 @@ function renderMy() {
       : `<div class="my-empty">You are not following anyone yet. Open a sport, tap a player and hit Follow, or the star next to his name. NBA parlay legs show up here too.</div>`;
   } else h = myBets();
   document.getElementById('myBody').innerHTML = h;
+  if (MY.tab === 'picks') { mountCash(); loadLeans(); }
 }
 if (location.hash === '#my') setTimeout(() => document.getElementById('my').scrollIntoView(), 50);
 loadMy();
+// the live chance to cash (onyx-cash.js) and share cards (onyx-share.js), when a page has not loaded them yet: My picks
+// draws fine without either and redraws once they arrive
+['onyx-cash.js', 'onyx-share.js'].forEach(src => {
+  if (document.querySelector(`script[src="${src}"]`)) return;
+  const s = document.createElement('script'); s.src = src; s.async = true;
+  s.onload = () => { if (MY.tab === 'picks' && MY_PK.length) renderMy(); };
+  s.onerror = () => s.remove();
+  document.head.appendChild(s);
+});
 
 marquees(); sports(); tonight(); top10().catch(() => {}); askInit(); lvInit();
 if (window.OnyxArt) marks(); else addEventListener('DOMContentLoaded', marks);

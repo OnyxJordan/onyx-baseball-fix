@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>My Season · Onyx Sports</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0c0c0c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Onyx Sports">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<meta name="description" content="Your Onyx season: every pick you saved, graded. Record, units at the odds you got, best bets, streaks and how you did against the model.">
+<link rel="stylesheet" href="onyx.css">
+<script src="onyx.js" defer></script>
+<script src="ui.js" defer></script>
+<script src="accounts.js"></script>
+<script src="saved.js"></script>
+<script src="season.js"></script>
+<style>
+body{background:#0c0c0c;color:#fff;margin:0}
+.se{padding-top:26px;padding-bottom:60px;max-width:1100px}
+.se h1{margin:12px 0 0;font-size:clamp(34px,8vw,56px);line-height:1}
+.se .lead{margin:10px 0 0;color:#b9b2c4;font-size:15px;line-height:1.6;max-width:640px}
+.back{display:inline-block;color:#d795ff;font:700 12px monospace;letter-spacing:.06em;text-transform:uppercase;text-decoration:none}
+.se-sync{margin:14px 0 4px;font:600 12px monospace;color:#9a93a6;line-height:1.5}.se-sync a{color:#d795ff}
+.se-sy.ok{color:#61e970}.se-sy.bad{color:#ff8a8a}
+.se-f{display:flex;flex-direction:column;gap:8px;margin:14px 0 12px;min-width:0}
+.se-seg{display:flex;gap:4px;padding:4px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);width:max-content;max-width:100%;box-sizing:border-box}
+.se-seg button{border:0;background:none;color:#cfc8da;font:700 12px monospace;padding:9px 12px;border-radius:999px;cursor:pointer;min-height:36px;white-space:nowrap}
+.se-seg button.on{background:linear-gradient(135deg,#b038f9,#635bff);color:#fff}
+.se-chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;max-width:100%}.se-chips::-webkit-scrollbar{display:none}
+.se-chips button{flex:none;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:#ddd;font:700 11px monospace;padding:8px 12px;border-radius:999px;cursor:pointer;min-height:34px}
+.se-chips button.on{border-color:#b038f9;background:rgba(176,56,249,.2);color:#fff}
+.se-kp{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+@media (max-width:560px){.se-kp{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.se-kp div{padding:14px 10px;border-radius:14px;border:1px solid rgba(176,56,249,.3);background:linear-gradient(160deg,rgba(162,75,255,.12),rgba(162,75,255,.03));text-align:center;min-width:0}
+.se-kp b{display:block;font:800 clamp(20px,5vw,28px) monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.se-kp span,.se-hl span,.se-mc span{display:block;font:600 10px monospace;letter-spacing:.08em;text-transform:uppercase;color:#a79fb5;margin-top:4px}
+.up{color:#61e970}.dn{color:#ff8a8a}
+.se-sub{margin-top:8px;font:600 11px monospace;color:#8f879c}
+.se-recap{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;margin:14px 0 4px;padding:16px 18px;border:0;border-radius:16px;cursor:pointer;text-align:left;color:#fff;
+  background:linear-gradient(120deg,#5a1fb0,#b038f9 55%,#635bff);box-shadow:0 8px 28px rgba(176,56,249,.3)}
+.se-recap span{font:800 19px "Space Grotesk",system-ui,sans-serif}.se-recap em{font:600 12px monospace;font-style:normal;opacity:.85}
+.se-card{margin-top:12px;padding:16px;border-radius:16px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);min-width:0}
+.se-card h3{margin:0 0 10px;font:700 11px monospace;letter-spacing:.12em;text-transform:uppercase;color:#d795ff}
+.se-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 12px}
+@media (max-width:760px){.se-2{grid-template-columns:minmax(0,1fr)}}
+.se-ch{display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto auto;gap:4px 8px}
+.se-ch-y{position:relative;display:flex;flex-direction:column;justify-content:space-between;height:200px;font:600 10px monospace;color:#8f879c;text-align:right;min-width:44px}
+.se-ch-y .z{position:absolute;right:0;transform:translateY(-50%)}
+.se-ch-p{position:relative;height:200px;touch-action:pan-y;cursor:crosshair}
+.se-ch-p svg{display:block;width:100%;height:100%}
+.se-ch-x{position:absolute;top:0;bottom:0;width:1px;background:rgba(255,255,255,.35);pointer-events:none}
+.se-ch-dot{position:absolute;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;background:#d795ff;box-shadow:0 0 0 2px #0c0c0c;pointer-events:none}
+.se-ch-tip{position:absolute;top:-6px;max-width:220px;padding:7px 9px;border-radius:9px;background:#1b1622;border:1px solid rgba(176,56,249,.5);font:600 11px monospace;color:#cfc8da;pointer-events:none;transform:translateY(-100%);z-index:2}
+.se-ch-tip b{display:block;color:#fff}.se-ch-tip span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.se-ch-tip em{font-style:normal;color:#d795ff}
+.se-ch-end{position:absolute;right:4px;transform:translateY(-130%);font:800 12px monospace;background:rgba(12,12,12,.7);padding:1px 4px;border-radius:5px}
+.se-ch-d{grid-column:2;display:flex;justify-content:space-between;font:600 10px monospace;color:#8f879c}
+.se-rows{display:flex;flex-direction:column;gap:2px}
+.se-row{display:grid;grid-template-columns:minmax(0,1.3fr) auto minmax(50px,1fr) auto auto;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.06);font:600 12px monospace}
+.se-row:last-child{border-bottom:0}
+.se-row .n{font:700 13px "Space Grotesk",system-ui,sans-serif;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.se-row .r{color:#cfc8da}.se-row .o{color:#8f879c;min-width:46px;text-align:right}.se-row .u{min-width:58px;text-align:right;font-weight:800}
+.se-row .b{position:relative;height:8px;border-radius:999px;background:rgba(255,255,255,.05)}
+.se-row .b i{position:absolute;top:0;bottom:0;border-radius:4px}.se-row .b i.up{background:#61e970}.se-row .b i.dn{background:#ff8a8a}
+.se-row .b::after{content:"";position:absolute;left:50%;top:-2px;bottom:-2px;width:1px;background:rgba(255,255,255,.3)}
+.se-hl,.se-mc{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.se-hl div,.se-mc div{padding:12px;border-radius:12px;background:rgba(0,0,0,.25);text-align:center;min-width:0}
+.se-hl b,.se-mc b{display:block;font:800 22px monospace}
+.se-note{margin:10px 0 0;color:#9a93a6;font-size:12.5px;line-height:1.55}
+.se-mb{display:flex;flex-direction:column;gap:4px;margin-top:10px}
+.se-mb div{display:flex;justify-content:space-between;gap:8px;font:600 11px monospace;color:#cfc8da;padding:6px 8px;border-radius:8px;background:rgba(255,255,255,.03)}
+.se-mb em{font-style:normal;color:#9a93a6;text-align:right}
+.se-bet,.se-st{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06);align-items:center}
+.se-bet:last-child{border-bottom:0}
+.se-bet .l,.se-st .l{font-size:14px;line-height:1.35;min-width:0;overflow-wrap:anywhere}.se-st .l small{display:block;color:#b9a6d6;font-size:12px}
+.se-bet .m,.se-st .m{grid-column:1;font:600 11px monospace;color:#8f879c;overflow-wrap:anywhere}
+.se-bet b{grid-column:2;grid-row:1/3;font:800 14px monospace}
+.se-st{grid-template-columns:minmax(0,1fr) auto auto}.se-st .m{grid-column:1}
+.se-st .r{grid-column:2;grid-row:1/3;font:800 10px monospace;letter-spacing:.06em;text-transform:uppercase;padding:4px 8px;border-radius:999px}
+.se-st b{grid-column:3;grid-row:1/3;font:800 13px monospace;min-width:62px;text-align:right}
+.r.W{background:rgba(97,233,112,.16);color:#61e970}.r.L{background:rgba(255,138,138,.12);color:#ff8a8a}.r.P{background:rgba(255,255,255,.08);color:#cfc8da}
+.se-more{margin-top:10px;background:none;border:1px solid #3a2a55;color:#d795ff;font:700 12px monospace;border-radius:999px;padding:9px 14px;cursor:pointer}
+.se-none{color:#8f879c;font-size:13px;padding:6px 0}
+.se-pend{margin-top:14px;padding:12px 14px;border-radius:12px;background:rgba(176,56,249,.1);border:1px solid rgba(176,56,249,.35);font-size:14px;color:#e6dcf2}
+.se-empty{margin-top:16px;padding:22px;border-radius:18px;border:1px dashed rgba(176,56,249,.45);background:rgba(176,56,249,.05)}
+.se-empty h2{margin:0;font-size:clamp(22px,5vw,30px)}.se-empty p{color:#b9b2c4;line-height:1.6;margin:8px 0 0}
+.se-empty ol{margin:14px 0 0;padding-left:20px;color:#cfc8da;line-height:1.7;font-size:14px}.se-empty b{color:#fff}
+.se-cta{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.se-btn{display:inline-block;font:700 13px monospace;border:1px solid #a24bff;background:#a24bff;color:#fff;border-radius:999px;padding:12px 18px;cursor:pointer;text-decoration:none;text-align:center}
+.se-btn.ghost{background:transparent;color:#d795ff;border-color:#3a2a55}
+/* the recap */
+.se-rc{position:fixed;inset:0;z-index:10300;background:#0a0710;display:flex;flex-direction:column;padding:calc(10px + env(safe-area-inset-top,0px)) 0 calc(10px + env(safe-area-inset-bottom,0px))}
+.se-rc-top{display:flex;align-items:center;gap:10px;padding:0 14px}
+.se-rc-dots{flex:1;display:flex;gap:4px}.se-rc-dots i{flex:1;height:3px;border-radius:3px;background:rgba(255,255,255,.2)}.se-rc-dots i.on{background:#d795ff}
+.se-rc-x{background:none;border:0;color:#cfc8da;font-size:28px;cursor:pointer;padding:2px 8px;min-height:40px}
+.se-rc-track{flex:1;display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;outline:none;overscroll-behavior-x:contain}
+.se-rc-track::-webkit-scrollbar{display:none}
+.se-rc-c{flex:0 0 100%;scroll-snap-align:start;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;padding:24px clamp(22px,8vw,120px);min-width:0;position:relative;cursor:pointer}
+.se-rc-c .eb{font:700 12px monospace;letter-spacing:.16em;text-transform:uppercase;color:#d795ff}
+.se-rc-c .big{display:block;margin:14px 0 10px;font:900 clamp(48px,15vw,120px)/1 "Space Grotesk",system-ui,sans-serif;letter-spacing:-.01em;background:linear-gradient(135deg,#fff,#d795ff 60%,#61e970);-webkit-background-clip:text;background-clip:text;color:transparent;overflow-wrap:anywhere}
+.se-rc-c p{margin:0;max-width:560px;font-size:clamp(16px,4.4vw,22px);line-height:1.45;color:#e2dbee}
+.se-rc-c .nx{position:absolute;bottom:18px;left:0;right:0;text-align:center;font:600 11px monospace;color:#6f6880}
+.se-rc-c.c0{background:radial-gradient(120% 70% at 20% 10%,rgba(176,56,249,.35),transparent 60%)}
+.se-rc-c.c1{background:radial-gradient(120% 70% at 80% 20%,rgba(97,233,112,.18),transparent 60%)}
+.se-rc-c.c2{background:radial-gradient(120% 70% at 30% 80%,rgba(99,91,255,.3),transparent 60%)}
+.se-rc-c.c3{background:radial-gradient(120% 70% at 70% 70%,rgba(176,56,249,.3),transparent 60%)}
+.se-rc-c.c4{background:radial-gradient(120% 70% at 20% 40%,rgba(255,138,138,.16),transparent 60%)}
+.se-rc-c.c5{background:radial-gradient(120% 70% at 50% 20%,rgba(176,56,249,.4),transparent 65%)}
+.se-rc-end{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+</style>
+</head>
+<body class="ox-page">
+<!-- the standard Onyx Sports header, bottom bar, menu and footer come from ui.js, as on every page -->
+<main>
+<section class="ox-wrap se">
+  <a class="back" href="home.html#my">‹ My Onyx</a>
+  <span class="ox-eyebrow" style="display:block;margin-top:16px">My Season</span>
+  <h1>Your season, graded.</h1>
+  <p class="lead">Every pick and parlay you saved, settled: your record, units at the odds you got, your best bets and how you did against the model.</p>
+  <div id="season"><div class="se-none">Loading your season...</div></div>
+</section>
+</main>
+<script>
+(function () { var el = document.getElementById('season'); if (window.OnyxSeason) OnyxSeason.mount(el); })();
+// share cards (onyx-share.js) for the recap, when not loaded yet; the recap falls back to the phone's share sheet
+if (!document.querySelector('script[src="onyx-share.js"]')) { const s = document.createElement('script'); s.src = 'onyx-share.js'; s.async = true; s.onerror = () => s.remove(); document.head.appendChild(s); }
+if (location.hash === '#settled') setTimeout(() => { const s = document.getElementById('settled'); if (s) s.scrollIntoView(); }, 200);
+</script>
+</body>
+</html>

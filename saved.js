@@ -6,6 +6,12 @@
 //    hcap (spread), name (player or team), saved: ISO time}
 // Pages call OnyxSaved.btn(pick) for the star button; home.html reads OnyxSaved.all().
 //
+// Saving, made better (11/16): a save opens a small sheet (openSheet) with Undo, "the odds I got" (my_price), a stake
+// in units (stake), an optional note (#tags) and where it is kept (syncState); removing has an Undo toast; every star
+// for one pick repaints together; saveSlip() saves the whole parlay slip as one ticket. A pick leaving My picks 24 hours
+// after its start stays in the history, graded: the Settled list on My Season (season.html), which counts units at
+// your own price and stake (unitsOf).
+//
 // Win alerts (11/1, the Onyx Baseball home-run alert, for every saved pick): every 45 s
 // while a page is open, each saved pick whose game has started is checked against ESPN's
 // live scoreboard and box score (OnyxSaved.track, the same rules My picks uses). When one
@@ -36,7 +42,8 @@
   // a pick drops off 24 hours after its game starts: tonight's picks, followed through the night
   function all() {
     var now = Date.now(), a = read(), keep = a.filter(function (p) { var t = Date.parse(p.start || p.saved); return isNaN(t) || now - t < KEEP_H * 3600e3; });
-    if (keep.length !== a.length) write(keep);
+    // a pick leaving My picks never leaves without a trace: it is in the history (the Settled list, My Season)
+    if (keep.length !== a.length) { a.forEach(function (p) { if (keep.indexOf(p) < 0) record(p); }); write(keep); }
     return keep;
   }
   // a play with no Onyx selection id (11/8: Onyx's feed is down, every play is on the market line and none has one,
@@ -56,13 +63,16 @@
   // (accounts.js), and never cleared by the 24-hour clean-up of the saved list. A pick taken back
   // before its game starts leaves the history; after the start it stays (that pick was ridden).
   var HKEY = 'onyxHistory', HMAX = 2000;
+  // what the person adds to a pick (11/16): the odds they got, their stake in units, a note (#tags in it become tags).
+  // 'edited' (ms) lets accounts.js send a later edit to the account and take a newer one from another device.
+  var USER = ['my_price', 'stake', 'note', 'tags', 'edited'];
   function history() { var a = lsGet(HKEY, []); return Array.isArray(a) ? a : []; }
   function hWrite(a) { lsSet(HKEY, a.slice(-HMAX)); try { dispatchEvent(new Event('onyx-history')); } catch (e) {} }
   function record(p) {
     if (!p || !p.id) return;
     var a = history();
     if (a.some(function (h) { return h.id === p.id; })) return;
-    var keep = ['id', 'sport', 'label', 'matchup', 'start', 'gid', 'team', 'price', 'conf', 'kind', 'mkt', 'side', 'line', 'hcap', 'name', 'saved', 'legs', 'my_price'];
+    var keep = ['id', 'sport', 'label', 'matchup', 'start', 'gid', 'team', 'price', 'conf', 'kind', 'mkt', 'side', 'line', 'hcap', 'name', 'saved', 'legs'].concat(USER);
     var h = {}; keep.forEach(function (k) { if (p[k] != null) h[k] = p[k]; });
     h.saved = h.saved || new Date().toISOString(); h.res = null;
     a.push(h); hWrite(a);
@@ -113,17 +123,91 @@
   function saveTicket(legs, o) {
     var t = ticket(legs, o); if (!t) return null;
     if (has(t.id)) { toast('This parlay is already in My picks'); return t; }
-    toggle(t);
-    if (o && o.my_price != null) setMyPrice(t.id, o.my_price);
+    var meta = {};
+    if (o && o.my_price != null && o.my_price !== '') meta.my_price = o.my_price;
+    if (o && o.stake != null && o.stake !== '') meta.stake = o.stake;
+    toggle(t, {meta: meta, quiet: !!(o && o.quiet)});
     return t;
   }
   // the odds you actually got: your record and units use them (11/8)
+  function cleanPrice(price) {
+    price = price == null || price === '' ? null : Math.round(+String(price).trim().replace(/^\+/, ''));
+    if (price != null && (isNaN(price) || (price > -100 && price < 100))) return undefined;
+    return price;
+  }
   function setMyPrice(id, price) {
-    price = price == null || price === '' ? null : Math.round(+price);
-    if (price != null && (isNaN(price) || (price > -100 && price < 100))) return false;
-    var a = read().map(function (p) { return p.id === id ? Object.assign({}, p, {my_price: price}) : p; }); write(a);
-    hWrite(history().map(function (h) { return h.id === id ? Object.assign({}, h, {my_price: price}) : h; }));
+    price = cleanPrice(price);
+    if (price === undefined) return false;
+    return setMeta(id, {my_price: price});
+  }
+  // what the person adds to a saved pick, on both lists: {my_price, stake (units, above 0 up to 100), note}
+  function setMeta(id, patch) {
+    var o = {};
+    if ('my_price' in patch) { var pr = cleanPrice(patch.my_price); if (pr === undefined) return false; o.my_price = pr; }
+    if ('stake' in patch) {
+      var st = patch.stake == null || patch.stake === '' ? null : Math.round(+patch.stake * 100) / 100;
+      if (st != null && (isNaN(st) || st <= 0 || st > 100)) return false;
+      o.stake = st;
+    }
+    if ('note' in patch) {
+      var n = String(patch.note || '').replace(/\s+/g, ' ').trim().slice(0, 140);
+      var tg = (n.match(/#[A-Za-z0-9_]{1,24}/g) || []).map(function (t) { return t.slice(1).toLowerCase(); }).filter(function (t, i, a) { return a.indexOf(t) === i; });
+      o.note = n || null; o.tags = tg.length ? tg : null;
+    }
+    o.edited = Date.now();
+    var fix = function (p) {
+      if (p.id !== id) return p;
+      var q = Object.assign({}, p, o); Object.keys(o).forEach(function (k) { if (q[k] == null) delete q[k]; }); return q;
+    };
+    write(read().map(fix));
+    hWrite(history().map(fix));
     return true;
+  }
+  function find(id) { return read().filter(function (p) { return p.id === id; })[0] || history().filter(function (h) { return h.id === id; })[0] || null; }
+  // units won or lost on a graded pick: your stake (1 unit unless you set one) at the odds you got (else the Onyx price
+  // when saved; no price at all counts even money). A push is 0 and is not risked.
+  function stakeOf(h) { return +h.stake > 0 ? +h.stake : 1; }
+  function priceOf(h) { var v = h.my_price != null ? +h.my_price : h.price != null ? +h.price : null; return v == null || isNaN(v) ? null : v; }
+  function unitsOf(h) {
+    var s = stakeOf(h), pr = priceOf(h);
+    if (h.res === 'W') return s * (pr == null ? 1 : pr > 0 ? pr / 100 : 100 / -pr);
+    if (h.res === 'L') return -s;
+    return 0;
+  }
+  // graded picks, newest first (the Settled list); days = how far back (none = all)
+  function settled(days) {
+    var now = Date.now();
+    return history().filter(function (h) {
+      if (!h.res) return false;
+      var t = Date.parse(h.start || h.saved);
+      return !days || isNaN(t) || now - t < days * 864e5;
+    }).sort(function (a, b) { return (Date.parse(b.start || b.saved) || 0) - (Date.parse(a.start || a.saved) || 0); });
+  }
+  // the whole parlay slip (parlay.js) as one saved ticket, in one tap
+  function saveSlip(o) {
+    o = o || {};
+    var slip = [];
+    try { slip = window.OnyxParlay && OnyxParlay.slip ? OnyxParlay.slip() : (JSON.parse(localStorage.getItem('onyxSlipAll') || '[]') || []); } catch (e) { slip = []; }
+    if (slip.length < 2) { toast(slip.length ? 'Add one more leg to save a parlay' : 'Your parlay slip is empty'); return null; }
+    var ok = function (v) { return v != null && v !== '' && !isNaN(+v) && (+v >= 100 || +v <= -100); };
+    var d = slip.every(function (x) { return ok(x.price); }) ? slip.reduce(function (m, x) { return m * decOf(x.price); }, 1) : null;
+    var my = o.my_price;
+    if (!ok(my) && slip.some(function (x) { return ok(x.my); })) {
+      var dm = slip.every(function (x) { return ok(x.my) || ok(x.price); }) ? slip.reduce(function (m, x) { return m * decOf(ok(x.my) ? x.my : x.price); }, 1) : null;
+      if (dm) my = amOf(dm);
+    }
+    return saveTicket(slip, {price: o.price != null ? o.price : d ? amOf(d) : null, label: o.label, my_price: ok(my) ? my : null, stake: o.stake});
+  }
+  // where saved picks are kept, in words (the save sheet, My picks, My Season)
+  function syncState() {
+    var A = window.OnyxAccounts, st = null;
+    try { st = A && A.state ? A.state() : null; } catch (e) {}
+    if (!st || !st.enabled) return {on: false, signedIn: false, text: 'Saved on this device'};
+    if (!st.signedIn) return {on: true, signedIn: false, text: 'On this device only'};
+    if (st.error) return {on: true, signedIn: true, bad: true, text: st.error};
+    if (st.syncing || !st.last) return {on: true, signedIn: true, text: 'Syncing to your account...'};
+    var ago = Math.max(0, Math.round((Date.now() - st.last) / 60000));
+    return {on: true, signedIn: true, ok: true, text: 'Synced to your account ' + (ago < 1 ? 'just now' : ago + ' min ago')};
   }
   // value of a price against our chance (11/8: "a tool where we enter the odds and you give us the value")
   function value(prob, price) {
@@ -159,11 +243,10 @@
     var g = a.filter(function (h) { return h.res; }), w = 0, l = 0, p = 0, units = 0, risked = 0, by = {};
     g.forEach(function (h) {
       var s = by[h.sport] = by[h.sport] || {w: 0, l: 0, p: 0, units: 0};
-      var pr = h.my_price != null ? h.my_price : h.price;      // the odds you got, when you entered them (11/8)
-      if (h.res === 'W') { w++; s.w++; var u = pr == null ? 1 : pr > 0 ? pr / 100 : 100 / -pr; units += u; s.units += u; }
-      else if (h.res === 'L') { l++; s.l++; units -= 1; s.units -= 1; }
-      else { p++; s.p++; }
-      if (h.res !== 'P') risked += 1;
+      var u = unitsOf(h);                    // the odds you got and your stake, when you entered them (11/8, 11/16)
+      units += u; s.units += u;
+      if (h.res === 'W') { w++; s.w++; } else if (h.res === 'L') { l++; s.l++; } else { p++; s.p++; }
+      if (h.res !== 'P') risked += stakeOf(h);
     });
     return {picks: a.length, graded: g.length, pending: a.length - g.length, w: w, l: l, p: p, units: Math.round(units * 100) / 100,
             roi: risked ? Math.round(units / risked * 1000) / 10 : null, rate: w + l ? Math.round(w / (w + l) * 1000) / 10 : null, by: by};
@@ -171,28 +254,122 @@
   function toast(msg, opts) { if (window.OX_TOAST) { try { window.OX_TOAST(msg, opts || {}); return; } catch (e) {} } }
   function alertsOn() { return lsGet(ALERTS, 0) === 1 && typeof Notification !== 'undefined' && Notification.permission === 'granted'; }
   function canAsk() { return typeof Notification !== 'undefined' && Notification.permission !== 'denied'; }
-  function toggle(p) {
+  // o: {quiet: no sheet or toast, meta: {my_price, stake, note} set right away}
+  function toggle(p, o) {
+    o = o || {};
     p = withId(p);
     if (!p || !p.id) return false;
-    if (has(p.id)) { remove(p.id); toast('Removed from My picks'); return false; }
+    if (has(p.id)) {
+      var gone = read().filter(function (x) { return x.id === p.id; })[0];
+      remove(p.id);
+      if (!o.quiet) toast('Removed from My picks', {rm: true, ms: 5000, action: 'Undo', onAction: function () { restore(gone); }});
+      return false;
+    }
     var a = read(), sp = Object.assign({}, p, {saved: new Date().toISOString()}); a.push(sp); write(a); record(sp);
-    if (!alertsOn() && canAsk()) toast('Saved. We will pop up the moment it wins', {action: 'Alert me', onAction: function () { setAlerts(true); }});
-    else toast('Saved. We will pop up the moment it wins');
+    if (o.meta && Object.keys(o.meta).length) setMeta(sp.id, o.meta);
+    if (!o.quiet) openSheet(find(sp.id) || sp);
     try { if (window.gtag) gtag('event', 'pick_save', {sport: p.sport}); } catch (e) {}
     setTimeout(watch, 1500);
     return true;
   }
+  // Undo after a removal: the pick comes back as it was (its odds, stake and note too)
+  function restore(p) {
+    if (!p || has(p.id)) return;
+    var a = read(); a.push(p); write(a); record(p);
+    var h = history(), i = -1; h.forEach(function (x, k) { if (x.id === p.id) i = k; });
+    if (i >= 0 && USER.some(function (k) { return p[k] != null && h[i][k] == null; })) { USER.forEach(function (k) { if (p[k] != null) h[i][k] = p[k]; }); hWrite(h); }
+    toast('Back in My picks');
+  }
+  // Undo right after a save: gone from My picks and from the history (it was never ridden)
+  function undoSave(id) {
+    write(read().filter(function (p) { return p.id !== id; }));
+    hWrite(history().filter(function (h) { return !(h.id === id && !h.res); }));
+    toast('Not saved', {rm: true});
+  }
+  // remove with an Undo toast (My picks' ×)
+  function drop(id) { var p = read().filter(function (x) { return x.id === id; })[0]; if (p) toggle(p); }
+  function paint(el, on) {
+    el.classList.toggle('on', on); el.innerHTML = on ? '★' : '☆';
+    el.setAttribute('aria-label', on ? 'Saved' : 'Save pick'); el.setAttribute('aria-pressed', on ? 'true' : 'false');
+    el.title = on ? 'Saved to My picks. Tap to remove' : 'Save this pick and follow it live';
+  }
   function tap(el, i) {
     var on = toggle(REG[i]);
-    el.classList.toggle('on', on); el.innerHTML = on ? '★' : '☆';
-    el.setAttribute('aria-label', on ? 'Saved' : 'Save pick');
+    paint(el, on);
+    if (on) { el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); }
   }
   function btn(p) {
     p = withId(p);
     if (!p || !p.id) return '';
     var i = REG.push(p) - 1, on = has(p.id);
-    return '<button class="ox-save' + (on ? ' on' : '') + '" aria-label="' + (on ? 'Saved' : 'Save pick') + '" title="Save this pick and follow it live" ' +
+    return '<button type="button" class="ox-save' + (on ? ' on' : '') + '" data-oxid="' + esc(p.id) + '" aria-pressed="' + on + '" aria-label="' + (on ? 'Saved' : 'Save pick') + '" title="' +
+      (on ? 'Saved to My picks. Tap to remove' : 'Save this pick and follow it live') + '" ' +
       'onclick="event.stopPropagation();event.preventDefault();OnyxSaved.tap(this,' + i + ')">' + (on ? '★' : '☆') + '</button>';
+  }
+  // every star for one pick shows the same state wherever it was saved or removed (the Top 10, Ask and My picks can
+  // all show the same play)
+  function repaint() {
+    try {
+      var ids = {}; read().forEach(function (p) { ids[p.id] = 1; });
+      document.querySelectorAll('.ox-save[data-oxid]').forEach(function (b) { var on = !!ids[b.getAttribute('data-oxid')]; if (b.classList.contains('on') !== on) paint(b, on); });
+    } catch (e) {}
+  }
+  addEventListener('onyx-saved', function () { setTimeout(repaint, 0); });
+  addEventListener('storage', function (e) { if (e.key === KEY) { repaint(); try { dispatchEvent(new Event('onyx-saved')); } catch (x) {} } });
+
+  // ── right after a save (11/16, Jordan: "make the entirety of the pick saving better"): a small sheet at the bottom
+  // with Undo, the odds you got, your stake in units, an optional note, and where it is kept (this device or the
+  // account). It never blocks the page and closes itself unless you are using it.
+  var SH = null, SHT = null, STAKES = [0.5, 1, 2, 3, 5];
+  function closeSheet() {
+    clearTimeout(SHT);
+    if (!SH) return;
+    var s = SH; SH = null; s.classList.remove('open');
+    setTimeout(function () { try { s.remove(); } catch (e) {} }, 220);
+  }
+  function armClose(ms) { clearTimeout(SHT); SHT = setTimeout(function () { if (SH && !SH.contains(document.activeElement) && !SH._hold) closeSheet(); else if (SH) armClose(3000); }, ms || 7000); }
+  function openSheet(p) {
+    if (!p || !document.body) return;
+    closeSheet();
+    var cur = find(p.id) || p, sy = syncState(), st = stakeOf(cur);
+    var s = document.createElement('div');
+    s.className = 'oxsv'; s.setAttribute('role', 'dialog'); s.setAttribute('aria-label', 'Saved to My picks');
+    s.innerHTML = '<div class="oxsv-h"><span class="oxsv-ic" aria-hidden="true">★</span><div class="oxsv-t"><b>Saved to My picks</b><span>' + esc(cur.label || cur.name || '') +
+        (cur.price != null ? ' · Onyx ' + esc(odds(cur.price)) : '') + '</span></div>' +
+        '<button type="button" class="oxsv-undo" data-oxsv="undo">Undo</button><button type="button" class="oxsv-x" data-oxsv="x" aria-label="Close">×</button></div>' +
+      '<div class="oxsv-row"><label>Odds you got<input data-oxsv="price" inputmode="text" autocomplete="off" enterkeyhint="done" placeholder="' + esc(cur.price != null ? odds(cur.price) : '-110') + '" value="' + esc(cur.my_price != null ? odds(cur.my_price) : '') + '"></label>' +
+        '<div class="oxsv-u" role="group" aria-label="Units"><span>Units</span>' + STAKES.map(function (u) { return '<button type="button" data-oxsv-u="' + u + '"' + (u === st ? ' class="on"' : '') + '>' + u + '</button>'; }).join('') + '</div></div>' +
+      '<div class="oxsv-n"><input data-oxsv="note" maxlength="140" autocomplete="off" enterkeyhint="done" placeholder="Note (optional, #tags work)" value="' + esc(cur.note || '') + '"></div>' +
+      '<div class="oxsv-f"><span class="oxsv-sy' + (sy.ok ? ' ok' : sy.bad ? ' bad' : '') + '">' + esc(sy.text) + (sy.on && !sy.signedIn ? ' · <a href="account.html">Sign in to sync</a>' : '') + '</span>' +
+        (!alertsOn() && canAsk() ? '<button type="button" class="oxsv-l" data-oxsv="alert">Alert me when it wins</button>' : '') +
+        '<a class="oxsv-l" href="home.html#my">My picks</a></div>';
+    document.body.appendChild(s); SH = s;
+    requestAnimationFrame(function () { s.classList.add('open'); });
+    var id = cur.id, msg = function (t, bad) { var e = s.querySelector('.oxsv-sy'); if (e) { e.className = 'oxsv-sy ' + (bad ? 'bad' : 'ok'); e.textContent = t; } };
+    s.addEventListener('click', function (e) {
+      var b = e.target.closest ? e.target.closest('[data-oxsv],[data-oxsv-u]') : null; if (!b || b.tagName === 'INPUT') return;
+      var a = b.getAttribute('data-oxsv'), u = b.getAttribute('data-oxsv-u');
+      if (u) {
+        if (setMeta(id, {stake: +u})) { s.querySelectorAll('[data-oxsv-u]').forEach(function (x) { x.classList.toggle('on', x === b); }); msg(u + (u === '1' ? ' unit' : ' units') + ' on it. My Season counts it'); }
+        armClose(9000);
+      } else if (a === 'undo') { closeSheet(); undoSave(id); }
+      else if (a === 'x') closeSheet();
+      else if (a === 'alert') { setAlerts(true); b.remove(); }
+    });
+    var pin = s.querySelector('[data-oxsv="price"]'), nin = s.querySelector('[data-oxsv="note"]');
+    var savePrice = function () {
+      var v = String(pin.value || '').trim();
+      if (setMyPrice(id, v)) { pin.classList.remove('bad'); if (v) msg('Your odds ' + odds(cleanPrice(v)) + ' saved. Your record uses them'); }
+      else { pin.classList.add('bad'); msg('Odds look like -110 or +150', true); }
+    };
+    var saveNote = function () { setMeta(id, {note: nin.value}); msg(nin.value.trim() ? 'Note saved' : 'Note cleared'); };
+    pin.addEventListener('change', savePrice);
+    nin.addEventListener('change', saveNote);
+    [pin, nin].forEach(function (inp) { inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') { inp.blur(); armClose(2500); } }); });
+    s.addEventListener('focusout', function () { armClose(5000); });
+    s.addEventListener('pointerenter', function () { s._hold = true; });
+    s.addEventListener('pointerleave', function () { s._hold = false; armClose(4000); });
+    armClose(8000);
   }
 
   // ── live tracking off ESPN (the rules home.html's My picks uses) ──────────
@@ -343,7 +520,7 @@
       '</div>' +
       '<a class="oxw-go" href="https://app.onyxodds.com/?utm_source=onyxsports&referrer=' + REFERRER + '" target="_blank" rel="noopener">Ride the run: build tonight\'s parlay on Onyx</a>' +
       '<div class="oxw-row"><a href="' + esc(t.gid && p.sport !== 'nba' && p.sport !== 'mlb' ? page + '#games:' + t.gid : page) + '">Open the game</a><a href="home.html#my" class="oxw-my">My picks</a>' +
-      (navigator.share ? '<button class="oxw-sh">Share</button>' : '') + '</div></div>';
+      (window.OnyxShare || navigator.share ? '<button class="oxw-sh">Share</button>' : '') + '</div></div>';
     document.body.appendChild(back);
     requestAnimationFrame(function () { back.classList.add('open'); });
     try { if (navigator.vibrate) navigator.vibrate([60, 40, 120]); } catch (e) {}
@@ -357,6 +534,9 @@
     back.querySelector('.oxw-my').addEventListener('click', function (e) { if (window.OnyxUI && OnyxUI.openPicks) { e.preventDefault(); close(); OnyxUI.openPicks(); } });
     var sh = back.querySelector('.oxw-sh');
     if (sh) sh.addEventListener('click', function () {
+      // the branded CASHED card (onyx-share.js, 11/16), else the plain share
+      if (window.OnyxShare && OnyxShare.open) { try { close(); OnyxShare.open({kind: 'cashed', price: p.price, chance: p.conf, sels: p.id && !/^[kt]:/.test(p.id) ? [p.id] : [],
+        legs: (p.legs || [p]).map(function (l) { return {label: l.label, matchup: l.matchup, price: l.price, conf: l.conf, sport: l.sport, res: 'W'}; })}); return; } catch (e) {} }
       try { navigator.share({title: 'Cashed on Onyx', text: 'My Onyx pick cashed: ' + (p.label || '') + (p.price != null ? ' (' + odds(p.price) + ')' : ''), url: location.origin + location.pathname.replace(/[^/]*$/, '') + 'home.html'}); } catch (e) {}
     });
     try { if (window.gtag) gtag('event', 'pick_won_popup', {sport: p.sport}); } catch (e) {}
@@ -411,7 +591,28 @@
   }
   addEventListener('visibilitychange', function () { if (!document.hidden) setTimeout(watch, 800); });
 
-  var css = '.ox-save{flex-shrink:0;width:34px;height:34px;border-radius:999px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.05);' +
+  var css = '.ox-save.pop{animation:oxsPop .42s cubic-bezier(.2,1.6,.4,1)}@keyframes oxsPop{0%{transform:scale(.6)}60%{transform:scale(1.18)}100%{transform:scale(1)}}' +
+    // the save sheet: above the bottom bar on a phone, bottom centre on a desktop
+    '.oxsv{position:fixed;left:50%;bottom:calc(86px + env(safe-area-inset-bottom,0px));z-index:10150;width:min(420px,calc(100vw - 24px));box-sizing:border-box;transform:translate(-50%,16px);opacity:0;transition:transform .22s,opacity .22s;' +
+    'background:#151318;border:1.5px solid rgba(176,56,249,.55);border-radius:16px;padding:12px;box-shadow:0 12px 36px rgba(0,0,0,.6);color:#fff;font-family:"Space Grotesk",system-ui,sans-serif}' +
+    '.oxsv.open{transform:translate(-50%,0);opacity:1}@media (min-width:1025px){.oxsv{bottom:18px}}' +
+    '.oxsv-h{display:flex;align-items:center;gap:10px}.oxsv-ic{width:30px;height:30px;flex:none;border-radius:999px;background:rgba(176,56,249,.25);border:1px solid rgba(176,56,249,.7);display:flex;align-items:center;justify-content:center;color:#fff}' +
+    '.oxsv-t{flex:1;min-width:0}.oxsv-t b{display:block;font-size:14px}.oxsv-t span{display:block;font:600 11px monospace;color:#b9b2c4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
+    '.oxsv-undo{flex:none;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);color:#fff;font:800 12px monospace;border-radius:999px;padding:8px 12px;cursor:pointer;min-height:36px}' +
+    '.oxsv-x{flex:none;background:none;border:0;color:#8a8399;font-size:22px;cursor:pointer;padding:2px 6px;min-height:36px}' +
+    '.oxsv-row{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;margin-top:10px}' +
+    '.oxsv-row label{display:flex;align-items:center;gap:6px;font:700 11px monospace;color:#9a93a6}' +
+    '.oxsv input{background:#0d0a12;border:1px solid #3a2a55;border-radius:9px;padding:8px 9px;color:#fff;font:700 16px monospace;min-height:36px;box-sizing:border-box}' +
+    '.oxsv-row input{width:84px}.oxsv input.bad{border-color:#ff8a8a}.oxsv input:focus{outline:none;border-color:#b038f9}' +
+    '.oxsv-u{display:flex;align-items:center;gap:4px}.oxsv-u span{font:700 11px monospace;color:#9a93a6;margin-right:2px}' +
+    '.oxsv-u button{min-width:36px;min-height:36px;border-radius:9px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.05);color:#ddd;font:800 12px monospace;cursor:pointer;padding:0 6px}' +
+    '.oxsv-u button.on{background:linear-gradient(135deg,#7a2ce0,#b038f9);border-color:transparent;color:#fff}' +
+    '.oxsv-n{margin-top:8px}.oxsv-n input{width:100%;font:600 16px "Space Grotesk",system-ui,sans-serif}' +
+    '.oxsv-f{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;margin-top:9px;font:600 11px monospace}' +
+    '.oxsv-sy{flex:1 1 180px;color:#9a93a6;line-height:1.4}.oxsv-sy.ok{color:#61e970}.oxsv-sy.bad{color:#ff8a8a}.oxsv-sy a{color:#d795ff}' +
+    '.oxsv .oxsv-l,.oxsv a.oxsv-l{background:none;border:0;color:#d795ff;font:700 12px monospace;text-decoration:none;cursor:pointer;padding:6px 0}' +
+    '@media (prefers-reduced-motion: reduce){.oxsv,.ox-save.pop{transition:none;animation:none}}' +
+    '.ox-save{flex-shrink:0;width:34px;height:34px;border-radius:999px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.05);' +
     'color:#d795ff;font-size:17px;line-height:1;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0}' +
     '.ox-save.on{background:rgba(176,56,249,.22);border-color:rgba(176,56,249,.7);color:#fff}' +
     // the win pop-up: Onyx Baseball's player-card modal (dark card, purple top rule) with a burst
@@ -442,6 +643,8 @@
   var st = document.createElement('style'); st.textContent = css; (document.head || document.documentElement).appendChild(st);
   window.OnyxSaved = {all: all, has: has, remove: remove, toggle: toggle, tap: tap, btn: btn,
     withId: withId, pickAt: function (i) { return REG[i] ? withId(REG[i]) : null; }, ticket: ticket, saveTicket: saveTicket, setMyPrice: setMyPrice, value: value, parlayValue: parlayValue, track: track, celebrate: celebrate, watch: watch, alertsOn: alertsOn, setAlerts: setAlerts,
-    history: history, grade: grade, stats: stats, record: record};
+    history: history, grade: grade, stats: stats, record: record,
+    setMeta: setMeta, find: find, drop: drop, unitsOf: unitsOf, stakeOf: stakeOf, priceOf: priceOf, settled: settled, saveSlip: saveSlip,
+    syncState: syncState, openSheet: openSheet, closeSheet: closeSheet};
   if (document.readyState === 'loading') addEventListener('DOMContentLoaded', start); else start();
 })();

@@ -167,7 +167,9 @@
     '#oxTap.pop .oxt-grab{display:none}',
     '.oxt-x{position:absolute;top:8px;right:8px;width:36px;height:36px;border-radius:18px;border:0;background:rgba(255,255,255,.07);color:#cfc8da;font:400 22px/1 system-ui,sans-serif;cursor:pointer}',
     '.oxt-x:hover,.oxt-x:focus-visible{background:rgba(176,56,249,.3);color:#fff}',
-    '.oxt-k{font:800 10px/1 monospace;letter-spacing:.12em;text-transform:uppercase;color:#d795ff;margin:4px 44px 6px 0}',
+    '.oxt-k{font:800 10px/1 monospace;letter-spacing:.12em;text-transform:uppercase;color:#d795ff;margin:4px 92px 6px 0}',
+    '.oxt-sh{position:absolute;top:8px;right:52px;width:36px;height:36px;border-radius:18px;border:0;background:rgba(255,255,255,.07);color:#d795ff;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}',
+    '.oxt-sh svg{width:17px;height:17px}.oxt-sh:hover,.oxt-sh:focus-visible{background:rgba(176,56,249,.3);color:#fff}',
     '.oxt-c h2{margin:0 44px 2px 0;font:800 18px/1.25 system-ui,-apple-system,sans-serif;color:#fff}',
     '.oxt-m{font:600 12px/1.4 monospace;color:#9a93a6;margin-bottom:12px}',
     '.oxt-n{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}',
@@ -278,6 +280,7 @@
     var S = studioLinks(p), slip = onSlip(p), saved = isSaved(p);
     var hasPG = p.kind === 'prop' && PG_SPORTS[k] && statOf(k, p.mkt) !== null;
     var h = '<div class="oxt-grab" aria-hidden="true"></div><button type="button" class="oxt-x" data-x="1" aria-label="Close">&times;</button>'
+      + (window.OnyxShare && p.label && p.price != null ? '<button type="button" class="oxt-sh" data-a="share" aria-label="Share this bet as an image card">' + OnyxShare.icon + '</button>' : '')
       + '<div class="oxt-k">' + esc([NAMES[k] || (k || '').toUpperCase(), !model && !loading ? 'Onyx line' : p.tag === 'trial' ? 'Trial' : 'Projection'].filter(Boolean).join(' · ')) + '</div>'
       + '<h2 id="oxtT">' + esc(p.label || 'Onyx price') + '</h2>'
       + '<div class="oxt-m">' + esc(meta || ' ') + '</div>'
@@ -357,6 +360,12 @@
     } else if (a === 'save') {
       var s = window.OnyxSaved ? OnyxSaved.toggle(savePick(p)) : false;
       b.classList.toggle('on', !!s); b.setAttribute('aria-pressed', !!s); b.textContent = s ? 'Saved, tracking' : 'Save / track';
+    } else if (a === 'share') {
+      // the shareable bet card (onyx-share.js): the card closes so the share sheet has the screen
+      var card = {kind: 'single', price: p.price, chance: p.conf != null && !p.no_read ? p.conf : null, sels: p.sel ? [p.sel] : [],
+        legs: [{label: p.label, matchup: [p.matchup, when(p.start)].filter(Boolean).join(' \u00b7 '), price: p.price, conf: p.conf != null && !p.no_read ? p.conf : null, sport: p.sport, sel: p.sel}]};
+      close();
+      if (window.OnyxShare) OnyxShare.open(card);
     } else if (a === 'nav') {
       gt('tap_card_studio', {sport: p.sport || '', to: /#sim/.test(b.getAttribute('href')) ? 'sim' : 'compare'});
       // same page (the Studio): the hash change switches the tool; close so it shows

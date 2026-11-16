@@ -494,7 +494,8 @@
         + (A.sameGame ? '<p class="lab-note">Same-game legs: Onyx prices them together, so its ticket can pay less than the legs multiplied shown here.</p>' : ''))
       + '<div class="lab-send">' + (missing.length
         ? '<button type="button" class="sx-btn" disabled>Send to Onyx</button><p class="lab-note">' + missing.length + ' leg' + (missing.length === 1 ? ' has' : 's have') + ' no Onyx selection yet (' + u.esc(missing.map(short).join(', ')) + '), so this slip cannot open on Onyx. Swap ' + (missing.length === 1 ? 'it' : 'them') + ' for a board play to send it.</p>'
-        : '<a class="sx-btn lab-go" href="#" target="_blank" rel="noopener" data-send="1">Send ' + (n === 1 ? 'this leg' : 'all ' + n + ' legs') + ' to Onyx · ' + u.odds(n >= 2 ? A.price : legs[0].price) + '</a>') + '</div></div>';
+        : '<a class="sx-btn lab-go" href="#" target="_blank" rel="noopener" data-send="1">Send ' + (n === 1 ? 'this leg' : 'all ' + n + ' legs') + ' to Onyx · ' + u.odds(n >= 2 ? A.price : legs[0].price) + '</a>')
+      + (window.OnyxShare ? '<button type="button" class="sx-chip lab-share" data-share="1">Share this ' + (n === 1 ? 'bet' : 'parlay') + ' as a card</button>' : '') + '</div></div>';
     box.querySelector('[data-send]') && (box.querySelector('[data-send]').dataset.sels = JSON.stringify(sels));
     // ladder
     var L = n >= 3 ? ladder(A) : [];
@@ -537,7 +538,7 @@
   }
   function onClick(e) {
     var t = e.target.closest ? e.target : null; if (!t) return;
-    var b = t.closest('[data-add],[data-rm],[data-preset],[data-load],[data-swap],[data-ladder],[data-more],[data-mode],[data-clear],[data-send]');
+    var b = t.closest('[data-add],[data-rm],[data-preset],[data-load],[data-swap],[data-ladder],[data-more],[data-mode],[data-clear],[data-send],[data-share]');
     if (!b || !ROOT.contains(b)) return;
     var P = OP();
     if (b.hasAttribute('data-add')) { var r = BYID[b.getAttribute('data-add')]; if (r && P) P.add(r); }
@@ -556,6 +557,14 @@
     }
     else if (b.hasAttribute('data-more')) { F.lim += 40; renderPicker(); }
     else if (b.hasAttribute('data-mode')) { F.mode = b.getAttribute('data-mode'); F.lim = 40; renderPicker(); }
+    else if (b.hasAttribute('data-share')) {
+      // the shareable card (onyx-share.js) with the lab's true chance: same-game legs read together, not multiplied
+      if (!LAST || !window.OnyxShare) return;
+      var SA = LAST.A, one = SA.n === 1;
+      OnyxShare.open({kind: one ? 'single' : 'parlay', price: one ? SA.legs[0].price : SA.price, chance: one ? (SA.legs[0].own ? null : SA.legs[0].p) : SA.trueP,
+        sels: SA.legs.every(function (l) { return l.sel; }) ? SA.legs.map(function (l) { return l.sel; }) : [],
+        legs: SA.legs.map(function (l) { return {label: l.label, matchup: gameName(l.gid, l.row && l.row.matchup), price: l.price, conf: l.own ? null : l.p, sport: (l.row && l.row.sport) || SPORT, sel: l.sel}; })});
+    }
     else if (b.hasAttribute('data-send')) {
       var sels = []; try { sels = JSON.parse(b.dataset.sels || '[]'); } catch (x) {}
       var href = u.onyx(sels, 'lab');
@@ -606,6 +615,7 @@
       '.lab-pairs{list-style:none;margin:12px 0 0;padding:0;font-size:13px;line-height:1.45}.lab-pairs li{padding:6px 0;border-top:1px solid rgba(255,255,255,.07)}.lab-pairs b{color:#fff}',
       '.lab-r0{font:600 10.5px monospace;color:var(--mute)}',
       '.lab-note{color:var(--pur2);font-size:12px;line-height:1.5;margin:10px 0 0}',
+      '.lab-share{display:block;width:100%;margin-top:8px;padding:11px;font-size:13.5px;cursor:pointer}',
       '.lab-send{margin-top:14px}.lab-send .sx-btn{display:block;width:100%;box-sizing:border-box;text-align:center;text-decoration:none;font-size:15px;padding:13px}',
       '.lab-sw{padding:12px 0;border-top:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;gap:8px}.lab-sw:nth-of-type(1){border-top:0}',
       '.lab-swl{display:flex;flex-direction:column;gap:2px;min-width:0;font-size:14px}.lab-swl s{color:var(--mute)}.lab-swl small{color:var(--mute);font:600 11px monospace;overflow-wrap:anywhere}',
