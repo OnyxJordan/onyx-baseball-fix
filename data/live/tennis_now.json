@@ -3313,5 +3313,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-187512-spread-home",
+  "sport": "tennis",
+  "gid": "187512",
+  "date": "2026-11-16",
+  "logged_at": "2026-11-16T20:35:06+00:00",
+  "matchup": "Flavio Cobolli vs Daniil Medvedev",
+  "home": "Daniil Medvedev",
+  "away": "Flavio Cobolli",
+  "label": "Daniil Medvedev -2.5 games",
+  "kind": "spread",
+  "side": "home",
+  "line": -2.5,
+  "price": -185,
+  "chance": 0.6795,
+  "implied": 0.6491,
+  "edge": 0.03,
+  "fair": -210,
+  "state": {
+   "sets": "4-5",
+   "srv": null,
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
