@@ -69,6 +69,15 @@
     var t = OnyxSaved.saveTicket(slip, {price: T.price, label: slip.length + '-leg parlay', my_price: my ? +my : null});
     if (t) toast('Saved to My picks: ' + t.label + (my ? ' at ' + odds(+my) : '') + '. Tracked and graded with your picks.');
   }
+  // share the slip as a branded image card (onyx-share.js): every leg, the ticket price, the chance every leg hits
+  function shareBtn() { return window.OnyxShare ? '<button type="button" class="alt pbx-sh" data-pb="share">Share slip</button>' : ''; }
+  function share() {
+    if (!window.OnyxShare || !slip.length) return;
+    var T = totals();
+    OnyxShare.open({kind: slip.length > 1 ? 'parlay' : 'single', price: slip.length > 1 ? T.price : slip[0].price, chance: T.prob,
+      legs: slip.map(function (x) { return {label: x.label, matchup: x.matchup, price: x.price, conf: x.conf, sport: x.sport, sel: x.sel}; }),
+      sels: T.onyx ? slip.map(function (x) { return x.sel; }) : []});
+  }
   // ── the pill and the slip ────────────────────────────────────────────────
   var CSS = [
     '#oxPB{position:fixed;right:12px;bottom:calc(86px + var(--sab,0px));z-index:9100;display:flex;flex-direction:column;align-items:flex-end;gap:8px;width:min(340px,calc(100vw - 24px));pointer-events:none}',
@@ -89,6 +98,7 @@
     '.pbx-v{font:600 11px monospace;line-height:1.5;color:#cfc8da;margin-bottom:6px}.pbx-v b.up{color:#61e970}.pbx-v b.dn{color:#ff8a8a}',
     '.pbx-b{display:flex;gap:6px;flex-wrap:wrap}.pbx-b button{flex:1;font:800 11.5px monospace;border:0;border-radius:9px;padding:9px 10px;cursor:pointer;color:#fff;background:linear-gradient(135deg,#7a2ce0,#b038f9)}',
     '.pbx-b button.alt{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18)}.pbx-b button[disabled]{opacity:.45;cursor:default}',
+    '.pbx-b button.pbx-sh{flex-basis:100%}',
     '.pbx-n{font:600 10.5px monospace;color:#d795ff;margin-top:6px;line-height:1.45}',
     'body.pb-armed .t10-bet,body.pb-armed .bet,body.pb-armed .btn-primary,body.pb-armed .oc:not(.dead),body.pb-armed .chipx:not(.dead),body.pb-armed [onclick*="bet(\\\'"],body.pb-armed a[href*="onyxodds.com/share"]{box-shadow:0 0 0 1.5px rgba(97,233,112,.8),0 0 10px rgba(97,233,112,.35)!important}'
   ].join('\n');
@@ -115,10 +125,10 @@
         + '<div>Your odds<b>' + (PV ? esc(odds(PV.price)) : '-') + '</b></div><div>Value<b class="' + (V ? (V.good ? 'up' : 'dn') : '') + '">' + (V ? (V.ev100 > 0 ? '+' : '') + V.ev100 + ' / $100' : '-') + '</b></div></div>'
         + (PV ? '<div class="pbx-v">Value = our chance x the payout. ' + (PV.quoted ? 'Our ' + (100 * PV.prob).toFixed(1) + '% x ' + PV.dec.toFixed(2) + ' (the ticket price you typed)' : 'Legs ' + PV.legs.map(function (L) { return mx(L.mult); }).join(' · ')) + ' = <b class="' + (PV.good ? 'up' : 'dn') + '">' + mx(PV.mult) + '</b>: ' + (PV.good ? 'the odds pay more than our chance says they should.' : 'the odds pay less than our chance says they should.') + ' Over x1.00 is value. Type your odds on any leg.</div>' : '')
         + '<div class="pbx-my">Ticket price quoted<input id="pbMy" inputmode="text" placeholder="' + esc(odds(T.price)) + '" value="' + esc(myv) + '"><span>' + (V ? 'needs ' + (100 * V.implied).toFixed(1) + '% · fair ' + esc(odds(V.fair)) : '') + '</span></div>'
-        + '<div class="pbx-b"><button type="button" data-pb="save">Save parlay to my account</button><button type="button" class="alt" data-pb="onyx"' + (T.onyx ? '' : ' disabled') + '>Build on Onyx</button></div>'
+        + '<div class="pbx-b"><button type="button" data-pb="save">Save parlay to my account</button><button type="button" class="alt" data-pb="onyx"' + (T.onyx ? '' : ' disabled') + '>Build on Onyx</button>' + shareBtn() + '</div>'
         + (!T.onyx ? '<div class="pbx-n">Onyx\'s lines are down, so these are market prices and cannot open on Onyx yet. Save it to track it.</div>' : '')
         + (T.sameGame ? '<div class="pbx-n">Same-game legs: Onyx prices them together and usually pays less than the legs multiplied.</div>' : '')
-        : '<div class="pbx-n">Add one more leg to see the parlay.</div>')
+        : '<div class="pbx-n">Add one more leg to see the parlay.</div>' + (window.OnyxShare ? '<div class="pbx-b">' + shareBtn() + '</div>' : ''))
       + '</div>' : '';
     el.innerHTML = panel + '<button type="button" class="pbx-fab' + (ARMED ? ' on' : '') + '" data-pb="fab">' + (ARMED ? 'Building · tap odds to add' : 'Parlay Builder') + (n ? ' <b>' + n + '</b>' : '') + '</button>';
   }
@@ -160,6 +170,7 @@
       else if (a === 'hide') { OPEN = false; ARMED = false; draw(); }
       else if (a === 'save') saveTicket();
       else if (a === 'onyx') build();
+      else if (a === 'share') share();
       return;
     }
     if (!ARMED || !t.closest) return;

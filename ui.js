@@ -1260,6 +1260,7 @@
     if (!window.OnyxRail) needScript('onyx-live-rail.js');
     // tap any price, anywhere (11/16): every Onyx price opens the quick bet card (onyx-tap.js)
     if (!window.OnyxTap) needScript('onyx-tap.js');
+    if (!window.OnyxShare) needScript('onyx-share.js');
     var t0 = (location.hash || '').slice(1);
     syncActive(PAGE ? PAGE[0] : typeof currentTab !== 'undefined' ? currentTab : (typeof curTab !== 'undefined' ? curTab : (t0 || 'home')));
     setTimeout(function () { showWhatsNew(false); }, 1200);
