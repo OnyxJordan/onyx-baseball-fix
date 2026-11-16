@@ -423,6 +423,10 @@
     '.osearch input{flex:1;background:none;border:0;outline:0;color:var(--text,#fff);font:500 15px "Space Grotesk",system-ui,sans-serif;min-width:0}',
     '.osearch kbd{font:700 10px monospace;padding:2px 6px;border-radius:5px;border:1px solid rgba(255,255,255,.15);color:var(--text3,#888)}',
     '.ogrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}',
+    '.osec-h{margin:14px 2px 8px;font:700 10.5px monospace;letter-spacing:.08em;text-transform:uppercase;color:#d795ff}',
+    'a.otile{color:inherit;text-decoration:none}',
+    /* the menu on every width (11/16): desktop had no way into it, so a sport's tools were hard to reach */
+    '.nav .nav-hamburger,.ox-stdnav .nav-hamburger{display:flex!important;align-items:center;justify-content:center}',
     '@media '+DESK+'{.ogrid{grid-template-columns:repeat(3,minmax(0,1fr))}}',
     '.otile{display:flex;gap:10px;align-items:flex-start;text-align:left;padding:12px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);',
     'color:var(--text,#fff);cursor:pointer;transition:transform .12s,border-color .15s,background .15s;-webkit-tap-highlight-color:transparent;opacity:0;transform:translateY(8px)}',
@@ -624,6 +628,30 @@
 
   // ── 4. sheet (menu + search) ──────────────────────────────────────────
   var sheet, sheetBg, lastFocus;
+  // everything for this sport in its menu (11/16, Jordan: "everything for each specific sport should be accessible by
+  // cheeseburger on that sports page, it's hard to get from nfl to picks and sgp tool especially on desktop"):
+  // the sport's Onyx Picks, its record, how its model works, Ask Onyx and, for the NFL, every NFL Studio tool.
+  // The NFL Studio page itself gets the NFL section too (with links back to the NFL tabs).
+  function sportLinks() {
+    var k = SITE === 'page' ? (FILE === 'studio.html' ? 'nfl' : null) : SITE;
+    var sp = ALL.filter(function (a) { return a[0] === k; })[0];
+    if (!sp) return '';
+    var nm = {cfb: 'College Football', cbb: 'College Basketball'}[k] || sp[1], L = [];
+    if (FILE === 'studio.html') L.push(['nfl.html#plays', 'NFL Plays', 'plays', 'Recommended plays and the lists'], ['nfl.html#board', 'NFL Onyx Board', 'board', 'Every Onyx line'],
+                                       ['nfl.html#games', 'NFL Games', 'games', 'Live scores and the gamecenter']);
+    if (k === 'nfl') L.push(['studio.html#lab', 'Parlay Lab (SGP)', 'slip', 'Same-game parlays with the true chance'],
+                            ['studio.html#sim', 'Play It Out', 'spark', 'Simulate any game 10,000 times'],
+                            ['studio.html#compare', 'Compare', 'ranks', 'Players and odds side by side'],
+                            ['studio.html#sweat', 'Sunday Sweat', 'games', 'Your bets, live'],
+                            ['studio.html#insights', 'Insights', 'search', 'What everyone is asking, answered']);
+    L.push(['picks.html', 'Onyx Picks', 'plays', 'Today\'s card and the record'],
+           ['scorecard.html', nm + ' record', 'record', 'Every list and lane, graded'],
+           ['home.html#ask', 'Ask Onyx', 'search', 'Any ' + nm + ' play or parlay, built for you'],
+           ['how.html#' + k, 'How the ' + nm + ' model works', 'model', 'What it reads, what it was tested on']);
+    return '<div class="osec-h">Everything ' + esc(nm) + '</div><div class="ogrid">' + L.filter(function (x) { return x[0].split('#')[0] !== FILE || x[0].indexOf('#') > 0; }).map(function (x) {
+      return '<a class="otile" href="' + esc(x[0]) + '" data-sport-link="1">' + svg(x[2]) + '<div><b>' + esc(x[1]) + '</b><span>' + esc(x[3]) + '</span></div></a>';
+    }).join('') + '</div>';
+  }
   function buildSheet() {
     sheetBg = el('div', 'osheet-bg');
     sheet = el('section', 'osheet');
@@ -640,7 +668,7 @@
       '<div class="ogrid">' + S.tabs.map(function (t, i) {
         return '<button class="otile" data-tab="' + t[0] + '"' + (t[4] ? ' data-href="' + esc(t[4]) + '"' : '') + ' style="transition-delay:' + (reduce ? 0 : 25 * i) + 'ms">' + svg(t[2]) +
           '<div><b>' + esc(t[1]) + '</b><span>' + esc(t[3]) + '</span></div></button>';
-      }).join('') + '</div>' +
+      }).join('') + '</div>' + sportLinks() +
       '<div class="oacts">' +
       // My picks and Account: the same entries on every page (the header has them too)
       '<button class="oact ox-all" data-act="mypicks">' + OX_MARK + '<span class="oact-my">My picks: saved picks and your record</span></button>' +
@@ -660,6 +688,7 @@
     sheet.querySelectorAll('.otile').forEach(function (t) {
       t.addEventListener('click', function () { buzz(); closeSheet(); if (t.dataset.href) goLink(t.dataset.href); else go(t.dataset.tab); });
     });
+    sheet.querySelectorAll('[data-sport-link]').forEach(function (a) { a.addEventListener('click', function () { buzz(); closeSheet(); }); });
     sheet.querySelector('[data-act="mypicks"]').addEventListener('click', function () { buzz(); closeSheet(); openPicks(); });
     var slipBtn = sheet.querySelector('[data-act="slip"]');
     if (slipBtn) slipBtn.addEventListener('click', function () {
