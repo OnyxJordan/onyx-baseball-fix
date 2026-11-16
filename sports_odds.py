@@ -159,7 +159,7 @@ def main():
 
     def pull(book):
         out = {"date": slate.get("date"), "fetched": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-               "book": book, "games": {}, "props": [], "matches": {}, "next_props": []}
+               "book": book, "games": {}, "props": [], "matches": {}, "next_props": [], "next_lines": {}}
         targets = {}
         for fid, (lg, f) in fixtures.items():
             if key == "tennis":
@@ -226,6 +226,25 @@ def main():
                             if float(od["points"]) == e["line"]:
                                 e[side], e[side + "_sel"] = price, _sel(od)
                         out["next_props"] += [e for e in nxt.values() if e["over"] is not None and e["under"] is not None]
+                        # its main game lines too (11/16): the next-week projections need each team's implied points
+                        nl = out["next_lines"].setdefault(g["gid"], {})
+                        for od in row.get("odds") or []:
+                            price, mid = american(od.get("price")), od.get("market_id")
+                            if price is None or not od.get("is_main"):
+                                continue
+                            sel, side = od.get("selection") or od.get("name") or "", str(od.get("selection_line") or "").lower()
+                            is_home = _norm(sel) == _norm(h_name) or (team_match(sel, g, "home") and not team_match(sel, g, "away"))
+                            is_away = _norm(sel) == _norm(a_name) or (team_match(sel, g, "away") and not team_match(sel, g, "home"))
+                            if mid == "moneyline" and (is_home or is_away):
+                                nl[("home" if is_home else "away") + "_ml"], nl[("home" if is_home else "away") + "_ml_sel"] = price, _sel(od)
+                            elif mid in SPREAD and od.get("points") is not None and (is_home or is_away):
+                                t = "home" if is_home else "away"
+                                nl[t + "_spread"], nl[t + "_spread_price"], nl[t + "_spread_sel"] = float(od["points"]), price, _sel(od)
+                            elif mid in TOTAL and od.get("points") is not None and side in ("over", "under"):
+                                nl["total"] = float(od["points"])
+                                nl[side + "_price"], nl[side + "_sel"] = price, _sel(od)
+                        if not nl:
+                            out["next_lines"].pop(g["gid"], None)
                         continue
                     gl = out["games"].setdefault(g["gid"], {})
                     props, alt = {}, {}
