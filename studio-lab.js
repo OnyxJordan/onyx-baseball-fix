@@ -37,18 +37,24 @@
   //   pass  QB passing yds, TDs, pass+rush yds  att    QB pass attempts (trailing teams throw more)
   //   recv  receptions, receiving yds           rush   rushing yds (and rush+rec yds for a running back)
   //   td    anytime / 2+ / 3+ TD                ftd    first TD (only one player scores it)
-  // The correlation of two legs = the table value x both directions. Figures are deliberately modest round numbers
-  // read off how game scripts move NFL stats together (a QB's yards and his receivers', a leading team running the
-  // ball, a high total lifting every skill player), not fitted coefficients.
-  var SAME_PLAYER = {'pass|pass': 0.6, 'att|pass': 0.55, 'att|att': 0.6, 'recv|recv': 0.7, 'rush|rush': 0.7, 'recv|rush': 0.35,
-    'recv|td': 0.35, 'rush|td': 0.35, 'pass|td': 0.15, 'td|td': 0.65, 'ftd|td': 0.5, 'ftd|recv': 0.2, 'ftd|rush': 0.2, 'att|td': 0.05, 'pass|rush': 0.2};
-  var TEAMMATES = {'pass|recv': 0.45, 'att|recv': 0.3, 'pass|td': 0.3, 'att|td': 0.1, 'pass|rush': -0.05, 'att|rush': -0.2, 'att|pass': 0.5,
-    'recv|recv': -0.05, 'recv|td': 0.1, 'rush|td': 0.15, 'td|td': 0.1, 'ftd|ftd': -0.35, 'ftd|td': 0.05, 'rush|rush': -0.15, 'ftd|pass': 0.1};
-  var OPPONENTS = {'pass|pass': 0.15, 'pass|recv': 0.12, 'recv|recv': 0.12, 'td|td': 0.1, 'pass|td': 0.1, 'recv|td': 0.1, 'rush|rush': -0.1,
-    'att|att': -0.1, 'ftd|ftd': -0.35, 'att|rush': 0.15};
-  var SIDE_OWN = {rush: 0.3, td: 0.25, ftd: 0.15, recv: 0.1, pass: 0.05, att: -0.25};     // a team's side and its own players
-  var SIDE_OPP = {rush: -0.25, td: -0.2, ftd: -0.1, recv: 0, pass: 0, att: 0.25};       // a team's side and the other team's players
-  var TOTAL = {pass: 0.4, att: 0.15, recv: 0.3, rush: 0.15, td: 0.35, ftd: 0.1, side: 0};  // the game total and anything in it
+  // The correlation of two legs = the table value x both directions. Fitted, not guessed (11/16, Jordan: "build the
+  // real same-game correlations for parlay lab"): tools/nfl_sgp_corr.py graded every Onyx opening line of 2025 and 2026
+  // (20,853 lines in 471 games: receptions, receiving / rushing / passing yards, pass attempts, anytime TD, spread and
+  // total), calibrated each market's chances, and set each cell to the correlation that best predicts how often its
+  // real same-game pairs both hit (524,593 pairs), shrunk toward 0 by n / (n + 80). Held out: fitted on 2025 and judged
+  // on 2026's 163,750 pairs, then the other way on 2025's 360,843, it beat the old hand-set table overall (log loss
+  // .38680 vs .38778 on 2025, .41744 vs .41714 on 2026), and the old table had overstated most links (opponents ~0,
+  // not +.12 to +.15; a total over and a receiver +.15, not +.30). First TD (ftd) has no graded history: those few
+  // cells keep the earlier hand-set values.
+  var SAME_PLAYER = {'recv|td': 0.297, 'recv|recv': 0.785, 'rush|td': 0.337, 'recv|rush': -0.144, 'pass|rush': 0.0, 'pass|td': 0.0, 'att|pass': 0.57,
+    'att|td': 0.044, 'att|rush': 0.087, 'pass|pass': 0.6, 'att|att': 0.6, 'rush|rush': 0.7, 'td|td': 0.65, 'ftd|td': 0.5, 'ftd|recv': 0.2, 'ftd|rush': 0.2};
+  var TEAMMATES = {'recv|td': 0.0, 'recv|recv': 0.05, 'td|td': -0.1, 'recv|rush': -0.05, 'rush|td': 0.0, 'pass|recv': 0.347, 'pass|td': 0.198,
+    'att|recv': 0.247, 'att|td': 0.0, 'rush|rush': 0.0, 'pass|rush': -0.142, 'att|rush': -0.092, 'att|pass': 0.5, 'ftd|ftd': -0.35, 'ftd|td': 0.05, 'ftd|pass': 0.1};
+  var OPPONENTS = {'recv|td': 0.0, 'recv|recv': 0.05, 'td|td': 0.0, 'recv|rush': 0.05, 'rush|td': 0.0, 'pass|recv': 0.05, 'pass|td': 0.049,
+    'att|recv': -0.049, 'att|td': 0.098, 'rush|rush': -0.097, 'pass|rush': 0.0, 'att|rush': 0.0, 'att|pass': 0.044, 'pass|pass': 0.084, 'att|att': 0.0, 'ftd|ftd': -0.35};
+  var SIDE_OWN = {recv: -0.05, td: 0.198, rush: 0.193, pass: 0.136, att: -0.175, ftd: 0.15};   // a team's side and its own players
+  var SIDE_OPP = {recv: 0.05, td: -0.198, rush: -0.193, pass: -0.136, att: 0.175, ftd: -0.1};  // a team's side and the other team's players
+  var TOTAL = {recv: 0.149, td: 0.247, rush: 0.097, pass: 0.319, att: 0.175, ftd: 0.1, side: 0}; // the game total and anything in it
   var SIDES = {same: 0.8, opp: -0.8};                                                     // moneyline / spread pairs
   var CAT = {pass_yds: 'pass', pass_td: 'pass', pass_rush_yds: 'pass', pass_att: 'att', rec: 'recv', rec_yds: 'recv', rush_yds: 'rush',
     anytime_td: 'td', two_td: 'td', three_td: 'td', first_td: 'ftd'};
@@ -523,11 +529,12 @@
     document.head.appendChild(s);
   }
   function howHTML() {
-    return '<details class="lab-howto sx-card"><summary>How the lab reads same-game legs</summary><p>Legs in different games multiply. Legs in the same game get a correlation, and the lab plays the slip out 5,000 times with every leg keeping the model\'s own chance. The main links:</p><ul>'
-      + '<li>A QB\'s passing over and his own receiver\'s receiving over: +0.45</li><li>A team covering and its own running back\'s rushing over: +0.30 (its anytime TD scorers +0.25)</li>'
-      + '<li>A team covering and its QB\'s pass attempts over: -0.25 (trailing teams throw more)</li><li>The game total over and a QB\'s passing over: +0.40, a receiver over +0.30, an anytime TD +0.35</li>'
-      + '<li>Two first TD scorers: -0.35 (only one player scores first)</li><li>One team\'s moneyline and the other team\'s spread: -0.80</li>'
-      + '<li>Unders flip the sign: a passing under with a receiving over fight each other.</li></ul><p>These are modest round numbers for how game scripts move stats together, not fitted figures. Model chances are projections, not Onyx Picks.</p></details>';
+    return '<details class="lab-howto sx-card"><summary>How the lab reads same-game legs</summary><p>Legs in different games multiply. Legs in the same game get a correlation, and the lab plays the slip out 5,000 times with every leg keeping the model\'s own chance. Every link is measured from real games: how often Onyx\'s own lines hit together across 524,593 same-game pairs in 2025 and 2026. The main ones:</p><ul>'
+      + '<li>A player\'s receptions over and his receiving yards over: +0.79</li><li>A QB\'s passing over and his own receiver\'s receiving over: +0.35 (his pass attempts and that receiver: +0.25)</li>'
+      + '<li>The game total over and a QB\'s passing over: +0.32, an anytime TD +0.25, a receiver over +0.15</li><li>A team covering and its own running back\'s rushing over: +0.19, its anytime TD scorers +0.20</li>'
+      + '<li>A team covering and its QB\'s pass attempts over: -0.18 (trailing teams throw more)</li><li>Two teammates both scoring a TD: -0.10 (they share the end zone)</li>'
+      + '<li>Players on opposite teams: about 0. A "shootout" lifts both sides less than it feels like.</li>'
+      + '<li>Unders flip the sign: a passing under with a receiving over fight each other.</li></ul><p>First TD links are estimates (there is no graded history to measure them on). Model chances are projections, not Onyx Picks.</p></details>';
   }
   function mount(el, d, uu) {
     D = d; u = uu; ROOT = el; css();
