@@ -12,6 +12,10 @@
 //      game lines a normal draw from the score, the time left and the pregame chance.
 //   3. Swing alerts: a gentle toast (window.OX_TOAST) when a saved leg hits, dies, or its game goes final. Each fires
 //      once per device (onyxRailSeen), only for games this device watched while they were in play.
+//   4. (11/16) With onyx-cash.js on the page, a pinned bet's chance is OnyxCash's live chance to cash (the number My Onyx
+//      shows), each bet carries a mini line of it, a 15-point move raises a "Big swing" toast (one per refresh, after any
+//      hit / dead / final toast), and up to three "Live leans" chips (OnyxCash.leans: the live model against Onyx's live
+//      line, projections) follow your bets while games are live.
 //
 // One ESPN poll, not two: saved.js (every 45 s), live.js (every 30 s) and this rail all read the same ESPN
 // scoreboards. OnyxESPN below is one in-memory cache in front of fetch() for site.api.espn.com GETs: a request for a
@@ -238,6 +242,40 @@
     return out;
   }
 
+  // a big swing (11/16): a pinned bet's live chance to cash moves 15 points or more since the last alert (or since
+  // this session first saw it). One toast, then that number is the new baseline. Kept for the session, so a reload
+  // does not repeat it.
+  var SWK = 'onyxRailSwing';
+  // busy: this refresh already raised a hit / dead / final toast, so a swing waits for the next quiet refresh (one toast at a time)
+  function bigSwings(bets, busy) {
+    var s; try { s = JSON.parse(sessionStorage.getItem(SWK) || '{}') || {}; } catch (e) { s = {}; }
+    var out = [];
+    bets.forEach(function (B) {
+      if (B.ch == null || B.tone === 'hit' || B.tone === 'dead') { delete s[B.id]; return; }
+      var was = s[B.id];
+      if (was == null) { s[B.id] = B.ch; return; }
+      if (Math.abs(B.ch - was) >= 0.15) {
+        B.swing = true;
+        if (busy || out.length) return;
+        s[B.id] = B.ch;
+        out.push('Big swing: ' + (B.ticket ? 'your ' + B.label : short(B.legs[0].p)) + (B.ch > was ? ' up to ' : ' down to ') + pct(B.ch) + ' to cash (was ' + pct(was) + ')');
+      }
+    });
+    try { sessionStorage.setItem(SWK, JSON.stringify(s)); } catch (e) {}
+    return out;
+  }
+  // live leans (onyx-cash.js): the live model against Onyx's live line, a few chips after your bets (projections)
+  var LEANS = [], leansAt = 0;
+  function moreLeans() {
+    if (!GAMES.length) { if (LEANS.length) { LEANS = []; draw(); } return; }
+    if (!window.OnyxCash || !OnyxCash.leans || Date.now() - leansAt < 90e3) return;
+    leansAt = Date.now();
+    OnyxCash.leans(MULTI ? null : SPORTS[0]).then(function (L) {
+      LEANS = (L || []).filter(function (x) { return SPORTS.indexOf(x.sport) >= 0 && x.label && x.price != null && x.p != null; }).slice(0, 3);
+      if (LEANS.length && GAMES.length) draw();
+    }).catch(function () {});
+  }
+
   // ── 7. one refresh ───────────────────────────────────────────────────────
   function savedInPlay() {
     if (!window.OnyxSaved || !OnyxSaved.all || !OnyxSaved.track) return [];
@@ -261,7 +299,20 @@
       R.forEach(function (r) { r[1].forEach(function (g) { gmap[gk(g.k, g.id)] = g; }); });
       // saved.js picks the game and grades the leg (its rules, its cache); the scoreboards above are already in memory
       return Promise.all(picks.map(function (p) { return OnyxSaved.track(p).catch(function () { return {p: p, state: 'pre', res: null}; }); })).then(function (T) {
+        // the live chance to cash (onyx-cash.js, 11/16): the same number My Onyx shows, from the same track results
+        var cashP = window.OnyxCash && OnyxCash.chance ? Promise.all(picks.map(function (p, i) { return OnyxCash.chance(p, {track: T[i]}).catch(function () { return null; }); }))
+          : Promise.resolve([]);
+        return Promise.race([cashP, new Promise(function (r) { setTimeout(function () { r([]); }, 6000); })]).then(function (C) { return [T, C || []]; });
+      }).then(function (TC) {
+        var T = TC[0], C = TC[1];
         var followed = [], bets = [];
+        var cashOf = function (c, l, lt, g) { return c && c.p != null ? c.p : chance(l, lt, g); };
+        // a broken under is dead now (onyx-cash.js), not at the final whistle
+        // and threes / combos read their stat from the box score there (saved.js has no reader for them)
+        var deadT = function (c, t) {
+          if (c && typeof c.cur === 'number' && c.cur !== t.cur) t = Object.assign({}, t, {cur: c.cur});
+          return c && c.res === 'L' && t.res !== 'L' && t.res !== 'W' ? Object.assign({}, t, {res: 'L'}) : t;
+        };
         var findG = function (l, t) {
           if (t.gid) return gmap[gk(l.sport, t.gid)] || null;
           if (l.sport === 'tennis') return Object.keys(gmap).map(function (k) { return gmap[k]; }).filter(function (g) {
@@ -272,19 +323,24 @@
         T.forEach(function (t, i) {
           var p = picks[i];
           if (p.kind === 'parlay') {
+            var CL = C[i] && C[i].legs || [];
             var legs = (t.legs || []).map(function (lt, j) {
-              var l = p.legs[j], g = findG(l, lt), ch = chance(l, lt, g);
+              var l = p.legs[j], g = findG(l, lt);
+              lt = deadT(CL[j], lt);
+              var ch = cashOf(CL[j], l, lt, g);
               var x = {id: p.id + '#' + j, p: l, t: lt, g: g, ch: ch, tone: toneOf(lt, ch), ticket: (p.legs || []).length + '-leg parlay'};
               followed.push(x); return x;
             });
             if (t.state !== 'in' && !legs.some(function (x) { return x.g && x.g.state === 'in'; })) return;
             var dead = legs.some(function (x) { return x.tone === 'dead'; });
-            var all = legs.reduce(function (m, x) { var c = x.ch != null ? x.ch : x.t.res === 'P' ? 1 : x.p.conf != null ? x.p.conf : implied(x.p.price); return c == null || m == null ? null : m * c; }, 1);
+            var all = C[i] && C[i].p != null ? C[i].p : legs.reduce(function (m, x) { var c = x.ch != null ? x.ch : x.t.res === 'P' ? 1 : x.p.conf != null ? x.p.conf : implied(x.p.price); return c == null || m == null ? null : m * c; }, 1);
             bets.push({ticket: true, id: p.id, sport: legs.map(function (x) { return x.p.sport; }).filter(function (k) { return STUDIO[k]; })[0] || 'nfl',
                        label: legs.length + '-leg parlay', hit: legs.filter(function (x) { return x.tone === 'hit'; }).length, n: legs.length,
                        ch: dead ? 0 : all, tone: dead ? 'dead' : all != null ? (all >= 0.6 ? 'good' : all < 0.15 ? 'bad' : 'live') : 'live', legs: legs});
           } else {
-            var g = findG(p, t), ch = chance(p, t, g), x = {id: p.id, p: p, t: t, g: g, ch: ch, tone: toneOf(t, ch)};
+            var g = findG(p, t);
+            t = deadT(C[i], t);
+            var ch = cashOf(C[i], p, t, g), x = {id: p.id, p: p, t: t, g: g, ch: ch, tone: toneOf(t, ch)};
             followed.push(x);
             if (t.state === 'in' || (g && g.state === 'in')) bets.push({ticket: false, id: p.id, sport: p.sport, legs: [x], tone: x.tone, ch: ch});
           }
@@ -296,8 +352,10 @@
         games.forEach(function (g) { g.mine = !!mine[gk(g.k, g.id)]; });
         games.sort(function (a, b) { return (b.mine - a.mine) || SPORTS.indexOf(a.k) - SPORTS.indexOf(b.k); });
         GAMES = games; BETS = bets;
-        swings(followed, gmap).forEach(function (m, i) { setTimeout(function () { toast(m); }, i * 700); });
+        var said = swings(followed, gmap);
+        said.concat(bigSwings(bets, said.length > 0)).forEach(function (m, i) { setTimeout(function () { toast(m); }, i * 700); });
         draw();
+        moreLeans();
         lsSet(SNAP, {t: Date.now(), s: SPORTS.join(','), games: GAMES.map(function (g) { return {k: g.k, id: g.id, state: g.state, detail: g.detail, a: g.a, h: g.h, mine: g.mine}; })});
         soon = picks.some(function (p) { var s = Date.parse(p.start); return !isNaN(s) && s > Date.now() && s - Date.now() < 20 * 60e3; });
       });
@@ -320,21 +378,36 @@
       + '<span class="olr-tm" data-side="h">' + esc(g.h.ab) + ' <b class="olr-s">' + scoreTxt(g.h, g) + '</b></span>'
       + '<span class="olr-c">' + esc(g.detail || 'Live') + '</span></a>';
   }
-  function legHTML(x, sport, inTicket) {
+  // the bet's chance to cash this session (OnyxCash history), a 30 x 14 line
+  function spark(B) {
+    // always the same 30 px slot once onyx-cash.js is here, so the chip never changes width (no layout shift)
+    if (!window.OnyxCash || !OnyxCash.history) return '';
+    var a = OnyxCash.history(B.id).slice(-30), box = '<svg class="olr-sp" width="30" height="14" viewBox="0 0 30 14" aria-hidden="true">';
+    if (a.length < 2) return box + '</svg>';
+    var c = B.tone === 'hit' ? '#61e970' : B.tone === 'dead' ? '#ff8a8a' : B.ch == null ? '#b038f9' : B.ch >= 0.6 ? '#61e970' : B.ch <= 0.25 ? '#ff8a8a' : '#b038f9';
+    var pts = a.map(function (x, i) { return (i / (a.length - 1) * 30).toFixed(1) + ',' + (13 - 12 * clamp(x.p)).toFixed(1); }).join(' ');
+    return box + '<polyline points="' + pts + '" fill="none" stroke="' + c + '" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+  }
+  function leanHTML(L) {
+    var pr = (L.price > 0 ? '+' : '') + L.price;
+    return '<a class="olr-ln" href="' + esc(L.href) + '" target="_blank" rel="noopener" title="Live lean: a projection, not an Onyx Pick" aria-label="' + esc('Live lean, a projection: ' + L.label + ' at Onyx ' + pr + ', our chance ' + pct(L.p) + '. Open on Onyx') + '">'
+      + '<span class="olr-ll">' + esc(L.label) + '</span><b class="olr-lpr">' + esc(pr) + '</b><span class="olr-lc">' + pct(L.p) + '</span></a>';
+  }
+  function legHTML(x, sport, inTicket, sp) {
     var b = barOf(x.p, x.t);
     return '<span class="olr-leg t-' + x.tone + (inTicket ? ' in' : '') + '">'
       + '<span class="olr-ll">' + esc(short(x.p)) + '</span>'
       + '<span class="olr-lp">' + esc(progress(x.p, x.t)) + '</span>'
-      + (b != null ? '<span class="olr-bar"><i style="width:' + Math.round(100 * b) + '%"></i></span>' : '')
+      + (b != null ? '<span class="olr-bar"><i style="width:' + Math.round(100 * b) + '%"></i></span>' : '') + (sp || '')
       + '<b class="olr-lc" title="' + esc(STATUS[x.tone]) + '">' + (x.tone === 'hit' ? 'Hit' : x.tone === 'dead' ? 'Dead' : x.ch != null ? pct(x.ch) : esc(STATUS[x.tone])) + '</b></span>';
   }
   function betHTML(B) {
     var sp = STUDIO[B.sport] ? B.sport : 'nfl';
     var inner = B.ticket
-      ? '<span class="olr-tk t-' + B.tone + '"><span class="olr-ll">' + esc(B.label) + '</span><span class="olr-lp">' + B.hit + ' of ' + B.n + ' hit</span><b class="olr-lc">' + (B.tone === 'dead' ? 'Dead' : B.ch != null ? pct(B.ch) : 'Live') + '</b></span>'
+      ? '<span class="olr-tk t-' + B.tone + '"><span class="olr-ll">' + esc(B.label) + '</span><span class="olr-lp">' + B.hit + ' of ' + B.n + ' hit</span>' + spark(B) + '<b class="olr-lc">' + (B.tone === 'dead' ? 'Dead' : B.ch != null ? pct(B.ch) : 'Live') + '</b></span>'
         + B.legs.map(function (x) { return legHTML(x, sp, true); }).join('')
-      : legHTML(B.legs[0], sp, false);
-    return '<a class="olr-bet" data-b="' + esc(B.id) + '" href="studio.html?sport=' + sp + '#sweat" aria-label="' + esc((B.ticket ? B.label : short(B.legs[0].p)) + ': follow it in the Live Sweat') + '">' + inner + '</a>';
+      : legHTML(B.legs[0], sp, false, spark(B));
+    return '<a class="olr-bet' + (B.swing ? ' olr-swing' : '') + '" data-b="' + esc(B.id) + '" href="studio.html?sport=' + sp + '#sweat" aria-label="' + esc((B.ticket ? B.label : short(B.legs[0].p)) + ': follow it in the Live Sweat') + '">' + inner + '</a>';
   }
   function css() {
     if (document.getElementById('olr-css')) return;
@@ -370,6 +443,11 @@
       '.t-hit{border-color:rgba(97,233,112,.55)}.t-hit .olr-lc,.t-good .olr-lc{color:#61e970}.t-hit .olr-bar i,.t-good .olr-bar i{background:#61e970}',
       '.t-dead{border-color:rgba(255,138,138,.5);opacity:.85}.t-dead .olr-lc,.t-bad .olr-lc{color:#ff8a8a}.t-dead .olr-bar i,.t-bad .olr-bar i{background:#ff8a8a}',
       '.t-pre .olr-lc{color:#a99fba}',
+      '.olr-sp{flex-shrink:0;display:block}',
+      '.olr-bet.olr-swing{animation:olrFlash 1.6s ease-out}',
+      '.olr-lab.l i{background:#61e970;box-shadow:0 0 8px #61e970}',
+      '.olr-ln{flex-shrink:0;display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 11px;border-radius:999px;text-decoration:none;color:#fff;box-sizing:border-box;background:rgba(97,233,112,.06);border:1px dashed rgba(97,233,112,.45);font:600 12px/1 "Space Grotesk",system-ui,sans-serif;white-space:nowrap}',
+      '.olr-ln:hover{border-color:#61e970}.olr-lpr{font:800 12px/1 monospace;color:#fff}.olr-ln .olr-lc{color:#61e970}',
       '@keyframes olrRoll{0%{transform:translateY(70%);opacity:0}100%{transform:none;opacity:1}}',
       '@keyframes olrFlash{0%{background:rgba(176,56,249,.55);box-shadow:0 0 0 2px #b038f9,0 0 18px rgba(176,56,249,.7)}100%{background:rgba(255,255,255,.05);box-shadow:none}}',
       '@keyframes olrDot{0%,100%{opacity:1}50%{opacity:.35}}',
@@ -400,6 +478,11 @@
       if (!bets) { bets = document.createElement('span'); bets.className = 'olr-bets'; bets.style.cssText = 'display:inline-flex;align-items:center;gap:8px;flex-shrink:0'; box.insertBefore(bets, box.firstChild); }
       bets.innerHTML = '<span class="olr-lab b"><i></i>Your bets</span>' + BETS.map(betHTML).join('') + (GAMES.length ? '<span class="olr-sep"></span>' : '');
     } else if (bets) bets.remove();
+    var ln = box.querySelector('.olr-leans');
+    if (LEANS.length && GAMES.length) {
+      if (!ln) { ln = document.createElement('span'); ln.className = 'olr-leans'; ln.style.cssText = 'display:inline-flex;align-items:center;gap:8px;flex-shrink:0'; box.insertBefore(ln, bets ? bets.nextSibling : box.firstChild); }
+      ln.innerHTML = '<span class="olr-lab l" title="Projections from the live model against Onyx live prices, not Onyx Picks"><i></i>Live leans</span>' + LEANS.map(leanHTML).join('') + '<span class="olr-sep"></span>';
+    } else if (ln) ln.remove();
     var lab = box.querySelector('.olr-lab.g');
     if (GAMES.length && !lab) { lab = document.createElement('span'); lab.className = 'olr-lab g'; lab.innerHTML = '<i></i>Live'; box.appendChild(lab); }
     else if (!GAMES.length && lab) lab.remove();
@@ -453,6 +536,6 @@
     (function go() { if (window.OnyxSaved || ++tries > 12) now(); else setTimeout(go, 150); })();
   }
   window.OnyxRail = {refresh: now, sports: function () { return SPORTS.slice(); }, games: function () { return GAMES; }, bets: function () { return BETS; },
-    chance: chance, el: function () { return rail; }, polls: function () { return polls; }};
+    chance: chance, el: function () { return rail; }, polls: function () { return polls; }, leans: function () { return LEANS; }};
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 })();

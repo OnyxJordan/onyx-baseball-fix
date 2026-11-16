@@ -535,8 +535,10 @@
   function bets(g, L, bx) {
     var out = [], M = g.M, pre = g.pre || {}, f = g.f, ten = g.sport === 'tennis';
     if (!M || !L) return out;
+    var XS = null;   // the Onyx selection id of the live line in hand, when the feed carries one (onyx-cash.js leans link to it)
     function add(o) {
       if (o.p == null || isNaN(o.p) || o.price == null) return;
+      if (XS && !o.sel) o.sel = XS;
       o.p = Math.min(0.995, Math.max(0.005, o.p));
       o.fair = price(o.p); o.edge = Math.round((o.p - implied(o.price)) * 1000) / 1000;
       if (o.p < 0.03 || o.p > 0.97) return;               // decided: nothing worth betting
@@ -552,6 +554,7 @@
     }
     var homeSel = function (sel) { return sameTeam(sel, g.hn) || sameTeam(sel, g.home); };
     L.lines.forEach(function (x) {
+      XS = x.id || x.sid || x.selection_id || null;
       if (x.m === 'ml' && M.win) {
         var h = homeSel(x.sel), pw = M.win();
         add({kind: 'ml', team: h ? g.home : g.away, logo: h ? g.hl : g.al, label: (h ? g.home : g.away) + ' to win', p: h ? pw : 1 - pw, price: x.price,

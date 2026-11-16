@@ -1259,6 +1259,7 @@
     else if (!window.OnyxAccounts) needScript('accounts.js');
     // Live everywhere (11/16): the live rail under the header, your bets pinned, swing alerts
     if (!window.OnyxRail) needScript('onyx-live-rail.js');
+    if (!window.OnyxCash) needScript('onyx-cash.js');
     // tap any price, anywhere (11/16): every Onyx price opens the quick bet card (onyx-tap.js)
     if (!window.OnyxTap) needScript('onyx-tap.js');
     if (!window.OnyxShare) needScript('onyx-share.js');
