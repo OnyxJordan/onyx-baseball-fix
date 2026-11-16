@@ -1258,6 +1258,8 @@
     else if (!window.OnyxAccounts) needScript('accounts.js');
     // Live everywhere (11/16): the live rail under the header, your bets pinned, swing alerts
     if (!window.OnyxRail) needScript('onyx-live-rail.js');
+    // tap any price, anywhere (11/16): every Onyx price opens the quick bet card (onyx-tap.js)
+    if (!window.OnyxTap) needScript('onyx-tap.js');
     var t0 = (location.hash || '').slice(1);
     syncActive(PAGE ? PAGE[0] : typeof currentTab !== 'undefined' ? currentTab : (typeof curTab !== 'undefined' ? curTab : (t0 || 'home')));
     setTimeout(function () { showWhatsNew(false); }, 1200);
