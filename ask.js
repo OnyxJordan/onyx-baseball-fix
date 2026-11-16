@@ -38,7 +38,10 @@
       return getJSON('data/' + k + '/names.json').then(function (L) {
         (L || []).forEach(function (r) { var c = clean(r[0]); if (c && c.split(' ').length >= 2 && !ROSTER[c]) ROSTER[c] = {name: r[0], sp: k, team: r[1]}; });
       }).catch(function () {});
-    }));
+    }).concat([getJSON('data/tennis/slate.json').then(function (S) {   // tennis (11/16): everyone on today's draw, priced or not
+      (S && S.events || []).forEach(function (e) { (e.matches || []).forEach(function (m) { (m.p || []).forEach(function (x) {
+        var c = clean(x && x.name); if (c && c.split(' ').length >= 2 && !ROSTER[c]) ROSTER[c] = {name: x.name, sp: 'tennis', team: null}; }); }); });
+    }).catch(function () {})]));
     return Promise.all(SPORTS.map(function (k) { return getJSON('data/' + k + '/board.json').catch(function () { return null; }); }).concat([prior, picks, roster]))
       .then(function (fs) {
         BOARD = []; fs.slice(0, SPORTS.length).forEach(function (f) { (f && f.plays || []).forEach(function (p) { BOARD.push(p); }); });
@@ -304,6 +307,11 @@
     (B || []).forEach(function (p) {
       if (p.kind !== 'prop' || !p.name || /_total$/.test(p.mkt) || /\bD\/ST\b|\bdefense\b/i.test(p.name)) return;
       add(p.name, 0.5 + (YW[p.mkt] && p.side === 'over' ? YW[p.mkt] * (p.line || 0) : 0), p.sport, p.mkt);
+    });
+    // tennis (11/16, "Laura Samson" read as Lauri Markkanen): both players of every priced match, by full name
+    (B || []).forEach(function (p) {
+      if (p.sport !== 'tennis') return;
+      String(p.matchup || '').split(/\s+vs\.?\s+/).forEach(function (n) { add(n, 3, 'tennis', p.mkt); });
     });
     (P || []).forEach(function (r) { add(r.n, r.ppg, 'nba'); });
     return C;
@@ -896,7 +904,8 @@
     if (s.player) {
       s.team = null; if (s.intent === 'list' && s.count == null && !/props|plays|lines|bets/.test(t)) s.count = s.player2 ? 10 : 5;
       if (!s.sports.length) {
-        var pl = String(s.player).toLowerCase(), on2 = sportsOn(B, function (p) { return p.kind === 'prop' && String(p.name || '').toLowerCase() === pl; });
+        var pl = String(s.player).toLowerCase(), on2 = sportsOn(B, function (p) { return (p.kind === 'prop' && String(p.name || '').toLowerCase() === pl)
+          || (p.sport === 'tennis' && String(p.matchup || '').toLowerCase().split(/\s+vs\.?\s+/).indexOf(pl) >= 0); });
         if (on2.length) s.sports = on2;
         else if ((PRIOR || []).some(function (r) { return String(r.n).toLowerCase() === pl; })) s.sports = ['nba'];
         else if (/mcdavid|ovechkin|mackinnon|matthews|draisaitl|kucherov|makar|crosby/.test(pl)) s.sports = ['nhl'];
@@ -1153,7 +1162,10 @@
       }                                  // positive value only (11/8)
       // first TD / first basket: Onyx's price beat the model in testing, so their edges are not value unless asked for
       if (spec.pos_value && (p.mkt === 'first_td' || p.mkt === 'first_basket') && (spec.markets || []).indexOf(p.mkt) < 0) return false;
+      // over / under named with no market (11/16, "NHL unders" came back puck lines and moneylines): totals and props only
+      if (spec.side && spec.side !== 'any' && !mk.length && (p.kind === 'spread' || p.kind === 'ml')) return false;
       if (spec.player && String(p.name || p.label).toLowerCase().indexOf(String(spec.player).toLowerCase()) < 0
+          && !(p.sport === 'tennis' && p.kind === 'total' && String(p.matchup || '').toLowerCase().indexOf(String(spec.player).toLowerCase()) >= 0)   // a player's match total
           && !(spec.player2 && String(p.name || p.label).toLowerCase().indexOf(String(spec.player2).toLowerCase()) >= 0)) return false;
       if (spec.exclude && spec.exclude.length && spec.exclude.some(function (x) {
         x = String(x || '').trim();
