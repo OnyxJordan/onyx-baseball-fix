@@ -891,6 +891,14 @@
       Object.keys(ROSTER).forEach(function (k) {
         if (tPlayer.indexOf(' ' + k + ' ') >= 0 && (!want || want.indexOf(ROSTER[k].sp) >= 0) && (!rost || k.length > rost.k.length)) rost = {k: k, r: ROSTER[k]};
       });
+      // tennis (11/16, "Tiafoe to win"): a last name alone finds a player on today's draw, when only one has it
+      if (!rost && (!want || want.indexOf('tennis') >= 0)) {
+        var lastT = {};
+        Object.keys(ROSTER).forEach(function (k) { if (ROSTER[k].sp !== 'tennis') return; var ln = k.split(' ').pop();
+          if (ln.length >= 4 && !NOT_NAMES.test(ln) && tPlayer.indexOf(' ' + ln + ' ') >= 0) lastT[ln] = (lastT[ln] || []).concat([k]); });
+        var lk = Object.keys(lastT).filter(function (ln) { return lastT[ln].length === 1; }).sort(function (a, b) { return b.length - a.length; })[0];
+        if (lk) rost = {k: lastT[lk][0], r: ROSTER[lastT[lk][0]]};
+      }
       if (rost) s.player = rost.r.name;
     }
     // "sides with the spread" (11/14, Jordan's screenshot: five moneylines came back): a spread named with no
@@ -1547,7 +1555,9 @@
     var question = (none.length && live.length ? none.join(', ') + (none.length > 1 ? ' have' : ' has') + ' no game on today\'s Onyx board, and ' : '')
       + (live.length
         ? (live.length === 1 ? live[0] + ' has' : live.join(' and ') + ' have') + ' already started. We build from Onyx\'s pregame prices, so in-game bets are not on our board yet. What should I build instead?'
-        : 'There is no game for ' + nm + ' on today\'s Onyx board. What should I build instead?');
+        : spec.player && !TL.length && ROSTER[clean(spec.player)] && ROSTER[clean(spec.player)].sp === 'tennis'
+          ? nm + ' is on the draw, but Onyx has not priced the match yet. What should I build instead?'   // on the draw, no price (11/16)
+          : 'There is no game for ' + nm + ' on today\'s Onyx board. What should I build instead?');
     var seen = {}, opts = [];
     B.filter(function (p) { return Date.parse(p.start) > now && (!sp || sp.indexOf(p.sport) >= 0); })
       .sort(function (a, b) { return Date.parse(a.start) - Date.parse(b.start); })
