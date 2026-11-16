@@ -115,3 +115,13 @@ jobs:
       # star that raises the shared count, no errors, no sideways scroll.
       - name: Account and My picks on every page
         run: node tools/verify_account_ui.js
+
+      # Interactive layer (11/16): tap any price, the live rail, share cards, pick saving + My Season
+      - name: Tap any price
+        run: node tools/verify_tap.js
+      - name: Live rail
+        run: node tools/verify_live_rail.js
+      - name: Share cards
+        run: node tools/verify_share.js
+      - name: Pick saving and My Season
+        run: node tools/verify_season.js

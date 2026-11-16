@@ -168,7 +168,7 @@
       else if (a === 'fab') { ARMED = !ARMED; OPEN = ARMED || !OPEN; if (ARMED) toast('Builder on: tap any odds to add a leg'); draw(); }
       else if (a === 'clear') clear();
       else if (a === 'hide') { OPEN = false; ARMED = false; draw(); }
-      else if (a === 'save') saveTicket();
+      else if (a === 'save') { if (window.OnyxSaved && OnyxSaved.saveSlip) OnyxSaved.saveSlip({my_price: ((document.getElementById('pbMy') || {}).value || '').replace(/^\+/, '') || null}); else saveTicket(); }
       else if (a === 'onyx') build();
       else if (a === 'share') share();
       return;

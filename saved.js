@@ -520,7 +520,7 @@
       '</div>' +
       '<a class="oxw-go" href="https://app.onyxodds.com/?utm_source=onyxsports&referrer=' + REFERRER + '" target="_blank" rel="noopener">Ride the run: build tonight\'s parlay on Onyx</a>' +
       '<div class="oxw-row"><a href="' + esc(t.gid && p.sport !== 'nba' && p.sport !== 'mlb' ? page + '#games:' + t.gid : page) + '">Open the game</a><a href="home.html#my" class="oxw-my">My picks</a>' +
-      (navigator.share ? '<button class="oxw-sh">Share</button>' : '') + '</div></div>';
+      (window.OnyxShare || navigator.share ? '<button class="oxw-sh">Share</button>' : '') + '</div></div>';
     document.body.appendChild(back);
     requestAnimationFrame(function () { back.classList.add('open'); });
     try { if (navigator.vibrate) navigator.vibrate([60, 40, 120]); } catch (e) {}
@@ -534,6 +534,9 @@
     back.querySelector('.oxw-my').addEventListener('click', function (e) { if (window.OnyxUI && OnyxUI.openPicks) { e.preventDefault(); close(); OnyxUI.openPicks(); } });
     var sh = back.querySelector('.oxw-sh');
     if (sh) sh.addEventListener('click', function () {
+      // the branded CASHED card (onyx-share.js, 11/16), else the plain share
+      if (window.OnyxShare && OnyxShare.open) { try { close(); OnyxShare.open({kind: 'cashed', price: p.price, chance: p.conf, sels: p.id && !/^[kt]:/.test(p.id) ? [p.id] : [],
+        legs: (p.legs || [p]).map(function (l) { return {label: l.label, matchup: l.matchup, price: l.price, conf: l.conf, sport: l.sport, res: 'W'}; })}); return; } catch (e) {} }
       try { navigator.share({title: 'Cashed on Onyx', text: 'My Onyx pick cashed: ' + (p.label || '') + (p.price != null ? ' (' + odds(p.price) + ')' : ''), url: location.origin + location.pathname.replace(/[^/]*$/, '') + 'home.html'}); } catch (e) {}
     });
     try { if (window.gtag) gtag('event', 'pick_won_popup', {sport: p.sport}); } catch (e) {}
