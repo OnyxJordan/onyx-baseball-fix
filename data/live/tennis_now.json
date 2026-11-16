@@ -3253,5 +3253,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186793-ml-home",
+  "sport": "tennis",
+  "gid": "186793",
+  "date": "2026-11-16",
+  "logged_at": "2026-11-16T17:49:48+00:00",
+  "matchup": "Ipek Oz vs Leyre Romero Gormaz",
+  "home": "Leyre Romero Gormaz",
+  "away": "Ipek Oz",
+  "label": "Leyre Romero Gormaz to win",
+  "kind": "ml",
+  "side": "home",
+  "line": null,
+  "price": -152,
+  "chance": 0.6518,
+  "implied": 0.6032,
+  "edge": 0.049,
+  "fair": -185,
+  "state": {
+   "sets": "1-0",
+   "srv": "home",
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
