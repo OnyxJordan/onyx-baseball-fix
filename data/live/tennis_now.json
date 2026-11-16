@@ -3223,5 +3223,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186797-ml-home",
+  "sport": "tennis",
+  "gid": "186797",
+  "date": "2026-11-16",
+  "logged_at": "2026-11-16T16:22:17+00:00",
+  "matchup": "Martina Trevisan vs Guiomar Maristany Zuleta De Reales",
+  "home": "Guiomar Maristany Zuleta De Reales",
+  "away": "Martina Trevisan",
+  "label": "Guiomar Maristany Zuleta De Reales to win",
+  "kind": "ml",
+  "side": "home",
+  "line": null,
+  "price": -162,
+  "chance": 0.6546,
+  "implied": 0.6183,
+  "edge": 0.036,
+  "fair": -190,
+  "state": {
+   "sets": "0-1",
+   "srv": null,
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
