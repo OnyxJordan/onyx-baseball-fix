@@ -101,5 +101,8 @@ module.exports = [
   C('is Trey Johnson going over his td scorer?', {markets: ['anytime_td']}),
   C('give me a 3 leg parlay college basketball game all games start 3 PM or earlier', {sports: ['cbb'], intent: 'parlay', count: 3, no_player: true}),
   C('nba parlay games after 8pm', {sports: ['nba'], intent: 'parlay'}),
-  C('round robin 4 picks by 2s', {intent: 'rr'})
+  C('round robin 4 picks by 2s', {intent: 'rr'}),
+  // over / under with no market is totals and props, never a puck line or moneyline (11/16)
+  C('NHL unders', {sports: ['nhl'], side: 'under'}),
+  C('nhl overs tonight', {sports: ['nhl'], side: 'over'})
 ];
