@@ -132,6 +132,15 @@ jobs:
         run: python3 live_log.py
         continue-on-error: true
         timeout-minutes: 4
+      # What people ask Ask Onyx (search_trends.py, 11/16): the last 7 days of search_log, counted by question type,
+      # -> data/insights/trending.json for the NFL Studio's Insights. Fail-soft; silent without the service key.
+      - name: Search trends (Insights)
+        run: python3 search_trends.py
+        continue-on-error: true
+        timeout-minutes: 2
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL || secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
       # Line tracking (lines_status.py, 11/6): per sport, where tonight's lines come from (Onyx or the
       # market fallback), every game to play with no line, and every live game without a live line and
       # why -> data/lines/status.json (status.html). Fail-soft.

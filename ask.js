@@ -1900,5 +1900,29 @@
       return res;
     });
   }
-  window.OnyxAsk = {whenOk: whenOk, slotOk: slotOk, ask: ask, plusMinus: plusMinus, chips: chips, chipBase: chipBase, explain: explain, reset: reset, normalize: normalize, localSpec: localSpec, run: run, describe: describe, loadBoards: loadBoards, LG: LG, PAGE: PAGE, MKTS: MKTS};
+  // search log (11/16, Jordan: "add the search logging so trending is real"): what a person typed and how it was
+  // read, one row in Supabase's search_log (supabase/schema.sql), insert-only from the public key: never who asked.
+  // Only searches a person types (home.html askGo, the Studio's "Ask your own"), once per question per page view;
+  // search_trends.py counts them on the server for the NFL Studio's Insights. Off until accounts.json is filled in.
+  var LOGGED = {}, LOGCFG = null;
+  function logSearch(q, R, page) {
+    try {
+      q = String(q || '').replace(/\s+/g, ' ').trim().slice(0, 200);
+      if (q.length < 2 || LOGGED[q.toLowerCase()] || navigator.webdriver) return;
+      if (/@|https?:|\d{7,}/.test(q)) return;                          // an email, a link or a phone number is not a search
+      LOGGED[q.toLowerCase()] = 1;
+      var sp = (R && R.spec) || {};
+      var spec = {intent: sp.intent || null, sports: (sp.sports || []).slice(0, 4), markets: (sp.markets || []).slice(0, 6), side: sp.side || null,
+                  min_price: sp.min_price != null ? sp.min_price : null, min_conf: sp.min_conf != null ? sp.min_conf : null,
+                  player: !!sp.player, team: !!(sp.team || (sp.teams || []).length), pos_value: !!sp.pos_value, via: (R && R.via) || null};
+      (LOGCFG || (LOGCFG = fetch('accounts.json', {cache: 'no-cache'}).then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; })))
+        .then(function (c) {
+          if (!c || !c.url || !c.anon) return;
+          return fetch(c.url.replace(/\/$/, '') + '/rest/v1/search_log', {method: 'POST', keepalive: true,
+            headers: {apikey: c.anon, 'content-type': 'application/json', prefer: 'return=minimal'},
+            body: JSON.stringify({q: q, sport: spec.sports[0] || null, spec: spec, page: String(page || '').slice(0, 24) || null})});
+        }).catch(function () {});
+    } catch (e) {}
+  }
+  window.OnyxAsk = {logSearch: logSearch, whenOk: whenOk, slotOk: slotOk, ask: ask, plusMinus: plusMinus, chips: chips, chipBase: chipBase, explain: explain, reset: reset, normalize: normalize, localSpec: localSpec, run: run, describe: describe, loadBoards: loadBoards, LG: LG, PAGE: PAGE, MKTS: MKTS};
 })();

@@ -72,7 +72,11 @@
     ['sgp', function (N) { var g = rnd(N.games); return g ? g.away + ' vs ' + g.home + ' same game parlay' : null; }],
     ['value', 'best nfl value plays']
   ];
-  (function () { var per = {}; BANK.forEach(function (b) { per[b[0]] = (per[b[0]] || 0) + 1; }); BANK.forEach(function (b) { b[2] = FREQ[b[0]] / per[b[0]]; }); })();
+  function weigh() { var per = {}; BANK.forEach(function (b) { per[b[0]] = (per[b[0]] || 0) + 1; }); BANK.forEach(function (b) { b[2] = Math.max(1, FREQ[b[0]] || 0) / per[b[0]]; }); }
+  weigh();
+  // real searches (11/16): search_trends.py counts what people typed into Ask Onyx over the last 7 days
+  // (data/insights/trending.json). With REAL_MIN+ NFL searches those counts replace the test-corpus ones above.
+  var REAL_MIN = 30, REAL = null;
 
   // the kind of question a typed one is (the kicker on its card), the same tags tools/insights_freq.py counts
   function typeOf(q) {
@@ -95,7 +99,7 @@
   }
 
   var CSS = [
-    '.ins-ask{display:flex;gap:8px;margin:0 0 12px}.ins-ask .sx-in{flex:1;min-width:0}',
+    '.ins-asked{display:flex;flex-wrap:wrap;gap:6px}.ins-q{white-space:normal;text-align:left}.ins-ask{display:flex;gap:8px;margin:0 0 12px}.ins-ask .sx-in{flex:1;min-width:0}',
     '.ins-top{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:18px 0 10px}',
     '.ins-top h2{margin:0;font-size:20px}.ins-top p{margin:4px 0 0;color:var(--dim);font-size:12.5px}',
     '.ins-trend{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:2px 0 4px;margin:0 0 6px}.ins-trend::-webkit-scrollbar{display:none}',
@@ -141,20 +145,34 @@
         '<p class="sx-sub" style="margin-top:0">The questions people ask search most, answered live from today\'s Onyx board by the model. Tap any card for its full page.</p>' +
         '<form class="ins-ask" id="insAsk" autocomplete="off"><input class="sx-in" id="insQ" type="search" enterkeyhint="go" placeholder="Ask your own: Josh Allen passing yards" aria-label="Ask your own NFL question"><button class="sx-btn" type="submit">Ask</button></form>' +
         '<div id="insOwn"></div>' +
-        '<div class="ins-top" style="margin-top:6px"><div><h2>Trending in search</h2><p>The most asked kinds of NFL question, out of ' + FREQ_N.toLocaleString() + ' NFL searches</p></div></div>' +
-        '<div class="ins-trend" id="insTrend"></div>' +
+        '<div class="ins-top" style="margin-top:6px"><div><h2>Trending in search</h2><p id="insTrendLead">The most asked kinds of NFL question, out of ' + FREQ_N.toLocaleString() + ' NFL searches in Ask Onyx\'s test set</p></div></div>' +
+        '<div class="ins-trend" id="insTrend"></div><div id="insAsked"></div>' +
         '<div class="ins-top"><div><h2>Today\'s answers</h2><p id="insLead">Dealing questions</p></div><button class="sx-btn ghost" id="insShuffle" type="button">Shuffle</button></div>' +
         '<div class="sx-grid" id="insGrid"></div>' +
-        '<p class="ins-note">Every answer is the model\'s projection on Onyx\'s current prices, built by Ask Onyx\'s own reader: the same plays a search returns. Projections are not Onyx Picks. Trending counts come from the ' + FREQ_ALL.toLocaleString() + ' questions Ask Onyx is tested against, ' + FREQ_N.toLocaleString() + ' of them NFL.</p>' +
+        '<p class="ins-note" id="insNote">Every answer is the model\'s projection on Onyx\'s current prices, built by Ask Onyx\'s own reader: the same plays a search returns. Projections are not Onyx Picks. Trending counts come from the ' + FREQ_ALL.toLocaleString() + ' questions Ask Onyx is tested against, ' + FREQ_N.toLocaleString() + ' of them NFL, until enough real searches are logged.</p>' +
         '</div><div id="insPage" class="ins-page" hidden></div>';
       var feed = el.querySelector('#insFeed'), page = el.querySelector('#insPage'), grid = el.querySelector('#insGrid');
 
       // ── trending strip ──────────────────────────────────────────────
-      var top5 = Object.keys(FREQ).sort(function (a, b) { return FREQ[b] - FREQ[a]; }).slice(0, 5), mx = FREQ[top5[0]];
-      el.querySelector('#insTrend').innerHTML = top5.map(function (k, i) {
-        return '<button class="ins-tr" type="button" data-t="' + k + '"><i>#' + (i + 1) + '</i><b>' + u.esc(TYPE[k]) + '</b><span>' + FREQ[k] + ' asks</span>' +
-          '<div class="ins-mini"><u style="width:' + Math.round(100 * FREQ[k] / mx) + '%"></u></div></button>';
-      }).join('');
+      function drawTrend() {
+        var top5 = Object.keys(FREQ).filter(function (k) { return TYPE[k] && FREQ[k] > 0; }).sort(function (a, b) { return FREQ[b] - FREQ[a]; }).slice(0, 5), mx = FREQ[top5[0]] || 1;
+        el.querySelector('#insTrend').innerHTML = top5.map(function (k, i) {
+          return '<button class="ins-tr" type="button" data-t="' + k + '"><i>#' + (i + 1) + '</i><b>' + u.esc(TYPE[k]) + '</b><span>' + FREQ[k] + ' asks</span>' +
+            '<div class="ins-mini"><u style="width:' + Math.round(100 * FREQ[k] / mx) + '%"></u></div></button>';
+        }).join('');
+        // the real questions asked most (3+ times this week), each opens its highlight page
+        var top = REAL && (REAL.top || []).slice(0, 8);
+        el.querySelector('#insAsked').innerHTML = top && top.length ? '<p class="sx-k" style="margin:10px 0 6px">Asked most this week</p><div class="ins-asked">' +
+          top.map(function (t) { return '<button class="sx-chip ins-q" type="button" data-q="' + u.esc(t.q) + '">' + u.esc(headline(t.q)) + ' <span class="sx-pur">' + t.n + '</span></button>'; }).join(' ') + '</div>' : '';
+      }
+      drawTrend();
+      fetch('data/insights/trending.json?v=' + Math.floor(Date.now() / 600000)).then(function (r) { return r.ok ? r.json() : null; }).then(function (T) {
+        if (!T || !(T.nfl >= REAL_MIN) || !T.types) return;
+        REAL = T; FREQ = {}; Object.keys(T.types).forEach(function (k) { if (TYPE[k]) FREQ[k] = T.types[k]; }); FREQ_N = T.nfl; weigh();
+        el.querySelector('#insTrendLead').textContent = 'What people asked Ask Onyx in the last ' + (T.days || 7) + ' days: ' + T.nfl.toLocaleString() + ' NFL searches';
+        el.querySelector('#insNote').innerHTML = 'Every answer is the model\'s projection on Onyx\'s current prices, built by Ask Onyx\'s own reader: the same plays a search returns. Projections are not Onyx Picks. Trending counts are real searches from the last ' + (T.days || 7) + ' days (only the question is kept, never who asked).';
+        drawTrend();
+      }).catch(function () {});
 
       // today's names for the templates: games, teams and players still to play
       function names() {
@@ -362,6 +380,7 @@
         if (e.target.closest('a')) return;
         if (e.target.closest('[data-back]')) { if (FROM_FEED && history.length > 1) { FROM_FEED = false; history.back(); } else location.hash = '#insights'; return; }
         if (e.target.closest('[data-share]')) { share(); return; }
+        var aq = e.target.closest('.ins-q'); if (aq && aq.dataset.q) { open(aq.dataset.q); return; }
         var tr = e.target.closest('.ins-tr');
         if (tr) { var cand = order().filter(function (x) { return x.type === tr.dataset.t; }); open(cand.length ? cand[0].q : 'best nfl bets today'); return; }
         var c = e.target.closest('.ins-card');
@@ -376,7 +395,7 @@
         var own = el.querySelector('#insOwn'), box = document.createElement('div'); own.innerHTML = ''; own.appendChild(box);
         box.className = 'sx-card ins-card ins-skel'; box.textContent = 'Reading the board'; box.style.marginBottom = '6px';
         delete CACHE[q.toLowerCase()];
-        answer(q).then(function (R) { fill(box, {type: 'own', q: q}, R); box.style.marginBottom = '6px'; }, function (e2) { box.className = 'sx-card'; box.innerHTML = '<p class="ins-honest">Search is still loading (' + u.esc(e2.message) + '). Try again in a moment.</p>'; });
+        answer(q).then(function (R) { fill(box, {type: 'own', q: q}, R); box.style.marginBottom = '6px'; if (OnyxAsk.logSearch) OnyxAsk.logSearch(q, R, 'studio'); }, function (e2) { box.className = 'sx-card'; box.innerHTML = '<p class="ins-honest">Search is still loading (' + u.esc(e2.message) + '). Try again in a moment.</p>'; });
       });
       // the slip changed elsewhere (the floating slip, another tab): keep "+ Slip" honest
       window.addEventListener('onyx-slip', function () {
