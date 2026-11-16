@@ -694,7 +694,7 @@
      "id": "186796",
      "start": "2026-11-16T15:50Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Grandstand",
@@ -706,7 +706,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        2,
+        0
        ],
        "serve": false
       },
@@ -717,9 +718,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        6
+        6,
+        0
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
@@ -739,9 +741,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        1
+        2
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Guiomar Maristany Zuleta De Reales",
@@ -750,7 +752,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        4
+        5
        ],
        "serve": false
       }
@@ -1542,5 +1544,5 @@
    ]
   }
  ],
- "fetched": "2026-11-16T16:39:04+00:00"
+ "fetched": "2026-11-16T16:45:08+00:00"
 }
