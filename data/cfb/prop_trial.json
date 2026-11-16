@@ -2830,5 +2830,181 @@
   "model": "v2",
   "result": null,
   "actual": null
+ },
+ {
+  "date": "2026-11-16",
+  "key": "401858307|kendrick raphael|rush_yds",
+  "gid": "401858307",
+  "pid": "4899368",
+  "name": "Kendrick Raphael",
+  "team": "SMU",
+  "opp": "ND",
+  "matchup": "SMU @ ND",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 41.5,
+  "price": -126,
+  "sel": "e9ace030-dc8a-4e74-aafc-12901a1fd4c8",
+  "proj": 60.2,
+  "prob": 0.6132,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.56,
+    "avg": 0.77,
+    "pp": -4.9
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.86,
+    "avg": 0.93,
+    "pp": 1.2
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.75,
+    "avg": -0.05,
+    "pp": 0.7
+   }
+  ],
+  "opened_at": "2026-11-16T21:41:48+00:00",
+  "logged_at": "2026-11-16T21:41:48+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-16",
+  "key": "401858528|bryson kuzdzal|rush_yds",
+  "gid": "401858528",
+  "pid": "5156348",
+  "name": "Bryson Kuzdzal",
+  "team": "MICH",
+  "opp": "UCLA",
+  "matchup": "MICH vs UCLA",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 28.5,
+  "price": -126,
+  "sel": "dbb12d91-e430-4f93-9da9-a3d141728e1b",
+  "proj": 21.0,
+  "prob": 0.6294,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.55,
+    "avg": 0.77,
+    "pp": -5.1
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.89,
+    "avg": 0.93,
+    "pp": 0.6
+   },
+   {
+    "k": "line vs his usual range",
+    "v": 0.11,
+    "avg": -0.05,
+    "pp": -0.2
+   }
+  ],
+  "opened_at": "2026-11-16T21:41:48+00:00",
+  "logged_at": "2026-11-16T21:41:48+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-16",
+  "key": "401858528|savion hiter|rush_yds",
+  "gid": "401858528",
+  "pid": "5159046",
+  "name": "Savion Hiter",
+  "team": "MICH",
+  "opp": "UCLA",
+  "matchup": "MICH vs UCLA",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 43.5,
+  "price": -126,
+  "sel": "3ffeb9ba-173f-49f1-8f43-4e7285ccac8b",
+  "proj": 34.6,
+  "prob": 0.6283,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.55,
+    "avg": 0.77,
+    "pp": -5.1
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.89,
+    "avg": 0.93,
+    "pp": 0.6
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.01,
+    "avg": -0.05,
+    "pp": -0.0
+   }
+  ],
+  "opened_at": "2026-11-16T21:41:48+00:00",
+  "logged_at": "2026-11-16T21:41:48+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-16",
+  "key": "401858307|kevin jennings|rush_yds",
+  "gid": "401858307",
+  "pid": "5084084",
+  "name": "Kevin Jennings",
+  "team": "SMU",
+  "opp": "ND",
+  "matchup": "SMU @ ND",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 8.5,
+  "price": -126,
+  "sel": "5aa8cd1e-754e-4d19-ab36-e85dc0bf427d",
+  "proj": 9.0,
+  "prob": 0.6177,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.56,
+    "avg": 0.77,
+    "pp": -4.9
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.86,
+    "avg": 0.93,
+    "pp": 1.2
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.26,
+    "avg": -0.05,
+    "pp": 0.2
+   }
+  ],
+  "opened_at": "2026-11-16T21:41:48+00:00",
+  "logged_at": "2026-11-16T21:41:48+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
  }
 ]
