@@ -3283,5 +3283,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186784-ml-away",
+  "sport": "tennis",
+  "gid": "186784",
+  "date": "2026-11-16",
+  "logged_at": "2026-11-16T17:57:03+00:00",
+  "matchup": "Carole Monnet vs Victoria Jimenez Kasintseva",
+  "home": "Victoria Jimenez Kasintseva",
+  "away": "Carole Monnet",
+  "label": "Carole Monnet to win",
+  "kind": "ml",
+  "side": "away",
+  "line": null,
+  "price": -149,
+  "chance": 0.6501,
+  "implied": 0.5984,
+  "edge": 0.052,
+  "fair": -185,
+  "state": {
+   "sets": "1-1",
+   "srv": "home",
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
