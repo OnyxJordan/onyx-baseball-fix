@@ -124,8 +124,8 @@
     {
      "id": "187512",
      "start": "2026-11-16T19:55Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Group Stage",
      "draw": "Men's Singles",
      "court": "Inalpi Arena",
@@ -147,12 +147,12 @@
        "short": "D. Medvedev",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/rus.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         7,
-        2
+        6
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -856,9 +856,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        0
+        2
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Valeriya Strakhova",
@@ -867,9 +867,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        0
+        5
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
@@ -1572,5 +1572,5 @@
    ]
   }
  ],
- "fetched": "2026-11-16T21:13:06+00:00"
+ "fetched": "2026-11-16T21:41:52+00:00"
 }
