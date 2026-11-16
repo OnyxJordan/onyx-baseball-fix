@@ -3103,5 +3103,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-187511-spread-away",
+  "sport": "tennis",
+  "gid": "187511",
+  "date": "2026-11-16",
+  "logged_at": "2026-11-16T13:20:04+00:00",
+  "matchup": "Frances Tiafoe vs Carlos Alcaraz",
+  "home": "Carlos Alcaraz",
+  "away": "Frances Tiafoe",
+  "label": "Frances Tiafoe +6.5 games",
+  "kind": "spread",
+  "side": "away",
+  "line": 6.5,
+  "price": -165,
+  "chance": 0.6719,
+  "implied": 0.6226,
+  "edge": 0.049,
+  "fair": -205,
+  "state": {
+   "sets": "0-1",
+   "srv": "home",
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
