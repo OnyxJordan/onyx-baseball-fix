@@ -36,7 +36,7 @@
   var FILE = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
   var PAGE_KEYS = {'home.html': ['home', 'Sports'], 'picks.html': ['picks', 'Picks'], 'account.html': ['account', 'Account'],
                    'how.html': ['how', 'How it works'], 'scorecard.html': ['scorecard', 'Scorecard'], 'cbb-players.html': ['cbbp', 'College Basketball'],
-                   'studio.html': ['studio', 'NFL Studio']};
+                   'studio.html': ['studio', 'Studio']};
   var IS_PAGE = !window.OX_SITE && !IS_NBA && !document.querySelector('nav.nav');
   var PAGE = IS_PAGE ? (PAGE_KEYS[FILE] || ['page', 'Sports']) : null;
   var IS_HUB = IS_PAGE && !!document.querySelector('.ox-head .ox-acts');
@@ -131,7 +131,7 @@
            ['alerts', 'Alerts', 'bell', 'Your push control center', 'picks.html#alerts'],
            ['ask', 'Ask Onyx', 'search', 'Plays or a parlay, built for you', 'home.html#ask'],
            ['top10', "Today's top 10", 'trophy', 'Our favorite plays today', 'home.html#top10'],
-           ['studio', 'NFL Studio', 'ranks', 'Compare, simulate, parlay, sweat', 'studio.html'],
+           ['studio', 'Onyx Studio', 'ranks', 'Compare, simulate, parlay, sweat: every sport', 'studio.html'],
            ['live', 'Live now', 'games', 'Every game in play', 'home.html#live'],
            ['account', 'Account', 'user', 'Sign in, your record', 'account.html'],
            ['profile', 'Your profile', 'record', 'Best sport, best bets, picks for you', 'account.html#oxProfile'],
@@ -633,17 +633,20 @@
   // the sport's Onyx Picks, its record, how its model works, Ask Onyx and, for the NFL, every NFL Studio tool.
   // The NFL Studio page itself gets the NFL section too (with links back to the NFL tabs).
   function sportLinks() {
-    var k = SITE === 'page' ? (FILE === 'studio.html' ? 'nfl' : null) : SITE;
+    var STU = {nfl: 1, nba: 1, cfb: 1, cbb: 1, nhl: 1, tennis: 1};
+    var k = SITE === 'page' ? (FILE === 'studio.html' ? ((location.search.match(/[?&]sport=([a-z]+)/) || [])[1] || 'nfl') : null) : SITE;
     var sp = ALL.filter(function (a) { return a[0] === k; })[0];
     if (!sp) return '';
     var nm = {cfb: 'College Football', cbb: 'College Basketball'}[k] || sp[1], L = [];
-    if (FILE === 'studio.html') L.push(['nfl.html#plays', 'NFL Plays', 'plays', 'Recommended plays and the lists'], ['nfl.html#board', 'NFL Onyx Board', 'board', 'Every Onyx line'],
-                                       ['nfl.html#games', 'NFL Games', 'games', 'Live scores and the gamecenter']);
-    if (k === 'nfl') L.push(['studio.html#lab', 'Parlay Lab (SGP)', 'slip', 'Same-game parlays with the true chance'],
-                            ['studio.html#sim', 'Play It Out', 'spark', 'Simulate any game 10,000 times'],
-                            ['studio.html#compare', 'Compare', 'ranks', 'Players and odds side by side'],
-                            ['studio.html#sweat', 'Sunday Sweat', 'games', 'Your bets, live'],
-                            ['studio.html#insights', 'Insights', 'search', 'What everyone is asking, answered']);
+    var pg = sp[2];
+    if (FILE === 'studio.html') L.push([pg + '#plays', nm + ' Plays', 'plays', 'The model\'s lists'], [pg + '#board', nm + ' Onyx Board', 'board', 'Every Onyx line'],
+                                       [pg + '#games', nm + ' Games', 'games', 'Live scores and the gamecenter']);
+    if (STU[k]) { var st = 'studio.html?sport=' + k + '#';
+      L.push([st + 'lab', 'Parlay Lab (SGP)', 'slip', 'Same-game parlays with the true chance'],
+             [st + 'sim', 'Play It Out', 'spark', 'Simulate any game 10,000 times'],
+             [st + 'compare', 'Compare', 'ranks', (k === 'tennis' ? 'Players' : 'Players and teams') + ' side by side'],
+             [st + 'sweat', 'Live Sweat', 'games', 'Your bets, live'],
+             [st + 'insights', 'Insights', 'search', 'What everyone is asking, answered']); }
     L.push(['picks.html', 'Onyx Picks', 'plays', 'Today\'s card and the record'],
            ['scorecard.html', nm + ' record', 'record', 'Every list and lane, graded'],
            ['home.html#ask', 'Ask Onyx', 'search', 'Any ' + nm + ' play or parlay, built for you'],
