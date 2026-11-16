@@ -2698,5 +2698,49 @@
   "result": "W",
   "actual": 49.0,
   "graded_at": "2026-11-15T03:59:02+00:00"
+ },
+ {
+  "date": "2026-11-16",
+  "key": "401858531|bo jackson|rush_yds",
+  "gid": "401858531",
+  "pid": "5141517",
+  "name": "Bo Jackson",
+  "team": "OSU",
+  "opp": "NEB",
+  "matchup": "OSU @ NEB",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 73.5,
+  "price": -126,
+  "sel": "985233a6-cf4b-45c0-945d-7df9ee5aa73e",
+  "proj": 62.5,
+  "prob": 0.6077,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.59,
+    "avg": 0.77,
+    "pp": -4.1
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.84,
+    "avg": 0.93,
+    "pp": 1.5
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.25,
+    "avg": -0.05,
+    "pp": 0.2
+   }
+  ],
+  "opened_at": "2026-11-16T12:53:58+00:00",
+  "logged_at": "2026-11-16T12:53:58+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
  }
 ]
