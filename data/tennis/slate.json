@@ -764,7 +764,7 @@
      "id": "186793",
      "start": "2026-11-16T17:40Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -776,9 +776,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        4
+        6,
+        1
        ],
-       "serve": false
+       "serve": true
       },
       {
        "name": "Leyre Romero Gormaz",
@@ -787,7 +788,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        2,
+        3
        ],
        "serve": false
       }
@@ -809,9 +811,9 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        7
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Victoria Jimenez Kasintseva",
@@ -820,7 +822,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        3
+        5
        ],
        "serve": false
       }
@@ -1554,5 +1556,5 @@
    ]
   }
  ],
- "fetched": "2026-11-16T18:08:56+00:00"
+ "fetched": "2026-11-16T18:43:18+00:00"
 }
