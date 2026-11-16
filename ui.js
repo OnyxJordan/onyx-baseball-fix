@@ -1256,6 +1256,8 @@
     // the Parlay Builder pill on every page (11/8); Onyx Baseball (index.html) keeps its own builder
     if (SITE !== 'mlb' && !window.OnyxParlay) needScript('parlay.js');
     else if (!window.OnyxAccounts) needScript('accounts.js');
+    // Live everywhere (11/16): the live rail under the header, your bets pinned, swing alerts
+    if (!window.OnyxRail) needScript('onyx-live-rail.js');
     var t0 = (location.hash || '').slice(1);
     syncActive(PAGE ? PAGE[0] : typeof currentTab !== 'undefined' ? currentTab : (typeof curTab !== 'undefined' ? curTab : (t0 || 'home')));
     setTimeout(function () { showWhatsNew(false); }, 1200);
