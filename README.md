@@ -1701,6 +1701,19 @@ later" (7 PM on), and "between 1 and 4 pm". A bare hour counts as afternoon or e
 after / until or with a game-time word, so "4 picks by 2s" and "after 2 legs" stay counts. Sides, totals and
 parlays already covered every sport.
 
+**Next-week NFL projections: catching the openers (11/16).** Jordan: "build the next-week NFL projections so we
+catch the openers". The NFL Recommended plays won at Onyx's opening price (121-62, +31.8% replayed 2024-26), but the
+board only saw a week's games after ESPN rolled its scoreboard (about Wednesday 12:15 AM ET), while Onyx posts next
+week's player lines Sunday night to Tuesday, so the list saw them days late (live board history 1-6, replay 34-11).
+Now `sports_odds.py nfl` also keeps next week's main game lines (`next_lines`, beside `next_props`), and
+`sports_build.nfl_next_week` runs the same NFL block on `slate.next_games` with those prices through a lane that
+reads one swapped file and writes nothing (`_NextWeekLane`: no ledger, opening capture, trial lane or weather file
+can change; checked by hashing every data file before and after). Its rows join the board marked `next_week`, so
+the Plays tab lists and the Model record (rule v2 logs a play the moment it qualifies, at the price showing) see
+them the hour Onyx prices them. They stay out of the home Top 10 (today's games). The NFL Studio lists next week's
+games once they have prices. First run (Monday 11/16): 27 Onyx lines on IND @ HOU, 453 sides projected, 19 priced
+rows on the board; none clears the Recommended bar yet (best under +2.2% EV).
+
 **Search logging, so Insights' trending is real (11/16).** Jordan: "add the search logging so trending is real".
 `OnyxAsk.logSearch(q, R, page)` (ask.js), called from home.html's askGo (typed searches only, not refinements built
 by buttons) and the Studio's "Ask your own", posts one row per question per page view to Supabase `search_log`: the

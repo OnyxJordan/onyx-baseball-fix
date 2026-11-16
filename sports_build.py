@@ -672,6 +672,47 @@ def nfl_block(lane, slate, odds):
                 p["trial"] = True
     return block
 
+class _NextWeekLane:
+    """A lane that reads like the real one (with some files swapped) and never writes: the next-week pass below runs
+    the NFL block a second time, and nothing it does may touch a ledger, the opening capture or the weather file."""
+
+    def __init__(self, lane, swap):
+        self._lane, self._swap = lane, swap
+
+    def __getattr__(self, k):
+        return getattr(self._lane, k)
+
+    def load(self, name, default=None):
+        return self._swap[name] if name in self._swap else self._lane.load(name, default)
+
+    def save(self, *a, **k):
+        return None
+
+
+def nfl_next_week(lane, slate, odds):
+    """Next week's NFL games, projected the moment Onyx prices them (11/16, Jordan: "build the next-week NFL
+    projections so we catch the openers"). The NFL Recommended plays (unders at 10%+ expected value) won at Onyx's
+    opening price (121-62, +31.8%), and Onyx posts next week's player lines Sunday night to Tuesday, while ESPN only
+    rolls its scoreboard to the new week about Wednesday 12:15 AM ET: until then those games were not on the board,
+    so the list first saw them days after they opened (the live board history went 1-6 against the replay's 34-11).
+    This runs the same NFL block on slate["next_games"] with Onyx's next-week player lines and game lines
+    (sports_odds next_props / next_lines), read-only, and returns (candidate rows marked next_week, the games)."""
+    nxt = slate.get("next_games") or []
+    gids = {g["gid"] for g in nxt}
+    props = [p for p in (odds or {}).get("next_props") or [] if p.get("gid") in gids]
+    if not nxt or not props:
+        return [], []
+    odds2 = {"date": (odds or {}).get("date"), "fetched": (odds or {}).get("fetched"), "book": (odds or {}).get("book"),
+             "games": {k: v for k, v in ((odds or {}).get("next_lines") or {}).items() if k in gids}, "props": props,
+             "matches": {}, "next_props": []}
+    slate2 = dict(slate, games=[dict(g) for g in nxt], next_games=[])
+    print(f"  next week: {len(props)} Onyx player lines and {len(odds2['games'])} game lines on {len(gids)} games, projecting")
+    m2 = nfl_block(_NextWeekLane(lane, {"odds.json": odds2}), slate2, odds2)
+    cands = [dict(c, next_week=True) for c in m2.get("_cands") or [] if c.get("gid") in gids]
+    print(f"  next week: {len(cands)} priced sides projected")
+    return cands, nxt
+
+
 TEAM_MODELS = {"nfl": "nfl_model", "cfb": "cfb_model", "cbb": "cbb_model", "nhl": "nhl_model"}
 DEFAULT_W = 0.3        # model share of the blend until a backtest sets it
 
@@ -1574,7 +1615,7 @@ def write_top(key, lane, slate, model):
           {m["id"] for e in slate.get("events") or [] for m in e.get("matches") or [] if m.get("state") == "pre"}
     rows = [DT.entry(key, r, "tracked" if r.get("sel") in tracked else "trial" if r.get("sel") in trial else "lean",
                      start.get(r.get("gid")))
-            for r in cands if DT.ok(r) and r.get("gid") in pre and not r.get("inj")    # no questionable players in the Top 10
+            for r in cands if DT.ok(r) and r.get("gid") in pre and not r.get("inj") and not r.get("next_week")   # Top 10: this week's games
             and (r.get("value_min") or 0) < 1]                                         # nor a side its own test says loses
     DT.write(lane.data, key, slate.get("date"), rows)
     # the full board for "Ask Onyx": every priced side, any price, plus every
@@ -1776,7 +1817,16 @@ def main():
         print(f"  cards: skipped ({type(ex).__name__}: {str(ex)[:160]})")
     for k_ in ("_R", "_w"):
         model.pop(k_, None)
-    write_top(key, lane, slate, model)
+    top_slate = slate
+    if key == "nfl":      # next week's openers on the board (nfl_next_week), fail-soft
+        try:
+            nc, ng = nfl_next_week(lane, slate, odds)
+            if nc:
+                model["_cands"] = (model.get("_cands") or []) + nc
+                top_slate = dict(slate, games=(slate.get("games") or []) + ng)
+        except Exception as ex:
+            print(f"  next week: skipped ({type(ex).__name__}: {str(ex)[:160]})")
+    write_top(key, lane, top_slate, model)
     # depth charts (11/2): data/<sport>/depth.json, refreshed at most every 3 hours, fail-soft
     # (a failure keeps the last file). College basketball's is written by its own helper.
     if key in ("nfl", "cfb", "nhl"):

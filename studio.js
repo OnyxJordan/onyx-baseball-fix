@@ -50,7 +50,9 @@
   function load() {
     if (LOADING) return LOADING;
     LOADING = Promise.all([getJSON('data/nfl/board.json'), getJSON('data/nfl/slate.json').catch(function () { return {}; })]).then(function (a) {
-      var b = a[0] || {}, s = a[1] || {}, plays = b.plays || [], games = s.games || [];
+      var b = a[0] || {}, s = a[1] || {}, plays = b.plays || [];
+      // next week's games too (11/16): the board carries their openers from the moment Onyx prices them
+      var games = (s.games || []).concat((s.next_games || []).filter(function (g) { return plays.some(function (p) { return p.gid === g.gid; }); }));
       var gi = {}; games.forEach(function (g) { gi[g.gid] = g; });
       var bp = {}; plays.forEach(function (p) { if (p.kind === 'prop' && p.name) (bp[u.nk(p.name)] = bp[u.nk(p.name)] || []).push(p); });
       var cards = {}, hist = null, tops = null;
