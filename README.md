@@ -1701,6 +1701,16 @@ later" (7 PM on), and "between 1 and 4 pm". A bare hour counts as afternoon or e
 after / until or with a game-time word, so "4 picks by 2s" and "after 2 legs" stay counts. Sides, totals and
 parlays already covered every sport.
 
+**Parlay Lab's same-game correlations, measured (11/16).** Jordan: "build the real same-game correlations for parlay
+lab". `tools/nfl_sgp_corr.py` grades every Onyx opening line of 2025-26 (20,853 lines, 471 games), calibrates each
+market's chances, and fits each cell of the lab's table (same player / teammates / opponents / a team's side / the game
+total x passing, attempts, receiving, rushing, anytime TD) to how often its real same-game pairs both hit. Held out
+(fit one season, judge the other, log loss on 524,593 two-leg pairs): fitted beat the hand-set table overall (.38680
+vs .38778 judged on 2025; .41744 vs .41714 on 2026). The old table overstated most links: opponents are about 0 (was
++.12 to +.15), total over + receiver +.15 (was +.30), total + TD +.25 (was +.35), QB passing + own receiver +.35 (was
++.45), side + own RB rushing +.19 (was +.30); teammates both scoring a TD -.10 (was +.10); receptions + receiving yards
+for one player +.79 (was +.70). So the lab's same-game "value" now reads lower and truer. First TD keeps hand-set values.
+
 **Next-week NFL projections: catching the openers (11/16).** Jordan: "build the next-week NFL projections so we
 catch the openers". The NFL Recommended plays won at Onyx's opening price (121-62, +31.8% replayed 2024-26), but the
 board only saw a week's games after ESPN rolled its scoreboard (about Wednesday 12:15 AM ET), while Onyx posts next
