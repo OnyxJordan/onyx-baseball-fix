@@ -3006,5 +3006,137 @@
   "model": "v2",
   "result": null,
   "actual": null
+ },
+ {
+  "date": "2026-11-17",
+  "key": "401858310|justice haynes|rush_yds",
+  "gid": "401858310",
+  "pid": "4870760",
+  "name": "Justice Haynes",
+  "team": "GT",
+  "opp": "WAKE",
+  "matchup": "GT vs WAKE",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 56.5,
+  "price": -126,
+  "sel": "efe2a6f4-6d5b-4d2f-aae4-732460d009ba",
+  "proj": 61.7,
+  "prob": 0.6207,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.54,
+    "avg": 0.77,
+    "pp": -5.4
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.87,
+    "avg": 0.93,
+    "pp": 1.0
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.8,
+    "avg": -0.05,
+    "pp": 0.7
+   }
+  ],
+  "opened_at": "2026-11-17T18:26:25+00:00",
+  "logged_at": "2026-11-17T18:26:25+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-17",
+  "key": "401858535|demond williams|rush_yds",
+  "gid": "401858535",
+  "pid": "5079653",
+  "name": "Demond Williams Jr.",
+  "team": "WASH",
+  "opp": "IU",
+  "matchup": "WASH vs IU",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 21.5,
+  "price": -126,
+  "sel": "a6d2ccdc-ed88-4fa5-8526-a3e76899804f",
+  "proj": 21.0,
+  "prob": 0.6372,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.5,
+    "avg": 0.77,
+    "pp": -6.2
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.9,
+    "avg": 0.93,
+    "pp": 0.5
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.42,
+    "avg": -0.05,
+    "pp": 0.4
+   }
+  ],
+  "opened_at": "2026-11-17T18:26:25+00:00",
+  "logged_at": "2026-11-17T18:26:25+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-17",
+  "key": "401858310|trelain maddox|rush_yds",
+  "gid": "401858310",
+  "pid": "5103639",
+  "name": "Trelain Maddox",
+  "team": "GT",
+  "opp": "WAKE",
+  "matchup": "GT vs WAKE",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 31.5,
+  "price": -126,
+  "sel": "fdfece54-ade0-4abb-9dbe-74077547dd6b",
+  "proj": 31.0,
+  "prob": 0.625,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.54,
+    "avg": 0.77,
+    "pp": -5.4
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.87,
+    "avg": 0.93,
+    "pp": 1.0
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.34,
+    "avg": -0.05,
+    "pp": 0.3
+   }
+  ],
+  "opened_at": "2026-11-17T18:26:25+00:00",
+  "logged_at": "2026-11-17T18:26:25+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
  }
 ]
