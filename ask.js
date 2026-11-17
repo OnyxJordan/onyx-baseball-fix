@@ -1086,6 +1086,10 @@
     // Onyx Picks (11/2): "Onyx picks", "official picks", "tracked picks": only the logged picks,
     // never a projection called a pick
     if (/\bonyx(s)? (official )?picks?\b|\bofficial (onyx )?picks?\b|\btracked picks?\b|\bgraded picks?\b|\bpicks page\b|\bonyx pick of the (day|night)\b/.test(t)) { s.onyx_picks = true; if (s.sort === 'conf') s.sort = 'rec'; }
+    // the game as a whole (11/17, Jordan: "best pick in the murray state basketball game" and "... the hofstra game" gave
+    // different answers): one team named with "game" / "matchup" / "match" means that team's whole game, both sides,
+    // and "best" there is the bet closest to positive value (EV), never just the named team's side
+    if (!s.player && (s.sort === 'rec' || s.sort === 'edge') && teamList(s).length >= 1 && teamList(s).length <= 2 && /\b(game|matchup|match)\b/.test(t) && !/\bsame[ -]game\b|\bsgp\b|\bgame (lines?|props?)\b/.test(t)) s.whole_game = true;
     // depth charts, minutes, starters and pace (11/2): answered from data/<sport>/depth.json, not the board
     var DEP = /\bwho (starts|is starting|s starting|will start|are the starters)\b|\bstarting (five|5|lineup|lineups|qb|quarterback|goalie|g)\b|\bstarters?\b|\bdepth( charts?)?\b|\brotations?\b|\b(projected |expected )?(minutes|mins)\b|\bplaying time\b|\bpace\b|\btempo\b|\busage\b|\bsnap (counts?|shares?)\b|\bice time\b|\blineups?\b|\bwho plays (for|on)\b|\bprojected (stats|numbers|line)\b|\bprojections? for\b/;
     if (DEP.test(t) && s.intent === 'list' && !s.unsupported && s.min_price == null && s.max_price == null && !s.target_price && !/\b(parlay|sgp|legs?|odds|bet|bets|spread|moneyline|ml|over|under|overs|unders)\b/.test(t)) {
@@ -1185,10 +1189,10 @@
       var TLp = teamsFor(spec, p.sport, TL);
       if (spec.tabbr && !TLp.length) return false;
       if (TLp.length && !onTeams(p, TLp)) return false;
-      if (TLp.length && (p.kind === 'spread' || p.kind === 'ml') && TLp.indexOf(String(p.team || p.name).toUpperCase()) < 0) return false;   // "Georgia to cover" is Georgia's side
+      if (TLp.length && !spec.whole_game && (p.kind === 'spread' || p.kind === 'ml') && TLp.indexOf(String(p.team || p.name).toUpperCase()) < 0) return false;   // "Georgia to cover" is Georgia's side
       // "Celtics points overs": Celtics players, not the Hornets in the same game (11/6: Coby White came back);
       // a same-game parlay keeps the whole game
-      if (TLp.length && p.kind === 'prop' && p.team && spec.intent !== 'sgp' && TLp.indexOf(String(p.team).toUpperCase()) < 0) return false;
+      if (TLp.length && !spec.whole_game && p.kind === 'prop' && p.team && spec.intent !== 'sgp' && TLp.indexOf(String(p.team).toUpperCase()) < 0) return false;
       if (spec.onyx_picks && !p.pick) return false;
       if (spec.when && !whenOk(spec.when, p.start)) return false;
       if (spec.slot && !slotOk(spec.slot, p.start)) return false;
@@ -1200,7 +1204,9 @@
     // "recommended": what this site stands behind first (graded picks, then the
     // on-trial lanes), then the blend of confidence and value
     var REC = {tracked: 0.2, trial: 0.1};
-    var key = twoOnyx ? function (p) { return -p.conf; } : spec.sort === 'two_td' || two ? function (p) { return -p.two; } : spec.sort === 'edge' ? function (p) { return -p.edge; }
+    var gameEv = spec.whole_game && (spec.sort === 'rec' || spec.sort === 'edge') && !two && !twoOnyx;   // the whole game's best: closest to positive value
+    var key = gameEv ? function (p) { return -(p.ev != null ? p.ev : p.edge) - (p.pick ? 1 : 0); }
+      : twoOnyx ? function (p) { return -p.conf; } : spec.sort === 'two_td' || two ? function (p) { return -p.two; } : spec.sort === 'edge' ? function (p) { return -p.edge; }
       : spec.sort === 'price' ? function (p) { return -p.price; }
       : spec.sort === 'proj' ? function (p) { return -(p.proj || 0); }
       : spec.sort === 'rec' ? function (p) {
@@ -1228,6 +1234,9 @@
       key = function (p) { return -((p.model != null ? p.model : p.conf) * dec(p.price)); };   // our chance / the price's: a ratio, so long shots are not favored by default
       pool.sort(function (a, b) { return key(a) - key(b); });
       note = 'None of these beats Onyx\'s price once its margin is counted, so they are ranked by our model\'s own chance against the price\'s (closest to fair first).';
+    } else if (gameEv && pool.length && (pool[0].ev != null ? pool[0].ev : pool[0].edge) <= 0) {
+      // the whole game (11/17): nothing in it beats Onyx's price, so the bet closest to fair leads, and the answer says so
+      note = 'Nothing in this game beats Onyx\'s price right now, so the bet closest to fair value comes first.';
     } else if (spec.sort === 'edge' && !two && pool.length && pool[0].edge <= 0) {
       key = function (p) { return -p.conf - p.edge / 10; };
       pool.sort(function (a, b) { return key(a) - key(b); });
@@ -1239,6 +1248,7 @@
       pool.forEach(function (p) { if (/^(ml|spread|total)$/.test(p.kind)) { if (!GL[p.kind]) GL[p.kind] = p; } else PR.push(p); });
       var card = ['ml', 'spread', 'total'].map(function (k) { return GL[k]; }).filter(Boolean), seenW = {};
       PR.forEach(function (p) { if (card.length < Math.max(3, spec.count || 8) && !seenW[WHO(p)]) { seenW[WHO(p)] = 1; card.push(p); } });
+      if (gameEv) card.sort(function (a, b) { return key(a) - key(b); });   // the whole game's best: closest to positive value first
       return {rows: card, pool: pool.length, two: false, note: note, matchup: true};
     }
     if (spec.intent === 'sgp') return sgp(spec, pool, key);
@@ -1386,7 +1396,7 @@
     else if (s.team && !(s.teams || []).length) b.push(s.team);
     if (s.conf) b.push(s.conf + ' teams');
     if (s.onyx_picks) b.push('Onyx Picks only');
-    b.push(s.sort === 'proj' ? 'highest projection first' : s.sort === 'rec' ? 'what we recommend most first' : s.sort === 'price' ? 'biggest payouts first' : s.sort === 'edge' ? (s.td_fav ? 'our TD model\'s favorites against their price first' : 'best value first') : s.sort === 'two_td' ? 'most likely 2+ TDs first' : 'highest confidence first');
+    b.push(s.sort === 'proj' ? 'highest projection first' : s.sort === 'rec' ? (s.whole_game ? 'the whole game, closest to positive value first' : 'what we recommend most first') : s.sort === 'price' ? 'biggest payouts first' : s.sort === 'edge' ? (s.td_fav ? 'our TD model\'s favorites against their price first' : 'best value first') : s.sort === 'two_td' ? 'most likely 2+ TDs first' : 'highest confidence first');
     return b.join(' · ');
   }
 

@@ -1857,13 +1857,26 @@ def main():
     page_cfg ={"name": cfg["name"], "full": cfg["full"], "kind": cfg["kind"], "espn": cfg["espn"],
                 "espn_q": cfg.get("espn_q", ""), "tone": cfg["tone"], "art": cfg["art"],
                 "onyx_league": ONYX_LEAGUE.get(key)}
-    data = {"sport": key, "cfg": page_cfg, "date": slate.get("date"), "label": slate.get("label"),
-            "season": slate.get("season"), "games": slate.get("games") or [], "events": slate.get("events") or [],
+    page_games, page_label, page_odds = slate.get("games") or [], slate.get("label"), odds
+    # the week rolls forward (11/17: on a Tuesday the NFL page showed last week's finals and "the Onyx feed is being
+    # wired", while the board held 128 Onyx prices on next week's games): once every game this week is final and Onyx
+    # has priced next week's (sports_odds next_lines / next_props), the page shows next week's games and their Onyx
+    # lines. Page only: the model, ledgers and Top 10 are unchanged (next-week rows stay marked next_week there).
+    nxt = slate.get("next_games") or []
+    if key == "nfl" and nxt and page_games and all(g.get("state") == "post" for g in page_games) \
+            and ((odds or {}).get("next_lines") or (odds or {}).get("next_props")):
+        page_games = nxt
+        wk = next((g.get("week") for g in nxt if g.get("week")), None)
+        page_label = f"Week {wk}" if wk else page_label
+        page_odds = dict(odds, games=odds.get("next_lines") or {}, props=odds.get("next_props") or [])
+        print(f"  page: week rolled forward to {page_label} ({len(nxt)} games, {len(page_odds['games'])} game lines, {len(page_odds['props'])} props)")
+    data = {"sport": key, "cfg": page_cfg, "date": slate.get("date"), "label": page_label,
+            "season": slate.get("season"), "games": page_games, "events": slate.get("events") or [],
             "next_date": slate.get("next_date"), "next_n": slate.get("next_n"),
             # 11/5 (Jordan: "no lines on games in the gamecenter"): with Onyx down the page's odds board,
             # game cards and gamecenter show the fallback market line, flagged market (labelled "Market
             # line", no bet selections). Only the page gets it: the model, ledgers and cards used `odds`.
-            "odds": odds if _priced(odds) else (_page_market(lane, slate, odds) or odds or {}), "model": model,
+            "odds": page_odds if _priced(page_odds) else (_page_market(lane, slate, odds) or odds or {}), "model": model,
             "depth_at": (depth or {}).get("generated") if (depth or {}).get("teams") else None,
             "sit_at": sit_at,
             "generated": datetime.now(timezone.utc).isoformat(timespec="seconds")}

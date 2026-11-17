@@ -145,7 +145,13 @@
     if (IDX) return IDX;
     IDX = Promise.all(['nfl', 'cfb', 'nba', 'cbb', 'nhl', 'tennis'].map(function (k) {
       return fetch('data/' + k + '/board.json', {cache: 'no-cache'}).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; });
-    })).then(function (fs) { var o = {}; fs.forEach(function (f) { (f && f.plays || []).forEach(function (p) { if (p.sel) o[p.sel] = p; }); }); return o; });
+    }).concat([fetch('data/picks/ledger.json', {cache: 'no-cache'}).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; })]))
+      .then(function (fs) { var o = {}; fs.slice(0, -1).forEach(function (f) { (f && f.plays || []).forEach(function (p) { if (p.sel) o[p.sel] = p; }); });
+        // an open Onyx Pick whose line has since moved off the board (11/17: the armed slip could not add it): its logged row
+        var L = fs[fs.length - 1]; (Array.isArray(L) ? L : []).forEach(function (r) {
+          if (r && r.sel && !r.result && !o[r.sel] && r.label) o[r.sel] = {sel: r.sel, label: r.label, sport: r.sport, price: r.price, start: r.start, matchup: r.matchup,
+            gid: r.gid, kind: r.kind, mkt: r.market, side: r.side, line: r.line, name: r.name || r.who, team: r.team, conf: r.chance, pick: true}; });
+        return o; });
     return IDX;
   }
   function bySel(sel, el) {
