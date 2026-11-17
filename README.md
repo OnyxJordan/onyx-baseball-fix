@@ -812,6 +812,25 @@ and writes only `data/<sport>/` and `<sport>.html`. The pipeline step is
     - CB out, the full test: QBs +8 yds with a regular CB Out/Doubtful (+6.5 2019-23, +12.3 2024-26); overs 17-6 /
       49-32 / 10-11 at the open (+14.8% open, +20.1% close overall), 2026 alone -9.6% at the open on 21: short of the
       trial bar. Jordan, 11/8: log it anyway to build the 2026 record -> the `cb_pass_over` capture lane below.
+    - **Re-run 11/17 (weeks 9-10 added; nothing shipped, nothing changed in code).**
+      - CB out: the live `cb_pass_over` lane is 7-4, +1.64u (+14.9%) at its logged game-day prices. Full backtest,
+        lane spec (snap-count CB, 60%+ of defensive snaps in 2+ games, Out/Doubtful on the final nflverse report):
+        2024-25 59-36 +16.9% at the open (52-34 +15.0% close); 2026 wks 1-10 16-11 +14.1% open (15-11 +8.8% close),
+        log loss -19.3 vs Onyx no-vig (one logit shift fit on 2024-25). 27 bets in 2026: short of 30, bar not cleared.
+        The 11/8 figures (17-6 / 49-32 / 10-11) did not reproduce in 32 definition variants (scripts were never
+        committed); the 2026 rows come out profitable, not -9.6%. The 7 ledger plays the backtest also flags graded
+        the same; 4 ledger rows came from ESPN's midweek status that the final report did not keep. Re-check at 30+.
+      - 2+ / 3+ TDs (rebuilt from 571 git versions of data/nfl/board.json, 11/1-11/17, graded from player_games):
+        2+ at the close n=716, 24 hits (3.35%); ours 3.45%, Onyx raw 6.30%; log loss ours 0.1132 vs Onyx 0.1263 (0.1181
+        at its best in-sample margin). Ours never beat Onyx's price (0 at close, 0-3 at the open): information only.
+        3+ n=436, 3 hits, ours 0.57% vs Onyx 3.71%. Top-5 "most likely 2+" lists: 8/40 hit, -13%; the same players'
+        anytime TD went 60%, +14% (n=40, too few to switch). Ranking by edge picks long shots (0/40). Keep the
+        Poisson (a logistic refit lost held out); re-run after ~8 more Sundays; 246 priced players with no box row
+        were voids (a snap-count capture would settle them).
+      - Backup RB: 4 new events (ARI w9, NYG w9, GB w10, KC w10), no new priced lines. Unchanged: carries name him
+        70% (145/207) vs the depth chart 63%; +24.3 rush yds over trailing held out but ~0 in 2026 (n=10). At the open
+        (31 rushing lines) the line sits +21.5 over trailing; no side wins both windows. Needs ~6 tune + 23 held-out
+        priced games (~3 seasons at ~0.7 a week). Week-10 lines need the odds_probe `job=lines` pull.
   - **Rules lab history and splits (10/31).** `data/rules_lab/<sport>/<market>.json` (columnar, loaded per
     market) holds 825,148 priced lines: NBA 2024-25 (Onyx from Feb 2025 and market prices), 2025-26 with the
     model replay, 2026-27 to date, game lines, threes; MLB 2025-26 Onyx (home run yes, hits, total bases,
