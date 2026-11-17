@@ -115889,10 +115889,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v7",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "11-15",
+  "profit": -1.0,
+  "graded_at": "2026-11-17T23:53:57+00:00"
  },
  {
   "id": "cbb-401906773-total-under",
@@ -116115,6 +116115,37 @@
    "period": 1,
    "clock": "11:48",
    "f": 0.795
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "cbb-401920706-total-under",
+  "sport": "cbb",
+  "gid": "401920706",
+  "date": "2026-11-17",
+  "logged_at": "2026-11-17T23:53:55+00:00",
+  "matchup": "LIP @ PUR",
+  "home": "PUR",
+  "away": "LIP",
+  "label": "Under 159.5",
+  "kind": "total",
+  "side": "under",
+  "line": 159.5,
+  "price": -120,
+  "chance": 0.596,
+  "implied": 0.5455,
+  "edge": 0.05,
+  "fair": -145,
+  "state": {
+   "score": "LIP 12 - 32 PUR",
+   "period": 1,
+   "clock": "9:49",
+   "f": 0.745
   },
   "pre_src": "onyx",
   "model": "live-v7",
