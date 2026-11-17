@@ -3373,5 +3373,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-187508-ml-away",
+  "sport": "tennis",
+  "gid": "187508",
+  "date": "2026-11-17",
+  "logged_at": "2026-11-17T14:04:49+00:00",
+  "matchup": "Rafael Jodar vs Arthur Fils",
+  "home": "Arthur Fils",
+  "away": "Rafael Jodar",
+  "label": "Rafael Jodar to win",
+  "kind": "ml",
+  "side": "away",
+  "line": null,
+  "price": -315,
+  "chance": 0.837,
+  "implied": 0.759,
+  "edge": 0.078,
+  "fair": -515,
+  "state": {
+   "sets": "6-4 1-0",
+   "srv": null,
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
