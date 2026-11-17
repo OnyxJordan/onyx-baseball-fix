@@ -158,9 +158,9 @@
     },
     {
      "id": "187508",
-     "start": "2026-11-17T13:05Z",
-     "state": "pre",
-     "detail": "11/17 - 8:05 AM EST",
+     "start": "2026-11-17T13:10Z",
+     "state": "post",
+     "detail": "Final",
      "round": "Group Stage",
      "draw": "Men's Singles",
      "court": "Inalpi Arena",
@@ -171,7 +171,11 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        6,
+        2,
+        2
+       ],
        "serve": false
       },
       {
@@ -179,8 +183,12 @@
        "short": "A. Fils",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
-       "win": false,
-       "sets": [],
+       "win": true,
+       "sets": [
+        4,
+        6,
+        6
+       ],
        "serve": false
       }
      ]
@@ -914,9 +922,9 @@
     },
     {
      "id": "186787",
-     "start": "2026-11-17T14:00Z",
-     "state": "pre",
-     "detail": "11/17 - 9:00 AM EST",
+     "start": "2026-11-17T14:05Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Grandstand",
@@ -927,8 +935,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/lat.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        4
+       ],
+       "serve": true
       },
       {
        "name": "Irene Burillo",
@@ -936,16 +946,18 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        5
+       ],
        "serve": false
       }
      ]
     },
     {
      "id": "186791",
-     "start": "2026-11-17T14:00Z",
-     "state": "pre",
-     "detail": "11/17 - 9:00 AM EST",
+     "start": "2026-11-17T14:05Z",
+     "state": "in",
+     "detail": "2nd",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -956,7 +968,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        3,
+        1
+       ],
        "serve": false
       },
       {
@@ -965,7 +980,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        6,
+        0
+       ],
        "serve": false
       }
      ]
@@ -1582,5 +1600,5 @@
    ]
   }
  ],
- "fetched": "2026-11-17T13:01:53+00:00"
+ "fetched": "2026-11-17T15:06:23+00:00"
 }
