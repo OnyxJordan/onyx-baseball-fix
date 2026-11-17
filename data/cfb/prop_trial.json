@@ -3182,5 +3182,93 @@
   "model": "v2",
   "result": null,
   "actual": null
+ },
+ {
+  "date": "2026-11-17",
+  "key": "401856755|kj jackson|rush_yds",
+  "gid": "401856755",
+  "pid": "5079516",
+  "name": "KJ Jackson",
+  "team": "ARK",
+  "opp": "TEX",
+  "matchup": "ARK @ TEX",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 9.5,
+  "price": -126,
+  "sel": "24c0032f-cefa-4b8b-9952-9b510f30c528",
+  "proj": 15.7,
+  "prob": 0.6089,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.66,
+    "avg": 0.77,
+    "pp": -2.5
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.96,
+    "avg": 0.93,
+    "pp": -0.4
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.36,
+    "avg": -0.05,
+    "pp": 0.3
+   }
+  ],
+  "opened_at": "2026-11-17T20:07:41+00:00",
+  "logged_at": "2026-11-17T20:07:41+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-17",
+  "key": "401856755|cam settles|rush_yds",
+  "gid": "401856755",
+  "pid": "5222564",
+  "name": "Cam Settles",
+  "team": "ARK",
+  "opp": "TEX",
+  "matchup": "ARK @ TEX",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 31.5,
+  "price": -126,
+  "sel": "caa50066-bdba-4162-9227-d5d79243cc4b",
+  "proj": 36.2,
+  "prob": 0.6088,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.66,
+    "avg": 0.77,
+    "pp": -2.5
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.96,
+    "avg": 0.93,
+    "pp": -0.4
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.37,
+    "avg": -0.05,
+    "pp": 0.3
+   }
+  ],
+  "opened_at": "2026-11-17T20:07:41+00:00",
+  "logged_at": "2026-11-17T20:07:41+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
  }
 ]
