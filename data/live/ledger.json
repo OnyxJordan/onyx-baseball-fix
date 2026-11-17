@@ -115742,5 +115742,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186782-spread-home",
+  "sport": "tennis",
+  "gid": "186782",
+  "date": "2026-11-17",
+  "logged_at": "2026-11-17T18:45:43+00:00",
+  "matchup": "Veronika Erjavec vs Maria Lourdes Carle",
+  "home": "Maria Lourdes Carle",
+  "away": "Veronika Erjavec",
+  "label": "Maria Lourdes Carle +5.5 games",
+  "kind": "spread",
+  "side": "home",
+  "line": 5.5,
+  "price": -130,
+  "chance": 0.6696,
+  "implied": 0.5652,
+  "edge": 0.104,
+  "fair": -205,
+  "state": {
+   "sets": "1-0",
+   "srv": "home",
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]

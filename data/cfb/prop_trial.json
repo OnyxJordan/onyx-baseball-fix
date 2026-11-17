@@ -3138,5 +3138,49 @@
   "model": "v2",
   "result": null,
   "actual": null
+ },
+ {
+  "date": "2026-11-17",
+  "key": "401858535|jayden limar|rush_yds",
+  "gid": "401858535",
+  "pid": "4870868",
+  "name": "Jayden Limar",
+  "team": "WASH",
+  "opp": "IU",
+  "matchup": "WASH vs IU",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 30.5,
+  "price": -126,
+  "sel": "e67f30e9-297b-4987-bdb2-8b9348c1f92c",
+  "proj": 27.6,
+  "prob": 0.638,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.5,
+    "avg": 0.77,
+    "pp": -6.2
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.9,
+    "avg": 0.93,
+    "pp": 0.5
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.33,
+    "avg": -0.05,
+    "pp": 0.3
+   }
+  ],
+  "opened_at": "2026-11-17T19:00:20+00:00",
+  "logged_at": "2026-11-17T19:00:20+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
  }
 ]
