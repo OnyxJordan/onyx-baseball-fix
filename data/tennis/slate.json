@@ -994,7 +994,7 @@
      "id": "186785",
      "start": "2026-11-17T15:50Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Grandstand",
@@ -1006,7 +1006,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        3,
+        1
        ],
        "serve": true
       },
@@ -1017,7 +1018,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        5
+        6,
+        3
        ],
        "serve": false
       }
@@ -1039,7 +1041,7 @@
        "seed": null,
        "win": false,
        "sets": [
-        1
+        5
        ],
        "serve": false
       },
@@ -1050,17 +1052,17 @@
        "seed": null,
        "win": false,
        "sets": [
-        0
+        4
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
     {
      "id": "186782",
-     "start": "2026-11-17T17:00Z",
+     "start": "2026-11-17T17:30Z",
      "state": "pre",
-     "detail": "11/17 - 12:00 PM EST",
+     "detail": "11/17 - 12:30 PM EST",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -1610,5 +1612,5 @@
    ]
   }
  ],
- "fetched": "2026-11-17T16:31:38+00:00"
+ "fetched": "2026-11-17T17:05:18+00:00"
 }
