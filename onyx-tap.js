@@ -339,6 +339,8 @@
     render(p, CUR.url, loading);
     ROOT.hidden = false;
     place(anchor);
+    // the card grows after it opens (the line-move panel, 11/17): keep the desktop popover on screen as it does
+    if (!CARD._ro && window.ResizeObserver) { CARD._ro = new ResizeObserver(function () { if (!ROOT.hidden && CUR && !sheetMode()) place(CUR.anchor); }); CARD._ro.observe(CARD); }
     if (!was) { void CARD.offsetWidth; ROOT.classList.add('on'); }
     try { CARD.focus({preventScroll: true}); } catch (e) { CARD.focus(); }
     gt('tap_card', {sport: p.sport || '', kind: p.kind || ''});
