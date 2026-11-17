@@ -14,6 +14,8 @@
 //   - anything while the parlay builder is armed (a tap still adds a leg), parlay links (several selections),
 //     "Bet ... on Onyx" buttons with no price on them, the NBA bet card cells, anything inside the card or slip
 //   - a modifier click (Cmd / Ctrl / Shift / Alt, or a middle click) and a long-press: those open Onyx directly
+// Line moves and price alerts (11/17): the card leaves three slots (data-pa-chip by the price, data-pa-move under the
+// numbers, data-pa-alert under the buttons) that onyx-alerts.js fills: open -> now with a sparkline, "Alert me at +150".
 // Loaded on every page by ui.js. window.OnyxTap = {open(play, anchor), close(), isOpen()}.
 (function () {
   'use strict';
@@ -292,9 +294,10 @@
       + '<div class="oxt-k">' + esc([NAMES[k] || (k || '').toUpperCase(), !model && !loading ? 'Onyx line' : p.tag === 'trial' ? 'Trial' : 'Projection'].filter(Boolean).join(' · ')) + '</div>'
       + '<h2 id="oxtT">' + esc(p.label || 'Onyx price') + '</h2>'
       + '<div class="oxt-m">' + esc(meta || ' ') + '</div>'
-      + '<div class="oxt-n"><div class="px"><small>Onyx price</small><b>' + esc(odds(p.price)) + '</b></div>'
+      + '<div class="oxt-n"><div class="px"><small>Onyx price</small><b>' + esc(odds(p.price)) + '</b><span class="oxt-pc" data-pa-chip></span></div>'
       + '<div><small>' + (p.conf != null && !p.no_read ? 'Model chance' : 'Onyx chance') + '</small><b data-tap-chance>' + (loading ? '&hellip;' : pct(chance)) + '</b></div>'
       + '<div><small>Fair odds</small><b>' + (loading ? '&hellip;' : esc(odds(fair))) + '</b></div></div>'
+      + '<div class="oxt-mv" data-pa-move hidden></div>'   // the line move, open -> now (onyx-alerts.js fills it)
       + '<p class="oxt-e">' + (loading ? 'Reading the model&hellip;' : edgeWords(p)) + '</p>'
       + (p.why ? '<div class="oxt-why">' + esc(String(p.why).slice(0, 160)) + '</div>' : '')
       + (hasPG ? '<div class="oxt-g" id="oxtG"><p>Last games vs this line</p><div class="oxt-gm">Loading game logs&hellip;</div></div>' : '')
@@ -307,9 +310,12 @@
       + (S.cmp ? '<a href="' + esc(S.cmp) + '" data-a="nav">Compare</a>' : '')
       + (S.sim ? '<a href="' + esc(S.sim) + '" data-a="nav">Simulate the game</a>' : '')
       + '</div>'
+      + '<div class="oxt-pa" data-pa-alert hidden></div>'   // price alerts (onyx-alerts.js)
       + '<p class="oxt-f">' + (model && p.tag !== 'pick' ? 'The chance is a model projection, not an Onyx Pick. ' : '') + (TOUCH ? 'Long-press a price' : 'Cmd or Ctrl-click a price') + ' to go straight to Onyx.</p>';
     CARD.innerHTML = h;
+    CARD.setAttribute('data-pa-sel', p.sel || '');
     stake(getStake(), false);
+    if (!loading && window.OnyxPriceAlerts) { try { OnyxPriceAlerts.mountCard(CARD, p); } catch (e) {} }
     if (hasPG) strip(p);
   }
 
