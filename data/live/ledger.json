@@ -115738,10 +115738,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v7",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "148",
+  "profit": -1.0,
+  "graded_at": "2026-11-17T19:34:20+00:00"
  },
  {
   "id": "tennis-186782-spread-home",
@@ -115765,6 +115765,37 @@
    "sets": "1-0",
    "srv": "home",
    "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "cbb-401920511-total-under",
+  "sport": "cbb",
+  "gid": "401920511",
+  "date": "2026-11-17",
+  "logged_at": "2026-11-17T19:34:17+00:00",
+  "matchup": "RUTG @ HOU",
+  "home": "HOU",
+  "away": "RUTG",
+  "label": "Under 144.5",
+  "kind": "total",
+  "side": "under",
+  "line": 144.5,
+  "price": -110,
+  "chance": 0.617,
+  "implied": 0.5238,
+  "edge": 0.093,
+  "fair": -160,
+  "state": {
+   "score": "RUTG 15 - 25 HOU",
+   "period": 1,
+   "clock": "7:52",
+   "f": 0.697
   },
   "pre_src": "onyx",
   "model": "live-v7",
