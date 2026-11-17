@@ -1144,7 +1144,7 @@
      "id": "186794",
      "start": "2026-11-17T21:30Z",
      "state": "in",
-     "detail": "2nd",
+     "detail": "3rd",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -1157,9 +1157,10 @@
        "win": false,
        "sets": [
         3,
-        5
+        6,
+        1
        ],
-       "serve": false
+       "serve": true
       },
       {
        "name": "Barbara Gatica",
@@ -1169,7 +1170,8 @@
        "win": false,
        "sets": [
         6,
-        2
+        2,
+        1
        ],
        "serve": false
       }
@@ -1642,5 +1644,5 @@
    ]
   }
  ],
- "fetched": "2026-11-17T23:07:26+00:00"
+ "fetched": "2026-11-17T23:20:28+00:00"
 }
