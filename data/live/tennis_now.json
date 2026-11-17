@@ -3403,5 +3403,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186787-ml-away",
+  "sport": "tennis",
+  "gid": "186787",
+  "date": "2026-11-17",
+  "logged_at": "2026-11-17T14:26:28+00:00",
+  "matchup": "Darja Semenistaja vs Irene Burillo",
+  "home": "Irene Burillo",
+  "away": "Darja Semenistaja",
+  "label": "Darja Semenistaja to win",
+  "kind": "ml",
+  "side": "away",
+  "line": null,
+  "price": -156,
+  "chance": 0.6858,
+  "implied": 0.6094,
+  "edge": 0.076,
+  "fair": -220,
+  "state": {
+   "sets": "2-1",
+   "srv": null,
+   "need": 2
+  },
+  "pre_src": null,
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
