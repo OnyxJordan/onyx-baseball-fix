@@ -210,7 +210,7 @@
        "win": false,
        "sets": [
         2,
-        3
+        6
        ],
        "serve": false
       },
@@ -222,7 +222,7 @@
        "win": false,
        "sets": [
         6,
-        2
+        6
        ],
        "serve": false
       }
@@ -1084,9 +1084,9 @@
        "sets": [
         5,
         7,
-        0
+        5
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Maria Lourdes Carle",
@@ -1097,9 +1097,9 @@
        "sets": [
         7,
         5,
-        0
+        4
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
@@ -1107,7 +1107,7 @@
      "id": "186786",
      "start": "2026-11-17T20:05Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Grandstand",
@@ -1119,7 +1119,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        3,
+        3
        ],
        "serve": false
       },
@@ -1130,17 +1131,18 @@
        "seed": null,
        "win": false,
        "sets": [
-        4
+        6,
+        2
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
     {
      "id": "186794",
-     "start": "2026-11-17T20:50Z",
+     "start": "2026-11-17T21:15Z",
      "state": "pre",
-     "detail": "11/17 - 3:50 PM EST",
+     "detail": "11/17 - 4:15 PM EST",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -1167,9 +1169,9 @@
     },
     {
      "id": "186795",
-     "start": "2026-11-17T22:00Z",
+     "start": "2026-11-17T22:30Z",
      "state": "pre",
-     "detail": "11/17 - 5:00 PM EST",
+     "detail": "11/17 - 5:30 PM EST",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -1632,5 +1634,5 @@
    ]
   }
  ],
- "fetched": "2026-11-17T20:41:32+00:00"
+ "fetched": "2026-11-17T21:16:05+00:00"
 }
