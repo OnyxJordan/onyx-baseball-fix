@@ -77,8 +77,16 @@
     });
     return IDX_ALL;
   }
+  // an open Onyx Pick whose line has moved off the board (11/17): its logged ledger row, so the card names the bet
+  var LEDGER = null;
+  function ledgerRow(sel) {
+    if (!LEDGER) LEDGER = fetch('data/picks/ledger.json').then(function (r) { return r.ok ? r.json() : []; }).catch(function () { return []; });
+    return LEDGER.then(function (L) { var r = (Array.isArray(L) ? L : []).filter(function (x) { return x && x.sel === sel && !x.result && x.label; })[0];
+      return r ? {sel: r.sel, label: r.label, sport: r.sport, price: r.price, start: r.start, matchup: r.matchup, gid: r.gid, kind: r.kind, mkt: r.market,
+                  side: r.side, line: r.line, name: r.name || r.who, team: r.team, conf: r.chance, pick: true} : null; });
+  }
   function find(sel) {
-    return index().then(function (o) { return o[sel] || indexAll().then(function (a) { return a[sel] || null; }); });
+    return index().then(function (o) { return o[sel] || indexAll().then(function (a) { return a[sel] || ledgerRow(sel); }); });
   }
 
   // ── what a tapped element is ─────────────────────────────────────────────────────────────
