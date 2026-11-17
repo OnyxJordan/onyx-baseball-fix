@@ -3433,5 +3433,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186791-ml-home",
+  "sport": "tennis",
+  "gid": "186791",
+  "date": "2026-11-17",
+  "logged_at": "2026-11-17T14:37:45+00:00",
+  "matchup": "Varvara Lepchenko vs Nadia Podoroska",
+  "home": "Nadia Podoroska",
+  "away": "Varvara Lepchenko",
+  "label": "Nadia Podoroska to win",
+  "kind": "ml",
+  "side": "home",
+  "line": null,
+  "price": -175,
+  "chance": 0.6749,
+  "implied": 0.6364,
+  "edge": 0.039,
+  "fair": -210,
+  "state": {
+   "sets": "2-3",
+   "srv": "away",
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
