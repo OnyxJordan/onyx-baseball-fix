@@ -1,7 +1,7 @@
 {
  "date": "2026-11-16",
  "source": "optic",
- "fetched": "2026-11-17T03:32:37+00:00",
+ "fetched": "2026-11-17T04:07:53+00:00",
  "games": [
   {
    "gid": "20261117065B6A66",
@@ -51,8 +51,8 @@
    "detail": "",
    "away": "CHI",
    "home": "CLE",
-   "away_rec": "3-9",
-   "home_rec": "7-7",
+   "away_rec": "3-10",
+   "home_rec": "8-7",
    "away_score": 115,
    "home_score": 126,
    "spread": null,
@@ -70,8 +70,8 @@
    "detail": "",
    "away": "PHI",
    "home": "BKN",
-   "away_rec": "11-3",
-   "home_rec": "3-9",
+   "away_rec": "12-3",
+   "home_rec": "3-10",
    "away_score": 135,
    "home_score": 123,
    "spread": null,
@@ -89,8 +89,8 @@
    "detail": "",
    "away": "HOU",
    "home": "MIA",
-   "away_rec": "11-3",
-   "home_rec": "7-6",
+   "away_rec": "11-4",
+   "home_rec": "8-6",
    "away_score": 110,
    "home_score": 128,
    "spread": null,
@@ -122,8 +122,8 @@
    "slug": "41811-38874-2026-11-16",
    "start": "2026-11-17T01:00:00Z",
    "season_type": "Regular Season",
-   "state": "live",
-   "status": "live",
+   "state": "post",
+   "status": "completed",
    "detail": "",
    "away": "POR",
    "home": "MIN",
@@ -148,8 +148,8 @@
    "home": "DEN",
    "away_rec": "5-7",
    "home_rec": "7-4",
-   "away_score": 59,
-   "home_score": 62,
+   "away_score": 104,
+   "home_score": 88,
    "spread": null,
    "total": null,
    "away_ml": null,
@@ -321,7 +321,7 @@
    "home": false,
    "gid": "20261117B36175C5",
    "pos": "G",
-   "inj": "OUT",
+   "inj": "GTD",
    "inj_detail": "Knee (Leg, Soreness, Left)",
    "hs": "4684740",
    "logo": "https://cdn.opticodds.com/player-logos/basketball/598471.png"
@@ -516,7 +516,7 @@
    "home": true,
    "gid": "20261117540D4085",
    "pos": "G",
-   "inj": "OUT",
+   "inj": "GTD",
    "inj_detail": "Foot (Leg, Plantar Fasciitis, Left)",
    "hs": "4683634",
    "logo": "https://cdn.opticodds.com/player-logos/basketball/598494.png"
@@ -685,7 +685,7 @@
    "home": true,
    "gid": "20261117540D4085",
    "pos": "SG",
-   "inj": "OUT",
+   "inj": "GTD",
    "inj_detail": "Elbow (Arm, Infection, Left)",
    "hs": "4576086",
    "logo": "https://cdn.opticodds.com/player-logos/basketball/598521.png"
@@ -906,7 +906,7 @@
    "home": false,
    "gid": "20261117578A87EB",
    "pos": "SG",
-   "inj": "OUT",
+   "inj": "GTD",
    "inj_detail": "Foot (Leg, Bruise, Right)",
    "hs": "4706557",
    "logo": "https://cdn.opticodds.com/player-logos/basketball/610651.png"
@@ -919,7 +919,7 @@
    "home": false,
    "gid": "20261117B36175C5",
    "pos": "C",
-   "inj": "OUT",
+   "inj": "GTD",
    "inj_detail": "Ankle (Leg, Sprain, Right)",
    "hs": "3102529",
    "logo": "https://cdn.opticodds.com/player-logos/basketball/598549.png"
@@ -1296,7 +1296,7 @@
    "home": false,
    "gid": "202611172FFF2E03",
    "pos": "F",
-   "inj": "OUT",
+   "inj": "GTD",
    "inj_detail": "Back (Torso, Fracture)",
    "hs": "4870562",
    "logo": "https://cdn.opticodds.com/player-logos/basketball/598613.png"
@@ -1816,7 +1816,7 @@
    "home": false,
    "gid": "20261117065B6A66",
    "pos": "C",
-   "inj": "OUT",
+   "inj": "GTD",
    "inj_detail": "Illness (Other)",
    "hs": "4432810",
    "logo": "https://cdn.opticodds.com/player-logos/basketball/598671.png"
@@ -1829,7 +1829,7 @@
    "home": false,
    "gid": "202611176EB8A12D",
    "pos": "F",
-   "inj": "OUT",
+   "inj": "GTD",
    "inj_detail": "Ankle (Leg, Surgery, Left)",
    "hs": "5107251",
    "logo": "https://cdn.opticodds.com/player-logos/basketball/611862.png"
@@ -2180,7 +2180,7 @@
    "home": true,
    "gid": "20261117CE99E1D6",
    "pos": "SG",
-   "inj": "OUT",
+   "inj": "GTD",
    "inj_detail": "Ankle (Leg, Right)",
    "hs": "4683747",
    "logo": "https://cdn.opticodds.com/player-logos/basketball/598737.png"
@@ -2817,7 +2817,7 @@
    "home": false,
    "gid": "202611172FFF2E03",
    "pos": "SF",
-   "inj": "OUT",
+   "inj": "GTD",
    "inj_detail": "Back (Torso)",
    "hs": "1966",
    "logo": "https://cdn.opticodds.com/player-logos/basketball/598845.png"
@@ -2921,7 +2921,7 @@
    "home": false,
    "gid": "20261117B36175C5",
    "pos": "PG",
-   "inj": "OUT",
+   "inj": "GTD",
    "inj_detail": "Suspension (Other)",
    "hs": "2990992",
    "logo": "https://cdn.opticodds.com/player-logos/basketball/598869.png"
@@ -3155,7 +3155,7 @@
    "home": true,
    "gid": "20261117CE99E1D6",
    "pos": "PF",
-   "inj": "OUT",
+   "inj": "GTD",
    "inj_detail": "Back (Torso)",
    "hs": "5106268",
    "logo": "https://cdn.opticodds.com/player-logos/basketball/616604.png"
@@ -3181,7 +3181,7 @@
    "home": true,
    "gid": "202611176EB8A12D",
    "pos": "C",
-   "inj": "OUT",
+   "inj": "GTD",
    "inj_detail": "Rest (Other)",
    "hs": "4397424",
    "logo": "https://cdn.opticodds.com/player-logos/basketball/598905.png"
@@ -3259,7 +3259,7 @@
    "home": true,
    "gid": "20261117B36175C5",
    "pos": "F",
-   "inj": "OUT",
+   "inj": "GTD",
    "inj_detail": "Illness (Other)",
    "hs": "4997528",
    "logo": "https://cdn.opticodds.com/player-logos/basketball/598914.png"
@@ -3506,7 +3506,7 @@
    "home": true,
    "gid": "20261117B36175C5",
    "pos": "SG",
-   "inj": "OUT",
+   "inj": "GTD",
    "inj_detail": "Illness (Other)",
    "hs": "4601025",
    "logo": "https://cdn.opticodds.com/player-logos/basketball/598942.png"
@@ -3792,7 +3792,7 @@
    "home": true,
    "gid": "20261117CE99E1D6",
    "pos": "SG",
-   "inj": "OUT",
+   "inj": "GTD",
    "inj_detail": "Elbow (Arm, Right)",
    "hs": "4066757",
    "logo": "https://cdn.opticodds.com/player-logos/basketball/598976.png"
@@ -3909,7 +3909,7 @@
    "home": false,
    "gid": "20261117B36175C5",
    "pos": "C",
-   "inj": "OUT",
+   "inj": "GTD",
    "inj_detail": "Calf (Leg)",
    "hs": "2991235",
    "logo": "https://cdn.opticodds.com/player-logos/basketball/598995.png"
@@ -4039,7 +4039,7 @@
    "home": false,
    "gid": "20261117CE99E1D6",
    "pos": "F",
-   "inj": "OUT",
+   "inj": "GTD",
    "inj_detail": "Back (Torso)",
    "hs": "5105555",
    "logo": "https://cdn.opticodds.com/player-logos/basketball/614834.png"
@@ -4169,7 +4169,7 @@
    "home": true,
    "gid": "20261117540D4085",
    "pos": "PF",
-   "inj": "OUT",
+   "inj": "GTD",
    "inj_detail": "Ankle (Leg, Sprain, Right)",
    "hs": "4431675",
    "logo": "https://cdn.opticodds.com/player-logos/basketball/599023.png"
@@ -4221,7 +4221,7 @@
    "home": true,
    "gid": "20261117540D4085",
    "pos": "SF",
-   "inj": "OUT",
+   "inj": "GTD",
    "inj_detail": "Knee (Leg, Tendinitis)",
    "hs": "4397688",
    "logo": "https://cdn.opticodds.com/player-logos/basketball/599030.png"
@@ -4273,7 +4273,7 @@
    "home": false,
    "gid": "20261117065B6A66",
    "pos": "PG",
-   "inj": "OUT",
+   "inj": "GTD",
    "inj_detail": "Hip (Torso, Soreness, Right)",
    "hs": "4065733",
    "logo": "https://cdn.opticodds.com/player-logos/basketball/599036.png"
