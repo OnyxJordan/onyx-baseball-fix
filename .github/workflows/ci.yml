@@ -131,3 +131,5 @@ jobs:
         run: node tools/verify_hedge.js
       - name: Price alerts and line moves
         run: node tools/verify_alerts_ui.js
+      - name: Live football field
+        run: node tools/verify_field.js
