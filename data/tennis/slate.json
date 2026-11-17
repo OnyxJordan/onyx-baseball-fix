@@ -197,7 +197,7 @@
      "id": "187503",
      "start": "2026-11-17T19:40Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Group Stage",
      "draw": "Men's Singles",
      "court": "Inalpi Arena",
@@ -209,9 +209,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        1
+        2,
+        3
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Alexander Zverev",
@@ -220,7 +221,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        3
+        6,
+        2
        ],
        "serve": false
       }
@@ -1068,7 +1070,7 @@
      "id": "186782",
      "start": "2026-11-17T18:35Z",
      "state": "in",
-     "detail": "2nd",
+     "detail": "3rd",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -1081,7 +1083,8 @@
        "win": false,
        "sets": [
         5,
-        4
+        7,
+        0
        ],
        "serve": true
       },
@@ -1093,7 +1096,8 @@
        "win": false,
        "sets": [
         7,
-        2
+        5,
+        0
        ],
        "serve": false
       }
@@ -1102,8 +1106,8 @@
     {
      "id": "186786",
      "start": "2026-11-17T20:05Z",
-     "state": "pre",
-     "detail": "11/17 - 3:05 PM EST",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Grandstand",
@@ -1114,7 +1118,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/cze.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        2
+       ],
        "serve": false
       },
       {
@@ -1123,16 +1129,18 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/gre.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        4
+       ],
+       "serve": true
       }
      ]
     },
     {
      "id": "186794",
-     "start": "2026-11-17T20:30Z",
+     "start": "2026-11-17T20:50Z",
      "state": "pre",
-     "detail": "11/17 - 3:30 PM EST",
+     "detail": "11/17 - 3:50 PM EST",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -1624,5 +1632,5 @@
    ]
   }
  ],
- "fetched": "2026-11-17T20:07:47+00:00"
+ "fetched": "2026-11-17T20:41:32+00:00"
 }
