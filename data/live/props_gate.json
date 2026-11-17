@@ -1,19 +1,19 @@
 {
  "passed": false,
- "n": 217,
- "w": 113,
- "l": 104,
- "units": -2.96,
- "roi": -0.0136,
+ "n": 0,
+ "w": 0,
+ "l": 0,
+ "units": 0,
+ "roi": null,
  "by_half": [
   {
-   "n": 217,
-   "w": 113,
-   "l": 104,
-   "units": -2.96,
-   "roi": -0.0136,
-   "from": "2026-11-09",
-   "to": "2026-11-09"
+   "n": 0,
+   "w": 0,
+   "l": 0,
+   "units": 0,
+   "roi": null,
+   "from": null,
+   "to": null
   },
   {
    "n": 0,
@@ -25,8 +25,8 @@
    "to": null
   }
  ],
- "version": "props-v1",
- "at": "2026-11-10T20:03:49Z",
+ "version": "props-v2",
+ "at": "2026-11-17T21:23:00Z",
  "pending": 0,
- "rule": "60+ graded live prop value plays (data/live/ledger.json, kind prop) logged under prop params props-v1, ROI +2% or better at the logged price, profitable in both halves split by date. Until it passes, the pages show live props as projections, \"Value untested\"."
+ "rule": "60+ graded live prop value plays (data/live/ledger.json, kind prop) logged under prop params props-v2, ROI +2% or better at the logged price, profitable in both halves split by date. Until it passes, the pages show live props as projections, \"Value untested\"."
 }
