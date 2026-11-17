@@ -25,6 +25,9 @@
 //     the Onyx selection id when the live feed carries one (href is then the Onyx bet link), else href opens Onyx.
 //   OnyxCash.history(id) -> [{t, p}], OnyxCash.text(r) -> one-line summary.
 //   window event 'onyx-cash' {detail: {id, p, prev, res}} whenever a pick's chance moves a point or more, or it settles.
+//   Hedge / lock profit (11/17): this file loads onyx-hedge.js (OnyxHedge) once the page is idle. Every chance() result
+//   goes to OnyxHedge.seen (the live rail's "Lock $X" chip) and every meter to OnyxHedge.decorate (the "Hedge available:
+//   lock $X" chip, or a "Hedge calculator" link on an open pick). The hedge math is arithmetic, never a promise.
 //
 // Models (all from live.js when it is on the page; this file loads it on demand when a saved pick is in play):
 //   props: the stat so far plus the pregame projection (backed out of the saved chance) for the time left, with
@@ -332,6 +335,7 @@
     r.pts = history(p.id); r.trend = trendOf(p.id);
     r.now = r.now || ''; r.need = r.need || '';
     fire(p.id, r.p, r.res);
+    if (window.OnyxHedge && OnyxHedge.seen) { try { OnyxHedge.seen(p, r); } catch (e) {} }
     return r;
   }
 
@@ -509,6 +513,8 @@
     box.setAttribute('role', 'group'); box.setAttribute('aria-label', 'Chance to cash: ' + text(r));
     box.innerHTML = meterHTML(m.pick, r, m.compact);
     m.drawn = true; m.r = r;
+    // the hedge chip (onyx-hedge.js): only on a worked-out chance (r.id), never on the reload's placeholder line
+    if (r.id && !m.compact && window.OnyxHedge && OnyxHedge.decorate) { try { OnyxHedge.decorate(box, m.pick, r); } catch (e) {} }
   }
   function update(m) {
     if (m.dead) return Promise.resolve();
@@ -571,6 +577,24 @@
     return p;
   }
 
-  window.OnyxCash = {chance: chance, mount: mount, leans: leans, history: history, text: text, status: statusOf, ensureLive: ensureLive, css: css,
+  // ── hedge / lock profit (onyx-hedge.js), loaded once the page is idle; meters drawn before it arrives get their chip then ──
+  var HEDGE_P = null;
+  function ensureHedge() {
+    if (window.OnyxHedge) return Promise.resolve(true);
+    if (HEDGE_P) return HEDGE_P;
+    HEDGE_P = new Promise(function (res) {
+      var s = document.querySelector('script[src="onyx-hedge.js"]');
+      var done = function () {
+        if (window.OnyxHedge) MOUNTS.forEach(function (m) { if (m.r && m.r.id && m.box && m.box.isConnected && !m.compact) { try { OnyxHedge.decorate(m.box, m.pick, m.r); } catch (e) {} } });
+        res(!!window.OnyxHedge);
+      };
+      if (!s) { s = document.createElement('script'); s.src = 'onyx-hedge.js'; s.async = true; (document.head || document.documentElement).appendChild(s); }
+      s.addEventListener('load', done); s.addEventListener('error', function () { res(false); });
+    });
+    return HEDGE_P;
+  }
+  if ('requestIdleCallback' in window) requestIdleCallback(ensureHedge, {timeout: 4000}); else setTimeout(ensureHedge, 1500);
+
+  window.OnyxCash = {chance: chance, ensureHedge: ensureHedge, mount: mount, leans: leans, history: history, text: text, status: statusOf, ensureLive: ensureLive, css: css,
     _fit: fitPre};
 })();
