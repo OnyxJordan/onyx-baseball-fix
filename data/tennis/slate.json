@@ -1106,8 +1106,8 @@
     {
      "id": "186786",
      "start": "2026-11-17T20:05Z",
-     "state": "in",
-     "detail": "3rd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Grandstand",
@@ -1117,11 +1117,11 @@
        "short": "L. Samson",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/cze.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         3,
         6,
-        5
+        6
        ],
        "serve": false
       },
@@ -1134,9 +1134,9 @@
        "sets": [
         6,
         3,
-        3
+        4
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -1144,7 +1144,7 @@
      "id": "186794",
      "start": "2026-11-17T21:30Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -1156,9 +1156,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        3
+        3,
+        2
        ],
-       "serve": false
+       "serve": true
       },
       {
        "name": "Barbara Gatica",
@@ -1167,7 +1168,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        6
+        6,
+        2
        ],
        "serve": false
       }
@@ -1415,9 +1417,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Laura Samson",
+       "short": "L. Samson",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/cze.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -1640,5 +1642,5 @@
    ]
   }
  ],
- "fetched": "2026-11-17T22:22:46+00:00"
+ "fetched": "2026-11-17T22:46:53+00:00"
 }
