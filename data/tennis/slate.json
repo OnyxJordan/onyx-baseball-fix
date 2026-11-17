@@ -993,8 +993,8 @@
     {
      "id": "186785",
      "start": "2026-11-17T15:50Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Grandstand",
@@ -1016,10 +1016,10 @@
        "short": "L. Bronzetti",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ita.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        4
+        6
        ],
        "serve": false
       }
@@ -1029,7 +1029,7 @@
      "id": "186790",
      "start": "2026-11-17T16:20Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -1041,7 +1041,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        6
+        6,
+        1
        ],
        "serve": false
       },
@@ -1052,17 +1053,18 @@
        "seed": null,
        "win": false,
        "sets": [
-        6
+        7,
+        3
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
     {
      "id": "186782",
-     "start": "2026-11-17T17:30Z",
+     "start": "2026-11-17T18:00Z",
      "state": "pre",
-     "detail": "11/17 - 12:30 PM EST",
+     "detail": "11/17 - 1:00 PM EST",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -1222,9 +1224,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Lucia Bronzetti",
+       "short": "L. Bronzetti",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ita.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -1612,5 +1614,5 @@
    ]
   }
  ],
- "fetched": "2026-11-17T17:19:41+00:00"
+ "fetched": "2026-11-17T17:52:58+00:00"
 }
