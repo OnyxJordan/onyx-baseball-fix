@@ -3,36 +3,6 @@
  "locked": false,
  "legs": [
   {
-   "pid": "0497CAEAD35C",
-   "player": "Scottie Barnes",
-   "team": "TOR",
-   "opp": "NY",
-   "gid": "2026111885F5F8DB",
-   "stat": "reb",
-   "side": "under",
-   "line": 7.5,
-   "odds": -150,
-   "prob": 0.5735,
-   "proj": 6.06,
-   "sel": "927bd32e-fa98-4e57-b469-343dc269162a",
-   "hit": null
-  },
-  {
-   "pid": "261FA9507199",
-   "player": "Ayo Dosunmu",
-   "team": "MIN",
-   "opp": "POR",
-   "gid": "202611185E8C0927",
-   "stat": "ast",
-   "side": "under",
-   "line": 3.5,
-   "odds": -145,
-   "prob": 0.5577,
-   "proj": 2.87,
-   "sel": "60bd0186-d45c-41ce-aeb5-45a5dd66245f",
-   "hit": null
-  },
-  {
    "pid": "744F7C5CA248",
    "player": "Rui Hachimura",
    "team": "LAC",
@@ -45,6 +15,36 @@
    "prob": 0.5538,
    "proj": 5.01,
    "sel": "a4ce8484-5bac-46b2-b5f4-51193e97d198",
+   "hit": null
+  },
+  {
+   "pid": "B05F49FE7024",
+   "player": "RJ Barrett",
+   "team": "TOR",
+   "opp": "NY",
+   "gid": "2026111885F5F8DB",
+   "stat": "ast",
+   "side": "over",
+   "line": 3.5,
+   "odds": -150,
+   "prob": 0.5492,
+   "proj": 4.25,
+   "sel": "af876498-8d5f-42b9-9509-d60f8ae2719d",
+   "hit": null
+  },
+  {
+   "pid": "A34D0F71C5A5",
+   "player": "Rudy Gobert",
+   "team": "MIN",
+   "opp": "POR",
+   "gid": "202611185E8C0927",
+   "stat": "pts",
+   "side": "under",
+   "line": 10.5,
+   "odds": -143,
+   "prob": 0.5469,
+   "proj": 9.76,
+   "sel": "33a53c56-f73e-454c-9d6e-b027f34162d7",
    "hit": null
   }
  ]

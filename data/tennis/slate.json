@@ -923,8 +923,8 @@
     {
      "id": "186787",
      "start": "2026-11-17T14:05Z",
-     "state": "in",
-     "detail": "1st",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Grandstand",
@@ -936,18 +936,20 @@
        "seed": null,
        "win": false,
        "sets": [
-        4
+        4,
+        0
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Irene Burillo",
        "short": "I. Burillo",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
-        5
+        6,
+        6
        ],
        "serve": false
       }
@@ -956,8 +958,8 @@
     {
      "id": "186791",
      "start": "2026-11-17T14:05Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -970,7 +972,7 @@
        "win": false,
        "sets": [
         3,
-        1
+        5
        ],
        "serve": false
       },
@@ -979,49 +981,20 @@
        "short": "N. Podoroska",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        0
+        7
        ],
        "serve": false
       }
      ]
     },
     {
-     "id": "186790",
-     "start": "2026-11-17T15:30Z",
-     "state": "pre",
-     "detail": "11/17 - 10:30 AM EST",
-     "round": "Round 1",
-     "draw": "Women's Singles",
-     "court": "Center Court",
-     "p": [
-      {
-       "name": "Miriam Bulgaru",
-       "short": "M. Bulgaru",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/rom.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      },
-      {
-       "name": "Polona Hercog",
-       "short": "P. Hercog",
-       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/slo.png",
-       "seed": null,
-       "win": false,
-       "sets": [],
-       "serve": false
-      }
-     ]
-    },
-    {
      "id": "186785",
-     "start": "2026-11-17T15:30Z",
-     "state": "pre",
-     "detail": "11/17 - 10:30 AM EST",
+     "start": "2026-11-17T15:50Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Grandstand",
@@ -1032,8 +1005,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        2
+       ],
+       "serve": true
       },
       {
        "name": "Lucia Bronzetti",
@@ -1041,7 +1016,42 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ita.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        5
+       ],
+       "serve": false
+      }
+     ]
+    },
+    {
+     "id": "186790",
+     "start": "2026-11-17T16:20Z",
+     "state": "in",
+     "detail": "1st",
+     "round": "Round 1",
+     "draw": "Women's Singles",
+     "court": "Center Court",
+     "p": [
+      {
+       "name": "Miriam Bulgaru",
+       "short": "M. Bulgaru",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/rom.png",
+       "seed": null,
+       "win": false,
+       "sets": [
+        1
+       ],
+       "serve": false
+      },
+      {
+       "name": "Polona Hercog",
+       "short": "P. Hercog",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/slo.png",
+       "seed": null,
+       "win": false,
+       "sets": [
+        0
+       ],
        "serve": false
       }
      ]
@@ -1259,9 +1269,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Nadia Podoroska",
+       "short": "N. Podoroska",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -1288,9 +1298,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Irene Burillo",
+       "short": "I. Burillo",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -1600,5 +1610,5 @@
    ]
   }
  ],
- "fetched": "2026-11-17T15:06:23+00:00"
+ "fetched": "2026-11-17T16:31:38+00:00"
 }
