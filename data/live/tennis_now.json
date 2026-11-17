@@ -3463,5 +3463,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186785-ml-home",
+  "sport": "tennis",
+  "gid": "186785",
+  "date": "2026-11-17",
+  "logged_at": "2026-11-17T16:01:26+00:00",
+  "matchup": "Alicia Herrero Linana vs Lucia Bronzetti",
+  "home": "Lucia Bronzetti",
+  "away": "Alicia Herrero Linana",
+  "label": "Lucia Bronzetti to win",
+  "kind": "ml",
+  "side": "home",
+  "line": null,
+  "price": -256,
+  "chance": 0.7492,
+  "implied": 0.7191,
+  "edge": 0.03,
+  "fair": -300,
+  "state": {
+   "sets": "0-2",
+   "srv": "home",
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
