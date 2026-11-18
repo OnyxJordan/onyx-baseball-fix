@@ -123732,5 +123732,36 @@
   "actual": "6-13",
   "profit": -1.0,
   "graded_at": "2026-11-18T21:24:20+00:00"
+ },
+ {
+  "id": "cbb-401920514-total-under",
+  "sport": "cbb",
+  "gid": "401920514",
+  "date": "2026-11-18",
+  "logged_at": "2026-11-18T21:57:44+00:00",
+  "matchup": "HOU @ FLA",
+  "home": "FLA",
+  "away": "HOU",
+  "label": "Under 148.5",
+  "kind": "total",
+  "side": "under",
+  "line": 148.5,
+  "price": -110,
+  "chance": 0.5943,
+  "implied": 0.5238,
+  "edge": 0.07,
+  "fair": -145,
+  "state": {
+   "score": "HOU 7 - 8 FLA",
+   "period": 1,
+   "clock": "15:37",
+   "f": 0.89
+  },
+  "pre_src": null,
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
