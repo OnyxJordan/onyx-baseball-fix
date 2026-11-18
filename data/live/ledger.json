@@ -123671,5 +123671,36 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "cbb-401920513-total-under",
+  "sport": "cbb",
+  "gid": "401920513",
+  "date": "2026-11-18",
+  "logged_at": "2026-11-18T19:43:51+00:00",
+  "matchup": "RUTG @ ND",
+  "home": "ND",
+  "away": "RUTG",
+  "label": "Under 170.5",
+  "kind": "total",
+  "side": "under",
+  "line": 170.5,
+  "price": -120,
+  "chance": 0.6473,
+  "implied": 0.5455,
+  "edge": 0.102,
+  "fair": -185,
+  "state": {
+   "score": "RUTG 37 - 43 ND",
+   "period": 1,
+   "clock": "2:49",
+   "f": 0.57
+  },
+  "pre_src": null,
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]

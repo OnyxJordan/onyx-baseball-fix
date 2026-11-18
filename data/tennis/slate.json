@@ -265,9 +265,9 @@
     },
     {
      "id": "187514",
-     "start": "2026-11-18T19:30Z",
-     "state": "pre",
-     "detail": "11/18 - 2:30 PM EST",
+     "start": "2026-11-18T19:40Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Group Stage",
      "draw": "Men's Singles",
      "court": "Inalpi Arena",
@@ -1294,7 +1294,7 @@
      "id": "186807",
      "start": "2026-11-18T18:40Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -1306,7 +1306,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        3
+        3,
+        2
        ],
        "serve": false
       },
@@ -1317,9 +1318,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        3
+        6,
+        1
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -1674,5 +1676,5 @@
    ]
   }
  ],
- "fetched": "2026-11-18T19:09:56+00:00"
+ "fetched": "2026-11-18T19:43:26+00:00"
 }
