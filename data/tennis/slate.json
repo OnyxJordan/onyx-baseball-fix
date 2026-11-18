@@ -1333,9 +1333,9 @@
     },
     {
      "id": "186802",
-     "start": "2026-11-18T22:50Z",
-     "state": "pre",
-     "detail": "11/18 - 5:50 PM EST",
+     "start": "2026-11-18T23:00Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -1346,8 +1346,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/cze.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        0
+       ],
+       "serve": true
       },
       {
        "name": "Ariana Geerlings",
@@ -1355,7 +1357,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        0
+       ],
        "serve": false
       }
      ]
@@ -1682,5 +1686,5 @@
    ]
   }
  ],
- "fetched": "2026-11-18T22:42:55+00:00"
+ "fetched": "2026-11-18T23:04:08+00:00"
 }
