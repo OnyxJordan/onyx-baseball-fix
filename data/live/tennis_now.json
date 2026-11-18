@@ -3643,5 +3643,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186795-ml-home",
+  "sport": "tennis",
+  "gid": "186795",
+  "date": "2026-11-17",
+  "logged_at": "2026-11-18T00:36:35+00:00",
+  "matchup": "Antonia Vergara Rivera vs Fernanda Labrana",
+  "home": "Fernanda Labrana",
+  "away": "Antonia Vergara Rivera",
+  "label": "Fernanda Labrana to win",
+  "kind": "ml",
+  "side": "home",
+  "line": null,
+  "price": -263,
+  "chance": 0.7573,
+  "implied": 0.7245,
+  "edge": 0.033,
+  "fair": -310,
+  "state": {
+   "sets": "0-5",
+   "srv": "away",
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
