@@ -1181,7 +1181,7 @@
      "id": "186795",
      "start": "2026-11-18T00:05Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 1",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -1193,9 +1193,10 @@
        "seed": null,
        "win": false,
        "sets": [
+        1,
         0
        ],
-       "serve": false
+       "serve": true
       },
       {
        "name": "Fernanda Labrana",
@@ -1204,7 +1205,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        3
+        6,
+        2
        ],
        "serve": false
       }
@@ -1648,5 +1650,5 @@
    ]
   }
  ],
- "fetched": "2026-11-18T00:26:38+00:00"
+ "fetched": "2026-11-18T01:00:21+00:00"
 }
