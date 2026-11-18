@@ -1293,8 +1293,8 @@
     {
      "id": "186807",
      "start": "2026-11-18T18:40Z",
-     "state": "pre",
-     "detail": "11/18 - 1:40 PM EST",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -1305,7 +1305,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        3
+       ],
        "serve": false
       },
       {
@@ -1314,8 +1316,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        3
+       ],
+       "serve": true
       }
      ]
     },
@@ -1670,5 +1674,5 @@
    ]
   }
  ],
- "fetched": "2026-11-18T18:36:58+00:00"
+ "fetched": "2026-11-18T19:09:56+00:00"
 }
