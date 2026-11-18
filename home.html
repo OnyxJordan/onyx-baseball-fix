@@ -340,7 +340,7 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
       </div>
       <div class="ox-records">
         <a class="ox-rec" href="nba.html#record"><span class="ox-pill live">NBA</span><div class="v g" id="rNba">-</div><div class="l">Model picks, won / lost</div><p id="rNbaTxt">Points, rebounds and assists picks graded nightly.</p></a>
-        <a class="ox-rec" href="nba.html#home"><span class="ox-pill live">NBA</span><div class="v p" id="rTk">-</div><div class="l">The Model's Parlay</div><p id="rTkTxt">Three legs a night, locked at first tip and graded leg by leg.</p></a>
+        <a class="ox-rec" href="nba.html#home"><span class="ox-pill live">NBA</span><div class="v p" id="rTk">-</div><div class="l">The Model's Parlay</div><p id="rTkTxt">Value legs only: a ticket only on nights two or more legs beat Onyx's price.</p></a>
         <a class="ox-rec" href="index.html#record"><span class="ox-pill live">MLB</span><div class="v">HR</div><div class="l">Home run model, K and edge plays</div><p>Every play graded in the public ledger, by price and by conviction.</p></a>
       </div>
     </div>
@@ -354,7 +354,7 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
     <div class="ox-wrap ox-cta-in">
       <span class="ox-eyebrow">Parlays</span>
       <h2>Stack your<br>picks.</h2>
-      <p id="pDesc">Tonight's Model's Parlay: the three Onyx lines with the best chance to win, picked by the NBA model.</p>
+      <p id="pDesc">Tonight's Model's Parlay: value legs only, the Onyx lines where the NBA model's chance beats the price. No ticket on a night when nothing does.</p>
       <div class="ox-legs" id="oxLegs" hidden></div>
       <div class="ox-hero-cta">
         <a class="ox-btn fill" id="pBet" data-onyx="parlay" href="#" target="_blank" rel="noopener">Bet it on Onyx</a>
@@ -803,7 +803,9 @@ async function strip() {
 async function tonight() {
   try {
     const tk = await getJSON('data/nba/ticket_lock.json');
-    const legs = tk.legs || [];
+    // rule v2 (11/17, value legs only); a lock without a rule is the retired v1 ticket
+    const legs = tk.rule === 'v2' ? tk.legs || [] : [];
+    if (tk.rule === 'v2' && !legs.length && tk.board) document.getElementById('pDesc').textContent = "No value parlay today: nothing on the board beats Onyx's price.";
     if (legs.length) {
       const S = {pts: 'PTS', reb: 'REB', ast: 'AST'};
       const dec = legs.reduce((a, l) => a * decOf(l.odds), 1), p = legs.reduce((a, l) => a * (l.prob || 0), 1);
@@ -818,15 +820,19 @@ async function tonight() {
         document.getElementById('pBet').dataset.onyx = 'parlay_slip';
       }
       document.getElementById('pDesc').textContent = (tk.locked ? 'Locked at first tip. ' : 'Locks at first tip. ')
-        + "Tonight's Model's Parlay: the three Onyx lines with the best chance to win, picked by the NBA model.";
+        + "Tonight's Model's Parlay: value legs only, the Onyx lines where the NBA model's chance beats the price.";
     }
   } catch (e) {}
   try {
     const h = await getJSON('data/nba/ticket_history.json');
-    const g = h.filter(r => r.hit === true || r.hit === false);
-    const w = g.filter(r => r.hit).length;
-    document.getElementById('rTk').textContent = g.length ? `${w}-${g.length - w}` : 'New';
-    if (!g.length) document.getElementById('rTkTxt').textContent = 'The first ticket locks at tonight\'s first tip. Graded leg by leg, every night.';
+    // each rule keeps its own record, never mixed: v2 leads, the earlier rule shows below it
+    const rec = rows => { const g = rows.filter(r => r.result === 'win' || r.result === 'loss');
+      return {w: g.filter(r => r.result === 'win').length, l: g.filter(r => r.result === 'loss').length, pnl: g.reduce((a, r) => a + (+r.pnl || 0), 0)}; };
+    const v2 = rec(h.filter(r => r.rule === 'v2')), v1rows = h.filter(r => (r.rule || 'v1') === 'v1'), v1 = rec(v1rows);
+    const md = d => d ? (+d.slice(5, 7)) + '/' + (+d.slice(8, 10)) : '';
+    document.getElementById('rTk').textContent = v2.w + v2.l ? `${v2.w}-${v2.l}` : 'New';
+    document.getElementById('rTkTxt').textContent = "Value legs only: a ticket only on nights two or more legs beat Onyx's price."
+      + (v1rows.length ? ` Earlier rule (most likely legs, ${md(v1rows[0].date)}-${md(v1rows[v1rows.length - 1].date)}): ${v1.w}-${v1.l}, ${v1.pnl < 0 ? '-' : '+'}$${Math.abs(v1.pnl).toFixed(2)}.` : '');
   } catch (e) {}
   try {
     const ph = await getJSON('data/nba/picks_history.json');

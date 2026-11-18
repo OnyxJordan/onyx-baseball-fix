@@ -44,8 +44,28 @@ TICKET_LOCK = "ticket_lock.json"     # today's ticket, refreshed until the first
 # projected minutes: -14% at the open, +19% at the close (median leg -146).
 # No version is proven at ~140 tickets; this one is no worse and plays like
 # a ticket people actually bet.
+# 11/17 (Jordan, "this is awful the record"): v1 went 1-17, -$150.55. Its 53 legs averaged a
+# 57.4% blended chance against 59.9% Onyx implied and hit 47.2%: ranking by win chance alone
+# picks the shortest prices, so the ticket paid Onyx's margin three times by construction.
+# RULE v2, VALUE LEGS ONLY: a leg qualifies only when the blended chance beats Onyx's
+# vig-inclusive implied (edge > 0, the same thing as EV > 0), with the same -150..+150 /
+# 28+ minute guards, one per game and player, plus the picks lane's role-mismatch guard
+# (PICK_MAX_GAP); ranked by EV, up to 3; fewer than 2 qualifying legs = NO ticket that day.
+# tools/nba_parlay_backtest.py, 2025-26 at Onyx main-line prices, same slates as v1:
+#   held out Feb-Apr  open:  v2 47 tickets 9-38 +46.7% (legs hit 55.8% vs 50.5% implied)
+#                            v1 49 tickets 9-40  -7.5% (legs 57.1% vs 58.7%)
+#                     close: v2 49 tickets 8-41  +1.4% (legs 49.7% vs 51.5%); v1 10-39 +0.7%
+#   tuning Oct-Jan    open:  v2 -0.3% (90 tickets), v1 +13.5%; close: v2 -21.3%, v1 +22.6%
+# Not proven: v2 lost the tuning months and won the held-out ones, so this is the honest rule
+# (no leg against the price), not a proven edge. The tuner's pick (edge 1pp+) won Oct-Jan and
+# lost Feb-Apr (-10.6% open, -56.2% close), so the threshold stays at the rule's own 0.
+# At Onyx's margin since 11/8 (~11.5% two-way on props) it almost never posts: 6 of 150
+# 2025-26 slates re-priced at the open, 10 of 148 at the close; 0 of 9 real slates 11/8-11/16.
 TICKET_LEGS, TICKET_MIN_LEGS, TICKET_MIN_MIN = 3, 2, 28.0
 TICKET_PRICE = (-150, 150)
+TICKET_RULE = "v2"            # new tickets carry it; rows without "rule" are v1 (10/26-11/17)
+TICKET_MIN_EDGE = 0.0         # blended chance minus Onyx's vig-inclusive implied, strictly above
+TICKET_RULE_LABEL = {"v1": "Earlier rule (most likely legs)", "v2": "Value legs only"}
 STAKE = 10.0
 
 # Picks lane (v1). Deliberately strict: an honest lane is a quiet lane.
@@ -467,11 +487,14 @@ def grade(ledger, today):
 
 # ── the daily Top Scorer Parlay, tracked like the MLB Model's Ticket ─────────
 def ticket_legs(rows, games):
-    """The Model's Parlay: the three Onyx main-line legs with the highest
-    blended win chance (20% model / 80% Onyx no-vig, the board's number),
-    any of points / rebounds / assists, over or under, priced -150..+150,
-    projected 28+ minutes (starters on standard prices), healthy, untipped, one leg per game and per player."""
-    cands = []
+    """The Model's Parlay, rule v2 (value legs only): Onyx main-line legs whose
+    blended win chance (20% model / 80% Onyx no-vig, the board's number) beats
+    Onyx's vig-inclusive price (edge > 0, EV > 0), any of points / rebounds /
+    assists, over or under, priced -150..+150, projected 28+ minutes, healthy,
+    untipped, no role mismatch, ranked by EV, one leg per game and per player.
+    Returns (legs, board): board = untipped legs that passed every guard but price
+    value, so the page can tell "nothing beats Onyx's price" from "no lines yet"."""
+    cands, board = [], 0
     for r in rows:
         if r["out"] or r["inj"] or r["min"] < TICKET_MIN_MIN:
             continue
@@ -480,24 +503,33 @@ def ticket_legs(rows, games):
         for s_, pr in (r.get("props") or {}).items():
             if pr.get("src") != "onyx":
                 continue
+            if pr.get("gap") is not None and pr["gap"] > PICK_MAX_GAP:
+                continue                      # projection and line describe different roles
             for side, a in (pr.get("all") or {}).items():
                 if not a.get("sel") or a.get("prob") is None or a.get("price") is None:
                     continue
                 if not (TICKET_PRICE[0] <= a["price"] <= TICKET_PRICE[1]):
                     continue
-                cands.append((a["prob"], r, s_, side, pr, a))
+                board += 1
+                imp = M.implied(a["price"])
+                edge = a["prob"] - imp
+                ev = a["prob"] * dec_odds(a["price"]) - 1
+                if edge <= TICKET_MIN_EDGE or ev <= 0:
+                    continue
+                cands.append((ev, edge, imp, r, s_, side, pr, a))
     cands.sort(key=lambda c: -c[0])
     out, g_used, p_used = [], set(), set()
-    for prob, r, s_, side, pr, a in cands:
+    for ev, edge, imp, r, s_, side, pr, a in cands:
         if len(out) >= TICKET_LEGS:
             break
         if r["gid"] in g_used or r["pid"] in p_used:
             continue
         g_used.add(r["gid"]); p_used.add(r["pid"])
         out.append({"pid": r["pid"], "player": r["name"], "team": r["team"], "opp": r["opp"], "gid": r["gid"],
-                    "stat": s_, "side": side, "line": pr["line"], "odds": a["price"], "prob": prob,
+                    "stat": s_, "side": side, "line": pr["line"], "odds": a["price"], "prob": a["prob"],
+                    "implied": round(imp, 4), "edge": round(edge, 4), "ev": round(ev, 4),
                     "proj": r["proj"][s_], "sel": a["sel"], "hit": None})
-    return out
+    return out, board
 
 
 def attach_lineups(slate, today):
@@ -703,21 +735,23 @@ def update_ticket(rows, games, slate, today, source):
     ledger exactly once (the MLB rule: locked at first pitch, never edited)."""
     lock = load(TICKET_LOCK, {})
     if lock.get("date") != today:
-        lock = {"date": today, "locked": False, "legs": []}
+        lock = {"date": today, "locked": False, "legs": [], "rule": TICKET_RULE}
     if not lock.get("locked"):
         if slate_started(slate):
             lock["locked"] = True
             if len(lock["legs"]) >= TICKET_MIN_LEGS:
                 hist = load(TICKETS, [])
                 if not any(t.get("date") == today for t in hist):
-                    hist.append({"date": today, "stake": STAKE, "data_src": source, "legs": lock["legs"],
+                    hist.append({"date": today, "rule": lock.get("rule", "v1"), "stake": STAKE, "data_src": source,
+                                 "legs": lock["legs"],
                                  "result": None, "pnl": None,
                                  "locked_at": datetime.now(timezone.utc).isoformat(timespec="seconds")})
                     save(TICKETS, hist, indent=1)
                     print(f"  ticket: locked {len(lock['legs'])}-leg parlay for {today}")
         else:
-            legs = ticket_legs(rows, games)
+            legs, board = ticket_legs(rows, games)
             lock["legs"] = legs if len(legs) >= TICKET_MIN_LEGS else []
+            lock["rule"], lock["board"] = TICKET_RULE, board
         save(TICKET_LOCK, lock, indent=1)
     return lock
 
@@ -776,16 +810,34 @@ def grade_tickets(today):
     return hist, n
 
 
+def ticket_rule(t):
+    return t.get("rule") or "v1"
+
+
 def summarize_tickets(hist, lock):
-    settled = [t for t in hist if t.get("result") in ("win", "loss")]
-    w = sum(1 for t in settled if t["result"] == "win")
-    pnl = round(sum(t["pnl"] for t in settled), 2)
-    staked = sum(t["stake"] for t in settled)
-    return {"w": w, "l": len(settled) - w, "pending": sum(1 for t in hist if not t.get("result")),
-            "void": sum(1 for t in hist if t.get("result") == "void"),
-            "pnl": pnl, "roi": round(pnl / staked, 4) if staked else 0.0,
-            "rows": [{**t, "legs": [dict(l) for l in t["legs"]]} for t in reversed(hist)],
-            "today": {**lock, "legs": [dict(l) for l in lock["legs"]]} if lock.get("legs") else None}
+    """The page's parlay record: the current rule (TICKET_RULE) leads, each
+    earlier rule keeps its own record under "prev". Never mixed (README: a list
+    rule's rows never block or mix with another's)."""
+    def rec(rows, rule):
+        settled = [t for t in rows if t.get("result") in ("win", "loss")]
+        w = sum(1 for t in settled if t["result"] == "win")
+        pnl = round(sum(t["pnl"] for t in settled), 2)
+        staked = sum(t["stake"] for t in settled)
+        return {"rule": rule, "label": TICKET_RULE_LABEL.get(rule, rule),
+                "w": w, "l": len(settled) - w, "pending": sum(1 for t in rows if not t.get("result")),
+                "void": sum(1 for t in rows if t.get("result") == "void"),
+                "pnl": pnl, "roi": round(pnl / staked, 4) if staked else 0.0,
+                "from": rows[0]["date"] if rows else None, "to": rows[-1]["date"] if rows else None,
+                "rows": [{**t, "legs": [dict(l) for l in t["legs"]]} for t in reversed(rows)]}
+    cur = rec([t for t in hist if ticket_rule(t) == TICKET_RULE], TICKET_RULE)
+    lock_cur = ticket_rule(lock) == TICKET_RULE
+    cur["today"] = {**lock, "legs": [dict(l) for l in lock["legs"]]} if lock.get("legs") and lock_cur else None
+    # "No value parlay today": the build looked at an untipped Onyx board and no 2 legs beat the price
+    cur["none"] = bool(lock_cur and not lock.get("legs") and lock.get("board"))
+    cur["min_edge"] = TICKET_MIN_EDGE
+    cur["prev"] = [rec([t for t in hist if ticket_rule(t) == r], r)
+                   for r in sorted({ticket_rule(t) for t in hist} - {TICKET_RULE})]
+    return cur
 
 
 def headshot_index(slate, hist):
@@ -961,7 +1013,8 @@ def main():
     # every record row gets a headshot, not only players on tonight's slate
     hsx = headshot_index(slate, hist)
     record = summarize(ledger)
-    for rr in record["rows"] + [l for t in tickets["rows"] for l in t["legs"]] + ((tickets["today"] or {}).get("legs") or []):
+    tk_rows = tickets["rows"] + [t for pv in tickets["prev"] for t in pv["rows"]]
+    for rr in record["rows"] + [l for t in tk_rows for l in t["legs"]] + ((tickets["today"] or {}).get("legs") or []):
         rr["hs"] = hsx.get(nk(rr.get("name") or rr.get("player") or ""))
     media = {p["pid"]: (p.get("hs"), p.get("logo")) for p in slate.get("players", [])}
     players_out = []

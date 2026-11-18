@@ -35,11 +35,11 @@ body{background:#0c0c0c;color:#fff;margin:0}
 .mr-w{overflow-x:auto;border:1px solid rgba(255,255,255,.1);border-radius:14px}
 .sc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:10px}
 .lane{padding:14px;border-radius:16px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.035);min-width:0}
-.lane.tracked{border-color:rgba(97,233,112,.45)}.lane.trial{border-color:rgba(176,56,249,.55)}.lane.closed{border-color:rgba(255,255,255,.18)}
+.lane.tracked{border-color:rgba(97,233,112,.45)}.lane.trial{border-color:rgba(176,56,249,.55)}.lane.closed,.lane.retired{border-color:rgba(255,255,255,.18)}
 .lane-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
 .tag{display:inline-block;padding:3px 8px;border-radius:999px;font:700 10px monospace;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
 .tag.sp{background:rgba(255,255,255,.08);color:#ddd}.tag.tracked{background:rgba(97,233,112,.15);color:#61e970}
-.tag.trial{background:rgba(176,56,249,.2);color:#d795ff}.tag.lean{background:rgba(255,255,255,.06);color:#9a93a6}.tag.closed{background:rgba(255,255,255,.1);color:#ccc}
+.tag.trial{background:rgba(176,56,249,.2);color:#d795ff}.tag.lean{background:rgba(255,255,255,.06);color:#9a93a6}.tag.closed,.tag.retired{background:rgba(255,255,255,.1);color:#ccc}
 .lane h3{margin:0 0 4px;font-size:17px;line-height:1.25}
 .lane .what{margin:0 0 10px;color:#b9b2c4;font-size:13px;line-height:1.55}
 .lane-nums{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-bottom:10px}
@@ -181,9 +181,14 @@ const LANES = [
   {sport: 'NBA', name: 'Player props', status: 'tracked', src: 'data/nba/picks_history.json', grade: gradePicks, href: 'nba.html#record',
    what: 'Points, rebounds and assists where the model beats the Onyx price, graded off the box score.',
    ev: 'Live because the NBA model beat Onyx\'s prices on a season it never saw (v8 added confirmed starting fives on 10/31).'},
-  {sport: 'NBA', name: "The Model's Parlay", status: 'tracked', src: 'data/nba/ticket_history.json', grade: gradeTickets, href: 'home.html#parlay',
-   what: 'Three mainstream legs a night (-150 to +150, 28+ minute starters), locked at first tip, $10 a ticket.',
-   ev: 'A ticket from the tracked props lane, so it shares that lane\'s evidence.'},
+  {sport: 'NBA', name: "The Model's Parlay (value legs only)", status: 'tracked', src: 'data/nba/ticket_history.json', grade: gradeTickets, href: 'nba.html#record',
+   filter: r => r.rule === 'v2',
+   what: 'Since 11/18: up to three legs (-150 to +150, 28+ minute starters, one per game) whose model chance beats Onyx\'s price, ranked by expected value. Fewer than two such legs means no ticket that night. Locked at first tip, $10 a ticket.',
+   ev: 'Replayed on 2025-26 at Onyx prices, judged on February to April: +46.7% at the opening price (47 tickets) and +1.4% at the closing price (49), against -7.5% and +0.7% for the earlier rule on the same nights. It lost in the months before (-0.3% and -21.3%), so it is not proven. At Onyx\'s prices since 11/8 it rarely posts a ticket.'},
+  {sport: 'NBA', name: "The Model's Parlay, earlier rule (most likely legs)", status: 'retired', src: 'data/nba/ticket_history.json', grade: gradeTickets, href: 'nba.html#record',
+   filter: r => (r.rule || 'v1') === 'v1',
+   what: '10/26 to 11/17: the three legs with the highest win chance each night, whatever the price. Retired for value legs only.',
+   ev: 'Its legs averaged a 57.4% win chance against 59.9% implied by Onyx\'s price, and hit 47.2%: favorites priced shorter than their real chance, on every leg.'},
   {sport: 'NBA', name: 'Assists unders', status: 'trial', src: 'data/nba/open_trial.json', grade: gradePicks, href: 'nba.html#plays',
    filter: r => r.kind === 'ast_under',
    what: 'Onyx\'s opening price moved by the assists the opponent allows and how far the line sits from the player\'s usual range. 3 points of edge or more, every one, since 11/1.',
@@ -225,7 +230,7 @@ const LANES = [
   {sport: 'MLB', name: "The Model's Ticket (2026)", status: 'closed', src: 'data/archive/mlb_2026/ticket_history.json', grade: gradeTickets, href: 'mlb-2026.html',
    what: 'One $10 home run parlay a day, locked at first pitch.', ev: 'Season closed 10/29.'},
 ];
-const ST = {tracked: 'Lab · graded', trial: 'Lab · on trial', lean: 'Lean only', closed: 'Season closed'};
+const ST = {tracked: 'Lab · graded', trial: 'Lab · on trial', lean: 'Lean only', closed: 'Season closed', retired: 'Retired rule'};
 
 async function scorecard() {
   const el = document.getElementById('scLanes');
@@ -241,7 +246,7 @@ async function scorecard() {
       if (L.filter) rows = rows.filter(L.filter);
       const g = L.grade(rows);
       const n = g.w + g.l;
-      if (L.status === 'tracked' || L.status === 'trial') { tot.w += g.w; tot.l += g.l; tot.units += g.units; }
+      if (L.status === 'tracked' || L.status === 'trial' || L.status === 'retired') { tot.w += g.w; tot.l += g.l; tot.units += g.units; }   // a retired rule's record still counts
       nums = n || g.pend ? `<div class="lane-nums"><div><b>${g.w}-${g.l}${g.p ? '-' + g.p : ''}</b><span>Won-lost${g.p ? '-push' : ''}</span></div>
         <div><b class="${g.priced ? (g.units >= 0 ? 'g' : 'r') : ''}">${g.priced ? money(10 * g.units) : (n ? (100 * g.w / n).toFixed(1) + '%' : '-')}</b><span>${g.priced ? '$10 a bet' : 'Win rate'}</span></div>
         <div><b class="p">${g.priced && n ? pctS(g.units / n) : g.pend}</b><span>${g.priced && n ? 'Return' : 'Pending'}</span></div></div>` +
