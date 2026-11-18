@@ -3793,5 +3793,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-187514-spread-home",
+  "sport": "tennis",
+  "gid": "187514",
+  "date": "2026-11-18",
+  "logged_at": "2026-11-18T20:02:29+00:00",
+  "matchup": "Frances Tiafoe vs Flavio Cobolli",
+  "home": "Flavio Cobolli",
+  "away": "Frances Tiafoe",
+  "label": "Flavio Cobolli +1.5 games",
+  "kind": "spread",
+  "side": "home",
+  "line": 1.5,
+  "price": -125,
+  "chance": 0.6701,
+  "implied": 0.5556,
+  "edge": 0.115,
+  "fair": -205,
+  "state": {
+   "sets": "2-3",
+   "srv": "home",
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
