@@ -24,7 +24,7 @@ permissions:
 jobs:
   build-and-verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 40   # 11/17: the interactive gates (tap, rail, share, season, cash, hedge, alerts, field) took the run past 20
     steps:
       - name: Checkout PR
         uses: actions/checkout@v4
