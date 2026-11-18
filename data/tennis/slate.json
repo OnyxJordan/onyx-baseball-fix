@@ -230,9 +230,9 @@
     },
     {
      "id": "187509",
-     "start": "2026-11-18T13:00Z",
-     "state": "pre",
-     "detail": "11/18 - 8:00 AM EST",
+     "start": "2026-11-18T13:10Z",
+     "state": "in",
+     "detail": "2nd",
      "round": "Group Stage",
      "draw": "Men's Singles",
      "court": "Inalpi Arena",
@@ -243,7 +243,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/rus.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        2,
+        4
+       ],
        "serve": false
       },
       {
@@ -252,8 +255,11 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        6,
+        5
+       ],
+       "serve": true
       }
      ]
     },
@@ -1216,9 +1222,9 @@
     },
     {
      "id": "186805",
-     "start": "2026-11-18T14:30Z",
+     "start": "2026-11-18T14:35Z",
      "state": "pre",
-     "detail": "11/18 - 9:30 AM EST",
+     "detail": "11/18 - 9:35 AM EST",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -1652,5 +1658,5 @@
    ]
   }
  ],
- "fetched": "2026-11-18T12:20:50+00:00"
+ "fetched": "2026-11-18T14:24:20+00:00"
 }
