@@ -3270,5 +3270,93 @@
   "model": "v2",
   "result": null,
   "actual": null
+ },
+ {
+  "date": "2026-11-17",
+  "key": "401858306|keyjuan brown|rush_yds",
+  "gid": "401858306",
+  "pid": "4923046",
+  "name": "Keyjuan Brown",
+  "team": "LOU",
+  "opp": "PITT",
+  "matchup": "LOU vs PITT",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 55.5,
+  "price": -126,
+  "sel": "44e93c0e-dc86-4b95-9789-49baad9d02d4",
+  "proj": 46.4,
+  "prob": 0.642,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.46,
+    "avg": 0.77,
+    "pp": -7.2
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.86,
+    "avg": 0.93,
+    "pp": 1.2
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.26,
+    "avg": -0.05,
+    "pp": 0.2
+   }
+  ],
+  "opened_at": "2026-11-18T05:42:03+00:00",
+  "logged_at": "2026-11-18T05:42:03+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-17",
+  "key": "401858306|lincoln kienholz|rush_yds",
+  "gid": "401858306",
+  "pid": "5078278",
+  "name": "Lincoln Kienholz",
+  "team": "LOU",
+  "opp": "PITT",
+  "matchup": "LOU vs PITT",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 33.5,
+  "price": -124,
+  "sel": "f4a5a3e5-b08f-426e-9066-c42b34d4cb1a",
+  "proj": 28.7,
+  "prob": 0.6416,
+  "implied": 0.5536,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.46,
+    "avg": 0.77,
+    "pp": -7.2
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.86,
+    "avg": 0.93,
+    "pp": 1.2
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.25,
+    "avg": -0.05,
+    "pp": 0.2
+   }
+  ],
+  "opened_at": "2026-11-18T05:42:03+00:00",
+  "logged_at": "2026-11-18T05:42:03+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
  }
 ]
