@@ -3358,5 +3358,137 @@
   "model": "v2",
   "result": null,
   "actual": null
+ },
+ {
+  "date": "2026-11-18",
+  "key": "401858527|jordan anderson|rush_yds",
+  "gid": "401858527",
+  "pid": "4826636",
+  "name": "Jordan Anderson",
+  "team": "ILL",
+  "opp": "IOWA",
+  "matchup": "ILL vs IOWA",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 25.5,
+  "price": -126,
+  "sel": "6958e9da-5c11-4319-ac99-d045f47c710f",
+  "proj": 18.6,
+  "prob": 0.6348,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.54,
+    "avg": 0.77,
+    "pp": -5.4
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.91,
+    "avg": 0.93,
+    "pp": 0.3
+   },
+   {
+    "k": "line vs his usual range",
+    "v": 0.08,
+    "avg": -0.05,
+    "pp": -0.1
+   }
+  ],
+  "opened_at": "2026-11-18T10:16:54+00:00",
+  "logged_at": "2026-11-18T10:16:54+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-18",
+  "key": "401858527|aidan laughery|rush_yds",
+  "gid": "401858527",
+  "pid": "4827047",
+  "name": "Aidan Laughery",
+  "team": "ILL",
+  "opp": "IOWA",
+  "matchup": "ILL vs IOWA",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 55.5,
+  "price": -126,
+  "sel": "88cba199-c415-4c45-bef8-ff055b9faeab",
+  "proj": 49.4,
+  "prob": 0.631,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.54,
+    "avg": 0.77,
+    "pp": -5.4
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.91,
+    "avg": 0.93,
+    "pp": 0.3
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.34,
+    "avg": -0.05,
+    "pp": 0.3
+   }
+  ],
+  "opened_at": "2026-11-18T10:16:54+00:00",
+  "logged_at": "2026-11-18T10:16:54+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-18",
+  "key": "401858306|isaac brown|rush_yds",
+  "gid": "401858306",
+  "pid": "5079349",
+  "name": "Isaac Brown",
+  "team": "LOU",
+  "opp": "PITT",
+  "matchup": "LOU vs PITT",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 58.5,
+  "price": -126,
+  "sel": "32a747f7-22a3-4467-b611-d412a7a2c38e",
+  "proj": 56.8,
+  "prob": 0.6414,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.46,
+    "avg": 0.77,
+    "pp": -7.2
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.86,
+    "avg": 0.93,
+    "pp": 1.2
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.32,
+    "avg": -0.05,
+    "pp": 0.3
+   }
+  ],
+  "opened_at": "2026-11-18T10:16:54+00:00",
+  "logged_at": "2026-11-18T10:16:54+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
  }
 ]
