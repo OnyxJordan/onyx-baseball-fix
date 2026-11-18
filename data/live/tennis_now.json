@@ -3673,5 +3673,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-187509-spread-away",
+  "sport": "tennis",
+  "gid": "187509",
+  "date": "2026-11-18",
+  "logged_at": "2026-11-18T13:33:08+00:00",
+  "matchup": "Daniil Medvedev vs Carlos Alcaraz",
+  "home": "Carlos Alcaraz",
+  "away": "Daniil Medvedev",
+  "label": "Daniil Medvedev +4.5 games",
+  "kind": "spread",
+  "side": "away",
+  "line": 4.5,
+  "price": -150,
+  "chance": 0.6994,
+  "implied": 0.6,
+  "edge": 0.099,
+  "fair": -235,
+  "state": {
+   "sets": "2-2",
+   "srv": "away",
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
