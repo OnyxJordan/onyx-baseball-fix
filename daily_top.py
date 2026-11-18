@@ -378,6 +378,39 @@ def tops(sport, date, rows, now=None):
     return {"sport": sport, "date": date, "generated": now.isoformat(timespec="seconds"), "lists": lists}
 
 
+MOVES_KEEP = 16   # points per selection: the first price seen, then the 15 latest changes
+
+
+def keep_moves(data_dir, date, rows):
+    """data/<sport>/moves.json (11/17, Jordan: "Price alerts + line moves"): every board selection's
+    Onyx price path, {"sel": {sel: [[utc minute, price, line], ...]}}. A point is added only when the
+    price or the line changed since the last one, the first point (where the line opened for us) is
+    always kept, and a selection that leaves the board (its game started) drops out. The quick bet
+    card (onyx-alerts.js) draws "moved from -110 to -125 since open" and its sparkline from it, and
+    price alerts poll board.json. Onyx prices only: market fallback rows carry no selection id."""
+    p = Path(data_dir) / "moves.json"
+    try:
+        old = json.loads(p.read_text(encoding="utf-8")).get("sel") or {}
+    except Exception:
+        old = {}
+    ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%MZ")
+    out = {}
+    for e in rows:
+        s, pr = e.get("sel"), e.get("price")
+        if not s or pr is None or e.get("src") == "market" or s in out:
+            continue
+        h = old.get(s) if isinstance(old.get(s), list) else []
+        ln = e.get("line")
+        if not h or h[-1][1] != pr or h[-1][2] != ln:
+            h = h + [[ts, pr, ln]]
+        if len(h) > MOVES_KEEP:
+            h = h[:1] + h[-(MOVES_KEEP - 1):]
+        out[s] = h
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text(json.dumps({"date": date, "generated": datetime.now(timezone.utc).isoformat(timespec="seconds"), "sel": out},
+                            separators=(",", ":")), encoding="utf-8")
+
+
 def write_board(data_dir, sport, date, rows, teams=None):
     """data/<sport>/board.json: every priced Onyx side the model reads today,
     any price, for the home page's "Ask Onyx" search (it filters and builds
@@ -396,6 +429,10 @@ def write_board(data_dir, sport, date, rows, teams=None):
         seen.add(k)
         out.append(e)
     keep_pregame(data_dir, out)
+    try:
+        keep_moves(data_dir, date, out[:BOARD_KEEP])
+    except Exception as ex:   # fail-soft: the board is what matters
+        print(f"  moves: skipped ({str(ex)[:120]})")
     p = Path(data_dir) / "board.json"
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(json.dumps({"sport": sport, "date": date, "generated": datetime.now(timezone.utc).isoformat(timespec="seconds"),

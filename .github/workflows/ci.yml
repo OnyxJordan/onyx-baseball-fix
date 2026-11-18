@@ -24,7 +24,7 @@ permissions:
 jobs:
   build-and-verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 40   # 11/17: the interactive gates (tap, rail, share, season, cash, hedge, alerts, field) took the run past 20
     steps:
       - name: Checkout PR
         uses: actions/checkout@v4
@@ -127,3 +127,9 @@ jobs:
         run: node tools/verify_season.js
       - name: Live chance to cash
         run: node tools/verify_cash.js
+      - name: Hedge / lock profit
+        run: node tools/verify_hedge.js
+      - name: Price alerts and line moves
+        run: node tools/verify_alerts_ui.js
+      - name: Live football field
+        run: node tools/verify_field.js

@@ -19,6 +19,8 @@
 <script src="live.js"></script>
 <script src="onyxpicks.js"></script>
 <script src="sidesday.js"></script>
+<!-- the live football field (onyx-field.js, 11/17): the NFL and college gamecenter's animated play reconstruction -->
+<script src="onyx-field.js"></script>
 <!-- team and player cards (cards.js, data/<sport>/cards/*.json): data-oxt / data-oxp open them -->
 <script src="cards.js" defer></script>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -786,6 +788,7 @@ function drawGame(gid) {
     <div class="gc-sec" style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-primary" onclick="bet(null,'game ${esc(g.away)} @ ${esc(g.home)}')">⚡ Bet this game on Onyx</button>
       <button class="btn-secondary" onclick="OPEN_GAME=null;renderGames()">Close</button></div>
     <div id="gcDetail">${s ? gcDetail(s, g) : '<div class="empty">Loading the gamecenter…</div>'}</div></div>`;
+  if (window.OnyxField && KIND === 'football') OnyxField.attach(s, g);
   const on = box.querySelector('.gc-strip .on'); if (on) on.parentNode.scrollLeft = on.offsetLeft - 60;
   gcFloatSync();
   if (!s || (g.state === 'in' && !_gcTimer)) loadSummary(gid);
@@ -799,7 +802,7 @@ function loadSummary(gid) {
       GC_CACHE[gid] = j;
       const el = document.getElementById('gcDetail');
       ypAlerts();
-      if (el && OPEN_GAME === gid) el.innerHTML = gcDetail(j, live(game(gid)));
+      if (el && OPEN_GAME === gid) { el.innerHTML = gcDetail(j, live(game(gid))); if (window.OnyxField && KIND === 'football') OnyxField.attach(j, live(game(gid))); }
       ['ypHome', 'ypGames'].forEach(i => { const y = document.getElementById(i); if (y) y.innerHTML = yourPlayers(); });
       // the open live game refreshes on its own every 6s, between scoreboard polls
       if (OPEN_GAME === gid && live(game(gid) || {}).state === 'in' && !document.hidden) _gcTimer = setTimeout(() => loadSummary(gid), 6000);
@@ -962,7 +965,9 @@ function footballDetail(s, g) {
   const cur = (s.drives || {}).current;
   const sp = (s.scoringPlays || []).slice().reverse();
   const res = d => /touchdown/i.test(d.result || d.displayResult || '') ? 'td' : /interception|fumble|downs/i.test(d.result || d.displayResult || '') ? 'to' : '';
-  return `${GC_PLAY ? '' : fieldView(g)}${fbPlaysView(s, g)}${wpChart(s, g)}
+  // the animated field (onyx-field.js) once the game has plays; the static field when the script is missing
+  const fx = window.OnyxField && g.state !== 'pre' && fbPlays(s).length;
+  return `${fx ? OnyxField.slot(g) : (GC_PLAY ? '' : fieldView(g)) + fbPlaysView(s, g)}${wpChart(s, g)}
     ${sp.length ? `<div class="gc-sec"><h4>Scoring plays</h4><div class="plays">${sp.map(p => `<div class="play"><span class="t">Q${esc((p.period || {}).number)} ${esc((p.clock || {}).displayValue || '')}</span>
       <span>${lg((p.team || {}).logo)} ${esc(p.text || '')}</span><span class="r td">${esc(p.awayScore)}-${esc(p.homeScore)}</span></div>`).join('')}</div></div>` : ''}
     ${drives.length || cur ? `<div class="gc-sec"><h4>Drives</h4><div class="plays">${(cur ? [cur] : []).concat(drives).slice(0, 24).map((d, i) => `<div class="play">
