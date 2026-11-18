@@ -168,7 +168,7 @@ model: 288 scored, 0 errors
 | Top 5 Picks (`picks_input.json`) | ticket legs first, then +EV fills; locked by first pitch; $10 grading | 51-208 (19.7% — roughly what the model claims; the issue is price, not calibration) |
 | Model's Ticket (`ticket_history.json`) | one $10 parlay/day, 2–4 legs, **one bat per team**, frozen at slate first pitch (`ticket_lock.json`) | 5-53, +$114 |
 | K Projections (`k_history.json`) | model's side vs listed line, only when projection beats line by >10% | 436-380 (53.4%) |
-| NBA Model's Parlay (`nba/ticket_history.json`) | the algorithm's best look to win: the 3 Onyx main-line legs with the highest blended win chance (pts / reb / ast, over or under, -400..+150, 24+ min, one per game and player), frozen at the slate's first tip (`nba/ticket_lock.json` refreshes until then); graded leg by leg, a DNP or push is void and drops from the payout; one $10 ticket per slate. Chosen by replaying 2025-26 at Onyx prices: Feb-Apr hit 28.6% open / 22.4% close vs 12.2% / 4.1% for top-scorer overs | starts 10/26 |
+| NBA Model's Parlay (`nba/ticket_history.json`) | **rule v2 (`"rule": "v2"`, from 11/18): value legs only.** Up to 3 Onyx main-line legs whose blended win chance beats Onyx's vig-inclusive price (edge > 0 = EV > 0), pts / reb / ast, over or under, -150..+150, 28+ projected min, role-mismatch guard, one per game and player, ranked by EV; fewer than 2 = no ticket that day ("No value parlay today"). Frozen at the slate's first tip (`nba/ticket_lock.json` refreshes until then, carries `rule` and `board`); graded leg by leg, a DNP or push is void and drops from the payout; one $10 ticket per slate. Rows without `rule` are **v1** (10/26-11/17, the 3 highest blended win chances whatever the price; 1-17, -$150.55 at retirement) and keep their own record, shown below v2, never mixed. Evidence: "NBA Model's Parlay v2" at the end of this file | v1 10/26, v2 11/18 |
 | HR Edge (`hr_history.json`) | edge >1.5pp **and** price ≤+400 **and** edge ≤2.5pp **and** ≥2 signals (v45), straight up at listed price. **All-time, no prune** (see below) | 25-285 @ 10/15 (the vig wall, displayed honestly) |
 
 **The ledger files hold more rows than the site shows, and that is deliberate.**
@@ -2804,3 +2804,43 @@ model has a distribution, Add to parlay and Bet on Onyx (share link + `KR680261`
   scrubs the chart and checks it snaps back; `node tools/verify_nba.js` does the same for an NBA
   team card.
 
+
+## NBA Model's Parlay v2: value legs only (11/17)
+
+Jordan, 11/17: "this is awful the record". The v1 Model's Parlay ("the model's best look to win": the
+3 highest blended win chances, one per game, -150..+150, 28+ min) went **1-17, -$150.55, -83.6%**. Its
+53 graded legs averaged a 57.4% blended chance against 59.9% Onyx implied and hit 47.2%. Ranking by win
+chance alone picks the shortest prices the blend agrees with, so the ticket paid Onyx's margin on every
+leg by construction. Since 11/8 Onyx's NBA props come from OpticOdds book `onyx_predictions` at ~11.5%
+two-way margin (~6.5% on `onyx_odds` through 11/5); with the 20/80 blend almost no prop beats that price.
+
+**Rule v2 (Jordan's choice, "value legs only")**: a leg qualifies only when the blended chance beats Onyx's
+vig-inclusive implied (edge > 0, which is the same as EV > 0); same price / minutes guards, plus the picks
+lane's role-mismatch guard (`PICK_MAX_GAP`); ranked by EV, up to 3, one per game and player; **fewer than
+2 legs = no ticket**, and the page says "No value parlay today: nothing on the board beats Onyx's price".
+New tickets carry `"rule": "v2"`; the v1 rows stay as they are (append-only) and are summarized apart
+(`nba_build.summarize_tickets` -> `tickets.prev`; home.html and scorecard.html split by `rule`).
+
+Evidence (`tools/nba_parlay_backtest.py bt/nba`, 2025-26 replayed through the live model as
+`nba_minutes_backtest.py` does, Onyx main lines; thresholds chosen on Oct-Jan, judged on Feb-Apr):
+
+| window / price | v1 most likely | v2 value legs |
+|---|---|---|
+| Feb-Apr, open (held out) | 49 tickets 9-40, -7.5% (legs 57.1% hit vs 58.7% implied) | 47 tickets 9-38, **+46.7%** (legs 55.8% vs 50.5%) |
+| Feb-Apr, close (held out) | 49 tickets 10-39, +0.7% | 49 tickets 8-41, +1.4% (legs 49.7% vs 51.5%) |
+| Oct-Jan, open (tuning) | 99 tickets 25-74, +13.5% | 90 tickets 15-75, -0.3% |
+| Oct-Jan, close (tuning) | 97 tickets 26-71, +22.6% | 83 tickets 11-72, -21.3% |
+
+- The replay flatters v1 next to its live record (1-17): the live legs were priced at today's wider margin.
+- v2 is **not proven**: it lost the tuning months and won the held-out ones; per leg it beat the opening
+  price held out but not the closing price. It is shipped as the honest rule (no leg against the price),
+  and because v1 is clearly losing live, not as a found edge.
+- The tuner's pick (edge 1pp+, best on Oct-Jan) lost held out (-10.6% open, -56.2% close), so the threshold
+  stays at the rule's own 0. Wider price bands changed nothing (no value leg sat outside -150..+150).
+- **At today's margin it rarely posts.** Every 2025-26 leg re-priced to an 11.5% two-way margin: v2 posts
+  on 6 of 150 slates at the open and 10 of 148 at the close. On the real 2026-27 board
+  (`data/nba/prop_archive.json`, minutes = season average so far): 2 tickets on 4 slates through 11/7,
+  **0 on 9 slates from 11/8** (4 qualifying legs in all). The 11/17 board: 140 eligible sides, best edge
+  -1.9pp. Expect "No value parlay today" most nights until Onyx's margin narrows or the model earns weight.
+- Gate: `node tools/verify_nba.js` fakes both states in the page (a v2 ticket, and no ticket) and checks
+  the earlier rule's record shows apart; `SHOTS=dir` saves `parlay-{ticket,none}-{390,1280}.png`.

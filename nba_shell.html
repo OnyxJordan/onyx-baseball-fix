@@ -571,6 +571,9 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
 .mp-track b{font:800 15px monospace}
 .mp-track a{font-size:12px;color:#d795ff;white-space:nowrap}
 .mp-spark{height:44px;min-width:0}.mp-spark em{font-size:11px;color:var(--text3);font-style:normal}
+.mp-none{font-size:14px;font-weight:700;color:var(--text);padding:4px 0 2px}.mp-none+p{font-size:12px;color:var(--text3);margin:4px 0 0;line-height:1.45}
+.mp-prev{margin-top:10px;font-size:12px;color:var(--text3);cursor:pointer}.mp-prev b{font-family:monospace;color:var(--text2)}
+.tk-prev{margin-top:26px;opacity:.92}
 @media (max-width:600px){.mp-track{grid-template-columns:repeat(3,1fr)}.mp-spark{grid-column:1/-1}.mp-track a{grid-column:1/-1}}
 .tsp-rec{display:block;margin-top:4px;font-size:11px;color:#d795ff;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 .money-pos{color:#61e970!important}.money-neg{color:#f87171!important}
@@ -752,7 +755,7 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
     </div>
     <div class="home-section">
       <div class="home-section-tag">The Model's Parlay · lab, not a pick</div>
-      <h2 class="home-section-title">The model's best look to win</h2>
+      <h2 class="home-section-title">Value legs only, or no ticket</h2>
       <div id="homeMP"></div>
     </div>
     <div class="home-section" style="margin-bottom:0">
@@ -853,10 +856,11 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
   <div class="rec-big" id="recBig"></div>
   <div class="sec-hdr"><span class="sec-title">By Market · $10 on every pick</span></div>
   <div class="rec-big rec-3" id="recByStat"></div>
-  <div class="sec-hdr"><div><span class="sec-title">The Model's Parlay · the algorithm's best look to win, one $10 ticket per slate, locked at first tip, auto-graded</span></div><span class="sec-count" id="tkCount"></span></div>
+  <div class="sec-hdr"><div><span class="sec-title">The Model's Parlay · value legs only: up to three legs whose model chance beats Onyx's price, one $10 ticket per slate, locked at first tip, auto-graded</span></div><span class="sec-count" id="tkCount"></span></div>
   <div class="rec-big rec-5" id="tkBig"></div>
   <div class="tk-chart" id="tkChart"></div>
   <div id="tkList"></div>
+  <div class="tk-prev" id="tkPrev"></div>
   <div class="sec-hdr"><span class="sec-title">Pick Log</span><span class="sec-count" id="recCount"></span></div>
   <div class="tbl"><table>
     <thead><tr><th>Date</th><th>Player</th><th>Pick</th><th class="r">Odds</th><th class="r">Proj</th><th class="r">Edge</th><th class="r">Actual</th><th class="r">Result</th><th class="r">$10 P&amp;L</th></tr></thead>
@@ -1173,9 +1177,17 @@ function topScorerLegs(n) {
   return out;
 }
 var TSP_N = 3;
-// ── The Model's Parlay: the algorithm's best look to win, tracked ──
+// ── The Model's Parlay (rule v2, value legs only), tracked ──
 // The legs come from the build (nba_build.ticket_legs), the exact ticket that
-// locks at the first tip and is graded on the Record tab.
+// locks at the first tip and is graded on the Record tab. A leg qualifies only
+// when the model's chance beats Onyx's price; with fewer than two there is no
+// ticket. The earlier rule (most likely legs) keeps its own record, never mixed.
+function mdOf(d) { const m = /^\d{4}-(\d\d)-(\d\d)/.exec(d || ''); return m ? (+m[1]) + '/' + (+m[2]) : ''; }
+function tkPrevLine(pv) {
+  const span = pv.from ? ', ' + mdOf(pv.from) + (pv.to && pv.to !== pv.from ? '-' + mdOf(pv.to) : '') : '';
+  const lab = String(pv.label || 'Earlier rule (' + (pv.rule || '') + ')');
+  return `${esc(lab.replace(/\)$/, '') + span + ')')}: <b>${pv.w || 0}-${pv.l || 0}, ${money(pv.pnl || 0)}</b>${pv.pending ? ` · ${pv.pending} pending` : ''}`;
+}
 function legText(l) { return `${l.side === 'over' ? 'Over' : 'Under'} ${l.line} ${STAT_ABBR[l.stat || 'pts']}`; }
 function tkSpark(rows, W, H) {
   const chrono = rows.slice().reverse().filter(t => t.result === 'win' || t.result === 'loss');
@@ -1200,7 +1212,11 @@ function mpHtml() {
       <div><span>ROI</span><b class="${moneyCls(T.roi || 0)}">${((T.roi || 0) >= 0 ? '+' : '') + ((T.roi || 0) * 100).toFixed(1)}%</b></div>
       <div class="mp-spark">${tkSpark(T.rows || [], 220, 44) || '<em>chart draws from the 2nd graded ticket</em>'}</div>
       <a>Full record &rsaquo;</a></div>`;
-  if (!t) return `<div class="tsp"><div class="empty" style="border:none">The Model's Parlay builds once Onyx posts lines for games that have not tipped.</div>${track}</div>`;
+  const prev = (T.prev || []).map(pv => `<div class="mp-prev" onclick="gotoTab('record')">${tkPrevLine(pv)}</div>`).join('');
+  if (!t) return `<div class="tsp">${T.none
+      ? `<div class="mp-none">No value parlay today: nothing on the board beats Onyx's price.</div>
+         <p>The model only posts a ticket when at least two legs (-150 to +150, 28+ minute starters, one per game) have a better chance to win than Onyx's price says. Most nights at today's prices, none do.</p>`
+      : `<div class="empty" style="border:none">The Model's Parlay checks Onyx's lines once they are posted for games that have not tipped. It posts only when two or more legs beat Onyx's price.</div>`}${track}${prev}</div>`;
   const legs = t.legs;
   let dec = 1, chance = 1;
   legs.forEach(l => { dec *= decOf(l.odds); chance *= l.prob || 0; });
@@ -1209,12 +1225,12 @@ function mpHtml() {
   const allIn = bet.every(l => inSlip(l.sel));
   return `<div class="tsp mp">
     <div class="mp-hd"><span class="mp-tag">${t.locked ? 'LOCKED · LIVE' : 'LOCKS AT FIRST TIP'}</span>
-      <span class="mp-why">The ${legs.length} legs on tonight's Onyx board the model is most likely to cash, one per game, any stat, either side.</span></div>
+      <span class="mp-why">Value legs only: the ${legs.length} legs on tonight's Onyx board where the model's chance beats Onyx's price by the most, one per game, any stat, either side.</span></div>
     <div class="tsp-legs">${legs.map((l, k) => { const p = playerOf(l.pid) || {name: l.player, hs: l.hs};
       return `<div class="tsp-leg">${hs(p, 'm')}<div style="min-width:0;flex:1">
         <div class="who"><span class="nm" style="cursor:pointer" onclick="openPlayer('${esc(l.pid)}')">${esc(l.player)}</span></div>
         <div class="ln"><b style="color:var(--text)">${legText(l)}</b> · ${esc(l.team)} vs ${esc(l.opp)}</div>
-        <div class="ln">win chance <b style="color:#d795ff">${pct(l.prob, 0)}</b> · proj ${num(l.proj)}</div></div>
+        <div class="ln">win chance <b style="color:#d795ff">${pct(l.prob, 0)}</b>${l.implied != null ? ` vs Onyx ${pct(l.implied, 0)}` : ''} · proj ${num(l.proj)}</div></div>
         ${legChip(bet[k], l.side)}</div>`; }).join('')}</div>
     <div class="tsp-foot">
       <span class="tsp-pay">${legs.length}-leg <b>${amerOf(dec)}</b> · win chance <b>${pct(chance, 0)}</b> · $10 pays <b>$${(10 * dec).toFixed(2)}</b></span>
@@ -1222,7 +1238,7 @@ function mpHtml() {
         <button class="btn-secondary" onclick="tspAdd([${ids.join(',')}])">${allIn ? '✓ In your slip' : '+ Add to Parlay Builder'}</button>
         <button class="btn-primary" onclick="tspBet([${ids.join(',')}])">⚡ Bet it on Onyx</button>
       </div></div>
-    ${track}</div>`;
+    ${track}${prev}</div>`;
 }
 function tspHtml() {
   const ps = topScorerLegs(TSP_N);
@@ -1483,7 +1499,7 @@ function trackStrip() {
   return `<div class="pl-div"><i></i><span>The lab · graded in public, not recommended</span><i></i></div><div class="tk-strip">
     <button onclick="gotoTab('record')"><i>Lab · props lane</i><b>${rec(R.w, R.l)}</b><em>Graded nightly. Strict screens, so most nights have none.</em></button>
     <button onclick="document.getElementById('plOpen').scrollIntoView({behavior:'smooth'})"><i>Lab · on trial</i><b>${rec(O.w, O.l)}</b><em>1st-quarter totals and assists unders, at Onyx's opening price.</em></button>
-    <button onclick="gotoTab('home')"><i>Lab · Model's Parlay</i><b>${rec(K.w, K.l)}</b><em>Three starters on standard prices, one ticket a night.</em></button></div>`;
+    <button onclick="gotoTab('home')"><i>Lab · Model's Parlay</i><b>${rec(K.w, K.l)}</b><em>Value legs only: a ticket only when two or more legs beat Onyx's price.</em></button></div>`;
 }
 function renderPlays() {
   const L = plLane(), picks = (D.picks || []).slice();
@@ -2668,7 +2684,14 @@ function renderTickets() {
   };
   const todayT = T.today && !rows.some(t => t.date === T.today.date) ? card(T.today, true) : '';
   document.getElementById('tkList').innerHTML = todayT + rows.map(t => card(t, t.date === (D.date || ''))).join('')
-    || '<div class="empty">No ticket yet: one builds once Onyx posts points lines, and locks at the first tip.</div>';
+    || `<div class="empty">${T.none ? "No value parlay today: nothing on the board beats Onyx's price. " : ''}No ticket under this rule yet: one posts only on a night when two or more legs beat Onyx's price, and locks at the first tip.</div>`;
+  // each earlier rule keeps its own record below, never mixed into the current one
+  document.getElementById('tkPrev').innerHTML = (T.prev || []).map(pv => {
+    const pr = (pv.rows || []);
+    return `<div class="sec-hdr"><div><span class="sec-title">${tkPrevLine(pv)}</span></div><span class="sec-count">${pr.length} ticket${pr.length === 1 ? '' : 's'} · ROI ${((pv.roi || 0) >= 0 ? '+' : '') + ((pv.roi || 0) * 100).toFixed(1)}%</span></div>
+      <div class="dim" style="font-size:12px;margin:-4px 0 6px">The three legs with the highest win chance each night, whatever the price. Retired 11/17: favorites priced shorter than their real chance, so the ticket paid Onyx's margin on every leg.</div>
+      ${pr.map(t => card(t, false)).join('')}`;
+  }).join('');
 }
 
 // ── player drawer ──────────────────────────────────────────────────

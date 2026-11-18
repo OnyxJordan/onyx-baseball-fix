@@ -7,6 +7,8 @@
  * phone and desktop widths, and opens one player drawer and one team card (cards.js). The team
  * card's Bets tab (11/2): ranked best value first, badged, an honest Best bet, a game line's bet
  * card scrubbed and snapped (BETS_CHECK), and a player prop row opening nba.html's own bet card.
+ * The Model's Parlay (rule v2) is faked in the page in both states, a value ticket and "No value
+ * parlay today", with the earlier rule's record apart below (SHOTS=dir saves parlay-*.png).
  *
  *   python3 -B nba_build.py && node tools/verify_nba.js
  */
@@ -227,6 +229,41 @@ function serve(rootDir) {
     }
     console.log(`  ${tc.startsWith('ok') || tc === 'no cards data' || tc === 'no games today' ? 'ok  ' : 'FAIL'} team card ${tc}`);
     if (!tc.startsWith('ok') && tc !== 'no cards data' && tc !== 'no games today') failures++;
+    // The Model's Parlay (rule v2, value legs only, 11/17): fake both states in the page (never in
+    // data/): a posted v2 ticket, and "No value parlay today". The earlier rule's record must show
+    // below, apart from v2's, on Home and on the Record tab. SHOTS=dir saves parlay-*.png.
+    for (const state of ['ticket', 'none']) {
+      const pr = await page.evaluate(st => {
+        const T0 = window.__T0 = D.tickets;
+        const ps = (D.players || []).filter(p => !p.out).slice(0, 3);
+        const leg = (p, i) => ({pid: p.pid, player: p.name, team: p.team, opp: p.opp, gid: 'G' + i, stat: ['pts', 'reb', 'ast'][i], side: i === 1 ? 'under' : 'over',
+          line: [18.5, 7.5, 4.5][i], odds: [110, -105, 120][i], prob: [0.51, 0.535, 0.48][i], implied: [0.476, 0.512, 0.455][i], edge: 0.03, ev: 0.07, proj: 20, sel: 'x' + i, hit: null});
+        const prev = (T0 && T0.prev && T0.prev.length) ? T0.prev : [{rule: 'v1', label: 'Earlier rule (most likely legs)', w: 1, l: 17, pnl: -150.55, roi: -0.836, pending: 0, from: '2026-10-26', to: '2026-11-17', rows: []}];
+        D.tickets = {rule: 'v2', label: 'Value legs only', w: 0, l: 0, pending: 0, void: 0, pnl: 0, roi: 0, rows: [], prev,
+          today: st === 'ticket' ? {date: D.date, locked: false, rule: 'v2', legs: ps.map(leg)} : null, none: st === 'none'};
+        gotoTab('record');
+        const r = document.getElementById('tkList').innerText + '\n' + document.getElementById('tkPrev').innerText;
+        gotoTab('home');
+        return {h: document.getElementById('homeMP').innerText, r, ps: ps.length};
+      }, state);
+      const bad = [];
+      const both = pr.h + '\n' + pr.r;
+      if (!/Earlier rule \(most likely legs, \d+\/\d+(-\d+\/\d+)?\): \d+-\d+, [+-]\$/.test(pr.h)) bad.push('home: no earlier-rule line');
+      if (!/Earlier rule \(most likely legs/i.test(pr.r)) bad.push('record: no earlier-rule section');
+      if (state === 'ticket' && pr.ps >= 2 && !(/Value legs only/.test(pr.h) && /vs Onyx \d+%/.test(pr.h))) bad.push('home: v2 ticket copy');
+      if (state === 'none' && !/No value parlay today: nothing on the board beats Onyx's price/.test(pr.h)) bad.push('home: no-ticket message');
+      if (/—/.test(both)) bad.push('em dash');
+      if (/\bundefined\b|\bNaN\b|\[object Object\]/.test(both)) bad.push('undefined/NaN');
+      if (/best look to win/i.test(both)) bad.push('old rule copy');
+      if (process.env.SHOTS) {
+        const sec = await page.evaluateHandle(() => { const e = document.getElementById('homeMP').closest('.home-section'); e.scrollIntoView(); return e; });
+        await page.waitForTimeout(150);
+        await sec.screenshot({ path: path.join(process.env.SHOTS, `parlay-${state}-${width}.png`) });
+      }
+      await page.evaluate(() => { D.tickets = window.__T0; gotoTab('home'); });
+      console.log(`  ${bad.length ? 'FAIL' : 'ok  '} Model's Parlay (${state === 'ticket' ? 'a v2 ticket' : 'no value parlay'})${bad.length ? '  <- ' + bad.join(', ') : ''}`);
+      if (bad.length) failures++;
+    }
     console.log(`  page errors: ${errs.length}`); errs.forEach(e => console.log('   ' + e));
     failures += errs.length;
     await page.close();
