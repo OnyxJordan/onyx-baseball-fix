@@ -350,9 +350,9 @@
        "win": false,
        "sets": [
         4,
-        0
+        4
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Alexander Zverev",
@@ -362,7 +362,7 @@
        "win": false,
        "sets": [
         6,
-        0
+        4
        ],
        "serve": false
       }
@@ -1455,8 +1455,8 @@
     {
      "id": "186806",
      "start": "2026-11-19T18:35Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Grandstand",
@@ -1466,12 +1466,12 @@
        "short": "I. Burillo",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        4
+        6
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Anastasia Zolotareva",
@@ -1526,9 +1526,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Irene Burillo",
+       "short": "I. Burillo",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -1722,5 +1722,5 @@
    ]
   }
  ],
- "fetched": "2026-11-19T20:22:33+00:00"
+ "fetched": "2026-11-19T20:51:07+00:00"
 }
