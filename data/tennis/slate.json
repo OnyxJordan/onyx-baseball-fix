@@ -1334,8 +1334,8 @@
     {
      "id": "186802",
      "start": "2026-11-18T23:00Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -1345,10 +1345,11 @@
        "short": "L. Samson",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/cze.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        2
+        2,
+        6
        ],
        "serve": false
       },
@@ -1360,9 +1361,10 @@
        "win": false,
        "sets": [
         3,
-        4
+        6,
+        0
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -1579,9 +1581,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Laura Samson",
+       "short": "L. Samson",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/cze.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -1688,5 +1690,5 @@
    ]
   }
  ],
- "fetched": "2026-11-19T00:11:43+00:00"
+ "fetched": "2026-11-19T00:45:59+00:00"
 }
