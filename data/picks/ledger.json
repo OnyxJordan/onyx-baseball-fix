@@ -2448,5 +2448,33 @@
   "actual": 60.0,
   "profit": 0.8197,
   "graded_at": "2026-11-19T03:34:08+00:00"
+ },
+ {
+  "id": "nba-202611201DE4DAFD-q1-q1_total",
+  "sport": "nba",
+  "date": "2026-11-19",
+  "logged_at": "2026-11-19T12:20:34+00:00",
+  "start": "2026-11-20T01:00:00Z",
+  "gid": "202611201DE4DAFD",
+  "matchup": "GS @ MEM",
+  "label": "GS @ MEM Over 55.5 1st-quarter points",
+  "market": "q1_total",
+  "kind": "prop",
+  "name": "GS @ MEM",
+  "team": "GS",
+  "who": "q1",
+  "side": "over",
+  "line": 55.5,
+  "hcap": null,
+  "price": -122,
+  "chance": 0.5755,
+  "edge": 0.026,
+  "ev": 0.0472,
+  "sel": "0d32edb6-3d1e-4fb2-b886-286025e003a2",
+  "model": "q1 0.254/12.0",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
