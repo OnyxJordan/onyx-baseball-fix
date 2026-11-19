@@ -335,9 +335,9 @@
     },
     {
      "id": "187504",
-     "start": "2026-11-19T19:30Z",
-     "state": "pre",
-     "detail": "11/19 - 2:30 PM EST",
+     "start": "2026-11-19T19:40Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Group Stage",
      "draw": "Men's Singles",
      "court": "Inalpi Arena",
@@ -348,7 +348,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        1
+       ],
        "serve": false
       },
       {
@@ -357,8 +359,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ger.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        0
+       ],
+       "serve": true
       }
      ]
     },
@@ -1414,8 +1418,8 @@
     {
      "id": "186808",
      "start": "2026-11-19T17:35Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -1428,19 +1432,19 @@
        "win": false,
        "sets": [
         3,
-        4
+        6
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Valeriya Strakhova",
        "short": "V. Strakhova",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ukr.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        5
+        7
        ],
        "serve": false
       }
@@ -1450,7 +1454,7 @@
      "id": "186806",
      "start": "2026-11-19T18:35Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Grandstand",
@@ -1462,7 +1466,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        5
+        6,
+        0
        ],
        "serve": true
       },
@@ -1473,7 +1478,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        3
+        4,
+        2
        ],
        "serve": false
       }
@@ -1547,9 +1553,9 @@
      "court": "",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Valeriya Strakhova",
+       "short": "V. Strakhova",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ukr.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -1714,5 +1720,5 @@
    ]
   }
  ],
- "fetched": "2026-11-19T19:15:00+00:00"
+ "fetched": "2026-11-19T19:48:46+00:00"
 }
