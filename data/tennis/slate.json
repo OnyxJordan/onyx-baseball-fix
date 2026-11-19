@@ -1377,8 +1377,8 @@
     {
      "id": "186809",
      "start": "2026-11-19T14:35Z",
-     "state": "in",
-     "detail": "3rd",
+     "state": "post",
+     "detail": "Final",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -1392,7 +1392,7 @@
        "sets": [
         4,
         6,
-        4
+        6
        ],
        "serve": false
       },
@@ -1401,21 +1401,21 @@
        "short": "L. Bronzetti",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ita.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
         1,
-        4
+        7
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
     {
      "id": "186808",
-     "start": "2026-11-19T17:10Z",
+     "start": "2026-11-19T17:35Z",
      "state": "pre",
-     "detail": "11/19 - 12:10 PM EST",
+     "detail": "11/19 - 12:35 PM EST",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -1546,9 +1546,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Lucia Bronzetti",
+       "short": "L. Bronzetti",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ita.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -1704,5 +1704,5 @@
    ]
   }
  ],
- "fetched": "2026-11-19T17:02:00+00:00"
+ "fetched": "2026-11-19T17:35:53+00:00"
 }
