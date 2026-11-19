@@ -1335,7 +1335,7 @@
      "id": "186802",
      "start": "2026-11-18T23:00Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -1347,9 +1347,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        5
+        6,
+        2
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Ariana Geerlings",
@@ -1358,9 +1359,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        3
+        3,
+        4
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
@@ -1686,5 +1688,5 @@
    ]
   }
  ],
- "fetched": "2026-11-18T23:37:49+00:00"
+ "fetched": "2026-11-19T00:11:43+00:00"
 }
