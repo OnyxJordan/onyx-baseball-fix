@@ -1414,8 +1414,8 @@
     {
      "id": "186808",
      "start": "2026-11-19T17:35Z",
-     "state": "pre",
-     "detail": "11/19 - 12:35 PM EST",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -1426,8 +1426,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/slo.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        2
+       ],
+       "serve": true
       },
       {
        "name": "Valeriya Strakhova",
@@ -1435,7 +1437,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ukr.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        4
+       ],
        "serve": false
       }
      ]
@@ -1704,5 +1708,5 @@
    ]
   }
  ],
- "fetched": "2026-11-19T17:35:53+00:00"
+ "fetched": "2026-11-19T18:08:34+00:00"
 }

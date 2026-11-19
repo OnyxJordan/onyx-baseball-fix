@@ -139753,5 +139753,35 @@
   "actual": "14-16",
   "profit": 0.578,
   "graded_at": "2026-11-19T17:36:17+00:00"
+ },
+ {
+  "id": "tennis-186808-spread-home",
+  "sport": "tennis",
+  "gid": "186808",
+  "date": "2026-11-19",
+  "logged_at": "2026-11-19T17:53:37+00:00",
+  "matchup": "Veronika Erjavec vs Valeriya Strakhova",
+  "home": "Valeriya Strakhova",
+  "away": "Veronika Erjavec",
+  "label": "Valeriya Strakhova +4.5 games",
+  "kind": "spread",
+  "side": "home",
+  "line": 4.5,
+  "price": -120,
+  "chance": 0.6538,
+  "implied": 0.5455,
+  "edge": 0.108,
+  "fair": -190,
+  "state": {
+   "sets": "1-2",
+   "srv": null,
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
