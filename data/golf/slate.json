@@ -15354,114 +15354,6 @@
     },
     {
      "pos": 143,
-     "name": "Camilo Villegas",
-     "flag": "https://a.espncdn.com/i/teamlogos/countries/500/col.png",
-     "to_par": "+5",
-     "rounds": [
-      {
-       "s": 75.0,
-       "d": "+5",
-       "h": [
-        [
-         1,
-         5,
-         "+1"
-        ],
-        [
-         2,
-         4,
-         "E"
-        ],
-        [
-         3,
-         3,
-         "E"
-        ],
-        [
-         4,
-         4,
-         "E"
-        ],
-        [
-         5,
-         3,
-         "-1"
-        ],
-        [
-         6,
-         3,
-         "E"
-        ],
-        [
-         7,
-         5,
-         "E"
-        ],
-        [
-         8,
-         4,
-         "E"
-        ],
-        [
-         9,
-         5,
-         "+1"
-        ],
-        [
-         10,
-         4,
-         "E"
-        ],
-        [
-         11,
-         5,
-         "+1"
-        ],
-        [
-         12,
-         4,
-         "+1"
-        ],
-        [
-         13,
-         4,
-         "E"
-        ],
-        [
-         14,
-         5,
-         "+1"
-        ],
-        [
-         15,
-         6,
-         "+1"
-        ],
-        [
-         16,
-         4,
-         "E"
-        ],
-        [
-         17,
-         3,
-         "E"
-        ],
-        [
-         18,
-         4,
-         "E"
-        ]
-       ],
-       "b": 1.0,
-       "bo": 6.0,
-       "e": 0.0
-      }
-     ],
-     "id": "1264"
-    },
-    {
-     "pos": 144,
      "name": "Jeffrey Kang",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "+5",
@@ -15569,7 +15461,7 @@
      "id": "4408318"
     },
     {
-     "pos": 145,
+     "pos": 144,
      "name": "Kevin Streelman",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "+5",
@@ -15677,7 +15569,7 @@
      "id": "1077"
     },
     {
-     "pos": 146,
+     "pos": 145,
      "name": "Calen Sanderson",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "+6",
@@ -15785,7 +15677,7 @@
      "id": "5362018"
     },
     {
-     "pos": 147,
+     "pos": 146,
      "name": "Troy Merritt",
      "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
      "to_par": "+8",
@@ -15891,6 +15783,23 @@
       }
      ],
      "id": "3970"
+    },
+    {
+     "pos": 147,
+     "name": "Camilo Villegas",
+     "flag": "https://a.espncdn.com/i/teamlogos/countries/500/col.png",
+     "to_par": "E",
+     "rounds": [
+      {
+       "s": 0.0,
+       "d": "-",
+       "h": [],
+       "b": 1.0,
+       "bo": 6.0,
+       "e": 0.0
+      }
+     ],
+     "id": "1264"
     }
    ],
    "course": null,
@@ -15898,5 +15807,5 @@
    "cut_n": 65
   }
  ],
- "fetched": "2026-11-19T21:58:28+00:00"
+ "fetched": "2026-11-19T22:31:46+00:00"
 }
