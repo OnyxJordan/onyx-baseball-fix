@@ -3823,5 +3823,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-187507-spread-home",
+  "sport": "tennis",
+  "gid": "187507",
+  "date": "2026-11-19",
+  "logged_at": "2026-11-19T13:44:20+00:00",
+  "matchup": "Rafael Jodar vs Ben Shelton",
+  "home": "Ben Shelton",
+  "away": "Rafael Jodar",
+  "label": "Ben Shelton -2.5 games",
+  "kind": "spread",
+  "side": "home",
+  "line": -2.5,
+  "price": -165,
+  "chance": 0.6635,
+  "implied": 0.6226,
+  "edge": 0.041,
+  "fair": -195,
+  "state": {
+   "sets": "3-4",
+   "srv": null,
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
