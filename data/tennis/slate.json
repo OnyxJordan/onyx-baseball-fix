@@ -1415,7 +1415,7 @@
      "id": "186808",
      "start": "2026-11-19T17:35Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -1427,7 +1427,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        3,
+        1
        ],
        "serve": true
       },
@@ -1438,7 +1439,8 @@
        "seed": null,
        "win": false,
        "sets": [
-        4
+        6,
+        2
        ],
        "serve": false
       }
@@ -1446,9 +1448,9 @@
     },
     {
      "id": "186806",
-     "start": "2026-11-19T18:30Z",
-     "state": "pre",
-     "detail": "11/19 - 1:30 PM EST",
+     "start": "2026-11-19T18:35Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Round 2",
      "draw": "Women's Singles",
      "court": "Grandstand",
@@ -1459,8 +1461,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        0
+       ],
+       "serve": true
       },
       {
        "name": "Anastasia Zolotareva",
@@ -1468,7 +1472,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/rus.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        0
+       ],
        "serve": false
       }
      ]
@@ -1708,5 +1714,5 @@
    ]
   }
  ],
- "fetched": "2026-11-19T18:08:34+00:00"
+ "fetched": "2026-11-19T18:41:22+00:00"
 }

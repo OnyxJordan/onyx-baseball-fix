@@ -2177,5 +2177,82 @@
   "model": "v16",
   "result": null,
   "actual": null
+ },
+ {
+  "date": "2026-11-19",
+  "season": 2026,
+  "week": 11,
+  "key": "401873072|baker mayfield|pass_att",
+  "gid": "401873072",
+  "pid": "3052587",
+  "name": "Baker Mayfield",
+  "team": "TB",
+  "opp": "DET",
+  "matchup": "TB @ DET",
+  "kind": "pass_att",
+  "lane": "pass_att_under",
+  "side": "under",
+  "line": 32.5,
+  "price": -124,
+  "sel": "80298552-54c2-491c-a999-f766ed87df53",
+  "proj": 26.5,
+  "prob": 0.6638,
+  "implied": 0.5536,
+  "why": [
+   {
+    "k": "game-to-game swings",
+    "v": 13.43,
+    "avg": 8.59,
+    "pp": -7.4
+   },
+   {
+    "k": "recent trend",
+    "v": -10.67,
+    "avg": 0.62,
+    "pp": -5.3
+   },
+   {
+    "k": "opponent catches allowed",
+    "v": 1.04,
+    "avg": 0.99,
+    "pp": 2.6
+   },
+   {
+    "k": "yards per carry",
+    "v": 5.29,
+    "avg": 4.11,
+    "pp": -2.0
+   }
+  ],
+  "opened_at": "2026-11-19T18:40:41+00:00",
+  "logged_at": "2026-11-19T18:40:41+00:00",
+  "model": "v16",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-19",
+  "season": 2026,
+  "week": 11,
+  "key": "401873072|cade otton|rec_yds",
+  "gid": "401873072",
+  "pid": "4243331",
+  "name": "Cade Otton",
+  "team": "TB",
+  "opp": "DET",
+  "matchup": "TB @ DET",
+  "kind": "rec",
+  "side": "under",
+  "line": 29.5,
+  "price": -122,
+  "sel": "9f520941-0ce6-4784-8a32-a19c045160b7",
+  "proj": 24.1,
+  "prob": 0.6431,
+  "implied": 0.5495,
+  "opened_at": "2026-11-19T18:40:41+00:00",
+  "logged_at": "2026-11-19T18:40:41+00:00",
+  "model": "v16",
+  "result": null,
+  "actual": null
  }
 ]
