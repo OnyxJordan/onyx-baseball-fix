@@ -3490,5 +3490,93 @@
   "model": "v2",
   "result": null,
   "actual": null
+ },
+ {
+  "date": "2026-11-19",
+  "key": "401856753|lanorris sellers|rush_yds",
+  "gid": "401856753",
+  "pid": "4875127",
+  "name": "LaNorris Sellers",
+  "team": "SC",
+  "opp": "UGA",
+  "matchup": "SC vs UGA",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 32.5,
+  "price": -131,
+  "sel": "d5f96d5a-8549-4c3a-941d-572bff6c4e15",
+  "proj": 53.4,
+  "prob": 0.6199,
+  "implied": 0.5671,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.55,
+    "avg": 0.77,
+    "pp": -5.1
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.88,
+    "avg": 0.93,
+    "pp": 0.8
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.79,
+    "avg": -0.05,
+    "pp": 0.7
+   }
+  ],
+  "opened_at": "2026-11-19T16:27:35+00:00",
+  "logged_at": "2026-11-19T16:27:35+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
+ },
+ {
+  "date": "2026-11-19",
+  "key": "401864542|markell holman|rush_yds",
+  "gid": "401864542",
+  "pid": "5227257",
+  "name": "Markell Holman",
+  "team": "WYO",
+  "opp": "UNM",
+  "matchup": "WYO vs UNM",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 37.5,
+  "price": -126,
+  "sel": "a89143ea-ad7a-4eb2-8343-b3d1ef133b3a",
+  "proj": 42.9,
+  "prob": 0.6269,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.49,
+    "avg": 0.77,
+    "pp": -6.5
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.84,
+    "avg": 0.93,
+    "pp": 1.6
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.72,
+    "avg": -0.05,
+    "pp": 0.6
+   }
+  ],
+  "opened_at": "2026-11-19T16:27:35+00:00",
+  "logged_at": "2026-11-19T16:27:35+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
  }
 ]
