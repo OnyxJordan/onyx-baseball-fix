@@ -2023,5 +2023,57 @@
   "model": "v16",
   "result": null,
   "actual": null
+ },
+ {
+  "date": "2026-11-18",
+  "season": 2026,
+  "week": 11,
+  "key": "401873074|justin herbert|pass_att",
+  "gid": "401873074",
+  "pid": "4038941",
+  "name": "Justin Herbert",
+  "team": "LAC",
+  "opp": "NYJ",
+  "matchup": "LAC vs NYJ",
+  "kind": "pass_att",
+  "lane": "pass_att_under",
+  "side": "under",
+  "line": 28.5,
+  "price": -134,
+  "sel": "ae37d913-ef22-41eb-9e54-78c6b04b2b97",
+  "proj": 27.3,
+  "prob": 0.6548,
+  "implied": 0.5726,
+  "why": [
+   {
+    "k": "opponent catches allowed",
+    "v": 0.79,
+    "avg": 0.99,
+    "pp": -9.1
+   },
+   {
+    "k": "game-to-game swings",
+    "v": 6.36,
+    "avg": 8.59,
+    "pp": 3.5
+   },
+   {
+    "k": "yards per carry",
+    "v": 5.89,
+    "avg": 4.11,
+    "pp": -3.0
+   },
+   {
+    "k": "recent trend",
+    "v": -3.92,
+    "avg": 0.62,
+    "pp": -2.1
+   }
+  ],
+  "opened_at": "2026-11-19T01:19:01+00:00",
+  "logged_at": "2026-11-19T01:19:01+00:00",
+  "model": "v16",
+  "result": null,
+  "actual": null
  }
 ]
