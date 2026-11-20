@@ -146496,5 +146496,36 @@
   "actual": "12-7",
   "profit": 0.7143,
   "graded_at": "2026-11-20T17:12:36+00:00"
+ },
+ {
+  "id": "cbb-401909698-total-under",
+  "sport": "cbb",
+  "gid": "401909698",
+  "date": "2026-11-20",
+  "logged_at": "2026-11-20T17:46:01+00:00",
+  "matchup": "GB @ FSU",
+  "home": "FSU",
+  "away": "GB",
+  "label": "Under 152.5",
+  "kind": "total",
+  "side": "under",
+  "line": 152.5,
+  "price": -101,
+  "chance": 0.5913,
+  "implied": 0.5025,
+  "edge": 0.089,
+  "fair": -145,
+  "state": {
+   "score": "GB 27 - 29 FSU",
+   "period": 1,
+   "clock": "3:57",
+   "f": 0.599
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
