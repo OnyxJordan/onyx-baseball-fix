@@ -146436,5 +146436,35 @@
   "actual": "147",
   "profit": 0.8696,
   "graded_at": "2026-11-20T06:30:57+00:00"
+ },
+ {
+  "id": "tennis-187510-spread-away",
+  "sport": "tennis",
+  "gid": "187510",
+  "date": "2026-11-20",
+  "logged_at": "2026-11-20T13:47:01+00:00",
+  "matchup": "Flavio Cobolli vs Carlos Alcaraz",
+  "home": "Carlos Alcaraz",
+  "away": "Flavio Cobolli",
+  "label": "Flavio Cobolli +5.5 games",
+  "kind": "spread",
+  "side": "away",
+  "line": 5.5,
+  "price": -150,
+  "chance": 0.678,
+  "implied": 0.6,
+  "edge": 0.078,
+  "fair": -210,
+  "state": {
+   "sets": "3-5",
+   "srv": "away",
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": "L",
+  "actual": "12-5",
+  "profit": -1.0,
+  "graded_at": "2026-11-20T14:46:27+00:00"
  }
 ]

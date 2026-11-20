@@ -370,9 +370,9 @@
     },
     {
      "id": "187510",
-     "start": "2026-11-20T13:00Z",
-     "state": "pre",
-     "detail": "11/20 - 8:00 AM EST",
+     "start": "2026-11-20T13:10Z",
+     "state": "post",
+     "detail": "Final",
      "round": "Group Stage",
      "draw": "Men's Singles",
      "court": "Inalpi Arena",
@@ -383,7 +383,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/ita.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        4,
+        1
+       ],
        "serve": false
       },
       {
@@ -391,8 +394,11 @@
        "short": "C. Alcaraz",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
-       "win": false,
-       "sets": [],
+       "win": true,
+       "sets": [
+        6,
+        6
+       ],
        "serve": false
       }
      ]
@@ -1730,5 +1736,5 @@
    ]
   }
  ],
- "fetched": "2026-11-20T12:42:17+00:00"
+ "fetched": "2026-11-20T14:46:02+00:00"
 }
