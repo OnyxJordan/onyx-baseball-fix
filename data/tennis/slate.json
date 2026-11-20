@@ -1533,8 +1533,8 @@
     {
      "id": "186801",
      "start": "2026-11-20T15:00Z",
-     "state": "pre",
-     "detail": "11/20 - 10:00 AM EST",
+     "state": "in",
+     "detail": "2nd",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -1545,7 +1545,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        4,
+        1
+       ],
        "serve": false
       },
       {
@@ -1554,16 +1557,19 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        6,
+        2
+       ],
        "serve": false
       }
      ]
     },
     {
      "id": "186800",
-     "start": "2026-11-20T16:30Z",
+     "start": "2026-11-20T16:50Z",
      "state": "pre",
-     "detail": "11/20 - 11:30 AM EST",
+     "detail": "11/20 - 11:50 AM EST",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -1736,5 +1742,5 @@
    ]
   }
  ],
- "fetched": "2026-11-20T14:46:02+00:00"
+ "fetched": "2026-11-20T16:38:37+00:00"
 }
