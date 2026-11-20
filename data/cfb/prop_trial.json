@@ -3622,5 +3622,49 @@
   "model": "v2",
   "result": null,
   "actual": null
+ },
+ {
+  "date": "2026-11-19",
+  "key": "401858533|fame ijeboi|rush_yds",
+  "gid": "401858533",
+  "pid": "5218961",
+  "name": "Fame Ijeboi",
+  "team": "PUR",
+  "opp": "WIS",
+  "matchup": "PUR vs WIS",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 56.5,
+  "price": -126,
+  "sel": "2bd6a4f6-1725-4862-b310-788e4d9cdc9c",
+  "proj": 53.4,
+  "prob": 0.6198,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.66,
+    "avg": 0.77,
+    "pp": -2.7
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 1.01,
+    "avg": 0.93,
+    "pp": -1.2
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.22,
+    "avg": -0.05,
+    "pp": 0.2
+   }
+  ],
+  "opened_at": "2026-11-20T03:52:28+00:00",
+  "logged_at": "2026-11-20T03:52:28+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
  }
 ]

@@ -144548,10 +144548,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v7",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "5",
+  "profit": 0.6993,
+  "graded_at": "2026-11-20T03:52:54+00:00"
  },
  {
   "id": "cbb-401921028-total-under",
@@ -144610,10 +144610,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v7",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "189",
+  "profit": -1.0,
+  "graded_at": "2026-11-20T03:52:54+00:00"
  },
  {
   "id": "nfl-401873066-spread-away",
@@ -145764,10 +145764,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v7",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "1-4",
+  "profit": -1.0,
+  "graded_at": "2026-11-20T03:52:54+00:00"
  },
  {
   "id": "cbb-401918950-total-under",
@@ -146305,6 +146305,68 @@
    "period": 1,
    "clock": "4:25",
    "f": 0.61
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "nhl-401892753-total-under",
+  "sport": "nhl",
+  "gid": "401892753",
+  "date": "2026-11-19",
+  "logged_at": "2026-11-20T03:52:52+00:00",
+  "matchup": "DAL @ VGK",
+  "home": "VGK",
+  "away": "DAL",
+  "label": "Under 6.5",
+  "kind": "total",
+  "side": "under",
+  "line": 6.5,
+  "price": -145,
+  "chance": 0.6423,
+  "implied": 0.5918,
+  "edge": 0.05,
+  "fair": -180,
+  "state": {
+   "score": "DAL 2 - 0 VGK",
+   "period": 1,
+   "clock": "0:00",
+   "f": 0.667
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "cbb-401917536-total-under",
+  "sport": "cbb",
+  "gid": "401917536",
+  "date": "2026-11-19",
+  "logged_at": "2026-11-20T03:52:52+00:00",
+  "matchup": "VCU @ SCU",
+  "home": "SCU",
+  "away": "VCU",
+  "label": "Under 170.5",
+  "kind": "total",
+  "side": "under",
+  "line": 170.5,
+  "price": -114,
+  "chance": 0.5694,
+  "implied": 0.5327,
+  "edge": 0.037,
+  "fair": -130,
+  "state": {
+   "score": "VCU 21 - 14 SCU",
+   "period": 1,
+   "clock": "12:05",
+   "f": 0.802
   },
   "pre_src": "onyx",
   "model": "live-v7",
