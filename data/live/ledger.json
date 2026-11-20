@@ -145888,10 +145888,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v7",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "168",
+  "profit": -1.0,
+  "graded_at": "2026-11-20T05:00:42+00:00"
  },
  {
   "id": "cbb-401911534-total-under",
@@ -145919,10 +145919,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v7",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "L",
+  "actual": "153",
+  "profit": -1.0,
+  "graded_at": "2026-11-20T05:00:42+00:00"
  },
  {
   "id": "nfl-401873066-prop-nico_collins-rec-over",
@@ -146240,10 +146240,10 @@
   },
   "pre_src": "onyx",
   "model": "live-v7",
-  "result": null,
-  "actual": null,
-  "profit": null,
-  "graded_at": null
+  "result": "W",
+  "actual": "140",
+  "profit": 0.8929,
+  "graded_at": "2026-11-20T05:00:42+00:00"
  },
  {
   "id": "nfl-401873066-prop-david_montgomery-rush_yds-under",
@@ -146398,6 +146398,37 @@
    "period": 2,
    "clock": "3:18",
    "f": 0.388
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
+ },
+ {
+  "id": "cbb-401926773-total-under",
+  "sport": "cbb",
+  "gid": "401926773",
+  "date": "2026-11-19",
+  "logged_at": "2026-11-20T05:00:41+00:00",
+  "matchup": "TAR @ USC",
+  "home": "USC",
+  "away": "TAR",
+  "label": "Under 160.5",
+  "kind": "total",
+  "side": "under",
+  "line": 160.5,
+  "price": -115,
+  "chance": 0.646,
+  "implied": 0.5349,
+  "edge": 0.111,
+  "fair": -180,
+  "state": {
+   "score": "TAR 21 - 55 USC",
+   "period": 1,
+   "clock": "0:00",
+   "f": 0.5
   },
   "pre_src": "onyx",
   "model": "live-v7",
