@@ -420,7 +420,7 @@
        "win": false,
        "sets": [
         3,
-        2
+        4
        ],
        "serve": false
       },
@@ -432,9 +432,9 @@
        "win": false,
        "sets": [
         6,
-        1
+        5
        ],
-       "serve": false
+       "serve": true
       }
      ]
     },
@@ -1609,8 +1609,8 @@
     {
      "id": "186799",
      "start": "2026-11-20T20:35Z",
-     "state": "pre",
-     "detail": "11/20 - 3:35 PM EST",
+     "state": "in",
+     "detail": "1st",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -1621,7 +1621,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        1
+       ],
        "serve": false
       },
       {
@@ -1630,8 +1632,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        5
+       ],
+       "serve": true
       }
      ]
     },
@@ -1754,5 +1758,5 @@
    ]
   }
  ],
- "fetched": "2026-11-20T20:33:00+00:00"
+ "fetched": "2026-11-20T21:07:03+00:00"
 }
