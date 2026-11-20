@@ -164,6 +164,10 @@ select.sel{background:var(--bg3);border:1px solid var(--border2);color:var(--tex
 .gc-strip button em{font-style:normal;color:var(--text3);font-weight:600}
 .gm-grid{margin-bottom:6px}
 #gcBody > .gc-nav{margin:0 0 12px;border-radius:14px;border:1px solid var(--border2)}
+/* Sim Replay (11/20): watch one of Play It Out's 10,000 simulated games, from the gamecenter */
+.gc-replay{display:flex;align-items:center;gap:12px;margin:0 0 12px;padding:12px 14px;border-radius:14px;border:1px solid rgba(176,56,249,.55);background:linear-gradient(135deg,rgba(122,44,224,.28),rgba(176,56,249,.12));color:#fff;text-decoration:none}
+.gc-replay i{flex:none;width:36px;height:36px;border-radius:50%;background:#b038f9;display:flex;align-items:center;justify-content:center;font-style:normal;font-size:14px;box-shadow:0 0 18px rgba(176,56,249,.6)}
+.gc-replay b{display:block;font-size:14px}.gc-replay small{display:block;font:600 10.5px monospace;letter-spacing:.06em;text-transform:uppercase;color:#d795ff;margin-top:2px}
 .gm-top .live{color:#61e970}
 .oc.in-slip{border-color:#b038f9;background:rgba(176,56,249,.22)}
 /* gamecenter (MLB .gc-* / .sb-*), NBA bits */
@@ -2112,7 +2116,9 @@ function renderGames() {
     <button class="${gcView === 'pbp' ? 'on' : ''}" onclick="gcView='pbp';rerender()">Plays</button>
     <button class="${gcView === 'box' ? 'on' : ''}" onclick="gcView='box';rerender()">Box</button></div>`;
   const court = started(g) ? liveCourt(g, sum) : '';
-  body.innerHTML = nbNav(g.gid) + header + court + betbar + watch + paceCard(g, box) + fbCard(g) + qhCard(g) + simSpots(g.gid) + sub
+  // Sim Replay: the most likely of the 10,000 simulated games, played out on a court (Studio tab #replay)
+  const replay = g.state === 'post' ? '' : `<a class="gc-replay" href="studio.html?sport=nba#replay?gid=${esc(g.gid)}"><i>▶</i><span><b>Watch the most likely game</b><small>Simulated game, 1 of 10,000 sims, not real highlights</small></span></a>`;
+  body.innerHTML = nbNav(g.gid) + header + court + betbar + replay + watch + paceCard(g, box) + fbCard(g) + qhCard(g) + simSpots(g.gid) + sub
     + (gcView === 'box' ? boxView(g, box, sum) : gcView === 'pbp' ? pbpView(g, sum) : overview(g, sum));
   const on = body.querySelector('.gc-strip .on'); if (on) on.parentNode.scrollLeft = on.offsetLeft - 60;
   gcFloatSync();

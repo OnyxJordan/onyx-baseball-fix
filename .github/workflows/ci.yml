@@ -104,6 +104,11 @@ jobs:
       - name: NFL Studio check
         run: node tools/verify_studio.js
 
+      # Sim Replay (11/20): the play-by-play of a simulated game reproduces that sim's final and every player's line,
+      # and the replay tab plays, scrubs, switches scenario, shows the final with Onyx links, shares and records video
+      - name: Sim Replay check
+        run: node tools/verify_replay.js
+
       # Installed-iPhone gate for both pages: a 0 safe-area inset (what iOS
       # sometimes reports) must not put the header or menu under the status
       # bar, and the bottom menu must open, navigate and close.

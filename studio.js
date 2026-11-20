@@ -25,8 +25,8 @@
                 nhl: ['NHL', 'nhl.html'], tennis: ['Tennis', 'tennis.html']};
   var SPORT = (function () { var m = location.search.match(/[?&]sport=([a-z]+)/); return m && SPORTS[m[1]] ? m[1] : 'nfl'; })();
   var DIR = 'data/' + SPORT + '/';
-  var NAMES = {compare: 'Compare', sim: 'Play It Out', lab: 'Parlay Lab', sweat: 'Sunday Sweat', insights: 'Insights'};
-  var ORDER = ['compare', 'sim', 'lab', 'sweat', 'insights'];
+  var NAMES = {compare: 'Compare', sim: 'Play It Out', replay: 'Sim Replay', lab: 'Parlay Lab', sweat: 'Sunday Sweat', insights: 'Insights'};
+  var ORDER = ['compare', 'sim', 'replay', 'lab', 'sweat', 'insights'];
 
   var u = {
     esc: function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]; }); },

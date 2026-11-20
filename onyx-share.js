@@ -65,8 +65,11 @@
     var st = c.stats || {}, rows = (st.sports || st.rows || []).filter(Boolean);
     if (kind === 'season') rows.forEach(function (r) { if (r.sport && sp.indexOf(r.sport) < 0) sp.push(r.sport); });
     var live = c.live && num(c.live.p) != null ? {p: Math.max(0, Math.min(1, num(c.live.p))), now: str(c.live.now)} : null;
+    // a Sim Replay final (11/20): the simulated game's score rides on top of the plays the sim likes
+    var fin = c.final && c.final.a && c.final.h ? {a: {abbr: str(c.final.a.abbr), score: num(c.final.a.score)}, h: {abbr: str(c.final.h.abbr), score: num(c.final.h.score)},
+              note: str(c.final.note || 'Simulated game, 1 of 10,000 sims, not real highlights'), ot: num(c.final.ot) || 0, scenario: str(c.final.scenario)} : null;
     return {kind: kind, title: str(c.title), legs: legs, price: price, chance: chance, sels: sels, sports: sp, live: live, stats: st, rows: rows,
-            cashed: kind === 'cashed' || c.res === 'W'};
+            cashed: kind === 'cashed' || c.res === 'W', final: fin};
   }
   function shareUrl(c) {
     var s = (c.sels || []).filter(Boolean);
@@ -75,6 +78,7 @@
   }
   function headline(c) {
     if (c.kind === 'season') return 'My season on Onyx Sports';
+    if (c.final) return 'Sim Replay on Onyx Sports: ' + c.final.a.abbr + ' ' + c.final.a.score + ', ' + c.final.h.abbr + ' ' + c.final.h.score + ' (simulated)';
     var n = c.legs.length;
     var what = n > 1 ? n + '-leg parlay' : (c.legs[0] && c.legs[0].label) || 'My Onyx bet';
     return (c.cashed ? 'Cashed on Onyx: ' : 'On Onyx: ') + what + (c.price != null ? ' at ' + odds(c.price) : '');
@@ -85,6 +89,7 @@
       return 'My season on Onyx Sports: ' + [recText(s.record), s.units != null ? unitsText(s.units) : '', s.roi != null ? 'ROI ' + roiText(s.roi) : ''].filter(Boolean).join(', ') + '. Bet it on Onyx with code ' + REF + '.';
     }
     var t = headline(c);
+    if (c.final) return t + '. ' + c.final.note + '. The plays the sim likes are on Onyx with code ' + REF + '.';
     if (c.live) t += '. Live chance to cash ' + pct(c.live.p) + ' (Onyx model)';
     else if (c.chance != null && !c.cashed) t += '. The Onyx model gives it ' + pct(c.chance);
     return t + '. Bet it on Onyx with code ' + REF + '.';
@@ -207,7 +212,7 @@
     path(x, WORD, wx, Y + mh / 2 - wh / 2 - 7, wh, 46.85, C.white);
     text(x, 'SPORTS', wx, Y + mh / 2 + wh / 2 + (sq ? 20 : 24), {w: 500, px: sq ? 17 : 20, fam: MONO, color: C.lil, ls: 6, maxW: 260, zone: 'head'});
     // the kind pill on the right
-    var k = c.kind === 'season' ? 'MY SEASON' : c.cashed ? 'CASHED TICKET' : c.live ? 'LIVE TICKET' : c.legs.length > 1 ? 'PARLAY · ' + c.legs.length + ' LEGS' : 'SINGLE';
+    var k = c.kind === 'season' ? 'MY SEASON' : c.final ? 'SIM REPLAY' : c.cashed ? 'CASHED TICKET' : c.live ? 'LIVE TICKET' : c.legs.length > 1 ? 'PARLAY · ' + c.legs.length + ' LEGS' : 'SINGLE';
     font(x, 600, sq ? 21 : 24, MONO); var kw = x.measureText(k).width + (sq ? 40 : 48), kh = sq ? 46 : 54, ky = Y + mh / 2 - kh / 2;
     rr(x, W - P - kw, ky, kw, kh, kh / 2);
     x.fillStyle = c.cashed ? 'rgba(97,233,112,.12)' : 'rgba(176,56,249,.16)'; x.fill();
@@ -364,6 +369,18 @@
     if (imp > 0.22) text(x, '0%', lx, ly, {w: 500, px: sq ? 14 : 17, fam: MONO, color: C.dim, maxW: 60});
     if (imp < 0.78) text(x, '100%', lx + iw, ly, {w: 500, px: sq ? 14 : 17, fam: MONO, align: 'right', color: C.dim, maxW: 80});
   }
+  // the simulated final: both teams and their scores, the label that it is a simulation
+  function finalPanel(x, f, P, Y, w, h, sq) {
+    panel(x, P, Y, w, h, sq ? 22 : 28, true);
+    var pad = sq ? 26 : 38, big = sq ? 64 : 104, mid = P + w / 2;
+    text(x, 'SIM REPLAY FINAL' + (f.ot ? ' / OT' : ''), mid, Y + pad + (sq ? 12 : 18), {w: 600, px: sq ? 16 : 21, fam: MONO, align: 'center', color: C.lil, ls: 3, maxW: w - 2 * pad});
+    var sy = Y + pad + (sq ? 12 : 18) + big * 0.95, aw = f.a.score > f.h.score;
+    text(x, f.a.abbr, P + pad, sy - big * 0.3, {w: 700, px: sq ? 24 : 32, fam: MONO, color: C.body, maxW: w / 4});
+    text(x, String(f.a.score), P + pad + (sq ? 96 : 130), sy, {w: 800, px: big, wide: true, color: aw ? C.grn : C.white, maxW: w / 4});
+    text(x, f.h.abbr, P + w - pad, sy - big * 0.3, {w: 700, px: sq ? 24 : 32, fam: MONO, align: 'right', color: C.body, maxW: w / 4});
+    text(x, String(f.h.score), P + w - pad - (sq ? 96 : 130), sy, {w: 800, px: big, wide: true, align: 'right', color: !aw ? C.grn : C.white, maxW: w / 4});
+    text(x, f.note.toUpperCase(), mid, Y + h - (sq ? 16 : 24), {w: 500, px: sq ? 13 : 17, min: 10, fam: MONO, align: 'center', color: C.dim, maxW: w - 2 * pad});
+  }
   function footer(x, P, sq) {
     var h = sq ? 88 : 118, y = sq ? H - h - 126 : H - 96 - h - 70, w = W - 2 * P;
     x.save();
@@ -477,6 +494,7 @@
     if (sub) { y += sq ? 34 : 46; text(x, sub, P, y, {w: 500, px: sq ? 22 : 28, min: 14, fam: MONO, color: C.body, maxW: bw}); }
     y += sq ? 26 : 44;
     if (c.kind === 'season') { seasonBody(x, c, P, y, bw, bottom, sq); return finish(cv); }
+    if (c.final) { var fh = sq ? 132 : 210; finalPanel(x, c.final, P, y, bw, fh, sq); y += fh + (sq ? 16 : 28); }
     if (single) {
       // a single: the hero, then the model against Onyx's price, the block centered in the space it has
       var hasBd = c.chance != null && c.price != null && !c.cashed;

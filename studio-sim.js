@@ -121,7 +121,8 @@
     '.sim-how summary{cursor:pointer;font:700 12px monospace;letter-spacing:.05em;text-transform:uppercase;color:var(--pur2)}',
     '.sim-how p{font-size:12.5px;color:var(--dim);line-height:1.6;margin:8px 0 0}',
     '.sim-more{margin-top:8px;width:100%}',
-    '.sim .sx-chip{white-space:nowrap}'
+    '.sim .sx-chip{white-space:nowrap}',
+    '.sim-watch{display:block;margin-top:10px;text-align:center;text-decoration:none;background:linear-gradient(135deg,#7a2ce0,#b038f9)}'
   ].join('\n');
 
   // ── math ─────────────────────────────────────────────────────────────────────────────────────
@@ -530,6 +531,8 @@
     var vf = Math.max(0.0004, (VT - VM) / (4 * mA * mH)), ve = Math.max(0.0004, (VM - vf * (mA - mH) * (mA - mH)) / (mA * mA + mH * mH));
     var sf = Math.sqrt(vf), se = Math.sqrt(ve), P0 = C.poss * X.pace;
     var sa = new Int16Array(N), sh = new Int16Array(N), fp = new Float32Array(N), fbu = new Float32Array(N), i = 0;
+    // kept for Sim Replay (sim-replay.js), read-only, no extra draws: regulation score and each overtime's points
+    var rg = new Int16Array(N), otn = new Uint8Array(N), otp = new Int8Array(N * 14);
     var lat = []; for (var q = 0; q < np; q++) lat.push([new Float32Array(N), new Float32Array(N), new Float32Array(N), new Float32Array(N)]);
     var eps = []; for (q = 0; q < nc; q++) eps.push(new Float32Array(N));
     X.poss = P0;
@@ -543,17 +546,19 @@
         for (q = 0; q < np; q++) { var L = lat[q]; L[0][i] = Z(); L[1][i] = Z(); L[2][i] = Z(); L[3][i] = Z(); }
         for (q = 0; q < nc; q++) eps[q][i] = Z();
         fbu[i] = R();
+        rg[i] = a === h ? a : -1;
         for (var ot = 0; a === h && ot < 6; ot++) {
-          var la = mA * C.ot * f, lh = mH * C.ot * f;
+          var la = mA * C.ot * f, lh = mH * C.ot * f, a0 = a, h0 = h;
           a += Math.max(0, Math.round(la + 1.15 * Math.sqrt(la) * Z())); h += Math.max(0, Math.round(lh + 1.15 * Math.sqrt(lh) * Z()));
+          otp[i * 14 + 2 * ot] = a - a0; otp[i * 14 + 2 * ot + 1] = h - h0; otn[i] = ot + 1;
         }
-        if (a === h) { if (R() < mA / (mA + mH)) a++; else h++; }
+        if (a === h) { if (R() < mA / (mA + mH)) a++; else h++; otp[i * 14 + 12] = 1 + (a > h ? 0 : 1); }
         sa[i] = a; sh[i] = h;
       }
       return i;
     }
     function done() {
-      var hits = {}, avg = {}, push = {}, k;
+      var hits = {}, avg = {}, push = {}, ys = {}, k;
       var SA = stdz(sa), SH = stdz(sh), T = new Float32Array(N);
       for (k = 0; k < N; k++) T[k] = sa[k] + sh[k];
       var TS = stdz(T);
@@ -577,9 +582,9 @@
           if (c.M.thr) for (k = 0; k < N; k++) raw[k] = 0.7 * L.pts[k] + 0.714 * e[k];
           else for (k = 0; k < N; k++) { var x = 0; c.M.parts.forEach(function (st) { x += c.pl.wt[st] * L[st][k]; }); raw[k] = x; }
         }
-        var z = stdz(raw), f = X.mult[ci], cc = c.c * f, ss = c.s * Math.sqrt(f), h = new Uint8Array(N), tot = 0, over = r.side !== 'under';
-        for (k = 0; k < N; k++) { var y = Math.max(0, Math.round(cc + ss * z[k])); tot += y; h[k] = over ? (y > r.line ? 1 : 0) : (y < r.line ? 1 : 0); }
-        hits[r.sel || r.label] = h; avg[r.sel || r.label] = tot / N;
+        var z = stdz(raw), f = X.mult[ci], cc = c.c * f, ss = c.s * Math.sqrt(f), h = new Uint8Array(N), tot = 0, over = r.side !== 'under', yy = new Int16Array(N);
+        for (k = 0; k < N; k++) { var y = Math.max(0, Math.round(cc + ss * z[k])); yy[k] = y; tot += y; h[k] = over ? (y > r.line ? 1 : 0) : (y < r.line ? 1 : 0); }
+        hits[r.sel || r.label] = h; avg[r.sel || r.label] = tot / N; ys[r.sel || r.label] = yy;
       });
       G.bin.forEach(function (b) {
         var p = b.pl; if (X.off[p.k]) return;
@@ -604,7 +609,10 @@
         hits[o.row.sel || o.row.label] = h;
       });
       lineHits(G, sa, sh, sa, sh, hits, push);
-      return summarize(G, X, sa, sh, hits, avg, push);
+      var out = summarize(G, X, sa, sh, hits, avg, push);
+      // every simulated game's own numbers, for Sim Replay (not enumerable: nothing that walks the result sees it)
+      Object.defineProperty(out, 'draws', {value: {sa: sa, sh: sh, rg: rg, ot: otn, otp: otp, fp: fp, PL: PL, ys: ys, fbu: fbu, X: X, poss: P0}});
+      return out;
     }
     return {step: step, done: done, tick: function (k) { return G.A + ' ' + sa[k] + ' - ' + sh[k] + ' ' + G.H; }, up: function (k) { return sa[k] > sh[k]; }};
   }
@@ -986,7 +994,8 @@
         + '<div class="sim-tick" id="simTick"></div>'
         + '<div class="sim-src">' + u.esc(srcText()) + (on ? '<br>' + u.esc(on) : '') + (RES && KIND === 'hk' ? '<br>' + u.esc('Overtime ' + u.pct(RES.ot) + ' · shootout ' + u.pct(RES.so) + ' · empty-net goal ' + u.pct(RES.en)) : '') + '</div>'
         + '<div class="sim-ctr" style="margin-top:12px"><button class="sx-btn" id="simGo"' + (busy ? ' disabled' : '') + '>' + (busy ? 'Playing it out' : RES ? 'Play it out again' : 'Play it out 10,000 times') + '</button>'
-        + '<button class="sx-btn ghost" id="simReset">Reset knobs</button></div>';
+        + '<button class="sx-btn ghost" id="simReset">Reset knobs</button></div>'
+        + (KIND === 'bb' && window.SimReplay ? '<a class="sx-btn sim-watch" href="#replay?gid=' + encodeURIComponent(G.gid) + '">&#9654; Watch the most likely game</a>' : '');
     }
     function tick(sim, from, to) {
       var t = $('simTick'); if (!t) return;
@@ -1294,5 +1303,9 @@
       + p('Serve form is a what-if: it moves one player\'s hold rate by 3 points a step. Same seed every run, so a knob move shows the knob, not luck.');
   }
 
+  // the engine, read-only, for Sim Replay (sim-replay.js): the same prep, the same 10,000 games, the same seed as this tab
+  Studio.simEngine = {N: N, KIND: KIND, prep: function (D, gid, u, X) { return ENG.prep(D, gid, u, X); }, run: function (G, K, seed) { return ENG.run(G, K, seed); },
+    extras: extras, mlChance: mlChance, BMK: BMK, BB: BB, seed: function (gid) { return 20261115 ^ (parseInt(gid, 10) || 7); },
+    freshK: function () { return {qb: {}, wind: 0, pace: 2, sit: {}, b2b: {}, gk: {}, form: {a: 2, h: 2}}; }};
   Studio.register('sim', {title: 'Play It Out', order: 2, mount: mount});
 })();
