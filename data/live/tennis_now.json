@@ -4063,5 +4063,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186800-spread-away",
+  "sport": "tennis",
+  "gid": "186800",
+  "date": "2026-11-20",
+  "logged_at": "2026-11-20T17:43:22+00:00",
+  "matchup": "Valeriya Strakhova vs Lucia Bronzetti",
+  "home": "Lucia Bronzetti",
+  "away": "Valeriya Strakhova",
+  "label": "Valeriya Strakhova +6.5 games",
+  "kind": "spread",
+  "side": "away",
+  "line": 6.5,
+  "price": -165,
+  "chance": 0.653,
+  "implied": 0.6226,
+  "edge": 0.03,
+  "fair": -190,
+  "state": {
+   "sets": "1-2",
+   "srv": null,
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
