@@ -1609,8 +1609,8 @@
     {
      "id": "186799",
      "start": "2026-11-20T20:35Z",
-     "state": "in",
-     "detail": "3rd",
+     "state": "post",
+     "detail": "Final",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -1626,18 +1626,18 @@
         6,
         4
        ],
-       "serve": true
+       "serve": false
       },
       {
        "name": "Guiomar Maristany Zuleta De Reales",
        "short": "G. Maristany Zuleta De Reales",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
         3,
-        4
+        6
        ],
        "serve": false
       }
@@ -1645,9 +1645,9 @@
     },
     {
      "id": "186798",
-     "start": "2026-11-20T23:20Z",
-     "state": "pre",
-     "detail": "11/20 - 6:20 PM EST",
+     "start": "2026-11-20T23:35Z",
+     "state": "in",
+     "detail": "1st",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -1658,7 +1658,9 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/cze.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        1
+       ],
        "serve": false
       },
       {
@@ -1667,8 +1669,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/sui.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        1
+       ],
+       "serve": true
       }
      ]
     },
@@ -1720,9 +1724,9 @@
        "serve": false
       },
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Guiomar Maristany Zuleta De Reales",
+       "short": "G. Maristany Zuleta De Reales",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -1762,5 +1766,5 @@
    ]
   }
  ],
- "fetched": "2026-11-20T23:14:56+00:00"
+ "fetched": "2026-11-20T23:47:54+00:00"
 }
