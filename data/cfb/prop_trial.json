@@ -3578,5 +3578,49 @@
   "model": "v2",
   "result": null,
   "actual": null
+ },
+ {
+  "date": "2026-11-19",
+  "key": "401858531|isaiah west|rush_yds",
+  "gid": "401858531",
+  "pid": "5141701",
+  "name": "Isaiah West",
+  "team": "OSU",
+  "opp": "NEB",
+  "matchup": "OSU @ NEB",
+  "kind": "rush_yds",
+  "lane": "rush_yds_under",
+  "side": "under",
+  "line": 23.5,
+  "price": -126,
+  "sel": "e4dcfbe4-0950-41b7-8f3a-141999ec52fa",
+  "proj": 22.0,
+  "prob": 0.6085,
+  "implied": 0.5575,
+  "why": [
+   {
+    "k": "rushing yards the defense allows",
+    "v": 0.59,
+    "avg": 0.77,
+    "pp": -4.2
+   },
+   {
+    "k": "carries the defense allows",
+    "v": 0.84,
+    "avg": 0.93,
+    "pp": 1.5
+   },
+   {
+    "k": "line vs his usual range",
+    "v": -0.18,
+    "avg": -0.05,
+    "pp": 0.1
+   }
+  ],
+  "opened_at": "2026-11-20T03:38:37+00:00",
+  "logged_at": "2026-11-20T03:38:37+00:00",
+  "model": "v2",
+  "result": null,
+  "actual": null
  }
 ]
