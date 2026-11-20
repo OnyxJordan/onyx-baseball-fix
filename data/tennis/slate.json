@@ -407,7 +407,7 @@
      "id": "187513",
      "start": "2026-11-20T19:40Z",
      "state": "in",
-     "detail": "1st",
+     "detail": "2nd",
      "round": "Group Stage",
      "draw": "Men's Singles",
      "court": "Inalpi Arena",
@@ -419,6 +419,7 @@
        "seed": null,
        "win": false,
        "sets": [
+        3,
         2
        ],
        "serve": false
@@ -430,9 +431,10 @@
        "seed": null,
        "win": false,
        "sets": [
-        2
+        6,
+        1
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -1606,9 +1608,9 @@
     },
     {
      "id": "186799",
-     "start": "2026-11-20T20:30Z",
+     "start": "2026-11-20T20:35Z",
      "state": "pre",
-     "detail": "11/20 - 3:30 PM EST",
+     "detail": "11/20 - 3:35 PM EST",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -1664,12 +1666,12 @@
     },
     {
      "id": "186811",
-     "start": "2026-11-21T05:00Z",
+     "start": "2026-11-21T20:00Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "11/21 - 3:00 PM EST",
      "round": "Semifinal",
      "draw": "Women's Singles",
-     "court": "",
+     "court": "Center Court",
      "p": [
       {
        "name": "Lucia Bronzetti",
@@ -1693,12 +1695,12 @@
     },
     {
      "id": "186810",
-     "start": "2026-11-21T05:00Z",
+     "start": "2026-11-21T21:30Z",
      "state": "pre",
-     "detail": "TBD",
+     "detail": "11/21 - 4:30 PM EST",
      "round": "Semifinal",
      "draw": "Women's Singles",
-     "court": "",
+     "court": "Center Court",
      "p": [
       {
        "name": "TBD",
@@ -1752,5 +1754,5 @@
    ]
   }
  ],
- "fetched": "2026-11-20T19:59:52+00:00"
+ "fetched": "2026-11-20T20:33:00+00:00"
 }
