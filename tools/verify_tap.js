@@ -126,10 +126,12 @@ async function pick(pg, prefer) {
         const n0 = await pg.evaluate(() => { OnyxParlay.clear(); OnyxParlay.arm(true); return OnyxParlay.slip().length; });
         await tapIt();
         await pg.waitForTimeout(1500);
-        const a = await pg.evaluate(() => ({open: window.OnyxTap.isOpen(), n: OnyxParlay.slip().length}));
+        const a = await pg.evaluate(() => ({open: window.OnyxTap.isOpen(), n: OnyxParlay.slip().length, started: /That game has started/.test(document.body.innerText)}));
         await pg.evaluate(() => { OnyxParlay.arm(false); OnyxParlay.clear(); });
         if (a.open) bad.push('armed builder: the card opened instead of adding a leg');
-        if (a.n !== n0 + 1) bad.push('armed builder: the tap did not add a leg (' + n0 + ' -> ' + a.n + ')');
+        // the tapped price's game tipped off while the board still shows it: the slip rightly refuses it, says so
+        if (a.n === n0 && a.started) notes.push('armed: game started, slip refused it');
+        else if (a.n !== n0 + 1) bad.push('armed builder: the tap did not add a leg (' + n0 + ' -> ' + a.n + ')');
         else notes.push('armed: leg added');
       }
       // NBA: a player-prop chip keeps the page's own bet card

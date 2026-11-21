@@ -12,6 +12,7 @@ const srv = http.createServer((q, r) => { const p = path.join(root, decodeURICom
   const only = args.filter(a => !a.startsWith('--'));
   // every sport's Studio (11/16): studio.html?sport=<k>; --sport=nba,cfb to narrow
   const SPORTS = sp ? sp.slice(8).split(',') : ['nfl', 'nba', 'cfb', 'cbb', 'nhl', 'tennis'];
+  const offNight = sport => { try { const sl = JSON.parse(require('fs').readFileSync(require('path').join(__dirname, '..', 'data', sport, 'slate.json'), 'utf8')); return Array.isArray(sl.games) && !sl.games.length && !(sl.events || []).length; } catch (e) { return false; } };
   for (const sport of SPORTS) for (const w of [390, 1280]) {
     const pg = await b.newPage({viewport: {width: w, height: 900}}), errs = [];
     pg.on('pageerror', e => errs.push(e.message));
@@ -38,7 +39,10 @@ const srv = http.createServer((q, r) => { const p = path.join(root, decodeURICom
       if (r.len < 40) bad.push('nearly empty (' + r.len + ' chars)');
       if (r.err) bad.push('error box: ' + r.errTxt.slice(0, 160));
       if (r.side) bad.push('sideways scroll');
-      if (r.chk) bad.push('self-check: ' + r.chk);
+      // a night off (no games on the league's schedule): the game tools have nothing to run, which is honest, not broken;
+      // they must still render without errors or sideways scroll
+      if (r.chk && offNight(sport)) r.head = 'no games tonight (' + r.chk + ')';
+      else if (r.chk) bad.push('self-check: ' + r.chk);
       out.push((bad.length ? 'FAIL' : 'ok  ') + ` ${sport.padEnd(7)} ${String(w).padEnd(5)} ${k.padEnd(9)} ${bad.length ? bad.join('; ') : r.head}`);
     }
     await pg.close();

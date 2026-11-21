@@ -1774,6 +1774,37 @@ tools, each one file registered with the frame in `studio.js` (shared board load
 Gate: `node tools/verify_studio.js` (in CI): every tab at 390 and 1280, no errors, no sideways scroll, and each
 tool's self-check (`Studio.checks`). Onyx clicks count on the tap (one listener in studio.js).
 
+**Sim Replay (11/20).** Jordan, sending a rival's simulated-game video: "this is better than ours currently, I want a
+better version of this". Studio tab `#replay` (NBA and college basketball; `studio.html?sport=nba#replay?gid=`), linked
+from Play It Out's game card ("Watch the most likely game") and from the NBA gamecenter (`nba_shell.html`, pregame and
+live games). One of Play It Out's 10,000 simulated games, played back on an animated court:
+- `sim-replay.js` (the engine): runs nothing new. Play It Out's own run (`Studio.simEngine`, same prep, same seed, same
+  10,000 games; `runBB` now also keeps each game's regulation score, overtime points and every prop's draw, read-only,
+  as `RES.draws`) picks the scenario game: Most likely (nearest the median margin and total, players nearest their
+  projections), Upset, Blowout, Overtime thriller, Your bets hit (every saved / slip leg on the game cashes). Then it
+  writes that game out: the box keeps every board player's points / rebounds / assists / threes exactly as the sim
+  drew them (a player's main line when he has an alternate), players without a line split the rest of the team's
+  score by projection; misses are exactly the rebounds both teams grab plus team rebounds; turnovers set the
+  possession count to the sim's pace; possessions alternate the NBA way, overtime games are tied after regulation and
+  each overtime holds the sim's points; the clock adds to 12:00 a quarter inside the 24 / 14-second clock. A rotation
+  from the model's projected minutes (starters start halves, closers finish close games, timeouts are the sub points)
+  and a bipartite matching hand every event to a player on the floor, so each player's totals land exactly (a player
+  the rotation cannot fit gets his possession moved or more minutes, then it re-matches). `SimReplay.verify` re-adds
+  everything from the events. Win probability: margin, time left, who has the ball, and the 10,000 games' own edge
+  and spread. Seeded by game and sim: a game always replays identically.
+- `studio-replay.js` (the tab): canvas court (half-court camera on phones, full court on desktop), headshots
+  (initials fallback), sets, passes, shot arcs, made / missed, callouts (from way downtown 27+ ft, heating up, rejected,
+  and-one, clutch, lead change, runs, double-doubles, 30 points, your bet hits), scoreboard with the shot clock and
+  Onyx's win-probability bar, live box scores (starters, who is on the floor), play log; 1x / 4x / 16x / 60x,
+  highlights (about 75 s a game), scrubber with quarters and big moments, jumps; the final (full box, top performers,
+  the plays the sim likes = hit rate across all 10,000 against Onyx's price, only where the sim mirrors the model's
+  listed chance, with Bet on Onyx and + Parlay slip; your bets graded); Share the final (OnyxShare `final` card) and
+  Download video (MediaRecorder: story 1080x1920 or landscape 1920x1080, MP4 where the browser records it, else WebM).
+- Always labeled "Simulated game, 1 of 10,000 sims, not real highlights"; projections, never Onyx Picks; positions are
+  schematic (a simulation has no tracking).
+- Gate: `node tools/verify_replay.js` (CI). Dev only: `node tools/render_sim_video.js --team=PHX --layout=both` renders
+  frame by frame into an H.264 MP4 with ffmpeg (or `--recorder` for the in-browser recorder).
+
 **Tune-ups and the tennis paper test (11/15).** Jordan: "start tuning up their models especially tennis", then "commit
 everything and build the tennis paper test". Each sport was replayed on Onyx's opening and closing prices, chosen on one
 season and judged on another:

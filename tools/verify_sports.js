@@ -293,7 +293,10 @@ function serve() {
           // a real tap on a game card's team name: it must open the team card, not the gamecenter
           await page.evaluate(() => { gotoTab('games'); OPEN_GAME = null; renderGames(); });
           const tapped = await page.evaluate(t => { const el = document.querySelector(`#pane-games .gm [data-oxt="${t}"]`) || document.querySelector('#pane-games [data-oxt]'); if (!el) return null; el.click(); return el.getAttribute('data-oxt'); }, pick.team);
-          if (!tapped) cbad.push('no tappable team name on the games tab');
+          // a night off (the league's schedule has no games: 11/20, Thanksgiving) has no game cards to tap; the slate says so
+          const offNight = (() => { try { const sl = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', pg, 'slate.json'), 'utf8')); return Array.isArray(sl.games) && !sl.games.length; } catch (e) { return false; } })();
+          if (!tapped && offNight) teamBets = 'no games tonight';
+          else if (!tapped) cbad.push('no tappable team name on the games tab');
           else {
             const r1 = await cardCheck(page, 'front', ['Why this number', 'Team history', 'Recent games']);
             if (r1) cbad.push('team ' + tapped + ': ' + r1);
