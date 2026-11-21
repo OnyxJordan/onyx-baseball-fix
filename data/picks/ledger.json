@@ -2896,5 +2896,33 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "nba-202611213186F74F-q1-q1_total",
+  "sport": "nba",
+  "date": "2026-11-21",
+  "logged_at": "2026-11-21T12:35:00+00:00",
+  "start": "2026-11-21T18:00:00Z",
+  "gid": "202611213186F74F",
+  "matchup": "MIL @ PHI",
+  "label": "MIL @ PHI Over 55.5 1st-quarter points",
+  "market": "q1_total",
+  "kind": "prop",
+  "name": "MIL @ PHI",
+  "team": "MIL",
+  "who": "q1",
+  "side": "over",
+  "line": 55.5,
+  "hcap": null,
+  "price": -127,
+  "chance": 0.5838,
+  "edge": 0.0243,
+  "ev": 0.0435,
+  "sel": "b8cc600d-f847-4aa2-af6d-2d64b0178660",
+  "model": "q1 0.254/12.0",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
