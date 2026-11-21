@@ -4153,5 +4153,35 @@
   "actual": null,
   "profit": null,
   "graded_at": null
+ },
+ {
+  "id": "tennis-186798-spread-away",
+  "sport": "tennis",
+  "gid": "186798",
+  "date": "2026-11-20",
+  "logged_at": "2026-11-21T00:10:04+00:00",
+  "matchup": "Laura Samson vs Rebeka Masarova",
+  "home": "Rebeka Masarova",
+  "away": "Laura Samson",
+  "label": "Laura Samson +5.5 games",
+  "kind": "spread",
+  "side": "away",
+  "line": 5.5,
+  "price": -200,
+  "chance": 0.7054,
+  "implied": 0.6667,
+  "edge": 0.039,
+  "fair": -240,
+  "state": {
+   "sets": "3-5",
+   "srv": "home",
+   "need": 2
+  },
+  "pre_src": "onyx",
+  "model": "live-v7",
+  "result": null,
+  "actual": null,
+  "profit": null,
+  "graded_at": null
  }
 ]
