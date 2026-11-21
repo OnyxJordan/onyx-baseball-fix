@@ -440,9 +440,9 @@
     },
     {
      "id": "187528",
-     "start": "2026-11-21T13:30Z",
-     "state": "pre",
-     "detail": "11/21 - 8:30 AM EST",
+     "start": "2026-11-21T13:40Z",
+     "state": "in",
+     "detail": "2nd",
      "round": "Semifinal",
      "draw": "Men's Singles",
      "court": "Inalpi Arena",
@@ -453,8 +453,11 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png",
        "seed": null,
        "win": false,
-       "sets": [],
-       "serve": false
+       "sets": [
+        6,
+        2
+       ],
+       "serve": true
       },
       {
        "name": "Carlos Alcaraz",
@@ -462,7 +465,10 @@
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png",
        "seed": null,
        "win": false,
-       "sets": [],
+       "sets": [
+        3,
+        3
+       ],
        "serve": false
       }
      ]
@@ -1768,5 +1774,5 @@
    ]
   }
  ],
- "fetched": "2026-11-21T12:35:48+00:00"
+ "fetched": "2026-11-21T14:39:44+00:00"
 }
