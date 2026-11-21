@@ -1646,8 +1646,8 @@
     {
      "id": "186798",
      "start": "2026-11-20T23:35Z",
-     "state": "in",
-     "detail": "2nd",
+     "state": "post",
+     "detail": "Final",
      "round": "Quarterfinal",
      "draw": "Women's Singles",
      "court": "Center Court",
@@ -1660,7 +1660,7 @@
        "win": false,
        "sets": [
         3,
-        1
+        2
        ],
        "serve": false
       },
@@ -1669,12 +1669,12 @@
        "short": "R. Masarova",
        "flag": "https://a.espncdn.com/i/teamlogos/countries/500/sui.png",
        "seed": null,
-       "win": false,
+       "win": true,
        "sets": [
         6,
-        0
+        6
        ],
-       "serve": true
+       "serve": false
       }
      ]
     },
@@ -1717,9 +1717,9 @@
      "court": "Center Court",
      "p": [
       {
-       "name": "TBD",
-       "short": "TBD",
-       "flag": null,
+       "name": "Rebeka Masarova",
+       "short": "R. Masarova",
+       "flag": "https://a.espncdn.com/i/teamlogos/countries/500/sui.png",
        "seed": null,
        "win": false,
        "sets": [],
@@ -1768,5 +1768,5 @@
    ]
   }
  ],
- "fetched": "2026-11-21T00:21:50+00:00"
+ "fetched": "2026-11-21T00:55:15+00:00"
 }
