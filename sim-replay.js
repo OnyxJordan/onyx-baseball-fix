@@ -325,6 +325,8 @@
       poss.A = pc(T.A); poss.H = pc(T.H);
     }
     if (Math.abs(poss.A - poss.H) > 1) return {ok: false, issues: ['possessions could not be balanced']};
+    // a sim whose box only fits at a pace far off the sim's own (lopsided blowouts) is skipped; the picker takes the next
+    if (Math.abs(poss.A - target) > 7 || Math.abs(poss.H - target) > 7) return {ok: false, issues: ['pace off the sim by ' + Math.round(Math.max(Math.abs(poss.A - target), Math.abs(poss.H - target))) + ' possessions']};
     T.A.poss = poss.A; T.H.poss = poss.H;
     // misses: threes vs twos, by who shoots them
     ['A', 'H'].forEach(function (side) {
